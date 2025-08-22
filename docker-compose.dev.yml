@@ -1,0 +1,155 @@
+version: '3.8'
+
+services:
+  # MySQL Database for development
+  mysql:
+    image: mysql:8.0
+    container_name: gate-mysql-dev
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-gate}
+      MYSQL_USER: ${DB_USER:-gate_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-gate_password}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+      - ./docker/mysql/conf.d:/etc/mysql/conf.d
+    networks:
+      - gate-dev-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpassword}"]
+      timeout: 20s
+      retries: 10
+      interval: 30s
+      start_period: 30s
+
+  # Redis Cache for development
+  redis:
+    image: redis:7-alpine
+    container_name: gate-redis-dev
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - gate-dev-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 10s
+      retries: 5
+      interval: 30s
+      start_period: 10s
+
+  # Backend API for development (with hot reload)
+  backend-dev:
+    build:
+      context: .
+      dockerfile: packages/backend/Dockerfile.dev
+      target: development
+    container_name: gate-backend-dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-gate}
+      DB_USER: ${DB_USER:-gate_user}
+      DB_PASSWORD: ${DB_PASSWORD:-gate_password}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret}
+      SESSION_SECRET: ${SESSION_SECRET:-dev-session-secret}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@motifgames.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      ADMIN_NAME: ${ADMIN_NAME:-Administrator}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      DISABLE_X_POWERED_BY: true
+      DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-ko}
+    ports:
+      - "${BACKEND_PORT:-5000}:5000"
+      - "9229:9229" # Debug port
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - gate-dev-network
+    volumes:
+      - ./packages/backend:/app
+      - /app/node_modules
+      - backend_dev_logs:/app/logs
+    command: npm run dev
+
+  # Frontend for development (with hot reload)
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: packages/frontend/Dockerfile.dev
+      target: development
+    container_name: gate-frontend-dev
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:5000/api/v1}
+      VITE_APP_NAME: ${VITE_APP_NAME:-Gate}
+      VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      - backend-dev
+    networks:
+      - gate-dev-network
+    volumes:
+      - ./packages/frontend:/app
+      - /app/node_modules
+    command: npm run dev
+
+  # Adminer for database management
+  adminer:
+    image: adminer:latest
+    container_name: gate-adminer-dev
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - gate-dev-network
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql
+
+  # Redis Commander for Redis management
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: gate-redis-commander-dev
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    networks:
+      - gate-dev-network
+    environment:
+      REDIS_HOSTS: local:redis:6379
+
+volumes:
+  mysql_dev_data:
+    driver: local
+  redis_dev_data:
+    driver: local
+  backend_dev_logs:
+    driver: local
+
+networks:
+  gate-dev-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16

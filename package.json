@@ -1,0 +1,82 @@
+{
+  "name": "gate",
+  "version": "1.0.0",
+  "description": "Gate - Online Game Platform Management System",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"yarn dev:backend\" \"yarn dev:frontend\"",
+    "dev:backend": "yarn workspace @gate/backend dev",
+    "dev:frontend": "yarn workspace @gate/frontend dev",
+    "build": "yarn build:backend && yarn build:frontend",
+    "build:backend": "yarn workspace @gate/backend build",
+    "build:frontend": "yarn workspace @gate/frontend build",
+    "start": "yarn workspace @gate/backend start",
+    "test": "yarn workspace @gate/backend test && yarn workspace @gate/frontend test",
+    "test:backend": "yarn workspace @gate/backend test",
+    "test:frontend": "yarn workspace @gate/frontend test",
+    "test:e2e": "yarn workspace @gate/frontend test:e2e",
+    "lint": "yarn workspace @gate/backend lint && yarn workspace @gate/frontend lint",
+    "lint:fix": "yarn workspace @gate/backend lint:fix && yarn workspace @gate/frontend lint:fix",
+    "typecheck": "yarn workspace @gate/backend typecheck && yarn workspace @gate/frontend typecheck",
+    "check-translations": "node scripts/check-translations.js",
+    "clean": "yarn workspace @gate/backend clean && yarn workspace @gate/frontend clean",
+    "migrate": "yarn workspace @gate/backend migrate",
+    "migrate:up": "yarn workspace @gate/backend migrate:up",
+    "migrate:status": "yarn workspace @gate/backend migrate:status",
+    "migrate:rollback": "yarn workspace @gate/backend migrate:rollback",
+    "seed": "yarn workspace @gate/backend seed",
+    "seed:run": "yarn workspace @gate/backend seed:run",
+    "seed:clear": "yarn workspace @gate/backend seed:clear",
+    "seed:reset": "yarn workspace @gate/backend seed:reset",
+    "setup": "yarn install && yarn migrate:up && yarn seed:run",
+    "setup:scripts": "chmod +x scripts/setup.sh && scripts/setup.sh",
+    "reset": "yarn seed:clear && yarn migrate:rollback && yarn migrate:up && yarn seed:run",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:build": "docker-compose build",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up -d",
+    "docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
+    "docker:dev:logs": "docker-compose -f docker-compose.dev.yml logs -f",
+    "docker:dev:build": "docker-compose -f docker-compose.dev.yml build",
+    "deploy": "chmod +x scripts/deploy.sh && scripts/deploy.sh",
+    "deploy:dev": "chmod +x scripts/deploy.sh && scripts/deploy.sh -e development",
+    "deploy:staging": "chmod +x scripts/deploy.sh && scripts/deploy.sh -e staging",
+    "check:tables": "node scripts/check-tables.js"
+  },
+  "keywords": [
+    "gate",
+    "game",
+    "platform",
+    "management",
+    "react",
+    "typescript",
+    "nodejs",
+    "express",
+    "mysql",
+    "redis",
+    "mui"
+  ],
+  "author": "Motif Games",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "@types/node": "^20.10.4",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/motifgames/gate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/motifgames/gate/issues"
+  },
+  "homepage": "https://github.com/motifgames/gate#readme"
+}

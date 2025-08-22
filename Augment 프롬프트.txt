@@ -1,0 +1,420 @@
+간단한 admin 페이지를 만들거야.
+
+아래의 주문 내용중에 반영해야할 내용이 있으면 적용해줘.
+
+0. 프로젝트 이름은 gate야. 온라인 게임의 플랫폼 관련 기능을 제공하는게 주 목적임.
+1. typescript, mui, swr, vite, yarn 사용.
+2. orm없이 mysql 사용.
+3. db migration 처리.
+4. 필요에 따라서 redis 사용.
+5. 로그는 winston logger 사용.
+6. api 서버 와 frontend 처리
+7. auth는 password, google, github. (jwt, passport 사용, refresh token 처리)
+8. 기본 admin 계정 제공. (id=admin, pw=admin123, role=admin, email=admin@motifgames.com)
+9. 새로 가입한 계정은 admin 계정을 통해서 인가시켜주는 형태.
+10. 화면 페이지 상단에는 항상 로그인 정보 표시(단, 로그인 대화상자 노출시에는 표시안함)
+11. 테마 변경 가능(dark, light, auto)
+12. 로컬라이징(영문, 한글, 중문(본토)) - i8next 사용
+13. 사이드바는 좌측에 위치(폴딩 기능 지원)
+14. admin 관리 페이지(계정들 관리 기능)
+15. 실시간 수정이 가능하도록 watch 구성
+16. ratelimiter 적용(express-rate-limit 사용, .env에서 설정 가능하도록)
+17. response caching 처리(redis 사용)
+18. post, put 계열일 경우 동일한 요청일 경우에는 캐싱된 결과만을 반환함.
+(요청ID는 header에 x-request-id로 전달됨)
+19. docker로 빌드 및 실행하는 것도 가능하도록 구성. (docker-compose도 만들기)
+20. frontend 단위 테스트는 vitest로 구성.
+21. backend 단위 테스트는 jest로 구성.
+22. e2e 테스트는 cypress로 구성.
+23. ci는 github actions로 구성.
+24. cd는 github actions로 구성.
+25. 코드 커버리지는 jest-coverage로 구성.
+26. git setup
+27. README.md 파일 작성
+28. powered by express 금지
+29. swr사용시 호출할 api를 swr로 wrapping해서 사용하기 편하도록 hook형태로
+30. 모든 mysql 테이블 이름앞에는 'g_' prefix 붙이기(현재 audit_logs, migrations등의 테이블이 여전히 g_가 붙어있지 않음)
+31. api 요청시에는 모래시계 출력
+31. 다양한 페이지가 추가될 예정이니까, pages/ 폴더에 모든 페이지들을 모으지 말고, user, admin, common 등으로 분리해서 관리.
+32. 로그인/가입/비밀번호 초기화 페이지가 아닌 경우에는 항상 로그인 상태 체크.
+33. mysql 컬럼및 모든 타입의 필드들은 camel case로
+34. 기본 언어는 한글로하고, 기본 언어 설정은 .env에서 설정 가능하도록.
+35. frontend 쪽은 모바일에서도 잘 보이도록 반응형으로 제작.
+36. mysql 초기화시에 grant 처리.
+37. openapi doc 을 위한 swagger처리.
+
+
+수정사항
+
+다음의 기능들이 안됨.
+
+비밀번호를 잊으셨나요?
+비밀번호 리셋시에는 리셋 이메일을 보내는 형태로 처리
+
+회원가입
+
+언어 설정(변경)은 페이지와 상관없이 가능하도록 화면 상단 우측에 항상 변경 버튼 표시
+
+다음과 같은 오류가 발생하지 않도록, migration sql문에서 테이블이 존재하지 않으면 생성하는 형태로 개선
+2025-08-20 09:46:08 [error]: Migration failed: Table 'g_users' already exists
+
+번역에 가능한 모든 언어를 추가
+
+비밀번호 재설정 메일 발송후 아래 메시지가 로컬라이징이 안되어 있음.
+"비밀번호 재설정 이메일이 발송되었습니다. 이메일을 확인해주세요."
+
+다음의 문제점을 수정
+- 비밀번호 리셋 페이지에서 언어설정 버튼이 오른쪽 끝이 아님. 아마도 페이지 너버 설징이 로그인 페이지와 다른듯.
+- 리셋 메일 보낸후 메시지가 여전히 로컬라이징이 안됨. (현재 선택된 언어 기준으로 로컬라이징이 되고 있는지)
+
+이메일 주소 입력 폼에서, 이메일 형식이 아닐 경우 안내 메시지가 나오는데, 이 메시지가 로컬라이징이 안되어 있음.
+
+로그아웃 버튼 클릭시 바로 로그아웃 하지 말고 "로그 아웃 할까요?"를 물어보고, 확인시에 로그아웃 되도록 함.
+
+홈 상단바에서 언어 변경 버튼을 맨 오른쪽으로 배치(자주 사용할 일이 없음)
+
+로그인 페이지에서 배경의 그라데이션 제거
+
+프로필 페이지가 너무 정리가 안된 느낌임. 이쁘게 정리해줘.
+
+그리고 프로필 내용을 수정할수 있도록하고,
+
+가입시나 수정시에 아바타 이미지를 업로드 해서 설정할수 있도록.
+
+-------------------------------------------------------------------------------------------
+
+AdminDashboardPage, UsersManagementPage 이 두페이지가 구혀이 안되어 있는데, 구현해줘
+
+메인 메뉴에 다음과 같은 메뉴를 추가
+
+   - 클라이언트 버전 관리
+
+좌측 사이드바 메뉴를 펼쳤다 접었다 할수 있도록 개선, 접었을때는 아이콘만 보여주는 형태와 같이(너비를 마우스 드래그로 조절할수 있으면 더 좋음)
+
+리셋메일이 실제로 발송이 안되는것 같은데 확인해봐.
+
+이메일 발송 결과를 보여주는 문구가 언어 변경시 이전 로컬라이징으로 처리가되고 있음.
+
+회원가입 페이지의 배경으로 로그인, 비밀번호 찾기 페이지의 배경으로 프로필 페이지의 배경으로도 사용하도록.
+
+토스트 메시지는 화면 하단 중앙에 출력
+
+AdminDashboardPage,UsersManagementPage, ClientVersionPage 이 좌측 사이드바 메뉴에 연결이 안되어 있는데, 연결해줘.
+
+-------------------------------------------------------------------------------------------
+
+Admin Dashboard 메뉴 클릭시
+
+Failed to load resource: the server responded with a status of 404 (Not Found)
+
+useSWR.ts:23 Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'includes')
+    at shouldRetryOnError (useSWR.ts:23:29)
+
+토스트 메시지에 "닫기" 버튼을 추가해서 바로 닫을수 있도록 개선
+
+
+-------------------------------------------------------------------------------------------
+
+게임월드 목록을 관리하는 기능을 추가해줘.
+
+- 월드정보는 worldId, 이름, 접속주소, 표시여부, 설명, 정보 생성일, 정보 수정일, 점검중
+- mysql의 테이블로 관리되어야함.
+- 기본적인 CRUD가 되어야함.
+- 페이징 지원
+- 정렬 기능
+- 검색 기능
+
+월드정보에서 접속주소 요소는 제거하고, shareId는 worldId로 바꿔주고 string타입임
+점겅중 필드도 추가해줘.
+
+- 표시 순서필드도 추가해줘.
+- 월드 리스트뷰에서 드래그해서 순서를 바꿀수 있는 형태로(직접 드래그로 순서변경, 하나씩 위로 올리고 내리고 버튼도 있으면 좋음)
+- 즉, 월드 리스트는 순서에 맞춰서 보여져야함.
+- Total Worlds, Visible Worlds, HiddenWorlds 카드는 even하게 정렬되도록 해줘.(지금은 좌측 정렬처럼 보임)
+- Add Game World시 입력 란을 top-bottom 형태로 나열된 형태로(지금 형태는 보기가 안좋음)
+- 검색필터에 Order는 제거
+- 사이드바 메뉴는 기본적으로 펼쳐진 상태로
+- 정렬 순서는 displayOrder를 기준으로 함. ASC가 아닌 DESC임.
+
+- 게임월드 페이지의 요소들이 로컬라이징이 안되어 있음.
+- 보이거나 감추거나, 점검 설정/해제, 삭제시에 물어보고, 확인시에 처리되도록 개선(시스템 prompt 박스 사용하면 안됨)
+- 리스트 항목에 보여줄때 visible, maintenance 상태를 따로 별도의 컬럼으로 분리해서 보여주기
+- 페이지 상단의 언어 변경 표시를 아이콘에서 실제 언어로 표시(한글, Eng, 이런 형태)
+
+- 사용자관리 페이지에서 사용자 추가 버튼의 기능이 동작을 하고 있지 않음.
+- 게임월드 관리 페이지의 요소들이 로컬라이징이 안됨(gameWorlds.visible 이런식으로 나옴)
+- 게임월드 관리 페이지의 목록에서 visible, maintenance 상태를 별도의 컬럼으로 분리해서 보여주기(안되었는데 되었다고 얘기하고 있음)
+- 사용자 추가시에는 이메일 인증한걸로 간주하고, 유저/관리자도 설정 가능하도록.
+
+- 사용자 추가 폼에서 email, name에 기본 값이 이미 들어가 있는데 제거.
+
+-------------------------------------------------------------------------------------
+
+화이트 리스트 관리
+
+- ID, Nickname, IP(optional), 등록일시, 등록자, 허용 기간(시작, 끝) - optional, 메모
+- 기본적인 crud
+- 대량 bulk 등록 기능 추가 지원
+
+
+- 한자(중문) 로컬라이징 빠진 부분이 많음.
+- 게임월드 페이지에서 중문은 번역이 잘되어서 나오는데, 한글과 영어는 gameWorlds.visible 이런식으로 나옴.
+
+- 게임월드 삭제시 확인 메시지창에서 게임월드 이름을 넣어서 맞을 경우에만 하도록.
+- 유저 삭제시 확인 메시지창에서 유저 email을 넣어서 맞을 경우에만 하도록.
+
+- Are you sure you want to delete "{name}"? This action cannot be undone.
+  {name} 이 포맷팅이 안되어서 나옴.
+
+- whitelist에서 오류 Rows per page:
+Cannot read properties of undefined (reading 'whitelists')
+
+- 게임월드 보이기/감추기, 점검/점검해제시 확인 메시지창에서 게임월드 이름을 넣어서 맞을 경우에만 하도록.
+
+- 사이드바 메뉴에 ADMIN PANEL 밑에 SETTINGS PANEL 하나 추가하고 SETTINGS 메뉴추가
+  우선 SETTINGS 페이지는 간단하게 타이틀 정도만 나오는 정도로만 만들어줘.
+  
+
+GameWorld 페이지에서 Visible, Maiternance 토글은 Actions에 버튼을 따로두지 말고
+Visible, Maiternance 표시 자체를 버튼으로 만들어서 클릭시에 토글되도록.
+
+테마 토글시 다크에서 라이트로 전환시 한번에 안되고 두번 클릭해야함.
+
+사이드바가 접혀진 상태에서 아이콘만 나오고 있을때 툴팁이 나오도록.(로컬라이징 잘해줘)
+
+로그인 화면에서 유효한 이메일 형식이 아닐 경우, 로그인 요청 자체를 안함. 이메일 형식이 아님을 알려주는 메시지가 나오도록.
+
+-------------------------------------------------------------------------------------
+
+클라이언트 버전 관리 페이지 제작 전략
+
+필드는 다음과 같은 것들이 있음.
+
+  channel: string
+  subChannel: string
+  clienVersion: string(semver)
+  clientStatus: string(온라인, 오프라인, 권장업데이트, 강제업데이트, 리뷰중, 접속불가&패치허용)
+  gameServerAddress: string(접속할 게임서버 주소)
+  gameServerAddressForWhiteList: string(접속할 게임서버 주소, 화이트리스트에 등록된 사용자만 접속할 수 있는 주소)
+  patchAddress: string(패치파일 다운로드 주소)
+  patchAddressForWhiteList: string(패치파일 다운로드 주소, 화이트리스트에 등록된 사용자만 다운로드 가능)
+  guestModeAllowed: boolean(게스트 모드 동작 여부)
+  externalClickLink: string(외부 클릭 링크)
+  memo: string(메모)
+  customPayload: string(사용자 정의 페이로드)
+  createdAt: string(생성일시)
+  createdBy: string(생성자)
+  updatedAt: string(수정일시)
+  updatedBy: string(수정자)
+
+리스트 형태로 관리되며 다음의 요구 사항이 있음.
+  각 row별로 체크를 해서 일괄로 상태를 변경할 수 있도록 하는 기능
+  상단에는 검색 기능, 필터 기능, 정렬 기능, 추가 버튼이 있음.
+  필터 기능은 channel, subChannel, clientStatus, gameServerAddress, patchAddress, guestModeAllowed, externalClickLink, memo, customPayload, createdAt, createdBy, updatedAt, updatedBy
+  페이징(페이징 단위는 localStorage에 기록해서 유지되도록)
+
+새클라이언트 버전 추가 기능
+  top-bottom 형태의 form으로 처리 형태로 하라고 했는데, 뒤죽박죽 되어 있음.
+  게임월드 등록폼처럼 위에서 아래로 입력란을 배치
+
+기존에 Client Version Management 메뉴 및 페이지는 제거해줘.
+
+Client version management 리스트의 필터가 기본적으로 보이지 않고 있음.
+
+리스트 컬럼에 Game Server 오른쪽에 Patch Address를 별도의 컬럼으로 분리해서 보여주기
+
+-------------------------------------------------------------------------------------
+
+clientVersions.status 로컬라이징 데이터가 없어서 clientVersions.status그대로 출력되고 있음.
+
+
+admin.users.name, admin.users.password, common.create 등이 로컬라이징 안되고 키 그대로 출력되고 있음.
+
+-------------------------------------------------------------------------------------
+
+다음 사항들을 수정
+
+1. 게임월드 관리 페이지의 리스트뷰에서 생성일 컬럼 출력시 시간(초까지)까지 출력. (이것뿐만 아니라 모든 시간 출력하는 부분은 초까지 표시)
+2. 사용자 관리 페이지의 리스트뷰에서 가입일, 마지막 로그인 값이 출력이 안되고 있음.
+3. users.user, users.joinDate, users.email이 로컬라이징이 안되고 키 그대로 출력되고 있음.
+4. 아래 오류 수정
+ClientVersionsPage.tsx:691 i18next::translator: accessing an object - but returnObjects options is not enabled! Error Component Stack
+    at ClientVersionsPage (ClientVersionsPage.tsx:64:17)
+    at RenderedRoute (react-router-dom.js?v=48bd9fb7:5662:26)
+    at Routes (react-router-dom.js?v=48bd9fb7:6399:3)
+    at main (<anonymous>)
+    at chunk-S6F4NB6U.js?v=48bd9fb7:2437:45
+    at Box3 (chunk-S6F4NB6U.js?v=48bd9fb7:5479:19)
+    at div (<anonymous>)
+    at chunk-S6F4NB6U.js?v=48bd9fb7:2437:45
+    at Box3 (chunk-S6F4NB6U.js?v=48bd9fb7:5479:19)
+    at MainLayout (MainLayout.tsx:89:57)
+    at ProtectedRoute (ProtectedRoute.tsx:13:3)
+    at RenderedRoute (react-router-dom.js?v=48bd9fb7:5662:26)
+    at Routes (react-router-dom.js?v=48bd9fb7:6399:3)
+    at Router (react-router-dom.js?v=48bd9fb7:6342:13)
+    at BrowserRouter (react-router-dom.js?v=48bd9fb7:9445:3)
+    at SnackbarProvider2 (notistack.js?v=48bd9fb7:1245:24)
+    at AuthProvider (AuthContext.tsx:27:61)
+    at DefaultPropsProvider (chunk-S6F4NB6U.js?v=48bd9fb7:6145:3)
+    at RtlProvider (chunk-S6F4NB6U.js?v=48bd9fb7:6121:3)
+    at ThemeProvider2 (chunk-S6F4NB6U.js?v=48bd9fb7:6077:5)
+    at ThemeProvider3 (chunk-S6F4NB6U.js?v=48bd9fb7:6300:5)
+    at ThemeProviderNoVars (chunk-FGX7PO3M.js?v=48bd9fb7:277:10)
+    at ThemeProvider (chunk-FGX7PO3M.js?v=48bd9fb7:430:3)
+    at ThemeProvider (ThemeContext.tsx:177:63)
+    at I18nProvider (I18nContext.tsx:67:61)
+    at App (<anonymous>)
+
+-------------------------------------------------------------------------------------
+
+클라이언트 새버전 기능이 동작하지 않아.
+새버전 추가 폼에서 저장 버튼을 눌러도 아무런 동작을 하지 않음.
+가능하면 저장 버튼을 추가 버튼으로 바꿔줘.
+
+-------------------------------------------------------------------------------------
+
+audit log 처리가 하나도 안되고 있음.
+- audit log 기록
+- sidebar에 audit log 메뉴 추가
+- audit log 페이지 추가
+- database처리에 문제 없도록 확실하게해. 지금까지 데이터베이스 작업할때마다 서너번 수정을 요청해야했음.
+
+-------------------------------------------------------------------------------------
+
+리스트에 보여줄 데이터를 가져올때 처리중임을 나타내는 방법
+
+- User Management 는 좋음 유지 (리스트 윗부분에 상태표시)
+- Client Version Management 는 User Management와 동일하게 적용해야함.
+- Game Worlds Management 는 User Management와 동일하게 적용해야함.
+- Whitelist Management 는 OK
+- Audit Logs 는 User Management와 동일하게 적용해야함.
+- 앞으로 모든 유사한 처리는 User Management와 동일하게 적용해야함. (리스트 윗부분에 상태표시되는 형태)
+
+-------------------------------------------------------------------------------------
+
+i18next::translator: missingKey en translation NAVIGATION NAVIGATION
+MainLayout.tsx:221 i18next::translator: missingKey en translation Dashboard Dashboard
+MainLayout.tsx:221 i18next::translator: missingKey en translation Profile Profile
+MainLayout.tsx:321 i18next::translator: missingKey en translation ADMIN PANEL ADMIN PANEL
+MainLayout.tsx:375 i18next::translator: missingKey en translation SETTINGS PANEL SETTINGS PANEL
+MainLayout.tsx:554 i18next::translator: missingKey en translation Profile Profile
+MainLayout.tsx:558 i18next::translator: missingKey en translation Logout Logout
+
+-------------------------------------------------------------------------------------
+
+- 인증 오류 확인하느라 넣었던 디버그 로그들 제거.
+- 클라이언트 버전 정보는 잘 추가가 되었음.
+- 다만, 클라이언트 버전 정보 목록 조회가 안됨. 비어있음.
+
+
+-------------------------------------------------------------------------------------
+
+클라이언트 버전 관리 페이지 개선
+
+- 검색어 필터에 Create By, Version 도 추가
+- Channel, SubChannel, Version은 매우 중요한 정보이므로, 뱃지처럼 강조가 되어서 눈에 잘 보이도록.
+- 체크 버튼으로 한개 이상 체크 되었을 경우에는 다음 메뉴가 활성화 되도록.
+  - Change Status
+  - Delete
+  - Export
+- Change Status 메뉴를 클릭하면, 선택된 항목들의 상태를 일괄 변경할 수 있는 모달이 뜨도록.
+- Delete 메뉴를 클릭하면, 선택된 항목들을 일괄 삭제할 수 있는 모달이 뜨도록.
+
+-------------------------------------------------------------------------------------
+
+클라이언트 버전 관리 페이지 개선
+
+- 검색어 필터에 Create By, Version 도 추가
+- 클라이언트 버전 관리 페이지 개선: 기존 항목을 복사해서 추가하는 기능을 추가(단, 버전은 변경되어야 하므로 비워둬야함)
+
+- 복사 편집시 대화상자 제목을 "Copy Version"으로 변경, 업데이트 버튼을 "Copy"로 변경
+- 리스트 작업 컬럼의 편집, 삭제도 버튼으로 처리
+
+
+Game Worlds Managements 페이지에서 처리중 표시만 할뿐 서버에 아무런 요청도 안하고 계속 처리중으로 보임.
+
+
+각 페이지 안의 컨텐츠 좌우 여백이 제각각이야.
+모든 페이지의 좌우 여백을
+Client Version Management 페이지의 여백으로 통일했으면 함.
+
+Profile, Dashboard, General Settings 페이지 여백도 통일
+
+-------------------------------------------------------------------------------------
+
+로컬라이징 누락
+
+clientVersions.patchAddress
+clientVersions.guestModeAllowed
+그리고 사이드바 메뉴의 Dashboard, Profile, SETTINGS PANEL, NAVIGATION, ADMIN PANEL
+
+감사로그 페이지의 리스트뷰 컬럼명 로컬라이징
+감사로그 페이지의 내용이 비었을때 나오는 메시지(중앙 정렬도 해주고, 다른 페이지에서 비었을때 나오는 메시지와 동일하게 표시.)
+
+화면 상단의 프로필 버튼 클릭시, Profile, Logout
+
+-------------------------------------------------------------------------------------
+
+사용자관리 페이지에서 사용자 편집이 안됨. (구현이 안된건가?)
+
+사용자 관리 페이지에서도 클라이언트 버전관리처럼 체크 박스를 표시해서 일괄 처리할수 있도록 개선
+
+-------------------------------------------------------------------------------------
+
+클라이언트 버전추가/편집/복사시에 input 밑에 설명을 다음과 같이 넣어줘.
+
+- 채널: 게임이 서비스될 채널을 지정합니다. (A1, PC, ...)
+- 서브 채널: 게임이 서비스될 서브 채널을 지정합니다. (QQ, WeChat, iOS, ...)
+- 버전: 게임의 버전을 지정합니다. (1.0.0, 1.0.0-alpha, ...)
+- 게임 서버 주소: 게임이 접속할 서버 주소를 지정합니다. (https://auth.uwo.com, ...)
+- 패치 서버 주소: 게임이 패치할 서버 주소를 지정합니다. (https://patch.uwo.com/cdn, ...)
+- 게스트 모드 허용: 게임의 게스트 모드를 허용할지 여부를 지정합니다. (true, false)
+- 상태: 게임의 상태를 지정합니다.(온라인, 오프라인, 권장 업데이트, 강제 업데이트, 리뷰 중, 패치 차단 허용)
+- 외부 클릭 링크: 게임에서 클릭할 수 있는 외부 링크를 지정합니다. (https://uwo.com, ...)
+- 메모: 게임에 대한 메모를 입력합니다. (최대 1000자)
+- 사용자 정의 페이로드: 게임에 전달할 사용자 정의 페이로드를 입력합니다. (JSON 형식, 최대 5000자)
+- 화이트리스트에 속한 유저를 위한 게임서버 주소: 화이트리스트에 속한 유저만 접속할 수 있는 게임서버 주소를 지정합니다. (https://auth.uwo.com, ...)
+- 화이트리스트에 속한 유저를 위한 패치서버 주소: 화이트리스트에 속한 유저만 접속할 수 있는 패치서버 주소를 지정합니다. (https://patch.uwo.com/cdn, ...)
+
+* 각 언어별로 로컬라이징 되어야함.
+
+-------------------------------------------------------------------------------------
+
+로컬라이징 누락
+
+- 화이트리스트 관리 페이지 내의 요소들
+- clientVersions.guestModeAllowed
+- clientVersions.externalClickLink
+- clientVersions.memo
+- clientVersions.customPayload
+- clientVersions.gameServerAddressForWhiteList
+- clientVersions.patchAddressForWhiteList
+
+-------------------------------------------------------------------------------------
+
+설정패널/일반설정 메뉴 밑에 "고급설정" 메뉴를 추가, 이 메뉴는 다음과 같은 기능을 지원함.
+
+- 서버에 테이블 형태로 관리되어야함. (영속성 필요)
+- 설정내용은 json 으로 관리되며, json editor component를 사용해서 편집 가능하도록. (직접 편집이 가능하고, 수정이 가능해야함)
+- 로컬 메모리에 캐싱해서 사용하되, backend 서버가 여러가 실행중일때를 대비해서 설정 변경시 다른 backend 서버의 로컬 캐시가 무료화될수 있도록 redis pubsub을 통해서 통지하도록.
+
+- 오해를 한것 같은데, key value 형태로 관리되는 형태가 아님. json 하나만 관리하면 됨. (그냥 단순히 json editor가 보이고 json 그자체를 수정할수 있는 형태)
+
+-------------------------------------------------------------------------------------
+
+버그수정
+
+- 게임월드 목록에서 드래그를 통해 순서를 바꾸면, 순서가 바뀌긴 하나, 저장이 안되어서 새로고침하면 다시 원상태로 돌아옴.(확인해보니 데이터베이스의 displayOrder 값이 변경되지 않음)
+- 게임월드 목록에서 Actions 컬럼의 버튼중 moveUp/moveDown이 동작안함. 그리고, 이미 가장 위이거나 가장 아래이면 동작하지 않아야함. (버튼 표시는 하되 동작은 하지 않아야함.
+
+advance settings 관련 처리하는 코드들을 왜 갑자기 .js로 바꿨는지 모르겠음.
+일관되게 .ts 로 바꿔줘.
+
+-------------------------------------------------------------------------------------
+
+JSON 편집기에서 설정 변경에 대한 설명은 필요없음.
+
+-------------------------------------------------------------------------------------
+
+sql query statement는 query builder인 knex를 통해서 처리하는걸로 변경
