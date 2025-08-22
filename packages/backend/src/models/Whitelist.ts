@@ -1,0 +1,262 @@
+import database from '../config/database';
+import { CustomError } from '../middleware/errorHandler';
+
+export interface Whitelist {
+  id: number;
+  nickname: string;
+  ipAddress?: string;
+  startDate?: Date;
+  endDate?: Date;
+  memo?: string;
+  createdBy: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateWhitelistData {
+  nickname: string;
+  ipAddress?: string;
+  startDate?: Date;
+  endDate?: Date;
+  memo?: string;
+  createdBy: number;
+}
+
+export interface UpdateWhitelistData {
+  nickname?: string;
+  ipAddress?: string;
+  startDate?: Date;
+  endDate?: Date;
+  memo?: string;
+}
+
+export interface WhitelistFilters {
+  nickname?: string;
+  ipAddress?: string;
+  createdBy?: number;
+  search?: string;
+}
+
+export interface WhitelistListResponse {
+  whitelists: Whitelist[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export class WhitelistModel {
+  static async findAll(
+    page: number = 1,
+    limit: number = 10,
+    filters: WhitelistFilters = {}
+  ): Promise<WhitelistListResponse> {
+    try {
+      const offset = (page - 1) * limit;
+      let whereClause = 'WHERE 1=1';
+      const filterParams: any[] = [];
+
+      // Apply filters
+      if (filters.nickname) {
+        whereClause += ' AND w.nickname LIKE ?';
+        filterParams.push(`%${filters.nickname}%`);
+      }
+
+      if (filters.ipAddress) {
+        whereClause += ' AND w.ip_address LIKE ?';
+        filterParams.push(`%${filters.ipAddress}%`);
+      }
+
+      if (filters.createdBy) {
+        whereClause += ' AND w.created_by = ?';
+        filterParams.push(filters.createdBy);
+      }
+
+      if (filters.search) {
+        whereClause += ' AND (w.nickname LIKE ? OR w.ip_address LIKE ? OR w.memo LIKE ?)';
+        filterParams.push(`%${filters.search}%`, `%${filters.search}%`, `%${filters.search}%`);
+      }
+
+      // Get total count
+      const countQuery = `
+        SELECT COUNT(*) as total
+        FROM g_whitelist w
+        LEFT JOIN g_users u ON w.created_by = u.id
+        ${whereClause}
+      `;
+      const countResult = await database.query(countQuery, filterParams);
+      const total = countResult[0].total;
+
+      // Get paginated results
+      const query = `
+        SELECT
+          w.id,
+          w.nickname,
+          w.ip_address as ipAddress,
+          w.start_date as startDate,
+          w.end_date as endDate,
+          w.memo,
+          w.created_by as createdBy,
+          w.created_at as createdAt,
+          w.updated_at as updatedAt,
+          u.name as createdByName
+        FROM g_whitelist w
+        LEFT JOIN g_users u ON w.created_by = u.id
+        ${whereClause}
+        ORDER BY w.created_at DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `;
+
+      const whitelists = await database.query(query, filterParams);
+
+      return {
+        whitelists,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      };
+    } catch (error) {
+      throw new CustomError('Failed to fetch whitelists', 500);
+    }
+  }
+
+  static async findById(id: number): Promise<Whitelist | null> {
+    try {
+      const query = `
+        SELECT 
+          w.id,
+          w.nickname,
+          w.ip_address as ipAddress,
+          w.start_date as startDate,
+          w.end_date as endDate,
+          w.memo,
+          w.created_by as createdBy,
+          w.created_at as createdAt,
+          w.updated_at as updatedAt,
+          u.name as createdByName
+        FROM g_whitelist w
+        LEFT JOIN g_users u ON w.created_by = u.id
+        WHERE w.id = ?
+      `;
+
+      const result = await database.query(query, [id]);
+      return result.length > 0 ? result[0] : null;
+    } catch (error) {
+      throw new CustomError('Failed to fetch whitelist entry', 500);
+    }
+  }
+
+  static async create(data: CreateWhitelistData): Promise<Whitelist> {
+    try {
+      const query = `
+        INSERT INTO g_whitelist (nickname, ip_address, start_date, end_date, memo, created_by)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `;
+
+      const result = await database.query(query, [
+        data.nickname,
+        data.ipAddress || null,
+        data.startDate || null,
+        data.endDate || null,
+        data.memo || null,
+        data.createdBy,
+      ]);
+
+      const created = await this.findById(result.insertId);
+      if (!created) {
+        throw new CustomError('Failed to create whitelist entry', 500);
+      }
+
+      return created;
+    } catch (error) {
+      throw new CustomError('Failed to create whitelist entry', 500);
+    }
+  }
+
+  static async update(id: number, data: UpdateWhitelistData): Promise<Whitelist | null> {
+    try {
+      const fields: string[] = [];
+      const params: any[] = [];
+
+      if (data.nickname !== undefined) {
+        fields.push('nickname = ?');
+        params.push(data.nickname);
+      }
+
+      if (data.ipAddress !== undefined) {
+        fields.push('ip_address = ?');
+        params.push(data.ipAddress || null);
+      }
+
+      if (data.startDate !== undefined) {
+        fields.push('start_date = ?');
+        params.push(data.startDate || null);
+      }
+
+      if (data.endDate !== undefined) {
+        fields.push('end_date = ?');
+        params.push(data.endDate || null);
+      }
+
+      if (data.memo !== undefined) {
+        fields.push('memo = ?');
+        params.push(data.memo || null);
+      }
+
+      if (fields.length === 0) {
+        throw new CustomError('No fields to update', 400);
+      }
+
+      fields.push('updated_at = CURRENT_TIMESTAMP');
+      params.push(id);
+
+      const query = `UPDATE g_whitelist SET ${fields.join(', ')} WHERE id = ?`;
+      await database.query(query, params);
+
+      return await this.findById(id);
+    } catch (error) {
+      throw new CustomError('Failed to update whitelist entry', 500);
+    }
+  }
+
+  static async delete(id: number): Promise<boolean> {
+    try {
+      const result = await database.query('DELETE FROM g_whitelist WHERE id = ?', [id]);
+      return result.affectedRows > 0;
+    } catch (error) {
+      throw new CustomError('Failed to delete whitelist entry', 500);
+    }
+  }
+
+  static async bulkCreate(entries: CreateWhitelistData[]): Promise<number> {
+    try {
+      if (entries.length === 0) {
+        return 0;
+      }
+
+      const values = entries.map(() => '(?, ?, ?, ?, ?, ?)').join(', ');
+      const query = `
+        INSERT INTO g_whitelist (nickname, ip_address, start_date, end_date, memo, created_by)
+        VALUES ${values}
+      `;
+
+      const params: any[] = [];
+      entries.forEach(entry => {
+        params.push(
+          entry.nickname,
+          entry.ipAddress || null,
+          entry.startDate || null,
+          entry.endDate || null,
+          entry.memo || null,
+          entry.createdBy
+        );
+      });
+
+      const result = await database.query(query, params);
+      return result.affectedRows;
+    } catch (error) {
+      throw new CustomError('Failed to bulk create whitelist entries', 500);
+    }
+  }
+}

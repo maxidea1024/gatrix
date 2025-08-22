@@ -1,0 +1,305 @@
+import { UserModel } from '../models/User';
+import { UserWithoutPassword } from '../types/user';
+import { CustomError } from '../middleware/errorHandler';
+import logger from '../config/logger';
+import EmailService from './EmailService';
+
+export interface UserFilters {
+  role?: string;
+  status?: string;
+  search?: string;
+}
+
+export interface PaginationOptions {
+  page?: number;
+  limit?: number;
+}
+
+export interface UserListResponse {
+  users: UserWithoutPassword[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export class UserService {
+  static async createUser(userData: {
+    name: string;
+    email: string;
+    password: string;
+    role?: 'admin' | 'user';
+    status?: 'active' | 'pending' | 'suspended';
+    emailVerified?: boolean;
+  }): Promise<UserWithoutPassword> {
+    try {
+      // Check if user already exists
+      const existingUser = await UserModel.findByEmail(userData.email);
+      if (existingUser) {
+        throw new CustomError('User with this email already exists', 400);
+      }
+
+      const user = await UserModel.create({
+        name: userData.name,
+        email: userData.email,
+        password: userData.password,
+        role: userData.role || 'user',
+        status: userData.status || 'active',
+        emailVerified: userData.emailVerified || true,
+      });
+
+      logger.info('User created successfully:', {
+        userId: user.id,
+        email: user.email,
+        role: user.role,
+      });
+
+      return user;
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      logger.error('Error creating user:', error);
+      throw new CustomError('Failed to create user', 500);
+    }
+  }
+
+  static async getAllUsers(
+    filters: UserFilters = {},
+    pagination: PaginationOptions = {}
+  ): Promise<UserListResponse> {
+    try {
+      const page = parseInt(pagination.page?.toString() || '1');
+      const limit = Math.min(parseInt(pagination.limit?.toString() || '10'), 100); // Max 100 items per page
+
+      const result = await UserModel.findAll(page, limit, filters);
+
+      return {
+        ...result,
+        totalPages: Math.ceil(result.total / limit),
+      };
+    } catch (error) {
+      logger.error('Error getting all users:', error);
+      throw new CustomError('Failed to get users', 500);
+    }
+  }
+
+  static async getUserById(id: number): Promise<UserWithoutPassword> {
+    try {
+      const user = await UserModel.findById(id);
+      if (!user) {
+        throw new CustomError('User not found', 404);
+      }
+
+      return user;
+    } catch (error) {
+      logger.error('Error getting user by ID:', error);
+      throw new CustomError('Failed to get user', 500);
+    }
+  }
+
+  static async updateUser(id: number, updateData: any): Promise<UserWithoutPassword> {
+    try {
+      // Validate updates for admin
+      const allowedFields = ['name', 'email', 'status', 'role', 'avatarUrl'];
+      const filteredUpdates: any = {};
+      
+      for (const [key, value] of Object.entries(updateData)) {
+        if (allowedFields.includes(key)) {
+          filteredUpdates[key] = value;
+        }
+      }
+
+      if (Object.keys(filteredUpdates).length === 0) {
+        throw new CustomError('No valid fields to update', 400);
+      }
+
+      const user = await UserModel.update(id, filteredUpdates);
+      if (!user) {
+        throw new CustomError('User not found', 404);
+      }
+
+      logger.info('User updated successfully:', {
+        userId: id,
+        updates: Object.keys(filteredUpdates),
+      });
+
+      return user;
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      logger.error('Error updating user:', error);
+      throw new CustomError('Failed to update user', 500);
+    }
+  }
+
+  static async deleteUser(id: number): Promise<void> {
+    try {
+      const user = await UserModel.findById(id);
+      if (!user) {
+        throw new CustomError('User not found', 404);
+      }
+
+      await UserModel.delete(id);
+
+      logger.info('User deleted successfully:', {
+        userId: id,
+        userEmail: user.email,
+      });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      logger.error('Error deleting user:', error);
+      throw new CustomError('Failed to delete user', 500);
+    }
+  }
+
+  static async getUserStats(): Promise<{
+    total: number;
+    active: number;
+    pending: number;
+    suspended: number;
+    admins: number;
+  }> {
+    try {
+      const [total, active, pending, suspended, admins] = await Promise.all([
+        UserModel.findAll(1, 1, {}).then(result => result.total),
+        UserModel.findAll(1, 1, { status: 'active' }).then(result => result.total),
+        UserModel.findAll(1, 1, { status: 'pending' }).then(result => result.total),
+        UserModel.findAll(1, 1, { status: 'suspended' }).then(result => result.total),
+        UserModel.findAll(1, 1, { role: 'admin' }).then(result => result.total),
+      ]);
+
+      return {
+        total,
+        active,
+        pending,
+        suspended,
+        admins,
+      };
+    } catch (error) {
+      logger.error('Error getting user stats:', error);
+      throw new CustomError('Failed to get user statistics', 500);
+    }
+  }
+
+  static async activateUser(userId: number): Promise<void> {
+    try {
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        throw new CustomError('User not found', 404);
+      }
+
+      if (user.status === 'active') {
+        throw new CustomError('User is already active', 400);
+      }
+
+      await UserModel.update(userId, { status: 'active' });
+
+      // 승인 이메일 발송
+      try {
+        await EmailService.sendAccountApprovalEmail(user.email, user.name);
+        logger.info('Account approval email sent:', {
+          userId,
+          email: user.email,
+        });
+      } catch (emailError) {
+        // 이메일 발송 실패는 로그만 남기고 전체 프로세스는 계속 진행
+        logger.error('Failed to send approval email:', {
+          userId,
+          email: user.email,
+          error: emailError,
+        });
+      }
+
+      logger.info('User activated:', {
+        userId,
+        email: user.email,
+      });
+    } catch (error) {
+      logger.error('Error activating user:', error);
+      throw error instanceof CustomError ? error : new CustomError('Failed to activate user', 500);
+    }
+  }
+
+  static async suspendUser(userId: number): Promise<void> {
+    try {
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        throw new CustomError('User not found', 404);
+      }
+
+      if (user.status === 'suspended') {
+        throw new CustomError('User is already suspended', 400);
+      }
+
+      await UserModel.update(userId, { status: 'suspended' });
+
+      logger.info('User suspended:', {
+        userId,
+        email: user.email,
+      });
+    } catch (error) {
+      logger.error('Error suspending user:', error);
+      throw error instanceof CustomError ? error : new CustomError('Failed to suspend user', 500);
+    }
+  }
+
+  static async promoteToAdmin(userId: number): Promise<void> {
+    try {
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        throw new CustomError('User not found', 404);
+      }
+
+      if (user.role === 'admin') {
+        throw new CustomError('User is already an admin', 400);
+      }
+
+      await UserModel.update(userId, { role: 'admin' });
+
+      logger.info('User promoted to admin:', {
+        userId,
+        email: user.email,
+      });
+    } catch (error) {
+      logger.error('Error promoting user to admin:', error);
+      throw error instanceof CustomError ? error : new CustomError('Failed to promote user to admin', 500);
+    }
+  }
+
+  static async demoteFromAdmin(userId: number): Promise<void> {
+    try {
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        throw new CustomError('User not found', 404);
+      }
+
+      if (user.role !== 'admin') {
+        throw new CustomError('User is not an admin', 400);
+      }
+
+      await UserModel.update(userId, { role: 'user' });
+
+      logger.info('User demoted from admin:', {
+        userId,
+        email: user.email,
+      });
+    } catch (error) {
+      logger.error('Error demoting user from admin:', error);
+      throw error instanceof CustomError ? error : new CustomError('Failed to demote user from admin', 500);
+    }
+  }
+
+  static async getPendingUsers(): Promise<UserWithoutPassword[]> {
+    try {
+      const result = await UserModel.findAll(1, 100, { status: 'pending' });
+      return result.users;
+    } catch (error) {
+      logger.error('Error getting pending users:', error);
+      throw new CustomError('Failed to get pending users', 500);
+    }
+  }
+}

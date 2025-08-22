@@ -1,0 +1,237 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test-backend:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: gate_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+      
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'yarn'
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Wait for MySQL
+      run: |
+        while ! mysqladmin ping -h"127.0.0.1" -P3306 -uroot -proot --silent; do
+          sleep 1
+        done
+
+    - name: Run backend tests
+      run: yarn workspace @gate/backend test
+      env:
+        NODE_ENV: test
+        DB_HOST: 127.0.0.1
+        DB_PORT: 3306
+        DB_NAME: gate_test
+        DB_USER: root
+        DB_PASSWORD: root
+        REDIS_HOST: 127.0.0.1
+        REDIS_PORT: 6379
+        JWT_SECRET: test-jwt-secret
+        SESSION_SECRET: test-session-secret
+
+    - name: Upload backend coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./packages/backend/coverage/lcov.info
+        flags: backend
+        name: backend-coverage
+
+  test-frontend:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'yarn'
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Run frontend tests
+      run: yarn workspace @gate/frontend test
+
+    - name: Upload frontend coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./packages/frontend/coverage/lcov.info
+        flags: frontend
+        name: frontend-coverage
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'yarn'
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Run ESLint
+      run: yarn lint
+
+    - name: Run TypeScript check
+      run: yarn typecheck
+
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: gate
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+      
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'yarn'
+
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Build applications
+      run: yarn build
+
+    - name: Setup test database
+      run: |
+        yarn workspace @gate/backend migrate:up
+        yarn workspace @gate/backend seed:run
+      env:
+        NODE_ENV: development
+        DB_HOST: 127.0.0.1
+        DB_PORT: 3306
+        DB_NAME: gate
+        DB_USER: root
+        DB_PASSWORD: root
+        REDIS_HOST: 127.0.0.1
+        REDIS_PORT: 6379
+        JWT_SECRET: test-jwt-secret
+        SESSION_SECRET: test-session-secret
+        ADMIN_EMAIL: admin@motifgames.com
+        ADMIN_PASSWORD: admin123
+        ADMIN_NAME: Administrator
+
+    - name: Start backend server
+      run: yarn workspace @gate/backend start &
+      env:
+        NODE_ENV: development
+        PORT: 5000
+        DB_HOST: 127.0.0.1
+        DB_PORT: 3306
+        DB_NAME: gate
+        DB_USER: root
+        DB_PASSWORD: root
+        REDIS_HOST: 127.0.0.1
+        REDIS_PORT: 6379
+        JWT_SECRET: test-jwt-secret
+        SESSION_SECRET: test-session-secret
+        CORS_ORIGIN: http://localhost:3000
+
+    - name: Start frontend server
+      run: yarn workspace @gate/frontend preview --port 3000 &
+      env:
+        VITE_API_URL: http://localhost:5000/api/v1
+
+    - name: Install wait-on
+      run: yarn add -D wait-on
+
+    - name: Wait for servers
+      run: |
+        npx wait-on http://localhost:5000/health
+        npx wait-on http://localhost:3000
+
+    - name: Run Cypress tests
+      run: yarn workspace @gate/frontend test:e2e
+      env:
+        CYPRESS_baseUrl: http://localhost:3000
+
+    - name: Upload E2E artifacts
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: cypress-screenshots
+        path: packages/frontend/cypress/screenshots
+
+    - name: Upload E2E videos
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: cypress-videos
+        path: packages/frontend/cypress/videos

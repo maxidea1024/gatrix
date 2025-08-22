@@ -1,0 +1,38 @@
+FROM node:18-alpine AS base
+
+# Install dependencies for development
+FROM base AS development
+WORKDIR /app
+
+# Install system dependencies
+RUN apk add --no-cache \
+    git \
+    python3 \
+    make \
+    g++
+
+# Copy package files
+COPY package.json yarn.lock* ./
+COPY packages/backend/package.json ./packages/backend/
+
+# Install all dependencies (including dev dependencies)
+RUN yarn install --frozen-lockfile
+
+# Copy source code
+COPY packages/backend ./packages/backend
+
+# Create logs directory
+RUN mkdir -p logs && chown node:node logs
+
+# Switch to non-root user
+USER node
+
+# Expose ports
+EXPOSE 5000 9229
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+
+# Default command (can be overridden)
+CMD ["npm", "run", "dev"]

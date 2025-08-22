@@ -1,0 +1,233 @@
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { ApiResponse } from '@/types';
+
+class ApiService {
+  private api: AxiosInstance;
+  private accessToken: string | null = null;
+
+  constructor() {
+    this.api = axios.create({
+      baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1',
+      timeout: 10000,
+      withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    this.setupInterceptors();
+  }
+
+  private setupInterceptors() {
+    // Request interceptor to add auth token
+    this.api.interceptors.request.use(
+      (config) => {
+        console.log('Request interceptor called:', {
+          url: config.url,
+          method: config.method,
+          hasToken: !!this.accessToken,
+          headers: config.headers,
+          baseURL: config.baseURL
+        });
+
+        if (this.accessToken) {
+          if (!config.headers) {
+            config.headers = {};
+          }
+          config.headers.Authorization = `Bearer ${this.accessToken}`;
+          console.log('Request interceptor - Token added:', {
+            url: config.url,
+            method: config.method,
+            tokenPrefix: this.accessToken.substring(0, 20) + '...',
+            authHeader: config.headers.Authorization?.substring(0, 30) + '...'
+          });
+        } else {
+          console.log('Request interceptor - No token available for:', {
+            url: config.url,
+            method: config.method
+          });
+        }
+        return config;
+      },
+      (error) => {
+        console.log('Request interceptor error:', error);
+        return Promise.reject(error);
+      }
+    );
+
+    // Response interceptor to handle errors and token refresh
+    this.api.interceptors.response.use(
+      (response: AxiosResponse) => {
+        return response;
+      },
+      async (error) => {
+        const originalRequest = error.config;
+
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          // Don't retry if this is already a refresh request
+          if (originalRequest.url?.includes('/auth/refresh')) {
+            this.clearTokens();
+            window.location.href = '/login';
+            return Promise.reject(error);
+          }
+
+          originalRequest._retry = true;
+
+          try {
+            // Try to refresh token
+            console.log('Attempting token refresh...');
+            const refreshResponse = await this.api.post('/auth/refresh');
+            const { accessToken } = refreshResponse.data.data;
+
+            console.log('Token refresh successful, new token:', accessToken?.substring(0, 20) + '...');
+            this.setAccessToken(accessToken);
+
+            // Ensure the new token is set in the original request
+            if (!originalRequest.headers) {
+              originalRequest.headers = {};
+            }
+            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+            console.log('Retrying original request with new token:', {
+              url: originalRequest.url,
+              method: originalRequest.method,
+              hasAuthHeader: !!originalRequest.headers.Authorization,
+              tokenPrefix: accessToken?.substring(0, 20) + '...'
+            });
+
+            return this.api(originalRequest);
+          } catch (refreshError) {
+            // Refresh failed, redirect to login
+            this.clearTokens();
+            window.location.href = '/login';
+            return Promise.reject(refreshError);
+          }
+        }
+
+        return Promise.reject(error);
+      }
+    );
+  }
+
+  setAccessToken(token: string) {
+    this.accessToken = token;
+
+    // 토큰 정보 디버깅
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      console.log('Token set:', {
+        userId: payload.userId,
+        role: payload.role,
+        exp: payload.exp,
+        expiresAt: new Date(payload.exp * 1000).toISOString(),
+        timeUntilExpiry: Math.round((payload.exp * 1000 - Date.now()) / 1000 / 60) + ' minutes'
+      });
+    } catch (e) {
+      console.log('Could not decode token:', token.substring(0, 20) + '...');
+    }
+  }
+
+  clearTokens() {
+    this.accessToken = null;
+  }
+
+  // Generic request method
+  private async request<T = any>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    try {
+      const response = await this.api.request<ApiResponse<T>>(config);
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.data) {
+        // Add status code to the error data
+        const errorData = {
+          ...error.response.data,
+          status: error.response.status,
+        };
+        throw errorData;
+      }
+
+      // 네트워크 오류 구분
+      const isNetworkError = !error.response && (
+        error.code === 'NETWORK_ERROR' ||
+        error.code === 'ECONNREFUSED' ||
+        error.message?.includes('Network Error') ||
+        error.message?.includes('ERR_NETWORK')
+      );
+
+      throw {
+        success: false,
+        error: {
+          message: error.message || 'Network error occurred',
+        },
+        status: error.response?.status || 500,
+        code: isNetworkError ? 'NETWORK_ERROR' : error.code,
+        isNetworkError,
+      };
+    }
+  }
+
+  // HTTP methods
+  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return this.request<T>({ ...config, method: 'GET', url });
+  }
+
+  async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return this.request<T>({ ...config, method: 'POST', url, data });
+  }
+
+  async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return this.request<T>({ ...config, method: 'PUT', url, data });
+  }
+
+  async patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return this.request<T>({ ...config, method: 'PATCH', url, data });
+  }
+
+  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    return this.request<T>({ ...config, method: 'DELETE', url });
+  }
+
+  // File upload
+  async upload<T = any>(url: string, file: File, fieldName: string = 'file', config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
+    const formData = new FormData();
+    formData.append(fieldName, file);
+
+    return this.request<T>({
+      ...config,
+      method: 'POST',
+      url,
+      data: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
+
+  // Download file
+  async download(url: string, filename?: string, config?: AxiosRequestConfig): Promise<void> {
+    try {
+      const response = await this.api.request({
+        ...config,
+        method: 'GET',
+        url,
+        responseType: 'blob',
+      });
+
+      const blob = new Blob([response.data]);
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = filename || 'download';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      throw error;
+    }
+  }
+}
+
+export const apiService = new ApiService();
+export const api = apiService; // alias for convenience
+export default apiService;
