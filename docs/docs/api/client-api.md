@@ -1,3 +1,7 @@
+---
+sidebar_position: 1
+---
+
 # Client API Documentation
 
 Public API endpoints that can be called directly from game clients.
@@ -23,8 +27,8 @@ Retrieves version information for game clients.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| channel | string | 채널 필터 (예: A1, PC) |
-| subChannel | string | 서브채널 필터 (예: QQ, WeChat, iOS) |
+| channel | string | Channel filter (e.g., A1, PC) |
+| subChannel | string | Sub-channel filter (e.g., QQ, WeChat, iOS) |
 
 #### Response
 
@@ -165,35 +169,35 @@ Retrieves cache performance statistics (for monitoring purposes).
    - Key: `game_worlds:public`
    - Processed asynchronously via queue
 
-### 큐 시스템 특징
+### Queue System Features
 
-- **높은 우선순위**: 캐시 무효화 작업은 우선순위 10으로 처리
-- **자동 정리**: 완료된 작업 100개, 실패한 작업 50개까지 보관
-- **동시성 제어**: 워커당 최대 5개 작업 동시 처리
-- **모니터링**: 큐 상태 실시간 모니터링 가능
+- **High Priority**: Cache invalidation jobs processed with priority 10
+- **Automatic Cleanup**: Keeps 100 completed jobs, 50 failed jobs
+- **Concurrency Control**: Maximum 5 concurrent jobs per worker
+- **Monitoring**: Real-time queue status monitoring available
 
-## 성능 최적화
+## Performance Optimization
 
-### 응답 시간
+### Response Times
 
-- **캐시 히트**: ~1ms
-- **캐시 미스**: ~50-100ms (DB 조회)
-- **캐시 무효화**: ~2-5ms (BullMQ 큐 추가)
-- **큐 처리**: ~10-50ms (백그라운드 처리)
+- **Cache Hit**: ~1ms
+- **Cache Miss**: ~50-100ms (database query)
+- **Cache Invalidation**: ~2-5ms (BullMQ queue addition)
+- **Queue Processing**: ~10-50ms (background processing)
 
-### 메모리 사용량
+### Memory Usage
 
-- **예상 사용량**: 항목당 ~1-5KB
-- **자동 정리**: 만료된 항목 1분마다 정리
-- **큐 정리**: 완료/실패 작업 자동 정리
-- **메모리 모니터링**: `/api/v1/client/cache-stats`로 확인
+- **Expected Usage**: ~1-5KB per item
+- **Automatic Cleanup**: Expired items cleaned every minute
+- **Queue Cleanup**: Automatic cleanup of completed/failed jobs
+- **Memory Monitoring**: Check via `/api/v1/client/cache-stats`
 
-## 사용 예시
+## Usage Examples
 
-### JavaScript (게임 클라이언트)
+### JavaScript (Game Client)
 
 ```javascript
-// 클라이언트 버전 정보 조회
+// Get client version information
 async function getClientVersion(channel, subChannel) {
   const params = new URLSearchParams();
   if (channel) params.append('channel', channel);
@@ -208,7 +212,7 @@ async function getClientVersion(channel, subChannel) {
   throw new Error('Failed to get client version');
 }
 
-// 게임월드 목록 조회
+// Get game world list
 async function getGameWorlds() {
   const response = await fetch('/api/v1/client/game-worlds');
   const data = await response.json();
@@ -220,7 +224,7 @@ async function getGameWorlds() {
 }
 ```
 
-### Unity C# (게임 클라이언트)
+### Unity C# (Game Client)
 
 ```csharp
 using UnityEngine;
@@ -246,7 +250,7 @@ public class ClientAPI : MonoBehaviour
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string json = request.downloadHandler.text;
-                // JSON 파싱 및 처리
+                // JSON parsing and processing
                 Debug.Log($"Client version data: {json}");
             }
         }
@@ -254,26 +258,26 @@ public class ClientAPI : MonoBehaviour
 }
 ```
 
-## 모니터링
+## Monitoring
 
-### 로그 확인
+### Log Checking
 
 ```bash
-# 캐시 관련 로그 확인
+# Check cache-related logs
 tail -f logs/app.log | grep -i cache
 
-# PubSub 관련 로그 확인
+# Check PubSub-related logs
 tail -f logs/app.log | grep -i pubsub
 ```
 
-### 캐시 및 큐 통계 모니터링
+### Cache and Queue Statistics Monitoring
 
 ```bash
-# 캐시 및 큐 통계 API 호출
+# Call cache and queue statistics API
 curl http://localhost:3000/api/v1/client/cache-stats
 ```
 
-**응답 예시:**
+**Response Example:**
 ```json
 {
   "success": true,
@@ -299,14 +303,14 @@ curl http://localhost:3000/api/v1/client/cache-stats
 }
 ```
 
-### BullMQ 대시보드 (선택사항)
+### BullMQ Dashboard (Optional)
 
-BullMQ UI를 통한 큐 모니터링:
+Queue monitoring via BullMQ UI:
 
 ```bash
-# BullMQ UI 설치 (개발 환경)
+# Install BullMQ UI (development environment)
 npm install -g @bull-board/ui
 
-# 대시보드 실행
+# Run dashboard
 bull-board
 ```

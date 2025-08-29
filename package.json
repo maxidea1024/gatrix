@@ -47,7 +47,14 @@
     "deploy": "chmod +x scripts/deploy.sh && scripts/deploy.sh",
     "deploy:dev": "chmod +x scripts/deploy.sh && scripts/deploy.sh -e development",
     "deploy:staging": "chmod +x scripts/deploy.sh && scripts/deploy.sh -e staging",
-    "check:tables": "node scripts/check-tables.js"
+    "check:tables": "node scripts/check-tables.js",
+    "docs:start": "cd docs && npm start",
+    "docs:build": "cd docs && npm run build",
+    "docs:serve": "cd docs && npm run serve",
+    "docs:clear": "cd docs && npm run clear",
+    "docs:install": "cd docs && npm install",
+    "docs:write-translations": "cd docs && npm run write-translations",
+    "docs:deploy": "cd docs && npm run deploy"
   },
   "keywords": [
     "gatrix",
