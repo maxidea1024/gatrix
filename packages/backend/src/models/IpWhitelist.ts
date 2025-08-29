@@ -5,6 +5,7 @@ export interface IpWhitelistFilters {
   ip?: string;
   description?: string;
   is_active?: boolean;
+  isEnabled?: boolean;
   created_by?: number;
   limit?: number;
   offset?: number;
@@ -18,6 +19,30 @@ export interface IpWhitelistListResponse {
   totalPages: number;
 }
 
+export interface IpWhitelist {
+  id?: number;
+  ip: string;
+  description?: string;
+  is_active: boolean;
+  start_date?: Date;
+  end_date?: Date;
+  created_by?: number;
+  updated_by?: number;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+export interface CreateIpWhitelistData extends Omit<IpWhitelist, 'id' | 'created_at' | 'updated_at'> {
+  ipAddress?: string;
+  purpose?: string;
+  isEnabled?: boolean;
+  createdBy?: number;
+  startDate?: Date;
+  endDate?: Date;
+}
+
+export interface UpdateIpWhitelistData extends Partial<CreateIpWhitelistData> {}
+
 export class IpWhitelistModel {
   static async findAll(
     page: number = 1,
@@ -25,8 +50,6 @@ export class IpWhitelistModel {
     filters: IpWhitelistFilters = {}
   ): Promise<IpWhitelistListResponse> {
     try {
-      console.log('🚀 IpWhitelistKnexModel.findAll called with filters:', filters);
-
       // 기본값 설정
       const pageNum = Number(page) || 1;
       const limitNum = Number(limit) || 10;
@@ -40,7 +63,7 @@ export class IpWhitelistModel {
       // 필터 적용 함수
       const applyFilters = (query: any) => {
         // 기본 조건: 만료되지 않은 항목만
-        query.where(function() {
+        query.where(function(this: any) {
           this.whereNull('iw.end_date')
               .orWhere('iw.end_date', '>', new Date());
         });
@@ -80,20 +103,14 @@ export class IpWhitelistModel {
         .limit(limitNum)
         .offset(offset);
 
-      console.log('🔍 Executing count and data queries...');
-
       // 병렬 실행
       const [countResult, dataResults] = await Promise.all([
         countQuery,
         dataQuery
       ]);
 
-      console.log('✅ Queries completed. Count:', countResult?.total, 'Data rows:', dataResults?.length);
-
       const total = countResult?.total || 0;
       const totalPages = Math.ceil(total / limitNum);
-
-      console.log('🎯 Returning result: ipWhitelists count =', dataResults.length, 'total =', total);
 
       return {
         ipWhitelists: dataResults.map(this.mapRowToIpWhitelist),
@@ -184,6 +201,18 @@ export class IpWhitelistModel {
       createdByName: row.createdByName,
       updatedByName: row.updatedByName,
     };
+  }
+
+  // 추가 메서드들
+  static async findByIpAddress(ip: string): Promise<any | null> {
+    try {
+      return await db('g_ip_whitelist')
+        .where('ip', ip)
+        .first();
+    } catch (error) {
+      logger.error('Error finding IP whitelist by IP address (Knex):', error);
+      throw error;
+    }
   }
 
   // 태그 관련 메서드들

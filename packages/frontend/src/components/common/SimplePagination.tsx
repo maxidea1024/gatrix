@@ -25,7 +25,7 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
   rowsPerPage,
   onPageChange,
   onRowsPerPageChange,
-  rowsPerPageOptions = [5, 10, 25, 50, 100],
+  rowsPerPageOptions = [5, 10, 20, 25, 50, 100],
   showRowsPerPage = true,
 }) => {
   const totalPages = Math.max(1, Math.ceil(count / rowsPerPage));

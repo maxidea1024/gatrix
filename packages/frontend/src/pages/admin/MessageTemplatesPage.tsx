@@ -96,6 +96,7 @@ const MessageTemplatesPage: React.FC = () => {
   const getLangLabel = (code: 'ko'|'en'|'zh') => allLangs.find(l=>l.code===code)?.label || code;
 
   const load = useCallback(async () => {
+    console.log('🚀 MessageTemplate load() function called');
     setLoading(true);
     try {
       const offset = page * rowsPerPage;
@@ -106,6 +107,10 @@ const MessageTemplatesPage: React.FC = () => {
       };
 
       const result = await messageTemplateService.list(params);
+
+      console.log('🔍 Frontend received data:', result);
+      console.log('🔍 Templates array:', result.templates);
+      console.log('🔍 Total count:', result.total);
 
       setItems(result.templates);
       setTotal(result.total);
@@ -130,6 +135,7 @@ const MessageTemplatesPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    console.log('🚀 MessageTemplate useEffect triggered');
     load();
     loadTags();
   }, [load, loadTags]);

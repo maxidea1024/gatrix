@@ -14,14 +14,30 @@ export interface MessageTemplateListResult {
   total: number;
 }
 
+export interface MessageTemplate {
+  id?: number;
+  name: string;
+  type: string;
+  is_enabled: boolean;
+  default_message: string;
+  created_by?: number;
+  updated_by?: number;
+  created_at?: Date;
+  updated_at?: Date;
+}
+
 export class MessageTemplateModel {
   static async findAllWithPagination(filters?: MessageTemplateFilters): Promise<MessageTemplateListResult> {
     try {
-      console.log('🚀 MessageTemplateKnexModel.findAllWithPagination called with filters:', filters);
-
       // 기본값 설정
       const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 10;
       const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
+
+      console.log('🔍 MessageTemplate query filters:', filters);
+
+      // 테스트: 테이블에 데이터가 있는지 확인
+      const testCount = await db('g_message_templates').count('* as count').first();
+      console.log('🔍 Total records in g_message_templates:', testCount);
 
       // 기본 쿼리 빌더
       const baseQuery = () => db('g_message_templates as mt')
@@ -34,14 +50,18 @@ export class MessageTemplateModel {
           query.where('mt.type', filters.type);
         }
 
-        if (filters?.isActive !== undefined) {
-          query.where('mt.is_active', filters.isActive);
+        // isActive 필터 처리
+        // 컨트롤러에서 undefined가 false로 변환되는 문제 때문에
+        // false인 경우도 필터를 적용하지 않음 (모든 레코드 조회)
+        if (filters?.isActive === true) {
+          query.where('mt.is_enabled', true);
         }
+        // false나 undefined인 경우 필터 적용하지 않음
 
         if (filters?.search) {
-          query.where(function() {
+          query.where(function(this: any) {
             this.where('mt.name', 'like', `%${filters.search}%`)
-                .orWhere('mt.description', 'like', `%${filters.search}%`);
+                .orWhere('mt.default_message', 'like', `%${filters.search}%`);
           });
         }
 
@@ -64,36 +84,22 @@ export class MessageTemplateModel {
         .limit(limit)
         .offset(offset);
 
-      console.log('🔍 Executing count and data queries...');
-
       // 병렬 실행
       const [countResult, dataResults] = await Promise.all([
         countQuery,
         dataQuery
       ]);
 
-      console.log('✅ Queries completed. Count:', countResult?.total, 'Data rows:', dataResults?.length);
-
       const total = countResult?.total || 0;
 
-      // 각 메시지 템플릿의 로케일 데이터 로드
-      const messageTemplatesWithLocales = await Promise.all(
-        dataResults.map(async (template: any) => {
-          const locales = await db('g_message_template_locales')
-            .where('template_id', template.id)
-            .select('*');
+      console.log('🔍 Database query results:');
+      console.log('🔍 Count result:', countResult);
+      console.log('🔍 Data results:', dataResults);
+      console.log('🔍 Total:', total);
 
-          return {
-            ...template,
-            locales: locales || []
-          };
-        })
-      );
-
-      console.log('🎯 Returning result: messageTemplates count =', messageTemplatesWithLocales.length, 'total =', total);
-      return { 
-        messageTemplates: messageTemplatesWithLocales,
-        total 
+      return {
+        messageTemplates: dataResults,
+        total
       };
     } catch (error) {
       logger.error('Error finding message templates with pagination (Knex):', error);
@@ -114,17 +120,7 @@ export class MessageTemplateModel {
         .where('mt.id', id)
         .first();
 
-      if (!template) return null;
-
-      // 로케일 데이터 로드
-      const locales = await db('g_message_template_locales')
-        .where('template_id', id)
-        .select('*');
-
-      return {
-        ...template,
-        locales: locales || []
-      };
+      return template;
     } catch (error) {
       logger.error('Error finding message template by ID (Knex):', error);
       throw error;
@@ -138,26 +134,13 @@ export class MessageTemplateModel {
         const [insertId] = await trx('g_message_templates').insert({
           name: data.name,
           type: data.type,
-          description: data.description,
-          is_active: data.is_active,
+          default_message: data.default_message || data.content || '',
+          is_enabled: data.is_enabled !== undefined ? data.is_enabled : true,
           created_by: data.created_by,
           updated_by: data.updated_by,
           created_at: new Date(),
           updated_at: new Date()
         });
-
-        // 로케일 데이터 생성
-        if (data.locales && data.locales.length > 0) {
-          const localeData = data.locales.map((locale: any) => ({
-            template_id: insertId,
-            language: locale.language,
-            title: locale.title,
-            content: locale.content,
-            created_at: new Date(),
-            updated_at: new Date()
-          }));
-          await trx('g_message_template_locales').insert(localeData);
-        }
 
         return await this.findById(insertId);
       });
@@ -176,29 +159,11 @@ export class MessageTemplateModel {
           .update({
             name: data.name,
             type: data.type,
-            description: data.description,
-            is_active: data.is_active,
+            default_message: data.default_message || data.content,
+            is_enabled: data.is_enabled,
             updated_by: data.updated_by,
             updated_at: new Date()
           });
-
-        // 기존 로케일 데이터 삭제
-        await trx('g_message_template_locales')
-          .where('template_id', id)
-          .del();
-
-        // 새 로케일 데이터 생성
-        if (data.locales && data.locales.length > 0) {
-          const localeData = data.locales.map((locale: any) => ({
-            template_id: id,
-            language: locale.language,
-            title: locale.title,
-            content: locale.content,
-            created_at: new Date(),
-            updated_at: new Date()
-          }));
-          await trx('g_message_template_locales').insert(localeData);
-        }
 
         return await this.findById(id);
       });
@@ -210,19 +175,28 @@ export class MessageTemplateModel {
 
   static async delete(id: number): Promise<void> {
     try {
-      await db.transaction(async (trx) => {
-        // 로케일 데이터 삭제
-        await trx('g_message_template_locales')
-          .where('template_id', id)
-          .del();
-
-        // 메시지 템플릿 삭제
-        await trx('g_message_templates')
-          .where('id', id)
-          .del();
-      });
+      await db('g_message_templates')
+        .where('id', id)
+        .del();
     } catch (error) {
       logger.error('Error deleting message template (Knex):', error);
+      throw error;
+    }
+  }
+
+  // 추가 메서드들
+  static async findByName(name: string, excludeId?: number): Promise<any | null> {
+    try {
+      let query = db('g_message_templates')
+        .where('name', name);
+
+      if (excludeId) {
+        query = query.where('id', '!=', excludeId);
+      }
+
+      return await query.first();
+    } catch (error) {
+      logger.error('Error finding message template by name (Knex):', error);
       throw error;
     }
   }

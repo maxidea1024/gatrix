@@ -2,7 +2,7 @@ import db from '../config/knex';
 import logger from '../config/logger';
 
 export interface ClientVersionFilters {
-  version?: string;
+  clientVersion?: string;
   platform?: string;
   clientStatus?: string;
   limit?: number;
@@ -17,9 +17,12 @@ export interface ClientVersionListResult {
 }
 
 export enum ClientStatus {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-  DEPRECATED = 'deprecated'
+  ONLINE = 'online',
+  OFFLINE = 'offline',
+  RECOMMENDED_UPDATE = 'recommended_update',
+  FORCED_UPDATE = 'forced_update',
+  UNDER_REVIEW = 'under_review',
+  BLOCKED_PATCH_ALLOWED = 'blocked_patch_allowed'
 }
 
 export interface ClientVersionAttributes {
@@ -28,7 +31,9 @@ export interface ClientVersionAttributes {
   platform: string;
   clientStatus: ClientStatus;
   gameServerAddress?: string;
+  gameServerAddressForWhiteList?: string;
   patchAddress?: string;
+  patchAddressForWhiteList?: string;
   guestModeAllowed?: boolean;
   externalClickLink?: string;
   memo?: string;
@@ -48,8 +53,6 @@ export interface BulkCreateClientVersionRequest {
 export class ClientVersionModel {
   static async findAll(filters?: ClientVersionFilters): Promise<ClientVersionListResult> {
     try {
-      console.log('🚀 ClientVersionKnexModel.findAll called with filters:', filters);
-
       // 기본값 설정
       const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 10;
       const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
@@ -63,8 +66,8 @@ export class ClientVersionModel {
 
       // 필터 적용 함수
       const applyFilters = (query: any) => {
-        if (filters?.version) {
-          query.where('cv.clientVersion', 'like', `%${filters.version}%`);
+        if (filters?.clientVersion) {
+          query.where('cv.clientVersion', 'like', `%${filters.clientVersion}%`);
         }
 
         if (filters?.platform) {
@@ -94,22 +97,17 @@ export class ClientVersionModel {
         .limit(limit)
         .offset(offset);
 
-      console.log('🔍 Executing count and data queries...');
-
       // 병렬 실행
       const [countResult, dataResults] = await Promise.all([
         countQuery,
         dataQuery
       ]);
 
-      console.log('✅ Queries completed. Count:', countResult?.total, 'Data rows:', dataResults?.length);
-
       const total = countResult?.total || 0;
 
-      console.log('🎯 Returning result: clientVersions count =', dataResults.length, 'total =', total);
-      return { 
+      return {
         clientVersions: dataResults,
-        total 
+        total
       };
     } catch (error) {
       logger.error('Error finding client versions (Knex):', error);

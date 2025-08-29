@@ -105,7 +105,7 @@ export class IpWhitelistController {
       }
     }
 
-    const filters = { ipAddress, purpose, isEnabled, createdBy, search, tags: tagsArray };
+    const filters = { ip: ipAddress, description: purpose, is_active: isEnabled, created_by: createdBy, search };
     const pagination = { page, limit };
 
     const result = await IpWhitelistService.getAllIpWhitelists(filters, pagination);

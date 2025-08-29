@@ -8,12 +8,13 @@ export class MessageTemplateController {
       // MessageTemplateModel 사용
       const result = await MessageTemplateModel.findAllWithPagination({
         type,
-        isActive: is_enabled === '1' || is_enabled === 'true',
+        isActive: is_enabled === undefined ? undefined : (is_enabled === '1' || is_enabled === 'true'),
         search: q,
         limit: Number(limit) || 50,
         offset: Number(offset) || 0
       });
       const data = { items: result.messageTemplates, total: result.total };
+      console.log('🔍 MessageTemplate API Response:', JSON.stringify(data, null, 2));
       res.json({ success: true, data });
     } catch (e) { next(e); }
   }

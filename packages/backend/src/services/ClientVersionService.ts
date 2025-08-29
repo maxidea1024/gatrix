@@ -68,13 +68,14 @@ export class ClientVersionService {
       whereConditions.guestModeAllowed = filters.guestModeAllowed;
     }
 
-    const { rows: data, count: total } = await ClientVersionModel.findAll({
-      where: whereConditions,
+    const result = await ClientVersionModel.findAll({
+      ...whereConditions,
       limit,
       offset,
-      orderBy: sortBy,
-      orderDirection: sortOrder,
+      sortBy,
+      sortOrder,
     });
+    const { clientVersions: data, total } = result;
 
     return { data, total };
   }
@@ -144,13 +145,14 @@ export class ClientVersionService {
       const searchConditions: any = {};
       // 여러 필드에서 검색하는 로직은 모델에서 처리
       searchConditions.search = filters.search;
-      const { rows: clientVersions, count: total } = await ClientVersionModel.findAll({
-        where: searchConditions,
+      const result = await ClientVersionModel.findAll({
+        ...searchConditions,
         limit,
         offset,
-        orderBy: sortBy,
-        orderDirection: sortOrder,
+        sortBy,
+        sortOrder,
       });
+      const { clientVersions, total } = result;
 
       const totalPages = Math.ceil(total / limit);
 
@@ -165,7 +167,7 @@ export class ClientVersionService {
 
     // ClientVersionModel 사용
     const result = await ClientVersionModel.findAll({
-      version: filters.version,
+      clientVersion: filters.version,
       platform: filters.platform,
       clientStatus: filters.clientStatus,
       limit,
@@ -177,7 +179,7 @@ export class ClientVersionService {
     const totalPages = Math.ceil(result.total / limit);
 
     return {
-      data: result.clientVersions,
+      clientVersions: result.clientVersions,
       total: result.total,
       page,
       limit,
@@ -203,7 +205,7 @@ export class ClientVersionService {
   static async bulkCreateClientVersions(
     data: BulkCreateClientVersionRequest
   ): Promise<ClientVersionAttributes[]> {
-    const result = await ClientVersionModel.bulkCreate(data);
+    const result = await ClientVersionModel.bulkCreate(data.clientVersions);
 
     // Invalidate client version cache
     await pubSubService.invalidateByPattern('client_version:.*');
@@ -229,7 +231,8 @@ export class ClientVersionService {
   }
 
   static async deleteClientVersion(id: number): Promise<boolean> {
-    const deletedRowsCount = await ClientVersionModel.delete(id);
+    await ClientVersionModel.delete(id);
+    const deletedRowsCount = 1;
 
     if (deletedRowsCount > 0) {
       // Invalidate client version cache
@@ -269,17 +272,16 @@ export class ClientVersionService {
     platform: string,
     clientVersion: string
   ): Promise<ClientVersionAttributes | null> {
-    const { rows } = await ClientVersionModel.findAll({
-      where: {
-        platform,
-        clientVersion,
-        clientStatus: ClientStatus.ONLINE,
-      },
+    const result = await ClientVersionModel.findAll({
+      platform,
+      clientVersion,
+      clientStatus: ClientStatus.ONLINE,
       limit: 1,
       offset: 0,
-      orderBy: 'id',
-      orderDirection: 'DESC',
+      sortBy: 'id',
+      sortOrder: 'DESC',
     });
+    const { clientVersions: rows } = result;
 
     return rows[0] || null;
   }

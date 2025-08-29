@@ -142,7 +142,8 @@ export const createJob = async (req: Request, res: Response) => {
       retry_count,
       max_retry_count,
       timeout_seconds,
-      created_by: userId
+      created_by: userId,
+      updated_by: userId
     };
 
     const createdJob = await JobModel.create(jobData);

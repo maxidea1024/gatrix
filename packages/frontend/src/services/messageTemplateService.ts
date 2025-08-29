@@ -28,15 +28,22 @@ export const messageTemplateService = {
     );
     const d: any = res.data;
 
+    console.log('🔍 Raw API response:', res);
+    console.log('🔍 Response data:', d);
+
     // 백워드 호환성: 배열이면 기존 형식, 객체면 새 형식
     if (Array.isArray(d)) {
+      console.log('🔍 Array format detected');
       return { templates: d, total: d.length };
     }
 
-    return {
-      templates: d?.templates ?? [],
+    const result = {
+      templates: d?.templates ?? d?.items ?? [],
       total: d?.total ?? 0
     };
+
+    console.log('🔍 Processed result:', result);
+    return result;
   },
   async get(id: number): Promise<MessageTemplate> {
     const res = await apiService.get<MessageTemplate>(`/message-templates/${id}`);
