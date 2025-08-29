@@ -226,7 +226,17 @@
       "tag_delete": "태그 삭제",
       "message_template_create": "메시지 템플릿 생성",
       "message_template_update": "메시지 템플릿 수정",
-      "message_template_delete": "메시지 템플릿 삭제"
+      "message_template_delete": "메시지 템플릿 삭제",
+      "message_template_bulk_delete": "메시지 템플릿 일괄 삭제",
+      "message_template_set_tags": "메시지 템플릿 태그 설정",
+      "job_create": "Job 생성",
+      "job_update": "Job 수정",
+      "job_delete": "Job 삭제",
+      "job_execute": "Job 실행",
+      "job_set_tags": "Job 태그 설정",
+      "whitelist_bulk_create": "화이트리스트 일괄 생성",
+      "whitelist_bulk_delete": "화이트리스트 일괄 삭제",
+      "whitelist_toggle_status": "화이트리스트 상태 변경"
     },
     "resources": {
       "user": "사용자",
@@ -236,7 +246,8 @@
       "maintenance": "점검",
       "scheduler": "스케줄",
       "tag": "태그",
-      "message_template": "메시지 템플릿"
+      "message_template": "메시지 템플릿",
+      "job": "Job"
     }
   },
   "auth": {

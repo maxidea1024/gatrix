@@ -1,5 +1,6 @@
 import express from 'express';
 import { authenticate, requireAdmin } from '../middleware/auth';
+import { auditLog } from '../middleware/auditLog';
 import {
   getJobs,
   getJob,
@@ -34,15 +35,70 @@ router.get('/job-types/:id', getJobType);
 // Jobs 라우트
 router.get('/jobs', getJobs);
 router.get('/jobs/:id', getJob);
-router.post('/jobs', createJob);
-router.put('/jobs/:id', updateJob);
-router.delete('/jobs/:id', deleteJob);
-router.post('/jobs/:id/execute', executeJob);
+router.post('/jobs',
+  auditLog({
+    action: 'job_create',
+    resourceType: 'job',
+    getResourceId: (req: any) => req.body?.name,
+    getDetails: (req: any) => ({
+      name: req.body?.name,
+      jobTypeId: req.body?.jobTypeId,
+      body: req.body,
+    }),
+  }) as any,
+  createJob
+);
+router.put('/jobs/:id',
+  auditLog({
+    action: 'job_update',
+    resourceType: 'job',
+    getResourceId: (req: any) => req.params?.id,
+    getDetails: (req: any) => ({
+      id: req.params?.id,
+      updates: req.body,
+    }),
+  }) as any,
+  updateJob
+);
+router.delete('/jobs/:id',
+  auditLog({
+    action: 'job_delete',
+    resourceType: 'job',
+    getResourceId: (req: any) => req.params?.id,
+    getDetails: (req: any) => ({
+      id: req.params?.id,
+    }),
+  }) as any,
+  deleteJob
+);
+router.post('/jobs/:id/execute',
+  auditLog({
+    action: 'job_execute',
+    resourceType: 'job',
+    getResourceId: (req: any) => req.params?.id,
+    getDetails: (req: any) => ({
+      jobId: req.params?.id,
+      executionType: 'manual',
+    }),
+  }) as any,
+  executeJob
+);
 router.get('/jobs/:id/executions', getJobExecutions);
 
 // Job 태그 관련 라우트
 router.get('/jobs/:id/tags', getJobTags);
-router.put('/jobs/:id/tags', setJobTags);
+router.put('/jobs/:id/tags',
+  auditLog({
+    action: 'job_set_tags',
+    resourceType: 'job',
+    getResourceId: (req: any) => req.params?.id,
+    getDetails: (req: any) => ({
+      jobId: req.params?.id,
+      tagIds: req.body,
+    }),
+  }) as any,
+  setJobTags
+);
 
 // Job Executions 라우트 (구체적인 라우트를 먼저 정의)
 router.get('/job-executions/statistics', getJobExecutionStatistics);

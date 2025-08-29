@@ -226,7 +226,17 @@
       "tag_delete": "标签删除",
       "message_template_create": "消息模板创建",
       "message_template_update": "消息模板更新",
-      "message_template_delete": "消息模板删除"
+      "message_template_delete": "消息模板删除",
+      "message_template_bulk_delete": "消息模板批量删除",
+      "message_template_set_tags": "消息模板设置标签",
+      "job_create": "作业创建",
+      "job_update": "作业更新",
+      "job_delete": "作业删除",
+      "job_execute": "作业执行",
+      "job_set_tags": "作业设置标签",
+      "whitelist_bulk_create": "白名单批量创建",
+      "whitelist_bulk_delete": "白名单批量删除",
+      "whitelist_toggle_status": "白名单状态切换"
     },
     "resources": {
       "user": "用户",
@@ -236,7 +246,8 @@
       "maintenance": "维护",
       "scheduler": "调度器",
       "tag": "标签",
-      "message_template": "消息模板"
+      "message_template": "消息模板",
+      "job": "作业"
     }
   },
   "auth": {

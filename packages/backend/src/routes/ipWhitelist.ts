@@ -16,13 +16,13 @@ router.get('/:id', IpWhitelistController.getIpWhitelistById);
 
 router.post('/',
   auditLog({
-    action: 'ip_whitelist_create',
-    resourceType: 'ip_whitelist',
-    getResourceId: (req) => req.body?.ipAddress,
-    getDetails: (req) => ({
-      ipAddress: req.body?.ipAddress,
-      purpose: req.body?.purpose,
-      isEnabled: req.body?.isEnabled,
+    action: 'whitelist_create',
+    resourceType: 'whitelist',
+    getResourceId: (req: any) => req.body?.ip,
+    getDetails: (req: any) => ({
+      ip: req.body?.ip,
+      description: req.body?.description,
+      body: req.body,
     }),
   }) as any,
   IpWhitelistController.createIpWhitelist
@@ -30,10 +30,10 @@ router.post('/',
 
 router.post('/bulk',
   auditLog({
-    action: 'ip_whitelist_bulk_create',
-    resourceType: 'ip_whitelist',
-    getResourceId: (req) => `bulk_${req.body?.entries?.length || 0}_entries`,
-    getDetails: (req) => ({
+    action: 'whitelist_bulk_create',
+    resourceType: 'whitelist',
+    getResourceId: (req: any) => `bulk_${req.body?.entries?.length || 0}_entries`,
+    getDetails: (req: any) => ({
       entriesCount: req.body?.entries?.length || 0,
       entries: req.body?.entries?.map((e: any) => ({
         ipAddress: e.ipAddress,
@@ -46,11 +46,11 @@ router.post('/bulk',
 
 router.put('/:id',
   auditLog({
-    action: 'ip_whitelist_update',
-    resourceType: 'ip_whitelist',
-    getResourceId: (req) => req.params?.id,
-    getDetails: (req) => ({
-      ipWhitelistId: req.params?.id,
+    action: 'whitelist_update',
+    resourceType: 'whitelist',
+    getResourceId: (req: any) => req.params?.id,
+    getDetails: (req: any) => ({
+      id: req.params?.id,
       updates: req.body,
     }),
   }) as any,
@@ -59,11 +59,11 @@ router.put('/:id',
 
 router.patch('/:id/toggle',
   auditLog({
-    action: 'ip_whitelist_toggle_status',
-    resourceType: 'ip_whitelist',
-    getResourceId: (req) => req.params?.id,
-    getDetails: (req) => ({
-      ipWhitelistId: req.params?.id,
+    action: 'whitelist_toggle_status',
+    resourceType: 'whitelist',
+    getResourceId: (req: any) => req.params?.id,
+    getDetails: (req: any) => ({
+      id: req.params?.id,
     }),
   }) as any,
   IpWhitelistController.toggleIpWhitelistStatus
@@ -71,14 +71,16 @@ router.patch('/:id/toggle',
 
 router.delete('/:id',
   auditLog({
-    action: 'ip_whitelist_delete',
-    resourceType: 'ip_whitelist',
-    getResourceId: (req) => req.params?.id,
-    getDetails: (req) => ({
-      ipWhitelistId: req.params?.id,
+    action: 'whitelist_delete',
+    resourceType: 'whitelist',
+    getResourceId: (req: any) => req.params?.id,
+    getDetails: (req: any) => ({
+      id: req.params?.id,
     }),
   }) as any,
   IpWhitelistController.deleteIpWhitelist
 );
+
+// bulk delete 기능이 구현되지 않음
 
 export default router;

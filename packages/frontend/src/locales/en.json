@@ -226,7 +226,17 @@
       "tag_delete": "Tag Delete",
       "message_template_create": "Message Template Create",
       "message_template_update": "Message Template Update",
-      "message_template_delete": "Message Template Delete"
+      "message_template_delete": "Message Template Delete",
+      "message_template_bulk_delete": "Message Template Bulk Delete",
+      "message_template_set_tags": "Message Template Set Tags",
+      "job_create": "Job Create",
+      "job_update": "Job Update",
+      "job_delete": "Job Delete",
+      "job_execute": "Job Execute",
+      "job_set_tags": "Job Set Tags",
+      "whitelist_bulk_create": "Whitelist Bulk Create",
+      "whitelist_bulk_delete": "Whitelist Bulk Delete",
+      "whitelist_toggle_status": "Whitelist Toggle Status"
     },
     "resources": {
       "user": "User",
@@ -236,7 +246,8 @@
       "maintenance": "Maintenance",
       "scheduler": "Scheduler",
       "tag": "Tag",
-      "message_template": "Message Template"
+      "message_template": "Message Template",
+      "job": "Job"
     }
   },
   "auth": {

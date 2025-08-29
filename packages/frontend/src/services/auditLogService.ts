@@ -137,6 +137,16 @@ export class AuditLogService {
       'message_template_create',
       'message_template_update',
       'message_template_delete',
+      'message_template_bulk_delete',
+      'message_template_set_tags',
+      'job_create',
+      'job_update',
+      'job_delete',
+      'job_execute',
+      'job_set_tags',
+      'whitelist_bulk_create',
+      'whitelist_bulk_delete',
+      'whitelist_toggle_status',
     ];
   }
 
@@ -153,6 +163,7 @@ export class AuditLogService {
       'scheduler',
       'tag',
       'message_template',
+      'job',
     ];
   }
 

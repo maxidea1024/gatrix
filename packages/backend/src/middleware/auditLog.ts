@@ -241,6 +241,9 @@ export const auditPasswordChange = auditLog({
   }),
 });
 
+// 기본 auditLog 함수만 유지하고 개별 미들웨어는 제거
+// 각 라우트에서 auditLog를 직접 사용하도록 변경
+
 export const auditProfileUpdate = auditLog({
   action: 'profile_update',
   resourceType: 'user',
