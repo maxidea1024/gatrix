@@ -60,4 +60,8 @@ router.post('/bulk',
   WhitelistController.bulkCreateWhitelists
 );
 
+// 태그 관련 라우트 (관리자만)
+router.get('/:id/tags', requireAdmin as any, WhitelistController.getTags);
+router.put('/:id/tags', requireAdmin as any, WhitelistController.setTags);
+
 export default router;

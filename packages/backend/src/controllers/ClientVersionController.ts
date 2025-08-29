@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Joi from 'joi';
 import ClientVersionService, { ClientVersionFilters, ClientVersionPagination, BulkStatusUpdateRequest } from '../services/ClientVersionService';
 import { ClientStatus, BulkCreateClientVersionRequest } from '../models/ClientVersion';
+import ClientVersionModel from '../models/ClientVersion';
 
 // Validation schemas
 const createClientVersionSchema = Joi.object({
@@ -38,6 +39,7 @@ const getClientVersionsQuerySchema = Joi.object({
   sortBy: Joi.string().valid('id', 'channel', 'subChannel', 'clientVersion', 'clientStatus', 'createdAt', 'updatedAt').default('createdAt'),
   sortOrder: Joi.string().valid('ASC', 'DESC').default('DESC'),
   version: Joi.string().optional(),
+  platform: Joi.string().optional(),
   channel: Joi.string().optional(),
   subChannel: Joi.string().optional(),
   clientStatus: Joi.string().valid(...Object.values(ClientStatus)).optional(),
@@ -311,6 +313,53 @@ export class ClientVersionController {
       success: true,
       data: platforms,
     });
+  }
+
+  // 클라이언트 버전 태그 설정
+  static async setTags(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { tagIds } = req.body;
+
+      if (!Array.isArray(tagIds)) {
+        return res.status(400).json({
+          success: false,
+          message: 'tagIds must be an array',
+        });
+      }
+
+      await ClientVersionModel.setTags(parseInt(id), tagIds);
+
+      res.json({
+        success: true,
+        message: 'Tags updated successfully',
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Failed to update tags',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+
+  // 클라이언트 버전 태그 조회
+  static async getTags(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const tags = await ClientVersionModel.getTags(parseInt(id));
+
+      res.json({
+        success: true,
+        data: tags,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get tags',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
   }
 }
 

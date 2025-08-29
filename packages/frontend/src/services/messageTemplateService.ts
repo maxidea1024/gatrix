@@ -58,6 +58,16 @@ export const messageTemplateService = {
   },
   async bulkDelete(ids: number[]): Promise<void> {
     await apiService.post('/message-templates/bulk-delete', { ids });
+  },
+
+  // 태그 관련 메서드
+  async getTags(id: number): Promise<any[]> {
+    const response = await apiService.get(`/message-templates/${id}/tags`);
+    return response.data?.data || [];
+  },
+
+  async setTags(id: number, tagIds: number[]): Promise<void> {
+    await apiService.put(`/message-templates/${id}/tags`, { tagIds });
   }
 };
 

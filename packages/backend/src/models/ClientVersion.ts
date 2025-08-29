@@ -1,4 +1,5 @@
 import Database from '../config/database';
+import TagAssignmentModel from './TagAssignment';
 
 // 클라이언트 상태 enum
 export enum ClientStatus {
@@ -154,10 +155,12 @@ export class ClientVersionModel {
       ORDER BY cv.clientVersion DESC, cv.platform DESC
     `;
 
-    if (limit) {
-      dataQuery += ` LIMIT ${limit}`;
-      if (offset) {
-        dataQuery += ` OFFSET ${offset}`;
+    if (limit && !isNaN(Number(limit)) && Number(limit) > 0) {
+      const limitNum = parseInt(limit.toString(), 10);
+      dataQuery += ` LIMIT ${limitNum}`;
+      if (offset !== undefined && !isNaN(Number(offset)) && Number(offset) >= 0) {
+        const offsetNum = parseInt(offset.toString(), 10);
+        dataQuery += ` OFFSET ${offsetNum}`;
       }
     }
 
@@ -347,6 +350,15 @@ export class ClientVersionModel {
 
     const result = await this.db.query(query, params);
     return (result[0]?.count || 0) > 0;
+  }
+
+  // 태그 관련 메서드들
+  async setTags(clientVersionId: number, tagIds: number[]): Promise<void> {
+    await TagAssignmentModel.setTagsForEntity('client_version', clientVersionId, tagIds);
+  }
+
+  async getTags(clientVersionId: number): Promise<any[]> {
+    return await TagAssignmentModel.listTagsForEntity('client_version', clientVersionId);
   }
 }
 

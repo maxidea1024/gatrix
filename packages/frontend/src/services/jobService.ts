@@ -1,5 +1,5 @@
 import api from './api';
-import { Job, JobType, JobExecution, CreateJobData, UpdateJobData, JobFilters, JobExecutionFilters } from '../types/job';
+import { Job, JobType, JobExecution, CreateJobData, UpdateJobData, JobFilters, JobExecutionFilters, JobListResponse } from '../types/job';
 
 export const jobService = {
   // Job Types
@@ -29,6 +29,41 @@ export const jobService = {
     const url = queryString ? `/jobs?${queryString}` : '/jobs';
     const response = await api.get(url);
     return response.data?.data || response.data || [];
+  },
+
+  async getJobsWithPagination(filters?: JobFilters): Promise<JobListResponse> {
+    const params = new URLSearchParams();
+    if (filters?.job_type_id) params.append('job_type_id', filters.job_type_id.toString());
+    if (filters?.is_enabled !== undefined) params.append('is_enabled', filters.is_enabled.toString());
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.limit) params.append('limit', filters.limit.toString());
+    if (filters?.offset !== undefined) params.append('offset', filters.offset.toString());
+    if (filters?.page) params.append('page', filters.page.toString());
+
+    const queryString = params.toString();
+    const url = queryString ? `/jobs?${queryString}` : '/jobs';
+    const response = await api.get(url);
+
+    // 백엔드 응답 구조에 맞게 처리
+    if (response.data?.pagination) {
+      return {
+        jobs: response.data.data || [],
+        pagination: response.data.pagination
+      };
+    } else {
+      // 페이지네이션이 없는 경우 기본값 반환
+      const jobs = response.data?.data || response.data || [];
+      return {
+        jobs,
+        pagination: {
+          total: jobs.length,
+          limit: filters?.limit || 20,
+          offset: filters?.offset || 0,
+          page: filters?.page || 1,
+          totalPages: 1
+        }
+      };
+    }
   },
 
   async getJob(id: number): Promise<Job> {

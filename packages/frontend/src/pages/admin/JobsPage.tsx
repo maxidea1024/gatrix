@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -26,7 +26,8 @@ import {
   Card,
   CardContent,
   Tabs,
-  Tab
+  Tab,
+  LinearProgress
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -39,10 +40,11 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { jobService } from '../../services/jobService';
-import { Job, JobType, JobExecution, JobExecutionStatus } from '../../types/job';
+import { Job, JobType, JobExecution, JobExecutionStatus, JobListResponse } from '../../types/job';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import JobForm from '../../components/jobs/JobForm';
 import JobExecutionHistory from '../../components/jobs/JobExecutionHistory';
+import SimplePagination from '../../components/common/SimplePagination';
 
 const JobsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -57,6 +59,11 @@ const JobsPage: React.FC = () => {
   const [enabledFilter, setEnabledFilter] = useState<boolean | ''>('');
   const [tabValue, setTabValue] = useState(0);
 
+  // Pagination state
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [total, setTotal] = useState(0);
+
   // Dialog states
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
@@ -68,20 +75,29 @@ const JobsPage: React.FC = () => {
   // Load data
   useEffect(() => {
     loadData();
-  }, []);
+  }, [page, rowsPerPage]);
+
+  useEffect(() => {
+    // Reset to first page when filters change
+    setPage(0);
+    loadData();
+  }, [selectedJobType, enabledFilter, searchTerm]);
 
   const loadData = async () => {
     try {
       setLoading(true);
-      const [jobsData, jobTypesData] = await Promise.all([
-        jobService.getJobs({
+      const [jobsResponse, jobTypesData] = await Promise.all([
+        jobService.getJobsWithPagination({
           job_type_id: selectedJobType || undefined,
           is_enabled: enabledFilter !== '' ? enabledFilter : undefined,
-          search: searchTerm || undefined
+          search: searchTerm || undefined,
+          limit: rowsPerPage,
+          offset: page * rowsPerPage
         }),
         jobService.getJobTypes()
       ]);
-      setJobs(jobsData);
+      setJobs(jobsResponse.jobs);
+      setTotal(jobsResponse.pagination.total);
       setJobTypes(jobTypesData);
     } catch (error) {
       console.error('Failed to load data:', error);
@@ -93,8 +109,29 @@ const JobsPage: React.FC = () => {
 
   // Handlers
   const handleSearch = () => {
+    setPage(0); // Reset to first page
     loadData();
   };
+
+  const handleReset = () => {
+    setSearchTerm('');
+    setSelectedJobType('');
+    setEnabledFilter('');
+    setPage(0); // Reset to first page
+    loadData();
+  };
+
+  // 페이지 변경 핸들러
+  const handlePageChange = useCallback((_: unknown, newPage: number) => {
+    setPage(newPage);
+  }, []);
+
+  // 페이지 크기 변경 핸들러
+  const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const newRowsPerPage = parseInt(event.target.value, 10);
+    setRowsPerPage(newRowsPerPage);
+    setPage(0);
+  }, []);
 
   const handleAddJob = () => {
     setEditingJob(null);
@@ -341,6 +378,16 @@ const JobsPage: React.FC = () => {
             )}
           </TableBody>
         </Table>
+        {loading && <LinearProgress />}
+
+        {/* 페이지네이션 */}
+        <SimplePagination
+          count={total}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+        />
       </TableContainer>
 
       {/* Job Form Dialog */}

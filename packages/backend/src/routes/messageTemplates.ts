@@ -14,5 +14,9 @@ router.post('/bulk-delete', MessageTemplateController.bulkDelete as any);
 router.put('/:id', MessageTemplateController.update as any);
 router.delete('/:id', MessageTemplateController.remove as any);
 
+// 태그 관련 라우트 (관리자만)
+router.get('/:id/tags', MessageTemplateController.getTags as any);
+router.put('/:id/tags', MessageTemplateController.setTags as any);
+
 export default router;
 

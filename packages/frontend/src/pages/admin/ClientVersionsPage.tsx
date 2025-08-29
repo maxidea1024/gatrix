@@ -26,13 +26,13 @@ import {
   DialogActions,
   Tooltip,
   Fab,
-
   FormControl,
   InputLabel,
   Select,
-
   LinearProgress,
   Alert,
+  Autocomplete,
+  TextField,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -48,6 +48,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { tagService, Tag } from '../../services/tagService';
 import { 
   ClientVersion, 
   ClientVersionFilters, 
@@ -117,6 +118,12 @@ const ClientVersionsPage: React.FC = () => {
 
   // 메타데이터
   const [platforms] = useState<string[]>(['pc', 'pc-wegame', 'ios', 'android', 'harmonyos']);
+
+  // 태그 관련 상태
+  const [allTags, setAllTags] = useState<Tag[]>([]);
+  const [tagDialogOpen, setTagDialogOpen] = useState(false);
+  const [selectedClientVersionForTags, setSelectedClientVersionForTags] = useState<ClientVersion | null>(null);
+  const [clientVersionTags, setClientVersionTags] = useState<Tag[]>([]);
   const [versions, setVersions] = useState<string[]>([]);
 
   // 클라이언트 버전 목록 로드
@@ -173,11 +180,22 @@ const ClientVersionsPage: React.FC = () => {
     }
   }, []);
 
+  // 태그 로드
+  const loadTags = useCallback(async () => {
+    try {
+      const tags = await tagService.list();
+      setAllTags(tags);
+    } catch (error) {
+      console.error('Error loading tags:', error);
+    }
+  }, []);
+
   // 초기 로드
   useEffect(() => {
     loadClientVersions();
     loadMetadata();
-  }, [loadClientVersions, loadMetadata]);
+    loadTags();
+  }, [loadClientVersions, loadMetadata, loadTags]);
 
   // 페이지 크기 변경 시 로컬 스토리지에 저장
   useEffect(() => {
@@ -404,6 +422,34 @@ const ClientVersionsPage: React.FC = () => {
 
     enqueueSnackbar(t('clientVersions.copySuccess'), { variant: 'success' });
   }, [t, enqueueSnackbar]);
+
+  // 태그 관련 핸들러
+  const handleOpenTagDialog = useCallback(async (clientVersion: ClientVersion) => {
+    try {
+      setSelectedClientVersionForTags(clientVersion);
+      const tags = await ClientVersionService.getTags(clientVersion.id!);
+      setClientVersionTags(tags);
+      setTagDialogOpen(true);
+    } catch (error) {
+      console.error('Error loading client version tags:', error);
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
+    }
+  }, [t, enqueueSnackbar]);
+
+  const handleSaveTags = useCallback(async (tagIds: number[]) => {
+    if (!selectedClientVersionForTags?.id) return;
+
+    try {
+      await ClientVersionService.setTags(selectedClientVersionForTags.id, tagIds);
+      setTagDialogOpen(false);
+      enqueueSnackbar(t('common.success'), { variant: 'success' });
+      // 필요시 목록 새로고침
+      loadClientVersions();
+    } catch (error) {
+      console.error('Error saving client version tags:', error);
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
+    }
+  }, [selectedClientVersionForTags, t, enqueueSnackbar, loadClientVersions]);
 
   return (
     <Box sx={{ p: 3 }}>
@@ -635,13 +681,14 @@ const ClientVersionsPage: React.FC = () => {
                   {t('common.createdAt')}
                 </TableCell>
                 <TableCell>{t('common.createdBy')}</TableCell>
+                <TableCell>{t('common.tags')}</TableCell>
                 <TableCell align="center">{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {clientVersions.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={11} align="center" sx={{ py: 4 }}>
+                  <TableCell colSpan={12} align="center" sx={{ py: 4 }}>
                     {loading ? (
                       <Typography variant="body2" color="text.secondary">
                         {t('common.loading')}
@@ -745,6 +792,18 @@ const ClientVersionsPage: React.FC = () => {
                     <Typography variant="body2">
                       {clientVersion.createdByName || 'Unknown'}
                     </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 200 }}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleOpenTagDialog(clientVersion)}
+                        sx={{ minWidth: 'auto', px: 1 }}
+                      >
+                        {t('common.tags')}
+                      </Button>
+                    </Box>
                   </TableCell>
                   <TableCell align="center">
                     <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
@@ -991,6 +1050,67 @@ const ClientVersionsPage: React.FC = () => {
             startIcon={<DeleteIcon />}
           >
             {t('common.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 태그 관리 다이얼로그 */}
+      <Dialog open={tagDialogOpen} onClose={() => setTagDialogOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>
+          {t('common.tags')} - {selectedClientVersionForTags?.clientVersion} ({selectedClientVersionForTags?.platform})
+        </DialogTitle>
+        <DialogContent>
+          <Autocomplete
+            multiple
+            options={allTags}
+            getOptionLabel={(option) => option.name}
+            value={clientVersionTags}
+            onChange={(_, newValue) => setClientVersionTags(newValue)}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                  <Chip
+                    variant="outlined"
+                    label={option.name}
+                    size="small"
+                    sx={{ bgcolor: option.color, color: '#fff' }}
+                    {...getTagProps({ index })}
+                  />
+                </Tooltip>
+              ))
+            }
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={t('common.tags')}
+                placeholder={t('common.selectTags')}
+              />
+            )}
+            renderOption={(props, option) => (
+              <li {...props}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Chip
+                    label={option.name}
+                    size="small"
+                    sx={{ bgcolor: option.color, color: '#fff' }}
+                  />
+                  <Typography variant="body2" color="text.secondary">
+                    {option.description || t('tags.noDescription')}
+                  </Typography>
+                </Box>
+              </li>
+            )}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setTagDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={() => handleSaveTags(clientVersionTags.map(tag => tag.id))}
+            variant="contained"
+          >
+            {t('common.save')}
           </Button>
         </DialogActions>
       </Dialog>

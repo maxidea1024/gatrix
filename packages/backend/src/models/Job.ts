@@ -1,5 +1,6 @@
 import Database from '../config/database';
 import logger from '../config/logger';
+import TagAssignmentModel from './TagAssignment';
 
 // 안전한 JSON 파싱 함수
 const safeJsonParse = (value: any): any => {
@@ -75,6 +76,13 @@ export interface JobFilters {
   job_type_id?: number;
   is_enabled?: boolean;
   search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface JobListResult {
+  jobs: JobAttributes[];
+  total: number;
 }
 
 export class JobModel {
@@ -125,6 +133,79 @@ export class JobModel {
       }));
     } catch (error) {
       logger.error('Error finding all jobs:', error);
+      throw error;
+    }
+  }
+
+  static async findAllWithPagination(filters?: JobFilters): Promise<JobListResult> {
+    try {
+      // 기본값 설정
+      const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 20;
+      const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
+
+      // Count query for total
+      let countQuery = `
+        SELECT COUNT(*) as total
+        FROM g_jobs j
+        LEFT JOIN g_job_types jt ON j.job_type_id = jt.id
+      `;
+
+      // Data query
+      let dataQuery = `
+        SELECT
+          j.*,
+          jt.name as job_type_name,
+          jt.display_name as job_type_display_name,
+          cu.name as created_by_name,
+          uu.name as updated_by_name
+        FROM g_jobs j
+        LEFT JOIN g_job_types jt ON j.job_type_id = jt.id
+        LEFT JOIN g_users cu ON j.created_by = cu.id
+        LEFT JOIN g_users uu ON j.updated_by = uu.id
+      `;
+
+      const conditions: string[] = [];
+      const values: any[] = [];
+
+      if (filters?.job_type_id) {
+        conditions.push('j.job_type_id = ?');
+        values.push(filters.job_type_id);
+      }
+
+      if (filters?.is_enabled !== undefined) {
+        conditions.push('j.is_enabled = ?');
+        values.push(filters.is_enabled);
+      }
+
+      if (filters?.search) {
+        conditions.push('(j.name LIKE ? OR j.description LIKE ? OR j.memo LIKE ?)');
+        const searchTerm = `%${filters.search}%`;
+        values.push(searchTerm, searchTerm, searchTerm);
+      }
+
+      if (conditions.length > 0) {
+        const whereClause = ' WHERE ' + conditions.join(' AND ');
+        countQuery += whereClause;
+        dataQuery += whereClause;
+      }
+
+      dataQuery += ` ORDER BY j.created_at DESC LIMIT ${limit} OFFSET ${offset}`;
+
+      // Execute both queries
+      const [countResults, dataResults] = await Promise.all([
+        Database.query(countQuery, values),
+        Database.query(dataQuery, values)
+      ]);
+
+      const total = countResults[0]?.total || 0;
+      const jobs = dataResults.map((row: any) => ({
+        ...row,
+        job_data_map: safeJsonParse(row.job_data_map)
+      }));
+
+      return { jobs, total };
+    } catch (error) {
+      logger.error('Error finding jobs with pagination:', error);
       throw error;
     }
   }
@@ -318,5 +399,14 @@ export class JobModel {
       logger.error('Error finding enabled jobs:', error);
       throw error;
     }
+  }
+
+  // 태그 관련 메서드들
+  static async setTags(jobId: number, tagIds: number[]): Promise<void> {
+    await TagAssignmentModel.setTagsForEntity('job', jobId, tagIds);
+  }
+
+  static async getTags(jobId: number): Promise<any[]> {
+    return await TagAssignmentModel.listTagsForEntity('job', jobId);
   }
 }

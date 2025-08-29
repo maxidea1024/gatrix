@@ -104,6 +104,20 @@ export interface JobFilters {
   job_type_id?: number;
   is_enabled?: boolean;
   search?: string;
+  limit?: number;
+  offset?: number;
+  page?: number;
+}
+
+export interface JobListResponse {
+  jobs: Job[];
+  pagination: {
+    total: number;
+    limit: number;
+    offset: number;
+    page: number;
+    totalPages: number;
+  };
 }
 
 export interface JobExecutionFilters {

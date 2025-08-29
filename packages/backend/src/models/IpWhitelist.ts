@@ -62,7 +62,10 @@ export class IpWhitelistModel {
     filters: IpWhitelistFilters = {}
   ): Promise<IpWhitelistListResponse> {
     try {
-      const offset = (page - 1) * limit;
+      // Ensure page and limit are numbers
+      const pageNum = Number(page) || 1;
+      const limitNum = Number(limit) || 10;
+      const offset = (pageNum - 1) * limitNum;
       
       let whereClause = 'WHERE 1=1';
       const params: any[] = [];
@@ -130,16 +133,16 @@ export class IpWhitelistModel {
         LIMIT ? OFFSET ?
       `;
 
-      const dataParams = [...params, limit, offset];
-      const ipWhitelists = await database.query(dataQuery, dataParams);
+      dataQuery = dataQuery.replace('LIMIT ? OFFSET ?', `LIMIT ${limitNum} OFFSET ${offset}`);
+      const ipWhitelists = await database.query(dataQuery, params);
 
-      const totalPages = Math.ceil(total / limit);
+      const totalPages = Math.ceil(total / limitNum);
 
       return {
         ipWhitelists: ipWhitelists.map(this.mapRowToIpWhitelist),
         total,
-        page,
-        limit,
+        page: pageNum,
+        limit: limitNum,
         totalPages,
       };
     } catch (error) {

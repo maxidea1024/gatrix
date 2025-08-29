@@ -131,7 +131,9 @@ const TagsPage: React.FC = () => {
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ md: 'center' }}>
-            <Chip label={newName || 'label'} sx={{ bgcolor: newColor, color: '#fff', height: 28 }} />
+            <Tooltip title={newDescription || t('tags.noDescription')} arrow>
+              <Chip label={newName || 'label'} sx={{ bgcolor: newColor, color: '#fff', height: 28, cursor: 'help' }} />
+            </Tooltip>
             <TextField label={t('tags.name')} value={newName} onChange={(e)=>setNewName(e.target.value)} sx={{ width: 260 }} />
             <TextField label={t('tags.description')} value={newDescription} onChange={(e)=>setNewDescription(e.target.value)} sx={{ flex: 1, minWidth: 220 }} />
             <Stack direction="row" spacing={1} alignItems="center">
@@ -199,7 +201,13 @@ const TagsPage: React.FC = () => {
                     <TableRow key={tag.id} hover>
                     <TableCell sx={{ width: 260 }}>
                       <Stack direction="row" spacing={1} alignItems="center">
-                        <Chip label={editingId === tag.id ? (editName || 'label') : tag.name} size="small" sx={{ bgcolor: editingId === tag.id ? editColor : tag.color, color: '#fff' }} />
+                        {editingId === tag.id ? (
+                          <Chip label={editName || 'label'} size="small" sx={{ bgcolor: editColor, color: '#fff' }} />
+                        ) : (
+                          <Tooltip title={tag.description || t('tags.noDescription')} arrow>
+                            <Chip label={tag.name} size="small" sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }} />
+                          </Tooltip>
+                        )}
                         {editingId === tag.id && (
                           <TextField size="small" value={editName} onChange={(e)=>setEditName(e.target.value)} sx={{ maxWidth: 160 }} />
                         )}

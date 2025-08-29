@@ -1,5 +1,6 @@
 import database from '../config/database';
 import { CustomError } from '../middleware/errorHandler';
+import TagAssignmentModel from './TagAssignment';
 
 export interface Whitelist {
   id: number;
@@ -295,5 +296,14 @@ export class WhitelistModel {
       updatedAt: new Date(row.updatedAt),
       createdByName: row.createdByName,
     };
+  }
+
+  // 태그 관련 메서드들
+  static async setTags(whitelistId: number, tagIds: number[]): Promise<void> {
+    await TagAssignmentModel.setTagsForEntity('whitelist', whitelistId, tagIds);
+  }
+
+  static async getTags(whitelistId: number): Promise<any[]> {
+    return await TagAssignmentModel.listTagsForEntity('whitelist', whitelistId);
   }
 }

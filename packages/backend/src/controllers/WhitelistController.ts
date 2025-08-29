@@ -3,6 +3,7 @@ import { WhitelistService } from '../services/WhitelistService';
 import { asyncHandler, CustomError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import Joi from 'joi';
+import { WhitelistModel } from '../models/Whitelist';
 
 // Validation schemas
 const createWhitelistSchema = Joi.object({
@@ -190,6 +191,34 @@ export class WhitelistController {
         requestedCount: value.entries.length,
       },
       message: `Successfully created ${createdCount} whitelist entries`,
+    });
+  });
+
+  // 화이트리스트 태그 설정
+  static setTags = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+    const { tagIds } = req.body;
+
+    if (!Array.isArray(tagIds)) {
+      throw new CustomError('tagIds must be an array', 400);
+    }
+
+    await WhitelistModel.setTags(parseInt(id), tagIds);
+
+    res.json({
+      success: true,
+      message: 'Tags updated successfully',
+    });
+  });
+
+  // 화이트리스트 태그 조회
+  static getTags = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+    const tags = await WhitelistModel.getTags(parseInt(id));
+
+    res.json({
+      success: true,
+      data: tags,
     });
   });
 }

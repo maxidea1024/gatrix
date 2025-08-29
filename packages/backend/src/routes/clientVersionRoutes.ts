@@ -82,4 +82,8 @@ router.delete('/:id',
   ClientVersionController.deleteClientVersion
 );
 
+// 태그 관련 라우트 (관리자만)
+router.get('/:id/tags', requireAdmin as any, ClientVersionController.getTags);
+router.put('/:id/tags', requireAdmin as any, ClientVersionController.setTags);
+
 export default router;

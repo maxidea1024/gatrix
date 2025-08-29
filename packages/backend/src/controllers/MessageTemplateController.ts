@@ -86,5 +86,44 @@ export class MessageTemplateController {
       next(e);
     }
   }
+
+  // 메시지 템플릿 태그 설정
+  static async setTags(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const { tagIds } = req.body;
+
+      if (!Array.isArray(tagIds)) {
+        return res.status(400).json({
+          success: false,
+          message: 'tagIds must be an array',
+        });
+      }
+
+      await MessageTemplateModel.setTags(parseInt(id), tagIds);
+
+      res.json({
+        success: true,
+        message: 'Tags updated successfully',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // 메시지 템플릿 태그 조회
+  static async getTags(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const tags = await MessageTemplateModel.getTags(parseInt(id));
+
+      res.json({
+        success: true,
+        data: tags,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 

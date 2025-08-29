@@ -119,7 +119,9 @@ const SortableRow: React.FC<SortableRowProps> = ({
     return (
       <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 220 }}>
         {items.map((tag, idx) => (
-          <Chip key={`${tag.id}-${idx}`} label={tag.name} size="small" sx={{ bgcolor: tag.color, color: '#fff' }} />
+          <Tooltip key={`${tag.id}-${idx}`} title={tag.description || t('tags.noDescription')} arrow>
+            <Chip label={tag.name} size="small" sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }} />
+          </Tooltip>
         ))}
       </Box>
     );
@@ -921,8 +923,11 @@ const GameWorldsPage: React.FC = () => {
                   value.map((option: string | Tag, index: number) => {
                     const name = typeof option === 'string' ? option : option.name;
                     const color = typeof option === 'string' ? '#607D8B' : option.color;
+                    const description = typeof option === 'string' ? t('tags.noDescription') : (option.description || t('tags.noDescription'));
                     return (
-                      <Chip variant="outlined" size="small" label={name} sx={{ bgcolor: color, color: '#fff' }} {...getTagProps({ index })} key={name + index} />
+                      <Tooltip key={name + index} title={description} arrow>
+                        <Chip variant="outlined" size="small" label={name} sx={{ bgcolor: color, color: '#fff', cursor: 'help' }} {...getTagProps({ index })} />
+                      </Tooltip>
                     );
                   })
                 }

@@ -7,7 +7,9 @@ import {
   updateJob,
   deleteJob,
   executeJob,
-  getJobExecutions
+  getJobExecutions,
+  setJobTags,
+  getJobTags
 } from '../controllers/jobController';
 import {
   getJobTypes,
@@ -37,6 +39,10 @@ router.put('/jobs/:id', updateJob);
 router.delete('/jobs/:id', deleteJob);
 router.post('/jobs/:id/execute', executeJob);
 router.get('/jobs/:id/executions', getJobExecutions);
+
+// Job 태그 관련 라우트
+router.get('/jobs/:id/tags', getJobTags);
+router.put('/jobs/:id/tags', setJobTags);
 
 // Job Executions 라우트 (구체적인 라우트를 먼저 정의)
 router.get('/job-executions/statistics', getJobExecutionStatistics);

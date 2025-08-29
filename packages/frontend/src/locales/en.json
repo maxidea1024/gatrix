@@ -433,9 +433,11 @@
     "loggedInAs": "Logged in as",
     "minute": "Minute",
     "month": "Month",
+    "moreThan": "more than",
     "name": "Name",
     "next": "Next",
     "no": "No",
+    "of": "of",
     "ok": "OK",
     "previous": "Previous",
     "refresh": "Refresh",
@@ -449,6 +451,7 @@
     "saving": "Saving...",
     "search": "Search",
     "select": "Select",
+    "selectTags": "Select tags...",
     "sort": "sort",
     "submit": "Submit",
     "success": "Success",
@@ -756,7 +759,10 @@
     "description": "Description",
     "duplicateName": "A tag with the same name already exists.",
     "name": "Name",
-    "title": "Tag Management"
+    "title": "Tag Management",
+    "noDescription": "No description",
+    "noTags": "No tags found",
+    "noMatchingTags": "No tags match your search"
   },
   "theme": "theme",
   "token": "token",
@@ -901,14 +907,7 @@
       "noBulkEntries": "No valid entries found for import"
     }
   },
-  "tags": {
-    "title": "Tag Management",
-    "name": "Name",
-    "description": "Description",
-    "duplicateName": "A tag with this name already exists",
-    "noTags": "No tags found",
-    "noMatchingTags": "No tags match your search"
-  },
+
   "jobs": {
     "title": "Job Management",
     "monitor": "Queue Monitor",

@@ -8,18 +8,45 @@ import logger from '../config/logger';
 // Job 목록 조회
 export const getJobs = async (req: Request, res: Response) => {
   try {
-    const { job_type_id, is_enabled, search } = req.query;
+    const {
+      job_type_id,
+      is_enabled,
+      search,
+      limit = 20,
+      offset = 0,
+      page
+    } = req.query;
 
     const filters: any = {};
     if (job_type_id) filters.job_type_id = parseInt(job_type_id as string);
     if (is_enabled !== undefined) filters.is_enabled = is_enabled === 'true';
     if (search) filters.search = search as string;
 
-    const jobs = await JobModel.findAll(filters);
+    // 페이지네이션 처리
+    const limitNum = parseInt(limit as string) || 20;
+    let offsetNum = parseInt(offset as string) || 0;
+
+    // page 파라미터가 있으면 offset 계산
+    if (page) {
+      const pageNum = parseInt(page as string) || 1;
+      offsetNum = (pageNum - 1) * limitNum;
+    }
+
+    filters.limit = limitNum;
+    filters.offset = offsetNum;
+
+    const result = await JobModel.findAllWithPagination(filters);
 
     res.json({
       success: true,
-      data: jobs
+      data: result.jobs,
+      pagination: {
+        total: result.total,
+        limit: limitNum,
+        offset: offsetNum,
+        page: Math.floor(offsetNum / limitNum) + 1,
+        totalPages: Math.ceil(result.total / limitNum)
+      }
     });
   } catch (error) {
     logger.error('Error getting jobs:', error);
@@ -292,6 +319,55 @@ export const getJobExecutions = async (req: Request, res: Response) => {
       success: false,
       message: 'Failed to get job executions',
       error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+};
+
+// Job 태그 설정
+export const setJobTags = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { tagIds } = req.body;
+
+    if (!Array.isArray(tagIds)) {
+      return res.status(400).json({
+        success: false,
+        message: 'tagIds must be an array',
+      });
+    }
+
+    await JobModel.setTags(parseInt(id), tagIds);
+
+    res.json({
+      success: true,
+      message: 'Tags updated successfully',
+    });
+  } catch (error) {
+    logger.error('Error setting job tags:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update tags',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+};
+
+// Job 태그 조회
+export const getJobTags = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const tags = await JobModel.getTags(parseInt(id));
+
+    res.json({
+      success: true,
+      data: tags,
+    });
+  } catch (error) {
+    logger.error('Error getting job tags:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get tags',
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 };

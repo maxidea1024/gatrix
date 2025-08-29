@@ -45,6 +45,7 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { messageTemplateService, MessageTemplate, MessageTemplateLocale, MessageTemplateType } from '@/services/messageTemplateService';
+import { tagService, Tag } from '@/services/tagService';
 
 const allLangs: Array<{ code: 'ko' | 'en' | 'zh'; label: string }> = [
   { code: 'ko', label: '한국어' },
@@ -81,6 +82,12 @@ const MessageTemplatesPage: React.FC = () => {
   const [deletingTemplate, setDeletingTemplate] = useState<MessageTemplate | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
+  // 태그 관련 상태
+  const [allTags, setAllTags] = useState<Tag[]>([]);
+  const [tagDialogOpen, setTagDialogOpen] = useState(false);
+  const [selectedTemplateForTags, setSelectedTemplateForTags] = useState<MessageTemplate | null>(null);
+  const [templateTags, setTemplateTags] = useState<Tag[]>([]);
+
   const [form, setForm] = useState<MessageTemplate>({ name: '', type: 'maintenance', is_enabled: true, default_message: '', locales: [] });
   const usedLangs = useMemo(() => new Set((form.locales || []).map(l => l.lang)), [form.locales]);
   const availableLangs = allLangs.filter(l => !usedLangs.has(l.code));
@@ -112,7 +119,20 @@ const MessageTemplatesPage: React.FC = () => {
     }
   }, [page, rowsPerPage, filters, enqueueSnackbar, t]);
 
-  useEffect(() => { load(); }, [load]);
+  // 태그 로딩
+  const loadTags = useCallback(async () => {
+    try {
+      const tags = await tagService.list();
+      setAllTags(tags);
+    } catch (error) {
+      console.error('Error loading tags:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+    loadTags();
+  }, [load, loadTags]);
 
   // 필터 핸들러
   const handleFilterChange = useCallback((newFilters: typeof filters) => {
@@ -232,7 +252,33 @@ const MessageTemplatesPage: React.FC = () => {
     setDialogOpen(true);
   };
 
+  // 태그 관련 핸들러
+  const handleOpenTagDialog = useCallback(async (template: MessageTemplate) => {
+    try {
+      setSelectedTemplateForTags(template);
+      const tags = await messageTemplateService.getTags(template.id!);
+      setTemplateTags(tags);
+      setTagDialogOpen(true);
+    } catch (error) {
+      console.error('Error loading template tags:', error);
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
+    }
+  }, [t, enqueueSnackbar]);
 
+  const handleSaveTags = useCallback(async (tagIds: number[]) => {
+    if (!selectedTemplateForTags?.id) return;
+
+    try {
+      await messageTemplateService.setTags(selectedTemplateForTags.id, tagIds);
+      setTagDialogOpen(false);
+      enqueueSnackbar(t('common.success'), { variant: 'success' });
+      // 필요시 목록 새로고침
+      load();
+    } catch (error) {
+      console.error('Error saving template tags:', error);
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
+    }
+  }, [selectedTemplateForTags, t, enqueueSnackbar, load]);
 
   const addLocale = () => {
     const lang = newLang; const message = newMsg.trim();
@@ -433,13 +479,14 @@ const MessageTemplatesPage: React.FC = () => {
                   <TableCell>{t('common.updatedAt')}</TableCell>
                   <TableCell>{t('common.languages')}</TableCell>
                   <TableCell>{t('common.creator')}</TableCell>
+                  <TableCell>{t('common.tags')}</TableCell>
                   <TableCell align="right">{t('common.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {items.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
+                    <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
                       <Typography variant="body2" color="text.secondary">
                         {t('admin.messageTemplates.noTemplates')}
                       </Typography>
@@ -477,6 +524,16 @@ const MessageTemplatesPage: React.FC = () => {
                       <TableCell>{formatDateTimeDetailed(row.updated_at) || '-'}</TableCell>
                       <TableCell>{hasLocales ? langs.map(c=>getLangLabel(c as any)).join(', ') : t('admin.messageTemplates.onlyDefaultMessage')}</TableCell>
                       <TableCell>{(row as any).created_by_name || '-'}</TableCell>
+                      <TableCell>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() => handleOpenTagDialog(row)}
+                          sx={{ minWidth: 'auto', px: 1 }}
+                        >
+                          {t('common.tags')}
+                        </Button>
+                      </TableCell>
                       <TableCell align="right">
                         <IconButton size="small" onClick={() => handleEdit(row)}><EditIcon fontSize="small" /></IconButton>
                         <IconButton size="small" color="error" onClick={() => openDeleteDialog(row)}><DeleteIcon fontSize="small" /></IconButton>
@@ -597,6 +654,69 @@ const MessageTemplatesPage: React.FC = () => {
           <Button onClick={() => setBulkDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button onClick={confirmBulkDelete} color="error" variant="contained">
             {t('common.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 태그 관리 다이얼로그 */}
+      <Dialog open={tagDialogOpen} onClose={() => setTagDialogOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>
+          {t('common.tags')} - {selectedTemplateForTags?.name}
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 2 }}>
+            <TextField
+              select
+              multiple
+              label={t('common.selectTags')}
+              value={templateTags.map(tag => tag.id)}
+              onChange={(e) => {
+                const selectedIds = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
+                const selectedTags = allTags.filter(tag => selectedIds.includes(tag.id));
+                setTemplateTags(selectedTags);
+              }}
+              SelectProps={{
+                multiple: true,
+                renderValue: (selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {(selected as number[]).map((id) => {
+                      const tag = allTags.find(t => t.id === id);
+                      return tag ? (
+                        <Chip
+                          key={id}
+                          label={tag.name}
+                          size="small"
+                          sx={{ bgcolor: tag.color, color: '#fff' }}
+                        />
+                      ) : null;
+                    })}
+                  </Box>
+                ),
+              }}
+              fullWidth
+            >
+              {allTags.map((tag) => (
+                <MenuItem key={tag.id} value={tag.id}>
+                  <Chip
+                    label={tag.name}
+                    size="small"
+                    sx={{ bgcolor: tag.color, color: '#fff', mr: 1 }}
+                  />
+                  {tag.description || t('tags.noDescription')}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setTagDialogOpen(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={() => handleSaveTags(templateTags.map(tag => tag.id))}
+            variant="contained"
+          >
+            {t('common.save')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -433,9 +433,11 @@
     "loggedInAs": "已登录账户",
     "minute": "分钟",
     "month": "月",
+    "moreThan": "超过",
     "name": "名称",
     "next": "下一个",
     "no": "否",
+    "of": "的",
     "ok": "确定",
     "previous": "上一个",
     "refresh": "刷新",
@@ -449,6 +451,7 @@
     "saving": "保存中...",
     "search": "搜索",
     "select": "选择",
+    "selectTags": "选择标签...",
     "sort": "排序",
     "submit": "提交",
     "success": "成功",
@@ -758,7 +761,10 @@
     "description": "描述",
     "duplicateName": "重复名称",
     "name": "名称",
-    "title": "标签管理"
+    "title": "标签管理",
+    "noDescription": "无描述",
+    "noTags": "没有标签",
+    "noMatchingTags": "没有匹配的标签"
   },
   "theme": "主题",
   "token": "令牌",
@@ -907,14 +913,7 @@
       "noBulkEntries": "未找到有效的导入条目"
     }
   },
-  "tags": {
-    "title": "标签管理",
-    "name": "名称",
-    "description": "描述",
-    "duplicateName": "此标签名称已存在",
-    "noTags": "没有标签",
-    "noMatchingTags": "没有匹配的标签"
-  },
+
   "jobs": {
     "title": "作业管理",
     "monitor": "队列监控",

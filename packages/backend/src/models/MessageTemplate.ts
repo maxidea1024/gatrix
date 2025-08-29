@@ -1,4 +1,5 @@
 import database from '../config/database';
+import TagAssignmentModel from './TagAssignment';
 
 export interface MessageTemplateLocale {
   id?: number;
@@ -120,6 +121,15 @@ export class MessageTemplateModel {
 
   static async delete(id: number) {
     await database.query('DELETE FROM g_message_templates WHERE id = ?', [id]);
+  }
+
+  // 태그 관련 메서드들
+  static async setTags(templateId: number, tagIds: number[]): Promise<void> {
+    await TagAssignmentModel.setTagsForEntity('message_template', templateId, tagIds);
+  }
+
+  static async getTags(templateId: number): Promise<any[]> {
+    return await TagAssignmentModel.listTagsForEntity('message_template', templateId);
   }
 }
 

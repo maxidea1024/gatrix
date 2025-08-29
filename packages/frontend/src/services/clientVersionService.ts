@@ -351,6 +351,21 @@ export class ClientVersionService {
       console.warn('Failed to save sort settings to localStorage:', error);
     }
   }
+
+  /**
+   * 클라이언트 버전 태그 조회
+   */
+  static async getTags(id: number): Promise<any[]> {
+    const response = await apiService.get<ApiResponse<any[]>>(`${this.BASE_URL}/${id}/tags`);
+    return response.data.data || [];
+  }
+
+  /**
+   * 클라이언트 버전 태그 설정
+   */
+  static async setTags(id: number, tagIds: number[]): Promise<void> {
+    await apiService.put(`${this.BASE_URL}/${id}/tags`, { tagIds });
+  }
 }
 
 export default ClientVersionService;
