@@ -16,6 +16,12 @@ import {
   Typography,
   Alert,
 } from '@mui/material';
+import {
+  Cancel as CancelIcon,
+  Save as SaveIcon,
+  Add as AddIcon,
+  FileCopy as CopyIcon
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useForm, Controller } from 'react-hook-form';
@@ -29,6 +35,7 @@ import {
   CLIENT_VERSION_VALIDATION,
 } from '../../types/clientVersion';
 import { ClientVersionService } from '../../services/clientVersionService';
+import JsonEditor from '../common/JsonEditor';
 
 interface ClientVersionFormProps {
   open: boolean;
@@ -36,22 +43,16 @@ interface ClientVersionFormProps {
   onSuccess: () => void;
   clientVersion?: ClientVersion | null;
   isCopyMode?: boolean;
-  channels: string[];
-  subChannels: string[];
+
 }
 
 // 폼 유효성 검사 스키마
 const createValidationSchema = (t: any) => yup.object({
-  channel: yup
+  platform: yup
     .string()
-    .required(t('clientVersions.form.channelRequired'))
-    .min(CLIENT_VERSION_VALIDATION.CHANNEL.MIN_LENGTH)
-    .max(CLIENT_VERSION_VALIDATION.CHANNEL.MAX_LENGTH),
-  subChannel: yup
-    .string()
-    .required(t('clientVersions.form.subChannelRequired'))
-    .min(CLIENT_VERSION_VALIDATION.SUB_CHANNEL.MIN_LENGTH)
-    .max(CLIENT_VERSION_VALIDATION.SUB_CHANNEL.MAX_LENGTH),
+    .required(t('clientVersions.form.platformRequired'))
+    .min(CLIENT_VERSION_VALIDATION.PLATFORM.MIN_LENGTH)
+    .max(CLIENT_VERSION_VALIDATION.PLATFORM.MAX_LENGTH),
   clientVersion: yup
     .string()
     .required(t('clientVersions.form.versionRequired'))
@@ -62,7 +63,7 @@ const createValidationSchema = (t: any) => yup.object({
   clientStatus: yup
     .string()
     .oneOf(Object.values(ClientStatus))
-    .required(),
+    .required(t('clientVersions.form.statusRequired')),
   gameServerAddress: yup
     .string()
     .required(t('clientVersions.form.gameServerRequired'))
@@ -112,13 +113,14 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   const versionFieldRef = useRef<HTMLInputElement>(null);
 
   const isEdit = !!clientVersion && !isCopyMode;
+  const [displayIsEdit, setDisplayIsEdit] = useState<boolean>(isEdit);
+  const [displayIsCopy, setDisplayIsCopy] = useState<boolean>(!!isCopyMode);
 
   // 기본값 설정
   const defaultValues: ClientVersionFormData = {
-    channel: '',
-    subChannel: '',
+    platform: 'pc', // 첫 번째 플랫폼을 기본값으로 설정
     clientVersion: '',
-    clientStatus: ClientStatus.OFFLINE,
+    clientStatus: ClientStatus.OFFLINE, // 첫 번째 상태를 기본값으로 설정
     gameServerAddress: '',
     gameServerAddressForWhiteList: '',
     patchAddress: '',
@@ -144,6 +146,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   // 폼 초기화
   useEffect(() => {
     if (open) {
+      // 렌더링 상태에서 표시용 모드는 오픈 시점 값으로 고정하여 버튼 라벨 깜빡임 방지
+      setDisplayIsEdit(!!clientVersion && !isCopyMode);
+      setDisplayIsCopy(!!isCopyMode);
+
       if (clientVersion) {
         // 편집 모드 또는 복사 모드일 때 기존 데이터로 초기화
         console.log('Initializing form with clientVersion data:', {
@@ -153,8 +159,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         });
 
         reset({
-          channel: clientVersion.channel,
-          subChannel: clientVersion.subChannel,
+          platform: clientVersion.platform,
           clientVersion: isCopyMode ? '' : clientVersion.clientVersion, // 복사 모드일 때만 버전 비움
           clientStatus: clientVersion.clientStatus,
           gameServerAddress: clientVersion.gameServerAddress,
@@ -173,8 +178,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       }
       setDuplicateError(null);
 
-      // 복사 모드일 때 버전 필드에 포커스
-      if (isCopyMode) {
+      // 복사 모드이거나 새로 추가할 때 버전 필드에 포커스
+      if (isCopyMode || !clientVersion) {
         setTimeout(() => {
           versionFieldRef.current?.focus();
         }, 100);
@@ -270,7 +275,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       onClose();
     } catch (error: any) {
       console.error('Error saving client version:', error);
-      enqueueSnackbar(error.message || 'Failed to save client version', { variant: 'error' });
+      enqueueSnackbar(error.message || t('clientVersions.saveError', 'Failed to save client version'), { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -317,66 +322,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
               {t('clientVersions.form.basicInfo')}
             </Typography>
 
-            <Controller
-              name="channel"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <FormControl fullWidth error={!!errors.channel}>
-                    <InputLabel>{t('clientVersions.channel')}</InputLabel>
-                    <Select
-                      {...field}
-                      label={t('clientVersions.channel')}
-                    >
-                      {channels.map((channel) => (
-                        <MenuItem key={channel} value={channel}>
-                          {channel}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {errors.channel && (
-                      <Typography variant="caption" color="error">
-                        {errors.channel.message}
-                      </Typography>
-                    )}
-                  </FormControl>
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.channelHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
-
-            <Controller
-              name="subChannel"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <FormControl fullWidth error={!!errors.subChannel}>
-                    <InputLabel>{t('clientVersions.subChannel')}</InputLabel>
-                    <Select
-                      {...field}
-                      label={t('clientVersions.subChannel')}
-                    >
-                      {subChannels.map((subChannel) => (
-                        <MenuItem key={subChannel} value={subChannel}>
-                          {subChannel}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {errors.subChannel && (
-                      <Typography variant="caption" color="error">
-                        {errors.subChannel.message}
-                      </Typography>
-                    )}
-                  </FormControl>
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.subChannelHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
-
+            {/* 버전 필드를 최상단으로 이동 */}
             <Controller
               name="clientVersion"
               control={control}
@@ -390,6 +336,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     placeholder={CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE}
                     error={!!errors.clientVersion}
                     helperText={errors.clientVersion?.message}
+                    inputProps={{
+                      autoComplete: 'off',
+                      autoCorrect: 'off',
+                      autoCapitalize: 'off',
+                      spellCheck: false
+                    }}
                   />
                   <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                     {t('clientVersions.form.versionHelp')}
@@ -399,13 +351,47 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             />
 
             <Controller
+              name="platform"
+              control={control}
+              render={({ field }) => (
+                <Box>
+                  <FormControl fullWidth error={!!errors.platform}>
+                    <InputLabel id="cvf-platform-label">{t('clientVersions.platform')}</InputLabel>
+                    <Select
+                      labelId="cvf-platform-label"
+                      {...field}
+                      label={t('clientVersions.platform')}
+                    >
+                      {['pc','pc-wegame','ios','android','harmonyos'].map((p) => (
+                        <MenuItem key={p} value={p}>
+                          {p}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.platform && (
+                      <Typography variant="caption" color="error">
+                        {errors.platform.message}
+                      </Typography>
+                    )}
+                  </FormControl>
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                    {t('clientVersions.form.platformHelp')}
+                  </Typography>
+                </Box>
+              )}
+            />
+
+
+
+            <Controller
               name="clientStatus"
               control={control}
               render={({ field }) => (
                 <Box>
-                  <FormControl fullWidth>
-                    <InputLabel>{t('clientVersions.statusLabel')}</InputLabel>
+                  <FormControl fullWidth variant="outlined">
+                    <InputLabel id="cvf-status-label" shrink={true}>{t('clientVersions.statusLabel')}</InputLabel>
                     <Select
+                      labelId="cvf-status-label"
                       {...field}
                       label={t('clientVersions.statusLabel')}
                     >
@@ -439,6 +425,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     label={t('clientVersions.gameServerAddress')}
                     error={!!errors.gameServerAddress}
                     helperText={errors.gameServerAddress?.message}
+                    inputProps={{
+                      autoComplete: 'off',
+                      autoCorrect: 'off',
+                      autoCapitalize: 'off',
+                      spellCheck: false
+                    }}
                   />
                   <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                     {t('clientVersions.form.gameServerAddressHelp')}
@@ -458,6 +450,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     label={t('clientVersions.gameServerAddressForWhiteList')}
                     error={!!errors.gameServerAddressForWhiteList}
                     helperText={errors.gameServerAddressForWhiteList?.message}
+                    inputProps={{
+                      autoComplete: 'off',
+                      autoCorrect: 'off',
+                      autoCapitalize: 'off',
+                      spellCheck: false
+                    }}
                   />
                   <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                     {t('clientVersions.form.gameServerAddressForWhiteListHelp')}
@@ -477,6 +475,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     label={t('clientVersions.patchAddress')}
                     error={!!errors.patchAddress}
                     helperText={errors.patchAddress?.message}
+                    inputProps={{
+                      autoComplete: 'off',
+                      autoCorrect: 'off',
+                      autoCapitalize: 'off',
+                      spellCheck: false
+                    }}
                   />
                   <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                     {t('clientVersions.form.patchAddressHelp')}
@@ -496,6 +500,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     label={t('clientVersions.patchAddressForWhiteList')}
                     error={!!errors.patchAddressForWhiteList}
                     helperText={errors.patchAddressForWhiteList?.message}
+                    inputProps={{
+                      autoComplete: 'off',
+                      autoCorrect: 'off',
+                      autoCapitalize: 'off',
+                      spellCheck: false
+                    }}
                   />
                   <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                     {t('clientVersions.form.patchAddressForWhiteListHelp')}
@@ -541,6 +551,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     label={t('clientVersions.externalClickLink')}
                     error={!!errors.externalClickLink}
                     helperText={errors.externalClickLink?.message}
+                    inputProps={{
+                      autoComplete: 'off',
+                      autoCorrect: 'off',
+                      autoCapitalize: 'off',
+                      spellCheck: false
+                    }}
                   />
                   <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                     {t('clientVersions.form.externalClickLinkHelp')}
@@ -575,19 +591,17 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
               control={control}
               render={({ field }) => (
                 <Box>
-                  <TextField
-                    {...field}
-                    fullWidth
-                    multiline
-                    rows={4}
+                  <JsonEditor
+                    value={field.value || '{}'}
+                    onChange={(newValue) => {
+                      field.onChange(newValue);
+                    }}
+                    height="200px"
                     label={t('clientVersions.customPayload')}
-                    placeholder="JSON 형식으로 입력하세요"
-                    error={!!errors.customPayload}
-                    helperText={errors.customPayload?.message}
+                    placeholder='{\n  "key": "value"\n}'
+                    error={errors.customPayload?.message}
+                    helperText={t('clientVersions.form.customPayloadHelp')}
                   />
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.customPayloadHelp')}
-                  </Typography>
                 </Box>
               )}
             />
@@ -595,13 +609,14 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={handleClose} disabled={isSubmitting || loading}>
+          <Button onClick={handleClose} disabled={isSubmitting || loading} startIcon={<CancelIcon />}>
             {t('common.cancel')}
           </Button>
           <Button
             type="submit"
             variant="contained"
             disabled={isSubmitting || loading || !!duplicateError}
+            startIcon={displayIsCopy ? <CopyIcon /> : displayIsEdit ? <SaveIcon /> : <AddIcon />}
             onClick={() => {
               console.log('Submit button clicked!', {
                 isSubmitting,
@@ -613,9 +628,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
               });
             }}
           >
-            {isCopyMode
+            {displayIsCopy
               ? t('common.copy')
-              : isEdit
+              : displayIsEdit
                 ? t('common.update')
                 : t('common.add')
             }

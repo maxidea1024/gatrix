@@ -3,12 +3,28 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { CssBaseline } from '@mui/material';
 import { SnackbarProvider } from 'notistack';
 import { ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+// MUI Date Pickers
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+import 'dayjs/locale/zh-cn';
+
+// MUI Locales for DatePicker
+import { koKR } from '@mui/x-date-pickers/locales';
+import { zhCN } from '@mui/x-date-pickers/locales';
+import { enUS } from '@mui/x-date-pickers/locales';
+
+// Styles
+import './styles/fullcalendar.css';
 
 // Contexts
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { I18nProvider } from './contexts/I18nContext';
+import { I18nProvider, useI18n } from './contexts/I18nContext';
 
 // Components
 import { LoadingIndicator } from './components/LoadingIndicator';
@@ -20,6 +36,7 @@ import { MainLayout } from './components/layout/MainLayout';
 // Pages - Auth
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
+import LandingPage from './pages/LandingPage';
 import SignUpPromptPage from './pages/auth/SignUpPromptPage';
 import PendingApprovalPage from './pages/auth/PendingApprovalPage';
 import AccountSuspendedPage from './pages/auth/AccountSuspendedPage';
@@ -34,6 +51,7 @@ import UnauthorizedPage from './pages/common/UnauthorizedPage';
 // Pages - User
 import ProfilePage from './pages/user/ProfilePage';
 import SettingsPage from './pages/SettingsPage';
+import TagsPage from './pages/settings/TagsPage';
 
 // Pages - Admin
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
@@ -42,16 +60,89 @@ import GameWorldsPage from './pages/admin/GameWorldsPage';
 import WhitelistPage from './pages/admin/WhitelistPage';
 import ClientVersionsPage from './pages/admin/ClientVersionsPage';
 import AuditLogsPage from './pages/admin/AuditLogsPage';
-// import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage';
+import MaintenancePage from './pages/admin/MaintenancePage';
+import MessageTemplatesPage from './pages/admin/MessageTemplatesPage';
+import SchedulerPage from './pages/admin/SchedulerPage';
 
-const App: React.FC = () => {
+import JobsPage from './pages/admin/JobsPage';
+import QueueMonitorPage from './pages/admin/QueueMonitorPage';
+import CustomQueueMonitorPage from './pages/admin/CustomQueueMonitorPage';
+// import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
+
+// LocalizationProvider with language support
+const LocalizedDatePickers: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { language } = useI18n();
+
+  console.log('🌍 LocalizedDatePickers - Current language:', language);
+
+  // Set dayjs locale
+  React.useEffect(() => {
+    console.log('⚙️ Setting dayjs locale for:', language);
+    switch (language) {
+      case 'ko':
+        dayjs.locale('ko');
+        console.log('✅ Dayjs locale set to Korean');
+        break;
+      case 'zh':
+        dayjs.locale('zh-cn');
+        console.log('✅ Dayjs locale set to Chinese');
+        break;
+      default:
+        dayjs.locale('en');
+        console.log('✅ Dayjs locale set to English');
+        break;
+    }
+  }, [language]);
+
+  // Get the correct locale text
+  const getLocaleText = () => {
+    switch (language) {
+      case 'ko':
+        console.log('🇰🇷 Using Korean locale text');
+        return koKR;
+      case 'zh':
+        console.log('🇨🇳 Using Chinese locale text');
+        return zhCN;
+      default:
+        console.log('🇺🇸 Using English locale text');
+        return enUS;
+    }
+  };
+
+  const localeText = getLocaleText();
+  console.log('📝 Final locale text:', localeText);
+
+  // Force complete re-mount when language changes
+  const adapterLocale = language === 'ko' ? 'ko' : language === 'zh' ? 'zh-cn' : 'en';
+
+  console.log('🔧 Final settings:', {
+    language,
+    adapterLocale,
+    localeText: localeText?.components?.MuiLocalizationProvider?.defaultProps?.localeText
+  });
+
   return (
-    <I18nProvider>
-      <ThemeProvider>
-        <AuthProvider>
+    <LocalizationProvider
+      key={`picker-${language}-${adapterLocale}`}
+      dateAdapter={AdapterDayjs}
+      adapterLocale={adapterLocale}
+      localeText={localeText?.components?.MuiLocalizationProvider?.defaultProps?.localeText}
+    >
+      {children}
+    </LocalizationProvider>
+  );
+};
+
+// App Content with LocalizedDatePickers inside I18nProvider
+const AppContent: React.FC = () => {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <LocalizedDatePickers>
           <CssBaseline />
           <SnackbarProvider
             maxSnack={3}
+            autoHideDuration={4000}
             anchorOrigin={{
               vertical: 'bottom',
               horizontal: 'center',
@@ -69,14 +160,10 @@ const App: React.FC = () => {
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
+                {/* Landing Page */}
+                <Route path="/" element={<LandingPage />} />
+
                 {/* Protected Routes */}
-                <Route path="/" element={
-                  <ProtectedRoute>
-                    <MainLayout>
-                      <Navigate to="/dashboard" replace />
-                    </MainLayout>
-                  </ProtectedRoute>
-                } />
 
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
@@ -94,11 +181,18 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 } />
 
-                {/* Settings Route */}
+                {/* Settings Routes */}
                 <Route path="/settings" element={
                   <ProtectedRoute>
                     <MainLayout>
                       <SettingsPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
+                <Route path="/settings/tags" element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <TagsPage />
                     </MainLayout>
                   </ProtectedRoute>
                 } />
@@ -115,7 +209,13 @@ const App: React.FC = () => {
                         <Route path="users" element={<UsersManagementPage />} />
                         <Route path="client-versions" element={<ClientVersionsPage />} />
                         <Route path="game-worlds" element={<GameWorldsPage />} />
+                        <Route path="maintenance" element={<MaintenancePage />} />
+                        <Route path="maintenance-templates" element={<MessageTemplatesPage />} />
+                        <Route path="scheduler" element={<SchedulerPage />} />
                         <Route path="whitelist" element={<WhitelistPage />} />
+
+                        <Route path="jobs" element={<JobsPage />} />
+                        <Route path="queue-monitor" element={<QueueMonitorPage />} />
                         <Route path="audit-logs" element={<AuditLogsPage />} />
                       </Routes>
                     </MainLayout>
@@ -138,8 +238,16 @@ const App: React.FC = () => {
               pauseOnHover
             />
           </SnackbarProvider>
-        </AuthProvider>
-      </ThemeProvider>
+        </LocalizedDatePickers>
+      </AuthProvider>
+    </ThemeProvider>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <I18nProvider>
+      <AppContent />
     </I18nProvider>
   );
 };

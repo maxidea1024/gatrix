@@ -1,0 +1,102 @@
+import api from './api';
+import { Job, JobType, JobExecution, CreateJobData, UpdateJobData, JobFilters, JobExecutionFilters } from '../types/job';
+
+export const jobService = {
+  // Job Types
+  async getJobTypes(): Promise<JobType[]> {
+    const response = await api.get('/job-types');
+    return response.data?.data || response.data || [];
+  },
+
+  async getJobType(id: number): Promise<JobType> {
+    const response = await api.get(`/job-types/${id}`);
+    return response.data?.data || response.data;
+  },
+
+  async getEnabledJobTypes(): Promise<JobType[]> {
+    const response = await api.get('/job-types?enabled=true');
+    return response.data?.data || response.data || [];
+  },
+
+  // Jobs
+  async getJobs(filters?: JobFilters): Promise<Job[]> {
+    const params = new URLSearchParams();
+    if (filters?.job_type_id) params.append('job_type_id', filters.job_type_id.toString());
+    if (filters?.is_enabled !== undefined) params.append('is_enabled', filters.is_enabled.toString());
+    if (filters?.search) params.append('search', filters.search);
+
+    const queryString = params.toString();
+    const url = queryString ? `/jobs?${queryString}` : '/jobs';
+    const response = await api.get(url);
+    return response.data?.data || response.data || [];
+  },
+
+  async getJob(id: number): Promise<Job> {
+    const response = await api.get(`/jobs/${id}`);
+    return response.data?.data || response.data;
+  },
+
+  async createJob(data: CreateJobData): Promise<Job> {
+    const response = await api.post('/jobs', data);
+    return response.data?.data || response.data;
+  },
+
+  async updateJob(id: number, data: UpdateJobData): Promise<Job> {
+    const response = await api.put(`/jobs/${id}`, data);
+    return response.data?.data || response.data;
+  },
+
+  async deleteJob(id: number): Promise<boolean> {
+    const response = await api.delete(`/jobs/${id}`);
+    return response.data?.success ?? true;
+  },
+
+  async executeJob(id: number): Promise<{ executionId: number }> {
+    const response = await api.post(`/jobs/${id}/execute`);
+    return response.data?.data || response.data;
+  },
+
+  // Job Executions
+  async getJobExecutions(jobId: number, filters?: JobExecutionFilters): Promise<JobExecution[]> {
+    const params = new URLSearchParams();
+    if (filters?.limit) params.append('limit', filters.limit.toString());
+    if (filters?.offset) params.append('offset', filters.offset.toString());
+
+    const queryString = params.toString();
+    const url = queryString ? `/jobs/${jobId}/executions?${queryString}` : `/jobs/${jobId}/executions`;
+    const response = await api.get(url);
+    return response.data?.data || response.data || [];
+  },
+
+  async getAllJobExecutions(filters?: JobExecutionFilters): Promise<JobExecution[]> {
+    const params = new URLSearchParams();
+    if (filters?.job_id) params.append('job_id', filters.job_id.toString());
+    if (filters?.schedule_id) params.append('schedule_id', filters.schedule_id.toString());
+    if (filters?.status) params.append('status', filters.status);
+    if (filters?.date_from) params.append('date_from', filters.date_from);
+    if (filters?.date_to) params.append('date_to', filters.date_to);
+    if (filters?.limit) params.append('limit', filters.limit.toString());
+    if (filters?.offset) params.append('offset', filters.offset.toString());
+
+    const queryString = params.toString();
+    const url = queryString ? `/job-executions?${queryString}` : '/job-executions';
+    const response = await api.get(url);
+    return response.data?.data || response.data || [];
+  },
+
+  async getJobExecution(id: number): Promise<JobExecution> {
+    const response = await api.get(`/job-executions/${id}`);
+    return response.data?.data || response.data;
+  },
+
+  async getJobExecutionStatistics(dateFrom?: string, dateTo?: string): Promise<any> {
+    const params = new URLSearchParams();
+    if (dateFrom) params.append('date_from', dateFrom);
+    if (dateTo) params.append('date_to', dateTo);
+
+    const queryString = params.toString();
+    const url = queryString ? `/job-executions/statistics?${queryString}` : '/job-executions/statistics';
+    const response = await api.get(url);
+    return response.data?.data || response.data;
+  }
+};

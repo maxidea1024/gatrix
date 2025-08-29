@@ -1,7 +1,9 @@
 import { Response, NextFunction } from 'express';
 import { AuditLogModel } from '../models/AuditLog';
 import { AuthenticatedRequest } from './auth';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('AuditLog');
 
 export interface AuditLogOptions {
   action: string;
@@ -165,6 +167,69 @@ export const auditUserDemote = auditLog({
     userId: req.params?.id,
     newRole: 'user',
   }),
+});
+
+// Game world actions
+export const auditGameWorldCreate = auditLog({
+  action: 'game_world_create',
+  resourceType: 'game_world',
+  getResourceId: (req) => req.body?.worldId,
+  getDetails: (req) => ({
+    body: req.body,
+  }),
+});
+
+export const auditGameWorldUpdate = auditLog({
+  action: 'game_world_update',
+  resourceType: 'game_world',
+  getResourceId: (req) => req.params?.id,
+  getDetails: (req) => ({
+    id: req.params?.id,
+    updates: req.body,
+  }),
+});
+
+export const auditGameWorldDelete = auditLog({
+  action: 'game_world_delete',
+  resourceType: 'game_world',
+  getResourceId: (req) => req.params?.id,
+  getDetails: (req) => ({ id: req.params?.id }),
+});
+
+export const auditGameWorldToggleVisibility = auditLog({
+  action: 'game_world_toggle_visibility',
+  resourceType: 'game_world',
+  getResourceId: (req) => req.params?.id,
+  getDetails: (req) => ({ id: req.params?.id, toggle: 'visibility' }),
+});
+
+export const auditGameWorldToggleMaintenance = auditLog({
+  action: 'game_world_toggle_maintenance',
+  resourceType: 'game_world',
+  getResourceId: (req) => req.params?.id,
+  getDetails: (req) => ({ id: req.params?.id, toggle: 'maintenance' }),
+});
+
+export const auditGameWorldUpdateOrders = auditLog({
+  action: 'game_world_update_orders',
+  resourceType: 'game_world',
+  getDetails: (req) => ({
+    updates: req.body?.orderUpdates,
+  }),
+});
+
+export const auditGameWorldMoveUp = auditLog({
+  action: 'game_world_update_orders',
+  resourceType: 'game_world',
+  getResourceId: (req) => req.params?.id,
+  getDetails: (req) => ({ id: req.params?.id, direction: 'up' }),
+});
+
+export const auditGameWorldMoveDown = auditLog({
+  action: 'game_world_update_orders',
+  resourceType: 'game_world',
+  getResourceId: (req) => req.params?.id,
+  getDetails: (req) => ({ id: req.params?.id, direction: 'down' }),
 });
 
 export const auditPasswordChange = auditLog({

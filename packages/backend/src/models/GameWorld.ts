@@ -9,6 +9,7 @@ export interface GameWorld {
   isMaintenance: boolean;
   displayOrder: number;
   description?: string;
+  tags?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -20,6 +21,7 @@ export interface CreateGameWorldData {
   isMaintenance?: boolean;
   displayOrder?: number;
   description?: string;
+  tags?: string | null;
 }
 
 export interface UpdateGameWorldData {
@@ -29,6 +31,7 @@ export interface UpdateGameWorldData {
   isMaintenance?: boolean;
   displayOrder?: number;
   description?: string;
+  tags?: string | null;
 }
 
 export interface GameWorldListParams {
@@ -37,6 +40,7 @@ export interface GameWorldListParams {
   sortOrder?: 'ASC' | 'DESC';
   isVisible?: boolean;
   isMaintenance?: boolean;
+  tags?: string; // comma-separated; filtering uses LIKE per tag
 }
 
 export class GameWorldModel {
@@ -72,7 +76,8 @@ export class GameWorldModel {
         search = '',
         sortBy = 'displayOrder',
         sortOrder = 'ASC',
-        isVisible
+        isVisible,
+        isMaintenance,
       } = params;
 
       // Build WHERE clause
@@ -80,9 +85,9 @@ export class GameWorldModel {
       const queryParams: any[] = [];
 
       if (search) {
-        whereConditions.push('(name LIKE ? OR worldId LIKE ? OR description LIKE ?)');
+        whereConditions.push('(name LIKE ? OR worldId LIKE ? OR description LIKE ? OR tags LIKE ?)');
         const searchPattern = `%${search}%`;
-        queryParams.push(searchPattern, searchPattern, searchPattern);
+        queryParams.push(searchPattern, searchPattern, searchPattern, searchPattern);
       }
 
       if (isVisible !== undefined) {
@@ -95,11 +100,20 @@ export class GameWorldModel {
         queryParams.push(params.isMaintenance);
       }
 
+      if (params.tags) {
+        const tags = params.tags.split(',').map(t => t.trim()).filter(Boolean);
+        if (tags.length > 0) {
+          tags.forEach(tag => {
+            whereConditions.push('tags LIKE ?');
+            queryParams.push(`%${tag}%`);
+          });
+        }
+      }
+
       const whereClause = whereConditions.length > 0
         ? `WHERE ${whereConditions.join(' AND ')}`
         : '';
 
-      // Get all results
       const dataQuery = `
         SELECT * FROM g_game_worlds
         ${whereClause}
@@ -119,22 +133,24 @@ export class GameWorldModel {
       // Get the next display order if not provided
       let displayOrder = worldData.displayOrder;
       if (displayOrder === undefined) {
-        const maxOrderResult = await database.query(
-          'SELECT COALESCE(MAX(displayOrder), 0) + 10 as nextOrder FROM g_game_worlds'
+        // Get the minimum display order to place new world at the top
+        const minOrderResult = await database.query(
+          'SELECT COALESCE(MIN(displayOrder), 10) - 10 as nextOrder FROM g_game_worlds'
         );
-        displayOrder = maxOrderResult[0].nextOrder;
+        displayOrder = minOrderResult[0].nextOrder;
       }
 
       const result = await database.query(
-        `INSERT INTO g_game_worlds (worldId, name, isVisible, isMaintenance, displayOrder, description)
-         VALUES (?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO g_game_worlds (worldId, name, isVisible, isMaintenance, displayOrder, description, tags)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
           worldData.worldId,
           worldData.name,
           worldData.isVisible ?? true,
           worldData.isMaintenance ?? false,
           displayOrder,
-          worldData.description || null
+          worldData.description || null,
+          worldData.tags || null
         ]
       );
 
@@ -214,7 +230,7 @@ export class GameWorldModel {
 
   static async updateDisplayOrders(orderUpdates: { id: number; displayOrder: number }[]): Promise<void> {
     try {
-      logger.info('Updating display orders for game worlds:', orderUpdates);
+      // logger.info('Updating display orders for game worlds:', orderUpdates);
 
       await database.transaction(async (connection) => {
         for (const update of orderUpdates) {
@@ -223,7 +239,7 @@ export class GameWorldModel {
             [update.displayOrder, update.id]
           ) as any;
 
-          logger.info(`Updated world ${update.id} with displayOrder ${update.displayOrder}, affected rows: ${result.affectedRows}`);
+          // logger.info(`Updated world ${update.id} with displayOrder ${update.displayOrder}, affected rows: ${result.affectedRows}`);
 
           if (result.affectedRows === 0) {
             throw new Error(`No game world found with id ${update.id}`);

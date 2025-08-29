@@ -3,6 +3,8 @@ import { config } from './config';
 import logger from './config/logger';
 import database from './config/database';
 import redisClient from './config/redis';
+import { pubSubService } from './services/PubSubService';
+import { queueService } from './services/QueueService';
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error: Error) => {
@@ -21,9 +23,23 @@ const gracefulShutdown = async (signal: string) => {
   logger.info(`Received ${signal}. Starting graceful shutdown...`);
   
   try {
+    // Close Queue service
+    try {
+      await queueService.shutdown();
+    } catch (error) {
+      logger.warn('Error shutting down Queue service:', error);
+    }
+
+    // Close PubSub service
+    try {
+      await pubSubService.shutdown();
+    } catch (error) {
+      logger.warn('Error shutting down PubSub service:', error);
+    }
+
     // Close database connections
     await database.close();
-    
+
     // Close Redis connection
     try {
       await redisClient.disconnect();
@@ -61,11 +77,21 @@ const startServer = async () => {
       logger.warn('Redis connection failed, continuing without Redis:', error);
     }
 
+    // Initialize Queue service
+    try {
+      await queueService.initialize();
+      logger.info('Queue service initialized successfully');
+    } catch (error) {
+      logger.warn('Queue service initialization failed, continuing without queues:', error);
+    }
+
     // Start HTTP server
     const server = app.listen(config.port, () => {
       logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`);
       logger.info(`Health check available at http://localhost:${config.port}/health`);
       logger.info(`API available at http://localhost:${config.port}/api/v1`);
+      logger.info(`Queue service ready: ${queueService.isReady()}`);
+      logger.info(`PubSub service ready: ${pubSubService.isReady()}`);
     });
 
     // Handle server errors
@@ -97,4 +123,7 @@ const startServer = async () => {
 };
 
 // Start the server
-startServer();
+startServer().catch((error) => {
+  logger.error('Failed to start server:', error);
+  process.exit(1);
+});

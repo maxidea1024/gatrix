@@ -27,7 +27,7 @@ export const gameWorldService = {
       }
 
       return {
-        worlds: data.worlds || [],
+        worlds: (data.worlds || []),
         total: data.total || 0
       };
     } catch (error: any) {
@@ -51,17 +51,7 @@ export const gameWorldService = {
   // Create new game world
   async createGameWorld(data: CreateGameWorldData): Promise<GameWorld> {
     const response = await api.post('/game-worlds', data);
-
-
-    // 응답 구조 확인
-    if (response.data?.data?.world) {
-      return response.data.data.world;
-    } else if (response.data?.world) {
-      return response.data.world;
-    } else {
-      console.error('Invalid create response structure:', response.data);
-      throw new Error('Invalid response structure');
-    }
+    return response.data?.data?.world || response.data?.world;
   },
 
   // Update game world
@@ -97,12 +87,12 @@ export const gameWorldService = {
   // Move world up
   async moveUp(id: number): Promise<boolean> {
     const response = await api.patch(`/game-worlds/${id}/move-up`);
-    return response.data.data.moved;
+    return response.data?.data?.moved ?? response.data?.moved ?? false;
   },
 
   // Move world down
   async moveDown(id: number): Promise<boolean> {
     const response = await api.patch(`/game-worlds/${id}/move-down`);
-    return response.data.data.moved;
+    return response.data?.data?.moved ?? response.data?.moved ?? false;
   }
 };

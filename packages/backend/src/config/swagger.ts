@@ -193,6 +193,40 @@ const options: swaggerJSDoc.Options = {
         },
       },
     },
+    tags: [
+      {
+        name: 'Authentication',
+        description: 'User authentication and authorization endpoints',
+      },
+      {
+        name: 'Users',
+        description: 'User management endpoints',
+      },
+      {
+        name: 'Admin',
+        description: 'Administrative endpoints (requires admin role)',
+      },
+      {
+        name: 'Client',
+        description: 'Public client endpoints (no authentication required, cached)',
+      },
+      {
+        name: 'Game Worlds',
+        description: 'Game world management endpoints',
+      },
+      {
+        name: 'Client Versions',
+        description: 'Client version management endpoints',
+      },
+      {
+        name: 'Whitelist',
+        description: 'User whitelist management endpoints',
+      },
+      {
+        name: 'Audit Logs',
+        description: 'System audit log endpoints',
+      },
+    ],
     security: [
       {
         bearerAuth: [],

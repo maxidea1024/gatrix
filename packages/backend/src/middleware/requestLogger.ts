@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('RequestLogger');
 
 export interface RequestWithStartTime extends Request {
   startTime?: number;

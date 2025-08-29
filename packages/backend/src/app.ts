@@ -10,10 +10,12 @@ import { config } from './config';
 import redisClient from './config/redis';
 import passport from './config/passport';
 import swaggerSpec from './config/swagger';
+import logger from './config/logger';
 import { requestLogger } from './middleware/requestLogger';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { generalLimiter, apiLimiter, authLimiter } from './middleware/rateLimiter';
 import { responseCache, cacheConfigs } from './middleware/responseCache';
+import { initializeJobTypes } from './services/jobs';
 
 // Import routes
 import authRoutes from './routes/auth';
@@ -22,9 +24,21 @@ import adminRoutes from './routes/admin';
 import uploadRoutes from './routes/upload';
 import gameWorldRoutes from './routes/gameWorlds';
 import whitelistRoutes from './routes/whitelist';
+import ipWhitelistRoutes from './routes/ipWhitelist';
 import clientVersionRoutes from './routes/clientVersionRoutes';
 import auditLogRoutes from './routes/auditLogs';
+import clientRoutes from './routes/client';
+import tagRoutes from './routes/tags';
+import maintenanceRoutes from './routes/maintenance';
+import messageTemplateRoutes from './routes/messageTemplates';
+import jobRoutes from './routes/jobs';
+import varsRoutes from './routes/vars';
+
 // import advancedSettingsRoutes from './routes/advancedSettings';
+import { authenticate, requireAdmin } from './middleware/auth';
+import { BullBoardConfig } from './config/bullboard';
+
+
 
 const app = express();
 
@@ -109,6 +123,18 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Server time
+app.get('/time', (req, res) => {
+  const clientLocalTime = req.query.clientLocalTime ? Number.parseInt(req.query.clientLocalTime as string) : 0;
+
+  res.status(200).json({
+    success: true,
+    serverLocalTimeISO: new Date().toISOString(),
+    serverLocalTime: new Date().getTime(),
+    clientLocalTime,
+  });
+});
+
 // Swagger API documentation
 if (config.nodeEnv !== 'production') {
   const swaggerOptions = {
@@ -141,9 +167,46 @@ app.use('/api/v1/users', responseCache(cacheConfigs.userSpecific), userRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/upload', uploadRoutes);
 app.use('/api/v1/game-worlds', gameWorldRoutes);
+
+// Time API (직접 구현)
+app.get('/time', (req, res) => {
+  try {
+    const serverLocalTime = Date.now();
+    const serverLocalTimeISO = new Date(serverLocalTime).toISOString();
+    const clientLocalTime = parseInt(req.query.clientLocalTime as string) || 0;
+
+    res.json({
+      success: true,
+      serverLocalTimeISO,
+      serverLocalTime,
+      clientLocalTime
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get server time'
+    });
+  }
+});
+
+// Bull Board (Admin only)
+const bullBoardAdapter = BullBoardConfig.initialize();
+app.use('/admin/queues', bullBoardAdapter.getRouter());
+app.use('/api/v1/admin/queues', (authenticate as any), (requireAdmin as any), bullBoardAdapter.getRouter());
+
+// Client API routes (no authentication, no rate limiting, with caching) - MUST BE BEFORE GENERAL /api/v1 routes
+app.use('/api/v1/client', clientRoutes);
+app.use('/api/v1/vars', varsRoutes);
+
 app.use('/api/v1/whitelist', whitelistRoutes);
+app.use('/api/v1/ip-whitelist', ipWhitelistRoutes);
 app.use('/api/v1/client-versions', clientVersionRoutes);
 app.use('/api/v1/audit-logs', auditLogRoutes);
+app.use('/api/v1/tags', tagRoutes);
+app.use('/api/v1', maintenanceRoutes);
+app.use('/api/v1/message-templates', messageTemplateRoutes);
+app.use('/api/v1', jobRoutes);
+
 // app.use('/api/v1/advanced-settings', advancedSettingsRoutes);
 
 // Temporary route for testing
@@ -160,5 +223,12 @@ app.use(notFoundHandler);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);
+
+// Initialize job types
+try {
+  initializeJobTypes();
+} catch (error) {
+  logger.error('Failed to initialize job types:', error);
+}
 
 export default app;

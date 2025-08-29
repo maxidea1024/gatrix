@@ -15,12 +15,12 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-// import { useTranslations } from '@/contexts/I18nContext';
+import { useTranslation } from 'react-i18next';
 
 const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  // const { t, errors } = useTranslations();
+  const { t } = useTranslation();
 
   const handleGoHome = () => {
     if (isAuthenticated) {
@@ -64,24 +64,28 @@ const NotFoundPage: React.FC = () => {
 
             {/* Title */}
             <Typography variant="h4" component="h1" gutterBottom color="primary.main">
-              404 - Page Not Found
+              {t('notFound.subtitle')}
+            </Typography>
+
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              {t('notFound.title')}
             </Typography>
 
             {/* Message */}
             <Typography variant="body1" paragraph sx={{ mb: 4 }}>
-              The page you're looking for doesn't exist or has been moved.
+              {t('notFound.description')}
             </Typography>
 
             <Typography variant="body2" color="text.secondary" paragraph>
-              This could happen if:
+              {t('notFound.possibleCauses')}
             </Typography>
 
             <Box sx={{ textAlign: 'left', mb: 4, mx: 'auto', maxWidth: 300 }}>
               <Typography variant="body2" color="text.secondary" component="ul" sx={{ pl: 2 }}>
-                <li>The URL was typed incorrectly</li>
-                <li>The page has been moved or deleted</li>
-                <li>You don't have permission to view this page</li>
-                <li>The link you followed is broken</li>
+                <li>{t('notFound.causeUrlTypo')}</li>
+                <li>{t('notFound.causeMovedOrDeleted')}</li>
+                <li>{t('notFound.causeNoPermission')}</li>
+                <li>{t('notFound.causeBrokenLink')}</li>
               </Typography>
             </Box>
 
@@ -96,7 +100,7 @@ const NotFoundPage: React.FC = () => {
               }}
             >
               <Typography variant="body2" fontWeight="medium">
-                Error 404: {errors.notFound}
+                Error 404: {t('errors.notFound')}
               </Typography>
             </Box>
 
@@ -108,7 +112,7 @@ const NotFoundPage: React.FC = () => {
                 onClick={handleGoHome}
                 fullWidth
               >
-                {isAuthenticated ? 'Go to Dashboard' : 'Go to Login'}
+                {isAuthenticated ? t('common.goToDashboard') : t('common.goToLogin')}
               </Button>
               
               <Button
@@ -117,14 +121,14 @@ const NotFoundPage: React.FC = () => {
                 onClick={handleGoBack}
                 fullWidth
               >
-                Go Back
+                {t('common.goBack')}
               </Button>
             </Box>
 
             {/* Additional Info */}
             <Box sx={{ mt: 4, pt: 3, borderTop: 1, borderColor: 'divider' }}>
               <Typography variant="caption" color="text.secondary">
-                If you believe this page should exist, please contact support.
+                {t('notFound.footer')}
               </Typography>
             </Box>
           </CardContent>

@@ -22,21 +22,43 @@ import {
   Tooltip,
   Alert,
   LinearProgress,
+  Pagination,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
   Info as InfoIcon,
+  ContentCopy as ContentCopyIcon,
 } from '@mui/icons-material';
 
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { AuditLogService, AuditLogFilters } from '../../services/auditLogService';
 import { AuditLog } from '../../types';
-import { format } from 'date-fns';
+import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import SimplePagination from '../../components/common/SimplePagination';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { useI18n } from '../../contexts/I18nContext';
+import { koKR, zhCN, enUS } from '@mui/x-date-pickers/locales';
+import dayjs, { Dayjs } from 'dayjs';
+
+
 
 const AuditLogsPage: React.FC = () => {
   const { t } = useTranslation();
+  const { language } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
+
+  // Get locale text for DateTimePicker
+  const getDatePickerLocale = () => {
+    switch (language) {
+      case 'ko':
+        return koKR;
+      case 'zh':
+        return zhCN;
+      default:
+        return enUS;
+    }
+  };
 
   // State
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
@@ -47,20 +69,28 @@ const AuditLogsPage: React.FC = () => {
 
   // Filters
   const [filters, setFilters] = useState<AuditLogFilters>({});
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
+  const [startDate, setStartDate] = useState<Dayjs | null>(null);
+  const [endDate, setEndDate] = useState<Dayjs | null>(null);
+  const [userFilter, setUserFilter] = useState<string>('');
+  const [ipFilter, setIpFilter] = useState<string>('');
 
   // Load audit logs
   const loadAuditLogs = useCallback(async () => {
     try {
       setLoading(true);
-      
+
       const dateFilters: AuditLogFilters = { ...filters };
       if (startDate) {
-        dateFilters.start_date = new Date(startDate).toISOString();
+        dateFilters.start_date = startDate.toISOString();
       }
       if (endDate) {
-        dateFilters.end_date = new Date(endDate).toISOString();
+        dateFilters.end_date = endDate.toISOString();
+      }
+      if (userFilter) {
+        (dateFilters as any).user = userFilter.trim();
+      }
+      if (ipFilter) {
+        (dateFilters as any).ip_address = ipFilter;
       }
 
       const result = await AuditLogService.getAuditLogs(
@@ -81,7 +111,7 @@ const AuditLogsPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Error loading audit logs:', error);
-      enqueueSnackbar(error.message || 'Failed to load audit logs', { variant: 'error' });
+      enqueueSnackbar(error.message || t('auditLogs.loadFailed'), { variant: 'error' });
       setAuditLogs([]);
       setTotal(0);
     } finally {
@@ -116,17 +146,23 @@ const AuditLogsPage: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), 'yyyy-MM-dd HH:mm:ss');
-    } catch {
-      return dateString;
-    }
+    return formatDateTimeDetailed(dateString);
   };
 
   const formatDetails = (details: any) => {
     if (!details) return '-';
     if (typeof details === 'string') return details;
     return JSON.stringify(details, null, 2);
+  };
+
+  const handleCopyDetails = async (details: any) => {
+    try {
+      const text = typeof details === 'string' ? details : JSON.stringify(details, null, 2);
+      await navigator.clipboard.writeText(text);
+      enqueueSnackbar(t('auditLogs.detailsCopied'), { variant: 'success' });
+    } catch {
+      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
+    }
   };
 
   return (
@@ -137,11 +173,7 @@ const AuditLogsPage: React.FC = () => {
           <Typography variant="h4" sx={{ fontWeight: 600 }}>
             {t('auditLogs.title')}
           </Typography>
-          <Tooltip title={t('common.refresh')}>
-            <IconButton onClick={handleRefresh} disabled={loading}>
-              <RefreshIcon />
-            </IconButton>
-          </Tooltip>
+
         </Box>
         <Typography variant="body1" color="text.secondary">
           {t('auditLogs.subtitle')}
@@ -151,72 +183,109 @@ const AuditLogsPage: React.FC = () => {
         {/* Filters */}
         <Card sx={{ mb: 3 }}>
           <CardContent>
-            <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={3}>
-              <FormControl fullWidth>
-                <InputLabel shrink={!!filters.action || filters.action === ''}>{t('auditLogs.action')}</InputLabel>
-                <Select
-                  value={filters.action || ''}
-                  label={t('auditLogs.action')}
-                  onChange={(e) => handleFilterChange('action', e.target.value)}
-                  displayEmpty
-                >
-                  <MenuItem value="">{t('auditLogs.allActions')}</MenuItem>
-                  {AuditLogService.getAvailableActions().map((action) => (
-                    <MenuItem key={action} value={action}>
-                      {AuditLogService.formatActionName(action)}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <FormControl fullWidth>
-                <InputLabel shrink={!!filters.resource_type || filters.resource_type === ''}>{t('auditLogs.resourceType')}</InputLabel>
-                <Select
-                  value={filters.resource_type || ''}
-                  label={t('auditLogs.resourceType')}
-                  onChange={(e) => handleFilterChange('resource_type', e.target.value)}
-                  displayEmpty
-                >
-                  <MenuItem value="">{t('auditLogs.allTypes')}</MenuItem>
-                  {AuditLogService.getAvailableResourceTypes().map((type) => (
-                    <MenuItem key={type} value={type}>
-                      {AuditLogService.formatResourceType(type)}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <TextField
-                label={t('auditLogs.startDate')}
-                type="date"
-                fullWidth
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <TextField
-                label={t('auditLogs.endDate')}
-                type="date"
-                fullWidth
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-            </Grid>
-          </Grid>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <InputLabel shrink={true}>{t('auditLogs.action')}</InputLabel>
+                  <Select
+                    value={filters.action || ''}
+                    label={t('auditLogs.action')}
+                    onChange={(e) => handleFilterChange('action', e.target.value)}
+                    displayEmpty
+                    size="small"
+                  >
+                    <MenuItem value="">{t('auditLogs.allActions')}</MenuItem>
+                    {AuditLogService.getAvailableActions().map((action) => (
+                      <MenuItem key={action} value={action}>
+                        {t(`auditLogs.actions.${action}`)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                  <InputLabel shrink={true}>{t('auditLogs.resourceType')}</InputLabel>
+                  <Select
+                    value={filters.resource_type || ''}
+                    label={t('auditLogs.resourceType')}
+                    onChange={(e) => handleFilterChange('resource_type', e.target.value)}
+                    displayEmpty
+                    size="small"
+                  >
+                    <MenuItem value="">{t('auditLogs.allTypes')}</MenuItem>
+                    {AuditLogService.getAvailableResourceTypes().map((type) => (
+                      <MenuItem key={type} value={type}>
+                        {t(`auditLogs.resources.${type}`)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <TextField
+                  label={t('auditLogs.user')}
+                  placeholder={t('auditLogs.searchUserPlaceholder')}
+                  size="small"
+                  sx={{ minWidth: 120 }}
+                  value={userFilter}
+                  onChange={(e) => setUserFilter(e.target.value)}
+                />
+
+                <TextField
+                  label={t('auditLogs.ipAddress')}
+                  size="small"
+                  sx={{ minWidth: 120 }}
+                  value={ipFilter}
+                  onChange={(e) => setIpFilter(e.target.value)}
+                />
+
+                <DateTimePicker
+                  key={`start-date-${language}`}
+                  label={t('auditLogs.startDate')}
+                  value={startDate}
+                  onChange={setStartDate}
+                  slotProps={{
+                    textField: {
+                      size: 'small',
+                      sx: { minWidth: 160 }
+                    },
+                    actionBar: {
+                      actions: ['cancel', 'accept']
+                    }
+                  }}
+                  localeText={getDatePickerLocale()}
+                />
+
+                <DateTimePicker
+                  key={`end-date-${language}`}
+                  label={t('auditLogs.endDate')}
+                  value={endDate}
+                  onChange={setEndDate}
+                  slotProps={{
+                    textField: {
+                      size: 'small',
+                      sx: { minWidth: 160 }
+                    },
+                    actionBar: {
+                      actions: ['cancel', 'accept']
+                    }
+                  }}
+                  localeText={getDatePickerLocale()}
+                />
+              </Box>
+
+              <Tooltip title={t('common.refresh')}>
+                <span>
+                  <IconButton onClick={handleRefresh} disabled={loading} sx={{ ml: 2 }}>
+                    <RefreshIcon />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Box>
           </CardContent>
         </Card>
 
         {/* Audit Logs Table */}
+
         <Card>
           {loading && <LinearProgress />}
           <TableContainer>
@@ -224,9 +293,9 @@ const AuditLogsPage: React.FC = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>{t('auditLogs.id')}</TableCell>
-                  <TableCell>{t('auditLogs.user')}</TableCell>
                   <TableCell>{t('auditLogs.action')}</TableCell>
                   <TableCell>{t('auditLogs.resource')}</TableCell>
+                  <TableCell>{t('auditLogs.user')}</TableCell>
                   <TableCell>{t('auditLogs.ipAddress')}</TableCell>
                   <TableCell>{t('auditLogs.date')}</TableCell>
                   <TableCell>{t('auditLogs.details')}</TableCell>
@@ -235,10 +304,13 @@ const AuditLogsPage: React.FC = () => {
               <TableBody>
                 {auditLogs.length === 0 && !loading ? (
                   <TableRow>
-                    <TableCell colSpan={7} align="center" sx={{ py: 8 }}>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                        <Typography variant="h6" color="text.secondary">
+                    <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Typography variant="h6" color="text.secondary" gutterBottom>
                           {t('auditLogs.noLogsFound')}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {t('auditLogs.noLogsDesc')}
                         </Typography>
                       </Box>
                     </TableCell>
@@ -247,6 +319,25 @@ const AuditLogsPage: React.FC = () => {
                   auditLogs.map((log) => (
                     <TableRow key={log.id}>
                       <TableCell>{log.id}</TableCell>
+                      <TableCell>
+                        <Chip label={t(`auditLogs.actions.${log.action}`)} color={AuditLogService.getActionColor(log.action)} size="small" />
+                      </TableCell>
+                      <TableCell>
+                        {(log.resource_type || (log as any).resourceType) ? (
+                          <Box>
+                            <Typography variant="body2" fontWeight="medium">
+                              {t(`auditLogs.resources.${(log as any).resource_type || (log as any).resourceType}`)}
+                            </Typography>
+                            {(log.resource_id || (log as any).resourceId) && (
+                              <Typography variant="caption" color="text.secondary">
+                                ID: {log.resource_id || (log as any).resourceId}
+                              </Typography>
+                            )}
+                          </Box>
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">-</Typography>
+                        )}
+                      </TableCell>
                       <TableCell>
                         {log.user_name ? (
                           <Box>
@@ -263,27 +354,8 @@ const AuditLogsPage: React.FC = () => {
                           </Typography>
                         )}
                       </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={AuditLogService.formatActionName(log.action)}
-                          color={AuditLogService.getActionColor(log.action)}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        {log.resource_type && (
-                          <Box>
-                            <Typography variant="body2">
-                              {AuditLogService.formatResourceType(log.resource_type)}
-                            </Typography>
-                            {log.resource_id && (
-                              <Typography variant="caption" color="text.secondary">
-                                ID: {log.resource_id}
-                              </Typography>
-                            )}
-                          </Box>
-                        )}
-                      </TableCell>
+
+
                       <TableCell>
                         <Typography variant="body2" fontFamily="monospace">
                           {log.ip_address || '-'}
@@ -291,14 +363,19 @@ const AuditLogsPage: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {formatDate(log.created_at)}
+                          {formatDateTimeDetailed((log as any).createdAt || log.created_at)}
                         </Typography>
                       </TableCell>
                       <TableCell>
                         <Tooltip title={formatDetails(log.details)}>
-                          <IconButton size="small">
-                            <InfoIcon />
-                          </IconButton>
+                          <Box sx={{ display: 'inline-flex', gap: 0.5 }}>
+                            <IconButton size="small">
+                              <InfoIcon />
+                            </IconButton>
+                            <IconButton size="small" onClick={() => handleCopyDetails(log.details)}>
+                              <ContentCopyIcon fontSize="small" />
+                            </IconButton>
+                          </Box>
                         </Tooltip>
                       </TableCell>
                     </TableRow>
@@ -307,18 +384,18 @@ const AuditLogsPage: React.FC = () => {
               </TableBody>
             </Table>
           </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25, 50]}
-            component="div"
+
+          <SimplePagination
             count={total}
-            rowsPerPage={rowsPerPage}
             page={page}
+            rowsPerPage={rowsPerPage}
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
+            rowsPerPageOptions={[5, 10, 25, 50]}
           />
         </Card>
       </Box>
-  );
+    );
 };
 
 export default AuditLogsPage;

@@ -24,17 +24,22 @@ function extractUsedKeys() {
   
   files.forEach(file => {
     const content = fs.readFileSync(file, 'utf8');
-    
-    // t('key') 패턴 찾기
+
+    // t('key') / t("key") / t(`key`) 패턴 찾기
     const matches = content.match(/t\(['"`]([^'"`]+)['"`]\)/g);
     if (matches) {
       matches.forEach(match => {
         const key = match.match(/t\(['"`]([^'"`]+)['"`]\)/)[1];
+        // 템플릿 리터럴 동적 키 또는 비정상 키는 제외
+        // - ${...} 포함 (동적 키)
+        // - 허용되지 않은 패턴(알파벳/숫자/언더스코어와 점(.)의 조합이 아닌 경우)
+        if (key.includes('${')) return;
+        if (!/^[A-Za-z0-9_]+(\.[A-Za-z0-9_]+)*$/.test(key)) return;
         usedKeys.add(key);
       });
     }
   });
-  
+
   return Array.from(usedKeys).sort();
 }
 

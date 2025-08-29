@@ -11,11 +11,8 @@ router.use((req, res, next) => {
 });
 
 // 메타데이터 라우트 (/:id보다 먼저 정의해야 함)
-// 채널 목록 조회 (관리자만)
-router.get('/meta/channels', requireAdmin as any, ClientVersionController.getChannels);
-
-// 서브채널 목록 조회 (관리자만)
-router.get('/meta/subchannels', requireAdmin as any, ClientVersionController.getSubChannels);
+// 플랫폼 목록 조회 (관리자만)
+router.get('/meta/platforms', requireAdmin as any, ClientVersionController.getPlatforms);
 
 // 클라이언트 버전 목록 조회 (관리자만)
 router.get('/', requireAdmin as any, ClientVersionController.getClientVersions);
@@ -35,11 +32,25 @@ router.post('/',
     getResourceId: (req) => req.body?.version,
     getDetails: (req) => ({
       version: req.body?.version,
-      channel: req.body?.channel,
-      subChannel: req.body?.subChannel,
+      platform: req.body?.platform,
     }),
   }) as any,
   ClientVersionController.createClientVersion
+);
+
+// 클라이언트 버전 간편 생성 (관리자만)
+router.post('/bulk',
+  requireAdmin as any,
+  auditLog({
+    action: 'client_version_bulk_create',
+    resourceType: 'client_version',
+    getResourceId: (req) => req.body?.clientVersion,
+    getDetails: (req) => ({
+      version: req.body?.clientVersion,
+      platforms: req.body?.platforms?.map((p: any) => p.platform),
+    }),
+  }) as any,
+  ClientVersionController.bulkCreateClientVersions
 );
 
 // 클라이언트 버전 수정 (관리자만)

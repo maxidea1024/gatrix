@@ -59,6 +59,8 @@ export class AuditLogModel {
     limit: number = 10,
     filters: {
       user_id?: number;
+      user?: string; // search by email or name
+      ip_address?: string;
       action?: string;
       resource_type?: string;
       start_date?: Date;
@@ -66,6 +68,16 @@ export class AuditLogModel {
     } = {}
   ): Promise<{ logs: AuditLog[]; total: number; page: number; limit: number }> {
     try {
+      // Check if table exists first
+      try {
+        await database.query('SELECT 1 FROM g_audit_logs LIMIT 1');
+      } catch (error: any) {
+        if (error.code === 'ER_NO_SUCH_TABLE') {
+          logger.error('g_audit_logs table does not exist. Please run migrations.');
+          throw new Error('Audit logs table not found. Please run database migrations.');
+        }
+        throw error;
+      }
       const offset = (page - 1) * limit;
       const whereConditions: string[] = [];
       const whereValues: any[] = [];
@@ -73,6 +85,11 @@ export class AuditLogModel {
       if (filters.user_id) {
         whereConditions.push('userId = ?');
         whereValues.push(filters.user_id);
+      }
+
+      if (filters.ip_address) {
+        whereConditions.push('ipAddress LIKE ?');
+        whereValues.push(`%${filters.ip_address}%`);
       }
 
       if (filters.action) {
@@ -83,6 +100,11 @@ export class AuditLogModel {
       if (filters.resource_type) {
         whereConditions.push('resourceType = ?');
         whereValues.push(filters.resource_type);
+      }
+
+      if (filters.user) {
+        whereConditions.push('(u.email LIKE ? OR u.name LIKE ?)');
+        whereValues.push(`%${filters.user}%`, `%${filters.user}%`);
       }
 
       if (filters.start_date) {
@@ -97,38 +119,31 @@ export class AuditLogModel {
 
       const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
-      logger.info('AuditLog query debug:', {
+      logger.debug('AuditLog findAll query details:', {
         whereConditions,
         whereValues,
         whereClause,
         limit,
-        offset
+        offset,
+        page
       });
 
       // Get total count
-      const countResult = await database.query(
-        `SELECT COUNT(*) as total FROM g_audit_logs ${whereClause}`,
-        whereValues
-      );
+      const countQuery = `SELECT COUNT(*) as total FROM g_audit_logs ${whereClause}`;
+      logger.debug('Count query:', { query: countQuery, params: whereValues });
+
+      const countResult = await database.query(countQuery, whereValues);
       const total = countResult[0].total;
 
+      logger.debug('Count result:', { total });
+
       // Get audit logs with user information
-      // 매개변수를 직접 배열로 생성 (WHERE 조건이 없으므로 LIMIT, OFFSET만)
-      const finalParams = [limit, offset];
-
-      console.log('=== AUDIT LOG DEBUG ===');
-      console.log('whereValues:', whereValues);
-      console.log('whereValues type:', typeof whereValues);
-      console.log('whereValues is array:', Array.isArray(whereValues));
-      console.log('limit:', limit, 'type:', typeof limit);
-      console.log('offset:', offset, 'type:', typeof offset);
-      console.log('finalParams:', finalParams);
-      console.log('finalParams is array:', Array.isArray(finalParams));
-      console.log('========================');
-
-      // MySQL LIMIT/OFFSET을 직접 문자열로 구성 (매개변수 바인딩 문제 회피)
-      const logs = await database.query(
-        `SELECT
+      // Note: Some MySQL drivers don't allow binding LIMIT/OFFSET as parameters reliably.
+      // Sanitize and inline numeric LIMIT/OFFSET values instead of using placeholders.
+      const safeLimit = Math.min(Math.max(Number(limit) || 10, 1), 1000);
+      const safeOffset = Math.max(Number(offset) || 0, 0);
+      const queryParams = [...whereValues];
+      const mainQuery = `SELECT
            al.*,
            u.name as user_name,
            u.email as user_email
@@ -136,9 +151,13 @@ export class AuditLogModel {
          LEFT JOIN g_users u ON al.userId = u.id
          ${whereClause}
          ORDER BY al.createdAt DESC
-         LIMIT ${limit} OFFSET ${offset}`,
-        whereValues
-      );
+         LIMIT ${safeLimit} OFFSET ${safeOffset}`;
+
+      logger.debug('Main query:', { query: mainQuery, params: queryParams });
+
+      const logs = await database.query(mainQuery, queryParams);
+
+      logger.debug('Query result:', { logsCount: logs.length });
 
       // Parse JSON details
       logs.forEach((log: any) => {
@@ -157,8 +176,26 @@ export class AuditLogModel {
         page,
         limit
       };
-    } catch (error) {
-      logger.error('Error finding all audit logs:', error);
+    } catch (error: any) {
+      logger.error('Error finding all audit logs:', {
+        error: error.message,
+        code: error.code,
+        sqlState: error.sqlState,
+        stack: error.stack,
+        filters,
+        page,
+        limit
+      });
+
+      // Provide more specific error messages
+      if (error.code === 'ER_NO_SUCH_TABLE') {
+        throw new Error('Audit logs table not found. Please run database migrations.');
+      } else if (error.code === 'ER_BAD_FIELD_ERROR') {
+        throw new Error('Database schema mismatch. Please check audit logs table structure.');
+      } else if (error.code === 'ECONNREFUSED') {
+        throw new Error('Database connection failed. Please check database server.');
+      }
+
       throw error;
     }
   }

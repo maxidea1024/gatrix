@@ -1,7 +1,7 @@
 {
-  "name": "gate",
+  "name": "gatrix",
   "version": "1.0.0",
-  "description": "Gate - Online Game Platform Management System",
+  "description": "Gatrix for UWO - Online Game Platform Management System",
   "license": "MIT",
   "private": true,
   "workspaces": [
@@ -9,29 +9,30 @@
   ],
   "scripts": {
     "dev": "concurrently \"yarn dev:backend\" \"yarn dev:frontend\"",
-    "dev:backend": "yarn workspace @gate/backend dev",
-    "dev:frontend": "yarn workspace @gate/frontend dev",
+    "dev:backend": "yarn workspace @gatrix/backend dev",
+    "dev:frontend": "yarn workspace @gatrix/frontend dev",
     "build": "yarn build:backend && yarn build:frontend",
-    "build:backend": "yarn workspace @gate/backend build",
-    "build:frontend": "yarn workspace @gate/frontend build",
-    "start": "yarn workspace @gate/backend start",
-    "test": "yarn workspace @gate/backend test && yarn workspace @gate/frontend test",
-    "test:backend": "yarn workspace @gate/backend test",
-    "test:frontend": "yarn workspace @gate/frontend test",
-    "test:e2e": "yarn workspace @gate/frontend test:e2e",
-    "lint": "yarn workspace @gate/backend lint && yarn workspace @gate/frontend lint",
-    "lint:fix": "yarn workspace @gate/backend lint:fix && yarn workspace @gate/frontend lint:fix",
-    "typecheck": "yarn workspace @gate/backend typecheck && yarn workspace @gate/frontend typecheck",
+    "build:backend": "yarn workspace @gatrix/backend build",
+    "build:frontend": "yarn workspace @gatrix/frontend build",
+    "start": "yarn workspace @gatrix/backend start",
+    "test": "yarn workspace @gatrix/backend test && yarn workspace @gatrix/frontend test",
+    "test:backend": "yarn workspace @gatrix/backend test",
+    "test:frontend": "yarn workspace @gatrix/frontend test",
+    "test:e2e": "yarn workspace @gatrix/frontend test:e2e",
+    "lint": "yarn workspace @gatrix/backend lint && yarn workspace @gatrix/frontend lint",
+    "lint:fix": "yarn workspace @gatrix/backend lint:fix && yarn workspace @gatrix/frontend lint:fix",
+    "typecheck": "yarn workspace @gatrix/backend typecheck && yarn workspace @gatrix/frontend typecheck",
     "check-translations": "node scripts/check-translations.js",
-    "clean": "yarn workspace @gate/backend clean && yarn workspace @gate/frontend clean",
-    "migrate": "yarn workspace @gate/backend migrate",
-    "migrate:up": "yarn workspace @gate/backend migrate:up",
-    "migrate:status": "yarn workspace @gate/backend migrate:status",
-    "migrate:rollback": "yarn workspace @gate/backend migrate:rollback",
-    "seed": "yarn workspace @gate/backend seed",
-    "seed:run": "yarn workspace @gate/backend seed:run",
-    "seed:clear": "yarn workspace @gate/backend seed:clear",
-    "seed:reset": "yarn workspace @gate/backend seed:reset",
+    "clean": "yarn workspace @gatrix/backend clean && yarn workspace @gatrix/frontend clean",
+    "migrate": "yarn workspace @gatrix/backend migrate",
+    "migrate:up": "yarn workspace @gatrix/backend migrate:up",
+    "migrate:status": "yarn workspace @gatrix/backend migrate:status",
+    "migrate:rollback": "yarn workspace @gatrix/backend migrate:rollback",
+    "db:reset": "yarn workspace @gatrix/backend db:reset",
+    "seed": "yarn workspace @gatrix/backend seed",
+    "seed:run": "yarn workspace @gatrix/backend seed:run",
+    "seed:clear": "yarn workspace @gatrix/backend seed:clear",
+    "seed:reset": "yarn workspace @gatrix/backend seed:reset",
     "setup": "yarn install && yarn migrate:up && yarn seed:run",
     "setup:scripts": "chmod +x scripts/setup.sh && scripts/setup.sh",
     "reset": "yarn seed:clear && yarn migrate:rollback && yarn migrate:up && yarn seed:run",
@@ -49,7 +50,8 @@
     "check:tables": "node scripts/check-tables.js"
   },
   "keywords": [
-    "gate",
+    "gatrix",
+    "uwo",
     "game",
     "platform",
     "management",
@@ -63,8 +65,8 @@
   ],
   "author": "Motif Games",
   "devDependencies": {
-    "concurrently": "^8.2.2",
     "@types/node": "^20.10.4",
+    "concurrently": "^8.2.2",
     "typescript": "^5.3.3"
   },
   "engines": {
@@ -78,5 +80,8 @@
   "bugs": {
     "url": "https://github.com/motifgames/gate/issues"
   },
-  "homepage": "https://github.com/motifgames/gate#readme"
+  "homepage": "https://github.com/motifgames/gate#readme",
+  "dependencies": {
+    "glob": "^11.0.3"
+  }
 }

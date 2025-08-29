@@ -15,26 +15,60 @@ export const authenticate = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    logger.debug('Authentication attempt:', {
+      path: req.path,
+      method: req.method,
+      hasAuthHeader: !!req.headers.authorization,
+      authHeaderPrefix: req.headers.authorization?.substring(0, 20) + '...'
+    });
+
     const token = JwtUtils.getTokenFromHeader(req.headers.authorization);
 
     if (!token) {
+      logger.warn('Authentication failed: No token provided', {
+        path: req.path,
+        method: req.method
+      });
       throw new CustomError('Access token is required', 401);
     }
 
     const payload = JwtUtils.verifyToken(token);
     if (!payload) {
+      logger.warn('Authentication failed: Invalid token', {
+        path: req.path,
+        method: req.method,
+        tokenPrefix: token.substring(0, 20) + '...'
+      });
       throw new CustomError('Invalid or expired token', 401);
     }
 
     // Verify user still exists and is active
     const user = await UserModel.findById(payload.userId);
     if (!user) {
+      logger.warn('Authentication failed: User not found', {
+        path: req.path,
+        method: req.method,
+        userId: payload.userId
+      });
       throw new CustomError('User not found', 401);
     }
 
     if (user.status !== 'active') {
+      logger.warn('Authentication failed: User not active', {
+        path: req.path,
+        method: req.method,
+        userId: payload.userId,
+        userStatus: user.status
+      });
       throw new CustomError('User account is not active', 401);
     }
+
+    logger.debug('Authentication successful:', {
+      path: req.path,
+      method: req.method,
+      userId: payload.userId,
+      userRole: payload.role
+    });
 
     req.user = payload;
     req.userDetails = user;
@@ -43,7 +77,12 @@ export const authenticate = async (
     if (error instanceof CustomError) {
       next(error);
     } else {
-      logger.error('Authentication error:', error);
+      logger.error('Authentication error:', {
+        error: (error as any)?.message,
+        stack: (error as any)?.stack,
+        path: req.path,
+        method: req.method
+      });
       next(new CustomError('Authentication failed', 401));
     }
   }

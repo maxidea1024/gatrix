@@ -6,29 +6,44 @@ import Joi from 'joi';
 
 // Validation schemas
 const createWhitelistSchema = Joi.object({
-  nickname: Joi.string().min(1).max(100).required(),
+  accountId: Joi.string().length(32).pattern(/^[a-zA-Z0-9]+$/).required()
+    .messages({
+      'string.length': 'Account ID must be exactly 32 characters',
+      'string.pattern.base': 'Account ID must contain only alphanumeric characters'
+    }),
   ipAddress: Joi.string().ip({ version: ['ipv4', 'ipv6'] }).optional().allow('').empty('').default(null),
   startDate: Joi.date().iso().optional().allow('').empty('').default(null),
   endDate: Joi.date().iso().optional().allow('').empty('').default(null),
   memo: Joi.string().max(1000).optional().allow('').empty('').default(null),
+  tags: Joi.array().items(Joi.string().max(50)).max(20).optional(),
 });
 
 const updateWhitelistSchema = Joi.object({
-  nickname: Joi.string().min(1).max(100).optional(),
+  accountId: Joi.string().length(32).pattern(/^[a-zA-Z0-9]+$/).optional()
+    .messages({
+      'string.length': 'Account ID must be exactly 32 characters',
+      'string.pattern.base': 'Account ID must contain only alphanumeric characters'
+    }),
   ipAddress: Joi.string().ip({ version: ['ipv4', 'ipv6'] }).optional().allow('').empty('').default(null),
   startDate: Joi.date().iso().optional().allow('').empty('').default(null),
   endDate: Joi.date().iso().optional().allow('').empty('').default(null),
   memo: Joi.string().max(1000).optional().allow('').empty('').default(null),
+  tags: Joi.array().items(Joi.string().max(50)).max(20).optional(),
 });
 
 const bulkCreateSchema = Joi.object({
   entries: Joi.array().items(
     Joi.object({
-      nickname: Joi.string().min(1).max(100).required(),
+      accountId: Joi.string().length(32).pattern(/^[a-zA-Z0-9]+$/).required()
+        .messages({
+          'string.length': 'Account ID must be exactly 32 characters',
+          'string.pattern.base': 'Account ID must contain only alphanumeric characters'
+        }),
       ipAddress: Joi.string().ip({ version: ['ipv4', 'ipv6'] }).optional().allow('').empty('').default(null),
       startDate: Joi.date().iso().optional().allow('').empty('').default(null),
       endDate: Joi.date().iso().optional().allow('').empty('').default(null),
       memo: Joi.string().max(1000).optional().allow('').empty('').default(null),
+      tags: Joi.array().items(Joi.string().max(50)).max(20).optional(),
     })
   ).min(1).max(1000).required(),
 });
@@ -36,12 +51,16 @@ const bulkCreateSchema = Joi.object({
 const getWhitelistsQuerySchema = Joi.object({
   page: Joi.number().integer().min(1).default(1),
   limit: Joi.number().integer().min(1).max(100).default(10),
-  nickname: Joi.string().optional(),
+  accountId: Joi.string().optional(),
   ipAddress: Joi.string().optional(),
   createdBy: Joi.number().integer().optional(),
   search: Joi.string().optional(),
+  tags: Joi.alternatives().try(
+    Joi.string(),
+    Joi.array().items(Joi.string())
+  ).optional(),
   _t: Joi.string().optional(), // 캐시 방지용 타임스탬프
-});
+}).options({ stripUnknown: true });
 
 export class WhitelistController {
   static getWhitelists = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -51,9 +70,19 @@ export class WhitelistController {
       throw new CustomError(error.details[0].message, 400);
     }
 
-    const { page, limit, nickname, ipAddress, createdBy, search } = value;
-    
-    const filters = { nickname, ipAddress, createdBy, search };
+    const { page, limit, accountId, ipAddress, createdBy, search, tags } = value;
+
+    // Handle tags parameter (can be string or array)
+    let tagsArray: string[] | undefined;
+    if (tags) {
+      if (typeof tags === 'string') {
+        tagsArray = [tags];
+      } else if (Array.isArray(tags)) {
+        tagsArray = tags;
+      }
+    }
+
+    const filters = { accountId, ipAddress, createdBy, search, tags: tagsArray };
     const pagination = { page, limit };
 
     const result = await WhitelistService.getAllWhitelists(filters, pagination);

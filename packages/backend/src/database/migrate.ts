@@ -33,13 +33,13 @@ async function showStatus() {
   try {
     const status = await migration.getStatus();
     
-    console.log('\n=== Migration Status ===');
-    console.log(`Executed migrations: ${status.executed.length}`);
-    status.executed.forEach(id => console.log(`  ✓ ${id}`));
-    
-    console.log(`\nPending migrations: ${status.pending.length}`);
-    status.pending.forEach(id => console.log(`  ○ ${id}`));
-    console.log('');
+    logger.info('\n=== Migration Status ===');
+    logger.info(`Executed migrations: ${status.executed.length}`);
+    status.executed.forEach(id => logger.info(`  ✓ ${id}`));
+
+    logger.info(`\nPending migrations: ${status.pending.length}`);
+    status.pending.forEach(id => logger.info(`  ○ ${id}`));
+    logger.info('');
   } catch (error) {
     logger.error('Failed to get migration status:', error);
     process.exit(1);
@@ -89,6 +89,9 @@ async function main() {
   
   process.exit(0);
 }
+
+// Export functions for use by other modules
+export { runMigrations, showStatus, rollback };
 
 if (require.main === module) {
   main().catch(error => {

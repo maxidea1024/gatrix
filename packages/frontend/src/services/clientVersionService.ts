@@ -2,6 +2,7 @@ import { apiService } from './api';
 import {
   ClientVersion,
   ClientVersionFormData,
+  BulkCreateFormData,
   ClientVersionFilters,
   ClientVersionListResponse,
   ClientVersionPagination,
@@ -102,6 +103,24 @@ export class ClientVersionService {
   }
 
   /**
+   * 클라이언트 버전 간편 생성
+   */
+  static async bulkCreateClientVersions(data: BulkCreateFormData): Promise<ClientVersion[]> {
+    const response = await apiService.post<ApiResponse<ClientVersion[]>>(
+      `${this.BASE_URL}/bulk`,
+      data
+    );
+
+    // ApiService.request()가 이미 response.data를 반환하므로
+    if (response?.success && response?.data) {
+      return response.data;
+    }
+
+    console.error('Unexpected bulk create response structure:', response);
+    throw new Error('Invalid response structure from server');
+  }
+
+  /**
    * 클라이언트 버전 수정
    */
   static async updateClientVersion(
@@ -152,50 +171,26 @@ export class ClientVersionService {
   /**
    * 채널 목록 조회
    */
-  static async getChannels(): Promise<string[]> {
+  static async getPlatforms(): Promise<string[]> {
     try {
       const response = await apiService.get<ApiResponse<string[]>>(
-        `${this.BASE_URL}/meta/channels`
+        `${this.BASE_URL}/meta/platforms`
       );
       return response.data?.data || [];
     } catch (error) {
-      console.error('Error fetching channels:', error);
+      console.error('Error fetching platforms:', error);
       return [];
     }
   }
 
   /**
-   * 서브채널 목록 조회
-   */
-  static async getSubChannels(channel?: string): Promise<string[]> {
-    try {
-      const params = new URLSearchParams();
-      if (channel) {
-        params.append('channel', channel);
-      }
-
-      const response = await apiService.get<ApiResponse<string[]>>(
-        `${this.BASE_URL}/meta/subchannels?${params}`
-      );
-      return response.data?.data || [];
-    } catch (error) {
-      console.error('Error fetching subchannels:', error);
-      return [];
-    }
-  }
-
-  /**
-   * 메타데이터 조회 (채널, 서브채널)
+   * 메타데이터 조회 (플랫폼)
    */
   static async getMetadata(): Promise<ClientVersionMetadata> {
-    const [channels, subChannels] = await Promise.all([
-      this.getChannels(),
-      this.getSubChannels(),
-    ]);
+    const platforms = await this.getPlatforms();
 
     return {
-      channels,
-      subChannels,
+      platforms,
     };
   }
 
@@ -203,24 +198,21 @@ export class ClientVersionService {
    * 클라이언트 버전 중복 검사
    */
   static async checkDuplicate(
-    channel: string,
-    subChannel: string,
+    platform: string,
     clientVersion: string,
     excludeId?: number
   ): Promise<boolean> {
     try {
       const filters: ClientVersionFilters = {
-        channel,
-        subChannel,
+        platform,
         search: clientVersion,
       };
 
       const result = await this.getClientVersions(1, 100, filters);
-      
+
       // 정확히 일치하는 버전이 있는지 확인
-      const duplicate = result.clientVersions.find(cv => 
-        cv.channel === channel &&
-        cv.subChannel === subChannel &&
+      const duplicate = result.clientVersions.find(cv =>
+        cv.platform === platform &&
         cv.clientVersion === clientVersion &&
         cv.id !== excludeId
       );

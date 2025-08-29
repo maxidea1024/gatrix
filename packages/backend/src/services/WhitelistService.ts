@@ -56,7 +56,7 @@ export class WhitelistService {
 
       logger.info('Whitelist entry created successfully:', {
         id: whitelist.id,
-        nickname: whitelist.nickname,
+        accountId: whitelist.accountId,
         createdBy: whitelist.createdBy,
       });
 
@@ -93,7 +93,7 @@ export class WhitelistService {
 
       logger.info('Whitelist entry updated successfully:', {
         id: updated.id,
-        nickname: updated.nickname,
+        accountId: updated.accountId,
       });
 
       return updated;
@@ -121,7 +121,7 @@ export class WhitelistService {
 
       logger.info('Whitelist entry deleted successfully:', {
         id,
-        nickname: existing.nickname,
+        accountId: existing.accountId,
       });
     } catch (error) {
       if (error instanceof CustomError) {
@@ -155,7 +155,7 @@ export class WhitelistService {
 
       // Convert to CreateWhitelistData format
       const createData: CreateWhitelistData[] = entries.map(entry => ({
-        nickname: entry.nickname.trim(),
+        accountId: entry.nickname.trim(),
         ipAddress: entry.ipAddress?.trim() || undefined,
         startDate: entry.startDate,
         endDate: entry.endDate,

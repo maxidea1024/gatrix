@@ -31,8 +31,7 @@ export const ClientStatusColors: Record<ClientStatus, 'success' | 'error' | 'war
 // 클라이언트 버전 인터페이스
 export interface ClientVersion {
   id: number;
-  channel: string;
-  subChannel: string;
+  platform: string;
   clientVersion: string;
   clientStatus: ClientStatus;
   gameServerAddress: string;
@@ -53,8 +52,7 @@ export interface ClientVersion {
 
 // 클라이언트 버전 생성/수정 데이터
 export interface ClientVersionFormData {
-  channel: string;
-  subChannel: string;
+  platform: string;
   clientVersion: string;
   clientStatus: ClientStatus;
   gameServerAddress: string;
@@ -67,10 +65,30 @@ export interface ClientVersionFormData {
   customPayload?: string;
 }
 
+// 간편 추가를 위한 플랫폼별 설정
+export interface PlatformSpecificSettings {
+  platform: string;
+  gameServerAddress: string;
+  gameServerAddressForWhiteList?: string;
+  patchAddress: string;
+  patchAddressForWhiteList?: string;
+}
+
+// 간편 추가 폼 데이터
+export interface BulkCreateFormData {
+  clientVersion: string;
+  clientStatus: ClientStatus;
+  guestModeAllowed: boolean;
+  externalClickLink?: string;
+  memo?: string;
+  customPayload?: string;
+  platforms: PlatformSpecificSettings[];
+}
+
 // 클라이언트 버전 필터
 export interface ClientVersionFilters {
-  channel?: string;
-  subChannel?: string;
+  version?: string;
+  platform?: string;
   clientStatus?: ClientStatus;
   gameServerAddress?: string;
   patchAddress?: string;
@@ -90,8 +108,7 @@ export interface ClientVersionFilters {
 // 클라이언트 버전 정렬 옵션
 export type ClientVersionSortField = 
   | 'id'
-  | 'channel'
-  | 'subChannel'
+  | 'platform'
   | 'clientVersion'
   | 'clientStatus'
   | 'createdAt'
@@ -159,8 +176,7 @@ export interface ApiResponse<T = any> {
 
 // 메타데이터 응답
 export interface ClientVersionMetadata {
-  channels: string[];
-  subChannels: string[];
+  platforms: string[];
 }
 
 // 로컬 스토리지 키
@@ -179,17 +195,13 @@ export const CLIENT_VERSION_DEFAULTS = {
 
 // 폼 유효성 검사 규칙
 export const CLIENT_VERSION_VALIDATION = {
-  CHANNEL: {
+  PLATFORM: {
     MIN_LENGTH: 1,
-    MAX_LENGTH: 100,
-  },
-  SUB_CHANNEL: {
-    MIN_LENGTH: 1,
-    MAX_LENGTH: 100,
+    MAX_LENGTH: 50,
   },
   CLIENT_VERSION: {
     PATTERN: /^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$/,
-    EXAMPLE: '1.0.0',
+    EXAMPLE: '예: 1.0.0, 2.1.3, 1.0.0-beta.1',
   },
   SERVER_ADDRESS: {
     MIN_LENGTH: 1,

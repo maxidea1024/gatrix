@@ -5,16 +5,40 @@ import {
   UpdateGameWorldData,
   GameWorldListParams
 } from '../models/GameWorld';
-import { CustomError } from '../middleware/errorHandler';
-import logger from '../config/logger';
+import { GatrixError } from '../middleware/errorHandler';
+import { GAME_WORLDS } from '../constants/cacheKeys';
+import { createLogger } from '../config/logger';
+import { pubSubService } from './PubSubService';
+
+const logger = createLogger('GameWorldService');
 
 export class GameWorldService {
-  static async getGameWorlds(params: GameWorldListParams): Promise<GameWorld[]> {
+  // Deprecated: kept for backward compatibility if referenced elsewhere
+  static async getGameWorlds(
+    filters: any = {},
+    pagination: { page?: number; limit?: number; sortBy?: string; sortOrder?: 'ASC' | 'DESC' } = {}
+  ): Promise<{ data: GameWorld[], total: number }> {
+    try {
+      const params: GameWorldListParams = {
+        sortBy: (pagination.sortBy as any) || 'displayOrder',
+        sortOrder: (pagination.sortOrder as any) || 'ASC',
+        ...filters
+      } as any;
+
+      const data = await GameWorldModel.list(params);
+      return { data, total: data.length };
+    } catch (error) {
+      logger.error('Error in getGameWorlds service:', error);
+      throw new GatrixError('Failed to fetch game worlds', 500);
+    }
+  }
+
+  static async getAllGameWorlds(params: GameWorldListParams): Promise<GameWorld[]> {
     try {
       return await GameWorldModel.list(params);
     } catch (error) {
-      logger.error('Error in getGameWorlds service:', error);
-      throw new CustomError('Failed to fetch game worlds', 500);
+      logger.error('Error in getAllGameWorlds service:', error);
+      throw new GatrixError('Failed to fetch game worlds', 500);
     }
   }
 
@@ -22,15 +46,15 @@ export class GameWorldService {
     try {
       const world = await GameWorldModel.findById(id);
       if (!world) {
-        throw new CustomError('Game world not found', 404);
+        throw new GatrixError('Game world not found', 404);
       }
       return world;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error in getGameWorldById service:', error);
-      throw new CustomError('Failed to fetch game world', 500);
+      throw new GatrixError('Failed to fetch game world', 500);
     }
   }
 
@@ -38,33 +62,42 @@ export class GameWorldService {
     try {
       const world = await GameWorldModel.findByWorldId(worldId);
       if (!world) {
-        throw new CustomError('Game world not found', 404);
+        throw new GatrixError('Game world not found', 404);
       }
       return world;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error in getGameWorldByWorldId service:', error);
-      throw new CustomError('Failed to fetch game world', 500);
+      throw new GatrixError('Failed to fetch game world', 500);
     }
   }
 
   static async createGameWorld(worldData: CreateGameWorldData): Promise<GameWorld> {
     try {
+      const normalized: CreateGameWorldData = {
+        ...worldData,
+      };
+
       // Check if worldId already exists
       const existingWorld = await GameWorldModel.findByWorldId(worldData.worldId);
       if (existingWorld) {
-        throw new CustomError('Game world with this world ID already exists', 409);
+        throw new GatrixError('Game world with this world ID already exists', 409);
       }
 
-      return await GameWorldModel.create(worldData);
+      const result = await GameWorldModel.create(normalized);
+
+      // Invalidate game worlds cache
+      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
+
+      return result;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error in createGameWorld service:', error);
-      throw new CustomError('Failed to create game world', 500);
+      throw new GatrixError('Failed to create game world', 500);
     }
   }
 
@@ -73,29 +106,32 @@ export class GameWorldService {
       // Check if game world exists
       const existingWorld = await GameWorldModel.findById(id);
       if (!existingWorld) {
-        throw new CustomError('Game world not found', 404);
+        throw new GatrixError('Game world not found', 404);
       }
 
       // Check if worldId is being updated and if it conflicts with existing ones
       if (worldData.worldId && worldData.worldId !== existingWorld.worldId) {
         const worldIdExists = await GameWorldModel.exists(worldData.worldId, id);
         if (worldIdExists) {
-          throw new CustomError('Game world with this world ID already exists', 409);
+          throw new GatrixError('Game world with this world ID already exists', 409);
         }
       }
 
       const updatedWorld = await GameWorldModel.update(id, worldData);
       if (!updatedWorld) {
-        throw new CustomError('Failed to update game world', 500);
+        throw new GatrixError('Failed to update game world', 500);
       }
+
+      // Invalidate game worlds cache
+      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
 
       return updatedWorld;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error in updateGameWorld service:', error);
-      throw new CustomError('Failed to update game world', 500);
+      throw new GatrixError('Failed to update game world', 500);
     }
   }
 
@@ -104,44 +140,57 @@ export class GameWorldService {
       // Check if game world exists
       const existingWorld = await GameWorldModel.findById(id);
       if (!existingWorld) {
-        throw new CustomError('Game world not found', 404);
+        throw new GatrixError('Game world not found', 404);
       }
 
       const deleted = await GameWorldModel.delete(id);
       if (!deleted) {
-        throw new CustomError('Failed to delete game world', 500);
+        throw new GatrixError('Failed to delete game world', 500);
       }
+
+      // Invalidate game worlds cache
+      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error in deleteGameWorld service:', error);
-      throw new CustomError('Failed to delete game world', 500);
+      throw new GatrixError('Failed to delete game world', 500);
     }
   }
 
   static async toggleVisibility(id: number): Promise<GameWorld> {
+    logger.info(`toggleVisibility called for id: ${id}`);
     try {
       const world = await GameWorldModel.findById(id);
       if (!world) {
-        throw new CustomError('Game world not found', 404);
+        throw new GatrixError('Game world not found', 404);
       }
+
+      logger.info(`Current visibility for ${world.worldId}: ${world.isVisible}`);
 
       const updatedWorld = await GameWorldModel.update(id, {
         isVisible: !world.isVisible
       });
 
       if (!updatedWorld) {
-        throw new CustomError('Failed to toggle visibility', 500);
+        throw new GatrixError('Failed to toggle visibility', 500);
       }
+
+      logger.info(`Visibility toggled for ${world.worldId}: ${world.isVisible} -> ${!world.isVisible}`);
+
+      // Invalidate game worlds cache
+      logger.info(`Calling cache invalidation for ${GAME_WORLDS.PUBLIC}`);
+      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
+      logger.info('Cache invalidation completed');
 
       return updatedWorld;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error in toggleVisibility service:', error);
-      throw new CustomError('Failed to toggle visibility', 500);
+      throw new GatrixError('Failed to toggle visibility', 500);
     }
   }
 
@@ -149,7 +198,7 @@ export class GameWorldService {
     try {
       const world = await GameWorldModel.findById(id);
       if (!world) {
-        throw new CustomError('Game world not found', 404);
+        throw new GatrixError('Game world not found', 404);
       }
 
       const updatedWorld = await GameWorldModel.update(id, {
@@ -157,43 +206,69 @@ export class GameWorldService {
       });
 
       if (!updatedWorld) {
-        throw new CustomError('Failed to toggle maintenance status', 500);
+        throw new GatrixError('Failed to toggle maintenance status', 500);
       }
+
+      // Invalidate game worlds cache
+      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
 
       return updatedWorld;
     } catch (error) {
-      if (error instanceof CustomError) {
+      if (error instanceof GatrixError) {
         throw error;
       }
       logger.error('Error in toggleMaintenance service:', error);
-      throw new CustomError('Failed to toggle maintenance status', 500);
+      throw new GatrixError('Failed to toggle maintenance status', 500);
     }
   }
 
   static async updateDisplayOrders(orderUpdates: { id: number; displayOrder: number }[]): Promise<void> {
     try {
       await GameWorldModel.updateDisplayOrders(orderUpdates);
+
+      // Invalidate game worlds cache
+      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
     } catch (error) {
       logger.error('Error in updateDisplayOrders service:', error);
-      throw new CustomError('Failed to update display orders', 500);
+      throw new GatrixError('Failed to update display orders', 500);
     }
   }
 
   static async moveUp(id: number): Promise<boolean> {
     try {
-      return await GameWorldModel.moveUp(id);
+      const result = await GameWorldModel.moveUp(id);
+
+      // Invalidate game worlds cache
+      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
+
+      return result;
     } catch (error) {
       logger.error('Error in moveUp service:', error);
-      throw new CustomError('Failed to move world up', 500);
+      throw new GatrixError('Failed to move world up', 500);
     }
   }
 
   static async moveDown(id: number): Promise<boolean> {
     try {
-      return await GameWorldModel.moveDown(id);
+      const result = await GameWorldModel.moveDown(id);
+
+      // Invalidate game worlds cache
+      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
+
+      return result;
     } catch (error) {
       logger.error('Error in moveDown service:', error);
-      throw new CustomError('Failed to move world down', 500);
+      throw new GatrixError('Failed to move world down', 500);
+    }
+  }
+
+  static async invalidateCache(): Promise<void> {
+    try {
+      // Invalidate game worlds cache
+      await pubSubService.invalidateKey(GAME_WORLDS.PUBLIC);
+    } catch (error) {
+      logger.error('Error in invalidateCache service:', error);
+      throw new GatrixError('Failed to invalidate cache', 500);
     }
   }
 }

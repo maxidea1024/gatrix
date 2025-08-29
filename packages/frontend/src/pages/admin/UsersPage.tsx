@@ -46,9 +46,12 @@ import {
   Search,
   FilterList,
   HourglassEmpty,
+  Cancel as CancelIcon,
+  CheckCircle as ConfirmIcon,
 } from '@mui/icons-material';
 import { Layout } from '@/components/layout/Layout';
 import { useUsers } from '@/hooks/useSWR';
+import SimplePagination from '../../components/common/SimplePagination';
 // import { useTranslations } from '@/contexts/I18nContext';
 import { User, UserFilters } from '@/types';
 import { UserService } from '@/services/users';
@@ -147,7 +150,7 @@ const UserActionMenu: React.FC<UserActionMenuProps> = ({ user, onAction }) => {
 const UsersPage: React.FC = () => {
   // const { t } = useTranslations();
   const [page, setPage] = useState(1);
-  const [limit] = useState(10);
+  const [limit, setLimit] = useState(10);
   const [filters, setFilters] = useState<UserFilters>({});
   const [searchTerm, setSearchTerm] = useState('');
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -302,11 +305,20 @@ const UsersPage: React.FC = () => {
               
               <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth>
-                  <InputLabel>Role</InputLabel>
+                  <InputLabel shrink={true}>Role</InputLabel>
                   <Select
                     value={filters.role || ''}
                     onChange={(e) => handleFilterChange('role', e.target.value)}
                     label="Role"
+                    displayEmpty
+                    sx={{
+                      minWidth: 120,
+                      '& .MuiSelect-select': {
+                        overflow: 'visible',
+                        textOverflow: 'clip',
+                        whiteSpace: 'nowrap',
+                      },
+                    }}
                   >
                     <MenuItem value="">All</MenuItem>
                     <MenuItem value="admin">Admin</MenuItem>
@@ -317,11 +329,20 @@ const UsersPage: React.FC = () => {
               
               <Grid item xs={12} sm={6} md={2}>
                 <FormControl fullWidth>
-                  <InputLabel>Status</InputLabel>
+                  <InputLabel shrink={true}>Status</InputLabel>
                   <Select
                     value={filters.status || ''}
                     onChange={(e) => handleFilterChange('status', e.target.value)}
                     label="Status"
+                    displayEmpty
+                    sx={{
+                      minWidth: 120,
+                      '& .MuiSelect-select': {
+                        overflow: 'visible',
+                        textOverflow: 'clip',
+                        whiteSpace: 'nowrap',
+                      },
+                    }}
                   >
                     <MenuItem value="">All</MenuItem>
                     <MenuItem value="active">Active</MenuItem>
@@ -442,16 +463,17 @@ const UsersPage: React.FC = () => {
             </TableContainer>
 
             {/* Pagination */}
-            {totalPages > 1 && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-                <Pagination
-                  count={totalPages}
-                  page={page}
-                  onChange={(_, newPage) => setPage(newPage)}
-                  color="primary"
-                />
-              </Box>
-            )}
+            <SimplePagination
+              count={total}
+              page={page - 1} // Convert 1-based to 0-based
+              rowsPerPage={limit}
+              onPageChange={(_, newPage) => setPage(newPage + 1)} // Convert 0-based to 1-based
+              onRowsPerPageChange={(e) => {
+                setLimit(parseInt(e.target.value, 10));
+                setPage(1);
+              }}
+              rowsPerPageOptions={[5, 10, 25, 50]}
+            />
           </CardContent>
         </Card>
 
@@ -471,6 +493,7 @@ const UsersPage: React.FC = () => {
           <DialogActions>
             <Button
               onClick={() => setConfirmDialog({ open: false, action: '', user: null })}
+              startIcon={<CancelIcon />}
             >
               Cancel
             </Button>
@@ -479,8 +502,9 @@ const UsersPage: React.FC = () => {
               variant="contained"
               disabled={loading}
               color={confirmDialog.action === 'delete' ? 'error' : 'primary'}
+              startIcon={loading ? <CircularProgress size={20} /> : <ConfirmIcon />}
             >
-              {loading ? <CircularProgress size={20} /> : 'Confirm'}
+              {loading ? 'Processing...' : 'Confirm'}
             </Button>
           </DialogActions>
         </Dialog>

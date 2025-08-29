@@ -1,0 +1,90 @@
+import { Request, Response, NextFunction } from 'express';
+import { MessageTemplateModel, MessageTemplate } from '../models/MessageTemplate';
+
+export class MessageTemplateController {
+  static async list(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { type, is_enabled, q, limit, offset } = req.query as any;
+      const data = await MessageTemplateModel.list({ type, is_enabled, q, limit: Number(limit)||50, offset: Number(offset)||0 });
+      res.json({ success: true, data });
+    } catch (e) { next(e); }
+  }
+
+  static async get(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = Number(req.params.id);
+      const data = await MessageTemplateModel.findById(id);
+      if (!data) return res.status(404).json({ success: false, message: 'Not found' });
+      res.json({ success: true, data });
+    } catch (e) { next(e); }
+  }
+
+  static async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const body = req.body as MessageTemplate;
+
+      // Check for duplicate name
+      const existing = await MessageTemplateModel.findByName(body.name);
+      if (existing) {
+        return res.status(409).json({
+          success: false,
+          error: { message: 'A message template with this name already exists' }
+        });
+      }
+
+      const created = await MessageTemplateModel.create({ ...body, created_by: (req as any)?.user?.userId, updated_by: (req as any)?.user?.userId });
+      res.status(201).json({ success: true, data: created });
+    } catch (e) { next(e); }
+  }
+
+  static async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = Number(req.params.id);
+      const body = req.body as MessageTemplate;
+
+      // Check for duplicate name (excluding current template)
+      const existing = await MessageTemplateModel.findByName(body.name, id);
+      if (existing) {
+        return res.status(409).json({
+          success: false,
+          error: { message: 'A message template with this name already exists' }
+        });
+      }
+
+      const updated = await MessageTemplateModel.update(id, { ...body, updated_by: (req as any)?.user?.userId });
+      res.json({ success: true, data: updated });
+    } catch (e) { next(e); }
+  }
+
+  static async remove(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = Number(req.params.id);
+      await MessageTemplateModel.delete(id);
+      res.json({ success: true });
+    } catch (e) { next(e); }
+  }
+
+  static async bulkDelete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { ids } = req.body;
+
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid or empty ids array'
+        });
+      }
+
+      // Delete all templates
+      await Promise.all(ids.map(id => MessageTemplateModel.delete(Number(id))));
+
+      res.json({
+        success: true,
+        message: `Successfully deleted ${ids.length} message templates`
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
+}
+

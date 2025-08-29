@@ -152,14 +152,14 @@ export class EmailService {
 
     // 개발 환경에서는 콘솔에 이메일 내용 출력
     if (config.nodeEnv === 'development') {
-      console.log('\n=== EMAIL CONTENT (NO PROVIDER CONFIGURED) ===');
-      console.log(`To: ${options.to}`);
-      console.log(`Subject: ${options.subject}`);
-      console.log(`HTML: ${options.html}`);
+      logger.info('\n=== EMAIL CONTENT (NO PROVIDER CONFIGURED) ===');
+      logger.info(`To: ${options.to}`);
+      logger.info(`Subject: ${options.subject}`);
+      logger.info(`HTML: ${options.html}`);
       if (options.text) {
-        console.log(`Text: ${options.text}`);
+        logger.info(`Text: ${options.text}`);
       }
-      console.log('===============================================\n');
+      logger.info('===============================================\n');
     }
 
     return true; // 개발 환경에서는 성공으로 처리

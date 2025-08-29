@@ -59,7 +59,7 @@ const NotFoundPage: React.FC = () => {
 
           {/* Message */}
           <Typography variant="body1" paragraph sx={{ mb: 3 }}>
-            The page you're looking for doesn't exist. It might have been moved, deleted, or you entered the wrong URL.
+            {t('notFound.description')}
           </Typography>
 
           {/* Actions */}
@@ -70,7 +70,7 @@ const NotFoundPage: React.FC = () => {
               onClick={handleGoHome}
               size="large"
             >
-              Go to Dashboard
+              {t('common.goToDashboard')}
             </Button>
             
             <Button
@@ -78,13 +78,13 @@ const NotFoundPage: React.FC = () => {
               startIcon={<ArrowBack />}
               onClick={handleGoBack}
             >
-              Go Back
+              {t('common.goBack')}
             </Button>
           </Box>
 
           {/* Footer */}
           <Typography variant="caption" color="text.secondary" sx={{ mt: 3, display: 'block' }}>
-            If you think this is a mistake, please contact support.
+            {t('notFound.footer')}
           </Typography>
         </CardContent>
       </Card>

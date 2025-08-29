@@ -19,6 +19,7 @@ import {
   VisibilityOff,
   Google,
   GitHub,
+  Login as LoginIcon,
 } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -263,13 +264,10 @@ const LoginPage: React.FC = () => {
               variant="contained"
               size="large"
               disabled={isSubmitting || isLoading || !!errors.email || !!errors.password || !emailValue || !passwordValue}
+              startIcon={isSubmitting || isLoading ? <CircularProgress size={20} /> : <LoginIcon />}
               sx={{ mt: 2, mb: 2 }}
             >
-              {isSubmitting || isLoading ? (
-                <CircularProgress size={24} />
-              ) : (
-                t('auth.signIn')
-              )}
+              {isSubmitting || isLoading ? t('auth.signingIn') : t('auth.signIn')}
             </Button>
 
             {/* Forgot Password Link */}

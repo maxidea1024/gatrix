@@ -1,0 +1,617 @@
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Stack,
+  TextField,
+  Switch,
+  FormControlLabel,
+  IconButton,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  MenuItem,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  TableContainer,
+  LinearProgress,
+  Select,
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  Tooltip,
+  Pagination,
+  Checkbox,
+  Alert
+} from '@mui/material';
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Close as CloseIcon,
+  Cancel as CancelIcon,
+  Save as SaveIcon,
+  Refresh as RefreshIcon
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { formatDateTimeDetailed } from '@/utils/dateFormat';
+import { messageTemplateService, MessageTemplate, MessageTemplateLocale, MessageTemplateType } from '@/services/messageTemplateService';
+
+const allLangs: Array<{ code: 'ko' | 'en' | 'zh'; label: string }> = [
+  { code: 'ko', label: '한국어' },
+  { code: 'en', label: 'English' },
+  { code: 'zh', label: '中文' },
+];
+
+const MessageTemplatesPage: React.FC = () => {
+  const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
+  const [items, setItems] = useState<MessageTemplate[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  // 페이지네이션
+  const [page, setPage] = useState(1);
+  const [rowsPerPage] = useState(10);
+
+  // 필터
+  const [filters, setFilters] = useState<{
+    type?: MessageTemplateType;
+    is_enabled?: boolean;
+    q?: string;
+  }>({});
+
+  // 선택 관련
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editing, setEditing] = useState<MessageTemplate | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletingTemplate, setDeletingTemplate] = useState<MessageTemplate | null>(null);
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+
+  const [form, setForm] = useState<MessageTemplate>({ name: '', type: 'maintenance', is_enabled: true, default_message: '', locales: [] });
+  const usedLangs = useMemo(() => new Set((form.locales || []).map(l => l.lang)), [form.locales]);
+  const availableLangs = allLangs.filter(l => !usedLangs.has(l.code));
+  const [newLang, setNewLang] = useState<'ko'|'en'|'zh'>('ko');
+  const [newMsg, setNewMsg] = useState('');
+  const getLangLabel = (code: 'ko'|'en'|'zh') => allLangs.find(l=>l.code===code)?.label || code;
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const offset = (page - 1) * rowsPerPage;
+      const params = {
+        ...filters,
+        limit: rowsPerPage,
+        offset
+      };
+
+      const result = await messageTemplateService.list(params);
+
+      setItems(result.templates);
+      setTotal(result.total);
+    } catch (error: any) {
+      console.error('Error loading message templates:', error);
+      enqueueSnackbar(error.message || t('admin.messageTemplates.loadFailed'), { variant: 'error' });
+      setItems([]);
+      setTotal(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, rowsPerPage, filters, enqueueSnackbar, t]);
+
+  useEffect(() => { load(); }, [load]);
+
+  // 필터 핸들러
+  const handleFilterChange = useCallback((newFilters: typeof filters) => {
+    setFilters(newFilters);
+    setPage(1);
+  }, []);
+
+  // 페이지 변경 핸들러
+  const handlePageChange = useCallback((_: unknown, newPage: number) => {
+    setPage(newPage);
+  }, []);
+
+  // 선택 관련 핸들러
+  const handleSelectAll = useCallback((checked: boolean) => {
+    setSelectAll(checked);
+    if (checked) {
+      setSelectedIds(items.filter(item => item.id).map(item => item.id!));
+    } else {
+      setSelectedIds([]);
+    }
+  }, [items]);
+
+  const handleSelectItem = useCallback((id: number, checked: boolean) => {
+    setSelectedIds(prev => {
+      const newIds = checked
+        ? [...prev, id]
+        : prev.filter(selectedId => selectedId !== id);
+
+      // 전체 선택 상태 업데이트
+      const availableIds = items.filter(item => item.id).map(item => item.id!);
+      setSelectAll(newIds.length === availableIds.length && availableIds.length > 0);
+
+      return newIds;
+    });
+  }, [items]);
+
+  // 일괄 삭제
+  const handleBulkDelete = useCallback(() => {
+    if (selectedIds.length === 0) return;
+    setBulkDeleteDialogOpen(true);
+  }, [selectedIds]);
+
+  const confirmBulkDelete = useCallback(async () => {
+    try {
+      await messageTemplateService.bulkDelete(selectedIds);
+      enqueueSnackbar(t('admin.messageTemplates.bulkDeleteSuccess', { count: selectedIds.length }), { variant: 'success' });
+      setSelectedIds([]);
+      setSelectAll(false);
+      setBulkDeleteDialogOpen(false);
+      load();
+    } catch (error: any) {
+      console.error('Error bulk deleting templates:', error);
+      enqueueSnackbar(error.message || t('admin.messageTemplates.bulkDeleteFailed'), { variant: 'error' });
+    }
+  }, [selectedIds, t, enqueueSnackbar, load]);
+
+  // 일괄 사용 가능/불가 변경
+  const handleBulkToggleAvailability = useCallback(async (isEnabled: boolean) => {
+    if (selectedIds.length === 0) return;
+
+    try {
+      await Promise.all(selectedIds.map(async (id) => {
+        const template = items.find(item => item.id === id);
+        if (template) {
+          await messageTemplateService.update(id, { ...template, is_enabled: isEnabled });
+        }
+      }));
+
+      enqueueSnackbar(
+        t('admin.messageTemplates.bulkUpdateSuccess', {
+          count: selectedIds.length,
+          status: isEnabled ? t('common.available') : t('common.unavailable')
+        }),
+        { variant: 'success' }
+      );
+      setSelectedIds([]);
+      setSelectAll(false);
+      load();
+    } catch (error: any) {
+      console.error('Error bulk updating templates:', error);
+      enqueueSnackbar(error.message || t('admin.messageTemplates.bulkUpdateFailed'), { variant: 'error' });
+    }
+  }, [selectedIds, items, t, enqueueSnackbar, load]);
+
+  // 개별 삭제
+  const openDeleteDialog = useCallback((template: MessageTemplate) => {
+    setDeletingTemplate(template);
+    setDeleteDialogOpen(true);
+  }, []);
+
+  const confirmDelete = useCallback(async () => {
+    if (!deletingTemplate?.id) return;
+
+    try {
+      await messageTemplateService.delete(deletingTemplate.id);
+      enqueueSnackbar(t('common.deleteSuccess'), { variant: 'success' });
+      setDeleteDialogOpen(false);
+      setDeletingTemplate(null);
+      load();
+    } catch (error: any) {
+      console.error('Error deleting template:', error);
+      enqueueSnackbar(error.message || t('common.deleteFailed'), { variant: 'error' });
+    }
+  }, [deletingTemplate, t, enqueueSnackbar, load]);
+
+  const handleAdd = () => {
+    setEditing(null);
+    setForm({ name: '', type: 'maintenance', is_enabled: true, default_message: '', locales: [] });
+    setNewLang('ko'); setNewMsg('');
+    setDialogOpen(true);
+  };
+
+  const handleEdit = (row: MessageTemplate) => {
+    setEditing(row);
+    setForm({ id: row.id, name: row.name, type: row.type, is_enabled: row.is_enabled, default_message: row.default_message || '', locales: row.locales || [] });
+    setNewLang('ko'); setNewMsg('');
+    setDialogOpen(true);
+  };
+
+  // Unified delete confirm dialog (consistent with other pages)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<MessageTemplate | null>(null);
+  const openDeleteDialog = (row: MessageTemplate) => { setDeleteTarget(row); setDeleteDialogOpen(true); };
+  const closeDeleteDialog = () => { setDeleteDialogOpen(false); setDeleteTarget(null); };
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget?.id) return;
+    await messageTemplateService.remove(deleteTarget.id);
+    closeDeleteDialog();
+    await load();
+  };
+
+  const addLocale = () => {
+    const lang = newLang; const message = newMsg.trim();
+    if (!message) return;
+    setForm(prev => ({ ...prev, locales: [...(prev.locales||[]).filter(l=>l.lang!==lang), { lang, message }] }));
+    setNewMsg('');
+  };
+
+  const removeLocale = (lang: 'ko'|'en'|'zh') => {
+    setForm(prev => ({ ...prev, locales: (prev.locales||[]).filter(l => l.lang !== lang) }));
+  };
+
+  const handleSave = async () => {
+    if (!form.name.trim()) {
+      enqueueSnackbar(t('common.nameRequired'), { variant: 'error' });
+      return;
+    }
+
+    if (!form.default_message?.trim()) {
+      enqueueSnackbar(t('admin.messageTemplates.defaultMessageRequired'), { variant: 'error' });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const payload: MessageTemplate = {
+        name: form.name.trim(),
+        type: form.type,
+        is_enabled: !!form.is_enabled,
+        default_message: form.default_message || null,
+        locales: form.locales,
+      };
+
+      if (editing?.id) {
+        await messageTemplateService.update(editing.id, payload);
+        enqueueSnackbar(t('common.updateSuccess'), { variant: 'success' });
+      } else {
+        await messageTemplateService.create(payload);
+        enqueueSnackbar(t('common.createSuccess'), { variant: 'success' });
+      }
+
+      setDialogOpen(false);
+      await load();
+    } catch (error: any) {
+      console.error('Failed to save message template:', error);
+
+      // Handle duplicate name error
+      if (error?.response?.status === 409) {
+        enqueueSnackbar(t('messageTemplates.errors.duplicateName'), { variant: 'error' });
+      } else {
+        const message = error?.response?.data?.error?.message || error?.message || t('common.saveFailed');
+        enqueueSnackbar(message, { variant: 'error' });
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Box sx={{ p: 3 }}>
+      {/* Header */}
+      <Box sx={{ mb: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Typography variant="h4" sx={{ fontWeight: 600 }}>
+            {t('admin.messageTemplates.title')}
+          </Typography>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
+            {t('common.add')}
+          </Button>
+        </Box>
+        <Typography variant="body1" color="text.secondary">
+          {t('admin.messageTemplates.subtitle')}
+        </Typography>
+      </Box>
+
+      {/* 필터 */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel shrink={true}>{t('admin.messageTemplates.type')}</InputLabel>
+                <Select
+                  value={filters.type || ''}
+                  label={t('admin.messageTemplates.type')}
+                  onChange={(e) => handleFilterChange({ ...filters, type: e.target.value as MessageTemplateType || undefined })}
+                  displayEmpty
+                  size="small"
+                >
+                  <MenuItem value="">
+                    <em>{t('common.all')}</em>
+                  </MenuItem>
+                  <MenuItem value="maintenance">{t('admin.messageTemplates.types.maintenance')}</MenuItem>
+                  <MenuItem value="general">{t('admin.messageTemplates.types.general')}</MenuItem>
+                  <MenuItem value="notification">{t('admin.messageTemplates.types.notification')}</MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel shrink={true}>{t('admin.messageTemplates.availability')}</InputLabel>
+                <Select
+                  value={filters.is_enabled?.toString() || ''}
+                  label={t('admin.messageTemplates.availability')}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    handleFilterChange({
+                      ...filters,
+                      is_enabled: value === '' ? undefined : value === 'true'
+                    });
+                  }}
+                  displayEmpty
+                  size="small"
+                >
+                  <MenuItem value="">
+                    <em>{t('common.all')}</em>
+                  </MenuItem>
+                  <MenuItem value="true">{t('common.available')}</MenuItem>
+                  <MenuItem value="false">{t('common.unavailable')}</MenuItem>
+                </Select>
+              </FormControl>
+
+              <TextField
+                label={t('common.search')}
+                placeholder={t('admin.messageTemplates.searchPlaceholder')}
+                size="small"
+                sx={{ minWidth: 200 }}
+                value={filters.q || ''}
+                onChange={(e) => handleFilterChange({ ...filters, q: e.target.value || undefined })}
+              />
+            </Box>
+
+            <Tooltip title={t('common.refresh')}>
+              <span>
+                <IconButton onClick={load} disabled={loading}>
+                  <RefreshIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Box>
+        </CardContent>
+      </Card>
+
+      {/* 일괄 작업 툴바 */}
+      {selectedIds.length > 0 && (
+        <Card sx={{ mb: 2, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(110, 168, 255, 0.08)' : 'rgba(25, 118, 210, 0.04)' }}>
+          <CardContent sx={{ py: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography variant="body2" color="primary" sx={{ fontWeight: 500 }}>
+                {t('admin.messageTemplates.selectedCount', { count: selectedIds.length })}
+              </Typography>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => handleBulkToggleAvailability(true)}
+                sx={{ minWidth: 'auto' }}
+              >
+                {t('admin.messageTemplates.makeAvailable')}
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => handleBulkToggleAvailability(false)}
+                sx={{ minWidth: 'auto' }}
+              >
+                {t('admin.messageTemplates.makeUnavailable')}
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                color="error"
+                onClick={handleBulkDelete}
+                sx={{ minWidth: 'auto' }}
+              >
+                {t('common.delete')}
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card>
+        <CardContent sx={{ p: 0 }}>
+          {loading && <LinearProgress />}
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectAll}
+                      indeterminate={selectedIds.length > 0 && selectedIds.length < items.filter(item => item.id).length}
+                      onChange={(e) => handleSelectAll(e.target.checked)}
+                    />
+                  </TableCell>
+                  <TableCell>{t('common.name')}</TableCell>
+                  <TableCell>{t('admin.maintenance.defaultMessage')}</TableCell>
+                  <TableCell>{t('admin.messageTemplates.availability')}</TableCell>
+                  <TableCell>{t('common.updatedAt')}</TableCell>
+                  <TableCell>{t('common.languages')}</TableCell>
+                  <TableCell>{t('common.creator')}</TableCell>
+                  <TableCell align="right">{t('common.actions')}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {items.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        {t('admin.messageTemplates.noTemplates')}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  items.map(row => {
+                  const langs = (row.locales||[]).map(l=>l.lang);
+                  const hasLocales = langs.length > 0;
+                  const langsLabel = hasLocales ? langs.join(', ') : t('admin.messageTemplates.onlyDefaultMessage');
+                  return (
+                    <TableRow key={row.id} hover>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={selectedIds.includes(row.id!)}
+                          onChange={(e) => handleSelectItem(row.id!, e.target.checked)}
+                          disabled={!row.id}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="subtitle2">{row.name}</Typography>
+                      </TableCell>
+                      <TableCell sx={{ maxWidth: 280 }}>
+                        {row.default_message ? (
+                          <Typography variant="body2" sx={{ whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+                            {String(row.default_message).replace(/\n/g, ' ')}
+                          </Typography>
+                        ) : (
+                          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                            {t('admin.messageTemplates.onlyDefaultMessage')}
+                          </Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>{row.is_enabled ? t('common.available') : t('common.unavailable')}</TableCell>
+                      <TableCell>{formatDateTimeDetailed(row.updated_at) || '-'}</TableCell>
+                      <TableCell>{hasLocales ? langs.map(c=>getLangLabel(c as any)).join(', ') : t('admin.messageTemplates.onlyDefaultMessage')}</TableCell>
+                      <TableCell>{(row as any).created_by_name || '-'}</TableCell>
+                      <TableCell align="right">
+                        <IconButton size="small" onClick={() => handleEdit(row)}><EditIcon fontSize="small" /></IconButton>
+                        <IconButton size="small" color="error" onClick={() => openDeleteDialog(row)}><DeleteIcon fontSize="small" /></IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </CardContent>
+      </Card>
+
+      {/* 페이지네이션 */}
+      {total > rowsPerPage && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+          <Pagination
+            count={Math.ceil(total / rowsPerPage)}
+            page={page}
+            onChange={handlePageChange}
+            color="primary"
+            showFirstButton
+            showLastButton
+          />
+        </Box>
+      )}
+
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>{editing ? t('common.edit') : t('common.add')}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            <TextField
+              label={t('common.name')}
+              value={form.name}
+              onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
+              fullWidth
+              required
+            />
+            <FormControlLabel
+              control={<Switch checked={form.is_enabled} onChange={(e) => setForm(prev => ({ ...prev, is_enabled: e.target.checked }))} />}
+              label={t('admin.messageTemplates.availability')}
+            />
+            <TextField
+              label={t('admin.maintenance.defaultMessage')}
+              value={form.default_message || ''}
+              onChange={(e) => setForm(prev => ({ ...prev, default_message: e.target.value }))}
+              multiline
+              minRows={3}
+              required
+              helperText={t('admin.messageTemplates.defaultMessageHelp')}
+            />
+            {(form.locales?.length ?? 0) === 0 && (
+              <Typography variant="caption" color="text.secondary">
+                {t('admin.maintenance.defaultMessageHint')}
+              </Typography>
+            )}
+
+            {/* Dynamic language entries */}
+            {availableLangs.length > 0 && (
+              <Stack direction="row" spacing={1} alignItems="flex-start">
+                <Select size="small" value={newLang} onChange={(e)=>setNewLang(e.target.value as any)} sx={{ minWidth: 120 }}>
+                  {availableLangs.map(l => <MenuItem key={l.code} value={l.code}>{l.label}</MenuItem>)}
+                </Select>
+                <TextField size="small" value={newMsg} onChange={(e)=>setNewMsg(e.target.value)} label={t('admin.maintenance.perLanguageMessage')} sx={{ flex: 1 }} multiline minRows={3} />
+                <Button onClick={addLocale} variant="outlined" sx={{ alignSelf: 'flex-start' }}>{t('common.add')}</Button>
+              </Stack>
+            )}
+            <Stack spacing={1}>
+              {(form.locales||[]).map(l => (
+                <Box key={l.lang} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                  <Chip label={getLangLabel(l.lang)} size="small" sx={{ width: 96, justifyContent: 'flex-start' }} />
+                  <TextField fullWidth size="small" value={l.message} onChange={(e)=>setForm(prev=>({ ...prev, locales: (prev.locales||[]).map(x=> x.lang===l.lang? { ...x, message: e.target.value }: x) }))} multiline minRows={3} />
+                  <IconButton size="small" onClick={()=>removeLocale(l.lang)} sx={{ alignSelf: 'flex-start' }}><CloseIcon fontSize="small" /></IconButton>
+                </Box>
+              ))}
+            </Stack>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)} disabled={saving} startIcon={<CancelIcon />}>{t('common.cancel')}</Button>
+          <Button
+            variant="contained"
+            onClick={handleSave}
+            disabled={saving}
+            startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
+          >
+            {saving ? t('common.saving') : t('common.save')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 개별 삭제 확인 다이얼로그 */}
+      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+        <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {t('admin.messageTemplates.confirmDelete', { name: deletingTemplate?.name })}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
+          <Button onClick={confirmDelete} color="error" variant="contained">
+            {t('common.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 일괄 삭제 확인 다이얼로그 */}
+      <Dialog open={bulkDeleteDialogOpen} onClose={() => setBulkDeleteDialogOpen(false)}>
+        <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {t('admin.messageTemplates.confirmBulkDelete', { count: selectedIds.length })}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBulkDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
+          <Button onClick={confirmBulkDelete} color="error" variant="contained">
+            {t('common.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
+};
+
+export default MessageTemplatesPage;

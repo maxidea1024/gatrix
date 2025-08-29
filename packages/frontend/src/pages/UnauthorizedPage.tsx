@@ -15,12 +15,12 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-// import { useTranslations } from '@/contexts/I18nContext';
+import { useTranslation } from 'react-i18next';
 
 const UnauthorizedPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
-  // const { t, errors } = useTranslations();
+  const { t } = useTranslation();
 
   const handleGoHome = () => {
     navigate('/dashboard');
@@ -60,33 +60,33 @@ const UnauthorizedPage: React.FC = () => {
 
             {/* Title */}
             <Typography variant="h4" component="h1" gutterBottom color="error.main">
-              Access Denied
+              {t('errors.forbidden')}
             </Typography>
 
             {/* Message */}
             <Typography variant="body1" paragraph sx={{ mb: 4 }}>
-              You don't have permission to access this page or resource.
+              {t('errors.noPermissionAdminOnly', 'You do not have permission to access this resource. This page is restricted to administrators only.')}
             </Typography>
 
             {user ? (
               <Box sx={{ mb: 4 }}>
                 <Typography variant="body2" color="text.secondary" paragraph>
-                  You are currently logged in as <strong>{user.name}</strong> with <strong>{user.role}</strong> privileges.
+                  {t('common.loggedInAs')}: <strong>{user.name}</strong> ({t('dashboard.role')}: <strong>{user.role}</strong>)
                 </Typography>
                 
                 {user.status !== 'active' && (
                   <Typography variant="body2" color="warning.main" paragraph>
-                    Your account status is: <strong>{user.status}</strong>
+                    {t('dashboard.status')}: <strong>{user.status}</strong>
                   </Typography>
                 )}
 
                 <Typography variant="body2" color="text.secondary">
-                  If you believe you should have access to this resource, please contact your administrator.
+                  {t('errors.contactSupport')}
                 </Typography>
               </Box>
             ) : (
               <Typography variant="body2" color="text.secondary" paragraph>
-                You may need to log in with appropriate credentials to access this resource.
+                {t('auth.loginRequired', 'You may need to log in with appropriate credentials to access this resource.')}
               </Typography>
             )}
 
@@ -101,7 +101,7 @@ const UnauthorizedPage: React.FC = () => {
               }}
             >
               <Typography variant="body2" fontWeight="medium">
-                Error 403: {errors.forbidden}
+                Error 403: {t('errors.forbidden')}
               </Typography>
             </Box>
 
@@ -115,7 +115,7 @@ const UnauthorizedPage: React.FC = () => {
                     onClick={handleGoHome}
                     fullWidth
                   >
-                    Go to Dashboard
+                    {t('common.goToDashboard')}
                   </Button>
                   
                   <Button
@@ -124,7 +124,7 @@ const UnauthorizedPage: React.FC = () => {
                     onClick={handleGoBack}
                     fullWidth
                   >
-                    Go Back
+                    {t('common.goBack')}
                   </Button>
                 </>
               ) : (
@@ -133,7 +133,7 @@ const UnauthorizedPage: React.FC = () => {
                   onClick={() => navigate('/login')}
                   fullWidth
                 >
-                  Login
+                  {t('auth.login')}
                 </Button>
               )}
             </Box>
@@ -141,7 +141,7 @@ const UnauthorizedPage: React.FC = () => {
             {/* Additional Info */}
             <Box sx={{ mt: 4, pt: 3, borderTop: 1, borderColor: 'divider' }}>
               <Typography variant="caption" color="text.secondary">
-                If you continue to experience issues, please contact support for assistance.
+                {t('errors.contactSupport')}
               </Typography>
             </Box>
           </CardContent>

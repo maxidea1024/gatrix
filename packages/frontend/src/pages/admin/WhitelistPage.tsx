@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { formatDateTimeDetailed } from '@/utils/dateFormat';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import moment from 'moment';
+
 import {
   Box,
   Typography,
@@ -23,6 +27,11 @@ import {
   DialogContent,
   DialogActions,
   LinearProgress,
+  Pagination,
+  Tooltip,
+  Tabs,
+  Tab,
+  Box as MuiBox,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -31,14 +40,20 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Upload as UploadIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import { WhitelistService, Whitelist, CreateWhitelistData, UpdateWhitelistData } from '../../services/whitelistService';
+import { WhitelistService, Whitelist, CreateWhitelistData } from '../../services/whitelistService';
+import SimplePagination from '../../components/common/SimplePagination';
+import IpWhitelistTab from '../../components/admin/IpWhitelistTab';
 
 const WhitelistPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+
+  // Tab state
+  const [currentTab, setCurrentTab] = useState(0);
 
   // State
   const [whitelists, setWhitelists] = useState<Whitelist[]>([]);
@@ -47,6 +62,7 @@ const WhitelistPage: React.FC = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState('');
+
 
   // Menu state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -78,7 +94,8 @@ const WhitelistPage: React.FC = () => {
   const loadWhitelists = async () => {
     try {
       setLoading(true);
-      const filters = search ? { search } : {};
+      const filters: any = {};
+      if (search) filters.search = search;
       const result = await WhitelistService.getWhitelists(page + 1, rowsPerPage, filters);
 
       console.log('Whitelist load result:', result);
@@ -95,7 +112,7 @@ const WhitelistPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Error loading whitelists:', error);
-      enqueueSnackbar(error.message || 'Failed to load whitelists', { variant: 'error' });
+      enqueueSnackbar(error.message || t('whitelist.errors.loadFailed'), { variant: 'error' });
       setWhitelists([]);
       setTotal(0);
     } finally {
@@ -108,12 +125,16 @@ const WhitelistPage: React.FC = () => {
   }, [page, rowsPerPage, search]);
 
   // Handlers
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setCurrentTab(newValue);
+  };
+
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
     setPage(0);
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
@@ -161,15 +182,15 @@ const WhitelistPage: React.FC = () => {
     if (selectedWhitelist) {
       setConfirmDialog({
         open: true,
-        title: 'Delete Whitelist Entry',
-        message: `Are you sure you want to delete "${selectedWhitelist.nickname}"?`,
+        title: t('whitelist.dialog.deleteTitle'),
+        message: t('whitelist.dialog.deleteMessage', { name: selectedWhitelist.nickname }),
         action: async () => {
           try {
             await WhitelistService.deleteWhitelist(selectedWhitelist.id);
-            enqueueSnackbar('Whitelist entry deleted successfully', { variant: 'success' });
+            enqueueSnackbar(t('whitelist.toast.deleted'), { variant: 'success' });
             loadWhitelists();
           } catch (error: any) {
-            enqueueSnackbar(error.message || 'Failed to delete whitelist entry', { variant: 'error' });
+            enqueueSnackbar(error.message || t('whitelist.errors.deleteFailed'), { variant: 'error' });
           }
           setConfirmDialog(prev => ({ ...prev, open: false }));
         },
@@ -182,11 +203,11 @@ const WhitelistPage: React.FC = () => {
     try {
       if (editDialog && selectedWhitelist) {
         await WhitelistService.updateWhitelist(selectedWhitelist.id, formData);
-        enqueueSnackbar('Whitelist entry updated successfully', { variant: 'success' });
+        enqueueSnackbar(t('whitelist.toast.updated'), { variant: 'success' });
         setEditDialog(false);
       } else {
         await WhitelistService.createWhitelist(formData);
-        enqueueSnackbar('Whitelist entry created successfully', { variant: 'success' });
+        enqueueSnackbar(t('whitelist.toast.created'), { variant: 'success' });
         setAddDialog(false);
       }
 
@@ -196,7 +217,7 @@ const WhitelistPage: React.FC = () => {
       }, 100);
     } catch (error: any) {
       console.error('Error saving whitelist:', error);
-      enqueueSnackbar(error.message || 'Failed to save whitelist entry', { variant: 'error' });
+      enqueueSnackbar(error.message || t('whitelist.errors.saveFailed'), { variant: 'error' });
     }
   };
 
@@ -213,23 +234,24 @@ const WhitelistPage: React.FC = () => {
       }).filter(entry => entry.nickname);
 
       if (entries.length === 0) {
-        enqueueSnackbar('No valid entries found', { variant: 'warning' });
+        enqueueSnackbar(t('whitelist.errors.noValidEntries'), { variant: 'warning' });
         return;
       }
 
       const result = await WhitelistService.bulkCreateWhitelists(entries);
-      enqueueSnackbar(`Successfully created ${result.createdCount} entries`, { variant: 'success' });
+      enqueueSnackbar(t('whitelist.toast.bulkCreated', { count: result.createdCount }), { variant: 'success' });
       setBulkDialog(false);
       setBulkData('');
       loadWhitelists();
     } catch (error: any) {
-      enqueueSnackbar(error.message || 'Failed to bulk create entries', { variant: 'error' });
+      enqueueSnackbar(error.message || t('whitelist.errors.bulkCreateFailed'), { variant: 'error' });
     }
   };
 
+  // Use shared date-time formatter
   const formatDate = (dateString?: string) => {
     if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString();
+    return formatDateTimeDetailed(dateString);
   };
 
   return (
@@ -238,74 +260,99 @@ const WhitelistPage: React.FC = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-            Whitelist Management
+            {t('whitelist.title')}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Manage user whitelist entries
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button
-            variant="outlined"
-            startIcon={<UploadIcon />}
-            onClick={() => setBulkDialog(true)}
-          >
-            Bulk Import
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAdd}
-          >
-            Add Entry
-          </Button>
+            {t('whitelist.subtitle')}</Typography>
         </Box>
       </Box>
 
-      {/* Search */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <TextField
-            fullWidth
-            placeholder={t('whitelist.searchPlaceholder') || 'Search by nickname, IP address, or memo...'}
-            value={search}
-            onChange={handleSearchChange}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Table */}
+      {/* Main Card with Tabs */}
       <Card>
-        <CardContent sx={{ p: 0 }}>
-          {loading && <LinearProgress />}
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Nickname</TableCell>
-                  <TableCell>IP Address</TableCell>
-                  <TableCell>Allow Period</TableCell>
-                  <TableCell>Created By</TableCell>
-                  <TableCell>Created At</TableCell>
-                  <TableCell>Memo</TableCell>
-                  <TableCell align="center">Actions</TableCell>
-                </TableRow>
-              </TableHead>
+        <CardContent>
+          <Tabs value={currentTab} onChange={handleTabChange} sx={{ mb: 3 }}>
+            <Tab label={t('whitelist.tabs.nickname')} />
+            <Tab label={t('whitelist.tabs.ip')} />
+          </Tabs>
+
+          {/* Tab Content */}
+          {currentTab === 0 && (
+            <>
+              {/* Nickname Whitelist Header */}
+              <Box sx={{ display: 'flex', gap: 2, mb: 3, justifyContent: 'flex-end' }}>
+                <Button
+                  variant="outlined"
+                  startIcon={<UploadIcon />}
+                  onClick={() => setBulkDialog(true)}
+                >
+                  {t('whitelist.bulkImport')}
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={handleAdd}
+                >
+                  {t('whitelist.addEntry')}
+                </Button>
+              </Box>
+
+              {/* Search & Filters */}
+              <Card variant="outlined" sx={{ mb: 3 }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+                      <TextField
+                        placeholder={t('whitelist.searchPlaceholder')}
+                        value={search}
+                        onChange={handleSearchChange}
+                        slotProps={{
+                          input: {
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <SearchIcon />
+                              </InputAdornment>
+                            ),
+                          },
+                        }}
+                        sx={{ minWidth: 300 }}
+                      />
+                    </Box>
+
+                    <Tooltip title={t('common.refresh')}>
+                      <span>
+                        <IconButton onClick={loadWhitelists} disabled={loading} sx={{ ml: 2 }}>
+                          <RefreshIcon />
+                        </IconButton>
+                      </span>
+                    </Tooltip>
+                  </Box>
+                </CardContent>
+              </Card>
+
+              {/* Nickname Whitelist Table */}
+              <Card variant="outlined">
+                <CardContent sx={{ p: 0 }}>
+                  {loading && <LinearProgress />}
+
+                  <TableContainer>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>{t('whitelist.columns.id')}</TableCell>
+                          <TableCell>{t('whitelist.columns.nickname')}</TableCell>
+                          <TableCell>{t('whitelist.columns.ipAddress')}</TableCell>
+                          <TableCell>{t('whitelist.columns.allowPeriod')}</TableCell>
+                          <TableCell>{t('whitelist.columns.createdBy')}</TableCell>
+                          <TableCell>{t('whitelist.columns.createdAt')}</TableCell>
+                          <TableCell>{t('whitelist.columns.memo')}</TableCell>
+                          <TableCell align="center">{t('whitelist.columns.actions')}</TableCell>
+                        </TableRow>
+                      </TableHead>
               <TableBody>
                 {whitelists.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} align="center">
-                      No whitelist entries found
+                      {t('whitelist.noEntries')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -322,7 +369,7 @@ const WhitelistPage: React.FC = () => {
                           <Chip label={whitelist.ipAddress} size="small" />
                         ) : (
                           <Typography variant="body2" color="text.secondary">
-                            Any IP
+                            {t('whitelist.anyIp')}
                           </Typography>
                         )}
                       </TableCell>
@@ -335,13 +382,13 @@ const WhitelistPage: React.FC = () => {
                           </Box>
                         ) : (
                           <Typography variant="body2" color="text.secondary">
-                            Permanent
+                            {t('whitelist.permanent')}
                           </Typography>
                         )}
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {whitelist.createdByName || `User ${whitelist.createdBy}`}
+                          {whitelist.createdByName || t('whitelist.userWithId', { id: whitelist.createdBy })}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -368,138 +415,141 @@ const WhitelistPage: React.FC = () => {
               </TableBody>
             </Table>
           </TableContainer>
-          <TablePagination
-            component="div"
+          <SimplePagination
             count={total}
             page={page}
-            onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
+            onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             rowsPerPageOptions={[5, 10, 25, 50]}
           />
+                </CardContent>
+              </Card>
+
+              {/* Action Menu */}
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                <MenuItem onClick={handleEdit}>
+                  <EditIcon sx={{ mr: 1 }} />
+                  {t('common.edit')}
+                </MenuItem>
+                <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
+                  <DeleteIcon sx={{ mr: 1 }} />
+                  {t('common.delete')}
+                </MenuItem>
+              </Menu>
+
+              {/* Add/Edit Dialog */}
+              <Dialog open={addDialog || editDialog} onClose={() => { setAddDialog(false); setEditDialog(false); }} maxWidth="sm" fullWidth>
+                <DialogTitle>
+                  {editDialog ? t('whitelist.dialog.editTitle') : t('whitelist.dialog.addTitle')}
+                </DialogTitle>
+                <DialogContent>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+                    <TextField
+                      fullWidth
+                      label={t('whitelist.form.nickname')}
+                      value={formData.nickname}
+                      onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
+                      required
+                    />
+                    <TextField
+                      fullWidth
+                      label={t('whitelist.form.ipAddressOpt')}
+                      value={formData.ipAddress}
+                      onChange={(e) => setFormData({ ...formData, ipAddress: e.target.value })}
+                      placeholder={t('whitelist.form.anyIpPlaceholder')}
+                    />
+                    <DatePicker
+                      label={t('whitelist.form.startDateOpt')}
+                      value={formData.startDate ? moment(formData.startDate) : null}
+                      onChange={(date) => setFormData({ ...formData, startDate: date ? date.format('YYYY-MM-DD') : '' })}
+                      slotProps={{ textField: { fullWidth: true } }}
+                    />
+                    <DatePicker
+                      label={t('whitelist.form.endDateOpt')}
+                      value={formData.endDate ? moment(formData.endDate) : null}
+                      onChange={(date) => setFormData({ ...formData, endDate: date ? date.format('YYYY-MM-DD') : '' })}
+                      slotProps={{ textField: { fullWidth: true } }}
+                    />
+                    <TextField
+                      fullWidth
+                      label={t('whitelist.form.memoOpt')}
+                      value={formData.memo}
+                      onChange={(e) => setFormData({ ...formData, memo: e.target.value })}
+                      multiline
+                      rows={3}
+                      placeholder={t('whitelist.form.memoPlaceholder')}
+                    />
+                  </Box>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => { setAddDialog(false); setEditDialog(false); }}>
+                    {t('common.cancel')}
+                  </Button>
+                  <Button onClick={handleSave} variant="contained">
+                    {editDialog ? t('common.update') : t('common.create')}
+                  </Button>
+                </DialogActions>
+              </Dialog>
+
+              {/* Bulk Import Dialog */}
+              <Dialog open={bulkDialog} onClose={() => setBulkDialog(false)} maxWidth="md" fullWidth>
+                <DialogTitle>{t('whitelist.dialog.bulkTitle')}</DialogTitle>
+                <DialogContent>
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      {t('whitelist.dialog.bulkHint1')}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      {t('whitelist.dialog.bulkHint2')}
+                    </Typography>
+                  </Box>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={10}
+                    value={bulkData}
+                    onChange={(e) => setBulkData(e.target.value)}
+                    placeholder={t('whitelist.dialog.bulkPlaceholder')}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => setBulkDialog(false)}>
+                    {t('common.cancel')}
+                  </Button>
+                  <Button onClick={handleBulkCreate} variant="contained">
+                    {t('whitelist.dialog.import')}
+                  </Button>
+                </DialogActions>
+              </Dialog>
+
+              {/* Confirmation Dialog */}
+              <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))}>
+                <DialogTitle>{confirmDialog.title}</DialogTitle>
+                <DialogContent>
+                  <Typography>{confirmDialog.message}</Typography>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}>
+                    {t('common.cancel')}
+                  </Button>
+                  <Button onClick={confirmDialog.action} color="error" variant="contained">
+                    {t('common.confirm')}
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </>
+          )}
+
+          {currentTab === 1 && (
+            <IpWhitelistTab />
+          )}
         </CardContent>
       </Card>
-
-      {/* Action Menu */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
-        <MenuItem onClick={handleEdit}>
-          <EditIcon sx={{ mr: 1 }} />
-          Edit
-        </MenuItem>
-        <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
-          <DeleteIcon sx={{ mr: 1 }} />
-          Delete
-        </MenuItem>
-      </Menu>
-
-      {/* Add/Edit Dialog */}
-      <Dialog open={addDialog || editDialog} onClose={() => { setAddDialog(false); setEditDialog(false); }} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          {editDialog ? 'Edit Whitelist Entry' : 'Add Whitelist Entry'}
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-            <TextField
-              fullWidth
-              label="Nickname"
-              value={formData.nickname}
-              onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
-              required
-            />
-            <TextField
-              fullWidth
-              label="IP Address (Optional)"
-              value={formData.ipAddress}
-              onChange={(e) => setFormData({ ...formData, ipAddress: e.target.value })}
-              placeholder="Leave empty for any IP"
-            />
-            <TextField
-              fullWidth
-              label="Start Date (Optional)"
-              type="date"
-              value={formData.startDate}
-              onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-            <TextField
-              fullWidth
-              label="End Date (Optional)"
-              type="date"
-              value={formData.endDate}
-              onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-            <TextField
-              fullWidth
-              label="Memo (Optional)"
-              value={formData.memo}
-              onChange={(e) => setFormData({ ...formData, memo: e.target.value })}
-              multiline
-              rows={3}
-              placeholder="Additional notes..."
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => { setAddDialog(false); setEditDialog(false); }}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave} variant="contained">
-            {editDialog ? 'Update' : 'Create'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Bulk Import Dialog */}
-      <Dialog open={bulkDialog} onClose={() => setBulkDialog(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Bulk Import Whitelist Entries</DialogTitle>
-        <DialogContent>
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              Enter one entry per line in the format: Nickname [Tab] IP Address [Tab] Memo
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Example: JohnDoe	192.168.1.100	VIP User
-            </Typography>
-          </Box>
-          <TextField
-            fullWidth
-            multiline
-            rows={10}
-            value={bulkData}
-            onChange={(e) => setBulkData(e.target.value)}
-            placeholder="JohnDoe	192.168.1.100	VIP User&#10;JaneSmith		Regular User&#10;AdminUser	10.0.0.1	Administrator"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setBulkDialog(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleBulkCreate} variant="contained">
-            Import
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Confirmation Dialog */}
-      <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))}>
-        <DialogTitle>{confirmDialog.title}</DialogTitle>
-        <DialogContent>
-          <Typography>{confirmDialog.message}</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}>
-            Cancel
-          </Button>
-          <Button onClick={confirmDialog.action} color="error" variant="contained">
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };

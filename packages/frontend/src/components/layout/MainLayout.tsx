@@ -38,6 +38,7 @@ import {
   Image as ImageIcon,
   Upload as UploadIcon,
   TextFields as TextIcon,
+  Build as BuildIcon,
   Animation as AnimationIcon,
   Extension as ExtensionIcon,
   ExpandLess,
@@ -56,12 +57,18 @@ import {
   Language as LanguageIcon,
   Security as SecurityIcon,
   History as HistoryIcon,
+  Label as LabelIcon,
+  Schedule as ScheduleIcon,
+  Work as JobIcon,
+  Monitor as MonitorIcon,
+
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme as useCustomTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import TimezoneSelector from '../common/TimezoneSelector';
 
 // Sidebar width is now dynamic
 
@@ -79,12 +86,19 @@ const adminMenuItems = [
   { text: 'admin.users.title', icon: <SchoolIcon />, path: '/admin/users' },
   { text: 'clientVersions.title', icon: <WidgetsIcon />, path: '/admin/client-versions' },
   { text: 'admin.gameWorlds.title', icon: <LanguageIcon />, path: '/admin/game-worlds' },
+  { text: 'admin.maintenance.title', icon: <BuildIcon />, path: '/admin/maintenance' },
+  { text: 'admin.messageTemplates.title', icon: <TextIcon />, path: '/admin/maintenance-templates' },
+  { text: 'admin.scheduler.title', icon: <ScheduleIcon />, path: '/admin/scheduler' },
+
+  { text: 'jobs.title', icon: <JobIcon />, path: '/admin/jobs' },
+  { text: 'jobs.monitor', icon: <MonitorIcon />, path: '/admin/queue-monitor' },
   { text: 'admin.whitelist.title', icon: <SecurityIcon />, path: '/admin/whitelist' },
   { text: 'navigation.auditLogs', icon: <HistoryIcon />, path: '/admin/audit-logs' },
 ];
 
 const settingsMenuItems = [
   { text: 'settings.general.title', icon: <SettingsIcon />, path: '/settings' },
+  { text: 'tags.title', icon: <LabelIcon />, path: '/settings/tags', requireAdmin: true },
   // { text: 'advancedSettings.title', icon: <SettingsIcon />, path: '/settings/advanced', requireAdmin: true },
 ];
 
@@ -277,7 +291,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         </Box>
         {!sidebarCollapsed && (
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Gate
+            Gatrix
           </Typography>
         )}
       </Box>
@@ -506,12 +520,24 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 </Typography>
               </Box>
               <Typography variant="h6" sx={{ fontWeight: 600, color: '#ffffff' }}>
-                Gate Platform
+                Gatrix
               </Typography>
             </Box>
           </Box>
           
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <TimezoneSelector />
+
+            {/* 구분선 */}
+            <Box
+              sx={{
+                width: '1px',
+                height: '24px',
+                bgcolor: 'rgba(255, 255, 255, 0.2)',
+                mx: 1
+              }}
+            />
+
             <IconButton onClick={toggleTheme} color="inherit">
               {isDark ? <LightModeIcon /> : <DarkModeIcon />}
             </IconButton>
@@ -534,7 +560,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   fontSize: '0.875rem'
                 }}
               >
-                {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                {user?.name?.charAt(0) || user?.email?.charAt(0)}
               </Avatar>
             </IconButton>
 

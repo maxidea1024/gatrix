@@ -3,38 +3,43 @@ import { CustomError } from '../middleware/errorHandler';
 
 export interface Whitelist {
   id: number;
-  nickname: string;
+  accountId: string;
   ipAddress?: string;
   startDate?: Date;
   endDate?: Date;
   memo?: string;
+  tags?: string[];
   createdBy: number;
   createdAt: Date;
   updatedAt: Date;
+  createdByName?: string;
 }
 
 export interface CreateWhitelistData {
-  nickname: string;
+  accountId: string;
   ipAddress?: string;
   startDate?: Date;
   endDate?: Date;
   memo?: string;
+  tags?: string[];
   createdBy: number;
 }
 
 export interface UpdateWhitelistData {
-  nickname?: string;
+  accountId?: string;
   ipAddress?: string;
   startDate?: Date;
   endDate?: Date;
   memo?: string;
+  tags?: string[];
 }
 
 export interface WhitelistFilters {
-  nickname?: string;
+  accountId?: string;
   ipAddress?: string;
   createdBy?: number;
   search?: string;
+  tags?: string[];
 }
 
 export interface WhitelistListResponse {
@@ -57,9 +62,9 @@ export class WhitelistModel {
       const filterParams: any[] = [];
 
       // Apply filters
-      if (filters.nickname) {
-        whereClause += ' AND w.nickname LIKE ?';
-        filterParams.push(`%${filters.nickname}%`);
+      if (filters.accountId) {
+        whereClause += ' AND w.account_id LIKE ?';
+        filterParams.push(`%${filters.accountId}%`);
       }
 
       if (filters.ipAddress) {
@@ -72,8 +77,16 @@ export class WhitelistModel {
         filterParams.push(filters.createdBy);
       }
 
+      if (filters.tags && filters.tags.length > 0) {
+        const tagConditions = filters.tags.map(() => 'JSON_CONTAINS(w.tags, ?)').join(' OR ');
+        whereClause += ` AND (${tagConditions})`;
+        filters.tags.forEach(tag => {
+          filterParams.push(JSON.stringify(tag));
+        });
+      }
+
       if (filters.search) {
-        whereClause += ' AND (w.nickname LIKE ? OR w.ip_address LIKE ? OR w.memo LIKE ?)';
+        whereClause += ' AND (w.account_id LIKE ? OR w.ip_address LIKE ? OR w.memo LIKE ?)';
         filterParams.push(`%${filters.search}%`, `%${filters.search}%`, `%${filters.search}%`);
       }
 
@@ -91,11 +104,12 @@ export class WhitelistModel {
       const query = `
         SELECT
           w.id,
-          w.nickname,
+          w.account_id as accountId,
           w.ip_address as ipAddress,
           w.start_date as startDate,
           w.end_date as endDate,
           w.memo,
+          w.tags,
           w.created_by as createdBy,
           w.created_at as createdAt,
           w.updated_at as updatedAt,
@@ -110,7 +124,7 @@ export class WhitelistModel {
       const whitelists = await database.query(query, filterParams);
 
       return {
-        whitelists,
+        whitelists: whitelists.map(this.mapRowToWhitelist),
         total,
         page,
         limit,
@@ -124,13 +138,14 @@ export class WhitelistModel {
   static async findById(id: number): Promise<Whitelist | null> {
     try {
       const query = `
-        SELECT 
+        SELECT
           w.id,
-          w.nickname,
+          w.account_id as accountId,
           w.ip_address as ipAddress,
           w.start_date as startDate,
           w.end_date as endDate,
           w.memo,
+          w.tags,
           w.created_by as createdBy,
           w.created_at as createdAt,
           w.updated_at as updatedAt,
@@ -141,7 +156,7 @@ export class WhitelistModel {
       `;
 
       const result = await database.query(query, [id]);
-      return result.length > 0 ? result[0] : null;
+      return result.length > 0 ? this.mapRowToWhitelist(result[0]) : null;
     } catch (error) {
       throw new CustomError('Failed to fetch whitelist entry', 500);
     }
@@ -150,16 +165,17 @@ export class WhitelistModel {
   static async create(data: CreateWhitelistData): Promise<Whitelist> {
     try {
       const query = `
-        INSERT INTO g_whitelist (nickname, ip_address, start_date, end_date, memo, created_by)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO g_whitelist (account_id, ip_address, start_date, end_date, memo, tags, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
       `;
 
       const result = await database.query(query, [
-        data.nickname,
+        data.accountId,
         data.ipAddress || null,
         data.startDate || null,
         data.endDate || null,
         data.memo || null,
+        data.tags ? JSON.stringify(data.tags) : null,
         data.createdBy,
       ]);
 
@@ -179,9 +195,9 @@ export class WhitelistModel {
       const fields: string[] = [];
       const params: any[] = [];
 
-      if (data.nickname !== undefined) {
-        fields.push('nickname = ?');
-        params.push(data.nickname);
+      if (data.accountId !== undefined) {
+        fields.push('account_id = ?');
+        params.push(data.accountId);
       }
 
       if (data.ipAddress !== undefined) {
@@ -202,6 +218,11 @@ export class WhitelistModel {
       if (data.memo !== undefined) {
         fields.push('memo = ?');
         params.push(data.memo || null);
+      }
+
+      if (data.tags !== undefined) {
+        fields.push('tags = ?');
+        params.push(data.tags ? JSON.stringify(data.tags) : null);
       }
 
       if (fields.length === 0) {
@@ -244,7 +265,7 @@ export class WhitelistModel {
       const params: any[] = [];
       entries.forEach(entry => {
         params.push(
-          entry.nickname,
+          entry.accountId,
           entry.ipAddress || null,
           entry.startDate || null,
           entry.endDate || null,
@@ -258,5 +279,21 @@ export class WhitelistModel {
     } catch (error) {
       throw new CustomError('Failed to bulk create whitelist entries', 500);
     }
+  }
+
+  private static mapRowToWhitelist(row: any): Whitelist {
+    return {
+      id: row.id,
+      accountId: row.accountId,
+      ipAddress: row.ipAddress,
+      startDate: row.startDate ? new Date(row.startDate) : undefined,
+      endDate: row.endDate ? new Date(row.endDate) : undefined,
+      memo: row.memo,
+      tags: row.tags ? JSON.parse(row.tags) : undefined,
+      createdBy: row.createdBy,
+      createdAt: new Date(row.createdAt),
+      updatedAt: new Date(row.updatedAt),
+      createdByName: row.createdByName,
+    };
   }
 }

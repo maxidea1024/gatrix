@@ -13,10 +13,12 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useTranslation } from 'react-i18next';
 
 const UnauthorizedPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
+  const { t } = useTranslation();
 
   const handleGoHome = () => {
     navigate('/dashboard');
@@ -50,25 +52,25 @@ const UnauthorizedPage: React.FC = () => {
 
           {/* Header */}
           <Typography variant="h4" component="h1" gutterBottom>
-            Access Denied
+            {t('errors.forbidden')}
           </Typography>
 
           <Typography variant="h6" gutterBottom color="text.secondary">
-            403 - Unauthorized
+            403 - {t('errors.unauthorized')}
           </Typography>
 
           {/* Message */}
           <Typography variant="body1" paragraph sx={{ mb: 3 }}>
-            You don't have permission to access this resource. This page is restricted to administrators only.
+            {t('errors.noPermissionAdminOnly', 'You do not have permission to access this resource. This page is restricted to administrators only.')}
           </Typography>
 
           {user && (
             <Box sx={{ mb: 3, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
               <Typography variant="body2" color="text.secondary">
-                Logged in as: <strong>{user.name}</strong>
+                {t('common.loggedInAs')}: <strong>{user.name}</strong>
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Role: <strong>{user.role}</strong>
+                {t('dashboard.role')}: <strong>{user.role}</strong>
               </Typography>
             </Box>
           )}
@@ -81,7 +83,7 @@ const UnauthorizedPage: React.FC = () => {
               onClick={handleGoHome}
               size="large"
             >
-              Go to Dashboard
+              {t('common.goToDashboard')}
             </Button>
             
             <Button
@@ -89,13 +91,13 @@ const UnauthorizedPage: React.FC = () => {
               startIcon={<ArrowBack />}
               onClick={handleGoBack}
             >
-              Go Back
+              {t('common.goBack')}
             </Button>
           </Box>
 
           {/* Footer */}
           <Typography variant="caption" color="text.secondary" sx={{ mt: 3, display: 'block' }}>
-            If you believe this is an error, please contact your administrator.
+            {t('errors.contactSupport')}
           </Typography>
         </CardContent>
       </Card>

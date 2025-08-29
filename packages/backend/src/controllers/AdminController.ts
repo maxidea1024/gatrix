@@ -5,6 +5,7 @@ import { AuditLogModel } from '../models/AuditLog';
 import { CustomError } from '../middleware/errorHandler';
 import { clearAllCache } from '../middleware/responseCache';
 import logger from '../config/logger';
+import database from '../config/database';
 
 export class AdminController {
   // Dashboard and statistics
@@ -235,28 +236,88 @@ export class AdminController {
   // Audit logs
   static async getAuditLogs(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
+      logger.debug('getAuditLogs called:', {
+        user: req.user,
+        query: req.query,
+        path: req.path
+      });
+
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const userId = req.query.user_id ? parseInt(req.query.user_id as string) : undefined;
+      const ipAddress = req.query.ip_address as string;
       const action = req.query.action as string;
       const resourceType = req.query.resource_type as string;
       const startDate = req.query.start_date ? new Date(req.query.start_date as string) : undefined;
       const endDate = req.query.end_date ? new Date(req.query.end_date as string) : undefined;
 
       const filters: any = {};
-      if (userId) filters.user_id = userId;
+      if (userId) filters.user_id = userId; // kept for compatibility
+      if (req.query.user) filters.user = String(req.query.user);
+      if (ipAddress) filters.ip_address = ipAddress;
       if (action) filters.action = action;
       if (resourceType) filters.resource_type = resourceType;
       if (startDate) filters.start_date = startDate;
       if (endDate) filters.end_date = endDate;
 
+      logger.debug('Calling AuditLogModel.findAll with:', {
+        page,
+        limit,
+        filters
+      });
+
       const result = await AuditLogModel.findAll(page, limit, filters);
-      
+
+      logger.debug('AuditLogModel.findAll result:', {
+        logsCount: result.logs?.length,
+        total: result.total,
+        page: result.page,
+        limit: result.limit
+      });
+
+      // Normalize fields for frontend compatibility (ISO date + snake_case duplicates)
+      const normalized = {
+        ...result,
+        logs: (result.logs || []).map((log: any) => {
+          const created = log.createdAt ?? log.created_at;
+          const date = created instanceof Date ? created : created ? new Date(created) : null;
+          const iso = date && !isNaN(date.getTime()) ? date.toISOString() : null;
+
+          const resourceType = log.resourceType ?? log.resource_type ?? null;
+          const resourceId = log.resourceId ?? log.resource_id ?? null;
+          const ipAddress = log.ipAddress ?? log.ip_address ?? null;
+          const userAgent = log.userAgent ?? log.user_agent ?? null;
+
+          return {
+            ...log,
+            // dates
+            createdAt: iso || log.createdAt || log.created_at,
+            created_at: iso || log.created_at || log.createdAt,
+            // resource/type/id
+            resourceType,
+            resource_type: resourceType,
+            resourceId,
+            resource_id: resourceId,
+            // network info
+            ipAddress,
+            ip_address: ipAddress,
+            userAgent,
+            user_agent: userAgent,
+          };
+        })
+      };
+
       res.json({
         success: true,
-        data: result
+        data: normalized
       });
-    } catch (error) {
+    } catch (error: any) {
+      logger.error('Error in getAuditLogs:', {
+        error: error?.message,
+        stack: error?.stack,
+        user: req.user,
+        query: req.query
+      });
       next(error);
     }
   }
@@ -370,6 +431,67 @@ export class AdminController {
         totalActions: 0,
         topActions: []
       };
+    }
+  }
+
+  // Health check for debugging audit logs issues
+  static async healthCheck(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const checks = {
+        database: false,
+        auditLogsTable: false,
+        usersTable: false,
+        sampleQuery: false
+      };
+
+      // Check database connection
+      try {
+        await database.query('SELECT 1');
+        checks.database = true;
+      } catch (error: any) {
+        logger.error('Database connection failed:', error);
+      }
+
+      // Check audit logs table
+      try {
+        await database.query('SELECT COUNT(*) FROM g_audit_logs');
+        checks.auditLogsTable = true;
+      } catch (error: any) {
+        logger.error('Audit logs table check failed:', error);
+      }
+
+      // Check users table
+      try {
+        await database.query('SELECT COUNT(*) FROM g_users');
+        checks.usersTable = true;
+      } catch (error: any) {
+        logger.error('Users table check failed:', error);
+      }
+
+      // Check sample audit logs query
+      try {
+        await database.query(`
+          SELECT al.*, u.name as user_name, u.email as user_email
+          FROM g_audit_logs al
+          LEFT JOIN g_users u ON al.userId = u.id
+          ORDER BY al.createdAt DESC
+          LIMIT 1
+        `);
+        checks.sampleQuery = true;
+      } catch (error: any) {
+        logger.error('Sample query failed:', error);
+      }
+
+      res.json({
+        success: true,
+        data: {
+          checks,
+          allHealthy: Object.values(checks).every(check => check),
+          timestamp: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      next(error);
     }
   }
 }

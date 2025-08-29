@@ -1,12 +1,14 @@
 import { apiService } from './api';
 import { AuditLog } from '../types';
+import { devLogger, prodLogger } from '../utils/logger';
 
 export interface AuditLogFilters {
-  user_id?: number;
+  user?: string; // email or name
   action?: string;
   resource_type?: string;
   start_date?: string;
   end_date?: string;
+  ip_address?: string;
 }
 
 export interface AuditLogListResponse {
@@ -49,16 +51,16 @@ export class AuditLogService {
       `${this.BASE_URL}?${params}`
     );
 
-    console.log('AuditLog response:', response);
+    devLogger.debug('AuditLog response:', response);
 
     // ApiService.request()가 이미 response.data를 반환하므로
     // response는 백엔드에서 보낸 { success: true, data: {...} } 구조
     if (response?.success && response?.data) {
-      console.log('AuditLog returning data:', response.data);
+      devLogger.debug('AuditLog returning data:', response.data);
       return response.data;
     }
 
-    console.warn('Unexpected audit logs response structure:', response);
+    prodLogger.warn('Unexpected audit logs response structure:', response);
     // 응답이 올바르지 않은 경우 기본값 반환
     return {
       logs: [],
@@ -121,6 +123,20 @@ export class AuditLogService {
       'game_world_create',
       'game_world_update',
       'game_world_delete',
+      'game_world_update_orders',
+      'maintenance_start',
+      'maintenance_stop',
+      'maintenance_update',
+      'scheduler_create',
+      'scheduler_update',
+      'scheduler_delete',
+      'scheduler_execute',
+      'tag_create',
+      'tag_update',
+      'tag_delete',
+      'message_template_create',
+      'message_template_update',
+      'message_template_delete',
     ];
   }
 
@@ -133,6 +149,10 @@ export class AuditLogService {
       'whitelist',
       'client_version',
       'game_world',
+      'maintenance',
+      'scheduler',
+      'tag',
+      'message_template',
     ];
   }
 

@@ -41,6 +41,9 @@ import {
   CheckCircle as CheckCircleIcon,
   Security as SecurityIcon,
   Person as PersonIcon,
+  Cancel as CancelIcon,
+  Add as AddIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -48,6 +51,7 @@ import { User } from '@/types';
 import { apiService } from '@/services/api';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
+import SimplePagination from '../../components/common/SimplePagination';
 
 interface UsersResponse {
   users: User[];
@@ -365,7 +369,7 @@ const UsersManagementPage: React.FC = () => {
             </Grid>
             <Grid item xs={12} md={3}>
               <FormControl fullWidth>
-                <InputLabel shrink={!!statusFilter || statusFilter === ''}>{t('admin.users.statusFilter')}</InputLabel>
+                <InputLabel shrink={true}>{t('admin.users.statusFilter')}</InputLabel>
                 <Select
                   value={statusFilter}
                   label={t('admin.users.statusFilter')}
@@ -389,7 +393,7 @@ const UsersManagementPage: React.FC = () => {
             </Grid>
             <Grid item xs={12} md={3}>
               <FormControl fullWidth>
-                <InputLabel shrink={!!roleFilter || roleFilter === ''}>{t('admin.users.roleFilter')}</InputLabel>
+                <InputLabel shrink={true}>{t('admin.users.roleFilter')}</InputLabel>
                 <Select
                   value={roleFilter}
                   label={t('admin.users.roleFilter')}
@@ -491,21 +495,16 @@ const UsersManagementPage: React.FC = () => {
             </Table>
           </TableContainer>
           
-          <TablePagination
-            component="div"
+          <SimplePagination
             count={total}
             page={page}
-            onPageChange={(_, newPage) => setPage(newPage)}
             rowsPerPage={rowsPerPage}
+            onPageChange={(_, newPage) => setPage(newPage)}
             onRowsPerPageChange={(e) => {
               setRowsPerPage(parseInt(e.target.value, 10));
               setPage(0);
             }}
             rowsPerPageOptions={[5, 10, 25, 50]}
-            labelRowsPerPage={t('common.rowsPerPage')}
-            labelDisplayedRows={({ from, to, count }) =>
-              t('common.displayedRows', { from, to, count })
-            }
           />
         </CardContent>
       </Card>
@@ -576,35 +575,50 @@ const UsersManagementPage: React.FC = () => {
             autoComplete="off"
             sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}
           >
-            <TextField
-              fullWidth
-              label={t('users.name')}
-              value={newUserData.name}
-              onChange={(e) => setNewUserData({ ...newUserData, name: e.target.value })}
-              autoComplete="new-name"
-              placeholder=""
-              required
-            />
-            <TextField
-              fullWidth
-              label={t('users.email')}
-              type="email"
-              value={newUserData.email}
-              onChange={(e) => setNewUserData({ ...newUserData, email: e.target.value })}
-              autoComplete="new-email"
-              placeholder=""
-              required
-            />
-            <TextField
-              fullWidth
-              label={t('users.password')}
-              type="password"
-              value={newUserData.password}
-              onChange={(e) => setNewUserData({ ...newUserData, password: e.target.value })}
-              autoComplete="new-password"
-              placeholder=""
-              required
-            />
+            <Box>
+              <TextField
+                fullWidth
+                label={t('users.name')}
+                value={newUserData.name}
+                onChange={(e) => setNewUserData({ ...newUserData, name: e.target.value })}
+                autoComplete="new-name"
+                placeholder=""
+                required
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                {t('admin.users.form.nameHelp')}
+              </Typography>
+            </Box>
+            <Box>
+              <TextField
+                fullWidth
+                label={t('users.email')}
+                type="email"
+                value={newUserData.email}
+                onChange={(e) => setNewUserData({ ...newUserData, email: e.target.value })}
+                autoComplete="new-email"
+                placeholder=""
+                required
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                {t('admin.users.form.emailHelp')}
+              </Typography>
+            </Box>
+            <Box>
+              <TextField
+                fullWidth
+                label={t('users.password')}
+                type="password"
+                value={newUserData.password}
+                onChange={(e) => setNewUserData({ ...newUserData, password: e.target.value })}
+                autoComplete="new-password"
+                placeholder=""
+                required
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                {t('admin.users.form.passwordHelp')}
+              </Typography>
+            </Box>
             <FormControl fullWidth>
               <InputLabel>{t('users.role')}</InputLabel>
               <Select
@@ -619,10 +633,10 @@ const UsersManagementPage: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseAddUserDialog}>
+          <Button onClick={handleCloseAddUserDialog} startIcon={<CancelIcon />}>
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleCreateUser} variant="contained">
+          <Button onClick={handleCreateUser} variant="contained" startIcon={<AddIcon />}>
             {t('common.create')}
           </Button>
         </DialogActions>
@@ -659,22 +673,24 @@ const UsersManagementPage: React.FC = () => {
             {t('admin.users.deleteConfirmation')}
           </Alert>
           <Typography variant="body2" sx={{ mb: 2 }}>
-            To confirm deletion, please type the user's email address: <strong>{deleteConfirmDialog.user?.email}</strong>
+            {t('admin.users.deleteConfirmationInput')}
+            <strong> {deleteConfirmDialog.user?.email}</strong>
           </Typography>
           <TextField
             fullWidth
-            label="Email Address"
+            label={t('users.email')}
             value={deleteConfirmDialog.inputValue}
             onChange={(e) => setDeleteConfirmDialog(prev => ({ ...prev, inputValue: e.target.value }))}
             placeholder={deleteConfirmDialog.user?.email}
             error={deleteConfirmDialog.inputValue !== '' && deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email}
-            helperText={deleteConfirmDialog.inputValue !== '' && deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email ? 'Email does not match' : ''}
+            helperText={deleteConfirmDialog.inputValue !== '' && deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email ? t('admin.users.emailDoesNotMatch') : ''}
           />
         </DialogContent>
         <DialogActions>
           <Button
             onClick={() => setDeleteConfirmDialog({ open: false, user: null, inputValue: '' })}
             color="inherit"
+            startIcon={<CancelIcon />}
           >
             {t('common.cancel')}
           </Button>
@@ -683,8 +699,9 @@ const UsersManagementPage: React.FC = () => {
             color="error"
             variant="contained"
             disabled={deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email}
+            startIcon={<DeleteIcon />}
           >
-            Delete
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -694,20 +711,30 @@ const UsersManagementPage: React.FC = () => {
         <DialogTitle>{t('admin.users.editUser')}</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-            <TextField
-              label={t('users.name')}
-              value={editUserData.name}
-              onChange={(e) => setEditUserData({ ...editUserData, name: e.target.value })}
-              fullWidth
-              disabled={editUserDialog.user && isCurrentUser(editUserDialog.user)}
-            />
-            <TextField
-              label={t('users.email')}
-              value={editUserData.email}
-              onChange={(e) => setEditUserData({ ...editUserData, email: e.target.value })}
-              fullWidth
-              disabled={editUserDialog.user && isCurrentUser(editUserDialog.user)}
-            />
+            <Box>
+              <TextField
+                label={t('users.name')}
+                value={editUserData.name}
+                onChange={(e) => setEditUserData({ ...editUserData, name: e.target.value })}
+                fullWidth
+                disabled={editUserDialog.user && isCurrentUser(editUserDialog.user)}
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                {t('admin.users.form.nameHelp')}
+              </Typography>
+            </Box>
+            <Box>
+              <TextField
+                label={t('users.email')}
+                value={editUserData.email}
+                onChange={(e) => setEditUserData({ ...editUserData, email: e.target.value })}
+                fullWidth
+                disabled={editUserDialog.user && isCurrentUser(editUserDialog.user)}
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                {t('admin.users.form.emailHelp')}
+              </Typography>
+            </Box>
             <FormControl fullWidth disabled={editUserDialog.user && isCurrentUser(editUserDialog.user)}>
               <InputLabel>{t('users.role')}</InputLabel>
               <Select
@@ -715,8 +742,8 @@ const UsersManagementPage: React.FC = () => {
                 onChange={(e) => setEditUserData({ ...editUserData, role: e.target.value as 'admin' | 'user' })}
                 label={t('users.role')}
               >
-                <MenuItem value="user">{t('users.user')}</MenuItem>
-                <MenuItem value="admin">{t('users.admin')}</MenuItem>
+                <MenuItem value="user">{t('users.roles.user')}</MenuItem>
+                <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
               </Select>
             </FormControl>
             <FormControl fullWidth disabled={editUserDialog.user && isCurrentUser(editUserDialog.user)}>
@@ -726,9 +753,9 @@ const UsersManagementPage: React.FC = () => {
                 onChange={(e) => setEditUserData({ ...editUserData, status: e.target.value as any })}
                 label={t('users.status')}
               >
-                <MenuItem value="pending">{t('users.pending')}</MenuItem>
-                <MenuItem value="active">{t('users.active')}</MenuItem>
-                <MenuItem value="suspended">{t('users.suspended')}</MenuItem>
+                <MenuItem value="pending">{t('users.statuses.pending')}</MenuItem>
+                <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
+                <MenuItem value="suspended">{t('users.statuses.suspended')}</MenuItem>
               </Select>
             </FormControl>
             {editUserDialog.user && isCurrentUser(editUserDialog.user) && (
@@ -739,13 +766,14 @@ const UsersManagementPage: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEditUserDialog({ open: false, user: null })}>
+          <Button onClick={() => setEditUserDialog({ open: false, user: null })} startIcon={<CancelIcon />}>
             {t('common.cancel')}
           </Button>
           <Button
             onClick={handleSaveEditUser}
             variant="contained"
             disabled={editUserDialog.user && isCurrentUser(editUserDialog.user)}
+            startIcon={<SaveIcon />}
           >
             {t('common.save')}
           </Button>

@@ -1,12 +1,11 @@
 import { Request, Response } from 'express';
 import Joi from 'joi';
 import ClientVersionService, { ClientVersionFilters, ClientVersionPagination, BulkStatusUpdateRequest } from '../services/ClientVersionService';
-import { ClientStatus } from '../models/ClientVersion';
+import { ClientStatus, BulkCreateClientVersionRequest } from '../models/ClientVersion';
 
 // Validation schemas
 const createClientVersionSchema = Joi.object({
-  channel: Joi.string().min(1).max(100).required(),
-  subChannel: Joi.string().min(1).max(100).required(),
+  platform: Joi.string().min(1).max(50).required(),
   clientVersion: Joi.string().pattern(/^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$/).required(),
   clientStatus: Joi.string().valid(...Object.values(ClientStatus)).required(),
   gameServerAddress: Joi.string().min(1).max(500).required(),
@@ -20,8 +19,7 @@ const createClientVersionSchema = Joi.object({
 });
 
 const updateClientVersionSchema = Joi.object({
-  channel: Joi.string().min(1).max(100).optional(),
-  subChannel: Joi.string().min(1).max(100).optional(),
+  platform: Joi.string().min(1).max(50).optional(),
   clientVersion: Joi.string().pattern(/^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$/).optional(),
   clientStatus: Joi.string().valid(...Object.values(ClientStatus)).optional(),
   gameServerAddress: Joi.string().min(1).max(500).optional(),
@@ -39,6 +37,7 @@ const getClientVersionsQuerySchema = Joi.object({
   limit: Joi.number().integer().min(1).max(100).default(10),
   sortBy: Joi.string().valid('id', 'channel', 'subChannel', 'clientVersion', 'clientStatus', 'createdAt', 'updatedAt').default('createdAt'),
   sortOrder: Joi.string().valid('ASC', 'DESC').default('DESC'),
+  version: Joi.string().optional(),
   channel: Joi.string().optional(),
   subChannel: Joi.string().optional(),
   clientStatus: Joi.string().valid(...Object.values(ClientStatus)).optional(),
@@ -61,6 +60,24 @@ const getClientVersionsQuerySchema = Joi.object({
 const bulkUpdateStatusSchema = Joi.object({
   ids: Joi.array().items(Joi.number().integer().positive()).min(1).required(),
   clientStatus: Joi.string().valid(...Object.values(ClientStatus)).required(),
+});
+
+const bulkCreateClientVersionSchema = Joi.object({
+  clientVersion: Joi.string().pattern(/^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$/).required(),
+  clientStatus: Joi.string().valid(...Object.values(ClientStatus)).required(),
+  guestModeAllowed: Joi.boolean().required(),
+  externalClickLink: Joi.string().max(500).optional().allow('').empty('').default(null),
+  memo: Joi.string().max(1000).optional().allow('').empty('').default(null),
+  customPayload: Joi.string().max(5000).optional().allow('').empty('').default(null),
+  platforms: Joi.array().items(
+    Joi.object({
+      platform: Joi.string().min(1).max(50).required(),
+      gameServerAddress: Joi.string().min(1).max(500).required(),
+      gameServerAddressForWhiteList: Joi.string().max(500).optional().allow('').empty('').default(null),
+      patchAddress: Joi.string().min(1).max(500).required(),
+      patchAddressForWhiteList: Joi.string().max(500).optional().allow('').empty('').default(null),
+    })
+  ).min(1).required(),
 });
 
 export class ClientVersionController {
@@ -147,6 +164,39 @@ export class ClientVersionController {
     res.status(201).json({
       success: true,
       data: clientVersion,
+    });
+  }
+
+  // 클라이언트 버전 간편 생성
+  static async bulkCreateClientVersions(req: Request, res: Response) {
+    const { error, value } = bulkCreateClientVersionSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details[0].message,
+      });
+    }
+
+    const userId = (req as any).user?.userId;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: 'User not authenticated',
+      });
+    }
+
+    const bulkCreateData: BulkCreateClientVersionRequest = {
+      ...value,
+      createdBy: userId,
+      updatedBy: userId,
+    };
+
+    const clientVersions = await ClientVersionService.bulkCreateClientVersions(bulkCreateData);
+
+    res.status(201).json({
+      success: true,
+      data: clientVersions,
+      message: `Successfully created ${clientVersions.length} client versions`,
     });
   }
 
@@ -254,24 +304,12 @@ export class ClientVersionController {
   }
 
   // 채널 목록 조회
-  static async getChannels(req: Request, res: Response) {
-    const channels = await ClientVersionService.getChannels();
+  static async getPlatforms(req: Request, res: Response) {
+    const platforms = await ClientVersionService.getPlatforms();
 
     res.json({
       success: true,
-      data: channels,
-    });
-  }
-
-  // 서브채널 목록 조회
-  static async getSubChannels(req: Request, res: Response) {
-    const { channel } = req.query;
-
-    const subChannels = await ClientVersionService.getSubChannels(channel as string);
-
-    res.json({
-      success: true,
-      data: subChannels,
+      data: platforms,
     });
   }
 }

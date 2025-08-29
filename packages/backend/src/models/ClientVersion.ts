@@ -13,8 +13,7 @@ export enum ClientStatus {
 // 클라이언트 버전 속성 인터페이스
 export interface ClientVersionAttributes {
   id: number;
-  channel: string;
-  subChannel: string;
+  platform: string;
   clientVersion: string;
   clientStatus: ClientStatus;
   gameServerAddress: string;
@@ -35,8 +34,7 @@ export interface ClientVersionAttributes {
 
 // 생성 시 필요한 속성
 export interface ClientVersionCreationAttributes {
-  channel: string;
-  subChannel: string;
+  platform: string;
   clientVersion: string;
   clientStatus: ClientStatus;
   gameServerAddress: string;
@@ -47,6 +45,28 @@ export interface ClientVersionCreationAttributes {
   externalClickLink?: string;
   memo?: string;
   customPayload?: string;
+  createdBy: number;
+  updatedBy: number;
+}
+
+// 간편 추가를 위한 플랫폼별 설정
+export interface PlatformSpecificSettings {
+  platform: string;
+  gameServerAddress: string;
+  gameServerAddressForWhiteList?: string;
+  patchAddress: string;
+  patchAddressForWhiteList?: string;
+}
+
+// 간편 추가 요청 데이터
+export interface BulkCreateClientVersionRequest {
+  clientVersion: string;
+  clientStatus: ClientStatus;
+  guestModeAllowed: boolean;
+  externalClickLink?: string;
+  memo?: string;
+  customPayload?: string;
+  platforms: PlatformSpecificSettings[];
   createdBy: number;
   updatedBy: number;
 }
@@ -80,8 +100,7 @@ export class ClientVersionModel {
           if (key === 'search') {
             // 검색어는 여러 컬럼에서 검색 (Created By, Version 추가)
             const searchConditions = [
-              'channel LIKE ?',
-              'subChannel LIKE ?',
+              'platform LIKE ?',
               'clientVersion LIKE ?',
               'gameServerAddress LIKE ?',
               'patchAddress LIKE ?',
@@ -132,7 +151,7 @@ export class ClientVersionModel {
       LEFT JOIN g_users creator ON cv.createdBy = creator.id
       LEFT JOIN g_users updater ON cv.updatedBy = updater.id
       ${whereClause}
-      ORDER BY cv.${orderBy} ${orderDirection}
+      ORDER BY cv.clientVersion DESC, cv.platform DESC
     `;
 
     if (limit) {
@@ -173,17 +192,16 @@ export class ClientVersionModel {
 
     const query = `
       INSERT INTO g_client_versions (
-        channel, subChannel, clientVersion, clientStatus,
+        platform, clientVersion, clientStatus,
         gameServerAddress, gameServerAddressForWhiteList,
         patchAddress, patchAddressForWhiteList,
         guestModeAllowed, externalClickLink, memo, customPayload,
         createdBy, updatedBy, createdAt, updatedAt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const params = [
-      data.channel,
-      data.subChannel,
+      data.platform,
       data.clientVersion,
       data.clientStatus,
       data.gameServerAddress,
@@ -260,32 +278,67 @@ export class ClientVersionModel {
     return result.affectedRows || 0;
   }
 
-  // 채널 목록 조회
-  async getChannels(): Promise<string[]> {
-    const query = 'SELECT DISTINCT channel FROM g_client_versions ORDER BY channel';
-    const result = await this.db.query(query);
-    return result.map((row: any) => row.channel);
+  // 간편 생성
+  async bulkCreate(data: BulkCreateClientVersionRequest): Promise<ClientVersionAttributes[]> {
+    const now = this.formatDateTimeForMySQL(new Date());
+    const createdVersions: ClientVersionAttributes[] = [];
+
+    // 트랜잭션으로 처리
+    await this.db.transaction(async (connection) => {
+      for (const platformSettings of data.platforms) {
+        const query = `
+          INSERT INTO g_client_versions (
+            platform, clientVersion, clientStatus,
+            gameServerAddress, gameServerAddressForWhiteList,
+            patchAddress, patchAddressForWhiteList,
+            guestModeAllowed, externalClickLink, memo, customPayload,
+            createdBy, updatedBy, createdAt, updatedAt
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        const params = [
+          platformSettings.platform,
+          data.clientVersion,
+          data.clientStatus,
+          platformSettings.gameServerAddress,
+          platformSettings.gameServerAddressForWhiteList || null,
+          platformSettings.patchAddress,
+          platformSettings.patchAddressForWhiteList || null,
+          data.guestModeAllowed,
+          data.externalClickLink || null,
+          data.memo || null,
+          data.customPayload || null,
+          data.createdBy,
+          data.updatedBy,
+          now,
+          now
+        ];
+
+        const result = await connection.execute(query, params);
+        const insertId = (result as any)[0].insertId;
+
+        // 생성된 버전 정보 조회
+        const created = await this.findById(insertId);
+        if (created) {
+          createdVersions.push(created);
+        }
+      }
+    });
+
+    return createdVersions;
   }
 
-  // 서브채널 목록 조회
-  async getSubChannels(channel?: string): Promise<string[]> {
-    let query = 'SELECT DISTINCT subChannel FROM g_client_versions';
-    const params: any[] = [];
-
-    if (channel) {
-      query += ' WHERE channel = ?';
-      params.push(channel);
-    }
-
-    query += ' ORDER BY subChannel';
-    const result = await this.db.query(query, params);
-    return result.map((row: any) => row.subChannel);
+  // 플랫폼 목록 조회
+  async getPlatforms(): Promise<string[]> {
+    const query = 'SELECT DISTINCT platform FROM g_client_versions ORDER BY platform';
+    const result = await this.db.query(query);
+    return result.map((row: any) => row.platform);
   }
 
   // 중복 검사
-  async checkDuplicate(channel: string, subChannel: string, clientVersion: string, excludeId?: number): Promise<boolean> {
-    let query = 'SELECT COUNT(*) as count FROM g_client_versions WHERE channel = ? AND subChannel = ? AND clientVersion = ?';
-    const params = [channel, subChannel, clientVersion];
+  async checkDuplicate(platform: string, clientVersion: string, excludeId?: number): Promise<boolean> {
+    let query = 'SELECT COUNT(*) as count FROM g_client_versions WHERE platform = ? AND clientVersion = ?';
+    const params = [platform, clientVersion];
 
     if (excludeId) {
       query += ' AND id != ?';

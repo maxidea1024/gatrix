@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -24,6 +24,8 @@ import {
   Tooltip,
   Alert,
   LinearProgress,
+  CircularProgress,
+  Autocomplete, Chip as MuiChip, TextField as MuiTextField,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -33,12 +35,14 @@ import {
   VisibilityOff as VisibilityOffIcon,
   Search as SearchIcon,
   Language as WorldIcon,
-  Link as LinkIcon,
   Build as MaintenanceIcon,
-  CheckCircle as ActiveIcon,
   KeyboardArrowUp as ArrowUpIcon,
   KeyboardArrowDown as ArrowDownIcon,
   DragIndicator as DragIcon,
+  Cancel as CancelIcon,
+  Save as SaveIcon,
+  ContentCopy as CopyIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import {
   DndContext,
@@ -62,18 +66,22 @@ import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { gameWorldService } from '../../services/gameWorldService';
-import { GameWorld, CreateGameWorldData, UpdateGameWorldData } from '../../types/gameWorld';
+import { tagService, Tag } from '@/services/tagService';
+import { GameWorld, CreateGameWorldData } from '../../types/gameWorld';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 
 // Sortable Row Component
 interface SortableRowProps {
   world: GameWorld;
+  index: number;
+  total: number;
   onEdit: (world: GameWorld) => void;
   onDelete: (id: number) => void;
   onToggleVisibility: (worldId: number) => void;
   onToggleMaintenance: (worldId: number) => void;
   onMoveUp: (world: GameWorld) => void;
   onMoveDown: (world: GameWorld) => void;
+  onCopy: (text: string, type: string) => void;
   t: (key: string) => string;
 }
 
@@ -85,7 +93,10 @@ const SortableRow: React.FC<SortableRowProps> = ({
   onToggleMaintenance,
   onMoveUp,
   onMoveDown,
+  onCopy,
   t,
+  index,
+  total,
 }) => {
   const {
     attributes,
@@ -102,6 +113,19 @@ const SortableRow: React.FC<SortableRowProps> = ({
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const renderTags = (tags?: Tag[] | null) => {
+    const items = (tags || []).slice(0, 6);
+    if (items.length === 0) return '-';
+    return (
+      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 220 }}>
+        {items.map((tag, idx) => (
+          <Chip key={`${tag.id}-${idx}`} label={tag.name} size="small" sx={{ bgcolor: tag.color, color: '#fff' }} />
+        ))}
+      </Box>
+    );
+  };
+
+
   return (
     <TableRow ref={setNodeRef} style={style} hover>
       <TableCell>
@@ -117,6 +141,15 @@ const SortableRow: React.FC<SortableRowProps> = ({
           <Typography variant="body2" sx={{ fontWeight: 500 }}>
             {world.worldId}
           </Typography>
+          <Tooltip title={t('common.copy')}>
+            <IconButton
+              size="small"
+              onClick={() => onCopy(world.worldId, t('gameWorlds.worldId'))}
+              sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
+            >
+              <CopyIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
         </Box>
       </TableCell>
       <TableCell>
@@ -125,12 +158,21 @@ const SortableRow: React.FC<SortableRowProps> = ({
           <Typography variant="body2">
             {world.name}
           </Typography>
+          <Tooltip title={t('common.copy')}>
+            <IconButton
+              size="small"
+              onClick={() => onCopy(world.name, t('gameWorlds.name'))}
+              sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
+            >
+              <CopyIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
         </Box>
       </TableCell>
       <TableCell>
         <Chip
           icon={world.isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
-          label={world.isVisible ? (t('gameWorlds.visible') || 'Visible') : (t('gameWorlds.hidden') || 'Hidden')}
+          label={world.isVisible ? (t('gameWorlds.visible')) : (t('gameWorlds.hidden'))}
           color={world.isVisible ? "success" : "default"}
           size="small"
           onClick={() => onToggleVisibility(world.id)}
@@ -145,7 +187,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
       <TableCell>
         <Chip
           icon={<MaintenanceIcon />}
-          label={world.isMaintenance ? (t('gameWorlds.maintenance') || 'Maintenance') : (t('gameWorlds.active') || 'Active')}
+          label={world.isMaintenance ? (t('gameWorlds.maintenance')) : (t('gameWorlds.active'))}
           color={world.isMaintenance ? "warning" : "success"}
           size="small"
           onClick={() => onToggleMaintenance(world.id)}
@@ -163,20 +205,27 @@ const SortableRow: React.FC<SortableRowProps> = ({
         </Typography>
       </TableCell>
       <TableCell>
+        {renderTags(world.tags)}
+      </TableCell>
+      <TableCell>
         <Typography variant="body2">
           {formatDateTimeDetailed(world.createdAt)}
         </Typography>
       </TableCell>
       <TableCell align="center">
         <Tooltip title={t('gameWorlds.moveUp')}>
-          <IconButton size="small" onClick={() => onMoveUp(world)}>
-            <ArrowUpIcon />
-          </IconButton>
+          <span>
+            <IconButton size="small" onClick={() => onMoveUp(world)} disabled={index === 0}>
+              <ArrowUpIcon />
+            </IconButton>
+          </span>
         </Tooltip>
         <Tooltip title={t('gameWorlds.moveDown')}>
-          <IconButton size="small" onClick={() => onMoveDown(world)}>
-            <ArrowDownIcon />
-          </IconButton>
+          <span>
+            <IconButton size="small" onClick={() => onMoveDown(world)} disabled={index === total - 1}>
+              <ArrowDownIcon />
+            </IconButton>
+          </span>
         </Tooltip>
 
         <Tooltip title={t('gameWorlds.editGameWorld')}>
@@ -203,11 +252,12 @@ const GameWorldsPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
 
 
-  
+
   const [worlds, setWorlds] = useState<GameWorld[]>([]);
   const [loading, setLoading] = useState(false);
-  const [total, setTotal] = useState(0);
+  const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
+  const [tagsFilter, setTagsFilter] = useState<string[]>([]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingWorld, setEditingWorld] = useState<GameWorld | null>(null);
@@ -217,8 +267,12 @@ const GameWorldsPage: React.FC = () => {
     isVisible: true,
     isMaintenance: false,
     description: '',
+    tagIds: [],
   });
+  const [formTags, setFormTags] = useState<(string | Tag)[]>([]);
+
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const worldIdRef = useRef<HTMLInputElement>(null);
 
   // Confirmation dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -247,6 +301,12 @@ const GameWorldsPage: React.FC = () => {
     })
   );
 
+  // Load registry tags for form use
+  const [allRegistryTags, setAllRegistryTags] = useState<Tag[]>([]);
+  useEffect(() => {
+    tagService.list().then(setAllRegistryTags).catch(() => {});
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -256,12 +316,21 @@ const GameWorldsPage: React.FC = () => {
       }
     };
 
-    loadData();
+    // allRegistryTags가 로드된 후에만 게임월드를 로드
+    if (allRegistryTags.length > 0 || tagsFilter.length === 0) {
+      loadData();
+    }
 
     return () => {
       isMounted = false;
     };
-  }, [search]);
+  }, [search, tagsFilter.join(','), allRegistryTags.length]);
+
+  // Avoid mobile viewport scroll zoom/focus issues by disabling autoScroll and portal for Autocomplete
+  const autocompleteSlotProps = {
+    popper: { modifiers: [{ name: 'preventOverflow', options: { altAxis: true, tether: true } }] },
+    paper: { sx: { maxHeight: 280 } },
+  } as const;
 
   const loadGameWorlds = async () => {
     // 이미 로딩 중이면 중복 요청 방지
@@ -269,23 +338,35 @@ const GameWorldsPage: React.FC = () => {
 
     try {
       setLoading(true);
+
+      // 태그 이름을 태그 ID로 변환
+      const tagIds = tagsFilter.length > 0
+        ? tagsFilter.map(tagName => {
+            const tag = allRegistryTags.find(t => t.name === tagName);
+            return tag ? tag.id : null;
+          }).filter(id => id !== null)
+        : [];
+
       const result = await gameWorldService.getGameWorlds({
+        // 페이징 파라미터 제거: page/limit 미전송
         search: search || undefined,
+        tagIds: tagIds.length ? tagIds.join(',') : undefined,
       });
 
       setWorlds(result.worlds);
-      setTotal(result.total);
     } catch (error: any) {
       console.error('Failed to load game worlds:', error);
 
       // 네트워크 오류인 경우에만 toast 표시
       if (error.message?.includes('Network Error') || error.code === 'NETWORK_ERROR') {
-        enqueueSnackbar('Failed to load game worlds', { variant: 'error' });
+        enqueueSnackbar(t('gameWorlds.errors.loadFailed'), { variant: 'error' });
       }
     } finally {
       setLoading(false);
     }
   };
+
+  // Pagination handlers removed
 
   const handleAddWorld = () => {
     setEditingWorld(null);
@@ -295,9 +376,15 @@ const GameWorldsPage: React.FC = () => {
       isVisible: true,
       isMaintenance: false,
       description: '',
+      tagIds: [],
     });
+    setFormTags([]);
     setFormErrors({});
     setDialogOpen(true);
+    setTimeout(() => {
+      worldIdRef.current?.focus();
+      worldIdRef.current?.select();
+    }, 100);
   };
 
   const handleEditWorld = (world: GameWorld) => {
@@ -308,7 +395,9 @@ const GameWorldsPage: React.FC = () => {
       isVisible: world.isVisible,
       isMaintenance: world.isMaintenance,
       description: world.description || '',
+      tagIds: (world.tags || []).map(t => t.id),
     });
+    setFormTags((world.tags || []));
     setFormErrors({});
     setDialogOpen(true);
   };
@@ -328,26 +417,56 @@ const GameWorldsPage: React.FC = () => {
     return Object.keys(errors).length === 0;
   };
 
+  const allTags = useMemo(() => {
+    const list = new Map<string, Tag>();
+    worlds.forEach(w => (w.tags || []).forEach(t => list.set(t.name.toLowerCase(), t)));
+    // merge with registry
+    allRegistryTags.forEach(t => list.set(t.name.toLowerCase(), t));
+    return Array.from(list.values());
+  }, [worlds, allRegistryTags]);
+
+  const existingTags = allTags;
+
   const handleSaveWorld = async () => {
     if (!validateForm()) {
       return;
     }
 
+    setSaving(true);
     try {
-      // Ensure boolean types are correct
+      // Ensure boolean types and tag IDs are correct
+      const names = (formTags || []).map(t => (typeof t === 'string' ? t : t.name)).map(s => s.trim()).filter(Boolean);
+      // Create missing tags first and get ids
+      const ensuredTags: Tag[] = [];
+      for (const name of names) {
+        const existing = allRegistryTags.find(rt => rt.name.toLowerCase() === name.toLowerCase());
+        if (existing) {
+          ensuredTags.push(existing);
+        } else {
+          try {
+            const created = await tagService.create({ name });
+            ensuredTags.push(created);
+            setAllRegistryTags(prev => [...prev, created].sort((a,b)=>a.name.localeCompare(b.name)));
+          } catch (e) {}
+        }
+      }
+      const tagIds = ensuredTags.map(t => t.id);
+
       const dataToSend = {
         ...formData,
+        tagIds,
         isVisible: Boolean(formData.isVisible),
         isMaintenance: Boolean(formData.isMaintenance),
       };
 
 
 
+      let savedWorld;
       if (editingWorld) {
-        await gameWorldService.updateGameWorld(editingWorld.id, dataToSend);
+        savedWorld = await gameWorldService.updateGameWorld(editingWorld.id, dataToSend);
         enqueueSnackbar(t('gameWorlds.worldUpdated'), { variant: 'success' });
       } else {
-        await gameWorldService.createGameWorld(dataToSend);
+        savedWorld = await gameWorldService.createGameWorld(dataToSend);
         enqueueSnackbar(t('gameWorlds.worldCreated'), { variant: 'success' });
       }
 
@@ -355,8 +474,20 @@ const GameWorldsPage: React.FC = () => {
       loadGameWorlds();
     } catch (error: any) {
       console.error('Failed to save game world:', error);
-      const message = error.response?.data?.message || 'Failed to save game world';
-      enqueueSnackbar(message, { variant: 'error' });
+      const status = error?.status || error?.response?.status;
+      let message = error?.error?.message || error?.response?.data?.error?.message || error?.response?.data?.message;
+      if (status === 409) {
+        message = t('gameWorlds.errors.alreadyExists');
+        // Focus the World ID field for quick correction
+        setTimeout(() => {
+          worldIdRef.current?.focus();
+          worldIdRef.current?.select();
+        }, 0);
+      }
+      if (!message) message = t('gameWorlds.errors.saveFailed');
+      enqueueSnackbar(message, { variant: 'error', autoHideDuration: 4000 });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -380,7 +511,7 @@ const GameWorldsPage: React.FC = () => {
         setDeleteConfirmDialog({ open: false, world: null, inputValue: '' });
       } catch (error) {
         console.error('Failed to delete game world:', error);
-        enqueueSnackbar('Failed to delete game world', { variant: 'error' });
+        enqueueSnackbar(t('gameWorlds.errors.deleteFailed'), { variant: 'error' });
       }
     }
   };
@@ -402,7 +533,7 @@ const GameWorldsPage: React.FC = () => {
           loadGameWorlds();
         } catch (error) {
           console.error('Failed to toggle visibility:', error);
-          enqueueSnackbar('Failed to toggle visibility', { variant: 'error' });
+          enqueueSnackbar(t('gameWorlds.errors.toggleVisibilityFailed'), { variant: 'error' });
         }
         setConfirmDialog(prev => ({ ...prev, open: false }));
       }
@@ -426,7 +557,7 @@ const GameWorldsPage: React.FC = () => {
           loadGameWorlds();
         } catch (error) {
           console.error('Failed to toggle maintenance:', error);
-          enqueueSnackbar('Failed to toggle maintenance status', { variant: 'error' });
+          enqueueSnackbar(t('gameWorlds.errors.toggleMaintenanceFailed'), { variant: 'error' });
         }
         setConfirmDialog(prev => ({ ...prev, open: false }));
       }
@@ -461,10 +592,11 @@ const GameWorldsPage: React.FC = () => {
       try {
         await gameWorldService.updateDisplayOrders(orderUpdates);
         console.log('Display orders updated successfully');
-        enqueueSnackbar('Order updated successfully', { variant: 'success' });
+        const movedWorld = worlds.find(w => w.id === active.id);
+        enqueueSnackbar(t('gameWorlds.orderUpdated', { name: movedWorld?.name || 'Unknown' }), { variant: 'success' });
       } catch (error) {
         console.error('Failed to update order:', error);
-        enqueueSnackbar('Failed to update order', { variant: 'error' });
+        enqueueSnackbar(t('gameWorlds.errors.orderUpdateFailed'), { variant: 'error' });
         // Reload to get correct order
         loadGameWorlds();
       }
@@ -475,14 +607,24 @@ const GameWorldsPage: React.FC = () => {
     try {
       const moved = await gameWorldService.moveUp(world.id);
       if (moved) {
-        enqueueSnackbar('Game world moved up successfully', { variant: 'success' });
-        loadGameWorlds();
+        // Update local state instead of reloading
+        setWorlds(prevWorlds => {
+          const currentIndex = prevWorlds.findIndex(w => w.id === world.id);
+          if (currentIndex <= 0) return prevWorlds;
+
+          const newWorlds = [...prevWorlds];
+          [newWorlds[currentIndex - 1], newWorlds[currentIndex]] =
+            [newWorlds[currentIndex], newWorlds[currentIndex - 1]];
+
+          return newWorlds;
+        });
+        enqueueSnackbar(t('gameWorlds.movedUp', { name: world.name }), { variant: 'success' });
       } else {
-        enqueueSnackbar('Game world is already at the top', { variant: 'info' });
+        enqueueSnackbar(t('gameWorlds.alreadyTop'), { variant: 'info' });
       }
     } catch (error) {
       console.error('Failed to move up:', error);
-      enqueueSnackbar('Failed to move world up', { variant: 'error' });
+      enqueueSnackbar(t('gameWorlds.errors.moveUpFailed'), { variant: 'error' });
     }
   };
 
@@ -490,14 +632,34 @@ const GameWorldsPage: React.FC = () => {
     try {
       const moved = await gameWorldService.moveDown(world.id);
       if (moved) {
-        enqueueSnackbar('Game world moved down successfully', { variant: 'success' });
-        loadGameWorlds();
+        // Update local state instead of reloading
+        setWorlds(prevWorlds => {
+          const currentIndex = prevWorlds.findIndex(w => w.id === world.id);
+          if (currentIndex >= prevWorlds.length - 1) return prevWorlds;
+
+          const newWorlds = [...prevWorlds];
+          [newWorlds[currentIndex], newWorlds[currentIndex + 1]] =
+            [newWorlds[currentIndex + 1], newWorlds[currentIndex]];
+
+          return newWorlds;
+        });
+        enqueueSnackbar(t('gameWorlds.movedDown', { name: world.name }), { variant: 'success' });
       } else {
-        enqueueSnackbar('Game world is already at the bottom', { variant: 'info' });
+        enqueueSnackbar(t('gameWorlds.alreadyBottom'), { variant: 'info' });
       }
     } catch (error) {
       console.error('Failed to move down:', error);
-      enqueueSnackbar('Failed to move world down', { variant: 'error' });
+      enqueueSnackbar(t('gameWorlds.errors.moveDownFailed'), { variant: 'error' });
+    }
+  };
+
+  const handleCopy = async (text: string, type: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      enqueueSnackbar(t('common.copied', { type, value: text }), { variant: 'success' });
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error);
+      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
     }
   };
 
@@ -513,10 +675,7 @@ const GameWorldsPage: React.FC = () => {
       <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-            {t('gameWorlds.title') || 'Game Worlds Management'}
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {t('gameWorlds.subtitle') || 'Manage game world settings'}
+            {t('gameWorlds.title')}
           </Typography>
         </Box>
         <Button
@@ -524,49 +683,49 @@ const GameWorldsPage: React.FC = () => {
           startIcon={<AddIcon />}
           onClick={handleAddWorld}
         >
-          {t('gameWorlds.addGameWorld') || 'Add Game World'}
+          {t('gameWorlds.addGameWorld')}
         </Button>
       </Box>
 
       {/* Statistics */}
-      <Box sx={{ display: 'flex', gap: 3, mb: 4, justifyContent: 'center', flexWrap: 'wrap' }}>
-        <Card sx={{ minWidth: 200, flex: 1 }}>
-          <CardContent>
-            <Typography variant="h4" color="primary.main" sx={{ fontWeight: 600 }}>
-              {total}
+      <Box sx={{ display: 'flex', gap: 2, mb: 3, justifyContent: 'center', flexWrap: 'wrap' }}>
+        <Card sx={{ minWidth: 180, flex: 1 }}>
+          <CardContent sx={{ py: 2, px: 3, textAlign: 'center' }}>
+            <Typography variant="h5" color="primary.main" sx={{ fontWeight: 600, mb: 0.5 }}>
+              {worlds.length}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('gameWorlds.totalWorlds') || 'Total Worlds'}
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+              {t('gameWorlds.totalWorlds')}
             </Typography>
           </CardContent>
         </Card>
-        <Card sx={{ minWidth: 200, flex: 1 }}>
-          <CardContent>
-            <Typography variant="h4" color="success.main" sx={{ fontWeight: 600 }}>
+        <Card sx={{ minWidth: 180, flex: 1 }}>
+          <CardContent sx={{ py: 2, px: 3, textAlign: 'center' }}>
+            <Typography variant="h5" color="success.main" sx={{ fontWeight: 600, mb: 0.5 }}>
               {worlds.filter(w => w.isVisible && !w.isMaintenance).length}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('gameWorlds.activeWorlds') || 'Active Worlds'}
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+              {t('gameWorlds.activeWorlds')}
             </Typography>
           </CardContent>
         </Card>
-        <Card sx={{ minWidth: 200, flex: 1 }}>
-          <CardContent>
-            <Typography variant="h4" color="warning.main" sx={{ fontWeight: 600 }}>
+        <Card sx={{ minWidth: 180, flex: 1 }}>
+          <CardContent sx={{ py: 2, px: 3, textAlign: 'center' }}>
+            <Typography variant="h5" color="warning.main" sx={{ fontWeight: 600, mb: 0.5 }}>
               {worlds.filter(w => w.isMaintenance).length}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('gameWorlds.maintenanceWorlds') || 'Under Maintenance'}
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+              {t('gameWorlds.maintenanceWorlds')}
             </Typography>
           </CardContent>
         </Card>
-        <Card sx={{ minWidth: 200, flex: 1 }}>
-          <CardContent>
-            <Typography variant="h4" color="error.main" sx={{ fontWeight: 600 }}>
+        <Card sx={{ minWidth: 180, flex: 1 }}>
+          <CardContent sx={{ py: 2, px: 3, textAlign: 'center' }}>
+            <Typography variant="h5" color="error.main" sx={{ fontWeight: 600, mb: 0.5 }}>
               {worlds.filter(w => !w.isVisible).length}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('gameWorlds.hiddenWorlds') || 'Hidden Worlds'}
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+              {t('gameWorlds.hiddenWorlds')}
             </Typography>
           </CardContent>
         </Card>
@@ -575,21 +734,47 @@ const GameWorldsPage: React.FC = () => {
       {/* Search and Filters */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <TextField
-            fullWidth
-            placeholder={t('gameWorlds.searchPlaceholder') || 'Search by name, world ID, or description...'}
-            value={search}
-            onChange={handleSearchChange}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+              <TextField
+                placeholder={t('gameWorlds.searchPlaceholder')}
+                value={search}
+                onChange={handleSearchChange}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+                sx={{ minWidth: 300 }}
+              />
+              <Autocomplete
+                multiple
+                freeSolo
+                sx={{ minWidth: 320, flexShrink: 0 }}
+                options={existingTags.map(t => t.name)}
+                value={tagsFilter}
+                onChange={(_, value) => setTagsFilter(value)}
+                slotProps={autocompleteSlotProps as any}
+                disablePortal
+                autoSelect
+                renderInput={(params) => (
+                  <TextField {...params} label={t('gameWorlds.tags')} />
+                )}
+              />
+            </Box>
+
+            <Tooltip title={t('common.refresh')}>
+              <span>
+                <IconButton onClick={loadGameWorlds} disabled={loading} sx={{ ml: 2 }}>
+                  <RefreshIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Box>
         </CardContent>
       </Card>
 
@@ -606,26 +791,34 @@ const GameWorldsPage: React.FC = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>{t('gameWorlds.worldId') || 'World ID'}</TableCell>
-                    <TableCell>{t('gameWorlds.name') || 'Name'}</TableCell>
-                    <TableCell>{t('gameWorlds.visible') || 'Visible'}</TableCell>
-                    <TableCell>{t('gameWorlds.maintenance') || 'Maintenance'}</TableCell>
-                    <TableCell>{t('gameWorlds.description') || 'Description'}</TableCell>
-                    <TableCell>{t('gameWorlds.created') || 'Created'}</TableCell>
-                    <TableCell align="center">{t('gameWorlds.actions') || 'Actions'}</TableCell>
+                    <TableCell>{t('gameWorlds.worldId')}</TableCell>
+                    <TableCell>{t('gameWorlds.name')}</TableCell>
+                    <TableCell>{t('gameWorlds.visible')}</TableCell>
+                    <TableCell>{t('gameWorlds.maintenance')}</TableCell>
+                    <TableCell>{t('gameWorlds.description')}</TableCell>
+                    <TableCell>{t('gameWorlds.tags')}</TableCell>
+                    <TableCell>{t('gameWorlds.created')}</TableCell>
+                    <TableCell align="center">{t('gameWorlds.actions')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {loading ? (
                     <TableRow>
                       <TableCell colSpan={7} align="center">
-                        {t('gameWorlds.loading') || 'Loading...'}
+                        {t('gameWorlds.loading')}
                       </TableCell>
                     </TableRow>
                   ) : worlds.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} align="center">
-                        {t('gameWorlds.noWorldsFound') || 'No game worlds found'}
+                      <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
+                        <Box sx={{ textAlign: 'center' }}>
+                          <Typography variant="h6" color="text.secondary" gutterBottom>
+                            {t('gameWorlds.noWorldsFound')}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {t('gameWorlds.noWorldsDesc')}
+                          </Typography>
+                        </Box>
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -633,16 +826,19 @@ const GameWorldsPage: React.FC = () => {
                       items={worlds.map(w => w.id)}
                       strategy={verticalListSortingStrategy}
                     >
-                      {worlds.map((world) => (
+                      {worlds.map((world, idx) => (
                         <SortableRow
                           key={world.id}
                           world={world}
+                          index={idx}
+                          total={worlds.length}
                           onEdit={handleEditWorld}
                           onDelete={handleDeleteWorld}
                           onToggleVisibility={handleToggleVisibility}
                           onToggleMaintenance={handleToggleMaintenance}
                           onMoveUp={handleMoveUp}
                           onMoveDown={handleMoveDown}
+                          onCopy={handleCopy}
                           t={t}
                         />
                       ))}
@@ -653,6 +849,7 @@ const GameWorldsPage: React.FC = () => {
             </TableContainer>
           </DndContext>
 
+        {/* Pagination removed (no server/client paging) */}
 
         </CardContent>
       </Card>
@@ -664,35 +861,76 @@ const GameWorldsPage: React.FC = () => {
         </DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
-            <TextField
-              fullWidth
-              label={t('gameWorlds.worldId')}
-              value={formData.worldId}
-              onChange={(e) => setFormData({ ...formData, worldId: e.target.value })}
-              error={!!formErrors.worldId}
-              helperText={formErrors.worldId}
-              required
-            />
+            <Box>
+              <TextField
+                fullWidth
+                label={t('gameWorlds.worldId')}
+                value={formData.worldId}
+                onChange={(e) => setFormData({ ...formData, worldId: e.target.value })}
+                error={!!formErrors.worldId}
+                helperText={formErrors.worldId}
+                required
+                inputRef={worldIdRef}
+                autoFocus
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                {t('gameWorlds.form.worldIdHelp')}
+              </Typography>
+            </Box>
 
-            <TextField
-              fullWidth
-              label={t('gameWorlds.name')}
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              error={!!formErrors.name}
-              helperText={formErrors.name}
-              required
-            />
+            <Box>
+              <TextField
+                fullWidth
+                label={t('gameWorlds.name')}
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                error={!!formErrors.name}
+                helperText={formErrors.name}
+                required
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                {t('gameWorlds.form.nameHelp')}
+              </Typography>
+            </Box>
 
-            <TextField
-              fullWidth
-              label={t('gameWorlds.description')}
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              multiline
-              rows={3}
-              placeholder={t('gameWorlds.description')}
-            />
+            <Box>
+              <TextField
+                fullWidth
+                label={t('gameWorlds.description')}
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                multiline
+                rows={3}
+                placeholder={t('gameWorlds.description')}
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                {t('gameWorlds.form.descriptionHelp')}
+              </Typography>
+            </Box>
+
+            <Box>
+              <Autocomplete
+                multiple
+                freeSolo
+                options={allRegistryTags}
+                getOptionLabel={(opt) => (typeof opt === 'string' ? opt : opt.name)}
+                filterSelectedOptions
+                value={formTags}
+                onChange={(_, value) => setFormTags(value as (string | Tag)[])}
+                renderTags={(value: readonly (string | Tag)[], getTagProps) =>
+                  value.map((option: string | Tag, index: number) => {
+                    const name = typeof option === 'string' ? option : option.name;
+                    const color = typeof option === 'string' ? '#607D8B' : option.color;
+                    return (
+                      <Chip variant="outlined" size="small" label={name} sx={{ bgcolor: color, color: '#fff' }} {...getTagProps({ index })} key={name + index} />
+                    );
+                  })
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label={t('gameWorlds.tags')} />
+                )}
+              />
+            </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               <FormControlLabel
@@ -704,6 +942,9 @@ const GameWorldsPage: React.FC = () => {
                 }
                 label={t('gameWorlds.visibleToUsers')}
               />
+              <Typography variant="caption" color="text.secondary" sx={{ ml: 6, mt: -0.5, mb: 1 }}>
+                {t('gameWorlds.form.visibleHelp')}
+              </Typography>
 
               <FormControlLabel
                 control={
@@ -714,15 +955,23 @@ const GameWorldsPage: React.FC = () => {
                 }
                 label={t('gameWorlds.underMaintenance')}
               />
+              <Typography variant="caption" color="text.secondary" sx={{ ml: 6, mt: -0.5 }}>
+                {t('gameWorlds.form.maintenanceHelp')}
+              </Typography>
             </Box>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>
+          <Button onClick={() => setDialogOpen(false)} disabled={saving} startIcon={<CancelIcon />}>
             {t('gameWorlds.cancel')}
           </Button>
-          <Button onClick={handleSaveWorld} variant="contained">
-            {t('gameWorlds.save')}
+          <Button
+            onClick={handleSaveWorld}
+            variant="contained"
+            disabled={saving}
+            startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
+          >
+            {saving ? t('common.saving') : t('gameWorlds.save')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -770,11 +1019,12 @@ const GameWorldsPage: React.FC = () => {
             {t('gameWorlds.confirmDelete', { name: deleteConfirmDialog.world?.name })}
           </Alert>
           <Typography variant="body2" sx={{ mb: 2 }}>
-            To confirm deletion, please type the game world name: <strong>{deleteConfirmDialog.world?.name}</strong>
+            {t('gameWorlds.deleteTypeToConfirm', { name: deleteConfirmDialog.world?.name })}
+            <strong>{deleteConfirmDialog.world?.name}</strong>
           </Typography>
           <TextField
             fullWidth
-            label="Game World Name"
+            label={t('gameWorlds.worldName')}
             value={deleteConfirmDialog.inputValue}
             onChange={(e) => setDeleteConfirmDialog(prev => ({ ...prev, inputValue: e.target.value }))}
             placeholder={deleteConfirmDialog.world?.name}
@@ -795,7 +1045,7 @@ const GameWorldsPage: React.FC = () => {
             variant="contained"
             disabled={deleteConfirmDialog.inputValue !== deleteConfirmDialog.world?.name}
           >
-            Delete
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>

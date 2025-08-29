@@ -10,7 +10,7 @@ interface ThemeContextType {
   isDark: boolean;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 // Theme configurations
 const getTheme = (mode: 'light' | 'dark'): Theme => {
@@ -18,9 +18,9 @@ const getTheme = (mode: 'light' | 'dark'): Theme => {
     palette: {
       mode,
       primary: {
-        main: mode === 'dark' ? '#90caf9' : '#1976d2',
-        light: mode === 'dark' ? '#bbdefb' : '#42a5f5',
-        dark: mode === 'dark' ? '#64b5f6' : '#1565c0',
+        main: mode === 'dark' ? '#6EA8FF' : '#1976d2',
+        light: mode === 'dark' ? '#8FB9FF' : '#42a5f5',
+        dark: mode === 'dark' ? '#3D7DFF' : '#1565c0',
       },
       secondary: {
         main: mode === 'dark' ? '#f48fb1' : '#dc004e',
@@ -28,12 +28,12 @@ const getTheme = (mode: 'light' | 'dark'): Theme => {
         dark: mode === 'dark' ? '#f06292' : '#c51162',
       },
       background: {
-        default: mode === 'dark' ? '#121212' : '#fafafa',
-        paper: mode === 'dark' ? '#1e1e1e' : '#ffffff',
+        default: mode === 'dark' ? '#0D0F12' : '#fafafa',
+        paper: mode === 'dark' ? '#15181D' : '#ffffff',
       },
       text: {
-        primary: mode === 'dark' ? '#ffffff' : '#000000',
-        secondary: mode === 'dark' ? '#b3b3b3' : '#666666',
+        primary: mode === 'dark' ? '#FFFFFF' : '#000000',
+        secondary: mode === 'dark' ? '#9AA4AF' : '#666666',
       },
     },
     typography: {
@@ -97,6 +97,29 @@ const getTheme = (mode: 'light' | 'dark'): Theme => {
           root: {
             textTransform: 'none',
             borderRadius: 8,
+            fontWeight: 500,
+          },
+        },
+      },
+      MuiPagination: {
+        styleOverrides: {
+          root: {
+            '& .MuiPaginationItem-root': {
+              borderRadius: 8,
+              fontWeight: 500,
+              '&.Mui-selected': {
+                backgroundColor: mode === 'dark' ? '#6EA8FF' : '#1976d2',
+                color: '#fff',
+                '&:hover': {
+                  backgroundColor: mode === 'dark' ? '#5A96E6' : '#1565c0',
+                },
+              },
+              '&:hover': {
+                backgroundColor: mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.08)'
+                  : 'rgba(0, 0, 0, 0.04)',
+              },
+            },
           },
         },
       },
@@ -105,6 +128,26 @@ const getTheme = (mode: 'light' | 'dark'): Theme => {
           root: {
             '& .MuiOutlinedInput-root': {
               borderRadius: 8,
+              backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'inherit',
+              '& fieldset': {
+                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
+              },
+              '&:hover fieldset': {
+                borderColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: mode === 'dark' ? '#6EA8FF' : '#1976d2',
+              },
+            },
+          },
+        },
+      },
+      MuiInputLabel: {
+        styleOverrides: {
+          root: {
+            color: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : undefined,
+            '&.Mui-focused': {
+              color: mode === 'dark' ? '#6EA8FF' : undefined,
             },
           },
         },
@@ -112,15 +155,22 @@ const getTheme = (mode: 'light' | 'dark'): Theme => {
       MuiTableRow: {
         styleOverrides: {
           root: {
+            transition: 'background-color 0.15s ease-in-out',
             '&:not(:last-child)': {
               '& td': {
                 borderBottom: 'none',
               },
             },
-            '&:hover': {
+            // Zebra stripes for better row separation
+            '&:nth-of-type(even)': {
               backgroundColor: mode === 'dark'
                 ? 'rgba(255, 255, 255, 0.04)'
-                : 'rgba(0, 0, 0, 0.04)',
+                : 'rgba(0, 0, 0, 0.025)',
+            },
+            '&:hover': {
+              backgroundColor: mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.08)'
+                : 'rgba(0, 0, 0, 0.05)',
             },
           },
         },
@@ -132,7 +182,7 @@ const getTheme = (mode: 'light' | 'dark'): Theme => {
           },
           head: {
             backgroundColor: mode === 'dark'
-              ? 'rgba(255, 255, 255, 0.02)'
+              ? 'rgba(255, 255, 255, 0.04)'
               : 'rgba(0, 0, 0, 0.02)',
             borderBottom: mode === 'dark'
               ? '1px solid rgba(255, 255, 255, 0.12)'
@@ -196,6 +246,13 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const actualTheme = mode === 'auto' ? systemTheme : mode;
   const theme = getTheme(actualTheme);
   const isDark = actualTheme === 'dark';
+
+  // Set data-theme attribute on document root for CSS selectors
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', actualTheme);
+    }
+  }, [actualTheme]);
 
   const toggleTheme = () => {
     // Simple toggle between light and dark (skip auto mode for better UX)

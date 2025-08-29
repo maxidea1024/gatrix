@@ -75,6 +75,7 @@ const requiredEnvVars = [
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
 
 if (missingEnvVars.length > 0 && process.env.NODE_ENV === 'production') {
+  // Note: logger may not be available yet during config initialization
   console.error('Missing required environment variables:', missingEnvVars);
   process.exit(1);
 }

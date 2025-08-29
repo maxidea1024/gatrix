@@ -1,12 +1,14 @@
 import { apiService } from './api';
+import { prodLogger } from '../utils/logger';
 
 export interface Whitelist {
   id: number;
-  nickname: string;
+  accountId: string;
   ipAddress?: string;
   startDate?: string;
   endDate?: string;
   memo?: string;
+  tags?: string[];
   createdBy: number;
   createdByName?: string;
   createdAt: string;
@@ -14,26 +16,29 @@ export interface Whitelist {
 }
 
 export interface CreateWhitelistData {
-  nickname: string;
+  accountId: string;
   ipAddress?: string;
   startDate?: string;
   endDate?: string;
   memo?: string;
+  tags?: string[];
 }
 
 export interface UpdateWhitelistData {
-  nickname?: string;
+  accountId?: string;
   ipAddress?: string;
   startDate?: string;
   endDate?: string;
   memo?: string;
+  tags?: string[];
 }
 
 export interface WhitelistFilters {
-  nickname?: string;
+  accountId?: string;
   ipAddress?: string;
   createdBy?: number;
   search?: string;
+  tags?: string[];
 }
 
 export interface WhitelistListResponse {
@@ -65,10 +70,13 @@ export class WhitelistService {
       _t: Date.now().toString(),
     });
 
-    if (filters.nickname) params.append('nickname', filters.nickname);
+    if (filters.accountId) params.append('accountId', filters.accountId);
     if (filters.ipAddress) params.append('ipAddress', filters.ipAddress);
     if (filters.createdBy) params.append('createdBy', filters.createdBy.toString());
     if (filters.search) params.append('search', filters.search);
+    if (filters.tags && filters.tags.length > 0) {
+      filters.tags.forEach(tag => params.append('tags', tag));
+    }
 
     const response = await apiService.get<{ success: boolean; data: WhitelistListResponse }>(`/whitelist?${params}`);
 
@@ -78,7 +86,7 @@ export class WhitelistService {
     }
 
     // 응답이 올바르지 않은 경우 기본값 반환
-    console.warn('Unexpected getWhitelists response structure:', response);
+    prodLogger.warn('Unexpected getWhitelists response structure:', response);
     return {
       whitelists: [],
       total: 0,

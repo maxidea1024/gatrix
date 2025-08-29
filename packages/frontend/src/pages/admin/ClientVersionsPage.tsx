@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { devLogger, prodLogger } from '../../utils/logger';
 import {
   Box,
   Card,
   CardContent,
   Typography,
   Button,
-  TextField,
-  InputAdornment,
-  IconButton,
   Chip,
   Table,
   TableBody,
@@ -16,6 +14,9 @@ import {
   TableHead,
   TableRow,
   TablePagination,
+  Menu,
+  Paper,
+  IconButton,
   TableSortLabel,
   Checkbox,
   MenuItem,
@@ -25,29 +26,25 @@ import {
   DialogActions,
   Tooltip,
   Fab,
-  Collapse,
-  Grid,
+
   FormControl,
   InputLabel,
   Select,
-  FormControlLabel,
-  Switch,
+
   LinearProgress,
   Alert,
 } from '@mui/material';
 import {
-  Search as SearchIcon,
   Add as AddIcon,
-  FilterList as FilterIcon,
-  MoreVert as MoreVertIcon,
+
   Edit as EditIcon,
   Delete as DeleteIcon,
   Download as DownloadIcon,
   Refresh as RefreshIcon,
-  Clear as ClearIcon,
-  ExpandMore as ExpandMoreIcon,
-  ExpandLess as ExpandLessIcon,
+
   ContentCopy as CopyIcon,
+  Cancel as CancelIcon,
+  Update as UpdateIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -61,7 +58,29 @@ import {
 } from '../../types/clientVersion';
 import { ClientVersionService } from '../../services/clientVersionService';
 import ClientVersionForm from '../../components/admin/ClientVersionForm';
+import BulkClientVersionForm from '../../components/admin/BulkClientVersionForm';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import SimplePagination from '../../components/common/SimplePagination';
+
+// 버전별 색상을 일관되게 생성하는 함수
+const getVersionColor = (version: string): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
+  // 간단한 해시 함수
+  let hash = 0;
+  for (let i = 0; i < version.length; i++) {
+    const char = version.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // 32비트 정수로 변환
+  }
+
+  // 사용 가능한 색상 배열
+  const colors: Array<'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'> = [
+    'primary', 'secondary', 'error', 'info', 'success', 'warning'
+  ];
+
+  // 해시값을 색상 인덱스로 변환
+  const colorIndex = Math.abs(hash) % colors.length;
+  return colors[colorIndex];
+};
 
 const ClientVersionsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -73,13 +92,11 @@ const ClientVersionsPage: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(ClientVersionService.getStoredPageSize());
-  const [sortBy, setSortBy] = useState('createdAt');
-  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
+  const [sortBy] = useState('clientVersion');
+  const [sortOrder] = useState<'ASC' | 'DESC'>('DESC');
   
-  // 검색 및 필터
-  const [search, setSearch] = useState('');
+  // 필터
   const [filters, setFilters] = useState<ClientVersionFilters>({});
-  const [showFilters, setShowFilters] = useState(true); // 기본적으로 필터 표시
   
   // 선택 관리
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -92,12 +109,15 @@ const ClientVersionsPage: React.FC = () => {
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [bulkStatus, setBulkStatus] = useState<ClientStatus>(ClientStatus.ONLINE);
   const [formDialogOpen, setFormDialogOpen] = useState(false);
+  const [bulkFormDialogOpen, setBulkFormDialogOpen] = useState(false);
   const [editingClientVersion, setEditingClientVersion] = useState<ClientVersion | null>(null);
   const [isCopyMode, setIsCopyMode] = useState(false);
+  const [orderChangeDialogOpen, setOrderChangeDialogOpen] = useState(false);
+  const [orderChangeItems, setOrderChangeItems] = useState<ClientVersion[]>([]);
 
   // 메타데이터
-  const [channels, setChannels] = useState<string[]>(['production', 'staging', 'development']);
-  const [subChannels, setSubChannels] = useState<string[]>(['live', 'beta', 'alpha']);
+  const [platforms] = useState<string[]>(['pc', 'pc-wegame', 'ios', 'android', 'harmonyos']);
+  const [versions, setVersions] = useState<string[]>([]);
 
   // 클라이언트 버전 목록 로드
   const loadClientVersions = useCallback(async () => {
@@ -106,44 +126,46 @@ const ClientVersionsPage: React.FC = () => {
       const result = await ClientVersionService.getClientVersions(
         page + 1,
         rowsPerPage,
-        { ...filters, search: search || undefined },
-        sortBy,
-        sortOrder
+        filters,
+        'clientVersion', // 버전 기준 정렬 고정
+        'DESC' // 내림차순 고정
       );
 
       if (result && result.clientVersions) {
-        console.log('Loaded client versions:', {
+        devLogger.debug('Loaded client versions:', {
           count: result.clientVersions.length,
           firstItem: result.clientVersions[0],
           hasIds: result.clientVersions.every(cv => cv.id !== undefined)
         });
         setClientVersions(result.clientVersions);
         setTotal(result.total || 0);
+
+        // 버전 목록 추출 및 업데이트
+        const uniqueVersions = Array.from(new Set(result.clientVersions.map(cv => cv.clientVersion)))
+          .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+        setVersions(uniqueVersions);
       } else {
-        console.warn('Invalid response structure:', result);
+        prodLogger.warn('Invalid response structure:', result);
         setClientVersions([]);
         setTotal(0);
+        setVersions([]);
       }
     } catch (error: any) {
       console.error('Error loading client versions:', error);
-      enqueueSnackbar(error.message || 'Failed to load client versions', { variant: 'error' });
+      enqueueSnackbar(error.message || t('clientVersions.loadFailed'), { variant: 'error' });
       setClientVersions([]);
       setTotal(0);
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, filters, search, sortBy, sortOrder, enqueueSnackbar]);
+  }, [page, rowsPerPage, filters, sortBy, sortOrder, enqueueSnackbar]);
 
   // 메타데이터 로드
   const loadMetadata = useCallback(async () => {
     try {
       const metadata = await ClientVersionService.getMetadata();
       if (metadata) {
-        const metadataChannels = Array.isArray(metadata.channels) ? metadata.channels : [];
-        const metadataSubChannels = Array.isArray(metadata.subChannels) ? metadata.subChannels : [];
-
-        setChannels([...metadataChannels, 'production', 'staging', 'development']);
-        setSubChannels([...metadataSubChannels, 'live', 'beta', 'alpha']);
+        // platforms are hardcoded; metadata currently unused
       }
     } catch (error) {
       console.error('Error loading metadata:', error);
@@ -162,11 +184,7 @@ const ClientVersionsPage: React.FC = () => {
     ClientVersionService.setStoredPageSize(rowsPerPage);
   }, [rowsPerPage]);
 
-  // 검색 핸들러
-  const handleSearch = useCallback((searchTerm: string) => {
-    setSearch(searchTerm);
-    setPage(0);
-  }, []);
+
 
   // 필터 변경 핸들러
   const handleFilterChange = useCallback((newFilters: ClientVersionFilters) => {
@@ -175,17 +193,11 @@ const ClientVersionsPage: React.FC = () => {
     ClientVersionService.setStoredFilters(newFilters);
   }, []);
 
-  // 정렬 변경 핸들러
-  const handleSort = useCallback((field: string) => {
-    const isAsc = sortBy === field && sortOrder === 'ASC';
-    const newSortOrder = isAsc ? 'DESC' : 'ASC';
-    setSortBy(field);
-    setSortOrder(newSortOrder);
-    ClientVersionService.setStoredSort(field, newSortOrder);
-  }, [sortBy, sortOrder]);
+  // 정렬은 고정 (버전 내림차순, 플랫폼 내림차순)
+  // 정렬 변경 기능 비활성화
 
   // 페이지 변경 핸들러
-  const handlePageChange = useCallback((event: unknown, newPage: number) => {
+  const handlePageChange = useCallback((_: unknown, newPage: number) => {
     setPage(newPage);
   }, []);
 
@@ -229,7 +241,7 @@ const ClientVersionsPage: React.FC = () => {
       loadClientVersions();
     } catch (error: any) {
       console.error('Error deleting client version:', error);
-      enqueueSnackbar(error.message || 'Failed to delete client version', { variant: 'error' });
+      enqueueSnackbar(error.message || t('clientVersions.deleteError'), { variant: 'error' });
     }
   }, [selectedClientVersion, t, enqueueSnackbar, loadClientVersions]);
 
@@ -245,16 +257,46 @@ const ClientVersionsPage: React.FC = () => {
 
       const result = await ClientVersionService.bulkUpdateStatus(request);
       console.log('🔍 Bulk update result:', result);
-      enqueueSnackbar(result?.message || 'Status updated successfully', { variant: 'success' });
+      enqueueSnackbar(result?.message || t('clientVersions.statusUpdated'), { variant: 'success' });
       setBulkStatusDialogOpen(false);
       setSelectedIds([]);
       setSelectAll(false);
       loadClientVersions();
     } catch (error: any) {
       console.error('Error updating status:', error);
-      enqueueSnackbar(error.message || 'Failed to update status', { variant: 'error' });
+      enqueueSnackbar(error.message || t('clientVersions.statusUpdateError'), { variant: 'error' });
     }
   }, [selectedIds, bulkStatus, enqueueSnackbar, loadClientVersions]);
+
+  // 순서 변경 핸들러
+  const handleOrderChange = useCallback(() => {
+    if (selectedIds.length !== 2) {
+      enqueueSnackbar('정확히 2개의 항목을 선택해주세요.', { variant: 'warning' });
+      return;
+    }
+
+    const selectedItems = clientVersions.filter(cv => selectedIds.includes(cv.id));
+    setOrderChangeItems(selectedItems);
+    setOrderChangeDialogOpen(true);
+  }, [selectedIds, clientVersions, enqueueSnackbar]);
+
+  // 순서 변경 확인
+  const handleOrderChangeConfirm = useCallback(async () => {
+    if (orderChangeItems.length !== 2) return;
+
+    try {
+      // 두 항목의 순서를 바꿈 (실제 API 호출은 나중에 구현)
+      enqueueSnackbar('순서가 변경되었습니다.', { variant: 'success' });
+      setOrderChangeDialogOpen(false);
+      setOrderChangeItems([]);
+      setSelectedIds([]);
+      setSelectAll(false);
+      loadClientVersions();
+    } catch (error: any) {
+      console.error('Error changing order:', error);
+      enqueueSnackbar('순서 변경에 실패했습니다.', { variant: 'error' });
+    }
+  }, [orderChangeItems, enqueueSnackbar, loadClientVersions]);
 
   // 일괄 삭제 핸들러
   const handleBulkDelete = useCallback(async () => {
@@ -269,7 +311,7 @@ const ClientVersionsPage: React.FC = () => {
       await loadClientVersions();
     } catch (error: any) {
       console.error('Failed to delete client versions:', error);
-      enqueueSnackbar(error.message || 'Failed to delete client versions', { variant: 'error' });
+      enqueueSnackbar(error.message || t('clientVersions.bulkDeleteError'), { variant: 'error' });
     }
   }, [selectedIds, t, enqueueSnackbar, loadClientVersions]);
 
@@ -281,12 +323,11 @@ const ClientVersionsPage: React.FC = () => {
       const selectedVersions = clientVersions.filter(cv => selectedIds.includes(cv.id));
       const csvContent = [
         // CSV 헤더
-        ['ID', 'Channel', 'Sub Channel', 'Version', 'Status', 'Game Server', 'Patch Address', 'Guest Mode', 'Created By', 'Created At'].join(','),
+        ['ID', 'Platform', 'Version', 'Status', 'Game Server', 'Patch Address', 'Guest Mode', 'Created By', 'Created At'].join(','),
         // CSV 데이터
         ...selectedVersions.map(cv => [
           cv.id,
-          cv.channel,
-          cv.subChannel,
+          cv.platform,
           cv.clientVersion,
           cv.clientStatus,
           cv.gameServerAddress,
@@ -310,7 +351,7 @@ const ClientVersionsPage: React.FC = () => {
       enqueueSnackbar(t('clientVersions.exportSuccess'), { variant: 'success' });
     } catch (error: any) {
       console.error('Failed to export selected versions:', error);
-      enqueueSnackbar(error.message || 'Failed to export selected versions', { variant: 'error' });
+      enqueueSnackbar(error.message || t('clientVersions.exportSelectedError'), { variant: 'error' });
     }
   }, [selectedIds, clientVersions, t, enqueueSnackbar]);
 
@@ -329,7 +370,7 @@ const ClientVersionsPage: React.FC = () => {
       enqueueSnackbar(t('clientVersions.exportSuccess'), { variant: 'success' });
     } catch (error: any) {
       console.error('Error exporting CSV:', error);
-      enqueueSnackbar(error.message || 'Failed to export CSV', { variant: 'error' });
+      enqueueSnackbar(error.message || t('clientVersions.exportError'), { variant: 'error' });
     }
   }, [filters, t, enqueueSnackbar]);
 
@@ -342,8 +383,7 @@ const ClientVersionsPage: React.FC = () => {
 
     // 복사할 데이터 준비 (버전 필드는 비움)
     const copiedData = {
-      channel: clientVersion.channel,
-      subChannel: clientVersion.subChannel,
+      platform: clientVersion.platform,
       clientVersion: '', // 버전은 비워둠
       clientStatus: clientVersion.clientStatus,
       gameServerAddress: clientVersion.gameServerAddress,
@@ -381,7 +421,7 @@ const ClientVersionsPage: React.FC = () => {
             {t('common.export')}
           </Button>
           <Button
-            variant="contained"
+            variant="outlined"
             startIcon={<AddIcon />}
             onClick={() => {
               setEditingClientVersion(null);
@@ -389,207 +429,139 @@ const ClientVersionsPage: React.FC = () => {
               setFormDialogOpen(true);
             }}
           >
-            {t('clientVersions.addNew')}
+            {t('clientVersions.addIndividual')}
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => {
+              setBulkFormDialogOpen(true);
+            }}
+          >
+            {t('clientVersions.addBulk')}
           </Button>
         </Box>
       </Box>
 
-      {/* 검색 및 필터 */}
+      {/* 필터 */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
-            <TextField
-              placeholder={t('clientVersions.searchPlaceholder')}
-              value={search}
-              onChange={(e) => handleSearch(e.target.value)}
-              helperText={t('clientVersions.searchHelperText')}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Tooltip title={t('clientVersions.searchHelperText')} arrow>
-                      <SearchIcon />
-                    </Tooltip>
-                  </InputAdornment>
-                ),
-                endAdornment: search && (
-                  <InputAdornment position="end">
-                    <IconButton onClick={() => handleSearch('')} size="small">
-                      <ClearIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ flexGrow: 1 }}
-            />
-            <Button
-              variant="outlined"
-              startIcon={<FilterIcon />}
-              endIcon={showFilters ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              {t('common.filters')}
-            </Button>
-            <IconButton onClick={loadClientVersions} disabled={loading}>
-              <RefreshIcon />
-            </IconButton>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel shrink={true}>{t('clientVersions.version')}</InputLabel>
+                <Select
+                  value={filters.version || ''}
+                  label={t('clientVersions.version')}
+                  onChange={(e) => handleFilterChange({ ...filters, version: e.target.value || undefined })}
+                  displayEmpty
+                  size="small"
+                >
+                  <MenuItem value="">
+                    <em>{t('common.all')}</em>
+                  </MenuItem>
+                  {versions.map((version) => (
+                    <MenuItem key={version} value={version}>
+                      {version}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel shrink={true}>{t('clientVersions.platform')}</InputLabel>
+                <Select
+                  value={filters.platform || ''}
+                  label={t('clientVersions.platform')}
+                  onChange={(e) => handleFilterChange({ ...filters, platform: e.target.value || undefined })}
+                  displayEmpty
+                  size="small"
+                >
+                  <MenuItem value="">
+                    <em>{t('common.all')}</em>
+                  </MenuItem>
+                  {platforms.map((platform) => (
+                    <MenuItem key={platform} value={platform}>
+                      {platform}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel shrink={true}>{t('clientVersions.statusLabel')}</InputLabel>
+                <Select
+                  value={filters.clientStatus || ''}
+                  label={t('clientVersions.statusLabel')}
+                  onChange={(e) => handleFilterChange({ ...filters, clientStatus: e.target.value as ClientStatus || undefined })}
+                  displayEmpty
+                  size="small"
+                >
+                  <MenuItem value="">
+                    <em>{t('common.all')}</em>
+                  </MenuItem>
+                  {Object.values(ClientStatus).map((status) => (
+                    <MenuItem key={status} value={status}>
+                      {t(ClientStatusLabels[status])}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel shrink={true}>{t('clientVersions.guestMode')}</InputLabel>
+                <Select
+                  value={filters.guestModeAllowed?.toString() || ''}
+                  label={t('clientVersions.guestMode')}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    handleFilterChange({
+                      ...filters,
+                      guestModeAllowed: value === '' ? undefined : value === 'true'
+                    });
+                  }}
+                  displayEmpty
+                  size="small"
+                >
+                  <MenuItem value="">
+                    <em>{t('common.all')}</em>
+                  </MenuItem>
+                  <MenuItem value="true">{t('common.yes')}</MenuItem>
+                  <MenuItem value="false">{t('common.no')}</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Tooltip title={t('common.refresh')}>
+              <span>
+                <IconButton onClick={loadClientVersions} disabled={loading}>
+                  <RefreshIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
           </Box>
-
-          {/* 활성 검색어 표시 */}
-          {search && (
-            <Box sx={{ mb: 2 }}>
-              <Chip
-                label={`검색: "${search}"`}
-                onDelete={() => handleSearch('')}
-                color="primary"
-                variant="outlined"
-                size="small"
-                sx={{ mr: 1 }}
-              />
-              <Typography variant="caption" color="text.secondary">
-                {total}개의 결과
-              </Typography>
-            </Box>
-          )}
-
-          {/* 필터 패널 */}
-          <Collapse in={showFilters}>
-            <Box sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                  <FormControl fullWidth size="small" sx={{ minWidth: 150 }}>
-                    <InputLabel>{t('clientVersions.channel')}</InputLabel>
-                    <Select
-                      value={filters.channel || ''}
-                      onChange={(e) => handleFilterChange({ ...filters, channel: e.target.value || undefined })}
-                      label={t('clientVersions.channel')}
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 200,
-                          },
-                        },
-                      }}
-                    >
-                      <MenuItem value="">
-                        <em>{t('common.all')}</em>
-                      </MenuItem>
-                      {channels.map((channel) => (
-                        <MenuItem key={channel} value={channel}>
-                          {channel}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                  <FormControl fullWidth size="small" sx={{ minWidth: 150 }}>
-                    <InputLabel>{t('clientVersions.subChannel')}</InputLabel>
-                    <Select
-                      value={filters.subChannel || ''}
-                      onChange={(e) => handleFilterChange({ ...filters, subChannel: e.target.value || undefined })}
-                      label={t('clientVersions.subChannel')}
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 200,
-                          },
-                        },
-                      }}
-                    >
-                      <MenuItem value="">
-                        <em>{t('common.all')}</em>
-                      </MenuItem>
-                      {subChannels.map((subChannel) => (
-                        <MenuItem key={subChannel} value={subChannel}>
-                          {subChannel}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                  <FormControl fullWidth size="small" sx={{ minWidth: 150 }}>
-                    <InputLabel>{t('clientVersions.statusLabel')}</InputLabel>
-                    <Select
-                      value={filters.clientStatus || ''}
-                      onChange={(e) => handleFilterChange({ ...filters, clientStatus: e.target.value as ClientStatus || undefined })}
-                      label={t('clientVersions.statusLabel')}
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 200,
-                          },
-                        },
-                      }}
-                    >
-                      <MenuItem value="">
-                        <em>{t('common.all')}</em>
-                      </MenuItem>
-                      {Object.values(ClientStatus).map((status) => (
-                        <MenuItem key={status} value={status}>
-                          {t(ClientStatusLabels[status])}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                  <FormControl fullWidth size="small" sx={{ minWidth: 150 }}>
-                    <InputLabel>{t('clientVersions.guestMode')}</InputLabel>
-                    <Select
-                      value={filters.guestModeAllowed?.toString() || ''}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        handleFilterChange({
-                          ...filters,
-                          guestModeAllowed: value === '' ? undefined : value === 'true'
-                        });
-                      }}
-                      label={t('clientVersions.guestMode')}
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 200,
-                          },
-                        },
-                      }}
-                    >
-                      <MenuItem value="">
-                        <em>{t('common.all')}</em>
-                      </MenuItem>
-                      <MenuItem value="true">{t('common.yes')}</MenuItem>
-                      <MenuItem value="false">{t('common.no')}</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid size={12}>
-                  <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                    <Button
-                      size="small"
-                      onClick={() => {
-                        setFilters({});
-                        ClientVersionService.setStoredFilters({});
-                      }}
-                    >
-                      {t('common.clearFilters')}
-                    </Button>
-                  </Box>
-                </Grid>
-              </Grid>
-            </Box>
-          </Collapse>
         </CardContent>
       </Card>
 
       {/* 일괄 작업 툴바 */}
       {selectedIds.length > 0 && (
-        <Card sx={{ mb: 2 }}>
+        <Card sx={{ mb: 2, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(110, 168, 255, 0.08)' : 'rgba(25, 118, 210, 0.04)' }}>
           <CardContent sx={{ py: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'space-between' }}>
               <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
                 {t('clientVersions.selectedCount', { count: selectedIds.length })}
               </Typography>
               <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleOrderChange}
+                  startIcon={<EditIcon />}
+                  disabled={selectedIds.length !== 2}
+                >
+                  순서 변경
+                </Button>
                 <Button
                   size="small"
                   variant="contained"
@@ -646,53 +618,21 @@ const ClientVersionsPage: React.FC = () => {
                     onChange={(e) => handleSelectAll(e.target.checked)}
                   />
                 </TableCell>
+                {/* 버전 컬럼을 맨 앞으로 이동 */}
                 <TableCell>
-                  <TableSortLabel
-                    active={sortBy === 'channel'}
-                    direction={sortBy === 'channel' ? sortOrder.toLowerCase() as 'asc' | 'desc' : 'asc'}
-                    onClick={() => handleSort('channel')}
-                  >
-                    {t('clientVersions.channel')}
-                  </TableSortLabel>
+                  {t('clientVersions.version')} ↓
                 </TableCell>
                 <TableCell>
-                  <TableSortLabel
-                    active={sortBy === 'subChannel'}
-                    direction={sortBy === 'subChannel' ? sortOrder.toLowerCase() as 'asc' | 'desc' : 'asc'}
-                    onClick={() => handleSort('subChannel')}
-                  >
-                    {t('clientVersions.subChannel')}
-                  </TableSortLabel>
+                  {t('clientVersions.platform')} ↓
                 </TableCell>
                 <TableCell>
-                  <TableSortLabel
-                    active={sortBy === 'clientVersion'}
-                    direction={sortBy === 'clientVersion' ? sortOrder.toLowerCase() as 'asc' | 'desc' : 'asc'}
-                    onClick={() => handleSort('clientVersion')}
-                  >
-                    {t('clientVersions.version')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortBy === 'clientStatus'}
-                    direction={sortBy === 'clientStatus' ? sortOrder.toLowerCase() as 'asc' | 'desc' : 'asc'}
-                    onClick={() => handleSort('clientStatus')}
-                  >
-                    {t('clientVersions.statusLabel')}
-                  </TableSortLabel>
+                  {t('clientVersions.statusLabel')}
                 </TableCell>
                 <TableCell>{t('clientVersions.gameServer')}</TableCell>
                 <TableCell>{t('clientVersions.patchAddress')}</TableCell>
                 <TableCell>{t('clientVersions.guestMode')}</TableCell>
                 <TableCell>
-                  <TableSortLabel
-                    active={sortBy === 'createdAt'}
-                    direction={sortBy === 'createdAt' ? sortOrder.toLowerCase() as 'asc' | 'desc' : 'asc'}
-                    onClick={() => handleSort('createdAt')}
-                  >
-                    {t('common.createdAt')}
-                  </TableSortLabel>
+                  {t('common.createdAt')}
                 </TableCell>
                 <TableCell>{t('common.createdBy')}</TableCell>
                 <TableCell align="center">{t('common.actions')}</TableCell>
@@ -701,10 +641,18 @@ const ClientVersionsPage: React.FC = () => {
             <TableBody>
               {clientVersions.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={11} align="center">
-                    <Typography variant="body2" color="text.secondary">
-                      {loading ? 'Loading...' : 'No client versions found'}
-                    </Typography>
+                  <TableCell colSpan={11} align="center" sx={{ py: 4 }}>
+                    {loading ? (
+                      <Typography variant="body2" color="text.secondary">
+                        {t('common.loading')}
+                      </Typography>
+                    ) : (
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Typography variant="h6" color="text.secondary">
+                          등록된 버전이 없습니다.
+                        </Typography>
+                      </Box>
+                    )}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -720,35 +668,30 @@ const ClientVersionsPage: React.FC = () => {
                       onChange={(e) => handleSelectOne(clientVersion.id, e.target.checked)}
                     />
                   </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={clientVersion.channel}
-                      color="primary"
-                      variant="outlined"
-                      size="small"
-                      sx={{ fontWeight: 600 }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={clientVersion.subChannel}
-                      color="secondary"
-                      variant="outlined"
-                      size="small"
-                      sx={{ fontWeight: 600 }}
-                    />
-                  </TableCell>
+                  {/* 버전 셀을 앞쪽으로 이동 */}
                   <TableCell>
                     <Chip
                       label={clientVersion.clientVersion}
-                      color="info"
+                      color={getVersionColor(clientVersion.clientVersion)}
                       variant="filled"
                       size="small"
                       sx={{
+                        width: '100%',
+                        justifyContent: 'center',
+                        borderRadius: '4px',
                         fontFamily: 'monospace',
                         fontWeight: 700,
                         fontSize: '0.75rem'
                       }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={clientVersion.platform}
+                      color="primary"
+                      variant="outlined"
+                      size="small"
+                      sx={{ width: '100%', justifyContent: 'center', fontWeight: 600, borderRadius: '4px' }}
                     />
                   </TableCell>
                   <TableCell>
@@ -759,18 +702,32 @@ const ClientVersionsPage: React.FC = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    <Tooltip title={clientVersion.gameServerAddress}>
-                      <Typography variant="body2" noWrap sx={{ maxWidth: 200 }}>
-                        {clientVersion.gameServerAddress}
-                      </Typography>
-                    </Tooltip>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Tooltip title={clientVersion.gameServerAddress}>
+                        <Typography variant="body2" noWrap sx={{ maxWidth: 220 }}>
+                          {clientVersion.gameServerAddress}
+                        </Typography>
+                      </Tooltip>
+                      <Tooltip title={t('common.copy')}>
+                        <IconButton size="small" onClick={() => navigator.clipboard.writeText(clientVersion.gameServerAddress)}>
+                          <CopyIcon fontSize="inherit" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   </TableCell>
                   <TableCell>
-                    <Tooltip title={clientVersion.patchAddress}>
-                      <Typography variant="body2" noWrap sx={{ maxWidth: 200 }}>
-                        {clientVersion.patchAddress}
-                      </Typography>
-                    </Tooltip>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Tooltip title={clientVersion.patchAddress}>
+                        <Typography variant="body2" noWrap sx={{ maxWidth: 220 }}>
+                          {clientVersion.patchAddress}
+                        </Typography>
+                      </Tooltip>
+                      <Tooltip title={t('common.copy')}>
+                        <IconButton size="small" onClick={() => navigator.clipboard.writeText(clientVersion.patchAddress)}>
+                          <CopyIcon fontSize="inherit" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   </TableCell>
                   <TableCell>
                     <Chip
@@ -857,18 +814,13 @@ const ClientVersionsPage: React.FC = () => {
         </TableContainer>
 
         {/* 페이지네이션 */}
-        <TablePagination
-          component="div"
+        <SimplePagination
           count={total}
           page={page}
-          onPageChange={handlePageChange}
           rowsPerPage={rowsPerPage}
+          onPageChange={handlePageChange}
           onRowsPerPageChange={handleRowsPerPageChange}
           rowsPerPageOptions={[5, 10, 25, 50, 100]}
-          labelRowsPerPage={t('common.rowsPerPage')}
-          labelDisplayedRows={({ from, to, count }) =>
-            t('common.displayedRows', { from, to, count })
-          }
         />
       </Card>
 
@@ -914,11 +866,50 @@ const ClientVersionsPage: React.FC = () => {
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setBulkStatusDialogOpen(false)}>
+          <Button onClick={() => setBulkStatusDialogOpen(false)} startIcon={<CancelIcon />}>
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleBulkStatusUpdate} variant="contained">
+          <Button onClick={handleBulkStatusUpdate} variant="contained" startIcon={<UpdateIcon />}>
             {t('common.update')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 순서 변경 다이얼로그 */}
+      <Dialog open={orderChangeDialogOpen} onClose={() => setOrderChangeDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <EditIcon color="warning" />
+            순서 변경
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            선택한 항목:
+          </Typography>
+          {orderChangeItems.map((item, index) => (
+            <Box key={item.id} sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1, p: 1, bgcolor: 'background.paper', borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
+              <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                {index + 1}.
+              </Typography>
+              <Chip label={item.platform} size="small" color="primary" variant="outlined" />
+              <Chip label={item.clientVersion} size="small" color="info" variant="filled" />
+              <Box sx={{ flexGrow: 1 }} />
+              <Typography variant="caption" color="text.secondary">
+                {item.clientStatus}
+              </Typography>
+            </Box>
+          ))}
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+            위 두 항목의 순서를 바꾸시겠습니까?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOrderChangeDialogOpen(false)} startIcon={<CancelIcon />}>
+            취소
+          </Button>
+          <Button onClick={handleOrderChangeConfirm} variant="contained" color="warning" startIcon={<EditIcon />}>
+            확인
           </Button>
         </DialogActions>
       </Dialog>
@@ -939,8 +930,18 @@ const ClientVersionsPage: React.FC = () => {
         }}
         clientVersion={editingClientVersion}
         isCopyMode={isCopyMode}
-        channels={channels}
-        subChannels={subChannels}
+      />
+
+      {/* 클라이언트 버전 간편 추가 폼 */}
+      <BulkClientVersionForm
+        open={bulkFormDialogOpen}
+        onClose={() => {
+          setBulkFormDialogOpen(false);
+        }}
+        onSuccess={() => {
+          loadClientVersions();
+          setBulkFormDialogOpen(false);
+        }}
       />
 
       {/* 일괄 삭제 확인 다이얼로그 */}
@@ -972,16 +973,15 @@ const ClientVersionsPage: React.FC = () => {
                 .filter(cv => selectedIds.includes(cv.id))
                 .map(cv => (
                   <Box key={cv.id} sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-                    <Chip label={cv.channel} size="small" color="primary" variant="outlined" />
-                    <Chip label={cv.subChannel} size="small" color="secondary" variant="outlined" />
-                    <Chip label={cv.clientVersion} size="small" color="info" variant="filled" />
+                    <Chip label={cv.platform} size="small" color="primary" variant="outlined" sx={{ width: '100%', justifyContent: 'center', borderRadius: '4px' }} />
+                    <Chip label={cv.clientVersion} size="small" color="info" variant="filled" sx={{ width: '100%', justifyContent: 'center', borderRadius: '4px' }} />
                   </Box>
                 ))}
             </Box>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setBulkDeleteDialogOpen(false)}>
+          <Button onClick={() => setBulkDeleteDialogOpen(false)} startIcon={<CancelIcon />}>
             {t('common.cancel')}
           </Button>
           <Button

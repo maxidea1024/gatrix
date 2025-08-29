@@ -6,7 +6,7 @@ export interface AppError extends Error {
   isOperational?: boolean;
 }
 
-export class CustomError extends Error implements AppError {
+export class GatrixError extends Error implements AppError {
   public statusCode: number;
   public isOperational: boolean;
 
@@ -19,8 +19,11 @@ export class CustomError extends Error implements AppError {
   }
 }
 
-export const createError = (message: string, statusCode: number = 500): CustomError => {
-  return new CustomError(message, statusCode);
+// Backward compatibility alias
+export const CustomError = GatrixError;
+
+export const createError = (message: string, statusCode: number = 500): GatrixError => {
+  return new GatrixError(message, statusCode);
 };
 
 export const errorHandler = (

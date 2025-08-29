@@ -117,7 +117,7 @@ const DashboardPage: React.FC = () => {
               <Typography color="error">Failed to load statistics</Typography>
             ) : (
               <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                   <StatsCard
                     title="Total Users"
                     value={stats.total}
@@ -125,7 +125,7 @@ const DashboardPage: React.FC = () => {
                     color="primary"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                   <StatsCard
                     title="Active Users"
                     value={stats.active}
@@ -133,7 +133,7 @@ const DashboardPage: React.FC = () => {
                     color="success"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                   <StatsCard
                     title="Pending Approval"
                     value={stats.pending}
@@ -142,7 +142,7 @@ const DashboardPage: React.FC = () => {
                     subtitle={stats.pending > 0 ? 'Requires attention' : 'All caught up'}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                   <StatsCard
                     title="Administrators"
                     value={stats.admins}
@@ -161,7 +161,7 @@ const DashboardPage: React.FC = () => {
         </Typography>
         
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -186,7 +186,7 @@ const DashboardPage: React.FC = () => {
           </Grid>
 
           {isAdmin() && (
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>

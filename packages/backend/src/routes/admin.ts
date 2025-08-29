@@ -11,6 +11,8 @@ import {
   auditUserPromote,
   auditUserDemote
 } from '../middleware/auditLog';
+import { queueService } from '../services/QueueService';
+
 
 const router = Router();
 
@@ -22,6 +24,9 @@ router.use(requireAdmin as any);
 router.get('/dashboard', AdminController.getDashboard as any);
 router.get('/stats', AdminController.getStats as any);
 router.get('/stats/users', AdminController.getUserStats as any);
+
+// Health check for debugging
+router.get('/health', AdminController.healthCheck as any);
 
 // User management
 router.get('/users', AdminController.getAllUsers as any);
@@ -40,6 +45,10 @@ router.get('/audit-logs', AdminController.getAuditLogs as any);
 router.get('/audit-logs/stats', AdminController.getAuditStats as any);
 
 // System management
+
+
+
+
 router.post('/cache/clear', AdminController.clearCache as any);
 router.post('/audit-logs/cleanup', AdminController.cleanupAuditLogs as any);
 

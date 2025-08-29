@@ -1,8 +1,9 @@
-import ClientVersionModel, { ClientVersionAttributes, ClientVersionCreationAttributes, ClientStatus } from '../models/ClientVersion';
+import ClientVersionModel, { ClientVersionAttributes, ClientVersionCreationAttributes, BulkCreateClientVersionRequest, ClientStatus } from '../models/ClientVersion';
+import { pubSubService } from './PubSubService';
 
 export interface ClientVersionFilters {
-  channel?: string;
-  subChannel?: string;
+  version?: string;
+  platform?: string;
   clientStatus?: ClientStatus;
   gameServerAddress?: string;
   patchAddress?: string;
@@ -41,6 +42,43 @@ export interface BulkStatusUpdateRequest {
 }
 
 export class ClientVersionService {
+  static async getClientVersions(
+    filters: ClientVersionFilters = {},
+    pagination: ClientVersionPagination
+  ): Promise<{ data: ClientVersionAttributes[], total: number }> {
+    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'DESC' } = pagination;
+    const offset = (page - 1) * limit;
+
+    const whereConditions: any = {};
+
+    // Apply filters
+    if (filters.platform) {
+      whereConditions.platform = filters.platform;
+    }
+    if (filters.clientStatus) {
+      whereConditions.clientStatus = filters.clientStatus;
+    }
+    if (filters.gameServerAddress) {
+      whereConditions.gameServerAddress = filters.gameServerAddress;
+    }
+    if (filters.patchAddress) {
+      whereConditions.patchAddress = filters.patchAddress;
+    }
+    if (filters.guestModeAllowed !== undefined) {
+      whereConditions.guestModeAllowed = filters.guestModeAllowed;
+    }
+
+    const { rows: data, count: total } = await ClientVersionModel.findAll({
+      where: whereConditions,
+      limit,
+      offset,
+      orderBy: sortBy,
+      orderDirection: sortOrder,
+    });
+
+    return { data, total };
+  }
+
   static async getAllClientVersions(
     filters: ClientVersionFilters = {},
     pagination: ClientVersionPagination
@@ -51,12 +89,12 @@ export class ClientVersionService {
     // 검색 조건 구성
     const whereConditions: any = {};
 
-    if (filters.channel) {
-      whereConditions.channel = { like: filters.channel };
+    if (filters.version) {
+      whereConditions.clientVersion = filters.version;
     }
 
-    if (filters.subChannel) {
-      whereConditions.subChannel = { like: filters.subChannel };
+    if (filters.platform) {
+      whereConditions.platform = { like: filters.platform };
     }
 
     if (filters.clientStatus) {
@@ -151,7 +189,23 @@ export class ClientVersionService {
   static async createClientVersion(
     data: ClientVersionCreationAttributes
   ): Promise<ClientVersionAttributes> {
-    return await ClientVersionModel.create(data);
+    const result = await ClientVersionModel.create(data);
+
+    // Invalidate client version cache
+    await pubSubService.invalidateByPattern('client_version:.*');
+
+    return result;
+  }
+
+  static async bulkCreateClientVersions(
+    data: BulkCreateClientVersionRequest
+  ): Promise<ClientVersionAttributes[]> {
+    const result = await ClientVersionModel.bulkCreate(data);
+
+    // Invalidate client version cache
+    await pubSubService.invalidateByPattern('client_version:.*');
+
+    return result;
   }
 
   static async updateClientVersion(
@@ -164,34 +218,67 @@ export class ClientVersionService {
       return null;
     }
 
+    // Invalidate client version cache
+    await pubSubService.invalidateByPattern('client_version:.*');
+
     const updatedClientVersion = await this.getClientVersionById(id);
     return updatedClientVersion;
   }
 
   static async deleteClientVersion(id: number): Promise<boolean> {
     const deletedRowsCount = await ClientVersionModel.delete(id);
+
+    if (deletedRowsCount > 0) {
+      // Invalidate client version cache
+      await pubSubService.invalidateByPattern('client_version:.*');
+    }
+
     return deletedRowsCount > 0;
   }
 
   static async bulkUpdateStatus(data: BulkStatusUpdateRequest): Promise<number> {
-    return await ClientVersionModel.bulkUpdateStatus(data.ids, data.clientStatus, data.updatedBy);
+    const result = await ClientVersionModel.bulkUpdateStatus(data.ids, data.clientStatus, data.updatedBy);
+
+    if (result > 0) {
+      // Invalidate client version cache
+      await pubSubService.invalidateByPattern('client_version:.*');
+    }
+
+    return result;
   }
 
-  static async getChannels(): Promise<string[]> {
-    return await ClientVersionModel.getChannels();
-  }
-
-  static async getSubChannels(channel?: string): Promise<string[]> {
-    return await ClientVersionModel.getSubChannels(channel);
+  static async getPlatforms(): Promise<string[]> {
+    return await ClientVersionModel.getPlatforms();
   }
 
   static async checkDuplicate(
-    channel: string,
-    subChannel: string,
+    platform: string,
     clientVersion: string,
     excludeId?: number
   ): Promise<boolean> {
-    return await ClientVersionModel.checkDuplicate(channel, subChannel, clientVersion, excludeId);
+    return await ClientVersionModel.checkDuplicate(platform, clientVersion, excludeId);
+  }
+
+  /**
+   * Find exactly matching ONLINE client version by channel, subChannel and clientVersion
+   */
+  static async findOnlineByExact(
+    platform: string,
+    clientVersion: string
+  ): Promise<ClientVersionAttributes | null> {
+    const { rows } = await ClientVersionModel.findAll({
+      where: {
+        platform,
+        clientVersion,
+        clientStatus: ClientStatus.ONLINE,
+      },
+      limit: 1,
+      offset: 0,
+      orderBy: 'id',
+      orderDirection: 'DESC',
+    });
+
+    return rows[0] || null;
   }
 }
 
