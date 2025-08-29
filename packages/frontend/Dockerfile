@@ -19,7 +19,7 @@ COPY . .
 
 # Build the frontend
 ENV NODE_ENV=production
-RUN yarn workspace @gate/frontend build
+RUN yarn workspace @gatrix/frontend build
 
 # Production image with Nginx
 FROM nginx:alpine AS runner

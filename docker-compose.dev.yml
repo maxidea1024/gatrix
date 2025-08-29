@@ -4,13 +4,13 @@ services:
   # MySQL Database for development
   mysql:
     image: mysql:8.0
-    container_name: gate-mysql-dev
+    container_name: gatrix-mysql-dev
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
-      MYSQL_DATABASE: ${DB_NAME:-gate}
-      MYSQL_USER: ${DB_USER:-gate_user}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-gate_password}
+      MYSQL_DATABASE: ${DB_NAME:-gatrix}
+      MYSQL_USER: ${DB_USER:-gatrix_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
     ports:
       - "${DB_PORT:-3306}:3306"
     volumes:
@@ -18,7 +18,7 @@ services:
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
       - ./docker/mysql/conf.d:/etc/mysql/conf.d
     networks:
-      - gate-dev-network
+      - gatrix-dev-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpassword}"]
       timeout: 20s
@@ -29,7 +29,7 @@ services:
   # Redis Cache for development
   redis:
     image: redis:7-alpine
-    container_name: gate-redis-dev
+    container_name: gatrix-redis-dev
     restart: unless-stopped
     command: redis-server --appendonly yes
     ports:
@@ -37,7 +37,7 @@ services:
     volumes:
       - redis_dev_data:/data
     networks:
-      - gate-dev-network
+      - gatrix-dev-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       timeout: 10s
@@ -51,16 +51,16 @@ services:
       context: .
       dockerfile: packages/backend/Dockerfile.dev
       target: development
-    container_name: gate-backend-dev
+    container_name: gatrix-backend-dev
     restart: unless-stopped
     environment:
       NODE_ENV: development
       PORT: 5000
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_NAME: ${DB_NAME:-gate}
-      DB_USER: ${DB_USER:-gate_user}
-      DB_PASSWORD: ${DB_PASSWORD:-gate_password}
+      DB_NAME: ${DB_NAME:-gatrix}
+      DB_USER: ${DB_USER:-gatrix_user}
+      DB_PASSWORD: ${DB_PASSWORD:-gatrix_password}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret}
@@ -81,7 +81,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - gate-dev-network
+      - gatrix-dev-network
     volumes:
       - ./packages/backend:/app
       - /app/node_modules
@@ -94,18 +94,18 @@ services:
       context: .
       dockerfile: packages/frontend/Dockerfile.dev
       target: development
-    container_name: gate-frontend-dev
+    container_name: gatrix-frontend-dev
     restart: unless-stopped
     environment:
       VITE_API_URL: ${VITE_API_URL:-http://localhost:5000/api/v1}
-      VITE_APP_NAME: ${VITE_APP_NAME:-Gate}
+      VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}
     ports:
       - "${FRONTEND_PORT:-3000}:3000"
     depends_on:
       - backend-dev
     networks:
-      - gate-dev-network
+      - gatrix-dev-network
     volumes:
       - ./packages/frontend:/app
       - /app/node_modules
@@ -114,28 +114,28 @@ services:
   # Adminer for database management
   adminer:
     image: adminer:latest
-    container_name: gate-adminer-dev
+    container_name: gatrix-adminer-dev
     restart: unless-stopped
     ports:
       - "8080:8080"
     depends_on:
       - mysql
     networks:
-      - gate-dev-network
+      - gatrix-dev-network
     environment:
       ADMINER_DEFAULT_SERVER: mysql
 
   # Redis Commander for Redis management
   redis-commander:
     image: rediscommander/redis-commander:latest
-    container_name: gate-redis-commander-dev
+    container_name: gatrix-redis-commander-dev
     restart: unless-stopped
     ports:
       - "8081:8081"
     depends_on:
       - redis
     networks:
-      - gate-dev-network
+      - gatrix-dev-network
     environment:
       REDIS_HOSTS: local:redis:6379
 
@@ -148,7 +148,7 @@ volumes:
     driver: local
 
 networks:
-  gate-dev-network:
+  gatrix-dev-network:
     driver: bridge
     ipam:
       config:

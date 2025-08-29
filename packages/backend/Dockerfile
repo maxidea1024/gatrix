@@ -18,7 +18,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Build the backend
-RUN yarn workspace @gate/backend build
+RUN yarn workspace @gatrix/backend build
 
 # Production image, copy all the files and run the app
 FROM base AS runner
