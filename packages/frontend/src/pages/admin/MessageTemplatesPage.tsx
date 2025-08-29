@@ -38,7 +38,8 @@ import {
   Close as CloseIcon,
   Cancel as CancelIcon,
   Save as SaveIcon,
-  Refresh as RefreshIcon
+  Refresh as RefreshIcon,
+  LocalOffer as LocalOfferIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -253,14 +254,22 @@ const MessageTemplatesPage: React.FC = () => {
 
   const handleAdd = () => {
     setEditing(null);
-    setForm({ name: '', type: 'maintenance', is_enabled: true, default_message: '', locales: [] });
+    setForm({ name: '', type: 'maintenance', is_enabled: true, default_message: '', locales: [], tags: [] });
     setNewLang('ko'); setNewMsg('');
     setDialogOpen(true);
   };
 
   const handleEdit = (row: MessageTemplate) => {
     setEditing(row);
-    setForm({ id: row.id, name: row.name, type: row.type, is_enabled: row.is_enabled, default_message: row.default_message || '', locales: row.locales || [] });
+    setForm({
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      is_enabled: row.is_enabled,
+      default_message: row.default_message || '',
+      locales: row.locales || [],
+      tags: row.tags || []
+    });
     setNewLang('ko'); setNewMsg('');
     setDialogOpen(true);
   };
@@ -306,12 +315,12 @@ const MessageTemplatesPage: React.FC = () => {
 
   const handleSave = async () => {
     if (!form.name.trim()) {
-      enqueueSnackbar(t('common.nameRequired'), { variant: 'error' });
+      enqueueSnackbar('이름을 입력해주세요.', { variant: 'error' });
       return;
     }
 
     if (!form.default_message?.trim()) {
-      enqueueSnackbar(t('admin.messageTemplates.defaultMessageRequired'), { variant: 'error' });
+      enqueueSnackbar('기본 메시지를 입력해주세요.', { variant: 'error' });
       return;
     }
 
@@ -325,12 +334,27 @@ const MessageTemplatesPage: React.FC = () => {
         locales: form.locales,
       };
 
+      let templateId: number;
+
       if (editing?.id) {
         await messageTemplateService.update(editing.id, payload);
+        templateId = editing.id;
         enqueueSnackbar(t('common.updateSuccess'), { variant: 'success' });
       } else {
-        await messageTemplateService.create(payload);
+        const created = await messageTemplateService.create(payload);
+        templateId = created?.id || created?.data?.id;
+        if (!templateId) {
+          throw new Error('생성된 템플릿 ID를 가져올 수 없습니다.');
+        }
         enqueueSnackbar(t('common.createSuccess'), { variant: 'success' });
+      }
+
+      // 태그 설정
+      if (form.tags && form.tags.length > 0) {
+        await messageTemplateService.setTags(templateId, form.tags.map(tag => tag.id));
+      } else {
+        // 태그가 없으면 기존 태그 모두 제거
+        await messageTemplateService.setTags(templateId, []);
       }
 
       setDialogOpen(false);
@@ -340,9 +364,9 @@ const MessageTemplatesPage: React.FC = () => {
 
       // Handle duplicate name error
       if (error?.response?.status === 409) {
-        enqueueSnackbar(t('messageTemplates.errors.duplicateName'), { variant: 'error' });
+        enqueueSnackbar('이미 존재하는 메시지 템플릿 이름입니다.', { variant: 'error' });
       } else {
-        const message = error?.response?.data?.error?.message || error?.message || t('common.saveFailed');
+        const message = error?.response?.data?.error?.message || error?.message || '저장에 실패했습니다.';
         enqueueSnackbar(message, { variant: 'error' });
       }
     } finally {
@@ -538,14 +562,26 @@ const MessageTemplatesPage: React.FC = () => {
                       <TableCell>{hasLocales ? langs.map(c=>getLangLabel(c as any)).join(', ') : t('admin.messageTemplates.onlyDefaultMessage')}</TableCell>
                       <TableCell>{(row as any).created_by_name || '-'}</TableCell>
                       <TableCell>
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onClick={() => handleOpenTagDialog(row)}
-                          sx={{ minWidth: 'auto', px: 1 }}
-                        >
-                          {t('common.tags')}
-                        </Button>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                          {row.tags && row.tags.length > 0 ? (
+                            row.tags.map((tag) => (
+                              <Chip
+                                key={tag.id}
+                                label={tag.name}
+                                size="small"
+                                sx={{
+                                  bgcolor: tag.color,
+                                  color: '#fff',
+                                  fontSize: '0.75rem'
+                                }}
+                              />
+                            ))
+                          ) : (
+                            <Typography variant="body2" color="text.secondary">
+                              -
+                            </Typography>
+                          )}
+                        </Box>
                       </TableCell>
                       <TableCell align="right">
                         <IconButton size="small" onClick={() => handleEdit(row)}><EditIcon fontSize="small" /></IconButton>
@@ -594,6 +630,49 @@ const MessageTemplatesPage: React.FC = () => {
               required
               helperText={t('admin.messageTemplates.defaultMessageHelp')}
             />
+
+            {/* 태그 선택 */}
+            <TextField
+              select
+              multiple
+              label={t('common.tags')}
+              value={form.tags?.map(tag => tag.id) || []}
+              onChange={(e) => {
+                const selectedIds = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
+                const selectedTags = allTags.filter(tag => selectedIds.includes(tag.id));
+                setForm(prev => ({ ...prev, tags: selectedTags }));
+              }}
+              SelectProps={{
+                multiple: true,
+                renderValue: (selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {(selected as number[]).map((id) => {
+                      const tag = allTags.find(t => t.id === id);
+                      return tag ? (
+                        <Chip
+                          key={id}
+                          label={tag.name}
+                          size="small"
+                          sx={{ bgcolor: tag.color, color: '#fff' }}
+                        />
+                      ) : null;
+                    })}
+                  </Box>
+                ),
+              }}
+              helperText="메시지 템플릿에 적용할 태그를 선택하세요"
+            >
+              {allTags.map((tag) => (
+                <MenuItem key={tag.id} value={tag.id}>
+                  <Chip
+                    label={tag.name}
+                    size="small"
+                    sx={{ bgcolor: tag.color, color: '#fff', mr: 1 }}
+                  />
+                  {tag.description || '설명 없음'}
+                </MenuItem>
+              ))}
+            </TextField>
             {(form.locales?.length ?? 0) === 0 && (
               <Typography variant="caption" color="text.secondary">
                 {t('admin.maintenance.defaultMessageHint')}

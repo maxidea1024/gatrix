@@ -11,6 +11,7 @@ export interface MessageTemplate {
   is_enabled: boolean;
   default_message?: string | null;
   locales?: MessageTemplateLocale[];
+  tags?: { id: number; name: string; color: string }[];
   created_at?: string;
   updated_at?: string;
 }
@@ -50,12 +51,12 @@ export const messageTemplateService = {
     return res.data as any;
   },
   async create(data: MessageTemplate): Promise<MessageTemplate> {
-    const res = await apiService.post<MessageTemplate>('/message-templates', data);
-    return res.data as any;
+    const res = await apiService.post<any>('/message-templates', data);
+    return res.data.data; // { success: true, data: created } 구조
   },
   async update(id: number, data: MessageTemplate): Promise<MessageTemplate> {
-    const res = await apiService.put<MessageTemplate>(`/message-templates/${id}`, data);
-    return res.data as any;
+    const res = await apiService.put<any>(`/message-templates/${id}`, data);
+    return res.data.data; // { success: true, data: updated } 구조
   },
   async remove(id: number): Promise<void> {
     await apiService.delete(`/message-templates/${id}`);

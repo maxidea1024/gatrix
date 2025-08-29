@@ -97,8 +97,24 @@ export class MessageTemplateModel {
       console.log('🔍 Data results:', dataResults);
       console.log('🔍 Total:', total);
 
+      // 각 메시지 템플릿에 태그 정보 추가
+      const messageTemplatesWithTags = await Promise.all(
+        dataResults.map(async (template: any) => {
+          const tags = await db('g_tag_assignments as ta')
+            .join('g_tags as t', 'ta.tagId', 't.id')
+            .where('ta.entityType', 'message_template')
+            .where('ta.entityId', template.id)
+            .select('t.id', 't.name', 't.color');
+
+          return {
+            ...template,
+            tags: tags || []
+          };
+        })
+      );
+
       return {
-        messageTemplates: dataResults,
+        messageTemplates: messageTemplatesWithTags,
         total
       };
     } catch (error) {
@@ -207,17 +223,17 @@ export class MessageTemplateModel {
       await db.transaction(async (trx) => {
         // 기존 태그 할당 삭제
         await trx('g_tag_assignments')
-          .where('entity_type', 'message_template')
-          .where('entity_id', templateId)
+          .where('entityType', 'message_template')
+          .where('entityId', templateId)
           .del();
 
         // 새 태그 할당 추가
         if (tagIds.length > 0) {
           const assignments = tagIds.map(tagId => ({
-            entity_type: 'message_template',
-            entity_id: templateId,
-            tag_id: tagId,
-            created_at: new Date()
+            entityType: 'message_template',
+            entityId: templateId,
+            tagId: tagId,
+            createdAt: new Date()
           }));
           await trx('g_tag_assignments').insert(assignments);
         }
@@ -231,10 +247,10 @@ export class MessageTemplateModel {
   static async getTags(templateId: number): Promise<any[]> {
     try {
       return await db('g_tag_assignments as ta')
-        .join('g_tags as t', 'ta.tag_id', 't.id')
+        .join('g_tags as t', 'ta.tagId', 't.id')
         .select(['t.id', 't.name', 't.color', 't.description'])
-        .where('ta.entity_type', 'message_template')
-        .where('ta.entity_id', templateId)
+        .where('ta.entityType', 'message_template')
+        .where('ta.entityId', templateId)
         .orderBy('t.name');
     } catch (error) {
       logger.error('Error getting message template tags (Knex):', error);
