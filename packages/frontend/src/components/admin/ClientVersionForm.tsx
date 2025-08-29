@@ -15,6 +15,7 @@ import {
   Box,
   Typography,
   Alert,
+  Chip,
 } from '@mui/material';
 import {
   Cancel as CancelIcon,
@@ -35,6 +36,7 @@ import {
   CLIENT_VERSION_VALIDATION,
 } from '../../types/clientVersion';
 import { ClientVersionService } from '../../services/clientVersionService';
+import { tagService } from '../../services/tagService';
 import JsonEditor from '../common/JsonEditor';
 
 interface ClientVersionFormProps {
@@ -116,6 +118,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   const [displayIsEdit, setDisplayIsEdit] = useState<boolean>(isEdit);
   const [displayIsCopy, setDisplayIsCopy] = useState<boolean>(!!isCopyMode);
 
+  // 태그 관련 상태
+  const [allTags, setAllTags] = useState<{ id: number; name: string; color: string; description?: string }[]>([]);
+  const [selectedTags, setSelectedTags] = useState<{ id: number; name: string; color: string }[]>([]);
+
   // 기본값 설정
   const defaultValues: ClientVersionFormData = {
     platform: 'pc', // 첫 번째 플랫폼을 기본값으로 설정
@@ -129,6 +135,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
     externalClickLink: '',
     memo: '',
     customPayload: '',
+    tags: [],
   };
 
   const {
@@ -170,11 +177,14 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           externalClickLink: clientVersion.externalClickLink || '',
           memo: clientVersion.memo || '',
           customPayload: clientVersion.customPayload || '',
+          tags: clientVersion.tags || [],
         });
+        setSelectedTags(clientVersion.tags || []);
       } else {
         // 새로 생성할 때 기본값으로 초기화
         console.log('Initializing form with default values');
         reset(defaultValues);
+        setSelectedTags([]);
       }
       setDuplicateError(null);
 
@@ -186,6 +196,21 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       }
     }
   }, [open, isEdit, isCopyMode, clientVersion, reset]);
+
+  // 태그 목록 로드
+  useEffect(() => {
+    if (open) {
+      const loadTags = async () => {
+        try {
+          const tags = await tagService.list();
+          setAllTags(tags);
+        } catch (error) {
+          console.error('Failed to load tags:', error);
+        }
+      };
+      loadTags();
+    }
+  }, [open]);
 
   // 중복 검사
   const watchedValues = watch(['channel', 'subChannel', 'clientVersion']);
@@ -242,6 +267,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
       console.log('Cleaned data to send:', cleanedData);
 
+      let clientVersionId: number;
+
       if (isEdit && clientVersion) {
         console.log('Updating existing client version:', {
           id: clientVersion.id,
@@ -257,6 +284,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         console.log('About to call updateClientVersion API...');
         await ClientVersionService.updateClientVersion(clientVersion.id, cleanedData);
         console.log('updateClientVersion API call completed');
+        clientVersionId = clientVersion.id;
         enqueueSnackbar(t('clientVersions.updateSuccess'), { variant: 'success' });
       } else {
         console.log('Creating new client version (copy mode or new):', {
@@ -265,9 +293,21 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           hasClientVersion: !!clientVersion
         });
         console.log('About to call createClientVersion API...');
-        await ClientVersionService.createClientVersion(cleanedData);
+        const created = await ClientVersionService.createClientVersion(cleanedData);
         console.log('createClientVersion API call completed');
+        clientVersionId = created?.id || created?.data?.id;
+        if (!clientVersionId) {
+          throw new Error('생성된 클라이언트 버전 ID를 가져올 수 없습니다.');
+        }
         enqueueSnackbar(t('clientVersions.createSuccess'), { variant: 'success' });
+      }
+
+      // 태그 설정
+      if (selectedTags && selectedTags.length > 0) {
+        await ClientVersionService.setTags(clientVersionId, selectedTags.map(tag => tag.id));
+      } else {
+        // 태그가 없으면 기존 태그 모두 제거
+        await ClientVersionService.setTags(clientVersionId, []);
       }
 
       console.log('Form submission successful');
@@ -605,6 +645,51 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                 </Box>
               )}
             />
+
+            {/* 태그 선택 */}
+            <TextField
+              select
+              multiple
+              label={t('common.tags')}
+              value={selectedTags.map(tag => tag.id)}
+              onChange={(e) => {
+                const selectedIds = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
+                const newSelectedTags = allTags.filter(tag => selectedIds.includes(tag.id));
+                setSelectedTags(newSelectedTags);
+                setValue('tags', newSelectedTags);
+              }}
+              SelectProps={{
+                multiple: true,
+                renderValue: (selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {(selected as number[]).map((id) => {
+                      const tag = allTags.find(t => t.id === id);
+                      return tag ? (
+                        <Chip
+                          key={id}
+                          label={tag.name}
+                          size="small"
+                          sx={{ bgcolor: tag.color, color: '#fff' }}
+                        />
+                      ) : null;
+                    })}
+                  </Box>
+                ),
+              }}
+              helperText="클라이언트 버전에 적용할 태그를 선택하세요"
+              fullWidth
+            >
+              {allTags.map((tag) => (
+                <MenuItem key={tag.id} value={tag.id}>
+                  <Chip
+                    label={tag.name}
+                    size="small"
+                    sx={{ bgcolor: tag.color, color: '#fff', mr: 1 }}
+                  />
+                  {tag.description || '설명 없음'}
+                </MenuItem>
+              ))}
+            </TextField>
           </Box>
         </DialogContent>
 

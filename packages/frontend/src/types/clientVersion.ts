@@ -42,6 +42,7 @@ export interface ClientVersion {
   externalClickLink?: string;
   memo?: string;
   customPayload?: string;
+  tags?: { id: number; name: string; color: string }[];
   createdAt: string;
   updatedAt: string;
   createdBy: number;
@@ -63,6 +64,7 @@ export interface ClientVersionFormData {
   externalClickLink?: string;
   memo?: string;
   customPayload?: string;
+  tags?: { id: number; name: string; color: string }[];
 }
 
 // 간편 추가를 위한 플랫폼별 설정
@@ -83,6 +85,7 @@ export interface BulkCreateFormData {
   memo?: string;
   customPayload?: string;
   platforms: PlatformSpecificSettings[];
+  tags?: { id: number; name: string; color: string }[];
 }
 
 // 클라이언트 버전 필터

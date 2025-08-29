@@ -795,14 +795,25 @@ const ClientVersionsPage: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 200 }}>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() => handleOpenTagDialog(clientVersion)}
-                        sx={{ minWidth: 'auto', px: 1 }}
-                      >
-                        {t('common.tags')}
-                      </Button>
+                      {clientVersion.tags && clientVersion.tags.length > 0 ? (
+                        clientVersion.tags.map((tag) => (
+                          <Chip
+                            key={tag.id}
+                            label={tag.name}
+                            size="small"
+                            sx={{ bgcolor: tag.color, color: '#fff' }}
+                          />
+                        ))
+                      ) : (
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() => handleOpenTagDialog(clientVersion)}
+                          sx={{ minWidth: 'auto', px: 1 }}
+                        >
+                          {t('common.tags')}
+                        </Button>
+                      )}
                     </Box>
                   </TableCell>
                   <TableCell align="center">

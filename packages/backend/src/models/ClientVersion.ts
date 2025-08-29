@@ -105,8 +105,19 @@ export class ClientVersionModel {
 
       const total = countResult?.total || 0;
 
+      // 각 클라이언트 버전에 대해 태그 정보 로드
+      const clientVersionsWithTags = await Promise.all(
+        dataResults.map(async (cv: any) => {
+          const tags = await this.getTags(cv.id);
+          return {
+            ...cv,
+            tags
+          };
+        })
+      );
+
       return {
-        clientVersions: dataResults,
+        clientVersions: clientVersionsWithTags,
         total
       };
     } catch (error) {
@@ -128,7 +139,17 @@ export class ClientVersionModel {
         .where('cv.id', id)
         .first();
 
-      return clientVersion || null;
+      if (!clientVersion) {
+        return null;
+      }
+
+      // 태그 정보 로드
+      const tags = await this.getTags(id);
+
+      return {
+        ...clientVersion,
+        tags
+      };
     } catch (error) {
       logger.error('Error finding client version by ID (Knex):', error);
       throw error;
@@ -250,17 +271,17 @@ export class ClientVersionModel {
       await db.transaction(async (trx) => {
         // 기존 태그 할당 삭제
         await trx('g_tag_assignments')
-          .where('entity_type', 'client_version')
-          .where('entity_id', clientVersionId)
+          .where('entityType', 'client_version')
+          .where('entityId', clientVersionId)
           .del();
 
         // 새 태그 할당 추가
         if (tagIds.length > 0) {
           const assignments = tagIds.map(tagId => ({
-            entity_type: 'client_version',
-            entity_id: clientVersionId,
-            tag_id: tagId,
-            created_at: new Date()
+            entityType: 'client_version',
+            entityId: clientVersionId,
+            tagId: tagId,
+            createdAt: new Date()
           }));
           await trx('g_tag_assignments').insert(assignments);
         }
@@ -274,10 +295,10 @@ export class ClientVersionModel {
   static async getTags(clientVersionId: number): Promise<any[]> {
     try {
       return await db('g_tag_assignments as ta')
-        .join('g_tags as t', 'ta.tag_id', 't.id')
+        .join('g_tags as t', 'ta.tagId', 't.id')
         .select(['t.id', 't.name', 't.color', 't.description'])
-        .where('ta.entity_type', 'client_version')
-        .where('ta.entity_id', clientVersionId)
+        .where('ta.entityType', 'client_version')
+        .where('ta.entityId', clientVersionId)
         .orderBy('t.name');
     } catch (error) {
       logger.error('Error getting client version tags (Knex):', error);
