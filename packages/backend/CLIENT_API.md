@@ -220,7 +220,7 @@ async function getGameWorlds() {
 }
 ```
 
-### Unity C# (게임 클라이언트)
+### Unity C# (Game Client)
 
 ```csharp
 using UnityEngine;
@@ -230,7 +230,7 @@ using System.Collections;
 public class ClientAPI : MonoBehaviour
 {
     private const string BASE_URL = "https://api.example.com/api/v1/client";
-    
+
     public IEnumerator GetClientVersion(string channel, string subChannel)
     {
         string url = $"{BASE_URL}/client-version";
@@ -238,15 +238,15 @@ public class ClientAPI : MonoBehaviour
             url += $"?channel={channel}";
         if (!string.IsNullOrEmpty(subChannel))
             url += $"&subChannel={subChannel}";
-            
+
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
             yield return request.SendWebRequest();
-            
+
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string json = request.downloadHandler.text;
-                // JSON 파싱 및 처리
+                // JSON parsing and processing
                 Debug.Log($"Client version data: {json}");
             }
         }
@@ -254,26 +254,26 @@ public class ClientAPI : MonoBehaviour
 }
 ```
 
-## 모니터링
+## Monitoring
 
-### 로그 확인
+### Log Checking
 
 ```bash
-# 캐시 관련 로그 확인
+# Check cache-related logs
 tail -f logs/app.log | grep -i cache
 
-# PubSub 관련 로그 확인
+# Check PubSub-related logs
 tail -f logs/app.log | grep -i pubsub
 ```
 
-### 캐시 및 큐 통계 모니터링
+### Cache and Queue Statistics Monitoring
 
 ```bash
-# 캐시 및 큐 통계 API 호출
+# Call cache and queue statistics API
 curl http://localhost:3000/api/v1/client/cache-stats
 ```
 
-**응답 예시:**
+**Response Example:**
 ```json
 {
   "success": true,
@@ -299,14 +299,14 @@ curl http://localhost:3000/api/v1/client/cache-stats
 }
 ```
 
-### BullMQ 대시보드 (선택사항)
+### BullMQ Dashboard (Optional)
 
-BullMQ UI를 통한 큐 모니터링:
+Queue monitoring via BullMQ UI:
 
 ```bash
-# BullMQ UI 설치 (개발 환경)
+# Install BullMQ UI (development environment)
 npm install -g @bull-board/ui
 
-# 대시보드 실행
+# Run dashboard
 bull-board
 ```

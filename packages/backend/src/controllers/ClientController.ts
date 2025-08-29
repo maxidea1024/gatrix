@@ -13,10 +13,12 @@ export class ClientController {
    * GET /api/v1/client/client-version
    */
   static getClientVersion = asyncHandler(async (req: Request, res: Response) => {
-    const { platform, version } = req.query as { platform?: string; version?: string };
+    const { platform, version, environment } = req.query as { platform?: string; version?: string, environment?: string };
+
+    // FGT, dev, live, production
 
     // Validate required query params
-    if (!platform || !version) {
+    if (!platform || !version || !environment) {
       return res.status(400).json({
         success: false,
         message: 'platform and version are required query parameters',
@@ -24,7 +26,7 @@ export class ClientController {
     }
 
     // Create cache key for exact match
-    const cacheKey = `client_version:${platform}:${version}`;
+    const cacheKey = `client_version:${platform}:${version}:${environment}`;
 
     // Try to get from cache first
     const cachedData = cacheService.get(cacheKey);
@@ -54,6 +56,7 @@ export class ClientController {
       id: record.id,
       platform: record.platform,
       clientVersion: record.clientVersion,
+      environment,
       gameServerAddress: record.gameServerAddress,
       gameServerAddressForWhiteList: record.gameServerAddressForWhiteList,
       patchAddress: record.patchAddress,
@@ -64,6 +67,8 @@ export class ClientController {
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
       timestamp: new Date().toISOString(),
+      // areaId: '...',
+      // groupId: '...'
     };
 
     // Cache the result for 5 minutes

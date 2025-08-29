@@ -232,17 +232,7 @@ const MessageTemplatesPage: React.FC = () => {
     setDialogOpen(true);
   };
 
-  // Unified delete confirm dialog (consistent with other pages)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<MessageTemplate | null>(null);
-  const openDeleteDialog = (row: MessageTemplate) => { setDeleteTarget(row); setDeleteDialogOpen(true); };
-  const closeDeleteDialog = () => { setDeleteDialogOpen(false); setDeleteTarget(null); };
-  const handleConfirmDelete = async () => {
-    if (!deleteTarget?.id) return;
-    await messageTemplateService.remove(deleteTarget.id);
-    closeDeleteDialog();
-    await load();
-  };
+
 
   const addLocale = () => {
     const lang = newLang; const message = newMsg.trim();

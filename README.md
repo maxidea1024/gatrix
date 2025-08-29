@@ -487,7 +487,9 @@ The Docker setup includes:
 - Nginx reverse proxy (production)
 - Volume mounts for development
 
-## API Documentation
+## Documentation
+
+### API Documentation
 
 Once the backend is running, you can access the Swagger API documentation at:
 ```
@@ -504,6 +506,58 @@ The API includes endpoints for:
 - Maintenance mode control
 - Tag management
 - Audit logging
+
+### Comprehensive Documentation
+
+Gatrix includes a comprehensive documentation site built with Docusaurus, supporting multiple languages:
+
+```bash
+# Start documentation site
+npm run docs:start
+
+# Build documentation for production
+npm run docs:build
+
+# Serve built documentation
+npm run docs:serve
+```
+
+The documentation site will be available at:
+```
+http://localhost:3000
+```
+
+#### Supported Languages
+
+- **English** (default): Complete documentation
+- **Korean (한국어)**: Full translation available
+- **Chinese Simplified (简体中文)**: Full translation available
+
+#### Documentation Sections
+
+- **Getting Started**: Quick setup and installation guide
+- **API Reference**: Detailed API endpoint documentation
+- **Backend**: Cache system and internal architecture
+- **Features**: Comprehensive feature guides
+  - Job Management System
+  - Game World Management
+  - Message Templates
+  - IP Whitelisting
+  - Maintenance Mode
+  - Tagging System
+
+#### Writing Translations
+
+To add or update translations:
+
+```bash
+# Generate translation files
+npm run docs:write-translations
+
+# Edit translation files in:
+# docs/i18n/ko/docusaurus-plugin-content-docs/current/
+# docs/i18n/zh-Hans/docusaurus-plugin-content-docs/current/
+```
 
 ## License
 
