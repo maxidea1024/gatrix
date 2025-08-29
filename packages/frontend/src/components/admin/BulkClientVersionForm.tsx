@@ -31,6 +31,7 @@ import {
   CLIENT_VERSION_VALIDATION,
 } from '../../types/clientVersion';
 import { ClientVersionService } from '../../services/clientVersionService';
+import { tagService } from '../../services/tagService';
 
 // 클라이언트 상태 라벨 매핑
 const ClientStatusLabels = {
@@ -122,6 +123,10 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
 
+  // 태그 관련 상태
+  const [allTags, setAllTags] = useState<{ id: number; name: string; color: string; description?: string }[]>([]);
+  const [selectedTags, setSelectedTags] = useState<{ id: number; name: string; color: string }[]>([]);
+
   // 기본값 설정
   const defaultValues: BulkCreateFormData = {
     clientVersion: '',
@@ -131,6 +136,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     memo: '',
     customPayload: '',
     platforms: [],
+    tags: [],
   };
 
   const {
@@ -151,8 +157,24 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     if (open) {
       reset(defaultValues);
       setSelectedPlatforms([]);
+      setSelectedTags([]);
     }
   }, [open, reset]);
+
+  // 태그 목록 로드
+  useEffect(() => {
+    if (open) {
+      const loadTags = async () => {
+        try {
+          const tags = await tagService.list();
+          setAllTags(tags);
+        } catch (error) {
+          console.error('Failed to load tags:', error);
+        }
+      };
+      loadTags();
+    }
+  }, [open]);
 
   // 선택된 플랫폼이 변경될 때 platforms 배열 업데이트
   useEffect(() => {
@@ -200,6 +222,16 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
       };
 
       const result = await ClientVersionService.bulkCreateClientVersions(cleanedData);
+
+      // 생성된 각 클라이언트 버전에 태그 설정
+      if (selectedTags && selectedTags.length > 0) {
+        const tagIds = selectedTags.map(tag => tag.id);
+        await Promise.all(
+          result.map((clientVersion: any) =>
+            ClientVersionService.setTags(clientVersion.id, tagIds)
+          )
+        );
+      }
 
       enqueueSnackbar(
         t('clientVersions.bulkCreateSuccess', { count: result.length }),
@@ -521,6 +553,57 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                 ))}
               </>
             )}
+
+            {/* 태그 선택 */}
+            <Box sx={{ mt: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                {t('common.tags')}
+              </Typography>
+
+              <TextField
+                select
+                multiple
+                label={t('common.tags')}
+                value={selectedTags.map(tag => tag.id)}
+                onChange={(e) => {
+                  const selectedIds = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
+                  const newSelectedTags = allTags.filter(tag => selectedIds.includes(tag.id));
+                  setSelectedTags(newSelectedTags);
+                  setValue('tags', newSelectedTags);
+                }}
+                SelectProps={{
+                  multiple: true,
+                  renderValue: (selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {(selected as number[]).map((id) => {
+                        const tag = allTags.find(t => t.id === id);
+                        return tag ? (
+                          <Chip
+                            key={id}
+                            label={tag.name}
+                            size="small"
+                            sx={{ bgcolor: tag.color, color: '#fff' }}
+                          />
+                        ) : null;
+                      })}
+                    </Box>
+                  ),
+                }}
+                helperText="생성될 모든 클라이언트 버전에 적용할 태그를 선택하세요"
+                fullWidth
+              >
+                {allTags.map((tag) => (
+                  <MenuItem key={tag.id} value={tag.id}>
+                    <Chip
+                      label={tag.name}
+                      size="small"
+                      sx={{ bgcolor: tag.color, color: '#fff', mr: 1 }}
+                    />
+                    {tag.description || '설명 없음'}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
           </Box>
         </DialogContent>
 
