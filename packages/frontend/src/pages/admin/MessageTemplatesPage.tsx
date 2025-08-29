@@ -28,7 +28,6 @@ import {
   FormControl,
   InputLabel,
   Tooltip,
-  Pagination,
   Checkbox,
   Alert
 } from '@mui/material';
@@ -46,6 +45,7 @@ import { useSnackbar } from 'notistack';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { messageTemplateService, MessageTemplate, MessageTemplateLocale, MessageTemplateType } from '@/services/messageTemplateService';
 import { tagService, Tag } from '@/services/tagService';
+import SimplePagination from '@/components/common/SimplePagination';
 
 const allLangs: Array<{ code: 'ko' | 'en' | 'zh'; label: string }> = [
   { code: 'ko', label: '한국어' },
@@ -62,8 +62,8 @@ const MessageTemplatesPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
 
   // 페이지네이션
-  const [page, setPage] = useState(1);
-  const [rowsPerPage] = useState(10);
+  const [page, setPage] = useState(0); // SimplePagination은 0-based
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   // 필터
   const [filters, setFilters] = useState<{
@@ -98,7 +98,7 @@ const MessageTemplatesPage: React.FC = () => {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const offset = (page - 1) * rowsPerPage;
+      const offset = page * rowsPerPage;
       const params = {
         ...filters,
         limit: rowsPerPage,
@@ -137,12 +137,19 @@ const MessageTemplatesPage: React.FC = () => {
   // 필터 핸들러
   const handleFilterChange = useCallback((newFilters: typeof filters) => {
     setFilters(newFilters);
-    setPage(1);
+    setPage(0);
   }, []);
 
   // 페이지 변경 핸들러
   const handlePageChange = useCallback((_: unknown, newPage: number) => {
     setPage(newPage);
+  }, []);
+
+  // 페이지 크기 변경 핸들러
+  const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const newRowsPerPage = parseInt(event.target.value, 10);
+    setRowsPerPage(newRowsPerPage);
+    setPage(0);
   }, []);
 
   // 선택 관련 핸들러
@@ -549,18 +556,13 @@ const MessageTemplatesPage: React.FC = () => {
       </Card>
 
       {/* 페이지네이션 */}
-      {total > rowsPerPage && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-          <Pagination
-            count={Math.ceil(total / rowsPerPage)}
-            page={page}
-            onChange={handlePageChange}
-            color="primary"
-            showFirstButton
-            showLastButton
-          />
-        </Box>
-      )}
+      <SimplePagination
+        count={total}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={handlePageChange}
+        onRowsPerPageChange={handleRowsPerPageChange}
+      />
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{editing ? t('common.edit') : t('common.add')}</DialogTitle>

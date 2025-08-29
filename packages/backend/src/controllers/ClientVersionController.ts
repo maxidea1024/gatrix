@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import Joi from 'joi';
 import ClientVersionService, { ClientVersionFilters, ClientVersionPagination, BulkStatusUpdateRequest } from '../services/ClientVersionService';
 import { ClientStatus, BulkCreateClientVersionRequest } from '../models/ClientVersion';
-import ClientVersionModel from '../models/ClientVersion';
+import { ClientVersionModel } from '../models/ClientVersion';
 
 // Validation schemas
 const createClientVersionSchema = Joi.object({
@@ -40,8 +40,6 @@ const getClientVersionsQuerySchema = Joi.object({
   sortOrder: Joi.string().valid('ASC', 'DESC').default('DESC'),
   version: Joi.string().optional(),
   platform: Joi.string().optional(),
-  channel: Joi.string().optional(),
-  subChannel: Joi.string().optional(),
   clientStatus: Joi.string().valid(...Object.values(ClientStatus)).optional(),
   gameServerAddress: Joi.string().optional(),
   patchAddress: Joi.string().optional(),

@@ -1,135 +1,270 @@
-import database from '../config/database';
-import TagAssignmentModel from './TagAssignment';
+import db from '../config/knex';
+import logger from '../config/logger';
 
-export interface MessageTemplateLocale {
-  id?: number;
-  lang: 'ko' | 'en' | 'zh';
-  message: string;
+export interface MessageTemplateFilters {
+  type?: string;
+  isActive?: boolean;
+  search?: string;
+  limit?: number;
+  offset?: number;
 }
 
-export interface MessageTemplate {
-  id?: number;
-  name: string;
-  type: 'maintenance' | 'general' | 'notification';
-  is_enabled: boolean;
-  default_message?: string | null;
-  created_by?: number | null;
-  updated_by?: number | null;
-  locales?: MessageTemplateLocale[];
+export interface MessageTemplateListResult {
+  messageTemplates: any[];
+  total: number;
 }
 
 export class MessageTemplateModel {
-  static async list(filters: { type?: string; is_enabled?: string; q?: string; limit?: number; offset?: number } = {}) {
-    const where: string[] = [];
-    const params: any[] = [];
-    if (filters.type) { where.push('t.type = ?'); params.push(filters.type); }
-    if (filters.is_enabled !== undefined) { where.push('t.is_enabled = ?'); params.push(filters.is_enabled === '1' || filters.is_enabled === 'true'); }
-    if (filters.q) { where.push('(t.name LIKE ? OR t.default_message LIKE ?)'); params.push(`%${filters.q}%`, `%${filters.q}%`); }
-    const limitNum = Math.min(Math.max(Number(filters.limit ?? 50) || 50, 1), 200);
-    const offsetNum = Math.max(Number(filters.offset ?? 0) || 0, 0);
+  static async findAllWithPagination(filters?: MessageTemplateFilters): Promise<MessageTemplateListResult> {
+    try {
+      console.log('🚀 MessageTemplateKnexModel.findAllWithPagination called with filters:', filters);
 
-    // Get total count
-    const countSql = `SELECT COUNT(*) as total
-                      FROM g_message_templates t
-                      ${where.length ? 'WHERE ' + where.join(' AND ') : ''}`;
-    const countResult = await database.query(countSql, params);
-    const total = countResult[0]?.total || 0;
+      // 기본값 설정
+      const limit = filters?.limit ? parseInt(filters.limit.toString(), 10) : 10;
+      const offset = filters?.offset ? parseInt(filters.offset.toString(), 10) : 0;
 
-    const sql = `SELECT t.*, c.name AS created_by_name, u.name AS updated_by_name
-                 FROM g_message_templates t
-                 LEFT JOIN g_users c ON c.id = t.created_by
-                 LEFT JOIN g_users u ON u.id = t.updated_by
-                 ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
-                 ORDER BY t.updated_at DESC
-                 LIMIT ${limitNum} OFFSET ${offsetNum}`;
+      // 기본 쿼리 빌더
+      const baseQuery = () => db('g_message_templates as mt')
+        .leftJoin('g_users as creator', 'mt.created_by', 'creator.id')
+        .leftJoin('g_users as updater', 'mt.updated_by', 'updater.id');
 
-    const templates = await database.query(sql, params);
+      // 필터 적용 함수
+      const applyFilters = (query: any) => {
+        if (filters?.type) {
+          query.where('mt.type', filters.type);
+        }
 
-    if (!templates?.length) return { templates: [], total };
+        if (filters?.isActive !== undefined) {
+          query.where('mt.is_active', filters.isActive);
+        }
 
-    const ids = templates.map((t: any) => t.id);
-    const placeholders = ids.map(() => '?').join(',');
-    const localesRows = await database.query(
-      `SELECT template_id, lang, message FROM g_message_template_locales WHERE template_id IN (${placeholders}) ORDER BY lang`,
-      ids
-    );
-    const map: Record<number, any[]> = {};
-    for (const row of localesRows) {
-      (map[row.template_id] = map[row.template_id] || []).push({ lang: row.lang, message: row.message });
+        if (filters?.search) {
+          query.where(function() {
+            this.where('mt.name', 'like', `%${filters.search}%`)
+                .orWhere('mt.description', 'like', `%${filters.search}%`);
+          });
+        }
+
+        return query;
+      };
+
+      // Count 쿼리
+      const countQuery = applyFilters(baseQuery())
+        .count('mt.id as total')
+        .first();
+
+      // Data 쿼리
+      const dataQuery = applyFilters(baseQuery())
+        .select([
+          'mt.*',
+          'creator.name as created_by_name',
+          'updater.name as updated_by_name'
+        ])
+        .orderBy('mt.created_at', 'desc')
+        .limit(limit)
+        .offset(offset);
+
+      console.log('🔍 Executing count and data queries...');
+
+      // 병렬 실행
+      const [countResult, dataResults] = await Promise.all([
+        countQuery,
+        dataQuery
+      ]);
+
+      console.log('✅ Queries completed. Count:', countResult?.total, 'Data rows:', dataResults?.length);
+
+      const total = countResult?.total || 0;
+
+      // 각 메시지 템플릿의 로케일 데이터 로드
+      const messageTemplatesWithLocales = await Promise.all(
+        dataResults.map(async (template: any) => {
+          const locales = await db('g_message_template_locales')
+            .where('template_id', template.id)
+            .select('*');
+
+          return {
+            ...template,
+            locales: locales || []
+          };
+        })
+      );
+
+      console.log('🎯 Returning result: messageTemplates count =', messageTemplatesWithLocales.length, 'total =', total);
+      return { 
+        messageTemplates: messageTemplatesWithLocales,
+        total 
+      };
+    } catch (error) {
+      logger.error('Error finding message templates with pagination (Knex):', error);
+      throw error;
     }
-    const templatesWithLocales = templates.map((t: any) => ({ ...t, locales: map[t.id] || [] }));
-    return { templates: templatesWithLocales, total };
   }
 
-  static async findById(id: number) {
-    const rows = await database.query('SELECT * FROM g_message_templates WHERE id = ?', [id]);
-    const tpl = rows[0];
-    if (!tpl) return null;
-    const locales = await database.query('SELECT * FROM g_message_template_locales WHERE template_id = ? ORDER BY lang', [id]);
-    return { ...tpl, locales };
-  }
+  static async findById(id: number): Promise<any | null> {
+    try {
+      const template = await db('g_message_templates as mt')
+        .leftJoin('g_users as creator', 'mt.created_by', 'creator.id')
+        .leftJoin('g_users as updater', 'mt.updated_by', 'updater.id')
+        .select([
+          'mt.*',
+          'creator.name as created_by_name',
+          'updater.name as updated_by_name'
+        ])
+        .where('mt.id', id)
+        .first();
 
-  static async findByName(name: string, excludeId?: number) {
-    let query = 'SELECT * FROM g_message_templates WHERE name = ?';
-    const params: any[] = [name];
+      if (!template) return null;
 
-    if (excludeId) {
-      query += ' AND id != ?';
-      params.push(excludeId);
+      // 로케일 데이터 로드
+      const locales = await db('g_message_template_locales')
+        .where('template_id', id)
+        .select('*');
+
+      return {
+        ...template,
+        locales: locales || []
+      };
+    } catch (error) {
+      logger.error('Error finding message template by ID (Knex):', error);
+      throw error;
     }
-
-    const rows = await database.query(query, params);
-    return rows[0] || null;
   }
 
-  static async create(data: MessageTemplate) {
-    const type = (data as any).type || 'general';
-    const result = await database.query(
-      `INSERT INTO g_message_templates (name, type, is_enabled, default_message, created_by, updated_by)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [data.name, type, data.is_enabled ? 1 : 0, data.default_message ?? null, data.created_by ?? null, data.updated_by ?? null]
-    );
-    const id = result.insertId;
-    if (data.locales?.length) {
-      for (const loc of data.locales) {
-        await database.query(
-          `INSERT INTO g_message_template_locales (template_id, lang, message) VALUES (?, ?, ?)
-           ON DUPLICATE KEY UPDATE message = VALUES(message)`,
-          [id, loc.lang, loc.message]
-        );
-      }
+  static async create(data: any): Promise<any> {
+    try {
+      return await db.transaction(async (trx) => {
+        // 메시지 템플릿 생성
+        const [insertId] = await trx('g_message_templates').insert({
+          name: data.name,
+          type: data.type,
+          description: data.description,
+          is_active: data.is_active,
+          created_by: data.created_by,
+          updated_by: data.updated_by,
+          created_at: new Date(),
+          updated_at: new Date()
+        });
+
+        // 로케일 데이터 생성
+        if (data.locales && data.locales.length > 0) {
+          const localeData = data.locales.map((locale: any) => ({
+            template_id: insertId,
+            language: locale.language,
+            title: locale.title,
+            content: locale.content,
+            created_at: new Date(),
+            updated_at: new Date()
+          }));
+          await trx('g_message_template_locales').insert(localeData);
+        }
+
+        return await this.findById(insertId);
+      });
+    } catch (error) {
+      logger.error('Error creating message template (Knex):', error);
+      throw error;
     }
-    return this.findById(id);
   }
 
-  static async update(id: number, data: MessageTemplate) {
-    await database.query(
-      `UPDATE g_message_templates SET name=?, type=?, is_enabled=?, default_message=?, updated_by=? WHERE id=?`,
-      [data.name, data.type, data.is_enabled ? 1 : 0, data.default_message ?? null, data.updated_by ?? null, id]
-    );
-    if (data.locales) {
-      await database.query('DELETE FROM g_message_template_locales WHERE template_id = ?', [id]);
-      for (const loc of data.locales) {
-        await database.query(
-          `INSERT INTO g_message_template_locales (template_id, lang, message) VALUES (?, ?, ?)`,
-          [id, loc.lang, loc.message]
-        );
-      }
+  static async update(id: number, data: any): Promise<any> {
+    try {
+      return await db.transaction(async (trx) => {
+        // 메시지 템플릿 업데이트
+        await trx('g_message_templates')
+          .where('id', id)
+          .update({
+            name: data.name,
+            type: data.type,
+            description: data.description,
+            is_active: data.is_active,
+            updated_by: data.updated_by,
+            updated_at: new Date()
+          });
+
+        // 기존 로케일 데이터 삭제
+        await trx('g_message_template_locales')
+          .where('template_id', id)
+          .del();
+
+        // 새 로케일 데이터 생성
+        if (data.locales && data.locales.length > 0) {
+          const localeData = data.locales.map((locale: any) => ({
+            template_id: id,
+            language: locale.language,
+            title: locale.title,
+            content: locale.content,
+            created_at: new Date(),
+            updated_at: new Date()
+          }));
+          await trx('g_message_template_locales').insert(localeData);
+        }
+
+        return await this.findById(id);
+      });
+    } catch (error) {
+      logger.error('Error updating message template (Knex):', error);
+      throw error;
     }
-    return this.findById(id);
   }
 
-  static async delete(id: number) {
-    await database.query('DELETE FROM g_message_templates WHERE id = ?', [id]);
+  static async delete(id: number): Promise<void> {
+    try {
+      await db.transaction(async (trx) => {
+        // 로케일 데이터 삭제
+        await trx('g_message_template_locales')
+          .where('template_id', id)
+          .del();
+
+        // 메시지 템플릿 삭제
+        await trx('g_message_templates')
+          .where('id', id)
+          .del();
+      });
+    } catch (error) {
+      logger.error('Error deleting message template (Knex):', error);
+      throw error;
+    }
   }
 
   // 태그 관련 메서드들
   static async setTags(templateId: number, tagIds: number[]): Promise<void> {
-    await TagAssignmentModel.setTagsForEntity('message_template', templateId, tagIds);
+    try {
+      await db.transaction(async (trx) => {
+        // 기존 태그 할당 삭제
+        await trx('g_tag_assignments')
+          .where('entity_type', 'message_template')
+          .where('entity_id', templateId)
+          .del();
+
+        // 새 태그 할당 추가
+        if (tagIds.length > 0) {
+          const assignments = tagIds.map(tagId => ({
+            entity_type: 'message_template',
+            entity_id: templateId,
+            tag_id: tagId,
+            created_at: new Date()
+          }));
+          await trx('g_tag_assignments').insert(assignments);
+        }
+      });
+    } catch (error) {
+      logger.error('Error setting message template tags (Knex):', error);
+      throw error;
+    }
   }
 
   static async getTags(templateId: number): Promise<any[]> {
-    return await TagAssignmentModel.listTagsForEntity('message_template', templateId);
+    try {
+      return await db('g_tag_assignments as ta')
+        .join('g_tags as t', 'ta.tag_id', 't.id')
+        .select(['t.id', 't.name', 't.color', 't.description'])
+        .where('ta.entity_type', 'message_template')
+        .where('ta.entity_id', templateId)
+        .orderBy('t.name');
+    } catch (error) {
+      logger.error('Error getting message template tags (Knex):', error);
+      throw error;
+    }
   }
 }
-

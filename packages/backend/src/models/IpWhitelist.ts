@@ -1,54 +1,17 @@
-import database from '../config/database';
-import { CustomError } from '../middleware/errorHandler';
-
-export interface IpWhitelist {
-  id: number;
-  ipAddress: string;
-  purpose: string;
-  isEnabled: boolean;
-  startDate?: Date;
-  endDate?: Date;
-  tags?: string[];
-  createdBy: number;
-  updatedBy?: number;
-  createdAt: Date;
-  updatedAt: Date;
-  createdByName?: string;
-  updatedByName?: string;
-}
-
-export interface CreateIpWhitelistData {
-  ipAddress: string;
-  purpose: string;
-  isEnabled?: boolean;
-  startDate?: Date;
-  endDate?: Date;
-  tags?: string[];
-  createdBy: number;
-}
-
-export interface UpdateIpWhitelistData {
-  ipAddress?: string;
-  purpose?: string;
-  isEnabled?: boolean;
-  startDate?: Date;
-  endDate?: Date;
-  tags?: string[];
-  updatedBy: number;
-}
+import db from '../config/knex';
+import logger from '../config/logger';
 
 export interface IpWhitelistFilters {
-  ipAddress?: string;
-  purpose?: string;
-  isEnabled?: boolean;
-  createdBy?: number;
-  search?: string;
-  includeExpired?: boolean;
-  tags?: string[];
+  ip?: string;
+  description?: string;
+  is_active?: boolean;
+  created_by?: number;
+  limit?: number;
+  offset?: number;
 }
 
 export interface IpWhitelistListResponse {
-  ipWhitelists: IpWhitelist[];
+  ipWhitelists: any[];
   total: number;
   page: number;
   limit: number;
@@ -62,285 +25,205 @@ export class IpWhitelistModel {
     filters: IpWhitelistFilters = {}
   ): Promise<IpWhitelistListResponse> {
     try {
-      // Ensure page and limit are numbers
+      console.log('🚀 IpWhitelistKnexModel.findAll called with filters:', filters);
+
+      // 기본값 설정
       const pageNum = Number(page) || 1;
       const limitNum = Number(limit) || 10;
       const offset = (pageNum - 1) * limitNum;
-      
-      let whereClause = 'WHERE 1=1';
-      const params: any[] = [];
 
-      if (filters.ipAddress) {
-        whereClause += ' AND iw.ip_address LIKE ?';
-        params.push(`%${filters.ipAddress}%`);
-      }
+      // 기본 쿼리 빌더
+      const baseQuery = () => db('g_ip_whitelist as iw')
+        .leftJoin('g_users as creator', 'iw.created_by', 'creator.id')
+        .leftJoin('g_users as updater', 'iw.updated_by', 'updater.id');
 
-      if (filters.purpose) {
-        whereClause += ' AND iw.purpose LIKE ?';
-        params.push(`%${filters.purpose}%`);
-      }
-
-      if (filters.isEnabled !== undefined) {
-        whereClause += ' AND iw.is_enabled = ?';
-        params.push(filters.isEnabled);
-      }
-
-      if (filters.createdBy) {
-        whereClause += ' AND iw.created_by = ?';
-        params.push(filters.createdBy);
-      }
-
-      if (filters.tags && filters.tags.length > 0) {
-        const tagConditions = filters.tags.map(() => 'JSON_CONTAINS(iw.tags, ?)').join(' OR ');
-        whereClause += ` AND (${tagConditions})`;
-        filters.tags.forEach(tag => {
-          params.push(JSON.stringify(tag));
+      // 필터 적용 함수
+      const applyFilters = (query: any) => {
+        // 기본 조건: 만료되지 않은 항목만
+        query.where(function() {
+          this.whereNull('iw.end_date')
+              .orWhere('iw.end_date', '>', new Date());
         });
-      }
 
-      if (filters.search) {
-        whereClause += ' AND (iw.ip_address LIKE ? OR iw.purpose LIKE ?)';
-        const searchParam = `%${filters.search}%`;
-        params.push(searchParam, searchParam);
-      }
+        if (filters.ip) {
+          query.where('iw.ip', 'like', `%${filters.ip}%`);
+        }
 
-      // Filter out expired entries by default
-      if (!filters.includeExpired) {
-        whereClause += ' AND (iw.end_date IS NULL OR iw.end_date > NOW())';
-      }
+        if (filters.description) {
+          query.where('iw.description', 'like', `%${filters.description}%`);
+        }
 
-      // Count query
-      const countQuery = `
-        SELECT COUNT(*) as total
-        FROM g_ip_whitelist iw
-        ${whereClause}
-      `;
+        if (filters.is_active !== undefined) {
+          query.where('iw.is_active', filters.is_active);
+        }
 
-      const countResult = await database.query(countQuery, params);
-      const total = countResult[0]?.total || 0;
+        if (filters.created_by) {
+          query.where('iw.created_by', filters.created_by);
+        }
 
-      // Data query with joins
-      const dataQuery = `
-        SELECT 
-          iw.*,
-          creator.name as createdByName,
-          updater.name as updatedByName
-        FROM g_ip_whitelist iw
-        LEFT JOIN g_users creator ON iw.created_by = creator.id
-        LEFT JOIN g_users updater ON iw.updated_by = updater.id
-        ${whereClause}
-        ORDER BY iw.created_at DESC
-        LIMIT ? OFFSET ?
-      `;
+        return query;
+      };
 
-      dataQuery = dataQuery.replace('LIMIT ? OFFSET ?', `LIMIT ${limitNum} OFFSET ${offset}`);
-      const ipWhitelists = await database.query(dataQuery, params);
+      // Count 쿼리
+      const countQuery = applyFilters(baseQuery())
+        .count('iw.id as total')
+        .first();
 
+      // Data 쿼리
+      const dataQuery = applyFilters(baseQuery())
+        .select([
+          'iw.*',
+          'creator.name as createdByName',
+          'updater.name as updatedByName'
+        ])
+        .orderBy('iw.created_at', 'desc')
+        .limit(limitNum)
+        .offset(offset);
+
+      console.log('🔍 Executing count and data queries...');
+
+      // 병렬 실행
+      const [countResult, dataResults] = await Promise.all([
+        countQuery,
+        dataQuery
+      ]);
+
+      console.log('✅ Queries completed. Count:', countResult?.total, 'Data rows:', dataResults?.length);
+
+      const total = countResult?.total || 0;
       const totalPages = Math.ceil(total / limitNum);
 
+      console.log('🎯 Returning result: ipWhitelists count =', dataResults.length, 'total =', total);
+
       return {
-        ipWhitelists: ipWhitelists.map(this.mapRowToIpWhitelist),
+        ipWhitelists: dataResults.map(this.mapRowToIpWhitelist),
         total,
         page: pageNum,
         limit: limitNum,
         totalPages,
       };
     } catch (error) {
-      console.error('Error in IpWhitelistModel.findAll:', error);
-      throw new CustomError('Failed to fetch IP whitelists', 500);
+      logger.error('Error finding IP whitelists (Knex):', error);
+      throw new Error('Failed to fetch IP whitelists');
     }
   }
 
-  static async findById(id: number): Promise<IpWhitelist | null> {
+  static async findById(id: number): Promise<any | null> {
     try {
-      const query = `
-        SELECT 
-          iw.*,
-          creator.name as createdByName,
-          updater.name as updatedByName
-        FROM g_ip_whitelist iw
-        LEFT JOIN g_users creator ON iw.created_by = creator.id
-        LEFT JOIN g_users updater ON iw.updated_by = updater.id
-        WHERE iw.id = ?
-      `;
+      const ipWhitelist = await db('g_ip_whitelist as iw')
+        .leftJoin('g_users as creator', 'iw.created_by', 'creator.id')
+        .leftJoin('g_users as updater', 'iw.updated_by', 'updater.id')
+        .select([
+          'iw.*',
+          'creator.name as createdByName',
+          'updater.name as updatedByName'
+        ])
+        .where('iw.id', id)
+        .first();
 
-      const result = await database.query(query, [id]);
-      
-      if (result.length === 0) {
-        return null;
-      }
-
-      return this.mapRowToIpWhitelist(result[0]);
+      return ipWhitelist ? this.mapRowToIpWhitelist(ipWhitelist) : null;
     } catch (error) {
-      console.error('Error in IpWhitelistModel.findById:', error);
-      throw new CustomError('Failed to fetch IP whitelist entry', 500);
+      logger.error('Error finding IP whitelist by ID (Knex):', error);
+      throw error;
     }
   }
 
-  static async findByIpAddress(ipAddress: string): Promise<IpWhitelist | null> {
+  static async create(data: any): Promise<any> {
     try {
-      const query = `
-        SELECT 
-          iw.*,
-          creator.name as createdByName,
-          updater.name as updatedByName
-        FROM g_ip_whitelist iw
-        LEFT JOIN g_users creator ON iw.created_by = creator.id
-        LEFT JOIN g_users updater ON iw.updated_by = updater.id
-        WHERE iw.ip_address = ?
-      `;
+      const [insertId] = await db('g_ip_whitelist').insert({
+        ...data,
+        created_at: new Date(),
+        updated_at: new Date()
+      });
 
-      const result = await database.query(query, [ipAddress]);
-      
-      if (result.length === 0) {
-        return null;
-      }
-
-      return this.mapRowToIpWhitelist(result[0]);
+      return await this.findById(insertId);
     } catch (error) {
-      console.error('Error in IpWhitelistModel.findByIpAddress:', error);
-      throw new CustomError('Failed to fetch IP whitelist entry', 500);
+      logger.error('Error creating IP whitelist (Knex):', error);
+      throw error;
     }
   }
 
-  static async create(data: CreateIpWhitelistData): Promise<IpWhitelist> {
+  static async update(id: number, data: any): Promise<any> {
     try {
-      const query = `
-        INSERT INTO g_ip_whitelist (ip_address, purpose, is_enabled, start_date, end_date, tags, created_by)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `;
+      await db('g_ip_whitelist')
+        .where('id', id)
+        .update({
+          ...data,
+          updated_at: new Date()
+        });
 
-      // Ensure no undefined values are passed to the database
-      const params = [
-        data.ipAddress,
-        data.purpose,
-        data.isEnabled ?? true,
-        data.startDate || null,
-        data.endDate || null,
-        data.tags ? JSON.stringify(data.tags) : null,
-        data.createdBy,
-      ];
-
-      console.log('Database query params:', params);
-      const result = await database.query(query, params);
-
-      const created = await this.findById(result.insertId);
-      if (!created) {
-        throw new CustomError('Failed to create IP whitelist entry', 500);
-      }
-
-      return created;
-    } catch (error: any) {
-      if (error.code === 'ER_DUP_ENTRY') {
-        throw new CustomError('IP address already exists in whitelist', 409);
-      }
-      console.error('Error in IpWhitelistModel.create:', error);
-      throw new CustomError('Failed to create IP whitelist entry', 500);
-    }
-  }
-
-  static async update(id: number, data: UpdateIpWhitelistData): Promise<IpWhitelist> {
-    try {
-      const setParts: string[] = [];
-      const params: any[] = [];
-
-      if (data.ipAddress !== undefined) {
-        setParts.push('ip_address = ?');
-        params.push(data.ipAddress);
-      }
-
-      if (data.purpose !== undefined) {
-        setParts.push('purpose = ?');
-        params.push(data.purpose);
-      }
-
-      if (data.isEnabled !== undefined) {
-        setParts.push('is_enabled = ?');
-        params.push(data.isEnabled);
-      }
-
-      if (data.startDate !== undefined) {
-        setParts.push('start_date = ?');
-        params.push(data.startDate ?? null);
-      }
-
-      if (data.endDate !== undefined) {
-        setParts.push('end_date = ?');
-        params.push(data.endDate ?? null);
-      }
-
-      if (data.tags !== undefined) {
-        setParts.push('tags = ?');
-        params.push(data.tags ? JSON.stringify(data.tags) : null);
-      }
-
-      setParts.push('updated_by = ?');
-      params.push(data.updatedBy);
-
-      params.push(id);
-
-      const query = `
-        UPDATE g_ip_whitelist 
-        SET ${setParts.join(', ')}
-        WHERE id = ?
-      `;
-
-      const result = await database.query(query, params);
-
-      if (result.affectedRows === 0) {
-        throw new CustomError('IP whitelist entry not found', 404);
-      }
-
-      const updated = await this.findById(id);
-      if (!updated) {
-        throw new CustomError('Failed to fetch updated IP whitelist entry', 500);
-      }
-
-      return updated;
-    } catch (error: any) {
-      if (error.code === 'ER_DUP_ENTRY') {
-        throw new CustomError('IP address already exists in whitelist', 409);
-      }
-      if (error instanceof CustomError) {
-        throw error;
-      }
-      console.error('Error in IpWhitelistModel.update:', error);
-      throw new CustomError('Failed to update IP whitelist entry', 500);
+      return await this.findById(id);
+    } catch (error) {
+      logger.error('Error updating IP whitelist (Knex):', error);
+      throw error;
     }
   }
 
   static async delete(id: number): Promise<void> {
     try {
-      const query = 'DELETE FROM g_ip_whitelist WHERE id = ?';
-      const result = await database.query(query, [id]);
-
-      if (result.affectedRows === 0) {
-        throw new CustomError('IP whitelist entry not found', 404);
-      }
+      await db('g_ip_whitelist').where('id', id).del();
     } catch (error) {
-      if (error instanceof CustomError) {
-        throw error;
-      }
-      console.error('Error in IpWhitelistModel.delete:', error);
-      throw new CustomError('Failed to delete IP whitelist entry', 500);
+      logger.error('Error deleting IP whitelist (Knex):', error);
+      throw error;
     }
   }
 
-  private static mapRowToIpWhitelist(row: any): IpWhitelist {
+  // 행 매핑 함수
+  private static mapRowToIpWhitelist(row: any): any {
     return {
       id: row.id,
-      ipAddress: row.ip_address,
-      purpose: row.purpose,
-      isEnabled: Boolean(row.is_enabled),
-      startDate: row.start_date ? new Date(row.start_date) : undefined,
-      endDate: row.end_date ? new Date(row.end_date) : undefined,
-      tags: row.tags ? JSON.parse(row.tags) : undefined,
-      createdBy: row.created_by,
-      updatedBy: row.updated_by,
-      createdAt: new Date(row.created_at),
-      updatedAt: new Date(row.updated_at),
+      ip: row.ip,
+      description: row.description,
+      is_active: Boolean(row.is_active),
+      start_date: row.start_date,
+      end_date: row.end_date,
+      created_by: row.created_by,
+      updated_by: row.updated_by,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
       createdByName: row.createdByName,
       updatedByName: row.updatedByName,
     };
+  }
+
+  // 태그 관련 메서드들
+  static async setTags(whitelistId: number, tagIds: number[]): Promise<void> {
+    try {
+      await db.transaction(async (trx) => {
+        // 기존 태그 할당 삭제
+        await trx('g_tag_assignments')
+          .where('entity_type', 'whitelist')
+          .where('entity_id', whitelistId)
+          .del();
+
+        // 새 태그 할당 추가
+        if (tagIds.length > 0) {
+          const assignments = tagIds.map(tagId => ({
+            entity_type: 'whitelist',
+            entity_id: whitelistId,
+            tag_id: tagId,
+            created_at: new Date()
+          }));
+          await trx('g_tag_assignments').insert(assignments);
+        }
+      });
+    } catch (error) {
+      logger.error('Error setting IP whitelist tags (Knex):', error);
+      throw error;
+    }
+  }
+
+  static async getTags(whitelistId: number): Promise<any[]> {
+    try {
+      return await db('g_tag_assignments as ta')
+        .join('g_tags as t', 'ta.tag_id', 't.id')
+        .select(['t.id', 't.name', 't.color', 't.description'])
+        .where('ta.entity_type', 'whitelist')
+        .where('ta.entity_id', whitelistId)
+        .orderBy('t.name');
+    } catch (error) {
+      logger.error('Error getting IP whitelist tags (Knex):', error);
+      throw error;
+    }
   }
 }

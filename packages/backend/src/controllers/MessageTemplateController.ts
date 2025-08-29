@@ -5,7 +5,15 @@ export class MessageTemplateController {
   static async list(req: Request, res: Response, next: NextFunction) {
     try {
       const { type, is_enabled, q, limit, offset } = req.query as any;
-      const data = await MessageTemplateModel.list({ type, is_enabled, q, limit: Number(limit)||50, offset: Number(offset)||0 });
+      // MessageTemplateModel 사용
+      const result = await MessageTemplateModel.findAllWithPagination({
+        type,
+        isActive: is_enabled === '1' || is_enabled === 'true',
+        search: q,
+        limit: Number(limit) || 50,
+        offset: Number(offset) || 0
+      });
+      const data = { items: result.messageTemplates, total: result.total };
       res.json({ success: true, data });
     } catch (e) { next(e); }
   }

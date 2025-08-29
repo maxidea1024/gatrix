@@ -1,4 +1,4 @@
-import ClientVersionModel, { ClientVersionAttributes, ClientVersionCreationAttributes, BulkCreateClientVersionRequest, ClientStatus } from '../models/ClientVersion';
+import { ClientVersionModel, ClientVersionAttributes, ClientVersionCreationAttributes, BulkCreateClientVersionRequest, ClientStatus } from '../models/ClientVersion';
 import { pubSubService } from './PubSubService';
 
 export interface ClientVersionFilters {
@@ -163,19 +163,22 @@ export class ClientVersionService {
       };
     }
 
-    const { rows: clientVersions, count: total } = await ClientVersionModel.findAll({
-      where: whereConditions,
+    // ClientVersionModel 사용
+    const result = await ClientVersionModel.findAll({
+      version: filters.version,
+      platform: filters.platform,
+      clientStatus: filters.clientStatus,
       limit,
       offset,
-      orderBy: sortBy,
-      orderDirection: sortOrder,
+      sortBy,
+      sortOrder
     });
 
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = Math.ceil(result.total / limit);
 
     return {
-      clientVersions,
-      total,
+      data: result.clientVersions,
+      total: result.total,
       page,
       limit,
       totalPages,
