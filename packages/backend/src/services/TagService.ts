@@ -16,8 +16,9 @@ export class TagService {
   }
 
   static async update(id: number, data: UpdateTagData, userId?: number) {
-    if (data.name) {
-      const name = data.name.trim();
+    if (data.name !== undefined) {
+      const name = data.name?.trim();
+      if (!name) throw new GatrixError('Tag name is required', 400);
       const existing = await TagModel.findByName(name);
       if (existing && existing.id !== id) throw new GatrixError('Tag with this name already exists', 409);
       data.name = name;

@@ -190,6 +190,7 @@
     "title": "Audit Logs",
     "user": "User",
     "actions": {
+      "create": "Create",
       "user_login": "User Login",
       "user_register": "User Register",
       "user_update": "User Update",
@@ -772,6 +773,7 @@
     "description": "Description",
     "duplicateName": "A tag with the same name already exists.",
     "name": "Name",
+    "nameRequired": "Tag name is required",
     "title": "Tag Management",
     "noDescription": "No description",
     "noTags": "No tags found",

@@ -41,49 +41,49 @@ export interface UserWithoutPassword extends Omit<User, 'passwordHash'> {}
 
 export interface OAuthAccount {
   id: number;
-  user_id: number;
+  userId: number;
   provider: 'google' | 'github';
-  provider_id: string;
-  provider_email?: string;
-  provider_name?: string;
-  provider_avatar?: string;
-  access_token?: string;
-  refresh_token?: string;
-  expires_at?: Date;
-  created_at: Date;
-  updated_at: Date;
+  providerId: string;
+  providerEmail?: string;
+  providerName?: string;
+  providerAvatar?: string;
+  accessToken?: string;
+  refreshToken?: string;
+  expiresAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CreateOAuthAccountData {
-  user_id: number;
+  userId: number;
   provider: 'google' | 'github';
-  provider_id: string;
-  provider_email?: string;
-  provider_name?: string;
-  provider_avatar?: string;
-  access_token?: string;
-  refresh_token?: string;
-  expires_at?: Date;
+  providerId: string;
+  providerEmail?: string;
+  providerName?: string;
+  providerAvatar?: string;
+  accessToken?: string;
+  refreshToken?: string;
+  expiresAt?: Date;
 }
 
 export interface AuditLog {
   id: number;
-  user_id?: number;
+  userId?: number;
   action: string;
-  resource_type?: string;
-  resource_id?: string;
+  resourceType?: string;
+  resourceId?: string;
   details?: any;
-  ip_address?: string;
-  user_agent?: string;
-  created_at: Date;
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: Date;
 }
 
 export interface CreateAuditLogData {
-  user_id?: number;
+  userId?: number;
   action: string;
-  resource_type?: string;
-  resource_id?: string;
+  resourceType?: string;
+  resourceId?: string;
   details?: any;
-  ip_address?: string;
-  user_agent?: string;
+  ipAddress?: string;
+  userAgent?: string;
 }

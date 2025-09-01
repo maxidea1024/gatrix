@@ -18,12 +18,12 @@ export interface MessageTemplate {
   id?: number;
   name: string;
   type: string;
-  is_enabled: boolean;
-  default_message: string;
-  created_by?: number;
-  updated_by?: number;
-  created_at?: Date;
-  updated_at?: Date;
+  isEnabled: boolean;
+  defaultMessage: string;
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export class MessageTemplateModel {
@@ -41,8 +41,8 @@ export class MessageTemplateModel {
 
       // 기본 쿼리 빌더
       const baseQuery = () => db('g_message_templates as mt')
-        .leftJoin('g_users as creator', 'mt.created_by', 'creator.id')
-        .leftJoin('g_users as updater', 'mt.updated_by', 'updater.id');
+        .leftJoin('g_users as creator', 'mt.createdBy', 'creator.id')
+        .leftJoin('g_users as updater', 'mt.updatedBy', 'updater.id');
 
       // 필터 적용 함수
       const applyFilters = (query: any) => {
@@ -54,14 +54,14 @@ export class MessageTemplateModel {
         // 컨트롤러에서 undefined가 false로 변환되는 문제 때문에
         // false인 경우도 필터를 적용하지 않음 (모든 레코드 조회)
         if (filters?.isActive === true) {
-          query.where('mt.is_enabled', true);
+          query.where('mt.isEnabled', true);
         }
         // false나 undefined인 경우 필터 적용하지 않음
 
         if (filters?.search) {
           query.where(function(this: any) {
             this.where('mt.name', 'like', `%${filters.search}%`)
-                .orWhere('mt.default_message', 'like', `%${filters.search}%`);
+                .orWhere('mt.defaultMessage', 'like', `%${filters.search}%`);
           });
         }
 
@@ -77,10 +77,10 @@ export class MessageTemplateModel {
       const dataQuery = applyFilters(baseQuery())
         .select([
           'mt.*',
-          'creator.name as created_by_name',
-          'updater.name as updated_by_name'
+          'creator.name as createdByName',
+          'updater.name as updatedByName'
         ])
-        .orderBy('mt.created_at', 'desc')
+        .orderBy('mt.createdAt', 'desc')
         .limit(limit)
         .offset(offset);
 
@@ -126,12 +126,12 @@ export class MessageTemplateModel {
   static async findById(id: number): Promise<any | null> {
     try {
       const template = await db('g_message_templates as mt')
-        .leftJoin('g_users as creator', 'mt.created_by', 'creator.id')
-        .leftJoin('g_users as updater', 'mt.updated_by', 'updater.id')
+        .leftJoin('g_users as creator', 'mt.createdBy', 'creator.id')
+        .leftJoin('g_users as updater', 'mt.updatedBy', 'updater.id')
         .select([
           'mt.*',
-          'creator.name as created_by_name',
-          'updater.name as updated_by_name'
+          'creator.name as createdByName',
+          'updater.name as updatedByName'
         ])
         .where('mt.id', id)
         .first();
@@ -150,12 +150,12 @@ export class MessageTemplateModel {
         const [insertId] = await trx('g_message_templates').insert({
           name: data.name,
           type: data.type,
-          default_message: data.default_message || data.content || '',
-          is_enabled: data.is_enabled !== undefined ? data.is_enabled : true,
-          created_by: data.created_by,
-          updated_by: data.updated_by,
-          created_at: new Date(),
-          updated_at: new Date()
+          defaultMessage: data.defaultMessage || data.default_message || data.content || '',
+          isEnabled: data.isEnabled !== undefined ? data.isEnabled : (data.is_enabled !== undefined ? data.is_enabled : true),
+          createdBy: data.createdBy || data.created_by,
+          updatedBy: data.updatedBy || data.updated_by,
+          createdAt: new Date(),
+          updatedAt: new Date()
         });
 
         return await this.findById(insertId);
@@ -175,10 +175,10 @@ export class MessageTemplateModel {
           .update({
             name: data.name,
             type: data.type,
-            default_message: data.default_message || data.content,
-            is_enabled: data.is_enabled,
-            updated_by: data.updated_by,
-            updated_at: new Date()
+            defaultMessage: data.defaultMessage || data.default_message || data.content,
+            isEnabled: data.isEnabled !== undefined ? data.isEnabled : data.is_enabled,
+            updatedBy: data.updatedBy || data.updated_by,
+            updatedAt: new Date()
           });
 
         return await this.findById(id);

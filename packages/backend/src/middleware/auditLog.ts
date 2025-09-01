@@ -48,10 +48,10 @@ export const auditLog = (options: AuditLogOptions) => {
         const details = options.getDetails ? options.getDetails(req, res) : undefined;
 
         await AuditLogModel.create({
-          user_id: req.user?.userId,
+          userId: req.user?.userId,
           action: options.action,
-          resource_type: options.resourceType,
-          resource_id: resourceId,
+          resourceType: options.resourceType,
+          resourceId: resourceId,
           details: details || {
             method: req.method,
             url: req.originalUrl,
@@ -60,8 +60,8 @@ export const auditLog = (options: AuditLogOptions) => {
             query: req.query,
             params: req.params,
           },
-          ip_address: req.ip,
-          user_agent: req.get('User-Agent'),
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent'),
         });
       } catch (error) {
         // Don't fail the request if audit logging fails

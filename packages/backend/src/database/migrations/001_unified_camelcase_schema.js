@@ -231,26 +231,87 @@ async function up(connection) {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
-  console.log('✓ All tables created with camelCase fields');
+  // 12. Audit Logs table
+  await connection.execute(`
+    CREATE TABLE IF NOT EXISTS g_audit_logs (
+      id BIGINT AUTO_INCREMENT PRIMARY KEY,
+      userId INT NULL,
+      action VARCHAR(255) NOT NULL,
+      resourceType VARCHAR(100) NULL,
+      resourceId VARCHAR(255) NULL,
+      details JSON NULL,
+      ipAddress VARCHAR(45) NULL,
+      userAgent TEXT NULL,
+      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (userId) REFERENCES g_users(id) ON DELETE SET NULL,
+      INDEX idx_user (userId),
+      INDEX idx_action (action),
+      INDEX idx_resource (resourceType, resourceId),
+      INDEX idx_created (createdAt)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
 
-  // Check actual column names for all tables
-  const tables = ['g_users', 'g_job_types', 'g_vars'];
-  for (const table of tables) {
-    try {
-      const [columns] = await connection.execute(`DESCRIBE ${table}`);
-      console.log(`${table} columns:`, columns.map(col => col.Field));
-    } catch (error) {
-      console.log(`❌ Could not describe ${table}:`, error.message);
-    }
-  }
+  // 13. Game Worlds table
+  await connection.execute(`
+    CREATE TABLE IF NOT EXISTS g_game_worlds (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      displayName VARCHAR(255) NOT NULL,
+      description TEXT NULL,
+      serverUrl VARCHAR(500) NULL,
+      isActive BOOLEAN NOT NULL DEFAULT TRUE,
+      maxPlayers INT NULL,
+      currentPlayers INT NOT NULL DEFAULT 0,
+      createdBy INT NULL,
+      updatedBy INT NULL,
+      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
+      FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
+      INDEX idx_name (name),
+      INDEX idx_active (isActive),
+      INDEX idx_created (createdBy),
+      INDEX idx_updated (updatedBy)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
+
+  // 14. Whitelists table
+  await connection.execute(`
+    CREATE TABLE IF NOT EXISTS g_whitelists (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      email VARCHAR(255) NOT NULL UNIQUE,
+      name VARCHAR(255) NULL,
+      description TEXT NULL,
+      isActive BOOLEAN NOT NULL DEFAULT TRUE,
+      createdBy INT NULL,
+      updatedBy INT NULL,
+      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
+      FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
+      INDEX idx_email (email),
+      INDEX idx_active (isActive),
+      INDEX idx_created (createdBy),
+      INDEX idx_updated (updatedBy)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
 
   console.log('Inserting default data...');
+
+  // Get admin credentials from environment variables
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
+  const adminName = process.env.ADMIN_NAME || 'Administrator';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+
+  // Hash the admin password
+  const bcrypt = require('bcryptjs');
+  const passwordHash = await bcrypt.hash(adminPassword, 12);
 
   // Insert default admin user (using actual column names from g_users)
   await connection.execute(`
     INSERT IGNORE INTO g_users (id, name, email, passwordHash, role, status, emailVerified) VALUES
-    (1, 'Admin', 'admin@example.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/RK.s5uDfm', 'admin', 'active', TRUE)
-  `);
+    (1, ?, ?, ?, 'admin', 'active', TRUE)
+  `, [adminName, adminEmail, passwordHash]);
 
   // Insert default job types (using actual column names from g_job_types)
   await connection.execute(`

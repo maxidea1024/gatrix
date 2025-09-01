@@ -244,21 +244,24 @@ export class AdminController {
 
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      const userId = req.query.user_id ? parseInt(req.query.user_id as string) : undefined;
-      const ipAddress = req.query.ip_address as string;
+      const userId = req.query.userId ? parseInt(req.query.userId as string) :
+                     req.query.user_id ? parseInt(req.query.user_id as string) : undefined; // backward compatibility
+      const ipAddress = req.query.ipAddress as string || req.query.ip_address as string; // backward compatibility
       const action = req.query.action as string;
-      const resourceType = req.query.resource_type as string;
-      const startDate = req.query.start_date ? new Date(req.query.start_date as string) : undefined;
-      const endDate = req.query.end_date ? new Date(req.query.end_date as string) : undefined;
+      const resourceType = req.query.resourceType as string || req.query.resource_type as string; // backward compatibility
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) :
+                        req.query.start_date ? new Date(req.query.start_date as string) : undefined; // backward compatibility
+      const endDate = req.query.endDate ? new Date(req.query.endDate as string) :
+                      req.query.end_date ? new Date(req.query.end_date as string) : undefined; // backward compatibility
 
       const filters: any = {};
-      if (userId) filters.user_id = userId; // kept for compatibility
+      if (userId) filters.userId = userId;
       if (req.query.user) filters.user = String(req.query.user);
-      if (ipAddress) filters.ip_address = ipAddress;
+      if (ipAddress) filters.ipAddress = ipAddress;
       if (action) filters.action = action;
-      if (resourceType) filters.resource_type = resourceType;
-      if (startDate) filters.start_date = startDate;
-      if (endDate) filters.end_date = endDate;
+      if (resourceType) filters.resourceType = resourceType;
+      if (startDate) filters.startDate = startDate;
+      if (endDate) filters.endDate = endDate;
 
       logger.debug('Calling AuditLogModel.findAll with:', {
         page,
@@ -324,8 +327,10 @@ export class AdminController {
 
   static async getAuditStats(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const startDate = req.query.start_date ? new Date(req.query.start_date as string) : undefined;
-      const endDate = req.query.end_date ? new Date(req.query.end_date as string) : undefined;
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) :
+                        req.query.start_date ? new Date(req.query.start_date as string) : undefined; // backward compatibility
+      const endDate = req.query.endDate ? new Date(req.query.endDate as string) :
+                      req.query.end_date ? new Date(req.query.end_date as string) : undefined; // backward compatibility
 
       const stats = await AuditLogModel.getActionStats(startDate, endDate);
       

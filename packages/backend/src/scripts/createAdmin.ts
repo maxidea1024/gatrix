@@ -1,13 +1,19 @@
 import bcrypt from 'bcrypt';
 import database from '../config/database';
 import logger from '../config/logger';
+import config from '../config';
 
 async function createDefaultAdmin() {
   try {
+    // Get admin credentials from config (which reads from environment variables)
+    const adminEmail = config.admin.email;
+    const adminPassword = config.admin.password;
+    const adminName = config.admin.name;
+
     // Check if admin user already exists
     const existingAdmin = await database.query(
       'SELECT id FROM g_users WHERE email = ? LIMIT 1',
-      ['admin@motifgames.com']
+      [adminEmail]
     );
 
     if (existingAdmin.length > 0) {
@@ -15,8 +21,8 @@ async function createDefaultAdmin() {
       return;
     }
 
-    // Hash the default password
-    const hashedPassword = await bcrypt.hash('admin123$', 12);
+    // Hash the admin password
+    const hashedPassword = await bcrypt.hash(adminPassword, 12);
 
     // Create default admin user
     await database.query(`
@@ -32,17 +38,17 @@ async function createDefaultAdmin() {
         updatedAt
       ) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW(), NOW())
     `, [
-      'admin@motifgames.com',
+      adminEmail,
       hashedPassword,
-      'Administrator',
+      adminName,
       'admin',
       'active',
       true
     ]);
 
     logger.info('Default admin user created successfully');
-    logger.info('Email: admin@motifgames.com');
-    logger.info('Password: admin123$');
+    logger.info(`Email: ${adminEmail}`);
+    logger.info(`Password: ${adminPassword}`);
   } catch (error) {
     logger.error('Error creating default admin user:', error);
     throw error;

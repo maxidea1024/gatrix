@@ -64,17 +64,17 @@ export class WhitelistModel {
 
       // Apply filters
       if (filters.accountId) {
-        whereClause += ' AND w.account_id LIKE ?';
+        whereClause += ' AND w.accountId LIKE ?';
         filterParams.push(`%${filters.accountId}%`);
       }
 
       if (filters.ipAddress) {
-        whereClause += ' AND w.ip_address LIKE ?';
+        whereClause += ' AND w.ipAddress LIKE ?';
         filterParams.push(`%${filters.ipAddress}%`);
       }
 
       if (filters.createdBy) {
-        whereClause += ' AND w.created_by = ?';
+        whereClause += ' AND w.createdBy = ?';
         filterParams.push(filters.createdBy);
       }
 
@@ -87,15 +87,15 @@ export class WhitelistModel {
       }
 
       if (filters.search) {
-        whereClause += ' AND (w.account_id LIKE ? OR w.ip_address LIKE ? OR w.memo LIKE ?)';
+        whereClause += ' AND (w.accountId LIKE ? OR w.ipAddress LIKE ? OR w.memo LIKE ?)';
         filterParams.push(`%${filters.search}%`, `%${filters.search}%`, `%${filters.search}%`);
       }
 
       // Get total count
       const countQuery = `
         SELECT COUNT(*) as total
-        FROM g_whitelist w
-        LEFT JOIN g_users u ON w.created_by = u.id
+        FROM g_account_whitelists w
+        LEFT JOIN g_users u ON w.createdBy = u.id
         ${whereClause}
       `;
       const countResult = await database.query(countQuery, filterParams);

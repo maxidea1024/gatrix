@@ -190,6 +190,7 @@
     "title": "审计日志",
     "user": "用户",
     "actions": {
+      "create": "创建",
       "user_login": "用户登录",
       "user_register": "用户注册",
       "user_update": "用户更新",
@@ -774,6 +775,7 @@
     "description": "描述",
     "duplicateName": "重复名称",
     "name": "名称",
+    "nameRequired": "标签名称是必需的",
     "title": "标签管理",
     "noDescription": "无描述",
     "noTags": "没有标签",

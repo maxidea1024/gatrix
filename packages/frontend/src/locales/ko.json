@@ -190,6 +190,7 @@
     "title": "감사 로그",
     "user": "사용자",
     "actions": {
+      "create": "생성",
       "user_login": "사용자 로그인",
       "user_register": "사용자 등록",
       "user_update": "사용자 수정",
@@ -890,6 +891,7 @@
     "description": "설명",
     "duplicateName": "중복된 이름",
     "name": "이름",
+    "nameRequired": "태그 이름은 필수입니다",
     "title": "태그 관리",
     "noDescription": "설명 없음",
     "addTag": "태그 추가",

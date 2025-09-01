@@ -4,9 +4,9 @@ import logger from '../config/logger';
 export interface IpWhitelistFilters {
   ip?: string;
   description?: string;
-  is_active?: boolean;
+  isActive?: boolean;
   isEnabled?: boolean;
-  created_by?: number;
+  createdBy?: number;
   limit?: number;
   offset?: number;
 }
@@ -23,16 +23,16 @@ export interface IpWhitelist {
   id?: number;
   ip: string;
   description?: string;
-  is_active: boolean;
-  start_date?: Date;
-  end_date?: Date;
-  created_by?: number;
-  updated_by?: number;
-  created_at?: Date;
-  updated_at?: Date;
+  isActive: boolean;
+  startDate?: Date;
+  endDate?: Date;
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-export interface CreateIpWhitelistData extends Omit<IpWhitelist, 'id' | 'created_at' | 'updated_at'> {
+export interface CreateIpWhitelistData extends Omit<IpWhitelist, 'id' | 'createdAt' | 'updatedAt'> {
   ipAddress?: string;
   purpose?: string;
   isEnabled?: boolean;
@@ -57,15 +57,15 @@ export class IpWhitelistModel {
 
       // 기본 쿼리 빌더
       const baseQuery = () => db('g_ip_whitelist as iw')
-        .leftJoin('g_users as creator', 'iw.created_by', 'creator.id')
-        .leftJoin('g_users as updater', 'iw.updated_by', 'updater.id');
+        .leftJoin('g_users as creator', 'iw.createdBy', 'creator.id')
+        .leftJoin('g_users as updater', 'iw.updatedBy', 'updater.id');
 
       // 필터 적용 함수
       const applyFilters = (query: any) => {
         // 기본 조건: 만료되지 않은 항목만
         query.where(function(this: any) {
-          this.whereNull('iw.end_date')
-              .orWhere('iw.end_date', '>', new Date());
+          this.whereNull('iw.endDate')
+              .orWhere('iw.endDate', '>', new Date());
         });
 
         if (filters.ip) {
@@ -76,12 +76,12 @@ export class IpWhitelistModel {
           query.where('iw.description', 'like', `%${filters.description}%`);
         }
 
-        if (filters.is_active !== undefined) {
-          query.where('iw.is_active', filters.is_active);
+        if (filters.isActive !== undefined) {
+          query.where('iw.isActive', filters.isActive);
         }
 
-        if (filters.created_by) {
-          query.where('iw.created_by', filters.created_by);
+        if (filters.createdBy) {
+          query.where('iw.createdBy', filters.createdBy);
         }
 
         return query;
@@ -99,7 +99,7 @@ export class IpWhitelistModel {
           'creator.name as createdByName',
           'updater.name as updatedByName'
         ])
-        .orderBy('iw.created_at', 'desc')
+        .orderBy('iw.createdAt', 'desc')
         .limit(limitNum)
         .offset(offset);
 
@@ -128,8 +128,8 @@ export class IpWhitelistModel {
   static async findById(id: number): Promise<any | null> {
     try {
       const ipWhitelist = await db('g_ip_whitelist as iw')
-        .leftJoin('g_users as creator', 'iw.created_by', 'creator.id')
-        .leftJoin('g_users as updater', 'iw.updated_by', 'updater.id')
+        .leftJoin('g_users as creator', 'iw.createdBy', 'creator.id')
+        .leftJoin('g_users as updater', 'iw.updatedBy', 'updater.id')
         .select([
           'iw.*',
           'creator.name as createdByName',
@@ -149,8 +149,8 @@ export class IpWhitelistModel {
     try {
       const [insertId] = await db('g_ip_whitelist').insert({
         ...data,
-        created_at: new Date(),
-        updated_at: new Date()
+        createdAt: new Date(),
+        updatedAt: new Date()
       });
 
       return await this.findById(insertId);
@@ -166,7 +166,7 @@ export class IpWhitelistModel {
         .where('id', id)
         .update({
           ...data,
-          updated_at: new Date()
+          updatedAt: new Date()
         });
 
       return await this.findById(id);
@@ -191,13 +191,13 @@ export class IpWhitelistModel {
       id: row.id,
       ip: row.ip,
       description: row.description,
-      is_active: Boolean(row.is_active),
-      start_date: row.start_date,
-      end_date: row.end_date,
-      created_by: row.created_by,
-      updated_by: row.updated_by,
-      created_at: row.created_at,
-      updated_at: row.updated_at,
+      isActive: Boolean(row.isActive),
+      startDate: row.startDate,
+      endDate: row.endDate,
+      createdBy: row.createdBy,
+      updatedBy: row.updatedBy,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
       createdByName: row.createdByName,
       updatedByName: row.updatedByName,
     };
@@ -228,10 +228,10 @@ export class IpWhitelistModel {
         // 새 태그 할당 추가
         if (tagIds.length > 0) {
           const assignments = tagIds.map(tagId => ({
-            entity_type: 'whitelist',
-            entity_id: whitelistId,
-            tag_id: tagId,
-            created_at: new Date()
+            entityType: 'whitelist',
+            entityId: whitelistId,
+            tagId: tagId,
+            createdAt: new Date()
           }));
           await trx('g_tag_assignments').insert(assignments);
         }

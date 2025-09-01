@@ -352,10 +352,11 @@ SSH_PRIVATE_KEY_PATH=/path/to/private/key
 ## Default Admin Account
 
 The system creates a default admin account on first run:
-- Email: admin@example.com (configurable via ADMIN_EMAIL)
-- Password: admin123 (configurable via ADMIN_PASSWORD)
+- Email: Configurable via ADMIN_EMAIL environment variable (default: admin@example.com)
+- Password: Configurable via ADMIN_PASSWORD environment variable (default: admin123)
+- Name: Configurable via ADMIN_NAME environment variable (default: Administrator)
 
-**Important**: Change the default credentials in production!
+**Important**: Always set these environment variables and change the default credentials in production!
 
 ## Available Scripts
 

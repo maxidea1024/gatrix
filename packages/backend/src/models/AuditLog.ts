@@ -6,13 +6,13 @@ export class AuditLogModel {
   static async create(auditData: CreateAuditLogData): Promise<AuditLog> {
     try {
       const [insertId] = await db('g_audit_logs').insert({
-        userId: auditData.user_id || null,
+        userId: auditData.userId || null,
         action: auditData.action,
-        resourceType: auditData.resource_type || null,
-        resourceId: auditData.resource_id || null,
+        resourceType: auditData.resourceType || null,
+        resourceId: auditData.resourceId || null,
         details: auditData.details ? JSON.stringify(auditData.details) : null,
-        ipAddress: auditData.ip_address || null,
-        userAgent: auditData.user_agent || null,
+        ipAddress: auditData.ipAddress || null,
+        userAgent: auditData.userAgent || null,
       });
 
       const auditLog = await this.findById(insertId);
@@ -52,13 +52,13 @@ export class AuditLogModel {
     page: number = 1,
     limit: number = 10,
     filters: {
-      user_id?: number;
+      userId?: number;
       user?: string; // search by email or name
-      ip_address?: string;
+      ipAddress?: string;
       action?: string;
-      resource_type?: string;
-      start_date?: Date;
-      end_date?: Date;
+      resourceType?: string;
+      startDate?: Date;
+      endDate?: Date;
     } = {}
   ): Promise<{ logs: AuditLog[]; total: number; page: number; limit: number }> {
     try {
@@ -81,20 +81,20 @@ export class AuditLogModel {
 
       // Apply filters function
       const applyFilters = (query: any) => {
-        if (filters.user_id) {
-          query.where('al.userId', filters.user_id);
+        if (filters.userId) {
+          query.where('al.userId', filters.userId);
         }
 
-        if (filters.ip_address) {
-          query.where('al.ipAddress', 'like', `%${filters.ip_address}%`);
+        if (filters.ipAddress) {
+          query.where('al.ipAddress', 'like', `%${filters.ipAddress}%`);
         }
 
         if (filters.action) {
           query.where('al.action', filters.action);
         }
 
-        if (filters.resource_type) {
-          query.where('al.resourceType', filters.resource_type);
+        if (filters.resourceType) {
+          query.where('al.resourceType', filters.resourceType);
         }
 
         if (filters.user) {
@@ -104,12 +104,12 @@ export class AuditLogModel {
           });
         }
 
-        if (filters.start_date) {
-          query.where('al.createdAt', '>=', filters.start_date);
+        if (filters.startDate) {
+          query.where('al.createdAt', '>=', filters.startDate);
         }
 
-        if (filters.end_date) {
-          query.where('al.createdAt', '<=', filters.end_date);
+        if (filters.endDate) {
+          query.where('al.createdAt', '<=', filters.endDate);
         }
 
         return query;
@@ -199,7 +199,7 @@ export class AuditLogModel {
     page: number = 1,
     limit: number = 10
   ): Promise<{ logs: AuditLog[]; total: number; page: number; limit: number }> {
-    return this.findAll(page, limit, { user_id: userId });
+    return this.findAll(page, limit, { userId: userId });
   }
 
   static async findByAction(
@@ -215,7 +215,7 @@ export class AuditLogModel {
     page: number = 1,
     limit: number = 10
   ): Promise<{ logs: AuditLog[]; total: number; page: number; limit: number }> {
-    return this.findAll(page, limit, { resource_type: resourceType });
+    return this.findAll(page, limit, { resourceType: resourceType });
   }
 
   static async deleteOldLogs(daysToKeep: number = 90): Promise<number> {

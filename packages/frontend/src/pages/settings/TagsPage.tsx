@@ -104,8 +104,14 @@ const TagsPage: React.FC = () => {
   };
 
   const saveEdit = async (id: number) => {
+    const name = editName.trim();
+    if (!name) {
+      enqueueSnackbar(t('tags.nameRequired'), { variant: 'error' });
+      return;
+    }
+
     try {
-      const updated = await tagService.update(id, { name: editName, color: editColor, description: editDescription || null });
+      const updated = await tagService.update(id, { name, color: editColor, description: editDescription || null });
       setTags(prev => prev.map(t => (t.id === id ? updated : t)));
       setEditingId(null);
       enqueueSnackbar(t('common.success'), { variant: 'success' });
@@ -113,6 +119,8 @@ const TagsPage: React.FC = () => {
       const msg = e?.response?.data?.error?.message;
       if (msg && /exists/i.test(msg)) {
         enqueueSnackbar(t('tags.duplicateName'), { variant: 'error' });
+      } else if (msg && /required/i.test(msg)) {
+        enqueueSnackbar(t('tags.nameRequired'), { variant: 'error' });
       } else {
         enqueueSnackbar(msg || t('errors.saveError'), { variant: 'error' });
       }
@@ -226,7 +234,7 @@ const TagsPage: React.FC = () => {
                     <TableCell align="right" sx={{ width: 140 }}>
                       {editingId === tag.id ? (
                         <Stack direction="row" spacing={1} justifyContent="flex-end">
-                          <IconButton size="small" color="primary" onClick={()=>saveEdit(tag.id)}><SaveIcon fontSize="small" /></IconButton>
+                          <IconButton size="small" color="primary" onClick={()=>saveEdit(tag.id)} disabled={!editName.trim()}><SaveIcon fontSize="small" /></IconButton>
                           <IconButton size="small" onClick={cancelEdit}><CloseIcon fontSize="small" /></IconButton>
                         </Stack>
                       ) : (
