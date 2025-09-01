@@ -289,6 +289,7 @@
     "nameMinLength": "Name must be at least 2 characters.",
     "nameRequired": "Name is required",
     "newPassword": "New Password",
+    "or": "OR",
     "password": "Password",
     "passwordMinLength": "Password must be at least 6 characters",
     "passwordRequired": "Password is required",
@@ -312,6 +313,7 @@
     "signIn": "Sign In",
     "signingIn": "Signing In",
     "signUp": "Sign Up",
+    "signUpDescription": "Join now and unlock all features",
     "tokenExpired": "Token has expired. Please request a new password reset.",
     "tokenValidationFailed": "Token validation failed.",
     "validatingToken": "validatingToken",
@@ -699,10 +701,10 @@
     "title": "Page Not Found"
   },
   "pendingApproval": {
-    "additionalInfo": "additionalInfo",
-    "backToLogin": "backToLogin",
-    "message": "message",
-    "title": "title"
+    "additionalInfo": "Additional Information",
+    "backToLogin": "Back to Login",
+    "message": "Your account is pending approval. You will be notified by email once approved.",
+    "title": "Pending Approval"
   },
   "platform": "platform",
   "profile": {
@@ -753,10 +755,10 @@
     "settingsPanel": "SETTINGS PANEL"
   },
   "signUpPrompt": {
-    "backToLogin": "backToLogin",
-    "createAccount": "createAccount",
-    "message": "message",
-    "title": "title"
+    "backToLogin": "Back to Login",
+    "createAccount": "Create Account",
+    "message": "An account is required to use this service. Please create an account or sign in with an existing one.",
+    "title": "Sign Up Required"
   },
   "slackWebhookUrl": "slackWebhookUrl",
   "status": {

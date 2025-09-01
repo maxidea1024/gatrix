@@ -289,6 +289,7 @@
     "nameMinLength": "姓名至少需要2个字符。",
     "nameRequired": "姓名是必需的",
     "newPassword": "新密码",
+    "or": "或",
     "password": "密码",
     "passwordMinLength": "密码至少需要6个字符",
     "passwordRequired": "密码是必需的",
@@ -312,6 +313,7 @@
     "signIn": "登录",
     "signingIn": "登录中",
     "signUp": "注册",
+    "signUpDescription": "立即注册，解锁所有功能",
     "tokenExpired": "令牌已过期。请请求新的密码重置。",
     "tokenValidationFailed": "令牌验证失败。",
     "validatingToken": "验证令牌中",
@@ -703,7 +705,7 @@
   "pendingApproval": {
     "additionalInfo": "附加信息",
     "backToLogin": "返回登录",
-    "message": "消息",
+    "message": "您的账户正在等待审批。审批完成后将通过邮件通知您。",
     "title": "待审批"
   },
   "platform": "平台",
@@ -757,7 +759,7 @@
   "signUpPrompt": {
     "backToLogin": "返回登录",
     "createAccount": "创建账户",
-    "message": "消息",
+    "message": "使用此服务需要账户。请创建账户或使用现有账户登录。",
     "title": "注册提示"
   },
   "slackWebhookUrl": "Slack Webhook URL",

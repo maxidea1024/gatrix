@@ -156,7 +156,7 @@ const RegisterPage: React.FC = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        backgroundColor: 'background.default',
         p: 2,
         position: 'relative',
       }}
@@ -177,20 +177,20 @@ const RegisterPage: React.FC = () => {
           {/* Header */}
           <Box sx={{ textAlign: 'center', mb: 4 }}>
             <Typography variant="h4" component="h1" gutterBottom>
-              Gate
+              Gatrix
             </Typography>
             <Typography variant="h6" gutterBottom>
               {t('auth.createAccount')}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {fromPrompt ? t('auth.completeRegistration') : t('auth.signUp')}
+              {fromPrompt ? t('auth.completeRegistration') : t('auth.signUpDescription')}
             </Typography>
           </Box>
 
 
 
           {/* Register Form */}
-          <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+          <Box component="form" onSubmit={handleSubmit(onSubmit)} autoComplete="off">
             <Controller
               name="name"
               control={control}
@@ -202,7 +202,7 @@ const RegisterPage: React.FC = () => {
                   error={false}
                   helperText=""
                   margin="normal"
-                  autoComplete="name"
+                  autoComplete="off"
                   autoFocus
                 />
               )}
@@ -220,7 +220,7 @@ const RegisterPage: React.FC = () => {
                   error={false}
                   helperText=""
                   margin="normal"
-                  autoComplete="email"
+                  autoComplete="off"
                 />
               )}
             />
@@ -237,7 +237,7 @@ const RegisterPage: React.FC = () => {
                   error={false}
                   helperText=""
                   margin="normal"
-                  autoComplete="new-password"
+                  autoComplete="off"
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
@@ -267,7 +267,7 @@ const RegisterPage: React.FC = () => {
                   error={false}
                   helperText=""
                   margin="normal"
-                  autoComplete="new-password"
+                  autoComplete="off"
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">

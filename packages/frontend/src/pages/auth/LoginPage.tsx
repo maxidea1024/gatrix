@@ -184,7 +184,7 @@ const LoginPage: React.FC = () => {
           {/* Header */}
           <Box sx={{ textAlign: 'center', mb: 4 }}>
             <Typography variant="h4" component="h1" gutterBottom>
-              Gate
+              Gatrix
             </Typography>
             <Typography variant="h6" gutterBottom>
               {t('auth.welcomeBack')}
@@ -197,7 +197,7 @@ const LoginPage: React.FC = () => {
 
 
           {/* Login Form */}
-          <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+          <Box component="form" onSubmit={handleSubmit(onSubmit)} autoComplete="off">
             <Controller
               name="email"
               control={control}
@@ -210,8 +210,14 @@ const LoginPage: React.FC = () => {
                   error={!!errors.email}
                   helperText={errors.email?.message || ''}
                   margin="normal"
-                  autoComplete="email"
+                  autoComplete="off"
                   autoFocus
+                  inputProps={{
+                    autoComplete: 'new-password', // 브라우저 자동완성 방지
+                    form: {
+                      autoComplete: 'off'
+                    }
+                  }}
                 />
               )}
             />
@@ -228,7 +234,13 @@ const LoginPage: React.FC = () => {
                   error={false}
                   helperText=""
                   margin="normal"
-                  autoComplete="current-password"
+                  autoComplete="off"
+                  inputProps={{
+                    autoComplete: 'new-password', // 브라우저 자동완성 방지
+                    form: {
+                      autoComplete: 'off'
+                    }
+                  }}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
@@ -285,7 +297,7 @@ const LoginPage: React.FC = () => {
             {/* Divider */}
             <Divider sx={{ my: 3 }}>
               <Typography variant="body2" color="text.secondary">
-                OR
+                {t('auth.or')}
               </Typography>
             </Divider>
 

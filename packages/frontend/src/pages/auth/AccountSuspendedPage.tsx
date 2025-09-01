@@ -61,7 +61,7 @@ const AccountSuspendedPage: React.FC = () => {
 
           {/* Header */}
           <Typography variant="h4" component="h1" gutterBottom>
-            Gate
+            Gatrix
           </Typography>
           <Typography variant="h6" gutterBottom color="error.main">
             {t('accountSuspended.title')}

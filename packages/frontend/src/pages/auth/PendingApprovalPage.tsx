@@ -64,7 +64,7 @@ const PendingApprovalPage: React.FC = () => {
 
           {/* Header */}
           <Typography variant="h4" component="h1" gutterBottom>
-            Gate
+            Gatrix
           </Typography>
           <Typography variant="h6" gutterBottom color="warning.main">
             {t('pendingApproval.title')}
@@ -77,11 +77,13 @@ const PendingApprovalPage: React.FC = () => {
                 mt: 2,
                 mb: 3,
                 p: 2,
-                backgroundColor: 'grey.100',
+                backgroundColor: 'action.hover',
+                border: 1,
+                borderColor: 'divider',
                 borderRadius: 1,
               }}
             >
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.primary" fontWeight="medium">
                 {email}
               </Typography>
             </Box>
