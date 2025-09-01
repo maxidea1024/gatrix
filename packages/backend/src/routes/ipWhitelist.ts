@@ -19,11 +19,7 @@ router.post('/',
     action: 'whitelist_create',
     resourceType: 'whitelist',
     getResourceId: (req: any) => req.body?.ip,
-    getDetails: (req: any) => ({
-      ip: req.body?.ip,
-      description: req.body?.description,
-      body: req.body,
-    }),
+    getNewValues: (req) => req.body,
   }) as any,
   IpWhitelistController.createIpWhitelist
 );
@@ -33,13 +29,7 @@ router.post('/bulk',
     action: 'whitelist_bulk_create',
     resourceType: 'whitelist',
     getResourceId: (req: any) => `bulk_${req.body?.entries?.length || 0}_entries`,
-    getDetails: (req: any) => ({
-      entriesCount: req.body?.entries?.length || 0,
-      entries: req.body?.entries?.map((e: any) => ({
-        ipAddress: e.ipAddress,
-        purpose: e.purpose,
-      })) || [],
-    }),
+    getNewValues: (req: any) => req.body,
   }) as any,
   IpWhitelistController.bulkCreateIpWhitelists
 );
@@ -49,10 +39,7 @@ router.put('/:id',
     action: 'whitelist_update',
     resourceType: 'whitelist',
     getResourceId: (req: any) => req.params?.id,
-    getDetails: (req: any) => ({
-      id: req.params?.id,
-      updates: req.body,
-    }),
+    getNewValues: (req) => req.body,
   }) as any,
   IpWhitelistController.updateIpWhitelist
 );
@@ -62,7 +49,7 @@ router.patch('/:id/toggle',
     action: 'whitelist_toggle_status',
     resourceType: 'whitelist',
     getResourceId: (req: any) => req.params?.id,
-    getDetails: (req: any) => ({
+    getNewValues: (req: any) => ({
       id: req.params?.id,
     }),
   }) as any,
@@ -74,7 +61,7 @@ router.delete('/:id',
     action: 'whitelist_delete',
     resourceType: 'whitelist',
     getResourceId: (req: any) => req.params?.id,
-    getDetails: (req: any) => ({
+    getNewValues: (req: any) => ({
       id: req.params?.id,
     }),
   }) as any,

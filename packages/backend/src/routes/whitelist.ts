@@ -17,10 +17,7 @@ router.post('/',
     action: 'whitelist_create',
     resourceType: 'whitelist',
     getResourceId: (req) => req.body?.nickname,
-    getDetails: (req) => ({
-      nickname: req.body?.nickname,
-      ipAddress: req.body?.ipAddress,
-    }),
+    getNewValues: (req) => req.body,
   }) as any,
   WhitelistController.createWhitelist
 );
@@ -29,10 +26,7 @@ router.put('/:id',
     action: 'whitelist_update',
     resourceType: 'whitelist',
     getResourceId: (req) => req.params?.id,
-    getDetails: (req) => ({
-      whitelistId: req.params?.id,
-      updates: req.body,
-    }),
+    getNewValues: (req) => req.body,
   }) as any,
   WhitelistController.updateWhitelist
 );
@@ -41,7 +35,7 @@ router.delete('/:id',
     action: 'whitelist_delete',
     resourceType: 'whitelist',
     getResourceId: (req) => req.params?.id,
-    getDetails: (req) => ({
+    getNewValues: (req) => ({
       whitelistId: req.params?.id,
     }),
   }) as any,
@@ -53,9 +47,7 @@ router.post('/bulk',
   auditLog({
     action: 'whitelist_bulk_create',
     resourceType: 'whitelist',
-    getDetails: (req) => ({
-      entriesCount: req.body?.entries?.length || 0,
-    }),
+    getNewValues: (req) => req.body,
   }) as any,
   WhitelistController.bulkCreateWhitelists
 );

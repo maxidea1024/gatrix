@@ -9,7 +9,8 @@ export interface AuditLogOptions {
   action: string;
   resourceType?: string;
   getResourceId?: (req: any) => string | undefined;
-  getDetails?: (req: any, res: any) => any;
+  getOldValues?: (req: any) => any;
+  getNewValues?: (req: any, res: any) => any;
   skipIf?: (req: any, res: any) => boolean;
 }
 
@@ -45,21 +46,16 @@ export const auditLog = (options: AuditLogOptions) => {
         }
 
         const resourceId = options.getResourceId ? options.getResourceId(req) : undefined;
-        const details = options.getDetails ? options.getDetails(req, res) : undefined;
+        const oldValues = options.getOldValues ? options.getOldValues(req) : undefined;
+        const newValues = options.getNewValues ? options.getNewValues(req, res) : req.body;
 
         await AuditLogModel.create({
           userId: req.user?.userId,
           action: options.action,
           resourceType: options.resourceType,
           resourceId: resourceId,
-          details: details || {
-            method: req.method,
-            url: req.originalUrl,
-            statusCode: res.statusCode,
-            body: req.body,
-            query: req.query,
-            params: req.params,
-          },
+          oldValues: oldValues,
+          newValues: newValues,
           ipAddress: req.ip,
           userAgent: req.get('User-Agent'),
         });
@@ -78,7 +74,7 @@ export const auditUserLogin = auditLog({
   action: 'user_login',
   resourceType: 'user',
   getResourceId: (req) => req.body?.email,
-  getDetails: (req) => ({
+  getNewValues: (req) => ({
     email: req.body?.email,
     loginMethod: 'password',
   }),
@@ -88,7 +84,7 @@ export const auditUserRegister = auditLog({
   action: 'user_register',
   resourceType: 'user',
   getResourceId: (req) => req.body?.email,
-  getDetails: (req) => ({
+  getNewValues: (req) => ({
     email: req.body?.email,
     name: req.body?.name,
   }),
@@ -98,75 +94,55 @@ export const auditUserUpdate = auditLog({
   action: 'user_update',
   resourceType: 'user',
   getResourceId: (req) => req.params?.id,
-  getDetails: (req) => ({
-    userId: req.params?.id,
-    updates: req.body,
-  }),
+  getNewValues: (req) => req.body,
 });
 
 export const auditUserDelete = auditLog({
   action: 'user_delete',
   resourceType: 'user',
   getResourceId: (req) => req.params?.id,
-  getDetails: (req) => ({
-    userId: req.params?.id,
-  }),
 });
 
 export const auditUserApprove = auditLog({
   action: 'user_approve',
   resourceType: 'user',
   getResourceId: (req) => req.params?.id,
-  getDetails: (req) => ({
-    userId: req.params?.id,
-  }),
+  getNewValues: () => ({ status: 'active' }),
 });
 
 export const auditUserReject = auditLog({
   action: 'user_reject',
   resourceType: 'user',
   getResourceId: (req) => req.params?.id,
-  getDetails: (req) => ({
-    userId: req.params?.id,
-  }),
+  getNewValues: () => ({ status: 'deleted' }),
 });
 
 export const auditUserSuspend = auditLog({
   action: 'user_suspend',
   resourceType: 'user',
   getResourceId: (req) => req.params?.id,
-  getDetails: (req) => ({
-    userId: req.params?.id,
-  }),
+  getNewValues: () => ({ status: 'suspended' }),
 });
 
 export const auditUserUnsuspend = auditLog({
   action: 'user_unsuspend',
   resourceType: 'user',
   getResourceId: (req) => req.params?.id,
-  getDetails: (req) => ({
-    userId: req.params?.id,
-  }),
+  getNewValues: () => ({ status: 'active' }),
 });
 
 export const auditUserPromote = auditLog({
   action: 'user_promote',
   resourceType: 'user',
   getResourceId: (req) => req.params?.id,
-  getDetails: (req) => ({
-    userId: req.params?.id,
-    newRole: 'admin',
-  }),
+  getNewValues: () => ({ role: 'admin' }),
 });
 
 export const auditUserDemote = auditLog({
   action: 'user_demote',
   resourceType: 'user',
   getResourceId: (req) => req.params?.id,
-  getDetails: (req) => ({
-    userId: req.params?.id,
-    newRole: 'user',
-  }),
+  getNewValues: () => ({ role: 'user' }),
 });
 
 // Game world actions
@@ -174,71 +150,60 @@ export const auditGameWorldCreate = auditLog({
   action: 'game_world_create',
   resourceType: 'game_world',
   getResourceId: (req) => req.body?.worldId,
-  getDetails: (req) => ({
-    body: req.body,
-  }),
+  getNewValues: (req) => req.body,
 });
 
 export const auditGameWorldUpdate = auditLog({
   action: 'game_world_update',
   resourceType: 'game_world',
   getResourceId: (req) => req.params?.id,
-  getDetails: (req) => ({
-    id: req.params?.id,
-    updates: req.body,
-  }),
+  getNewValues: (req) => req.body,
 });
 
 export const auditGameWorldDelete = auditLog({
   action: 'game_world_delete',
   resourceType: 'game_world',
   getResourceId: (req) => req.params?.id,
-  getDetails: (req) => ({ id: req.params?.id }),
 });
 
 export const auditGameWorldToggleVisibility = auditLog({
   action: 'game_world_toggle_visibility',
   resourceType: 'game_world',
   getResourceId: (req) => req.params?.id,
-  getDetails: (req) => ({ id: req.params?.id, toggle: 'visibility' }),
+  getNewValues: (req) => ({ isVisible: req.body?.isVisible }),
 });
 
 export const auditGameWorldToggleMaintenance = auditLog({
   action: 'game_world_toggle_maintenance',
   resourceType: 'game_world',
   getResourceId: (req) => req.params?.id,
-  getDetails: (req) => ({ id: req.params?.id, toggle: 'maintenance' }),
+  getNewValues: (req) => ({ isMaintenance: req.body?.isMaintenance }),
 });
 
 export const auditGameWorldUpdateOrders = auditLog({
   action: 'game_world_update_orders',
   resourceType: 'game_world',
-  getDetails: (req) => ({
-    updates: req.body?.orderUpdates,
-  }),
+  getNewValues: (req) => ({ orderUpdates: req.body?.orderUpdates }),
 });
 
 export const auditGameWorldMoveUp = auditLog({
   action: 'game_world_update_orders',
   resourceType: 'game_world',
   getResourceId: (req) => req.params?.id,
-  getDetails: (req) => ({ id: req.params?.id, direction: 'up' }),
+  getNewValues: () => ({ direction: 'up' }),
 });
 
 export const auditGameWorldMoveDown = auditLog({
   action: 'game_world_update_orders',
   resourceType: 'game_world',
   getResourceId: (req) => req.params?.id,
-  getDetails: (req) => ({ id: req.params?.id, direction: 'down' }),
+  getNewValues: () => ({ direction: 'down' }),
 });
 
 export const auditPasswordChange = auditLog({
   action: 'password_change',
   resourceType: 'user',
   getResourceId: (req: AuthenticatedRequest) => req.user?.userId?.toString(),
-  getDetails: (req: AuthenticatedRequest) => ({
-    userId: req.user?.userId,
-  }),
 });
 
 // 기본 auditLog 함수만 유지하고 개별 미들웨어는 제거
@@ -248,8 +213,5 @@ export const auditProfileUpdate = auditLog({
   action: 'profile_update',
   resourceType: 'user',
   getResourceId: (req: AuthenticatedRequest) => req.user?.userId?.toString(),
-  getDetails: (req: AuthenticatedRequest) => ({
-    userId: req.user?.userId,
-    updates: req.body,
-  }),
+  getNewValues: (req: AuthenticatedRequest) => req.body,
 });

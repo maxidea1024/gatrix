@@ -15,11 +15,7 @@ router.post('/',
     action: 'message_template_create',
     resourceType: 'message_template',
     getResourceId: (req: any) => req.body?.name,
-    getDetails: (req: any) => ({
-      name: req.body?.name,
-      type: req.body?.type,
-      body: req.body,
-    }),
+    getNewValues: (req) => req.body,
   }) as any,
   MessageTemplateController.create as any
 );
@@ -27,10 +23,7 @@ router.post('/bulk-delete',
   auditLog({
     action: 'message_template_bulk_delete',
     resourceType: 'message_template',
-    getDetails: (req: any) => ({
-      ids: req.body?.ids,
-      count: req.body?.ids?.length,
-    }),
+    getNewValues: (req) => req.body,
   }) as any,
   MessageTemplateController.bulkDelete as any
 );
@@ -39,10 +32,7 @@ router.put('/:id',
     action: 'message_template_update',
     resourceType: 'message_template',
     getResourceId: (req: any) => req.params?.id,
-    getDetails: (req: any) => ({
-      id: req.params?.id,
-      updates: req.body,
-    }),
+    getNewValues: (req) => req.body,
   }) as any,
   MessageTemplateController.update as any
 );
@@ -51,7 +41,7 @@ router.delete('/:id',
     action: 'message_template_delete',
     resourceType: 'message_template',
     getResourceId: (req: any) => req.params?.id,
-    getDetails: (req: any) => ({
+    getNewValues: (req: any) => ({
       id: req.params?.id,
     }),
   }) as any,
@@ -65,10 +55,7 @@ router.put('/:id/tags',
     action: 'message_template_set_tags',
     resourceType: 'message_template',
     getResourceId: (req: any) => req.params?.id,
-    getDetails: (req: any) => ({
-      templateId: req.params?.id,
-      tagIds: req.body,
-    }),
+    getNewValues: (req) => req.body,
   }) as any,
   MessageTemplateController.setTags as any
 );

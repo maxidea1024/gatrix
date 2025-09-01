@@ -8,9 +8,10 @@ export class AuditLogModel {
       const [insertId] = await db('g_audit_logs').insert({
         userId: auditData.userId || null,
         action: auditData.action,
-        resourceType: auditData.resourceType || null,
-        resourceId: auditData.resourceId || null,
-        details: auditData.details ? JSON.stringify(auditData.details) : null,
+        entityType: auditData.resourceType || null,
+        entityId: auditData.resourceId || null,
+        oldValues: auditData.oldValues ? JSON.stringify(auditData.oldValues) : null,
+        newValues: auditData.newValues ? JSON.stringify(auditData.newValues) : null,
         ipAddress: auditData.ipAddress || null,
         userAgent: auditData.userAgent || null,
       });
@@ -94,7 +95,7 @@ export class AuditLogModel {
         }
 
         if (filters.resourceType) {
-          query.where('al.resourceType', filters.resourceType);
+          query.where('al.entityType', filters.resourceType);
         }
 
         if (filters.user) {

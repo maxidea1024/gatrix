@@ -22,12 +22,13 @@ exports.up = async function() {
       id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
       email VARCHAR(255) NOT NULL UNIQUE,
-      password VARCHAR(255) NULL,
+      passwordHash VARCHAR(255) NULL,
       role ENUM('admin', 'user') NOT NULL DEFAULT 'user',
       status ENUM('active', 'inactive', 'deleted') NOT NULL DEFAULT 'active',
       emailVerified BOOLEAN NOT NULL DEFAULT FALSE,
       emailVerifiedAt TIMESTAMP NULL,
       lastLoginAt TIMESTAMP NULL,
+      avatarUrl VARCHAR(500) NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       INDEX idx_email (email),
@@ -91,17 +92,17 @@ exports.up = async function() {
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_game_worlds (
       id INT AUTO_INCREMENT PRIMARY KEY,
+      worldId VARCHAR(50) NOT NULL UNIQUE,
       name VARCHAR(255) NOT NULL,
       description TEXT NULL,
-      serverUrl VARCHAR(500) NOT NULL,
-      isActive BOOLEAN NOT NULL DEFAULT TRUE,
+      isVisible BOOLEAN NOT NULL DEFAULT TRUE,
       isMaintenance BOOLEAN NOT NULL DEFAULT FALSE,
-      maintenanceMessage TEXT NULL,
       displayOrder INT NOT NULL DEFAULT 0,
       tags JSON NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      INDEX idx_active (isActive),
+      INDEX idx_world_id (worldId),
+      INDEX idx_visible (isVisible),
       INDEX idx_maintenance (isMaintenance),
       INDEX idx_display_order (displayOrder)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
@@ -304,7 +305,7 @@ exports.up = async function() {
   console.log('✓ Job system tables created');
 
   // Get admin credentials from environment variables
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@gatrix.local';
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@gatrix.com';
   const adminName = process.env.ADMIN_NAME || 'Admin';
   const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
 
@@ -314,7 +315,7 @@ exports.up = async function() {
 
   // Insert default admin user
   await connection.execute(`
-    INSERT IGNORE INTO g_users (id, name, email, password, role, status, emailVerified, createdAt, updatedAt)
+    INSERT IGNORE INTO g_users (id, name, email, passwordHash, role, status, emailVerified, createdAt, updatedAt)
     VALUES (1, ?, ?, ?, 'admin', 'active', TRUE, NOW(), NOW())
   `, [adminName, adminEmail, passwordHash]);
 

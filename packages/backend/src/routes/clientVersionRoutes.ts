@@ -30,10 +30,7 @@ router.post('/',
     action: 'client_version_create',
     resourceType: 'client_version',
     getResourceId: (req) => req.body?.version,
-    getDetails: (req) => ({
-      version: req.body?.version,
-      platform: req.body?.platform,
-    }),
+    getNewValues: (req) => req.body,
   }) as any,
   ClientVersionController.createClientVersion
 );
@@ -45,10 +42,7 @@ router.post('/bulk',
     action: 'client_version_bulk_create',
     resourceType: 'client_version',
     getResourceId: (req) => req.body?.clientVersion,
-    getDetails: (req) => ({
-      version: req.body?.clientVersion,
-      platforms: req.body?.platforms?.map((p: any) => p.platform),
-    }),
+    getNewValues: (req) => req.body,
   }) as any,
   ClientVersionController.bulkCreateClientVersions
 );
@@ -60,10 +54,7 @@ router.put('/:id',
     action: 'client_version_update',
     resourceType: 'client_version',
     getResourceId: (req) => req.params?.id,
-    getDetails: (req) => ({
-      clientVersionId: req.params?.id,
-      updates: req.body,
-    }),
+    getNewValues: (req) => req.body,
   }) as any,
   ClientVersionController.updateClientVersion
 );
@@ -75,9 +66,7 @@ router.delete('/:id',
     action: 'client_version_delete',
     resourceType: 'client_version',
     getResourceId: (req) => req.params?.id,
-    getDetails: (req) => ({
-      clientVersionId: req.params?.id,
-    }),
+    getNewValues: () => ({}),
   }) as any,
   ClientVersionController.deleteClientVersion
 );

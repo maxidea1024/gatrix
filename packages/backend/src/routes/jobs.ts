@@ -40,11 +40,7 @@ router.post('/jobs',
     action: 'job_create',
     resourceType: 'job',
     getResourceId: (req: any) => req.body?.name,
-    getDetails: (req: any) => ({
-      name: req.body?.name,
-      jobTypeId: req.body?.jobTypeId,
-      body: req.body,
-    }),
+    getNewValues: (req) => req.body,
   }) as any,
   createJob
 );
@@ -53,10 +49,7 @@ router.put('/jobs/:id',
     action: 'job_update',
     resourceType: 'job',
     getResourceId: (req: any) => req.params?.id,
-    getDetails: (req: any) => ({
-      id: req.params?.id,
-      updates: req.body,
-    }),
+    getNewValues: (req) => req.body,
   }) as any,
   updateJob
 );
@@ -65,7 +58,7 @@ router.delete('/jobs/:id',
     action: 'job_delete',
     resourceType: 'job',
     getResourceId: (req: any) => req.params?.id,
-    getDetails: (req: any) => ({
+    getNewValues: (req: any) => ({
       id: req.params?.id,
     }),
   }) as any,
@@ -76,7 +69,7 @@ router.post('/jobs/:id/execute',
     action: 'job_execute',
     resourceType: 'job',
     getResourceId: (req: any) => req.params?.id,
-    getDetails: (req: any) => ({
+    getNewValues: (req: any) => ({
       jobId: req.params?.id,
       executionType: 'manual',
     }),
@@ -92,10 +85,7 @@ router.put('/jobs/:id/tags',
     action: 'job_set_tags',
     resourceType: 'job',
     getResourceId: (req: any) => req.params?.id,
-    getDetails: (req: any) => ({
-      jobId: req.params?.id,
-      tagIds: req.body,
-    }),
+    getNewValues: (req) => req.body,
   }) as any,
   setJobTags
 );

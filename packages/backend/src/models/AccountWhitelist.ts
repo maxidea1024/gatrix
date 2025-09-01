@@ -105,20 +105,20 @@ export class WhitelistModel {
       const query = `
         SELECT
           w.id,
-          w.account_id as accountId,
-          w.ip_address as ipAddress,
-          w.start_date as startDate,
-          w.end_date as endDate,
+          w.accountId,
+          w.ipAddress,
+          w.startDate,
+          w.endDate,
           w.memo,
           w.tags,
-          w.created_by as createdBy,
-          w.created_at as createdAt,
-          w.updated_at as updatedAt,
+          w.createdBy,
+          w.createdAt,
+          w.updatedAt,
           u.name as createdByName
         FROM g_account_whitelist w
-        LEFT JOIN g_users u ON w.created_by = u.id
+        LEFT JOIN g_users u ON w.createdBy = u.id
         ${whereClause}
-        ORDER BY w.created_at DESC
+        ORDER BY w.createdAt DESC
         LIMIT ${limit} OFFSET ${offset}
       `;
 
@@ -141,18 +141,18 @@ export class WhitelistModel {
       const query = `
         SELECT
           w.id,
-          w.account_id as accountId,
-          w.ip_address as ipAddress,
-          w.start_date as startDate,
-          w.end_date as endDate,
+          w.accountId,
+          w.ipAddress,
+          w.startDate,
+          w.endDate,
           w.memo,
           w.tags,
-          w.created_by as createdBy,
-          w.created_at as createdAt,
-          w.updated_at as updatedAt,
+          w.createdBy,
+          w.createdAt,
+          w.updatedAt,
           u.name as createdByName
         FROM g_account_whitelist w
-        LEFT JOIN g_users u ON w.created_by = u.id
+        LEFT JOIN g_users u ON w.createdBy = u.id
         WHERE w.id = ?
       `;
 
@@ -166,7 +166,7 @@ export class WhitelistModel {
   static async create(data: CreateWhitelistData): Promise<Whitelist> {
     try {
       const query = `
-        INSERT INTO g_account_whitelist (account_id, ip_address, start_date, end_date, memo, tags, created_by)
+        INSERT INTO g_account_whitelist (accountId, ipAddress, startDate, endDate, memo, tags, createdBy)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `;
 
@@ -197,22 +197,22 @@ export class WhitelistModel {
       const params: any[] = [];
 
       if (data.accountId !== undefined) {
-        fields.push('account_id = ?');
+        fields.push('accountId = ?');
         params.push(data.accountId);
       }
 
       if (data.ipAddress !== undefined) {
-        fields.push('ip_address = ?');
+        fields.push('ipAddress = ?');
         params.push(data.ipAddress || null);
       }
 
       if (data.startDate !== undefined) {
-        fields.push('start_date = ?');
+        fields.push('startDate = ?');
         params.push(data.startDate || null);
       }
 
       if (data.endDate !== undefined) {
-        fields.push('end_date = ?');
+        fields.push('endDate = ?');
         params.push(data.endDate || null);
       }
 
@@ -230,7 +230,7 @@ export class WhitelistModel {
         throw new CustomError('No fields to update', 400);
       }
 
-      fields.push('updated_at = CURRENT_TIMESTAMP');
+      fields.push('updatedAt = CURRENT_TIMESTAMP');
       params.push(id);
 
       const query = `UPDATE g_account_whitelist SET ${fields.join(', ')} WHERE id = ?`;
@@ -259,7 +259,7 @@ export class WhitelistModel {
 
       const values = entries.map(() => '(?, ?, ?, ?, ?, ?)').join(', ');
       const query = `
-        INSERT INTO g_account_whitelist (nickname, ip_address, start_date, end_date, memo, created_by)
+        INSERT INTO g_account_whitelist (accountId, ipAddress, startDate, endDate, memo, createdBy)
         VALUES ${values}
       `;
 

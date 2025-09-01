@@ -71,6 +71,16 @@ class ApiService {
             return Promise.reject(error);
           }
 
+          // Don't retry for login requests - login failures should not trigger token refresh
+          if (originalRequest.url?.includes('/auth/login')) {
+            return Promise.reject(error);
+          }
+
+          // Don't retry for register requests
+          if (originalRequest.url?.includes('/auth/register')) {
+            return Promise.reject(error);
+          }
+
           originalRequest._retry = true;
 
           try {

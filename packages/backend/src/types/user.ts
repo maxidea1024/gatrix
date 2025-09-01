@@ -70,9 +70,10 @@ export interface AuditLog {
   id: number;
   userId?: number;
   action: string;
-  resourceType?: string;
-  resourceId?: string;
-  details?: any;
+  entityType?: string;
+  entityId?: number;
+  oldValues?: any;
+  newValues?: any;
   ipAddress?: string;
   userAgent?: string;
   createdAt: Date;
@@ -83,7 +84,8 @@ export interface CreateAuditLogData {
   action: string;
   resourceType?: string;
   resourceId?: string;
-  details?: any;
+  oldValues?: any;
+  newValues?: any;
   ipAddress?: string;
   userAgent?: string;
 }
