@@ -10,6 +10,33 @@ import { CustomError } from '../middleware/errorHandler';
 import { normalizeIPOrCIDR, isValidIPOrCIDR } from '../utils/ipValidation';
 import logger from '../config/logger';
 
+// CIDR 매칭 함수
+function ipMatchesCIDR(ip: string, cidr: string): boolean {
+  // 단순 IP 주소인 경우 (CIDR 표기가 아닌 경우)
+  if (!cidr.includes('/')) {
+    return ip === cidr;
+  }
+
+  try {
+    const [network, prefixLength] = cidr.split('/');
+    const prefix = parseInt(prefixLength, 10);
+
+    // IPv4 주소를 32비트 정수로 변환
+    const ipToInt = (ipAddr: string): number => {
+      return ipAddr.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
+    };
+
+    const ipInt = ipToInt(ip);
+    const networkInt = ipToInt(network);
+    const mask = (0xFFFFFFFF << (32 - prefix)) >>> 0;
+
+    return (ipInt & mask) === (networkInt & mask);
+  } catch (error) {
+    logger.error('Error in CIDR matching:', { ip, cidr, error });
+    return false;
+  }
+}
+
 export class IpWhitelistService {
   /**
    * Get all IP whitelist entries with pagination and filtering
@@ -258,8 +285,10 @@ export class IpWhitelistService {
           return true;
         }
 
-        // TODO: Implement CIDR matching logic here using ipMatchesCIDR
-        // For now, we only do exact matches
+        // CIDR 매칭 로직 구현
+        if (ipMatchesCIDR(ipAddress, entry.ipAddress)) {
+          return true;
+        }
       }
 
       return false;

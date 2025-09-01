@@ -2,8 +2,8 @@ import db from '../config/knex';
 import logger from '../config/logger';
 
 export interface JobFilters {
-  job_type_id?: number;
-  is_enabled?: boolean;
+  jobTypeId?: number;
+  isEnabled?: boolean;
   search?: string;
   limit?: number;
   offset?: number;
@@ -17,28 +17,28 @@ export interface JobListResult {
 export interface CreateJobData {
   name: string;
   description?: string;
-  job_type_id: number;
-  is_enabled: boolean;
-  job_data_map?: any;
+  jobTypeId: number;
+  isEnabled: boolean;
+  jobDataMap?: any;
   memo?: string;
-  retry_count?: number;
-  max_retry_count?: number;
-  timeout_seconds?: number;
-  created_by: number;
-  updated_by: number;
+  retryCount?: number;
+  maxRetryCount?: number;
+  timeoutSeconds?: number;
+  createdBy: number;
+  updatedBy: number;
 }
 
 export interface UpdateJobData {
   name?: string;
   description?: string;
-  job_type_id?: number;
-  is_enabled?: boolean;
-  job_data_map?: any;
+  jobTypeId?: number;
+  isEnabled?: boolean;
+  jobDataMap?: any;
   memo?: string;
-  retry_count?: number;
-  max_retry_count?: number;
-  timeout_seconds?: number;
-  updated_by: number;
+  retryCount?: number;
+  maxRetryCount?: number;
+  timeoutSeconds?: number;
+  updatedBy: number;
 }
 
 // JSON 파싱 유틸리티 함수
@@ -61,18 +61,18 @@ export class JobModel {
 
       // 기본 쿼리 빌더
       const baseQuery = () => db('g_jobs as j')
-        .leftJoin('g_job_types as jt', 'j.job_type_id', 'jt.id')
-        .leftJoin('g_users as cu', 'j.created_by', 'cu.id')
-        .leftJoin('g_users as uu', 'j.updated_by', 'uu.id');
+        .leftJoin('g_job_types as jt', 'j.jobTypeId', 'jt.id')
+        .leftJoin('g_users as cu', 'j.createdBy', 'cu.id')
+        .leftJoin('g_users as uu', 'j.updatedBy', 'uu.id');
 
       // 필터 적용 함수
       const applyFilters = (query: any) => {
-        if (filters?.job_type_id) {
-          query.where('j.job_type_id', filters.job_type_id);
+        if (filters?.jobTypeId) {
+          query.where('j.jobTypeId', filters.jobTypeId);
         }
 
-        if (filters?.is_enabled !== undefined) {
-          query.where('j.is_enabled', filters.is_enabled);
+        if (filters?.isEnabled !== undefined) {
+          query.where('j.isEnabled', filters.isEnabled);
         }
 
         if (filters?.search) {
@@ -95,12 +95,12 @@ export class JobModel {
       const dataQuery = applyFilters(baseQuery())
         .select([
           'j.*',
-          'jt.name as job_type_name',
-          'jt.display_name as job_type_display_name',
-          'cu.name as created_by_name',
-          'uu.name as updated_by_name'
+          'jt.name as jobTypeName',
+          'jt.displayName as jobTypeDisplayName',
+          'cu.name as createdByName',
+          'uu.name as updatedByName'
         ])
-        .orderBy('j.created_at', 'desc')
+        .orderBy('j.createdAt', 'desc')
         .limit(limit)
         .offset(offset);
 
@@ -118,7 +118,7 @@ export class JobModel {
 
       return { jobs, total };
     } catch (error) {
-      logger.error('Error finding jobs with pagination (Knex):', error);
+      logger.error('Error finding jobs with pagination:', error);
       throw error;
     }
   }
@@ -126,15 +126,15 @@ export class JobModel {
   static async findById(id: number): Promise<any | null> {
     try {
       const job = await db('g_jobs as j')
-        .leftJoin('g_job_types as jt', 'j.job_type_id', 'jt.id')
-        .leftJoin('g_users as cu', 'j.created_by', 'cu.id')
-        .leftJoin('g_users as uu', 'j.updated_by', 'uu.id')
+        .leftJoin('g_job_types as jt', 'j.jobTypeId', 'jt.id')
+        .leftJoin('g_users as cu', 'j.createdBy', 'cu.id')
+        .leftJoin('g_users as uu', 'j.updatedBy', 'uu.id')
         .select([
           'j.*',
-          'jt.name as job_type_name',
-          'jt.display_name as job_type_display_name',
-          'cu.name as created_by_name',
-          'uu.name as updated_by_name'
+          'jt.name as jobTypeName',
+          'jt.displayName as jobTypeDisplayName',
+          'cu.name as createdByName',
+          'uu.name as updatedByName'
         ])
         .where('j.id', id)
         .first();
@@ -143,43 +143,63 @@ export class JobModel {
 
       return {
         ...job,
-        job_data_map: safeJsonParse(job.job_data_map)
+        jobDataMap: safeJsonParse(job.jobDataMap)
       };
     } catch (error) {
-      logger.error('Error finding job by ID (Knex):', error);
+      logger.error('Error finding job by ID:', error);
       throw error;
     }
   }
 
-  static async create(jobData: any): Promise<any> {
+  static async create(jobData: CreateJobData): Promise<any> {
     try {
       const [insertId] = await db('g_jobs').insert({
-        ...jobData,
-        job_data_map: JSON.stringify(jobData.job_data_map || {}),
-        created_at: new Date(),
-        updated_at: new Date()
+        name: jobData.name,
+        description: jobData.description,
+        jobTypeId: jobData.jobTypeId,
+        isEnabled: jobData.isEnabled,
+        jobDataMap: JSON.stringify(jobData.jobDataMap || {}),
+        memo: jobData.memo,
+        retryCount: jobData.retryCount || 0,
+        maxRetryCount: jobData.maxRetryCount || 3,
+        timeoutSeconds: jobData.timeoutSeconds,
+        createdBy: jobData.createdBy,
+        updatedBy: jobData.updatedBy,
+        createdAt: new Date(),
+        updatedAt: new Date()
       });
 
       return await this.findById(insertId);
     } catch (error) {
-      logger.error('Error creating job (Knex):', error);
+      logger.error('Error creating job:', error);
       throw error;
     }
   }
 
-  static async update(id: number, jobData: any): Promise<any> {
+  static async update(id: number, jobData: UpdateJobData): Promise<any> {
     try {
+      const updateData: any = {};
+
+      if (jobData.name !== undefined) updateData.name = jobData.name;
+      if (jobData.description !== undefined) updateData.description = jobData.description;
+      if (jobData.jobTypeId !== undefined) updateData.jobTypeId = jobData.jobTypeId;
+      if (jobData.isEnabled !== undefined) updateData.isEnabled = jobData.isEnabled;
+      if (jobData.jobDataMap !== undefined) updateData.jobDataMap = JSON.stringify(jobData.jobDataMap);
+      if (jobData.memo !== undefined) updateData.memo = jobData.memo;
+      if (jobData.retryCount !== undefined) updateData.retryCount = jobData.retryCount;
+      if (jobData.maxRetryCount !== undefined) updateData.maxRetryCount = jobData.maxRetryCount;
+      if (jobData.timeoutSeconds !== undefined) updateData.timeoutSeconds = jobData.timeoutSeconds;
+      if (jobData.updatedBy !== undefined) updateData.updatedBy = jobData.updatedBy;
+
+      updateData.updatedAt = new Date();
+
       await db('g_jobs')
         .where('id', id)
-        .update({
-          ...jobData,
-          job_data_map: jobData.job_data_map ? JSON.stringify(jobData.job_data_map) : undefined,
-          updated_at: new Date()
-        });
+        .update(updateData);
 
       return await this.findById(id);
     } catch (error) {
-      logger.error('Error updating job (Knex):', error);
+      logger.error('Error updating job:', error);
       throw error;
     }
   }
@@ -188,7 +208,7 @@ export class JobModel {
     try {
       await db('g_jobs').where('id', id).del();
     } catch (error) {
-      logger.error('Error deleting job (Knex):', error);
+      logger.error('Error deleting job:', error);
       throw error;
     }
   }
@@ -215,7 +235,7 @@ export class JobModel {
         }
       });
     } catch (error) {
-      logger.error('Error setting job tags (Knex):', error);
+      logger.error('Error setting job tags:', error);
       throw error;
     }
   }
@@ -229,7 +249,20 @@ export class JobModel {
         .where('ta.entity_id', jobId)
         .orderBy('t.name');
     } catch (error) {
-      logger.error('Error getting job tags (Knex):', error);
+      logger.error('Error getting job tags:', error);
+      throw error;
+    }
+  }
+
+  static async findByName(name: string): Promise<any | null> {
+    try {
+      const job = await db('g_jobs')
+        .where('name', name)
+        .first();
+
+      return job || null;
+    } catch (error) {
+      logger.error('Error finding job by name:', error);
       throw error;
     }
   }

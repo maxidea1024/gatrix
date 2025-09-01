@@ -1,25 +1,21 @@
-import database from '../config/database';
+import db from '../config/knex';
 import logger from '../config/logger';
 import { AuditLog, CreateAuditLogData } from '../types/user';
 
 export class AuditLogModel {
   static async create(auditData: CreateAuditLogData): Promise<AuditLog> {
     try {
-      const result = await database.query(
-        `INSERT INTO g_audit_logs (userId, action, resourceType, resourceId, details, ipAddress, userAgent)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [
-          auditData.user_id || null,
-          auditData.action,
-          auditData.resource_type || null,
-          auditData.resource_id || null,
-          auditData.details ? JSON.stringify(auditData.details) : null,
-          auditData.ip_address || null,
-          auditData.user_agent || null,
-        ]
-      );
+      const [insertId] = await db('g_audit_logs').insert({
+        userId: auditData.user_id || null,
+        action: auditData.action,
+        resourceType: auditData.resource_type || null,
+        resourceId: auditData.resource_id || null,
+        details: auditData.details ? JSON.stringify(auditData.details) : null,
+        ipAddress: auditData.ip_address || null,
+        userAgent: auditData.user_agent || null,
+      });
 
-      const auditLog = await this.findById(result.insertId);
+      const auditLog = await this.findById(insertId);
       if (!auditLog) {
         throw new Error('Failed to create audit log');
       }
@@ -33,12 +29,10 @@ export class AuditLogModel {
 
   static async findById(id: number): Promise<AuditLog | null> {
     try {
-      const rows = await database.query(
-        'SELECT * FROM g_audit_logs WHERE id = ?',
-        [id]
-      );
-      
-      const auditLog = rows[0];
+      const auditLog = await db('g_audit_logs')
+        .where('id', id)
+        .first();
+
       if (auditLog && auditLog.details) {
         try {
           auditLog.details = JSON.parse(auditLog.details);
@@ -46,7 +40,7 @@ export class AuditLogModel {
           // If JSON parsing fails, keep as string
         }
       }
-      
+
       return auditLog || null;
     } catch (error) {
       logger.error('Error finding audit log by ID:', error);
@@ -70,7 +64,7 @@ export class AuditLogModel {
     try {
       // Check if table exists first
       try {
-        await database.query('SELECT 1 FROM g_audit_logs LIMIT 1');
+        await db('g_audit_logs').select(1).limit(1);
       } catch (error: any) {
         if (error.code === 'ER_NO_SUCH_TABLE') {
           logger.error('g_audit_logs table does not exist. Please run migrations.');
@@ -78,86 +72,86 @@ export class AuditLogModel {
         }
         throw error;
       }
+
       const offset = (page - 1) * limit;
-      const whereConditions: string[] = [];
-      const whereValues: any[] = [];
 
-      if (filters.user_id) {
-        whereConditions.push('userId = ?');
-        whereValues.push(filters.user_id);
-      }
+      // Build base query
+      const baseQuery = () => db('g_audit_logs as al')
+        .leftJoin('g_users as u', 'al.userId', 'u.id');
 
-      if (filters.ip_address) {
-        whereConditions.push('ipAddress LIKE ?');
-        whereValues.push(`%${filters.ip_address}%`);
-      }
+      // Apply filters function
+      const applyFilters = (query: any) => {
+        if (filters.user_id) {
+          query.where('al.userId', filters.user_id);
+        }
 
-      if (filters.action) {
-        whereConditions.push('action = ?');
-        whereValues.push(filters.action);
-      }
+        if (filters.ip_address) {
+          query.where('al.ipAddress', 'like', `%${filters.ip_address}%`);
+        }
 
-      if (filters.resource_type) {
-        whereConditions.push('resourceType = ?');
-        whereValues.push(filters.resource_type);
-      }
+        if (filters.action) {
+          query.where('al.action', filters.action);
+        }
 
-      if (filters.user) {
-        whereConditions.push('(u.email LIKE ? OR u.name LIKE ?)');
-        whereValues.push(`%${filters.user}%`, `%${filters.user}%`);
-      }
+        if (filters.resource_type) {
+          query.where('al.resourceType', filters.resource_type);
+        }
 
-      if (filters.start_date) {
-        whereConditions.push('createdAt >= ?');
-        whereValues.push(filters.start_date);
-      }
+        if (filters.user) {
+          query.where(function(this: any) {
+            this.where('u.email', 'like', `%${filters.user}%`)
+                .orWhere('u.name', 'like', `%${filters.user}%`);
+          });
+        }
 
-      if (filters.end_date) {
-        whereConditions.push('createdAt <= ?');
-        whereValues.push(filters.end_date);
-      }
+        if (filters.start_date) {
+          query.where('al.createdAt', '>=', filters.start_date);
+        }
 
-      const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+        if (filters.end_date) {
+          query.where('al.createdAt', '<=', filters.end_date);
+        }
+
+        return query;
+      };
 
       logger.debug('AuditLog findAll query details:', {
-        whereConditions,
-        whereValues,
-        whereClause,
+        filters,
         limit,
         offset,
         page
       });
 
       // Get total count
-      const countQuery = `SELECT COUNT(*) as total FROM g_audit_logs ${whereClause}`;
-      logger.debug('Count query:', { query: countQuery, params: whereValues });
-
-      const countResult = await database.query(countQuery, whereValues);
-      const total = countResult[0].total;
-
-      logger.debug('Count result:', { total });
+      const countQuery = applyFilters(baseQuery())
+        .count('al.id as total')
+        .first();
 
       // Get audit logs with user information
-      // Note: Some MySQL drivers don't allow binding LIMIT/OFFSET as parameters reliably.
-      // Sanitize and inline numeric LIMIT/OFFSET values instead of using placeholders.
       const safeLimit = Math.min(Math.max(Number(limit) || 10, 1), 1000);
       const safeOffset = Math.max(Number(offset) || 0, 0);
-      const queryParams = [...whereValues];
-      const mainQuery = `SELECT
-           al.*,
-           u.name as user_name,
-           u.email as user_email
-         FROM g_audit_logs al
-         LEFT JOIN g_users u ON al.userId = u.id
-         ${whereClause}
-         ORDER BY al.createdAt DESC
-         LIMIT ${safeLimit} OFFSET ${safeOffset}`;
 
-      logger.debug('Main query:', { query: mainQuery, params: queryParams });
+      const logsQuery = applyFilters(baseQuery())
+        .select([
+          'al.*',
+          'u.name as user_name',
+          'u.email as user_email'
+        ])
+        .orderBy('al.createdAt', 'desc')
+        .limit(safeLimit)
+        .offset(safeOffset);
 
-      const logs = await database.query(mainQuery, queryParams);
+      logger.debug('Executing queries...');
 
-      logger.debug('Query result:', { logsCount: logs.length });
+      // Execute queries in parallel
+      const [countResult, logs] = await Promise.all([
+        countQuery,
+        logsQuery
+      ]);
+
+      const total = countResult?.total || 0;
+
+      logger.debug('Query result:', { logsCount: logs.length, total });
 
       // Parse JSON details
       logs.forEach((log: any) => {
@@ -229,13 +223,12 @@ export class AuditLogModel {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-      const result = await database.query(
-        'DELETE FROM g_audit_logs WHERE createdAt < ?',
-        [cutoffDate]
-      );
+      const result = await db('g_audit_logs')
+        .where('createdAt', '<', cutoffDate)
+        .del();
 
-      logger.info(`Deleted ${result.affectedRows} old audit logs older than ${daysToKeep} days`);
-      return result.affectedRows;
+      logger.info(`Deleted ${result} old audit logs older than ${daysToKeep} days`);
+      return result;
     } catch (error) {
       logger.error('Error deleting old audit logs:', error);
       throw error;
@@ -262,16 +255,22 @@ export class AuditLogModel {
 
       const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
-      const stats = await database.query(
-        `SELECT action, COUNT(*) as count
-         FROM g_audit_logs
-         ${whereClause}
-         GROUP BY action
-         ORDER BY count DESC`,
-        whereValues
-      );
+      const query = db('g_audit_logs')
+        .select('action')
+        .count('* as count')
+        .groupBy('action')
+        .orderBy('count', 'desc');
 
-      return stats;
+      if (startDate) {
+        query.where('createdAt', '>=', startDate);
+      }
+      if (endDate) {
+        query.where('createdAt', '<=', endDate);
+      }
+
+      const stats = await query;
+
+      return stats as { action: string; count: number }[];
     } catch (error) {
       logger.error('Error getting action stats:', error);
       throw error;

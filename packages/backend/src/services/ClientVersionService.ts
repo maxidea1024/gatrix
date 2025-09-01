@@ -134,10 +134,35 @@ export class ClientVersionService {
       whereConditions.updatedBy = filters.updatedBy;
     }
 
-    // 날짜 필터는 나중에 구현
-    // if (filters.createdAtFrom || filters.createdAtTo) {
-    //   // TODO: 날짜 범위 필터 구현
-    // }
+    // 날짜 필터 구현
+    if (filters.createdAtFrom || filters.createdAtTo) {
+      const dateFilters: any = {};
+      if (filters.createdAtFrom) {
+        dateFilters.createdAtFrom = filters.createdAtFrom;
+      }
+      if (filters.createdAtTo) {
+        dateFilters.createdAtTo = filters.createdAtTo;
+      }
+
+      const result = await ClientVersionModel.findAll({
+        ...dateFilters,
+        limit,
+        offset,
+        sortBy,
+        sortOrder,
+      });
+      const { clientVersions, total } = result;
+
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        clientVersions,
+        total,
+        page,
+        limit,
+        totalPages,
+      };
+    }
 
     // 전체 검색 - 간단한 구현
     if (filters.search) {

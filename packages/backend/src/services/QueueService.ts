@@ -333,8 +333,35 @@ export class QueueService {
     const { payload } = job.data;
     logger.info('Processing email job:', { jobId: job.id, to: payload.to });
 
-    // TODO: Implement email sending logic
-    // await emailService.sendEmail(payload);
+    try {
+      // 이메일 발송 로직 구현
+      const nodemailer = require('nodemailer');
+
+      // 개발 환경에서는 Ethereal Email 사용
+      const transporter = nodemailer.createTransporter({
+        host: process.env.SMTP_HOST || 'smtp.ethereal.email',
+        port: parseInt(process.env.SMTP_PORT || '587'),
+        secure: false,
+        auth: {
+          user: process.env.SMTP_USER || 'ethereal.user@ethereal.email',
+          pass: process.env.SMTP_PASS || 'ethereal.pass'
+        }
+      });
+
+      const mailOptions = {
+        from: process.env.SMTP_FROM || 'noreply@gatrix.com',
+        to: payload.to,
+        subject: payload.subject || 'Notification',
+        text: payload.body || payload.text,
+        html: payload.html
+      };
+
+      const info = await transporter.sendMail(mailOptions);
+      logger.info('Email sent successfully:', { jobId: job.id, messageId: info.messageId });
+    } catch (error) {
+      logger.error('Email sending failed:', { jobId: job.id, error });
+      throw error;
+    }
 
     logger.info('Email job completed:', job.id);
   }

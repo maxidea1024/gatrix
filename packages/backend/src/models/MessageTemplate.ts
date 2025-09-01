@@ -118,7 +118,7 @@ export class MessageTemplateModel {
         total
       };
     } catch (error) {
-      logger.error('Error finding message templates with pagination (Knex):', error);
+      logger.error('Error finding message templates with pagination:', error);
       throw error;
     }
   }
@@ -138,7 +138,7 @@ export class MessageTemplateModel {
 
       return template;
     } catch (error) {
-      logger.error('Error finding message template by ID (Knex):', error);
+      logger.error('Error finding message template by ID:', error);
       throw error;
     }
   }
@@ -161,7 +161,7 @@ export class MessageTemplateModel {
         return await this.findById(insertId);
       });
     } catch (error) {
-      logger.error('Error creating message template (Knex):', error);
+      logger.error('Error creating message template:', error);
       throw error;
     }
   }
@@ -184,7 +184,7 @@ export class MessageTemplateModel {
         return await this.findById(id);
       });
     } catch (error) {
-      logger.error('Error updating message template (Knex):', error);
+      logger.error('Error updating message template:', error);
       throw error;
     }
   }
@@ -195,7 +195,7 @@ export class MessageTemplateModel {
         .where('id', id)
         .del();
     } catch (error) {
-      logger.error('Error deleting message template (Knex):', error);
+      logger.error('Error deleting message template:', error);
       throw error;
     }
   }
@@ -212,7 +212,7 @@ export class MessageTemplateModel {
 
       return await query.first();
     } catch (error) {
-      logger.error('Error finding message template by name (Knex):', error);
+      logger.error('Error finding message template by name:', error);
       throw error;
     }
   }
@@ -239,7 +239,7 @@ export class MessageTemplateModel {
         }
       });
     } catch (error) {
-      logger.error('Error setting message template tags (Knex):', error);
+      logger.error('Error setting message template tags:', error);
       throw error;
     }
   }
@@ -253,7 +253,7 @@ export class MessageTemplateModel {
         .where('ta.entityId', templateId)
         .orderBy('t.name');
     } catch (error) {
-      logger.error('Error getting message template tags (Knex):', error);
+      logger.error('Error getting message template tags:', error);
       throw error;
     }
   }

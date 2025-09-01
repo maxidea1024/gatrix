@@ -126,24 +126,31 @@ export const createJob = async (req: Request, res: Response) => {
       });
     }
 
-    // Job 이름 중복 검증 (Knex 모델에서는 별도 구현 필요)
-    // TODO: findByName 메서드를 JobKnexModel에 추가하거나 여기서 직접 체크
+    // Job 이름 중복 검증
+    const existingJob = await JobModel.findByName(name);
+    if (existingJob) {
+      return res.status(409).json({
+        success: false,
+        message: 'Job name already exists',
+        error: { message: 'A job with this name already exists' }
+      });
+    }
 
     // 사용자 ID 가져오기 (인증된 사용자)
     const userId = (req as any).user?.id;
 
     const jobData: CreateJobData = {
       name,
-      job_type_id,
-      job_data_map,
+      jobTypeId: job_type_id,
+      jobDataMap: job_data_map,
       description,
       memo,
-      is_enabled,
-      retry_count,
-      max_retry_count,
-      timeout_seconds,
-      created_by: userId,
-      updated_by: userId
+      isEnabled: is_enabled,
+      retryCount: retry_count,
+      maxRetryCount: max_retry_count,
+      timeoutSeconds: timeout_seconds,
+      createdBy: userId,
+      updatedBy: userId
     };
 
     const createdJob = await JobModel.create(jobData);
@@ -200,18 +207,25 @@ export const updateJob = async (req: Request, res: Response) => {
     const userId = (req as any).user?.id;
 
     // Job 이름 중복 검증 (이름이 변경되는 경우에만)
-    // TODO: findByName 메서드를 JobModel에 추가하거나 여기서 직접 체크
+    const existingJobByName = await JobModel.findByName(name);
+    if (existingJobByName && existingJobByName.id !== jobId) {
+      return res.status(409).json({
+        success: false,
+        message: 'Job name already exists',
+        error: { message: 'A job with this name already exists' }
+      });
+    }
 
     const updateData: UpdateJobData = {
       name,
-      job_data_map,
+      jobDataMap: job_data_map,
       description,
       memo,
-      is_enabled,
-      retry_count,
-      max_retry_count,
-      timeout_seconds,
-      updated_by: userId
+      isEnabled: is_enabled,
+      retryCount: retry_count,
+      maxRetryCount: max_retry_count,
+      timeoutSeconds: timeout_seconds,
+      updatedBy: userId
     };
 
     const updatedJob = await JobModel.update(jobId, updateData);

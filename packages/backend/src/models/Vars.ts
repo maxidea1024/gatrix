@@ -1,16 +1,20 @@
-import database from '../config/database';
+import db from '../config/knex';
 
 export default class VarsModel {
   static async get(key: string): Promise<string | null> {
-    const rows = await database.query(`SELECT \`value\` FROM g_vars WHERE \`key\` = ?`, [key]);
-    return rows[0]?.value ?? null;
+    const result = await db('g_vars')
+      .select('varValue')
+      .where('varKey', key)
+      .first();
+
+    return result?.varValue ?? null;
   }
 
   static async set(key: string, value: string | null): Promise<void> {
-    await database.query(
-      `INSERT INTO g_vars (\`key\`, \`value\`) VALUES (?, ?) ON DUPLICATE KEY UPDATE \`value\` = VALUES(\`value\`)`,
-      [key, value]
-    );
+    await db('g_vars')
+      .insert({ varKey: key, varValue: value })
+      .onConflict('varKey')
+      .merge({ varValue: value });
   }
 }
 

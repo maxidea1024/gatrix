@@ -6,11 +6,11 @@ export interface User {
   avatarUrl?: string;
   role: 'admin' | 'user';
   status: 'pending' | 'active' | 'suspended' | 'deleted';
-  email_verified: boolean;
-  email_verified_at?: string;
-  last_login_at?: string;
-  created_at: string;
-  updated_at: string;
+  emailVerified: boolean;
+  emailVerifiedAt?: string;
+  lastLoginAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AuthUser extends User {
@@ -97,16 +97,16 @@ export interface UserFilters {
 // Audit log types
 export interface AuditLog {
   id: number;
-  user_id?: number;
-  user_name?: string;
-  user_email?: string;
+  userId?: number;
+  userName?: string;
+  userEmail?: string;
   action: string;
-  resource_type?: string;
-  resource_id?: string;
+  resourceType?: string;
+  resourceId?: string;
   details?: any;
-  ip_address?: string;
-  user_agent?: string;
-  created_at: string;
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: string;
 }
 
 // Error types

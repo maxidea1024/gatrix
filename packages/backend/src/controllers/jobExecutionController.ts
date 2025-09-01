@@ -5,22 +5,22 @@ import logger from '../config/logger';
 // Job 실행 이력 목록 조회
 export const getJobExecutions = async (req: Request, res: Response) => {
   try {
-    const { 
-      job_id, 
-      schedule_id, 
-      status, 
-      date_from, 
-      date_to, 
-      limit = 50, 
-      offset = 0 
+    const {
+      jobId,
+      scheduleId,
+      status,
+      dateFrom,
+      dateTo,
+      limit = 50,
+      offset = 0
     } = req.query;
-    
+
     const filters: any = {};
-    if (job_id) filters.job_id = parseInt(job_id as string);
-    if (schedule_id) filters.schedule_id = parseInt(schedule_id as string);
+    if (jobId) filters.jobId = parseInt(jobId as string);
+    if (scheduleId) filters.scheduleId = parseInt(scheduleId as string);
     if (status) filters.status = status as string;
-    if (date_from) filters.date_from = date_from as string;
-    if (date_to) filters.date_to = date_to as string;
+    if (dateFrom) filters.dateFrom = dateFrom as string;
+    if (dateTo) filters.dateTo = dateTo as string;
     if (limit) filters.limit = parseInt(limit as string);
     if (offset) filters.offset = parseInt(offset as string);
 

@@ -121,7 +121,7 @@ export class ClientVersionModel {
         total
       };
     } catch (error) {
-      logger.error('Error finding client versions (Knex):', error);
+      logger.error('Error finding client versions:', error);
       throw error;
     }
   }
@@ -151,7 +151,7 @@ export class ClientVersionModel {
         tags
       };
     } catch (error) {
-      logger.error('Error finding client version by ID (Knex):', error);
+      logger.error('Error finding client version by ID:', error);
       throw error;
     }
   }
@@ -166,7 +166,7 @@ export class ClientVersionModel {
 
       return await this.findById(insertId);
     } catch (error) {
-      logger.error('Error creating client version (Knex):', error);
+      logger.error('Error creating client version:', error);
       throw error;
     }
   }
@@ -182,7 +182,7 @@ export class ClientVersionModel {
 
       return await this.findById(id);
     } catch (error) {
-      logger.error('Error updating client version (Knex):', error);
+      logger.error('Error updating client version:', error);
       throw error;
     }
   }
@@ -191,7 +191,7 @@ export class ClientVersionModel {
     try {
       await db('g_client_versions').where('id', id).del();
     } catch (error) {
-      logger.error('Error deleting client version (Knex):', error);
+      logger.error('Error deleting client version:', error);
       throw error;
     }
   }
@@ -212,7 +212,7 @@ export class ClientVersionModel {
         return results;
       });
     } catch (error) {
-      logger.error('Error bulk creating client versions (Knex):', error);
+      logger.error('Error bulk creating client versions:', error);
       throw error;
     }
   }
@@ -228,7 +228,7 @@ export class ClientVersionModel {
         });
       return { affectedRows: ids.length };
     } catch (error) {
-      logger.error('Error bulk updating client version status (Knex):', error);
+      logger.error('Error bulk updating client version status:', error);
       throw error;
     }
   }
@@ -242,7 +242,7 @@ export class ClientVersionModel {
         .orderBy('platform');
       return result.map(row => row.platform);
     } catch (error) {
-      logger.error('Error getting platforms (Knex):', error);
+      logger.error('Error getting platforms:', error);
       throw error;
     }
   }
@@ -260,7 +260,7 @@ export class ClientVersionModel {
       const result = await query.first();
       return !!result;
     } catch (error) {
-      logger.error('Error checking duplicate (Knex):', error);
+      logger.error('Error checking duplicate:', error);
       throw error;
     }
   }
@@ -287,7 +287,7 @@ export class ClientVersionModel {
         }
       });
     } catch (error) {
-      logger.error('Error setting client version tags (Knex):', error);
+      logger.error('Error setting client version tags:', error);
       throw error;
     }
   }
@@ -301,7 +301,7 @@ export class ClientVersionModel {
         .where('ta.entityId', clientVersionId)
         .orderBy('t.name');
     } catch (error) {
-      logger.error('Error getting client version tags (Knex):', error);
+      logger.error('Error getting client version tags:', error);
       throw error;
     }
   }

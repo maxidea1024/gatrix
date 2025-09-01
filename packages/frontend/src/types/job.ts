@@ -1,16 +1,16 @@
 export interface JobType {
   id: number;
   name: string;
-  display_name: string;
+  displayName: string;
   description?: string;
-  schema_definition?: JobSchemaDefinition;
-  is_enabled: boolean;
-  created_at: string;
-  updated_at: string;
-  created_by?: number;
-  updated_by?: number;
-  created_by_name?: string;
-  updated_by_name?: string;
+  schemaDefinition?: JobSchemaDefinition;
+  isEnabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: number;
+  updatedBy?: number;
+  createdByName?: string;
+  updatedByName?: string;
 }
 
 export interface JobSchemaDefinition {
@@ -33,45 +33,45 @@ export interface JobSchemaField {
 export interface Job {
   id: number;
   name: string;
-  job_type_id: number;
-  job_data_map?: any;
+  jobTypeId: number;
+  jobDataMap?: any;
   description?: string;
   memo?: string;
-  is_enabled: boolean;
-  retry_count: number;
-  max_retry_count: number;
-  timeout_seconds: number;
-  created_at: string;
-  updated_at: string;
-  created_by?: number;
-  updated_by?: number;
-  created_by_name?: string;
-  updated_by_name?: string;
-  job_type_name?: string;
-  job_type_display_name?: string;
+  isEnabled: boolean;
+  retryCount: number;
+  maxRetryCount: number;
+  timeoutSeconds: number;
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: number;
+  updatedBy?: number;
+  createdByName?: string;
+  updatedByName?: string;
+  jobTypeName?: string;
+  jobTypeDisplayName?: string;
 }
 
 export interface CreateJobData {
   name: string;
-  job_type_id: number;
-  job_data_map?: any;
+  jobTypeId: number;
+  jobDataMap?: any;
   description?: string;
   memo?: string;
-  is_enabled?: boolean;
-  retry_count?: number;
-  max_retry_count?: number;
-  timeout_seconds?: number;
+  isEnabled?: boolean;
+  retryCount?: number;
+  maxRetryCount?: number;
+  timeoutSeconds?: number;
 }
 
 export interface UpdateJobData {
   name?: string;
-  job_data_map?: any;
+  jobDataMap?: any;
   description?: string;
   memo?: string;
-  is_enabled?: boolean;
-  retry_count?: number;
-  max_retry_count?: number;
-  timeout_seconds?: number;
+  isEnabled?: boolean;
+  retryCount?: number;
+  maxRetryCount?: number;
+  timeoutSeconds?: number;
 }
 
 export enum JobExecutionStatus {
@@ -85,24 +85,24 @@ export enum JobExecutionStatus {
 
 export interface JobExecution {
   id: number;
-  job_id: number;
-  schedule_id?: number;
+  jobId: number;
+  scheduleId?: number;
   status: JobExecutionStatus;
-  started_at?: string;
-  completed_at?: string;
+  startedAt?: string;
+  completedAt?: string;
   result?: any;
-  error_message?: string;
-  retry_attempt: number;
-  execution_time_ms?: number;
-  created_at: string;
-  job_name?: string;
-  job_type_name?: string;
-  schedule_name?: string;
+  errorMessage?: string;
+  retryAttempt: number;
+  executionTimeMs?: number;
+  createdAt: string;
+  jobName?: string;
+  jobTypeName?: string;
+  scheduleName?: string;
 }
 
 export interface JobFilters {
-  job_type_id?: number;
-  is_enabled?: boolean;
+  jobTypeId?: number;
+  isEnabled?: boolean;
   search?: string;
   limit?: number;
   offset?: number;
@@ -121,11 +121,11 @@ export interface JobListResponse {
 }
 
 export interface JobExecutionFilters {
-  job_id?: number;
-  schedule_id?: number;
+  jobId?: number;
+  scheduleId?: number;
   status?: JobExecutionStatus;
-  date_from?: string;
-  date_to?: string;
+  dateFrom?: string;
+  dateTo?: string;
   limit?: number;
   offset?: number;
 }

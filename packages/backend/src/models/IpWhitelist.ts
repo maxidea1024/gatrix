@@ -120,7 +120,7 @@ export class IpWhitelistModel {
         totalPages,
       };
     } catch (error) {
-      logger.error('Error finding IP whitelists (Knex):', error);
+      logger.error('Error finding IP whitelists:', error);
       throw new Error('Failed to fetch IP whitelists');
     }
   }
@@ -140,7 +140,7 @@ export class IpWhitelistModel {
 
       return ipWhitelist ? this.mapRowToIpWhitelist(ipWhitelist) : null;
     } catch (error) {
-      logger.error('Error finding IP whitelist by ID (Knex):', error);
+      logger.error('Error finding IP whitelist by ID:', error);
       throw error;
     }
   }
@@ -155,7 +155,7 @@ export class IpWhitelistModel {
 
       return await this.findById(insertId);
     } catch (error) {
-      logger.error('Error creating IP whitelist (Knex):', error);
+      logger.error('Error creating IP whitelist:', error);
       throw error;
     }
   }
@@ -171,7 +171,7 @@ export class IpWhitelistModel {
 
       return await this.findById(id);
     } catch (error) {
-      logger.error('Error updating IP whitelist (Knex):', error);
+      logger.error('Error updating IP whitelist:', error);
       throw error;
     }
   }
@@ -180,7 +180,7 @@ export class IpWhitelistModel {
     try {
       await db('g_ip_whitelist').where('id', id).del();
     } catch (error) {
-      logger.error('Error deleting IP whitelist (Knex):', error);
+      logger.error('Error deleting IP whitelist:', error);
       throw error;
     }
   }
@@ -210,7 +210,7 @@ export class IpWhitelistModel {
         .where('ip', ip)
         .first();
     } catch (error) {
-      logger.error('Error finding IP whitelist by IP address (Knex):', error);
+      logger.error('Error finding IP whitelist by IP address:', error);
       throw error;
     }
   }
@@ -237,7 +237,7 @@ export class IpWhitelistModel {
         }
       });
     } catch (error) {
-      logger.error('Error setting IP whitelist tags (Knex):', error);
+      logger.error('Error setting IP whitelist tags:', error);
       throw error;
     }
   }
@@ -251,7 +251,7 @@ export class IpWhitelistModel {
         .where('ta.entity_id', whitelistId)
         .orderBy('t.name');
     } catch (error) {
-      logger.error('Error getting IP whitelist tags (Knex):', error);
+      logger.error('Error getting IP whitelist tags:', error);
       throw error;
     }
   }

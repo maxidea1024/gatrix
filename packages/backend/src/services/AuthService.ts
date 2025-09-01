@@ -4,6 +4,7 @@ import { JwtUtils } from '../utils/jwt';
 import { CustomError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 import { CreateUserData, UserWithoutPassword } from '../types/user';
+import db from '../config/knex';
 
 export interface LoginCredentials {
   email: string;
@@ -191,18 +192,41 @@ export class AuthService {
         return;
       }
 
-      // In a real application, you would:
-      // 1. Generate a secure reset token
-      // 2. Store it in database with expiration
-      // 3. Send email with reset link
-      
-      // For now, just log the request
-      logger.info('Password reset requested:', {
+      // 1. 보안 리셋 토큰 생성
+      const crypto = require('crypto');
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const expiresAt = new Date(Date.now() + 3600000); // 1시간 후 만료
+
+      // 2. 데이터베이스에 토큰 저장
+      await db('g_password_reset_tokens').insert({
+        userId: user.id,
+        token: resetToken,
+        expiresAt,
+        createdAt: new Date()
+      });
+
+      // 3. 이메일 발송
+      const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+
+      // QueueService를 통해 이메일 발송 (비동기)
+      const QueueService = require('./QueueService').default;
+      await QueueService.addEmailJob({
+        to: user.email,
+        subject: 'Password Reset Request',
+        html: `
+          <h2>Password Reset Request</h2>
+          <p>You requested a password reset. Click the link below to reset your password:</p>
+          <a href="${resetUrl}">Reset Password</a>
+          <p>This link will expire in 1 hour.</p>
+          <p>If you didn't request this, please ignore this email.</p>
+        `,
+        text: `Password reset requested. Visit: ${resetUrl} (expires in 1 hour)`
+      });
+
+      logger.info('Password reset email sent:', {
         userId: user.id,
         email: user.email,
       });
-
-      // TODO: Implement email sending and token generation
     } catch (error) {
       logger.error('Password reset error:', error);
       throw new CustomError('Password reset failed', 500);

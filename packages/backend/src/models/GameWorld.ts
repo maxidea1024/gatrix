@@ -1,3 +1,4 @@
+import db from '../config/knex';
 import database from '../config/database';
 import logger from '../config/logger';
 
@@ -46,11 +47,11 @@ export interface GameWorldListParams {
 export class GameWorldModel {
   static async findById(id: number): Promise<GameWorld | null> {
     try {
-      const rows = await database.query(
-        'SELECT * FROM g_game_worlds WHERE id = ?',
-        [id]
-      );
-      return rows[0] || null;
+      const gameWorld = await db('g_game_worlds')
+        .where('id', id)
+        .first();
+
+      return gameWorld || null;
     } catch (error) {
       logger.error('Error finding game world by ID:', error);
       throw error;
@@ -59,11 +60,11 @@ export class GameWorldModel {
 
   static async findByWorldId(worldId: string): Promise<GameWorld | null> {
     try {
-      const rows = await database.query(
-        'SELECT * FROM g_game_worlds WHERE worldId = ?',
-        [worldId]
-      );
-      return rows[0] || null;
+      const gameWorld = await db('g_game_worlds')
+        .where('worldId', worldId)
+        .first();
+
+      return gameWorld || null;
     } catch (error) {
       logger.error('Error finding game world by world ID:', error);
       throw error;

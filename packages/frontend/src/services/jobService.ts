@@ -105,11 +105,11 @@ export const jobService = {
 
   async getAllJobExecutions(filters?: JobExecutionFilters): Promise<JobExecution[]> {
     const params = new URLSearchParams();
-    if (filters?.job_id) params.append('job_id', filters.job_id.toString());
-    if (filters?.schedule_id) params.append('schedule_id', filters.schedule_id.toString());
+    if (filters?.jobId) params.append('jobId', filters.jobId.toString());
+    if (filters?.scheduleId) params.append('scheduleId', filters.scheduleId.toString());
     if (filters?.status) params.append('status', filters.status);
-    if (filters?.date_from) params.append('date_from', filters.date_from);
-    if (filters?.date_to) params.append('date_to', filters.date_to);
+    if (filters?.dateFrom) params.append('dateFrom', filters.dateFrom);
+    if (filters?.dateTo) params.append('dateTo', filters.dateTo);
     if (filters?.limit) params.append('limit', filters.limit.toString());
     if (filters?.offset) params.append('offset', filters.offset.toString());
 

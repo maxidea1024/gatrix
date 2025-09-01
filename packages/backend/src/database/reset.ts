@@ -11,28 +11,26 @@ async function dropAllTables() {
   try {
     console.log('Starting database reset...');
 
-    // Disable foreign key checks
+    // Disable foreign key checks to allow dropping tables with dependencies
     await database.query('SET FOREIGN_KEY_CHECKS = 0');
 
-    // Get all tables in the current database
-    const [tables] = await database.query(`
-      SELECT TABLE_NAME
-      FROM information_schema.TABLES
-      WHERE TABLE_SCHEMA = DATABASE()
-    `);
+    // Get all tables using SHOW TABLES
+    const tables = await database.query('SHOW TABLES') as any;
 
     if (Array.isArray(tables) && tables.length > 0) {
       console.log(`Found ${tables.length} tables to drop`);
 
       // Drop each table
-      for (const table of tables) {
-        const tableName = table.TABLE_NAME;
-        console.log(`Dropping table: ${tableName}`);
+      for (const tableRow of tables) {
+        const tableName = Object.values(tableRow)[0] as string;
         await database.query(`DROP TABLE IF EXISTS \`${tableName}\``);
       }
     } else {
       console.log('No tables found to drop');
     }
+
+    // Also drop migrations table to force re-run
+    await database.query('DROP TABLE IF EXISTS `g_migrations`');
 
     // Re-enable foreign key checks
     await database.query('SET FOREIGN_KEY_CHECKS = 1');

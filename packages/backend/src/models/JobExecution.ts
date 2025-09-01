@@ -1,4 +1,4 @@
-import Database from '../config/database';
+import db from '../config/knex';
 import logger from '../config/logger';
 
 export enum JobExecutionStatus {
@@ -12,43 +12,43 @@ export enum JobExecutionStatus {
 
 export interface JobExecutionAttributes {
   id: number;
-  job_id: number;
-  schedule_id?: number;
+  jobId: number;
+  scheduleId?: number;
   status: JobExecutionStatus;
-  started_at?: string;
-  completed_at?: string;
+  startedAt?: string;
+  completedAt?: string;
   result?: any;
-  error_message?: string;
-  retry_attempt: number;
-  execution_time_ms?: number;
-  created_at: string;
-  job_name?: string;
-  job_type_name?: string;
-  schedule_name?: string;
+  errorMessage?: string;
+  retryAttempt: number;
+  executionTimeMs?: number;
+  createdAt: string;
+  jobName?: string;
+  jobTypeName?: string;
+  scheduleName?: string;
 }
 
 export interface CreateJobExecutionData {
-  job_id: number;
-  schedule_id?: number;
+  jobId: number;
+  scheduleId?: number;
   status?: JobExecutionStatus;
-  retry_attempt?: number;
+  retryAttempt?: number;
 }
 
 export interface UpdateJobExecutionData {
   status?: JobExecutionStatus;
-  started_at?: string;
-  completed_at?: string;
+  startedAt?: string;
+  completedAt?: string;
   result?: any;
-  error_message?: string;
-  execution_time_ms?: number;
+  errorMessage?: string;
+  executionTimeMs?: number;
 }
 
 export interface JobExecutionFilters {
-  job_id?: number;
-  schedule_id?: number;
+  jobId?: number;
+  scheduleId?: number;
   status?: JobExecutionStatus;
-  date_from?: string;
-  date_to?: string;
+  dateFrom?: string;
+  dateTo?: string;
   limit?: number;
   offset?: number;
 }
@@ -56,63 +56,37 @@ export interface JobExecutionFilters {
 export class JobExecutionModel {
   static async findAll(filters?: JobExecutionFilters): Promise<JobExecutionAttributes[]> {
     try {
-      let query = `
-        SELECT 
-          je.*,
-          j.name as job_name,
-          jt.name as job_type_name,
-          s.name as schedule_name
-        FROM g_job_executions je
-        LEFT JOIN g_jobs j ON je.job_id = j.id
-        LEFT JOIN g_job_types jt ON j.job_type_id = jt.id
-        LEFT JOIN g_schedules s ON je.schedule_id = s.id
-      `;
-      
-      const conditions: string[] = [];
-      const values: any[] = [];
-      
-      if (filters?.job_id) {
-        conditions.push('je.job_id = ?');
-        values.push(filters.job_id);
+
+      // Convert to knex query builder
+      const baseQuery = db('g_job_executions as je')
+        .leftJoin('g_jobs as j', 'je.jobId', 'j.id')
+        .leftJoin('g_job_types as jt', 'j.jobTypeId', 'jt.id')
+        .leftJoin('g_schedules as s', 'je.scheduleId', 's.id')
+        .select([
+          'je.*',
+          'j.name as jobName',
+          'jt.name as jobTypeName',
+          's.name as scheduleName'
+        ]);
+
+      // Apply filters
+      if (filters?.jobId) {
+        baseQuery.where('je.jobId', filters.jobId);
       }
-      
-      if (filters?.schedule_id) {
-        conditions.push('je.schedule_id = ?');
-        values.push(filters.schedule_id);
-      }
-      
       if (filters?.status) {
-        conditions.push('je.status = ?');
-        values.push(filters.status);
+        baseQuery.where('je.status', filters.status);
       }
-      
-      if (filters?.date_from) {
-        conditions.push('je.created_at >= ?');
-        values.push(filters.date_from);
+      if (filters?.dateFrom) {
+        baseQuery.where('je.createdAt', '>=', filters.dateFrom);
       }
-      
-      if (filters?.date_to) {
-        conditions.push('je.created_at <= ?');
-        values.push(filters.date_to);
+      if (filters?.dateTo) {
+        baseQuery.where('je.createdAt', '<=', filters.dateTo);
       }
-      
-      if (conditions.length > 0) {
-        query += ' WHERE ' + conditions.join(' AND ');
-      }
-      
-      query += ' ORDER BY je.created_at DESC';
-      
-      if (filters?.limit) {
-        query += ' LIMIT ?';
-        values.push(filters.limit);
-        
-        if (filters?.offset) {
-          query += ' OFFSET ?';
-          values.push(filters.offset);
-        }
-      }
-      
-      const results = await Database.query(query, values);
+
+      const results = await baseQuery
+        .orderBy('je.createdAt', 'desc')
+        .limit(filters?.limit || 50)
+        .offset(filters?.offset || 0);
       return results.map((row: any) => ({
         ...row,
         result: row.result ? JSON.parse(row.result) : null
@@ -125,20 +99,19 @@ export class JobExecutionModel {
 
   static async findById(id: number): Promise<JobExecutionAttributes | null> {
     try {
-      const query = `
-        SELECT 
-          je.*,
-          j.name as job_name,
-          jt.name as job_type_name,
-          s.name as schedule_name
-        FROM g_job_executions je
-        LEFT JOIN g_jobs j ON je.job_id = j.id
-        LEFT JOIN g_job_types jt ON j.job_type_id = jt.id
-        LEFT JOIN g_schedules s ON je.schedule_id = s.id
-        WHERE je.id = ?
-      `;
+
       
-      const results = await Database.query(query, [id]);
+      const results = await db('g_job_executions as je')
+        .leftJoin('g_jobs as j', 'je.jobId', 'j.id')
+        .leftJoin('g_job_types as jt', 'j.jobTypeId', 'jt.id')
+        .leftJoin('g_schedules as s', 'je.scheduleId', 's.id')
+        .select([
+          'je.*',
+          'j.name as jobName',
+          'jt.name as jobTypeName',
+          's.name as scheduleName'
+        ])
+        .where('je.id', id);
       if (results.length === 0) return null;
       
       const row = results[0];
@@ -154,24 +127,19 @@ export class JobExecutionModel {
 
   static async create(data: CreateJobExecutionData): Promise<JobExecutionAttributes> {
     try {
-      const query = `
-        INSERT INTO g_job_executions (job_id, schedule_id, status, retry_attempt)
-        VALUES (?, ?, ?, ?)
-      `;
-      
-      const result = await Database.query(query, [
-        data.job_id,
-        data.schedule_id || null,
-        data.status || JobExecutionStatus.PENDING,
-        data.retry_attempt || 0
-      ]);
-      
-      const insertId = (result as any).insertId;
+
+      const [insertId] = await db('g_job_executions').insert({
+        jobId: data.jobId,
+        scheduleId: data.scheduleId || null,
+        status: data.status || JobExecutionStatus.PENDING,
+        retryAttempt: data.retryAttempt || 0
+      });
+
       const created = await this.findById(insertId);
       if (!created) {
         throw new Error('Failed to retrieve created job execution');
       }
-      
+
       return created;
     } catch (error) {
       logger.error('Error creating job execution:', error);
@@ -181,47 +149,41 @@ export class JobExecutionModel {
 
   static async update(id: number, data: UpdateJobExecutionData): Promise<JobExecutionAttributes> {
     try {
-      const updates: string[] = [];
-      const values: any[] = [];
-      
+
+      const updateData: any = {};
+
       if (data.status !== undefined) {
-        updates.push('status = ?');
-        values.push(data.status);
+        updateData.status = data.status;
       }
-      
-      if (data.started_at !== undefined) {
-        updates.push('started_at = ?');
-        values.push(data.started_at);
+      if (data.startedAt !== undefined) {
+        updateData.startedAt = data.startedAt;
       }
-      
-      if (data.completed_at !== undefined) {
-        updates.push('completed_at = ?');
-        values.push(data.completed_at);
+      if (data.completedAt !== undefined) {
+        updateData.completedAt = data.completedAt;
       }
-      
       if (data.result !== undefined) {
-        updates.push('result = ?');
-        values.push(data.result ? JSON.stringify(data.result) : null);
+        updateData.result = data.result ? JSON.stringify(data.result) : null;
       }
-      
-      if (data.error_message !== undefined) {
-        updates.push('error_message = ?');
-        values.push(data.error_message);
+      if (data.errorMessage !== undefined) {
+        updateData.errorMessage = data.errorMessage;
       }
-      
-      if (data.execution_time_ms !== undefined) {
-        updates.push('execution_time_ms = ?');
-        values.push(data.execution_time_ms);
+      if (data.executionTimeMs !== undefined) {
+        updateData.executionTimeMs = data.executionTimeMs;
       }
-      
-      if (updates.length === 0) {
-        throw new Error('No fields to update');
+
+      if (Object.keys(updateData).length === 0) {
+        const existing = await this.findById(id);
+        if (!existing) {
+          throw new Error('Job execution not found');
+        }
+        return existing;
       }
-      
-      values.push(id);
-      const query = `UPDATE g_job_executions SET ${updates.join(', ')} WHERE id = ?`;
-      
-      await Database.query(query, values);
+
+      updateData.updatedAt = db.fn.now();
+
+      await db('g_job_executions')
+        .where('id', id)
+        .update(updateData);
       
       const updated = await this.findById(id);
       if (!updated) {
@@ -237,9 +199,11 @@ export class JobExecutionModel {
 
   static async delete(id: number): Promise<boolean> {
     try {
-      const query = 'DELETE FROM g_job_executions WHERE id = ?';
-      const result = await Database.query(query, [id]);
-      return (result as any).affectedRows > 0;
+      const result = await db('g_job_executions')
+        .where('id', id)
+        .del();
+
+      return result > 0;
     } catch (error) {
       logger.error('Error deleting job execution:', error);
       throw error;
@@ -248,7 +212,7 @@ export class JobExecutionModel {
 
   static async findByJob(jobId: number, limit?: number): Promise<JobExecutionAttributes[]> {
     try {
-      return await this.findAll({ job_id: jobId, limit });
+      return await this.findAll({ jobId, limit });
     } catch (error) {
       logger.error('Error finding job executions by job:', error);
       throw error;
@@ -257,7 +221,7 @@ export class JobExecutionModel {
 
   static async findBySchedule(scheduleId: number, limit?: number): Promise<JobExecutionAttributes[]> {
     try {
-      return await this.findAll({ schedule_id: scheduleId, limit });
+      return await this.findAll({ scheduleId, limit });
     } catch (error) {
       logger.error('Error finding job executions by schedule:', error);
       throw error;
@@ -275,36 +239,23 @@ export class JobExecutionModel {
 
   static async getStatistics(dateFrom?: string, dateTo?: string): Promise<any> {
     try {
-      let query = `
-        SELECT 
-          status,
-          COUNT(*) as count,
-          AVG(execution_time_ms) as avg_execution_time,
-          MAX(execution_time_ms) as max_execution_time,
-          MIN(execution_time_ms) as min_execution_time
-        FROM g_job_executions
-      `;
-      
-      const conditions: string[] = [];
-      const values: any[] = [];
-      
-      if (dateFrom) {
-        conditions.push('created_at >= ?');
-        values.push(dateFrom);
-      }
-      
-      if (dateTo) {
-        conditions.push('created_at <= ?');
-        values.push(dateTo);
-      }
-      
-      if (conditions.length > 0) {
-        query += ' WHERE ' + conditions.join(' AND ');
-      }
-      
-      query += ' GROUP BY status';
-      
-      const results = await Database.query(query, values);
+      const results = await db('g_job_executions')
+        .select([
+          'status',
+          db.raw('COUNT(*) as count'),
+          db.raw('AVG(executionTimeMs) as avgExecutionTime'),
+          db.raw('MAX(executionTimeMs) as maxExecutionTime'),
+          db.raw('MIN(executionTimeMs) as minExecutionTime')
+        ])
+        .modify((query) => {
+          if (dateFrom) {
+            query.where('createdAt', '>=', dateFrom);
+          }
+          if (dateTo) {
+            query.where('createdAt', '<=', dateTo);
+          }
+        })
+        .groupBy('status');
       return results;
     } catch (error) {
       logger.error('Error getting job execution statistics:', error);

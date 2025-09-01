@@ -1,22 +1,29 @@
 import bcrypt from 'bcryptjs';
-import database from '../config/database';
+import db from '../config/knex';
 import logger from '../config/logger';
 import { User, CreateUserData, UpdateUserData, UserWithoutPassword } from '../types/user';
 
 export class UserModel {
   static async findById(id: number): Promise<UserWithoutPassword | null> {
     try {
-      const rows = await database.query(
-        `SELECT id, email, name, avatarUrl, role, status,
-                emailVerified as email_verified,
-                emailVerifiedAt as email_verified_at,
-                lastLoginAt as last_login_at,
-                createdAt as created_at,
-                updatedAt as updated_at
-         FROM g_users WHERE id = ?`,
-        [id]
-      );
-      return rows[0] || null;
+      const user = await db('g_users')
+        .select([
+          'id',
+          'email',
+          'name',
+          'avatarUrl',
+          'role',
+          'status',
+          'emailVerified',
+          'emailVerifiedAt',
+          'lastLoginAt',
+          'createdAt',
+          'updatedAt'
+        ])
+        .where('id', id)
+        .first();
+
+      return user || null;
     } catch (error) {
       logger.error('Error finding user by ID:', error);
       throw error;
@@ -25,11 +32,11 @@ export class UserModel {
 
   static async findByEmail(email: string): Promise<User | null> {
     try {
-      const rows = await database.query(
-        'SELECT * FROM g_users WHERE email = ?',
-        [email]
-      );
-      return rows[0] || null;
+      const user = await db('g_users')
+        .where('email', email)
+        .first();
+
+      return user || null;
     } catch (error) {
       logger.error('Error finding user by email:', error);
       throw error;
@@ -38,17 +45,24 @@ export class UserModel {
 
   static async findByEmailWithoutPassword(email: string): Promise<UserWithoutPassword | null> {
     try {
-      const rows = await database.query(
-        `SELECT id, email, name, avatarUrl, role, status,
-                emailVerified as email_verified,
-                emailVerifiedAt as email_verified_at,
-                lastLoginAt as last_login_at,
-                createdAt as created_at,
-                updatedAt as updated_at
-         FROM g_users WHERE email = ?`,
-        [email]
-      );
-      return rows[0] || null;
+      const user = await db('g_users')
+        .select([
+          'id',
+          'email',
+          'name',
+          'avatarUrl',
+          'role',
+          'status',
+          'emailVerified',
+          'emailVerifiedAt',
+          'lastLoginAt',
+          'createdAt',
+          'updatedAt'
+        ])
+        .where('email', email)
+        .first();
+
+      return user || null;
     } catch (error) {
       logger.error('Error finding user by email:', error);
       throw error;
@@ -58,26 +72,22 @@ export class UserModel {
   static async create(userData: CreateUserData): Promise<UserWithoutPassword> {
     try {
       let passwordHash: string | undefined;
-      
+
       if (userData.password) {
         passwordHash = await bcrypt.hash(userData.password, 12);
       }
 
-      const result = await database.query(
-        `INSERT INTO g_users (email, passwordHash, name, avatarUrl, role, status, emailVerified)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [
-          userData.email,
-          passwordHash || null,
-          userData.name,
-          userData.avatarUrl || null,
-          userData.role || 'user',
-          userData.status || 'pending',
-          userData.emailVerified || false
-        ]
-      );
+      const [insertId] = await db('g_users').insert({
+        email: userData.email,
+        passwordHash: passwordHash || null,
+        name: userData.name,
+        avatarUrl: userData.avatarUrl || null,
+        role: userData.role || 'user',
+        status: userData.status || 'pending',
+        emailVerified: userData.emailVerified || false
+      });
 
-      const user = await this.findById(result.insertId);
+      const user = await this.findById(insertId);
       if (!user) {
         throw new Error('Failed to create user');
       }
@@ -91,26 +101,23 @@ export class UserModel {
 
   static async update(id: number, userData: UpdateUserData): Promise<UserWithoutPassword | null> {
     try {
-      const updateFields: string[] = [];
-      const updateValues: any[] = [];
+      const updateData: any = {};
 
       Object.entries(userData).forEach(([key, value]) => {
         if (value !== undefined) {
-          updateFields.push(`${key} = ?`);
-          updateValues.push(value);
+          updateData[key] = value;
         }
       });
 
-      if (updateFields.length === 0) {
+      if (Object.keys(updateData).length === 0) {
         return this.findById(id);
       }
 
-      updateValues.push(id);
+      updateData.updatedAt = db.fn.now();
 
-      await database.query(
-        `UPDATE g_users SET ${updateFields.join(', ')}, updatedAt = CURRENT_TIMESTAMP WHERE id = ?`,
-        updateValues
-      );
+      await db('g_users')
+        .where('id', id)
+        .update(updateData);
 
       return this.findById(id);
     } catch (error) {
@@ -121,8 +128,11 @@ export class UserModel {
 
   static async delete(id: number): Promise<boolean> {
     try {
-      const result = await database.query('DELETE FROM g_users WHERE id = ?', [id]);
-      return result.affectedRows > 0;
+      const result = await db('g_users')
+        .where('id', id)
+        .del();
+
+      return result > 0;
     } catch (error) {
       logger.error('Error deleting user:', error);
       throw error;
@@ -139,46 +149,61 @@ export class UserModel {
       const pageNum = parseInt(page.toString());
       const limitNum = parseInt(limit.toString());
       const offset = (pageNum - 1) * limitNum;
-      const whereConditions: string[] = [];
-      const whereValues: any[] = [];
 
-      if (filters.role) {
-        whereConditions.push('role = ?');
-        whereValues.push(filters.role);
-      }
+      // Build base query
+      const baseQuery = () => db('g_users');
 
-      if (filters.status) {
-        whereConditions.push('status = ?');
-        whereValues.push(filters.status);
-      }
+      // Apply filters function
+      const applyFilters = (query: any) => {
+        if (filters.role) {
+          query.where('role', filters.role);
+        }
 
-      if (filters.search) {
-        whereConditions.push('(name LIKE ? OR email LIKE ?)');
-        whereValues.push(`%${filters.search}%`, `%${filters.search}%`);
-      }
+        if (filters.status) {
+          query.where('status', filters.status);
+        }
 
-      const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+        if (filters.search) {
+          query.where(function(this: any) {
+            this.where('name', 'like', `%${filters.search}%`)
+                .orWhere('email', 'like', `%${filters.search}%`);
+          });
+        }
+
+        return query;
+      };
 
       // Get total count
-      const countResult = await database.query(
-        `SELECT COUNT(*) as total FROM g_users ${whereClause}`,
-        whereValues
-      );
-      const total = countResult[0].total;
+      const countQuery = applyFilters(baseQuery())
+        .count('* as total')
+        .first();
 
-      // Get users with field name conversion for frontend compatibility
-      const users = await database.query(
-        `SELECT id, email, name, avatarUrl, role, status,
-                emailVerified as email_verified,
-                emailVerifiedAt as email_verified_at,
-                lastLoginAt as last_login_at,
-                createdAt as created_at,
-                updatedAt as updated_at
-         FROM g_users ${whereClause}
-         ORDER BY createdAt DESC
-         LIMIT ${limitNum} OFFSET ${offset}`,
-        whereValues
-      );
+      // Get users with camelCase field names
+      const usersQuery = applyFilters(baseQuery())
+        .select([
+          'id',
+          'email',
+          'name',
+          'avatarUrl',
+          'role',
+          'status',
+          'emailVerified',
+          'emailVerifiedAt',
+          'lastLoginAt',
+          'createdAt',
+          'updatedAt'
+        ])
+        .orderBy('createdAt', 'desc')
+        .limit(limitNum)
+        .offset(offset);
+
+      // Execute queries in parallel
+      const [countResult, users] = await Promise.all([
+        countQuery,
+        usersQuery
+      ]);
+
+      const total = countResult?.total || 0;
 
       return {
         users,
@@ -207,11 +232,14 @@ export class UserModel {
   static async updatePassword(id: number, newPassword: string): Promise<boolean> {
     try {
       const passwordHash = await bcrypt.hash(newPassword, 12);
-      const result = await database.query(
-        'UPDATE g_users SET passwordHash = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?',
-        [passwordHash, id]
-      );
-      return result.affectedRows > 0;
+      const result = await db('g_users')
+        .where('id', id)
+        .update({
+          passwordHash,
+          updatedAt: db.fn.now()
+        });
+
+      return result > 0;
     } catch (error) {
       logger.error('Error updating password:', error);
       throw error;
@@ -220,10 +248,11 @@ export class UserModel {
 
   static async updateLastLogin(id: number): Promise<void> {
     try {
-      await database.query(
-        'UPDATE g_users SET lastLoginAt = CURRENT_TIMESTAMP WHERE id = ?',
-        [id]
-      );
+      await db('g_users')
+        .where('id', id)
+        .update({
+          lastLoginAt: db.fn.now()
+        });
     } catch (error) {
       logger.error('Error updating last login:', error);
       // Don't throw error for this non-critical operation

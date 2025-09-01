@@ -84,24 +84,24 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
   };
 
   const formatExecutionTime = (execution: JobExecution) => {
-    if (!execution.started_at) return '-';
-    
-    if (execution.execution_time_ms) {
-      return formatDuration(execution.execution_time_ms);
+    if (!execution.startedAt) return '-';
+
+    if (execution.executionTimeMs) {
+      return formatDuration(execution.executionTimeMs);
     }
-    
-    if (execution.completed_at) {
-      const start = new Date(execution.started_at).getTime();
-      const end = new Date(execution.completed_at).getTime();
+
+    if (execution.completedAt) {
+      const start = new Date(execution.startedAt).getTime();
+      const end = new Date(execution.completedAt).getTime();
       return formatDuration(end - start);
     }
-    
+
     if (execution.status === JobExecutionStatus.RUNNING) {
-      const start = new Date(execution.started_at).getTime();
+      const start = new Date(execution.startedAt).getTime();
       const now = Date.now();
       return formatDuration(now - start) + ' (running)';
     }
-    
+
     return '-';
   };
 
@@ -119,13 +119,13 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                   <strong>{t('jobs.executionId')}:</strong> {execution.id}
                 </Typography>
                 <Typography variant="body2">
-                  <strong>{t('jobs.retryAttempt')}:</strong> {execution.retry_attempt}
+                  <strong>{t('jobs.retryAttempt')}:</strong> {execution.retryAttempt}
                 </Typography>
                 <Typography variant="body2">
-                  <strong>{t('jobs.startedAt')}:</strong> {execution.started_at ? formatDateTimeDetailed(execution.started_at) : '-'}
+                  <strong>{t('jobs.startedAt')}:</strong> {execution.startedAt ? formatDateTimeDetailed(execution.startedAt) : '-'}
                 </Typography>
                 <Typography variant="body2">
-                  <strong>{t('jobs.completedAt')}:</strong> {execution.completed_at ? formatDateTimeDetailed(execution.completed_at) : '-'}
+                  <strong>{t('jobs.completedAt')}:</strong> {execution.completedAt ? formatDateTimeDetailed(execution.completedAt) : '-'}
                 </Typography>
                 <Typography variant="body2">
                   <strong>{t('jobs.executionTime')}:</strong> {formatExecutionTime(execution)}
@@ -231,11 +231,11 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
                   </TableCell>
                   <TableCell>{getStatusChip(execution.status)}</TableCell>
                   <TableCell>
-                    {execution.started_at ? formatDateTimeDetailed(execution.started_at) : '-'}
+                    {execution.startedAt ? formatDateTimeDetailed(execution.startedAt) : '-'}
                   </TableCell>
                   <TableCell>{formatExecutionTime(execution)}</TableCell>
-                  <TableCell>{execution.retry_attempt}</TableCell>
-                  <TableCell>{formatDateTimeDetailed(execution.created_at)}</TableCell>
+                  <TableCell>{execution.retryAttempt}</TableCell>
+                  <TableCell>{formatDateTimeDetailed(execution.createdAt)}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell colSpan={6} sx={{ p: 0, border: 0 }}>
