@@ -94,7 +94,7 @@ export class WhitelistModel {
       // Get total count
       const countQuery = `
         SELECT COUNT(*) as total
-        FROM g_account_whitelists w
+        FROM g_account_whitelist w
         LEFT JOIN g_users u ON w.createdBy = u.id
         ${whereClause}
       `;
@@ -115,7 +115,7 @@ export class WhitelistModel {
           w.created_at as createdAt,
           w.updated_at as updatedAt,
           u.name as createdByName
-        FROM g_whitelist w
+        FROM g_account_whitelist w
         LEFT JOIN g_users u ON w.created_by = u.id
         ${whereClause}
         ORDER BY w.created_at DESC
@@ -151,7 +151,7 @@ export class WhitelistModel {
           w.created_at as createdAt,
           w.updated_at as updatedAt,
           u.name as createdByName
-        FROM g_whitelist w
+        FROM g_account_whitelist w
         LEFT JOIN g_users u ON w.created_by = u.id
         WHERE w.id = ?
       `;
@@ -166,7 +166,7 @@ export class WhitelistModel {
   static async create(data: CreateWhitelistData): Promise<Whitelist> {
     try {
       const query = `
-        INSERT INTO g_whitelist (account_id, ip_address, start_date, end_date, memo, tags, created_by)
+        INSERT INTO g_account_whitelist (account_id, ip_address, start_date, end_date, memo, tags, created_by)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `;
 
@@ -233,7 +233,7 @@ export class WhitelistModel {
       fields.push('updated_at = CURRENT_TIMESTAMP');
       params.push(id);
 
-      const query = `UPDATE g_whitelist SET ${fields.join(', ')} WHERE id = ?`;
+      const query = `UPDATE g_account_whitelist SET ${fields.join(', ')} WHERE id = ?`;
       await database.query(query, params);
 
       return await this.findById(id);
@@ -244,7 +244,7 @@ export class WhitelistModel {
 
   static async delete(id: number): Promise<boolean> {
     try {
-      const result = await database.query('DELETE FROM g_whitelist WHERE id = ?', [id]);
+      const result = await database.query('DELETE FROM g_account_whitelist WHERE id = ?', [id]);
       return result.affectedRows > 0;
     } catch (error) {
       throw new CustomError('Failed to delete whitelist entry', 500);
@@ -259,7 +259,7 @@ export class WhitelistModel {
 
       const values = entries.map(() => '(?, ?, ?, ?, ?, ?)').join(', ');
       const query = `
-        INSERT INTO g_whitelist (nickname, ip_address, start_date, end_date, memo, created_by)
+        INSERT INTO g_account_whitelist (nickname, ip_address, start_date, end_date, memo, created_by)
         VALUES ${values}
       `;
 

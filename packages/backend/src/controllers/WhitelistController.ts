@@ -3,7 +3,7 @@ import { WhitelistService } from '../services/WhitelistService';
 import { asyncHandler, CustomError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import Joi from 'joi';
-import { WhitelistModel } from '../models/Whitelist';
+import { WhitelistModel } from '../models/AccountWhitelist';
 
 // Validation schemas
 const createWhitelistSchema = Joi.object({

@@ -1,4 +1,4 @@
-import { WhitelistModel, Whitelist, CreateWhitelistData, UpdateWhitelistData, WhitelistFilters, WhitelistListResponse } from '../models/Whitelist';
+import { WhitelistModel, Whitelist, CreateWhitelistData, UpdateWhitelistData, WhitelistFilters, WhitelistListResponse } from '../models/AccountWhitelist';
 import { CustomError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 
