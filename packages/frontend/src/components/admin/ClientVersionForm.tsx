@@ -255,9 +255,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       setLoading(true);
       console.log('Starting form submission...');
 
-      // 빈 문자열을 undefined로 변환
+      // 빈 문자열을 undefined로 변환하고 tags 필드 제거 (별도 처리)
+      const { tags, ...dataWithoutTags } = data;
       const cleanedData = {
-        ...data,
+        ...dataWithoutTags,
         gameServerAddressForWhiteList: data.gameServerAddressForWhiteList || undefined,
         patchAddressForWhiteList: data.patchAddressForWhiteList || undefined,
         externalClickLink: data.externalClickLink || undefined,
@@ -665,12 +666,13 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                     {(selected as number[]).map((id) => {
                       const tag = allTags.find(t => t.id === id);
                       return tag ? (
-                        <Chip
-                          key={id}
-                          label={tag.name}
-                          size="small"
-                          sx={{ bgcolor: tag.color, color: '#fff' }}
-                        />
+                        <Tooltip key={id} title={tag.description || tag.name} arrow>
+                          <Chip
+                            label={tag.name}
+                            size="small"
+                            sx={{ bgcolor: tag.color, color: '#fff' }}
+                          />
+                        </Tooltip>
                       ) : null;
                     })}
                   </Box>

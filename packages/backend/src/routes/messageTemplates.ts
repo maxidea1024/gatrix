@@ -14,8 +14,9 @@ router.post('/',
   auditLog({
     action: 'message_template_create',
     resourceType: 'message_template',
-    getResourceId: (req: any) => req.body?.name,
+    // 메시지 템플릿 생성 시에는 ID가 아직 없으므로 getResourceId 제거
     getNewValues: (req) => req.body,
+    getResourceIdFromResponse: (res: any) => res?.data?.id,
   }) as any,
   MessageTemplateController.create as any
 );

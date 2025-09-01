@@ -9,6 +9,7 @@ export interface AuditLogOptions {
   action: string;
   resourceType?: string;
   getResourceId?: (req: any) => string | undefined;
+  getResourceIdFromResponse?: (responseBody: any) => string | number | undefined;
   getOldValues?: (req: any) => any;
   getNewValues?: (req: any, res: any) => any;
   skipIf?: (req: any, res: any) => boolean;
@@ -45,7 +46,13 @@ export const auditLog = (options: AuditLogOptions) => {
           return;
         }
 
-        const resourceId = options.getResourceId ? options.getResourceId(req) : undefined;
+        // Resource ID 결정 (요청에서 또는 응답에서)
+        let resourceId = options.getResourceId ? options.getResourceId(req) : undefined;
+        if (!resourceId && options.getResourceIdFromResponse && responseBody) {
+          const id = options.getResourceIdFromResponse(responseBody);
+          resourceId = id ? id.toString() : undefined;
+        }
+
         const oldValues = options.getOldValues ? options.getOldValues(req) : undefined;
         const newValues = options.getNewValues ? options.getNewValues(req, res) : req.body;
 
@@ -53,7 +60,7 @@ export const auditLog = (options: AuditLogOptions) => {
           userId: req.user?.userId,
           action: options.action,
           resourceType: options.resourceType,
-          resourceId: resourceId,
+          resourceId: resourceId ? resourceId.toString() : undefined,
           oldValues: oldValues,
           newValues: newValues,
           ipAddress: req.ip,
@@ -149,7 +156,7 @@ export const auditUserDemote = auditLog({
 export const auditGameWorldCreate = auditLog({
   action: 'game_world_create',
   resourceType: 'game_world',
-  getResourceId: (req) => req.body?.worldId,
+  // Don't set getResourceId for create operations since ID doesn't exist yet
   getNewValues: (req) => req.body,
 });
 

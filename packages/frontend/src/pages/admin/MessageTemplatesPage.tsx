@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import {
   Box,
   Card,
@@ -89,12 +89,16 @@ const MessageTemplatesPage: React.FC = () => {
   const [selectedTemplateForTags, setSelectedTemplateForTags] = useState<MessageTemplate | null>(null);
   const [templateTags, setTemplateTags] = useState<Tag[]>([]);
 
-  const [form, setForm] = useState<MessageTemplate>({ name: '', type: 'maintenance', is_enabled: true, default_message: '', locales: [] });
+  const [form, setForm] = useState<MessageTemplate>({ name: '', type: 'maintenance', isEnabled: true, defaultMessage: '', locales: [] });
   const usedLangs = useMemo(() => new Set((form.locales || []).map(l => l.lang)), [form.locales]);
   const availableLangs = allLangs.filter(l => !usedLangs.has(l.code));
   const [newLang, setNewLang] = useState<'ko'|'en'|'zh'>('ko');
   const [newMsg, setNewMsg] = useState('');
   const getLangLabel = (code: 'ko'|'en'|'zh') => allLangs.find(l=>l.code===code)?.label || code;
+
+  // 폼 필드 ref들
+  const nameFieldRef = useRef<HTMLInputElement>(null);
+  const defaultMessageFieldRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
     console.log('🚀 MessageTemplate load() function called');
@@ -254,7 +258,7 @@ const MessageTemplatesPage: React.FC = () => {
 
   const handleAdd = () => {
     setEditing(null);
-    setForm({ name: '', type: 'maintenance', is_enabled: true, default_message: '', locales: [], tags: [] });
+    setForm({ name: '', type: 'maintenance', isEnabled: true, defaultMessage: '', locales: [], tags: [] });
     setNewLang('ko'); setNewMsg('');
     setDialogOpen(true);
   };
@@ -265,8 +269,8 @@ const MessageTemplatesPage: React.FC = () => {
       id: row.id,
       name: row.name,
       type: row.type,
-      is_enabled: row.is_enabled,
-      default_message: row.default_message || '',
+      isEnabled: (row as any).isEnabled,
+      defaultMessage: (row as any).defaultMessage || '',
       locales: row.locales || [],
       tags: row.tags || []
     });
@@ -316,11 +320,13 @@ const MessageTemplatesPage: React.FC = () => {
   const handleSave = async () => {
     if (!form.name.trim()) {
       enqueueSnackbar('이름을 입력해주세요.', { variant: 'error' });
+      nameFieldRef.current?.focus();
       return;
     }
 
-    if (!form.default_message?.trim()) {
+    if (!form.defaultMessage?.trim()) {
       enqueueSnackbar('기본 메시지를 입력해주세요.', { variant: 'error' });
+      defaultMessageFieldRef.current?.focus();
       return;
     }
 
@@ -329,8 +335,8 @@ const MessageTemplatesPage: React.FC = () => {
       const payload: MessageTemplate = {
         name: form.name.trim(),
         type: form.type,
-        is_enabled: !!form.is_enabled,
-        default_message: form.default_message || null,
+        isEnabled: !!form.isEnabled,
+        defaultMessage: form.defaultMessage || null,
         locales: form.locales,
       };
 
@@ -342,7 +348,8 @@ const MessageTemplatesPage: React.FC = () => {
         enqueueSnackbar(t('common.updateSuccess'), { variant: 'success' });
       } else {
         const created = await messageTemplateService.create(payload);
-        templateId = created?.id || created?.data?.id;
+        templateId = created?.id || (created as any)?.data?.id || (created as any)?.insertId;
+
         if (!templateId) {
           throw new Error('생성된 템플릿 ID를 가져올 수 없습니다.');
         }
@@ -360,13 +367,19 @@ const MessageTemplatesPage: React.FC = () => {
       setDialogOpen(false);
       await load();
     } catch (error: any) {
-      console.error('Failed to save message template:', error);
+      // Handle duplicate name error - 두 가지 오류 구조 모두 처리
+      const status = error?.response?.status || error?.status;
+      const errorData = error?.response?.data?.error || error?.error;
 
-      // Handle duplicate name error
-      if (error?.response?.status === 409) {
-        enqueueSnackbar('이미 존재하는 메시지 템플릿 이름입니다.', { variant: 'error' });
+      if (status === 409) {
+        if (errorData?.code === 'DUPLICATE_NAME') {
+          const templateName = errorData?.value || form.name;
+          enqueueSnackbar(`이미 존재하는 메시지 템플릿 이름입니다: "${templateName}"`, { variant: 'error' });
+        } else {
+          enqueueSnackbar('이미 존재하는 메시지 템플릿 이름입니다.', { variant: 'error' });
+        }
       } else {
-        const message = error?.response?.data?.error?.message || error?.message || '저장에 실패했습니다.';
+        const message = error?.response?.data?.error?.message || error?.error?.message || error?.message || '저장에 실패했습니다.';
         enqueueSnackbar(message, { variant: 'error' });
       }
     } finally {
@@ -547,9 +560,9 @@ const MessageTemplatesPage: React.FC = () => {
                         <Typography variant="subtitle2">{row.name}</Typography>
                       </TableCell>
                       <TableCell sx={{ maxWidth: 280 }}>
-                        {row.default_message ? (
+                        {(row as any).defaultMessage ? (
                           <Typography variant="body2" sx={{ whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
-                            {String(row.default_message).replace(/\n/g, ' ')}
+                            {String((row as any).defaultMessage).replace(/\n/g, ' ')}
                           </Typography>
                         ) : (
                           <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
@@ -557,10 +570,10 @@ const MessageTemplatesPage: React.FC = () => {
                           </Typography>
                         )}
                       </TableCell>
-                      <TableCell>{row.is_enabled ? t('common.available') : t('common.unavailable')}</TableCell>
-                      <TableCell>{formatDateTimeDetailed(row.updated_at) || '-'}</TableCell>
+                      <TableCell>{(row as any).isEnabled ? t('common.available') : t('common.unavailable')}</TableCell>
+                      <TableCell>{formatDateTimeDetailed((row as any).updatedAt) || '-'}</TableCell>
                       <TableCell>{hasLocales ? langs.map(c=>getLangLabel(c as any)).join(', ') : t('admin.messageTemplates.onlyDefaultMessage')}</TableCell>
-                      <TableCell>{(row as any).created_by_name || '-'}</TableCell>
+                      <TableCell>{(row as any).createdByName || '-'}</TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                           {row.tags && row.tags.length > 0 ? (
@@ -616,19 +629,21 @@ const MessageTemplatesPage: React.FC = () => {
               onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
               fullWidth
               required
+              inputRef={nameFieldRef}
             />
             <FormControlLabel
-              control={<Switch checked={form.is_enabled} onChange={(e) => setForm(prev => ({ ...prev, is_enabled: e.target.checked }))} />}
+              control={<Switch checked={form.isEnabled} onChange={(e) => setForm(prev => ({ ...prev, isEnabled: e.target.checked }))} />}
               label={t('admin.messageTemplates.availability')}
             />
             <TextField
               label={t('admin.maintenance.defaultMessage')}
-              value={form.default_message || ''}
-              onChange={(e) => setForm(prev => ({ ...prev, default_message: e.target.value }))}
+              value={form.defaultMessage || ''}
+              onChange={(e) => setForm(prev => ({ ...prev, defaultMessage: e.target.value }))}
               multiline
               minRows={3}
               required
               helperText={t('admin.messageTemplates.defaultMessageHelp')}
+              inputRef={defaultMessageFieldRef}
             />
 
             {/* 태그 선택 */}

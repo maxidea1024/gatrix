@@ -362,6 +362,7 @@
       "platformRequired": "平台必填",
       "serverAddresses": "服务器地址",
       "statusHelp": "请选择状态",
+      "statusRequired": "状态必填",
       "title": "标题",
       "versionHelp": "请使用语义化版本(SemVer)格式。示例：1.0.0, 2.1.3, 1.0.0-beta.1 (主版本.次版本.修订版本 或 主版本.次版本.修订版本-预发布版本)",
       "versionInvalid": "版本号无效",
@@ -407,6 +408,7 @@
     "allStatuses": "所有状态",
     "available": "可用",
     "unavailable": "不可用",
+    "usable": "可用",
     "back": "返回",
     "calendar": "日历",
     "cancel": "取消",
@@ -445,6 +447,7 @@
     "info": "信息",
     "loading": "加载中",
     "loggedInAs": "已登录账户",
+    "memo": "备忘录",
     "minute": "分钟",
     "month": "月",
     "moreThan": "超过",
@@ -467,6 +470,7 @@
     "select": "选择",
     "selectTags": "选择标签...",
     "sort": "排序",
+    "status": "状态",
     "submit": "提交",
     "success": "成功",
     "tags": "标签",
@@ -576,6 +580,8 @@
     "updated": "\"{{name}}\" 任务更新成功",
     "deleted": "\"{{name}}\" 任务删除成功",
     "confirmDeleteMessage": "确定要删除任务 \"{{name}}\" 吗？",
+    "monitor": "队列监控",
+    "monitorLoadError": "队列监控加载失败",
     "noExecutions": "无执行历史",
     "executionDetails": "执行详情",
     "executionId": "执行ID",
@@ -927,12 +933,6 @@
       "purposeRequired": "用途为必填项",
       "noBulkEntries": "未找到有效的导入条目"
     }
-  },
-
-  "jobs": {
-    "title": "作业管理",
-    "monitor": "队列监控",
-    "monitorLoadError": "队列监控加载失败"
   },
   "landing": {
     "welcome": "欢迎使用 Gatrix",

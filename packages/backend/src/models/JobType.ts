@@ -69,8 +69,18 @@ export class JobTypeModel {
         .orderBy('jt.name', 'asc');
 
       return results.map((row: any) => ({
-        ...row,
-        schemaDefinition: row.schemaDefinition ? this.parseSchemaDefinition(row.schemaDefinition) : null
+        id: row.id,
+        name: row.name,
+        displayName: row.displayName,
+        description: row.description,
+        schemaDefinition: row.schema ? this.parseSchemaDefinition(row.schema) : null,
+        isEnabled: Boolean(row.isActive),
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt,
+        createdBy: row.createdBy,
+        updatedBy: row.updatedBy,
+        createdByName: row.createdByName,
+        updatedByName: row.updatedByName
       }));
     } catch (error) {
       logger.error('Error finding all job types:', error);
@@ -136,8 +146,8 @@ export class JobTypeModel {
         name: data.name,
         displayName: data.displayName,
         description: data.description || null,
-        schemaDefinition: schemaJson,
-        isEnabled: data.isEnabled ?? true,
+        schema: schemaJson,
+        isActive: data.isEnabled ?? true,
         createdBy: data.createdBy || null
       });
 
@@ -165,10 +175,10 @@ export class JobTypeModel {
         updateData.description = data.description;
       }
       if (data.schemaDefinition !== undefined) {
-        updateData.schemaDefinition = data.schemaDefinition ? JSON.stringify(data.schemaDefinition) : null;
+        updateData.schema = data.schemaDefinition ? JSON.stringify(data.schemaDefinition) : null;
       }
       if (data.isEnabled !== undefined) {
-        updateData.isEnabled = data.isEnabled;
+        updateData.isActive = data.isEnabled;
       }
       if (data.updatedBy !== undefined) {
         updateData.updatedBy = data.updatedBy;
@@ -219,8 +229,18 @@ export class JobTypeModel {
         .orderBy('jt.name', 'asc');
 
       return results.map((row: any) => ({
-        ...row,
-        schemaDefinition: row.schemaDefinition ? this.parseSchemaDefinition(row.schemaDefinition) : null
+        id: row.id,
+        name: row.name,
+        displayName: row.displayName,
+        description: row.description,
+        schemaDefinition: row.schema ? this.parseSchemaDefinition(row.schema) : null,
+        isEnabled: Boolean(row.isActive),
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt,
+        createdBy: row.createdBy,
+        updatedBy: row.updatedBy,
+        createdByName: row.createdByName,
+        updatedByName: row.updatedByName
       }));
     } catch (error) {
       logger.error('Error finding enabled job types:', error);

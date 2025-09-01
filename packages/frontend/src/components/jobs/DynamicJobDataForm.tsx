@@ -37,25 +37,45 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // 스키마가 변경될 때 기본값 설정
+  console.log('DynamicJobDataForm received data:', data);
+  console.log('DynamicJobDataForm received schema:', schema);
+
+  // 스키마가 변경될 때만 기본값 설정
   useEffect(() => {
     if (!schema || Object.keys(schema).length === 0) return;
 
+    console.log('DynamicJobDataForm useEffect - schema changed');
+    console.log('Current data:', data);
+    console.log('Schema:', schema);
+
+    // 기본값이 필요한 필드만 처리
     const newData = { ...data };
     let hasChanges = false;
 
     Object.entries(schema).forEach(([fieldName, field]) => {
-      // 필드에 값이 없고 기본값이 있는 경우 기본값 설정
-      if (data[fieldName] === undefined && field.default !== undefined) {
+      // 필드에 값이 없고 기본값이 있는 경우에만 기본값 설정
+      const currentValue = data[fieldName];
+      const hasValue = currentValue !== undefined &&
+                      currentValue !== null &&
+                      currentValue !== '';
+
+      console.log(`Field ${fieldName}: currentValue=${currentValue}, hasValue=${hasValue}, default=${field.default}`);
+
+      // 기본값이 있고 현재 값이 없는 경우에만 설정
+      if (!hasValue && field.default !== undefined) {
+        console.log(`Setting default value for ${fieldName}: ${field.default}`);
         newData[fieldName] = field.default;
         hasChanges = true;
       }
     });
 
+    console.log('New data after defaults:', newData);
+    console.log('Has changes:', hasChanges);
+
     if (hasChanges) {
       onChange(newData);
     }
-  }, [schema, data, onChange]);
+  }, [schema]); // schema만 의존성으로 설정
 
   const handleFieldChange = (fieldName: string, value: any) => {
     const newData = { ...data, [fieldName]: value };

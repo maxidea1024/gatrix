@@ -34,11 +34,23 @@ export class AuditLogModel {
         .where('id', id)
         .first();
 
-      if (auditLog && auditLog.details) {
-        try {
-          auditLog.details = JSON.parse(auditLog.details);
-        } catch (e) {
-          // If JSON parsing fails, keep as string
+      if (auditLog) {
+        // Parse oldValues if it exists and is a string
+        if (auditLog.oldValues && typeof auditLog.oldValues === 'string') {
+          try {
+            auditLog.oldValues = JSON.parse(auditLog.oldValues);
+          } catch (e) {
+            // If JSON parsing fails, keep as string
+          }
+        }
+
+        // Parse newValues if it exists and is a string
+        if (auditLog.newValues && typeof auditLog.newValues === 'string') {
+          try {
+            auditLog.newValues = JSON.parse(auditLog.newValues);
+          } catch (e) {
+            // If JSON parsing fails, keep as string
+          }
         }
       }
 
@@ -154,11 +166,21 @@ export class AuditLogModel {
 
       logger.debug('Query result:', { logsCount: logs.length, total });
 
-      // Parse JSON details
+      // Parse JSON fields
       logs.forEach((log: any) => {
-        if (log.details) {
+        // Parse oldValues if it exists and is a string
+        if (log.oldValues && typeof log.oldValues === 'string') {
           try {
-            log.details = JSON.parse(log.details);
+            log.oldValues = JSON.parse(log.oldValues);
+          } catch (e) {
+            // If JSON parsing fails, keep as string
+          }
+        }
+
+        // Parse newValues if it exists and is a string
+        if (log.newValues && typeof log.newValues === 'string') {
+          try {
+            log.newValues = JSON.parse(log.newValues);
           } catch (e) {
             // If JSON parsing fails, keep as string
           }

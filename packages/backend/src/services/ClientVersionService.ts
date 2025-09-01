@@ -1,5 +1,6 @@
 import { ClientVersionModel, ClientVersionAttributes, ClientVersionCreationAttributes, BulkCreateClientVersionRequest, ClientStatus } from '../models/ClientVersion';
 import { pubSubService } from './PubSubService';
+import logger from '../config/logger';
 
 export interface ClientVersionFilters {
   version?: string;
@@ -42,6 +43,17 @@ export interface BulkStatusUpdateRequest {
 }
 
 export class ClientVersionService {
+  // 사용 가능한 버전 목록 조회 (distinct)
+  static async getAvailableVersions(): Promise<string[]> {
+    try {
+      const versions = await ClientVersionModel.getDistinctVersions();
+      return versions.sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+    } catch (error) {
+      logger.error('Error getting available versions:', error);
+      throw error;
+    }
+  }
+
   static async getClientVersions(
     filters: ClientVersionFilters = {},
     pagination: ClientVersionPagination

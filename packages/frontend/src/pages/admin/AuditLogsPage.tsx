@@ -157,10 +157,18 @@ const AuditLogsPage: React.FC = () => {
 
   const handleCopyDetails = async (details: any) => {
     try {
-      const text = typeof details === 'string' ? details : JSON.stringify(details, null, 2);
+      let text = '';
+      if (!details) {
+        text = 'No details available';
+      } else if (typeof details === 'string') {
+        text = details;
+      } else {
+        text = JSON.stringify(details, null, 2);
+      }
       await navigator.clipboard.writeText(text);
       enqueueSnackbar(t('auditLogs.detailsCopied'), { variant: 'success' });
-    } catch {
+    } catch (error) {
+      console.error('Copy failed:', error);
       enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
     }
   };
@@ -323,14 +331,14 @@ const AuditLogsPage: React.FC = () => {
                         <Chip label={t(`auditLogs.actions.${log.action}`)} color={AuditLogService.getActionColor(log.action)} size="small" />
                       </TableCell>
                       <TableCell>
-                        {(log.resource_type || (log as any).resourceType) ? (
+                        {((log as any).resourceType || (log as any).resource_type || (log as any).entityType) ? (
                           <Box>
                             <Typography variant="body2" fontWeight="medium">
-                              {t(`auditLogs.resources.${(log as any).resource_type || (log as any).resourceType}`)}
+                              {t(`auditLogs.resources.${(log as any).resourceType || (log as any).resource_type || (log as any).entityType}`, (log as any).resourceType || (log as any).resource_type || (log as any).entityType)}
                             </Typography>
-                            {(log.resource_id || (log as any).resourceId) && (
+                            {((log as any).resourceId || (log as any).resource_id || (log as any).entityId) && (
                               <Typography variant="caption" color="text.secondary">
-                                ID: {log.resource_id || (log as any).resourceId}
+                                ID: {(log as any).resourceId || (log as any).resource_id || (log as any).entityId}
                               </Typography>
                             )}
                           </Box>

@@ -37,7 +37,12 @@ export class MessageTemplateController {
       if (existing) {
         return res.status(409).json({
           success: false,
-          error: { message: 'A message template with this name already exists' }
+          error: {
+            message: 'A message template with this name already exists',
+            code: 'DUPLICATE_NAME',
+            field: 'name',
+            value: body.name
+          }
         });
       }
 
@@ -56,7 +61,12 @@ export class MessageTemplateController {
       if (existing) {
         return res.status(409).json({
           success: false,
-          error: { message: 'A message template with this name already exists' }
+          error: {
+            message: 'A message template with this name already exists',
+            code: 'DUPLICATE_NAME',
+            field: 'name',
+            value: body.name
+          }
         });
       }
 

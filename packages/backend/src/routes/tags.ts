@@ -13,8 +13,9 @@ router.post('/',
   auditLog({
     action: 'tag_create',
     resourceType: 'tag',
-    getResourceId: (req: any) => req.body?.name,
+    // 태그 생성 시에는 ID가 아직 없으므로 getResourceId 제거
     getNewValues: (req) => req.body,
+    getResourceIdFromResponse: (res: any) => res?.data?.tag?.id,
   }) as any,
   TagController.create as any
 );

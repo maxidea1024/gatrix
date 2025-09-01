@@ -286,10 +286,19 @@ export class AdminController {
           const date = created instanceof Date ? created : created ? new Date(created) : null;
           const iso = date && !isNaN(date.getTime()) ? date.toISOString() : null;
 
-          const resourceType = log.resourceType ?? log.resource_type ?? null;
-          const resourceId = log.resourceId ?? log.resource_id ?? null;
+          const resourceType = log.entityType ?? log.resourceType ?? log.resource_type ?? null;
+          const resourceId = log.entityId ?? log.resourceId ?? log.resource_id ?? null;
           const ipAddress = log.ipAddress ?? log.ip_address ?? null;
           const userAgent = log.userAgent ?? log.user_agent ?? null;
+
+          // Create details object from oldValues and newValues
+          const details: any = {};
+          if (log.oldValues) {
+            details.oldValues = log.oldValues;
+          }
+          if (log.newValues) {
+            details.newValues = log.newValues;
+          }
 
           return {
             ...log,
@@ -306,6 +315,8 @@ export class AdminController {
             ip_address: ipAddress,
             userAgent,
             user_agent: userAgent,
+            // details for frontend
+            details: Object.keys(details).length > 0 ? details : null,
           };
         })
       };

@@ -16,6 +16,19 @@ export class ClientVersionService {
   private static readonly BASE_URL = '/client-versions';
 
   /**
+   * 사용 가능한 버전 목록 조회
+   */
+  static async getAvailableVersions(): Promise<string[]> {
+    try {
+      const response = await apiService.get(`${this.BASE_URL}/meta/versions`);
+      return response.data.data || [];
+    } catch (error) {
+      console.error('Error getting available versions:', error);
+      throw error;
+    }
+  }
+
+  /**
    * 클라이언트 버전 목록 조회
    */
   static async getClientVersions(
@@ -34,11 +47,14 @@ export class ClientVersionService {
     });
 
     // 필터 조건 추가
+    console.log('Processing filters:', filters);
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
+        console.log(`Adding filter: ${key} = ${value} (${typeof value})`);
         params.append(key, value.toString());
       }
     });
+    console.log('Final URL params:', params.toString());
 
     const response = await apiService.get<ApiResponse<ClientVersionListResponse>>(
       `${this.BASE_URL}?${params}`

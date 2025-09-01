@@ -74,6 +74,7 @@ const JobsPage: React.FC = () => {
 
   // Load data
   useEffect(() => {
+    console.log('JobsPage useEffect - loading data');
     loadData();
   }, [page, rowsPerPage]);
 
@@ -85,17 +86,20 @@ const JobsPage: React.FC = () => {
 
   const loadData = async () => {
     try {
+      console.log('JobsPage loadData called');
       setLoading(true);
+      console.log('JobsPage calling jobService.getJobsWithPagination');
       const [jobsResponse, jobTypesData] = await Promise.all([
         jobService.getJobsWithPagination({
-          job_type_id: selectedJobType || undefined,
-          is_enabled: enabledFilter !== '' ? enabledFilter : undefined,
+          jobTypeId: selectedJobType || undefined,
+          isEnabled: enabledFilter !== '' ? enabledFilter : undefined,
           search: searchTerm || undefined,
           limit: rowsPerPage,
           offset: page * rowsPerPage
         }),
         jobService.getJobTypes()
       ]);
+
       setJobs(jobsResponse.jobs);
       setTotal(jobsResponse.pagination.total);
       setJobTypes(jobTypesData);
@@ -205,15 +209,15 @@ const JobsPage: React.FC = () => {
   };
 
   const getStatusChip = (job: Job) => {
-    if (!job.is_enabled) {
-      return <Chip label={t('common.disabled')} color="default" size="small" />;
+    if (!job.isEnabled) {
+      return <Chip label={t('common.unavailable')} color="default" size="small" />;
     }
-    return <Chip label={t('common.enabled')} color="success" size="small" />;
+    return <Chip label={t('common.usable')} color="success" size="small" />;
   };
 
   const getJobTypeLabel = (jobTypeId: number) => {
     const jobType = jobTypes.find(jt => jt.id === jobTypeId);
-    return jobType?.display_name || jobType?.name || 'Unknown';
+    return jobType?.displayName || jobType?.name || 'Unknown';
   };
 
   return (
@@ -270,7 +274,7 @@ const JobsPage: React.FC = () => {
                   <MenuItem value="">{t('common.all')}</MenuItem>
                   {jobTypes.map((jobType) => (
                     <MenuItem key={jobType.id} value={jobType.id}>
-                      {jobType.display_name}
+                      {jobType.displayName}
                     </MenuItem>
                   ))}
                 </Select>
@@ -278,11 +282,11 @@ const JobsPage: React.FC = () => {
             </Grid>
             <Grid item xs={12} md={3}>
               <FormControl fullWidth>
-                <InputLabel shrink={true}>{t('common.status')}</InputLabel>
+                <InputLabel shrink={true}>{t('common.usable')}</InputLabel>
                 <Select
                   value={enabledFilter}
                   onChange={(e) => setEnabledFilter(e.target.value as boolean | '')}
-                  label={t('common.status')}
+                  label={t('common.usable')}
                   displayEmpty
                   sx={{
                     minWidth: 120,
@@ -294,8 +298,8 @@ const JobsPage: React.FC = () => {
                   }}
                 >
                   <MenuItem value="">{t('common.all')}</MenuItem>
-                  <MenuItem value={true}>{t('common.enabled')}</MenuItem>
-                  <MenuItem value={false}>{t('common.disabled')}</MenuItem>
+                  <MenuItem value={true}>{t('common.usable')}</MenuItem>
+                  <MenuItem value={false}>{t('common.unavailable')}</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -306,15 +310,16 @@ const JobsPage: React.FC = () => {
 
       {/* Jobs Table */}
       <TableContainer component={Paper}>
+        {loading && <LinearProgress />}
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>{t('common.name')}</TableCell>
               <TableCell>{t('jobs.jobType')}</TableCell>
-              <TableCell>{t('common.status')}</TableCell>
-              <TableCell>{t('jobs.retryCount')}</TableCell>
-              <TableCell>{t('jobs.timeout')}</TableCell>
-              <TableCell>{t('common.updatedAt')}</TableCell>
+              <TableCell>{t('common.usable')}</TableCell>
+              <TableCell>{t('common.tags')}</TableCell>
+              <TableCell>{t('common.createdBy')}</TableCell>
+              <TableCell>{t('common.createdAt')}</TableCell>
               <TableCell align="right">{t('common.actions')}</TableCell>
             </TableRow>
           </TableHead>
@@ -335,24 +340,73 @@ const JobsPage: React.FC = () => {
                     <Typography variant="body2" fontWeight="medium">
                       {job.name}
                     </Typography>
-                    {job.description && (
+                    {job.memo && (
                       <Typography variant="caption" color="text.secondary">
-                        {job.description}
+                        {job.memo}
                       </Typography>
                     )}
                   </Box>
                 </TableCell>
-                <TableCell>{getJobTypeLabel(job.job_type_id)}</TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="body2">
+                      {getJobTypeLabel(job.jobTypeId)}
+                    </Typography>
+                  </Box>
+                </TableCell>
                 <TableCell>{getStatusChip(job)}</TableCell>
-                <TableCell>{job.retry_count} / {job.max_retry_count}</TableCell>
-                <TableCell>{job.timeout_seconds}s</TableCell>
-                <TableCell>{formatDateTimeDetailed(job.updated_at)}</TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {job.tags && job.tags.length > 0 ? (
+                      job.tags.map((tag) => (
+                        <Tooltip key={tag.id} title={tag.description || tag.name}>
+                          <Chip
+                            label={tag.name}
+                            size="small"
+                            style={{
+                              backgroundColor: tag.color,
+                              color: '#fff',
+                              fontSize: '0.75rem'
+                            }}
+                          />
+                        </Tooltip>
+                      ))
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">
+                        -
+                      </Typography>
+                    )}
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  {job.createdByName ? (
+                    <Box>
+                      <Typography variant="body2" fontWeight="medium">
+                        {job.createdByName}
+                      </Typography>
+                      {job.createdByEmail && (
+                        <Typography variant="caption" color="text.secondary">
+                          {job.createdByEmail}
+                        </Typography>
+                      )}
+                    </Box>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      -
+                    </Typography>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body2">
+                    {formatDateTimeDetailed(job.createdAt)}
+                  </Typography>
+                </TableCell>
                 <TableCell align="right">
                   <Tooltip title={t('jobs.execute')}>
                     <IconButton
                       size="small"
                       onClick={() => handleExecuteJob(job)}
-                      disabled={!job.is_enabled}
+                      disabled={!job.isEnabled}
                     >
                       <ExecuteIcon />
                     </IconButton>
@@ -378,7 +432,6 @@ const JobsPage: React.FC = () => {
             )}
           </TableBody>
         </Table>
-        {loading && <LinearProgress />}
 
         {/* 페이지네이션 */}
         <SimplePagination

@@ -98,6 +98,9 @@ const ClientVersionsPage: React.FC = () => {
   
   // 필터
   const [filters, setFilters] = useState<ClientVersionFilters>({});
+
+  // 디버깅: 현재 필터 상태 로그
+  console.log('Current filters state:', filters);
   
   // 선택 관리
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -126,14 +129,26 @@ const ClientVersionsPage: React.FC = () => {
   const [clientVersionTags, setClientVersionTags] = useState<Tag[]>([]);
   const [versions, setVersions] = useState<string[]>([]);
 
+  // 사용 가능한 버전 목록 로드
+  const loadAvailableVersions = useCallback(async () => {
+    try {
+      const versions = await ClientVersionService.getAvailableVersions();
+      setVersions(versions);
+    } catch (error) {
+      prodLogger.error('Error loading available versions:', error);
+    }
+  }, []);
+
   // 클라이언트 버전 목록 로드
-  const loadClientVersions = useCallback(async () => {
+  const loadClientVersions = useCallback(async (customFilters?: ClientVersionFilters) => {
     try {
       setLoading(true);
+      const filtersToUse = customFilters || filters;
+      console.log('Loading client versions with filters:', filtersToUse);
       const result = await ClientVersionService.getClientVersions(
         page + 1,
         rowsPerPage,
-        filters,
+        filtersToUse,
         'clientVersion', // 버전 기준 정렬 고정
         'DESC' // 내림차순 고정
       );
@@ -146,16 +161,10 @@ const ClientVersionsPage: React.FC = () => {
         });
         setClientVersions(result.clientVersions);
         setTotal(result.total || 0);
-
-        // 버전 목록 추출 및 업데이트
-        const uniqueVersions = Array.from(new Set(result.clientVersions.map(cv => cv.clientVersion)))
-          .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
-        setVersions(uniqueVersions);
       } else {
         prodLogger.warn('Invalid response structure:', result);
         setClientVersions([]);
         setTotal(0);
-        setVersions([]);
       }
     } catch (error: any) {
       console.error('Error loading client versions:', error);
@@ -165,7 +174,7 @@ const ClientVersionsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, filters, sortBy, sortOrder, enqueueSnackbar]);
+  }, [page, rowsPerPage, sortBy, sortOrder, enqueueSnackbar]);
 
   // 메타데이터 로드
   const loadMetadata = useCallback(async () => {
@@ -197,6 +206,11 @@ const ClientVersionsPage: React.FC = () => {
     loadTags();
   }, [loadClientVersions, loadMetadata, loadTags]);
 
+  // 버전 목록 별도 로드
+  useEffect(() => {
+    loadAvailableVersions();
+  }, []);
+
   // 페이지 크기 변경 시 로컬 스토리지에 저장
   useEffect(() => {
     ClientVersionService.setStoredPageSize(rowsPerPage);
@@ -204,12 +218,17 @@ const ClientVersionsPage: React.FC = () => {
 
 
 
+
+
   // 필터 변경 핸들러
   const handleFilterChange = useCallback((newFilters: ClientVersionFilters) => {
+    console.log('Filter change handler called with:', newFilters);
     setFilters(newFilters);
     setPage(0);
     ClientVersionService.setStoredFilters(newFilters);
-  }, []);
+    // 새 필터로 즉시 데이터 로드
+    loadClientVersions(newFilters);
+  }, [loadClientVersions]);
 
   // 정렬은 고정 (버전 내림차순, 플랫폼 내림차순)
   // 정렬 변경 기능 비활성화
@@ -561,9 +580,11 @@ const ClientVersionsPage: React.FC = () => {
                   label={t('clientVersions.guestMode')}
                   onChange={(e) => {
                     const value = e.target.value;
+                    const guestModeValue = value === '' ? undefined : value === 'true';
+                    console.log('Guest mode filter changed:', { value, guestModeValue });
                     handleFilterChange({
                       ...filters,
-                      guestModeAllowed: value === '' ? undefined : value === 'true'
+                      guestModeAllowed: guestModeValue
                     });
                   }}
                   displayEmpty
@@ -676,12 +697,12 @@ const ClientVersionsPage: React.FC = () => {
                 </TableCell>
                 <TableCell>{t('clientVersions.gameServer')}</TableCell>
                 <TableCell>{t('clientVersions.patchAddress')}</TableCell>
-                <TableCell>{t('clientVersions.guestMode')}</TableCell>
+                <TableCell align="center">{t('clientVersions.guestMode')}</TableCell>
                 <TableCell>
                   {t('common.createdAt')}
                 </TableCell>
                 <TableCell>{t('common.createdBy')}</TableCell>
-                <TableCell>{t('common.tags')}</TableCell>
+                <TableCell align="center">{t('common.tags')}</TableCell>
                 <TableCell align="center">{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
@@ -776,7 +797,7 @@ const ClientVersionsPage: React.FC = () => {
                       </Tooltip>
                     </Box>
                   </TableCell>
-                  <TableCell>
+                  <TableCell align="center">
                     <Chip
                       label={clientVersion.guestModeAllowed ? t('common.yes') : t('common.no')}
                       color={clientVersion.guestModeAllowed ? 'success' : 'default'}
@@ -793,26 +814,22 @@ const ClientVersionsPage: React.FC = () => {
                       {clientVersion.createdByName || 'Unknown'}
                     </Typography>
                   </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 200 }}>
+                  <TableCell align="center">
+                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 200, justifyContent: 'center' }}>
                       {clientVersion.tags && clientVersion.tags.length > 0 ? (
                         clientVersion.tags.map((tag) => (
-                          <Chip
-                            key={tag.id}
-                            label={tag.name}
-                            size="small"
-                            sx={{ bgcolor: tag.color, color: '#fff' }}
-                          />
+                          <Tooltip key={tag.id} title={tag.description || tag.name} arrow>
+                            <Chip
+                              label={tag.name}
+                              size="small"
+                              sx={{ bgcolor: tag.color, color: '#fff' }}
+                            />
+                          </Tooltip>
                         ))
                       ) : (
-                        <Button
-                          size="small"
-                          variant="outlined"
-                          onClick={() => handleOpenTagDialog(clientVersion)}
-                          sx={{ minWidth: 'auto', px: 1 }}
-                        >
-                          {t('common.tags')}
-                        </Button>
+                        <Typography variant="body2" color="text.secondary">
+                          -
+                        </Typography>
                       )}
                     </Box>
                   </TableCell>

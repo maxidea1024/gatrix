@@ -362,6 +362,7 @@
       "platformRequired": "Platform is required",
       "serverAddresses": "Server Addresses",
       "statusHelp": "Specify the status of the game. (Online, Offline, Recommended Update, Forced Update, Under Review, Blocked & Patch Allowed)",
+      "statusRequired": "Status is required",
       "title": "Client Version",
       "versionHelp": "Use Semantic Versioning (SemVer) format. Examples: 1.0.0, 2.1.3, 1.0.0-beta.1 (major.minor.patch or major.minor.patch-prerelease)",
       "versionInvalid": "Version format is invalid",
@@ -407,6 +408,7 @@
     "allStatuses": "All Statuses",
     "available": "Available",
     "unavailable": "Unavailable",
+    "usable": "Usable",
     "back": "Back",
     "calendar": "Calendar",
     "cancel": "Cancel",
@@ -445,6 +447,7 @@
     "info": "Information",
     "loading": "Loading...",
     "loggedInAs": "Logged in as",
+    "memo": "Memo",
     "minute": "Minute",
     "month": "Month",
     "moreThan": "more than",
@@ -467,6 +470,7 @@
     "select": "Select",
     "selectTags": "Select tags...",
     "sort": "sort",
+    "status": "Status",
     "submit": "Submit",
     "success": "Success",
     "tags": "Tags",
@@ -576,6 +580,8 @@
     "startedAt": "Started At",
     "completedAt": "Completed At",
     "retryAttempt": "Retry Attempt",
+    "monitor": "Queue Monitor",
+    "monitorLoadError": "Failed to load queue monitor",
     "errorMessage": "Error Message",
     "noConfigurationRequired": "No configuration required",
     "jsonFormatHint": "Enter in JSON format",
@@ -921,12 +927,6 @@
       "purposeRequired": "Purpose is required",
       "noBulkEntries": "No valid entries found for import"
     }
-  },
-
-  "jobs": {
-    "title": "Job Management",
-    "monitor": "Queue Monitor",
-    "monitorLoadError": "Failed to load queue monitor"
   },
   "landing": {
     "welcome": "Welcome to Gatrix",

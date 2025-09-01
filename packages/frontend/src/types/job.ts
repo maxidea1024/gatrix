@@ -1,3 +1,5 @@
+import { Tag } from '../services/tagService';
+
 export interface JobType {
   id: number;
   name: string;
@@ -10,7 +12,9 @@ export interface JobType {
   createdBy?: number;
   updatedBy?: number;
   createdByName?: string;
+  createdByEmail?: string;
   updatedByName?: string;
+  updatedByEmail?: string;
 }
 
 export interface JobSchemaDefinition {
@@ -35,18 +39,17 @@ export interface Job {
   name: string;
   jobTypeId: number;
   jobDataMap?: any;
-  description?: string;
   memo?: string;
   isEnabled: boolean;
-  retryCount: number;
-  maxRetryCount: number;
-  timeoutSeconds: number;
+  tags?: Tag[];
   createdAt: string;
   updatedAt: string;
   createdBy?: number;
   updatedBy?: number;
   createdByName?: string;
+  createdByEmail?: string;
   updatedByName?: string;
+  updatedByEmail?: string;
   jobTypeName?: string;
   jobTypeDisplayName?: string;
 }
@@ -55,23 +58,18 @@ export interface CreateJobData {
   name: string;
   jobTypeId: number;
   jobDataMap?: any;
-  description?: string;
   memo?: string;
   isEnabled?: boolean;
-  retryCount?: number;
-  maxRetryCount?: number;
-  timeoutSeconds?: number;
+  tagIds?: number[];
 }
 
 export interface UpdateJobData {
   name?: string;
+  jobTypeId?: number;
   jobDataMap?: any;
-  description?: string;
   memo?: string;
   isEnabled?: boolean;
-  retryCount?: number;
-  maxRetryCount?: number;
-  timeoutSeconds?: number;
+  tagIds?: number[];
 }
 
 export enum JobExecutionStatus {

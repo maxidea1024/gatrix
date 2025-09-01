@@ -14,6 +14,9 @@ router.use((req, res, next) => {
 // 플랫폼 목록 조회 (관리자만)
 router.get('/meta/platforms', requireAdmin as any, ClientVersionController.getPlatforms);
 
+// 사용 가능한 버전 목록 조회 (관리자만)
+router.get('/meta/versions', requireAdmin as any, ClientVersionController.getAvailableVersions);
+
 // 클라이언트 버전 목록 조회 (관리자만)
 router.get('/', requireAdmin as any, ClientVersionController.getClientVersions);
 

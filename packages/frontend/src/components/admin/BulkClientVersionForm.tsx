@@ -208,9 +208,10 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     try {
       setLoading(true);
 
-      // 빈 문자열을 undefined로 변환
+      // 빈 문자열을 undefined로 변환하고 tags 필드 제거 (별도 처리)
+      const { tags, ...dataWithoutTags } = data;
       const cleanedData = {
-        ...data,
+        ...dataWithoutTags,
         externalClickLink: data.externalClickLink || undefined,
         memo: data.memo || undefined,
         customPayload: data.customPayload || undefined,
@@ -578,12 +579,13 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                       {(selected as number[]).map((id) => {
                         const tag = allTags.find(t => t.id === id);
                         return tag ? (
-                          <Chip
-                            key={id}
-                            label={tag.name}
-                            size="small"
-                            sx={{ bgcolor: tag.color, color: '#fff' }}
-                          />
+                          <Tooltip key={id} title={tag.description || tag.name} arrow>
+                            <Chip
+                              label={tag.name}
+                              size="small"
+                              sx={{ bgcolor: tag.color, color: '#fff' }}
+                            />
+                          </Tooltip>
                         ) : null;
                       })}
                     </Box>

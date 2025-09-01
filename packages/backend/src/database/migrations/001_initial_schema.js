@@ -112,16 +112,35 @@ exports.up = async function() {
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_client_versions (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      version VARCHAR(50) NOT NULL,
-      platform ENUM('pc', 'mobile', 'pc-wegame') NOT NULL DEFAULT 'pc',
-      downloadUrl VARCHAR(500) NOT NULL,
-      isRequired BOOLEAN NOT NULL DEFAULT FALSE,
-      releaseNotes TEXT NULL,
-      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      UNIQUE KEY unique_version_platform (version, platform),
+      platform VARCHAR(100) NOT NULL COMMENT '플랫폼 (예: android, ios, web, pc)',
+      clientVersion VARCHAR(50) NOT NULL COMMENT '클라이언트 버전 (semver 형식)',
+      clientStatus ENUM(
+        'online',
+        'offline',
+        'recommended_update',
+        'forced_update',
+        'under_review',
+        'blocked_patch_allowed'
+      ) NOT NULL COMMENT '클라이언트 상태',
+      gameServerAddress VARCHAR(500) NOT NULL COMMENT '게임서버 주소',
+      gameServerAddressForWhiteList VARCHAR(500) NULL COMMENT '화이트리스트 전용 게임서버 주소',
+      patchAddress VARCHAR(500) NOT NULL COMMENT '패치파일 다운로드 주소',
+      patchAddressForWhiteList VARCHAR(500) NULL COMMENT '화이트리스트 전용 패치파일 다운로드 주소',
+      guestModeAllowed BOOLEAN NOT NULL DEFAULT FALSE COMMENT '게스트 모드 허용 여부',
+      externalClickLink VARCHAR(500) NULL COMMENT '외부 클릭 링크',
+      memo TEXT NULL COMMENT '메모',
+      customPayload TEXT NULL COMMENT '사용자 정의 페이로드 (JSON 형식)',
+      createdAt DATETIME NOT NULL,
+      updatedAt DATETIME NOT NULL,
+      createdBy INT NOT NULL COMMENT '생성자 사용자 ID',
+      updatedBy INT NOT NULL COMMENT '수정자 사용자 ID',
+      CONSTRAINT fk_client_versions_creator FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE RESTRICT,
+      CONSTRAINT fk_client_versions_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE RESTRICT,
       INDEX idx_platform (platform),
-      INDEX idx_required (isRequired)
+      INDEX idx_client_version (clientVersion),
+      INDEX idx_client_status (clientStatus),
+      INDEX idx_created_at (createdAt),
+      UNIQUE KEY unique_platform_version (platform, clientVersion)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
@@ -212,25 +231,37 @@ exports.up = async function() {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
-  // 12. Message templates table
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_message_templates (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(255) NOT NULL UNIQUE,
+      id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(191) NOT NULL UNIQUE,
+      type ENUM('maintenance', 'general', 'notification', 'email', 'sms', 'push', 'system') NOT NULL DEFAULT 'maintenance',
+      isEnabled BOOLEAN NOT NULL DEFAULT TRUE,
+      defaultMessage TEXT NULL,
       subject VARCHAR(500) NULL,
-      content TEXT NOT NULL,
-      type ENUM('email', 'sms', 'push', 'system') NOT NULL DEFAULT 'email',
+      content TEXT NULL,
       variables JSON NULL,
-      isActive BOOLEAN NOT NULL DEFAULT TRUE,
-      createdBy INT NULL,
-      updatedBy INT NULL,
+      createdBy BIGINT NULL,
+      updatedBy BIGINT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      CONSTRAINT fk_message_templates_creator FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
-      CONSTRAINT fk_message_templates_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
       INDEX idx_name (name),
       INDEX idx_type (type),
-      INDEX idx_active (isActive)
+      INDEX idx_enabled (isEnabled)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
+
+  await connection.execute(`
+    CREATE TABLE IF NOT EXISTS g_message_template_locales (
+      id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+      templateId BIGINT UNSIGNED NOT NULL,
+      lang ENUM('ko', 'en', 'zh') NOT NULL,
+      message TEXT NOT NULL,
+      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (templateId) REFERENCES g_message_templates(id) ON DELETE CASCADE,
+      INDEX idx_template (templateId),
+      INDEX idx_lang (lang)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
@@ -241,12 +272,18 @@ exports.up = async function() {
     CREATE TABLE IF NOT EXISTS g_job_types (
       id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(100) NOT NULL UNIQUE,
+      displayName VARCHAR(200) NOT NULL,
       description TEXT NULL,
       \`schema\` JSON NULL,
       isActive BOOLEAN NOT NULL DEFAULT TRUE,
+      createdBy INT NULL,
+      updatedBy INT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      CONSTRAINT fk_job_types_creator FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
+      CONSTRAINT fk_job_types_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
       INDEX idx_name (name),
+      INDEX idx_display_name (displayName),
       INDEX idx_active (isActive)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
@@ -256,13 +293,10 @@ exports.up = async function() {
     CREATE TABLE IF NOT EXISTS g_jobs (
       id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
-      description TEXT NULL,
+      memo TEXT NULL,
       jobTypeId INT NOT NULL,
-      config JSON NULL,
-      schedule VARCHAR(100) NULL,
-      isActive BOOLEAN NOT NULL DEFAULT TRUE,
-      lastRunAt TIMESTAMP NULL,
-      nextRunAt TIMESTAMP NULL,
+      jobDataMap JSON NULL,
+      isEnabled BOOLEAN NOT NULL DEFAULT TRUE,
       createdBy INT NULL,
       updatedBy INT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -272,9 +306,7 @@ exports.up = async function() {
       CONSTRAINT fk_jobs_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
       INDEX idx_name (name),
       INDEX idx_type (jobTypeId),
-      INDEX idx_active (isActive),
-      INDEX idx_schedule (schedule),
-      INDEX idx_next_run (nextRunAt)
+      INDEX idx_enabled (isEnabled)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
@@ -321,11 +353,24 @@ exports.up = async function() {
 
   // Insert default job types
   await connection.execute(`
-    INSERT IGNORE INTO g_job_types (name, description, \`schema\`, isActive) VALUES
-    ('mailsend', 'Send email messages', '{"type":"object","properties":{"to":{"type":"string"},"subject":{"type":"string"},"body":{"type":"string"}}}', TRUE),
-    ('http_request', 'Make HTTP requests', '{"type":"object","properties":{"url":{"type":"string"},"method":{"type":"string"},"headers":{"type":"object"},"body":{"type":"string"}}}', TRUE),
-    ('ssh_command', 'Execute SSH commands', '{"type":"object","properties":{"host":{"type":"string"},"command":{"type":"string"},"username":{"type":"string"}}}', TRUE),
-    ('log_message', 'Log messages', '{"type":"object","properties":{"level":{"type":"string"},"message":{"type":"string"}}}', TRUE)
+    INSERT IGNORE INTO g_job_types (name, displayName, description, \`schema\`, isActive) VALUES
+    ('mailsend', 'Email Sender', 'Send email messages', '{"to":{"type":"string","required":true,"description":"Recipient email address"},"subject":{"type":"string","required":true,"description":"Email subject"},"body":{"type":"text","required":true,"description":"Email body content"}}', TRUE),
+    ('http_request', 'HTTP Request', 'Make HTTP requests', '{"url":{"type":"string","required":true,"description":"Request URL"},"method":{"type":"select","required":true,"description":"HTTP method","options":["GET","POST","PUT","DELETE","PATCH"],"default":"GET"},"headers":{"type":"object","required":false,"description":"Request headers (JSON format)"},"body":{"type":"text","required":false,"description":"Request body"}}', TRUE),
+    ('ssh_command', 'SSH Command', 'Execute SSH commands', '{"host":{"type":"string","required":true,"description":"SSH host address"},"username":{"type":"string","required":true,"description":"SSH username"},"command":{"type":"text","required":true,"description":"Command to execute"},"port":{"type":"number","required":false,"description":"SSH port","default":22}}', TRUE),
+    ('log_message', 'Log Message', 'Log messages', '{"level":{"type":"select","required":true,"description":"Log level","options":["debug","info","warn","error"],"default":"info"},"message":{"type":"text","required":true,"description":"Log message content"}}', TRUE)
+  `);
+
+  // Insert default client versions
+  await connection.execute(`
+    INSERT IGNORE INTO g_client_versions (
+      platform, clientVersion, clientStatus,
+      gameServerAddress, patchAddress, guestModeAllowed,
+      createdAt, updatedAt, createdBy, updatedBy
+    ) VALUES
+    ('android', '1.0.0', 'online', 'https://game.example.com', 'https://patch.example.com', FALSE, NOW(), NOW(), 1, 1),
+    ('ios', '1.0.0', 'online', 'https://game.example.com', 'https://patch.example.com', FALSE, NOW(), NOW(), 1, 1),
+    ('web', '1.0.0', 'online', 'https://game.example.com', 'https://patch.example.com', TRUE, NOW(), NOW(), 1, 1),
+    ('pc', '1.0.0', 'online', 'https://game.example.com', 'https://patch.example.com', FALSE, NOW(), NOW(), 1, 1)
   `);
 
   console.log('✓ Default data inserted');

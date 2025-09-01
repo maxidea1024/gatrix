@@ -39,8 +39,9 @@ router.post('/jobs',
   auditLog({
     action: 'job_create',
     resourceType: 'job',
-    getResourceId: (req: any) => req.body?.name,
+    // Job 생성 시에는 ID가 아직 없으므로 getResourceId 제거
     getNewValues: (req) => req.body,
+    getResourceIdFromResponse: (res: any) => res?.data?.id,
   }) as any,
   createJob
 );
@@ -77,6 +78,8 @@ router.post('/jobs/:id/execute',
   executeJob
 );
 router.get('/jobs/:id/executions', getJobExecutions);
+
+// 디버그 라우트 제거됨
 
 // Job 태그 관련 라우트
 router.get('/jobs/:id/tags', getJobTags);

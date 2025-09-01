@@ -97,18 +97,24 @@ export class MessageTemplateModel {
       console.log('🔍 Data results:', dataResults);
       console.log('🔍 Total:', total);
 
-      // 각 메시지 템플릿에 태그 정보 추가
+      // 각 메시지 템플릿에 태그 정보와 locales 정보 추가
       const messageTemplatesWithTags = await Promise.all(
         dataResults.map(async (template: any) => {
-          const tags = await db('g_tag_assignments as ta')
-            .join('g_tags as t', 'ta.tagId', 't.id')
-            .where('ta.entityType', 'message_template')
-            .where('ta.entityId', template.id)
-            .select('t.id', 't.name', 't.color');
+          const [tags, locales] = await Promise.all([
+            db('g_tag_assignments as ta')
+              .join('g_tags as t', 'ta.tagId', 't.id')
+              .where('ta.entityType', 'message_template')
+              .where('ta.entityId', template.id)
+              .select('t.id', 't.name', 't.color'),
+            db('g_message_template_locales')
+              .where('templateId', template.id)
+              .select('lang', 'message')
+          ]);
 
           return {
             ...template,
-            tags: tags || []
+            tags: tags || [],
+            locales: locales || []
           };
         })
       );
@@ -136,7 +142,19 @@ export class MessageTemplateModel {
         .where('mt.id', id)
         .first();
 
-      return template;
+      if (!template) {
+        return null;
+      }
+
+      // locales 정보 추가
+      const locales = await db('g_message_template_locales')
+        .where('templateId', id)
+        .select('lang', 'message');
+
+      return {
+        ...template,
+        locales: locales || []
+      };
     } catch (error) {
       logger.error('Error finding message template by ID:', error);
       throw error;
@@ -158,7 +176,34 @@ export class MessageTemplateModel {
           updatedAt: new Date()
         });
 
-        return await this.findById(insertId);
+        // 언어별 메시지 처리
+        if (data.locales && data.locales.length > 0) {
+          const localeInserts = data.locales.map((locale: any) => ({
+            templateId: insertId,
+            lang: locale.lang,
+            message: locale.message,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }));
+
+          await trx('g_message_template_locales').insert(localeInserts);
+        }
+
+        const created = await this.findById(insertId);
+
+        if (!created) {
+          // 직접 ID와 기본 정보를 반환
+          return {
+            id: insertId,
+            name: data.name,
+            type: data.type,
+            defaultMessage: data.defaultMessage || data.default_message || data.content || '',
+            isEnabled: data.isEnabled !== undefined ? data.isEnabled : (data.is_enabled !== undefined ? data.is_enabled : true),
+            locales: data.locales || []
+          };
+        }
+
+        return created;
       });
     } catch (error) {
       logger.error('Error creating message template:', error);
@@ -180,6 +225,22 @@ export class MessageTemplateModel {
             updatedBy: data.updatedBy || data.updated_by,
             updatedAt: new Date()
           });
+
+        // 기존 언어별 메시지 삭제
+        await trx('g_message_template_locales').where('templateId', id).del();
+
+        // 새로운 언어별 메시지 추가
+        if (data.locales && data.locales.length > 0) {
+          const localeInserts = data.locales.map((locale: any) => ({
+            templateId: id,
+            lang: locale.lang,
+            message: locale.message,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }));
+
+          await trx('g_message_template_locales').insert(localeInserts);
+        }
 
         return await this.findById(id);
       });

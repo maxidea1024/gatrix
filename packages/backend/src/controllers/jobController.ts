@@ -9,8 +9,8 @@ import logger from '../config/logger';
 export const getJobs = async (req: Request, res: Response) => {
   try {
     const {
-      job_type_id,
-      is_enabled,
+      jobTypeId,
+      isEnabled,
       search,
       limit = 20,
       offset = 0,
@@ -18,8 +18,8 @@ export const getJobs = async (req: Request, res: Response) => {
     } = req.query;
 
     const filters: any = {};
-    if (job_type_id) filters.job_type_id = parseInt(job_type_id as string);
-    if (is_enabled !== undefined) filters.is_enabled = is_enabled === 'true';
+    if (jobTypeId) filters.jobTypeId = parseInt(jobTypeId as string);
+    if (isEnabled !== undefined) filters.isEnabled = isEnabled === 'true';
     if (search) filters.search = search as string;
 
     // 페이지네이션 처리
@@ -79,7 +79,6 @@ export const getJob = async (req: Request, res: Response) => {
         message: 'Job not found'
       });
     }
-
     res.json({
       success: true,
       data: job
@@ -99,26 +98,23 @@ export const createJob = async (req: Request, res: Response) => {
   try {
     const {
       name,
-      job_type_id,
-      job_data_map,
-      description,
+      jobTypeId,
+      jobDataMap,
       memo,
-      is_enabled,
-      retry_count,
-      max_retry_count,
-      timeout_seconds
+      isEnabled,
+      tagIds
     } = req.body;
 
     // 필수 필드 검증
-    if (!name || !job_type_id) {
+    if (!name || !jobTypeId) {
       return res.status(400).json({
         success: false,
-        message: 'Name and job_type_id are required'
+        message: 'Name and jobTypeId are required'
       });
     }
 
     // Job 타입 존재 여부 확인
-    const jobType = await JobTypeModel.findById(job_type_id);
+    const jobType = await JobTypeModel.findById(jobTypeId);
     if (!jobType) {
       return res.status(400).json({
         success: false,
@@ -137,18 +133,15 @@ export const createJob = async (req: Request, res: Response) => {
     }
 
     // 사용자 ID 가져오기 (인증된 사용자)
-    const userId = (req as any).user?.id;
+    const userId = (req as any).user?.userId;
 
     const jobData: CreateJobData = {
       name,
-      jobTypeId: job_type_id,
-      jobDataMap: job_data_map,
-      description,
+      jobTypeId,
+      jobDataMap,
       memo,
-      isEnabled: is_enabled,
-      retryCount: retry_count,
-      maxRetryCount: max_retry_count,
-      timeoutSeconds: timeout_seconds,
+      isEnabled,
+      tagIds,
       createdBy: userId,
       updatedBy: userId
     };
@@ -194,17 +187,15 @@ export const updateJob = async (req: Request, res: Response) => {
 
     const {
       name,
-      job_data_map,
-      description,
+      jobTypeId,
+      jobDataMap,
       memo,
-      is_enabled,
-      retry_count,
-      max_retry_count,
-      timeout_seconds
+      isEnabled,
+      tagIds
     } = req.body;
 
     // 사용자 ID 가져오기 (인증된 사용자)
-    const userId = (req as any).user?.id;
+    const userId = (req as any).user?.userId;
 
     // Job 이름 중복 검증 (이름이 변경되는 경우에만)
     const existingJobByName = await JobModel.findByName(name);
@@ -218,13 +209,11 @@ export const updateJob = async (req: Request, res: Response) => {
 
     const updateData: UpdateJobData = {
       name,
-      jobDataMap: job_data_map,
-      description,
+      jobTypeId,
+      jobDataMap,
       memo,
-      isEnabled: is_enabled,
-      retryCount: retry_count,
-      maxRetryCount: max_retry_count,
-      timeoutSeconds: timeout_seconds,
+      isEnabled,
+      tagIds,
       updatedBy: userId
     };
 
@@ -367,3 +356,5 @@ export const getJobTags = async (req: Request, res: Response) => {
     });
   }
 };
+
+

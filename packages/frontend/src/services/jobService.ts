@@ -32,9 +32,10 @@ export const jobService = {
   },
 
   async getJobsWithPagination(filters?: JobFilters): Promise<JobListResponse> {
+    console.log('jobService.getJobsWithPagination called with filters:', filters);
     const params = new URLSearchParams();
-    if (filters?.job_type_id) params.append('job_type_id', filters.job_type_id.toString());
-    if (filters?.is_enabled !== undefined) params.append('is_enabled', filters.is_enabled.toString());
+    if (filters?.jobTypeId) params.append('jobTypeId', filters.jobTypeId.toString());
+    if (filters?.isEnabled !== undefined) params.append('isEnabled', filters.isEnabled.toString());
     if (filters?.search) params.append('search', filters.search);
     if (filters?.limit) params.append('limit', filters.limit.toString());
     if (filters?.offset !== undefined) params.append('offset', filters.offset.toString());
@@ -42,7 +43,9 @@ export const jobService = {
 
     const queryString = params.toString();
     const url = queryString ? `/jobs?${queryString}` : '/jobs';
+    console.log('jobService making API call to:', url);
     const response = await api.get(url);
+    console.log('jobService received response:', response.data);
 
     // 백엔드 응답 구조에 맞게 처리
     if (response.data?.pagination) {

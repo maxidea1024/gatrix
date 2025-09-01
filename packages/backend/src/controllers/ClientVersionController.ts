@@ -3,6 +3,7 @@ import Joi from 'joi';
 import ClientVersionService, { ClientVersionFilters, ClientVersionPagination, BulkStatusUpdateRequest } from '../services/ClientVersionService';
 import { ClientStatus, BulkCreateClientVersionRequest } from '../models/ClientVersion';
 import { ClientVersionModel } from '../models/ClientVersion';
+import logger from '../config/logger';
 
 // Validation schemas
 const createClientVersionSchema = Joi.object({
@@ -17,6 +18,16 @@ const createClientVersionSchema = Joi.object({
   externalClickLink: Joi.string().max(500).optional().allow('').empty('').default(null),
   memo: Joi.string().optional().allow('').empty('').default(null),
   customPayload: Joi.string().optional().allow('').empty('').default(null),
+  tags: Joi.array().items(Joi.object({
+    id: Joi.number().integer().positive().required(),
+    name: Joi.string().optional(),
+    color: Joi.string().optional(),
+    description: Joi.string().optional().allow(null),
+    createdBy: Joi.number().integer().optional(),
+    updatedBy: Joi.number().integer().optional(),
+    createdAt: Joi.date().optional(),
+    updatedAt: Joi.date().optional()
+  }).unknown(true)).optional().default([]),
 });
 
 const updateClientVersionSchema = Joi.object({
@@ -31,6 +42,7 @@ const updateClientVersionSchema = Joi.object({
   externalClickLink: Joi.string().max(500).optional().allow('').empty('').default(null),
   memo: Joi.string().optional().allow('').empty('').default(null),
   customPayload: Joi.string().optional().allow('').empty('').default(null),
+
 });
 
 const getClientVersionsQuerySchema = Joi.object({
@@ -43,7 +55,11 @@ const getClientVersionsQuerySchema = Joi.object({
   clientStatus: Joi.string().valid(...Object.values(ClientStatus)).optional(),
   gameServerAddress: Joi.string().optional(),
   patchAddress: Joi.string().optional(),
-  guestModeAllowed: Joi.boolean().optional(),
+  guestModeAllowed: Joi.string().valid('true', 'false').optional().custom((value, helpers) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return helpers.error('any.invalid');
+  }),
   externalClickLink: Joi.string().optional(),
   memo: Joi.string().optional(),
   customPayload: Joi.string().optional(),
@@ -69,6 +85,7 @@ const bulkCreateClientVersionSchema = Joi.object({
   externalClickLink: Joi.string().max(500).optional().allow('').empty('').default(null),
   memo: Joi.string().max(1000).optional().allow('').empty('').default(null),
   customPayload: Joi.string().max(5000).optional().allow('').empty('').default(null),
+
   platforms: Joi.array().items(
     Joi.object({
       platform: Joi.string().min(1).max(50).required(),
@@ -81,6 +98,23 @@ const bulkCreateClientVersionSchema = Joi.object({
 });
 
 export class ClientVersionController {
+  // 사용 가능한 버전 목록 조회 (distinct)
+  static async getAvailableVersions(req: Request, res: Response) {
+    try {
+      const versions = await ClientVersionService.getAvailableVersions();
+      res.json({
+        success: true,
+        data: versions,
+      });
+    } catch (error: any) {
+      logger.error('Error getting available versions:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to get available versions',
+      });
+    }
+  }
+
   // 클라이언트 버전 목록 조회
   static async getClientVersions(req: Request, res: Response) {
     const { error, value } = getClientVersionsQuerySchema.validate(req.query);
@@ -91,6 +125,8 @@ export class ClientVersionController {
       });
     }
 
+    console.log('Received filters:', value);
+
     const { page, limit, sortBy, sortOrder, _t, ...filterParams } = value;
 
     const filters: ClientVersionFilters = {};
@@ -98,10 +134,28 @@ export class ClientVersionController {
 
     // 필터 조건 설정
     Object.keys(filterParams).forEach(key => {
-      if (filterParams[key] !== undefined && filterParams[key] !== '') {
-        filters[key as keyof ClientVersionFilters] = filterParams[key];
+      const value = filterParams[key];
+      // guestModeAllowed는 boolean이므로 false도 유효한 값
+      if (value !== undefined && (value !== '' || key === 'guestModeAllowed')) {
+        let processedValue: any = value;
+
+        // guestModeAllowed는 문자열을 boolean으로 변환
+        if (key === 'guestModeAllowed') {
+          processedValue = value === 'true';
+        }
+
+        console.log(`Setting filter: ${key} = ${processedValue} (${typeof processedValue})`);
+
+        // 타입 안전하게 할당
+        if (key === 'guestModeAllowed') {
+          (filters as any).guestModeAllowed = processedValue;
+        } else {
+          filters[key as keyof ClientVersionFilters] = processedValue;
+        }
       }
     });
+
+    console.log('Final filters passed to service:', filters);
 
     const result = await ClientVersionService.getAllClientVersions(filters, pagination);
 

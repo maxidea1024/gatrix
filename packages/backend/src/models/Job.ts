@@ -16,40 +16,68 @@ export interface JobListResult {
 
 export interface CreateJobData {
   name: string;
-  description?: string;
+  memo?: string;
   jobTypeId: number;
   isEnabled: boolean;
   jobDataMap?: any;
-  memo?: string;
-  retryCount?: number;
-  maxRetryCount?: number;
-  timeoutSeconds?: number;
+  tagIds?: number[];
   createdBy: number;
   updatedBy: number;
 }
 
 export interface UpdateJobData {
   name?: string;
-  description?: string;
+  memo?: string;
   jobTypeId?: number;
   isEnabled?: boolean;
   jobDataMap?: any;
-  memo?: string;
-  retryCount?: number;
-  maxRetryCount?: number;
-  timeoutSeconds?: number;
+  tagIds?: number[];
   updatedBy: number;
 }
 
 // JSON 파싱 유틸리티 함수
-const safeJsonParse = (jsonString: string | null): any => {
-  if (!jsonString) return {};
-  try {
-    return JSON.parse(jsonString);
-  } catch (error) {
-    logger.warn('Failed to parse JSON:', { jsonString, error });
+const safeJsonParse = (input: any): any => {
+  // 이미 객체인 경우 그대로 반환
+  if (typeof input === 'object' && input !== null) {
+    return input;
+  }
+
+  // null이나 undefined인 경우 빈 객체 반환
+  if (!input) {
     return {};
   }
+
+  // 문자열인 경우 JSON 파싱 시도
+  if (typeof input === 'string') {
+    if (input === '{}') {
+      return {};
+    }
+
+    try {
+      return JSON.parse(input);
+    } catch (error) {
+      logger.warn('Failed to parse JSON string:', { input, error });
+      return {};
+    }
+  }
+
+  // 기타 타입인 경우 그대로 반환
+  return input;
+};
+
+// JSON 문자열화 유틸리티 함수
+const safeJsonStringify = (data: any): string => {
+  if (typeof data === 'string') {
+    // 이미 문자열인 경우, JSON인지 확인
+    try {
+      JSON.parse(data);
+      return data; // 이미 유효한 JSON 문자열
+    } catch {
+      // 유효하지 않은 JSON이면 다시 stringify
+      return JSON.stringify(data);
+    }
+  }
+  return JSON.stringify(data || {});
 };
 
 export class JobModel {
@@ -91,14 +119,16 @@ export class JobModel {
         .count('j.id as total')
         .first();
 
-      // Data 쿼리
+      // Data 쿼리 - 태그 정보 포함
       const dataQuery = applyFilters(baseQuery())
         .select([
           'j.*',
           'jt.name as jobTypeName',
           'jt.displayName as jobTypeDisplayName',
           'cu.name as createdByName',
-          'uu.name as updatedByName'
+          'cu.email as createdByEmail',
+          'uu.name as updatedByName',
+          'uu.email as updatedByEmail'
         ])
         .orderBy('j.createdAt', 'desc')
         .limit(limit)
@@ -111,10 +141,61 @@ export class JobModel {
       ]);
 
       const total = countResult?.total || 0;
+
+      // Job 결과 매핑
       const jobs = dataResults.map((row: any) => ({
-        ...row,
-        job_data_map: safeJsonParse(row.job_data_map)
+        id: row.id,
+        name: row.name,
+        memo: row.memo,
+        jobTypeId: row.jobTypeId,
+        jobDataMap: safeJsonParse(row.jobDataMap),
+        isEnabled: Boolean(row.isEnabled),
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt,
+        createdBy: row.createdBy,
+        updatedBy: row.updatedBy,
+        jobTypeName: row.jobTypeName,
+        jobTypeDisplayName: row.jobTypeDisplayName,
+        createdByName: row.createdByName,
+        createdByEmail: row.createdByEmail,
+        updatedByName: row.updatedByName,
+        updatedByEmail: row.updatedByEmail
       }));
+
+      // 각 Job에 대한 태그 정보 조회
+      const jobIds = jobs.map((job: any) => job.id);
+      if (jobIds.length > 0) {
+        const jobTags = await db('g_tag_assignments as ta')
+          .join('g_tags as t', 'ta.tagId', 't.id')
+          .select([
+            'ta.entityId as jobId',
+            't.id as tagId',
+            't.name as tagName',
+            't.description as tagDescription',
+            't.color as tagColor'
+          ])
+          .where('ta.entityType', 'job')
+          .whereIn('ta.entityId', jobIds);
+
+        // Job별로 태그 그룹화
+        const tagsByJobId = jobTags.reduce((acc: any, tag: any) => {
+          if (!acc[tag.jobId]) {
+            acc[tag.jobId] = [];
+          }
+          acc[tag.jobId].push({
+            id: tag.tagId,
+            name: tag.tagName,
+            description: tag.tagDescription,
+            color: tag.tagColor
+          });
+          return acc;
+        }, {});
+
+        // Job에 태그 정보 추가
+        jobs.forEach((job: any) => {
+          job.tags = tagsByJobId[job.id] || [];
+        });
+      }
 
       return { jobs, total };
     } catch (error) {
@@ -134,16 +215,38 @@ export class JobModel {
           'jt.name as jobTypeName',
           'jt.displayName as jobTypeDisplayName',
           'cu.name as createdByName',
-          'uu.name as updatedByName'
+          'cu.email as createdByEmail',
+          'uu.name as updatedByName',
+          'uu.email as updatedByEmail'
         ])
         .where('j.id', id)
         .first();
 
       if (!job) return null;
 
+      // 태그 정보 조회
+      const jobTags = await db('g_tag_assignments as ta')
+        .join('g_tags as t', 'ta.tagId', 't.id')
+        .select([
+          't.id as tagId',
+          't.name as tagName',
+          't.description as tagDescription',
+          't.color as tagColor'
+        ])
+        .where('ta.entityType', 'job')
+        .where('ta.entityId', id);
+
+      const tags = jobTags.map((tag: any) => ({
+        id: tag.tagId,
+        name: tag.tagName,
+        description: tag.tagDescription,
+        color: tag.tagColor
+      }));
+
       return {
         ...job,
-        jobDataMap: safeJsonParse(job.jobDataMap)
+        jobDataMap: safeJsonParse(job.jobDataMap),
+        tags: tags
       };
     } catch (error) {
       logger.error('Error finding job by ID:', error);
@@ -152,62 +255,102 @@ export class JobModel {
   }
 
   static async create(jobData: CreateJobData): Promise<any> {
+    const trx = await db.transaction();
     try {
-      const [insertId] = await db('g_jobs').insert({
+      const [insertId] = await trx('g_jobs').insert({
         name: jobData.name,
-        description: jobData.description,
+        memo: jobData.memo,
         jobTypeId: jobData.jobTypeId,
         isEnabled: jobData.isEnabled,
-        jobDataMap: JSON.stringify(jobData.jobDataMap || {}),
-        memo: jobData.memo,
-        retryCount: jobData.retryCount || 0,
-        maxRetryCount: jobData.maxRetryCount || 3,
-        timeoutSeconds: jobData.timeoutSeconds,
+        jobDataMap: safeJsonStringify(jobData.jobDataMap || {}),
         createdBy: jobData.createdBy,
         updatedBy: jobData.updatedBy,
         createdAt: new Date(),
         updatedAt: new Date()
       });
 
+      // 태그 연결
+      if (jobData.tagIds && jobData.tagIds.length > 0) {
+        const tagAssignments = jobData.tagIds.map(tagId => ({
+          entityType: 'job',
+          entityId: insertId,
+          tagId: tagId,
+          createdAt: new Date()
+        }));
+        await trx('g_tag_assignments').insert(tagAssignments);
+      }
+
+      await trx.commit();
       return await this.findById(insertId);
     } catch (error) {
+      await trx.rollback();
       logger.error('Error creating job:', error);
       throw error;
     }
   }
 
   static async update(id: number, jobData: UpdateJobData): Promise<any> {
+    const trx = await db.transaction();
     try {
       const updateData: any = {};
 
       if (jobData.name !== undefined) updateData.name = jobData.name;
-      if (jobData.description !== undefined) updateData.description = jobData.description;
+      if (jobData.memo !== undefined) updateData.memo = jobData.memo;
       if (jobData.jobTypeId !== undefined) updateData.jobTypeId = jobData.jobTypeId;
       if (jobData.isEnabled !== undefined) updateData.isEnabled = jobData.isEnabled;
-      if (jobData.jobDataMap !== undefined) updateData.jobDataMap = JSON.stringify(jobData.jobDataMap);
-      if (jobData.memo !== undefined) updateData.memo = jobData.memo;
-      if (jobData.retryCount !== undefined) updateData.retryCount = jobData.retryCount;
-      if (jobData.maxRetryCount !== undefined) updateData.maxRetryCount = jobData.maxRetryCount;
-      if (jobData.timeoutSeconds !== undefined) updateData.timeoutSeconds = jobData.timeoutSeconds;
+      if (jobData.jobDataMap !== undefined) updateData.jobDataMap = safeJsonStringify(jobData.jobDataMap);
       if (jobData.updatedBy !== undefined) updateData.updatedBy = jobData.updatedBy;
 
       updateData.updatedAt = new Date();
 
-      await db('g_jobs')
+      await trx('g_jobs')
         .where('id', id)
         .update(updateData);
 
+      // 태그 업데이트
+      if (jobData.tagIds !== undefined) {
+        // 기존 태그 연결 삭제
+        await trx('g_tag_assignments')
+          .where('entityType', 'job')
+          .where('entityId', id)
+          .del();
+
+        // 새 태그 연결 추가
+        if (jobData.tagIds.length > 0) {
+          const tagAssignments = jobData.tagIds.map(tagId => ({
+            entityType: 'job',
+            entityId: id,
+            tagId: tagId,
+            createdAt: new Date()
+          }));
+          await trx('g_tag_assignments').insert(tagAssignments);
+        }
+      }
+
+      await trx.commit();
       return await this.findById(id);
     } catch (error) {
+      await trx.rollback();
       logger.error('Error updating job:', error);
       throw error;
     }
   }
 
   static async delete(id: number): Promise<void> {
+    const trx = await db.transaction();
     try {
-      await db('g_jobs').where('id', id).del();
+      // 태그 할당 삭제
+      await trx('g_tag_assignments')
+        .where('entityType', 'job')
+        .where('entityId', id)
+        .del();
+
+      // Job 삭제
+      await trx('g_jobs').where('id', id).del();
+
+      await trx.commit();
     } catch (error) {
+      await trx.rollback();
       logger.error('Error deleting job:', error);
       throw error;
     }

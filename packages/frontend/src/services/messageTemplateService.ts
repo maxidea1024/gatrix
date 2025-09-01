@@ -8,10 +8,15 @@ export interface MessageTemplate {
   id?: number;
   name: string;
   type: MessageTemplateType;
-  is_enabled: boolean;
-  default_message?: string | null;
+  isEnabled: boolean;
+  defaultMessage?: string | null;
   locales?: MessageTemplateLocale[];
   tags?: { id: number; name: string; color: string }[];
+  createdAt?: string;
+  updatedAt?: string;
+  // 백워드 호환성을 위한 snake_case 필드들 (선택적)
+  is_enabled?: boolean;
+  default_message?: string | null;
   created_at?: string;
   updated_at?: string;
 }
@@ -52,11 +57,25 @@ export const messageTemplateService = {
   },
   async create(data: MessageTemplate): Promise<MessageTemplate> {
     const res = await apiService.post<any>('/message-templates', data);
-    return res.data.data; // { success: true, data: created } 구조
+
+    // 서버 응답 구조: { success: true, data: created }
+    if (res?.data?.success && res?.data?.data) {
+      return res.data.data;
+    }
+
+    // 백워드 호환성을 위한 다른 구조들
+    return res?.data?.data || res?.data || res;
   },
   async update(id: number, data: MessageTemplate): Promise<MessageTemplate> {
     const res = await apiService.put<any>(`/message-templates/${id}`, data);
-    return res.data.data; // { success: true, data: updated } 구조
+
+    // 서버 응답 구조: { success: true, data: updated }
+    if (res?.data?.success && res?.data?.data) {
+      return res.data.data;
+    }
+
+    // 백워드 호환성을 위한 다른 구조들
+    return res?.data?.data || res?.data || res;
   },
   async remove(id: number): Promise<void> {
     await apiService.delete(`/message-templates/${id}`);

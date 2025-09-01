@@ -121,45 +121,36 @@ Create structured log entries for audit trails and monitoring.
 - Integration with Winston logger
 - Searchable log entries
 
-## Scheduling
+## Job Execution
 
-### Cron Syntax
+Jobs are executed manually or through external scheduling systems. The job management system focuses on:
 
-Jobs can be scheduled using cron-like syntax:
+- **Manual Execution**: Jobs can be triggered manually from the admin interface
+- **External Scheduling**: Integration with external schedulers (Cron, Kubernetes CronJobs, etc.)
+- **API Execution**: Jobs can be triggered via REST API calls
+
+### Manual Execution
+
+Jobs can be executed immediately through the admin interface:
 
 ```javascript
-// Every minute
-"* * * * *"
-
-// Every hour at minute 0
-"0 * * * *"
-
-// Every day at 2:30 AM
-"30 2 * * *"
-
-// Every Monday at 9:00 AM
-"0 9 * * 1"
-
-// Every 15 minutes
-"*/15 * * * *"
+// Execute job by ID
+POST /api/jobs/{id}/execute
 ```
 
-### One-time Jobs
+### API Integration
 
-For immediate or delayed execution:
+For programmatic execution:
 
 ```javascript
-// Execute immediately
-{
-  "schedule": null,
-  "delay": 0
-}
-
-// Execute after 5 minutes
-{
-  "schedule": null,
-  "delay": 300000
-}
+// Execute job via API
+fetch('/api/jobs/123/execute', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer <token>',
+    'Content-Type': 'application/json'
+  }
+});
 ```
 
 ## Job Configuration
@@ -170,17 +161,13 @@ For immediate or delayed execution:
 interface Job {
   id?: number;
   name: string;                    // Job display name
-  job_type_id: number;            // Job type (1=mailsend, 2=http_request, etc.)
-  job_data_map: object;           // Job-specific configuration
-  description?: string;           // Job description
+  jobTypeId: number;              // Job type (1=mailsend, 2=http_request, etc.)
+  jobDataMap: object;             // Job-specific configuration
   memo?: string;                  // Additional notes
-  is_enabled: boolean;            // Enable/disable job
-  retry_count: number;            // Current retry count
-  max_retry_count: number;        // Maximum retries (default: 3)
-  timeout_seconds: number;        // Job timeout (default: 300)
-  schedule?: string;              // Cron schedule (optional)
-  created_by?: number;            // Creator user ID
-  updated_by?: number;            // Last updater user ID
+  isEnabled: boolean;             // Enable/disable job
+  tags?: Tag[];                   // Associated tags
+  createdBy?: number;             // Creator user ID
+  updatedBy?: number;             // Last updater user ID
 }
 ```
 

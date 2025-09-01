@@ -5,6 +5,7 @@ export interface ClientVersionFilters {
   clientVersion?: string;
   platform?: string;
   clientStatus?: string;
+  guestModeAllowed?: boolean;
   limit?: number;
   offset?: number;
   sortBy?: string;
@@ -51,6 +52,20 @@ export interface BulkCreateClientVersionRequest {
 }
 
 export class ClientVersionModel {
+  // 사용 가능한 버전 목록 조회 (distinct)
+  static async getDistinctVersions(): Promise<string[]> {
+    try {
+      const result = await db('g_client_versions')
+        .distinct('clientVersion')
+        .orderBy('clientVersion', 'desc');
+
+      return result.map(row => row.clientVersion);
+    } catch (error) {
+      logger.error('Error getting distinct versions:', error);
+      throw error;
+    }
+  }
+
   static async findAll(filters?: ClientVersionFilters): Promise<ClientVersionListResult> {
     try {
       // 기본값 설정
@@ -67,7 +82,7 @@ export class ClientVersionModel {
       // 필터 적용 함수
       const applyFilters = (query: any) => {
         if (filters?.clientVersion) {
-          query.where('cv.clientVersion', 'like', `%${filters.clientVersion}%`);
+          query.where('cv.clientVersion', filters.clientVersion);
         }
 
         if (filters?.platform) {
@@ -76,6 +91,16 @@ export class ClientVersionModel {
 
         if (filters?.clientStatus) {
           query.where('cv.clientStatus', filters.clientStatus);
+        }
+
+        if (filters?.guestModeAllowed !== undefined) {
+          // TINYINT 타입이므로 boolean을 숫자로 변환 (true -> 1, false -> 0)
+          const guestModeValue = filters.guestModeAllowed ? 1 : 0;
+          logger.info('Applying guestModeAllowed filter:', filters.guestModeAllowed, '-> DB value:', guestModeValue);
+          query.where('cv.guestModeAllowed', guestModeValue);
+
+          // 디버깅: 쿼리 로그
+          logger.info('Query with guestModeAllowed filter:', query.toSQL());
         }
 
         return query;
@@ -104,6 +129,11 @@ export class ClientVersionModel {
       ]);
 
       const total = countResult?.total || 0;
+
+      // 디버깅: 조회된 데이터의 guestModeAllowed 값들 확인
+      logger.info('Retrieved client versions guestModeAllowed values:',
+        dataResults.map((cv: any) => ({ id: cv.id, guestModeAllowed: cv.guestModeAllowed, type: typeof cv.guestModeAllowed }))
+      );
 
       // 각 클라이언트 버전에 대해 태그 정보 로드
       const clientVersionsWithTags = await Promise.all(
@@ -268,12 +298,16 @@ export class ClientVersionModel {
   // 태그 관련 메서드들
   static async setTags(clientVersionId: number, tagIds: number[]): Promise<void> {
     try {
+      logger.info(`Setting tags for client version ${clientVersionId}:`, tagIds);
+
       await db.transaction(async (trx) => {
         // 기존 태그 할당 삭제
-        await trx('g_tag_assignments')
+        const deletedCount = await trx('g_tag_assignments')
           .where('entityType', 'client_version')
           .where('entityId', clientVersionId)
           .del();
+
+        logger.info(`Deleted ${deletedCount} existing tag assignments for client version ${clientVersionId}`);
 
         // 새 태그 할당 추가
         if (tagIds.length > 0) {
@@ -283,7 +317,10 @@ export class ClientVersionModel {
             tagId: tagId,
             createdAt: new Date()
           }));
+
+          logger.info(`Inserting ${assignments.length} new tag assignments:`, assignments);
           await trx('g_tag_assignments').insert(assignments);
+          logger.info(`Successfully inserted tag assignments for client version ${clientVersionId}`);
         }
       });
     } catch (error) {
@@ -294,12 +331,15 @@ export class ClientVersionModel {
 
   static async getTags(clientVersionId: number): Promise<any[]> {
     try {
-      return await db('g_tag_assignments as ta')
+      const tags = await db('g_tag_assignments as ta')
         .join('g_tags as t', 'ta.tagId', 't.id')
         .select(['t.id', 't.name', 't.color', 't.description'])
         .where('ta.entityType', 'client_version')
         .where('ta.entityId', clientVersionId)
         .orderBy('t.name');
+
+      logger.info(`Client version ${clientVersionId} has ${tags.length} tags:`, tags);
+      return tags;
     } catch (error) {
       logger.error('Error getting client version tags:', error);
       throw error;

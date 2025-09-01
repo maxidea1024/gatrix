@@ -16,8 +16,9 @@ router.post('/',
   auditLog({
     action: 'whitelist_create',
     resourceType: 'whitelist',
-    getResourceId: (req) => req.body?.nickname,
+    // 화이트리스트 생성 시에는 ID가 아직 없으므로 getResourceId 제거
     getNewValues: (req) => req.body,
+    getResourceIdFromResponse: (res: any) => res?.data?.id,
   }) as any,
   WhitelistController.createWhitelist
 );
