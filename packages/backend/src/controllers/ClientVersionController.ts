@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import Joi from 'joi';
 import ClientVersionService, { ClientVersionFilters, ClientVersionPagination, BulkStatusUpdateRequest } from '../services/ClientVersionService';
-import { ClientStatus, BulkCreateClientVersionRequest } from '../models/ClientVersion';
+import { ClientStatus } from '../models/ClientVersion';
 import { ClientVersionModel } from '../models/ClientVersion';
 import logger from '../config/logger';
 
@@ -239,7 +239,7 @@ export class ClientVersionController {
       });
     }
 
-    const bulkCreateData: BulkCreateClientVersionRequest = {
+    const bulkCreateData = {
       ...value,
       createdBy: userId,
       updatedBy: userId,

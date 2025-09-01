@@ -154,20 +154,13 @@ const ClientVersionsPage: React.FC = () => {
       );
 
       if (result && result.clientVersions) {
-        devLogger.debug('Loaded client versions:', {
-          count: result.clientVersions.length,
-          firstItem: result.clientVersions[0],
-          hasIds: result.clientVersions.every(cv => cv.id !== undefined)
-        });
         setClientVersions(result.clientVersions);
         setTotal(result.total || 0);
       } else {
-        prodLogger.warn('Invalid response structure:', result);
         setClientVersions([]);
         setTotal(0);
       }
     } catch (error: any) {
-      console.error('Error loading client versions:', error);
       enqueueSnackbar(error.message || t('clientVersions.loadFailed'), { variant: 'error' });
       setClientVersions([]);
       setTotal(0);

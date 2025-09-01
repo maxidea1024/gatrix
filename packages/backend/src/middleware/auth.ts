@@ -63,12 +63,7 @@ export const authenticate = async (
       throw new CustomError('User account is not active', 401);
     }
 
-    logger.debug('Authentication successful:', {
-      path: req.path,
-      method: req.method,
-      userId: payload.userId,
-      userRole: payload.role
-    });
+
 
     req.user = payload;
     req.userDetails = user;

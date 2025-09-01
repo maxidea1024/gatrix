@@ -382,6 +382,7 @@
     "platform": "平台",
     "searchHelperText": "搜索帮助文本",
     "searchPlaceholder": "请输入搜索关键词",
+    "selectedCount": "已选择{{count}}个",
     "selectedItems": "选中项目",
     "status": {
       "online": "在线",

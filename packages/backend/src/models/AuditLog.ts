@@ -128,13 +128,6 @@ export class AuditLogModel {
         return query;
       };
 
-      logger.debug('AuditLog findAll query details:', {
-        filters,
-        limit,
-        offset,
-        page
-      });
-
       // Get total count
       const countQuery = applyFilters(baseQuery())
         .count('al.id as total')
@@ -154,8 +147,6 @@ export class AuditLogModel {
         .limit(safeLimit)
         .offset(safeOffset);
 
-      logger.debug('Executing queries...');
-
       // Execute queries in parallel
       const [countResult, logs] = await Promise.all([
         countQuery,
@@ -163,8 +154,6 @@ export class AuditLogModel {
       ]);
 
       const total = countResult?.total || 0;
-
-      logger.debug('Query result:', { logsCount: logs.length, total });
 
       // Parse JSON fields
       logs.forEach((log: any) => {

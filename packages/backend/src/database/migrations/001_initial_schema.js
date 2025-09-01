@@ -222,12 +222,12 @@ exports.up = async function() {
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS g_vars (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      \`key\` VARCHAR(255) NOT NULL UNIQUE,
-      value TEXT NULL,
+      varKey VARCHAR(255) NOT NULL UNIQUE,
+      varValue TEXT NULL,
       description TEXT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      INDEX idx_key (\`key\`)
+      INDEX idx_varKey (varKey)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 

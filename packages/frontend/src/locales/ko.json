@@ -403,6 +403,7 @@
     "platform": "플랫폼",
     "searchHelperText": "검색 도움말",
     "searchPlaceholder": "검색어를 입력하세요",
+    "selectedCount": "{{count}}개 선택됨",
     "selectedItems": "선택된 항목",
     "status": {
       "online": "온라인",

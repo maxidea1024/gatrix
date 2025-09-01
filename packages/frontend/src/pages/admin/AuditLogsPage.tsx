@@ -99,13 +99,10 @@ const AuditLogsPage: React.FC = () => {
         dateFilters
       );
 
-      console.log('Audit logs result:', result);
-
       if (result && Array.isArray(result.logs)) {
         setAuditLogs(result.logs);
         setTotal(result.total || 0);
       } else {
-        console.error('Invalid audit logs response:', result);
         setAuditLogs([]);
         setTotal(0);
       }

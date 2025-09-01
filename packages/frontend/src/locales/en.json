@@ -382,6 +382,7 @@
     "platform": "Platform",
     "searchHelperText": "Search by platform, version, server address, patch address, or creator name",
     "searchPlaceholder": "Search by platform, version, server address, creator...",
+    "selectedCount": "{{count}} selected",
     "selectedItems": "Selected Items",
     "status": {
       "online": "Online",

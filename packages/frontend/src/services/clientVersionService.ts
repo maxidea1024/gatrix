@@ -61,11 +61,19 @@ export class ClientVersionService {
     );
 
     console.log('getClientVersions response:', response);
+    console.log('Response type:', typeof response);
+    console.log('Response keys:', Object.keys(response || {}));
+    if (response?.data) {
+      console.log('Response.data type:', typeof response.data);
+      console.log('Response.data keys:', Object.keys(response.data || {}));
+      console.log('Response.data.clientVersions length:', response.data.clientVersions?.length);
+    }
 
     // ApiService.request()가 이미 response.data를 반환하므로
     // response는 백엔드에서 보낸 { success: true, data: {...} } 구조
     if (response?.success && response?.data) {
       console.log('Using standard response structure');
+      console.log('Returning data:', response.data);
       return response.data;
     } else if (response?.clientVersions) {
       // 혹시 다른 구조일 경우

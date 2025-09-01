@@ -1,4 +1,4 @@
-import { ClientVersionModel, ClientVersionAttributes, ClientVersionCreationAttributes, BulkCreateClientVersionRequest, ClientStatus } from '../models/ClientVersion';
+import { ClientVersionModel, ClientVersionAttributes, ClientVersionCreationAttributes, ClientStatus } from '../models/ClientVersion';
 import { pubSubService } from './PubSubService';
 import logger from '../config/logger';
 
@@ -240,9 +240,26 @@ export class ClientVersionService {
   }
 
   static async bulkCreateClientVersions(
-    data: BulkCreateClientVersionRequest
+    data: any
   ): Promise<ClientVersionAttributes[]> {
-    const result = await ClientVersionModel.bulkCreate(data.clientVersions);
+    // 받은 데이터를 각 플랫폼별로 클라이언트 버전 배열로 변환
+    const clientVersions = data.platforms.map((platform: any) => ({
+      platform: platform.platform,
+      clientVersion: data.clientVersion,
+      clientStatus: data.clientStatus,
+      gameServerAddress: platform.gameServerAddress,
+      gameServerAddressForWhiteList: platform.gameServerAddressForWhiteList || null,
+      patchAddress: platform.patchAddress,
+      patchAddressForWhiteList: platform.patchAddressForWhiteList || null,
+      guestModeAllowed: data.guestModeAllowed,
+      externalClickLink: data.externalClickLink || null,
+      memo: data.memo || null,
+      customPayload: data.customPayload || null,
+      createdBy: data.createdBy,
+      updatedBy: data.updatedBy,
+    }));
+
+    const result = await ClientVersionModel.bulkCreate(clientVersions);
 
     // Invalidate client version cache
     await pubSubService.invalidateByPattern('client_version:.*');

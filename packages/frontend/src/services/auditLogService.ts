@@ -51,16 +51,11 @@ export class AuditLogService {
       `${this.BASE_URL}?${params}`
     );
 
-    devLogger.debug('AuditLog response:', response);
-
     // ApiService.request()가 이미 response.data를 반환하므로
     // response는 백엔드에서 보낸 { success: true, data: {...} } 구조
     if (response?.success && response?.data) {
-      devLogger.debug('AuditLog returning data:', response.data);
       return response.data;
     }
-
-    prodLogger.warn('Unexpected audit logs response structure:', response);
     // 응답이 올바르지 않은 경우 기본값 반환
     return {
       logs: [],

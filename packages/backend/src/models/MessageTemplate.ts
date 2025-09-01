@@ -92,10 +92,7 @@ export class MessageTemplateModel {
 
       const total = countResult?.total || 0;
 
-      console.log('🔍 Database query results:');
-      console.log('🔍 Count result:', countResult);
-      console.log('🔍 Data results:', dataResults);
-      console.log('🔍 Total:', total);
+
 
       // 각 메시지 템플릿에 태그 정보와 locales 정보 추가
       const messageTemplatesWithTags = await Promise.all(
@@ -105,7 +102,7 @@ export class MessageTemplateModel {
               .join('g_tags as t', 'ta.tagId', 't.id')
               .where('ta.entityType', 'message_template')
               .where('ta.entityId', template.id)
-              .select('t.id', 't.name', 't.color'),
+              .select('t.id', 't.name', 't.color', 't.description'),
             db('g_message_template_locales')
               .where('templateId', template.id)
               .select('lang', 'message')

@@ -101,7 +101,6 @@ const MessageTemplatesPage: React.FC = () => {
   const defaultMessageFieldRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
-    console.log('🚀 MessageTemplate load() function called');
     setLoading(true);
     try {
       const offset = page * rowsPerPage;
@@ -113,14 +112,9 @@ const MessageTemplatesPage: React.FC = () => {
 
       const result = await messageTemplateService.list(params);
 
-      console.log('🔍 Frontend received data:', result);
-      console.log('🔍 Templates array:', result.templates);
-      console.log('🔍 Total count:', result.total);
-
       setItems(result.templates);
       setTotal(result.total);
     } catch (error: any) {
-      console.error('Error loading message templates:', error);
       enqueueSnackbar(error.message || t('admin.messageTemplates.loadFailed'), { variant: 'error' });
       setItems([]);
       setTotal(0);
@@ -135,12 +129,11 @@ const MessageTemplatesPage: React.FC = () => {
       const tags = await tagService.list();
       setAllTags(tags);
     } catch (error) {
-      console.error('Error loading tags:', error);
+      // Error handling
     }
   }, []);
 
   useEffect(() => {
-    console.log('🚀 MessageTemplate useEffect triggered');
     load();
     loadTags();
   }, [load, loadTags]);
@@ -578,16 +571,18 @@ const MessageTemplatesPage: React.FC = () => {
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                           {row.tags && row.tags.length > 0 ? (
                             row.tags.map((tag) => (
-                              <Chip
-                                key={tag.id}
-                                label={tag.name}
-                                size="small"
-                                sx={{
-                                  bgcolor: tag.color,
-                                  color: '#fff',
-                                  fontSize: '0.75rem'
-                                }}
-                              />
+                              <Tooltip key={tag.id} title={(tag as any).description || t('tags.noDescription')} arrow>
+                                <Chip
+                                  label={tag.name}
+                                  size="small"
+                                  sx={{
+                                    bgcolor: tag.color,
+                                    color: '#fff',
+                                    fontSize: '0.75rem',
+                                    cursor: 'help'
+                                  }}
+                                />
+                              </Tooltip>
                             ))
                           ) : (
                             <Typography variant="body2" color="text.secondary">

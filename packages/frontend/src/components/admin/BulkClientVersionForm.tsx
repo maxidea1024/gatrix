@@ -18,6 +18,7 @@ import {
   Chip,
   OutlinedInput,
   SelectChangeEvent,
+  Tooltip,
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -288,6 +289,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                 <Box>
                   <TextField
                     {...field}
+                    value={field.value || ''}
                     fullWidth
                     label={t('clientVersions.version')}
                     placeholder={CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE}
@@ -353,6 +355,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                     <Select
                       labelId="bulk-status-label"
                       {...field}
+                      value={field.value || ClientStatus.OFFLINE}
                       label={t('clientVersions.statusLabel')}
                     >
                       {Object.values(ClientStatus).map((status) => (
@@ -380,7 +383,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
               render={({ field }) => (
                 <Box>
                   <FormControlLabel
-                    control={<Switch {...field} checked={field.value} />}
+                    control={<Switch {...field} checked={field.value || false} />}
                     label={t('clientVersions.guestModeAllowed')}
                   />
                   <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
@@ -397,6 +400,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                 <Box>
                   <TextField
                     {...field}
+                    value={field.value || ''}
                     fullWidth
                     label={t('clientVersions.externalClickLink')}
                     error={!!errors.externalClickLink}
@@ -422,6 +426,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                 <Box>
                   <TextField
                     {...field}
+                    value={field.value || ''}
                     fullWidth
                     label={t('clientVersions.memo')}
                     multiline
@@ -457,6 +462,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                           <Box>
                             <TextField
                               {...field}
+                              value={field.value || ''}
                               fullWidth
                               label={t('clientVersions.gameServerAddress')}
                               error={!!errors.platforms?.[index]?.gameServerAddress}
@@ -482,6 +488,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                           <Box>
                             <TextField
                               {...field}
+                              value={field.value || ''}
                               fullWidth
                               label={t('clientVersions.gameServerAddressForWhiteList')}
                               error={!!errors.platforms?.[index]?.gameServerAddressForWhiteList}
@@ -507,6 +514,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                           <Box>
                             <TextField
                               {...field}
+                              value={field.value || ''}
                               fullWidth
                               label={t('clientVersions.patchAddress')}
                               error={!!errors.platforms?.[index]?.patchAddress}
@@ -532,6 +540,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                           <Box>
                             <TextField
                               {...field}
+                              value={field.value || ''}
                               fullWidth
                               label={t('clientVersions.patchAddressForWhiteList')}
                               error={!!errors.platforms?.[index]?.patchAddressForWhiteList}

@@ -44,8 +44,10 @@ router.post('/bulk',
   auditLog({
     action: 'client_version_bulk_create',
     resourceType: 'client_version',
-    getResourceId: (req) => req.body?.clientVersion,
+    // 일괄 생성의 경우 단일 ID가 없으므로 getResourceId 제거
     getNewValues: (req) => req.body,
+    // 응답에서 생성된 첫 번째 클라이언트 버전의 ID를 사용
+    getResourceIdFromResponse: (res: any) => res?.data?.[0]?.id,
   }) as any,
   ClientVersionController.bulkCreateClientVersions
 );

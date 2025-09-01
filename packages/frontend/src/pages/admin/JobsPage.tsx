@@ -86,9 +86,7 @@ const JobsPage: React.FC = () => {
 
   const loadData = async () => {
     try {
-      console.log('JobsPage loadData called');
       setLoading(true);
-      console.log('JobsPage calling jobService.getJobsWithPagination');
       const [jobsResponse, jobTypesData] = await Promise.all([
         jobService.getJobsWithPagination({
           jobTypeId: selectedJobType || undefined,
@@ -315,6 +313,7 @@ const JobsPage: React.FC = () => {
           <TableHead>
             <TableRow>
               <TableCell>{t('common.name')}</TableCell>
+              <TableCell>{t('common.memo')}</TableCell>
               <TableCell>{t('jobs.jobType')}</TableCell>
               <TableCell>{t('common.usable')}</TableCell>
               <TableCell>{t('common.tags')}</TableCell>
@@ -326,7 +325,7 @@ const JobsPage: React.FC = () => {
           <TableBody>
             {jobs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} align="center" sx={{ py: 8 }}>
+                <TableCell colSpan={8} align="center" sx={{ py: 8 }}>
                   <Typography variant="body1" color="text.secondary">
                     {t('jobs.noJobsFound')}
                   </Typography>
@@ -336,16 +335,14 @@ const JobsPage: React.FC = () => {
               jobs.map((job) => (
                 <TableRow key={job.id}>
                 <TableCell>
-                  <Box>
-                    <Typography variant="body2" fontWeight="medium">
-                      {job.name}
-                    </Typography>
-                    {job.memo && (
-                      <Typography variant="caption" color="text.secondary">
-                        {job.memo}
-                      </Typography>
-                    )}
-                  </Box>
+                  <Typography variant="body2" fontWeight="medium">
+                    {job.name}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body2" color="text.secondary">
+                    {job.memo || '-'}
+                  </Typography>
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
