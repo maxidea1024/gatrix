@@ -77,9 +77,13 @@ export class IpWhitelistService {
     limit: number = 10,
     filters: IpWhitelistFilters = {}
   ): Promise<IpWhitelistListResponse> {
+    // Ensure page and limit are valid numbers
+    const validPage = typeof page === 'number' && !isNaN(page) && page > 0 ? page : 1;
+    const validLimit = typeof limit === 'number' && !isNaN(limit) && limit > 0 ? limit : 10;
+
     const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
+      page: validPage.toString(),
+      limit: validLimit.toString(),
       // Cache prevention for development
       _t: Date.now().toString(),
     });

@@ -306,6 +306,23 @@ export class WhitelistModel {
     };
   }
 
+  static async findByAccountId(accountId: string): Promise<Whitelist[]> {
+    try {
+      const query = `
+        SELECT w.*, u.name as createdByName, u.email as createdByEmail
+        FROM g_account_whitelist w
+        LEFT JOIN g_users u ON w.createdBy = u.id
+        WHERE w.accountId = ?
+        ORDER BY w.createdAt DESC
+      `;
+
+      const rows = await database.query(query, [accountId]);
+      return rows.map(this.mapRowToWhitelist);
+    } catch (error) {
+      throw new CustomError('Failed to find whitelist entries by account ID', 500);
+    }
+  }
+
   // 태그 관련 메서드들
   static async setTags(whitelistId: number, tagIds: number[]): Promise<void> {
     await TagAssignmentModel.setTagsForEntity('whitelist', whitelistId, tagIds);

@@ -835,8 +835,30 @@
     "anyIp": "任意IP",
     "bulkImport": "批量导入",
     "tabs": {
+      "overview": "概览",
       "account": "账户白名单",
       "ip": "IP白名单"
+    },
+    "overview": {
+      "title": "白名单概览",
+      "accountWhitelists": "账户白名单",
+      "ipWhitelists": "IP白名单",
+      "activeEntries": "活跃条目",
+      "activeRanges": "活跃范围",
+      "accountList": "适用账户列表",
+      "ipRangeList": "适用IP范围列表",
+      "noActiveAccounts": "没有活跃账户",
+      "noActiveIpRanges": "没有活跃IP范围",
+      "noPurpose": "无目的",
+      "moreEntries": "个更多条目",
+      "testTitle": "白名单测试",
+      "testDescription": "输入账户ID和IP地址来检查白名单应用状态。",
+      "testAccountId": "测试账户ID",
+      "testIpAddress": "测试IP地址",
+      "testButton": "运行测试",
+      "testAllowed": "允许访问",
+      "testDenied": "拒绝访问",
+      "matchedRules": "匹配规则"
     },
     "columns": {
       "actions": "操作",

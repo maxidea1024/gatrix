@@ -274,9 +274,20 @@ export class IpWhitelistService {
 
       // Get all enabled IP whitelist entries
       const result = await IpWhitelistModel.findAll(1, 1000, { isEnabled: true });
+      const now = new Date();
 
       // Check if IP matches any whitelist entry
       for (const entry of result.ipWhitelists) {
+        if (!entry.isEnabled) continue;
+
+        // Check date range
+        const startDate = entry.startDate ? new Date(entry.startDate) : null;
+        const endDate = entry.endDate ? new Date(entry.endDate) : null;
+
+        if (startDate && startDate > now) continue;
+        if (endDate && endDate < now) continue;
+
+        // Check exact match
         if (entry.ipAddress === ipAddress) {
           return true;
         }

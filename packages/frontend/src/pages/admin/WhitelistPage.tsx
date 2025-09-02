@@ -44,12 +44,14 @@ import {
   Refresh as RefreshIcon,
   Cancel as CancelIcon,
   Save as SaveIcon,
+  ContentCopy as ContentCopyIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { WhitelistService, Whitelist, CreateWhitelistData } from '../../services/whitelistService';
 import SimplePagination from '../../components/common/SimplePagination';
 import IpWhitelistTab from '../../components/admin/IpWhitelistTab';
+import WhitelistOverview from '../../components/admin/WhitelistOverview';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 
@@ -158,7 +160,12 @@ const WhitelistPage: React.FC = () => {
   };
 
   const handleChangePage = (_event: unknown, newPage: number) => {
-    setPage(newPage);
+    if (typeof newPage === 'number' && !isNaN(newPage)) {
+      setPage(newPage);
+    } else {
+      console.error('Invalid page number received:', newPage);
+      setPage(0); // Reset to first page
+    }
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,6 +181,17 @@ const WhitelistPage: React.FC = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
     // selectedWhitelist는 다이얼로그가 닫힐 때까지 유지
+  };
+
+  // 복사 기능
+  const handleCopyToClipboard = async (text: string, type: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      enqueueSnackbar(`${type}이(가) 복사되었습니다.`, { variant: 'success' });
+    } catch (error) {
+      console.error('복사 실패:', error);
+      enqueueSnackbar('복사에 실패했습니다.', { variant: 'error' });
+    }
   };
 
   const handleAdd = () => {
@@ -310,8 +328,9 @@ const WhitelistPage: React.FC = () => {
       <Card>
         <CardContent>
           <Tabs value={currentTab} onChange={handleTabChange} sx={{ mb: 3 }}>
-            <Tab label="계정 화이트리스트" />
-            <Tab label="IP 화이트리스트" />
+            <Tab label={t('whitelist.tabs.account')} />
+            <Tab label={t('whitelist.tabs.ip')} />
+            <Tab label="Playground" />
           </Tabs>
 
           {/* Tab Content */}
@@ -415,13 +434,35 @@ const WhitelistPage: React.FC = () => {
                         />
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" fontWeight="medium">
-                          {whitelist.accountId}
-                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="body2" fontWeight="medium">
+                            {whitelist.accountId}
+                          </Typography>
+                          <Tooltip title="계정 ID 복사">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleCopyToClipboard(whitelist.accountId, '계정 ID')}
+                              sx={{ p: 0.5 }}
+                            >
+                              <ContentCopyIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
                       </TableCell>
                       <TableCell>
                         {whitelist.ipAddress ? (
-                          <Chip label={whitelist.ipAddress} size="small" />
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Chip label={whitelist.ipAddress} size="small" />
+                            <Tooltip title="IP 주소 복사">
+                              <IconButton
+                                size="small"
+                                onClick={() => handleCopyToClipboard(whitelist.ipAddress!, 'IP 주소')}
+                                sx={{ p: 0.5 }}
+                              >
+                                <ContentCopyIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
                         ) : (
                           <Typography variant="body2" color="text.secondary">
                             {t('whitelist.anyIp')}
@@ -660,6 +701,10 @@ const WhitelistPage: React.FC = () => {
 
           {currentTab === 1 && (
             <IpWhitelistTab />
+          )}
+
+          {currentTab === 2 && (
+            <WhitelistOverview />
           )}
         </CardContent>
       </Card>

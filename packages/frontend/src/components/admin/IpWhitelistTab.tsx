@@ -36,9 +36,9 @@ import {
   Upload as UploadIcon,
   Refresh as RefreshIcon,
   PowerSettingsNew as ToggleIcon,
-  Info as InfoIcon,
   Cancel as CancelIcon,
   Save as SaveIcon,
+  ContentCopy as ContentCopyIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -130,7 +130,12 @@ const IpWhitelistTab: React.FC = () => {
   };
 
   const handleChangePage = (_event: unknown, newPage: number) => {
-    setPage(newPage);
+    if (typeof newPage === 'number' && !isNaN(newPage)) {
+      setPage(newPage);
+    } else {
+      console.error('Invalid page number received:', newPage);
+      setPage(0); // Reset to first page
+    }
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,6 +151,17 @@ const IpWhitelistTab: React.FC = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
     setSelectedIpWhitelist(null);
+  };
+
+  // 복사 기능
+  const handleCopyToClipboard = async (text: string, type: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      enqueueSnackbar(`${type}이(가) 복사되었습니다.`, { variant: 'success' });
+    } catch (error) {
+      console.error('복사 실패:', error);
+      enqueueSnackbar('복사에 실패했습니다.', { variant: 'error' });
+    }
   };
 
   const handleAdd = () => {
@@ -385,8 +401,14 @@ const IpWhitelistTab: React.FC = () => {
                         <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
                           {ipWhitelist.ipAddress}
                         </Typography>
-                        <Tooltip title={IpWhitelistService.getIpDescription(ipWhitelist.ipAddress)}>
-                          <InfoIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                        <Tooltip title="IP 주소 복사">
+                          <IconButton
+                            size="small"
+                            onClick={() => handleCopyToClipboard(ipWhitelist.ipAddress, 'IP 주소')}
+                            sx={{ p: 0.5 }}
+                          >
+                            <ContentCopyIcon fontSize="small" />
+                          </IconButton>
                         </Tooltip>
                       </Box>
                     </TableCell>

@@ -34,6 +34,16 @@ const updateWhitelistSchema = Joi.object({
   tags: Joi.array().items(Joi.string().max(50)).max(20).optional(),
 });
 
+const testWhitelistSchema = Joi.object({
+  accountId: Joi.string().min(4).max(36).pattern(/^[a-zA-Z0-9]+$/).optional()
+    .messages({
+      'string.min': 'Account ID must be at least 4 characters',
+      'string.max': 'Account ID must be at most 36 characters',
+      'string.pattern.base': 'Account ID must contain only alphanumeric characters'
+    }),
+  ipAddress: Joi.string().ip({ version: ['ipv4', 'ipv6'] }).optional(),
+}).or('accountId', 'ipAddress');
+
 const bulkCreateSchema = Joi.object({
   entries: Joi.array().items(
     Joi.object({
@@ -222,6 +232,22 @@ export class WhitelistController {
     res.json({
       success: true,
       data: tags,
+    });
+  });
+
+  // 화이트리스트 테스트
+  static testWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { error, value } = testWhitelistSchema.validate(req.body);
+    if (error) {
+      throw new CustomError(error.details[0].message, 400);
+    }
+
+    const { accountId, ipAddress } = value;
+    const result = await WhitelistService.testWhitelist(accountId, ipAddress);
+
+    res.json({
+      success: true,
+      data: result,
     });
   });
 }

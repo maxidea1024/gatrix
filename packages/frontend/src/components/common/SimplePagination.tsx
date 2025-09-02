@@ -32,7 +32,9 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
   const currentPage = page + 1; // Convert 0-based to 1-based
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, newPage: number) => {
-    onPageChange(event, newPage - 1); // Convert 1-based to 0-based
+    // Ensure newPage is a valid number before converting
+    const pageNumber = typeof newPage === 'number' ? newPage - 1 : 0;
+    onPageChange(event, pageNumber); // Convert 1-based to 0-based
   };
 
   const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {

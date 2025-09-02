@@ -59,15 +59,33 @@ export interface BulkCreateEntry {
   purpose?: string;
 }
 
+export interface WhitelistTestRequest {
+  accountId?: string;
+  ipAddress?: string;
+}
+
+export interface WhitelistTestResult {
+  isAllowed: boolean;
+  matchedRules: Array<{
+    type: 'account' | 'ip';
+    rule: string;
+    reason: string;
+  }>;
+}
+
 export class WhitelistService {
   static async getWhitelists(
     page: number = 1,
     limit: number = 10,
     filters: WhitelistFilters = {}
   ): Promise<WhitelistListResponse> {
+    // Ensure page and limit are valid numbers
+    const validPage = typeof page === 'number' && !isNaN(page) && page > 0 ? page : 1;
+    const validLimit = typeof limit === 'number' && !isNaN(limit) && limit > 0 ? limit : 10;
+
     const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
+      page: validPage.toString(),
+      limit: validLimit.toString(),
       // 캐시 방지를 위한 타임스탬프 추가 (개발 환경)
       _t: Date.now().toString(),
     });
@@ -162,6 +180,17 @@ export class WhitelistService {
     }
 
     console.error('Unexpected bulkCreate response structure:', response);
+    throw new Error('Invalid response structure from server');
+  }
+
+  static async testWhitelist(request: WhitelistTestRequest): Promise<WhitelistTestResult> {
+    const response = await apiService.post<{ success: boolean; data: WhitelistTestResult }>('/whitelist/test', request);
+
+    if (response?.success && response?.data) {
+      return response.data;
+    }
+
+    console.error('Unexpected test response structure:', response);
     throw new Error('Invalid response structure from server');
   }
 }

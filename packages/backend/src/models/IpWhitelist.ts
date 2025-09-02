@@ -74,7 +74,9 @@ export class IpWhitelistModel {
         }
 
         if (filters.isEnabled !== undefined) {
-          query.where('iw.isEnabled', filters.isEnabled);
+          // Convert boolean to the format expected by the database
+          const enabledValue = filters.isEnabled ? 1 : 0;
+          query.where('iw.isEnabled', enabledValue);
         }
 
         if (filters.createdBy) {

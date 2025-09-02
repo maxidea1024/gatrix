@@ -180,4 +180,90 @@ export class WhitelistService {
       throw new CustomError('Failed to bulk create whitelist entries', 500);
     }
   }
+
+  static async testWhitelist(accountId?: string, ipAddress?: string): Promise<{
+    isAllowed: boolean;
+    matchedRules: Array<{
+      type: 'account' | 'ip';
+      rule: string;
+      reason: string;
+    }>;
+  }> {
+    try {
+      const matchedRules: Array<{
+        type: 'account' | 'ip';
+        rule: string;
+        reason: string;
+      }> = [];
+
+      // Check account whitelist
+      if (accountId) {
+        const accountWhitelists = await WhitelistModel.findByAccountId(accountId);
+        const now = new Date();
+
+        for (const whitelist of accountWhitelists) {
+          // Check if whitelist is currently active
+          const startDate = whitelist.startDate ? new Date(whitelist.startDate) : null;
+          const endDate = whitelist.endDate ? new Date(whitelist.endDate) : null;
+
+          if (startDate && startDate > now) continue;
+          if (endDate && endDate < now) continue;
+
+          // If whitelist has ipAddress specified, check IP match (AND condition)
+          if (whitelist.ipAddress) {
+            if (!ipAddress || whitelist.ipAddress !== ipAddress) {
+              continue; // IP doesn't match, skip this whitelist entry
+            }
+          }
+
+          matchedRules.push({
+            type: 'account',
+            rule: `${whitelist.accountId}${whitelist.ipAddress ? ` (${whitelist.ipAddress})` : ''}`,
+            reason: whitelist.purpose || 'Account whitelist match'
+          });
+        }
+      }
+
+      // Check IP whitelist
+      if (ipAddress) {
+        const { IpWhitelistService } = await import('./IpWhitelistService');
+        const isWhitelisted = await IpWhitelistService.isIpWhitelisted(ipAddress);
+
+        if (isWhitelisted) {
+          // Get the specific whitelist entries that match
+          const { IpWhitelistModel } = await import('../models/IpWhitelist');
+          const ipWhitelists = await IpWhitelistModel.findAll(1, 1000, { isEnabled: true });
+          const now = new Date();
+          const { ipMatchesCIDR } = await import('../utils/ipValidation');
+
+          for (const ipWhitelist of ipWhitelists.ipWhitelists) {
+            if (!ipWhitelist.isEnabled) continue;
+
+            const startDate = ipWhitelist.startDate ? new Date(ipWhitelist.startDate) : null;
+            const endDate = ipWhitelist.endDate ? new Date(ipWhitelist.endDate) : null;
+
+            if (startDate && startDate > now) continue;
+            if (endDate && endDate < now) continue;
+
+            // Check both exact match and CIDR match
+            if (ipWhitelist.ipAddress === ipAddress || ipMatchesCIDR(ipAddress, ipWhitelist.ipAddress)) {
+              matchedRules.push({
+                type: 'ip',
+                rule: ipWhitelist.ipAddress,
+                reason: ipWhitelist.purpose || 'IP whitelist match'
+              });
+            }
+          }
+        }
+      }
+
+      return {
+        isAllowed: matchedRules.length > 0,
+        matchedRules
+      };
+    } catch (error) {
+      logger.error('Error testing whitelist:', error);
+      throw new CustomError('Failed to test whitelist', 500);
+    }
+  }
 }

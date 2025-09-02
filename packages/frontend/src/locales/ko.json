@@ -959,8 +959,30 @@
     "anyIp": "모든 IP",
     "bulkImport": "일괄 가져오기",
     "tabs": {
+      "overview": "개요",
       "account": "계정 화이트리스트",
       "ip": "IP 화이트리스트"
+    },
+    "overview": {
+      "title": "화이트리스트 개요",
+      "accountWhitelists": "계정 화이트리스트",
+      "ipWhitelists": "IP 화이트리스트",
+      "activeEntries": "활성 항목",
+      "activeRanges": "활성 범위",
+      "accountList": "적용 대상 계정 목록",
+      "ipRangeList": "적용 대상 IP 범위",
+      "noActiveAccounts": "활성 계정이 없습니다",
+      "noActiveIpRanges": "활성 IP 범위가 없습니다",
+      "noPurpose": "목적 없음",
+      "moreEntries": "개 더 보기",
+      "testTitle": "화이트리스트 테스트",
+      "testDescription": "계정 ID와 IP 주소를 입력하여 화이트리스트 적용 여부를 확인할 수 있습니다.",
+      "testAccountId": "테스트 계정 ID",
+      "testIpAddress": "테스트 IP 주소",
+      "testButton": "테스트 실행",
+      "testAllowed": "접근이 허용됩니다",
+      "testDenied": "접근이 거부됩니다",
+      "matchedRules": "일치하는 규칙"
     },
     "columns": {
       "actions": "작업",

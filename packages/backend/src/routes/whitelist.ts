@@ -53,6 +53,9 @@ router.post('/bulk',
   WhitelistController.bulkCreateWhitelists
 );
 
+// 화이트리스트 테스트 라우트
+router.post('/test', WhitelistController.testWhitelist);
+
 // 태그 관련 라우트 (관리자만)
 router.get('/:id/tags', requireAdmin as any, WhitelistController.getTags);
 router.put('/:id/tags', requireAdmin as any, WhitelistController.setTags);

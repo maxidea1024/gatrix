@@ -833,8 +833,30 @@
     "anyIp": "Any IP",
     "bulkImport": "Bulk Import",
     "tabs": {
+      "overview": "Overview",
       "account": "Account Whitelist",
       "ip": "IP Whitelist"
+    },
+    "overview": {
+      "title": "Whitelist Overview",
+      "accountWhitelists": "Account Whitelists",
+      "ipWhitelists": "IP Whitelists",
+      "activeEntries": "Active Entries",
+      "activeRanges": "Active Ranges",
+      "accountList": "Applied Account List",
+      "ipRangeList": "Applied IP Range List",
+      "noActiveAccounts": "No active accounts",
+      "noActiveIpRanges": "No active IP ranges",
+      "noPurpose": "No purpose",
+      "moreEntries": "more entries",
+      "testTitle": "Whitelist Test",
+      "testDescription": "Enter account ID and IP address to check whitelist application status.",
+      "testAccountId": "Test Account ID",
+      "testIpAddress": "Test IP Address",
+      "testButton": "Run Test",
+      "testAllowed": "Access is allowed",
+      "testDenied": "Access is denied",
+      "matchedRules": "Matched Rules"
     },
     "columns": {
       "actions": "Actions",
