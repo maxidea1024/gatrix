@@ -114,6 +114,7 @@ export class AdminController {
         role: role || 'user',
         status: 'active' as const, // Admin-created users are active by default
         emailVerified: true, // Admin-created users are verified by default
+        createdBy: req.user?.userId, // Set the creator
       };
 
       const user = await UserService.createUser(userData);

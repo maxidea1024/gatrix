@@ -119,6 +119,8 @@ export class AuditLogService {
       'game_world_update',
       'game_world_delete',
       'game_world_update_orders',
+      'game_world_toggle_visibility',
+      'game_world_toggle_maintenance',
       'maintenance_start',
       'maintenance_stop',
       'maintenance_update',

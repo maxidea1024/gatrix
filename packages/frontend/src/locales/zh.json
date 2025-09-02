@@ -54,6 +54,7 @@
       "addUser": "添加用户",
       "approve": "批准",
       "cannotModifyOwnAccount": "无法修改自己的账户",
+      "canOnlyModifyOwnName": "您只能修改自己的姓名",
       "deleteConfirmation": "您确定要删除此用户吗？",
       "deleteConfirmationInput": "要确认删除，请输入用户的邮箱地址：",
       "deleteUser": "删除用户",
@@ -217,6 +218,7 @@
       "game_world_delete": "游戏世界删除",
       "game_world_update_orders": "游戏世界重新排序",
       "game_world_toggle_visibility": "游戏世界显示状态切换",
+      "game_world_toggle_maintenance": "游戏世界维护状态切换",
       "maintenance_start": "维护开始",
       "maintenance_stop": "维护结束",
       "maintenance_update": "维护更新",
@@ -820,6 +822,7 @@
     "status": "状态",
     "statuses": {
       "active": "活跃",
+      "inactive": "非活跃",
       "pending": "待处理",
       "suspended": "已暂停"
     },

@@ -54,6 +54,7 @@
       "addUser": "Add User",
       "approve": "Approve",
       "cannotModifyOwnAccount": "Cannot modify your own account",
+      "canOnlyModifyOwnName": "You can only modify your own name",
       "deleteConfirmation": "Are you sure you want to delete this user?",
       "deleteConfirmationInput": "To confirm deletion, please type the user's email address:",
       "deleteUser": "Delete User",
@@ -217,6 +218,7 @@
       "game_world_delete": "Game World Delete",
       "game_world_update_orders": "Game World Reorder",
       "game_world_toggle_visibility": "Game World Visibility Toggle",
+      "game_world_toggle_maintenance": "Game World Maintenance Toggle",
       "maintenance_start": "Maintenance Start",
       "maintenance_stop": "Maintenance Stop",
       "maintenance_update": "Maintenance Update",
@@ -818,6 +820,7 @@
     "status": "Status",
     "statuses": {
       "active": "Active",
+      "inactive": "Inactive",
       "pending": "Pending",
       "suspended": "Suspended"
     },

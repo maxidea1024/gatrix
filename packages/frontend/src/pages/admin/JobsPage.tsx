@@ -218,6 +218,13 @@ const JobsPage: React.FC = () => {
     return jobType?.displayName || jobType?.name || 'Unknown';
   };
 
+  // 텍스트 길이 제한 함수
+  const truncateText = (text: string | null | undefined, maxLength: number = 50) => {
+    if (!text) return '-';
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
@@ -307,19 +314,25 @@ const JobsPage: React.FC = () => {
       </Card>
 
       {/* Jobs Table */}
-      <TableContainer component={Paper}>
+      <TableContainer
+        component={Paper}
+        sx={{
+          maxWidth: '100%',
+          overflow: 'auto'
+        }}
+      >
         {loading && <LinearProgress />}
-        <Table>
+        <Table sx={{ tableLayout: 'fixed', minWidth: 1100 }}>
           <TableHead>
             <TableRow>
-              <TableCell>{t('common.name')}</TableCell>
-              <TableCell>{t('common.memo')}</TableCell>
-              <TableCell>{t('jobs.jobType')}</TableCell>
-              <TableCell>{t('common.usable')}</TableCell>
-              <TableCell>{t('common.tags')}</TableCell>
-              <TableCell>{t('common.createdBy')}</TableCell>
-              <TableCell>{t('common.createdAt')}</TableCell>
-              <TableCell align="right">{t('common.actions')}</TableCell>
+              <TableCell sx={{ width: '150px' }}>{t('common.name')}</TableCell>
+              <TableCell sx={{ width: '200px' }}>{t('common.memo')}</TableCell>
+              <TableCell sx={{ width: '120px' }}>{t('jobs.jobType')}</TableCell>
+              <TableCell sx={{ width: '80px' }}>{t('common.usable')}</TableCell>
+              <TableCell sx={{ width: '150px' }}>{t('common.tags')}</TableCell>
+              <TableCell sx={{ width: '120px' }}>{t('common.createdBy')}</TableCell>
+              <TableCell sx={{ width: '140px' }}>{t('common.createdAt')}</TableCell>
+              <TableCell align="right" sx={{ width: '140px' }}>{t('common.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -333,20 +346,76 @@ const JobsPage: React.FC = () => {
               jobs.map((job) => (
                 <TableRow key={job.id}>
                 <TableCell>
-                  <Typography variant="body2" fontWeight="medium">
-                    {job.name}
-                  </Typography>
+                  {job.name && job.name.length > 30 ? (
+                    <Tooltip title={job.name} arrow>
+                      <Typography
+                        variant="body2"
+                        fontWeight="medium"
+                        sx={{
+                          cursor: 'help',
+                          maxWidth: '150px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        {truncateText(job.name, 30)}
+                      </Typography>
+                    </Tooltip>
+                  ) : (
+                    <Typography variant="body2" fontWeight="medium">
+                      {job.name}
+                    </Typography>
+                  )}
                 </TableCell>
                 <TableCell>
-                  <Typography variant="body2" color="text.secondary">
-                    {job.memo || '-'}
-                  </Typography>
+                  {job.memo && job.memo.length > 50 ? (
+                    <Tooltip title={job.memo} arrow>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                          cursor: 'help',
+                          maxWidth: '200px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        {truncateText(job.memo, 50)}
+                      </Typography>
+                    </Tooltip>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      {job.memo || '-'}
+                    </Typography>
+                  )}
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2">
-                      {getJobTypeLabel(job.jobTypeId)}
-                    </Typography>
+                    {(() => {
+                      const jobTypeLabel = getJobTypeLabel(job.jobTypeId);
+                      return jobTypeLabel && jobTypeLabel.length > 20 ? (
+                        <Tooltip title={jobTypeLabel} arrow>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              cursor: 'help',
+                              maxWidth: '120px',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            {truncateText(jobTypeLabel, 20)}
+                          </Typography>
+                        </Tooltip>
+                      ) : (
+                        <Typography variant="body2">
+                          {jobTypeLabel}
+                        </Typography>
+                      );
+                    })()}
                   </Box>
                 </TableCell>
                 <TableCell>{getStatusChip(job)}</TableCell>

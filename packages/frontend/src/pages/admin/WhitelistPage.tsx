@@ -173,7 +173,7 @@ const WhitelistPage: React.FC = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedWhitelist(null);
+    // selectedWhitelist는 다이얼로그가 닫힐 때까지 유지
   };
 
   const handleAdd = () => {
@@ -230,11 +230,21 @@ const WhitelistPage: React.FC = () => {
         return;
       }
 
+      console.log('handleSave - Debug info:', {
+        editDialog,
+        selectedWhitelist,
+        selectedWhitelistId: selectedWhitelist?.id,
+        formData
+      });
+
       if (editDialog && selectedWhitelist) {
+        console.log('Executing UPDATE with ID:', selectedWhitelist.id);
         await WhitelistService.updateWhitelist(selectedWhitelist.id, formData);
         enqueueSnackbar('화이트리스트가 수정되었습니다.', { variant: 'success' });
         setEditDialog(false);
+        setSelectedWhitelist(null);
       } else {
+        console.log('Executing CREATE');
         await WhitelistService.createWhitelist(formData);
         enqueueSnackbar('화이트리스트가 생성되었습니다.', { variant: 'success' });
         setAddDialog(false);
@@ -502,7 +512,11 @@ const WhitelistPage: React.FC = () => {
               </Menu>
 
               {/* Add/Edit Dialog */}
-              <Dialog open={addDialog || editDialog} onClose={() => { setAddDialog(false); setEditDialog(false); }} maxWidth="sm" fullWidth>
+              <Dialog open={addDialog || editDialog} onClose={() => {
+                setSelectedWhitelist(null);
+                setAddDialog(false);
+                setEditDialog(false);
+              }} maxWidth="sm" fullWidth>
                 <FormDialogHeader
                   title={editDialog ? '계정 화이트리스트 편집' : '계정 화이트리스트 추가'}
                   description={editDialog
@@ -582,11 +596,15 @@ const WhitelistPage: React.FC = () => {
                   </Box>
                 </DialogContent>
                 <DialogActions>
-                  <Button onClick={() => { setAddDialog(false); setEditDialog(false); }} startIcon={<CancelIcon />}>
+                  <Button onClick={() => {
+                    setSelectedWhitelist(null);
+                    setAddDialog(false);
+                    setEditDialog(false);
+                  }} startIcon={<CancelIcon />}>
                     취소
                   </Button>
                   <Button onClick={handleSave} variant="contained" startIcon={<SaveIcon />}>
-                    {editDialog ? '계정 화이트리스트 수정' : '계정 화이트리스트 추가'}
+                    {(editDialog && selectedWhitelist) ? '계정 화이트리스트 수정' : '계정 화이트리스트 추가'}
                   </Button>
                 </DialogActions>
               </Dialog>

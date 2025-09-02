@@ -15,7 +15,6 @@ import {
   TextField,
   InputAdornment,
   IconButton,
-  Menu,
   MenuItem,
   Chip,
   Avatar,
@@ -44,6 +43,8 @@ import {
   Cancel as CancelIcon,
   Add as AddIcon,
   Save as SaveIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -81,8 +82,6 @@ const UsersManagementPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     title: string;
@@ -96,6 +95,7 @@ const UsersManagementPage: React.FC = () => {
   });
 
   const [addUserDialog, setAddUserDialog] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [newUserData, setNewUserData] = useState({
     name: '',
     email: '',
@@ -139,8 +139,8 @@ const UsersManagementPage: React.FC = () => {
       console.log('Loaded users data:', {
         count: response.data.users.length,
         firstUser: response.data.users[0],
-        hasCreatedAt: response.data.users.length > 0 && response.data.users[0].created_at !== undefined,
-        hasLastLoginAt: response.data.users.length > 0 && response.data.users[0].last_login_at !== undefined
+        hasCreatedAt: response.data.users.length > 0 && response.data.users[0].createdAt !== undefined,
+        hasLastLoginAt: response.data.users.length > 0 && response.data.users[0].lastLoginAt !== undefined
       });
 
       setUsers(response.data.users);
@@ -156,51 +156,43 @@ const UsersManagementPage: React.FC = () => {
     fetchUsers();
   }, [page, rowsPerPage, searchTerm, statusFilter, roleFilter]);
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, user: User) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedUser(user);
+
+
+  const handleSuspendUser = (user: User) => {
+    setConfirmDialog({
+      open: true,
+      title: '사용자 정지',
+      message: `${user.name} 사용자를 정지하시겠습니까?`,
+      action: async () => {
+        try {
+          await apiService.post(`/admin/users/${user.id}/suspend`);
+          enqueueSnackbar('사용자가 정지되었습니다.', { variant: 'success' });
+          fetchUsers();
+        } catch (error: any) {
+          enqueueSnackbar(error.message || '사용자 정지에 실패했습니다.', { variant: 'error' });
+        }
+      },
+    });
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedUser(null);
+  const handleActivateUser = (user: User) => {
+    setConfirmDialog({
+      open: true,
+      title: '사용자 활성화',
+      message: `${user.name} 사용자를 활성화하시겠습니까?`,
+      action: async () => {
+        try {
+          await apiService.post(`/admin/users/${user.id}/activate`);
+          enqueueSnackbar('사용자가 활성화되었습니다.', { variant: 'success' });
+          fetchUsers();
+        } catch (error: any) {
+          enqueueSnackbar(error.message || '사용자 활성화에 실패했습니다.', { variant: 'error' });
+        }
+      },
+    });
   };
 
-  const handleStatusChange = async (userId: number, newStatus: string) => {
-    // Prevent changing own status
-    if (currentUser?.id === userId) {
-      enqueueSnackbar(t('admin.users.cannotModifyOwnAccount'), { variant: 'error' });
-      handleMenuClose();
-      return;
-    }
 
-    try {
-      await apiService.put(`/admin/users/${userId}`, { status: newStatus });
-      enqueueSnackbar(t('admin.users.statusUpdated'), { variant: 'success' });
-      fetchUsers();
-    } catch (error: any) {
-      enqueueSnackbar(error.message || t('admin.users.updateError'), { variant: 'error' });
-    }
-    handleMenuClose();
-  };
-
-  const handleRoleChange = async (userId: number, newRole: string) => {
-    // Prevent changing own role
-    if (currentUser?.id === userId) {
-      enqueueSnackbar(t('admin.users.cannotModifyOwnAccount'), { variant: 'error' });
-      handleMenuClose();
-      return;
-    }
-
-    try {
-      await apiService.put(`/admin/users/${userId}`, { role: newRole });
-      enqueueSnackbar(t('admin.users.roleUpdated'), { variant: 'success' });
-      fetchUsers();
-    } catch (error: any) {
-      enqueueSnackbar(error.message || t('admin.users.updateError'), { variant: 'error' });
-    }
-    handleMenuClose();
-  };
 
   const handleEditUser = (user: User) => {
     setEditUserData({
@@ -213,20 +205,23 @@ const UsersManagementPage: React.FC = () => {
       open: true,
       user,
     });
-    handleMenuClose();
   };
 
   const handleSaveEditUser = async () => {
     if (!editUserDialog.user) return;
 
-    // Prevent editing own account
-    if (isCurrentUser(editUserDialog.user)) {
-      enqueueSnackbar(t('admin.users.cannotModifyOwnAccount'), { variant: 'error' });
-      return;
-    }
-
     try {
-      await apiService.put(`/admin/users/${editUserDialog.user.id}`, editUserData);
+      // For own account, only allow name changes
+      if (isCurrentUser(editUserDialog.user)) {
+        const updateData = {
+          name: editUserData.name
+        };
+        await apiService.put(`/admin/users/${editUserDialog.user.id}`, updateData);
+      } else {
+        // For other users, allow all changes
+        await apiService.put(`/admin/users/${editUserDialog.user.id}`, editUserData);
+      }
+
       enqueueSnackbar(t('admin.users.userUpdated'), { variant: 'success' });
       fetchUsers();
       setEditUserDialog({ open: false, user: null });
@@ -239,7 +234,6 @@ const UsersManagementPage: React.FC = () => {
     // Prevent deleting own account
     if (isCurrentUser(user)) {
       enqueueSnackbar(t('admin.users.cannotModifyOwnAccount'), { variant: 'error' });
-      handleMenuClose();
       return;
     }
 
@@ -248,7 +242,6 @@ const UsersManagementPage: React.FC = () => {
       user,
       inputValue: '',
     });
-    handleMenuClose();
   };
 
   const handleConfirmDeleteUser = async () => {
@@ -264,15 +257,7 @@ const UsersManagementPage: React.FC = () => {
     }
   };
 
-  const openConfirmDialog = (title: string, message: string, action: () => void) => {
-    setConfirmDialog({
-      open: true,
-      title,
-      message,
-      action,
-    });
-    handleMenuClose();
-  };
+
 
   const handleAddUser = () => {
     // 폼 데이터 초기화
@@ -297,6 +282,7 @@ const UsersManagementPage: React.FC = () => {
 
   const handleCloseAddUserDialog = () => {
     setAddUserDialog(false);
+    setShowPassword(false);
     setNewUserData({
       name: '',
       email: '',
@@ -440,17 +426,19 @@ const UsersManagementPage: React.FC = () => {
                 <TableRow>
                   <TableCell>{t('users.user')}</TableCell>
                   <TableCell>{t('users.email')}</TableCell>
+                  <TableCell align="center">{t('users.emailVerified')}</TableCell>
                   <TableCell>{t('users.role')}</TableCell>
                   <TableCell>{t('users.status')}</TableCell>
                   <TableCell>{t('users.joinDate')}</TableCell>
                   <TableCell>{t('users.lastLogin')}</TableCell>
+                  <TableCell>{t('users.createdBy')}</TableCell>
                   <TableCell align="center">{t('common.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {users.length === 0 ? (
                   <EmptyTableRow
-                    colSpan={7}
+                    colSpan={9}
                     loading={loading}
                     message="등록된 사용자가 없습니다."
                   />
@@ -468,6 +456,23 @@ const UsersManagementPage: React.FC = () => {
                       </Box>
                     </TableCell>
                     <TableCell>{user.email}</TableCell>
+                    <TableCell align="center">
+                      {user.emailVerified ? (
+                        <Chip
+                          label="인증됨"
+                          color="success"
+                          size="small"
+                          variant="outlined"
+                        />
+                      ) : (
+                        <Chip
+                          label="미인증"
+                          color="warning"
+                          size="small"
+                          variant="outlined"
+                        />
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Chip
                         icon={user.role === 'admin' ? <SecurityIcon /> : <PersonIcon />}
@@ -485,18 +490,68 @@ const UsersManagementPage: React.FC = () => {
                       />
                     </TableCell>
                     <TableCell>
-                      {formatDateTimeDetailed(user.created_at)}
+                      {formatDateTimeDetailed(user.createdAt)}
                     </TableCell>
                     <TableCell>
-                      {formatDateTimeDetailed(user.last_login_at)}
+                      {formatDateTimeDetailed(user.lastLoginAt)}
+                    </TableCell>
+                    <TableCell>
+                      {user.createdByName ? (
+                        <Box>
+                          <Typography variant="body2" fontWeight="medium">
+                            {user.createdByName}
+                          </Typography>
+                          {user.createdByEmail && (
+                            <Typography variant="caption" color="text.secondary">
+                              {user.createdByEmail}
+                            </Typography>
+                          )}
+                        </Box>
+                      ) : (
+                        '-'
+                      )}
                     </TableCell>
                     <TableCell align="center">
-                      <IconButton
-                        onClick={(e) => handleMenuOpen(e, user)}
-                        size="small"
-                      >
-                        <MoreVertIcon />
-                      </IconButton>
+                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                        <IconButton
+                          onClick={() => handleEditUser(user)}
+                          size="small"
+                          color="primary"
+                          title="편집"
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        {user.status === 'active' ? (
+                          <IconButton
+                            onClick={() => handleSuspendUser(user)}
+                            size="small"
+                            color="warning"
+                            title="정지"
+                            disabled={isCurrentUser(user)}
+                          >
+                            <BlockIcon />
+                          </IconButton>
+                        ) : (
+                          <IconButton
+                            onClick={() => handleActivateUser(user)}
+                            size="small"
+                            color="success"
+                            title="활성화"
+                            disabled={isCurrentUser(user)}
+                          >
+                            <CheckCircleIcon />
+                          </IconButton>
+                        )}
+                        <IconButton
+                          onClick={() => handleDeleteUser(user)}
+                          size="small"
+                          color="error"
+                          title="삭제"
+                          disabled={isCurrentUser(user)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
                     </TableCell>
                   </TableRow>
                   ))
@@ -519,56 +574,7 @@ const UsersManagementPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Action Menu */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
-        {selectedUser?.status === 'pending' && selectedUser && !isCurrentUser(selectedUser) && (
-          <MenuItem onClick={() => handleStatusChange(selectedUser.id, 'active')}>
-            <CheckCircleIcon sx={{ mr: 1 }} />
-            {t('admin.users.approve')}
-          </MenuItem>
-        )}
-        {selectedUser?.status === 'active' && selectedUser && !isCurrentUser(selectedUser) && (
-          <MenuItem onClick={() => handleStatusChange(selectedUser.id, 'suspended')}>
-            <BlockIcon sx={{ mr: 1 }} />
-            {t('admin.users.suspend')}
-          </MenuItem>
-        )}
-        {selectedUser?.status === 'suspended' && selectedUser && !isCurrentUser(selectedUser) && (
-          <MenuItem onClick={() => handleStatusChange(selectedUser.id, 'active')}>
-            <CheckCircleIcon sx={{ mr: 1 }} />
-            {t('admin.users.activate')}
-          </MenuItem>
-        )}
-        {selectedUser?.role === 'user' && selectedUser && !isCurrentUser(selectedUser) && (
-          <MenuItem onClick={() => handleRoleChange(selectedUser.id, 'admin')}>
-            <SecurityIcon sx={{ mr: 1 }} />
-            {t('users.promoteToAdmin')}
-          </MenuItem>
-        )}
-        {selectedUser?.role === 'admin' && selectedUser && !isCurrentUser(selectedUser) && (
-          <MenuItem onClick={() => handleRoleChange(selectedUser.id, 'user')}>
-            <PersonIcon sx={{ mr: 1 }} />
-            {t('users.demoteToUser')}
-          </MenuItem>
-        )}
-        <MenuItem onClick={() => selectedUser && handleEditUser(selectedUser)}>
-          <EditIcon sx={{ mr: 1 }} />
-          {t('common.edit')}
-        </MenuItem>
-        {selectedUser && !isCurrentUser(selectedUser) && (
-          <MenuItem
-            onClick={() => handleDeleteUser(selectedUser)}
-            sx={{ color: 'error.main' }}
-          >
-            <DeleteIcon sx={{ mr: 1 }} />
-            {t('common.delete')}
-          </MenuItem>
-        )}
-      </Menu>
+
 
       {/* Add User Dialog */}
       <Dialog
@@ -621,12 +627,26 @@ const UsersManagementPage: React.FC = () => {
               <TextField
                 fullWidth
                 label={t('users.password')}
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 value={newUserData.password}
                 onChange={(e) => setNewUserData({ ...newUserData, password: e.target.value })}
                 autoComplete="new-password"
                 placeholder=""
                 required
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                        size="small"
+                        aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
+                      >
+                        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
               <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                 {t('admin.users.form.passwordHelp')}
@@ -733,7 +753,6 @@ const UsersManagementPage: React.FC = () => {
                 value={editUserData.name}
                 onChange={(e) => setEditUserData({ ...editUserData, name: e.target.value })}
                 fullWidth
-                disabled={editUserDialog.user && isCurrentUser(editUserDialog.user)}
               />
               <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                 {t('admin.users.form.nameHelp')}
@@ -751,32 +770,36 @@ const UsersManagementPage: React.FC = () => {
                 {t('admin.users.form.emailHelp')}
               </Typography>
             </Box>
-            <FormControl fullWidth disabled={editUserDialog.user && isCurrentUser(editUserDialog.user)}>
-              <InputLabel>{t('users.role')}</InputLabel>
-              <Select
-                value={editUserData.role}
-                onChange={(e) => setEditUserData({ ...editUserData, role: e.target.value as 'admin' | 'user' })}
-                label={t('users.role')}
-              >
-                <MenuItem value="user">{t('users.roles.user')}</MenuItem>
-                <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl fullWidth disabled={editUserDialog.user && isCurrentUser(editUserDialog.user)}>
-              <InputLabel>{t('users.status')}</InputLabel>
-              <Select
-                value={editUserData.status}
-                onChange={(e) => setEditUserData({ ...editUserData, status: e.target.value as any })}
-                label={t('users.status')}
-              >
-                <MenuItem value="pending">{t('users.statuses.pending')}</MenuItem>
-                <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
-                <MenuItem value="suspended">{t('users.statuses.suspended')}</MenuItem>
-              </Select>
-            </FormControl>
+            {!(editUserDialog.user && isCurrentUser(editUserDialog.user)) && (
+              <>
+                <FormControl fullWidth>
+                  <InputLabel>{t('users.role')}</InputLabel>
+                  <Select
+                    value={editUserData.role}
+                    onChange={(e) => setEditUserData({ ...editUserData, role: e.target.value as 'admin' | 'user' })}
+                    label={t('users.role')}
+                  >
+                    <MenuItem value="user">{t('users.roles.user')}</MenuItem>
+                    <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl fullWidth>
+                  <InputLabel>{t('users.status')}</InputLabel>
+                  <Select
+                    value={editUserData.status}
+                    onChange={(e) => setEditUserData({ ...editUserData, status: e.target.value as any })}
+                    label={t('users.status')}
+                  >
+                    <MenuItem value="pending">{t('users.statuses.pending')}</MenuItem>
+                    <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
+                    <MenuItem value="suspended">{t('users.statuses.suspended')}</MenuItem>
+                  </Select>
+                </FormControl>
+              </>
+            )}
             {editUserDialog.user && isCurrentUser(editUserDialog.user) && (
-              <Alert severity="warning">
-                {t('admin.users.cannotModifyOwnAccount')}
+              <Alert severity="info">
+                {t('admin.users.canOnlyModifyOwnName')}
               </Alert>
             )}
           </Box>
@@ -788,7 +811,6 @@ const UsersManagementPage: React.FC = () => {
           <Button
             onClick={handleSaveEditUser}
             variant="contained"
-            disabled={editUserDialog.user && isCurrentUser(editUserDialog.user)}
             startIcon={<SaveIcon />}
           >
             {t('common.save')}

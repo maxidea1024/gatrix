@@ -31,6 +31,7 @@ export class UserService {
     role?: 'admin' | 'user';
     status?: 'active' | 'pending' | 'suspended';
     emailVerified?: boolean;
+    createdBy?: number;
   }): Promise<UserWithoutPassword> {
     try {
       // Check if user already exists
@@ -46,6 +47,7 @@ export class UserService {
         role: userData.role || 'user',
         status: userData.status || 'active',
         emailVerified: userData.emailVerified || true,
+        createdBy: userData.createdBy,
       });
 
       logger.info('User created successfully:', {

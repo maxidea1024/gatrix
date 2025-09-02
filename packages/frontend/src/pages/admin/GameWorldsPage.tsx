@@ -967,7 +967,7 @@ const GameWorldsPage: React.FC = () => {
             onClick={handleSaveWorld}
             variant="contained"
             disabled={saving}
-            startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
+            startIcon={saving ? <CircularProgress size={20} /> : (editingWorld ? <SaveIcon /> : <AddIcon />)}
           >
             {saving ? t('common.saving') : (editingWorld ? '게임 월드 수정' : '게임 월드 추가')}
           </Button>

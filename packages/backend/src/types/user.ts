@@ -13,6 +13,9 @@ export interface User {
   oauthId?: string;
   createdAt: Date;
   updatedAt: Date;
+  createdBy?: number;
+  createdByName?: string;
+  createdByEmail?: string;
 }
 
 export interface CreateUserData {
@@ -25,6 +28,7 @@ export interface CreateUserData {
   emailVerified?: boolean;
   oauthProvider?: string;
   oauthId?: string;
+  createdBy?: number;
 }
 
 export interface UpdateUserData {

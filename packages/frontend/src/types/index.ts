@@ -11,6 +11,9 @@ export interface User {
   lastLoginAt?: string;
   createdAt: string;
   updatedAt: string;
+  createdBy?: number;
+  createdByName?: string;
+  createdByEmail?: string;
 }
 
 export interface AuthUser extends User {

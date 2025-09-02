@@ -8,19 +8,23 @@ export class UserModel {
     try {
       const user = await db('g_users')
         .select([
-          'id',
-          'email',
-          'name',
-          'avatarUrl',
-          'role',
-          'status',
-          'emailVerified',
-          'emailVerifiedAt',
-          'lastLoginAt',
-          'createdAt',
-          'updatedAt'
+          'g_users.id',
+          'g_users.email',
+          'g_users.name',
+          'g_users.avatarUrl',
+          'g_users.role',
+          'g_users.status',
+          'g_users.emailVerified',
+          'g_users.emailVerifiedAt',
+          'g_users.lastLoginAt',
+          'g_users.createdAt',
+          'g_users.updatedAt',
+          'g_users.createdBy',
+          'creator.name as createdByName',
+          'creator.email as createdByEmail'
         ])
-        .where('id', id)
+        .leftJoin('g_users as creator', 'g_users.createdBy', 'creator.id')
+        .where('g_users.id', id)
         .first();
 
       return user || null;
@@ -84,7 +88,8 @@ export class UserModel {
         avatarUrl: userData.avatarUrl || null,
         role: userData.role || 'user',
         status: userData.status || 'pending',
-        emailVerified: userData.emailVerified || false
+        emailVerified: userData.emailVerified || false,
+        createdBy: userData.createdBy || null
       });
 
       const user = await this.findById(insertId);
@@ -156,17 +161,17 @@ export class UserModel {
       // Apply filters function
       const applyFilters = (query: any) => {
         if (filters.role) {
-          query.where('role', filters.role);
+          query.where('g_users.role', filters.role);
         }
 
         if (filters.status) {
-          query.where('status', filters.status);
+          query.where('g_users.status', filters.status);
         }
 
         if (filters.search) {
           query.where(function(this: any) {
-            this.where('name', 'like', `%${filters.search}%`)
-                .orWhere('email', 'like', `%${filters.search}%`);
+            this.where('g_users.name', 'like', `%${filters.search}%`)
+                .orWhere('g_users.email', 'like', `%${filters.search}%`);
           });
         }
 
@@ -175,25 +180,31 @@ export class UserModel {
 
       // Get total count
       const countQuery = applyFilters(baseQuery())
-        .count('* as total')
+        .count('g_users.id as total')
         .first();
 
       // Get users with camelCase field names
-      const usersQuery = applyFilters(baseQuery())
+      const usersQuery = applyFilters(
+        db('g_users')
+          .leftJoin('g_users as creator', 'g_users.createdBy', 'creator.id')
+      )
         .select([
-          'id',
-          'email',
-          'name',
-          'avatarUrl',
-          'role',
-          'status',
-          'emailVerified',
-          'emailVerifiedAt',
-          'lastLoginAt',
-          'createdAt',
-          'updatedAt'
+          'g_users.id',
+          'g_users.email',
+          'g_users.name',
+          'g_users.avatarUrl',
+          'g_users.role',
+          'g_users.status',
+          'g_users.emailVerified',
+          'g_users.emailVerifiedAt',
+          'g_users.lastLoginAt',
+          'g_users.createdAt',
+          'g_users.updatedAt',
+          'g_users.createdBy',
+          'creator.name as createdByName',
+          'creator.email as createdByEmail'
         ])
-        .orderBy('createdAt', 'desc')
+        .orderBy('g_users.createdAt', 'desc')
         .limit(limitNum)
         .offset(offset);
 
