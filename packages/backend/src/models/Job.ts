@@ -362,17 +362,17 @@ export class JobModel {
       await db.transaction(async (trx) => {
         // 기존 태그 할당 삭제
         await trx('g_tag_assignments')
-          .where('entity_type', 'job')
-          .where('entity_id', jobId)
+          .where('entityType', 'job')
+          .where('entityId', jobId)
           .del();
 
         // 새 태그 할당 추가
         if (tagIds.length > 0) {
           const assignments = tagIds.map(tagId => ({
-            entity_type: 'job',
-            entity_id: jobId,
-            tag_id: tagId,
-            created_at: new Date()
+            entityType: 'job',
+            entityId: jobId,
+            tagId: tagId,
+            createdAt: new Date()
           }));
           await trx('g_tag_assignments').insert(assignments);
         }
@@ -386,10 +386,10 @@ export class JobModel {
   static async getTags(jobId: number): Promise<any[]> {
     try {
       return await db('g_tag_assignments as ta')
-        .join('g_tags as t', 'ta.tag_id', 't.id')
+        .join('g_tags as t', 'ta.tagId', 't.id')
         .select(['t.id', 't.name', 't.color', 't.description'])
-        .where('ta.entity_type', 'job')
-        .where('ta.entity_id', jobId)
+        .where('ta.entityType', 'job')
+        .where('ta.entityId', jobId)
         .orderBy('t.name');
     } catch (error) {
       logger.error('Error getting job tags:', error);
