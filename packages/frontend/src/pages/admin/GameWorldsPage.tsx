@@ -969,7 +969,7 @@ const GameWorldsPage: React.FC = () => {
             disabled={saving}
             startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
           >
-            {saving ? t('common.saving') : t('gameWorlds.save')}
+            {saving ? t('common.saving') : (editingWorld ? '게임 월드 수정' : '게임 월드 추가')}
           </Button>
         </DialogActions>
       </Dialog>

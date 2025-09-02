@@ -73,21 +73,7 @@ const JobsPage: React.FC = () => {
   const [selectedJobForHistory, setSelectedJobForHistory] = useState<Job | null>(null);
   const [jobToDelete, setJobToDelete] = useState<Job | null>(null);
 
-  // Reset page when filters change
-  useEffect(() => {
-    setPage(0);
-  }, [selectedJobType, enabledFilter, searchTerm]);
-
-  // Load data
-  useEffect(() => {
-    console.log('JobsPage useEffect - loading data');
-    loadData();
-  }, [loadData]);
-
   const loadData = useCallback(async () => {
-    // 이미 로딩 중이면 중복 호출 방지
-    if (loading) return;
-
     try {
       setLoading(true);
       const [jobsResponse, jobTypesData] = await Promise.all([
@@ -110,7 +96,18 @@ const JobsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [loading, selectedJobType, enabledFilter, searchTerm, page, rowsPerPage]);
+  }, [selectedJobType, enabledFilter, searchTerm, page, rowsPerPage]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(0);
+  }, [selectedJobType, enabledFilter, searchTerm]);
+
+  // Load data
+  useEffect(() => {
+    console.log('JobsPage useEffect - loading data');
+    loadData();
+  }, [loadData]);
 
   // Handlers
   const handleSearch = () => {
@@ -239,7 +236,7 @@ const JobsPage: React.FC = () => {
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TextField
                 fullWidth
                 label={t('common.search')}
@@ -255,7 +252,7 @@ const JobsPage: React.FC = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid size={{ xs: 12, md: 3 }}>
               <FormControl fullWidth>
                 <InputLabel shrink={true}>{t('jobs.jobType')}</InputLabel>
                 <Select
@@ -281,7 +278,7 @@ const JobsPage: React.FC = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid size={{ xs: 12, md: 3 }}>
               <FormControl fullWidth>
                 <InputLabel shrink={true}>{t('common.usable')}</InputLabel>
                 <Select

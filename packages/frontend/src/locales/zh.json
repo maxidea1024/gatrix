@@ -692,7 +692,8 @@
     "worldDeleted": "游戏世界删除成功",
     "worldId": "世界ID",
     "worldName": "世界名称",
-    "worldUpdated": "游戏世界更新成功"
+    "worldUpdated": "游戏世界更新成功",
+    "saveWorld": "保存游戏世界"
   },
   "genericWebhookUrl": "通用Webhook URL",
   "language": {

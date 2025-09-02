@@ -630,7 +630,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
             variant="contained"
             disabled={loading || isSubmitting}
           >
-            {loading ? t('common.creating') : t('clientVersions.bulkCreate')}
+            {loading ? '클라이언트 버전 생성 중...' : '클라이언트 버전 일괄 추가'}
           </Button>
         </DialogActions>
       </form>

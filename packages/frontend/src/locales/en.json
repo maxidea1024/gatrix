@@ -113,7 +113,8 @@
       },
       "errors": {
         "duplicateName": "A message template with this name already exists"
-      }
+      },
+      "addTemplate": "Add Message Template"
     }
   },
   "scheduler": {
@@ -684,6 +685,7 @@
     "worldId": "World ID",
     "worldName": "World Name",
     "worldUpdated": "Game world updated successfully",
+    "saveWorld": "Save Game World",
     "confirmDelete": "Are you sure you want to delete the \"{{name}}\" game world?",
     "deleteTypeToConfirm": "To confirm deletion, please type the game world name: ",
     "confirmHide": "Are you sure you want to hide the \"{{name}}\" game world?",

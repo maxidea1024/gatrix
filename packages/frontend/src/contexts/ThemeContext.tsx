@@ -206,12 +206,43 @@ const getTheme = (mode: 'light' | 'dark'): Theme => {
       MuiModal: {
         styleOverrides: {
           root: {
-            '& .MuiBackdrop-root': {
+            // Dialog와 Drawer에만 블러 효과 적용, Select는 제외
+            '&:not(.MuiSelect-root) .MuiBackdrop-root': {
               backgroundColor: mode === 'dark'
                 ? 'rgba(0, 0, 0, 0.7)'
                 : 'rgba(0, 0, 0, 0.5)',
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)', // Safari support
+            },
+            // Select 드롭다운용 투명한 배경
+            '&.MuiSelect-root .MuiBackdrop-root': {
+              backgroundColor: 'transparent',
+            },
+          },
+        },
+      },
+      MuiSelect: {
+        defaultProps: {
+          MenuProps: {
+            disableScrollLock: true,
+            BackdropProps: {
+              style: {
+                backgroundColor: 'transparent',
+                backdropFilter: 'none',
+                WebkitBackdropFilter: 'none',
+              },
+            },
+          },
+        },
+      },
+      MuiMenu: {
+        defaultProps: {
+          disableScrollLock: true,
+          BackdropProps: {
+            style: {
+              backgroundColor: 'transparent',
+              backdropFilter: 'none',
+              WebkitBackdropFilter: 'none',
             },
           },
         },

@@ -582,7 +582,7 @@ const IpWhitelistTab: React.FC = () => {
             취소
           </Button>
           <Button onClick={handleSave} variant="contained" startIcon={<SaveIcon />}>
-            {editDialog ? '수정' : '생성'}
+            {editDialog ? 'IP 화이트리스트 수정' : 'IP 화이트리스트 추가'}
           </Button>
         </DialogActions>
       </Dialog>

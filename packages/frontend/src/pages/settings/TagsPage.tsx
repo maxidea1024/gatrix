@@ -154,7 +154,7 @@ const TagsPage: React.FC = () => {
             </Stack>
             <Stack direction="row" spacing={1}>
               <Button variant="outlined" onClick={()=>{ setNewName(''); setNewDescription(''); }}>{t('common.cancel')}</Button>
-              <Button variant="contained" onClick={handleCreate} disabled={!newName.trim()}>{t('common.create')}</Button>
+              <Button variant="contained" onClick={handleCreate} disabled={!newName.trim()}>태그 추가</Button>
             </Stack>
           </Stack>
         </CardContent>

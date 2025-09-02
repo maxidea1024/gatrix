@@ -334,7 +334,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel }) 
             {t('common.cancel')}
           </Button>
           <Button type="submit" variant="contained" startIcon={job ? <SaveIcon /> : <AddIcon />}>
-            {job ? t('common.update') : t('common.create')}
+            {job ? '작업 수정' : '작업 추가'}
           </Button>
         </Box>
       </Box>

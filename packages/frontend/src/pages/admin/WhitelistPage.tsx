@@ -586,7 +586,7 @@ const WhitelistPage: React.FC = () => {
                     취소
                   </Button>
                   <Button onClick={handleSave} variant="contained" startIcon={<SaveIcon />}>
-                    {editDialog ? '수정' : '생성'}
+                    {editDialog ? '계정 화이트리스트 수정' : '계정 화이트리스트 추가'}
                   </Button>
                 </DialogActions>
               </Dialog>

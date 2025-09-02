@@ -728,10 +728,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             }}
           >
             {displayIsCopy
-              ? t('common.copy')
+              ? '클라이언트 버전 복사'
               : displayIsEdit
-                ? t('common.update')
-                : t('common.add')
+                ? '클라이언트 버전 수정'
+                : '클라이언트 버전 추가'
             }
           </Button>
         </DialogActions>

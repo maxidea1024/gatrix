@@ -650,7 +650,7 @@ const UsersManagementPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button onClick={handleCreateUser} variant="contained" startIcon={<AddIcon />}>
-            {t('common.create')}
+            사용자 추가
           </Button>
         </DialogActions>
       </Dialog>

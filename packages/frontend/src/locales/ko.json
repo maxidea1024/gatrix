@@ -747,6 +747,7 @@
     "worldName": "월드 이름",
     "worldUpdated": "월드가 업데이트되었습니다",
     "addNew": "새 게임 월드 추가",
+    "saveWorld": "게임 월드 저장",
     "confirmDelete": "정말로 \"{{name}}\" 게임 월드를 삭제하시겠습니까?",
     "deleteTypeToConfirm": "삭제를 확인하려면 게임 월드 이름을 입력하세요: ",
     "confirmHide": "정말로 \"{{name}}\" 게임 월드를 숨기시겠습니까?",
