@@ -111,6 +111,8 @@ export class MessageTemplateModel {
 
           return {
             ...template,
+            isEnabled: Boolean(template.isEnabled),
+            supportsMultiLanguage: Boolean(template.supportsMultiLanguage),
             tags: tags || [],
             locales: locales || []
           };
@@ -151,6 +153,8 @@ export class MessageTemplateModel {
 
       return {
         ...template,
+        isEnabled: Boolean(template.isEnabled),
+        supportsMultiLanguage: Boolean(template.supportsMultiLanguage),
         locales: locales || []
       };
     } catch (error) {

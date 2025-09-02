@@ -264,8 +264,8 @@ const MessageTemplatesPage: React.FC = () => {
       id: row.id,
       name: row.name,
       type: row.type,
-      isEnabled: (row as any).isEnabled,
-      supportsMultiLanguage: (row as any).supportsMultiLanguage || false,
+      isEnabled: Boolean((row as any).isEnabled),
+      supportsMultiLanguage: Boolean((row as any).supportsMultiLanguage),
       defaultMessage: (row as any).defaultMessage || '',
       locales: row.locales || [],
       tags: row.tags || []

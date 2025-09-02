@@ -112,7 +112,7 @@ export class WhitelistModel {
           w.startDate,
           w.endDate,
           w.purpose,
-          w.tags,
+          CAST(w.tags AS CHAR) as tags,
           w.createdBy,
           w.createdAt,
           w.updatedAt,
@@ -136,6 +136,7 @@ export class WhitelistModel {
         totalPages: Math.ceil(total / limit),
       };
     } catch (error) {
+      console.error('AccountWhitelist.findAll error:', error);
       throw new CustomError('Failed to fetch whitelists', 500);
     }
   }
@@ -150,7 +151,7 @@ export class WhitelistModel {
           w.startDate,
           w.endDate,
           w.purpose,
-          w.tags,
+          CAST(w.tags AS CHAR) as tags,
           w.createdBy,
           w.createdAt,
           w.updatedAt,
@@ -289,6 +290,21 @@ export class WhitelistModel {
   }
 
   private static mapRowToWhitelist(row: any): Whitelist {
+    let tags: string[] | undefined = undefined;
+
+    if (row.tags) {
+      try {
+        tags = JSON.parse(row.tags);
+      } catch (error) {
+        // JSON 파싱 실패 시 문자열을 배열로 변환
+        console.warn(`Invalid JSON in tags for whitelist ${row.id}: ${row.tags}`);
+        if (typeof row.tags === 'string') {
+          // 쉼표로 구분된 문자열을 배열로 변환
+          tags = row.tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag.length > 0);
+        }
+      }
+    }
+
     return {
       id: row.id,
       accountId: row.accountId,
@@ -296,7 +312,7 @@ export class WhitelistModel {
       startDate: row.startDate ? new Date(row.startDate) : undefined,
       endDate: row.endDate ? new Date(row.endDate) : undefined,
       purpose: row.purpose,
-      tags: row.tags ? JSON.parse(row.tags) : undefined,
+      tags: tags,
       createdBy: row.createdBy,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),

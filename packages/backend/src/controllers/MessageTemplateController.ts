@@ -8,7 +8,7 @@ export class MessageTemplateController {
       // MessageTemplateModel 사용
       const result = await MessageTemplateModel.findAllWithPagination({
         type,
-        isActive: is_enabled === undefined ? undefined : (is_enabled === '1' || is_enabled === 'true'),
+        isEnabled: is_enabled === undefined ? undefined : (is_enabled === '1' || is_enabled === 'true'),
         search: q,
         limit: Number(limit) || 50,
         offset: Number(offset) || 0
