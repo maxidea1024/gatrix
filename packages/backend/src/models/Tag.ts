@@ -11,6 +11,8 @@ export interface TagAttributes {
   updatedBy?: number | null;
   createdByName?: string | null;
   updatedByName?: string | null;
+  createdByEmail?: string | null;
+  updatedByEmail?: string | null;
 }
 
 export interface CreateTagData {
@@ -30,7 +32,9 @@ export interface UpdateTagData {
 export default class TagModel {
   static async list(): Promise<TagAttributes[]> {
     return await database.query(`
-      SELECT t.*, c.name as createdByName, u.name as updatedByName
+      SELECT t.*,
+             c.name as createdByName, c.email as createdByEmail,
+             u.name as updatedByName, u.email as updatedByEmail
       FROM g_tags t
       LEFT JOIN g_users c ON c.id = t.createdBy
       LEFT JOIN g_users u ON u.id = t.updatedBy

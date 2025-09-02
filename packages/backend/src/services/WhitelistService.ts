@@ -226,33 +226,27 @@ export class WhitelistService {
 
       // Check IP whitelist
       if (ipAddress) {
-        const { IpWhitelistService } = await import('./IpWhitelistService');
-        const isWhitelisted = await IpWhitelistService.isIpWhitelisted(ipAddress);
+        const { IpWhitelistModel } = await import('../models/IpWhitelist');
+        const ipWhitelists = await IpWhitelistModel.findAll(1, 1000, { isEnabled: true });
+        const now = new Date();
+        const { ipMatchesCIDR } = await import('../utils/ipValidation');
 
-        if (isWhitelisted) {
-          // Get the specific whitelist entries that match
-          const { IpWhitelistModel } = await import('../models/IpWhitelist');
-          const ipWhitelists = await IpWhitelistModel.findAll(1, 1000, { isEnabled: true });
-          const now = new Date();
-          const { ipMatchesCIDR } = await import('../utils/ipValidation');
+        for (const ipWhitelist of ipWhitelists.ipWhitelists) {
+          if (!ipWhitelist.isEnabled) continue;
 
-          for (const ipWhitelist of ipWhitelists.ipWhitelists) {
-            if (!ipWhitelist.isEnabled) continue;
+          const startDate = ipWhitelist.startDate ? new Date(ipWhitelist.startDate) : null;
+          const endDate = ipWhitelist.endDate ? new Date(ipWhitelist.endDate) : null;
 
-            const startDate = ipWhitelist.startDate ? new Date(ipWhitelist.startDate) : null;
-            const endDate = ipWhitelist.endDate ? new Date(ipWhitelist.endDate) : null;
+          if (startDate && startDate > now) continue;
+          if (endDate && endDate < now) continue;
 
-            if (startDate && startDate > now) continue;
-            if (endDate && endDate < now) continue;
-
-            // Check both exact match and CIDR match
-            if (ipWhitelist.ipAddress === ipAddress || ipMatchesCIDR(ipAddress, ipWhitelist.ipAddress)) {
-              matchedRules.push({
-                type: 'ip',
-                rule: ipWhitelist.ipAddress,
-                reason: ipWhitelist.purpose || 'IP whitelist match'
-              });
-            }
+          // Check both exact match and CIDR match
+          if (ipWhitelist.ipAddress === ipAddress || ipMatchesCIDR(ipAddress, ipWhitelist.ipAddress)) {
+            matchedRules.push({
+              type: 'ip',
+              rule: ipWhitelist.ipAddress,
+              reason: ipWhitelist.purpose || 'IP whitelist match'
+            });
           }
         }
       }

@@ -229,7 +229,20 @@ const TagsPage: React.FC = () => {
                     </TableCell>
                     <TableCell sx={{ width: 180 }}>{formatDateTimeDetailed(tag.createdAt || '')}</TableCell>
                     <TableCell sx={{ width: 180 }}>{formatDateTimeDetailed(tag.updatedAt || '')}</TableCell>
-                    <TableCell sx={{ width: 180 }}>{tag.createdByName || '-'}</TableCell>
+                    <TableCell sx={{ width: 180 }}>
+                      {tag.createdByName ? (
+                        <Box>
+                          <Typography variant="body2">{tag.createdByName}</Typography>
+                          {tag.createdByEmail && (
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                              {tag.createdByEmail}
+                            </Typography>
+                          )}
+                        </Box>
+                      ) : (
+                        '-'
+                      )}
+                    </TableCell>
                     <TableCell align="right" sx={{ width: 140 }}>
                       {editingId === tag.id ? (
                         <Stack direction="row" spacing={1} justifyContent="flex-end">

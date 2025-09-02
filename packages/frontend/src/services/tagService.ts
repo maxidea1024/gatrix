@@ -11,6 +11,8 @@ export interface Tag {
   updatedBy?: number | null;
   createdByName?: string | null;
   updatedByName?: string | null;
+  createdByEmail?: string | null;
+  updatedByEmail?: string | null;
 }
 
 export interface TagListParams {
