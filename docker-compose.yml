@@ -67,7 +67,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this-in-production}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-your-super-secret-refresh-key-change-this-in-production}
       SESSION_SECRET: ${SESSION_SECRET:-your-super-secret-session-key-change-this-in-production}
-      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@motifgames.com}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@gatrix.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
       ADMIN_NAME: ${ADMIN_NAME:-Administrator}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}

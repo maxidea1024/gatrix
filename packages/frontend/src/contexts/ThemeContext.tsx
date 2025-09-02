@@ -190,6 +190,32 @@ const getTheme = (mode: 'light' | 'dark'): Theme => {
           },
         },
       },
+      MuiDialog: {
+        styleOverrides: {
+          root: {
+            '& .MuiBackdrop-root': {
+              backgroundColor: mode === 'dark'
+                ? 'rgba(0, 0, 0, 0.7)'
+                : 'rgba(0, 0, 0, 0.5)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)', // Safari support
+            },
+          },
+        },
+      },
+      MuiModal: {
+        styleOverrides: {
+          root: {
+            '& .MuiBackdrop-root': {
+              backgroundColor: mode === 'dark'
+                ? 'rgba(0, 0, 0, 0.7)'
+                : 'rgba(0, 0, 0, 0.5)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)', // Safari support
+            },
+          },
+        },
+      },
     },
   });
 };

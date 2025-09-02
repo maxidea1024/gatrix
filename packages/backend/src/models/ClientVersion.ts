@@ -116,7 +116,9 @@ export class ClientVersionModel {
         .select([
           'cv.*',
           'creator.name as createdByName',
-          'updater.name as updatedByName'
+          'creator.email as createdByEmail',
+          'updater.name as updatedByName',
+          'updater.email as updatedByEmail'
         ])
         .orderBy(`cv.${sortBy}`, sortOrder)
         .limit(limit)
@@ -164,7 +166,9 @@ export class ClientVersionModel {
         .select([
           'cv.*',
           'creator.name as createdByName',
-          'updater.name as updatedByName'
+          'creator.email as createdByEmail',
+          'updater.name as updatedByName',
+          'updater.email as updatedByEmail'
         ])
         .where('cv.id', id)
         .first();
@@ -188,8 +192,11 @@ export class ClientVersionModel {
 
   static async create(data: any): Promise<any> {
     try {
+      // tags 필드는 별도 테이블에서 관리하므로 제거
+      const { tags, ...clientVersionData } = data;
+
       const [insertId] = await db('g_client_versions').insert({
-        ...data,
+        ...clientVersionData,
         createdAt: new Date(),
         updatedAt: new Date()
       });
@@ -232,8 +239,11 @@ export class ClientVersionModel {
       return await db.transaction(async (trx) => {
         const results = [];
         for (const item of data) {
+          // tags 필드는 별도 테이블에서 관리하므로 제거
+          const { tags, ...clientVersionData } = item as any;
+
           const [insertId] = await trx('g_client_versions').insert({
-            ...item,
+            ...clientVersionData,
             createdAt: new Date(),
             updatedAt: new Date()
           });

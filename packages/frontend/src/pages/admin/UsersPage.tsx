@@ -52,6 +52,7 @@ import {
 import { Layout } from '@/components/layout/Layout';
 import { useUsers } from '@/hooks/useSWR';
 import SimplePagination from '../../components/common/SimplePagination';
+import EmptyTableRow from '../../components/common/EmptyTableRow';
 // import { useTranslations } from '@/contexts/I18nContext';
 import { User, UserFilters } from '@/types';
 import { UserService } from '@/services/users';
@@ -402,7 +403,14 @@ const UsersPage: React.FC = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {users.map((user) => (
+                  {users.length === 0 ? (
+                    <EmptyTableRow
+                      colSpan={7}
+                      loading={isLoading}
+                      message="등록된 사용자가 없습니다."
+                    />
+                  ) : (
+                    users.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -457,7 +465,8 @@ const UsersPage: React.FC = () => {
                         <UserActionMenu user={user} onAction={handleAction} />
                       </TableCell>
                     </TableRow>
-                  ))}
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>

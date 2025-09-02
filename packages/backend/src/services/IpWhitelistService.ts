@@ -104,9 +104,9 @@ export class IpWhitelistService {
 
       // Clean up data to ensure no undefined values
       const createData: CreateIpWhitelistData = {
-        ip: normalizedIP,
-        description: data.purpose.trim(),
-        isActive: data.isEnabled ?? true,
+        ipAddress: normalizedIP,
+        purpose: data.purpose.trim(),
+        isEnabled: data.isEnabled ?? true,
         createdBy: data.createdBy,
       };
 
@@ -273,7 +273,7 @@ export class IpWhitelistService {
       }
 
       // Get all enabled IP whitelist entries
-      const result = await IpWhitelistModel.findAll(1, 1000, { isActive: true });
+      const result = await IpWhitelistModel.findAll(1, 1000, { isEnabled: true });
 
       // Check if IP matches any whitelist entry
       for (const entry of result.ipWhitelists) {

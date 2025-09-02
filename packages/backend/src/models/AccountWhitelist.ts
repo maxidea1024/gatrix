@@ -8,12 +8,14 @@ export interface Whitelist {
   ipAddress?: string;
   startDate?: Date;
   endDate?: Date;
-  memo?: string;
+  purpose?: string;
   tags?: string[];
   createdBy: number;
   createdAt: Date;
   updatedAt: Date;
   createdByName?: string;
+  createdByEmail?: string;
+  isActive: boolean;
 }
 
 export interface CreateWhitelistData {
@@ -21,7 +23,7 @@ export interface CreateWhitelistData {
   ipAddress?: string;
   startDate?: Date;
   endDate?: Date;
-  memo?: string;
+  purpose?: string;
   tags?: string[];
   createdBy: number;
 }
@@ -31,7 +33,7 @@ export interface UpdateWhitelistData {
   ipAddress?: string;
   startDate?: Date;
   endDate?: Date;
-  memo?: string;
+  purpose?: string;
   tags?: string[];
 }
 
@@ -87,7 +89,7 @@ export class WhitelistModel {
       }
 
       if (filters.search) {
-        whereClause += ' AND (w.accountId LIKE ? OR w.ipAddress LIKE ? OR w.memo LIKE ?)';
+        whereClause += ' AND (w.accountId LIKE ? OR w.ipAddress LIKE ? OR w.purpose LIKE ?)';
         filterParams.push(`%${filters.search}%`, `%${filters.search}%`, `%${filters.search}%`);
       }
 
@@ -109,12 +111,14 @@ export class WhitelistModel {
           w.ipAddress,
           w.startDate,
           w.endDate,
-          w.memo,
+          w.purpose,
           w.tags,
           w.createdBy,
           w.createdAt,
           w.updatedAt,
-          u.name as createdByName
+          u.name as createdByName,
+          u.email as createdByEmail,
+          1 as isActive
         FROM g_account_whitelist w
         LEFT JOIN g_users u ON w.createdBy = u.id
         ${whereClause}
@@ -145,12 +149,14 @@ export class WhitelistModel {
           w.ipAddress,
           w.startDate,
           w.endDate,
-          w.memo,
+          w.purpose,
           w.tags,
           w.createdBy,
           w.createdAt,
           w.updatedAt,
-          u.name as createdByName
+          u.name as createdByName,
+          u.email as createdByEmail,
+          1 as isActive
         FROM g_account_whitelist w
         LEFT JOIN g_users u ON w.createdBy = u.id
         WHERE w.id = ?
@@ -166,7 +172,7 @@ export class WhitelistModel {
   static async create(data: CreateWhitelistData): Promise<Whitelist> {
     try {
       const query = `
-        INSERT INTO g_account_whitelist (accountId, ipAddress, startDate, endDate, memo, tags, createdBy)
+        INSERT INTO g_account_whitelist (accountId, ipAddress, startDate, endDate, purpose, tags, createdBy)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `;
 
@@ -175,7 +181,7 @@ export class WhitelistModel {
         data.ipAddress || null,
         data.startDate || null,
         data.endDate || null,
-        data.memo || null,
+        data.purpose || null,
         data.tags ? JSON.stringify(data.tags) : null,
         data.createdBy,
       ]);
@@ -216,9 +222,9 @@ export class WhitelistModel {
         params.push(data.endDate || null);
       }
 
-      if (data.memo !== undefined) {
-        fields.push('memo = ?');
-        params.push(data.memo || null);
+      if (data.purpose !== undefined) {
+        fields.push('purpose = ?');
+        params.push(data.purpose || null);
       }
 
       if (data.tags !== undefined) {
@@ -259,7 +265,7 @@ export class WhitelistModel {
 
       const values = entries.map(() => '(?, ?, ?, ?, ?, ?)').join(', ');
       const query = `
-        INSERT INTO g_account_whitelist (accountId, ipAddress, startDate, endDate, memo, createdBy)
+        INSERT INTO g_account_whitelist (accountId, ipAddress, startDate, endDate, purpose, createdBy)
         VALUES ${values}
       `;
 
@@ -270,7 +276,7 @@ export class WhitelistModel {
           entry.ipAddress || null,
           entry.startDate || null,
           entry.endDate || null,
-          entry.memo || null,
+          entry.purpose || null,
           entry.createdBy
         );
       });
@@ -289,12 +295,14 @@ export class WhitelistModel {
       ipAddress: row.ipAddress,
       startDate: row.startDate ? new Date(row.startDate) : undefined,
       endDate: row.endDate ? new Date(row.endDate) : undefined,
-      memo: row.memo,
+      purpose: row.purpose,
       tags: row.tags ? JSON.parse(row.tags) : undefined,
       createdBy: row.createdBy,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
       createdByName: row.createdByName,
+      createdByEmail: row.createdByEmail,
+      isActive: Boolean(row.isActive),
     };
   }
 

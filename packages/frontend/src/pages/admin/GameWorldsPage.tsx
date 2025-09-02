@@ -69,6 +69,8 @@ import { gameWorldService } from '../../services/gameWorldService';
 import { tagService, Tag } from '@/services/tagService';
 import { GameWorld, CreateGameWorldData } from '../../types/gameWorld';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import FormDialogHeader from '../../components/common/FormDialogHeader';
+import EmptyTableRow from '../../components/common/EmptyTableRow';
 
 // Sortable Row Component
 interface SortableRowProps {
@@ -804,25 +806,12 @@ const GameWorldsPage: React.FC = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {loading ? (
-                    <TableRow>
-                      <TableCell colSpan={7} align="center">
-                        {t('gameWorlds.loading')}
-                      </TableCell>
-                    </TableRow>
-                  ) : worlds.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
-                        <Box sx={{ textAlign: 'center' }}>
-                          <Typography variant="h6" color="text.secondary" gutterBottom>
-                            {t('gameWorlds.noWorldsFound')}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {t('gameWorlds.noWorldsDesc')}
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                    </TableRow>
+                  {worlds.length === 0 ? (
+                    <EmptyTableRow
+                      colSpan={8}
+                      loading={loading}
+                      message="등록된 게임 월드가 없습니다."
+                    />
                   ) : (
                     <SortableContext
                       items={worlds.map(w => w.id)}
@@ -858,9 +847,13 @@ const GameWorldsPage: React.FC = () => {
 
       {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>
-          {editingWorld ? t('gameWorlds.editGameWorld') : t('gameWorlds.addGameWorld')}
-        </DialogTitle>
+        <FormDialogHeader
+          title={editingWorld ? '게임 월드 편집' : '게임 월드 추가'}
+          description={editingWorld
+            ? '기존 게임 월드의 설정을 수정하고 업데이트할 수 있습니다.'
+            : '새로운 게임 월드를 생성하고 서버 설정 및 접속 정보를 구성할 수 있습니다.'
+          }
+        />
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
             <Box>

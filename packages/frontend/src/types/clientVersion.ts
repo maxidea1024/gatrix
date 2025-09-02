@@ -48,7 +48,9 @@ export interface ClientVersion {
   createdBy: number;
   updatedBy: number;
   createdByName?: string;
+  createdByEmail?: string;
   updatedByName?: string;
+  updatedByEmail?: string;
 }
 
 // 클라이언트 버전 생성/수정 데이터

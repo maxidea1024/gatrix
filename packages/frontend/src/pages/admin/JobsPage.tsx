@@ -45,6 +45,7 @@ import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import JobForm from '../../components/jobs/JobForm';
 import JobExecutionHistory from '../../components/jobs/JobExecutionHistory';
 import SimplePagination from '../../components/common/SimplePagination';
+import EmptyTableRow from '../../components/common/EmptyTableRow';
 
 const JobsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -72,19 +73,21 @@ const JobsPage: React.FC = () => {
   const [selectedJobForHistory, setSelectedJobForHistory] = useState<Job | null>(null);
   const [jobToDelete, setJobToDelete] = useState<Job | null>(null);
 
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(0);
+  }, [selectedJobType, enabledFilter, searchTerm]);
+
   // Load data
   useEffect(() => {
     console.log('JobsPage useEffect - loading data');
     loadData();
-  }, [page, rowsPerPage]);
+  }, [loadData]);
 
-  useEffect(() => {
-    // Reset to first page when filters change
-    setPage(0);
-    loadData();
-  }, [selectedJobType, enabledFilter, searchTerm]);
+  const loadData = useCallback(async () => {
+    // 이미 로딩 중이면 중복 호출 방지
+    if (loading) return;
 
-  const loadData = async () => {
     try {
       setLoading(true);
       const [jobsResponse, jobTypesData] = await Promise.all([
@@ -103,16 +106,16 @@ const JobsPage: React.FC = () => {
       setJobTypes(jobTypesData);
     } catch (error) {
       console.error('Failed to load data:', error);
-      enqueueSnackbar(t('jobs.errors.loadFailed'), { variant: 'error' });
+      enqueueSnackbar('작업 목록을 불러오는데 실패했습니다.', { variant: 'error' });
     } finally {
       setLoading(false);
     }
-  };
+  }, [loading, selectedJobType, enabledFilter, searchTerm, page, rowsPerPage]);
 
   // Handlers
   const handleSearch = () => {
     setPage(0); // Reset to first page
-    loadData();
+    // loadData will be called automatically by useEffect
   };
 
   const handleReset = () => {
@@ -120,7 +123,7 @@ const JobsPage: React.FC = () => {
     setSelectedJobType('');
     setEnabledFilter('');
     setPage(0); // Reset to first page
-    loadData();
+    // loadData will be called automatically by useEffect
   };
 
   // 페이지 변경 핸들러
@@ -158,7 +161,7 @@ const JobsPage: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to execute job:', error);
-      enqueueSnackbar(t('jobs.errors.executeFailed'), { variant: 'error' });
+      enqueueSnackbar('작업 실행에 실패했습니다.', { variant: 'error' });
     }
   };
 
@@ -178,7 +181,7 @@ const JobsPage: React.FC = () => {
       loadData();
     } catch (error) {
       console.error('Failed to delete job:', error);
-      enqueueSnackbar(t('jobs.errors.deleteFailed'), { variant: 'error' });
+      enqueueSnackbar('작업 삭제에 실패했습니다.', { variant: 'error' });
     }
   };
 
@@ -199,9 +202,9 @@ const JobsPage: React.FC = () => {
       // 409 에러 (이름 중복) 처리
       const status = error?.status || error?.response?.status;
       if (status === 409) {
-        enqueueSnackbar(t('jobs.errors.nameAlreadyExists'), { variant: 'error' });
+        enqueueSnackbar('이미 존재하는 작업 이름입니다.', { variant: 'error' });
       } else {
-        enqueueSnackbar(t('jobs.errors.saveFailed'), { variant: 'error' });
+        enqueueSnackbar('작업 저장에 실패했습니다.', { variant: 'error' });
       }
     }
   };
@@ -324,13 +327,11 @@ const JobsPage: React.FC = () => {
           </TableHead>
           <TableBody>
             {jobs.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={8} align="center" sx={{ py: 8 }}>
-                  <Typography variant="body1" color="text.secondary">
-                    {t('jobs.noJobsFound')}
-                  </Typography>
-                </TableCell>
-              </TableRow>
+              <EmptyTableRow
+                colSpan={8}
+                loading={loading}
+                message="등록된 작업이 없습니다."
+              />
             ) : (
               jobs.map((job) => (
                 <TableRow key={job.id}>

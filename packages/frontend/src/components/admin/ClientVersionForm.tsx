@@ -16,6 +16,9 @@ import {
   Typography,
   Alert,
   Chip,
+  Divider,
+  Paper,
+  Stack,
 } from '@mui/material';
 import {
   Cancel as CancelIcon,
@@ -28,6 +31,7 @@ import { useSnackbar } from 'notistack';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import FormDialogHeader from '../common/FormDialogHeader';
 import {
   ClientVersion,
   ClientVersionFormData,
@@ -338,14 +342,20 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         sx: { minHeight: '80vh' }
       }}
     >
-      <DialogTitle>
-        {isCopyMode
-          ? t('clientVersions.form.copyTitle')
+      <FormDialogHeader
+        title={isCopyMode
+          ? '클라이언트 버전 복사'
           : isEdit
-            ? t('clientVersions.form.editTitle')
-            : t('clientVersions.form.title')
+            ? '클라이언트 버전 편집'
+            : '클라이언트 버전 추가'
         }
-      </DialogTitle>
+        description={isCopyMode
+          ? '기존 클라이언트 버전을 복사하여 새로운 버전을 생성할 수 있습니다.'
+          : isEdit
+            ? '기존 클라이언트 버전의 설정을 수정하고 업데이트할 수 있습니다.'
+            : '새로운 클라이언트 버전을 생성하고 게임 서버 및 패치 설정을 구성할 수 있습니다.'
+        }
+      />
 
       <form onSubmit={handleSubmit(onSubmit, (errors) => {
         console.log('Form validation failed:', errors);
@@ -357,342 +367,344 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             </Alert>
           )}
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
-            {/* 기본 정보 */}
-            <Typography variant="h6" gutterBottom>
-              {t('clientVersions.form.basicInfo')}
-            </Typography>
+          <Stack spacing={3} sx={{ mt: 1 }}>
+            {/* 기본 정보 섹션 */}
+            <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200' }}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                📋 {t('clientVersions.form.basicInfo')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('clientVersions.form.basicInfoDescription')}
+              </Typography>
 
-            {/* 버전 필드를 최상단으로 이동 */}
-            <Controller
-              name="clientVersion"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <TextField
-                    {...field}
-                    inputRef={versionFieldRef}
-                    fullWidth
-                    label={t('clientVersions.version')}
-                    placeholder={CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE}
-                    error={!!errors.clientVersion}
-                    helperText={errors.clientVersion?.message}
-                    inputProps={{
-                      autoComplete: 'off',
-                      autoCorrect: 'off',
-                      autoCapitalize: 'off',
-                      spellCheck: false
-                    }}
-                  />
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.versionHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
-
-            <Controller
-              name="platform"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <FormControl fullWidth error={!!errors.platform}>
-                    <InputLabel id="cvf-platform-label">{t('clientVersions.platform')}</InputLabel>
-                    <Select
-                      labelId="cvf-platform-label"
+              <Stack spacing={2}>
+                {/* 버전 필드 */}
+                <Controller
+                  name="clientVersion"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
                       {...field}
-                      label={t('clientVersions.platform')}
-                    >
-                      {['pc','pc-wegame','ios','android','harmonyos'].map((p) => (
-                        <MenuItem key={p} value={p}>
-                          {p}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {errors.platform && (
-                      <Typography variant="caption" color="error">
-                        {errors.platform.message}
+                      inputRef={versionFieldRef}
+                      fullWidth
+                      label={
+                        <Box component="span">
+                          {t('clientVersions.version')} <Typography component="span" color="error">*</Typography>
+                        </Box>
+                      }
+                      placeholder={CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE}
+                      error={!!errors.clientVersion}
+                      helperText={errors.clientVersion?.message || t('clientVersions.form.versionHelp')}
+                      inputProps={{
+                        autoComplete: 'off',
+                        autoCorrect: 'off',
+                        autoCapitalize: 'off',
+                        spellCheck: false
+                      }}
+                    />
+                  )}
+                />
+
+                {/* 플랫폼 필드 */}
+                <Controller
+                  name="platform"
+                  control={control}
+                  render={({ field }) => (
+                    <FormControl fullWidth error={!!errors.platform}>
+                      <InputLabel id="cvf-platform-label">
+                        {t('clientVersions.platform')} <Typography component="span" color="error">*</Typography>
+                      </InputLabel>
+                      <Select
+                        labelId="cvf-platform-label"
+                        {...field}
+                        label={`${t('clientVersions.platform')} *`}
+                      >
+                        {['pc','pc-wegame','ios','android','harmonyos'].map((p) => (
+                          <MenuItem key={p} value={p}>
+                            {p}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {(errors.platform?.message || t('clientVersions.form.platformHelp')) && (
+                        <Typography variant="caption" color={errors.platform ? "error" : "text.secondary"} sx={{ mt: 0.5, display: 'block' }}>
+                          {errors.platform?.message || t('clientVersions.form.platformHelp')}
+                        </Typography>
+                      )}
+                    </FormControl>
+                  )}
+                />
+
+                {/* 상태 필드 */}
+                <Controller
+                  name="clientStatus"
+                  control={control}
+                  render={({ field }) => (
+                    <FormControl fullWidth variant="outlined">
+                      <InputLabel id="cvf-status-label" shrink={true}>
+                        {t('clientVersions.statusLabel')} <Typography component="span" color="error">*</Typography>
+                      </InputLabel>
+                      <Select
+                        labelId="cvf-status-label"
+                        {...field}
+                        label={`${t('clientVersions.statusLabel')} *`}
+                      >
+                        {Object.values(ClientStatus).map((status) => (
+                          <MenuItem key={status} value={status}>
+                            {t(ClientStatusLabels[status])}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                        {t('clientVersions.form.statusHelp')}
                       </Typography>
-                    )}
-                  </FormControl>
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.platformHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
+                    </FormControl>
+                  )}
+                />
+              </Stack>
+            </Paper>
 
+            {/* 서버 주소 섹션 */}
+            <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200' }}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                🌐 {t('clientVersions.form.serverAddresses')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('clientVersions.form.serverAddressesDescription')}
+              </Typography>
 
+              <Stack spacing={2}>
 
-            <Controller
-              name="clientStatus"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <FormControl fullWidth variant="outlined">
-                    <InputLabel id="cvf-status-label" shrink={true}>{t('clientVersions.statusLabel')}</InputLabel>
-                    <Select
-                      labelId="cvf-status-label"
+                {/* 게임 서버 주소 */}
+                <Controller
+                  name="gameServerAddress"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
                       {...field}
-                      label={t('clientVersions.statusLabel')}
-                    >
-                      {Object.values(ClientStatus).map((status) => (
-                        <MenuItem key={status} value={status}>
-                          {t(ClientStatusLabels[status])}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.statusHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
+                      fullWidth
+                      label={
+                        <Box component="span">
+                          {t('clientVersions.gameServerAddress')} <Typography component="span" color="error">*</Typography>
+                        </Box>
+                      }
+                      error={!!errors.gameServerAddress}
+                      helperText={errors.gameServerAddress?.message || t('clientVersions.form.gameServerAddressHelp')}
+                      inputProps={{
+                        autoComplete: 'off',
+                        autoCorrect: 'off',
+                        autoCapitalize: 'off',
+                        spellCheck: false
+                      }}
+                    />
+                  )}
+                />
 
-            {/* 서버 주소 */}
-            <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
-              {t('clientVersions.form.serverAddresses')}
-            </Typography>
+                {/* 게임 서버 주소 (화이트리스트용) */}
+                <Controller
+                  name="gameServerAddressForWhiteList"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label={t('clientVersions.gameServerAddressForWhiteList')}
+                      error={!!errors.gameServerAddressForWhiteList}
+                      helperText={errors.gameServerAddressForWhiteList?.message || t('clientVersions.form.gameServerAddressForWhiteListHelp')}
+                      inputProps={{
+                        autoComplete: 'off',
+                        autoCorrect: 'off',
+                        autoCapitalize: 'off',
+                        spellCheck: false
+                      }}
+                    />
+                  )}
+                />
 
-            <Controller
-              name="gameServerAddress"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label={t('clientVersions.gameServerAddress')}
-                    error={!!errors.gameServerAddress}
-                    helperText={errors.gameServerAddress?.message}
-                    inputProps={{
-                      autoComplete: 'off',
-                      autoCorrect: 'off',
-                      autoCapitalize: 'off',
-                      spellCheck: false
-                    }}
-                  />
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.gameServerAddressHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
+                {/* 패치 주소 */}
+                <Controller
+                  name="patchAddress"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label={
+                        <Box component="span">
+                          {t('clientVersions.patchAddress')} <Typography component="span" color="error">*</Typography>
+                        </Box>
+                      }
+                      error={!!errors.patchAddress}
+                      helperText={errors.patchAddress?.message || t('clientVersions.form.patchAddressHelp')}
+                      inputProps={{
+                        autoComplete: 'off',
+                        autoCorrect: 'off',
+                        autoCapitalize: 'off',
+                        spellCheck: false
+                      }}
+                    />
+                  )}
+                />
 
-            <Controller
-              name="gameServerAddressForWhiteList"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label={t('clientVersions.gameServerAddressForWhiteList')}
-                    error={!!errors.gameServerAddressForWhiteList}
-                    helperText={errors.gameServerAddressForWhiteList?.message}
-                    inputProps={{
-                      autoComplete: 'off',
-                      autoCorrect: 'off',
-                      autoCapitalize: 'off',
-                      spellCheck: false
-                    }}
-                  />
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.gameServerAddressForWhiteListHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
+                {/* 패치 주소 (화이트리스트용) */}
+                <Controller
+                  name="patchAddressForWhiteList"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label={t('clientVersions.patchAddressForWhiteList')}
+                      error={!!errors.patchAddressForWhiteList}
+                      helperText={errors.patchAddressForWhiteList?.message || t('clientVersions.form.patchAddressForWhiteListHelp')}
+                      inputProps={{
+                        autoComplete: 'off',
+                        autoCorrect: 'off',
+                        autoCapitalize: 'off',
+                        spellCheck: false
+                      }}
+                    />
+                  )}
+                />
+              </Stack>
+            </Paper>
 
-            <Controller
-              name="patchAddress"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label={t('clientVersions.patchAddress')}
-                    error={!!errors.patchAddress}
-                    helperText={errors.patchAddress?.message}
-                    inputProps={{
-                      autoComplete: 'off',
-                      autoCorrect: 'off',
-                      autoCapitalize: 'off',
-                      spellCheck: false
-                    }}
-                  />
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.patchAddressHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
+            {/* 추가 설정 섹션 */}
+            <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200' }}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                ⚙️ {t('clientVersions.form.additionalSettings')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('clientVersions.form.additionalSettingsDescription')}
+              </Typography>
 
-            <Controller
-              name="patchAddressForWhiteList"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label={t('clientVersions.patchAddressForWhiteList')}
-                    error={!!errors.patchAddressForWhiteList}
-                    helperText={errors.patchAddressForWhiteList?.message}
-                    inputProps={{
-                      autoComplete: 'off',
-                      autoCorrect: 'off',
-                      autoCapitalize: 'off',
-                      spellCheck: false
-                    }}
-                  />
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.patchAddressForWhiteListHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
+              <Stack spacing={2}>
 
-            {/* 추가 설정 */}
-            <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
-              {t('clientVersions.form.additionalSettings')}
-            </Typography>
-
-            <Controller
-              name="guestModeAllowed"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={field.value}
-                        onChange={field.onChange}
-                      />
-                    }
-                    label={t('clientVersions.guestModeAllowed')}
-                  />
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.guestModeAllowedHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
-
-            <Controller
-              name="externalClickLink"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label={t('clientVersions.externalClickLink')}
-                    error={!!errors.externalClickLink}
-                    helperText={errors.externalClickLink?.message}
-                    inputProps={{
-                      autoComplete: 'off',
-                      autoCorrect: 'off',
-                      autoCapitalize: 'off',
-                      spellCheck: false
-                    }}
-                  />
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.externalClickLinkHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
-
-            <Controller
-              name="memo"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <TextField
-                    {...field}
-                    fullWidth
-                    multiline
-                    rows={3}
-                    label={t('clientVersions.memo')}
-                    error={!!errors.memo}
-                    helperText={errors.memo?.message}
-                  />
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.memoHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
-
-            <Controller
-              name="customPayload"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <JsonEditor
-                    value={field.value || '{}'}
-                    onChange={(newValue) => {
-                      field.onChange(newValue);
-                    }}
-                    height="200px"
-                    label={t('clientVersions.customPayload')}
-                    placeholder='{\n  "key": "value"\n}'
-                    error={errors.customPayload?.message}
-                    helperText={t('clientVersions.form.customPayloadHelp')}
-                  />
-                </Box>
-              )}
-            />
-
-            {/* 태그 선택 */}
-            <TextField
-              select
-              multiple
-              label={t('common.tags')}
-              value={selectedTags.map(tag => tag.id)}
-              onChange={(e) => {
-                const selectedIds = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
-                const newSelectedTags = allTags.filter(tag => selectedIds.includes(tag.id));
-                setSelectedTags(newSelectedTags);
-                setValue('tags', newSelectedTags);
-              }}
-              SelectProps={{
-                multiple: true,
-                renderValue: (selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {(selected as number[]).map((id) => {
-                      const tag = allTags.find(t => t.id === id);
-                      return tag ? (
-                        <Tooltip key={id} title={tag.description || tag.name} arrow>
-                          <Chip
-                            label={tag.name}
-                            size="small"
-                            sx={{ bgcolor: tag.color, color: '#fff' }}
+                {/* 게스트 모드 허용 */}
+                <Controller
+                  name="guestModeAllowed"
+                  control={control}
+                  render={({ field }) => (
+                    <Box>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={field.value}
+                            onChange={field.onChange}
                           />
-                        </Tooltip>
-                      ) : null;
-                    })}
-                  </Box>
-                ),
-              }}
-              helperText="클라이언트 버전에 적용할 태그를 선택하세요"
-              fullWidth
-            >
-              {allTags.map((tag) => (
-                <MenuItem key={tag.id} value={tag.id}>
-                  <Chip
-                    label={tag.name}
-                    size="small"
-                    sx={{ bgcolor: tag.color, color: '#fff', mr: 1 }}
-                  />
-                  {tag.description || '설명 없음'}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Box>
+                        }
+                        label={t('clientVersions.guestModeAllowed')}
+                      />
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                        {t('clientVersions.form.guestModeAllowedHelp')}
+                      </Typography>
+                    </Box>
+                  )}
+                />
+
+                {/* 외부 클릭 링크 */}
+                <Controller
+                  name="externalClickLink"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      label={t('clientVersions.externalClickLink')}
+                      error={!!errors.externalClickLink}
+                      helperText={errors.externalClickLink?.message || t('clientVersions.form.externalClickLinkHelp')}
+                      inputProps={{
+                        autoComplete: 'off',
+                        autoCorrect: 'off',
+                        autoCapitalize: 'off',
+                        spellCheck: false
+                      }}
+                    />
+                  )}
+                />
+
+                {/* 메모 */}
+                <Controller
+                  name="memo"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      multiline
+                      rows={3}
+                      label={t('clientVersions.memo')}
+                      error={!!errors.memo}
+                      helperText={errors.memo?.message || t('clientVersions.form.memoHelp')}
+                    />
+                  )}
+                />
+
+                {/* 커스텀 페이로드 */}
+                <Controller
+                  name="customPayload"
+                  control={control}
+                  render={({ field }) => (
+                    <JsonEditor
+                      value={field.value || '{}'}
+                      onChange={(newValue) => {
+                        field.onChange(newValue);
+                      }}
+                      height="200px"
+                      label={t('clientVersions.customPayload')}
+                      placeholder='{\n  "key": "value"\n}'
+                      error={errors.customPayload?.message}
+                      helperText={t('clientVersions.form.customPayloadHelp')}
+                    />
+                  )}
+                />
+
+                {/* 태그 선택 */}
+                <TextField
+                  select
+                  multiple
+                  label={t('common.tags')}
+                  value={selectedTags.map(tag => tag.id)}
+                  onChange={(e) => {
+                    const selectedIds = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
+                    const newSelectedTags = allTags.filter(tag => selectedIds.includes(tag.id));
+                    setSelectedTags(newSelectedTags);
+                    setValue('tags', newSelectedTags);
+                  }}
+                  SelectProps={{
+                    multiple: true,
+                    renderValue: (selected) => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {(selected as number[]).map((id) => {
+                          const tag = allTags.find(t => t.id === id);
+                          return tag ? (
+                            <Chip
+                              key={id}
+                              label={tag.name}
+                              size="small"
+                              sx={{ bgcolor: tag.color, color: '#fff' }}
+                            />
+                          ) : null;
+                        })}
+                      </Box>
+                    ),
+                  }}
+                  helperText={t('clientVersions.form.tagsHelp')}
+                  fullWidth
+                >
+                  {allTags.map((tag) => (
+                    <MenuItem key={tag.id} value={tag.id}>
+                      <Chip
+                        label={tag.name}
+                        size="small"
+                        sx={{ bgcolor: tag.color, color: '#fff', mr: 1 }}
+                      />
+                      {tag.description || '설명 없음'}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Stack>
+            </Paper>
+          </Stack>
         </DialogContent>
 
         <DialogActions>

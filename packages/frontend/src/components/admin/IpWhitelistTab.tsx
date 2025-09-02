@@ -37,6 +37,8 @@ import {
   Refresh as RefreshIcon,
   PowerSettingsNew as ToggleIcon,
   Info as InfoIcon,
+  Cancel as CancelIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -48,6 +50,8 @@ import {
 } from '../../services/ipWhitelistService';
 import SimplePagination from '../common/SimplePagination';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import FormDialogHeader from '../common/FormDialogHeader';
+import EmptyTableRow from '../common/EmptyTableRow';
 import dayjs from 'dayjs';
 
 const IpWhitelistTab: React.FC = () => {
@@ -367,8 +371,15 @@ const IpWhitelistTab: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {ipWhitelists.map((ipWhitelist) => (
-                  <TableRow key={ipWhitelist.id} hover>
+                {ipWhitelists.length === 0 ? (
+                  <EmptyTableRow
+                    colSpan={7}
+                    loading={loading}
+                    message="IP 화이트리스트 항목이 없습니다."
+                  />
+                ) : (
+                  ipWhitelists.map((ipWhitelist) => (
+                    <TableRow key={ipWhitelist.id} hover>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
@@ -433,7 +444,8 @@ const IpWhitelistTab: React.FC = () => {
                       </IconButton>
                     </TableCell>
                   </TableRow>
-                ))}
+                  ))
+                )}
               </TableBody>
             </Table>
           </TableContainer>
@@ -471,75 +483,106 @@ const IpWhitelistTab: React.FC = () => {
         maxWidth="sm" 
         fullWidth
       >
-        <DialogTitle>
-          {editDialog ? t('ipWhitelist.dialog.editTitle') : t('ipWhitelist.dialog.addTitle')}
-        </DialogTitle>
+        <FormDialogHeader
+          title={editDialog ? 'IP 화이트리스트 편집' : 'IP 화이트리스트 추가'}
+          description={editDialog
+            ? '기존 IP 화이트리스트 항목의 정보를 수정할 수 있습니다.'
+            : '새로운 IP 주소를 화이트리스트에 추가하고 접근 권한을 설정할 수 있습니다.'
+          }
+        />
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-            <TextField
-              fullWidth
-              label={t('ipWhitelist.form.ipAddress')}
-              value={formData.ipAddress}
-              onChange={(e) => setFormData({ ...formData, ipAddress: e.target.value })}
-              error={!!formErrors.ipAddress}
-              helperText={formErrors.ipAddress || t('ipWhitelist.form.ipAddressHelp')}
-              placeholder="192.168.1.1 or 192.168.1.0/24"
-            />
-            <TextField
-              fullWidth
-              label={t('ipWhitelist.form.purpose')}
-              value={formData.purpose}
-              onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
-              error={!!formErrors.purpose}
-              helperText={formErrors.purpose}
-              placeholder={t('ipWhitelist.form.purposePlaceholder')}
-            />
-            <DateTimePicker
-              label={t('ipWhitelist.form.startDate')}
-              value={formData.startDate ? dayjs(formData.startDate) : null}
-              onChange={(date) => setFormData({
-                ...formData,
-                startDate: date?.isValid() ? date.toISOString() : undefined
-              })}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  helperText: t('ipWhitelist.form.startDateHelp')
+            <Box>
+              <TextField
+                fullWidth
+                label="IP 주소 또는 CIDR"
+                value={formData.ipAddress}
+                onChange={(e) => setFormData({ ...formData, ipAddress: e.target.value })}
+                error={!!formErrors.ipAddress}
+                helperText={formErrors.ipAddress}
+                placeholder="예: 192.168.1.1 또는 192.168.1.0/24"
+                required
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                IP 주소(예: 192.168.1.1) 또는 CIDR 표기법(예: 192.168.1.0/24)을 입력하세요.
+              </Typography>
+            </Box>
+            <Box>
+              <DateTimePicker
+                label="시작일 (선택사항)"
+                value={formData.startDate ? dayjs(formData.startDate) : null}
+                onChange={(date) => setFormData({
+                  ...formData,
+                  startDate: date?.isValid() ? date.toISOString() : undefined
+                })}
+                slotProps={{
+                  textField: {
+                    fullWidth: true
+                  }
+                }}
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                화이트리스트가 활성화될 시작 날짜와 시간을 선택하세요. 비워두면 즉시 활성화됩니다.
+              </Typography>
+            </Box>
+            <Box>
+              <DateTimePicker
+                label="종료일 (선택사항)"
+                value={formData.endDate ? dayjs(formData.endDate) : null}
+                onChange={(date) => setFormData({
+                  ...formData,
+                  endDate: date?.isValid() ? date.toISOString() : undefined
+                })}
+                minDateTime={formData.startDate ? dayjs(formData.startDate) : undefined}
+                slotProps={{
+                  textField: {
+                    fullWidth: true
+                  }
+                }}
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                화이트리스트가 만료될 날짜와 시간을 선택하세요. 비워두면 영구적으로 유지됩니다.
+              </Typography>
+            </Box>
+            <Box>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.isEnabled}
+                    onChange={(e) => setFormData({ ...formData, isEnabled: e.target.checked })}
+                  />
                 }
-              }}
-            />
-            <DateTimePicker
-              label={t('ipWhitelist.form.endDate')}
-              value={formData.endDate ? dayjs(formData.endDate) : null}
-              onChange={(date) => setFormData({
-                ...formData,
-                endDate: date?.isValid() ? date.toISOString() : undefined
-              })}
-              minDateTime={formData.startDate ? dayjs(formData.startDate) : undefined}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  helperText: t('ipWhitelist.form.endDateHelp')
-                }
-              }}
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.isEnabled}
-                  onChange={(e) => setFormData({ ...formData, isEnabled: e.target.checked })}
-                />
-              }
-              label={t('ipWhitelist.form.enabled')}
-            />
+                label="활성화"
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                화이트리스트 항목의 활성화 상태를 설정합니다. 비활성화하면 접근이 차단됩니다.
+              </Typography>
+            </Box>
+            <Box>
+              <TextField
+                fullWidth
+                label="사용 목적"
+                value={formData.purpose}
+                onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
+                error={!!formErrors.purpose}
+                helperText={formErrors.purpose}
+                placeholder="IP 화이트리스트 추가 목적을 입력하세요"
+                multiline
+                rows={3}
+                required
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                IP 화이트리스트 추가 사유나 목적을 기록해주세요. 관리 및 추적에 도움이 됩니다.
+              </Typography>
+            </Box>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => { setAddDialog(false); setEditDialog(false); }}>
-            {t('common.cancel')}
+          <Button onClick={() => { setAddDialog(false); setEditDialog(false); }} startIcon={<CancelIcon />}>
+            취소
           </Button>
-          <Button onClick={handleSave} variant="contained">
-            {t('common.save')}
+          <Button onClick={handleSave} variant="contained" startIcon={<SaveIcon />}>
+            {editDialog ? '수정' : '생성'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -565,11 +608,11 @@ const IpWhitelistTab: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setBulkDialog(false)}>
-            {t('common.cancel')}
+          <Button onClick={() => setBulkDialog(false)} startIcon={<CancelIcon />}>
+            취소
           </Button>
-          <Button onClick={handleBulkImport} variant="contained">
-            {t('common.import')}
+          <Button onClick={handleBulkImport} variant="contained" startIcon={<UploadIcon />}>
+            가져오기
           </Button>
         </DialogActions>
       </Dialog>
@@ -581,11 +624,11 @@ const IpWhitelistTab: React.FC = () => {
           <Typography>{confirmDialog.message}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}>
-            {t('common.cancel')}
+          <Button onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))} startIcon={<CancelIcon />}>
+            취소
           </Button>
-          <Button onClick={confirmDialog.action} color="error" variant="contained">
-            {t('common.confirm')}
+          <Button onClick={confirmDialog.action} color="error" variant="contained" startIcon={<DeleteIcon />}>
+            확인
           </Button>
         </DialogActions>
       </Dialog>

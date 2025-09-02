@@ -67,19 +67,52 @@ const LoginPage: React.FC = () => {
     },
   });
 
+  const getErrorMessage = (error: any): string => {
+    if (!error) return '';
+
+    const status = error.status;
+
+    if (status === 401) {
+      return '이메일 또는 비밀번호가 올바르지 않습니다.';
+    }
+
+    if (status === 404) {
+      return '등록되지 않은 이메일입니다.';
+    }
+
+    if (status === 403) {
+      return '계정에 접근할 수 없습니다. 관리자에게 문의하세요.';
+    }
+
+    if (status === 429) {
+      return '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
+    }
+
+    if (status >= 500) {
+      return '서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
+    }
+
+    if (error.name === 'NetworkError' || !status) {
+      return '네트워크 연결을 확인하고 다시 시도해주세요.';
+    }
+
+    return '로그인에 실패했습니다. 다시 시도해주세요.';
+  };
+
   const onSubmit = async (data: LoginCredentials & { rememberMe: boolean }) => {
     try {
       setLoginError(null);
       clearError();
-      
+
       await login({
         email: data.email,
         password: data.password,
       });
-      
+
       navigate(from, { replace: true });
     } catch (err: any) {
-      setLoginError(err.message || 'Login failed. Please try again.');
+      const errorMessage = getErrorMessage(err);
+      setLoginError(errorMessage);
     }
   };
 
@@ -120,7 +153,14 @@ const LoginPage: React.FC = () => {
 
           {/* Error Alert */}
           {(loginError || error) && (
-            <Alert severity="error" sx={{ mb: 3 }}>
+            <Alert
+              severity="error"
+              sx={{ mb: 3 }}
+              onClose={() => {
+                setLoginError(null);
+                clearError();
+              }}
+            >
               {loginError || error}
             </Alert>
           )}

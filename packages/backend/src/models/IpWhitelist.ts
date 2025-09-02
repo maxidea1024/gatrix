@@ -2,9 +2,8 @@ import db from '../config/knex';
 import logger from '../config/logger';
 
 export interface IpWhitelistFilters {
-  ip?: string;
-  description?: string;
-  isActive?: boolean;
+  ipAddress?: string;
+  purpose?: string;
   isEnabled?: boolean;
   createdBy?: number;
   limit?: number;
@@ -21,9 +20,9 @@ export interface IpWhitelistListResponse {
 
 export interface IpWhitelist {
   id?: number;
-  ip: string;
-  description?: string;
-  isActive: boolean;
+  ipAddress: string;
+  purpose?: string;
+  isEnabled: boolean;
   startDate?: Date;
   endDate?: Date;
   createdBy?: number;
@@ -33,9 +32,7 @@ export interface IpWhitelist {
 }
 
 export interface CreateIpWhitelistData extends Omit<IpWhitelist, 'id' | 'createdAt' | 'updatedAt'> {
-  ipAddress?: string;
   purpose?: string;
-  isEnabled?: boolean;
   createdBy?: number;
   startDate?: Date;
   endDate?: Date;
@@ -68,16 +65,16 @@ export class IpWhitelistModel {
               .orWhere('iw.endDate', '>', new Date());
         });
 
-        if (filters.ip) {
-          query.where('iw.ip', 'like', `%${filters.ip}%`);
+        if (filters.ipAddress) {
+          query.where('iw.ipAddress', 'like', `%${filters.ipAddress}%`);
         }
 
-        if (filters.description) {
-          query.where('iw.description', 'like', `%${filters.description}%`);
+        if (filters.purpose) {
+          query.where('iw.purpose', 'like', `%${filters.purpose}%`);
         }
 
-        if (filters.isActive !== undefined) {
-          query.where('iw.isActive', filters.isActive);
+        if (filters.isEnabled !== undefined) {
+          query.where('iw.isEnabled', filters.isEnabled);
         }
 
         if (filters.createdBy) {
@@ -189,9 +186,9 @@ export class IpWhitelistModel {
   private static mapRowToIpWhitelist(row: any): any {
     return {
       id: row.id,
-      ip: row.ip,
-      description: row.description,
-      isActive: Boolean(row.isActive),
+      ipAddress: row.ipAddress,
+      purpose: row.purpose,
+      isEnabled: Boolean(row.isEnabled),
       startDate: row.startDate,
       endDate: row.endDate,
       createdBy: row.createdBy,
@@ -207,7 +204,7 @@ export class IpWhitelistModel {
   static async findByIpAddress(ip: string): Promise<any | null> {
     try {
       return await db('g_ip_whitelist')
-        .where('ip', ip)
+        .where('ipAddress', ip)
         .first();
     } catch (error) {
       logger.error('Error finding IP whitelist by IP address:', error);
@@ -221,8 +218,8 @@ export class IpWhitelistModel {
       await db.transaction(async (trx) => {
         // 기존 태그 할당 삭제
         await trx('g_tag_assignments')
-          .where('entity_type', 'whitelist')
-          .where('entity_id', whitelistId)
+          .where('entityType', 'whitelist')
+          .where('entityId', whitelistId)
           .del();
 
         // 새 태그 할당 추가
@@ -245,10 +242,10 @@ export class IpWhitelistModel {
   static async getTags(whitelistId: number): Promise<any[]> {
     try {
       return await db('g_tag_assignments as ta')
-        .join('g_tags as t', 'ta.tag_id', 't.id')
+        .join('g_tags as t', 'ta.tagId', 't.id')
         .select(['t.id', 't.name', 't.color', 't.description'])
-        .where('ta.entity_type', 'whitelist')
-        .where('ta.entity_id', whitelistId)
+        .where('ta.entityType', 'whitelist')
+        .where('ta.entityId', whitelistId)
         .orderBy('t.name');
     } catch (error) {
       logger.error('Error getting IP whitelist tags:', error);

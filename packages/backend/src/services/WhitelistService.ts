@@ -7,7 +7,7 @@ export interface BulkCreateEntry {
   ipAddress?: string;
   startDate?: Date;
   endDate?: Date;
-  memo?: string;
+  purpose?: string;
 }
 
 export class WhitelistService {
@@ -159,7 +159,7 @@ export class WhitelistService {
         ipAddress: entry.ipAddress?.trim() || undefined,
         startDate: entry.startDate,
         endDate: entry.endDate,
-        memo: entry.memo?.trim() || undefined,
+        purpose: entry.purpose?.trim() || undefined,
         createdBy,
       }));
 

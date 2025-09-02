@@ -36,6 +36,7 @@ import { AuditLogService, AuditLogFilters } from '../../services/auditLogService
 import { AuditLog } from '../../types';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import SimplePagination from '../../components/common/SimplePagination';
+import EmptyTableRow from '../../components/common/EmptyTableRow';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useI18n } from '../../contexts/I18nContext';
 import { koKR, zhCN, enUS } from '@mui/x-date-pickers/locales';
@@ -307,19 +308,12 @@ const AuditLogsPage: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {auditLogs.length === 0 && !loading ? (
-                  <TableRow>
-                    <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
-                      <Box sx={{ textAlign: 'center' }}>
-                        <Typography variant="h6" color="text.secondary" gutterBottom>
-                          {t('auditLogs.noLogsFound')}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {t('auditLogs.noLogsDesc')}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
+                {auditLogs.length === 0 ? (
+                  <EmptyTableRow
+                    colSpan={7}
+                    loading={loading}
+                    message="감사 로그가 없습니다."
+                  />
                 ) : (
                   auditLogs.map((log) => (
                     <TableRow key={log.id}>

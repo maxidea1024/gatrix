@@ -63,6 +63,7 @@ import zhLocale from '@fullcalendar/core/locales/zh-cn';
 
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import FormDialogHeader from '@/components/common/FormDialogHeader';
 
 // 스케줄 이벤트 타입 정의
 interface ScheduleEvent {
@@ -437,9 +438,13 @@ const SchedulerPage: React.FC = () => {
 
         {/* Add/Edit Event Dialog */}
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-          <DialogTitle>
-            {editingEvent ? t('scheduler.editEvent') : t('scheduler.addEvent')}
-          </DialogTitle>
+          <FormDialogHeader
+            title={editingEvent ? '스케줄 이벤트 편집' : '스케줄 이벤트 추가'}
+            description={editingEvent
+              ? '기존 스케줄 이벤트의 정보를 수정하고 업데이트할 수 있습니다.'
+              : '새로운 스케줄 이벤트를 생성하고 실행 시간을 설정할 수 있습니다.'
+            }
+          />
           <DialogContent>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
               {/* 기본 정보 */}

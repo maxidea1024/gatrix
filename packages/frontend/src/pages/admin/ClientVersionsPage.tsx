@@ -33,6 +33,7 @@ import {
   Alert,
   Autocomplete,
   TextField,
+  Divider,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -62,6 +63,7 @@ import ClientVersionForm from '../../components/admin/ClientVersionForm';
 import BulkClientVersionForm from '../../components/admin/BulkClientVersionForm';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import SimplePagination from '../../components/common/SimplePagination';
+import EmptyTableRow from '../../components/common/EmptyTableRow';
 
 // 버전별 색상을 일관되게 생성하는 함수
 const getVersionColor = (version: string): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
@@ -353,7 +355,7 @@ const ClientVersionsPage: React.FC = () => {
       const selectedVersions = clientVersions.filter(cv => selectedIds.includes(cv.id));
       const csvContent = [
         // CSV 헤더
-        ['ID', 'Platform', 'Version', 'Status', 'Game Server', 'Patch Address', 'Guest Mode', 'Created By', 'Created At'].join(','),
+        ['ID', 'Platform', 'Version', 'Status', 'Game Server', 'Patch Address', 'Guest Mode', 'Created By', 'Created By Email', 'Created At'].join(','),
         // CSV 데이터
         ...selectedVersions.map(cv => [
           cv.id,
@@ -363,7 +365,8 @@ const ClientVersionsPage: React.FC = () => {
           cv.gameServerAddress,
           cv.patchAddress,
           cv.guestModeAllowed ? 'Yes' : 'No',
-          cv.createdByName,
+          cv.createdByName || 'Unknown',
+          cv.createdByEmail || '',
           new Date(cv.createdAt).toLocaleDateString()
         ].join(','))
       ].join('\n');
@@ -701,21 +704,11 @@ const ClientVersionsPage: React.FC = () => {
             </TableHead>
             <TableBody>
               {clientVersions.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={12} align="center" sx={{ py: 4 }}>
-                    {loading ? (
-                      <Typography variant="body2" color="text.secondary">
-                        {t('common.loading')}
-                      </Typography>
-                    ) : (
-                      <Box sx={{ textAlign: 'center' }}>
-                        <Typography variant="h6" color="text.secondary">
-                          등록된 버전이 없습니다.
-                        </Typography>
-                      </Box>
-                    )}
-                  </TableCell>
-                </TableRow>
+                <EmptyTableRow
+                  colSpan={12}
+                  loading={loading}
+                  message="등록된 클라이언트 버전이 없습니다."
+                />
               ) : (
                 clientVersions.map((clientVersion) => (
                 <TableRow
@@ -803,9 +796,16 @@ const ClientVersionsPage: React.FC = () => {
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2">
-                      {clientVersion.createdByName || 'Unknown'}
-                    </Typography>
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        {clientVersion.createdByName || 'Unknown'}
+                      </Typography>
+                      {clientVersion.createdByEmail && (
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                          {clientVersion.createdByEmail}
+                        </Typography>
+                      )}
+                    </Box>
                   </TableCell>
                   <TableCell align="center">
                     <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 200, justifyContent: 'center' }}>

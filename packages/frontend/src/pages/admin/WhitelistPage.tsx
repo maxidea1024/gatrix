@@ -32,6 +32,7 @@ import {
   Tabs,
   Tab,
   Box as MuiBox,
+  Checkbox,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -41,12 +42,16 @@ import {
   Delete as DeleteIcon,
   Upload as UploadIcon,
   Refresh as RefreshIcon,
+  Cancel as CancelIcon,
+  Save as SaveIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { WhitelistService, Whitelist, CreateWhitelistData } from '../../services/whitelistService';
 import SimplePagination from '../../components/common/SimplePagination';
 import IpWhitelistTab from '../../components/admin/IpWhitelistTab';
+import FormDialogHeader from '../../components/common/FormDialogHeader';
+import EmptyTableRow from '../../components/common/EmptyTableRow';
 
 const WhitelistPage: React.FC = () => {
   const { t } = useTranslation();
@@ -67,6 +72,7 @@ const WhitelistPage: React.FC = () => {
   // Menu state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedWhitelist, setSelectedWhitelist] = useState<Whitelist | null>(null);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   // Dialog states
   const [addDialog, setAddDialog] = useState(false);
@@ -81,14 +87,31 @@ const WhitelistPage: React.FC = () => {
 
   // Form data
   const [formData, setFormData] = useState<CreateWhitelistData>({
-    nickname: '',
+    accountId: '',
     ipAddress: '',
     startDate: '',
     endDate: '',
-    memo: '',
+    purpose: '',
   });
 
   const [bulkData, setBulkData] = useState('');
+
+  // Selection handlers
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      setSelectedIds(whitelists.map(w => w.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: number) => {
+    setSelectedIds(prev =>
+      prev.includes(id)
+        ? prev.filter(selectedId => selectedId !== id)
+        : [...prev, id]
+    );
+  };
 
   // Load whitelists
   const loadWhitelists = async () => {
@@ -155,11 +178,11 @@ const WhitelistPage: React.FC = () => {
 
   const handleAdd = () => {
     setFormData({
-      nickname: '',
+      accountId: '',
       ipAddress: '',
       startDate: '',
       endDate: '',
-      memo: '',
+      purpose: '',
     });
     setAddDialog(true);
   };
@@ -167,11 +190,11 @@ const WhitelistPage: React.FC = () => {
   const handleEdit = () => {
     if (selectedWhitelist) {
       setFormData({
-        nickname: selectedWhitelist.nickname,
+        accountId: selectedWhitelist.accountId,
         ipAddress: selectedWhitelist.ipAddress || '',
         startDate: selectedWhitelist.startDate ? selectedWhitelist.startDate.split('T')[0] : '',
         endDate: selectedWhitelist.endDate ? selectedWhitelist.endDate.split('T')[0] : '',
-        memo: selectedWhitelist.memo || '',
+        purpose: selectedWhitelist.purpose || '',
       });
       setEditDialog(true);
     }
@@ -183,7 +206,7 @@ const WhitelistPage: React.FC = () => {
       setConfirmDialog({
         open: true,
         title: t('whitelist.dialog.deleteTitle'),
-        message: t('whitelist.dialog.deleteMessage', { name: selectedWhitelist.nickname }),
+        message: t('whitelist.dialog.deleteMessage', { name: selectedWhitelist.accountId }),
         action: async () => {
           try {
             await WhitelistService.deleteWhitelist(selectedWhitelist.id);
@@ -201,13 +224,19 @@ const WhitelistPage: React.FC = () => {
 
   const handleSave = async () => {
     try {
+      // 계정 ID 유효성 검사
+      if (!formData.accountId || formData.accountId.trim().length < 4 || formData.accountId.trim().length > 36) {
+        enqueueSnackbar('계정 ID는 4~36글자 사이여야 합니다.', { variant: 'error' });
+        return;
+      }
+
       if (editDialog && selectedWhitelist) {
         await WhitelistService.updateWhitelist(selectedWhitelist.id, formData);
-        enqueueSnackbar(t('whitelist.toast.updated'), { variant: 'success' });
+        enqueueSnackbar('화이트리스트가 수정되었습니다.', { variant: 'success' });
         setEditDialog(false);
       } else {
         await WhitelistService.createWhitelist(formData);
-        enqueueSnackbar(t('whitelist.toast.created'), { variant: 'success' });
+        enqueueSnackbar('화이트리스트가 생성되었습니다.', { variant: 'success' });
         setAddDialog(false);
       }
 
@@ -227,11 +256,11 @@ const WhitelistPage: React.FC = () => {
       const entries = lines.map(line => {
         const parts = line.split('\t'); // Tab-separated values
         return {
-          nickname: parts[0]?.trim() || '',
+          accountId: parts[0]?.trim() || '',
           ipAddress: parts[1]?.trim() || undefined,
-          memo: parts[2]?.trim() || undefined,
+          purpose: parts[2]?.trim() || undefined,
         };
-      }).filter(entry => entry.nickname);
+      }).filter(entry => entry.accountId);
 
       if (entries.length === 0) {
         enqueueSnackbar(t('whitelist.errors.noValidEntries'), { variant: 'warning' });
@@ -260,10 +289,10 @@ const WhitelistPage: React.FC = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-            {t('whitelist.title')}
+            화이트리스트 관리
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            {t('whitelist.subtitle')}</Typography>
+            계정 및 IP 화이트리스트 관리</Typography>
         </Box>
       </Box>
 
@@ -271,8 +300,8 @@ const WhitelistPage: React.FC = () => {
       <Card>
         <CardContent>
           <Tabs value={currentTab} onChange={handleTabChange} sx={{ mb: 3 }}>
-            <Tab label={t('whitelist.tabs.nickname')} />
-            <Tab label={t('whitelist.tabs.ip')} />
+            <Tab label="계정 화이트리스트" />
+            <Tab label="IP 화이트리스트" />
           </Tabs>
 
           {/* Tab Content */}
@@ -338,30 +367,46 @@ const WhitelistPage: React.FC = () => {
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>{t('whitelist.columns.id')}</TableCell>
-                          <TableCell>{t('whitelist.columns.nickname')}</TableCell>
-                          <TableCell>{t('whitelist.columns.ipAddress')}</TableCell>
-                          <TableCell>{t('whitelist.columns.allowPeriod')}</TableCell>
-                          <TableCell>{t('whitelist.columns.createdBy')}</TableCell>
-                          <TableCell>{t('whitelist.columns.createdAt')}</TableCell>
-                          <TableCell>{t('whitelist.columns.memo')}</TableCell>
-                          <TableCell align="center">{t('whitelist.columns.actions')}</TableCell>
+                          <TableCell>
+                            <Checkbox
+                              checked={selectedIds.length > 0 && selectedIds.length === whitelists.length}
+                              indeterminate={selectedIds.length > 0 && selectedIds.length < whitelists.length}
+                              onChange={handleSelectAll}
+                            />
+                          </TableCell>
+                          <TableCell>계정 ID</TableCell>
+                          <TableCell>IP 주소</TableCell>
+                          <TableCell>허용 기간</TableCell>
+                          <TableCell>사용 목적</TableCell>
+                          <TableCell>상태</TableCell>
+                          <TableCell>생성자</TableCell>
+                          <TableCell>생성일</TableCell>
+                          <TableCell align="center">작업</TableCell>
                         </TableRow>
                       </TableHead>
               <TableBody>
                 {whitelists.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={8} align="center">
-                      {t('whitelist.noEntries')}
-                    </TableCell>
-                  </TableRow>
+                  <EmptyTableRow
+                    colSpan={9}
+                    loading={loading}
+                    message="계정 화이트리스트 항목이 없습니다."
+                  />
                 ) : (
                   whitelists.map((whitelist) => (
-                    <TableRow key={whitelist.id}>
-                      <TableCell>{whitelist.id}</TableCell>
+                    <TableRow
+                      key={whitelist.id}
+                      hover
+                      selected={selectedIds.includes(whitelist.id)}
+                    >
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedIds.includes(whitelist.id)}
+                          onChange={() => handleSelectOne(whitelist.id)}
+                        />
+                      </TableCell>
                       <TableCell>
                         <Typography variant="body2" fontWeight="medium">
-                          {whitelist.nickname}
+                          {whitelist.accountId}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -382,23 +427,37 @@ const WhitelistPage: React.FC = () => {
                           </Box>
                         ) : (
                           <Typography variant="body2" color="text.secondary">
-                            {t('whitelist.permanent')}
+                            영구
                           </Typography>
                         )}
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2">
-                          {whitelist.createdByName || t('whitelist.userWithId', { id: whitelist.createdBy })}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2">
-                          {formatDate(whitelist.createdAt)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
                         <Typography variant="body2" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {whitelist.memo || '-'}
+                          {whitelist.purpose || '-'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={whitelist.isActive ? '활성' : '비활성'}
+                          color={whitelist.isActive ? 'success' : 'default'}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {whitelist.createdByName || 'Unknown'}
+                          </Typography>
+                          {whitelist.createdByEmail && (
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                              {whitelist.createdByEmail}
+                            </Typography>
+                          )}
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {formatDateTimeDetailed(whitelist.createdAt)}
                         </Typography>
                       </TableCell>
                       <TableCell align="center">
@@ -444,54 +503,90 @@ const WhitelistPage: React.FC = () => {
 
               {/* Add/Edit Dialog */}
               <Dialog open={addDialog || editDialog} onClose={() => { setAddDialog(false); setEditDialog(false); }} maxWidth="sm" fullWidth>
-                <DialogTitle>
-                  {editDialog ? t('whitelist.dialog.editTitle') : t('whitelist.dialog.addTitle')}
-                </DialogTitle>
+                <FormDialogHeader
+                  title={editDialog ? '계정 화이트리스트 편집' : '계정 화이트리스트 추가'}
+                  description={editDialog
+                    ? '기존 화이트리스트 항목의 정보를 수정할 수 있습니다.'
+                    : '새로운 계정을 화이트리스트에 추가하고 접근 권한을 설정할 수 있습니다.'
+                  }
+                />
                 <DialogContent>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-                    <TextField
-                      fullWidth
-                      label={t('whitelist.form.nickname')}
-                      value={formData.nickname}
-                      onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
-                      required
-                    />
-                    <TextField
-                      fullWidth
-                      label={t('whitelist.form.ipAddressOpt')}
-                      value={formData.ipAddress}
-                      onChange={(e) => setFormData({ ...formData, ipAddress: e.target.value })}
-                      placeholder={t('whitelist.form.anyIpPlaceholder')}
-                    />
-                    <DatePicker
-                      label={t('whitelist.form.startDateOpt')}
-                      value={formData.startDate ? moment(formData.startDate) : null}
-                      onChange={(date) => setFormData({ ...formData, startDate: date ? date.format('YYYY-MM-DD') : '' })}
-                      slotProps={{ textField: { fullWidth: true } }}
-                    />
-                    <DatePicker
-                      label={t('whitelist.form.endDateOpt')}
-                      value={formData.endDate ? moment(formData.endDate) : null}
-                      onChange={(date) => setFormData({ ...formData, endDate: date ? date.format('YYYY-MM-DD') : '' })}
-                      slotProps={{ textField: { fullWidth: true } }}
-                    />
-                    <TextField
-                      fullWidth
-                      label={t('whitelist.form.memoOpt')}
-                      value={formData.memo}
-                      onChange={(e) => setFormData({ ...formData, memo: e.target.value })}
-                      multiline
-                      rows={3}
-                      placeholder={t('whitelist.form.memoPlaceholder')}
-                    />
+                    <Box>
+                      <TextField
+                        fullWidth
+                        label="계정 ID"
+                        value={formData.accountId}
+                        onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
+                        required
+                        placeholder="사용자 계정 ID를 입력하세요"
+                        error={formData.accountId && (formData.accountId.trim().length < 4 || formData.accountId.trim().length > 36)}
+                        helperText={
+                          formData.accountId && (formData.accountId.trim().length < 4 || formData.accountId.trim().length > 36)
+                            ? '계정 ID는 4~36글자 사이여야 합니다.'
+                            : undefined
+                        }
+                      />
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                        화이트리스트에 추가할 사용자의 계정 ID를 정확히 입력해주세요. (4~36글자)
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <TextField
+                        fullWidth
+                        label="IP 주소 (선택사항)"
+                        value={formData.ipAddress}
+                        onChange={(e) => setFormData({ ...formData, ipAddress: e.target.value })}
+                        placeholder="예: 192.168.1.100"
+                      />
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                        특정 IP에서만 접근을 허용하려면 입력하세요. 비워두면 모든 IP에서 접근 가능합니다.
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <DatePicker
+                        label="시작일 (선택사항)"
+                        value={formData.startDate ? moment(formData.startDate) : null}
+                        onChange={(date) => setFormData({ ...formData, startDate: date ? date.format('YYYY-MM-DD') : '' })}
+                        slotProps={{ textField: { fullWidth: true } }}
+                      />
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                        화이트리스트가 활성화될 시작 날짜를 선택하세요. 비워두면 즉시 활성화됩니다.
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <DatePicker
+                        label="종료일 (선택사항)"
+                        value={formData.endDate ? moment(formData.endDate) : null}
+                        onChange={(date) => setFormData({ ...formData, endDate: date ? date.format('YYYY-MM-DD') : '' })}
+                        slotProps={{ textField: { fullWidth: true } }}
+                      />
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                        화이트리스트가 만료될 날짜를 선택하세요. 비워두면 영구적으로 유지됩니다.
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <TextField
+                        fullWidth
+                        label="사용 목적"
+                        value={formData.purpose}
+                        onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
+                        multiline
+                        rows={3}
+                        placeholder="화이트리스트 추가 목적을 입력하세요"
+                      />
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                        화이트리스트 추가 사유나 목적을 기록해주세요. 관리 및 추적에 도움이 됩니다.
+                      </Typography>
+                    </Box>
                   </Box>
                 </DialogContent>
                 <DialogActions>
-                  <Button onClick={() => { setAddDialog(false); setEditDialog(false); }}>
-                    {t('common.cancel')}
+                  <Button onClick={() => { setAddDialog(false); setEditDialog(false); }} startIcon={<CancelIcon />}>
+                    취소
                   </Button>
-                  <Button onClick={handleSave} variant="contained">
-                    {editDialog ? t('common.update') : t('common.create')}
+                  <Button onClick={handleSave} variant="contained" startIcon={<SaveIcon />}>
+                    {editDialog ? '수정' : '생성'}
                   </Button>
                 </DialogActions>
               </Dialog>

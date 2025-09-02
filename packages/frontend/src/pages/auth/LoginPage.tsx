@@ -13,6 +13,7 @@ import {
   InputAdornment,
   Checkbox,
   FormControlLabel,
+  Alert,
 } from '@mui/material';
 import {
   Visibility,
@@ -30,9 +31,54 @@ import { useAuth } from '@/hooks/useAuth';
 import { LoginCredentials } from '@/types';
 import { AuthService } from '@/services/auth';
 import { LanguageSelector } from '@/components/LanguageSelector';
-import { toast } from 'react-toastify';
 
 // Validation schema - will be created inside component to access t function
+
+// 사용자 친화적인 오류 메시지 함수
+const getErrorMessage = (error: any, t: any): string => {
+  if (!error) return '';
+
+  const errorCode = error.message || error.error?.message || '';
+  const status = error.status;
+
+  // 상태 코드별 메시지
+  if (status === 401) {
+    return '이메일 또는 비밀번호가 올바르지 않습니다.';
+  }
+
+  if (status === 404) {
+    return '등록되지 않은 이메일입니다.';
+  }
+
+  if (status === 403) {
+    if (errorCode === 'ACCOUNT_PENDING') {
+      return '계정 승인 대기 중입니다. 관리자의 승인을 기다려주세요.';
+    }
+    if (errorCode === 'ACCOUNT_SUSPENDED') {
+      return '계정이 일시 정지되었습니다. 관리자에게 문의하세요.';
+    }
+    if (errorCode.includes('not active')) {
+      return '계정이 비활성화 상태입니다. 관리자에게 문의하세요.';
+    }
+    return '계정에 접근할 수 없습니다. 관리자에게 문의하세요.';
+  }
+
+  if (status === 429) {
+    return '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
+  }
+
+  if (status >= 500) {
+    return '서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
+  }
+
+  // 네트워크 오류
+  if (error.name === 'NetworkError' || !status) {
+    return '네트워크 연결을 확인하고 다시 시도해주세요.';
+  }
+
+  // 기본 메시지
+  return '로그인에 실패했습니다. 다시 시도해주세요.';
+};
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -130,14 +176,12 @@ const LoginPage: React.FC = () => {
             }
           });
         } else {
-          const errorMessage = err.error?.message || err.message || t('auth.loginFailed');
+          const errorMessage = getErrorMessage(err, t);
           setLoginError(errorMessage);
-          toast.error(errorMessage);
         }
       } else {
-        const errorMessage = err.error?.message || err.message || t('auth.loginFailed');
+        const errorMessage = getErrorMessage(err, t);
         setLoginError(errorMessage);
-        toast.error(errorMessage);
       }
     }
   };
@@ -198,6 +242,17 @@ const LoginPage: React.FC = () => {
 
           {/* Login Form */}
           <Box component="form" onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+            {/* Error Alert */}
+            {loginError && (
+              <Alert
+                severity="error"
+                sx={{ mb: 2 }}
+                onClose={() => setLoginError(null)}
+              >
+                {loginError}
+              </Alert>
+            )}
+
             <Controller
               name="email"
               control={control}

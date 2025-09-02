@@ -19,6 +19,9 @@ import {
   OutlinedInput,
   SelectChangeEvent,
   Tooltip,
+  Paper,
+  Stack,
+  Divider,
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -32,6 +35,7 @@ import {
   CLIENT_VERSION_VALIDATION,
 } from '../../types/clientVersion';
 import { ClientVersionService } from '../../services/clientVersionService';
+import FormDialogHeader from '../common/FormDialogHeader';
 import { tagService } from '../../services/tagService';
 
 // 클라이언트 상태 라벨 매핑
@@ -269,204 +273,215 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
         sx: { minHeight: '80vh' }
       }}
     >
-      <DialogTitle>
-        {t('clientVersions.bulkAdd')}
-      </DialogTitle>
+      <FormDialogHeader
+        title="클라이언트 버전 간편 추가"
+        description="하나의 버전으로 여러 플랫폼의 클라이언트 버전을 동시에 생성할 수 있습니다."
+      />
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <DialogContent dividers>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
-            {/* 기본 정보 */}
-            <Typography variant="h6" gutterBottom>
-              {t('clientVersions.form.basicInfo')}
-            </Typography>
+          <Stack spacing={3} sx={{ mt: 1 }}>
+            {/* 기본 정보 섹션 */}
+            <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200' }}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                📋 {t('clientVersions.form.basicInfo')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('clientVersions.form.bulkBasicInfoDescription')}
+              </Typography>
 
-            {/* 버전 필드 */}
-            <Controller
-              name="clientVersion"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <TextField
-                    {...field}
-                    value={field.value || ''}
-                    fullWidth
-                    label={t('clientVersions.version')}
-                    placeholder={CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE}
-                    error={!!errors.clientVersion}
-                    helperText={errors.clientVersion?.message}
-                    inputProps={{
-                      autoComplete: 'off',
-                      autoCorrect: 'off',
-                      autoCapitalize: 'off',
-                      spellCheck: false
-                    }}
-                  />
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.versionHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
+              <Stack spacing={2}>
+                {/* 버전 필드 */}
+                <Controller
+                  name="clientVersion"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      value={field.value || ''}
+                      fullWidth
+                      label={
+                        <Box component="span">
+                          {t('clientVersions.version')} <Typography component="span" color="error">*</Typography>
+                        </Box>
+                      }
+                      placeholder={CLIENT_VERSION_VALIDATION.CLIENT_VERSION.EXAMPLE}
+                      error={!!errors.clientVersion}
+                      helperText={errors.clientVersion?.message || t('clientVersions.form.versionHelp')}
+                      inputProps={{
+                        autoComplete: 'off',
+                        autoCorrect: 'off',
+                        autoCapitalize: 'off',
+                        spellCheck: false
+                      }}
+                    />
+                  )}
+                />
 
-            {/* 플랫폼 선택 (멀티셀렉트) */}
-            <Box>
-              <FormControl fullWidth error={!!errors.platforms}>
-                <InputLabel id="bulk-platform-label">{t('clientVersions.selectPlatforms')}</InputLabel>
-                <Select
-                  labelId="bulk-platform-label"
-                  multiple
-                  value={selectedPlatforms}
-                  onChange={handlePlatformChange}
-                  input={<OutlinedInput label={t('clientVersions.selectPlatforms')} />}
-                  renderValue={(selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((value) => (
-                        <Chip key={value} label={value.toUpperCase()} size="small" />
-                      ))}
+                {/* 플랫폼 선택 (멀티셀렉트) */}
+                <FormControl fullWidth error={!!errors.platforms}>
+                  <InputLabel id="bulk-platform-label">
+                    {t('clientVersions.selectPlatforms')} <Typography component="span" color="error">*</Typography>
+                  </InputLabel>
+                  <Select
+                    labelId="bulk-platform-label"
+                    multiple
+                    value={selectedPlatforms}
+                    onChange={handlePlatformChange}
+                    input={<OutlinedInput label={`${t('clientVersions.selectPlatforms')} *`} />}
+                    renderValue={(selected) => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {selected.map((value) => (
+                          <Chip key={value} label={value.toUpperCase()} size="small" />
+                        ))}
+                      </Box>
+                    )}
+                  >
+                    {AVAILABLE_PLATFORMS.map((platform) => (
+                      <MenuItem key={platform} value={platform}>
+                        {platform.toUpperCase()}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {(errors.platforms?.message || t('clientVersions.form.bulkPlatformHelp')) && (
+                    <Typography variant="caption" color={errors.platforms ? "error" : "text.secondary"} sx={{ mt: 0.5, display: 'block' }}>
+                      {errors.platforms?.message || t('clientVersions.form.bulkPlatformHelp')}
+                    </Typography>
+                  )}
+                </FormControl>
+
+                {/* 상태 */}
+                <Controller
+                  name="clientStatus"
+                  control={control}
+                  render={({ field }) => (
+                    <FormControl fullWidth variant="outlined">
+                      <InputLabel id="bulk-status-label" shrink={true}>
+                        {t('clientVersions.statusLabel')} <Typography component="span" color="error">*</Typography>
+                      </InputLabel>
+                      <Select
+                        labelId="bulk-status-label"
+                        {...field}
+                        value={field.value || ClientStatus.OFFLINE}
+                        label={`${t('clientVersions.statusLabel')} *`}
+                      >
+                        {Object.values(ClientStatus).map((status) => (
+                          <MenuItem key={status} value={status}>
+                            {t(ClientStatusLabels[status])}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                        {t('clientVersions.form.statusHelp')}
+                      </Typography>
+                    </FormControl>
+                  )}
+                />
+              </Stack>
+            </Paper>
+
+            {/* 추가 설정 섹션 */}
+            <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200' }}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                ⚙️ {t('clientVersions.form.additionalSettings')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('clientVersions.form.additionalSettingsDescription')}
+              </Typography>
+
+              <Stack spacing={2}>
+                {/* 게스트 모드 허용 */}
+                <Controller
+                  name="guestModeAllowed"
+                  control={control}
+                  render={({ field }) => (
+                    <Box>
+                      <FormControlLabel
+                        control={<Switch {...field} checked={field.value || false} />}
+                        label={t('clientVersions.guestModeAllowed')}
+                      />
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                        {t('clientVersions.form.guestModeAllowedHelp')}
+                      </Typography>
                     </Box>
                   )}
-                >
-                  {AVAILABLE_PLATFORMS.map((platform) => (
-                    <MenuItem key={platform} value={platform}>
-                      {platform.toUpperCase()}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.platforms && (
-                  <Typography variant="caption" color="error">
-                    {errors.platforms.message}
-                  </Typography>
-                )}
-              </FormControl>
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                {t('clientVersions.form.platformHelp')}
-              </Typography>
-            </Box>
+                />
 
-            {/* 상태 */}
-            <Controller
-              name="clientStatus"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <FormControl fullWidth variant="outlined">
-                    <InputLabel id="bulk-status-label" shrink={true}>{t('clientVersions.statusLabel')}</InputLabel>
-                    <Select
-                      labelId="bulk-status-label"
+                {/* 외부 클릭 링크 */}
+                <Controller
+                  name="externalClickLink"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
                       {...field}
-                      value={field.value || ClientStatus.OFFLINE}
-                      label={t('clientVersions.statusLabel')}
-                    >
-                      {Object.values(ClientStatus).map((status) => (
-                        <MenuItem key={status} value={status}>
-                          {t(ClientStatusLabels[status])}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.statusHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
+                      value={field.value || ''}
+                      fullWidth
+                      label={t('clientVersions.externalClickLink')}
+                      error={!!errors.externalClickLink}
+                      helperText={errors.externalClickLink?.message || t('clientVersions.form.externalClickLinkHelp')}
+                      inputProps={{
+                        autoComplete: 'off',
+                        autoCorrect: 'off',
+                        autoCapitalize: 'off',
+                        spellCheck: false
+                      }}
+                    />
+                  )}
+                />
 
-            {/* 추가 설정 */}
-            <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
-              {t('clientVersions.form.additionalSettings')}
-            </Typography>
-
-            <Controller
-              name="guestModeAllowed"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <FormControlLabel
-                    control={<Switch {...field} checked={field.value || false} />}
-                    label={t('clientVersions.guestModeAllowed')}
-                  />
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.guestModeAllowedHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
-
-            <Controller
-              name="externalClickLink"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <TextField
-                    {...field}
-                    value={field.value || ''}
-                    fullWidth
-                    label={t('clientVersions.externalClickLink')}
-                    error={!!errors.externalClickLink}
-                    helperText={errors.externalClickLink?.message}
-                    inputProps={{
-                      autoComplete: 'off',
-                      autoCorrect: 'off',
-                      autoCapitalize: 'off',
-                      spellCheck: false
-                    }}
-                  />
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.externalClickLinkHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
-
-            <Controller
-              name="memo"
-              control={control}
-              render={({ field }) => (
-                <Box>
-                  <TextField
-                    {...field}
-                    value={field.value || ''}
-                    fullWidth
-                    label={t('clientVersions.memo')}
-                    multiline
-                    rows={3}
-                    error={!!errors.memo}
-                    helperText={errors.memo?.message}
-                  />
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {t('clientVersions.form.memoHelp')}
-                  </Typography>
-                </Box>
-              )}
-            />
+                {/* 메모 */}
+                <Controller
+                  name="memo"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      value={field.value || ''}
+                      fullWidth
+                      label={t('clientVersions.memo')}
+                      multiline
+                      rows={3}
+                      error={!!errors.memo}
+                      helperText={errors.memo?.message || t('clientVersions.form.memoHelp')}
+                    />
+                  )}
+                />
+              </Stack>
+            </Paper>
 
             {/* 플랫폼별 서버 주소 설정 */}
             {selectedPlatforms.length > 0 && (
-              <>
-                <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
-                  {t('clientVersions.form.serverAddresses')}
+              <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200' }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  🌐 {t('clientVersions.form.serverAddresses')}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {t('clientVersions.form.platformSpecificDescription')}
                 </Typography>
 
-                {selectedPlatforms.map((platform, index) => (
-                  <Box key={platform} sx={{ mb: 3, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
-                    <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600, color: 'primary.main' }}>
-                      {platform.toUpperCase()}
-                    </Typography>
+                <Stack spacing={3}>
+                  {selectedPlatforms.map((platform, index) => (
+                    <Paper key={platform} elevation={1} sx={{ p: 2, bgcolor: 'white' }}>
+                      <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600, color: 'primary.main', display: 'flex', alignItems: 'center', gap: 1 }}>
+                        📱 {platform.toUpperCase()}
+                      </Typography>
 
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      <Controller
-                        name={`platforms.${index}.gameServerAddress`}
-                        control={control}
-                        render={({ field }) => (
-                          <Box>
+                      <Stack spacing={2}>
+                        <Controller
+                          name={`platforms.${index}.gameServerAddress`}
+                          control={control}
+                          render={({ field }) => (
                             <TextField
                               {...field}
                               value={field.value || ''}
                               fullWidth
-                              label={t('clientVersions.gameServerAddress')}
+                              label={
+                                <Box component="span">
+                                  {t('clientVersions.gameServerAddress')} <Typography component="span" color="error">*</Typography>
+                                </Box>
+                              }
                               error={!!errors.platforms?.[index]?.gameServerAddress}
-                              helperText={errors.platforms?.[index]?.gameServerAddress?.message}
+                              helperText={errors.platforms?.[index]?.gameServerAddress?.message || t('clientVersions.form.gameServerAddressHelp')}
                               inputProps={{
                                 autoComplete: 'off',
                                 autoCorrect: 'off',
@@ -474,25 +489,20 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                                 spellCheck: false
                               }}
                             />
-                            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                              {t('clientVersions.form.gameServerAddressHelp')}
-                            </Typography>
-                          </Box>
-                        )}
-                      />
+                          )}
+                        />
 
-                      <Controller
-                        name={`platforms.${index}.gameServerAddressForWhiteList`}
-                        control={control}
-                        render={({ field }) => (
-                          <Box>
+                        <Controller
+                          name={`platforms.${index}.gameServerAddressForWhiteList`}
+                          control={control}
+                          render={({ field }) => (
                             <TextField
                               {...field}
                               value={field.value || ''}
                               fullWidth
                               label={t('clientVersions.gameServerAddressForWhiteList')}
                               error={!!errors.platforms?.[index]?.gameServerAddressForWhiteList}
-                              helperText={errors.platforms?.[index]?.gameServerAddressForWhiteList?.message}
+                              helperText={errors.platforms?.[index]?.gameServerAddressForWhiteList?.message || t('clientVersions.form.gameServerAddressForWhiteListHelp')}
                               inputProps={{
                                 autoComplete: 'off',
                                 autoCorrect: 'off',
@@ -500,25 +510,24 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                                 spellCheck: false
                               }}
                             />
-                            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                              {t('clientVersions.form.gameServerAddressForWhiteListHelp')}
-                            </Typography>
-                          </Box>
-                        )}
-                      />
+                          )}
+                        />
 
-                      <Controller
-                        name={`platforms.${index}.patchAddress`}
-                        control={control}
-                        render={({ field }) => (
-                          <Box>
+                        <Controller
+                          name={`platforms.${index}.patchAddress`}
+                          control={control}
+                          render={({ field }) => (
                             <TextField
                               {...field}
                               value={field.value || ''}
                               fullWidth
-                              label={t('clientVersions.patchAddress')}
+                              label={
+                                <Box component="span">
+                                  {t('clientVersions.patchAddress')} <Typography component="span" color="error">*</Typography>
+                                </Box>
+                              }
                               error={!!errors.platforms?.[index]?.patchAddress}
-                              helperText={errors.platforms?.[index]?.patchAddress?.message}
+                              helperText={errors.platforms?.[index]?.patchAddress?.message || t('clientVersions.form.patchAddressHelp')}
                               inputProps={{
                                 autoComplete: 'off',
                                 autoCorrect: 'off',
@@ -526,25 +535,20 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                                 spellCheck: false
                               }}
                             />
-                            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                              {t('clientVersions.form.patchAddressHelp')}
-                            </Typography>
-                          </Box>
-                        )}
-                      />
+                          )}
+                        />
 
-                      <Controller
-                        name={`platforms.${index}.patchAddressForWhiteList`}
-                        control={control}
-                        render={({ field }) => (
-                          <Box>
+                        <Controller
+                          name={`platforms.${index}.patchAddressForWhiteList`}
+                          control={control}
+                          render={({ field }) => (
                             <TextField
                               {...field}
                               value={field.value || ''}
                               fullWidth
                               label={t('clientVersions.patchAddressForWhiteList')}
                               error={!!errors.platforms?.[index]?.patchAddressForWhiteList}
-                              helperText={errors.platforms?.[index]?.patchAddressForWhiteList?.message}
+                              helperText={errors.platforms?.[index]?.patchAddressForWhiteList?.message || t('clientVersions.form.patchAddressForWhiteListHelp')}
                               inputProps={{
                                 autoComplete: 'off',
                                 autoCorrect: 'off',
@@ -552,22 +556,22 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                                 spellCheck: false
                               }}
                             />
-                            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                              {t('clientVersions.form.patchAddressForWhiteListHelp')}
-                            </Typography>
-                          </Box>
-                        )}
-                      />
-                    </Box>
-                  </Box>
-                ))}
-              </>
+                          )}
+                        />
+                      </Stack>
+                    </Paper>
+                  ))}
+                </Stack>
+              </Paper>
             )}
 
-            {/* 태그 선택 */}
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                {t('common.tags')}
+            {/* 태그 선택 섹션 */}
+            <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200' }}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                🏷️ {t('common.tags')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('clientVersions.form.tagsHelp')}
               </Typography>
 
               <TextField
@@ -588,19 +592,18 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                       {(selected as number[]).map((id) => {
                         const tag = allTags.find(t => t.id === id);
                         return tag ? (
-                          <Tooltip key={id} title={tag.description || tag.name} arrow>
-                            <Chip
-                              label={tag.name}
-                              size="small"
-                              sx={{ bgcolor: tag.color, color: '#fff' }}
-                            />
-                          </Tooltip>
+                          <Chip
+                            key={id}
+                            label={tag.name}
+                            size="small"
+                            sx={{ bgcolor: tag.color, color: '#fff' }}
+                          />
                         ) : null;
                       })}
                     </Box>
                   ),
                 }}
-                helperText="생성될 모든 클라이언트 버전에 적용할 태그를 선택하세요"
+                helperText={t('clientVersions.form.bulkTagsHelp')}
                 fullWidth
               >
                 {allTags.map((tag) => (
@@ -614,8 +617,8 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                   </MenuItem>
                 ))}
               </TextField>
-            </Box>
-          </Box>
+            </Paper>
+          </Stack>
         </DialogContent>
 
         <DialogActions>

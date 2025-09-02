@@ -47,6 +47,8 @@ import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { messageTemplateService, MessageTemplate, MessageTemplateLocale, MessageTemplateType } from '@/services/messageTemplateService';
 import { tagService, Tag } from '@/services/tagService';
 import SimplePagination from '@/components/common/SimplePagination';
+import FormDialogHeader from '@/components/common/FormDialogHeader';
+import EmptyTableRow from '@/components/common/EmptyTableRow';
 
 const allLangs: Array<{ code: 'ko' | 'en' | 'zh'; label: string }> = [
   { code: 'ko', label: '한국어' },
@@ -251,7 +253,7 @@ const MessageTemplatesPage: React.FC = () => {
 
   const handleAdd = () => {
     setEditing(null);
-    setForm({ name: '', type: 'maintenance', isEnabled: true, defaultMessage: '', locales: [], tags: [] });
+    setForm({ name: '', type: 'maintenance', isEnabled: true, supportsMultiLanguage: false, defaultMessage: '', locales: [], tags: [] });
     setNewLang('ko'); setNewMsg('');
     setDialogOpen(true);
   };
@@ -263,6 +265,7 @@ const MessageTemplatesPage: React.FC = () => {
       name: row.name,
       type: row.type,
       isEnabled: (row as any).isEnabled,
+      supportsMultiLanguage: (row as any).supportsMultiLanguage || false,
       defaultMessage: (row as any).defaultMessage || '',
       locales: row.locales || [],
       tags: row.tags || []
@@ -329,6 +332,7 @@ const MessageTemplatesPage: React.FC = () => {
         name: form.name.trim(),
         type: form.type,
         isEnabled: !!form.isEnabled,
+        supportsMultiLanguage: !!form.supportsMultiLanguage,
         defaultMessage: form.defaultMessage || null,
         locales: form.locales,
       };
@@ -389,7 +393,7 @@ const MessageTemplatesPage: React.FC = () => {
             {t('admin.messageTemplates.title')}
           </Typography>
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-            {t('common.add')}
+            {t('admin.messageTemplates.addTemplate')}
           </Button>
         </Box>
         <Typography variant="body1" color="text.secondary">
@@ -528,13 +532,11 @@ const MessageTemplatesPage: React.FC = () => {
               </TableHead>
               <TableBody>
                 {items.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        {t('admin.messageTemplates.noTemplates')}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
+                  <EmptyTableRow
+                    colSpan={9}
+                    loading={loading}
+                    message="등록된 메시지 템플릿이 없습니다."
+                  />
                 ) : (
                   items.map(row => {
                   const langs = (row.locales||[]).map(l=>l.lang);
@@ -614,8 +616,27 @@ const MessageTemplatesPage: React.FC = () => {
         onRowsPerPageChange={handleRowsPerPageChange}
       />
 
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editing ? t('common.edit') : t('common.add')}</DialogTitle>
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        TransitionProps={{
+          onEntered: () => {
+            // 대화상자가 열린 후 이름 필드에 포커스
+            setTimeout(() => {
+              nameFieldRef.current?.focus();
+            }, 100);
+          }
+        }}
+      >
+        <FormDialogHeader
+          title={editing ? '메시지 템플릿 편집' : '메시지 템플릿 추가'}
+          description={editing
+            ? '기존 메시지 템플릿의 정보를 수정하고 다국어 메시지를 관리할 수 있습니다.'
+            : '새로운 메시지 템플릿을 생성하고 다국어 메시지를 설정할 수 있습니다.'
+          }
+        />
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
@@ -640,6 +661,35 @@ const MessageTemplatesPage: React.FC = () => {
               helperText={t('admin.messageTemplates.defaultMessageHelp')}
               inputRef={defaultMessageFieldRef}
             />
+            <FormControlLabel
+              control={<Switch checked={form.supportsMultiLanguage} onChange={(e) => setForm(prev => ({ ...prev, supportsMultiLanguage: e.target.checked }))} />}
+              label={t('admin.messageTemplates.supportsMultiLanguage')}
+            />
+
+            {/* Multi-language section - only show when supportsMultiLanguage is true */}
+            {form.supportsMultiLanguage && (
+              <>
+                {/* Dynamic language entries */}
+                {availableLangs.length > 0 && (
+                  <Stack direction="row" spacing={1} alignItems="flex-start">
+                    <Select size="small" value={newLang} onChange={(e)=>setNewLang(e.target.value as any)} sx={{ minWidth: 120 }}>
+                      {availableLangs.map(l => <MenuItem key={l.code} value={l.code}>{l.label}</MenuItem>)}
+                    </Select>
+                    <TextField size="small" value={newMsg} onChange={(e)=>setNewMsg(e.target.value)} label={t('admin.maintenance.perLanguageMessage')} sx={{ flex: 1 }} multiline minRows={3} />
+                    <Button onClick={addLocale} variant="outlined" sx={{ alignSelf: 'flex-start' }}>{t('common.add')}</Button>
+                  </Stack>
+                )}
+                <Stack spacing={1}>
+                  {(form.locales||[]).map(l => (
+                    <Box key={l.lang} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+                      <Chip label={getLangLabel(l.lang)} size="small" sx={{ width: 96, justifyContent: 'flex-start' }} />
+                      <TextField fullWidth size="small" value={l.message} onChange={(e)=>setForm(prev=>({ ...prev, locales: (prev.locales||[]).map(x=> x.lang===l.lang? { ...x, message: e.target.value }: x) }))} multiline minRows={3} />
+                      <IconButton size="small" onClick={()=>removeLocale(l.lang)} sx={{ alignSelf: 'flex-start' }}><CloseIcon fontSize="small" /></IconButton>
+                    </Box>
+                  ))}
+                </Stack>
+              </>
+            )}
 
             {/* 태그 선택 */}
             <TextField
@@ -683,31 +733,6 @@ const MessageTemplatesPage: React.FC = () => {
                 </MenuItem>
               ))}
             </TextField>
-            {(form.locales?.length ?? 0) === 0 && (
-              <Typography variant="caption" color="text.secondary">
-                {t('admin.maintenance.defaultMessageHint')}
-              </Typography>
-            )}
-
-            {/* Dynamic language entries */}
-            {availableLangs.length > 0 && (
-              <Stack direction="row" spacing={1} alignItems="flex-start">
-                <Select size="small" value={newLang} onChange={(e)=>setNewLang(e.target.value as any)} sx={{ minWidth: 120 }}>
-                  {availableLangs.map(l => <MenuItem key={l.code} value={l.code}>{l.label}</MenuItem>)}
-                </Select>
-                <TextField size="small" value={newMsg} onChange={(e)=>setNewMsg(e.target.value)} label={t('admin.maintenance.perLanguageMessage')} sx={{ flex: 1 }} multiline minRows={3} />
-                <Button onClick={addLocale} variant="outlined" sx={{ alignSelf: 'flex-start' }}>{t('common.add')}</Button>
-              </Stack>
-            )}
-            <Stack spacing={1}>
-              {(form.locales||[]).map(l => (
-                <Box key={l.lang} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
-                  <Chip label={getLangLabel(l.lang)} size="small" sx={{ width: 96, justifyContent: 'flex-start' }} />
-                  <TextField fullWidth size="small" value={l.message} onChange={(e)=>setForm(prev=>({ ...prev, locales: (prev.locales||[]).map(x=> x.lang===l.lang? { ...x, message: e.target.value }: x) }))} multiline minRows={3} />
-                  <IconButton size="small" onClick={()=>removeLocale(l.lang)} sx={{ alignSelf: 'flex-start' }}><CloseIcon fontSize="small" /></IconButton>
-                </Box>
-              ))}
-            </Stack>
           </Stack>
         </DialogContent>
         <DialogActions>

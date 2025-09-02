@@ -1,7 +1,4 @@
 {
-  "T": "T",
-  "_": " ",
-  "a": "a",
   "accountSuspended": {
     "additionalInfo": "추가 정보",
     "backToLogin": "로그인으로 돌아가기",
@@ -59,7 +56,7 @@
       "deleteUser": "사용자 삭제",
       "editUser": "사용자 편집",
       "emailDoesNotMatch": "이메일이 일치하지 않습니다",
-      "fetchError": "가져오기 오류",
+      "fetchError": "사용자 목록을 불러오는데 실패했습니다.",
       "form": {
         "emailHelp": "유효한 이메일 주소를 입력하세요",
         "nameHelp": "사용자의 실명을 입력하세요",
@@ -94,11 +91,12 @@
       "availability": "사용 가능",
       "searchPlaceholder": "이름 또는 메시지로 검색...",
       "defaultMessageRequired": "기본 메시지는 필수입니다",
-      "defaultMessageHelp": "모든 언어에서 공통으로 사용될 기본 메시지입니다",
+      "defaultMessageHelp": "사용할 언어를 지정하지 않았을 경우 기본적으로 표시되는 메시지입니다",
       "loadFailed": "메시지 템플릿을 불러오지 못했습니다",
       "selectedCount": "{{count}}개 선택됨",
       "makeAvailable": "사용 가능으로 변경",
       "makeUnavailable": "사용 불가로 변경",
+      "supportsMultiLanguage": "다국어 지원",
       "confirmDelete": "메시지 템플릿 '{{name}}'을(를) 삭제하시겠습니까?",
       "confirmBulkDelete": "선택한 {{count}}개의 메시지 템플릿을 삭제하시겠습니까?",
       "bulkDeleteSuccess": "{{count}}개의 메시지 템플릿이 삭제되었습니다",
@@ -112,7 +110,8 @@
       },
       "errors": {
         "duplicateName": "같은 이름의 메시지 템플릿이 이미 존재합니다"
-      }
+      },
+      "addTemplate": "메시지 템플릿 추가"
     }
   },
   "scheduler": {
@@ -178,7 +177,7 @@
     "endDate": "종료일",
     "id": "ID",
     "ipAddress": "IP 주소",
-    "loadFailed": "로드 실패",
+    "loadFailed": "감사 로그를 불러오는데 실패했습니다.",
     "noLogsDesc": "감사 로그가 없습니다",
     "noLogsFound": "감사 로그를 찾을 수 없습니다",
     "resource": "리소스",
@@ -323,7 +322,7 @@
   "clientStatus": "클라이언트 상태",
   "clientVersion": "클라이언트 버전",
   "clientVersions": {
-    "addNew": "새로 추가",
+    "addNew": "클라이언트 버전 추가",
     "addIndividual": "개별 버전 추가",
     "addBulk": "간편 추가",
     "bulkAdd": "간편 버전 추가",
@@ -355,7 +354,13 @@
     "externalClickLink": "외부 클릭 링크",
     "form": {
       "additionalSettings": "추가 설정",
+      "additionalSettingsDescription": "게스트 모드, 외부 링크, 메모 등의 부가 설정을 관리하세요.",
       "basicInfo": "기본 정보",
+      "basicInfoDescription": "클라이언트 버전의 기본적인 식별 정보를 입력하세요.",
+      "bulkBasicInfoDescription": "모든 플랫폼에 공통으로 적용될 기본 정보를 입력하세요.",
+      "bulkPlatformHelp": "클라이언트 버전을 생성할 플랫폼을 선택하세요. 선택한 각 플랫폼마다 별도의 버전이 생성됩니다.",
+      "bulkTagsHelp": "생성될 모든 클라이언트 버전에 적용할 태그를 선택하세요.",
+      "platformSpecificDescription": "선택한 각 플랫폼별로 서버 주소를 설정하세요.",
       "copyTitle": "클라이언트 버전 복사",
       "customPayloadHelp": "사용자 정의 페이로드를 입력하세요",
       "duplicateVersion": "중복된 버전",
@@ -372,7 +377,9 @@
       "platformHelp": "대상 플랫폼을 선택하세요 (pc, pc-wegame, ios, android, harmonyos)",
       "platformRequired": "플랫폼이 필요합니다",
       "serverAddresses": "서버 주소",
+      "serverAddressesDescription": "게임 서버와 패치 서버의 주소를 설정하세요.",
       "statusHelp": "상태를 선택하세요",
+      "tagsHelp": "클라이언트 버전에 적용할 태그를 선택하세요.",
       "statusRequired": "상태가 필요합니다",
       "title": "클라이언트 버전 추가",
       "versionHelp": "Semantic Versioning(SemVer) 형식을 사용하세요. 예: 1.0.0, 2.1.3, 1.0.0-beta.1 (주.부.수정 또는 주.부.수정-사전릴리스)",
@@ -394,7 +401,7 @@
     "gameServerAddressForWhiteList": "화이트리스트용 게임 서버 주소",
     "guestMode": "게스트 모드",
     "guestModeAllowed": "게스트 모드 허용",
-    "loadFailed": "로드 실패",
+    "loadFailed": "클라이언트 버전을 불러오는데 실패했습니다.",
     "memo": "메모",
     "noVersionsDesc": "버전이 없습니다",
     "noVersionsFound": "버전을 찾을 수 없습니다",
@@ -556,7 +563,6 @@
     "page": "페이지",
     "selectAll": "모두 선택",
     "start": "시작",
-    "status": "상태",
     "time": "시간",
     "total": "총",
     "updatedBy": "수정자",
@@ -617,7 +623,7 @@
     "title": "Job 관리",
     "monitor": "큐 모니터",
     "monitorLoadError": "큐 모니터 로드에 실패했습니다",
-    "addJob": "Job 추가",
+    "addJob": "작업 추가",
     "editJob": "Job 편집",
     "jobType": "Job 타입",
     "basicInformation": "기본 정보",
@@ -688,15 +694,15 @@
     "editGameWorld": "게임 월드 편집",
     "endMaintenance": "점검 종료",
     "errors": {
-      "alreadyExists": "이미 존재합니다",
-      "deleteFailed": "삭제 실패",
-      "loadFailed": "로드 실패",
-      "moveDownFailed": "아래로 이동 실패",
-      "moveUpFailed": "위로 이동 실패",
-      "orderUpdateFailed": "순서 업데이트 실패",
-      "saveFailed": "저장 실패",
-      "toggleMaintenanceFailed": "점검 모드 전환 실패",
-      "toggleVisibilityFailed": "표시 상태 전환 실패"
+      "alreadyExists": "이미 존재하는 게임 월드입니다.",
+      "deleteFailed": "게임 월드 삭제에 실패했습니다.",
+      "loadFailed": "게임 월드를 불러오는데 실패했습니다.",
+      "moveDownFailed": "게임 월드 아래로 이동에 실패했습니다.",
+      "moveUpFailed": "게임 월드 위로 이동에 실패했습니다.",
+      "orderUpdateFailed": "게임 월드 순서 업데이트에 실패했습니다.",
+      "saveFailed": "게임 월드 저장에 실패했습니다.",
+      "toggleMaintenanceFailed": "점검 모드 전환에 실패했습니다.",
+      "toggleVisibilityFailed": "게임 월드 표시 상태 전환에 실패했습니다."
     },
     "form": {
       "descriptionHelp": "게임 월드 설명을 입력하세요",
@@ -869,7 +875,6 @@
     "auditLogs": "감사 로그",
     "clientVersions": "클라이언트 버전",
     "collapse": "접기",
-    "dashboard": "대시보드",
     "expand": "펼치기",
     "gameWorlds": "게임 월드",
     "maintenance": "점검 관리",
@@ -944,7 +949,7 @@
     "userDeleted": "사용자가 삭제되었습니다"
   },
   "whitelist": {
-    "addEntry": "항목 추가",
+    "addEntry": "계정 화이트리스트 추가",
     "anyIp": "모든 IP",
     "bulkImport": "일괄 가져오기",
     "tabs": {
@@ -979,11 +984,11 @@
       "createTitle": "새 항목 생성"
     },
     "errors": {
-      "bulkCreateFailed": "일괄 생성 실패",
-      "deleteFailed": "삭제 실패",
-      "loadFailed": "로드 실패",
+      "bulkCreateFailed": "계정 화이트리스트 일괄 생성에 실패했습니다.",
+      "deleteFailed": "계정 화이트리스트 삭제에 실패했습니다.",
+      "loadFailed": "계정 화이트리스트를 불러오는데 실패했습니다.",
       "noValidEntries": "유효한 항목이 없습니다",
-      "saveFailed": "저장 실패"
+      "saveFailed": "계정 화이트리스트 저장에 실패했습니다."
     },
     "form": {
       "anyIpPlaceholder": "모든 IP 허용",
@@ -1032,7 +1037,7 @@
     "subtitle": "CIDR 지원 IP 기반 화이트리스트 항목 관리",
     "searchPlaceholder": "IP 주소, 사용 목적, 메모로 검색...",
     "bulkImport": "일괄 가져오기",
-    "addEntry": "IP 항목 추가",
+    "addEntry": "IP 화이트리스트 추가",
     "ipAddress": "IP 주소",
     "purpose": "사용 목적",
     "period": "적용 기간",

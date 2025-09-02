@@ -7,43 +7,46 @@ import { WhitelistModel } from '../models/AccountWhitelist';
 
 // Validation schemas
 const createWhitelistSchema = Joi.object({
-  accountId: Joi.string().length(32).pattern(/^[a-zA-Z0-9]+$/).required()
+  accountId: Joi.string().min(4).max(36).pattern(/^[a-zA-Z0-9]+$/).required()
     .messages({
-      'string.length': 'Account ID must be exactly 32 characters',
+      'string.min': 'Account ID must be at least 4 characters',
+      'string.max': 'Account ID must be at most 36 characters',
       'string.pattern.base': 'Account ID must contain only alphanumeric characters'
     }),
   ipAddress: Joi.string().ip({ version: ['ipv4', 'ipv6'] }).optional().allow('').empty('').default(null),
   startDate: Joi.date().iso().optional().allow('').empty('').default(null),
   endDate: Joi.date().iso().optional().allow('').empty('').default(null),
-  memo: Joi.string().max(1000).optional().allow('').empty('').default(null),
+  purpose: Joi.string().max(1000).optional().allow('').empty('').default(null),
   tags: Joi.array().items(Joi.string().max(50)).max(20).optional(),
 });
 
 const updateWhitelistSchema = Joi.object({
-  accountId: Joi.string().length(32).pattern(/^[a-zA-Z0-9]+$/).optional()
+  accountId: Joi.string().min(4).max(36).pattern(/^[a-zA-Z0-9]+$/).optional()
     .messages({
-      'string.length': 'Account ID must be exactly 32 characters',
+      'string.min': 'Account ID must be at least 4 characters',
+      'string.max': 'Account ID must be at most 36 characters',
       'string.pattern.base': 'Account ID must contain only alphanumeric characters'
     }),
   ipAddress: Joi.string().ip({ version: ['ipv4', 'ipv6'] }).optional().allow('').empty('').default(null),
   startDate: Joi.date().iso().optional().allow('').empty('').default(null),
   endDate: Joi.date().iso().optional().allow('').empty('').default(null),
-  memo: Joi.string().max(1000).optional().allow('').empty('').default(null),
+  purpose: Joi.string().max(1000).optional().allow('').empty('').default(null),
   tags: Joi.array().items(Joi.string().max(50)).max(20).optional(),
 });
 
 const bulkCreateSchema = Joi.object({
   entries: Joi.array().items(
     Joi.object({
-      accountId: Joi.string().length(32).pattern(/^[a-zA-Z0-9]+$/).required()
+      accountId: Joi.string().min(4).max(36).pattern(/^[a-zA-Z0-9]+$/).required()
         .messages({
-          'string.length': 'Account ID must be exactly 32 characters',
+          'string.min': 'Account ID must be at least 4 characters',
+          'string.max': 'Account ID must be at most 36 characters',
           'string.pattern.base': 'Account ID must contain only alphanumeric characters'
         }),
       ipAddress: Joi.string().ip({ version: ['ipv4', 'ipv6'] }).optional().allow('').empty('').default(null),
       startDate: Joi.date().iso().optional().allow('').empty('').default(null),
       endDate: Joi.date().iso().optional().allow('').empty('').default(null),
-      memo: Joi.string().max(1000).optional().allow('').empty('').default(null),
+      purpose: Joi.string().max(1000).optional().allow('').empty('').default(null),
       tags: Joi.array().items(Joi.string().max(50)).max(20).optional(),
     })
   ).min(1).max(1000).required(),

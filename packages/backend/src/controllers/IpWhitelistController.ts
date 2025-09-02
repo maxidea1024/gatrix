@@ -105,7 +105,7 @@ export class IpWhitelistController {
       }
     }
 
-    const filters = { ip: ipAddress, description: purpose, is_active: isEnabled, created_by: createdBy, search };
+    const filters = { ipAddress, purpose, isEnabled, createdBy, search };
     const pagination = { page, limit };
 
     const result = await IpWhitelistService.getAllIpWhitelists(filters, pagination);
@@ -139,11 +139,14 @@ export class IpWhitelistController {
     }
 
     // Clean up the validated data to remove any undefined values
+    console.log('req.user:', req.user);
+    console.log('req.user.userId:', (req.user as any)?.userId);
+
     const createData: any = {
       ipAddress: value.ipAddress,
       purpose: value.purpose,
       isEnabled: value.isEnabled ?? true,
-      createdBy: (req.user as any).id,
+      createdBy: (req.user as any)?.userId,
     };
 
     // Only include date fields if they are provided and valid
@@ -179,7 +182,7 @@ export class IpWhitelistController {
 
     const updateData = {
       ...value,
-      updatedBy: (req.user as any).id,
+      updatedBy: (req.user as any).userId,
     };
 
     const updated = await IpWhitelistService.updateIpWhitelist(id, updateData);
@@ -212,7 +215,7 @@ export class IpWhitelistController {
       throw new CustomError('Invalid IP whitelist ID', 400);
     }
 
-    const updated = await IpWhitelistService.toggleIpWhitelistStatus(id, (req.user as any).id);
+    const updated = await IpWhitelistService.toggleIpWhitelistStatus(id, (req.user as any).userId);
 
     res.json({
       success: true,
@@ -229,7 +232,7 @@ export class IpWhitelistController {
 
     const createdCount = await IpWhitelistService.bulkCreateIpWhitelists(
       value.entries,
-      (req.user as any).id
+      (req.user as any).userId
     );
 
     res.status(201).json({

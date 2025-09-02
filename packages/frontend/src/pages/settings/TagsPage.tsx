@@ -4,6 +4,7 @@ import { Delete as DeleteIcon, Edit as EditIcon, Save as SaveIcon, Close as Clos
 import { useTranslation } from 'react-i18next';
 import { tagService, Tag, TagListParams } from '@/services/tagService';
 import { useSnackbar } from 'notistack';
+import EmptyTableRow from '@/components/common/EmptyTableRow';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 
 const randomHexColor = () => `#${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0')}`;
@@ -197,13 +198,11 @@ const TagsPage: React.FC = () => {
               </TableHead>
               <TableBody>
                 {filtered.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        {tags.length === 0 ? t('tags.noTags') : t('tags.noMatchingTags')}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
+                  <EmptyTableRow
+                    colSpan={6}
+                    loading={loading}
+                    message={tags.length === 0 ? '등록된 태그가 없습니다.' : '검색 조건에 맞는 태그가 없습니다.'}
+                  />
                 ) : (
                   filtered.map(tag => (
                     <TableRow key={tag.id} hover>

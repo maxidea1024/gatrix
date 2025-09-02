@@ -9,6 +9,7 @@ export interface MessageTemplate {
   name: string;
   type: MessageTemplateType;
   isEnabled: boolean;
+  supportsMultiLanguage?: boolean;
   defaultMessage?: string | null;
   locales?: MessageTemplateLocale[];
   tags?: { id: number; name: string; color: string }[];

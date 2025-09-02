@@ -7,12 +7,14 @@ export interface Whitelist {
   ipAddress?: string;
   startDate?: string;
   endDate?: string;
-  memo?: string;
+  purpose?: string;
   tags?: string[];
   createdBy: number;
   createdByName?: string;
+  createdByEmail?: string;
   createdAt: string;
   updatedAt: string;
+  isActive: boolean;
 }
 
 export interface CreateWhitelistData {
@@ -20,7 +22,7 @@ export interface CreateWhitelistData {
   ipAddress?: string;
   startDate?: string;
   endDate?: string;
-  memo?: string;
+  purpose?: string;
   tags?: string[];
 }
 
@@ -29,7 +31,7 @@ export interface UpdateWhitelistData {
   ipAddress?: string;
   startDate?: string;
   endDate?: string;
-  memo?: string;
+  purpose?: string;
   tags?: string[];
 }
 
@@ -50,11 +52,11 @@ export interface WhitelistListResponse {
 }
 
 export interface BulkCreateEntry {
-  nickname: string;
+  accountId: string;
   ipAddress?: string;
   startDate?: string;
   endDate?: string;
-  memo?: string;
+  purpose?: string;
 }
 
 export class WhitelistService {

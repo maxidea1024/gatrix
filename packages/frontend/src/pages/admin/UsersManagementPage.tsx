@@ -52,6 +52,8 @@ import { apiService } from '@/services/api';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
 import SimplePagination from '../../components/common/SimplePagination';
+import FormDialogHeader from '../../components/common/FormDialogHeader';
+import EmptyTableRow from '../../components/common/EmptyTableRow';
 
 interface UsersResponse {
   users: User[];
@@ -446,7 +448,14 @@ const UsersManagementPage: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {users.map((user) => (
+                {users.length === 0 ? (
+                  <EmptyTableRow
+                    colSpan={7}
+                    loading={loading}
+                    message="등록된 사용자가 없습니다."
+                  />
+                ) : (
+                  users.map((user) => (
                   <TableRow key={user.id} hover>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -490,7 +499,8 @@ const UsersManagementPage: React.FC = () => {
                       </IconButton>
                     </TableCell>
                   </TableRow>
-                ))}
+                  ))
+                )}
               </TableBody>
             </Table>
           </TableContainer>
@@ -568,7 +578,10 @@ const UsersManagementPage: React.FC = () => {
         fullWidth
         key={addUserDialog ? 'add-user-dialog-open' : 'add-user-dialog-closed'}
       >
-        <DialogTitle>{t('users.addUser')}</DialogTitle>
+        <FormDialogHeader
+          title="사용자 추가"
+          description="새로운 사용자 계정을 생성하고 권한을 설정할 수 있습니다."
+        />
         <DialogContent>
           <Box
             component="form"
@@ -708,7 +721,10 @@ const UsersManagementPage: React.FC = () => {
 
       {/* Edit User Dialog */}
       <Dialog open={editUserDialog.open} onClose={() => setEditUserDialog({ open: false, user: null })} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('admin.users.editUser')}</DialogTitle>
+        <FormDialogHeader
+          title="사용자 편집"
+          description="기존 사용자의 정보와 권한을 수정할 수 있습니다."
+        />
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             <Box>

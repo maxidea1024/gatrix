@@ -19,6 +19,7 @@ export interface MessageTemplate {
   name: string;
   type: string;
   isEnabled: boolean;
+  supportsMultiLanguage: boolean;
   defaultMessage: string;
   createdBy?: number;
   updatedBy?: number;
@@ -167,6 +168,7 @@ export class MessageTemplateModel {
           type: data.type,
           defaultMessage: data.defaultMessage || data.default_message || data.content || '',
           isEnabled: data.isEnabled !== undefined ? data.isEnabled : (data.is_enabled !== undefined ? data.is_enabled : true),
+          supportsMultiLanguage: data.supportsMultiLanguage !== undefined ? data.supportsMultiLanguage : false,
           createdBy: data.createdBy || data.created_by,
           updatedBy: data.updatedBy || data.updated_by,
           createdAt: new Date(),
@@ -219,6 +221,7 @@ export class MessageTemplateModel {
             type: data.type,
             defaultMessage: data.defaultMessage || data.default_message || data.content,
             isEnabled: data.isEnabled !== undefined ? data.isEnabled : data.is_enabled,
+            supportsMultiLanguage: data.supportsMultiLanguage !== undefined ? data.supportsMultiLanguage : false,
             updatedBy: data.updatedBy || data.updated_by,
             updatedAt: new Date()
           });

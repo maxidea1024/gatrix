@@ -237,6 +237,7 @@ exports.up = async function() {
       name VARCHAR(191) NOT NULL UNIQUE,
       type ENUM('maintenance', 'general', 'notification', 'email', 'sms', 'push', 'system') NOT NULL DEFAULT 'maintenance',
       isEnabled BOOLEAN NOT NULL DEFAULT TRUE,
+      supportsMultiLanguage BOOLEAN NOT NULL DEFAULT FALSE,
       defaultMessage TEXT NULL,
       subject VARCHAR(500) NULL,
       content TEXT NULL,
