@@ -489,8 +489,8 @@ const WhitelistPage: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <Chip
-                          label={whitelist.isActive ? '활성' : '비활성'}
-                          color={whitelist.isActive ? 'success' : 'default'}
+                          label={whitelist.isEnabled ? '활성' : '비활성'}
+                          color={whitelist.isEnabled ? 'success' : 'default'}
                           size="small"
                         />
                       </TableCell>

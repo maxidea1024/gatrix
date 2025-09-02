@@ -14,7 +14,7 @@ export interface Whitelist {
   createdByEmail?: string;
   createdAt: string;
   updatedAt: string;
-  isActive: boolean;
+  isEnabled: boolean;
 }
 
 export interface CreateWhitelistData {

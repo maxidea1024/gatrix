@@ -74,7 +74,7 @@ export class JobTypeModel {
         displayName: row.displayName,
         description: row.description,
         schemaDefinition: row.schema ? this.parseSchemaDefinition(row.schema) : null,
-        isEnabled: Boolean(row.isActive),
+        isEnabled: Boolean(row.isEnabled),
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
         createdBy: row.createdBy,
@@ -147,7 +147,7 @@ export class JobTypeModel {
         displayName: data.displayName,
         description: data.description || null,
         schema: schemaJson,
-        isActive: data.isEnabled ?? true,
+        isEnabled: data.isEnabled ?? true,
         createdBy: data.createdBy || null
       });
 
@@ -178,7 +178,7 @@ export class JobTypeModel {
         updateData.schema = data.schemaDefinition ? JSON.stringify(data.schemaDefinition) : null;
       }
       if (data.isEnabled !== undefined) {
-        updateData.isActive = data.isEnabled;
+        updateData.isEnabled = data.isEnabled;
       }
       if (data.updatedBy !== undefined) {
         updateData.updatedBy = data.updatedBy;
@@ -234,7 +234,7 @@ export class JobTypeModel {
         displayName: row.displayName,
         description: row.description,
         schemaDefinition: row.schema ? this.parseSchemaDefinition(row.schema) : null,
-        isEnabled: Boolean(row.isActive),
+        isEnabled: Boolean(row.isEnabled),
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
         createdBy: row.createdBy,

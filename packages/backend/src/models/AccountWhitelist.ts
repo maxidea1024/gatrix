@@ -15,7 +15,7 @@ export interface Whitelist {
   updatedAt: Date;
   createdByName?: string;
   createdByEmail?: string;
-  isActive: boolean;
+  isEnabled: boolean;
 }
 
 export interface CreateWhitelistData {
@@ -26,6 +26,7 @@ export interface CreateWhitelistData {
   purpose?: string;
   tags?: string[];
   createdBy: number;
+  isEnabled: boolean;
 }
 
 export interface UpdateWhitelistData {
@@ -35,6 +36,7 @@ export interface UpdateWhitelistData {
   endDate?: Date;
   purpose?: string;
   tags?: string[];
+  isEnabled?: boolean;
 }
 
 export interface WhitelistFilters {
@@ -43,6 +45,7 @@ export interface WhitelistFilters {
   createdBy?: number;
   search?: string;
   tags?: string[];
+  isEnabled?: boolean;
 }
 
 export interface WhitelistListResponse {
@@ -78,6 +81,11 @@ export class WhitelistModel {
       if (filters.createdBy) {
         whereClause += ' AND w.createdBy = ?';
         filterParams.push(filters.createdBy);
+      }
+
+      if (filters.isEnabled) {
+        whereClause += ' AND w.isEnabled = ?';
+        filterParams.push(filters.isEnabled);
       }
 
       if (filters.tags && filters.tags.length > 0) {
@@ -118,7 +126,7 @@ export class WhitelistModel {
           w.updatedAt,
           u.name as createdByName,
           u.email as createdByEmail,
-          1 as isActive
+          w.isEnabled
         FROM g_account_whitelist w
         LEFT JOIN g_users u ON w.createdBy = u.id
         ${whereClause}
@@ -157,7 +165,7 @@ export class WhitelistModel {
           w.updatedAt,
           u.name as createdByName,
           u.email as createdByEmail,
-          1 as isActive
+          w.isEnabled
         FROM g_account_whitelist w
         LEFT JOIN g_users u ON w.createdBy = u.id
         WHERE w.id = ?
@@ -173,7 +181,7 @@ export class WhitelistModel {
   static async create(data: CreateWhitelistData): Promise<Whitelist> {
     try {
       const query = `
-        INSERT INTO g_account_whitelist (accountId, ipAddress, startDate, endDate, purpose, tags, createdBy)
+        INSERT INTO g_account_whitelist (accountId, ipAddress, startDate, endDate, purpose, tags, createdBy, isEnabled)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `;
 
@@ -185,6 +193,7 @@ export class WhitelistModel {
         data.purpose || null,
         data.tags ? JSON.stringify(data.tags) : null,
         data.createdBy,
+        data.isEnabled
       ]);
 
       const created = await this.findById(result.insertId);
@@ -211,6 +220,11 @@ export class WhitelistModel {
       if (data.ipAddress !== undefined) {
         fields.push('ipAddress = ?');
         params.push(data.ipAddress || null);
+      }
+
+      if (data.isEnabled !== undefined) {
+        fields.push('isEnabled = ?');
+        params.push(data.isEnabled || null);
       }
 
       if (data.startDate !== undefined) {
@@ -266,7 +280,7 @@ export class WhitelistModel {
 
       const values = entries.map(() => '(?, ?, ?, ?, ?, ?)').join(', ');
       const query = `
-        INSERT INTO g_account_whitelist (accountId, ipAddress, startDate, endDate, purpose, createdBy)
+        INSERT INTO g_account_whitelist (accountId, ipAddress, startDate, endDate, purpose, createdBy, isEnabled)
         VALUES ${values}
       `;
 
@@ -278,7 +292,8 @@ export class WhitelistModel {
           entry.startDate || null,
           entry.endDate || null,
           entry.purpose || null,
-          entry.createdBy
+          entry.createdBy,
+          entry.isEnabled
         );
       });
 
@@ -318,7 +333,7 @@ export class WhitelistModel {
       updatedAt: new Date(row.updatedAt),
       createdByName: row.createdByName,
       createdByEmail: row.createdByEmail,
-      isActive: Boolean(row.isActive),
+      isEnabled: Boolean(row.isEnabled),
     };
   }
 

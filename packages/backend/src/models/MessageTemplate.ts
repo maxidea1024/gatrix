@@ -51,7 +51,7 @@ export class MessageTemplateModel {
           query.where('mt.type', filters.type);
         }
 
-        // isActive 필터 처리
+        // isEnabled 필터 처리
         // 컨트롤러에서 undefined가 false로 변환되는 문제 때문에
         // false인 경우도 필터를 적용하지 않음 (모든 레코드 조회)
         if (filters?.isEnabled === true) {
