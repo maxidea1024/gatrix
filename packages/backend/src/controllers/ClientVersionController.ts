@@ -125,7 +125,7 @@ export class ClientVersionController {
       });
     }
 
-    console.log('Received filters:', value);
+
 
     const { page, limit, sortBy, sortOrder, _t, ...filterParams } = value;
 
@@ -144,7 +144,7 @@ export class ClientVersionController {
           processedValue = value === 'true';
         }
 
-        console.log(`Setting filter: ${key} = ${processedValue} (${typeof processedValue})`);
+
 
         // 타입 안전하게 할당
         if (key === 'guestModeAllowed') {
@@ -155,7 +155,7 @@ export class ClientVersionController {
       }
     });
 
-    console.log('Final filters passed to service:', filters);
+
 
     const result = await ClientVersionService.getAllClientVersions(filters, pagination);
 

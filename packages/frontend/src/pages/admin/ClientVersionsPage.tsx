@@ -145,7 +145,7 @@ const ClientVersionsPage: React.FC = () => {
     try {
       setLoading(true);
       const filtersToUse = customFilters || filters;
-      console.log('Loading client versions with filters:', filtersToUse);
+
       const result = await ClientVersionService.getClientVersions(
         page + 1,
         rowsPerPage,

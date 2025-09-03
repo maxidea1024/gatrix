@@ -96,11 +96,7 @@ export class ClientVersionModel {
         if (filters?.guestModeAllowed !== undefined) {
           // TINYINT 타입이므로 boolean을 숫자로 변환 (true -> 1, false -> 0)
           const guestModeValue = filters.guestModeAllowed ? 1 : 0;
-          logger.info('Applying guestModeAllowed filter:', filters.guestModeAllowed, '-> DB value:', guestModeValue);
           query.where('cv.guestModeAllowed', guestModeValue);
-
-          // 디버깅: 쿼리 로그
-          logger.info('Query with guestModeAllowed filter:', query.toSQL());
         }
 
         return query;
@@ -132,10 +128,7 @@ export class ClientVersionModel {
 
       const total = countResult?.total || 0;
 
-      // 디버깅: 조회된 데이터의 guestModeAllowed 값들 확인
-      logger.info('Retrieved client versions guestModeAllowed values:',
-        dataResults.map((cv: any) => ({ id: cv.id, guestModeAllowed: cv.guestModeAllowed, type: typeof cv.guestModeAllowed }))
-      );
+
 
       // 각 클라이언트 버전에 대해 태그 정보 로드
       const clientVersionsWithTags = await Promise.all(
@@ -349,7 +342,7 @@ export class ClientVersionModel {
         .where('ta.entityId', clientVersionId)
         .orderBy('t.name');
 
-      logger.info(`Client version ${clientVersionId} has ${tags.length} tags:`, tags);
+
       return tags;
     } catch (error) {
       logger.error('Error getting client version tags:', error);

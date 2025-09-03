@@ -48,10 +48,8 @@ export class ClientVersionService {
     });
 
     // 필터 조건 추가
-    console.log('Processing filters:', filters);
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        console.log(`Adding filter: ${key} = ${value} (${typeof value})`);
         params.append(key, value.toString());
       }
     });
