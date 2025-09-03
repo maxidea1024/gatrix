@@ -472,6 +472,15 @@
     "clearSelection": "Clear Selection",
     "close": "Close",
     "collapse": "Collapse",
+    "color": "Color",
+    "colorPicker": {
+      "apply": "Apply",
+      "cancel": "Cancel",
+      "customColor": "Custom Color",
+      "presetColors": "Preset Colors",
+      "randomColor": "Random Color",
+      "selectColor": "Select Color"
+    },
     "confirm": "Confirm",
     "confirmDelete": "Confirm Delete",
     "copied": "{{type}} \"{{value}}\" copied to clipboard",
@@ -606,7 +615,20 @@
     "updateSuccess": "Successfully updated",
     "updatedBy": "Updated By",
     "view": "View",
-    "year": "Year"
+    "year": "Year",
+    "promoteUser": "Promote User",
+    "demoteUser": "Demote User",
+    "promoteUserConfirm": "Are you sure you want to promote {{name}} to admin?",
+    "demoteUserConfirm": "Are you sure you want to demote {{name}} from admin?",
+    "userPromoted": "User has been promoted to admin",
+    "userDemoted": "User has been demoted from admin",
+    "userPromoteFailed": "Failed to promote user",
+    "userDemoteFailed": "Failed to demote user",
+    "promoteToAdmin": "Promote to Admin",
+    "demoteFromAdmin": "Demote from Admin",
+    "suspend": "Suspend",
+    "activate": "Activate",
+    "suspended": "Suspended"
   },
   "createdAt": "createdAt",
   "dashboard": {
@@ -717,7 +739,7 @@
     }
   },
   "gameWorlds": {
-    "description": "Game world server environment configuration and connection status management",
+    "description": "Description",
     "actions": "Actions",
     "active": "Active",
     "activeWorlds": "Active Worlds",
@@ -729,7 +751,6 @@
     "created": "Created",
     "creator": "Creator",
     "deleteGameWorld": "Delete Game World",
-    "description": "Description",
     "editGameWorld": "Edit Game World",
     "endMaintenance": "End Maintenance",
     "errors": {
@@ -909,7 +930,6 @@
     "name": "Name",
     "noUsersFound": "No users found.",
     "password": "Password",
-    "promoteToAdmin": "Promote to Admin",
     "role": "Role",
     "roles": {
       "admin": "Admin",
@@ -927,8 +947,8 @@
     "userDeleted": "User deleted successfully"
   },
   "whitelist": {
-    "title": "Whitelist Management",
-    "subtitle": "Manage account and IP whitelist entries",
+    "title": "Account Whitelist Management",
+    "subtitle": "Manage account whitelist entries",
     "addEntry": "Add Entry",
     "allowedPeriod": "Allowed Period",
     "anyIp": "Any IP",
@@ -1019,8 +1039,6 @@
     },
     "permanent": "Permanent",
     "searchPlaceholder": "Search by account ID, IP address, memo, or tags...",
-    "subtitle": "Manage account whitelist entries",
-    "title": "Account Whitelist Management",
     "toast": {
       "created": "Whitelist entry created successfully",
       "deleted": "Whitelist entry deleted successfully",

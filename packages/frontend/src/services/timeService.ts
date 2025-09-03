@@ -14,6 +14,7 @@ export interface ServerTimeData {
   ping: number;
   offset: number; // 서버와 클라이언트 시간 차이 (ms)
   uptime: number; // 서버 업타임 (초 단위)
+  uptimeBaseTime: number; // uptime 기준 시간 (timestamp)
 }
 
 class TimeService {
@@ -45,7 +46,8 @@ class TimeService {
         localTime: new Date(currentLocalTime),
         ping,
         offset,
-        uptime
+        uptime,
+        uptimeBaseTime: currentLocalTime
       };
 
       this.currentServerTime = serverTimeData;
@@ -69,6 +71,19 @@ class TimeService {
     const now = Date.now();
     const timeSinceLastSync = now - this.currentServerTime.localTime.getTime();
     return new Date(this.currentServerTime.serverTime.getTime() + timeSinceLastSync);
+  }
+
+  /**
+   * 현재 서버 업타임 반환 (실시간)
+   */
+  getCurrentUptime(): number {
+    if (!this.currentServerTime) {
+      return 0;
+    }
+
+    const now = Date.now();
+    const timeSinceLastSync = (now - this.currentServerTime.uptimeBaseTime) / 1000; // 초 단위
+    return this.currentServerTime.uptime + timeSinceLastSync;
   }
 
   /**

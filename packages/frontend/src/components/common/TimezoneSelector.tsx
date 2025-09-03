@@ -32,6 +32,7 @@ const TimezoneSelector: React.FC = () => {
   const [timezone, setTimezone] = useState<string>(getStoredTimezone());
   const [serverTime, setServerTime] = useState<Date>(new Date());
   const [serverTimeData, setServerTimeData] = useState<ServerTimeData | null>(null);
+  const [currentUptime, setCurrentUptime] = useState<number>(0);
 
   const timezoneOptions = moment.tz.names();
   const open = Boolean(anchorEl);
@@ -47,9 +48,10 @@ const TimezoneSelector: React.FC = () => {
 
     timeService.addListener(handleServerTimeUpdate);
 
-    // 1초마다 현재 서버 시간 업데이트
+    // 1초마다 현재 서버 시간과 업타임 업데이트
     const interval = setInterval(() => {
       setServerTime(timeService.getCurrentServerTime());
+      setCurrentUptime(timeService.getCurrentUptime());
     }, 1000);
 
     return () => {
@@ -193,7 +195,7 @@ const TimezoneSelector: React.FC = () => {
                   {t('common.serverUptime')}
                 </Typography>
                 <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                  {formatUptime(serverTimeData.uptime)}
+                  {formatUptime(currentUptime)}
                 </Typography>
               </Box>
             )}

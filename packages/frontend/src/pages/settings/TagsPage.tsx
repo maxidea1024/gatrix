@@ -6,6 +6,7 @@ import { tagService, Tag, TagListParams } from '@/services/tagService';
 import { useSnackbar } from 'notistack';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
+import { ColorPicker } from '@/components/common/ColorPicker';
 
 const randomHexColor = () => `#${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0')}`;
 
@@ -143,13 +144,34 @@ const TagsPage: React.FC = () => {
             <Tooltip title={newDescription || t('tags.noDescription')} arrow>
               <Chip label={newName || 'label'} sx={{ bgcolor: newColor, color: '#fff', height: 28, cursor: 'help' }} />
             </Tooltip>
-            <TextField label={t('tags.name')} value={newName} onChange={(e)=>setNewName(e.target.value)} sx={{ width: 260 }} />
-            <TextField label={t('tags.description')} value={newDescription} onChange={(e)=>setNewDescription(e.target.value)} sx={{ flex: 1, minWidth: 220 }} />
+            <TextField
+              label={t('tags.name')}
+              value={newName}
+              onChange={(e)=>setNewName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newName.trim()) {
+                  handleCreate();
+                }
+              }}
+              sx={{ width: 260 }}
+            />
+            <TextField
+              label={t('tags.description')}
+              value={newDescription}
+              onChange={(e)=>setNewDescription(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newName.trim()) {
+                  handleCreate();
+                }
+              }}
+              sx={{ flex: 1, minWidth: 220 }}
+            />
             <Stack direction="row" spacing={1} alignItems="center">
-              <Tooltip title={t('common.refresh')}>
-                <IconButton onClick={()=> setNewColor(randomHexColor())} color="success"><RandomIcon /></IconButton>
-              </Tooltip>
-              <TextField type="color" value={newColor} onChange={(e)=>setNewColor(e.target.value)} sx={{ width: 56, p: 0 }} />
+              <ColorPicker
+                value={newColor}
+                onChange={setNewColor}
+                label={t('common.color')}
+              />
               <Typography variant="body2" sx={{ minWidth: 80 }}>{newColor}</Typography>
             </Stack>
             <Stack direction="row" spacing={1}>
@@ -182,6 +204,7 @@ const TagsPage: React.FC = () => {
                 <TableRow>
                   <TableCell>{t('tags.name')}</TableCell>
                   <TableCell>{t('tags.description')}</TableCell>
+                  <TableCell sx={{ width: 100 }}>색상</TableCell>
                   <TableCell>
                     <TableSortLabel active={!!sort?.startsWith('createdAt')} direction={sort?.endsWith('Asc') ? 'asc' : 'desc'} onClick={() => setSort(sort?.startsWith('createdAt') && sort.endsWith('Desc') ? 'createdAtAsc' : 'createdAtDesc')}>
                       {t('common.createdAt')}
@@ -199,7 +222,7 @@ const TagsPage: React.FC = () => {
               <TableBody>
                 {filtered.length === 0 ? (
                   <EmptyTableRow
-                    colSpan={6}
+                    colSpan={7}
                     loading={loading}
                     message={tags.length === 0 ? t('tags.noTagsFound') : t('tags.noMatchingTags')}
                     loadingMessage={t('common.loadingData')}
@@ -217,15 +240,56 @@ const TagsPage: React.FC = () => {
                           </Tooltip>
                         )}
                         {editingId === tag.id && (
-                          <TextField size="small" value={editName} onChange={(e)=>setEditName(e.target.value)} sx={{ maxWidth: 160 }} />
+                          <TextField
+                            size="small"
+                            value={editName}
+                            onChange={(e)=>setEditName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                handleSaveEdit();
+                              }
+                            }}
+                            sx={{ maxWidth: 160 }}
+                          />
                         )}
                       </Stack>
                     </TableCell>
                     <TableCell sx={{ minWidth: 300 }}>
                       {editingId === tag.id ? (
-                        <TextField size="small" value={editDescription} onChange={(e)=>setEditDescription(e.target.value)} fullWidth />
+                        <TextField
+                          size="small"
+                          value={editDescription}
+                          onChange={(e)=>setEditDescription(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              handleSaveEdit();
+                            }
+                          }}
+                          fullWidth
+                        />
                       ) : (
                         <Typography variant="body2" color="text.secondary">{tag.description || '-'}</Typography>
+                      )}
+                    </TableCell>
+                    <TableCell sx={{ width: 100 }}>
+                      {editingId === tag.id ? (
+                        <ColorPicker
+                          value={editColor}
+                          onChange={setEditColor}
+                          label={t('common.color')}
+                          size="small"
+                        />
+                      ) : (
+                        <Box
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            bgcolor: tag.color,
+                            borderRadius: 1,
+                            border: '1px solid',
+                            borderColor: 'divider',
+                          }}
+                        />
                       )}
                     </TableCell>
                     <TableCell sx={{ width: 180 }}>{formatDateTimeDetailed(tag.createdAt || '')}</TableCell>

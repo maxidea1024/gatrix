@@ -114,28 +114,23 @@ export const formatDuration = (milliseconds: number): string => {
 };
 
 /**
- * 서버 업타임을 포맷 (초 단위 입력)
+ * 서버 업타임을 HH:MM:SS 형태로 포맷 (초 단위 입력)
  */
 export const formatUptime = (uptimeSeconds: number): string => {
-  if (uptimeSeconds < 60) {
-    return `${Math.floor(uptimeSeconds)}s`;
+  const totalSeconds = Math.floor(uptimeSeconds);
+
+  const days = Math.floor(totalSeconds / (24 * 3600));
+  const hours = Math.floor((totalSeconds % (24 * 3600)) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  // 24시간 미만인 경우 HH:MM:SS 형태
+  if (days === 0) {
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
 
-  const minutes = Math.floor(uptimeSeconds / 60);
-  const remainingSeconds = Math.floor(uptimeSeconds % 60);
-  if (minutes < 60) {
-    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
-  }
-
-  const hours = Math.floor(minutes / 60);
-  const remainingMinutes = minutes % 60;
-  if (hours < 24) {
-    return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
-  }
-
-  const days = Math.floor(hours / 24);
-  const remainingHours = hours % 24;
-  return remainingHours > 0 ? `${days}d ${remainingHours}h` : `${days}d`;
+  // 24시간 이상인 경우 Dd HH:MM:SS 형태
+  return `${days}d ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 };
 
 /**

@@ -77,12 +77,13 @@ export default class TagModel {
   }
 
   static async create(data: CreateTagData): Promise<TagAttributes> {
-    const [id] = await db('g_tags').insert({
+    const insertData = {
       name: data.name,
       color: data.color || '#607D8B',
       description: data.description || null,
       createdBy: data.createdBy ?? null
-    });
+    };
+    const [id] = await db('g_tags').insert(insertData);
     return (await this.findById(id))!;
   }
 

@@ -515,6 +515,15 @@
     "clearSelection": "선택 지우기",
     "close": "닫기",
     "collapse": "접기",
+    "color": "색상",
+    "colorPicker": {
+      "apply": "적용",
+      "cancel": "취소",
+      "customColor": "커스텀 색상",
+      "presetColors": "미리 정의된 색상",
+      "randomColor": "랜덤 색상",
+      "selectColor": "색상 선택"
+    },
     "confirm": "확인",
     "confirmDelete": "삭제 확인",
     "copied": "{{type}} \"{{value}}\"이(가) 클립보드에 복사되었습니다",
@@ -650,7 +659,20 @@
     "jobNameDuplicate": "이미 존재하는 작업 이름입니다",
     "copySuccess": "{{type}}이(가) 복사되었습니다",
     "copyFailed": "복사에 실패했습니다",
-    "cannotGetTemplateId": "생성된 템플릿 ID를 가져올 수 없습니다"
+    "cannotGetTemplateId": "생성된 템플릿 ID를 가져올 수 없습니다",
+    "promoteUser": "사용자 승격",
+    "demoteUser": "사용자 강등",
+    "promoteUserConfirm": "{{name}} 사용자를 관리자로 승격하시겠습니까?",
+    "demoteUserConfirm": "{{name}} 사용자를 일반 사용자로 강등하시겠습니까?",
+    "userPromoted": "사용자가 관리자로 승격되었습니다",
+    "userDemoted": "사용자가 일반 사용자로 강등되었습니다",
+    "userPromoteFailed": "사용자 승격에 실패했습니다",
+    "userDemoteFailed": "사용자 강등에 실패했습니다",
+    "promoteToAdmin": "관리자로 승격",
+    "demoteFromAdmin": "관리자에서 강등",
+    "suspend": "정지",
+    "activate": "활성화",
+    "suspended": "정지됨"
   },
   "createdAt": "생성일",
   "dashboard": {
@@ -1023,7 +1045,6 @@
     "name": "이름",
     "noUsersFound": "등록된 사용자가 없습니다.",
     "password": "비밀번호",
-    "promoteToAdmin": "관리자로 승격",
     "role": "역할",
     "roles": {
       "admin": "관리자",

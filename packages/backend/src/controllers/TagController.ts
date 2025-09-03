@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { TagService } from '../services/TagService';
 import { asyncHandler, CustomError } from '../middleware/errorHandler';
-import { AuthenticatedRequest } from '../types/auth';
+import { AuthenticatedRequest } from '../middleware/auth';
 
 export const TagController = {
   list: asyncHandler(async (req: Request, res: Response) => {
@@ -24,7 +24,7 @@ export const TagController = {
 
   create: asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { name, color, description } = req.body;
-    const tag = await TagService.create({ name, color, description }, req.user?.id);
+    const tag = await TagService.create({ name, color, description }, req.user?.userId);
     res.json({ success: true, data: { tag }, message: 'Tag created' });
   }),
 
@@ -32,7 +32,7 @@ export const TagController = {
     const id = parseInt(req.params.id);
     if (isNaN(id)) throw new CustomError('Invalid tag ID', 400);
     const { name, color, description } = req.body;
-    const tag = await TagService.update(id, { name, color, description }, req.user?.id);
+    const tag = await TagService.update(id, { name, color, description }, req.user?.userId);
     res.json({ success: true, data: { tag }, message: 'Tag updated' });
   }),
 
@@ -48,7 +48,7 @@ export const TagController = {
     if (!entityType || !entityId || !Array.isArray(tagIds)) {
       throw new CustomError('Invalid payload', 400);
     }
-    await TagService.setTagsForEntity(entityType, Number(entityId), tagIds.map(Number), req.user?.id);
+    await TagService.setTagsForEntity(entityType, Number(entityId), tagIds.map(Number), req.user?.userId);
     res.json({ success: true, message: 'Tags set for entity' });
   }),
 

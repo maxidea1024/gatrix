@@ -476,6 +476,15 @@
     "clearSelection": "清除选择",
     "close": "关闭",
     "collapse": "折叠",
+    "color": "颜色",
+    "colorPicker": {
+      "apply": "应用",
+      "cancel": "取消",
+      "customColor": "自定义颜色",
+      "presetColors": "预设颜色",
+      "randomColor": "随机颜色",
+      "selectColor": "选择颜色"
+    },
     "confirm": "确认",
     "confirmDelete": "确认删除",
     "copied": "{{type}} \"{{value}}\" 已复制到剪贴板",
@@ -599,18 +608,24 @@
     "creating": "创建中...",
     "disable": "禁用",
     "enable": "启用",
-    "import": "导入",
-    "lastModified": "最后修改",
-    "noData": "无数据",
-    "page": "页面",
-    "selectAll": "全选",
     "start": "开始",
     "time": "时间",
     "total": "总计",
     "updateSuccess": "更新成功",
-    "updatedBy": "更新者",
-    "view": "查看",
-    "year": "年"
+    "year": "年",
+    "promoteUser": "提升用户",
+    "demoteUser": "降级用户",
+    "promoteUserConfirm": "确定要将 {{name}} 提升为管理员吗？",
+    "demoteUserConfirm": "确定要将 {{name}} 从管理员降级吗？",
+    "userPromoted": "用户已提升为管理员",
+    "userDemoted": "用户已从管理员降级",
+    "userPromoteFailed": "提升用户失败",
+    "userDemoteFailed": "降级用户失败",
+    "promoteToAdmin": "提升为管理员",
+    "demoteFromAdmin": "从管理员降级",
+    "suspend": "暂停",
+    "activate": "激活",
+    "suspended": "已暂停"
   },
   "createdAt": "创建时间",
   "dashboard": {
@@ -722,7 +737,7 @@
     }
   },
   "gameWorlds": {
-    "description": "游戏世界服务器环境配置及连接状态管理",
+    "description": "描述",
     "actions": "操作",
     "active": "活跃",
     "activeWorlds": "活跃世界",
@@ -734,7 +749,6 @@
     "created": "创建时间",
     "creator": "创建者",
     "deleteGameWorld": "删除游戏世界",
-    "description": "描述",
     "editGameWorld": "编辑游戏世界",
     "endMaintenance": "结束维护",
     "errors": {
@@ -906,7 +920,6 @@
     "lastLogin": "最后登录",
     "name": "姓名",
     "password": "密码",
-    "promoteToAdmin": "提升为管理员",
     "role": "角色",
     "roles": {
       "admin": "管理员",
@@ -924,15 +937,15 @@
     "userDeleted": "用户删除成功"
   },
   "whitelist": {
-    "title": "白名单管理",
-    "subtitle": "管理账户和IP白名单条目",
+    "title": "账户白名单管理",
+    "subtitle": "管理账户白名单条目",
     "addEntry": "添加条目",
     "allowedPeriod": "允许期间",
     "anyIp": "任意IP",
     "bulkImport": "批量导入",
     "copyAccountId": "复制账户ID",
     "copyIpAddress": "复制IP地址",
-    "noEntries": "没有找到账户白名单条目。",
+    "noEntries": "没有账户白名单条目",
     "tabs": {
       "overview": "概览",
       "account": "账户白名单",
@@ -1010,11 +1023,8 @@
       "tagsPlaceholder": "用逗号分隔输入标签",
       "startDateOpt": "开始日期（可选）"
     },
-    "noEntries": "没有账户白名单条目",
     "permanent": "永久",
     "searchPlaceholder": "按账户ID、IP地址、备注或标签搜索...",
-    "subtitle": "管理账户白名单条目",
-    "title": "账户白名单管理",
     "toast": {
       "created": "白名单条目创建成功",
       "deleted": "白名单条目删除成功",

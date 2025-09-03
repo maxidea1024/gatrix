@@ -29,6 +29,9 @@ import {
   DialogContent,
   DialogActions,
   LinearProgress,
+  Menu,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -95,6 +98,8 @@ const UsersManagementPage: React.FC = () => {
   });
 
   const [addUserDialog, setAddUserDialog] = useState(false);
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [newUserData, setNewUserData] = useState({
     name: '',
@@ -171,6 +176,7 @@ const UsersManagementPage: React.FC = () => {
         } catch (error: any) {
           enqueueSnackbar(error.message || t('common.userSuspendFailed'), { variant: 'error' });
         }
+        setConfirmDialog(prev => ({ ...prev, open: false }));
       },
     });
   };
@@ -188,11 +194,82 @@ const UsersManagementPage: React.FC = () => {
         } catch (error: any) {
           enqueueSnackbar(error.message || t('common.userActivateFailed'), { variant: 'error' });
         }
+        setConfirmDialog(prev => ({ ...prev, open: false }));
       },
     });
   };
 
+  const handlePromoteUser = (user: User) => {
+    setConfirmDialog({
+      open: true,
+      title: t('common.promoteUser'),
+      message: t('common.promoteUserConfirm', { name: user.name }),
+      action: async () => {
+        try {
+          await apiService.post(`/admin/users/${user.id}/promote`);
+          enqueueSnackbar(t('common.userPromoted'), { variant: 'success' });
+          fetchUsers();
+        } catch (error: any) {
+          enqueueSnackbar(error.message || t('common.userPromoteFailed'), { variant: 'error' });
+        }
+        setConfirmDialog(prev => ({ ...prev, open: false }));
+      },
+    });
+  };
 
+  const handleDemoteUser = (user: User) => {
+    setConfirmDialog({
+      open: true,
+      title: t('common.demoteUser'),
+      message: t('common.demoteUserConfirm', { name: user.name }),
+      action: async () => {
+        try {
+          await apiService.post(`/admin/users/${user.id}/demote`);
+          enqueueSnackbar(t('common.userDemoted'), { variant: 'success' });
+          fetchUsers();
+        } catch (error: any) {
+          enqueueSnackbar(error.message || t('common.userDemoteFailed'), { variant: 'error' });
+        }
+        setConfirmDialog(prev => ({ ...prev, open: false }));
+      },
+    });
+  };
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, user: User) => {
+    setMenuAnchorEl(event.currentTarget);
+    setSelectedUser(user);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    setSelectedUser(null);
+  };
+
+  const handleMenuAction = (action: string) => {
+    if (!selectedUser) return;
+
+    switch (action) {
+      case 'edit':
+        handleEditUser(selectedUser);
+        break;
+      case 'suspend':
+        handleSuspendUser(selectedUser);
+        break;
+      case 'activate':
+        handleActivateUser(selectedUser);
+        break;
+      case 'promote':
+        handlePromoteUser(selectedUser);
+        break;
+      case 'demote':
+        handleDemoteUser(selectedUser);
+        break;
+      case 'delete':
+        handleDeleteUser(selectedUser);
+        break;
+    }
+    handleMenuClose();
+  };
 
   const handleEditUser = (user: User) => {
     setEditUserData({
@@ -513,46 +590,13 @@ const UsersManagementPage: React.FC = () => {
                       )}
                     </TableCell>
                     <TableCell align="center">
-                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                        <IconButton
-                          onClick={() => handleEditUser(user)}
-                          size="small"
-                          color="primary"
-                          title={t('admin.users.editTooltip')}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                        {user.status === 'active' ? (
-                          <IconButton
-                            onClick={() => handleSuspendUser(user)}
-                            size="small"
-                            color="warning"
-                            title={t('admin.users.suspendTooltip')}
-                            disabled={isCurrentUser(user)}
-                          >
-                            <BlockIcon />
-                          </IconButton>
-                        ) : (
-                          <IconButton
-                            onClick={() => handleActivateUser(user)}
-                            size="small"
-                            color="success"
-                            title={t('admin.users.activateTooltip')}
-                            disabled={isCurrentUser(user)}
-                          >
-                            <CheckCircleIcon />
-                          </IconButton>
-                        )}
-                        <IconButton
-                          onClick={() => handleDeleteUser(user)}
-                          size="small"
-                          color="error"
-                          title={t('admin.users.deleteTooltip')}
-                          disabled={isCurrentUser(user)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Box>
+                      <IconButton
+                        onClick={(event) => handleMenuOpen(event, user)}
+                        size="small"
+                        title={t('common.actions')}
+                      >
+                        <MoreVertIcon />
+                      </IconButton>
                     </TableCell>
                   </TableRow>
                   ))
@@ -575,7 +619,81 @@ const UsersManagementPage: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Actions Menu */}
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={handleMenuClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        <MenuItem onClick={() => handleMenuAction('edit')}>
+          <ListItemIcon>
+            <EditIcon />
+          </ListItemIcon>
+          <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
 
+        {selectedUser?.status === 'active' ? (
+          <MenuItem
+            onClick={() => handleMenuAction('suspend')}
+            disabled={isCurrentUser(selectedUser)}
+          >
+            <ListItemIcon>
+              <BlockIcon />
+            </ListItemIcon>
+            <ListItemText>{t('common.suspend')}</ListItemText>
+          </MenuItem>
+        ) : (
+          <MenuItem
+            onClick={() => handleMenuAction('activate')}
+            disabled={isCurrentUser(selectedUser)}
+          >
+            <ListItemIcon>
+              <CheckCircleIcon />
+            </ListItemIcon>
+            <ListItemText>{t('common.activate')}</ListItemText>
+          </MenuItem>
+        )}
+
+        {selectedUser?.role === 'user' && selectedUser?.status === 'active' && (
+          <MenuItem onClick={() => handleMenuAction('promote')}>
+            <ListItemIcon>
+              <SecurityIcon />
+            </ListItemIcon>
+            <ListItemText>{t('common.promoteToAdmin')}</ListItemText>
+          </MenuItem>
+        )}
+
+        {selectedUser?.role === 'admin' && (
+          <MenuItem
+            onClick={() => handleMenuAction('demote')}
+            disabled={isCurrentUser(selectedUser)}
+          >
+            <ListItemIcon>
+              <PersonIcon />
+            </ListItemIcon>
+            <ListItemText>{t('common.demoteFromAdmin')}</ListItemText>
+          </MenuItem>
+        )}
+
+        <MenuItem
+          onClick={() => handleMenuAction('delete')}
+          disabled={isCurrentUser(selectedUser)}
+          sx={{ color: 'error.main' }}
+        >
+          <ListItemIcon sx={{ color: 'inherit' }}>
+            <DeleteIcon />
+          </ListItemIcon>
+          <ListItemText>{t('common.delete')}</ListItemText>
+        </MenuItem>
+      </Menu>
 
       {/* Add User Dialog */}
       <Dialog
