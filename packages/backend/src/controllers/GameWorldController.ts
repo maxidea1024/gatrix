@@ -132,7 +132,7 @@ export class GameWorldController {
 
     const world = await GameWorldService.createGameWorld(worldData);
     if (Array.isArray(tagIds)) {
-      await TagService.setTagsForEntity('game_world', world.id, tagIds);
+      await TagService.setTagsForEntity('game_world', world.id, tagIds, req.user!.userId);
     }
     const tags = await TagService.listTagsForEntity('game_world', world.id);
 
@@ -166,7 +166,7 @@ export class GameWorldController {
 
     const world = await GameWorldService.updateGameWorld(id, updateData);
     if (Array.isArray(tagIds)) {
-      await TagService.setTagsForEntity('game_world', id, tagIds);
+      await TagService.setTagsForEntity('game_world', id, tagIds, req.user!.userId);
     }
     const tags = await TagService.listTagsForEntity('game_world', id);
 

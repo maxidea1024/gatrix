@@ -1,7 +1,4 @@
 {
-  "T": "T",
-  "_": " ",
-  "a": "a",
   "accountSuspended": {
     "additionalInfo": "additionalInfo",
     "backToLogin": "backToLogin",
@@ -11,16 +8,17 @@
   },
   "admin": {
     "dashboard": {
-      "avgResponseTime": "avgResponseTime",
-      "errorRate": "errorRate",
-      "recentActivities": "recentActivities",
-      "serverUptime": "serverUptime",
+      "avgResponseTime": "Average Response Time",
+      "errorRate": "Error Rate",
+      "recentActivities": "Recent Activities",
+      "serverUptime": "Server Uptime",
       "subtitle": "Manage your admin panel and monitor system activity",
-      "systemPerformance": "systemPerformance",
+      "systemPerformance": "System Performance",
       "title": "Admin Dashboard",
-      "totalSessions": "totalSessions"
+      "totalSessions": "Total Sessions"
     },
     "maintenance": {
+      "description": "Manage system maintenance status and configure maintenance messages and schedules.",
       "applyEndsAt": "Apply ends at",
       "confirmStartMessage": "Type \"start maintenance\" to confirm starting maintenance mode.",
       "confirmStartTitle": "Confirm maintenance start",
@@ -75,7 +73,19 @@
       "suspend": "Suspend",
       "title": "User Management",
       "updateError": "Failed to update user",
-      "userUpdated": "User updated successfully"
+      "userUpdated": "User updated successfully",
+      "verified": "Verified",
+      "unverified": "Unverified",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "editTooltip": "Edit",
+      "suspendTooltip": "Suspend",
+      "activateTooltip": "Activate",
+      "deleteTooltip": "Delete",
+      "addUserDialogTitle": "Add User",
+      "addUserDialogDescription": "Create a new user account and set permissions.",
+      "editUserDialogTitle": "Edit User",
+      "editUserDialogDescription": "Modify existing user information and permissions."
     },
     "gameWorlds": {
       "title": "Game Worlds"
@@ -349,6 +359,7 @@
   "clientStatus": "clientStatus",
   "clientVersion": "clientVersion",
   "clientVersions": {
+    "description": "Manage game client versions and configure server addresses and update settings.",
     "addNew": "Add New Version",
     "addIndividual": "Add Individual Version",
     "addBulk": "Quick Add",
@@ -401,6 +412,7 @@
       "patchAddressRequired": "Patch address is required",
       "platformHelp": "Select the target platform (pc, pc-wegame, ios, android, harmonyos)",
       "platformRequired": "Platform is required",
+      "selectPlatforms": "Select Platforms",
       "serverAddresses": "Server Addresses",
       "serverAddressesDescription": "Configure game server and patch server addresses.",
       "statusHelp": "Specify the status of the game. (Online, Offline, Recommended Update, Forced Update, Under Review, Blocked & Patch Allowed)",
@@ -529,6 +541,7 @@
     "timestamp": "Timestamp",
     "timezone": "Timezone",
     "serverTime": "Server Time",
+    "serverUptime": "Server Uptime",
     "currentLocalTime": "Current Local Time",
     "selectTimezone": "Select Timezone",
     "searchTimezone": "Search timezone...",
@@ -578,8 +591,22 @@
     "jobSaveFailed": "Failed to save job",
     "jobNameDuplicate": "Job name already exists",
     "copySuccess": "{{type}} has been copied",
-    "copyFailed": "Failed to copy",
-    "cannotGetTemplateId": "Cannot get created template ID"
+    "cannotGetTemplateId": "Cannot get created template ID",
+    "creating": "Creating...",
+    "disable": "Disable",
+    "enable": "Enable",
+    "import": "Import",
+    "lastModified": "Last Modified",
+    "noData": "No Data",
+    "page": "Page",
+    "selectAll": "Select All",
+    "start": "Start",
+    "time": "Time",
+    "total": "Total",
+    "updateSuccess": "Successfully updated",
+    "updatedBy": "Updated By",
+    "view": "View",
+    "year": "Year"
   },
   "createdAt": "createdAt",
   "dashboard": {
@@ -629,6 +656,8 @@
   },
   "jobs": {
     "title": "Job Management",
+    "description": "Create and manage scheduled jobs, monitor job execution status and history.",
+    "monitorDescription": "Monitor job queue status in real-time and view running or pending jobs.",
     "addJob": "Add Job",
     "editJob": "Edit Job",
     "noJobsFound": "No jobs found.",
@@ -663,7 +692,6 @@
     "noConfigurationRequired": "No configuration required",
     "jsonFormatHint": "Enter in JSON format",
     "getRequestNoBody": "Request body is not allowed for GET requests",
-    "noJobsFound": "No jobs found",
     "status": {
       "pending": "Pending",
       "running": "Running",
@@ -689,6 +717,7 @@
     }
   },
   "gameWorlds": {
+    "description": "Manage game world servers and configure server status and connection settings.",
     "actions": "Actions",
     "active": "Active",
     "activeWorlds": "Active Worlds",
@@ -873,6 +902,8 @@
     "deleteError": "Failed to delete user",
     "demoteToUser": "Demote to User",
     "email": "Email",
+    "emailVerified": "Email Verified",
+    "createdBy": "Created By",
     "joinDate": "Join Date",
     "lastLogin": "Last Login",
     "name": "Name",
@@ -967,6 +998,7 @@
     "form": {
       "anyIpPlaceholder": "Leave empty for any IP",
       "endDateOpt": "End Date (Optional)",
+      "ipAddress": "IP Address",
       "ipAddressOpt": "IP Address (Optional)",
       "memoOpt": "Memo (Optional)",
       "memoPlaceholder": "Additional notes...",
@@ -985,7 +1017,6 @@
       "tagsPlaceholder": "Enter tags separated by commas",
       "startDateOpt": "Start Date (Optional)"
     },
-    "noEntries": "No account whitelist entries found",
     "permanent": "Permanent",
     "searchPlaceholder": "Search by account ID, IP address, memo, or tags...",
     "subtitle": "Manage account whitelist entries",
@@ -1002,7 +1033,6 @@
     "searchPlaceholder": "Search by IP address, purpose, or memo...",
     "bulkImport": "Bulk Import",
     "addEntry": "Add IP Entry",
-    "noEntries": "No IP whitelist entries found.",
     "ipAddress": "IP Address",
     "purpose": "Purpose",
     "period": "Period",

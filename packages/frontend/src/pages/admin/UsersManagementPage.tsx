@@ -460,14 +460,14 @@ const UsersManagementPage: React.FC = () => {
                     <TableCell align="center">
                       {user.emailVerified ? (
                         <Chip
-                          label="인증됨"
+                          label={t('admin.users.verified')}
                           color="success"
                           size="small"
                           variant="outlined"
                         />
                       ) : (
                         <Chip
-                          label="미인증"
+                          label={t('admin.users.unverified')}
                           color="warning"
                           size="small"
                           variant="outlined"
@@ -518,7 +518,7 @@ const UsersManagementPage: React.FC = () => {
                           onClick={() => handleEditUser(user)}
                           size="small"
                           color="primary"
-                          title="편집"
+                          title={t('admin.users.editTooltip')}
                         >
                           <EditIcon />
                         </IconButton>
@@ -527,7 +527,7 @@ const UsersManagementPage: React.FC = () => {
                             onClick={() => handleSuspendUser(user)}
                             size="small"
                             color="warning"
-                            title="정지"
+                            title={t('admin.users.suspendTooltip')}
                             disabled={isCurrentUser(user)}
                           >
                             <BlockIcon />
@@ -537,7 +537,7 @@ const UsersManagementPage: React.FC = () => {
                             onClick={() => handleActivateUser(user)}
                             size="small"
                             color="success"
-                            title="활성화"
+                            title={t('admin.users.activateTooltip')}
                             disabled={isCurrentUser(user)}
                           >
                             <CheckCircleIcon />
@@ -547,7 +547,7 @@ const UsersManagementPage: React.FC = () => {
                           onClick={() => handleDeleteUser(user)}
                           size="small"
                           color="error"
-                          title="삭제"
+                          title={t('admin.users.deleteTooltip')}
                           disabled={isCurrentUser(user)}
                         >
                           <DeleteIcon />
@@ -586,8 +586,8 @@ const UsersManagementPage: React.FC = () => {
         key={addUserDialog ? 'add-user-dialog-open' : 'add-user-dialog-closed'}
       >
         <FormDialogHeader
-          title="사용자 추가"
-          description="새로운 사용자 계정을 생성하고 권한을 설정할 수 있습니다."
+          title={t('admin.users.addUserDialogTitle')}
+          description={t('admin.users.addUserDialogDescription')}
         />
         <DialogContent>
           <Box
@@ -641,7 +641,7 @@ const UsersManagementPage: React.FC = () => {
                         onClick={() => setShowPassword(!showPassword)}
                         edge="end"
                         size="small"
-                        aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 보기'}
+                        aria-label={showPassword ? t('admin.users.hidePassword') : t('admin.users.showPassword')}
                       >
                         {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                       </IconButton>
@@ -671,7 +671,7 @@ const UsersManagementPage: React.FC = () => {
             {t('common.cancel')}
           </Button>
           <Button onClick={handleCreateUser} variant="contained" startIcon={<AddIcon />}>
-            사용자 추가
+            {t('admin.users.addUser')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -743,8 +743,8 @@ const UsersManagementPage: React.FC = () => {
       {/* Edit User Dialog */}
       <Dialog open={editUserDialog.open} onClose={() => setEditUserDialog({ open: false, user: null })} maxWidth="sm" fullWidth>
         <FormDialogHeader
-          title="사용자 편집"
-          description="기존 사용자의 정보와 권한을 수정할 수 있습니다."
+          title={t('admin.users.editUserDialogTitle')}
+          description={t('admin.users.editUserDialogDescription')}
         />
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>

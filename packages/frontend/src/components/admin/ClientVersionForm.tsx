@@ -307,7 +307,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
       // 태그 설정
       if (selectedTags && selectedTags.length > 0) {
-        await ClientVersionService.setTags(clientVersionId, selectedTags.map(tag => tag.id));
+        const tagIds = selectedTags.map(tag => tag.id);
+        await ClientVersionService.setTags(clientVersionId, tagIds);
       } else {
         // 태그가 없으면 기존 태그 모두 제거
         await ClientVersionService.setTags(clientVersionId, []);
@@ -367,7 +368,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
           <Stack spacing={3} sx={{ mt: 1 }}>
             {/* 기본 정보 섹션 */}
-            <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200' }}>
+            <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
               <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                 📋 {t('clientVersions.form.basicInfo')}
               </Typography>
@@ -462,7 +463,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             </Paper>
 
             {/* 서버 주소 섹션 */}
-            <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200' }}>
+            <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
               <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                 🌐 {t('clientVersions.form.serverAddresses')}
               </Typography>
@@ -567,7 +568,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             </Paper>
 
             {/* 추가 설정 섹션 */}
-            <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200' }}>
+            <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
               <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                 ⚙️ {t('clientVersions.form.additionalSettings')}
               </Typography>
@@ -659,11 +660,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                 {/* 태그 선택 */}
                 <TextField
                   select
+                  multiple
                   label={t('common.tags')}
-                  value={selectedTags.map(tag => tag.id.toString())}
+                  value={selectedTags.map(tag => tag.id)}
                   onChange={(e) => {
                     const selectedIds = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
-                    const newSelectedTags = allTags.filter(tag => selectedIds.includes(tag.id.toString()));
+                    const newSelectedTags = allTags.filter(tag => selectedIds.includes(tag.id));
                     setSelectedTags(newSelectedTags);
                     setValue('tags', newSelectedTags);
                   }}

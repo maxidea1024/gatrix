@@ -23,6 +23,7 @@ import {
   Stack,
   Divider,
 } from '@mui/material';
+import { Cancel as CancelIcon, Add as AddIcon } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -282,7 +283,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
         <DialogContent dividers>
           <Stack spacing={3} sx={{ mt: 1 }}>
             {/* 기본 정보 섹션 */}
-            <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200' }}>
+            <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
               <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                 📋 {t('clientVersions.form.basicInfo')}
               </Typography>
@@ -381,7 +382,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
             </Paper>
 
             {/* 추가 설정 섹션 */}
-            <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200' }}>
+            <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
               <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                 ⚙️ {t('clientVersions.form.additionalSettings')}
               </Typography>
@@ -451,7 +452,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
 
             {/* 플랫폼별 서버 주소 설정 */}
             {selectedPlatforms.length > 0 && (
-              <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200' }}>
+              <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
                 <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                   🌐 {t('clientVersions.form.serverAddresses')}
                 </Typography>
@@ -461,7 +462,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
 
                 <Stack spacing={3}>
                   {selectedPlatforms.map((platform, index) => (
-                    <Paper key={platform} elevation={1} sx={{ p: 2, bgcolor: 'white' }}>
+                    <Paper key={platform} elevation={1} sx={{ p: 2, bgcolor: 'background.paper' }}>
                       <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600, color: 'primary.main', display: 'flex', alignItems: 'center', gap: 1 }}>
                         📱 {platform.toUpperCase()}
                       </Typography>
@@ -566,7 +567,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
             )}
 
             {/* 태그 선택 섹션 */}
-            <Paper elevation={0} sx={{ p: 2, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200' }}>
+            <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
               <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                 🏷️ {t('common.tags')}
               </Typography>
@@ -622,13 +623,14 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={handleClose} disabled={loading}>
+          <Button onClick={handleClose} disabled={loading} startIcon={<CancelIcon />}>
             {t('common.cancel')}
           </Button>
           <Button
             type="submit"
             variant="contained"
             disabled={loading || isSubmitting}
+            startIcon={<AddIcon />}
           >
             {loading ? t('clientVersions.creating') : t('clientVersions.bulkCreate')}
           </Button>

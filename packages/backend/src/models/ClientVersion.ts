@@ -306,7 +306,7 @@ export class ClientVersionModel {
   }
 
   // 태그 관련 메서드들
-  static async setTags(clientVersionId: number, tagIds: number[]): Promise<void> {
+  static async setTags(clientVersionId: number, tagIds: number[], createdBy?: number): Promise<void> {
     try {
       logger.info(`Setting tags for client version ${clientVersionId}:`, tagIds);
 
@@ -325,6 +325,7 @@ export class ClientVersionModel {
             entityType: 'client_version',
             entityId: clientVersionId,
             tagId: tagId,
+            createdBy: createdBy || 1,
             createdAt: new Date()
           }));
 

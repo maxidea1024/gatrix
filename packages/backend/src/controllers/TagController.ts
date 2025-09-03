@@ -43,12 +43,12 @@ export const TagController = {
     res.json({ success: true, message: 'Tag deleted' });
   }),
 
-  setForEntity: asyncHandler(async (req: Request, res: Response) => {
+  setForEntity: asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { entityType, entityId, tagIds } = req.body;
     if (!entityType || !entityId || !Array.isArray(tagIds)) {
       throw new CustomError('Invalid payload', 400);
     }
-    await TagService.setTagsForEntity(entityType, Number(entityId), tagIds.map(Number));
+    await TagService.setTagsForEntity(entityType, Number(entityId), tagIds.map(Number), req.user?.userId);
     res.json({ success: true, message: 'Tags set for entity' });
   }),
 

@@ -170,7 +170,7 @@ const AppContent: React.FC = () => {
           <CssBaseline />
           <SnackbarProvider
             maxSnack={3}
-            autoHideDuration={4000}
+            autoHideDuration={3000}
             anchorOrigin={{
               vertical: 'bottom',
               horizontal: 'center',
@@ -257,12 +257,12 @@ const AppContent: React.FC = () => {
             </Router>
             <ToastContainer
               position="bottom-right"
-              autoClose={5000}
+              autoClose={3000}
               hideProgressBar={false}
               newestOnTop={false}
               closeOnClick
               rtl={false}
-              pauseOnFocusLoss
+              // pauseOnFocusLoss
               draggable
               pauseOnHover
             />

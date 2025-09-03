@@ -275,6 +275,7 @@ export class JobModel {
           entityType: 'job',
           entityId: insertId,
           tagId: tagId,
+          createdBy: jobData.createdBy || 1,
           createdAt: new Date()
         }));
         await trx('g_tag_assignments').insert(tagAssignments);
@@ -357,7 +358,7 @@ export class JobModel {
   }
 
   // 태그 관련 메서드들
-  static async setTags(jobId: number, tagIds: number[]): Promise<void> {
+  static async setTags(jobId: number, tagIds: number[], createdBy?: number): Promise<void> {
     try {
       await db.transaction(async (trx) => {
         // 기존 태그 할당 삭제
@@ -372,6 +373,7 @@ export class JobModel {
             entityType: 'job',
             entityId: jobId,
             tagId: tagId,
+            createdBy: createdBy || 1,
             createdAt: new Date()
           }));
           await trx('g_tag_assignments').insert(assignments);

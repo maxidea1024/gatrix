@@ -21,7 +21,8 @@ export class ClientVersionService {
   static async getAvailableVersions(): Promise<string[]> {
     try {
       const response = await apiService.get(`${this.BASE_URL}/meta/versions`);
-      return response.data.data || [];
+      // apiService.get()이 이미 response.data를 반환하므로 response.data가 실제 데이터
+      return response.data || [];
     } catch (error) {
       console.error('Error getting available versions:', error);
       throw error;

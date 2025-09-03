@@ -123,18 +123,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Server time
-app.get('/time', (req, res) => {
-  const clientLocalTime = req.query.clientLocalTime ? Number.parseInt(req.query.clientLocalTime as string) : 0;
-
-  res.status(200).json({
-    success: true,
-    serverLocalTimeISO: new Date().toISOString(),
-    serverLocalTime: new Date().getTime(),
-    clientLocalTime,
-  });
-});
-
 // Swagger API documentation
 if (config.nodeEnv !== 'production') {
   const swaggerOptions = {
@@ -174,12 +162,14 @@ app.get('/time', (req, res) => {
     const serverLocalTime = Date.now();
     const serverLocalTimeISO = new Date(serverLocalTime).toISOString();
     const clientLocalTime = parseInt(req.query.clientLocalTime as string) || 0;
+    const uptime = process.uptime(); // 서버 업타임 (초 단위)
 
     res.json({
       success: true,
       serverLocalTimeISO,
       serverLocalTime,
-      clientLocalTime
+      clientLocalTime,
+      uptime
     });
   } catch (error) {
     res.status(500).json({

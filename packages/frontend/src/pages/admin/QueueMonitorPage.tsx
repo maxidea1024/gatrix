@@ -32,9 +32,14 @@ const QueueMonitorPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" sx={{ fontWeight: 600, mb: 3 }}>
-        {t('jobs.monitor')}
-      </Typography>
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
+          {t('jobs.monitor')}
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          {t('jobs.monitorDescription')}
+        </Typography>
+      </Box>
 
       <Card>
         <CardContent sx={{ p: 0, position: 'relative', height: 'calc(100vh - 200px)' }}>

@@ -9,7 +9,7 @@ export interface TagAssignment {
 }
 
 export default class TagAssignmentModel {
-  static async setTagsForEntity(entityType: string, entityId: number, tagIds: number[]): Promise<void> {
+  static async setTagsForEntity(entityType: string, entityId: number, tagIds: number[], createdBy?: number): Promise<void> {
     await db.transaction(async (trx) => {
       await trx('g_tag_assignments')
         .where('entityType', entityType)
@@ -20,7 +20,8 @@ export default class TagAssignmentModel {
         const insertData = tagIds.map(tagId => ({
           tagId,
           entityType,
-          entityId
+          entityId,
+          createdBy: createdBy || 1 // 기본값으로 1 사용 (시스템 사용자)
         }));
         await trx('g_tag_assignments').insert(insertData);
       }

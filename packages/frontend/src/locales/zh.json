@@ -21,6 +21,7 @@
       "totalSessions": "总会话数"
     },
     "maintenance": {
+      "description": "管理系统维护状态，设置维护消息和时间安排。",
       "applyEndsAt": "应用结束时间",
       "confirmStartMessage": "请输入 \"start maintenance\" 来开始维护。",
       "confirmStartTitle": "确认开始维护",
@@ -75,7 +76,19 @@
       "suspend": "暂停",
       "title": "用户管理",
       "updateError": "更新用户失败",
-      "userUpdated": "用户更新成功"
+      "userUpdated": "用户更新成功",
+      "verified": "已验证",
+      "unverified": "未验证",
+      "showPassword": "显示密码",
+      "hidePassword": "隐藏密码",
+      "editTooltip": "编辑",
+      "suspendTooltip": "暂停",
+      "activateTooltip": "激活",
+      "deleteTooltip": "删除",
+      "addUserDialogTitle": "添加用户",
+      "addUserDialogDescription": "创建新用户账户并设置权限。",
+      "editUserDialogTitle": "编辑用户",
+      "editUserDialogDescription": "修改现有用户信息和权限。"
     },
     "gameWorlds": {
       "title": "游戏世界"
@@ -350,6 +363,7 @@
   "clientStatus": "客户端状态",
   "clientVersion": "客户端版本",
   "clientVersions": {
+    "description": "管理游戏客户端版本，配置服务器地址和更新设置。",
     "addNew": "添加新版本",
     "addIndividual": "添加单个版本",
     "addBulk": "快速添加",
@@ -402,6 +416,7 @@
       "patchAddressRequired": "补丁地址必填",
       "platformHelp": "请选择目标平台 (pc, pc-wegame, ios, android, harmonyos)",
       "platformRequired": "平台必填",
+      "selectPlatforms": "选择平台",
       "serverAddresses": "服务器地址",
       "serverAddressesDescription": "配置游戏服务器和补丁服务器地址。",
       "statusHelp": "请选择状态",
@@ -523,6 +538,7 @@
     "timestamp": "时间戳",
     "timezone": "时区",
     "serverTime": "服务器时间",
+    "serverUptime": "服务器运行时间",
     "currentLocalTime": "当前本地时间",
     "selectTimezone": "选择时区",
     "searchTimezone": "搜索时区...",
@@ -579,8 +595,22 @@
     "jobSaveFailed": "保存作业失败",
     "jobNameDuplicate": "作业名称已存在",
     "copySuccess": "{{type}}已复制",
-    "copyFailed": "复制失败",
-    "cannotGetTemplateId": "无法获取创建的模板ID"
+    "cannotGetTemplateId": "无法获取创建的模板ID",
+    "creating": "创建中...",
+    "disable": "禁用",
+    "enable": "启用",
+    "import": "导入",
+    "lastModified": "最后修改",
+    "noData": "无数据",
+    "page": "页面",
+    "selectAll": "全选",
+    "start": "开始",
+    "time": "时间",
+    "total": "总计",
+    "updateSuccess": "更新成功",
+    "updatedBy": "更新者",
+    "view": "查看",
+    "year": "年"
   },
   "createdAt": "创建时间",
   "dashboard": {
@@ -631,6 +661,8 @@
   },
   "jobs": {
     "title": "任务管理",
+    "description": "创建和管理定时任务，监控任务执行状态和历史记录。",
+    "monitorDescription": "实时监控任务队列状态，查看正在运行和等待中的任务。",
     "addJob": "添加任务",
     "editJob": "编辑任务",
     "jobType": "任务类型",
@@ -690,6 +722,7 @@
     }
   },
   "gameWorlds": {
+    "description": "管理游戏世界服务器，配置服务器状态和连接设置。",
     "actions": "操作",
     "active": "活跃",
     "activeWorlds": "活跃世界",
@@ -867,6 +900,8 @@
     "deleteError": "删除用户失败",
     "demoteToUser": "降级为用户",
     "email": "邮箱",
+    "emailVerified": "邮箱已验证",
+    "createdBy": "创建者",
     "joinDate": "加入日期",
     "lastLogin": "最后登录",
     "name": "姓名",
@@ -956,6 +991,7 @@
     "form": {
       "anyIpPlaceholder": "留空表示任意IP允许",
       "endDateOpt": "结束日期（可选）",
+      "ipAddress": "IP地址",
       "ipAddressOpt": "IP地址（可选）",
       "memoOpt": "备注（可选）",
       "memoPlaceholder": "附加备注...",

@@ -283,7 +283,7 @@ export class MessageTemplateModel {
   }
 
   // 태그 관련 메서드들
-  static async setTags(templateId: number, tagIds: number[]): Promise<void> {
+  static async setTags(templateId: number, tagIds: number[], createdBy?: number): Promise<void> {
     try {
       await db.transaction(async (trx) => {
         // 기존 태그 할당 삭제
@@ -298,6 +298,7 @@ export class MessageTemplateModel {
             entityType: 'message_template',
             entityId: templateId,
             tagId: tagId,
+            createdBy: createdBy || 1,
             createdAt: new Date()
           }));
           await trx('g_tag_assignments').insert(assignments);

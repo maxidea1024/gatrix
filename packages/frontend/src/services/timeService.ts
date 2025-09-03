@@ -5,6 +5,7 @@ export interface ServerTimeResponse {
   serverLocalTimeISO: string;
   serverLocalTime: number;
   clientLocalTime: number;
+  uptime: number; // 서버 업타임 (초 단위)
 }
 
 export interface ServerTimeData {
@@ -12,6 +13,7 @@ export interface ServerTimeData {
   localTime: Date;
   ping: number;
   offset: number; // 서버와 클라이언트 시간 차이 (ms)
+  uptime: number; // 서버 업타임 (초 단위)
 }
 
 class TimeService {
@@ -30,7 +32,7 @@ class TimeService {
       const response = await axios.get<ServerTimeResponse>(`${baseURL}/time?clientLocalTime=${clientLocalTime}`);
       const currentLocalTime = new Date().getTime();
 
-      const { serverLocalTime } = response.data;
+      const { serverLocalTime, uptime } = response.data;
 
       const roundTripTime = currentLocalTime - clientLocalTime;
       const ping = roundTripTime / 2;
@@ -42,7 +44,8 @@ class TimeService {
         serverTime,
         localTime: new Date(currentLocalTime),
         ping,
-        offset
+        offset,
+        uptime
       };
 
       this.currentServerTime = serverTimeData;

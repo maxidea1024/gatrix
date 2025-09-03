@@ -32,8 +32,8 @@ export class TagService {
     await TagModel.delete(id);
   }
 
-  static async setTagsForEntity(entityType: string, entityId: number, tagIds: number[]): Promise<void> {
-    await TagAssignmentModel.setTagsForEntity(entityType, entityId, tagIds);
+  static async setTagsForEntity(entityType: string, entityId: number, tagIds: number[], createdBy?: number): Promise<void> {
+    await TagAssignmentModel.setTagsForEntity(entityType, entityId, tagIds, createdBy);
   }
 
   static async listTagsForEntity(entityType: string, entityId: number) {

@@ -18,10 +18,11 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import moment from 'moment-timezone';
-import { 
-  getStoredTimezone, 
-  setStoredTimezone, 
-  formatDateTimeDetailed 
+import {
+  getStoredTimezone,
+  setStoredTimezone,
+  formatDateTimeDetailed,
+  formatUptime
 } from '../../utils/dateFormat';
 import { timeService, ServerTimeData } from '../../services/timeService';
 
@@ -184,6 +185,18 @@ const TimezoneSelector: React.FC = () => {
                 )}
               </Typography>
             </Box>
+
+            {/* 서버 업타임 */}
+            {serverTimeData && (
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  {t('common.serverUptime')}
+                </Typography>
+                <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                  {formatUptime(serverTimeData.uptime)}
+                </Typography>
+              </Box>
+            )}
 
             <Divider />
 

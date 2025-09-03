@@ -104,7 +104,12 @@ const MaintenancePage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3, transition:'background-color 0.2s ease', backgroundColor: (theme)=> isMaintenance ? alpha(theme.palette.error.light, 0.08) : alpha(theme.palette.success.light, 0.06) }}>
-      <Typography variant="h4" sx={{ mb: 2 }}>{t('admin.maintenance.title')}</Typography>
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h4" sx={{ mb: 1 }}>{t('admin.maintenance.title')}</Typography>
+        <Typography variant="body1" color="text.secondary">
+          {t('admin.maintenance.description')}
+        </Typography>
+      </Box>
       <Card sx={{ borderColor: (theme)=> isMaintenance ? theme.palette.error.main : theme.palette.success.main, borderWidth: 1, borderStyle: 'solid' }}>
         <CardContent>
             <Stack spacing={2} sx={{ mt: 1 }}>

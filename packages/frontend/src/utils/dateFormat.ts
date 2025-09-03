@@ -114,6 +114,31 @@ export const formatDuration = (milliseconds: number): string => {
 };
 
 /**
+ * 서버 업타임을 포맷 (초 단위 입력)
+ */
+export const formatUptime = (uptimeSeconds: number): string => {
+  if (uptimeSeconds < 60) {
+    return `${Math.floor(uptimeSeconds)}s`;
+  }
+
+  const minutes = Math.floor(uptimeSeconds / 60);
+  const remainingSeconds = Math.floor(uptimeSeconds % 60);
+  if (minutes < 60) {
+    return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  if (hours < 24) {
+    return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
+  }
+
+  const days = Math.floor(hours / 24);
+  const remainingHours = hours % 24;
+  return remainingHours > 0 ? `${days}d ${remainingHours}h` : `${days}d`;
+};
+
+/**
  * 상대 시간 포맷 (예: "2 minutes ago", "Just now")
  */
 export const formatRelativeTime = (date: string | Date | null | undefined): string => {

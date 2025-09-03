@@ -697,6 +697,9 @@ const GameWorldsPage: React.FC = () => {
           <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
             {t('gameWorlds.title')}
           </Typography>
+          <Typography variant="body1" color="text.secondary">
+            {t('gameWorlds.description')}
+          </Typography>
         </Box>
         <Button
           variant="contained"

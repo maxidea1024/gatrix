@@ -118,8 +118,7 @@ const ClientVersionsPage: React.FC = () => {
   const [bulkFormDialogOpen, setBulkFormDialogOpen] = useState(false);
   const [editingClientVersion, setEditingClientVersion] = useState<ClientVersion | null>(null);
   const [isCopyMode, setIsCopyMode] = useState(false);
-  const [orderChangeDialogOpen, setOrderChangeDialogOpen] = useState(false);
-  const [orderChangeItems, setOrderChangeItems] = useState<ClientVersion[]>([]);
+
 
   // 메타데이터
   const [platforms] = useState<string[]>(['pc', 'pc-wegame', 'ios', 'android', 'harmonyos']);
@@ -271,11 +270,12 @@ const ClientVersionsPage: React.FC = () => {
       setDeleteDialogOpen(false);
       setSelectedClientVersion(null);
       loadClientVersions();
+      loadAvailableVersions(); // 버전 목록도 갱신
     } catch (error: any) {
       console.error('Error deleting client version:', error);
       enqueueSnackbar(error.message || t('clientVersions.deleteError'), { variant: 'error' });
     }
-  }, [selectedClientVersion, t, enqueueSnackbar, loadClientVersions]);
+  }, [selectedClientVersion, t, enqueueSnackbar, loadClientVersions, loadAvailableVersions]);
 
   // 일괄 상태 변경 핸들러
   const handleBulkStatusUpdate = useCallback(async () => {
@@ -294,41 +294,14 @@ const ClientVersionsPage: React.FC = () => {
       setSelectedIds([]);
       setSelectAll(false);
       loadClientVersions();
+      loadAvailableVersions(); // 버전 목록도 갱신
     } catch (error: any) {
       console.error('Error updating status:', error);
       enqueueSnackbar(error.message || t('clientVersions.statusUpdateError'), { variant: 'error' });
     }
-  }, [selectedIds, bulkStatus, enqueueSnackbar, loadClientVersions]);
+  }, [selectedIds, bulkStatus, enqueueSnackbar, loadClientVersions, loadAvailableVersions]);
 
-  // 순서 변경 핸들러
-  const handleOrderChange = useCallback(() => {
-    if (selectedIds.length !== 2) {
-      enqueueSnackbar('정확히 2개의 항목을 선택해주세요.', { variant: 'warning' });
-      return;
-    }
 
-    const selectedItems = clientVersions.filter(cv => selectedIds.includes(cv.id));
-    setOrderChangeItems(selectedItems);
-    setOrderChangeDialogOpen(true);
-  }, [selectedIds, clientVersions, enqueueSnackbar]);
-
-  // 순서 변경 확인
-  const handleOrderChangeConfirm = useCallback(async () => {
-    if (orderChangeItems.length !== 2) return;
-
-    try {
-      // 두 항목의 순서를 바꿈 (실제 API 호출은 나중에 구현)
-      enqueueSnackbar('순서가 변경되었습니다.', { variant: 'success' });
-      setOrderChangeDialogOpen(false);
-      setOrderChangeItems([]);
-      setSelectedIds([]);
-      setSelectAll(false);
-      loadClientVersions();
-    } catch (error: any) {
-      console.error('Error changing order:', error);
-      enqueueSnackbar('순서 변경에 실패했습니다.', { variant: 'error' });
-    }
-  }, [orderChangeItems, enqueueSnackbar, loadClientVersions]);
 
   // 일괄 삭제 핸들러
   const handleBulkDelete = useCallback(async () => {
@@ -341,11 +314,12 @@ const ClientVersionsPage: React.FC = () => {
       setSelectAll(false);
       setBulkDeleteDialogOpen(false);
       await loadClientVersions();
+      loadAvailableVersions(); // 버전 목록도 갱신
     } catch (error: any) {
       console.error('Failed to delete client versions:', error);
       enqueueSnackbar(error.message || t('clientVersions.bulkDeleteError'), { variant: 'error' });
     }
-  }, [selectedIds, t, enqueueSnackbar, loadClientVersions]);
+  }, [selectedIds, t, enqueueSnackbar, loadClientVersions, loadAvailableVersions]);
 
   // 선택된 항목 내보내기
   const handleExportSelected = useCallback(async () => {
@@ -460,19 +434,25 @@ const ClientVersionsPage: React.FC = () => {
       enqueueSnackbar(t('common.success'), { variant: 'success' });
       // 필요시 목록 새로고침
       loadClientVersions();
+      loadAvailableVersions(); // 버전 목록도 갱신
     } catch (error) {
       console.error('Error saving client version tags:', error);
       enqueueSnackbar(t('common.error'), { variant: 'error' });
     }
-  }, [selectedClientVersionForTags, t, enqueueSnackbar, loadClientVersions]);
+  }, [selectedClientVersionForTags, t, enqueueSnackbar, loadClientVersions, loadAvailableVersions]);
 
   return (
     <Box sx={{ p: 3 }}>
       {/* 헤더 */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" sx={{ fontWeight: 600 }}>
-          {t('clientVersions.title')}
-        </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+        <Box>
+          <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
+            {t('clientVersions.title')}
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            {t('clientVersions.description')}
+          </Typography>
+        </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button
             variant="outlined"
@@ -597,7 +577,7 @@ const ClientVersionsPage: React.FC = () => {
 
             <Tooltip title={t('common.refresh')}>
               <span>
-                <IconButton onClick={loadClientVersions} disabled={loading}>
+                <IconButton onClick={() => loadClientVersions()} disabled={loading}>
                   <RefreshIcon />
                 </IconButton>
               </span>
@@ -615,16 +595,6 @@ const ClientVersionsPage: React.FC = () => {
                 {t('clientVersions.selectedCount', { count: selectedIds.length })}
               </Typography>
               <Box sx={{ display: 'flex', gap: 1 }}>
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="secondary"
-                  onClick={handleOrderChange}
-                  startIcon={<EditIcon />}
-                  disabled={selectedIds.length !== 2}
-                >
-                  순서 변경
-                </Button>
                 <Button
                   size="small"
                   variant="contained"
@@ -956,44 +926,7 @@ const ClientVersionsPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* 순서 변경 다이얼로그 */}
-      <Dialog open={orderChangeDialogOpen} onClose={() => setOrderChangeDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <EditIcon color="warning" />
-            순서 변경
-          </Box>
-        </DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            선택한 항목:
-          </Typography>
-          {orderChangeItems.map((item, index) => (
-            <Box key={item.id} sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1, p: 1, bgcolor: 'background.paper', borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
-              <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                {index + 1}.
-              </Typography>
-              <Chip label={item.platform} size="small" color="primary" variant="outlined" />
-              <Chip label={item.clientVersion} size="small" color="info" variant="filled" />
-              <Box sx={{ flexGrow: 1 }} />
-              <Typography variant="caption" color="text.secondary">
-                {item.clientStatus}
-              </Typography>
-            </Box>
-          ))}
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-            위 두 항목의 순서를 바꾸시겠습니까?
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOrderChangeDialogOpen(false)} startIcon={<CancelIcon />}>
-            취소
-          </Button>
-          <Button onClick={handleOrderChangeConfirm} variant="contained" color="warning" startIcon={<EditIcon />}>
-            확인
-          </Button>
-        </DialogActions>
-      </Dialog>
+
 
       {/* 클라이언트 버전 추가/편집 폼 */}
       <ClientVersionForm
@@ -1005,6 +938,7 @@ const ClientVersionsPage: React.FC = () => {
         }}
         onSuccess={() => {
           loadClientVersions();
+          loadAvailableVersions(); // 버전 목록도 갱신
           setFormDialogOpen(false);
           setEditingClientVersion(null);
           setIsCopyMode(false);
@@ -1021,6 +955,7 @@ const ClientVersionsPage: React.FC = () => {
         }}
         onSuccess={() => {
           loadClientVersions();
+          loadAvailableVersions(); // 버전 목록도 갱신
           setBulkFormDialogOpen(false);
         }}
       />

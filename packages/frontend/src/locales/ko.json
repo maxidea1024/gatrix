@@ -18,6 +18,7 @@
       "totalSessions": "총 세션 수"
     },
     "maintenance": {
+      "description": "시스템 점검 상태를 관리하고 점검 메시지 및 시간 일정을 설정합니다.",
       "applyEndsAt": "종료 시간 적용",
       "confirmStartMessage": "점검을 시작하려면 \"start maintenance\"를 입력하세요.",
       "confirmStartTitle": "점검 시작 확인",
@@ -72,7 +73,19 @@
       "suspend": "정지",
       "title": "사용자 관리",
       "updateError": "업데이트 중 오류가 발생했습니다",
-      "userUpdated": "사용자가 업데이트되었습니다"
+      "userUpdated": "사용자가 업데이트되었습니다",
+      "verified": "인증됨",
+      "unverified": "미인증",
+      "showPassword": "비밀번호 보기",
+      "hidePassword": "비밀번호 숨기기",
+      "editTooltip": "편집",
+      "suspendTooltip": "정지",
+      "activateTooltip": "활성화",
+      "deleteTooltip": "삭제",
+      "addUserDialogTitle": "사용자 추가",
+      "addUserDialogDescription": "새로운 사용자 계정을 생성하고 권한을 설정할 수 있습니다.",
+      "editUserDialogTitle": "사용자 편집",
+      "editUserDialogDescription": "기존 사용자의 정보와 권한을 수정할 수 있습니다."
     },
     "gameWorlds": {
       "title": "게임 월드"
@@ -346,6 +359,7 @@
   "clientStatus": "클라이언트 상태",
   "clientVersion": "클라이언트 버전",
   "clientVersions": {
+    "description": "게임 클라이언트 버전을 관리하고 서버 주소 및 업데이트 설정을 구성합니다.",
     "addNew": "클라이언트 버전 추가",
     "addIndividual": "개별 버전 추가",
     "addBulk": "간편 추가",
@@ -407,6 +421,7 @@
       "patchAddressRequired": "패치 주소가 필요합니다",
       "platformHelp": "대상 플랫폼을 선택하세요 (pc, pc-wegame, ios, android, harmonyos)",
       "platformRequired": "플랫폼이 필요합니다",
+      "selectPlatforms": "플랫폼 선택",
       "serverAddresses": "서버 주소",
       "serverAddressesDescription": "게임 서버와 패치 서버의 주소를 설정하세요.",
       "statusHelp": "상태를 선택하세요",
@@ -574,6 +589,7 @@
     "timestamp": "타임스탬프",
     "timezone": "시간대",
     "serverTime": "서버 시간",
+    "serverUptime": "서버 업타임",
     "currentLocalTime": "현재 로컬 시간",
     "selectTimezone": "시간대 선택",
     "searchTimezone": "시간대 검색...",
@@ -586,11 +602,10 @@
     "updateSuccess": "성공적으로 업데이트되었습니다",
     "updatedAt": "수정일",
     "valid": "유효함",
-    "warning": "경고",
-    "yes": "예",
     "invalid": "유효하지 않음",
     "warning": "경고",
     "week": "주",
+    "yes": "예",
     "weekdays": {
       "sun": "일",
       "mon": "월",
@@ -600,7 +615,6 @@
       "fri": "금",
       "sat": "토"
     },
-    "yes": "예",
     "import": "가져오기",
     "lastModified": "마지막 수정",
     "noData": "데이터 없음",
@@ -616,7 +630,6 @@
     "languages": "언어",
     "creator": "생성자",
     "displayedRows": "{{from}}-{{to}} / {{count}}",
-    "createSuccess": "성공적으로 생성되었습니다",
     "deleteSuccess": "성공적으로 삭제되었습니다",
     "saveSuccess": "성공적으로 저장되었습니다",
     "saveFailed": "저장에 실패했습니다",
@@ -688,7 +701,9 @@
   },
   "jobs": {
     "title": "Job 관리",
+    "description": "정기 작업을 생성하고 관리하며, 작업 실행 상태와 이력을 모니터링합니다.",
     "monitor": "큐 모니터",
+    "monitorDescription": "작업 큐 상태를 실시간으로 모니터링하고 실행 중이거나 대기 중인 작업을 확인합니다.",
     "monitorLoadError": "큐 모니터 로드에 실패했습니다",
     "addJob": "작업 추가",
     "noJobsFound": "등록된 작업이 없습니다.",
@@ -748,6 +763,7 @@
     }
   },
   "gameWorlds": {
+    "description": "게임 월드 서버를 관리하고 서버 상태 및 연결 설정을 구성합니다.",
     "actions": "작업",
     "active": "활성",
     "activeWorlds": "활성 월드",
@@ -1101,6 +1117,7 @@
     "form": {
       "anyIpPlaceholder": "모든 IP 허용",
       "endDateOpt": "종료일 (선택사항)",
+      "ipAddress": "IP 주소",
       "ipAddressOpt": "IP 주소 (선택사항)",
       "memoOpt": "메모 (선택사항)",
       "memoPlaceholder": "메모를 입력하세요",

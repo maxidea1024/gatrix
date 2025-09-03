@@ -354,8 +354,8 @@ export class WhitelistModel {
   }
 
   // 태그 관련 메서드들
-  static async setTags(whitelistId: number, tagIds: number[]): Promise<void> {
-    await TagAssignmentModel.setTagsForEntity('whitelist', whitelistId, tagIds);
+  static async setTags(whitelistId: number, tagIds: number[], createdBy?: number): Promise<void> {
+    await TagAssignmentModel.setTagsForEntity('whitelist', whitelistId, tagIds, createdBy);
   }
 
   static async getTags(whitelistId: number): Promise<any[]> {
