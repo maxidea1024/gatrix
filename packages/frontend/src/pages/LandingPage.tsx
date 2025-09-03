@@ -49,6 +49,9 @@ const LandingPage: React.FC = () => {
       toggleTheme();
     }
 
+    // 방문 기록 저장 (다음에는 랜딩 페이지를 건너뛰기 위해)
+    localStorage.setItem('hasVisitedBefore', 'true');
+
     // 로그인 페이지로 이동
     navigate('/login');
   };

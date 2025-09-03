@@ -7,7 +7,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   error: string | null;
-  login: (credentials: { email: string; password: string }) => Promise<void>;
+  login: (credentials: { email: string; password: string; rememberMe?: boolean }) => Promise<void>;
   logout: () => Promise<void>;
   refreshAuth: () => Promise<void>;
   register?: (data: any) => Promise<void>;
@@ -31,7 +31,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const isAuthenticated = !!user;
 
-  const login = async (credentials: { email: string; password: string }): Promise<void> => {
+  const login = async (credentials: { email: string; password: string; rememberMe?: boolean }): Promise<void> => {
     try {
       setIsLoading(true);
       setError(null);
@@ -80,7 +80,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return;
       }
 
-      // Try to get fresh profile
+      // Validate token by checking if it's expired
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const currentTime = Date.now() / 1000;
+
+        if (payload.exp && payload.exp < currentTime) {
+          // Token is expired
+          console.log('Token expired, clearing auth data');
+          AuthService.clearAuthData();
+          setUser(null);
+          return;
+        }
+      } catch (tokenError) {
+        console.error('Invalid token format:', tokenError);
+        AuthService.clearAuthData();
+        setUser(null);
+        return;
+      }
+
+      // Try to get fresh profile to validate token with server
       const user = await AuthService.getProfile();
       setUser(user);
     } catch (error) {

@@ -128,6 +128,20 @@ const LoginPage: React.FC = () => {
   const emailValue = watch('email') || '';
   const passwordValue = watch('password') || '';
 
+  // Initialize form with remembered credentials
+  useEffect(() => {
+    const rememberedEmail = AuthService.getRememberedEmail();
+    const isRememberMeEnabled = AuthService.isRememberMeEnabled();
+
+    if (rememberedEmail && isRememberMeEnabled) {
+      reset({
+        email: rememberedEmail,
+        password: '',
+        rememberMe: true,
+      });
+    }
+  }, [reset]);
+
   // Re-validate form when language changes
   useEffect(() => {
     clearErrors();
@@ -142,6 +156,7 @@ const LoginPage: React.FC = () => {
       await login({
         email: data.email,
         password: data.password,
+        rememberMe: data.rememberMe,
       });
 
       navigate(from, { replace: true });

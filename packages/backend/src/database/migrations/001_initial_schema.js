@@ -393,19 +393,6 @@ exports.up = async function() {
     ('log_message', 'Log Message', 'Log messages', '{"level":{"type":"select","required":true,"description":"Log level","options":["debug","info","warn","error"],"default":"info"},"message":{"type":"text","required":true,"description":"Log message content"}}', TRUE)
   `);
 
-  // Insert default client versions
-  await connection.execute(`
-    INSERT IGNORE INTO g_client_versions (
-      platform, clientVersion, clientStatus,
-      gameServerAddress, patchAddress, guestModeAllowed,
-      createdAt, updatedAt, createdBy, updatedBy
-    ) VALUES
-    ('android', '1.0.0', 'online', 'https://game.example.com', 'https://patch.example.com', FALSE, NOW(), NOW(), 1, 1),
-    ('ios', '1.0.0', 'online', 'https://game.example.com', 'https://patch.example.com', FALSE, NOW(), NOW(), 1, 1),
-    ('web', '1.0.0', 'online', 'https://game.example.com', 'https://patch.example.com', TRUE, NOW(), NOW(), 1, 1),
-    ('pc', '1.0.0', 'online', 'https://game.example.com', 'https://patch.example.com', FALSE, NOW(), NOW(), 1, 1)
-  `);
-
   console.log('✓ Default data inserted');
   console.log('🎉 Initial schema creation completed successfully!');
 

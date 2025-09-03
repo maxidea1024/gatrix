@@ -86,8 +86,8 @@ class SqlExecutor {
     for (let i = 0; i < statements.length; i++) {
       const statement = statements[i].trim();
       
-      if (!statement || statement.startsWith('--') || statement.startsWith('/*')) {
-        continue; // 빈 줄이나 주석 건너뛰기
+      if (!statement) {
+        continue; // 빈 문장 건너뛰기
       }
 
       try {
@@ -99,9 +99,17 @@ class SqlExecutor {
         const [results] = await this.connection.execute(statement);
         executedCount++;
 
-        if (options.verbose && results) {
-          if (Array.isArray(results)) {
-            logger.info(`✅ Executed successfully. Affected rows: ${results.length}`);
+        if (results) {
+          if (Array.isArray(results) && results.length > 0) {
+            if (options.verbose) {
+              logger.info(`✅ Executed successfully. Rows returned: ${results.length}`);
+              // SELECT 쿼리 결과 출력
+              if (statement.trim().toUpperCase().startsWith('SELECT')) {
+                console.table(results);
+              }
+            } else {
+              logger.info(`✅ Executed successfully. Rows returned: ${results.length}`);
+            }
           } else if ('affectedRows' in results) {
             logger.info(`✅ Executed successfully. Affected rows: ${results.affectedRows}`);
           } else {
@@ -127,12 +135,41 @@ class SqlExecutor {
   }
 
   private splitSqlStatements(sqlContent: string): string[] {
-    // 간단한 SQL 문장 분리 (세미콜론 기준)
-    // 더 정교한 파싱이 필요하면 SQL 파서 라이브러리 사용 고려
-    return sqlContent
-      .split(';')
-      .map(statement => statement.trim())
-      .filter(statement => statement.length > 0);
+    // SQL 문장을 세미콜론으로 분리하되, 주석과 빈 줄을 제거
+    const statements: string[] = [];
+    const lines = sqlContent.split('\n');
+    let currentStatement = '';
+
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+
+      // 빈 줄이나 주석 줄 건너뛰기
+      if (!trimmedLine || trimmedLine.startsWith('--') || trimmedLine.startsWith('/*')) {
+        continue;
+      }
+
+      // 줄 끝 주석 제거
+      const lineWithoutComment = trimmedLine.split('--')[0].trim();
+      if (!lineWithoutComment) continue;
+
+      currentStatement += lineWithoutComment + ' ';
+
+      // 세미콜론으로 끝나면 문장 완료
+      if (lineWithoutComment.endsWith(';')) {
+        const statement = currentStatement.trim();
+        if (statement && statement !== ';') {
+          statements.push(statement);
+        }
+        currentStatement = '';
+      }
+    }
+
+    // 마지막 문장이 세미콜론 없이 끝난 경우
+    if (currentStatement.trim()) {
+      statements.push(currentStatement.trim());
+    }
+
+    return statements;
   }
 }
 

@@ -156,20 +156,8 @@ if (config.oauth.github.clientId && config.oauth.github.clientSecret) {
   ));
 }
 
-// Serialize user for session
-passport.serializeUser((user: any, done) => {
-  done(null, user.id);
-});
-
-// Deserialize user from session
-passport.deserializeUser(async (id: number, done) => {
-  try {
-    const user = await UserModel.findById(id);
-    done(null, user);
-  } catch (error) {
-    logger.error('User deserialization error:', error);
-    done(error);
-  }
-});
+// Note: Session serialization/deserialization removed
+// This application uses JWT-based authentication (stateless)
+// Sessions are not needed for JWT authentication
 
 export default passport;

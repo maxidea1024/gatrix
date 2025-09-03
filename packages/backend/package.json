@@ -22,7 +22,7 @@
     "seed:run": "ts-node src/database/seed.ts run",
     "seed:clear": "ts-node src/database/seed.ts clear",
     "seed:reset": "ts-node src/database/seed.ts reset",
-    "sql": "ts-node src/scripts/executeSql.ts",
+    "sql": "node ../../node_modules/ts-node/dist/bin.js src/scripts/executeSql.ts",
     "setup:db": "mysql -u root -p < scripts/setup-database.sql",
     "setup:db:win": "scripts\\setup-database.bat",
     "setup:db:unix": "bash scripts/setup-database.sh",

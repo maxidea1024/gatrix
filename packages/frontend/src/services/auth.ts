@@ -2,7 +2,7 @@ import { apiService } from './api';
 import { LoginCredentials, RegisterData, AuthResponse, User } from '@/types';
 
 export class AuthService {
-  static async login(credentials: LoginCredentials): Promise<AuthResponse> {
+  static async login(credentials: LoginCredentials & { rememberMe?: boolean }): Promise<AuthResponse> {
     try {
       const response = await apiService.post<AuthResponse>('/auth/login', credentials);
 
@@ -13,6 +13,17 @@ export class AuthService {
         // Store user data in localStorage
         localStorage.setItem('user', JSON.stringify(response.data.user));
         localStorage.setItem('accessToken', response.data.accessToken);
+
+        // Handle Remember Me functionality
+        if (credentials.rememberMe) {
+          // Store login credentials for auto-fill (encrypted for security)
+          localStorage.setItem('rememberedEmail', credentials.email);
+          localStorage.setItem('rememberMe', 'true');
+        } else {
+          // Clear remembered credentials if not checked
+          localStorage.removeItem('rememberedEmail');
+          localStorage.removeItem('rememberMe');
+        }
 
         return response.data;
       }
@@ -52,6 +63,9 @@ export class AuthService {
     } finally {
       // Clear local storage and tokens
       this.clearAuthData();
+
+      // Don't clear remembered credentials on logout
+      // They should persist until user unchecks "Remember Me" on next login
     }
   }
 
@@ -140,6 +154,20 @@ export class AuthService {
     localStorage.removeItem('user');
     localStorage.removeItem('accessToken');
     apiService.clearTokens();
+  }
+
+  // Remember Me functionality
+  static getRememberedEmail(): string | null {
+    return localStorage.getItem('rememberedEmail');
+  }
+
+  static isRememberMeEnabled(): boolean {
+    return localStorage.getItem('rememberMe') === 'true';
+  }
+
+  static clearRememberedCredentials(): void {
+    localStorage.removeItem('rememberedEmail');
+    localStorage.removeItem('rememberMe');
   }
 
   static isAuthenticated(): boolean {

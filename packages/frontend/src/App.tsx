@@ -29,6 +29,7 @@ import { I18nProvider, useI18n } from './contexts/I18nContext';
 // Components
 import { LoadingIndicator } from './components/LoadingIndicator';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { useAuth } from './contexts/AuthContext';
 
 // Layout Components
 import { MainLayout } from './components/layout/MainLayout';
@@ -68,6 +69,32 @@ import JobsPage from './pages/admin/JobsPage';
 import QueueMonitorPage from './pages/admin/QueueMonitorPage';
 import CustomQueueMonitorPage from './pages/admin/CustomQueueMonitorPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
+
+// Conditional Landing Page Component
+const ConditionalLandingPage: React.FC = () => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return <LoadingIndicator />;
+  }
+
+  // If authenticated, redirect to dashboard
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // Check if user has visited before (has set initial preferences)
+  const hasVisitedBefore = localStorage.getItem('hasVisitedBefore') === 'true';
+
+  if (hasVisitedBefore) {
+    // Returning user - go directly to login
+    return <Navigate to="/login" replace />;
+  }
+
+  // First-time visitor - show landing page
+  return <LandingPage />;
+};
 
 // LocalizationProvider with language support
 const LocalizedDatePickers: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -160,8 +187,8 @@ const AppContent: React.FC = () => {
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-                {/* Landing Page */}
-                <Route path="/" element={<LandingPage />} />
+                {/* Landing Page - only for first-time visitors */}
+                <Route path="/" element={<ConditionalLandingPage />} />
 
                 {/* Protected Routes */}
 
