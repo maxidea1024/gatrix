@@ -1044,6 +1044,7 @@
     "form": {
       "ipAddress": "IP地址或CIDR",
       "ipAddressHelp": "输入IP地址（如：192.168.1.1）或CIDR表示法（如：192.168.1.0/24）",
+      "ipAddressPlaceholder": "如：192.168.1.1 或 192.168.1.0/24",
       "purpose": "用途",
       "purposePlaceholder": "如：办公网络、VPN服务器等",
       "startDate": "开始日期（可选）",
@@ -1052,11 +1053,14 @@
       "endDateHelp": "留空表示无限制结束",
       "tags": "标签",
       "tagsPlaceholder": "用逗号分隔输入标签",
-      "enabled": "启用"
+      "enabled": "启用",
+      "enabledHelp": "设置白名单条目的激活状态。禁用时将阻止访问。"
     },
     "dialog": {
       "addTitle": "添加IP白名单条目",
-      "editTitle": "编辑IP白名单条目"
+      "editTitle": "编辑IP白名单条目",
+      "addDescription": "添加新的IP地址到白名单并配置访问权限。",
+      "editDescription": "修改现有IP白名单条目的信息。"
     },
     "confirmDelete": {
       "title": "删除IP白名单条目",

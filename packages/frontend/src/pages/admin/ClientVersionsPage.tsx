@@ -344,7 +344,7 @@ const ClientVersionsPage: React.FC = () => {
           cv.gameServerAddress,
           cv.patchAddress,
           cv.guestModeAllowed ? 'Yes' : 'No',
-          cv.createdByName || 'Unknown',
+          cv.createdByName || t('dashboard.unknown'),
           cv.createdByEmail || '',
           new Date(cv.createdAt).toLocaleDateString()
         ].join(','))
@@ -774,7 +774,7 @@ const ClientVersionsPage: React.FC = () => {
                   <TableCell>
                     <Box>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {clientVersion.createdByName || 'Unknown'}
+                        {clientVersion.createdByName || t('dashboard.unknown')}
                       </Typography>
                       {clientVersion.createdByEmail && (
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>

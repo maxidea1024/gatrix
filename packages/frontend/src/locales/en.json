@@ -1046,6 +1046,7 @@
     "form": {
       "ipAddress": "IP Address or CIDR",
       "ipAddressHelp": "Enter IP address (e.g., 192.168.1.1) or CIDR notation (e.g., 192.168.1.0/24)",
+      "ipAddressPlaceholder": "e.g., 192.168.1.1 or 192.168.1.0/24",
       "purpose": "Purpose",
       "purposePlaceholder": "e.g., Office network, VPN server, etc.",
       "startDate": "Start Date (Optional)",
@@ -1054,11 +1055,14 @@
       "endDateHelp": "Leave empty for unlimited end",
       "tags": "Tags",
       "tagsPlaceholder": "Enter tags separated by commas",
-      "enabled": "Enabled"
+      "enabled": "Enabled",
+      "enabledHelp": "Set the activation status of the whitelist entry. When disabled, access will be blocked."
     },
     "dialog": {
       "addTitle": "Add IP Whitelist Entry",
-      "editTitle": "Edit IP Whitelist Entry"
+      "editTitle": "Edit IP Whitelist Entry",
+      "addDescription": "Add a new IP address to the whitelist and configure access permissions.",
+      "editDescription": "Modify the information of an existing IP whitelist entry."
     },
     "confirmDelete": {
       "title": "Delete IP Whitelist Entry",

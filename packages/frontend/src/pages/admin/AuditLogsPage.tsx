@@ -213,7 +213,7 @@ const AuditLogsPage: React.FC = () => {
                 <FormControl size="small" sx={{ minWidth: 120 }}>
                   <InputLabel shrink={true}>{t('auditLogs.action')}</InputLabel>
                   <Select
-                    value={filters.action || ''}
+                    value={pageState.filters?.action || ''}
                     label={t('auditLogs.action')}
                     onChange={(e) => handleFilterChange('action', e.target.value)}
                     displayEmpty
@@ -231,7 +231,7 @@ const AuditLogsPage: React.FC = () => {
                 <FormControl size="small" sx={{ minWidth: 120 }}>
                   <InputLabel shrink={true}>{t('auditLogs.resourceType')}</InputLabel>
                   <Select
-                    value={filters.resource_type || ''}
+                    value={pageState.filters?.resource_type || ''}
                     label={t('auditLogs.resourceType')}
                     onChange={(e) => handleFilterChange('resource_type', e.target.value)}
                     displayEmpty

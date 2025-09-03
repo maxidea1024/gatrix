@@ -86,7 +86,7 @@ const PendingPage: React.FC = () => {
               <strong>Status:</strong> Pending Approval
             </Typography>
             <Typography variant="body2">
-              <strong>Created:</strong> {user?.createdAt ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}
+              <strong>Created:</strong> {user?.createdAt ? new Date(user.created_at).toLocaleDateString() : t('dashboard.unknown')}
             </Typography>
           </Box>
 

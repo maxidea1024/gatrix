@@ -496,7 +496,7 @@ const WhitelistPage: React.FC = () => {
                           </Box>
                         ) : (
                           <Typography variant="body2" color="text.secondary">
-                            영구
+                            {t('whitelist.permanent')}
                           </Typography>
                         )}
                       </TableCell>
@@ -507,7 +507,7 @@ const WhitelistPage: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <Chip
-                          label={whitelist.isEnabled ? '활성' : '비활성'}
+                          label={whitelist.isEnabled ? t('status.active') : t('status.inactive')}
                           color={whitelist.isEnabled ? 'success' : 'default'}
                           size="small"
                         />
@@ -515,7 +515,7 @@ const WhitelistPage: React.FC = () => {
                       <TableCell>
                         <Box>
                           <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                            {whitelist.createdByName || 'Unknown'}
+                            {whitelist.createdByName || t('dashboard.unknown')}
                           </Typography>
                           {whitelist.createdByEmail && (
                             <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>

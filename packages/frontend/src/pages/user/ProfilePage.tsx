@@ -210,14 +210,14 @@ const ProfilePage: React.FC = () => {
                   variant="filled"
                 />
                 <Chip
-                  label={user.status?.toUpperCase() || 'UNKNOWN'}
+                  label={user.status?.toUpperCase() || t('dashboard.unknown').toUpperCase()}
                   color={getStatusColor(user.status || '')}
                   size="small"
                   variant="outlined"
                 />
               </Stack>
               <Typography variant="body2" color="text.secondary">
-                {t('profile.memberSince')}: {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}
+                {t('profile.memberSince')}: {user.created_at ? new Date(user.created_at).toLocaleDateString() : t('dashboard.unknown')}
               </Typography>
             </Box>
           </Box>

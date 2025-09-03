@@ -402,10 +402,10 @@ const IpWhitelistTab: React.FC = () => {
                         <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
                           {ipWhitelist.ipAddress}
                         </Typography>
-                        <Tooltip title="IP 주소 복사">
+                        <Tooltip title={t('common.copy') + ' ' + t('ipWhitelist.ipAddress')}>
                           <IconButton
                             size="small"
-                            onClick={() => handleCopyToClipboard(ipWhitelist.ipAddress, 'IP 주소')}
+                            onClick={() => handleCopyToClipboard(ipWhitelist.ipAddress, t('ipWhitelist.ipAddress'))}
                             sx={{ p: 0.5 }}
                           >
                             <ContentCopyIcon fontSize="small" />
@@ -441,7 +441,7 @@ const IpWhitelistTab: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2">
-                        {ipWhitelist.createdByName || `User ${ipWhitelist.createdBy}`}
+                        {ipWhitelist.createdByName || t('dashboard.unknown')}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -507,10 +507,10 @@ const IpWhitelistTab: React.FC = () => {
         fullWidth
       >
         <FormDialogHeader
-          title={editDialog ? 'IP 화이트리스트 편집' : 'IP 화이트리스트 추가'}
+          title={editDialog ? t('ipWhitelist.dialog.editTitle') : t('ipWhitelist.dialog.addTitle')}
           description={editDialog
-            ? '기존 IP 화이트리스트 항목의 정보를 수정할 수 있습니다.'
-            : '새로운 IP 주소를 화이트리스트에 추가하고 접근 권한을 설정할 수 있습니다.'
+            ? t('ipWhitelist.dialog.editDescription')
+            : t('ipWhitelist.dialog.addDescription')
           }
         />
         <DialogContent>
@@ -518,21 +518,21 @@ const IpWhitelistTab: React.FC = () => {
             <Box>
               <TextField
                 fullWidth
-                label="IP 주소 또는 CIDR"
+                label={t('ipWhitelist.form.ipAddress')}
                 value={formData.ipAddress}
                 onChange={(e) => setFormData({ ...formData, ipAddress: e.target.value })}
                 error={!!formErrors.ipAddress}
                 helperText={formErrors.ipAddress}
-                placeholder="예: 192.168.1.1 또는 192.168.1.0/24"
+                placeholder={t('ipWhitelist.form.ipAddressPlaceholder')}
                 required
               />
               <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                IP 주소(예: 192.168.1.1) 또는 CIDR 표기법(예: 192.168.1.0/24)을 입력하세요.
+                {t('ipWhitelist.form.ipAddressHelp')}
               </Typography>
             </Box>
             <Box>
               <DateTimePicker
-                label="시작일 (선택사항)"
+                label={t('ipWhitelist.form.startDate')}
                 value={formData.startDate ? dayjs(formData.startDate) : null}
                 onChange={(date) => setFormData({
                   ...formData,
@@ -545,12 +545,12 @@ const IpWhitelistTab: React.FC = () => {
                 }}
               />
               <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                화이트리스트가 활성화될 시작 날짜와 시간을 선택하세요. 비워두면 즉시 활성화됩니다.
+                {t('ipWhitelist.form.startDateHelp')}
               </Typography>
             </Box>
             <Box>
               <DateTimePicker
-                label="종료일 (선택사항)"
+                label={t('ipWhitelist.form.endDate')}
                 value={formData.endDate ? dayjs(formData.endDate) : null}
                 onChange={(date) => setFormData({
                   ...formData,
@@ -564,7 +564,7 @@ const IpWhitelistTab: React.FC = () => {
                 }}
               />
               <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                화이트리스트가 만료될 날짜와 시간을 선택하세요. 비워두면 영구적으로 유지됩니다.
+                {t('ipWhitelist.form.endDateHelp')}
               </Typography>
             </Box>
             <Box>
@@ -575,37 +575,37 @@ const IpWhitelistTab: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, isEnabled: e.target.checked })}
                   />
                 }
-                label="활성화"
+                label={t('ipWhitelist.form.enabled')}
               />
               <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                화이트리스트 항목의 활성화 상태를 설정합니다. 비활성화하면 접근이 차단됩니다.
+                {t('ipWhitelist.form.enabledHelp')}
               </Typography>
             </Box>
             <Box>
               <TextField
                 fullWidth
-                label="사용 목적"
+                label={t('ipWhitelist.form.purpose')}
                 value={formData.purpose}
                 onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
                 error={!!formErrors.purpose}
                 helperText={formErrors.purpose}
-                placeholder="IP 화이트리스트 추가 목적을 입력하세요"
+                placeholder={t('ipWhitelist.form.purposePlaceholder')}
                 multiline
                 rows={3}
                 required
               />
               <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                IP 화이트리스트 추가 사유나 목적을 기록해주세요. 관리 및 추적에 도움이 됩니다.
+                {t('ipWhitelist.form.purposeHelp')}
               </Typography>
             </Box>
           </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => { setAddDialog(false); setEditDialog(false); }} startIcon={<CancelIcon />}>
-            취소
+            {t('common.cancel')}
           </Button>
           <Button onClick={handleSave} variant="contained" startIcon={<SaveIcon />}>
-            {editDialog ? 'IP 화이트리스트 수정' : 'IP 화이트리스트 추가'}
+            {editDialog ? t('ipWhitelist.dialog.editTitle') : t('ipWhitelist.dialog.addTitle')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -632,10 +632,10 @@ const IpWhitelistTab: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setBulkDialog(false)} startIcon={<CancelIcon />}>
-            취소
+            {t('common.cancel')}
           </Button>
           <Button onClick={handleBulkImport} variant="contained" startIcon={<UploadIcon />}>
-            가져오기
+            {t('common.import')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -648,10 +648,10 @@ const IpWhitelistTab: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))} startIcon={<CancelIcon />}>
-            취소
+            {t('common.cancel')}
           </Button>
           <Button onClick={confirmDialog.action} color="error" variant="contained" startIcon={<DeleteIcon />}>
-            확인
+            {t('common.confirm')}
           </Button>
         </DialogActions>
       </Dialog>
