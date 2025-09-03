@@ -244,7 +244,7 @@ const WhitelistPage: React.FC = () => {
     try {
       // 계정 ID 유효성 검사
       if (!formData.accountId || formData.accountId.trim().length < 4 || formData.accountId.trim().length > 36) {
-        enqueueSnackbar('계정 ID는 4~36글자 사이여야 합니다.', { variant: 'error' });
+        enqueueSnackbar(t('whitelist.form.accountIdValidation'), { variant: 'error' });
         return;
       }
 
@@ -258,13 +258,13 @@ const WhitelistPage: React.FC = () => {
       if (editDialog && selectedWhitelist) {
         console.log('Executing UPDATE with ID:', selectedWhitelist.id);
         await WhitelistService.updateWhitelist(selectedWhitelist.id, formData);
-        enqueueSnackbar('화이트리스트가 수정되었습니다.', { variant: 'success' });
+        enqueueSnackbar(t('whitelist.toast.updated'), { variant: 'success' });
         setEditDialog(false);
         setSelectedWhitelist(null);
       } else {
         console.log('Executing CREATE');
         await WhitelistService.createWhitelist(formData);
-        enqueueSnackbar('화이트리스트가 생성되었습니다.', { variant: 'success' });
+        enqueueSnackbar(t('whitelist.toast.created'), { variant: 'success' });
         setAddDialog(false);
       }
 
@@ -403,14 +403,14 @@ const WhitelistPage: React.FC = () => {
                               onChange={handleSelectAll}
                             />
                           </TableCell>
-                          <TableCell>계정 ID</TableCell>
-                          <TableCell>IP 주소</TableCell>
-                          <TableCell>허용 기간</TableCell>
-                          <TableCell>사용 목적</TableCell>
-                          <TableCell>상태</TableCell>
-                          <TableCell>생성자</TableCell>
-                          <TableCell>생성일</TableCell>
-                          <TableCell align="center">작업</TableCell>
+                          <TableCell>{t('whitelist.form.accountId')}</TableCell>
+                          <TableCell>{t('whitelist.form.ipAddress')}</TableCell>
+                          <TableCell>{t('whitelist.allowedPeriod')}</TableCell>
+                          <TableCell>{t('whitelist.form.purpose')}</TableCell>
+                          <TableCell>{t('common.status')}</TableCell>
+                          <TableCell>{t('common.createdBy')}</TableCell>
+                          <TableCell>{t('common.createdAt')}</TableCell>
+                          <TableCell align="center">{t('common.actions')}</TableCell>
                         </TableRow>
                       </TableHead>
               <TableBody>
@@ -439,10 +439,10 @@ const WhitelistPage: React.FC = () => {
                           <Typography variant="body2" fontWeight="medium">
                             {whitelist.accountId}
                           </Typography>
-                          <Tooltip title="계정 ID 복사">
+                          <Tooltip title={t('whitelist.copyAccountId')}>
                             <IconButton
                               size="small"
-                              onClick={() => handleCopyToClipboard(whitelist.accountId, '계정 ID')}
+                              onClick={() => handleCopyToClipboard(whitelist.accountId, t('whitelist.form.accountId'))}
                               sx={{ p: 0.5 }}
                             >
                               <ContentCopyIcon fontSize="small" />
@@ -454,10 +454,10 @@ const WhitelistPage: React.FC = () => {
                         {whitelist.ipAddress ? (
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <Chip label={whitelist.ipAddress} size="small" />
-                            <Tooltip title="IP 주소 복사">
+                            <Tooltip title={t('whitelist.copyIpAddress')}>
                               <IconButton
                                 size="small"
-                                onClick={() => handleCopyToClipboard(whitelist.ipAddress!, 'IP 주소')}
+                                onClick={() => handleCopyToClipboard(whitelist.ipAddress!, t('whitelist.form.ipAddress'))}
                                 sx={{ p: 0.5 }}
                               >
                                 <ContentCopyIcon fontSize="small" />
@@ -571,68 +571,68 @@ const WhitelistPage: React.FC = () => {
                     <Box>
                       <TextField
                         fullWidth
-                        label="계정 ID"
+                        label={t('whitelist.form.accountId')}
                         value={formData.accountId}
                         onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
                         required
-                        placeholder="사용자 계정 ID를 입력하세요"
+                        placeholder={t('whitelist.form.accountIdPlaceholder')}
                         error={formData.accountId && (formData.accountId.trim().length < 4 || formData.accountId.trim().length > 36)}
                         helperText={
                           formData.accountId && (formData.accountId.trim().length < 4 || formData.accountId.trim().length > 36)
-                            ? '계정 ID는 4~36글자 사이여야 합니다.'
+                            ? t('whitelist.form.accountIdValidation')
                             : undefined
                         }
                       />
                       <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                        화이트리스트에 추가할 사용자의 계정 ID를 정확히 입력해주세요. (4~36글자)
+                        {t('whitelist.form.accountIdHelp')}
                       </Typography>
                     </Box>
                     <Box>
                       <TextField
                         fullWidth
-                        label="IP 주소 (선택사항)"
+                        label={t('whitelist.form.ipAddressOpt')}
                         value={formData.ipAddress}
                         onChange={(e) => setFormData({ ...formData, ipAddress: e.target.value })}
-                        placeholder="예: 192.168.1.100"
+                        placeholder={t('whitelist.form.ipPlaceholder')}
                       />
                       <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                        특정 IP에서만 접근을 허용하려면 입력하세요. 비워두면 모든 IP에서 접근 가능합니다.
+                        {t('whitelist.form.ipHelp')}
                       </Typography>
                     </Box>
                     <Box>
                       <DatePicker
-                        label="시작일 (선택사항)"
+                        label={t('whitelist.form.startDateOpt')}
                         value={formData.startDate ? moment(formData.startDate) : null}
                         onChange={(date) => setFormData({ ...formData, startDate: date ? date.format('YYYY-MM-DD') : '' })}
                         slotProps={{ textField: { fullWidth: true } }}
                       />
                       <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                        화이트리스트가 활성화될 시작 날짜를 선택하세요. 비워두면 즉시 활성화됩니다.
+                        {t('whitelist.form.startDateHelp')}
                       </Typography>
                     </Box>
                     <Box>
                       <DatePicker
-                        label="종료일 (선택사항)"
+                        label={t('whitelist.form.endDateOpt')}
                         value={formData.endDate ? moment(formData.endDate) : null}
                         onChange={(date) => setFormData({ ...formData, endDate: date ? date.format('YYYY-MM-DD') : '' })}
                         slotProps={{ textField: { fullWidth: true } }}
                       />
                       <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                        화이트리스트가 만료될 날짜를 선택하세요. 비워두면 영구적으로 유지됩니다.
+                        {t('whitelist.form.endDateHelp')}
                       </Typography>
                     </Box>
                     <Box>
                       <TextField
                         fullWidth
-                        label="사용 목적"
+                        label={t('whitelist.form.purpose')}
                         value={formData.purpose}
                         onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
                         multiline
                         rows={3}
-                        placeholder="화이트리스트 추가 목적을 입력하세요"
+                        placeholder={t('whitelist.form.purposePlaceholder')}
                       />
                       <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                        화이트리스트 추가 사유나 목적을 기록해주세요. 관리 및 추적에 도움이 됩니다.
+                        {t('whitelist.form.purposeHelp')}
                       </Typography>
                     </Box>
                   </Box>

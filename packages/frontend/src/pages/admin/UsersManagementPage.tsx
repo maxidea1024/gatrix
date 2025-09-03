@@ -161,15 +161,15 @@ const UsersManagementPage: React.FC = () => {
   const handleSuspendUser = (user: User) => {
     setConfirmDialog({
       open: true,
-      title: '사용자 정지',
-      message: `${user.name} 사용자를 정지하시겠습니까?`,
+      title: t('common.suspendUser'),
+      message: t('common.suspendUserConfirm', { name: user.name }),
       action: async () => {
         try {
           await apiService.post(`/admin/users/${user.id}/suspend`);
-          enqueueSnackbar('사용자가 정지되었습니다.', { variant: 'success' });
+          enqueueSnackbar(t('common.userSuspended'), { variant: 'success' });
           fetchUsers();
         } catch (error: any) {
-          enqueueSnackbar(error.message || '사용자 정지에 실패했습니다.', { variant: 'error' });
+          enqueueSnackbar(error.message || t('common.userSuspendFailed'), { variant: 'error' });
         }
       },
     });
@@ -178,15 +178,15 @@ const UsersManagementPage: React.FC = () => {
   const handleActivateUser = (user: User) => {
     setConfirmDialog({
       open: true,
-      title: '사용자 활성화',
-      message: `${user.name} 사용자를 활성화하시겠습니까?`,
+      title: t('common.activateUser'),
+      message: t('common.activateUserConfirm', { name: user.name }),
       action: async () => {
         try {
           await apiService.post(`/admin/users/${user.id}/activate`);
-          enqueueSnackbar('사용자가 활성화되었습니다.', { variant: 'success' });
+          enqueueSnackbar(t('common.userActivated'), { variant: 'success' });
           fetchUsers();
         } catch (error: any) {
-          enqueueSnackbar(error.message || '사용자 활성화에 실패했습니다.', { variant: 'error' });
+          enqueueSnackbar(error.message || t('common.userActivateFailed'), { variant: 'error' });
         }
       },
     });

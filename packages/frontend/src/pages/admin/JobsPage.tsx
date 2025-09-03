@@ -158,7 +158,7 @@ const JobsPage: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to execute job:', error);
-      enqueueSnackbar('작업 실행에 실패했습니다.', { variant: 'error' });
+      enqueueSnackbar(t('common.jobExecuteFailed'), { variant: 'error' });
     }
   };
 
@@ -199,9 +199,9 @@ const JobsPage: React.FC = () => {
       // 409 에러 (이름 중복) 처리
       const status = error?.status || error?.response?.status;
       if (status === 409) {
-        enqueueSnackbar('이미 존재하는 작업 이름입니다.', { variant: 'error' });
+        enqueueSnackbar(t('common.jobNameDuplicate'), { variant: 'error' });
       } else {
-        enqueueSnackbar('작업 저장에 실패했습니다.', { variant: 'error' });
+        enqueueSnackbar(t('common.jobSaveFailed'), { variant: 'error' });
       }
     }
   };

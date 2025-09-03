@@ -237,7 +237,12 @@ const RegisterPage: React.FC = () => {
                   error={false}
                   helperText=""
                   margin="normal"
-                  autoComplete="off"
+                  autoComplete="new-password"
+                  inputProps={{
+                    autoComplete: 'new-password',
+                    'data-lpignore': 'true', // LastPass 무시
+                    'data-form-type': 'other', // 브라우저 힌트 제거
+                  }}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
@@ -267,7 +272,12 @@ const RegisterPage: React.FC = () => {
                   error={false}
                   helperText=""
                   margin="normal"
-                  autoComplete="off"
+                  autoComplete="new-password"
+                  inputProps={{
+                    autoComplete: 'new-password',
+                    'data-lpignore': 'true', // LastPass 무시
+                    'data-form-type': 'other', // 브라우저 힌트 제거
+                  }}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">

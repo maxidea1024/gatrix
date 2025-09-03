@@ -28,7 +28,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import FormDialogHeader from '../common/FormDialogHeader';
@@ -78,7 +78,7 @@ const createValidationSchema = (t: any) => yup.object({
   gameServerAddressForWhiteList: yup
     .string()
     .max(CLIENT_VERSION_VALIDATION.SERVER_ADDRESS.MAX_LENGTH)
-    .optional(),
+    .notRequired(),
   patchAddress: yup
     .string()
     .required(t('clientVersions.form.patchAddressRequired'))
@@ -87,20 +87,21 @@ const createValidationSchema = (t: any) => yup.object({
   patchAddressForWhiteList: yup
     .string()
     .max(CLIENT_VERSION_VALIDATION.PATCH_ADDRESS.MAX_LENGTH)
-    .optional(),
+    .notRequired(),
   guestModeAllowed: yup.boolean().required(),
   externalClickLink: yup
     .string()
     .max(CLIENT_VERSION_VALIDATION.EXTERNAL_LINK.MAX_LENGTH)
-    .optional(),
+    .notRequired(),
   memo: yup
     .string()
     .max(CLIENT_VERSION_VALIDATION.MEMO.MAX_LENGTH)
-    .optional(),
+    .notRequired(),
   customPayload: yup
     .string()
     .max(CLIENT_VERSION_VALIDATION.CUSTOM_PAYLOAD.MAX_LENGTH)
-    .optional(),
+    .notRequired(),
+  tags: yup.array().notRequired(),
 });
 
 const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
@@ -109,8 +110,6 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   onSuccess,
   clientVersion,
   isCopyMode = false,
-  channels,
-  subChannels,
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -217,15 +216,14 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   }, [open]);
 
   // 중복 검사
-  const watchedValues = watch(['channel', 'subChannel', 'clientVersion']);
+  const watchedValues = watch(['platform', 'clientVersion']);
   useEffect(() => {
-    const [channel, subChannel, version] = watchedValues;
-    if (channel && subChannel && version) {
+    const [platform, version] = watchedValues;
+    if (platform && version) {
       const checkDuplicate = async () => {
         try {
           const isDuplicate = await ClientVersionService.checkDuplicate(
-            channel,
-            subChannel,
+            platform,
             version,
             isEdit ? clientVersion?.id : undefined
           );
@@ -243,7 +241,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   }, [watchedValues, isEdit, clientVersion?.id, t]);
 
   // 폼 제출
-  const onSubmit = async (data: ClientVersionFormData) => {
+  const onSubmit: SubmitHandler<ClientVersionFormData> = async (data) => {
     console.log('=== FORM SUBMIT START ===');
     console.log('Form data:', data);
     console.log('isEdit:', isEdit);
@@ -300,9 +298,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         console.log('About to call createClientVersion API...');
         const created = await ClientVersionService.createClientVersion(cleanedData);
         console.log('createClientVersion API call completed');
-        clientVersionId = created?.id || created?.data?.id;
+        clientVersionId = created?.id;
         if (!clientVersionId) {
-          throw new Error('생성된 클라이언트 버전 ID를 가져올 수 없습니다.');
+          throw new Error(t('common.cannotGetClientVersionId'));
         }
         enqueueSnackbar(t('clientVersions.createSuccess'), { variant: 'success' });
       }
@@ -344,20 +342,20 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
     >
       <FormDialogHeader
         title={isCopyMode
-          ? '클라이언트 버전 복사'
+          ? t('clientVersions.form.copyTitle')
           : isEdit
-            ? '클라이언트 버전 편집'
-            : '클라이언트 버전 추가'
+            ? t('clientVersions.form.editTitle')
+            : t('clientVersions.form.title')
         }
         description={isCopyMode
-          ? '기존 클라이언트 버전을 복사하여 새로운 버전을 생성할 수 있습니다.'
+          ? t('clientVersions.form.copyDescription')
           : isEdit
-            ? '기존 클라이언트 버전의 설정을 수정하고 업데이트할 수 있습니다.'
-            : '새로운 클라이언트 버전을 생성하고 게임 서버 및 패치 설정을 구성할 수 있습니다.'
+            ? t('clientVersions.form.editDescription')
+            : t('clientVersions.form.createDescription')
         }
       />
 
-      <form onSubmit={handleSubmit(onSubmit, (errors) => {
+      <form onSubmit={handleSubmit(onSubmit as SubmitHandler<ClientVersionFormData>, (errors) => {
         console.log('Form validation failed:', errors);
       })}>
         <DialogContent dividers>
@@ -661,12 +659,11 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                 {/* 태그 선택 */}
                 <TextField
                   select
-                  multiple
                   label={t('common.tags')}
-                  value={selectedTags.map(tag => tag.id)}
+                  value={selectedTags.map(tag => tag.id.toString())}
                   onChange={(e) => {
                     const selectedIds = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
-                    const newSelectedTags = allTags.filter(tag => selectedIds.includes(tag.id));
+                    const newSelectedTags = allTags.filter(tag => selectedIds.includes(tag.id.toString()));
                     setSelectedTags(newSelectedTags);
                     setValue('tags', newSelectedTags);
                   }}
@@ -728,10 +725,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             }}
           >
             {displayIsCopy
-              ? '클라이언트 버전 복사'
+              ? t('clientVersions.form.copyTitle')
               : displayIsEdit
-                ? '클라이언트 버전 수정'
-                : '클라이언트 버전 추가'
+                ? t('clientVersions.form.updateTitle')
+                : t('clientVersions.form.createTitle')
             }
           </Button>
         </DialogActions>

@@ -11,6 +11,10 @@ export interface GameWorld {
   tags?: Tag[]; // normalized
   createdAt: string;
   updatedAt: string;
+  createdByName?: string;
+  createdByEmail?: string;
+  updatedByName?: string;
+  updatedByEmail?: string;
 }
 
 export interface CreateGameWorldData {

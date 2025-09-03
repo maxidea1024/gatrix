@@ -157,10 +157,10 @@ const IpWhitelistTab: React.FC = () => {
   const handleCopyToClipboard = async (text: string, type: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      enqueueSnackbar(`${type}이(가) 복사되었습니다.`, { variant: 'success' });
+      enqueueSnackbar(t('common.copySuccess', { type }), { variant: 'success' });
     } catch (error) {
       console.error('복사 실패:', error);
-      enqueueSnackbar('복사에 실패했습니다.', { variant: 'error' });
+      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
     }
   };
 

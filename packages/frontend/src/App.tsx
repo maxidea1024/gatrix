@@ -36,6 +36,7 @@ import { MainLayout } from './components/layout/MainLayout';
 
 // Pages - Auth
 import LoginPage from './pages/auth/LoginPage';
+import LogoutPage from './pages/auth/LogoutPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import LandingPage from './pages/LandingPage';
 import SignUpPromptPage from './pages/auth/SignUpPromptPage';
@@ -179,6 +180,7 @@ const AppContent: React.FC = () => {
               <Routes>
                 {/* Public Routes */}
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/logout" element={<LogoutPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/signup-prompt" element={<SignUpPromptPage />} />
                 <Route path="/pending-approval" element={<PendingApprovalPage />} />

@@ -15,7 +15,9 @@ export interface GameWorld {
   createdAt: string;
   updatedAt: string;
   createdByName?: string;
+  createdByEmail?: string;
   updatedByName?: string;
+  updatedByEmail?: string;
 }
 
 export interface CreateGameWorldData {
@@ -147,7 +149,9 @@ export class GameWorldModel {
         .select([
           'gw.*',
           'c.name as createdByName',
-          'u.name as updatedByName'
+          'c.email as createdByEmail',
+          'u.name as updatedByName',
+          'u.email as updatedByEmail'
         ]);
 
       // Apply search filter
@@ -199,14 +203,14 @@ export class GameWorldModel {
       // Get the next display order if not provided
       let displayOrder = worldData.displayOrder;
       if (displayOrder === undefined) {
-        // Get the minimum display order to place new world at the top
-        const minOrderResult = await db('g_game_worlds')
-          .min('displayOrder as minOrder')
+        // Get the maximum display order to place new world at the top (when sorted DESC)
+        const maxOrderResult = await db('g_game_worlds')
+          .max('displayOrder as maxOrder')
           .first();
-        displayOrder = (minOrderResult?.minOrder || 10) - 10;
+        displayOrder = (maxOrderResult?.maxOrder || 0) + 10;
       }
 
-      const [insertId] = await db('g_game_worlds').insert({
+      const insertData = {
         worldId: worldData.worldId,
         name: worldData.name,
         isVisible: worldData.isVisible ?? true,
@@ -215,7 +219,11 @@ export class GameWorldModel {
         description: worldData.description || null,
         tags: worldData.tags || null,
         createdBy: worldData.createdBy
-      });
+      };
+
+
+
+      const [insertId] = await db('g_game_worlds').insert(insertData);
 
       const world = await this.findById(insertId);
       if (!world) {

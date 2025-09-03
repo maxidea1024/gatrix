@@ -212,6 +212,22 @@ const SortableRow: React.FC<SortableRowProps> = ({
         {renderTags(world.tags)}
       </TableCell>
       <TableCell>
+        {world.createdByName ? (
+          <Box>
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+              {world.createdByName}
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+              {world.createdByEmail}
+            </Typography>
+          </Box>
+        ) : (
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            -
+          </Typography>
+        )}
+      </TableCell>
+      <TableCell>
         <Typography variant="body2">
           {formatDateTimeDetailed(world.createdAt)}
         </Typography>
@@ -801,6 +817,7 @@ const GameWorldsPage: React.FC = () => {
                     <TableCell>{t('gameWorlds.maintenance')}</TableCell>
                     <TableCell>{t('gameWorlds.description')}</TableCell>
                     <TableCell>{t('gameWorlds.tags')}</TableCell>
+                    <TableCell>{t('gameWorlds.creator')}</TableCell>
                     <TableCell>{t('gameWorlds.created')}</TableCell>
                     <TableCell align="center">{t('gameWorlds.actions')}</TableCell>
                   </TableRow>
@@ -808,7 +825,7 @@ const GameWorldsPage: React.FC = () => {
                 <TableBody>
                   {worlds.length === 0 ? (
                     <EmptyTableRow
-                      colSpan={8}
+                      colSpan={9}
                       loading={loading}
                       message="등록된 게임 월드가 없습니다."
                     />

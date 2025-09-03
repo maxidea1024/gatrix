@@ -121,7 +121,16 @@ export class GameWorldController {
     }
 
     const { tagIds, ...worldValue } = value as any;
-    const world = await GameWorldService.createGameWorld(worldValue);
+
+    // Add createdBy from authenticated user session
+    const worldData = {
+      ...worldValue,
+      createdBy: req.user!.userId
+    };
+
+
+
+    const world = await GameWorldService.createGameWorld(worldData);
     if (Array.isArray(tagIds)) {
       await TagService.setTagsForEntity('game_world', world.id, tagIds);
     }
@@ -148,7 +157,14 @@ export class GameWorldController {
     }
 
     const { tagIds, ...updateValue } = value as any;
-    const world = await GameWorldService.updateGameWorld(id, updateValue);
+
+    // Add updatedBy from authenticated user session
+    const updateData = {
+      ...updateValue,
+      updatedBy: req.user!.userId
+    };
+
+    const world = await GameWorldService.updateGameWorld(id, updateData);
     if (Array.isArray(tagIds)) {
       await TagService.setTagsForEntity('game_world', id, tagIds);
     }

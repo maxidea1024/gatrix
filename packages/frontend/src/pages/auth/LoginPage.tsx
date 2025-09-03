@@ -43,41 +43,41 @@ const getErrorMessage = (error: any, t: any): string => {
 
   // 상태 코드별 메시지
   if (status === 401) {
-    return '이메일 또는 비밀번호가 올바르지 않습니다.';
+    return t('auth.errors.invalidCredentials');
   }
 
   if (status === 404) {
-    return '등록되지 않은 이메일입니다.';
+    return t('auth.errors.userNotFound');
   }
 
   if (status === 403) {
     if (errorCode === 'ACCOUNT_PENDING') {
-      return '계정 승인 대기 중입니다. 관리자의 승인을 기다려주세요.';
+      return t('auth.errors.accountPending');
     }
     if (errorCode === 'ACCOUNT_SUSPENDED') {
-      return '계정이 일시 정지되었습니다. 관리자에게 문의하세요.';
+      return t('auth.errors.accountSuspended');
     }
     if (errorCode.includes('not active')) {
-      return '계정이 비활성화 상태입니다. 관리자에게 문의하세요.';
+      return t('auth.errors.accountInactive');
     }
-    return '계정에 접근할 수 없습니다. 관리자에게 문의하세요.';
+    return t('auth.errors.accessDenied');
   }
 
   if (status === 429) {
-    return '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
+    return t('auth.errors.tooManyAttempts');
   }
 
   if (status >= 500) {
-    return '서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
+    return t('auth.errors.serverError');
   }
 
   // 네트워크 오류
   if (error.name === 'NetworkError' || !status) {
-    return '네트워크 연결을 확인하고 다시 시도해주세요.';
+    return t('auth.errors.networkError');
   }
 
   // 기본 메시지
-  return '로그인에 실패했습니다. 다시 시도해주세요.';
+  return t('auth.errors.loginFailed');
 };
 
 const LoginPage: React.FC = () => {
@@ -304,12 +304,11 @@ const LoginPage: React.FC = () => {
                   error={false}
                   helperText=""
                   margin="normal"
-                  autoComplete="off"
+                  autoComplete="current-password"
                   inputProps={{
-                    autoComplete: 'new-password', // 브라우저 자동완성 방지
-                    form: {
-                      autoComplete: 'off'
-                    }
+                    autoComplete: 'current-password',
+                    'data-lpignore': 'true', // LastPass 무시
+                    'data-form-type': 'other', // 브라우저 힌트 제거
                   }}
                   InputProps={{
                     endAdornment: (

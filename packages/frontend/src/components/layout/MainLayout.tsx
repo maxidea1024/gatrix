@@ -19,12 +19,6 @@ import {
   Menu,
   MenuItem,
   Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -107,7 +101,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
-  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({
     admin: true,
   });
@@ -182,18 +175,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   };
 
   const handleLogoutClick = () => {
-    setLogoutDialogOpen(true);
+    navigate('/logout');
     handleUserMenuClose();
-  };
-
-  const handleLogoutConfirm = async () => {
-    setLogoutDialogOpen(false);
-    await logout();
-    navigate('/login');
-  };
-
-  const handleLogoutCancel = () => {
-    setLogoutDialogOpen(false);
   };
 
   const toggleSection = (section: string) => {
@@ -690,30 +673,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         {children}
       </Box>
 
-      {/* 로그아웃 확인 다이얼로그 */}
-      <Dialog
-        open={logoutDialogOpen}
-        onClose={handleLogoutCancel}
-        aria-labelledby="logout-dialog-title"
-        aria-describedby="logout-dialog-description"
-      >
-        <DialogTitle id="logout-dialog-title">
-          {t('auth.confirmLogout')}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="logout-dialog-description">
-            {t('auth.confirmLogoutMessage')}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleLogoutCancel} color="primary">
-            {t('common.cancel')}
-          </Button>
-          <Button onClick={handleLogoutConfirm} color="primary" variant="contained">
-            {t('auth.logout')}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Box>
   );
 };

@@ -315,13 +315,13 @@ const MessageTemplatesPage: React.FC = () => {
 
   const handleSave = async () => {
     if (!form.name.trim()) {
-      enqueueSnackbar('이름을 입력해주세요.', { variant: 'error' });
+      enqueueSnackbar(t('common.nameRequired'), { variant: 'error' });
       nameFieldRef.current?.focus();
       return;
     }
 
     if (!form.defaultMessage?.trim()) {
-      enqueueSnackbar('기본 메시지를 입력해주세요.', { variant: 'error' });
+      enqueueSnackbar(t('common.defaultMessageRequired'), { variant: 'error' });
       defaultMessageFieldRef.current?.focus();
       return;
     }
@@ -348,7 +348,7 @@ const MessageTemplatesPage: React.FC = () => {
         templateId = created?.id || (created as any)?.data?.id || (created as any)?.insertId;
 
         if (!templateId) {
-          throw new Error('생성된 템플릿 ID를 가져올 수 없습니다.');
+          throw new Error(t('common.cannotGetTemplateId'));
         }
         enqueueSnackbar(t('common.createSuccess'), { variant: 'success' });
       }
@@ -371,12 +371,12 @@ const MessageTemplatesPage: React.FC = () => {
       if (status === 409) {
         if (errorData?.code === 'DUPLICATE_NAME') {
           const templateName = errorData?.value || form.name;
-          enqueueSnackbar(`이미 존재하는 메시지 템플릿 이름입니다: "${templateName}"`, { variant: 'error' });
+          enqueueSnackbar(t('common.duplicateNameErrorWithValue', { name: templateName }), { variant: 'error' });
         } else {
-          enqueueSnackbar('이미 존재하는 메시지 템플릿 이름입니다.', { variant: 'error' });
+          enqueueSnackbar(t('common.duplicateNameError'), { variant: 'error' });
         }
       } else {
-        const message = error?.response?.data?.error?.message || error?.error?.message || error?.message || '저장에 실패했습니다.';
+        const message = error?.response?.data?.error?.message || error?.error?.message || error?.message || t('common.saveFailed');
         enqueueSnackbar(message, { variant: 'error' });
       }
     } finally {

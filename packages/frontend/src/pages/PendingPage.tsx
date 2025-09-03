@@ -22,13 +22,8 @@ const PendingPage: React.FC = () => {
   const { user, logout } = useAuth();
   // const { t, auth } = useTranslations();
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
+  const handleLogout = () => {
+    navigate('/logout');
   };
 
   const handleContactSupport = () => {

@@ -24,9 +24,9 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/contexts/ThemeContext';
-// // import { useTranslations } from '@/contexts/I18nContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -34,9 +34,9 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onMenuClick, title = 'Admin Panel' }) => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { mode, setTheme } = useTheme();
-  // // const { t } = useTranslations(); // TODO: Implement translations
+  const { t } = useTranslation();
   const navigate = useNavigate();
   
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -63,13 +63,8 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title = 'Admin Pane
     handleProfileMenuClose();
   };
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
+  const handleLogout = () => {
+    navigate('/logout');
     handleProfileMenuClose();
   };
 
@@ -203,20 +198,20 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title = 'Admin Pane
             <ListItemIcon>
               <AccountCircle fontSize="small" />
             </ListItemIcon>
-            <ListItemText>Profile</ListItemText>
+            <ListItemText>{t('navigation.profile')}</ListItemText>
           </MenuItem>
           <MenuItem onClick={() => { navigate('/settings'); handleProfileMenuClose(); }}>
             <ListItemIcon>
               <Settings fontSize="small" />
             </ListItemIcon>
-            <ListItemText>Settings</ListItemText>
+            <ListItemText>{t('navigation.settings')}</ListItemText>
           </MenuItem>
           <Divider />
           <MenuItem onClick={handleLogout}>
             <ListItemIcon>
               <Logout fontSize="small" />
             </ListItemIcon>
-            <ListItemText>Logout</ListItemText>
+            <ListItemText>{t('navigation.logout')}</ListItemText>
           </MenuItem>
         </Menu>
       </Toolbar>

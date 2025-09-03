@@ -21,7 +21,7 @@ export class GameWorldService {
     try {
       const params: GameWorldListParams = {
         sortBy: (pagination.sortBy as any) || 'displayOrder',
-        sortOrder: (pagination.sortOrder as any) || 'ASC',
+        sortOrder: (pagination.sortOrder as any) || 'DESC',
         ...filters
       } as any;
 
@@ -79,6 +79,8 @@ export class GameWorldService {
       const normalized: CreateGameWorldData = {
         ...worldData,
       };
+
+
 
       // Check if worldId already exists
       const existingWorld = await GameWorldModel.findByWorldId(worldData.worldId);
