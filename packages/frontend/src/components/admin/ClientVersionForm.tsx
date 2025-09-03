@@ -695,7 +695,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                         size="small"
                         sx={{ bgcolor: tag.color, color: '#fff', mr: 1 }}
                       />
-                      {tag.description || '설명 없음'}
+                      {tag.description || t('common.noDescription')}
                     </MenuItem>
                   ))}
                 </TextField>

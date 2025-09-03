@@ -206,7 +206,7 @@ export const CLIENT_VERSION_VALIDATION = {
   },
   CLIENT_VERSION: {
     PATTERN: /^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$/,
-    EXAMPLE: '예: 1.0.0, 2.1.3, 1.0.0-beta.1',
+    EXAMPLE: 'e.g., 1.0.0, 2.1.3, 1.0.0-beta.1',
   },
   SERVER_ADDRESS: {
     MIN_LENGTH: 1,

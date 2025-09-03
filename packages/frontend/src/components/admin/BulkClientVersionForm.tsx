@@ -274,8 +274,8 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
       }}
     >
       <FormDialogHeader
-        title="클라이언트 버전 간편 추가"
-        description="하나의 버전으로 여러 플랫폼의 클라이언트 버전을 동시에 생성할 수 있습니다."
+        title={t('clientVersions.bulkAdd')}
+        description={t('clientVersions.form.bulkDescription')}
       />
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -613,7 +613,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                       size="small"
                       sx={{ bgcolor: tag.color, color: '#fff', mr: 1 }}
                     />
-                    {tag.description || '설명 없음'}
+                    {tag.description || t('common.noDescription')}
                   </MenuItem>
                 ))}
               </TextField>
@@ -630,7 +630,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
             variant="contained"
             disabled={loading || isSubmitting}
           >
-            {loading ? '클라이언트 버전 생성 중...' : '클라이언트 버전 일괄 추가'}
+            {loading ? t('clientVersions.creating') : t('clientVersions.bulkCreate')}
           </Button>
         </DialogActions>
       </form>
