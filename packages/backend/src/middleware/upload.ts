@@ -1,6 +1,7 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { Express } from 'express-serve-static-core';
 import { CustomError } from './errorHandler';
 
 // Ensure uploads directory exists

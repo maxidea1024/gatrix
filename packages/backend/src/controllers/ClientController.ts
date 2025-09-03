@@ -3,7 +3,7 @@ import { ClientVersionService } from '../services/ClientVersionService';
 import { GameWorldService } from '../services/GameWorldService';
 import { cacheService } from '../services/CacheService';
 import { pubSubService } from '../services/PubSubService';
-import { GAME_WORLDS, CLIENT_VERSION, DEFAULT_CONFIG } from '../constants/cacheKeys';
+import { GAME_WORLDS, DEFAULT_CONFIG } from '../constants/cacheKeys';
 import logger from '../config/logger';
 import { asyncHandler } from '../utils/asyncHandler';
 

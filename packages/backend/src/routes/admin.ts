@@ -11,7 +11,7 @@ import {
   auditUserPromote,
   auditUserDemote
 } from '../middleware/auditLog';
-import { queueService } from '../services/QueueService';
+
 
 
 const router = Router();

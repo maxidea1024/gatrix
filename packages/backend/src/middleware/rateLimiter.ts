@@ -1,5 +1,4 @@
 import rateLimit, { RateLimitRequestHandler } from 'express-rate-limit';
-import { Request, Response } from 'express';
 import logger from '../config/logger';
 
 // Rate limiter configuration from environment variables

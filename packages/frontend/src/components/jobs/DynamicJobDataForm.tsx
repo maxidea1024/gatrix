@@ -19,11 +19,11 @@ import {
   Delete as DeleteIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { JobSchemaDefinition, JobSchemaField } from '../../types/job';
+import { JobSchema, JobSchemaField } from '../../types/job';
 import JsonEditor from '../common/JsonEditor';
 
 interface DynamicJobDataFormProps {
-  jobSchema: JobSchemaDefinition;
+  jobSchema: JobSchema;
   data: any;
   onChange: (data: any) => void;
   errors: Record<string, string>;

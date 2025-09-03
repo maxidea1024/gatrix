@@ -1,4 +1,5 @@
-import { config } from '../config';
+
+import '../types/global';
 
 // Set test environment
 process.env.NODE_ENV = 'test';
@@ -25,7 +26,7 @@ jest.mock('../config/redis', () => ({
 }));
 
 // Global test utilities
-global.testUtils = {
+(global as any).testUtils = {
   createTestUser: (overrides = {}) => ({
     id: 1,
     email: 'test@example.com',
@@ -51,20 +52,7 @@ global.testUtils = {
   }),
 };
 
-// Extend Jest matchers
-declare global {
-  namespace jest {
-    interface Matchers<R> {
-      toBeValidDate(): R;
-      toBeValidEmail(): R;
-    }
-  }
-  
-  var testUtils: {
-    createTestUser: (overrides?: any) => any;
-    createTestAdmin: (overrides?: any) => any;
-  };
-}
+
 
 expect.extend({
   toBeValidDate(received) {

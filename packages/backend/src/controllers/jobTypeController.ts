@@ -29,7 +29,7 @@ export const getJobTypes = async (req: Request, res: Response) => {
         displayName: '메일 발송',
         description: '이메일을 발송하는 Job',
         isEnabled: true,
-        schemaDefinition: {
+        jobSchema: {
           to: {
             type: 'string',
             label: '받는 사람',
@@ -54,7 +54,7 @@ export const getJobTypes = async (req: Request, res: Response) => {
         displayName: 'HTTP 요청',
         description: 'HTTP API를 호출하는 Job',
         isEnabled: true,
-        schemaDefinition: {
+        jobSchema: {
           url: {
             type: 'string',
             label: 'URL',
@@ -86,7 +86,7 @@ export const getJobTypes = async (req: Request, res: Response) => {
         displayName: 'SSH 명령',
         description: '원격 서버에서 SSH 명령을 실행하는 Job',
         isEnabled: true,
-        schemaDefinition: {
+        jobSchema: {
           host: {
             type: 'string',
             label: '호스트',
@@ -123,7 +123,7 @@ export const getJobTypes = async (req: Request, res: Response) => {
         displayName: '로그 메시지',
         description: '지정된 로그 레벨로 메시지를 기록하는 Job',
         isEnabled: true,
-        schemaDefinition: {
+        jobSchema: {
           message: {
             type: 'text',
             label: '로그 메시지',

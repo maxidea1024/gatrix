@@ -55,7 +55,7 @@ export class AuthService {
       await UserModel.updateLastLogin(user.id);
 
       // Remove password hash from user object
-      const { passwordHash, ...userWithoutPassword } = user;
+      const { passwordHash: _passwordHash, ...userWithoutPassword } = user;
 
       // Generate tokens
       const accessToken = JwtUtils.generateToken(userWithoutPassword);

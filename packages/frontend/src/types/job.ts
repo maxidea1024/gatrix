@@ -5,7 +5,7 @@ export interface JobType {
   name: string;
   displayName: string;
   description?: string;
-  jobSchema?: JobSchemaDefinition;
+  jobSchema?: JobSchema;
   isEnabled: boolean;
   createdAt: string;
   updatedAt: string;
@@ -17,7 +17,7 @@ export interface JobType {
   updatedByEmail?: string;
 }
 
-export interface JobSchemaDefinition {
+export interface JobSchema {
   [key: string]: JobSchemaField;
 }
 

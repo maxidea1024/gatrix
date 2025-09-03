@@ -4,11 +4,11 @@ import { MessageTemplateModel, MessageTemplate } from '../models/MessageTemplate
 export class MessageTemplateController {
   static async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const { type, is_enabled, q, limit, offset } = req.query as any;
+      const { type, isEnabled, q, limit, offset } = req.query as any;
       // MessageTemplateModel 사용
       const result = await MessageTemplateModel.findAllWithPagination({
         type,
-        isEnabled: is_enabled === undefined ? undefined : (is_enabled === '1' || is_enabled === 'true'),
+        isEnabled: isEnabled === undefined ? undefined : (isEnabled === '1' || isEnabled === 'true'),
         search: q,
         limit: Number(limit) || 50,
         offset: Number(offset) || 0

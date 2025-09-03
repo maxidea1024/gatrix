@@ -32,7 +32,7 @@ passport.use(new LocalStrategy(
       }
 
       // Remove password hash before returning user
-      const { passwordHash, ...userWithoutPassword } = user;
+      const { passwordHash: _passwordHash, ...userWithoutPassword } = user;
       return done(null, userWithoutPassword);
     } catch (error) {
       logger.error('Local strategy error:', error);

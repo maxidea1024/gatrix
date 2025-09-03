@@ -111,7 +111,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel }) 
   const handleJobTypeChange = (jobTypeId: string) => {
     const jobType = jobTypes.find(jt => jt.id === parseInt(jobTypeId));
     console.log('Selected job type:', jobType);
-    console.log('Schema definition:', jobType?.schemaDefinition);
+    console.log('Job schema:', jobType?.jobSchema);
     setSelectedJobType(jobType || null);
     setFormData(prev => ({
       ...prev,
@@ -165,8 +165,8 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel }) 
     }
 
     // Validate job data map based on schema
-    if (selectedJobType?.schemaDefinition) {
-      const schema = selectedJobType.schemaDefinition;
+    if (selectedJobType?.jobSchema) {
+      const schema = selectedJobType.jobSchema;
       Object.entries(schema).forEach(([key, field]: [string, JobSchemaField]) => {
         if (field.required && !formData.jobDataMap[key]) {
           newErrors[`jobDataMap.${key}`] = t('jobs.validation.fieldRequired', { field: field.description });
@@ -302,7 +302,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel }) 
 
 
         {/* Job Data Configuration */}
-        {selectedJobType && selectedJobType.schemaDefinition && (
+        {selectedJobType && selectedJobType.jobSchema && (
           <Box>
             <Divider sx={{ my: 2 }} />
             <Accordion defaultExpanded>
@@ -318,7 +318,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel }) 
                   </Typography>
                 )}
                 <DynamicJobDataForm
-                  schema={selectedJobType.schemaDefinition}
+                  jobSchema={selectedJobType.jobSchema}
                   data={formData.jobDataMap}
                   onChange={handleJobDataChange}
                   errors={errors}

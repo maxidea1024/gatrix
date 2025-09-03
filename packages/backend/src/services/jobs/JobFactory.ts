@@ -1,5 +1,5 @@
 import logger from '../../config/logger';
-import { JobExecutionStatus } from '../../models/JobExecution';
+
 
 // Job 실행 결과 인터페이스
 export interface JobExecutionResult {

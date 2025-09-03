@@ -71,7 +71,7 @@ const MessageTemplatesPage: React.FC = () => {
   // 필터
   const [filters, setFilters] = useState<{
     type?: MessageTemplateType;
-    is_enabled?: boolean;
+    isEnabled?: boolean;
     q?: string;
   }>({});
 
@@ -210,7 +210,7 @@ const MessageTemplatesPage: React.FC = () => {
       await Promise.all(selectedIds.map(async (id) => {
         const template = items.find(item => item.id === id);
         if (template) {
-          await messageTemplateService.update(id, { ...template, is_enabled: isEnabled });
+          await messageTemplateService.update(id, { ...template, isEnabled });
         }
       }));
 
@@ -427,13 +427,13 @@ const MessageTemplatesPage: React.FC = () => {
               <FormControl size="small" sx={{ minWidth: 120 }}>
                 <InputLabel shrink={true}>{t('admin.messageTemplates.availability')}</InputLabel>
                 <Select
-                  value={filters.is_enabled?.toString() || ''}
+                  value={filters.isEnabled?.toString() || ''}
                   label={t('admin.messageTemplates.availability')}
                   onChange={(e) => {
                     const value = e.target.value;
                     handleFilterChange({
                       ...filters,
-                      is_enabled: value === '' ? undefined : value === 'true'
+                      isEnabled: value === '' ? undefined : value === 'true'
                     });
                   }}
                   displayEmpty

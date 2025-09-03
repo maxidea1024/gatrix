@@ -21,8 +21,8 @@ export const jobService = {
   // Jobs
   async getJobs(filters?: JobFilters): Promise<Job[]> {
     const params = new URLSearchParams();
-    if (filters?.job_type_id) params.append('job_type_id', filters.job_type_id.toString());
-    if (filters?.is_enabled !== undefined) params.append('is_enabled', filters.is_enabled.toString());
+    if (filters?.jobTypeId) params.append('jobTypeId', filters.jobTypeId.toString());
+    if (filters?.isEnabled !== undefined) params.append('isEnabled', filters.isEnabled.toString());
     if (filters?.search) params.append('search', filters.search);
 
     const queryString = params.toString();

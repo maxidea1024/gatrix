@@ -58,7 +58,7 @@ const MaintenancePage: React.FC = () => {
       }
     }).catch(() => {});
 
-    messageTemplateService.list({ is_enabled: true }).then(response => {
+    messageTemplateService.list({ isEnabled: true }).then(response => {
       setTpls(response.templates || []);
     }).catch(() => {
       setTpls([]);

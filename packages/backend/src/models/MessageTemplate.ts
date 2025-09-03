@@ -171,7 +171,7 @@ export class MessageTemplateModel {
           name: data.name,
           type: data.type,
           defaultMessage: data.defaultMessage || data.default_message || data.content || '',
-          isEnabled: data.isEnabled !== undefined ? data.isEnabled : (data.is_enabled !== undefined ? data.is_enabled : true),
+          isEnabled: data.isEnabled !== undefined ? data.isEnabled : (data.isEnabled !== undefined ? data.isEnabled : true),
           supportsMultiLanguage: data.supportsMultiLanguage !== undefined ? data.supportsMultiLanguage : false,
           createdBy: data.createdBy || data.created_by,
           updatedBy: data.updatedBy || data.updated_by,
@@ -201,7 +201,7 @@ export class MessageTemplateModel {
             name: data.name,
             type: data.type,
             defaultMessage: data.defaultMessage || data.default_message || data.content || '',
-            isEnabled: data.isEnabled !== undefined ? data.isEnabled : (data.is_enabled !== undefined ? data.is_enabled : true),
+            isEnabled: data.isEnabled !== undefined ? data.isEnabled : (data.isEnabled !== undefined ? data.isEnabled : true),
             locales: data.locales || []
           };
         }
@@ -223,8 +223,8 @@ export class MessageTemplateModel {
           .update({
             name: data.name,
             type: data.type,
-            defaultMessage: data.defaultMessage || data.default_message || data.content,
-            isEnabled: data.isEnabled !== undefined ? data.isEnabled : data.is_enabled,
+            defaultMessage: data.defaultMessage || data.content,
+            isEnabled: data.isEnabled !== undefined ? data.isEnabled : data.isEnabled,
             supportsMultiLanguage: data.supportsMultiLanguage !== undefined ? data.supportsMultiLanguage : false,
             updatedBy: data.updatedBy || data.updated_by,
             updatedAt: new Date()

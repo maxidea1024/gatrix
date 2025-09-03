@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 import { JobModel, CreateJobData, UpdateJobData } from '../models/Job';
 import { JobTypeModel } from '../models/JobType';
-import { JobExecutionModel } from '../models/JobExecution';
-import { JobFactory, JobExecutor } from '../services/jobs';
 import logger from '../config/logger';
 
 // Job 목록 조회

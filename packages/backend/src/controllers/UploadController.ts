@@ -1,7 +1,6 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { asyncHandler, CustomError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
-import { config } from '../config';
 
 export class UploadController {
   static uploadAvatar = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {

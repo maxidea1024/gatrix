@@ -1,4 +1,4 @@
-import { BaseJob, JobExecutionResult, JobExecutionContext } from './JobFactory';
+import { BaseJob, JobExecutionResult } from './JobFactory';
 import logger from '../../config/logger';
 
 interface LogMessageJobData {

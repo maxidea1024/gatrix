@@ -1,6 +1,6 @@
 #!/usr/bin/env ts-node
 
-import { config } from '../config';
+
 import logger from '../config/logger';
 import migration from './Migration';
 

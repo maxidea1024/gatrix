@@ -370,7 +370,7 @@ export class QueueService {
    * Process audit log job
    */
   private async processAuditLogJob(job: Job<QueueJobData>): Promise<void> {
-    const { payload } = job.data;
+    const { payload: _payload } = job.data;
     logger.info('Processing audit log job:', { jobId: job.id });
 
     // TODO: Implement audit log processing

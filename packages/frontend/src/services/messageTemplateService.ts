@@ -15,11 +15,6 @@ export interface MessageTemplate {
   tags?: { id: number; name: string; color: string }[];
   createdAt?: string;
   updatedAt?: string;
-  // 백워드 호환성을 위한 snake_case 필드들 (선택적)
-  is_enabled?: boolean;
-  default_message?: string | null;
-  created_at?: string;
-  updated_at?: string;
 }
 
 export interface MessageTemplateListResponse {
@@ -28,7 +23,7 @@ export interface MessageTemplateListResponse {
 }
 
 export const messageTemplateService = {
-  async list(params?: { type?: MessageTemplateType; is_enabled?: boolean; q?: string; limit?: number; offset?: number }): Promise<MessageTemplateListResponse> {
+  async list(params?: { type?: MessageTemplateType; isEnabled?: boolean; q?: string; limit?: number; offset?: number }): Promise<MessageTemplateListResponse> {
     const res = await apiService.get<MessageTemplateListResponse | MessageTemplate[]>(
       '/message-templates',
       { params } as any

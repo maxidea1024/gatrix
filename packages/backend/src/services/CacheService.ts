@@ -99,7 +99,7 @@ export class CacheService extends EventEmitter {
     let validItems = 0;
     let expiredItems = 0;
 
-    for (const [key, item] of this.cache.entries()) {
+    for (const [_key, item] of this.cache.entries()) {
       if (now - item.timestamp > item.ttl) {
         expiredItems++;
       } else {

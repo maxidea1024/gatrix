@@ -2,7 +2,6 @@ import { Response } from 'express';
 import { UserService } from '../services/userService';
 import { asyncHandler, CustomError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
-import logger from '../config/logger';
 import Joi from 'joi';
 
 // Validation schemas
