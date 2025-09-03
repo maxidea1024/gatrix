@@ -204,7 +204,7 @@ const TagsPage: React.FC = () => {
                 <TableRow>
                   <TableCell>{t('tags.name')}</TableCell>
                   <TableCell>{t('tags.description')}</TableCell>
-                  <TableCell sx={{ width: 100 }}>색상</TableCell>
+                  <TableCell sx={{ width: 100 }}>{t('common.color')}</TableCell>
                   <TableCell>
                     <TableSortLabel active={!!sort?.startsWith('createdAt')} direction={sort?.endsWith('Asc') ? 'asc' : 'desc'} onClick={() => setSort(sort?.startsWith('createdAt') && sort.endsWith('Desc') ? 'createdAtAsc' : 'createdAtDesc')}>
                       {t('common.createdAt')}
