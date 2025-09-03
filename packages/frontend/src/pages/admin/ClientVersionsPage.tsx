@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { devLogger, prodLogger } from '../../utils/logger';
+import { usePageState } from '../../hooks/usePageState';
 import {
   Box,
   Card,
@@ -89,20 +90,28 @@ const ClientVersionsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
+  // 페이지 상태 관리 (localStorage 연동)
+  const {
+    pageState,
+    updatePage,
+    updateLimit,
+    updateSort,
+    updateFilters,
+  } = usePageState({
+    defaultState: {
+      page: 1,
+      limit: 10,
+      sortBy: 'clientVersion',
+      sortOrder: 'DESC',
+      filters: {},
+    },
+    storageKey: 'clientVersionsPage',
+  });
+
   // 상태 관리
   const [clientVersions, setClientVersions] = useState<ClientVersion[]>([]);
   const [loading, setLoading] = useState(false);
   const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(ClientVersionService.getStoredPageSize());
-  const [sortBy] = useState('clientVersion');
-  const [sortOrder] = useState<'ASC' | 'DESC'>('DESC');
-  
-  // 필터
-  const [filters, setFilters] = useState<ClientVersionFilters>({});
-
-  // 디버깅: 현재 필터 상태 로그
-  console.log('Current filters state:', filters);
   
   // 선택 관리
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -144,14 +153,14 @@ const ClientVersionsPage: React.FC = () => {
   const loadClientVersions = useCallback(async (customFilters?: ClientVersionFilters) => {
     try {
       setLoading(true);
-      const filtersToUse = customFilters || filters;
+      const filtersToUse = customFilters || pageState.filters || {};
 
       const result = await ClientVersionService.getClientVersions(
-        page + 1,
-        rowsPerPage,
+        pageState.page,
+        pageState.limit,
         filtersToUse,
-        'clientVersion', // 버전 기준 정렬 고정
-        'DESC' // 내림차순 고정
+        pageState.sortBy || 'clientVersion',
+        pageState.sortOrder || 'DESC'
       );
 
       if (result && result.clientVersions) {
@@ -168,7 +177,7 @@ const ClientVersionsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, sortBy, sortOrder, enqueueSnackbar]);
+  }, [pageState, enqueueSnackbar, t]);
 
   // 메타데이터 로드
   const loadMetadata = useCallback(async () => {
@@ -203,12 +212,12 @@ const ClientVersionsPage: React.FC = () => {
   // 버전 목록 별도 로드
   useEffect(() => {
     loadAvailableVersions();
-  }, []);
+  }, [loadAvailableVersions]);
 
-  // 페이지 크기 변경 시 로컬 스토리지에 저장
+  // pageState 변경 시 데이터 다시 로드
   useEffect(() => {
-    ClientVersionService.setStoredPageSize(rowsPerPage);
-  }, [rowsPerPage]);
+    loadClientVersions();
+  }, [pageState.page, pageState.limit, pageState.sortBy, pageState.sortOrder]);
 
 
 
@@ -216,28 +225,24 @@ const ClientVersionsPage: React.FC = () => {
 
   // 필터 변경 핸들러
   const handleFilterChange = useCallback((newFilters: ClientVersionFilters) => {
-    console.log('Filter change handler called with:', newFilters);
-    setFilters(newFilters);
-    setPage(0);
-    ClientVersionService.setStoredFilters(newFilters);
+    updateFilters(newFilters);
     // 새 필터로 즉시 데이터 로드
     loadClientVersions(newFilters);
-  }, [loadClientVersions]);
+  }, [updateFilters, loadClientVersions]);
 
   // 정렬은 고정 (버전 내림차순, 플랫폼 내림차순)
   // 정렬 변경 기능 비활성화
 
   // 페이지 변경 핸들러
   const handlePageChange = useCallback((_: unknown, newPage: number) => {
-    setPage(newPage);
-  }, []);
+    updatePage(newPage + 1); // MUI는 0부터 시작, 우리는 1부터 시작
+  }, [updatePage]);
 
   // 페이지 크기 변경 핸들러
   const handleRowsPerPageChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const newRowsPerPage = parseInt(event.target.value, 10);
-    setRowsPerPage(newRowsPerPage);
-    setPage(0);
-  }, []);
+    const newLimit = parseInt(event.target.value, 10);
+    updateLimit(newLimit);
+  }, [updateLimit]);
 
   // 선택 관리
   const handleSelectAll = useCallback((checked: boolean) => {
@@ -365,7 +370,7 @@ const ClientVersionsPage: React.FC = () => {
   // CSV 내보내기
   const handleExportCSV = useCallback(async () => {
     try {
-      const blob = await ClientVersionService.exportToCSV(filters);
+      const blob = await ClientVersionService.exportToCSV(pageState.filters || {});
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -379,7 +384,7 @@ const ClientVersionsPage: React.FC = () => {
       console.error('Error exporting CSV:', error);
       enqueueSnackbar(error.message || t('clientVersions.exportError'), { variant: 'error' });
     }
-  }, [filters, t, enqueueSnackbar]);
+  }, [pageState.filters, t, enqueueSnackbar]);
 
   // 버전 복사 핸들러
   const handleCopyVersion = useCallback((clientVersion: ClientVersion) => {
@@ -492,9 +497,9 @@ const ClientVersionsPage: React.FC = () => {
               <FormControl size="small" sx={{ minWidth: 120 }}>
                 <InputLabel shrink={true}>{t('clientVersions.version')}</InputLabel>
                 <Select
-                  value={filters.version || ''}
+                  value={pageState.filters?.version || ''}
                   label={t('clientVersions.version')}
-                  onChange={(e) => handleFilterChange({ ...filters, version: e.target.value || undefined })}
+                  onChange={(e) => handleFilterChange({ ...pageState.filters, version: e.target.value || undefined })}
                   displayEmpty
                   size="small"
                 >
@@ -512,9 +517,9 @@ const ClientVersionsPage: React.FC = () => {
               <FormControl size="small" sx={{ minWidth: 120 }}>
                 <InputLabel shrink={true}>{t('clientVersions.platform')}</InputLabel>
                 <Select
-                  value={filters.platform || ''}
+                  value={pageState.filters?.platform || ''}
                   label={t('clientVersions.platform')}
-                  onChange={(e) => handleFilterChange({ ...filters, platform: e.target.value || undefined })}
+                  onChange={(e) => handleFilterChange({ ...pageState.filters, platform: e.target.value || undefined })}
                   displayEmpty
                   size="small"
                 >
@@ -532,9 +537,9 @@ const ClientVersionsPage: React.FC = () => {
               <FormControl size="small" sx={{ minWidth: 120 }}>
                 <InputLabel shrink={true}>{t('clientVersions.statusLabel')}</InputLabel>
                 <Select
-                  value={filters.clientStatus || ''}
+                  value={pageState.filters?.clientStatus || ''}
                   label={t('clientVersions.statusLabel')}
-                  onChange={(e) => handleFilterChange({ ...filters, clientStatus: e.target.value as ClientStatus || undefined })}
+                  onChange={(e) => handleFilterChange({ ...pageState.filters, clientStatus: e.target.value as ClientStatus || undefined })}
                   displayEmpty
                   size="small"
                 >
@@ -552,14 +557,14 @@ const ClientVersionsPage: React.FC = () => {
               <FormControl size="small" sx={{ minWidth: 120 }}>
                 <InputLabel shrink={true}>{t('clientVersions.guestMode')}</InputLabel>
                 <Select
-                  value={filters.guestModeAllowed?.toString() || ''}
+                  value={pageState.filters?.guestModeAllowed?.toString() || ''}
                   label={t('clientVersions.guestMode')}
                   onChange={(e) => {
                     const value = e.target.value;
                     const guestModeValue = value === '' ? undefined : value === 'true';
                     console.log('Guest mode filter changed:', { value, guestModeValue });
                     handleFilterChange({
-                      ...filters,
+                      ...pageState.filters,
                       guestModeAllowed: guestModeValue
                     });
                   }}
@@ -867,8 +872,8 @@ const ClientVersionsPage: React.FC = () => {
         {/* 페이지네이션 */}
         <SimplePagination
           count={total}
-          page={page}
-          rowsPerPage={rowsPerPage}
+          page={pageState.page - 1} // MUI는 0부터 시작
+          rowsPerPage={pageState.limit}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleRowsPerPageChange}
           rowsPerPageOptions={[5, 10, 25, 50, 100]}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { usePageState } from '../../hooks/usePageState';
 import {
   Box,
   Typography,
@@ -49,6 +50,23 @@ const AuditLogsPage: React.FC = () => {
   const { language } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
 
+  // 페이지 상태 관리 (localStorage 연동)
+  const {
+    pageState,
+    updatePage,
+    updateLimit,
+    updateFilters,
+  } = usePageState({
+    defaultState: {
+      page: 1,
+      limit: 10,
+      sortBy: 'createdAt',
+      sortOrder: 'DESC',
+      filters: {},
+    },
+    storageKey: 'auditLogsPage',
+  });
+
   // Get locale text for DateTimePicker
   const getDatePickerLocale = () => {
     switch (language) {
@@ -65,22 +83,23 @@ const AuditLogsPage: React.FC = () => {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  // Filters
-  const [filters, setFilters] = useState<AuditLogFilters>({});
-  const [startDate, setStartDate] = useState<Dayjs | null>(null);
-  const [endDate, setEndDate] = useState<Dayjs | null>(null);
-  const [userFilter, setUserFilter] = useState<string>('');
-  const [ipFilter, setIpFilter] = useState<string>('');
+  // Filters - localStorage에서 복원
+  const [startDate, setStartDate] = useState<Dayjs | null>(
+    pageState.filters?.start_date ? dayjs(pageState.filters.start_date) : null
+  );
+  const [endDate, setEndDate] = useState<Dayjs | null>(
+    pageState.filters?.end_date ? dayjs(pageState.filters.end_date) : null
+  );
+  const [userFilter, setUserFilter] = useState<string>(pageState.filters?.user || '');
+  const [ipFilter, setIpFilter] = useState<string>(pageState.filters?.ip || '');
 
   // Load audit logs
   const loadAuditLogs = useCallback(async () => {
     try {
       setLoading(true);
 
-      const dateFilters: AuditLogFilters = { ...filters };
+      const dateFilters: AuditLogFilters = { ...pageState.filters };
       if (startDate) {
         dateFilters.start_date = startDate.toISOString();
       }
@@ -95,8 +114,8 @@ const AuditLogsPage: React.FC = () => {
       }
 
       const result = await AuditLogService.getAuditLogs(
-        page + 1,
-        rowsPerPage,
+        pageState.page,
+        pageState.limit,
         dateFilters
       );
 
@@ -115,7 +134,7 @@ const AuditLogsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, filters, startDate, endDate, enqueueSnackbar]);
+  }, [pageState, startDate, endDate, userFilter, ipFilter, enqueueSnackbar, t]);
 
   useEffect(() => {
     loadAuditLogs();
@@ -123,20 +142,20 @@ const AuditLogsPage: React.FC = () => {
 
   // Handlers
   const handlePageChange = (event: unknown, newPage: number) => {
-    setPage(newPage);
+    updatePage(newPage + 1); // MUI는 0부터 시작, 우리는 1부터 시작
   };
 
   const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    const newLimit = parseInt(event.target.value, 10);
+    updateLimit(newLimit);
   };
 
   const handleFilterChange = (key: keyof AuditLogFilters, value: any) => {
-    setFilters(prev => ({
-      ...prev,
+    const newFilters = {
+      ...pageState.filters,
       [key]: value || undefined,
-    }));
-    setPage(0);
+    };
+    updateFilters(newFilters);
   };
 
   const handleRefresh = () => {
@@ -233,7 +252,11 @@ const AuditLogsPage: React.FC = () => {
                   size="small"
                   sx={{ minWidth: 120 }}
                   value={userFilter}
-                  onChange={(e) => setUserFilter(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setUserFilter(value);
+                    handleFilterChange('user', value);
+                  }}
                 />
 
                 <TextField
@@ -241,14 +264,21 @@ const AuditLogsPage: React.FC = () => {
                   size="small"
                   sx={{ minWidth: 120 }}
                   value={ipFilter}
-                  onChange={(e) => setIpFilter(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setIpFilter(value);
+                    handleFilterChange('ip_address', value);
+                  }}
                 />
 
                 <DateTimePicker
                   key={`start-date-${language}`}
                   label={t('auditLogs.startDate')}
                   value={startDate}
-                  onChange={setStartDate}
+                  onChange={(date) => {
+                    setStartDate(date);
+                    handleFilterChange('start_date', date ? date.toISOString() : undefined);
+                  }}
                   slotProps={{
                     textField: {
                       size: 'small',
@@ -265,7 +295,10 @@ const AuditLogsPage: React.FC = () => {
                   key={`end-date-${language}`}
                   label={t('auditLogs.endDate')}
                   value={endDate}
-                  onChange={setEndDate}
+                  onChange={(date) => {
+                    setEndDate(date);
+                    handleFilterChange('end_date', date ? date.toISOString() : undefined);
+                  }}
                   slotProps={{
                     textField: {
                       size: 'small',
@@ -387,8 +420,8 @@ const AuditLogsPage: React.FC = () => {
 
           <SimplePagination
             count={total}
-            page={page}
-            rowsPerPage={rowsPerPage}
+            page={pageState.page - 1} // MUI는 0부터 시작
+            rowsPerPage={pageState.limit}
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
             rowsPerPageOptions={[5, 10, 25, 50]}

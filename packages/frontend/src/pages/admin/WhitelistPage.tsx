@@ -3,6 +3,7 @@ import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import { useI18n } from '@/contexts/I18nContext';
+import { usePageState } from '../../hooks/usePageState';
 
 import {
   Box,
@@ -61,6 +62,23 @@ const WhitelistPage: React.FC = () => {
   const { language } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
 
+  // 페이지 상태 관리 (localStorage 연동)
+  const {
+    pageState,
+    updatePage,
+    updateLimit,
+    updateFilters,
+  } = usePageState({
+    defaultState: {
+      page: 1,
+      limit: 10,
+      sortBy: 'createdAt',
+      sortOrder: 'DESC',
+      filters: { search: '' },
+    },
+    storageKey: 'whitelistPage',
+  });
+
   // Tab state
   const [currentTab, setCurrentTab] = useState(0);
 
@@ -68,9 +86,6 @@ const WhitelistPage: React.FC = () => {
   const [whitelists, setWhitelists] = useState<Whitelist[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [search, setSearch] = useState('');
 
 
   // Menu state
@@ -122,8 +137,8 @@ const WhitelistPage: React.FC = () => {
     try {
       setLoading(true);
       const filters: any = {};
-      if (search) filters.search = search;
-      const result = await WhitelistService.getWhitelists(page + 1, rowsPerPage, filters);
+      if (pageState.filters?.search) filters.search = pageState.filters.search;
+      const result = await WhitelistService.getWhitelists(pageState.page, pageState.limit, filters);
 
       console.log('Whitelist load result:', result);
 
@@ -149,7 +164,7 @@ const WhitelistPage: React.FC = () => {
 
   useEffect(() => {
     loadWhitelists();
-  }, [page, rowsPerPage, search]);
+  }, [pageState.page, pageState.limit, pageState.filters]);
 
   // Handlers
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -157,22 +172,22 @@ const WhitelistPage: React.FC = () => {
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(event.target.value);
-    setPage(0);
+    const searchValue = event.target.value;
+    updateFilters({ search: searchValue });
   };
 
   const handleChangePage = (_event: unknown, newPage: number) => {
     if (typeof newPage === 'number' && !isNaN(newPage)) {
-      setPage(newPage);
+      updatePage(newPage + 1); // MUI는 0부터 시작, 우리는 1부터 시작
     } else {
       console.error('Invalid page number received:', newPage);
-      setPage(0); // Reset to first page
+      updatePage(1); // Reset to first page
     }
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    const newLimit = parseInt(event.target.value, 10);
+    updateLimit(newLimit);
   };
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, whitelist: Whitelist) => {
@@ -363,7 +378,7 @@ const WhitelistPage: React.FC = () => {
                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
                       <TextField
                         placeholder={t('whitelist.searchPlaceholder')}
-                        value={search}
+                        value={pageState.filters?.search || ''}
                         onChange={handleSearchChange}
                         slotProps={{
                           input: {
@@ -530,8 +545,8 @@ const WhitelistPage: React.FC = () => {
           </TableContainer>
           <SimplePagination
             count={total}
-            page={page}
-            rowsPerPage={rowsPerPage}
+            page={pageState.page - 1} // MUI는 0부터 시작
+            rowsPerPage={pageState.limit}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             rowsPerPageOptions={[5, 10, 25, 50]}
