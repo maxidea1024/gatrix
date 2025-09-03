@@ -10,6 +10,7 @@ import Joi from 'joi';
 const loginSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
+  rememberMe: Joi.boolean().optional(),
 });
 
 const registerSchema = Joi.object({
@@ -45,8 +46,13 @@ export class AuthController {
       throw new CustomError(error.details[0].message, 400);
     }
 
-    const { email, password } = value;
+    const { email, password, rememberMe } = value;
     const result = await AuthService.login({ email, password });
+
+    // Log rememberMe preference for potential future use
+    if (rememberMe) {
+      logger.info(`User ${email} chose to be remembered`);
+    }
 
     // Set refresh token as httpOnly cookie
     res.cookie('refreshToken', result.refreshToken, {

@@ -312,7 +312,8 @@ const AuditLogsPage: React.FC = () => {
                   <EmptyTableRow
                     colSpan={7}
                     loading={loading}
-                    message="감사 로그가 없습니다."
+                    message={t('auditLogs.noLogsFound')}
+                    loadingMessage={t('common.loadingAuditLogs')}
                   />
                 ) : (
                   auditLogs.map((log) => (

@@ -707,7 +707,8 @@ const ClientVersionsPage: React.FC = () => {
                 <EmptyTableRow
                   colSpan={12}
                   loading={loading}
-                  message="등록된 클라이언트 버전이 없습니다."
+                  message={t('clientVersions.noVersionsFound')}
+                  loadingMessage={t('common.loadingClientVersions')}
                 />
               ) : (
                 clientVersions.map((clientVersion) => (

@@ -317,10 +317,10 @@ const WhitelistPage: React.FC = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-            화이트리스트 관리
+            {t('whitelist.title')}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            계정 및 IP 화이트리스트 관리</Typography>
+            {t('whitelist.subtitle')}</Typography>
         </Box>
       </Box>
 
@@ -418,7 +418,8 @@ const WhitelistPage: React.FC = () => {
                   <EmptyTableRow
                     colSpan={9}
                     loading={loading}
-                    message="계정 화이트리스트 항목이 없습니다."
+                    message={t('whitelist.noEntries')}
+                    loadingMessage={t('common.loadingWhitelist')}
                   />
                 ) : (
                   whitelists.map((whitelist) => (
@@ -559,10 +560,10 @@ const WhitelistPage: React.FC = () => {
                 setEditDialog(false);
               }} maxWidth="sm" fullWidth>
                 <FormDialogHeader
-                  title={editDialog ? '계정 화이트리스트 편집' : '계정 화이트리스트 추가'}
+                  title={editDialog ? t('whitelist.dialog.editTitle') : t('whitelist.dialog.addTitle')}
                   description={editDialog
-                    ? '기존 화이트리스트 항목의 정보를 수정할 수 있습니다.'
-                    : '새로운 계정을 화이트리스트에 추가하고 접근 권한을 설정할 수 있습니다.'
+                    ? t('whitelist.dialog.editDescription')
+                    : t('whitelist.dialog.addDescription')
                   }
                 />
                 <DialogContent>
@@ -642,10 +643,10 @@ const WhitelistPage: React.FC = () => {
                     setAddDialog(false);
                     setEditDialog(false);
                   }} startIcon={<CancelIcon />}>
-                    취소
+                    {t('common.cancel')}
                   </Button>
                   <Button onClick={handleSave} variant="contained" startIcon={<SaveIcon />}>
-                    {(editDialog && selectedWhitelist) ? '계정 화이트리스트 수정' : '계정 화이트리스트 추가'}
+                    {(editDialog && selectedWhitelist) ? t('whitelist.dialog.update') : t('whitelist.dialog.add')}
                   </Button>
                 </DialogActions>
               </Dialog>

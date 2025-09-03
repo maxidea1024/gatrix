@@ -12,7 +12,7 @@ const EmptyTableRow: React.FC<EmptyTableRowProps> = ({
   colSpan,
   loading = false,
   message,
-  loadingMessage = "로딩 중..."
+  loadingMessage = "Loading..."
 }) => {
   return (
     <TableRow>

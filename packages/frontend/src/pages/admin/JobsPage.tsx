@@ -340,7 +340,8 @@ const JobsPage: React.FC = () => {
               <EmptyTableRow
                 colSpan={8}
                 loading={loading}
-                message="등록된 작업이 없습니다."
+                message={t('jobs.noJobsFound')}
+                loadingMessage={t('common.loadingJobs')}
               />
             ) : (
               jobs.map((job) => (

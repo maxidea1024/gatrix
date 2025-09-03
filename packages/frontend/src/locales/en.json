@@ -459,6 +459,13 @@
     "id": "ID",
     "info": "Information",
     "loading": "Loading...",
+    "loadingData": "Loading data...",
+    "loadingWhitelist": "Loading whitelist...",
+    "loadingUsers": "Loading users...",
+    "loadingGameWorlds": "Loading game worlds...",
+    "loadingClientVersions": "Loading client versions...",
+    "loadingJobs": "Loading jobs...",
+    "loadingAuditLogs": "Loading audit logs...",
     "loggedInAs": "Logged in as",
     "memo": "Memo",
     "minute": "Minute",
@@ -829,9 +836,12 @@
     "userDeleted": "User deleted successfully"
   },
   "whitelist": {
+    "title": "Whitelist Management",
+    "subtitle": "Manage account and IP whitelist entries",
     "addEntry": "Add Entry",
     "anyIp": "Any IP",
     "bulkImport": "Bulk Import",
+    "noEntries": "No account whitelist entries found.",
     "tabs": {
       "overview": "Overview",
       "account": "Account Whitelist",
@@ -871,13 +881,17 @@
     },
     "dialog": {
       "addTitle": "Add Account Whitelist Entry",
+      "editTitle": "Edit Account Whitelist Entry",
+      "addDescription": "Add a new account to the whitelist and configure access permissions.",
+      "editDescription": "Modify the information of an existing whitelist entry.",
+      "add": "Add Account Whitelist",
+      "update": "Update Account Whitelist",
       "bulkHint1": "Enter one entry per line in the format: Account ID [Tab] IP Address [Tab] Memo [Tab] Tags",
       "bulkHint2": "Example: 12345678901234567890123456789012\\t192.168.1.100\\tVIP User\\tvip;premium",
       "bulkPlaceholder": "12345678901234567890123456789012\t192.168.1.100\tVIP User\tvip;premium\n98765432109876543210987654321098\t\tRegular User\tregular\n11111111111111111111111111111111\t10.0.0.1\tAdministrator\tadmin;staff",
       "bulkTitle": "Bulk Import Account Whitelist Entries",
       "deleteMessage": "Are you sure you want to delete this account whitelist entry?",
       "deleteTitle": "Delete Account Whitelist Entry",
-      "editTitle": "Edit Account Whitelist Entry",
       "import": "Import"
     },
     "errors": {

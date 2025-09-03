@@ -407,7 +407,8 @@ const UsersPage: React.FC = () => {
                     <EmptyTableRow
                       colSpan={7}
                       loading={isLoading}
-                      message="등록된 사용자가 없습니다."
+                      message={t('users.noUsersFound')}
+                      loadingMessage={t('common.loadingUsers')}
                     />
                   ) : (
                     users.map((user) => (

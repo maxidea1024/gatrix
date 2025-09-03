@@ -201,7 +201,8 @@ const TagsPage: React.FC = () => {
                   <EmptyTableRow
                     colSpan={6}
                     loading={loading}
-                    message={tags.length === 0 ? '등록된 태그가 없습니다.' : '검색 조건에 맞는 태그가 없습니다.'}
+                    message={tags.length === 0 ? t('tags.noTagsFound') : t('tags.noMatchingTags')}
+                    loadingMessage={t('common.loadingData')}
                   />
                 ) : (
                   filtered.map(tag => (

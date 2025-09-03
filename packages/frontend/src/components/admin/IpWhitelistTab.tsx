@@ -391,7 +391,8 @@ const IpWhitelistTab: React.FC = () => {
                   <EmptyTableRow
                     colSpan={7}
                     loading={loading}
-                    message="IP 화이트리스트 항목이 없습니다."
+                    message={t('ipWhitelist.noEntries')}
+                    loadingMessage={t('common.loadingWhitelist')}
                   />
                 ) : (
                   ipWhitelists.map((ipWhitelist) => (

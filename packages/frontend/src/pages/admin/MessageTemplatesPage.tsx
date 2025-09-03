@@ -535,7 +535,8 @@ const MessageTemplatesPage: React.FC = () => {
                   <EmptyTableRow
                     colSpan={9}
                     loading={loading}
-                    message="등록된 메시지 템플릿이 없습니다."
+                    message={t('admin.messageTemplates.noTemplatesFound')}
+                    loadingMessage={t('common.loadingData')}
                   />
                 ) : (
                   items.map(row => {
