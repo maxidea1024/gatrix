@@ -125,14 +125,14 @@ export class GameWorldController {
     // Add createdBy from authenticated user session
     const worldData = {
       ...worldValue,
-      createdBy: req.user!.userId
+      createdBy: req.user!.id,
     };
 
 
 
     const world = await GameWorldService.createGameWorld(worldData);
     if (Array.isArray(tagIds)) {
-      await TagService.setTagsForEntity('game_world', world.id, tagIds, req.user!.userId);
+      await TagService.setTagsForEntity('game_world', world.id, tagIds, req.user!.id);
     }
     const tags = await TagService.listTagsForEntity('game_world', world.id);
 
@@ -161,12 +161,12 @@ export class GameWorldController {
     // Add updatedBy from authenticated user session
     const updateData = {
       ...updateValue,
-      updatedBy: req.user!.userId
+      updatedBy: req.user!.id
     };
 
     const world = await GameWorldService.updateGameWorld(id, updateData);
     if (Array.isArray(tagIds)) {
-      await TagService.setTagsForEntity('game_world', id, tagIds, req.user!.userId);
+      await TagService.setTagsForEntity('game_world', id, tagIds, req.user!.id);
     }
     const tags = await TagService.listTagsForEntity('game_world', id);
 

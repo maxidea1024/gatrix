@@ -48,7 +48,7 @@ export const TagController = {
     if (!entityType || !entityId || !Array.isArray(tagIds)) {
       throw new CustomError('Invalid payload', 400);
     }
-    await TagService.setTagsForEntity(entityType, Number(entityId), tagIds.map(Number), req.user?.userId);
+    await TagService.setTagsForEntity(entityType, Number(entityId), tagIds.map(Number), req.user?.id);
     res.json({ success: true, message: 'Tags set for entity' });
   }),
 

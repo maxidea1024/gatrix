@@ -18,7 +18,7 @@
       "totalSessions": "총 세션 수"
     },
     "maintenance": {
-      "description": "시스템 점검 상태를 관리하고 점검 메시지 및 시간 일정을 설정합니다.",
+      "description": "시스템 점검 모드 관리 및 사용자 안내 메시지 설정",
       "applyEndsAt": "종료 시간 적용",
       "confirmStartMessage": "점검을 시작하려면 \"start maintenance\"를 입력하세요.",
       "confirmStartTitle": "점검 시작 확인",
@@ -359,7 +359,7 @@
   "clientStatus": "클라이언트 상태",
   "clientVersion": "클라이언트 버전",
   "clientVersions": {
-    "description": "게임 클라이언트 버전을 관리하고 서버 주소 및 업데이트 설정을 구성합니다.",
+    "description": "게임 클라이언트 버전별 서버 연결 정보 및 업데이트 정책 관리",
     "addNew": "클라이언트 버전 추가",
     "addIndividual": "개별 버전 추가",
     "addBulk": "간편 추가",
@@ -701,9 +701,9 @@
   },
   "jobs": {
     "title": "Job 관리",
-    "description": "정기 작업을 생성하고 관리하며, 작업 실행 상태와 이력을 모니터링합니다.",
+    "description": "자동화된 백그라운드 작업 생성, 스케줄링 및 실행 이력 추적",
     "monitor": "큐 모니터",
-    "monitorDescription": "작업 큐 상태를 실시간으로 모니터링하고 실행 중이거나 대기 중인 작업을 확인합니다.",
+    "monitorDescription": "실시간 작업 큐 모니터링 및 진행 상황 추적",
     "monitorLoadError": "큐 모니터 로드에 실패했습니다",
     "addJob": "작업 추가",
     "noJobsFound": "등록된 작업이 없습니다.",
@@ -763,7 +763,7 @@
     }
   },
   "gameWorlds": {
-    "description": "게임 월드 서버를 관리하고 서버 상태 및 연결 설정을 구성합니다.",
+    "description": "게임 월드별 서버 환경 설정 및 접속 상태 관리",
     "actions": "작업",
     "active": "활성",
     "activeWorlds": "활성 월드",

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import moment from 'moment';
+import dayjs from 'dayjs';
+import { useI18n } from '@/contexts/I18nContext';
 
 import {
   Box,
@@ -57,6 +58,7 @@ import EmptyTableRow from '../../components/common/EmptyTableRow';
 
 const WhitelistPage: React.FC = () => {
   const { t } = useTranslation();
+  const { language } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
 
   // Tab state
@@ -601,10 +603,21 @@ const WhitelistPage: React.FC = () => {
                     </Box>
                     <Box>
                       <DatePicker
+                        key={`start-date-${language}`}
                         label={t('whitelist.form.startDateOpt')}
-                        value={formData.startDate ? moment(formData.startDate) : null}
-                        onChange={(date) => setFormData({ ...formData, startDate: date ? date.format('YYYY-MM-DD') : '' })}
-                        slotProps={{ textField: { fullWidth: true } }}
+                        value={formData.startDate ? dayjs(formData.startDate) : null}
+                        onChange={(date) => {
+                          setFormData({
+                            ...formData,
+                            startDate: date && dayjs.isDayjs(date) ? date.format('YYYY-MM-DD') : ''
+                          });
+                        }}
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            error: false
+                          }
+                        }}
                       />
                       <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                         {t('whitelist.form.startDateHelp')}
@@ -612,8 +625,9 @@ const WhitelistPage: React.FC = () => {
                     </Box>
                     <Box>
                       <DatePicker
+                        key={`end-date-${language}`}
                         label={t('whitelist.form.endDateOpt')}
-                        value={formData.endDate ? moment(formData.endDate) : null}
+                        value={formData.endDate ? dayjs(formData.endDate) : null}
                         onChange={(date) => setFormData({ ...formData, endDate: date ? date.format('YYYY-MM-DD') : '' })}
                         slotProps={{ textField: { fullWidth: true } }}
                       />

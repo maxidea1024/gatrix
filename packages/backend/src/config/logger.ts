@@ -148,15 +148,34 @@ const createLogger = (category: string): winston.Logger => {
       winston.format.timestamp(),
       winston.format.errors({ stack: true })
     ),
-    transports: [...transports],
+    transports: [
+      // Console transport with category format
+      new winston.transports.Console({
+        level: logLevel,
+        format: categoryFormat,
+      }),
+      // Add file transports only in production or when LOG_DIR is specified
+      ...(process.env.NODE_ENV === 'production' || process.env.LOG_DIR ? [
+        new DailyRotateFile({
+          filename: path.join(logDir, 'error-%DATE%.log'),
+          datePattern: 'YYYY-MM-DD',
+          level: 'error',
+          format: fileFormat,
+          maxSize: '20m',
+          maxFiles: '14d',
+          zippedArchive: true,
+        }),
+        new DailyRotateFile({
+          filename: path.join(logDir, 'combined-%DATE%.log'),
+          datePattern: 'YYYY-MM-DD',
+          format: fileFormat,
+          maxSize: '20m',
+          maxFiles: '14d',
+          zippedArchive: true,
+        })
+      ] : [])
+    ],
   });
-
-  // Add console transport for development
-  if (process.env.NODE_ENV !== 'production') {
-    categoryLogger.add(new winston.transports.Console({
-      format: categoryFormat,
-    }));
-  }
 
   loggers.set(category, categoryLogger);
   return categoryLogger;

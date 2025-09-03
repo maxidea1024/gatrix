@@ -18,7 +18,7 @@
       "totalSessions": "Total Sessions"
     },
     "maintenance": {
-      "description": "Manage system maintenance status and configure maintenance messages and schedules.",
+      "description": "System maintenance mode management and user notification settings",
       "applyEndsAt": "Apply ends at",
       "confirmStartMessage": "Type \"start maintenance\" to confirm starting maintenance mode.",
       "confirmStartTitle": "Confirm maintenance start",
@@ -359,7 +359,7 @@
   "clientStatus": "clientStatus",
   "clientVersion": "clientVersion",
   "clientVersions": {
-    "description": "Manage game client versions and configure server addresses and update settings.",
+    "description": "Game client version management and server connection configuration",
     "addNew": "Add New Version",
     "addIndividual": "Add Individual Version",
     "addBulk": "Quick Add",
@@ -656,8 +656,8 @@
   },
   "jobs": {
     "title": "Job Management",
-    "description": "Create and manage scheduled jobs, monitor job execution status and history.",
-    "monitorDescription": "Monitor job queue status in real-time and view running or pending jobs.",
+    "description": "Automated background task creation, scheduling and execution history tracking",
+    "monitorDescription": "Real-time job queue monitoring and progress tracking",
     "addJob": "Add Job",
     "editJob": "Edit Job",
     "noJobsFound": "No jobs found.",
@@ -717,7 +717,7 @@
     }
   },
   "gameWorlds": {
-    "description": "Manage game world servers and configure server status and connection settings.",
+    "description": "Game world server environment configuration and connection status management",
     "actions": "Actions",
     "active": "Active",
     "activeWorlds": "Active Worlds",

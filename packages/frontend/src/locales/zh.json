@@ -21,7 +21,7 @@
       "totalSessions": "总会话数"
     },
     "maintenance": {
-      "description": "管理系统维护状态，设置维护消息和时间安排。",
+      "description": "系统维护模式管理及用户通知消息设置",
       "applyEndsAt": "应用结束时间",
       "confirmStartMessage": "请输入 \"start maintenance\" 来开始维护。",
       "confirmStartTitle": "确认开始维护",
@@ -363,7 +363,7 @@
   "clientStatus": "客户端状态",
   "clientVersion": "客户端版本",
   "clientVersions": {
-    "description": "管理游戏客户端版本，配置服务器地址和更新设置。",
+    "description": "游戏客户端版本管理及服务器连接配置",
     "addNew": "添加新版本",
     "addIndividual": "添加单个版本",
     "addBulk": "快速添加",
@@ -661,8 +661,8 @@
   },
   "jobs": {
     "title": "任务管理",
-    "description": "创建和管理定时任务，监控任务执行状态和历史记录。",
-    "monitorDescription": "实时监控任务队列状态，查看正在运行和等待中的任务。",
+    "description": "自动化后台任务创建、调度及执行历史跟踪",
+    "monitorDescription": "实时任务队列监控及进度跟踪",
     "addJob": "添加任务",
     "editJob": "编辑任务",
     "jobType": "任务类型",
@@ -722,7 +722,7 @@
     }
   },
   "gameWorlds": {
-    "description": "管理游戏世界服务器，配置服务器状态和连接设置。",
+    "description": "游戏世界服务器环境配置及连接状态管理",
     "actions": "操作",
     "active": "活跃",
     "activeWorlds": "活跃世界",
