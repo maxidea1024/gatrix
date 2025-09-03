@@ -132,13 +132,12 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
             borderColor: 'divider'
           },
         }}
-        BackdropProps={{
-          sx: {
-            backgroundColor: 'transparent',
-            backdropFilter: 'none'
-          }
-        }}
+        hideBackdrop
         disableScrollLock
+        disablePortal={false}
+        disableAutoFocus
+        disableEnforceFocus
+        disableRestoreFocus
       >
         <Stack spacing={2}>
           <Typography variant="subtitle2" fontWeight="bold">
