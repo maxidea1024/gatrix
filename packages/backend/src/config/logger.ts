@@ -134,9 +134,8 @@ const createLogger = (category: string): winston.Logger => {
           metaStr = '\n[Object could not be serialized]';
         }
       }
-      // Apply colors to different parts
-      // const coloredCategory = winston.format.colorize().colorize('info', `[${category}]`);
-      const coloredCategory = `[${category}]`;
+      // Apply yellow color to category name only
+      const coloredCategory = `[\x1b[33m${category}\x1b[0m]`;
       const result = `${timestamp} [${level}] ${coloredCategory}: ${message}${metaStr}`;
       return result;
     })
