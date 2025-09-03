@@ -1,4 +1,4 @@
-import database from '../config/database';
+import db from '../config/knex';
 
 export interface TagAssignment {
   id: number;
@@ -10,19 +10,30 @@ export interface TagAssignment {
 
 export default class TagAssignmentModel {
   static async setTagsForEntity(entityType: string, entityId: number, tagIds: number[]): Promise<void> {
-    await database.transaction(async (conn) => {
-      await conn.execute(`DELETE FROM g_tag_assignments WHERE entityType = ? AND entityId = ?`, [entityType, entityId]);
-      for (const tagId of tagIds) {
-        await conn.execute(`INSERT INTO g_tag_assignments (tagId, entityType, entityId) VALUES (?, ?, ?)`, [tagId, entityType, entityId]);
+    await db.transaction(async (trx) => {
+      await trx('g_tag_assignments')
+        .where('entityType', entityType)
+        .where('entityId', entityId)
+        .del();
+
+      if (tagIds.length > 0) {
+        const insertData = tagIds.map(tagId => ({
+          tagId,
+          entityType,
+          entityId
+        }));
+        await trx('g_tag_assignments').insert(insertData);
       }
     });
   }
 
   static async listTagsForEntity(entityType: string, entityId: number): Promise<any[]> {
-    const rows = await database.query(
-      `SELECT t.* FROM g_tag_assignments a JOIN g_tags t ON t.id = a.tagId WHERE a.entityType = ? AND a.entityId = ? ORDER BY t.name`,
-      [entityType, entityId]
-    );
+    const rows = await db('g_tag_assignments as a')
+      .join('g_tags as t', 't.id', 'a.tagId')
+      .select('t.*')
+      .where('a.entityType', entityType)
+      .where('a.entityId', entityId)
+      .orderBy('t.name');
     return rows;
   }
 }

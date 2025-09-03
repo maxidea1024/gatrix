@@ -23,14 +23,14 @@ import { JobSchemaDefinition, JobSchemaField } from '../../types/job';
 import JsonEditor from '../common/JsonEditor';
 
 interface DynamicJobDataFormProps {
-  schema: JobSchemaDefinition;
+  jobSchema: JobSchemaDefinition;
   data: any;
   onChange: (data: any) => void;
   errors: Record<string, string>;
 }
 
 const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
-  schema,
+  jobSchema,
   data,
   onChange,
   errors
@@ -38,21 +38,21 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
   const { t } = useTranslation();
 
   console.log('DynamicJobDataForm received data:', data);
-  console.log('DynamicJobDataForm received schema:', schema);
+  console.log('DynamicJobDataForm received jobSchema:', jobSchema);
 
   // 스키마가 변경될 때만 기본값 설정
   useEffect(() => {
-    if (!schema || Object.keys(schema).length === 0) return;
+    if (!jobSchema || Object.keys(jobSchema).length === 0) return;
 
-    console.log('DynamicJobDataForm useEffect - schema changed');
+    console.log('DynamicJobDataForm useEffect - jobSchema changed');
     console.log('Current data:', data);
-    console.log('Schema:', schema);
+    console.log('JobSchema:', jobSchema);
 
     // 기본값이 필요한 필드만 처리
     const newData = { ...data };
     let hasChanges = false;
 
-    Object.entries(schema).forEach(([fieldName, field]) => {
+    Object.entries(jobSchema).forEach(([fieldName, field]) => {
       // 필드에 값이 없고 기본값이 있는 경우에만 기본값 설정
       const currentValue = data[fieldName];
       const hasValue = currentValue !== undefined &&
@@ -75,7 +75,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
     if (hasChanges) {
       onChange(newData);
     }
-  }, [schema]); // schema만 의존성으로 설정
+  }, [jobSchema]); // jobSchema만 의존성으로 설정
 
   const handleFieldChange = (fieldName: string, value: any) => {
     const newData = { ...data, [fieldName]: value };
@@ -286,7 +286,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
     }
   };
 
-  if (!schema || Object.keys(schema).length === 0) {
+  if (!jobSchema || Object.keys(jobSchema).length === 0) {
     return (
       <Typography variant="body2" color="text.secondary">
         {t('jobs.noConfigurationRequired')}
@@ -295,7 +295,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
   }
 
   // HTTP 요청 타입인지 확인
-  const isHttpRequest = Object.keys(schema).includes('url') && Object.keys(schema).includes('method');
+  const isHttpRequest = Object.keys(jobSchema).includes('url') && Object.keys(jobSchema).includes('method');
   const httpMethod = data.method || 'GET';
   const shouldHideBody = isHttpRequest && httpMethod === 'GET';
 
@@ -303,16 +303,16 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
   const getFieldOrder = () => {
     if (isHttpRequest) {
       const orderedFields = ['method', 'url', 'headers', 'body'];
-      const otherFields = Object.keys(schema).filter(key => !orderedFields.includes(key));
+      const otherFields = Object.keys(jobSchema).filter(key => !orderedFields.includes(key));
       return [...orderedFields, ...otherFields];
     }
-    return Object.keys(schema);
+    return Object.keys(jobSchema);
   };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       {/* GET 요청일 때 body 필드가 숨겨졌다는 안내 메시지 */}
-      {shouldHideBody && schema.body && (
+      {shouldHideBody && jobSchema.body && (
         <Box sx={{
           p: 2,
           bgcolor: 'info.light',
@@ -328,7 +328,7 @@ const DynamicJobDataForm: React.FC<DynamicJobDataFormProps> = ({
       )}
 
       {getFieldOrder().map((fieldName) => {
-        const field = schema[fieldName];
+        const field = jobSchema[fieldName];
         if (!field) return null;
 
         // GET 요청일 때 body 필드 숨기기

@@ -1,17 +1,19 @@
 /**
  * Initial Database Schema for Gatrix
- * Creates all tables with camelCase field names
+ * Creates all tables with updated field names and tracking columns
+ * Updated: 2025-09-03 - Added createdBy/updatedBy fields, changed enums to strings
  */
 
 const mysql = require('mysql2/promise');
+require('dotenv').config();
 
 exports.up = async function() {
   const connection = await mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'gatrix'
+    user: process.env.DB_USER || 'motif_dev',
+    password: process.env.DB_PASSWORD || 'dev123$',
+    database: process.env.DB_NAME || 'uwo_gate'
   });
 
   console.log('Creating initial database schema...');
@@ -23,17 +25,23 @@ exports.up = async function() {
       name VARCHAR(255) NOT NULL,
       email VARCHAR(255) NOT NULL UNIQUE,
       passwordHash VARCHAR(255) NULL,
-      role ENUM('admin', 'user') NOT NULL DEFAULT 'user',
-      status ENUM('active', 'inactive', 'deleted') NOT NULL DEFAULT 'active',
+      role VARCHAR(50) NOT NULL DEFAULT 'user',
+      status VARCHAR(50) NOT NULL DEFAULT 'active',
       emailVerified BOOLEAN NOT NULL DEFAULT FALSE,
       emailVerifiedAt TIMESTAMP NULL,
       lastLoginAt TIMESTAMP NULL,
       avatarUrl VARCHAR(500) NULL,
+      createdBy INT NULL,
+      updatedBy INT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       INDEX idx_email (email),
       INDEX idx_role (role),
-      INDEX idx_status (status)
+      INDEX idx_status (status),
+      INDEX idx_created_by (createdBy),
+      INDEX idx_updated_by (updatedBy),
+      CONSTRAINT fk_users_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
+      CONSTRAINT fk_users_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
@@ -99,12 +107,18 @@ exports.up = async function() {
       isMaintenance BOOLEAN NOT NULL DEFAULT FALSE,
       displayOrder INT NOT NULL DEFAULT 0,
       tags JSON NULL,
+      createdBy INT NOT NULL,
+      updatedBy INT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       INDEX idx_world_id (worldId),
       INDEX idx_visible (isVisible),
       INDEX idx_maintenance (isMaintenance),
-      INDEX idx_display_order (displayOrder)
+      INDEX idx_display_order (displayOrder),
+      INDEX idx_created_by (createdBy),
+      INDEX idx_updated_by (updatedBy),
+      CONSTRAINT fk_game_worlds_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE RESTRICT,
+      CONSTRAINT fk_game_worlds_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
@@ -114,14 +128,7 @@ exports.up = async function() {
       id INT AUTO_INCREMENT PRIMARY KEY,
       platform VARCHAR(100) NOT NULL COMMENT '플랫폼 (예: android, ios, web, pc)',
       clientVersion VARCHAR(50) NOT NULL COMMENT '클라이언트 버전 (semver 형식)',
-      clientStatus ENUM(
-        'online',
-        'offline',
-        'recommended_update',
-        'forced_update',
-        'under_review',
-        'blocked_patch_allowed'
-      ) NOT NULL COMMENT '클라이언트 상태',
+      clientStatus VARCHAR(50) NOT NULL COMMENT '클라이언트 상태',
       gameServerAddress VARCHAR(500) NOT NULL COMMENT '게임서버 주소',
       gameServerAddressForWhiteList VARCHAR(500) NULL COMMENT '화이트리스트 전용 게임서버 주소',
       patchAddress VARCHAR(500) NOT NULL COMMENT '패치파일 다운로드 주소',
@@ -152,16 +159,22 @@ exports.up = async function() {
       ipAddress VARCHAR(45) NULL,
       startDate DATETIME NULL,
       endDate DATETIME NULL,
-      memo TEXT NULL,
+      purpose TEXT NULL,
+      isEnabled BOOLEAN NOT NULL DEFAULT TRUE,
       tags JSON NULL,
       createdBy INT NOT NULL,
+      updatedBy INT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       CONSTRAINT fk_whitelist_creator FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE RESTRICT,
+      CONSTRAINT fk_whitelist_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
       UNIQUE KEY unique_account_id (accountId),
       INDEX idx_account_id (accountId),
       INDEX idx_ip_address (ipAddress),
-      INDEX idx_date_range (startDate, endDate)
+      INDEX idx_date_range (startDate, endDate),
+      INDEX idx_enabled (isEnabled),
+      INDEX idx_created_by (createdBy),
+      INDEX idx_updated_by (updatedBy)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
@@ -211,9 +224,16 @@ exports.up = async function() {
       tagId INT NOT NULL,
       entityType VARCHAR(50) NOT NULL,
       entityId INT NOT NULL,
+      createdBy INT NOT NULL,
+      updatedBy INT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       CONSTRAINT fk_tag_assignments_tag FOREIGN KEY (tagId) REFERENCES g_tags(id) ON DELETE CASCADE,
+      CONSTRAINT fk_tag_assignments_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE RESTRICT,
+      CONSTRAINT fk_tag_assignments_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
       INDEX idx_entity (entityType, entityId),
+      INDEX idx_created_by (createdBy),
+      INDEX idx_updated_by (updatedBy),
       UNIQUE KEY unique_assignment (tagId, entityType, entityId)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
@@ -225,9 +245,15 @@ exports.up = async function() {
       varKey VARCHAR(255) NOT NULL UNIQUE,
       varValue TEXT NULL,
       description TEXT NULL,
+      createdBy INT NOT NULL,
+      updatedBy INT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      INDEX idx_varKey (varKey)
+      INDEX idx_varKey (varKey),
+      INDEX idx_created_by (createdBy),
+      INDEX idx_updated_by (updatedBy),
+      CONSTRAINT fk_vars_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE RESTRICT,
+      CONSTRAINT fk_vars_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
@@ -235,7 +261,7 @@ exports.up = async function() {
     CREATE TABLE IF NOT EXISTS g_message_templates (
       id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(191) NOT NULL UNIQUE,
-      type ENUM('maintenance', 'general', 'notification', 'email', 'sms', 'push', 'system') NOT NULL DEFAULT 'maintenance',
+      type VARCHAR(50) NOT NULL DEFAULT 'maintenance',
       isEnabled BOOLEAN NOT NULL DEFAULT TRUE,
       supportsMultiLanguage BOOLEAN NOT NULL DEFAULT FALSE,
       defaultMessage TEXT NULL,
@@ -256,13 +282,19 @@ exports.up = async function() {
     CREATE TABLE IF NOT EXISTS g_message_template_locales (
       id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
       templateId BIGINT UNSIGNED NOT NULL,
-      lang ENUM('ko', 'en', 'zh') NOT NULL,
+      lang VARCHAR(10) NOT NULL,
       message TEXT NOT NULL,
+      createdBy INT NOT NULL,
+      updatedBy INT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       FOREIGN KEY (templateId) REFERENCES g_message_templates(id) ON DELETE CASCADE,
+      CONSTRAINT fk_message_locales_created_by FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE RESTRICT,
+      CONSTRAINT fk_message_locales_updated_by FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
       INDEX idx_template (templateId),
-      INDEX idx_lang (lang)
+      INDEX idx_lang (lang),
+      INDEX idx_created_by (createdBy),
+      INDEX idx_updated_by (updatedBy)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
@@ -275,7 +307,7 @@ exports.up = async function() {
       name VARCHAR(100) NOT NULL UNIQUE,
       displayName VARCHAR(200) NOT NULL,
       description TEXT NULL,
-      \`schema\` JSON NULL,
+      jobSchema JSON NULL,
       isActive BOOLEAN NOT NULL DEFAULT TRUE,
       createdBy INT NULL,
       updatedBy INT NULL,
@@ -316,13 +348,13 @@ exports.up = async function() {
     CREATE TABLE IF NOT EXISTS g_job_executions (
       id INT AUTO_INCREMENT PRIMARY KEY,
       jobId INT NOT NULL,
-      status ENUM('pending', 'running', 'completed', 'failed', 'cancelled') NOT NULL DEFAULT 'pending',
+      status VARCHAR(50) NOT NULL DEFAULT 'pending',
       startedAt TIMESTAMP NULL,
       completedAt TIMESTAMP NULL,
       result JSON NULL,
       error TEXT NULL,
       logs TEXT NULL,
-      triggeredBy ENUM('schedule', 'manual', 'api') NOT NULL DEFAULT 'schedule',
+      triggeredBy VARCHAR(50) NOT NULL DEFAULT 'schedule',
       triggeredByUserId INT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -354,7 +386,7 @@ exports.up = async function() {
 
   // Insert default job types
   await connection.execute(`
-    INSERT IGNORE INTO g_job_types (name, displayName, description, \`schema\`, isActive) VALUES
+    INSERT IGNORE INTO g_job_types (name, displayName, description, jobSchema, isActive) VALUES
     ('mailsend', 'Email Sender', 'Send email messages', '{"to":{"type":"string","required":true,"description":"Recipient email address"},"subject":{"type":"string","required":true,"description":"Email subject"},"body":{"type":"text","required":true,"description":"Email body content"}}', TRUE),
     ('http_request', 'HTTP Request', 'Make HTTP requests', '{"url":{"type":"string","required":true,"description":"Request URL"},"method":{"type":"select","required":true,"description":"HTTP method","options":["GET","POST","PUT","DELETE","PATCH"],"default":"GET"},"headers":{"type":"object","required":false,"description":"Request headers (JSON format)"},"body":{"type":"text","required":false,"description":"Request body"}}', TRUE),
     ('ssh_command', 'SSH Command', 'Execute SSH commands', '{"host":{"type":"string","required":true,"description":"SSH host address"},"username":{"type":"string","required":true,"description":"SSH username"},"command":{"type":"text","required":true,"description":"Command to execute"},"port":{"type":"number","required":false,"description":"SSH port","default":22}}', TRUE),
@@ -396,6 +428,7 @@ exports.down = async function() {
     'g_job_executions',
     'g_jobs',
     'g_job_types',
+    'g_message_template_locales',
     'g_message_templates',
     'g_vars',
     'g_tag_assignments',

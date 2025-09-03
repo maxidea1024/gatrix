@@ -1,4 +1,4 @@
-import database from '../config/database';
+import db from '../config/knex';
 import { CustomError } from '../middleware/errorHandler';
 import TagAssignmentModel from './TagAssignment';
 
@@ -9,13 +9,16 @@ export interface Whitelist {
   startDate?: Date;
   endDate?: Date;
   purpose?: string;
+  isEnabled: boolean;
   tags?: string[];
   createdBy: number;
+  updatedBy?: number;
   createdAt: Date;
   updatedAt: Date;
   createdByName?: string;
   createdByEmail?: string;
-  isEnabled: boolean;
+  updatedByName?: string;
+  updatedByEmail?: string;
 }
 
 export interface CreateWhitelistData {
@@ -24,9 +27,9 @@ export interface CreateWhitelistData {
   startDate?: Date;
   endDate?: Date;
   purpose?: string;
+  isEnabled?: boolean;
   tags?: string[];
   createdBy: number;
-  isEnabled: boolean;
 }
 
 export interface UpdateWhitelistData {
@@ -37,6 +40,7 @@ export interface UpdateWhitelistData {
   purpose?: string;
   tags?: string[];
   isEnabled?: boolean;
+  updatedBy?: number;
 }
 
 export interface WhitelistFilters {
@@ -64,77 +68,77 @@ export class WhitelistModel {
   ): Promise<WhitelistListResponse> {
     try {
       const offset = (page - 1) * limit;
-      let whereClause = 'WHERE 1=1';
-      const filterParams: any[] = [];
+
+      // Build base query
+      let query = db('g_account_whitelist as w')
+        .leftJoin('g_users as c', 'w.createdBy', 'c.id')
+        .leftJoin('g_users as u', 'w.updatedBy', 'u.id')
+        .select([
+          'w.id',
+          'w.accountId',
+          'w.ipAddress',
+          'w.startDate',
+          'w.endDate',
+          'w.purpose',
+          'w.isEnabled',
+          db.raw('CAST(w.tags AS CHAR) as tags'),
+          'w.createdBy',
+          'w.updatedBy',
+          'w.createdAt',
+          'w.updatedAt',
+          'c.name as createdByName',
+          'c.email as createdByEmail',
+          'u.name as updatedByName',
+          'u.email as updatedByEmail'
+        ]);
 
       // Apply filters
       if (filters.accountId) {
-        whereClause += ' AND w.accountId LIKE ?';
-        filterParams.push(`%${filters.accountId}%`);
+        query = query.where('w.accountId', 'like', `%${filters.accountId}%`);
       }
 
       if (filters.ipAddress) {
-        whereClause += ' AND w.ipAddress LIKE ?';
-        filterParams.push(`%${filters.ipAddress}%`);
+        query = query.where('w.ipAddress', 'like', `%${filters.ipAddress}%`);
       }
 
       if (filters.createdBy) {
-        whereClause += ' AND w.createdBy = ?';
-        filterParams.push(filters.createdBy);
+        query = query.where('w.createdBy', filters.createdBy);
       }
 
-      if (filters.isEnabled) {
-        whereClause += ' AND w.isEnabled = ?';
-        filterParams.push(filters.isEnabled);
+      if (filters.isEnabled !== undefined) {
+        query = query.where('w.isEnabled', filters.isEnabled);
       }
 
       if (filters.tags && filters.tags.length > 0) {
-        const tagConditions = filters.tags.map(() => 'JSON_CONTAINS(w.tags, ?)').join(' OR ');
-        whereClause += ` AND (${tagConditions})`;
-        filters.tags.forEach(tag => {
-          filterParams.push(JSON.stringify(tag));
+        query = query.where(function() {
+          filters.tags!.forEach((tag, index) => {
+            if (index === 0) {
+              this.whereRaw('JSON_CONTAINS(w.tags, ?)', [JSON.stringify(tag)]);
+            } else {
+              this.orWhereRaw('JSON_CONTAINS(w.tags, ?)', [JSON.stringify(tag)]);
+            }
+          });
         });
       }
 
       if (filters.search) {
-        whereClause += ' AND (w.accountId LIKE ? OR w.ipAddress LIKE ? OR w.purpose LIKE ?)';
-        filterParams.push(`%${filters.search}%`, `%${filters.search}%`, `%${filters.search}%`);
+        query = query.where(function() {
+          this.where('w.accountId', 'like', `%${filters.search}%`)
+            .orWhere('w.ipAddress', 'like', `%${filters.search}%`)
+            .orWhere('w.purpose', 'like', `%${filters.search}%`);
+        });
       }
 
       // Get total count
-      const countQuery = `
-        SELECT COUNT(*) as total
-        FROM g_account_whitelist w
-        LEFT JOIN g_users u ON w.createdBy = u.id
-        ${whereClause}
-      `;
-      const countResult = await database.query(countQuery, filterParams);
-      const total = countResult[0].total;
+      const countQuery = query.clone().clearSelect().count('* as total').first();
+      const countResult = await countQuery;
+      const total = Number(countResult?.total || 0);
 
       // Get paginated results
-      const query = `
-        SELECT
-          w.id,
-          w.accountId,
-          w.ipAddress,
-          w.startDate,
-          w.endDate,
-          w.purpose,
-          CAST(w.tags AS CHAR) as tags,
-          w.createdBy,
-          w.createdAt,
-          w.updatedAt,
-          u.name as createdByName,
-          u.email as createdByEmail,
-          w.isEnabled
-        FROM g_account_whitelist w
-        LEFT JOIN g_users u ON w.createdBy = u.id
-        ${whereClause}
-        ORDER BY w.createdAt DESC
-        LIMIT ${limit} OFFSET ${offset}
-      `;
-
-      const whitelists = await database.query(query, filterParams);
+      const whitelists = await query
+        .orderBy('w.createdAt', 'desc')
+        .limit(limit)
+        .offset(offset);
 
       return {
         whitelists: whitelists.map(this.mapRowToWhitelist),
@@ -151,28 +155,31 @@ export class WhitelistModel {
 
   static async findById(id: number): Promise<Whitelist | null> {
     try {
-      const query = `
-        SELECT
-          w.id,
-          w.accountId,
-          w.ipAddress,
-          w.startDate,
-          w.endDate,
-          w.purpose,
-          CAST(w.tags AS CHAR) as tags,
-          w.createdBy,
-          w.createdAt,
-          w.updatedAt,
-          u.name as createdByName,
-          u.email as createdByEmail,
-          w.isEnabled
-        FROM g_account_whitelist w
-        LEFT JOIN g_users u ON w.createdBy = u.id
-        WHERE w.id = ?
-      `;
+      const result = await db('g_account_whitelist as w')
+        .leftJoin('g_users as c', 'w.createdBy', 'c.id')
+        .leftJoin('g_users as u', 'w.updatedBy', 'u.id')
+        .select([
+          'w.id',
+          'w.accountId',
+          'w.ipAddress',
+          'w.startDate',
+          'w.endDate',
+          'w.purpose',
+          'w.isEnabled',
+          db.raw('CAST(w.tags AS CHAR) as tags'),
+          'w.createdBy',
+          'w.updatedBy',
+          'w.createdAt',
+          'w.updatedAt',
+          'c.name as createdByName',
+          'c.email as createdByEmail',
+          'u.name as updatedByName',
+          'u.email as updatedByEmail'
+        ])
+        .where('w.id', id)
+        .first();
 
-      const result = await database.query(query, [id]);
-      return result.length > 0 ? this.mapRowToWhitelist(result[0]) : null;
+      return result ? this.mapRowToWhitelist(result) : null;
     } catch (error) {
       throw new CustomError('Failed to fetch whitelist entry', 500);
     }
@@ -180,23 +187,18 @@ export class WhitelistModel {
 
   static async create(data: CreateWhitelistData): Promise<Whitelist> {
     try {
-      const query = `
-        INSERT INTO g_account_whitelist (accountId, ipAddress, startDate, endDate, purpose, tags, createdBy, isEnabled)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `;
+      const [insertId] = await db('g_account_whitelist').insert({
+        accountId: data.accountId,
+        ipAddress: data.ipAddress || null,
+        startDate: data.startDate || null,
+        endDate: data.endDate || null,
+        purpose: data.purpose || null,
+        isEnabled: data.isEnabled !== undefined ? data.isEnabled : true,
+        tags: data.tags ? JSON.stringify(data.tags) : null,
+        createdBy: data.createdBy
+      });
 
-      const result = await database.query(query, [
-        data.accountId,
-        data.ipAddress || null,
-        data.startDate || null,
-        data.endDate || null,
-        data.purpose || null,
-        data.tags ? JSON.stringify(data.tags) : null,
-        data.createdBy,
-        data.isEnabled
-      ]);
-
-      const created = await this.findById(result.insertId);
+      const created = await this.findById(insertId);
       if (!created) {
         throw new CustomError('Failed to create whitelist entry', 500);
       }
@@ -209,53 +211,49 @@ export class WhitelistModel {
 
   static async update(id: number, data: UpdateWhitelistData): Promise<Whitelist | null> {
     try {
-      const fields: string[] = [];
-      const params: any[] = [];
+      const updateData: any = {};
 
       if (data.accountId !== undefined) {
-        fields.push('accountId = ?');
-        params.push(data.accountId);
+        updateData.accountId = data.accountId;
       }
 
       if (data.ipAddress !== undefined) {
-        fields.push('ipAddress = ?');
-        params.push(data.ipAddress || null);
+        updateData.ipAddress = data.ipAddress || null;
       }
 
       if (data.isEnabled !== undefined) {
-        fields.push('isEnabled = ?');
-        params.push(data.isEnabled || null);
+        updateData.isEnabled = data.isEnabled;
       }
 
       if (data.startDate !== undefined) {
-        fields.push('startDate = ?');
-        params.push(data.startDate || null);
+        updateData.startDate = data.startDate || null;
       }
 
       if (data.endDate !== undefined) {
-        fields.push('endDate = ?');
-        params.push(data.endDate || null);
+        updateData.endDate = data.endDate || null;
       }
 
       if (data.purpose !== undefined) {
-        fields.push('purpose = ?');
-        params.push(data.purpose || null);
+        updateData.purpose = data.purpose || null;
       }
 
       if (data.tags !== undefined) {
-        fields.push('tags = ?');
-        params.push(data.tags ? JSON.stringify(data.tags) : null);
+        updateData.tags = data.tags ? JSON.stringify(data.tags) : null;
       }
 
-      if (fields.length === 0) {
+      if (data.updatedBy !== undefined) {
+        updateData.updatedBy = data.updatedBy;
+      }
+
+      if (Object.keys(updateData).length === 0) {
         throw new CustomError('No fields to update', 400);
       }
 
-      fields.push('updatedAt = CURRENT_TIMESTAMP');
-      params.push(id);
+      updateData.updatedAt = db.fn.now();
 
-      const query = `UPDATE g_account_whitelist SET ${fields.join(', ')} WHERE id = ?`;
-      await database.query(query, params);
+      await db('g_account_whitelist')
+        .where('id', id)
+        .update(updateData);
 
       return await this.findById(id);
     } catch (error) {
@@ -265,8 +263,10 @@ export class WhitelistModel {
 
   static async delete(id: number): Promise<boolean> {
     try {
-      const result = await database.query('DELETE FROM g_account_whitelist WHERE id = ?', [id]);
-      return result.affectedRows > 0;
+      const result = await db('g_account_whitelist')
+        .where('id', id)
+        .del();
+      return result > 0;
     } catch (error) {
       throw new CustomError('Failed to delete whitelist entry', 500);
     }
@@ -278,27 +278,19 @@ export class WhitelistModel {
         return 0;
       }
 
-      const values = entries.map(() => '(?, ?, ?, ?, ?, ?)').join(', ');
-      const query = `
-        INSERT INTO g_account_whitelist (accountId, ipAddress, startDate, endDate, purpose, createdBy, isEnabled)
-        VALUES ${values}
-      `;
+      const insertData = entries.map(entry => ({
+        accountId: entry.accountId,
+        ipAddress: entry.ipAddress || null,
+        startDate: entry.startDate || null,
+        endDate: entry.endDate || null,
+        purpose: entry.purpose || null,
+        createdBy: entry.createdBy,
+        isEnabled: entry.isEnabled !== undefined ? entry.isEnabled : true,
+        tags: entry.tags ? JSON.stringify(entry.tags) : null
+      }));
 
-      const params: any[] = [];
-      entries.forEach(entry => {
-        params.push(
-          entry.accountId,
-          entry.ipAddress || null,
-          entry.startDate || null,
-          entry.endDate || null,
-          entry.purpose || null,
-          entry.createdBy,
-          entry.isEnabled
-        );
-      });
-
-      const result = await database.query(query, params);
-      return result.affectedRows;
+      const result = await db('g_account_whitelist').insert(insertData);
+      return Array.isArray(result) ? result.length : 1;
     } catch (error) {
       throw new CustomError('Failed to bulk create whitelist entries', 500);
     }
@@ -327,27 +319,34 @@ export class WhitelistModel {
       startDate: row.startDate ? new Date(row.startDate) : undefined,
       endDate: row.endDate ? new Date(row.endDate) : undefined,
       purpose: row.purpose,
+      isEnabled: Boolean(row.isEnabled),
       tags: tags,
       createdBy: row.createdBy,
+      updatedBy: row.updatedBy,
       createdAt: new Date(row.createdAt),
       updatedAt: new Date(row.updatedAt),
       createdByName: row.createdByName,
       createdByEmail: row.createdByEmail,
-      isEnabled: Boolean(row.isEnabled),
+      updatedByName: row.updatedByName,
+      updatedByEmail: row.updatedByEmail,
     };
   }
 
   static async findByAccountId(accountId: string): Promise<Whitelist[]> {
     try {
-      const query = `
-        SELECT w.*, u.name as createdByName, u.email as createdByEmail
-        FROM g_account_whitelist w
-        LEFT JOIN g_users u ON w.createdBy = u.id
-        WHERE w.accountId = ?
-        ORDER BY w.createdAt DESC
-      `;
+      const rows = await db('g_account_whitelist as w')
+        .leftJoin('g_users as c', 'w.createdBy', 'c.id')
+        .leftJoin('g_users as u', 'w.updatedBy', 'u.id')
+        .select([
+          'w.*',
+          'c.name as createdByName',
+          'c.email as createdByEmail',
+          'u.name as updatedByName',
+          'u.email as updatedByEmail'
+        ])
+        .where('w.accountId', accountId)
+        .orderBy('w.createdAt', 'desc');
 
-      const rows = await database.query(query, [accountId]);
       return rows.map(this.mapRowToWhitelist);
     } catch (error) {
       throw new CustomError('Failed to find whitelist entries by account ID', 500);

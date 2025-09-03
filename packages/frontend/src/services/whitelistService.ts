@@ -8,13 +8,16 @@ export interface Whitelist {
   startDate?: string;
   endDate?: string;
   purpose?: string;
+  isEnabled: boolean;
   tags?: string[];
   createdBy: number;
+  updatedBy?: number;
   createdByName?: string;
   createdByEmail?: string;
+  updatedByName?: string;
+  updatedByEmail?: string;
   createdAt: string;
   updatedAt: string;
-  isEnabled: boolean;
 }
 
 export interface CreateWhitelistData {
@@ -23,6 +26,7 @@ export interface CreateWhitelistData {
   startDate?: string;
   endDate?: string;
   purpose?: string;
+  isEnabled?: boolean;
   tags?: string[];
 }
 
@@ -32,6 +36,7 @@ export interface UpdateWhitelistData {
   startDate?: string;
   endDate?: string;
   purpose?: string;
+  isEnabled?: boolean;
   tags?: string[];
 }
 

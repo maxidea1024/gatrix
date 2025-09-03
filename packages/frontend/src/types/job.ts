@@ -5,7 +5,7 @@ export interface JobType {
   name: string;
   displayName: string;
   description?: string;
-  schemaDefinition?: JobSchemaDefinition;
+  jobSchema?: JobSchemaDefinition;
   isEnabled: boolean;
   createdAt: string;
   updatedAt: string;

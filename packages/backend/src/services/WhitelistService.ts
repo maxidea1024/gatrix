@@ -161,6 +161,7 @@ export class WhitelistService {
         endDate: entry.endDate,
         purpose: entry.purpose?.trim() || undefined,
         createdBy,
+        isEnabled: true,
       }));
 
       const createdCount = await WhitelistModel.bulkCreate(createData);

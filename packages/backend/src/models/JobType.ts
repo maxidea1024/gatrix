@@ -6,7 +6,7 @@ export interface JobTypeAttributes {
   name: string;
   displayName: string;
   description?: string;
-  schemaDefinition?: any;
+  jobSchema?: any;
   isEnabled: boolean;
   createdAt: string;
   updatedAt: string;
@@ -20,7 +20,7 @@ export interface CreateJobTypeData {
   name: string;
   displayName: string;
   description?: string;
-  schemaDefinition?: any;
+  jobSchema?: any;
   isEnabled?: boolean;
   createdBy?: number;
 }
@@ -28,14 +28,14 @@ export interface CreateJobTypeData {
 export interface UpdateJobTypeData {
   displayName?: string;
   description?: string;
-  schemaDefinition?: any;
+  jobSchema?: any;
   isEnabled?: boolean;
   updatedBy?: number;
 }
 
 export class JobTypeModel {
   // 안전한 JSON 파싱 메서드
-  private static parseSchemaDefinition(value: any): any {
+  private static parseJobSchema(value: any): any {
     if (!value) return null;
 
     // 이미 객체인 경우 그대로 반환
@@ -48,7 +48,7 @@ export class JobTypeModel {
       try {
         return JSON.parse(value);
       } catch (error) {
-        logger.error('Failed to parse schemaDefinition JSON:', { value, error });
+        logger.error('Failed to parse jobSchema JSON:', { value, error });
         return null;
       }
     }
@@ -73,7 +73,7 @@ export class JobTypeModel {
         name: row.name,
         displayName: row.displayName,
         description: row.description,
-        schemaDefinition: row.schema ? this.parseSchemaDefinition(row.schema) : null,
+        jobSchema: row.jobSchema ? this.parseJobSchema(row.jobSchema) : null,
         isEnabled: Boolean(row.isEnabled),
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
@@ -105,7 +105,7 @@ export class JobTypeModel {
 
       return {
         ...row,
-        schemaDefinition: row.schemaDefinition ? this.parseSchemaDefinition(row.schemaDefinition) : null
+        jobSchema: row.jobSchema ? this.parseJobSchema(row.jobSchema) : null
       };
     } catch (error) {
       logger.error('Error finding job type by id:', error);
@@ -130,7 +130,7 @@ export class JobTypeModel {
 
       return {
         ...row,
-        schemaDefinition: row.schemaDefinition ? this.parseSchemaDefinition(row.schemaDefinition) : null
+        jobSchema: row.jobSchema ? this.parseJobSchema(row.jobSchema) : null
       };
     } catch (error) {
       logger.error('Error finding job type by name:', error);
@@ -140,13 +140,13 @@ export class JobTypeModel {
 
   static async create(data: CreateJobTypeData): Promise<JobTypeAttributes> {
     try {
-      const schemaJson = data.schemaDefinition ? JSON.stringify(data.schemaDefinition) : null;
+      const schemaJson = data.jobSchema ? JSON.stringify(data.jobSchema) : null;
 
       const [insertId] = await db('g_job_types').insert({
         name: data.name,
         displayName: data.displayName,
         description: data.description || null,
-        schema: schemaJson,
+        jobSchema: schemaJson,
         isEnabled: data.isEnabled ?? true,
         createdBy: data.createdBy || null
       });
@@ -174,8 +174,8 @@ export class JobTypeModel {
       if (data.description !== undefined) {
         updateData.description = data.description;
       }
-      if (data.schemaDefinition !== undefined) {
-        updateData.schema = data.schemaDefinition ? JSON.stringify(data.schemaDefinition) : null;
+      if (data.jobSchema !== undefined) {
+        updateData.jobSchema = data.jobSchema ? JSON.stringify(data.jobSchema) : null;
       }
       if (data.isEnabled !== undefined) {
         updateData.isEnabled = data.isEnabled;
@@ -233,7 +233,7 @@ export class JobTypeModel {
         name: row.name,
         displayName: row.displayName,
         description: row.description,
-        schemaDefinition: row.schema ? this.parseSchemaDefinition(row.schema) : null,
+        jobSchema: row.jobSchema ? this.parseJobSchema(row.jobSchema) : null,
         isEnabled: Boolean(row.isEnabled),
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
