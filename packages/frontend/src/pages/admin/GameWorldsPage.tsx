@@ -710,49 +710,7 @@ const GameWorldsPage: React.FC = () => {
         </Button>
       </Box>
 
-      {/* Statistics */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3, justifyContent: 'center', flexWrap: 'wrap' }}>
-        <Card sx={{ minWidth: 180, flex: 1 }}>
-          <CardContent sx={{ py: 2, px: 3, textAlign: 'center' }}>
-            <Typography variant="h5" color="primary.main" sx={{ fontWeight: 600, mb: 0.5 }}>
-              {worlds.length}
-            </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
-              {t('gameWorlds.totalWorlds')}
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card sx={{ minWidth: 180, flex: 1 }}>
-          <CardContent sx={{ py: 2, px: 3, textAlign: 'center' }}>
-            <Typography variant="h5" color="success.main" sx={{ fontWeight: 600, mb: 0.5 }}>
-              {worlds.filter(w => w.isVisible && !w.isMaintenance).length}
-            </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
-              {t('gameWorlds.activeWorlds')}
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card sx={{ minWidth: 180, flex: 1 }}>
-          <CardContent sx={{ py: 2, px: 3, textAlign: 'center' }}>
-            <Typography variant="h5" color="warning.main" sx={{ fontWeight: 600, mb: 0.5 }}>
-              {worlds.filter(w => w.isMaintenance).length}
-            </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
-              {t('gameWorlds.maintenanceWorlds')}
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card sx={{ minWidth: 180, flex: 1 }}>
-          <CardContent sx={{ py: 2, px: 3, textAlign: 'center' }}>
-            <Typography variant="h5" color="error.main" sx={{ fontWeight: 600, mb: 0.5 }}>
-              {worlds.filter(w => !w.isVisible).length}
-            </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
-              {t('gameWorlds.hiddenWorlds')}
-            </Typography>
-          </CardContent>
-        </Card>
-      </Box>
+
 
       {/* Search and Filters */}
       <Card sx={{ mb: 3 }}>

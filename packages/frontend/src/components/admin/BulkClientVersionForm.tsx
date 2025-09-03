@@ -231,17 +231,24 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
       const result = await ClientVersionService.bulkCreateClientVersions(cleanedData);
 
       // 생성된 각 클라이언트 버전에 태그 설정
-      if (selectedTags && selectedTags.length > 0) {
-        const tagIds = selectedTags.map(tag => tag.id);
-        await Promise.all(
-          result.map((clientVersion: any) =>
-            ClientVersionService.setTags(clientVersion.id, tagIds)
-          )
-        );
+      if (result && Array.isArray(result) && selectedTags && selectedTags.length > 0) {
+        const tagIds = selectedTags
+          .filter(tag => tag && tag.id)
+          .map(tag => tag.id);
+
+        if (tagIds.length > 0) {
+          await Promise.all(
+            result
+              .filter((clientVersion: any) => clientVersion && clientVersion.id)
+              .map((clientVersion: any) =>
+                ClientVersionService.setTags(clientVersion.id, tagIds)
+              )
+          );
+        }
       }
 
       enqueueSnackbar(
-        t('clientVersions.bulkCreateSuccess', { count: result.length }),
+        t('clientVersions.bulkCreateSuccess', { count: result?.length || 0 }),
         { variant: 'success' }
       );
 
