@@ -308,7 +308,7 @@ exports.up = async function() {
       displayName VARCHAR(200) NOT NULL,
       description TEXT NULL,
       jobSchema JSON NULL,
-      isActive BOOLEAN NOT NULL DEFAULT TRUE,
+      isEnabled BOOLEAN NOT NULL DEFAULT TRUE,
       createdBy INT NULL,
       updatedBy INT NULL,
       createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -317,7 +317,7 @@ exports.up = async function() {
       CONSTRAINT fk_job_types_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
       INDEX idx_name (name),
       INDEX idx_display_name (displayName),
-      INDEX idx_active (isActive)
+      INDEX idx_enabled (isEnabled)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
@@ -386,7 +386,7 @@ exports.up = async function() {
 
   // Insert default job types
   await connection.execute(`
-    INSERT IGNORE INTO g_job_types (name, displayName, description, jobSchema, isActive) VALUES
+    INSERT IGNORE INTO g_job_types (name, displayName, description, jobSchema, isEnabled) VALUES
     ('mailsend', 'Email Sender', 'Send email messages', '{"to":{"type":"string","required":true,"description":"Recipient email address"},"subject":{"type":"string","required":true,"description":"Email subject"},"body":{"type":"text","required":true,"description":"Email body content"}}', TRUE),
     ('http_request', 'HTTP Request', 'Make HTTP requests', '{"url":{"type":"string","required":true,"description":"Request URL"},"method":{"type":"select","required":true,"description":"HTTP method","options":["GET","POST","PUT","DELETE","PATCH"],"default":"GET"},"headers":{"type":"object","required":false,"description":"Request headers (JSON format)"},"body":{"type":"text","required":false,"description":"Request body"}}', TRUE),
     ('ssh_command', 'SSH Command', 'Execute SSH commands', '{"host":{"type":"string","required":true,"description":"SSH host address"},"username":{"type":"string","required":true,"description":"SSH username"},"command":{"type":"text","required":true,"description":"Command to execute"},"port":{"type":"number","required":false,"description":"SSH port","default":22}}', TRUE),

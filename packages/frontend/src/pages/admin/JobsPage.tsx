@@ -89,6 +89,7 @@ const JobsPage: React.FC = () => {
 
       setJobs(jobsResponse.jobs);
       setTotal(jobsResponse.pagination.total);
+      console.log('JobsPage - jobTypesData received:', jobTypesData);
       setJobTypes(jobTypesData);
     } catch (error) {
       console.error('Failed to load data:', error);
@@ -519,6 +520,7 @@ const JobsPage: React.FC = () => {
           {editingJob ? t('jobs.editJob') : t('jobs.addJob')}
         </DialogTitle>
         <DialogContent>
+          {console.log('JobsPage - Passing jobTypes to JobForm:', jobTypes) || null}
           <JobForm
             job={editingJob}
             jobTypes={jobTypes}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
@@ -61,6 +61,9 @@ const WhitelistPage: React.FC = () => {
   const { t } = useTranslation();
   const { language } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
+
+  // Refs for form focus
+  const accountIdFieldRef = useRef<HTMLInputElement>(null);
 
   // 페이지 상태 관리 (localStorage 연동)
   const {
@@ -220,6 +223,11 @@ const WhitelistPage: React.FC = () => {
       purpose: '',
     });
     setAddDialog(true);
+
+    // 계정ID 필드에 포커스
+    setTimeout(() => {
+      accountIdFieldRef.current?.focus();
+    }, 100);
   };
 
   const handleEdit = () => {
@@ -232,6 +240,11 @@ const WhitelistPage: React.FC = () => {
         purpose: selectedWhitelist.purpose || '',
       });
       setEditDialog(true);
+
+      // 계정ID 필드에 포커스
+      setTimeout(() => {
+        accountIdFieldRef.current?.focus();
+      }, 100);
     }
     handleMenuClose();
   };
@@ -599,6 +612,7 @@ const WhitelistPage: React.FC = () => {
                             ? t('whitelist.form.accountIdValidation')
                             : undefined
                         }
+                        inputRef={accountIdFieldRef}
                       />
                       <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                         {t('whitelist.form.accountIdHelp')}

@@ -74,7 +74,7 @@ export class JobTypeModel {
         displayName: row.displayName,
         description: row.description,
         jobSchema: row.jobSchema ? this.parseJobSchema(row.jobSchema) : null,
-        isEnabled: Boolean(row.isEnabled),
+        isEnabled: Boolean(row.isActive),
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
         createdBy: row.createdBy,
@@ -130,6 +130,7 @@ export class JobTypeModel {
 
       return {
         ...row,
+        isEnabled: Boolean(row.isActive),
         jobSchema: row.jobSchema ? this.parseJobSchema(row.jobSchema) : null
       };
     } catch (error) {
@@ -147,7 +148,7 @@ export class JobTypeModel {
         displayName: data.displayName,
         description: data.description || null,
         jobSchema: schemaJson,
-        isEnabled: data.isEnabled ?? true,
+        isActive: data.isEnabled ?? true,
         createdBy: data.createdBy || null
       });
 

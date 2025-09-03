@@ -14,6 +14,9 @@ export const getJobTypes = async (req: Request, res: Response) => {
       jobTypes = await JobTypeModel.findAll();
     }
 
+    console.log('jobTypeController.getJobTypes - Returning data:', jobTypes);
+    console.log('jobTypeController.getJobTypes - Data length:', jobTypes?.length);
+
     res.json({
       success: true,
       data: jobTypes

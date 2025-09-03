@@ -5,7 +5,11 @@ export const jobService = {
   // Job Types
   async getJobTypes(): Promise<JobType[]> {
     const response = await api.get('/job-types');
-    return response.data?.data || response.data || [];
+    console.log('jobService.getJobTypes - Raw response:', response);
+    console.log('jobService.getJobTypes - Response data:', response.data);
+    const result = response.data?.data || response.data || [];
+    console.log('jobService.getJobTypes - Final result:', result);
+    return result;
   },
 
   async getJobType(id: number): Promise<JobType> {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -57,6 +57,9 @@ import dayjs from 'dayjs';
 const IpWhitelistTab: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+
+  // Refs for form focus
+  const ipAddressFieldRef = useRef<HTMLInputElement>(null);
 
   // State
   const [ipWhitelists, setIpWhitelists] = useState<IpWhitelist[]>([]);
@@ -174,6 +177,11 @@ const IpWhitelistTab: React.FC = () => {
     });
     setFormErrors({});
     setAddDialog(true);
+
+    // IP Address 필드에 포커스
+    setTimeout(() => {
+      ipAddressFieldRef.current?.focus();
+    }, 100);
   };
 
   const handleEdit = () => {
@@ -187,6 +195,11 @@ const IpWhitelistTab: React.FC = () => {
       });
       setFormErrors({});
       setEditDialog(true);
+
+      // IP Address 필드에 포커스
+      setTimeout(() => {
+        ipAddressFieldRef.current?.focus();
+      }, 100);
     }
     handleMenuClose();
   };
@@ -525,6 +538,7 @@ const IpWhitelistTab: React.FC = () => {
                 helperText={formErrors.ipAddress}
                 placeholder={t('ipWhitelist.form.ipAddressPlaceholder')}
                 required
+                inputRef={ipAddressFieldRef}
               />
               <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                 {t('ipWhitelist.form.ipAddressHelp')}

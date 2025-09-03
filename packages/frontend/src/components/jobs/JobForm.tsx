@@ -40,6 +40,10 @@ interface JobFormProps {
 const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel }) => {
   const { t } = useTranslation();
 
+  console.log('JobForm - Component rendered with jobTypes:', jobTypes);
+  console.log('JobForm - jobTypes length:', jobTypes?.length);
+  console.log('JobForm - jobTypes type:', typeof jobTypes);
+
   // Form state
   const [formData, setFormData] = useState({
     name: '',
@@ -227,7 +231,7 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel }) 
               label={t('jobs.jobType')}
               disabled={!!job} // Disable job type change when editing
             >
-              {jobTypes.filter(jt => jt.isEnabled).map((jobType) => (
+              {console.log('JobForm - Rendering job types:', jobTypes) || jobTypes.filter(jt => jt.isEnabled).map((jobType) => (
                 <MenuItem key={jobType.id} value={jobType.id.toString()}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     {jobType.displayName}
