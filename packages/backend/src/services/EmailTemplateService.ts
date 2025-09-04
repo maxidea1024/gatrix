@@ -102,9 +102,9 @@ export class EmailTemplateService {
         zh: 'Gatrix - 密码重置'
       },
       'welcome': {
-        en: 'Welcome to Gate!',
-        ko: 'Gate에 오신 것을 환영합니다!',
-        zh: '欢迎来到 Gate！'
+        en: 'Welcome to Gatrix!',
+        ko: 'Gatrix에 오신 것을 환영합니다!',
+        zh: '欢迎来到 Gatrix！'
       },
       'account-approval': {
         en: '🎉 Gatrix Account Approved - Login Now!',

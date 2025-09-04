@@ -21,7 +21,7 @@ process.on('unhandledRejection', (reason: any, promise: Promise<any>) => {
 // Graceful shutdown
 const gracefulShutdown = async (signal: string) => {
   logger.info(`Received ${signal}. Starting graceful shutdown...`);
-  
+
   try {
     // Close Queue service
     try {
@@ -46,7 +46,7 @@ const gracefulShutdown = async (signal: string) => {
     } catch (error) {
       logger.warn('Error disconnecting Redis:', error);
     }
-    
+
     logger.info('Graceful shutdown completed');
     process.exit(0);
   } catch (error) {

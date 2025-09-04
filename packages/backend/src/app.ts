@@ -3,11 +3,11 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import session from 'express-session';
-import ConnectRedis from 'connect-redis';
+// import session from 'express-session';
+// import ConnectRedis from 'connect-redis';
 import swaggerUi from 'swagger-ui-express';
 import { config } from './config';
-import redisClient from './config/redis';
+// import redisClient from './config/redis';
 import passport from './config/passport';
 import swaggerSpec from './config/swagger';
 import logger from './config/logger';
@@ -37,8 +37,6 @@ import varsRoutes from './routes/vars';
 // import advancedSettingsRoutes from './routes/advancedSettings';
 import { authenticate, requireAdmin } from './middleware/auth';
 import { BullBoardConfig } from './config/bullboard';
-
-
 
 const app = express();
 
@@ -89,29 +87,29 @@ app.use(generalLimiter as any);
 app.use('/api', apiLimiter as any);
 
 // Session configuration with Redis store
-const RedisStore = (ConnectRedis as any)(session);
-app.use(session({
-  store: new RedisStore({
-    client: redisClient.getClient(),
-    prefix: 'gatrix:session:',
-    ttl: config.session.ttl, // TTL in seconds for Redis
-  }),
-  secret: config.session.secret,
-  resave: false,
-  saveUninitialized: false,
-  rolling: true, // Reset TTL on each request
-  cookie: {
-    secure: config.nodeEnv === 'production',
-    httpOnly: true,
-    maxAge: config.session.maxAge,
-    sameSite: 'lax',
-  },
-  name: 'gatrix-session',
-}) as any);
+// const RedisStore = (ConnectRedis as any)(session);
+// app.use(session({
+//   store: new RedisStore({
+//     client: redisClient.getClient(),
+//     prefix: 'gatrix:session:',
+//     ttl: config.session.ttl, // TTL in seconds for Redis
+//   }),
+//   secret: config.session.secret,
+//   resave: false,
+//   saveUninitialized: false,
+//   rolling: true, // Reset TTL on each request
+//   cookie: {
+//     secure: config.nodeEnv === 'production',
+//     httpOnly: true,
+//     maxAge: config.session.maxAge,
+//     sameSite: 'lax',
+//   },
+//   name: 'gatrix-session',
+// }) as any);
 
 // Passport middleware
 app.use(passport.initialize() as any);
-app.use(passport.session() as any);
+// app.use(passport.session() as any);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
