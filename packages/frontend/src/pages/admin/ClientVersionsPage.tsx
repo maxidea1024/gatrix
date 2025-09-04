@@ -177,7 +177,7 @@ const ClientVersionsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [pageState, enqueueSnackbar, t]);
+  }, [enqueueSnackbar, t]); // pageState 의존성 제거
 
   // 메타데이터 로드
   const loadMetadata = useCallback(async () => {
@@ -216,8 +216,35 @@ const ClientVersionsPage: React.FC = () => {
 
   // pageState 변경 시 데이터 다시 로드
   useEffect(() => {
-    loadClientVersions();
-  }, [pageState.page, pageState.limit, pageState.sortBy, pageState.sortOrder]);
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const result = await ClientVersionService.getClientVersions(
+          pageState.page,
+          pageState.limit,
+          pageState.filters || {},
+          pageState.sortBy || 'clientVersion',
+          pageState.sortOrder || 'DESC'
+        );
+
+        if (result && result.clientVersions) {
+          setClientVersions(result.clientVersions);
+          setTotal(result.total || 0);
+        } else {
+          setClientVersions([]);
+          setTotal(0);
+        }
+      } catch (error: any) {
+        enqueueSnackbar(error.message || t('clientVersions.loadFailed'), { variant: 'error' });
+        setClientVersions([]);
+        setTotal(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [pageState.page, pageState.limit, pageState.sortBy, pageState.sortOrder, JSON.stringify(pageState.filters), enqueueSnackbar, t]);
 
 
 
@@ -226,9 +253,7 @@ const ClientVersionsPage: React.FC = () => {
   // 필터 변경 핸들러
   const handleFilterChange = useCallback((newFilters: ClientVersionFilters) => {
     updateFilters(newFilters);
-    // 새 필터로 즉시 데이터 로드
-    loadClientVersions(newFilters);
-  }, [updateFilters, loadClientVersions]);
+  }, [updateFilters]);
 
   // 정렬은 고정 (버전 내림차순, 플랫폼 내림차순)
   // 정렬 변경 기능 비활성화

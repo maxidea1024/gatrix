@@ -3,6 +3,7 @@ import Joi from 'joi';
 import ClientVersionService, { ClientVersionFilters, ClientVersionPagination, BulkStatusUpdateRequest } from '../services/ClientVersionService';
 import { ClientStatus } from '../models/ClientVersion';
 import { ClientVersionModel } from '../models/ClientVersion';
+import { CustomError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 
 // Validation schemas
@@ -95,6 +96,15 @@ const bulkCreateClientVersionSchema = Joi.object({
       patchAddressForWhiteList: Joi.string().max(500).optional().allow('').empty('').default(null),
     })
   ).min(1).required(),
+
+  // 태그 필드 추가 - 필요한 필드만 받음
+  tags: Joi.array().items(
+    Joi.object({
+      id: Joi.number().integer().positive().required(),
+      name: Joi.string().required(),
+      color: Joi.string().required(),
+    })
+  ).optional().default([]),
 });
 
 export class ClientVersionController {
@@ -239,7 +249,15 @@ export class ClientVersionController {
       updatedBy: userId,
     };
 
-    const clientVersions = await ClientVersionService.bulkCreateClientVersions(bulkCreateData);
+    let clientVersions;
+    try {
+      clientVersions = await ClientVersionService.bulkCreateClientVersions(bulkCreateData);
+    } catch (error: any) {
+      if (error.message && error.message.includes('Duplicate client versions found')) {
+        throw new CustomError(error.message, 409);
+      }
+      throw error;
+    }
 
     res.status(201).json({
       success: true,

@@ -242,6 +242,19 @@ export class ClientVersionService {
   static async bulkCreateClientVersions(
     data: any
   ): Promise<ClientVersionAttributes[]> {
+    // 중복 체크
+    const duplicates = [];
+    for (const platform of data.platforms) {
+      const isDuplicate = await ClientVersionModel.checkDuplicate(platform.platform, data.clientVersion);
+      if (isDuplicate) {
+        duplicates.push(`${platform.platform}-${data.clientVersion}`);
+      }
+    }
+
+    if (duplicates.length > 0) {
+      throw new Error(`Duplicate client versions found: ${duplicates.join(', ')}`);
+    }
+
     // 받은 데이터를 각 플랫폼별로 클라이언트 버전 배열로 변환
     const clientVersions = data.platforms.map((platform: any) => ({
       platform: platform.platform,
@@ -260,6 +273,27 @@ export class ClientVersionService {
     }));
 
     const result = await ClientVersionModel.bulkCreate(clientVersions);
+
+    // 태그가 있는 경우 각 생성된 클라이언트 버전에 태그 설정
+    if (data.tags && Array.isArray(data.tags) && data.tags.length > 0) {
+      const tagIds = data.tags.map((tag: any) => tag.id).filter((id: any) => id); // null/undefined 제거
+
+      if (tagIds.length > 0) {
+        // 각 생성된 클라이언트 버전에 태그 설정
+        for (const clientVersion of result) {
+          if (clientVersion && clientVersion.id) {
+            try {
+              await ClientVersionModel.setTags(clientVersion.id, tagIds, data.createdBy);
+            } catch (error) {
+              logger.error(`Failed to set tags for client version ${clientVersion.id}:`, error);
+              // 태그 설정 실패는 전체 작업을 중단하지 않음
+            }
+          } else {
+            logger.warn('Skipping tag setting for invalid client version:', clientVersion);
+          }
+        }
+      }
+    }
 
     // Invalidate client version cache
     await pubSubService.invalidateByPattern('client_version:.*');

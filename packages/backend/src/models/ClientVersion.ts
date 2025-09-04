@@ -226,11 +226,15 @@ export class ClientVersionModel {
     }
   }
 
+
+
   // 추가 메서드들
   static async bulkCreate(data: ClientVersionCreationAttributes[]): Promise<any> {
     try {
-      return await db.transaction(async (trx) => {
-        const results = [];
+      const insertedIds: number[] = [];
+
+      // 먼저 모든 데이터를 삽입
+      await db.transaction(async (trx) => {
         for (const item of data) {
           // tags 필드는 별도 테이블에서 관리하므로 제거
           const { tags, ...clientVersionData } = item as any;
@@ -240,10 +244,24 @@ export class ClientVersionModel {
             createdAt: new Date(),
             updatedAt: new Date()
           });
-          results.push(await this.findById(insertId));
+          insertedIds.push(insertId);
         }
-        return results;
       });
+
+      // 트랜잭션 완료 후 생성된 데이터 조회
+      const results = [];
+      for (const id of insertedIds) {
+        const clientVersion = await this.findById(id);
+        if (clientVersion) {
+          results.push(clientVersion);
+        } else {
+          logger.warn(`Failed to find created client version with id: ${id}`);
+          // 기본 객체라도 반환하여 null 방지
+          results.push({ id, platform: 'unknown', clientVersion: 'unknown' });
+        }
+      }
+
+      return results;
     } catch (error) {
       logger.error('Error bulk creating client versions:', error);
       throw error;

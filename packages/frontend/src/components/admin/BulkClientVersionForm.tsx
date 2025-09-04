@@ -214,10 +214,9 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     try {
       setLoading(true);
 
-      // 빈 문자열을 undefined로 변환하고 tags 필드 제거 (별도 처리)
-      const { tags, ...dataWithoutTags } = data;
+      // 빈 문자열을 undefined로 변환하고 태그 데이터 포함
       const cleanedData = {
-        ...dataWithoutTags,
+        ...data,
         externalClickLink: data.externalClickLink || undefined,
         memo: data.memo || undefined,
         customPayload: data.customPayload || undefined,
@@ -225,27 +224,18 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
           ...platform,
           gameServerAddressForWhiteList: platform.gameServerAddressForWhiteList || undefined,
           patchAddressForWhiteList: platform.patchAddressForWhiteList || undefined,
-        }))
+        })),
+        // 선택된 태그를 포함 (필요한 필드만 전송)
+        tags: selectedTags && selectedTags.length > 0
+          ? selectedTags.map(tag => ({
+              id: tag.id,
+              name: tag.name,
+              color: tag.color
+            }))
+          : []
       };
 
       const result = await ClientVersionService.bulkCreateClientVersions(cleanedData);
-
-      // 생성된 각 클라이언트 버전에 태그 설정
-      if (result && Array.isArray(result) && selectedTags && selectedTags.length > 0) {
-        const tagIds = selectedTags
-          .filter(tag => tag && tag.id)
-          .map(tag => tag.id);
-
-        if (tagIds.length > 0) {
-          await Promise.all(
-            result
-              .filter((clientVersion: any) => clientVersion && clientVersion.id)
-              .map((clientVersion: any) =>
-                ClientVersionService.setTags(clientVersion.id, tagIds)
-              )
-          );
-        }
-      }
 
       enqueueSnackbar(
         t('clientVersions.bulkCreateSuccess', { count: result?.length || 0 }),

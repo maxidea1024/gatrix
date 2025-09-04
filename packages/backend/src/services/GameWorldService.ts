@@ -76,13 +76,9 @@ export class GameWorldService {
 
   static async createGameWorld(worldData: CreateGameWorldData): Promise<GameWorld> {
     try {
-      logger.info('Creating game world with data:', worldData);
-
       const normalized: CreateGameWorldData = {
         ...worldData,
       };
-
-      logger.info('Normalized game world data:', normalized);
 
       // Check if worldId already exists
       const existingWorld = await GameWorldModel.findByWorldId(worldData.worldId);

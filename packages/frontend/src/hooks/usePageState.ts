@@ -35,7 +35,7 @@ export const usePageState = ({ defaultState, storageKey }: UsePageStateOptions) 
       // 오류 발생 시 기본값 사용
       setPageState(defaultState);
     }
-  }, [storageKey, defaultState]);
+  }, [storageKey]); // defaultState 제거
 
   // localStorage에 상태 저장
   const savePageState = useCallback((newState: Partial<PageState>) => {
