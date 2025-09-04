@@ -55,7 +55,7 @@ jobs:
         done
 
     - name: Run backend tests
-      run: yarn workspace @gate/backend test
+      run: yarn workspace @gatrix/backend test
       env:
         NODE_ENV: test
         DB_HOST: 127.0.0.1
@@ -93,7 +93,7 @@ jobs:
       run: yarn install --frozen-lockfile
 
     - name: Run frontend tests
-      run: yarn workspace @gate/frontend test
+      run: yarn workspace @gatrix/frontend test
 
     - name: Upload frontend coverage
       uses: codecov/codecov-action@v3
@@ -134,7 +134,7 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: gate
+          MYSQL_DATABASE: gatrix
         ports:
           - 3306:3306
         options: >-
@@ -171,13 +171,13 @@ jobs:
 
     - name: Setup test database
       run: |
-        yarn workspace @gate/backend migrate:up
-        yarn workspace @gate/backend seed:run
+        yarn workspace @gatrix/backend migrate:up
+        yarn workspace @gatrix/backend seed:run
       env:
         NODE_ENV: development
         DB_HOST: 127.0.0.1
         DB_PORT: 3306
-        DB_NAME: gate
+        DB_NAME: gatrix
         DB_USER: root
         DB_PASSWORD: root
         REDIS_HOST: 127.0.0.1
@@ -189,13 +189,13 @@ jobs:
         ADMIN_NAME: Administrator
 
     - name: Start backend server
-      run: yarn workspace @gate/backend start &
+      run: yarn workspace @gatrix/backend start &
       env:
         NODE_ENV: development
         PORT: 5000
         DB_HOST: 127.0.0.1
         DB_PORT: 3306
-        DB_NAME: gate
+        DB_NAME: gatrix
         DB_USER: root
         DB_PASSWORD: root
         REDIS_HOST: 127.0.0.1
@@ -205,7 +205,7 @@ jobs:
         CORS_ORIGIN: http://localhost:3000
 
     - name: Start frontend server
-      run: yarn workspace @gate/frontend preview --port 3000 &
+      run: yarn workspace @gatrix/frontend preview --port 3000 &
       env:
         VITE_API_URL: http://localhost:5000/api/v1
 
@@ -218,7 +218,7 @@ jobs:
         npx wait-on http://localhost:3000
 
     - name: Run Cypress tests
-      run: yarn workspace @gate/frontend test:e2e
+      run: yarn workspace @gatrix/frontend test:e2e
       env:
         CYPRESS_baseUrl: http://localhost:3000
 

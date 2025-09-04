@@ -3,11 +3,11 @@
 # Replace environment variables in built files
 # This allows runtime configuration of the frontend
 
-echo "Starting Gate Frontend..."
+echo "Starting Gatrix Frontend..."
 
 # Default values
 API_URL=${VITE_API_URL:-"http://localhost:5000/api/v1"}
-APP_NAME=${VITE_APP_NAME:-"Gate"}
+APP_NAME=${VITE_APP_NAME:-"Gatrix"}
 DEFAULT_LANGUAGE=${VITE_DEFAULT_LANGUAGE:-"ko"}
 
 echo "Configuration:"

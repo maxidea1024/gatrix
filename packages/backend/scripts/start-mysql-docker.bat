@@ -22,7 +22,7 @@ if %errorlevel% neq 0 (
 )
 
 REM MySQL container configuration
-set CONTAINER_NAME=gate-mysql
+set CONTAINER_NAME=gatrix-mysql
 set MYSQL_ROOT_PASSWORD=root123
 set MYSQL_DATABASE=uwo_gate
 set MYSQL_USER=motif_dev

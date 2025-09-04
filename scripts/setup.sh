@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Gate Application Setup Script
+# Gatrix Application Setup Script
 # This script sets up the development environment
 
 set -e
@@ -85,7 +85,7 @@ check_docker() {
     fi
 }
 
-print_status "Setting up Gate development environment..."
+print_status "Setting up Gatrix development environment..."
 
 # Check prerequisites
 print_status "Checking prerequisites..."
@@ -148,7 +148,7 @@ if [ -d ".git" ]; then
     # Create pre-commit hook
     cat > .git/hooks/pre-commit << 'EOF'
 #!/bin/sh
-# Gate pre-commit hook
+# Gatrix pre-commit hook
 
 echo "Running pre-commit checks..."
 
@@ -240,7 +240,7 @@ fi
 
 # Final instructions
 echo ""
-print_success "Gate development environment setup completed!"
+print_success "Gatrix development environment setup completed!"
 echo ""
 echo "Next steps:"
 echo "  1. Review and update .env file with your configuration"

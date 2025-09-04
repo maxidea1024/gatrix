@@ -3,8 +3,8 @@ import { config } from '../config';
 import logger from '../config/logger';
 
 export class SessionManager {
-  private static readonly SESSION_PREFIX = 'gate:session:';
-  private static readonly USER_SESSIONS_PREFIX = 'gate:user_sessions:';
+  private static readonly SESSION_PREFIX = 'gatrix:session:';
+  private static readonly USER_SESSIONS_PREFIX = 'gatrix:user_sessions:';
 
   /**
    * Get all active sessions for a user

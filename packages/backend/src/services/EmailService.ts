@@ -194,12 +194,12 @@ export class EmailService {
       <body>
         <div class="container">
           <div class="header">
-            <h1>Gate - 비밀번호 재설정</h1>
+            <h1>Gatrix - 비밀번호 재설정</h1>
           </div>
           <div class="content">
             <h2>비밀번호 재설정 요청</h2>
             <p>안녕하세요,</p>
-            <p>Gate 계정의 비밀번호 재설정을 요청하셨습니다. 아래 버튼을 클릭하여 새로운 비밀번호를 설정해주세요.</p>
+            <p>Gatrix 계정의 비밀번호 재설정을 요청하셨습니다. 아래 버튼을 클릭하여 새로운 비밀번호를 설정해주세요.</p>
             <p style="text-align: center;">
               <a href="${resetUrl}" class="button">비밀번호 재설정</a>
             </p>
@@ -220,11 +220,11 @@ export class EmailService {
     `;
 
     const text = `
-Gate - 비밀번호 재설정
+Gatrix - 비밀번호 재설정
 
 안녕하세요,
 
-Gate 계정의 비밀번호 재설정을 요청하셨습니다. 
+Gatrix 계정의 비밀번호 재설정을 요청하셨습니다. 
 다음 링크를 클릭하여 새로운 비밀번호를 설정해주세요:
 
 ${resetUrl}
@@ -238,7 +238,7 @@ ${resetUrl}
 
     return this.sendEmail({
       to: email,
-      subject: 'Gate - 비밀번호 재설정',
+      subject: 'Gatrix - 비밀번호 재설정',
       html,
       text,
     });
@@ -266,7 +266,7 @@ ${resetUrl}
           </div>
           <div class="content">
             <h2>안녕하세요, ${name}님!</h2>
-            <p>Gate 온라인 게임 플랫폼에 가입해주셔서 감사합니다.</p>
+            <p>Gatrix 온라인 게임 플랫폼에 가입해주셔서 감사합니다.</p>
             <p>이제 다양한 게임과 기능을 즐기실 수 있습니다:</p>
             <ul>
               <li>개인화된 대시보드</li>
@@ -300,7 +300,7 @@ ${resetUrl}
       <html>
       <head>
         <meta charset="utf-8">
-        <title>Gate 계정 승인 완료</title>
+        <title>Gatrix 계정 승인 완료</title>
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
@@ -326,7 +326,7 @@ ${resetUrl}
           <div class="content">
             <h2>안녕하세요, ${name}님!</h2>
             <p><strong>좋은 소식이 있습니다!</strong></p>
-            <p>Gate 계정이 관리자에 의해 승인되었습니다. 이제 모든 기능을 사용하실 수 있습니다.</p>
+            <p>Gatrix 계정이 관리자에 의해 승인되었습니다. 이제 모든 기능을 사용하실 수 있습니다.</p>
 
             <div style="text-align: center; margin: 30px 0;">
               <a href="${loginUrl}" class="button">지금 로그인하기</a>
@@ -353,12 +353,12 @@ ${resetUrl}
     `;
 
     const text = `
-Gate - 계정 승인 완료
+Gatrix - 계정 승인 완료
 
 안녕하세요, ${name}님!
 
 좋은 소식이 있습니다!
-Gate 계정이 관리자에 의해 승인되었습니다. 이제 모든 기능을 사용하실 수 있습니다.
+Gatrix 계정이 관리자에 의해 승인되었습니다. 이제 모든 기능을 사용하실 수 있습니다.
 
 로그인하기: ${loginUrl}
 
@@ -375,7 +375,7 @@ Gate에 오신 것을 진심으로 환영합니다!
 
     return this.sendEmail({
       to: email,
-      subject: '🎉 Gate 계정 승인 완료 - 이제 로그인하세요!',
+      subject: '🎉 Gatrix 계정 승인 완료 - 이제 로그인하세요!',
       html,
       text,
     });

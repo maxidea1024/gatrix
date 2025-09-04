@@ -93,7 +93,7 @@ const RedisStore = (ConnectRedis as any)(session);
 app.use(session({
   store: new RedisStore({
     client: redisClient.getClient(),
-    prefix: 'gate:session:',
+    prefix: 'gatrix:session:',
     ttl: config.session.ttl, // TTL in seconds for Redis
   }),
   secret: config.session.secret,
@@ -106,7 +106,7 @@ app.use(session({
     maxAge: config.session.maxAge,
     sameSite: 'lax',
   },
-  name: 'gate-session',
+  name: 'gatrix-session',
 }) as any);
 
 // Passport middleware
@@ -128,7 +128,7 @@ if (config.nodeEnv !== 'production') {
   const swaggerOptions = {
     explorer: true,
     customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'Gate API Documentation',
+    customSiteTitle: 'Gatrix API Documentation',
   };
 
   app.use('/api-docs', swaggerUi.serve as any, swaggerUi.setup(swaggerSpec, swaggerOptions) as any);

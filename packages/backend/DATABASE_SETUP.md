@@ -1,6 +1,6 @@
 # Database Setup Guide
 
-This guide will help you set up the MySQL database for the Gate project.
+This guide will help you set up the MySQL database for the Gatrix project.
 
 ## Prerequisites
 

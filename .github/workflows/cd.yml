@@ -46,8 +46,8 @@ jobs:
       uses: docker/metadata-action@v5
       with:
         images: |
-          motifgames/gate-backend
-          motifgames/gate-frontend
+          motifgames/gatrix-backend
+          motifgames/gatrix-frontend
         tags: |
           type=ref,event=branch
           type=ref,event=pr
@@ -61,7 +61,7 @@ jobs:
         context: .
         file: ./packages/backend/Dockerfile
         push: true
-        tags: motifgames/gate-backend:${{ steps.meta.outputs.tags }}
+        tags: motifgames/gatrix-backend:${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -72,7 +72,7 @@ jobs:
         context: .
         file: ./packages/frontend/Dockerfile
         push: true
-        tags: motifgames/gate-frontend:${{ steps.meta.outputs.tags }}
+        tags: motifgames/gatrix-frontend:${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -141,8 +141,8 @@ jobs:
 
     - name: Run npm audit
       run: |
-        yarn workspace @gate/backend audit
-        yarn workspace @gate/frontend audit
+        yarn workspace @gatrix/backend audit
+        yarn workspace @gatrix/frontend audit
 
     - name: Check for outdated packages
       run: yarn outdated || true

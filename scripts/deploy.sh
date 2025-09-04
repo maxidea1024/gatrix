@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Gate Application Deployment Script
+# Gatrix Application Deployment Script
 # This script handles deployment to different environments
 
 set -e
@@ -172,7 +172,7 @@ print_success "Database is ready"
 # Run migrations if enabled
 if [[ "$RUN_MIGRATIONS" == true ]]; then
     print_status "Running database migrations..."
-    docker-compose -f "$COMPOSE_FILE" run --rm backend-dev yarn workspace @gate/backend migrate:up || {
+    docker-compose -f "$COMPOSE_FILE" run --rm backend-dev yarn workspace @gatrix/backend migrate:up || {
         print_error "Database migrations failed"
         exit 1
     }
@@ -182,7 +182,7 @@ fi
 # Run seeds if enabled
 if [[ "$RUN_SEEDS" == true ]]; then
     print_status "Running database seeds..."
-    docker-compose -f "$COMPOSE_FILE" run --rm backend-dev yarn workspace @gate/backend seed:run || {
+    docker-compose -f "$COMPOSE_FILE" run --rm backend-dev yarn workspace @gatrix/backend seed:run || {
         print_error "Database seeding failed"
         exit 1
     }

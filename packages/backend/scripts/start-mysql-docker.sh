@@ -19,7 +19,7 @@ if ! docker info &> /dev/null; then
 fi
 
 # MySQL container configuration
-CONTAINER_NAME="gate-mysql"
+CONTAINER_NAME="gatrix-mysql"
 MYSQL_ROOT_PASSWORD="root123"
 MYSQL_DATABASE="uwo_gate"
 MYSQL_USER="motif_dev"

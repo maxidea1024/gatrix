@@ -5,9 +5,9 @@ const options: swaggerJSDoc.Options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Gate API',
+      title: 'Gatrix API',
       version: '1.0.0',
-      description: 'Gate - Online Game Platform Management System API',
+      description: 'Gatrix - Online Game Platform Management System API',
       contact: {
         name: 'Motif Games',
         email: 'admin@motifgames.com',
@@ -23,7 +23,7 @@ const options: swaggerJSDoc.Options = {
         description: 'Development server',
       },
       {
-        url: 'https://api.gate.motifgames.com/api/v1',
+        url: 'https://api.gatrix.motifgames.com/api/v1',
         description: 'Production server',
       },
     ],
@@ -37,7 +37,7 @@ const options: swaggerJSDoc.Options = {
         cookieAuth: {
           type: 'apiKey',
           in: 'cookie',
-          name: 'gate-session',
+          name: 'gatrix-session',
         },
       },
       schemas: {

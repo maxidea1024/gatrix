@@ -1,7 +1,7 @@
 -- =====================================================
--- Gate Project Database Setup Script
+-- Gatrix Project Database Setup Script
 -- =====================================================
--- This script creates the database and user for the Gate project
+-- This script creates the database and user for the Gatrix project
 -- Run this script as MySQL root user
 
 -- Create database

@@ -1,6 +1,6 @@
 @echo off
 echo =====================================================
-echo Gate Project Database Setup
+echo Gatrix Project Database Setup
 echo =====================================================
 echo.
 echo This script will create the 'uwo_gate' database and 'motif_dev' user.

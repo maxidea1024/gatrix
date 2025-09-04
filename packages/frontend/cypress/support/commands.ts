@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-// Custom commands for Gate application
+// Custom commands for Gatrix application
 
 declare global {
   namespace Cypress {

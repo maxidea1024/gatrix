@@ -82,12 +82,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/motifgames/gate.git"
+    "url": "https://github.com/motifgames/gatrix.git"
   },
   "bugs": {
-    "url": "https://github.com/motifgames/gate/issues"
+    "url": "https://github.com/motifgames/gatrix/issues"
   },
-  "homepage": "https://github.com/motifgames/gate#readme",
+  "homepage": "https://github.com/motifgames/gatrix#readme",
   "dependencies": {
     "glob": "^11.0.3"
   }
