@@ -123,10 +123,18 @@ export class GameWorldController {
     const { tagIds, ...worldValue } = value as any;
 
     // Add createdBy from authenticated user session
+    logger.info('User from request:', req.user);
+
+    if (!req.user || !req.user.id) {
+      throw new CustomError('User authentication required', 401);
+    }
+
     const worldData = {
       ...worldValue,
-      createdBy: req.user!.id,
+      createdBy: req.user.id,
     };
+
+    logger.info('Final worldData for creation:', worldData);
 
 
 

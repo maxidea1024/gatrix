@@ -19,6 +19,7 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSnackbar } from 'notistack';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 const LogoutPage: React.FC = () => {
   const { t } = useTranslation();
@@ -82,10 +83,23 @@ const LogoutPage: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          bgcolor: 'background.default',
+          backgroundColor: 'background.default',
           p: 2,
+          position: 'relative',
         }}
       >
+        {/* Language Selector */}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            zIndex: 1000,
+          }}
+        >
+          <LanguageSelector variant="icon" size="medium" />
+        </Box>
+
         <Card sx={{ maxWidth: 400, width: '100%' }}>
           <CardContent sx={{ textAlign: 'center', py: 4 }}>
             <CheckCircleIcon 
@@ -115,10 +129,23 @@ const LogoutPage: React.FC = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: 'background.default',
+        backgroundColor: 'background.default',
         p: 2,
+        position: 'relative',
       }}
     >
+      {/* Language Selector */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 16,
+          right: 16,
+          zIndex: 1000,
+        }}
+      >
+        <LanguageSelector variant="icon" size="medium" />
+      </Box>
+
       <Card sx={{ maxWidth: 400, width: '100%' }}>
         <CardContent sx={{ p: 4 }}>
           <Box sx={{ textAlign: 'center', mb: 3 }}>

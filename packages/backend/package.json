@@ -14,6 +14,7 @@
     "test:email-template": "node ../../node_modules/ts-node/dist/bin.js src/test/email-template-test.ts",
     "test:email-integration": "node ../../node_modules/ts-node/dist/bin.js src/test/integration-test.ts",
     "test:knex-migration": "node ../../node_modules/ts-node/dist/bin.js src/test/knex-migration-test.ts",
+    "check:schema": "node ../../node_modules/ts-node/dist/bin.js src/test/check-schema.ts",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "migrate": "ts-node src/database/migrate.ts",

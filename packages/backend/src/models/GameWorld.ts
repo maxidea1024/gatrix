@@ -200,6 +200,8 @@ export class GameWorldModel {
 
   static async create(worldData: CreateGameWorldData): Promise<GameWorld> {
     try {
+      logger.info('GameWorldModel.create called with:', worldData);
+
       // Get the next display order if not provided
       let displayOrder = worldData.displayOrder;
       if (displayOrder === undefined) {
@@ -208,6 +210,11 @@ export class GameWorldModel {
           .max('displayOrder as maxOrder')
           .first();
         displayOrder = (maxOrderResult?.maxOrder || 0) + 10;
+      }
+
+      // Validate createdBy
+      if (!worldData.createdBy || typeof worldData.createdBy !== 'number') {
+        throw new Error(`Invalid createdBy value: ${worldData.createdBy}`);
       }
 
       const insertData = {
@@ -221,7 +228,8 @@ export class GameWorldModel {
         createdBy: worldData.createdBy
       };
 
-
+      logger.info('Insert data prepared:', insertData);
+      logger.info('createdBy type and value:', typeof worldData.createdBy, worldData.createdBy);
 
       const [insertId] = await db('g_game_worlds').insert(insertData);
 
