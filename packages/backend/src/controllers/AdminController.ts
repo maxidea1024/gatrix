@@ -5,7 +5,7 @@ import { AuditLogModel } from '../models/AuditLog';
 import { CustomError } from '../middleware/errorHandler';
 import { clearAllCache } from '../middleware/responseCache';
 import logger from '../config/logger';
-import database from '../config/database';
+import db from '../config/knex';
 
 export class AdminController {
   // Dashboard and statistics
@@ -463,7 +463,7 @@ export class AdminController {
 
       // Check database connection
       try {
-        await database.query('SELECT 1');
+        await db.raw('SELECT 1');
         checks.database = true;
       } catch (error: any) {
         logger.error('Database connection failed:', error);
@@ -471,7 +471,7 @@ export class AdminController {
 
       // Check audit logs table
       try {
-        await database.query('SELECT COUNT(*) FROM g_audit_logs');
+        await db('g_audit_logs').count('* as count').first();
         checks.auditLogsTable = true;
       } catch (error: any) {
         logger.error('Audit logs table check failed:', error);
@@ -479,7 +479,7 @@ export class AdminController {
 
       // Check users table
       try {
-        await database.query('SELECT COUNT(*) FROM g_users');
+        await db('g_users').count('* as count').first();
         checks.usersTable = true;
       } catch (error: any) {
         logger.error('Users table check failed:', error);
@@ -487,13 +487,16 @@ export class AdminController {
 
       // Check sample audit logs query
       try {
-        await database.query(`
-          SELECT al.*, u.name as user_name, u.email as user_email
-          FROM g_audit_logs al
-          LEFT JOIN g_users u ON al.userId = u.id
-          ORDER BY al.createdAt DESC
-          LIMIT 1
-        `);
+        await db('g_audit_logs as al')
+          .leftJoin('g_users as u', 'al.userId', 'u.id')
+          .select([
+            'al.*',
+            'u.name as user_name',
+            'u.email as user_email'
+          ])
+          .orderBy('al.createdAt', 'desc')
+          .limit(1)
+          .first();
         checks.sampleQuery = true;
       } catch (error: any) {
         logger.error('Sample query failed:', error);
