@@ -971,7 +971,9 @@
     "notifications": "알림",
     "privacy": "개인정보",
     "security": "보안",
-    "timezone": "시간대"
+    "timezone": "시간대",
+    "languageSaved": "언어 설정이 성공적으로 저장되었습니다",
+    "languageSaveFailed": "언어 설정 저장에 실패했습니다"
   },
   "sidebar": {
     "adminPanel": "관리자 패널",

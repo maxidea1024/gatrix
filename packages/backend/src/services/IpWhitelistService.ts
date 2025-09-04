@@ -1,10 +1,10 @@
-import { 
-  IpWhitelistModel, 
-  IpWhitelist, 
-  CreateIpWhitelistData, 
-  UpdateIpWhitelistData, 
-  IpWhitelistFilters, 
-  IpWhitelistListResponse 
+import {
+  IpWhitelistModel,
+  IpWhitelist,
+  CreateIpWhitelistData,
+  UpdateIpWhitelistData,
+  IpWhitelistFilters,
+  IpWhitelistListResponse
 } from '../models/IpWhitelist';
 import { CustomError } from '../middleware/errorHandler';
 import { normalizeIPOrCIDR, isValidIPOrCIDR } from '../utils/ipValidation';
@@ -64,7 +64,7 @@ export class IpWhitelistService {
   static async getIpWhitelistById(id: number): Promise<IpWhitelist> {
     try {
       const ipWhitelist = await IpWhitelistModel.findById(id);
-      
+
       if (!ipWhitelist) {
         throw new CustomError('IP whitelist entry not found', 404);
       }
@@ -118,8 +118,6 @@ export class IpWhitelistService {
       if (data.endDate) {
         createData.endDate = data.endDate instanceof Date ? data.endDate : new Date(data.endDate);
       }
-
-      console.log('Creating IP whitelist with data:', createData);
 
       const created = await IpWhitelistModel.create(createData);
 

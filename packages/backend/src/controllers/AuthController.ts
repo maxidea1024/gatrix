@@ -27,6 +27,7 @@ const changePasswordSchema = Joi.object({
 const updateProfileSchema = Joi.object({
   name: Joi.string().min(2).max(100).optional(),
   avatarUrl: Joi.string().uri().optional().allow(''),
+  preferredLanguage: Joi.string().valid('en', 'ko', 'zh').optional(),
 });
 
 const forgotPasswordSchema = Joi.object({
@@ -157,8 +158,6 @@ export class AuthController {
     });
   });
 
-
-
   static changePassword = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {
       throw new CustomError('User not authenticated', 401);
@@ -179,8 +178,6 @@ export class AuthController {
     });
   });
 
-
-
   static verifyEmail = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {
       throw new CustomError('User not authenticated', 401);
@@ -197,7 +194,7 @@ export class AuthController {
   // OAuth success callback
   static oauthSuccess = asyncHandler(async (req: Request, res: Response) => {
     const user = req.user as any;
-    
+
     if (!user) {
       throw new CustomError('OAuth authentication failed', 401);
     }

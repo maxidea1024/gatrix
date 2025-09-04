@@ -55,4 +55,3 @@ export class MaintenanceController {
     } catch (e) { next(e); }
   }
 }
-

@@ -109,7 +109,7 @@ export class WhitelistController {
 
   static getWhitelistById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = parseInt(req.params.id);
-    
+
     if (isNaN(id)) {
       throw new CustomError('Invalid whitelist ID', 400);
     }
@@ -149,7 +149,7 @@ export class WhitelistController {
 
   static updateWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = parseInt(req.params.id);
-    
+
     if (isNaN(id)) {
       throw new CustomError('Invalid whitelist ID', 400);
     }
@@ -171,7 +171,7 @@ export class WhitelistController {
 
   static deleteWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = parseInt(req.params.id);
-    
+
     if (isNaN(id)) {
       throw new CustomError('Invalid whitelist ID', 400);
     }
@@ -199,7 +199,7 @@ export class WhitelistController {
 
     res.status(201).json({
       success: true,
-      data: { 
+      data: {
         createdCount,
         requestedCount: value.entries.length,
       },

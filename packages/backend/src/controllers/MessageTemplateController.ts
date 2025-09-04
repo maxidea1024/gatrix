@@ -14,7 +14,6 @@ export class MessageTemplateController {
         offset: Number(offset) || 0
       });
       const data = { items: result.messageTemplates, total: result.total };
-      console.log('🔍 MessageTemplate API Response:', JSON.stringify(data, null, 2));
       res.json({ success: true, data });
     } catch (e) { next(e); }
   }
@@ -145,4 +144,3 @@ export class MessageTemplateController {
     }
   }
 }
-

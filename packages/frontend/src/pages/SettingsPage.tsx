@@ -19,6 +19,9 @@ import { getStoredTimezone, getStoredDateTimeFormat, setStoredTimezone, setStore
 import { useI18n, getLanguageDisplayName } from '@/contexts/I18nContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { varsService } from '@/services/varsService';
+import { useAuth } from '@/contexts/AuthContext';
+import { AuthService } from '@/services/auth';
+import { useSnackbar } from 'notistack';
 
 const formatPresets = [
   'YYYY-MM-DD HH:mm:ss',
@@ -33,6 +36,8 @@ const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
   const { language, changeLanguage, supportedLanguages } = useI18n();
   const { mode, setTheme } = useTheme();
+  const { user, refreshAuth } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
 
   const tzOptions = useMemo(() => moment.tz.names(), []);
   const [timezone, setTimezone] = useState<string>(getStoredTimezone());
@@ -76,6 +81,29 @@ const SettingsPage: React.FC = () => {
   useEffect(() => { setStoredTimezone(timezone); }, [timezone]);
   useEffect(() => { setStoredDateTimeFormat(dtFormat); }, [dtFormat]);
 
+  // Update preview
+  useEffect(() => {
+    const now = moment().tz(timezone);
+    setPreview(now.format(dtFormat));
+  }, [timezone, dtFormat]);
+
+  // Save language preference to user profile
+  const handleLanguageChange = async (newLanguage: string) => {
+    try {
+      // Update UI immediately
+      changeLanguage(newLanguage as any);
+
+      // Save to backend if user is logged in
+      if (user) {
+        await AuthService.updateProfile({ preferredLanguage: newLanguage });
+        await refreshAuth(); // Refresh user data
+        enqueueSnackbar(t('settings.languageSaved'), { variant: 'success' });
+      }
+    } catch (error: any) {
+      enqueueSnackbar(error.message || t('settings.languageSaveFailed'), { variant: 'error' });
+    }
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ mb: 4 }}>
@@ -104,7 +132,7 @@ const SettingsPage: React.FC = () => {
                   options={supportedLanguages}
                   getOptionLabel={(opt) => getLanguageDisplayName(opt)}
                   value={language}
-                  onChange={(_, v) => v && changeLanguage(v)}
+                  onChange={(_, v) => v && handleLanguageChange(v)}
                   renderInput={(params) => (
                     <TextField {...params} label={t('language.changeLanguage')} />
                   )}

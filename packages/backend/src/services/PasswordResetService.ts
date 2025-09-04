@@ -17,7 +17,7 @@ export interface PasswordResetToken {
 export class PasswordResetService {
   private static instance: PasswordResetService;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): PasswordResetService {
     if (!PasswordResetService.instance) {
@@ -182,7 +182,7 @@ export class PasswordResetService {
       const result = await database.query(
         'DELETE FROM g_password_reset_tokens WHERE expiresAt < NOW() OR used = TRUE'
       );
-      
+
       logger.info('Cleaned up expired password reset tokens', { deletedCount: result.affectedRows });
     } catch (error) {
       logger.error('Error cleaning up expired tokens:', error);

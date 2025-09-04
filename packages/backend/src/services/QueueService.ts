@@ -42,7 +42,6 @@ export class QueueService {
       await this.createQueue('cleanup', this.processCleanupJob.bind(this));
       await this.createQueue('scheduler', this.processSchedulerJob.bind(this));
 
-
       this.isInitialized = true;
       logger.info('Queue service initialized successfully');
     } catch (error) {

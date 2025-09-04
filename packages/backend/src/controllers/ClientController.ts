@@ -15,8 +15,6 @@ export class ClientController {
   static getClientVersion = asyncHandler(async (req: Request, res: Response) => {
     const { platform, version, environment } = req.query as { platform?: string; version?: string, environment?: string };
 
-    // FGT, dev, live, production
-
     // Validate required query params
     if (!platform || !version || !environment) {
       return res.status(400).json({

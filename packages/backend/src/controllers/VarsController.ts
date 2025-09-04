@@ -27,4 +27,3 @@ export class VarsController {
     } catch (e) { next(e); }
   }
 }
-

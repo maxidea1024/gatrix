@@ -14,9 +14,6 @@ export const getJobTypes = async (req: Request, res: Response) => {
       jobTypes = await JobTypeModel.findAll();
     }
 
-    console.log('jobTypeController.getJobTypes - Returning data:', jobTypes);
-    console.log('jobTypeController.getJobTypes - Data length:', jobTypes?.length);
-
     res.json({
       success: true,
       data: jobTypes
@@ -170,14 +167,14 @@ export const getJobType = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const jobType = await JobTypeModel.findById(parseInt(id));
-    
+
     if (!jobType) {
       return res.status(404).json({
         success: false,
         message: 'Job type not found'
       });
     }
-    
+
     res.json({
       success: true,
       data: jobType

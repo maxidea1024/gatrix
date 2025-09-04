@@ -872,7 +872,9 @@
     },
     "subtitle": "管理您的应用程序设置和偏好",
     "title": "设置",
-    "timezone": "时区"
+    "timezone": "时区",
+    "languageSaved": "语言偏好设置已成功保存",
+    "languageSaveFailed": "保存语言偏好设置失败"
   },
   "sidebar": {
     "adminPanel": "管理员面板",

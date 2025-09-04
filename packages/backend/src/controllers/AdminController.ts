@@ -74,7 +74,7 @@ export class AdminController {
       if (search) filters.search = search;
 
       const result = await UserService.getAllUsers(filters, { page, limit });
-      
+
       res.json({
         success: true,
         data: result
@@ -88,7 +88,7 @@ export class AdminController {
     try {
       const userId = parseInt(req.params.id);
       const user = await UserService.getUserById(userId);
-      
+
       res.json({
         success: true,
         data: user
@@ -149,14 +149,14 @@ export class AdminController {
   static async deleteUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = parseInt(req.params.id);
-      
+
       // Prevent admin from deleting themselves
       if (req.user?.userId === userId) {
         throw new CustomError('Cannot delete your own account', 400);
       }
-      
+
       await UserService.deleteUser(userId);
-      
+
       res.json({
         success: true,
         message: 'User deleted successfully'
@@ -170,7 +170,7 @@ export class AdminController {
     try {
       const userId = parseInt(req.params.id);
       await UserService.activateUser(userId);
-      
+
       res.json({
         success: true,
         message: 'User activated successfully'
@@ -183,14 +183,14 @@ export class AdminController {
   static async suspendUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = parseInt(req.params.id);
-      
+
       // Prevent admin from suspending themselves
       if (req.user?.userId === userId) {
         throw new CustomError('Cannot suspend your own account', 400);
       }
-      
+
       await UserService.suspendUser(userId);
-      
+
       res.json({
         success: true,
         message: 'User suspended successfully'
@@ -204,7 +204,7 @@ export class AdminController {
     try {
       const userId = parseInt(req.params.id);
       await UserService.promoteToAdmin(userId);
-      
+
       res.json({
         success: true,
         message: 'User promoted to admin successfully'
@@ -217,14 +217,14 @@ export class AdminController {
   static async demoteFromAdmin(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = parseInt(req.params.id);
-      
+
       // Prevent admin from demoting themselves
       if (req.user?.userId === userId) {
         throw new CustomError('Cannot demote your own account', 400);
       }
-      
+
       await UserService.demoteFromAdmin(userId);
-      
+
       res.json({
         success: true,
         message: 'User demoted from admin successfully'
@@ -246,14 +246,14 @@ export class AdminController {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
       const userId = req.query.userId ? parseInt(req.query.userId as string) :
-                     req.query.user_id ? parseInt(req.query.user_id as string) : undefined; // backward compatibility
+        req.query.user_id ? parseInt(req.query.user_id as string) : undefined; // backward compatibility
       const ipAddress = req.query.ipAddress as string || req.query.ip_address as string; // backward compatibility
       const action = req.query.action as string;
       const resourceType = req.query.resourceType as string || req.query.resource_type as string; // backward compatibility
       const startDate = req.query.startDate ? new Date(req.query.startDate as string) :
-                        req.query.start_date ? new Date(req.query.start_date as string) : undefined; // backward compatibility
+        req.query.start_date ? new Date(req.query.start_date as string) : undefined; // backward compatibility
       const endDate = req.query.endDate ? new Date(req.query.endDate as string) :
-                      req.query.end_date ? new Date(req.query.end_date as string) : undefined; // backward compatibility
+        req.query.end_date ? new Date(req.query.end_date as string) : undefined; // backward compatibility
 
       const filters: any = {};
       if (userId) filters.userId = userId;
@@ -340,12 +340,12 @@ export class AdminController {
   static async getAuditStats(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const startDate = req.query.startDate ? new Date(req.query.startDate as string) :
-                        req.query.start_date ? new Date(req.query.start_date as string) : undefined; // backward compatibility
+        req.query.start_date ? new Date(req.query.start_date as string) : undefined; // backward compatibility
       const endDate = req.query.endDate ? new Date(req.query.endDate as string) :
-                      req.query.end_date ? new Date(req.query.end_date as string) : undefined; // backward compatibility
+        req.query.end_date ? new Date(req.query.end_date as string) : undefined; // backward compatibility
 
       const stats = await AuditLogModel.getActionStats(startDate, endDate);
-      
+
       res.json({
         success: true,
         data: stats
@@ -359,12 +359,12 @@ export class AdminController {
   static async clearCache(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       await clearAllCache();
-      
+
       logger.info('Cache cleared by admin', {
         adminId: req.user?.userId,
         adminEmail: req.user?.email
       });
-      
+
       res.json({
         success: true,
         message: 'Cache cleared successfully'
@@ -378,7 +378,7 @@ export class AdminController {
     try {
       const daysToKeep = parseInt(req.body.days_to_keep) || 90;
       const deletedCount = await AuditLogModel.deleteOldLogs(daysToKeep);
-      
+
       res.json({
         success: true,
         message: `Cleaned up ${deletedCount} old audit logs`,
@@ -393,7 +393,7 @@ export class AdminController {
   static async getPendingUsers(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const pendingUsers = await UserService.getPendingUsers();
-      
+
       res.json({
         success: true,
         data: pendingUsers
@@ -407,7 +407,7 @@ export class AdminController {
     try {
       const userId = parseInt(req.params.id);
       await UserService.activateUser(userId);
-      
+
       res.json({
         success: true,
         message: 'User approved and activated successfully'
@@ -421,7 +421,7 @@ export class AdminController {
     try {
       const userId = parseInt(req.params.id);
       await UserService.deleteUser(userId);
-      
+
       res.json({
         success: true,
         message: 'User rejected and removed successfully'
@@ -436,7 +436,7 @@ export class AdminController {
     try {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      
+
       const stats = await AuditLogModel.getActionStats(thirtyDaysAgo);
       return {
         totalActions: stats.reduce((sum, stat) => sum + stat.count, 0),

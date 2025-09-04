@@ -265,10 +265,10 @@ export class AuthService {
     }
   }
 
-  static async updateProfile(userId: number, updateData: { name?: string; avatarUrl?: string }): Promise<UserWithoutPassword> {
+  static async updateProfile(userId: number, updateData: { name?: string; avatarUrl?: string; preferredLanguage?: string }): Promise<UserWithoutPassword> {
     try {
       // Only allow specific fields for profile updates
-      const allowedFields = ['name', 'avatarUrl'];
+      const allowedFields = ['name', 'avatarUrl', 'preferredLanguage'];
       const filteredData: any = {};
 
       for (const [key, value] of Object.entries(updateData)) {

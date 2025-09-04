@@ -256,14 +256,13 @@ export const deleteJob = async (req: Request, res: Response) => {
 
     await JobModel.delete(jobId);
 
-
-
     res.json({
       success: true,
       message: 'Job deleted successfully'
     });
   } catch (error) {
     logger.error('Error deleting job:', error);
+
     res.status(500).json({
       success: false,
       message: 'Failed to delete job',
@@ -281,6 +280,7 @@ export const executeJob = async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Error executing job:', error);
+
     res.status(500).json({
       success: false,
       message: 'Failed to execute job',
@@ -298,6 +298,7 @@ export const getJobExecutions = async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Error getting job executions:', error);
+
     res.status(500).json({
       success: false,
       message: 'Failed to get job executions',
@@ -327,6 +328,7 @@ export const setJobTags = async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Error setting job tags:', error);
+
     res.status(500).json({
       success: false,
       message: 'Failed to update tags',
@@ -347,6 +349,7 @@ export const getJobTags = async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Error getting job tags:', error);
+
     res.status(500).json({
       success: false,
       message: 'Failed to get tags',
@@ -354,5 +357,3 @@ export const getJobTags = async (req: Request, res: Response) => {
     });
   }
 };
-
-

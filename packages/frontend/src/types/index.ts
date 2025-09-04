@@ -1,9 +1,12 @@
 // User types
+export type SupportedLanguage = 'en' | 'ko' | 'zh';
+
 export interface User {
   id: number;
   email: string;
   name: string;
   avatarUrl?: string;
+  preferredLanguage: SupportedLanguage;
   role: 'admin' | 'user';
   status: 'pending' | 'active' | 'suspended' | 'deleted';
   emailVerified: boolean;

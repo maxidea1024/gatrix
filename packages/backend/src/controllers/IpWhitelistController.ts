@@ -118,7 +118,7 @@ export class IpWhitelistController {
 
   static getIpWhitelistById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = parseInt(req.params.id);
-    
+
     if (isNaN(id)) {
       throw new CustomError('Invalid IP whitelist ID', 400);
     }
@@ -169,7 +169,7 @@ export class IpWhitelistController {
 
   static updateIpWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = parseInt(req.params.id);
-    
+
     if (isNaN(id)) {
       throw new CustomError('Invalid IP whitelist ID', 400);
     }
@@ -195,7 +195,7 @@ export class IpWhitelistController {
 
   static deleteIpWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = parseInt(req.params.id);
-    
+
     if (isNaN(id)) {
       throw new CustomError('Invalid IP whitelist ID', 400);
     }
@@ -210,7 +210,7 @@ export class IpWhitelistController {
 
   static toggleIpWhitelistStatus = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = parseInt(req.params.id);
-    
+
     if (isNaN(id)) {
       throw new CustomError('Invalid IP whitelist ID', 400);
     }
@@ -247,7 +247,7 @@ export class IpWhitelistController {
 
   static checkIpWhitelist = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { ipAddress } = req.query;
-    
+
     if (!ipAddress || typeof ipAddress !== 'string') {
       throw new CustomError('IP address is required', 400);
     }

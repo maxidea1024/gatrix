@@ -31,7 +31,7 @@ export class UserController {
     }
 
     const { page, limit, role, status, search } = value;
-    
+
     const filters = { role, status, search };
     const pagination = { page, limit };
 
@@ -45,7 +45,7 @@ export class UserController {
 
   static getUserById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = parseInt(req.params.id);
-    
+
     if (isNaN(userId)) {
       throw new CustomError('Invalid user ID', 400);
     }
@@ -60,7 +60,7 @@ export class UserController {
 
   static updateUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = parseInt(req.params.id);
-    
+
     if (isNaN(userId)) {
       throw new CustomError('Invalid user ID', 400);
     }
@@ -89,7 +89,7 @@ export class UserController {
 
   static deleteUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = parseInt(req.params.id);
-    
+
     if (isNaN(userId)) {
       throw new CustomError('Invalid user ID', 400);
     }
@@ -109,7 +109,7 @@ export class UserController {
 
   static approveUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = parseInt(req.params.id);
-    
+
     if (isNaN(userId)) {
       throw new CustomError('Invalid user ID', 400);
     }
@@ -126,7 +126,7 @@ export class UserController {
 
   static rejectUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = parseInt(req.params.id);
-    
+
     if (isNaN(userId)) {
       throw new CustomError('Invalid user ID', 400);
     }
@@ -141,7 +141,7 @@ export class UserController {
 
   static suspendUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = parseInt(req.params.id);
-    
+
     if (isNaN(userId)) {
       throw new CustomError('Invalid user ID', 400);
     }
@@ -162,7 +162,7 @@ export class UserController {
 
   static unsuspendUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = parseInt(req.params.id);
-    
+
     if (isNaN(userId)) {
       throw new CustomError('Invalid user ID', 400);
     }
@@ -179,7 +179,7 @@ export class UserController {
 
   static promoteToAdmin = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = parseInt(req.params.id);
-    
+
     if (isNaN(userId)) {
       throw new CustomError('Invalid user ID', 400);
     }
@@ -195,7 +195,7 @@ export class UserController {
 
   static demoteFromAdmin = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const userId = parseInt(req.params.id);
-    
+
     if (isNaN(userId)) {
       throw new CustomError('Invalid user ID', 400);
     }
@@ -255,6 +255,7 @@ export class UserController {
     const selfUpdateSchema = Joi.object({
       name: Joi.string().min(2).max(100).optional(),
       avatarUrl: Joi.string().uri().optional().allow(''),
+      preferredLanguage: Joi.string().valid('en', 'ko', 'zh').optional(),
     });
 
     const { error, value } = selfUpdateSchema.validate(req.body);

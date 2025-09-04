@@ -25,7 +25,7 @@ export const getJobExecutions = async (req: Request, res: Response) => {
     if (offset) filters.offset = parseInt(offset as string);
 
     const executions = await JobExecutionModel.findAll(filters);
-    
+
     res.json({
       success: true,
       data: executions
@@ -45,14 +45,14 @@ export const getJobExecution = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const execution = await JobExecutionModel.findById(parseInt(id));
-    
+
     if (!execution) {
       return res.status(404).json({
         success: false,
         message: 'Job execution not found'
       });
     }
-    
+
     res.json({
       success: true,
       data: execution
@@ -71,12 +71,12 @@ export const getJobExecution = async (req: Request, res: Response) => {
 export const getJobExecutionStatistics = async (req: Request, res: Response) => {
   try {
     const { date_from, date_to } = req.query;
-    
+
     const statistics = await JobExecutionModel.getStatistics(
       date_from as string,
       date_to as string
     );
-    
+
     res.json({
       success: true,
       data: statistics

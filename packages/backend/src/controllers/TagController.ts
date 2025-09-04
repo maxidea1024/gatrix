@@ -12,12 +12,12 @@ export const TagController = {
     if (createdBy) result = result.filter(t => String(t.createdBy) === String(createdBy));
     if (updatedBy) result = result.filter(t => String(t.updatedBy) === String(updatedBy));
     switch (sort) {
-      case 'createdAtDesc': result = result.sort((a,b)=> new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()); break;
-      case 'createdAtAsc':  result = result.sort((a,b)=> new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()); break;
-      case 'updatedAtDesc': result = result.sort((a,b)=> new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()); break;
-      case 'updatedAtAsc':  result = result.sort((a,b)=> new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()); break;
-      case 'nameDesc':      result = result.sort((a,b)=> b.name.localeCompare(a.name)); break;
-      default:              result = result.sort((a,b)=> a.name.localeCompare(b.name));
+      case 'createdAtDesc': result = result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()); break;
+      case 'createdAtAsc': result = result.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()); break;
+      case 'updatedAtDesc': result = result.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()); break;
+      case 'updatedAtAsc': result = result.sort((a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()); break;
+      case 'nameDesc': result = result.sort((a, b) => b.name.localeCompare(a.name)); break;
+      default: result = result.sort((a, b) => a.name.localeCompare(b.name));
     }
     res.json({ success: true, data: { tags: result } });
   }),
@@ -59,4 +59,3 @@ export const TagController = {
     res.json({ success: true, data: { tags } });
   }),
 };
-

@@ -125,8 +125,6 @@ export class ClientVersionController {
       });
     }
 
-
-
     const { page, limit, sortBy, sortOrder, _t, ...filterParams } = value;
 
     const filters: ClientVersionFilters = {};
@@ -144,8 +142,6 @@ export class ClientVersionController {
           processedValue = value === 'true';
         }
 
-
-
         // 타입 안전하게 할당
         if (key === 'guestModeAllowed') {
           (filters as any).guestModeAllowed = processedValue;
@@ -154,8 +150,6 @@ export class ClientVersionController {
         }
       }
     });
-
-
 
     const result = await ClientVersionService.getAllClientVersions(filters, pagination);
 

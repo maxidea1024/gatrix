@@ -81,7 +81,7 @@ export class GameWorldController {
 
   static getGameWorldById = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = parseInt(req.params.id);
-    
+
     if (isNaN(id)) {
       throw new CustomError('Invalid game world ID', 400);
     }
@@ -179,7 +179,7 @@ export class GameWorldController {
 
   static deleteGameWorld = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const id = parseInt(req.params.id);
-    
+
     if (isNaN(id)) {
       throw new CustomError('Invalid game world ID', 400);
     }
@@ -228,8 +228,6 @@ export class GameWorldController {
   static updateDisplayOrders = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { orderUpdates } = req.body;
 
-    // logger.info('Received order updates request:', { orderUpdates, userId: req.user?.id });
-
     if (!Array.isArray(orderUpdates)) {
       throw new CustomError('Order updates must be an array', 400);
     }
@@ -241,9 +239,7 @@ export class GameWorldController {
       }
     }
 
-    // logger.info('Validation passed, updating display orders...');
     await GameWorldService.updateDisplayOrders(orderUpdates);
-    // logger.info('Display orders updated successfully');
 
     res.json({
       success: true,

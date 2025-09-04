@@ -97,11 +97,12 @@ export class AuthService {
     throw new Error(response.error?.message || 'Failed to get profile');
   }
 
-  static async updateProfile(data: { name?: string; avatarUrl?: string }): Promise<User> {
+  static async updateProfile(data: { name?: string; avatarUrl?: string; preferredLanguage?: string }): Promise<User> {
     // Only send defined fields
     const backendData: any = {};
     if (data.name !== undefined) backendData.name = data.name;
     if (data.avatarUrl !== undefined) backendData.avatarUrl = data.avatarUrl;
+    if (data.preferredLanguage !== undefined) backendData.preferredLanguage = data.preferredLanguage;
 
     const response = await apiService.put<{ user: User }>('/auth/profile', backendData);
     

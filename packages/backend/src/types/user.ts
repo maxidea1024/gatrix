@@ -1,9 +1,12 @@
+export type SupportedLanguage = 'en' | 'ko' | 'zh';
+
 export interface User {
   id: number;
   email: string;
   passwordHash?: string;
   name: string;
   avatarUrl?: string;
+  preferredLanguage: SupportedLanguage;
   role: 'admin' | 'user';
   status: 'pending' | 'active' | 'suspended' | 'deleted';
   emailVerified: boolean;
@@ -23,6 +26,7 @@ export interface CreateUserData {
   password?: string;
   name: string;
   avatarUrl?: string;
+  preferredLanguage?: SupportedLanguage;
   role?: 'admin' | 'user';
   status?: 'pending' | 'active' | 'suspended' | 'deleted';
   emailVerified?: boolean;
@@ -35,6 +39,7 @@ export interface UpdateUserData {
   email?: string;
   name?: string;
   avatarUrl?: string;
+  preferredLanguage?: SupportedLanguage;
   role?: 'admin' | 'user';
   status?: 'pending' | 'active' | 'suspended' | 'deleted';
   emailVerified?: boolean;
