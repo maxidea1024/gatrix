@@ -61,7 +61,7 @@ const UnauthorizedPage: React.FC = () => {
 
           {/* Message */}
           <Typography variant="body1" paragraph sx={{ mb: 3 }}>
-            {t('errors.noPermissionAdminOnly', 'You do not have permission to access this resource. This page is restricted to administrators only.')}
+            {t('errors.noPermissionAdminOnly')}
           </Typography>
 
           {user && (

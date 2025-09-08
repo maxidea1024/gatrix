@@ -38,7 +38,7 @@ import { MainLayout } from './components/layout/MainLayout';
 import LoginPage from './pages/auth/LoginPage';
 import LogoutPage from './pages/auth/LogoutPage';
 import RegisterPage from './pages/auth/RegisterPage';
-import LandingPage from './pages/LandingPage';
+import LandingPage from './pages/auth/SignUpPromptPage'; // LandingPage 대신 SignUpPromptPage 사용
 import SignUpPromptPage from './pages/auth/SignUpPromptPage';
 import PendingApprovalPage from './pages/auth/PendingApprovalPage';
 import AccountSuspendedPage from './pages/auth/AccountSuspendedPage';
@@ -52,7 +52,6 @@ import UnauthorizedPage from './pages/common/UnauthorizedPage';
 
 // Pages - User
 import ProfilePage from './pages/user/ProfilePage';
-import SettingsPage from './pages/SettingsPage';
 import TagsPage from './pages/settings/TagsPage';
 
 // Pages - Admin
@@ -93,8 +92,8 @@ const ConditionalLandingPage: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  // First-time visitor - show landing page
-  return <LandingPage />;
+  // First-time visitor - show signup prompt
+  return <SignUpPromptPage />;
 };
 
 // LocalizationProvider with language support
@@ -211,13 +210,7 @@ const AppContent: React.FC = () => {
                 } />
 
                 {/* Settings Routes */}
-                <Route path="/settings" element={
-                  <ProtectedRoute>
-                    <MainLayout>
-                      <SettingsPage />
-                    </MainLayout>
-                  </ProtectedRoute>
-                } />
+                <Route path="/settings" element={<Navigate to="/settings/tags" replace />} />
                 <Route path="/settings/tags" element={
                   <ProtectedRoute>
                     <MainLayout>

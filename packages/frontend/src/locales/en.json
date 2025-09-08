@@ -62,7 +62,10 @@
       "form": {
         "emailHelp": "Email for login and notifications",
         "nameHelp": "Enter the user's real name",
-        "passwordHelp": "Set a temporary password"
+        "passwordHelp": "Set a temporary password",
+        "nameRequired": "Name is required",
+        "emailRequired": "Email is required",
+        "passwordRequired": "Password is required"
       },
       "roleFilter": "Role Filter",
       "roleUpdated": "User role updated",
@@ -944,6 +947,7 @@
       "pending": "Pending",
       "suspended": "Suspended"
     },
+    "tags": "Tags",
     "user": "User",
     "userCreated": "userCreated",
     "userDeleted": "User deleted successfully"

@@ -16,6 +16,7 @@ router.use(requireAdmin as any);
 
 // User management routes
 router.get('/', UserController.getAllUsers);
+router.post('/', UserController.createUser);
 router.get('/stats', UserController.getUserStats);
 router.get('/pending', UserController.getPendingUsers);
 router.get('/:id', UserController.getUserById);
@@ -31,5 +32,11 @@ router.post('/:id/unsuspend', UserController.unsuspendUser);
 // Role management
 router.post('/:id/promote', UserController.promoteToAdmin);
 router.post('/:id/demote', UserController.demoteFromAdmin);
+
+// Tag management
+router.get('/:id/tags', UserController.getUserTags);
+router.put('/:id/tags', UserController.setUserTags);
+router.post('/:id/tags', UserController.addUserTag);
+router.delete('/:id/tags/:tagId', UserController.removeUserTag);
 
 export default router;

@@ -62,7 +62,10 @@
       "form": {
         "emailHelp": "유효한 이메일 주소를 입력하세요",
         "nameHelp": "사용자의 실명을 입력하세요",
-        "passwordHelp": "8자 이상의 안전한 비밀번호를 입력하세요"
+        "passwordHelp": "8자 이상의 안전한 비밀번호를 입력하세요",
+        "nameRequired": "이름을 입력해주세요",
+        "emailRequired": "이메일을 입력해주세요",
+        "passwordRequired": "비밀번호를 입력해주세요"
       },
       "roleFilter": "역할 필터",
       "roleUpdated": "역할이 업데이트되었습니다",
@@ -1059,6 +1062,7 @@
       "pending": "대기",
       "suspended": "정지"
     },
+    "tags": "태그",
     "user": "사용자",
     "userCreated": "사용자 생성됨",
     "userDeleted": "사용자가 삭제되었습니다"

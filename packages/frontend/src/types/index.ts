@@ -1,6 +1,16 @@
 // User types
 export type SupportedLanguage = 'en' | 'ko' | 'zh';
 
+// 태그 인터페이스
+export interface Tag {
+  id: number;
+  name: string;
+  color: string;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface User {
   id: number;
   email: string;
@@ -17,6 +27,7 @@ export interface User {
   createdBy?: number;
   createdByName?: string;
   createdByEmail?: string;
+  tags?: Tag[];
 }
 
 export interface AuthUser extends User {
@@ -98,6 +109,7 @@ export interface UserFilters {
   role?: 'admin' | 'user';
   status?: 'pending' | 'active' | 'suspended' | 'deleted';
   search?: string;
+  tags?: number[]; // 태그 ID 배열로 필터링
 }
 
 // Audit log types

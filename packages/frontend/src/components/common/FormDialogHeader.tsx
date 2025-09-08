@@ -15,7 +15,7 @@ const FormDialogHeader: React.FC<FormDialogHeaderProps> = ({ title, description 
   return (
     <>
       <DialogTitle sx={{ pb: 1 }}>
-        <Typography variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
+        <Typography component="div" variant="h5" sx={{ fontWeight: 600, mb: 1 }}>
           {title}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 400 }}>

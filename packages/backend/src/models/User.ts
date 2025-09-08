@@ -28,6 +28,12 @@ export class UserModel {
         .where('g_users.id', id)
         .first();
 
+      if (user) {
+        // 태그 정보 로드
+        const tags = await this.getTags(user.id);
+        user.tags = tags;
+      }
+
       return user || null;
     } catch (error) {
       logger.error('Error finding user by ID:', error);
@@ -220,8 +226,19 @@ export class UserModel {
 
       const total = countResult?.total || 0;
 
+      // 각 사용자에 대해 태그 정보 로드
+      const usersWithTags = await Promise.all(
+        users.map(async (user: any) => {
+          const tags = await this.getTags(user.id);
+          return {
+            ...user,
+            tags
+          };
+        })
+      );
+
       return {
-        users,
+        users: usersWithTags,
         total,
         page: pageNum,
         limit: limitNum
@@ -271,6 +288,90 @@ export class UserModel {
     } catch (error) {
       logger.error('Error updating last login:', error);
       // Don't throw error for this non-critical operation
+    }
+  }
+
+  // 태그 관련 메서드들
+  static async getTags(userId: number): Promise<any[]> {
+    try {
+      const tags = await db('g_tag_assignments')
+        .join('g_tags', 'g_tag_assignments.tagId', 'g_tags.id')
+        .select([
+          'g_tags.id',
+          'g_tags.name',
+          'g_tags.color',
+          'g_tags.description',
+          'g_tags.createdAt',
+          'g_tags.updatedAt'
+        ])
+        .where('g_tag_assignments.entityType', 'user')
+        .where('g_tag_assignments.entityId', userId)
+        .orderBy('g_tags.name');
+
+      return tags;
+    } catch (error) {
+      logger.error('Error getting user tags:', error);
+      throw error;
+    }
+  }
+
+  static async setTags(userId: number, tagIds: number[], updatedBy: number): Promise<void> {
+    try {
+      await db.transaction(async (trx) => {
+        // 기존 태그 할당 삭제
+        await trx('g_tag_assignments')
+          .where('entityType', 'user')
+          .where('entityId', userId)
+          .del();
+
+        // 새 태그 할당 추가
+        if (tagIds.length > 0) {
+          const assignments = tagIds.map(tagId => ({
+            tagId,
+            entityType: 'user',
+            entityId: userId,
+            createdBy: updatedBy,
+            updatedBy: updatedBy,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }));
+
+          await trx('g_tag_assignments').insert(assignments);
+        }
+      });
+    } catch (error) {
+      logger.error('Error setting user tags:', error);
+      throw error;
+    }
+  }
+
+  static async addTag(userId: number, tagId: number, createdBy: number): Promise<void> {
+    try {
+      await db('g_tag_assignments').insert({
+        tagId,
+        entityType: 'user',
+        entityId: userId,
+        createdBy,
+        updatedBy: createdBy,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+    } catch (error) {
+      logger.error('Error adding user tag:', error);
+      throw error;
+    }
+  }
+
+  static async removeTag(userId: number, tagId: number): Promise<void> {
+    try {
+      await db('g_tag_assignments')
+        .where('entityType', 'user')
+        .where('entityId', userId)
+        .where('tagId', tagId)
+        .del();
+    } catch (error) {
+      logger.error('Error removing user tag:', error);
+      throw error;
     }
   }
 }

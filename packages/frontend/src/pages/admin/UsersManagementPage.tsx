@@ -32,6 +32,8 @@ import {
   Menu,
   ListItemIcon,
   ListItemText,
+  Autocomplete,
+  Tooltip,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -48,11 +50,14 @@ import {
   Save as SaveIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
+  LocalOffer as TagIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import { User } from '@/types';
+import { User, Tag } from '@/types';
 import { apiService } from '@/services/api';
+import { UserService } from '@/services/users';
+import { tagService } from '@/services/tagService';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
 import SimplePagination from '../../components/common/SimplePagination';
@@ -107,6 +112,12 @@ const UsersManagementPage: React.FC = () => {
     password: '',
     role: 'user' as 'admin' | 'user',
   });
+  const [newUserTags, setNewUserTags] = useState<Tag[]>([]);
+  const [newUserErrors, setNewUserErrors] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
 
   // Delete confirmation state
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState({
@@ -114,6 +125,9 @@ const UsersManagementPage: React.FC = () => {
     user: null as User | null,
     inputValue: '',
   });
+
+  // Tags state
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
 
   // Edit user dialog state
   const [editUserDialog, setEditUserDialog] = useState({
@@ -125,6 +139,11 @@ const UsersManagementPage: React.FC = () => {
     email: '',
     role: 'user' as 'admin' | 'user',
     status: 'active' as 'pending' | 'active' | 'suspended' | 'deleted',
+  });
+  const [editUserTags, setEditUserTags] = useState<Tag[]>([]);
+  const [editUserErrors, setEditUserErrors] = useState({
+    name: '',
+    email: '',
   });
 
   const fetchUsers = async () => {
@@ -160,6 +179,19 @@ const UsersManagementPage: React.FC = () => {
   useEffect(() => {
     fetchUsers();
   }, [page, rowsPerPage, searchTerm, statusFilter, roleFilter]);
+
+  // Load available tags
+  useEffect(() => {
+    const loadTags = async () => {
+      try {
+        const tags = await tagService.list();
+        setAvailableTags(tags);
+      } catch (error) {
+        console.error('Failed to load tags:', error);
+      }
+    };
+    loadTags();
+  }, []);
 
 
 
@@ -252,6 +284,10 @@ const UsersManagementPage: React.FC = () => {
       case 'edit':
         handleEditUser(selectedUser);
         break;
+      case 'manageTags':
+        // TODO: 태그 관리 다이얼로그 열기
+        console.log('Manage tags for user:', selectedUser.name);
+        break;
       case 'suspend':
         handleSuspendUser(selectedUser);
         break;
@@ -278,14 +314,41 @@ const UsersManagementPage: React.FC = () => {
       role: user.role,
       status: user.status,
     });
+    setEditUserTags(user.tags || []);
+    setEditUserErrors({
+      name: '',
+      email: '',
+    });
     setEditUserDialog({
       open: true,
       user,
     });
   };
 
+  const validateEditUserForm = () => {
+    const errors = {
+      name: '',
+      email: '',
+    };
+
+    if (!editUserData.name.trim()) {
+      errors.name = t('admin.users.form.nameRequired');
+    }
+    if (!editUserData.email.trim()) {
+      errors.email = t('admin.users.form.emailRequired');
+    }
+
+    setEditUserErrors(errors);
+    return !errors.name && !errors.email;
+  };
+
   const handleSaveEditUser = async () => {
     if (!editUserDialog.user) return;
+
+    // 폼 검증
+    if (!validateEditUserForm()) {
+      return;
+    }
 
     try {
       // For own account, only allow name changes
@@ -295,15 +358,21 @@ const UsersManagementPage: React.FC = () => {
         };
         await apiService.put(`/admin/users/${editUserDialog.user.id}`, updateData);
       } else {
-        // For other users, allow all changes
-        await apiService.put(`/admin/users/${editUserDialog.user.id}`, editUserData);
+        // For other users, allow all changes including tags
+        const updateData = {
+          ...editUserData,
+          tagIds: editUserTags.map(tag => tag.id)
+        };
+        await apiService.put(`/admin/users/${editUserDialog.user.id}`, updateData);
       }
 
       enqueueSnackbar(t('admin.users.userUpdated'), { variant: 'success' });
       fetchUsers();
       setEditUserDialog({ open: false, user: null });
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('admin.users.updateError'), { variant: 'error' });
+      // API 오류 응답에서 구체적인 메시지 추출
+      const errorMessage = error.error?.message || error.message || t('admin.users.updateError');
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
 
@@ -329,7 +398,9 @@ const UsersManagementPage: React.FC = () => {
         fetchUsers();
         setDeleteConfirmDialog({ open: false, user: null, inputValue: '' });
       } catch (error: any) {
-        enqueueSnackbar(error.message || t('users.deleteError'), { variant: 'error' });
+        // API 오류 응답에서 구체적인 메시지 추출
+        const errorMessage = error.error?.message || error.message || t('users.deleteError');
+        enqueueSnackbar(errorMessage, { variant: 'error' });
       }
     }
   };
@@ -344,6 +415,7 @@ const UsersManagementPage: React.FC = () => {
       password: '',
       role: 'user',
     });
+    setNewUserTags([]);
     setAddUserDialog(true);
 
     // 브라우저 자동완성을 방지하기 위해 약간의 지연 후 다시 초기화
@@ -354,6 +426,7 @@ const UsersManagementPage: React.FC = () => {
         password: '',
         role: 'user',
       });
+      setNewUserTags([]);
     }, 100);
   };
 
@@ -366,16 +439,54 @@ const UsersManagementPage: React.FC = () => {
       password: '',
       role: 'user',
     });
+    setNewUserTags([]);
+    setNewUserErrors({
+      name: '',
+      email: '',
+      password: '',
+    });
+  };
+
+  const validateNewUserForm = () => {
+    const errors = {
+      name: '',
+      email: '',
+      password: '',
+    };
+
+    if (!newUserData.name.trim()) {
+      errors.name = t('admin.users.form.nameRequired');
+    }
+    if (!newUserData.email.trim()) {
+      errors.email = t('admin.users.form.emailRequired');
+    }
+    if (!newUserData.password.trim()) {
+      errors.password = t('admin.users.form.passwordRequired');
+    }
+
+    setNewUserErrors(errors);
+    return !errors.name && !errors.email && !errors.password;
   };
 
   const handleCreateUser = async () => {
+    // 폼 검증
+    if (!validateNewUserForm()) {
+      return;
+    }
+
     try {
-      await apiService.post('/admin/users', newUserData);
+      const userData = {
+        ...newUserData,
+        tagIds: newUserTags.map(tag => tag.id)
+      };
+      await apiService.post('/admin/users', userData);
       enqueueSnackbar(t('users.userCreated'), { variant: 'success' });
       fetchUsers();
       handleCloseAddUserDialog();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('users.createError'), { variant: 'error' });
+      // API 오류 응답에서 구체적인 메시지 추출
+      const errorMessage = error.error?.message || error.message || t('users.createError');
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
 
@@ -506,6 +617,7 @@ const UsersManagementPage: React.FC = () => {
                   <TableCell align="center">{t('users.emailVerified')}</TableCell>
                   <TableCell>{t('users.role')}</TableCell>
                   <TableCell>{t('users.status')}</TableCell>
+                  <TableCell>{t('users.tags')}</TableCell>
                   <TableCell>{t('users.joinDate')}</TableCell>
                   <TableCell>{t('users.lastLogin')}</TableCell>
                   <TableCell>{t('users.createdBy')}</TableCell>
@@ -515,7 +627,7 @@ const UsersManagementPage: React.FC = () => {
               <TableBody>
                 {users.length === 0 ? (
                   <EmptyTableRow
-                    colSpan={9}
+                    colSpan={10}
                     loading={loading}
                     message={t('users.noUsersFound')}
                     loadingMessage={t('common.loadingUsers')}
@@ -566,6 +678,24 @@ const UsersManagementPage: React.FC = () => {
                         color={getStatusColor(user.status)}
                         size="small"
                       />
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {user.tags && user.tags.length > 0 && (
+                          user.tags.map((tag: any) => (
+                            <Chip
+                              key={tag.id}
+                              label={tag.name}
+                              size="small"
+                              sx={{
+                                backgroundColor: tag.color,
+                                color: 'white',
+                                fontSize: '0.75rem',
+                              }}
+                            />
+                          ))
+                        )}
+                      </Box>
                     </TableCell>
                     <TableCell>
                       {formatDateTimeDetailed(user.createdAt)}
@@ -638,6 +768,13 @@ const UsersManagementPage: React.FC = () => {
             <EditIcon />
           </ListItemIcon>
           <ListItemText>{t('common.edit')}</ListItemText>
+        </MenuItem>
+
+        <MenuItem onClick={() => handleMenuAction('manageTags')}>
+          <ListItemIcon>
+            <TagIcon />
+          </ListItemIcon>
+          <ListItemText>Manage Tags</ListItemText>
         </MenuItem>
 
         {selectedUser?.status === 'active' ? (
@@ -722,10 +859,9 @@ const UsersManagementPage: React.FC = () => {
                 autoComplete="new-name"
                 placeholder=""
                 required
+                error={!!newUserErrors.name}
+                helperText={newUserErrors.name || t('admin.users.form.nameHelp')}
               />
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                {t('admin.users.form.nameHelp')}
-              </Typography>
             </Box>
             <Box>
               <TextField
@@ -737,10 +873,9 @@ const UsersManagementPage: React.FC = () => {
                 autoComplete="new-email"
                 placeholder=""
                 required
+                error={!!newUserErrors.email}
+                helperText={newUserErrors.email || t('admin.users.form.emailHelp')}
               />
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                {t('admin.users.form.emailHelp')}
-              </Typography>
             </Box>
             <Box>
               <TextField
@@ -752,6 +887,8 @@ const UsersManagementPage: React.FC = () => {
                 autoComplete="new-password"
                 placeholder=""
                 required
+                error={!!newUserErrors.password}
+                helperText={newUserErrors.password || t('admin.users.form.passwordHelp')}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -767,9 +904,6 @@ const UsersManagementPage: React.FC = () => {
                   ),
                 }}
               />
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                {t('admin.users.form.passwordHelp')}
-              </Typography>
             </Box>
             <FormControl fullWidth>
               <InputLabel>{t('users.role')}</InputLabel>
@@ -782,6 +916,37 @@ const UsersManagementPage: React.FC = () => {
                 <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
               </Select>
             </FormControl>
+
+            {/* Tags Selection */}
+            <Box>
+              <Autocomplete
+                multiple
+                options={availableTags}
+                getOptionLabel={(option) => option.name}
+                filterSelectedOptions
+                value={newUserTags}
+                onChange={(_, value) => setNewUserTags(value)}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...chipProps } = getTagProps({ index });
+                    return (
+                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                        <Chip
+                          variant="outlined"
+                          label={option.name}
+                          size="small"
+                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          {...chipProps}
+                        />
+                      </Tooltip>
+                    );
+                  })
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label={t('users.tags')} />
+                )}
+              />
+            </Box>
           </Box>
         </DialogContent>
         <DialogActions>
@@ -872,10 +1037,9 @@ const UsersManagementPage: React.FC = () => {
                 value={editUserData.name}
                 onChange={(e) => setEditUserData({ ...editUserData, name: e.target.value })}
                 fullWidth
+                error={!!editUserErrors.name}
+                helperText={editUserErrors.name || t('admin.users.form.nameHelp')}
               />
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                {t('admin.users.form.nameHelp')}
-              </Typography>
             </Box>
             <Box>
               <TextField
@@ -884,10 +1048,9 @@ const UsersManagementPage: React.FC = () => {
                 onChange={(e) => setEditUserData({ ...editUserData, email: e.target.value })}
                 fullWidth
                 disabled={editUserDialog.user && isCurrentUser(editUserDialog.user)}
+                error={!!editUserErrors.email}
+                helperText={editUserErrors.email || t('admin.users.form.emailHelp')}
               />
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                {t('admin.users.form.emailHelp')}
-              </Typography>
             </Box>
             {!(editUserDialog.user && isCurrentUser(editUserDialog.user)) && (
               <>
@@ -916,6 +1079,37 @@ const UsersManagementPage: React.FC = () => {
                 </FormControl>
               </>
             )}
+
+            {/* Tags Selection for Edit */}
+            <Box>
+              <Autocomplete
+                multiple
+                options={availableTags}
+                getOptionLabel={(option) => option.name}
+                filterSelectedOptions
+                value={editUserTags}
+                onChange={(_, value) => setEditUserTags(value)}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...chipProps } = getTagProps({ index });
+                    return (
+                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                        <Chip
+                          variant="outlined"
+                          label={option.name}
+                          size="small"
+                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          {...chipProps}
+                        />
+                      </Tooltip>
+                    );
+                  })
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label={t('users.tags')} />
+                )}
+              />
+            </Box>
             {editUserDialog.user && isCurrentUser(editUserDialog.user) && (
               <Alert severity="info">
                 {t('admin.users.canOnlyModifyOwnName')}

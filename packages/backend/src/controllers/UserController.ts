@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { UserService } from '../services/userService';
+import { UserTagService } from '../services/UserTagService';
 import { asyncHandler, CustomError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import Joi from 'joi';
@@ -22,6 +23,24 @@ const updateUserSchema = Joi.object({
   email_verified: Joi.boolean().optional(),
 });
 
+const setUserTagsSchema = Joi.object({
+  tagIds: Joi.array().items(Joi.number().integer().positive()).required(),
+});
+
+const addUserTagSchema = Joi.object({
+  tagId: Joi.number().integer().positive().required(),
+});
+
+const createUserSchema = Joi.object({
+  name: Joi.string().min(2).max(100).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required(),
+  role: Joi.string().valid('admin', 'user').optional().default('user'),
+  status: Joi.string().valid('pending', 'active', 'suspended', 'deleted').optional().default('active'),
+  emailVerified: Joi.boolean().optional().default(true),
+  tags: Joi.array().items(Joi.number().integer().positive()).optional().default([]),
+});
+
 export class UserController {
   static getAllUsers = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     // Validate query parameters
@@ -40,6 +59,33 @@ export class UserController {
     res.json({
       success: true,
       data: result,
+    });
+  });
+
+  static createUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { error, value } = createUserSchema.validate(req.body);
+    if (error) {
+      throw new CustomError(error.details[0].message, 400);
+    }
+
+    const { tags, ...userData } = value;
+    const createdBy = (req.user as any).id;
+
+    // 사용자 생성
+    const user = await UserService.createUser({
+      ...userData,
+      createdBy,
+    });
+
+    // 태그 설정
+    if (tags && tags.length > 0) {
+      await UserTagService.setUserTags(user.id, tags, createdBy);
+    }
+
+    res.status(201).json({
+      success: true,
+      data: { user },
+      message: 'User created successfully',
     });
   });
 
@@ -269,6 +315,84 @@ export class UserController {
       success: true,
       data: { user },
       message: 'Profile updated successfully',
+    });
+  });
+
+  // 태그 관련 엔드포인트들
+  static getUserTags = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const userId = parseInt(req.params.id);
+
+    if (isNaN(userId)) {
+      throw new CustomError('Invalid user ID', 400);
+    }
+
+    const tags = await UserTagService.getUserTags(userId);
+
+    res.json({
+      success: true,
+      data: tags,
+    });
+  });
+
+  static setUserTags = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const userId = parseInt(req.params.id);
+
+    if (isNaN(userId)) {
+      throw new CustomError('Invalid user ID', 400);
+    }
+
+    const { error, value } = setUserTagsSchema.validate(req.body);
+    if (error) {
+      throw new CustomError(error.details[0].message, 400);
+    }
+
+    const { tagIds } = value;
+    const updatedBy = (req.user as any).id;
+
+    await UserTagService.setUserTags(userId, tagIds, updatedBy);
+
+    res.json({
+      success: true,
+      message: 'User tags updated successfully',
+    });
+  });
+
+  static addUserTag = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const userId = parseInt(req.params.id);
+
+    if (isNaN(userId)) {
+      throw new CustomError('Invalid user ID', 400);
+    }
+
+    const { error, value } = addUserTagSchema.validate(req.body);
+    if (error) {
+      throw new CustomError(error.details[0].message, 400);
+    }
+
+    const { tagId } = value;
+    const createdBy = (req.user as any).id;
+
+    await UserTagService.addUserTag(userId, tagId, createdBy);
+
+    res.json({
+      success: true,
+      message: 'Tag added to user successfully',
+    });
+  });
+
+  static removeUserTag = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const userId = parseInt(req.params.id);
+    const tagId = parseInt(req.params.tagId);
+
+    if (isNaN(userId) || isNaN(tagId)) {
+      throw new CustomError('Invalid user ID or tag ID', 400);
+    }
+
+    await UserTagService.removeUserTag(userId, tagId);
+
+    res.json({
+      success: true,
+      message: 'Tag removed from user successfully',
     });
   });
 }
