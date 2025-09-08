@@ -289,7 +289,7 @@ const GameWorldsPage: React.FC = () => {
     description: '',
     tagIds: [],
   });
-  const [formTags, setFormTags] = useState<(string | Tag)[]>([]);
+  const [formTags, setFormTags] = useState<Tag[]>([]);
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const worldIdRef = useRef<HTMLInputElement>(null);
@@ -449,23 +449,8 @@ const GameWorldsPage: React.FC = () => {
 
     setSaving(true);
     try {
-      // Ensure boolean types and tag IDs are correct
-      const names = (formTags || []).map(t => (typeof t === 'string' ? t : t.name)).map(s => s.trim()).filter(Boolean);
-      // Create missing tags first and get ids
-      const ensuredTags: Tag[] = [];
-      for (const name of names) {
-        const existing = allRegistryTags.find(rt => rt.name.toLowerCase() === name.toLowerCase());
-        if (existing) {
-          ensuredTags.push(existing);
-        } else {
-          try {
-            const created = await tagService.create({ name });
-            ensuredTags.push(created);
-            setAllRegistryTags(prev => [...prev, created].sort((a,b)=>a.name.localeCompare(b.name)));
-          } catch (e) {}
-        }
-      }
-      const tagIds = ensuredTags.map(t => t.id);
+      // Tag 객체에서 ID 추출
+      const tagIds = (formTags || []).map(t => t.id);
 
       const dataToSend = {
         ...formData,
@@ -733,6 +718,7 @@ const GameWorldsPage: React.FC = () => {
                 options={existingTags}
                 getOptionLabel={(option) => option.name}
                 filterSelectedOptions
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={tagsFilter}
                 onChange={(_, value) => setTagsFilter(value)}
                 slotProps={autocompleteSlotProps as any}
@@ -904,20 +890,24 @@ const GameWorldsPage: React.FC = () => {
             <Box>
               <Autocomplete
                 multiple
-                freeSolo
-                options={allRegistryTags}
-                getOptionLabel={(opt) => (typeof opt === 'string' ? opt : opt.name)}
+                options={allRegistryTags.filter(tag => typeof tag !== 'string')} // Tag 객체만 사용
+                getOptionLabel={(option) => option.name}
                 filterSelectedOptions
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={formTags}
-                onChange={(_, value) => setFormTags(value as (string | Tag)[])}
-                renderTags={(value: readonly (string | Tag)[], getTagProps) =>
-                  value.map((option: string | Tag, index: number) => {
-                    const name = typeof option === 'string' ? option : option.name;
-                    const color = typeof option === 'string' ? '#607D8B' : option.color;
-                    const description = typeof option === 'string' ? t('tags.noDescription') : (option.description || t('tags.noDescription'));
+                onChange={(_, value) => setFormTags(value)}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...chipProps } = getTagProps({ index });
                     return (
-                      <Tooltip key={name + index} title={description} arrow>
-                        <Chip variant="outlined" size="small" label={name} sx={{ bgcolor: color, color: '#fff', cursor: 'help' }} {...getTagProps({ index })} />
+                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                        <Chip
+                          variant="outlined"
+                          label={option.name}
+                          size="small"
+                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          {...chipProps}
+                        />
                       </Tooltip>
                     );
                   })
@@ -925,6 +915,19 @@ const GameWorldsPage: React.FC = () => {
                 renderInput={(params) => (
                   <TextField {...params} label={t('gameWorlds.tags')} />
                 )}
+                renderOption={(props, option) => {
+                  const { key, ...otherProps } = props;
+                  return (
+                    <Box component="li" key={key} {...otherProps}>
+                      <Chip
+                        label={option.name}
+                        size="small"
+                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                      />
+                      {option.description || t('common.noDescription')}
+                    </Box>
+                  );
+                }}
               />
             </Box>
 

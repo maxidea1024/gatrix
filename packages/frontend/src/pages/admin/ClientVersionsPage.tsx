@@ -618,7 +618,6 @@ const ClientVersionsPage: React.FC = () => {
               {/* 태그 필터 */}
               <Autocomplete
                 multiple
-                size="small"
                 sx={{ minWidth: 200 }}
                 options={allTags}
                 getOptionLabel={(option) => option.name}
@@ -642,12 +641,21 @@ const ClientVersionsPage: React.FC = () => {
                   })
                 }
                 renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t('common.tags')}
-                    size="small"
-                  />
+                  <TextField {...params} label={t('common.tags')} />
                 )}
+                renderOption={(props, option) => {
+                  const { key, ...otherProps } = props;
+                  return (
+                    <Box component="li" key={key} {...otherProps}>
+                      <Chip
+                        label={option.name}
+                        size="small"
+                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                      />
+                      {option.description || t('common.noDescription')}
+                    </Box>
+                  );
+                }}
               />
             </Box>
 
@@ -1097,6 +1105,8 @@ const ClientVersionsPage: React.FC = () => {
             multiple
             options={allTags}
             getOptionLabel={(option) => option.name}
+            filterSelectedOptions
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             value={clientVersionTags}
             onChange={(_, newValue) => setClientVersionTags(newValue)}
             renderTags={(value, getTagProps) =>

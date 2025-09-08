@@ -578,6 +578,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                 options={allTags}
                 getOptionLabel={(option) => option.name}
                 filterSelectedOptions
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={selectedTags}
                 onChange={(_, value) => {
                   setSelectedTags(value);

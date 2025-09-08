@@ -80,11 +80,13 @@ const JobsPage: React.FC = () => {
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
+      const tagIds = tagFilter.map(tag => tag.id.toString());
       const [jobsResponse, jobTypesData] = await Promise.all([
         jobService.getJobsWithPagination({
           jobTypeId: selectedJobType || undefined,
           isEnabled: enabledFilter !== '' ? enabledFilter : undefined,
           search: searchTerm || undefined,
+          tags: tagIds.length > 0 ? tagIds : undefined,
           limit: rowsPerPage,
           offset: page * rowsPerPage
         }),
@@ -101,18 +103,29 @@ const JobsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [selectedJobType, enabledFilter, searchTerm, page, rowsPerPage]);
+  }, [selectedJobType, enabledFilter, searchTerm, tagFilter, page, rowsPerPage]);
+
+  // 태그 로딩
+  const loadTags = useCallback(async () => {
+    try {
+      const tags = await tagService.list();
+      setAllTags(tags);
+    } catch (error) {
+      console.error('Failed to load tags:', error);
+    }
+  }, []);
 
   // Reset page when filters change
   useEffect(() => {
     setPage(0);
-  }, [selectedJobType, enabledFilter, searchTerm]);
+  }, [selectedJobType, enabledFilter, searchTerm, tagFilter]);
 
-  // Load data
+  // Load data and tags
   useEffect(() => {
     console.log('JobsPage useEffect - loading data');
     loadData();
-  }, [loadData]);
+    loadTags();
+  }, [loadData, loadTags]);
 
   // Handlers
   const handleSearch = () => {
@@ -124,9 +137,16 @@ const JobsPage: React.FC = () => {
     setSearchTerm('');
     setSelectedJobType('');
     setEnabledFilter('');
+    setTagFilter([]);
     setPage(0); // Reset to first page
     // loadData will be called automatically by useEffect
   };
+
+  // 태그 필터 변경 핸들러
+  const handleTagFilterChange = useCallback((tags: Tag[]) => {
+    setTagFilter(tags);
+    setPage(0);
+  }, []);
 
   // 페이지 변경 핸들러
   const handlePageChange = useCallback((_: unknown, newPage: number) => {
@@ -253,7 +273,7 @@ const JobsPage: React.FC = () => {
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Grid container spacing={2} alignItems="center">
-            <Grid size={{ xs: 12, md: 4 }}>
+            <Grid size={{ xs: 12, md: 3 }}>
               <TextField
                 fullWidth
                 label={t('common.search')}
@@ -269,7 +289,7 @@ const JobsPage: React.FC = () => {
                 }}
               />
             </Grid>
-            <Grid size={{ xs: 12, md: 3 }}>
+            <Grid size={{ xs: 12, md: 2 }}>
               <FormControl fullWidth>
                 <InputLabel shrink={true}>{t('jobs.jobType')}</InputLabel>
                 <Select
@@ -295,7 +315,7 @@ const JobsPage: React.FC = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid size={{ xs: 12, md: 3 }}>
+            <Grid size={{ xs: 12, md: 2 }}>
               <FormControl fullWidth>
                 <InputLabel shrink={true}>{t('common.usable')}</InputLabel>
                 <Select
@@ -317,6 +337,51 @@ const JobsPage: React.FC = () => {
                   <MenuItem value={false}>{t('common.unavailable')}</MenuItem>
                 </Select>
               </FormControl>
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 5 }}>
+              {/* 태그 필터 */}
+              <Autocomplete
+                multiple
+                sx={{ minWidth: 350 }}
+                options={allTags}
+                getOptionLabel={(option) => option.name}
+                filterSelectedOptions
+                value={tagFilter}
+                onChange={(_, value) => handleTagFilterChange(value)}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...chipProps } = getTagProps({ index });
+                    return (
+                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                        <Chip
+                          variant="outlined"
+                          label={option.name}
+                          size="small"
+                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          {...chipProps}
+                        />
+                      </Tooltip>
+                    );
+                  })
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label={t('common.tags')} />
+                )}
+                renderOption={(props, option) => {
+                  const { key, ...otherProps } = props;
+                  return (
+                    <Box component="li" key={key} {...otherProps}>
+                      <Chip
+                        label={option.name}
+                        size="small"
+                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                      />
+                      {option.description || t('common.noDescription')}
+                    </Box>
+                  );
+                }}
+              />
             </Grid>
 
           </Grid>

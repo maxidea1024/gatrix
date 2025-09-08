@@ -10,6 +10,7 @@ export interface ClientVersionFilters {
   offset?: number;
   sortBy?: string;
   sortOrder?: 'ASC' | 'DESC';
+  tags?: string[];
 }
 
 export interface ClientVersionListResult {
@@ -97,6 +98,19 @@ export class ClientVersionModel {
           // TINYINT 타입이므로 boolean을 숫자로 변환 (true -> 1, false -> 0)
           const guestModeValue = filters.guestModeAllowed ? 1 : 0;
           query.where('cv.guestModeAllowed', guestModeValue);
+        }
+
+        // 태그 필터링 (AND 조건)
+        if (filters?.tags && filters.tags.length > 0) {
+          filters.tags.forEach(tagId => {
+            query.whereExists(function() {
+              this.select('*')
+                .from('g_tag_assignments as ta')
+                .whereRaw('ta.entityId = cv.id')
+                .where('ta.entityType', 'client_version')
+                .where('ta.tagId', tagId);
+            });
+          });
         }
 
         return query;

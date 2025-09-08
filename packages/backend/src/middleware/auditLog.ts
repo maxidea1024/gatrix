@@ -80,7 +80,7 @@ export const auditLog = (options: AuditLogOptions) => {
 export const auditUserLogin = auditLog({
   action: 'user_login',
   resourceType: 'user',
-  getResourceId: (req) => req.body?.email,
+  getResourceIdFromResponse: (responseBody) => responseBody?.data?.user?.id,
   getNewValues: (req) => ({
     email: req.body?.email,
     loginMethod: 'password',
@@ -90,7 +90,7 @@ export const auditUserLogin = auditLog({
 export const auditUserRegister = auditLog({
   action: 'user_register',
   resourceType: 'user',
-  getResourceId: (req) => req.body?.email,
+  getResourceIdFromResponse: (responseBody) => responseBody?.data?.user?.id,
   getNewValues: (req) => ({
     email: req.body?.email,
     name: req.body?.name,

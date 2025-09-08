@@ -665,6 +665,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                   options={allTags}
                   getOptionLabel={(option) => option.name}
                   filterSelectedOptions
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
                   value={selectedTags}
                   onChange={(_, value) => {
                     setSelectedTags(value);

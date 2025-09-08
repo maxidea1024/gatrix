@@ -49,7 +49,14 @@ export class ClientVersionService {
     // 필터 조건 추가
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        params.append(key, value.toString());
+        // 배열인 경우 각 요소를 개별적으로 추가
+        if (Array.isArray(value)) {
+          value.forEach(item => {
+            params.append(key, item.toString());
+          });
+        } else {
+          params.append(key, value.toString());
+        }
       }
     });
 

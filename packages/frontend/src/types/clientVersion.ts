@@ -108,6 +108,7 @@ export interface ClientVersionFilters {
   updatedAtFrom?: string;
   updatedAtTo?: string;
   search?: string;
+  tags?: string[];
 }
 
 // 클라이언트 버전 정렬 옵션

@@ -129,6 +129,12 @@ const TagsPage: React.FC = () => {
     }
   };
 
+  const handleSaveEdit = () => {
+    if (editingId !== null) {
+      saveEdit(editingId);
+    }
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       {/* Header toolbar */}
@@ -247,6 +253,8 @@ const TagsPage: React.FC = () => {
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') {
                                 handleSaveEdit();
+                              } else if (e.key === 'Escape') {
+                                cancelEdit();
                               }
                             }}
                             sx={{ maxWidth: 160 }}
@@ -263,6 +271,8 @@ const TagsPage: React.FC = () => {
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                               handleSaveEdit();
+                            } else if (e.key === 'Escape') {
+                              cancelEdit();
                             }
                           }}
                           fullWidth

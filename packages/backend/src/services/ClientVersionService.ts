@@ -19,6 +19,7 @@ export interface ClientVersionFilters {
   updatedAtFrom?: Date;
   updatedAtTo?: Date;
   search?: string;
+  tags?: string[];
 }
 
 export interface ClientVersionPagination {

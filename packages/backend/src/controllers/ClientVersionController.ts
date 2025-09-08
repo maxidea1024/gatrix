@@ -71,6 +71,7 @@ const getClientVersionsQuerySchema = Joi.object({
   updatedAtFrom: Joi.date().iso().optional(),
   updatedAtTo: Joi.date().iso().optional(),
   search: Joi.string().optional(),
+  tags: Joi.array().items(Joi.string()).optional(),
   _t: Joi.string().optional(), // 캐시 방지용 타임스탬프
 });
 
@@ -144,7 +145,7 @@ export class ClientVersionController {
     Object.keys(filterParams).forEach(key => {
       const value = filterParams[key];
       // guestModeAllowed는 boolean이므로 false도 유효한 값
-      if (value !== undefined && (value !== '' || key === 'guestModeAllowed')) {
+      if (value !== undefined && (value !== '' || key === 'guestModeAllowed' || key === 'tags')) {
         let processedValue: any = value;
 
         // guestModeAllowed는 문자열을 boolean으로 변환
@@ -155,6 +156,8 @@ export class ClientVersionController {
         // 타입 안전하게 할당
         if (key === 'guestModeAllowed') {
           (filters as any).guestModeAllowed = processedValue;
+        } else if (key === 'tags') {
+          (filters as any).tags = processedValue;
         } else {
           filters[key as keyof ClientVersionFilters] = processedValue;
         }

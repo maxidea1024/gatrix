@@ -421,6 +421,7 @@ const UsersManagementPage: React.FC = () => {
       name: '',
       email: '',
     });
+    setEditUserDialog({ open: true, user });
     setEditUserDialog({
       open: true,
       user,
@@ -699,6 +700,7 @@ const UsersManagementPage: React.FC = () => {
                 options={availableTags}
                 getOptionLabel={(option) => option.name}
                 filterSelectedOptions
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={tagFilter}
                 onChange={(_, value) => setTagFilter(value)}
                 renderTags={(value, getTagProps) =>
@@ -720,16 +722,19 @@ const UsersManagementPage: React.FC = () => {
                 renderInput={(params) => (
                   <TextField {...params} label={t('admin.users.tagFilter')} />
                 )}
-                renderOption={(props, option) => (
-                  <Box component="li" {...props}>
-                    <Chip
-                      label={option.name}
-                      size="small"
-                      sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
-                    />
-                    {option.description || t('common.noDescription')}
-                  </Box>
-                )}
+                renderOption={(props, option) => {
+                  const { key, ...otherProps } = props;
+                  return (
+                    <Box component="li" key={key} {...otherProps}>
+                      <Chip
+                        label={option.name}
+                        size="small"
+                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                      />
+                      {option.description || t('common.noDescription')}
+                    </Box>
+                  );
+                }}
               />
             </Grid>
             <Grid item xs={12} md={2}>
@@ -1159,6 +1164,7 @@ const UsersManagementPage: React.FC = () => {
                 options={availableTags}
                 getOptionLabel={(option) => option.name}
                 filterSelectedOptions
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={newUserTags}
                 onChange={(_, value) => setNewUserTags(value)}
                 renderTags={(value, getTagProps) =>
@@ -1184,6 +1190,19 @@ const UsersManagementPage: React.FC = () => {
                     helperText={t('users.tagsHelp')}
                   />
                 )}
+                renderOption={(props, option) => {
+                  const { key, ...otherProps } = props;
+                  return (
+                    <Box component="li" key={key} {...otherProps}>
+                      <Chip
+                        label={option.name}
+                        size="small"
+                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                      />
+                      {option.description || t('common.noDescription')}
+                    </Box>
+                  );
+                }}
               />
             </Box>
           </Box>
@@ -1328,6 +1347,7 @@ const UsersManagementPage: React.FC = () => {
                 options={availableTags}
                 getOptionLabel={(option) => option.name}
                 filterSelectedOptions
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={editUserTags}
                 onChange={(_, value) => setEditUserTags(value)}
                 renderTags={(value, getTagProps) =>
@@ -1353,6 +1373,19 @@ const UsersManagementPage: React.FC = () => {
                     helperText={t('users.tagsHelp')}
                   />
                 )}
+                renderOption={(props, option) => {
+                  const { key, ...otherProps } = props;
+                  return (
+                    <Box component="li" key={key} {...otherProps}>
+                      <Chip
+                        label={option.name}
+                        size="small"
+                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                      />
+                      {option.description || t('common.noDescription')}
+                    </Box>
+                  );
+                }}
               />
             </Box>
             {editUserDialog.user && isCurrentUser(editUserDialog.user) && (
@@ -1428,6 +1461,8 @@ const UsersManagementPage: React.FC = () => {
                 multiple
                 options={availableTags}
                 getOptionLabel={(option) => option.name}
+                filterSelectedOptions
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={bulkActionTags}
                 onChange={(_, value) => setBulkActionTags(value)}
                 renderTags={(value, getTagProps) =>
@@ -1449,6 +1484,19 @@ const UsersManagementPage: React.FC = () => {
                 renderInput={(params) => (
                   <TextField {...params} label={t('users.tags')} />
                 )}
+                renderOption={(props, option) => {
+                  const { key, ...otherProps } = props;
+                  return (
+                    <Box component="li" key={key} {...otherProps}>
+                      <Chip
+                        label={option.name}
+                        size="small"
+                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                      />
+                      {option.description || t('common.noDescription')}
+                    </Box>
+                  );
+                }}
               />
             </Box>
           )}
