@@ -467,7 +467,8 @@
       "recommendedUpdate": "推荐更新",
       "forcedUpdate": "强制更新",
       "underReview": "审核中",
-      "blockedPatchAllowed": "阻止&允许补丁"
+      "blockedPatchAllowed": "阻止&允许补丁",
+      "maintenance": "维护中"
     },
     "statusLabel": "状态标签",
     "statusUpdateError": "状态更新错误",

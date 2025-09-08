@@ -436,7 +436,7 @@
       "selectPlatforms": "Select Platforms",
       "serverAddresses": "Server Addresses",
       "serverAddressesDescription": "Configure game server and patch server addresses.",
-      "statusHelp": "Specify the status of the game. (Online, Offline, Recommended Update, Forced Update, Under Review, Blocked & Patch Allowed)",
+      "statusHelp": "Specify the status of the game. (Online, Offline, Recommended Update, Forced Update, Under Review, Blocked & Patch Allowed, Maintenance)",
       "tagsHelp": "Select tags to apply to this client version.",
       "statusRequired": "Status is required",
       "title": "Client Version",
@@ -466,7 +466,8 @@
       "recommendedUpdate": "Recommended Update",
       "forcedUpdate": "Forced Update",
       "underReview": "Under Review",
-      "blockedPatchAllowed": "Blocked & Patch Allowed"
+      "blockedPatchAllowed": "Blocked & Patch Allowed",
+      "maintenance": "Maintenance"
     },
     "statusLabel": "Status",
     "statusUpdateError": "Failed to update status",

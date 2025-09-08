@@ -24,7 +24,8 @@ export enum ClientStatus {
   RECOMMENDED_UPDATE = 'recommended_update',
   FORCED_UPDATE = 'forced_update',
   UNDER_REVIEW = 'under_review',
-  BLOCKED_PATCH_ALLOWED = 'blocked_patch_allowed'
+  BLOCKED_PATCH_ALLOWED = 'blocked_patch_allowed',
+  MAINTENANCE = 'maintenance'
 }
 
 export interface ClientVersionAttributes {

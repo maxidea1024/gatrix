@@ -485,7 +485,8 @@
       "recommendedUpdate": "권장 업데이트",
       "forcedUpdate": "강제 업데이트",
       "underReview": "리뷰 중",
-      "blockedPatchAllowed": "접속불가&패치허용"
+      "blockedPatchAllowed": "접속불가&패치허용",
+      "maintenance": "점검중"
     },
     "statusLabel": "상태 라벨",
     "statusUpdateError": "상태 업데이트 오류",
