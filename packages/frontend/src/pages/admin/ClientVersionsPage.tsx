@@ -137,6 +137,7 @@ const ClientVersionsPage: React.FC = () => {
   const [tagDialogOpen, setTagDialogOpen] = useState(false);
   const [selectedClientVersionForTags, setSelectedClientVersionForTags] = useState<ClientVersion | null>(null);
   const [clientVersionTags, setClientVersionTags] = useState<Tag[]>([]);
+  const [tagFilter, setTagFilter] = useState<Tag[]>([]);
   const [versions, setVersions] = useState<string[]>([]);
 
   // 사용 가능한 버전 목록 로드
@@ -254,6 +255,16 @@ const ClientVersionsPage: React.FC = () => {
   const handleFilterChange = useCallback((newFilters: ClientVersionFilters) => {
     updateFilters(newFilters);
   }, [updateFilters]);
+
+  // 태그 필터 변경 핸들러
+  const handleTagFilterChange = useCallback((tags: Tag[]) => {
+    setTagFilter(tags);
+    const tagIds = tags.map(tag => tag.id.toString());
+    handleFilterChange({
+      ...pageState.filters,
+      tags: tagIds.length > 0 ? tagIds : undefined
+    });
+  }, [pageState.filters, handleFilterChange]);
 
   // 정렬은 고정 (버전 내림차순, 플랫폼 내림차순)
   // 정렬 변경 기능 비활성화
@@ -603,6 +614,41 @@ const ClientVersionsPage: React.FC = () => {
                   <MenuItem value="false">{t('common.no')}</MenuItem>
                 </Select>
               </FormControl>
+
+              {/* 태그 필터 */}
+              <Autocomplete
+                multiple
+                size="small"
+                sx={{ minWidth: 200 }}
+                options={allTags}
+                getOptionLabel={(option) => option.name}
+                filterSelectedOptions
+                value={tagFilter}
+                onChange={(_, value) => handleTagFilterChange(value)}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...chipProps } = getTagProps({ index });
+                    return (
+                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                        <Chip
+                          variant="outlined"
+                          label={option.name}
+                          size="small"
+                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          {...chipProps}
+                        />
+                      </Tooltip>
+                    );
+                  })
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t('common.tags')}
+                    size="small"
+                  />
+                )}
+              />
             </Box>
 
             <Tooltip title={t('common.refresh')}>
@@ -698,7 +744,7 @@ const ClientVersionsPage: React.FC = () => {
                   {t('common.createdAt')}
                 </TableCell>
                 <TableCell>{t('common.createdBy')}</TableCell>
-                <TableCell align="center">{t('common.tags')}</TableCell>
+                <TableCell>{t('common.tags')}</TableCell>
                 <TableCell align="center">{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
@@ -808,8 +854,8 @@ const ClientVersionsPage: React.FC = () => {
                       )}
                     </Box>
                   </TableCell>
-                  <TableCell align="center">
-                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 200, justifyContent: 'center' }}>
+                  <TableCell>
+                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 200, justifyContent: 'flex-start' }}>
                       {clientVersion.tags && clientVersion.tags.length > 0 ? (
                         clientVersion.tags.map((tag) => (
                           <Tooltip key={tag.id} title={tag.description || tag.name} arrow>

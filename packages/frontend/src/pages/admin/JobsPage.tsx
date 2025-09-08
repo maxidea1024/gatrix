@@ -27,7 +27,8 @@ import {
   CardContent,
   Tabs,
   Tab,
-  LinearProgress
+  LinearProgress,
+  Autocomplete
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -40,6 +41,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { jobService } from '../../services/jobService';
+import { tagService, Tag } from '../../services/tagService';
 import { Job, JobType, JobExecution, JobExecutionStatus, JobListResponse } from '../../types/job';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import JobForm from '../../components/jobs/JobForm';
@@ -54,6 +56,8 @@ const JobsPage: React.FC = () => {
   // State
   const [jobs, setJobs] = useState<Job[]>([]);
   const [jobTypes, setJobTypes] = useState<JobType[]>([]);
+  const [allTags, setAllTags] = useState<Tag[]>([]);
+  const [tagFilter, setTagFilter] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJobType, setSelectedJobType] = useState<number | ''>('');

@@ -29,7 +29,8 @@ import {
   InputLabel,
   Tooltip,
   Checkbox,
-  Alert
+  Alert,
+  Autocomplete
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -73,7 +74,9 @@ const MessageTemplatesPage: React.FC = () => {
     type?: MessageTemplateType;
     isEnabled?: boolean;
     q?: string;
+    tags?: string[];
   }>({});
+  const [tagFilter, setTagFilter] = useState<Tag[]>([]);
 
   // 선택 관련
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -145,6 +148,16 @@ const MessageTemplatesPage: React.FC = () => {
     setFilters(newFilters);
     setPage(0);
   }, []);
+
+  // 태그 필터 변경 핸들러
+  const handleTagFilterChange = useCallback((tags: Tag[]) => {
+    setTagFilter(tags);
+    const tagIds = tags.map(tag => tag.id.toString());
+    handleFilterChange({
+      ...filters,
+      tags: tagIds.length > 0 ? tagIds : undefined
+    });
+  }, [filters, handleFilterChange]);
 
   // 페이지 변경 핸들러
   const handlePageChange = useCallback((_: unknown, newPage: number) => {
@@ -454,6 +467,41 @@ const MessageTemplatesPage: React.FC = () => {
                 sx={{ minWidth: 200 }}
                 value={filters.q || ''}
                 onChange={(e) => handleFilterChange({ ...filters, q: e.target.value || undefined })}
+              />
+
+              {/* 태그 필터 */}
+              <Autocomplete
+                multiple
+                size="small"
+                sx={{ minWidth: 200 }}
+                options={allTags}
+                getOptionLabel={(option) => option.name}
+                filterSelectedOptions
+                value={tagFilter}
+                onChange={(_, value) => handleTagFilterChange(value)}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...chipProps } = getTagProps({ index });
+                    return (
+                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                        <Chip
+                          variant="outlined"
+                          label={option.name}
+                          size="small"
+                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          {...chipProps}
+                        />
+                      </Tooltip>
+                    );
+                  })
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t('common.tags')}
+                    size="small"
+                  />
+                )}
               />
             </Box>
 
