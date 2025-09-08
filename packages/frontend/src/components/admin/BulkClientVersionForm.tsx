@@ -23,8 +23,16 @@ import {
   Stack,
   Divider,
   Autocomplete,
+  IconButton,
 } from '@mui/material';
-import { Cancel as CancelIcon, Add as AddIcon } from '@mui/icons-material';
+import { Cancel as CancelIcon, Save as SaveIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+import 'dayjs/locale/en';
+import 'dayjs/locale/zh-cn';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -34,6 +42,7 @@ import {
   BulkCreateFormData,
   PlatformSpecificSettings,
   ClientStatus,
+  ClientVersionMaintenanceLocale,
   CLIENT_VERSION_VALIDATION,
 } from '../../types/clientVersion';
 import { ClientVersionService } from '../../services/clientVersionService';
@@ -48,6 +57,7 @@ const ClientStatusLabels = {
   [ClientStatus.FORCED_UPDATE]: 'clientVersions.status.forcedUpdate',
   [ClientStatus.UNDER_REVIEW]: 'clientVersions.status.underReview',
   [ClientStatus.BLOCKED_PATCH_ALLOWED]: 'clientVersions.status.blockedPatchAllowed',
+  [ClientStatus.MAINTENANCE]: 'clientVersions.status.maintenance',
 };
 
 interface BulkClientVersionFormProps {
@@ -118,6 +128,18 @@ const createValidationSchema = (t: any) => yup.object({
     )
     .min(1, t('clientVersions.form.selectAtLeastOnePlatform'))
     .required(),
+  // 점검 관련 필드
+  maintenanceStartDate: yup.string().optional(),
+  maintenanceEndDate: yup.string().optional(),
+  maintenanceMessage: yup
+    .string()
+    .when('clientStatus', {
+      is: 'MAINTENANCE',
+      then: (schema) => schema.required(t('clientVersions.maintenance.messageRequired')),
+      otherwise: (schema) => schema.optional(),
+    }),
+  supportsMultiLanguage: yup.boolean().optional(),
+  maintenanceLocales: yup.array().optional(),
 });
 
 const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
@@ -134,6 +156,10 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   const [allTags, setAllTags] = useState<{ id: number; name: string; color: string; description?: string }[]>([]);
   const [selectedTags, setSelectedTags] = useState<{ id: number; name: string; color: string }[]>([]);
 
+  // 점검 관련 상태
+  const [maintenanceLocales, setMaintenanceLocales] = useState<ClientVersionMaintenanceLocale[]>([]);
+  const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
+
   // 기본값 설정
   const defaultValues: BulkCreateFormData = {
     clientVersion: '',
@@ -142,6 +168,11 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     externalClickLink: '',
     memo: '',
     customPayload: '',
+    maintenanceStartDate: '',
+    maintenanceEndDate: '',
+    maintenanceMessage: '',
+    supportsMultiLanguage: false,
+    maintenanceLocales: [],
     platforms: [],
     tags: [],
   };
@@ -165,6 +196,8 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
       reset(defaultValues);
       setSelectedPlatforms([]);
       setSelectedTags([]);
+      setMaintenanceLocales([]);
+      setSupportsMultiLanguage(false);
     }
   }, [open, reset]);
 
@@ -182,6 +215,77 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
       loadTags();
     }
   }, [open]);
+
+  // 점검 메시지 로케일 관리 함수들
+  const addMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
+    if (!maintenanceLocales.find(l => l.lang === lang)) {
+      const newLocales = [...maintenanceLocales, { lang, message: '' }];
+      setMaintenanceLocales(newLocales);
+      setValue('maintenanceLocales', newLocales);
+    }
+  };
+
+  const updateMaintenanceLocale = (lang: 'ko' | 'en' | 'zh', message: string) => {
+    const newLocales = maintenanceLocales.map(l =>
+      l.lang === lang ? { ...l, message } : l
+    );
+    setMaintenanceLocales(newLocales);
+    setValue('maintenanceLocales', newLocales);
+  };
+
+  const removeMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
+    const newLocales = maintenanceLocales.filter(l => l.lang !== lang);
+    setMaintenanceLocales(newLocales);
+    setValue('maintenanceLocales', newLocales);
+  };
+
+  // 언어별 메시지 사용 여부 변경
+  const handleSupportsMultiLanguageChange = (enabled: boolean) => {
+    setSupportsMultiLanguage(enabled);
+    setValue('supportsMultiLanguage', enabled);
+    if (enabled) {
+      // 모든 언어를 자동으로 초기화
+      const allLanguageLocales = availableLanguages.map(lang => ({
+        lang: lang.code,
+        message: ''
+      }));
+      setMaintenanceLocales(allLanguageLocales);
+      setValue('maintenanceLocales', allLanguageLocales);
+    } else {
+      setMaintenanceLocales([]);
+      setValue('maintenanceLocales', []);
+    }
+  };
+
+  // 사용 가능한 언어 목록
+  const availableLanguages = [
+    { code: 'ko' as const, label: t('clientVersions.maintenance.korean') },
+    { code: 'en' as const, label: t('clientVersions.maintenance.english') },
+    { code: 'zh' as const, label: t('clientVersions.maintenance.chinese') },
+  ];
+
+  const usedLanguages = new Set(maintenanceLocales.map(l => l.lang));
+  const availableToAdd = availableLanguages.filter(l => !usedLanguages.has(l.code));
+
+  // 날짜 로케일 설정
+  const getDateLocale = () => {
+    const currentLang = t('language') || 'ko';
+    switch (currentLang) {
+      case 'en':
+        dayjs.locale('en');
+        return 'en';
+      case 'zh':
+        dayjs.locale('zh-cn');
+        return 'zh-cn';
+      default:
+        dayjs.locale('ko');
+        return 'ko';
+    }
+  };
+
+  // 현재 상태 감시
+  const currentStatus = watch('clientStatus');
+  const isMaintenanceMode = currentStatus === ClientStatus.MAINTENANCE;
 
   // 선택된 플랫폼이 변경될 때 platforms 배열 업데이트
   useEffect(() => {
@@ -221,6 +325,11 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
         externalClickLink: data.externalClickLink || undefined,
         memo: data.memo || undefined,
         customPayload: data.customPayload || undefined,
+        maintenanceStartDate: data.maintenanceStartDate || undefined,
+        maintenanceEndDate: data.maintenanceEndDate || undefined,
+        maintenanceMessage: data.maintenanceMessage || undefined,
+        supportsMultiLanguage: data.supportsMultiLanguage || false,
+        maintenanceLocales: maintenanceLocales.filter(l => l.message.trim() !== ''),
         platforms: data.platforms.map(platform => ({
           ...platform,
           gameServerAddressForWhiteList: platform.gameServerAddressForWhiteList || undefined,
@@ -378,6 +487,122 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                 />
               </Stack>
             </Paper>
+
+            {/* 점검 설정 섹션 */}
+            {isMaintenanceMode && (
+              <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'warning.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  🔧 {t('clientVersions.maintenance.title')}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {t('clientVersions.maintenance.description')}
+                </Typography>
+
+                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
+                  <Stack spacing={2}>
+                    {/* 점검 시작일 */}
+                    <Controller
+                      name="maintenanceStartDate"
+                      control={control}
+                      render={({ field }) => (
+                        <DateTimePicker
+                          label={t('clientVersions.maintenance.startDate')}
+                          value={field.value ? dayjs(field.value) : null}
+                          onChange={(date) => field.onChange(date ? date.toISOString() : '')}
+                          slotProps={{
+                            textField: {
+                              fullWidth: true,
+                              helperText: t('clientVersions.maintenance.startDateHelp'),
+                              error: !!errors.maintenanceStartDate,
+                            },
+                          }}
+                        />
+                      )}
+                    />
+
+                    {/* 점검 종료일 */}
+                    <Controller
+                      name="maintenanceEndDate"
+                      control={control}
+                      render={({ field }) => (
+                        <DateTimePicker
+                          label={t('clientVersions.maintenance.endDate')}
+                          value={field.value ? dayjs(field.value) : null}
+                          onChange={(date) => field.onChange(date ? date.toISOString() : '')}
+                          slotProps={{
+                            textField: {
+                              fullWidth: true,
+                              helperText: t('clientVersions.maintenance.endDateHelp'),
+                              error: !!errors.maintenanceEndDate,
+                            },
+                          }}
+                        />
+                      )}
+                    />
+
+                    {/* 기본 점검 메시지 */}
+                    <Controller
+                      name="maintenanceMessage"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          fullWidth
+                          multiline
+                          rows={3}
+                          label={t('clientVersions.maintenance.defaultMessage')}
+                          helperText={t('clientVersions.maintenance.defaultMessageHelp')}
+                          error={!!errors.maintenanceMessage}
+                        />
+                      )}
+                    />
+
+                    {/* 언어별 메시지 사용 여부 */}
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={supportsMultiLanguage}
+                          onChange={(e) => handleSupportsMultiLanguageChange(e.target.checked)}
+                        />
+                      }
+                      label={t('clientVersions.maintenance.supportsMultiLanguage')}
+                    />
+                    <Typography variant="caption" color="text.secondary">
+                      {t('clientVersions.maintenance.supportsMultiLanguageHelp')}
+                    </Typography>
+
+                    {/* 언어별 메시지 */}
+                    {supportsMultiLanguage && (
+                      <Box>
+                        <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
+                          {t('clientVersions.maintenance.languageSpecificMessages')}
+                        </Typography>
+
+                        {/* 모든 언어별 메시지 입력 */}
+                        {availableLanguages.map((lang) => {
+                          const locale = maintenanceLocales.find(l => l.lang === lang.code);
+                          return (
+                            <Box key={lang.code} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                                {lang.label}
+                              </Typography>
+                              <TextField
+                                fullWidth
+                                multiline
+                                rows={3}
+                                value={locale?.message || ''}
+                                onChange={(e) => updateMaintenanceLocale(lang.code, e.target.value)}
+                                placeholder={t(`clientVersions.maintenance.${lang.code}Help`)}
+                              />
+                            </Box>
+                          );
+                        })}
+                      </Box>
+                    )}
+                  </Stack>
+                </LocalizationProvider>
+              </Paper>
+            )}
 
             {/* 추가 설정 섹션 */}
             <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
@@ -626,7 +851,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
             type="submit"
             variant="contained"
             disabled={loading || isSubmitting}
-            startIcon={<AddIcon />}
+            startIcon={<SaveIcon />}
           >
             {loading ? t('clientVersions.creating') : t('clientVersions.bulkCreate')}
           </Button>

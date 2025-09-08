@@ -41,13 +41,30 @@ export interface ClientVersionAttributes {
   externalClickLink?: string;
   memo?: string;
   customPayload?: string;
+  maintenanceStartDate?: Date;
+  maintenanceEndDate?: Date;
+  maintenanceMessage?: string;
+  supportsMultiLanguage?: boolean;
   createdBy?: number;
   updatedBy?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-export interface ClientVersionCreationAttributes extends Omit<ClientVersionAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
+export interface ClientVersionMaintenanceLocale {
+  id?: number;
+  clientVersionId: number;
+  lang: 'ko' | 'en' | 'zh';
+  message: string;
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface ClientVersionCreationAttributes extends Omit<ClientVersionAttributes, 'id' | 'createdAt' | 'updatedAt'> {
+  maintenanceLocales?: Omit<ClientVersionMaintenanceLocale, 'id' | 'clientVersionId' | 'createdAt' | 'updatedAt'>[];
+}
 
 export interface BulkCreateClientVersionRequest {
   clientVersions: ClientVersionCreationAttributes[];
@@ -104,8 +121,8 @@ export class ClientVersionModel {
         // 태그 필터링 (AND 조건)
         if (filters?.tags && filters.tags.length > 0) {
           filters.tags.forEach(tagId => {
-            query.whereExists(function() {
-              this.select('*')
+            query.whereExists((subquery: any) => {
+              subquery.select('*')
                 .from('g_tag_assignments as ta')
                 .whereRaw('ta.entityId = cv.id')
                 .where('ta.entityType', 'client_version')
@@ -188,9 +205,15 @@ export class ClientVersionModel {
       // 태그 정보 로드
       const tags = await this.getTags(id);
 
+      // 점검 메시지 로케일 정보 로드
+      const maintenanceLocales = await db('g_client_version_maintenance_locales')
+        .where('clientVersionId', id)
+        .select('lang', 'message');
+
       return {
         ...clientVersion,
-        tags
+        tags,
+        maintenanceLocales: maintenanceLocales || []
       };
     } catch (error) {
       logger.error('Error finding client version by ID:', error);
@@ -200,16 +223,33 @@ export class ClientVersionModel {
 
   static async create(data: any): Promise<any> {
     try {
-      // tags 필드는 별도 테이블에서 관리하므로 제거
-      const { tags, ...clientVersionData } = data;
+      return await db.transaction(async (trx) => {
+        // tags와 maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
+        const { tags, maintenanceLocales, ...clientVersionData } = data;
 
-      const [insertId] = await db('g_client_versions').insert({
-        ...clientVersionData,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        const [insertId] = await trx('g_client_versions').insert({
+          ...clientVersionData,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+
+        // 점검 메시지 로케일 처리
+        if (maintenanceLocales && maintenanceLocales.length > 0) {
+          const localeInserts = maintenanceLocales.map((locale: any) => ({
+            clientVersionId: insertId,
+            lang: locale.lang,
+            message: locale.message,
+            createdBy: data.createdBy,
+            updatedBy: data.updatedBy,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }));
+
+          await trx('g_client_version_maintenance_locales').insert(localeInserts);
+        }
+
+        return await this.findById(insertId);
       });
-
-      return await this.findById(insertId);
     } catch (error) {
       logger.error('Error creating client version:', error);
       throw error;
@@ -218,14 +258,42 @@ export class ClientVersionModel {
 
   static async update(id: number, data: any): Promise<any> {
     try {
-      await db('g_client_versions')
-        .where('id', id)
-        .update({
-          ...data,
-          updatedAt: new Date()
-        });
+      return await db.transaction(async (trx) => {
+        // tags와 maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
+        const { tags, maintenanceLocales, ...clientVersionData } = data;
 
-      return await this.findById(id);
+        await trx('g_client_versions')
+          .where('id', id)
+          .update({
+            ...clientVersionData,
+            updatedAt: new Date()
+          });
+
+        // 점검 메시지 로케일 처리
+        if (maintenanceLocales !== undefined) {
+          // 기존 로케일 삭제
+          await trx('g_client_version_maintenance_locales')
+            .where('clientVersionId', id)
+            .del();
+
+          // 새 로케일 추가
+          if (maintenanceLocales.length > 0) {
+            const localeInserts = maintenanceLocales.map((locale: any) => ({
+              clientVersionId: id,
+              lang: locale.lang,
+              message: locale.message,
+              createdBy: data.createdBy,
+              updatedBy: data.updatedBy,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }));
+
+            await trx('g_client_version_maintenance_locales').insert(localeInserts);
+          }
+        }
+
+        return await this.findById(id);
+      });
     } catch (error) {
       logger.error('Error updating client version:', error);
       throw error;

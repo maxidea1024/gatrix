@@ -26,6 +26,11 @@ import {
   LinearProgress,
   CircularProgress,
   Autocomplete, Chip as MuiChip, TextField as MuiTextField,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Paper,
+  Stack,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -43,6 +48,7 @@ import {
   Save as SaveIcon,
   ContentCopy as CopyIcon,
   Refresh as RefreshIcon,
+  ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import {
   DndContext,
@@ -65,9 +71,16 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+import 'dayjs/locale/en';
+import 'dayjs/locale/zh-cn';
 import { gameWorldService } from '../../services/gameWorldService';
 import { tagService, Tag } from '@/services/tagService';
-import { GameWorld, CreateGameWorldData } from '../../types/gameWorld';
+import { GameWorld, CreateGameWorldData, GameWorldMaintenanceLocale } from '../../types/gameWorld';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
@@ -189,19 +202,59 @@ const SortableRow: React.FC<SortableRowProps> = ({
         />
       </TableCell>
       <TableCell>
-        <Chip
-          icon={<MaintenanceIcon />}
-          label={world.isMaintenance ? (t('gameWorlds.maintenance')) : (t('gameWorlds.active'))}
-          color={world.isMaintenance ? "warning" : "success"}
-          size="small"
-          onClick={() => onToggleMaintenance(world.id)}
-          sx={{
-            cursor: 'pointer',
-            '&:hover': {
-              backgroundColor: world.isMaintenance ? 'warning.dark' : 'success.dark',
+        {world.isMaintenance ? (
+          <Tooltip
+            title={
+              <Box>
+                {world.maintenanceMessage && (
+                  <Typography variant="body2" sx={{ mb: 1 }}>
+                    {world.maintenanceMessage}
+                  </Typography>
+                )}
+                {world.maintenanceStartDate && (
+                  <Typography variant="caption" display="block">
+                    {t('gameWorlds.maintenance.startDate')}: {new Date(world.maintenanceStartDate).toLocaleString()}
+                  </Typography>
+                )}
+                {world.maintenanceEndDate && (
+                  <Typography variant="caption" display="block">
+                    {t('gameWorlds.maintenance.endDate')}: {new Date(world.maintenanceEndDate).toLocaleString()}
+                  </Typography>
+                )}
+              </Box>
             }
-          }}
-        />
+            arrow
+            placement="top"
+          >
+            <Chip
+              icon={<MaintenanceIcon />}
+              label={t('gameWorlds.maintenance')}
+              color="warning"
+              size="small"
+              onClick={() => onToggleMaintenance(world.id)}
+              sx={{
+                cursor: 'pointer',
+                '&:hover': {
+                  backgroundColor: 'warning.dark',
+                }
+              }}
+            />
+          </Tooltip>
+        ) : (
+          <Chip
+            icon={<MaintenanceIcon />}
+            label={t('gameWorlds.active')}
+            color="success"
+            size="small"
+            onClick={() => onToggleMaintenance(world.id)}
+            sx={{
+              cursor: 'pointer',
+              '&:hover': {
+                backgroundColor: 'success.dark',
+              }
+            }}
+          />
+        )}
       </TableCell>
       <TableCell>
         <Typography variant="body2" sx={{ maxWidth: 200 }} noWrap>
@@ -287,9 +340,16 @@ const GameWorldsPage: React.FC = () => {
     isVisible: true,
     isMaintenance: false,
     description: '',
+    maintenanceStartDate: '',
+    maintenanceEndDate: '',
+    maintenanceMessage: '',
+    supportsMultiLanguage: false,
+    maintenanceLocales: [],
     tagIds: [],
   });
   const [formTags, setFormTags] = useState<Tag[]>([]);
+  const [maintenanceLocales, setMaintenanceLocales] = useState<GameWorldMaintenanceLocale[]>([]);
+  const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const worldIdRef = useRef<HTMLInputElement>(null);
@@ -326,6 +386,73 @@ const GameWorldsPage: React.FC = () => {
   useEffect(() => {
     tagService.list().then(setAllRegistryTags).catch(() => {});
   }, []);
+
+  // 점검 메시지 로케일 관리 함수들
+  const addMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
+    if (!maintenanceLocales.find(l => l.lang === lang)) {
+      const newLocales = [...maintenanceLocales, { lang, message: '' }];
+      setMaintenanceLocales(newLocales);
+      setFormData(prev => ({ ...prev, maintenanceLocales: newLocales }));
+    }
+  };
+
+  const updateMaintenanceLocale = (lang: 'ko' | 'en' | 'zh', message: string) => {
+    const newLocales = maintenanceLocales.map(l =>
+      l.lang === lang ? { ...l, message } : l
+    );
+    setMaintenanceLocales(newLocales);
+    setFormData(prev => ({ ...prev, maintenanceLocales: newLocales }));
+  };
+
+  const removeMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
+    const newLocales = maintenanceLocales.filter(l => l.lang !== lang);
+    setMaintenanceLocales(newLocales);
+    setFormData(prev => ({ ...prev, maintenanceLocales: newLocales }));
+  };
+
+  // 언어별 메시지 사용 여부 변경
+  const handleSupportsMultiLanguageChange = (enabled: boolean) => {
+    setSupportsMultiLanguage(enabled);
+    setFormData(prev => ({ ...prev, supportsMultiLanguage: enabled }));
+    if (enabled) {
+      // 모든 언어를 자동으로 초기화
+      const allLanguageLocales = availableLanguages.map(lang => ({
+        lang: lang.code,
+        message: ''
+      }));
+      setMaintenanceLocales(allLanguageLocales);
+      setFormData(prev => ({ ...prev, maintenanceLocales: allLanguageLocales }));
+    } else {
+      setMaintenanceLocales([]);
+      setFormData(prev => ({ ...prev, maintenanceLocales: [] }));
+    }
+  };
+
+  // 사용 가능한 언어 목록
+  const availableLanguages = [
+    { code: 'ko' as const, label: t('gameWorlds.maintenance.korean') },
+    { code: 'en' as const, label: t('gameWorlds.maintenance.english') },
+    { code: 'zh' as const, label: t('gameWorlds.maintenance.chinese') },
+  ];
+
+  const usedLanguages = new Set(maintenanceLocales.map(l => l.lang));
+  const availableToAdd = availableLanguages.filter(l => !usedLanguages.has(l.code));
+
+  // 날짜 로케일 설정
+  const getDateLocale = () => {
+    const currentLang = t('language') || 'ko';
+    switch (currentLang) {
+      case 'en':
+        dayjs.locale('en');
+        return 'en';
+      case 'zh':
+        dayjs.locale('zh-cn');
+        return 'zh-cn';
+      default:
+        dayjs.locale('ko');
+        return 'ko';
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -391,9 +518,16 @@ const GameWorldsPage: React.FC = () => {
       isVisible: true,
       isMaintenance: false,
       description: '',
+      maintenanceStartDate: '',
+      maintenanceEndDate: '',
+      maintenanceMessage: '',
+      supportsMultiLanguage: false,
+      maintenanceLocales: [],
       tagIds: [],
     });
     setFormTags([]);
+    setMaintenanceLocales([]);
+    setSupportsMultiLanguage(false);
     setFormErrors({});
     setDialogOpen(true);
     setTimeout(() => {
@@ -410,9 +544,16 @@ const GameWorldsPage: React.FC = () => {
       isVisible: world.isVisible,
       isMaintenance: world.isMaintenance,
       description: world.description || '',
+      maintenanceStartDate: world.maintenanceStartDate || '',
+      maintenanceEndDate: world.maintenanceEndDate || '',
+      maintenanceMessage: world.maintenanceMessage || '',
+      supportsMultiLanguage: world.supportsMultiLanguage || false,
+      maintenanceLocales: world.maintenanceLocales || [],
       tagIds: (world.tags || []).map(t => t.id),
     });
     setFormTags((world.tags || []));
+    setMaintenanceLocales(world.maintenanceLocales || []);
+    setSupportsMultiLanguage(world.supportsMultiLanguage || false);
     setFormErrors({});
     setDialogOpen(true);
   };
@@ -426,6 +567,11 @@ const GameWorldsPage: React.FC = () => {
 
     if (!formData.name.trim()) {
       errors.name = 'Name is required';
+    }
+
+    // 점검 모드일 때 기본 점검 메시지 필수 체크
+    if (formData.isMaintenance && (!formData.maintenanceMessage || !formData.maintenanceMessage.trim())) {
+      errors.maintenanceMessage = t('gameWorlds.maintenance.messageRequired');
     }
 
     setFormErrors(errors);
@@ -457,6 +603,11 @@ const GameWorldsPage: React.FC = () => {
         tagIds,
         isVisible: Boolean(formData.isVisible),
         isMaintenance: Boolean(formData.isMaintenance),
+        maintenanceStartDate: formData.maintenanceStartDate || undefined,
+        maintenanceEndDate: formData.maintenanceEndDate || undefined,
+        maintenanceMessage: formData.maintenanceMessage || undefined,
+        supportsMultiLanguage: formData.supportsMultiLanguage || false,
+        maintenanceLocales: maintenanceLocales.filter(l => l.message.trim() !== ''),
       };
 
 
@@ -958,6 +1109,102 @@ const GameWorldsPage: React.FC = () => {
                 {t('gameWorlds.form.maintenanceHelp')}
               </Typography>
             </Box>
+
+            {/* 점검 설정 섹션 */}
+            {formData.isMaintenance && (
+              <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
+                <Typography variant="h6" gutterBottom sx={{ color: 'warning.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  🔧 {t('gameWorlds.maintenance.title')}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {t('gameWorlds.maintenance.description')}
+                </Typography>
+
+                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
+                  <Stack spacing={2}>
+                    {/* 점검 시작일 */}
+                    <DateTimePicker
+                      label={t('gameWorlds.maintenance.startDate')}
+                      value={formData.maintenanceStartDate ? dayjs(formData.maintenanceStartDate) : null}
+                      onChange={(date) => setFormData({ ...formData, maintenanceStartDate: date ? date.toISOString() : '' })}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          helperText: t('gameWorlds.maintenance.startDateHelp'),
+                        },
+                      }}
+                    />
+
+                    {/* 점검 종료일 */}
+                    <DateTimePicker
+                      label={t('gameWorlds.maintenance.endDate')}
+                      value={formData.maintenanceEndDate ? dayjs(formData.maintenanceEndDate) : null}
+                      onChange={(date) => setFormData({ ...formData, maintenanceEndDate: date ? date.toISOString() : '' })}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          helperText: t('gameWorlds.maintenance.endDateHelp'),
+                        },
+                      }}
+                    />
+
+                    {/* 기본 점검 메시지 */}
+                    <TextField
+                      fullWidth
+                      multiline
+                      rows={3}
+                      label={t('gameWorlds.maintenance.defaultMessage')}
+                      value={formData.maintenanceMessage}
+                      onChange={(e) => setFormData({ ...formData, maintenanceMessage: e.target.value })}
+                      helperText={t('gameWorlds.maintenance.defaultMessageHelp')}
+                    />
+
+                    {/* 언어별 메시지 사용 여부 */}
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={supportsMultiLanguage}
+                          onChange={(e) => handleSupportsMultiLanguageChange(e.target.checked)}
+                        />
+                      }
+                      label={t('gameWorlds.maintenance.supportsMultiLanguage')}
+                    />
+                    <Typography variant="caption" color="text.secondary">
+                      {t('gameWorlds.maintenance.supportsMultiLanguageHelp')}
+                    </Typography>
+
+                    {/* 언어별 메시지 */}
+                    {supportsMultiLanguage && (
+                      <Box>
+                        <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
+                          {t('gameWorlds.maintenance.languageSpecificMessages')}
+                        </Typography>
+
+                        {/* 모든 언어별 메시지 입력 */}
+                        {availableLanguages.map((lang) => {
+                          const locale = maintenanceLocales.find(l => l.lang === lang.code);
+                          return (
+                            <Box key={lang.code} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                                {lang.label}
+                              </Typography>
+                              <TextField
+                                fullWidth
+                                multiline
+                                rows={3}
+                                value={locale?.message || ''}
+                                onChange={(e) => updateMaintenanceLocale(lang.code, e.target.value)}
+                                placeholder={t(`gameWorlds.maintenance.${lang.code}Help`)}
+                              />
+                            </Box>
+                          );
+                        })}
+                      </Box>
+                    )}
+                  </Stack>
+                </LocalizationProvider>
+              </Paper>
+            )}
           </Box>
         </DialogContent>
         <DialogActions>

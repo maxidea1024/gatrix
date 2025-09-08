@@ -517,7 +517,28 @@
     "selectNone": "선택 해제",
     "subtitle": "클라이언트 버전 관리 및 배포",
     "updateError": "업데이트 오류",
-    "viewDetails": "세부사항 보기"
+    "viewDetails": "세부사항 보기",
+    "maintenance": {
+      "title": "점검 설정",
+      "description": "점검 기간과 메시지를 설정하세요.",
+      "startDate": "점검 시작일",
+      "endDate": "점검 종료일",
+      "startDateHelp": "점검 시작 일시를 선택하세요 (선택사항)",
+      "endDateHelp": "점검 종료 일시를 선택하세요 (선택사항)",
+      "defaultMessage": "기본 점검 메시지",
+      "defaultMessageHelp": "모든 언어에 공통으로 사용될 기본 점검 메시지를 입력하세요",
+      "supportsMultiLanguage": "언어별 메시지 사용",
+      "supportsMultiLanguageHelp": "언어별로 다른 점검 메시지를 설정할 수 있습니다",
+      "languageSpecificMessages": "언어별 메시지",
+      "korean": "한국어 메시지",
+      "english": "영어 메시지",
+      "chinese": "중국어 메시지",
+      "koreanHelp": "한국어 사용자에게 표시될 점검 메시지",
+      "englishHelp": "영어 사용자에게 표시될 점검 메시지",
+      "chineseHelp": "중국어 사용자에게 표시될 점검 메시지",
+      "messagePreview": "점검 메시지 미리보기",
+      "messageRequired": "점검중 상태일 때 기본 점검 메시지는 필수입니다"
+    }
   },
   "common": {
     "action": "작업",
@@ -896,7 +917,28 @@
     "updateError": "업데이트 오류",
     "updateSuccess": "업데이트 성공",
     "viewDetails": "세부사항 보기",
-    "worldOrder": "월드 순서"
+    "worldOrder": "월드 순서",
+    "maintenance": {
+      "title": "점검 설정",
+      "description": "점검 기간과 메시지를 설정하세요.",
+      "startDate": "점검 시작일",
+      "endDate": "점검 종료일",
+      "startDateHelp": "점검 시작 일시를 선택하세요 (선택사항)",
+      "endDateHelp": "점검 종료 일시를 선택하세요 (선택사항)",
+      "defaultMessage": "기본 점검 메시지",
+      "defaultMessageHelp": "모든 언어에 공통으로 사용될 기본 점검 메시지를 입력하세요",
+      "supportsMultiLanguage": "언어별 메시지 사용",
+      "supportsMultiLanguageHelp": "언어별로 다른 점검 메시지를 설정할 수 있습니다",
+      "languageSpecificMessages": "언어별 메시지",
+      "korean": "한국어 메시지",
+      "english": "영어 메시지",
+      "chinese": "중국어 메시지",
+      "koreanHelp": "한국어 사용자에게 표시될 점검 메시지",
+      "englishHelp": "영어 사용자에게 표시될 점검 메시지",
+      "chineseHelp": "중국어 사용자에게 표시될 점검 메시지",
+      "messagePreview": "점검 메시지 미리보기",
+      "messageRequired": "점검 모드일 때 기본 점검 메시지는 필수입니다"
+    }
   },
   "genericWebhookUrl": "일반 웹훅 URL",
   "language": {

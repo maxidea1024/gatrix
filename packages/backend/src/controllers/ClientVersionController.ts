@@ -19,6 +19,21 @@ const createClientVersionSchema = Joi.object({
   externalClickLink: Joi.string().max(500).optional().allow('').empty('').default(null),
   memo: Joi.string().optional().allow('').empty('').default(null),
   customPayload: Joi.string().optional().allow('').empty('').default(null),
+  // 점검 관련 필드
+  maintenanceStartDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
+  maintenanceEndDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
+  maintenanceMessage: Joi.when('clientStatus', {
+    is: 'MAINTENANCE',
+    then: Joi.string().min(1).required(),
+    otherwise: Joi.string().optional().allow('').empty('').default(null)
+  }),
+  supportsMultiLanguage: Joi.boolean().optional().default(false),
+  maintenanceLocales: Joi.array().items(
+    Joi.object({
+      lang: Joi.string().valid('ko', 'en', 'zh').required(),
+      message: Joi.string().required(),
+    })
+  ).optional().default([]),
   tags: Joi.array().items(Joi.object({
     id: Joi.number().integer().positive().required(),
     name: Joi.string().optional(),
@@ -43,7 +58,21 @@ const updateClientVersionSchema = Joi.object({
   externalClickLink: Joi.string().max(500).optional().allow('').empty('').default(null),
   memo: Joi.string().optional().allow('').empty('').default(null),
   customPayload: Joi.string().optional().allow('').empty('').default(null),
-
+  // 점검 관련 필드
+  maintenanceStartDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
+  maintenanceEndDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
+  maintenanceMessage: Joi.when('clientStatus', {
+    is: 'MAINTENANCE',
+    then: Joi.string().min(1).required(),
+    otherwise: Joi.string().optional().allow('').empty('').default(null)
+  }),
+  supportsMultiLanguage: Joi.boolean().optional().default(false),
+  maintenanceLocales: Joi.array().items(
+    Joi.object({
+      lang: Joi.string().valid('ko', 'en', 'zh').required(),
+      message: Joi.string().required(),
+    })
+  ).optional().default([]),
 });
 
 const getClientVersionsQuerySchema = Joi.object({
@@ -87,6 +116,22 @@ const bulkCreateClientVersionSchema = Joi.object({
   externalClickLink: Joi.string().max(500).optional().allow('').empty('').default(null),
   memo: Joi.string().max(1000).optional().allow('').empty('').default(null),
   customPayload: Joi.string().max(5000).optional().allow('').empty('').default(null),
+
+  // 점검 관련 필드
+  maintenanceStartDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
+  maintenanceEndDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
+  maintenanceMessage: Joi.when('clientStatus', {
+    is: 'MAINTENANCE',
+    then: Joi.string().min(1).required(),
+    otherwise: Joi.string().optional().allow('').empty('').default(null)
+  }),
+  supportsMultiLanguage: Joi.boolean().optional().default(false),
+  maintenanceLocales: Joi.array().items(
+    Joi.object({
+      lang: Joi.string().valid('ko', 'en', 'zh').required(),
+      message: Joi.string().required(),
+    })
+  ).optional().default([]),
 
   platforms: Joi.array().items(
     Joi.object({

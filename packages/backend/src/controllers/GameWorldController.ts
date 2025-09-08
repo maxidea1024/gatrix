@@ -15,6 +15,21 @@ const createGameWorldSchema = Joi.object({
   isMaintenance: Joi.boolean().optional(),
   displayOrder: Joi.number().integer().optional(),
   description: Joi.string().max(1000).optional().allow(''),
+  // 점검 관련 필드
+  maintenanceStartDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
+  maintenanceEndDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
+  maintenanceMessage: Joi.when('isMaintenance', {
+    is: true,
+    then: Joi.string().min(1).required(),
+    otherwise: Joi.string().optional().allow('').empty('').default(null)
+  }),
+  supportsMultiLanguage: Joi.boolean().optional().default(false),
+  maintenanceLocales: Joi.array().items(
+    Joi.object({
+      lang: Joi.string().valid('ko', 'en', 'zh').required(),
+      message: Joi.string().required(),
+    })
+  ).optional().default([]),
   tagIds: Joi.array().items(Joi.number().integer().min(1)).optional()
 });
 
@@ -25,6 +40,21 @@ const updateGameWorldSchema = Joi.object({
   isMaintenance: Joi.boolean().optional(),
   displayOrder: Joi.number().integer().optional(),
   description: Joi.string().max(1000).optional().allow(''),
+  // 점검 관련 필드
+  maintenanceStartDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
+  maintenanceEndDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
+  maintenanceMessage: Joi.when('isMaintenance', {
+    is: true,
+    then: Joi.string().min(1).required(),
+    otherwise: Joi.string().optional().allow('').empty('').default(null)
+  }),
+  supportsMultiLanguage: Joi.boolean().optional().default(false),
+  maintenanceLocales: Joi.array().items(
+    Joi.object({
+      lang: Joi.string().valid('ko', 'en', 'zh').required(),
+      message: Joi.string().required(),
+    })
+  ).optional().default([]),
   tagIds: Joi.array().items(Joi.number().integer().min(1)).optional()
 });
 

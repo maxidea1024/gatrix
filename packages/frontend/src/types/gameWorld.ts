@@ -1,5 +1,10 @@
 import type { Tag } from '@/services/tagService';
 
+export interface GameWorldMaintenanceLocale {
+  lang: 'ko' | 'en' | 'zh';
+  message: string;
+}
+
 export interface GameWorld {
   id: number;
   worldId: string;
@@ -8,6 +13,11 @@ export interface GameWorld {
   isMaintenance: boolean;
   displayOrder: number;
   description?: string;
+  maintenanceStartDate?: string;
+  maintenanceEndDate?: string;
+  maintenanceMessage?: string;
+  supportsMultiLanguage?: boolean;
+  maintenanceLocales?: GameWorldMaintenanceLocale[];
   tags?: Tag[]; // normalized
   createdAt: string;
   updatedAt: string;
@@ -24,6 +34,11 @@ export interface CreateGameWorldData {
   isMaintenance?: boolean;
   displayOrder?: number;
   description?: string;
+  maintenanceStartDate?: string;
+  maintenanceEndDate?: string;
+  maintenanceMessage?: string;
+  supportsMultiLanguage?: boolean;
+  maintenanceLocales?: GameWorldMaintenanceLocale[];
   tagIds?: number[]; // normalized
 }
 
@@ -34,6 +49,11 @@ export interface UpdateGameWorldData {
   isMaintenance?: boolean;
   displayOrder?: number;
   description?: string;
+  maintenanceStartDate?: string;
+  maintenanceEndDate?: string;
+  maintenanceMessage?: string;
+  supportsMultiLanguage?: boolean;
+  maintenanceLocales?: GameWorldMaintenanceLocale[];
   tagIds?: number[]; // normalized
 }
 

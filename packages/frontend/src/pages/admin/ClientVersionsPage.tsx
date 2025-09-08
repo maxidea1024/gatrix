@@ -804,11 +804,43 @@ const ClientVersionsPage: React.FC = () => {
                     />
                   </TableCell>
                   <TableCell>
-                    <Chip
-                      label={t(ClientStatusLabels[clientVersion.clientStatus])}
-                      color={ClientStatusColors[clientVersion.clientStatus]}
-                      size="small"
-                    />
+                    {clientVersion.clientStatus === ClientStatus.MAINTENANCE ? (
+                      <Tooltip
+                        title={
+                          <Box>
+                            {clientVersion.maintenanceMessage && (
+                              <Typography variant="body2" sx={{ mb: 1 }}>
+                                {clientVersion.maintenanceMessage}
+                              </Typography>
+                            )}
+                            {clientVersion.maintenanceStartDate && (
+                              <Typography variant="caption" display="block">
+                                {t('clientVersions.maintenance.startDate')}: {new Date(clientVersion.maintenanceStartDate).toLocaleString()}
+                              </Typography>
+                            )}
+                            {clientVersion.maintenanceEndDate && (
+                              <Typography variant="caption" display="block">
+                                {t('clientVersions.maintenance.endDate')}: {new Date(clientVersion.maintenanceEndDate).toLocaleString()}
+                              </Typography>
+                            )}
+                          </Box>
+                        }
+                        arrow
+                        placement="top"
+                      >
+                        <Chip
+                          label={t(ClientStatusLabels[clientVersion.clientStatus])}
+                          color={ClientStatusColors[clientVersion.clientStatus]}
+                          size="small"
+                        />
+                      </Tooltip>
+                    ) : (
+                      <Chip
+                        label={t(ClientStatusLabels[clientVersion.clientStatus])}
+                        color={ClientStatusColors[clientVersion.clientStatus]}
+                        size="small"
+                      />
+                    )}
                   </TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>

@@ -475,7 +475,28 @@
     "statusUpdated": "状态已更新",
     "title": "客户端版本",
     "updateSuccess": "更新成功",
-    "version": "版本"
+    "version": "版本",
+    "maintenance": {
+      "title": "维护设置",
+      "description": "配置维护期间和消息。",
+      "startDate": "维护开始日期",
+      "endDate": "维护结束日期",
+      "startDateHelp": "选择维护开始日期和时间（可选）",
+      "endDateHelp": "选择维护结束日期和时间（可选）",
+      "defaultMessage": "默认维护消息",
+      "defaultMessageHelp": "输入所有语言通用的默认维护消息",
+      "supportsMultiLanguage": "使用多语言消息",
+      "supportsMultiLanguageHelp": "为每种语言启用不同的维护消息",
+      "languageSpecificMessages": "多语言消息",
+      "korean": "韩语消息",
+      "english": "英语消息",
+      "chinese": "中文消息",
+      "koreanHelp": "韩语用户的维护消息",
+      "englishHelp": "英语用户的维护消息",
+      "chineseHelp": "中文用户的维护消息",
+      "messagePreview": "维护消息预览",
+      "messageRequired": "维护状态时默认维护消息是必需的"
+    }
   },
   "common": {
     "action": "操作",
@@ -819,7 +840,28 @@
     "worldId": "世界ID",
     "worldName": "世界名称",
     "worldUpdated": "游戏世界更新成功",
-    "saveWorld": "保存游戏世界"
+    "saveWorld": "保存游戏世界",
+    "maintenance": {
+      "title": "维护设置",
+      "description": "配置维护期间和消息。",
+      "startDate": "维护开始日期",
+      "endDate": "维护结束日期",
+      "startDateHelp": "选择维护开始日期和时间（可选）",
+      "endDateHelp": "选择维护结束日期和时间（可选）",
+      "defaultMessage": "默认维护消息",
+      "defaultMessageHelp": "输入所有语言通用的默认维护消息",
+      "supportsMultiLanguage": "使用多语言消息",
+      "supportsMultiLanguageHelp": "为每种语言启用不同的维护消息",
+      "languageSpecificMessages": "多语言消息",
+      "korean": "韩语消息",
+      "english": "英语消息",
+      "chinese": "中文消息",
+      "koreanHelp": "韩语用户的维护消息",
+      "englishHelp": "英语用户的维护消息",
+      "chineseHelp": "中文用户的维护消息",
+      "messagePreview": "维护消息预览",
+      "messageRequired": "启用维护模式时默认维护消息是必需的"
+    }
   },
   "genericWebhookUrl": "通用Webhook URL",
   "language": {

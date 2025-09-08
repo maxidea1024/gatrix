@@ -1,6 +1,17 @@
 import db from '../config/knex';
 import logger from '../config/logger';
 
+export interface GameWorldMaintenanceLocale {
+  id?: number;
+  gameWorldId: number;
+  lang: 'ko' | 'en' | 'zh';
+  message: string;
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 export interface GameWorld {
   id: number;
   worldId: string;
@@ -10,6 +21,10 @@ export interface GameWorld {
   displayOrder: number;
   description?: string;
   tags?: string | null;
+  maintenanceStartDate?: Date;
+  maintenanceEndDate?: Date;
+  maintenanceMessage?: string;
+  supportsMultiLanguage?: boolean;
   createdBy: number;
   updatedBy?: number;
   createdAt: string;
@@ -28,6 +43,11 @@ export interface CreateGameWorldData {
   displayOrder?: number;
   description?: string;
   tags?: string | null;
+  maintenanceStartDate?: Date;
+  maintenanceEndDate?: Date;
+  maintenanceMessage?: string;
+  supportsMultiLanguage?: boolean;
+  maintenanceLocales?: GameWorldMaintenanceLocale[];
   createdBy: number;
 }
 
@@ -39,6 +59,11 @@ export interface UpdateGameWorldData {
   displayOrder?: number;
   description?: string;
   tags?: string | null;
+  maintenanceStartDate?: Date;
+  maintenanceEndDate?: Date;
+  maintenanceMessage?: string;
+  supportsMultiLanguage?: boolean;
+  maintenanceLocales?: GameWorldMaintenanceLocale[];
   updatedBy?: number;
 }
 
@@ -65,7 +90,19 @@ export class GameWorldModel {
         .where('gw.id', id)
         .first();
 
-      return gameWorld || null;
+      if (!gameWorld) {
+        return null;
+      }
+
+      // 점검 메시지 로케일 정보 로드
+      const maintenanceLocales = await db('g_game_world_maintenance_locales')
+        .where('gameWorldId', id)
+        .select('lang', 'message');
+
+      return {
+        ...gameWorld,
+        maintenanceLocales: maintenanceLocales || []
+      };
     } catch (error) {
       logger.error('Error finding game world by ID:', error);
       throw error;
@@ -215,27 +252,49 @@ export class GameWorldModel {
         throw new Error(`Invalid createdBy value: ${worldData.createdBy}`);
       }
 
-      const insertData = {
-        worldId: worldData.worldId,
-        name: worldData.name,
-        isVisible: worldData.isVisible ?? true,
-        isMaintenance: worldData.isMaintenance ?? false,
-        displayOrder,
-        description: worldData.description || null,
-        tags: worldData.tags || null,
-        createdBy: worldData.createdBy
-      };
+      return await db.transaction(async (trx) => {
+        // maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
+        const { maintenanceLocales, ...gameWorldData } = worldData;
 
+        const insertData = {
+          worldId: gameWorldData.worldId,
+          name: gameWorldData.name,
+          isVisible: gameWorldData.isVisible ?? true,
+          isMaintenance: gameWorldData.isMaintenance ?? false,
+          displayOrder,
+          description: gameWorldData.description || null,
+          tags: gameWorldData.tags || null,
+          maintenanceStartDate: gameWorldData.maintenanceStartDate || null,
+          maintenanceEndDate: gameWorldData.maintenanceEndDate || null,
+          maintenanceMessage: gameWorldData.maintenanceMessage || null,
+          supportsMultiLanguage: gameWorldData.supportsMultiLanguage ?? false,
+          createdBy: gameWorldData.createdBy
+        };
 
+        const [insertId] = await trx('g_game_worlds').insert(insertData);
 
-      const [insertId] = await db('g_game_worlds').insert(insertData);
+        // 점검 메시지 로케일 처리
+        if (maintenanceLocales && maintenanceLocales.length > 0) {
+          const localeInserts = maintenanceLocales.map((locale: any) => ({
+            gameWorldId: insertId,
+            lang: locale.lang,
+            message: locale.message,
+            createdBy: worldData.createdBy,
+            updatedBy: worldData.createdBy,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }));
 
-      const world = await this.findById(insertId);
-      if (!world) {
-        throw new Error('Failed to create game world');
-      }
+          await trx('g_game_world_maintenance_locales').insert(localeInserts);
+        }
 
-      return world;
+        const world = await this.findById(insertId);
+        if (!world) {
+          throw new Error('Failed to create game world');
+        }
+
+        return world;
+      });
     } catch (error) {
       logger.error('Error creating game world:', error);
       throw error;
@@ -244,25 +303,51 @@ export class GameWorldModel {
 
   static async update(id: number, worldData: UpdateGameWorldData): Promise<GameWorld | null> {
     try {
-      const updateData: any = {};
+      return await db.transaction(async (trx) => {
+        // maintenanceLocales 필드는 별도 테이블에서 관리하므로 제거
+        const { maintenanceLocales, ...gameWorldUpdateData } = worldData;
 
-      Object.entries(worldData).forEach(([key, value]) => {
-        if (value !== undefined) {
-          updateData[key] = value;
+        const updateData: any = {};
+
+        Object.entries(gameWorldUpdateData).forEach(([key, value]) => {
+          if (value !== undefined) {
+            updateData[key] = value;
+          }
+        });
+
+        if (Object.keys(updateData).length > 0) {
+          updateData.updatedAt = db.fn.now();
+
+          await trx('g_game_worlds')
+            .where('id', id)
+            .update(updateData);
         }
-      });
 
-      if (Object.keys(updateData).length === 0) {
+        // 점검 메시지 로케일 처리
+        if (maintenanceLocales !== undefined) {
+          // 기존 로케일 삭제
+          await trx('g_game_world_maintenance_locales')
+            .where('gameWorldId', id)
+            .del();
+
+          // 새 로케일 추가
+          if (maintenanceLocales.length > 0) {
+            const localeInserts = maintenanceLocales.map((locale: any) => ({
+              gameWorldId: id,
+              lang: locale.lang,
+              message: locale.message,
+              createdBy: worldData.updatedBy,
+              updatedBy: worldData.updatedBy,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }));
+
+            await trx('g_game_world_maintenance_locales').insert(localeInserts);
+          }
+        }
+
         return this.findById(id);
-      }
-
-      updateData.updatedAt = db.fn.now();
-
-      await db('g_game_worlds')
-        .where('id', id)
-        .update(updateData);
-
-      return this.findById(id);
+      });
     } catch (error) {
       logger.error('Error updating game world:', error);
       throw error;

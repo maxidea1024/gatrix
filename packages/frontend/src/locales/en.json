@@ -474,7 +474,28 @@
     "statusUpdated": "Status updated successfully",
     "title": "Client Version Management",
     "updateSuccess": "Client version updated successfully",
-    "version": "Version"
+    "version": "Version",
+    "maintenance": {
+      "title": "Maintenance Settings",
+      "description": "Configure maintenance period and messages.",
+      "startDate": "Maintenance Start Date",
+      "endDate": "Maintenance End Date",
+      "startDateHelp": "Select maintenance start date and time (optional)",
+      "endDateHelp": "Select maintenance end date and time (optional)",
+      "defaultMessage": "Default Maintenance Message",
+      "defaultMessageHelp": "Enter the default maintenance message for all languages",
+      "supportsMultiLanguage": "Use Language-specific Messages",
+      "supportsMultiLanguageHelp": "Enable different maintenance messages for each language",
+      "languageSpecificMessages": "Language-specific Messages",
+      "korean": "Korean Message",
+      "english": "English Message",
+      "chinese": "Chinese Message",
+      "koreanHelp": "Maintenance message for Korean users",
+      "englishHelp": "Maintenance message for English users",
+      "chineseHelp": "Maintenance message for Chinese users",
+      "messagePreview": "Maintenance Message Preview",
+      "messageRequired": "Default maintenance message is required when status is maintenance"
+    }
   },
   "common": {
     "action": "Action",
@@ -830,7 +851,28 @@
     "confirmHide": "Are you sure you want to hide the \"{{name}}\" game world?",
     "confirmShow": "Are you sure you want to show the \"{{name}}\" game world?",
     "confirmStartMaintenance": "Are you sure you want to start maintenance for the \"{{name}}\" game world?",
-    "confirmEndMaintenance": "Are you sure you want to end maintenance for the \"{{name}}\" game world?"
+    "confirmEndMaintenance": "Are you sure you want to end maintenance for the \"{{name}}\" game world?",
+    "maintenance": {
+      "title": "Maintenance Settings",
+      "description": "Configure maintenance period and messages.",
+      "startDate": "Maintenance Start Date",
+      "endDate": "Maintenance End Date",
+      "startDateHelp": "Select maintenance start date and time (optional)",
+      "endDateHelp": "Select maintenance end date and time (optional)",
+      "defaultMessage": "Default Maintenance Message",
+      "defaultMessageHelp": "Enter the default maintenance message for all languages",
+      "supportsMultiLanguage": "Use Language-specific Messages",
+      "supportsMultiLanguageHelp": "Enable different maintenance messages for each language",
+      "languageSpecificMessages": "Language-specific Messages",
+      "korean": "Korean Message",
+      "english": "English Message",
+      "chinese": "Chinese Message",
+      "koreanHelp": "Maintenance message for Korean users",
+      "englishHelp": "Maintenance message for English users",
+      "chineseHelp": "Maintenance message for Chinese users",
+      "messagePreview": "Maintenance Message Preview",
+      "messageRequired": "Default maintenance message is required when maintenance mode is enabled"
+    }
   },
   "genericWebhookUrl": "genericWebhookUrl",
   "language": {

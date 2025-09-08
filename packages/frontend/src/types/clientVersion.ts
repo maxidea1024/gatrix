@@ -32,6 +32,11 @@ export const ClientStatusColors: Record<ClientStatus, 'success' | 'error' | 'war
 };
 
 // 클라이언트 버전 인터페이스
+export interface ClientVersionMaintenanceLocale {
+  lang: 'ko' | 'en' | 'zh';
+  message: string;
+}
+
 export interface ClientVersion {
   id: number;
   platform: string;
@@ -45,6 +50,11 @@ export interface ClientVersion {
   externalClickLink?: string;
   memo?: string;
   customPayload?: string;
+  maintenanceStartDate?: string;
+  maintenanceEndDate?: string;
+  maintenanceMessage?: string;
+  supportsMultiLanguage?: boolean;
+  maintenanceLocales?: ClientVersionMaintenanceLocale[];
   tags?: { id: number; name: string; color: string }[];
   createdAt: string;
   updatedAt: string;
@@ -69,6 +79,11 @@ export interface ClientVersionFormData {
   externalClickLink?: string;
   memo?: string;
   customPayload?: string;
+  maintenanceStartDate?: string;
+  maintenanceEndDate?: string;
+  maintenanceMessage?: string;
+  supportsMultiLanguage?: boolean;
+  maintenanceLocales?: ClientVersionMaintenanceLocale[];
   tags?: { id: number; name: string; color: string }[];
 }
 
@@ -89,6 +104,11 @@ export interface BulkCreateFormData {
   externalClickLink?: string;
   memo?: string;
   customPayload?: string;
+  maintenanceStartDate?: string;
+  maintenanceEndDate?: string;
+  maintenanceMessage?: string;
+  supportsMultiLanguage?: boolean;
+  maintenanceLocales?: ClientVersionMaintenanceLocale[];
   platforms: PlatformSpecificSettings[];
   tags?: { id: number; name: string; color: string }[];
 }
