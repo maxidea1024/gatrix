@@ -20,6 +20,7 @@ import {
   Avatar,
   Button,
   FormControl,
+  FormHelperText,
   InputLabel,
   Select,
   Alert,
@@ -34,6 +35,7 @@ import {
   ListItemText,
   Autocomplete,
   Tooltip,
+  Checkbox,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -107,6 +109,14 @@ const UsersManagementPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
+  const [tagFilter, setTagFilter] = useState<Tag[]>([]);
+
+  // 일괄 선택 관련 상태
+  const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
+  const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
+  const [bulkActionType, setBulkActionType] = useState<'status' | 'role' | 'tags' | 'emailVerified' | 'delete'>('status');
+  const [bulkActionValue, setBulkActionValue] = useState<any>('');
+  const [bulkActionTags, setBulkActionTags] = useState<Tag[]>([]);
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     title: string;
@@ -175,6 +185,11 @@ const UsersManagementPage: React.FC = () => {
       if (statusFilter) params.append('status', statusFilter);
       if (roleFilter) params.append('role', roleFilter);
 
+      // 태그 필터 처리
+      if (tagFilter.length > 0) {
+        tagFilter.forEach(tag => params.append('tags', tag.id.toString()));
+      }
+
       const response = await apiService.get<UsersResponse>(`/admin/users?${params}`);
 
       console.log('Loaded users data:', {
@@ -195,7 +210,7 @@ const UsersManagementPage: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [page, rowsPerPage, searchTerm, statusFilter, roleFilter]);
+  }, [page, rowsPerPage, searchTerm, statusFilter, roleFilter, tagFilter]);
 
   // Load available tags
   useEffect(() => {
@@ -210,7 +225,81 @@ const UsersManagementPage: React.FC = () => {
     loadTags();
   }, []);
 
+  // 체크박스 핸들러
+  const handleSelectUser = (userId: number) => {
+    const newSelected = new Set(selectedUsers);
+    if (newSelected.has(userId)) {
+      newSelected.delete(userId);
+    } else {
+      newSelected.add(userId);
+    }
+    setSelectedUsers(newSelected);
+  };
 
+  const handleSelectAllUsers = () => {
+    if (selectedUsers.size === users.length) {
+      setSelectedUsers(new Set());
+    } else {
+      setSelectedUsers(new Set(users.map(user => user.id)));
+    }
+  };
+
+  // 일괄 처리 핸들러
+  const handleBulkAction = (actionType: 'status' | 'role' | 'tags' | 'emailVerified' | 'delete') => {
+    setBulkActionType(actionType);
+    setBulkActionDialogOpen(true);
+  };
+
+  const executeBulkAction = async () => {
+    if (selectedUsers.size === 0) return;
+
+    try {
+      const userIds = Array.from(selectedUsers);
+
+      switch (bulkActionType) {
+        case 'status':
+          await apiService.post('/admin/users/bulk/status', {
+            userIds,
+            status: bulkActionValue
+          });
+          enqueueSnackbar(t('admin.users.bulkStatusUpdated'), { variant: 'success' });
+          break;
+        case 'role':
+          await apiService.post('/admin/users/bulk/role', {
+            userIds,
+            role: bulkActionValue
+          });
+          enqueueSnackbar(t('admin.users.bulkRoleUpdated'), { variant: 'success' });
+          break;
+        case 'emailVerified':
+          await apiService.post('/admin/users/bulk/email-verified', {
+            userIds,
+            emailVerified: bulkActionValue === 'true'
+          });
+          enqueueSnackbar(t('admin.users.bulkEmailVerifiedUpdated'), { variant: 'success' });
+          break;
+        case 'tags':
+          await apiService.post('/admin/users/bulk/tags', {
+            userIds,
+            tagIds: bulkActionTags.map(tag => tag.id)
+          });
+          enqueueSnackbar(t('admin.users.bulkTagsUpdated'), { variant: 'success' });
+          break;
+        case 'delete':
+          await apiService.post('/admin/users/bulk/delete', { userIds });
+          enqueueSnackbar(t('admin.users.bulkDeleted'), { variant: 'success' });
+          break;
+      }
+
+      fetchUsers();
+      setSelectedUsers(new Set());
+      setBulkActionDialogOpen(false);
+      setBulkActionValue('');
+      setBulkActionTags([]);
+    } catch (error: any) {
+      enqueueSnackbar(error.message || t('admin.users.bulkActionFailed'), { variant: 'error' });
+    }
+  };
 
   const handleSuspendUser = (user: User) => {
     setConfirmDialog({
@@ -541,7 +630,7 @@ const UsersManagementPage: React.FC = () => {
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={3}>
               <TextField
                 fullWidth
                 placeholder={t('admin.users.searchPlaceholder')}
@@ -556,7 +645,7 @@ const UsersManagementPage: React.FC = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={2}>
               <FormControl fullWidth>
                 <InputLabel shrink={true}>{t('admin.users.statusFilter')}</InputLabel>
                 <Select
@@ -580,7 +669,7 @@ const UsersManagementPage: React.FC = () => {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={2}>
               <FormControl fullWidth>
                 <InputLabel shrink={true}>{t('admin.users.roleFilter')}</InputLabel>
                 <Select
@@ -602,6 +691,46 @@ const UsersManagementPage: React.FC = () => {
                   <MenuItem value="user">{t('users.roles.user')}</MenuItem>
                 </Select>
               </FormControl>
+            </Grid>
+            <Grid item xs={12} md={5}>
+              <Autocomplete
+                multiple
+                sx={{ minWidth: 350 }}
+                options={availableTags}
+                getOptionLabel={(option) => option.name}
+                filterSelectedOptions
+                value={tagFilter}
+                onChange={(_, value) => setTagFilter(value)}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...chipProps } = getTagProps({ index });
+                    return (
+                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                        <Chip
+                          variant="outlined"
+                          label={option.name}
+                          size="small"
+                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          {...chipProps}
+                        />
+                      </Tooltip>
+                    );
+                  })
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label={t('admin.users.tagFilter')} />
+                )}
+                renderOption={(props, option) => (
+                  <Box component="li" {...props}>
+                    <Chip
+                      label={option.name}
+                      size="small"
+                      sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                    />
+                    {option.description || t('common.noDescription')}
+                  </Box>
+                )}
+              />
             </Grid>
             <Grid item xs={12} md={2}>
               <Button
@@ -625,6 +754,13 @@ const UsersManagementPage: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      indeterminate={selectedUsers.size > 0 && selectedUsers.size < users.length}
+                      checked={users.length > 0 && selectedUsers.size === users.length}
+                      onChange={handleSelectAllUsers}
+                    />
+                  </TableCell>
                   <TableCell>{t('users.user')}</TableCell>
                   <TableCell>{t('users.email')}</TableCell>
                   <TableCell align="center">{t('users.emailVerified')}</TableCell>
@@ -640,7 +776,7 @@ const UsersManagementPage: React.FC = () => {
               <TableBody>
                 {users.length === 0 ? (
                   <EmptyTableRow
-                    colSpan={10}
+                    colSpan={11}
                     loading={loading}
                     message={t('users.noUsersFound')}
                     loadingMessage={t('common.loadingUsers')}
@@ -648,6 +784,12 @@ const UsersManagementPage: React.FC = () => {
                 ) : (
                   users.map((user) => (
                   <TableRow key={user.id} hover>
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={selectedUsers.has(user.id)}
+                        onChange={() => handleSelectUser(user.id)}
+                      />
+                    </TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <Avatar src={user.avatarUrl}>
@@ -785,6 +927,66 @@ const UsersManagementPage: React.FC = () => {
           />
         </CardContent>
       </Card>
+
+      {/* 일괄 작업 툴바 */}
+      {selectedUsers.size > 0 && (
+        <Card sx={{ mb: 2, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(110, 168, 255, 0.08)' : 'rgba(25, 118, 210, 0.04)' }}>
+          <CardContent sx={{ py: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'space-between' }}>
+              <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                {selectedUsers.size} {t('admin.users.selectedUsers')}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleBulkAction('status')}
+                  startIcon={<PersonIcon />}
+                >
+                  {t('admin.users.bulkUpdateStatus')}
+                </Button>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleBulkAction('role')}
+                  startIcon={<AdminIcon />}
+                >
+                  {t('admin.users.bulkUpdateRole')}
+                </Button>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleBulkAction('emailVerified')}
+                  startIcon={<CheckCircleIcon />}
+                >
+                  {t('admin.users.bulkVerifyEmail')}
+                </Button>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleBulkAction('tags')}
+                  startIcon={<TagIcon />}
+                >
+                  {t('admin.users.bulkUpdateTags')}
+                </Button>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="error"
+                  onClick={() => handleBulkAction('delete')}
+                  startIcon={<DeleteIcon />}
+                >
+                  {t('admin.users.bulkDelete')}
+                </Button>
+              </Box>
+            </Box>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Actions Menu */}
       <Menu
@@ -947,6 +1149,7 @@ const UsersManagementPage: React.FC = () => {
                 <MenuItem value="user">{t('users.roles.user')}</MenuItem>
                 <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
               </Select>
+              <FormHelperText>{t('users.roleHelp')}</FormHelperText>
             </FormControl>
 
             {/* Tags Selection */}
@@ -975,7 +1178,11 @@ const UsersManagementPage: React.FC = () => {
                   })
                 }
                 renderInput={(params) => (
-                  <TextField {...params} label={t('users.tags')} />
+                  <TextField
+                    {...params}
+                    label={t('users.tags')}
+                    helperText={t('users.tagsHelp')}
+                  />
                 )}
               />
             </Box>
@@ -1096,6 +1303,7 @@ const UsersManagementPage: React.FC = () => {
                     <MenuItem value="user">{t('users.roles.user')}</MenuItem>
                     <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
                   </Select>
+                  <FormHelperText>{t('users.roleHelp')}</FormHelperText>
                 </FormControl>
                 <FormControl fullWidth>
                   <InputLabel>{t('users.status')}</InputLabel>
@@ -1108,6 +1316,7 @@ const UsersManagementPage: React.FC = () => {
                     <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
                     <MenuItem value="suspended">{t('users.statuses.suspended')}</MenuItem>
                   </Select>
+                  <FormHelperText>{t('users.statusHelp')}</FormHelperText>
                 </FormControl>
               </>
             )}
@@ -1138,7 +1347,11 @@ const UsersManagementPage: React.FC = () => {
                   })
                 }
                 renderInput={(params) => (
-                  <TextField {...params} label={t('users.tags')} />
+                  <TextField
+                    {...params}
+                    label={t('users.tags')}
+                    helperText={t('users.tagsHelp')}
+                  />
                 )}
               />
             </Box>
@@ -1157,6 +1370,103 @@ const UsersManagementPage: React.FC = () => {
             onClick={handleSaveEditUser}
             variant="contained"
             startIcon={<SaveIcon />}
+          >
+            {t('common.save')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Bulk Action Dialog */}
+      <Dialog open={bulkActionDialogOpen} onClose={() => setBulkActionDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {t(`admin.users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}`)} ({selectedUsers.size} {t('admin.users.selectedUsers')})
+        </DialogTitle>
+        <DialogContent>
+          {bulkActionType === 'status' && (
+            <FormControl fullWidth sx={{ mt: 2 }}>
+              <InputLabel>{t('users.status')}</InputLabel>
+              <Select
+                value={bulkActionValue}
+                label={t('users.status')}
+                onChange={(e) => setBulkActionValue(e.target.value)}
+              >
+                <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
+                <MenuItem value="pending">{t('users.statuses.pending')}</MenuItem>
+                <MenuItem value="suspended">{t('users.statuses.suspended')}</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+          {bulkActionType === 'role' && (
+            <FormControl fullWidth sx={{ mt: 2 }}>
+              <InputLabel>{t('users.role')}</InputLabel>
+              <Select
+                value={bulkActionValue}
+                label={t('users.role')}
+                onChange={(e) => setBulkActionValue(e.target.value)}
+              >
+                <MenuItem value="user">{t('users.roles.user')}</MenuItem>
+                <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+          {bulkActionType === 'emailVerified' && (
+            <FormControl fullWidth sx={{ mt: 2 }}>
+              <InputLabel>{t('users.emailVerified')}</InputLabel>
+              <Select
+                value={bulkActionValue}
+                label={t('users.emailVerified')}
+                onChange={(e) => setBulkActionValue(e.target.value)}
+              >
+                <MenuItem value="true">{t('admin.users.verified')}</MenuItem>
+                <MenuItem value="false">{t('admin.users.unverified')}</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+          {bulkActionType === 'tags' && (
+            <Box sx={{ mt: 2 }}>
+              <Autocomplete
+                multiple
+                options={availableTags}
+                getOptionLabel={(option) => option.name}
+                value={bulkActionTags}
+                onChange={(_, value) => setBulkActionTags(value)}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...chipProps } = getTagProps({ index });
+                    return (
+                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                        <Chip
+                          variant="outlined"
+                          label={option.name}
+                          size="small"
+                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          {...chipProps}
+                        />
+                      </Tooltip>
+                    );
+                  })
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label={t('users.tags')} />
+                )}
+              />
+            </Box>
+          )}
+          {bulkActionType === 'delete' && (
+            <Typography sx={{ mt: 2 }}>
+              {t('admin.users.bulkDeleteConfirm', { count: selectedUsers.size })}
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBulkActionDialogOpen(false)} startIcon={<CancelIcon />}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={executeBulkAction}
+            variant="contained"
+            color={bulkActionType === 'delete' ? 'error' : 'primary'}
+            startIcon={bulkActionType === 'delete' ? <DeleteIcon /> : <SaveIcon />}
           >
             {t('common.save')}
           </Button>

@@ -8,6 +8,7 @@ export interface UserFilters {
   role?: string;
   status?: string;
   search?: string;
+  tags?: string[];
 }
 
 export interface PaginationOptions {

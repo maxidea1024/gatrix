@@ -68,11 +68,16 @@ export class AdminController {
       const role = req.query.role as string;
       const status = req.query.status as string;
       const search = req.query.search as string;
+      const tags = req.query.tags;
 
       const filters: any = {};
       if (role) filters.role = role;
       if (status) filters.status = status;
       if (search) filters.search = search;
+      if (tags) {
+        // tags can be a single string or array of strings
+        filters.tags = Array.isArray(tags) ? tags : [tags];
+      }
 
       const result = await UserService.getAllUsers(filters, { page, limit });
 
@@ -102,9 +107,12 @@ export class AdminController {
   static async createUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { name, email, password, role, tagIds } = req.body;
-      const createdBy = req.user?.userId;
 
+      if (!req.user?.userId) {
+        throw new CustomError('User not authenticated', 401);
+      }
 
+      const createdBy = req.user.userId;
 
       // Validate required fields
       if (!name || !email || !password) {
@@ -125,7 +133,7 @@ export class AdminController {
 
       // 태그 설정
       if (tagIds && tagIds.length > 0) {
-        await UserTagService.setUserTags(user.id, tagIds, createdBy);
+        await UserTagService.setUserTags(user.id, tagIds, req.user.userId);
 
         // 태그 설정 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
         user = await UserService.getUserById(user.id);
@@ -145,15 +153,18 @@ export class AdminController {
     try {
       const userId = parseInt(req.params.id);
       const { tagIds, ...updates } = req.body;
-      const updatedBy = req.user?.userId;
 
+      if (!req.user?.userId) {
+        throw new CustomError('User not authenticated', 401);
+      }
 
+      const updatedBy = req.user.userId;
 
       let user = await UserService.updateUser(userId, updates);
 
       // 태그 설정 (tagIds가 제공된 경우에만)
       if (tagIds !== undefined) {
-        await UserTagService.setUserTags(userId, tagIds, updatedBy);
+        await UserTagService.setUserTags(userId, tagIds, req.user.userId);
 
         // 태그 업데이트 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
         user = await UserService.getUserById(userId);
@@ -532,6 +543,273 @@ export class AdminController {
           allHealthy: Object.values(checks).every(check => check),
           timestamp: new Date().toISOString()
         }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // Bulk operations for users
+  static async bulkUpdateUserStatus(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { userIds, status } = req.body;
+
+      if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+        throw new CustomError('User IDs are required', 400);
+      }
+
+      if (!status || !['active', 'pending', 'suspended'].includes(status)) {
+        throw new CustomError('Valid status is required', 400);
+      }
+
+      if (!req.user?.userId) {
+        throw new CustomError('User not authenticated', 401);
+      }
+
+      const currentUserId = req.user.userId;
+
+      await db.transaction(async (trx) => {
+        await trx('g_users')
+          .whereIn('id', userIds)
+          .update({
+            status,
+            updatedAt: new Date()
+          });
+
+        // Log audit entries
+        for (const userId of userIds) {
+          await AuditLogModel.create({
+            userId: currentUserId,
+            action: 'user_status_updated',
+            resourceType: 'user',
+            resourceId: userId.toString(),
+            newValues: { status, bulkOperation: true },
+            ipAddress: req.ip
+          });
+        }
+      });
+
+      clearAllCache();
+
+      res.json({
+        success: true,
+        message: `Updated status for ${userIds.length} users`
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async bulkUpdateUserRole(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { userIds, role } = req.body;
+
+      if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+        throw new CustomError('User IDs are required', 400);
+      }
+
+      if (!role || !['user', 'admin'].includes(role)) {
+        throw new CustomError('Valid role is required', 400);
+      }
+
+      if (!req.user?.userId) {
+        throw new CustomError('User not authenticated', 401);
+      }
+
+      const currentUserId = req.user.userId;
+
+      await db.transaction(async (trx) => {
+        await trx('g_users')
+          .whereIn('id', userIds)
+          .update({
+            role,
+            updatedAt: new Date()
+          });
+
+        // Log audit entries
+        for (const userId of userIds) {
+          await AuditLogModel.create({
+            userId: currentUserId,
+            action: 'user_role_updated',
+            resourceType: 'user',
+            resourceId: userId.toString(),
+            newValues: { role, bulkOperation: true },
+            ipAddress: req.ip
+          });
+        }
+      });
+
+      clearAllCache();
+
+      res.json({
+        success: true,
+        message: `Updated role for ${userIds.length} users`
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async bulkUpdateUserEmailVerified(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { userIds, emailVerified } = req.body;
+
+      if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+        throw new CustomError('User IDs are required', 400);
+      }
+
+      if (typeof emailVerified !== 'boolean') {
+        throw new CustomError('Valid emailVerified boolean is required', 400);
+      }
+
+      if (!req.user?.userId) {
+        throw new CustomError('User not authenticated', 401);
+      }
+
+      const currentUserId = req.user.userId;
+
+      await db.transaction(async (trx) => {
+        await trx('g_users')
+          .whereIn('id', userIds)
+          .update({
+            emailVerified,
+            updatedAt: new Date()
+          });
+
+        // Log audit entries
+        for (const userId of userIds) {
+          await AuditLogModel.create({
+            userId: currentUserId,
+            action: 'user_email_verified_updated',
+            resourceType: 'user',
+            resourceId: userId.toString(),
+            newValues: { emailVerified, bulkOperation: true },
+            ipAddress: req.ip
+          });
+        }
+      });
+
+      clearAllCache();
+
+      res.json({
+        success: true,
+        message: `Updated email verification for ${userIds.length} users`
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async bulkUpdateUserTags(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { userIds, tagIds } = req.body;
+
+      if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+        throw new CustomError('User IDs are required', 400);
+      }
+
+      if (!tagIds || !Array.isArray(tagIds)) {
+        throw new CustomError('Tag IDs array is required', 400);
+      }
+
+      if (!req.user?.userId) {
+        throw new CustomError('User not authenticated', 401);
+      }
+
+      const currentUserId = req.user.userId;
+
+      await db.transaction(async (trx) => {
+        // Remove existing tags for these users
+        await trx('g_tag_assignments')
+          .whereIn('userId', userIds)
+          .del();
+
+        // Add new tags
+        if (tagIds.length > 0) {
+          const assignments = userIds.flatMap(userId =>
+            tagIds.map(tagId => ({
+              userId,
+              tagId,
+              createdBy: currentUserId,
+              createdAt: new Date()
+            }))
+          );
+
+          await trx('g_tag_assignments').insert(assignments);
+        }
+
+        // Log audit entries
+        for (const userId of userIds) {
+          await AuditLogModel.create({
+            userId: currentUserId,
+            action: 'user_tags_updated',
+            resourceType: 'user',
+            resourceId: userId.toString(),
+            newValues: { tagIds, bulkOperation: true },
+            ipAddress: req.ip
+          });
+        }
+      });
+
+      clearAllCache();
+
+      res.json({
+        success: true,
+        message: `Updated tags for ${userIds.length} users`
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async bulkDeleteUsers(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { userIds } = req.body;
+
+      if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+        throw new CustomError('User IDs are required', 400);
+      }
+
+      if (!req.user?.userId) {
+        throw new CustomError('User not authenticated', 401);
+      }
+
+      const currentUserId = req.user.userId;
+
+      // Prevent deleting current user
+      if (userIds.includes(currentUserId)) {
+        throw new CustomError('Cannot delete your own account', 400);
+      }
+
+      await db.transaction(async (trx) => {
+        // Log audit entries before deletion
+        for (const userId of userIds) {
+          await AuditLogModel.create({
+            userId: currentUserId,
+            action: 'user_deleted',
+            resourceType: 'user',
+            resourceId: userId.toString(),
+            newValues: { bulkOperation: true },
+            ipAddress: req.ip
+          });
+        }
+
+        // Delete tag assignments
+        await trx('g_tag_assignments')
+          .whereIn('userId', userIds)
+          .del();
+
+        // Delete users
+        await trx('g_users')
+          .whereIn('id', userIds)
+          .del();
+      });
+
+      clearAllCache();
+
+      res.json({
+        success: true,
+        message: `Deleted ${userIds.length} users`
       });
     } catch (error) {
       next(error);

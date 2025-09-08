@@ -156,7 +156,7 @@ export class UserModel {
   static async findAll(
     page: number = 1,
     limit: number = 10,
-    filters: { role?: string; status?: string; search?: string } = {}
+    filters: { role?: string; status?: string; search?: string; tags?: string[] } = {}
   ): Promise<{ users: UserWithoutPassword[]; total: number; page: number; limit: number }> {
     try {
       // Ensure page and limit are integers
@@ -181,6 +181,19 @@ export class UserModel {
           query.where(function(this: any) {
             this.where('g_users.name', 'like', `%${filters.search}%`)
                 .orWhere('g_users.email', 'like', `%${filters.search}%`);
+          });
+        }
+
+        if (filters.tags && filters.tags.length > 0) {
+          // AND 조건: 모든 태그를 가진 사용자만 반환
+          filters.tags.forEach((tagId: string) => {
+            query.whereExists(function(this: any) {
+              this.select('*')
+                  .from('g_tag_assignments')
+                  .whereRaw('g_tag_assignments.entityId = g_users.id')
+                  .where('g_tag_assignments.entityType', 'user')
+                  .where('g_tag_assignments.tagId', tagId);
+            });
           });
         }
 

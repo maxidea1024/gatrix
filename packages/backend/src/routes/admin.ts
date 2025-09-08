@@ -40,6 +40,13 @@ router.post('/users/:id/suspend', auditUserSuspend as any, AdminController.suspe
 router.post('/users/:id/promote', auditUserPromote as any, AdminController.promoteToAdmin as any);
 router.post('/users/:id/demote', auditUserDemote as any, AdminController.demoteFromAdmin as any);
 
+// Bulk user operations
+router.post('/users/bulk/status', AdminController.bulkUpdateUserStatus as any);
+router.post('/users/bulk/role', AdminController.bulkUpdateUserRole as any);
+router.post('/users/bulk/email-verified', AdminController.bulkUpdateUserEmailVerified as any);
+router.post('/users/bulk/tags', AdminController.bulkUpdateUserTags as any);
+router.post('/users/bulk/delete', AdminController.bulkDeleteUsers as any);
+
 // Audit logs
 router.get('/audit-logs', AdminController.getAuditLogs as any);
 router.get('/audit-logs/stats', AdminController.getAuditStats as any);

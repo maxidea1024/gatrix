@@ -277,7 +277,7 @@ const GameWorldsPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
-  const [tagsFilter, setTagsFilter] = useState<string[]>([]);
+  const [tagsFilter, setTagsFilter] = useState<Tag[]>([]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingWorld, setEditingWorld] = useState<GameWorld | null>(null);
@@ -344,7 +344,7 @@ const GameWorldsPage: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [search, tagsFilter.join(','), allRegistryTags.length]);
+  }, [search, tagsFilter.map(t => t.id).join(','), allRegistryTags.length]);
 
   // Avoid mobile viewport scroll zoom/focus issues by disabling autoScroll and portal for Autocomplete
   const autocompleteSlotProps = {
@@ -359,13 +359,8 @@ const GameWorldsPage: React.FC = () => {
     try {
       setLoading(true);
 
-      // 태그 이름을 태그 ID로 변환
-      const tagIds = tagsFilter.length > 0
-        ? tagsFilter.map(tagName => {
-            const tag = allRegistryTags.find(t => t.name === tagName);
-            return tag ? tag.id : null;
-          }).filter(id => id !== null)
-        : [];
+      // 태그 ID 추출
+      const tagIds = tagsFilter.length > 0 ? tagsFilter.map(tag => tag.id) : [];
 
       const result = await gameWorldService.getGameWorlds({
         // 페이징 파라미터 제거: page/limit 미전송
@@ -734,16 +729,41 @@ const GameWorldsPage: React.FC = () => {
               />
               <Autocomplete
                 multiple
-                freeSolo
                 sx={{ minWidth: 320, flexShrink: 0 }}
-                options={existingTags.map(t => t.name)}
+                options={existingTags}
+                getOptionLabel={(option) => option.name}
+                filterSelectedOptions
                 value={tagsFilter}
                 onChange={(_, value) => setTagsFilter(value)}
                 slotProps={autocompleteSlotProps as any}
-                disablePortal
-                autoSelect
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...chipProps } = getTagProps({ index });
+                    return (
+                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                        <Chip
+                          variant="outlined"
+                          label={option.name}
+                          size="small"
+                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          {...chipProps}
+                        />
+                      </Tooltip>
+                    );
+                  })
+                }
                 renderInput={(params) => (
                   <TextField {...params} label={t('gameWorlds.tags')} />
+                )}
+                renderOption={(props, option) => (
+                  <Box component="li" {...props}>
+                    <Chip
+                      label={option.name}
+                      size="small"
+                      sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                    />
+                    {option.description || t('common.noDescription')}
+                  </Box>
                 )}
               />
             </Box>
