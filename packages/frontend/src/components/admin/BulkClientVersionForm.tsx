@@ -22,6 +22,7 @@ import {
   Paper,
   Stack,
   Divider,
+  Autocomplete,
 } from '@mui/material';
 import { Cancel as CancelIcon, Add as AddIcon } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
@@ -572,49 +573,46 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                 {t('clientVersions.form.tagsHelp')}
               </Typography>
 
-              <TextField
-                select
+              <Autocomplete
                 multiple
-                label={t('common.tags')}
-                value={selectedTags.map(tag => tag.id)}
-                onChange={(e) => {
-                  const selectedIds = Array.isArray(e.target.value) ? e.target.value : [e.target.value];
-                  const newSelectedTags = allTags.filter(tag => selectedIds.includes(tag.id));
-                  setSelectedTags(newSelectedTags);
-                  setValue('tags', newSelectedTags);
+                options={allTags}
+                getOptionLabel={(option) => option.name}
+                filterSelectedOptions
+                value={selectedTags}
+                onChange={(_, value) => {
+                  setSelectedTags(value);
+                  setValue('tags', value);
                 }}
-                SelectProps={{
-                  multiple: true,
-                  renderValue: (selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {(selected as number[]).map((id) => {
-                        const tag = allTags.find(t => t.id === id);
-                        return tag ? (
-                          <Chip
-                            key={id}
-                            label={tag.name}
-                            size="small"
-                            sx={{ bgcolor: tag.color, color: '#fff' }}
-                          />
-                        ) : null;
-                      })}
-                    </Box>
-                  ),
-                }}
-                helperText={t('clientVersions.form.bulkTagsHelp')}
-                fullWidth
-              >
-                {allTags.map((tag) => (
-                  <MenuItem key={tag.id} value={tag.id}>
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...chipProps } = getTagProps({ index });
+                    return (
+                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                        <Chip
+                          variant="outlined"
+                          label={option.name}
+                          size="small"
+                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          {...chipProps}
+                        />
+                      </Tooltip>
+                    );
+                  })
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label={t('common.tags')} helperText={t('clientVersions.form.bulkTagsHelp')} />
+                )}
+                renderOption={(props, option) => (
+                  <Box component="li" {...props}>
                     <Chip
-                      label={tag.name}
+                      label={option.name}
                       size="small"
-                      sx={{ bgcolor: tag.color, color: '#fff', mr: 1 }}
+                      sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
                     />
-                    {tag.description || t('common.noDescription')}
-                  </MenuItem>
-                ))}
-              </TextField>
+                    {option.description || t('common.noDescription')}
+                  </Box>
+                )}
+              />
             </Paper>
           </Stack>
         </DialogContent>

@@ -960,7 +960,9 @@
     "tags": "Tags",
     "user": "User",
     "userCreated": "userCreated",
-    "userDeleted": "User deleted successfully"
+    "userDeleted": "User deleted successfully",
+    "nameCopied": "Name copied to clipboard",
+    "emailCopied": "Email copied to clipboard"
   },
   "whitelist": {
     "title": "Account Whitelist Management",

@@ -48,6 +48,12 @@ import {
   Cancel as CancelIcon,
   Add as AddIcon,
   Save as SaveIcon,
+  ContentCopy as ContentCopyIcon,
+  LocalOffer as TagIcon,
+  SelectAll as SelectAllIcon,
+  Email as EmailIcon,
+  AdminPanelSettings as AdminIcon,
+  PersonRemove as PersonRemoveIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
@@ -78,6 +84,19 @@ const UsersManagementPage: React.FC = () => {
   // Helper function to check if user is current user
   const isCurrentUser = (user: User | null): boolean => {
     return currentUser?.id === user?.id;
+  };
+
+  // 클립보드 복사 함수
+  const copyToClipboard = async (text: string, type: 'name' | 'email') => {
+    try {
+      await navigator.clipboard.writeText(text);
+      enqueueSnackbar(
+        t(type === 'name' ? 'users.nameCopied' : 'users.emailCopied'),
+        { variant: 'success' }
+      );
+    } catch (error) {
+      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
+    }
   };
 
   const [users, setUsers] = useState<User[]>([]);
@@ -634,12 +653,34 @@ const UsersManagementPage: React.FC = () => {
                         <Avatar src={user.avatarUrl}>
                           {user.name?.charAt(0).toUpperCase()}
                         </Avatar>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                          {user.name}
-                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {user.name}
+                          </Typography>
+                          <IconButton
+                            size="small"
+                            onClick={() => copyToClipboard(user.name, 'name')}
+                            sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
+                          >
+                            <ContentCopyIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
                       </Box>
                     </TableCell>
-                    <TableCell>{user.email}</TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="body2">
+                          {user.email}
+                        </Typography>
+                        <IconButton
+                          size="small"
+                          onClick={() => copyToClipboard(user.email, 'email')}
+                          sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
+                        >
+                          <ContentCopyIcon fontSize="small" />
+                        </IconButton>
+                      </Box>
+                    </TableCell>
                     <TableCell align="center">
                       {user.emailVerified ? (
                         <Chip
@@ -677,16 +718,18 @@ const UsersManagementPage: React.FC = () => {
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                         {user.tags && user.tags.length > 0 && (
                           user.tags.map((tag: any) => (
-                            <Chip
-                              key={tag.id}
-                              label={tag.name}
-                              size="small"
-                              sx={{
-                                backgroundColor: tag.color,
-                                color: 'white',
-                                fontSize: '0.75rem',
-                              }}
-                            />
+                            <Tooltip key={tag.id} title={tag.description || t('tags.noDescription')} arrow>
+                              <Chip
+                                label={tag.name}
+                                size="small"
+                                sx={{
+                                  backgroundColor: tag.color,
+                                  color: 'white',
+                                  fontSize: '0.75rem',
+                                  cursor: 'help'
+                                }}
+                              />
+                            </Tooltip>
                           ))
                         )}
                       </Box>

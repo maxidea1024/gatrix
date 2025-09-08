@@ -1,6 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { UserService } from '../services/userService';
+import { UserTagService } from '../services/UserTagService';
 import { AuditLogModel } from '../models/AuditLog';
 import { CustomError } from '../middleware/errorHandler';
 import { clearAllCache } from '../middleware/responseCache';
@@ -100,7 +101,10 @@ export class AdminController {
 
   static async createUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { name, email, password, role } = req.body;
+      const { name, email, password, role, tagIds } = req.body;
+      const createdBy = req.user?.userId;
+
+
 
       // Validate required fields
       if (!name || !email || !password) {
@@ -114,10 +118,18 @@ export class AdminController {
         role: role || 'user',
         status: 'active' as const, // Admin-created users are active by default
         emailVerified: true, // Admin-created users are verified by default
-        createdBy: req.user?.userId, // Set the creator
+        createdBy, // Set the creator
       };
 
-      const user = await UserService.createUser(userData);
+      let user = await UserService.createUser(userData);
+
+      // 태그 설정
+      if (tagIds && tagIds.length > 0) {
+        await UserTagService.setUserTags(user.id, tagIds, createdBy);
+
+        // 태그 설정 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
+        user = await UserService.getUserById(user.id);
+      }
 
       res.status(201).json({
         success: true,
@@ -132,9 +144,20 @@ export class AdminController {
   static async updateUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = parseInt(req.params.id);
-      const updates = req.body;
+      const { tagIds, ...updates } = req.body;
+      const updatedBy = req.user?.userId;
 
-      const user = await UserService.updateUser(userId, updates);
+
+
+      let user = await UserService.updateUser(userId, updates);
+
+      // 태그 설정 (tagIds가 제공된 경우에만)
+      if (tagIds !== undefined) {
+        await UserTagService.setUserTags(userId, tagIds, updatedBy);
+
+        // 태그 업데이트 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
+        user = await UserService.getUserById(userId);
+      }
 
       res.json({
         success: true,

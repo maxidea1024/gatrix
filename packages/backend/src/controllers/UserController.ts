@@ -21,6 +21,7 @@ const updateUserSchema = Joi.object({
   role: Joi.string().valid('admin', 'user').optional(),
   status: Joi.string().valid('pending', 'active', 'suspended', 'deleted').optional(),
   email_verified: Joi.boolean().optional(),
+  tagIds: Joi.array().items(Joi.number().integer().positive()).optional(),
 });
 
 const setUserTagsSchema = Joi.object({
@@ -38,7 +39,7 @@ const createUserSchema = Joi.object({
   role: Joi.string().valid('admin', 'user').optional().default('user'),
   status: Joi.string().valid('pending', 'active', 'suspended', 'deleted').optional().default('active'),
   emailVerified: Joi.boolean().optional().default(true),
-  tags: Joi.array().items(Joi.number().integer().positive()).optional().default([]),
+  tagIds: Joi.array().items(Joi.number().integer().positive()).optional().default([]),
 });
 
 export class UserController {
@@ -68,18 +69,23 @@ export class UserController {
       throw new CustomError(error.details[0].message, 400);
     }
 
-    const { tags, ...userData } = value;
+    const { tagIds, ...userData } = value;
     const createdBy = (req.user as any).id;
 
     // 사용자 생성
-    const user = await UserService.createUser({
+    let user = await UserService.createUser({
       ...userData,
       createdBy,
     });
 
     // 태그 설정
-    if (tags && tags.length > 0) {
-      await UserTagService.setUserTags(user.id, tags, createdBy);
+    if (tagIds && tagIds.length > 0) {
+      console.log('Setting user tags for new user:', { userId: user.id, tagIds, createdBy });
+      await UserTagService.setUserTags(user.id, tagIds, createdBy);
+      console.log('User tags set successfully for new user');
+
+      // 태그 설정 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
+      user = await UserService.getUserById(user.id);
     }
 
     res.status(201).json({
@@ -112,19 +118,39 @@ export class UserController {
     }
 
     // Validate request body
+    console.log('Raw request body:', req.body);
     const { error, value } = updateUserSchema.validate(req.body);
     if (error) {
+      console.log('Validation error:', error.details);
       throw new CustomError(error.details[0].message, 400);
     }
 
+    console.log('Validated value:', value);
+    const { tagIds, ...userData } = value;
+    const updatedBy = (req.user as any).id;
+
+    console.log('Update user request:', { userId, tagIds, userData, updatedBy });
+
     // Prevent users from modifying their own role or status (except admins)
     if (req.user?.userId === userId && req.user?.role !== 'admin') {
-      if (value.role || value.status) {
+      if (userData.role || userData.status) {
         throw new CustomError('You cannot modify your own role or status', 403);
       }
     }
 
-    const user = await UserService.updateUser(userId, value);
+    let user = await UserService.updateUser(userId, userData);
+
+    // 태그 설정 (tagIds가 제공된 경우에만)
+    if (tagIds !== undefined) {
+      console.log('Setting user tags:', { userId, tagIds, updatedBy });
+      await UserTagService.setUserTags(userId, tagIds, updatedBy);
+      console.log('User tags set successfully');
+
+      // 태그 업데이트 후 사용자 정보를 다시 로드하여 최신 태그 정보 포함
+      user = await UserService.getUserById(userId);
+    } else {
+      console.log('No tagIds provided, skipping tag update');
+    }
 
     res.json({
       success: true,

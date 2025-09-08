@@ -1075,7 +1075,9 @@
     "tags": "태그",
     "user": "사용자",
     "userCreated": "사용자 생성됨",
-    "userDeleted": "사용자가 삭제되었습니다"
+    "userDeleted": "사용자가 삭제되었습니다",
+    "nameCopied": "이름이 클립보드에 복사되었습니다",
+    "emailCopied": "이메일이 클립보드에 복사되었습니다"
   },
   "whitelist": {
     "title": "화이트리스트 관리",

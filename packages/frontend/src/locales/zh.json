@@ -936,7 +936,9 @@
     },
     "user": "用户",
     "userCreated": "用户已创建",
-    "userDeleted": "用户删除成功"
+    "userDeleted": "用户删除成功",
+    "nameCopied": "姓名已复制到剪贴板",
+    "emailCopied": "邮箱已复制到剪贴板"
   },
   "whitelist": {
     "title": "账户白名单管理",
