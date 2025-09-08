@@ -50,13 +50,11 @@ import {
   Save as SaveIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
-  LocalOffer as TagIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { User, Tag } from '@/types';
 import { apiService } from '@/services/api';
-import { UserService } from '@/services/users';
 import { tagService } from '@/services/tagService';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
@@ -283,10 +281,6 @@ const UsersManagementPage: React.FC = () => {
     switch (action) {
       case 'edit':
         handleEditUser(selectedUser);
-        break;
-      case 'manageTags':
-        // TODO: 태그 관리 다이얼로그 열기
-        console.log('Manage tags for user:', selectedUser.name);
         break;
       case 'suspend':
         handleSuspendUser(selectedUser);
@@ -770,12 +764,7 @@ const UsersManagementPage: React.FC = () => {
           <ListItemText>{t('common.edit')}</ListItemText>
         </MenuItem>
 
-        <MenuItem onClick={() => handleMenuAction('manageTags')}>
-          <ListItemIcon>
-            <TagIcon />
-          </ListItemIcon>
-          <ListItemText>Manage Tags</ListItemText>
-        </MenuItem>
+
 
         {selectedUser?.status === 'active' ? (
           <MenuItem

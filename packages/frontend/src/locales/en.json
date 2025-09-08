@@ -866,8 +866,17 @@
     "user": "user"
   },
   "settings": {
+    "title": "Settings",
+    "subtitle": "Configure your preferences and system settings",
+    "languageSaved": "Language preference saved successfully",
+    "languageSaveFailed": "Failed to save language preference",
     "general": {
       "title": "General Settings"
+    },
+    "network": {
+      "title": "Network Settings",
+      "admindUrl": "Admin Dashboard URL",
+      "admindUrlHelp": "URL for the admin dashboard interface"
     },
     "integrations": {
       "genericWebhook": "Generic Webhook URL",
@@ -910,7 +919,7 @@
   },
   "tags": {
     "confirmDeleteMessage": "Are you sure you want to delete the tag \"{{name}}\"?",
-    "description": "Description",
+    "description": "Manage tags for organizing and categorizing content",
     "duplicateName": "A tag with the same name already exists.",
     "name": "Name",
     "nameRequired": "Tag name is required",
@@ -918,7 +927,8 @@
     "noDescription": "No description",
     "noTagsFound": "No tags found.",
     "noMatchingTags": "No tags match the search criteria.",
-    "noTags": "No tags found"
+    "noTags": "No tags found",
+    "quickAction": "Manage tags"
   },
   "theme": "theme",
   "token": "token",

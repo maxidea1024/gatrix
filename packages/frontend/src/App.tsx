@@ -52,6 +52,7 @@ import UnauthorizedPage from './pages/common/UnauthorizedPage';
 
 // Pages - User
 import ProfilePage from './pages/user/ProfilePage';
+import SettingsPage from './pages/SettingsPage';
 import TagsPage from './pages/settings/TagsPage';
 
 // Pages - Admin
@@ -210,7 +211,13 @@ const AppContent: React.FC = () => {
                 } />
 
                 {/* Settings Routes */}
-                <Route path="/settings" element={<Navigate to="/settings/tags" replace />} />
+                <Route path="/settings" element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <SettingsPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
                 <Route path="/settings/tags" element={
                   <ProtectedRoute>
                     <MainLayout>

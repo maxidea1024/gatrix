@@ -953,8 +953,17 @@
     "user": "사용자"
   },
   "settings": {
+    "title": "설정",
+    "subtitle": "환경설정 및 시스템 설정을 구성합니다",
+    "languageSaved": "언어 설정이 저장되었습니다",
+    "languageSaveFailed": "언어 설정 저장에 실패했습니다",
     "general": {
       "title": "일반 설정"
+    },
+    "network": {
+      "title": "네트워크 설정",
+      "admindUrl": "관리자 대시보드 URL",
+      "admindUrlHelp": "관리자 대시보드 인터페이스 URL"
     },
     "integrations": {
       "title": "통합 설정",
@@ -1015,7 +1024,7 @@
     "inactive": "비활성"
   },
   "tags": {
-    "description": "설명",
+    "description": "콘텐츠를 정리하고 분류하기 위한 태그를 관리합니다",
     "duplicateName": "중복된 이름",
     "name": "이름",
     "nameRequired": "태그 이름은 필수입니다",
@@ -1025,6 +1034,7 @@
     "noMatchingTags": "검색 조건에 맞는 태그가 없습니다.",
     "addTag": "태그 추가",
     "confirmDeleteMessage": "정말로 \"{{name}}\" 태그를 삭제하시겠습니까?",
+    "quickAction": "태그 관리",
     "createTag": "태그 생성",
     "deleteTag": "태그 삭제",
     "editTag": "태그 편집",
