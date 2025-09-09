@@ -139,6 +139,8 @@
       "availability": "Availability",
       "searchPlaceholder": "Search by name or message...",
       "defaultMessageRequired": "Default message is required",
+      "defaultMessage": "Default Message",
+
       "defaultMessageHelp": "Default message displayed when no specific language is specified",
       "loadFailed": "Failed to load message templates",
       "selectedCount": "{{count}} selected",
@@ -246,6 +248,8 @@
       "user_reject": "User Reject",
       "user_suspend": "User Suspend",
       "user_unsuspend": "User Unsuspend",
+      "user_email_verified_updated": "Email Verification Updated",
+
       "user_promote": "User Promote",
       "user_demote": "User Demote",
       "password_change": "Password Change",

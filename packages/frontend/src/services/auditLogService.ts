@@ -105,6 +105,7 @@ export class AuditLogService {
       'user_reject',
       'user_suspend',
       'user_unsuspend',
+      'user_email_verified_updated',
       'user_promote',
       'user_demote',
       'password_change',

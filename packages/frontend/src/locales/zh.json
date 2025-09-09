@@ -139,6 +139,8 @@
       "searchPlaceholder": "按名称或消息搜索...",
       "defaultMessageRequired": "默认消息是必需的",
       "defaultMessageHelp": "未指定特定语言时默认显示的消息",
+      "defaultMessage": "默认消息",
+
       "loadFailed": "加载消息模板失败",
       "selectedCount": "已选择{{count}}个",
       "makeAvailable": "设为可用",
@@ -245,6 +247,8 @@
       "user_reject": "用户拒绝",
       "user_suspend": "用户暂停",
       "user_unsuspend": "用户解除暂停",
+      "user_email_verified_updated": "邮箱验证状态更新",
+
       "user_promote": "用户提升",
       "user_demote": "用户降级",
       "password_change": "密码更改",

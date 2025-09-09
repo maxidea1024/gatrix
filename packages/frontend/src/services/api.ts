@@ -22,30 +22,30 @@ class ApiService {
     // Request interceptor to add auth token
     this.api.interceptors.request.use(
       (config) => {
-        console.log('Request interceptor called:', {
-          url: config.url,
-          method: config.method,
-          hasToken: !!this.accessToken,
-          headers: config.headers,
-          baseURL: config.baseURL
-        });
+        // console.log('Request interceptor called:', {
+        //   url: config.url,
+        //   method: config.method,
+        //   hasToken: !!this.accessToken,
+        //   headers: config.headers,
+        //   baseURL: config.baseURL
+        // });
 
         if (this.accessToken) {
           if (!config.headers) {
             config.headers = {};
           }
           config.headers.Authorization = `Bearer ${this.accessToken}`;
-          console.log('Request interceptor - Token added:', {
-            url: config.url,
-            method: config.method,
-            tokenPrefix: this.accessToken.substring(0, 20) + '...',
-            authHeader: config.headers.Authorization?.substring(0, 30) + '...'
-          });
+          // console.log('Request interceptor - Token added:', {
+          //   url: config.url,
+          //   method: config.method,
+          //   tokenPrefix: this.accessToken.substring(0, 20) + '...',
+          //   authHeader: config.headers.Authorization?.substring(0, 30) + '...'
+          // });
         } else {
-          console.log('Request interceptor - No token available for:', {
-            url: config.url,
-            method: config.method
-          });
+          // console.log('Request interceptor - No token available for:', {
+          //   url: config.url,
+          //   method: config.method
+          // });
         }
         return config;
       },
@@ -85,11 +85,11 @@ class ApiService {
 
           try {
             // Try to refresh token
-            console.log('Attempting token refresh...');
+            // console.log('Attempting token refresh...');
             const refreshResponse = await this.api.post('/auth/refresh');
             const { accessToken } = refreshResponse.data.data;
 
-            console.log('Token refresh successful, new token:', accessToken?.substring(0, 20) + '...');
+            // console.log('Token refresh successful, new token:', accessToken?.substring(0, 20) + '...');
             this.setAccessToken(accessToken);
 
             // Ensure the new token is set in the original request
@@ -98,12 +98,12 @@ class ApiService {
             }
             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
-            console.log('Retrying original request with new token:', {
-              url: originalRequest.url,
-              method: originalRequest.method,
-              hasAuthHeader: !!originalRequest.headers.Authorization,
-              tokenPrefix: accessToken?.substring(0, 20) + '...'
-            });
+            // console.log('Retrying original request with new token:', {
+            //   url: originalRequest.url,
+            //   method: originalRequest.method,
+            //   hasAuthHeader: !!originalRequest.headers.Authorization,
+            //   tokenPrefix: accessToken?.substring(0, 20) + '...'
+            // });
 
             return this.api(originalRequest);
           } catch (refreshError) {
@@ -123,18 +123,18 @@ class ApiService {
     this.accessToken = token;
 
     // 토큰 정보 디버깅
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      console.log('Token set:', {
-        userId: payload.userId,
-        role: payload.role,
-        exp: payload.exp,
-        expiresAt: new Date(payload.exp * 1000).toISOString(),
-        timeUntilExpiry: Math.round((payload.exp * 1000 - Date.now()) / 1000 / 60) + ' minutes'
-      });
-    } catch (e) {
-      console.log('Could not decode token:', token.substring(0, 20) + '...');
-    }
+    // try {
+    //   const payload = JSON.parse(atob(token.split('.')[1]));
+    //   console.log('Token set:', {
+    //     userId: payload.userId,
+    //     role: payload.role,
+    //     exp: payload.exp,
+    //     expiresAt: new Date(payload.exp * 1000).toISOString(),
+    //     timeUntilExpiry: Math.round((payload.exp * 1000 - Date.now()) / 1000 / 60) + ' minutes'
+    //   });
+    // } catch (e) {
+    //   console.log('Could not decode token:', token.substring(0, 20) + '...');
+    // }
   }
 
   clearTokens() {

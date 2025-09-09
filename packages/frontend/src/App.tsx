@@ -38,7 +38,6 @@ import { MainLayout } from './components/layout/MainLayout';
 import LoginPage from './pages/auth/LoginPage';
 import LogoutPage from './pages/auth/LogoutPage';
 import RegisterPage from './pages/auth/RegisterPage';
-import LandingPage from './pages/auth/SignUpPromptPage'; // LandingPage 대신 SignUpPromptPage 사용
 import SignUpPromptPage from './pages/auth/SignUpPromptPage';
 import PendingApprovalPage from './pages/auth/PendingApprovalPage';
 import AccountSuspendedPage from './pages/auth/AccountSuspendedPage';
@@ -100,23 +99,23 @@ const ConditionalLandingPage: React.FC = () => {
 const LocalizedDatePickers: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { language } = useI18n();
 
-  console.log('🌍 LocalizedDatePickers - Current language:', language);
+  // console.log('🌍 LocalizedDatePickers - Current language:', language);
 
   // Set dayjs locale
   React.useEffect(() => {
-    console.log('⚙️ Setting dayjs locale for:', language);
+    // console.log('⚙️ Setting dayjs locale for:', language);
     switch (language) {
       case 'ko':
         dayjs.locale('ko');
-        console.log('✅ Dayjs locale set to Korean');
+        // console.log('✅ Dayjs locale set to Korean');
         break;
       case 'zh':
         dayjs.locale('zh-cn');
-        console.log('✅ Dayjs locale set to Chinese');
+        // console.log('✅ Dayjs locale set to Chinese');
         break;
       default:
         dayjs.locale('en');
-        console.log('✅ Dayjs locale set to English');
+        // console.log('✅ Dayjs locale set to English');
         break;
     }
   }, [language]);
@@ -125,28 +124,28 @@ const LocalizedDatePickers: React.FC<{ children: React.ReactNode }> = ({ childre
   const getLocaleText = () => {
     switch (language) {
       case 'ko':
-        console.log('🇰🇷 Using Korean locale text');
+        // console.log('🇰🇷 Using Korean locale text');
         return koKR;
       case 'zh':
-        console.log('🇨🇳 Using Chinese locale text');
+        // console.log('🇨🇳 Using Chinese locale text');
         return zhCN;
       default:
-        console.log('🇺🇸 Using English locale text');
+        // console.log('🇺🇸 Using English locale text');
         return enUS;
     }
   };
 
   const localeText = getLocaleText();
-  console.log('📝 Final locale text:', localeText);
+  // console.log('📝 Final locale text:', localeText);
 
   // Force complete re-mount when language changes
   const adapterLocale = language === 'ko' ? 'ko' : language === 'zh' ? 'zh-cn' : 'en';
 
-  console.log('🔧 Final settings:', {
-    language,
-    adapterLocale,
-    localeText: localeText?.components?.MuiLocalizationProvider?.defaultProps?.localeText
-  });
+  // console.log('🔧 Final settings:', {
+  //   language,
+  //   adapterLocale,
+  //   localeText: localeText?.components?.MuiLocalizationProvider?.defaultProps?.localeText
+  // });
 
   return (
     <LocalizationProvider
@@ -280,4 +279,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-
