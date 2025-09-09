@@ -65,11 +65,16 @@ const MessageTemplatesPage: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   // Copy helper with type/label for proper i18n interpolation
-  const copyWithToast = async (value: string, typeLabel?: string) => {
+  // includeValue=false -> use short toast without the copied value
+  const copyWithToast = async (value: string, typeLabel?: string, includeValue: boolean = true) => {
     try {
       await navigator.clipboard.writeText(value);
-      // common.copied expects { type, value }
-      enqueueSnackbar(t('common.copied', { type: typeLabel || '', value }), { variant: 'success' });
+      const message = includeValue && typeLabel
+        ? t('common.copied', { type: typeLabel, value })
+        : typeLabel
+          ? t('common.copySuccess', { type: typeLabel })
+          : t('common.copySuccess', { type: t('common.copy') });
+      enqueueSnackbar(message, { variant: 'success' });
     } catch (e) {
       enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
     }
@@ -636,7 +641,7 @@ const MessageTemplatesPage: React.FC = () => {
                             <Typography variant="body2" sx={{ whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
                               {String((row as any).defaultMessage).replace(/\n/g, ' ')}
                             </Typography>
-                            <IconButton size="small" onClick={() => copyWithToast(String((row as any).defaultMessage), t('admin.messageTemplates.defaultMessage'))} sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}>
+                            <IconButton size="small" onClick={() => copyWithToast(String((row as any).defaultMessage), t('admin.messageTemplates.defaultMessage'), false)} sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}>
                               <ContentCopyIcon fontSize="small" />
                             </IconButton>
                           </Box>
