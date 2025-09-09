@@ -40,7 +40,8 @@ import {
   Cancel as CancelIcon,
   Save as SaveIcon,
   Refresh as RefreshIcon,
-  LocalOffer as LocalOfferIcon
+  LocalOffer as LocalOfferIcon,
+  ContentCopy as ContentCopyIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -63,6 +64,17 @@ const MessageTemplatesPage: React.FC = () => {
   const [items, setItems] = useState<MessageTemplate[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
+  // Copy helper with type/label for proper i18n interpolation
+  const copyWithToast = async (value: string, typeLabel?: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      // common.copied expects { type, value }
+      enqueueSnackbar(t('common.copied', { type: typeLabel || '', value }), { variant: 'success' });
+    } catch (e) {
+      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
+    }
+  };
+
   const [saving, setSaving] = useState(false);
 
   // 페이지네이션
@@ -472,13 +484,13 @@ const MessageTemplatesPage: React.FC = () => {
               {/* 태그 필터 */}
               <Autocomplete
                 multiple
-                sx={{ minWidth: 200 }}
+                sx={{ minWidth: 400 }}
                 options={allTags}
                 getOptionLabel={(option) => option.name}
                 filterSelectedOptions
                 value={tagFilter}
                 onChange={(_, value) => handleTagFilterChange(value)}
-                renderTags={(value, getTagProps) =>
+                renderValue={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });
                     return (
@@ -528,35 +540,37 @@ const MessageTemplatesPage: React.FC = () => {
       {selectedIds.length > 0 && (
         <Card sx={{ mb: 2, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(110, 168, 255, 0.08)' : 'rgba(25, 118, 210, 0.04)' }}>
           <CardContent sx={{ py: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'space-between' }}>
               <Typography variant="body2" color="primary" sx={{ fontWeight: 500 }}>
                 {t('admin.messageTemplates.selectedCount', { count: selectedIds.length })}
               </Typography>
-              <Button
-                size="small"
-                variant="outlined"
-                onClick={() => handleBulkToggleAvailability(true)}
-                sx={{ minWidth: 'auto' }}
-              >
-                {t('admin.messageTemplates.makeAvailable')}
-              </Button>
-              <Button
-                size="small"
-                variant="outlined"
-                onClick={() => handleBulkToggleAvailability(false)}
-                sx={{ minWidth: 'auto' }}
-              >
-                {t('admin.messageTemplates.makeUnavailable')}
-              </Button>
-              <Button
-                size="small"
-                variant="outlined"
-                color="error"
-                onClick={handleBulkDelete}
-                sx={{ minWidth: 'auto' }}
-              >
-                {t('common.delete')}
-              </Button>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => handleBulkToggleAvailability(true)}
+                  sx={{ minWidth: 'auto' }}
+                >
+                  {t('admin.messageTemplates.makeAvailable')}
+                </Button>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => handleBulkToggleAvailability(false)}
+                  sx={{ minWidth: 'auto' }}
+                >
+                  {t('admin.messageTemplates.makeUnavailable')}
+                </Button>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  color="error"
+                  onClick={handleBulkDelete}
+                  sx={{ minWidth: 'auto' }}
+                >
+                  {t('common.delete')}
+                </Button>
+              </Box>
             </Box>
           </CardContent>
         </Card>
@@ -577,7 +591,7 @@ const MessageTemplatesPage: React.FC = () => {
                     />
                   </TableCell>
                   <TableCell>{t('common.name')}</TableCell>
-                  <TableCell>{t('admin.maintenance.defaultMessage')}</TableCell>
+                  <TableCell>{t('admin.messageTemplates.defaultMessage')}</TableCell>
                   <TableCell>{t('admin.messageTemplates.availability')}</TableCell>
                   <TableCell>{t('common.updatedAt')}</TableCell>
                   <TableCell>{t('common.languages')}</TableCell>
@@ -609,13 +623,23 @@ const MessageTemplatesPage: React.FC = () => {
                         />
                       </TableCell>
                       <TableCell>
-                        <Typography variant="subtitle2">{row.name}</Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <Typography variant="subtitle2">{row.name}</Typography>
+                          <IconButton size="small" onClick={() => copyWithToast(row.name, t('common.name'))} sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}>
+                            <ContentCopyIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
                       </TableCell>
                       <TableCell sx={{ maxWidth: 280 }}>
                         {(row as any).defaultMessage ? (
-                          <Typography variant="body2" sx={{ whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
-                            {String((row as any).defaultMessage).replace(/\n/g, ' ')}
-                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <Typography variant="body2" sx={{ whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+                              {String((row as any).defaultMessage).replace(/\n/g, ' ')}
+                            </Typography>
+                            <IconButton size="small" onClick={() => copyWithToast(String((row as any).defaultMessage), t('admin.messageTemplates.defaultMessage'))} sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}>
+                              <ContentCopyIcon fontSize="small" />
+                            </IconButton>
+                          </Box>
                         ) : (
                           <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
                             {t('admin.messageTemplates.onlyDefaultMessage')}
@@ -709,7 +733,7 @@ const MessageTemplatesPage: React.FC = () => {
               label={t('admin.messageTemplates.availability')}
             />
             <TextField
-              label={t('admin.maintenance.defaultMessage')}
+              label={t('admin.messageTemplates.defaultMessage')}
               value={form.defaultMessage || ''}
               onChange={(e) => setForm(prev => ({ ...prev, defaultMessage: e.target.value }))}
               multiline

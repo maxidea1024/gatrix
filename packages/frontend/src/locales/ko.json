@@ -120,6 +120,12 @@
     "scheduler": {
       "title": "스케줄 관리"
     },
+    "gameWorlds": {
+      "title": "게임 월드"
+    },
+    "gameWordls": {
+      "title": "게임 월드"
+    },
     "whitelist": {
       "title": "화이트리스트 관리"
     },

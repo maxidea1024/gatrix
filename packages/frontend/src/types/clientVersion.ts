@@ -131,6 +131,9 @@ export interface ClientVersionFilters {
   updatedAtFrom?: string;
   updatedAtTo?: string;
   search?: string;
+  // Comma-separated tag IDs for AND semantics, e.g. "1,2,3"
+  tagIds?: string;
+  // Legacy support: array of tag IDs
   tags?: string[];
 }
 

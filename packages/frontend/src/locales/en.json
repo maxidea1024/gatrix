@@ -120,6 +120,12 @@
     "scheduler": {
       "title": "Scheduler Management"
     },
+    "gameWorlds": {
+      "title": "Game Worlds"
+    },
+    "gameWordls": {
+      "title": "Game Worlds"
+    },
     "whitelist": {
       "title": "Whitelist Management"
     },

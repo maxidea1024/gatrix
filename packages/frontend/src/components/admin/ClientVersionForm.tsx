@@ -386,15 +386,11 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         try {
           const defaults = await PlatformDefaultsService.getPlatformDefaults(watchedPlatform);
 
-          // 현재 값이 비어있는 경우에만 기본값 적용
-          const currentGameServerAddress = getValues('gameServerAddress');
-          const currentPatchAddress = getValues('patchAddress');
-
-          if (!currentGameServerAddress && defaults.gameServerAddress) {
+          // 플랫폼 기본값을 적용 (기존 값과 상관없이 덮어쓰기)
+          if (defaults.gameServerAddress) {
             setValue('gameServerAddress', defaults.gameServerAddress);
           }
-
-          if (!currentPatchAddress && defaults.patchAddress) {
+          if (defaults.patchAddress) {
             setValue('patchAddress', defaults.patchAddress);
           }
         } catch (error) {
@@ -596,15 +592,11 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                             try {
                               const defaults = await PlatformDefaultsService.getPlatformDefaults(e.target.value as string);
 
-                              // 현재 값이 비어있는 경우에만 기본값 적용
-                              const currentGameServerAddress = getValues('gameServerAddress');
-                              const currentPatchAddress = getValues('patchAddress');
-
-                              if (!currentGameServerAddress && defaults.gameServerAddress) {
+                              // 플랫폼 기본값을 적용 (기존 값과 상관없이 덮어쓰기)
+                              if (defaults.gameServerAddress) {
                                 setValue('gameServerAddress', defaults.gameServerAddress);
                               }
-
-                              if (!currentPatchAddress && defaults.patchAddress) {
+                              if (defaults.patchAddress) {
                                 setValue('patchAddress', defaults.patchAddress);
                               }
                             } catch (error) {
@@ -879,6 +871,59 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
               </Stack>
             </Paper>
 
+            {/* 태그 섹션 (추가 설정 밖) */}
+            <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
+              <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                🏷️ {t('common.tags')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('clientVersions.form.tagsHelp')}
+              </Typography>
+
+              <Autocomplete
+                multiple
+                options={allTags}
+                getOptionLabel={(option) => option.name}
+                filterSelectedOptions
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                value={selectedTags}
+                onChange={(_, value) => {
+                  setSelectedTags(value);
+                  setValue('tags', value);
+                }}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...chipProps } = getTagProps({ index });
+                    return (
+                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                        <Chip
+                          variant="outlined"
+                          label={option.name}
+                          size="small"
+                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          {...chipProps}
+                        />
+                      </Tooltip>
+                    );
+                  })
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label={t('common.tags')} helperText={t('clientVersions.form.tagsHelp')} />
+                )}
+                renderOption={(props, option) => (
+                  <Box component="li" {...props}>
+                    <Chip
+                      label={option.name}
+                      size="small"
+                      sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                    />
+                    {option.description || t('common.noDescription')}
+                  </Box>
+                )}
+              />
+            </Paper>
+
+
             {/* 추가 설정 섹션 */}
             <Accordion defaultExpanded={false} disableGutters sx={{ border: '1px solid', borderColor: 'divider', bgcolor: 'background.default' }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -972,48 +1017,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                   )}
                 />
 
-                {/* 태그 선택 */}
-                <Autocomplete
-                  multiple
-                  options={allTags}
-                  getOptionLabel={(option) => option.name}
-                  filterSelectedOptions
-                  isOptionEqualToValue={(option, value) => option.id === value.id}
-                  value={selectedTags}
-                  onChange={(_, value) => {
-                    setSelectedTags(value);
-                    setValue('tags', value);
-                  }}
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, index) => {
-                      const { key, ...chipProps } = getTagProps({ index });
-                      return (
-                        <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
-                          <Chip
-                            variant="outlined"
-                            label={option.name}
-                            size="small"
-                            sx={{ bgcolor: option.color, color: '#fff' }}
-                            {...chipProps}
-                          />
-                        </Tooltip>
-                      );
-                    })
-                  }
-                  renderInput={(params) => (
-                    <TextField {...params} label={t('common.tags')} helperText={t('clientVersions.form.tagsHelp')} />
-                  )}
-                  renderOption={(props, option) => (
-                    <Box component="li" {...props}>
-                      <Chip
-                        label={option.name}
-                        size="small"
-                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
-                      />
-                      {option.description || t('common.noDescription')}
-                    </Box>
-                  )}
-                />
+                {/* 태그 선택: 섹션 외부로 이동됨 */}
               </Stack>
             </AccordionDetails>
             </Accordion>

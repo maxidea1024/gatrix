@@ -343,13 +343,13 @@ const JobsPage: React.FC = () => {
               {/* 태그 필터 */}
               <Autocomplete
                 multiple
-                sx={{ minWidth: 350 }}
+                sx={{ minWidth: 400 }}
                 options={allTags}
                 getOptionLabel={(option) => option.name}
                 filterSelectedOptions
                 value={tagFilter}
                 onChange={(_, value) => handleTagFilterChange(value)}
-                renderTags={(value, getTagProps) =>
+                renderValue={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });
                     return (
@@ -589,7 +589,6 @@ const JobsPage: React.FC = () => {
           {editingJob ? t('jobs.editJob') : t('jobs.addJob')}
         </DialogTitle>
         <DialogContent>
-          {console.log('JobsPage - Passing jobTypes to JobForm:', jobTypes) || null}
           <JobForm
             job={editingJob}
             jobTypes={jobTypes}

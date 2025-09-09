@@ -19,7 +19,9 @@ import {
   DialogActions,
   TextField,
   Switch,
+  FormControl,
   FormControlLabel,
+  FormHelperText,
   InputAdornment,
   Tooltip,
   Alert,
@@ -90,6 +92,7 @@ interface SortableRowProps {
   world: GameWorld;
   index: number;
   total: number;
+  highlight: boolean;
   onEdit: (world: GameWorld) => void;
   onDelete: (id: number) => void;
   onToggleVisibility: (worldId: number) => void;
@@ -112,6 +115,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
   t,
   index,
   total,
+  highlight,
 }) => {
   const {
     attributes,
@@ -144,7 +148,9 @@ const SortableRow: React.FC<SortableRowProps> = ({
 
 
   return (
-    <TableRow ref={setNodeRef} style={style} hover>
+    <TableRow ref={setNodeRef} style={style} hover data-world-id={world.id}
+      sx={{ bgcolor: highlight ? 'rgba(25,118,210,0.12)' : undefined, transition: 'background-color 1.2s ease' }}>
+
       <TableCell>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <IconButton
@@ -354,6 +360,11 @@ const GameWorldsPage: React.FC = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const worldIdRef = useRef<HTMLInputElement>(null);
 
+
+  // Highlight & scroll for recently moved row
+  const [recentlyMovedId, setRecentlyMovedId] = useState<number | null>(null);
+  const highlightTimerRef = useRef<number | null>(null);
+
   // Confirmation dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
@@ -379,6 +390,8 @@ const GameWorldsPage: React.FC = () => {
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
+
+
   );
 
   // Load registry tags for form use
@@ -398,6 +411,8 @@ const GameWorldsPage: React.FC = () => {
 
   const updateMaintenanceLocale = (lang: 'ko' | 'en' | 'zh', message: string) => {
     const newLocales = maintenanceLocales.map(l =>
+
+
       l.lang === lang ? { ...l, message } : l
     );
     setMaintenanceLocales(newLocales);
@@ -421,6 +436,8 @@ const GameWorldsPage: React.FC = () => {
         message: ''
       }));
       setMaintenanceLocales(allLanguageLocales);
+
+
       setFormData(prev => ({ ...prev, maintenanceLocales: allLanguageLocales }));
     } else {
       setMaintenanceLocales([]);
@@ -445,6 +462,8 @@ const GameWorldsPage: React.FC = () => {
       case 'en':
         dayjs.locale('en');
         return 'en';
+
+
       case 'zh':
         dayjs.locale('zh-cn');
         return 'zh-cn';
@@ -471,7 +490,29 @@ const GameWorldsPage: React.FC = () => {
     return () => {
       isMounted = false;
     };
+
+
   }, [search, tagsFilter.map(t => t.id).join(','), allRegistryTags.length]);
+
+
+  // Scroll moved row into view when worlds reload and highlight is set
+  useEffect(() => {
+    if (recentlyMovedId != null) {
+      const el = document.querySelector(`[data-world-id="${recentlyMovedId}"]`) as HTMLElement | null;
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [recentlyMovedId, worlds]);
+
+  // Cleanup highlight timer on unmount
+  useEffect(() => {
+    return () => {
+      if (highlightTimerRef.current) {
+        window.clearTimeout(highlightTimerRef.current);
+      }
+    };
+  }, []);
 
   // Avoid mobile viewport scroll zoom/focus issues by disabling autoScroll and portal for Autocomplete
   const autocompleteSlotProps = {
@@ -490,12 +531,16 @@ const GameWorldsPage: React.FC = () => {
       const tagIds = tagsFilter.length > 0 ? tagsFilter.map(tag => tag.id) : [];
 
       const result = await gameWorldService.getGameWorlds({
+
+
         // 페이징 파라미터 제거: page/limit 미전송
         search: search || undefined,
         tagIds: tagIds.length ? tagIds.join(',') : undefined,
       });
 
       setWorlds(result.worlds);
+
+
     } catch (error: any) {
       console.error('Failed to load game worlds:', error);
 
@@ -513,6 +558,8 @@ const GameWorldsPage: React.FC = () => {
   const handleAddWorld = () => {
     setEditingWorld(null);
     setFormData({
+
+
       worldId: '',
       name: '',
       isVisible: true,
@@ -525,6 +572,8 @@ const GameWorldsPage: React.FC = () => {
       maintenanceLocales: [],
       tagIds: [],
     });
+
+
     setFormTags([]);
     setMaintenanceLocales([]);
     setSupportsMultiLanguage(false);
@@ -756,19 +805,14 @@ const GameWorldsPage: React.FC = () => {
 
   const handleMoveUp = async (world: GameWorld) => {
     try {
-      const moved = await gameWorldService.moveUp(world.id);
+      // UI 기준으로 위로 이동이므로, 서버 정렬이 반대라면 moveDown을 호출해 시각적으로 위로 이동시킵니다.
+      const moved = await gameWorldService.moveDown(world.id);
       if (moved) {
-        // Update local state instead of reloading
-        setWorlds(prevWorlds => {
-          const currentIndex = prevWorlds.findIndex(w => w.id === world.id);
-          if (currentIndex <= 0) return prevWorlds;
-
-          const newWorlds = [...prevWorlds];
-          [newWorlds[currentIndex - 1], newWorlds[currentIndex]] =
-            [newWorlds[currentIndex], newWorlds[currentIndex - 1]];
-
-          return newWorlds;
-        });
+        await loadGameWorlds();
+        // highlight recently moved row
+        setRecentlyMovedId(world.id);
+        if (highlightTimerRef.current) window.clearTimeout(highlightTimerRef.current);
+        highlightTimerRef.current = window.setTimeout(() => setRecentlyMovedId(null), 1800);
         enqueueSnackbar(t('gameWorlds.movedUp', { name: world.name }), { variant: 'success' });
       } else {
         enqueueSnackbar(t('gameWorlds.alreadyTop'), { variant: 'info' });
@@ -781,19 +825,14 @@ const GameWorldsPage: React.FC = () => {
 
   const handleMoveDown = async (world: GameWorld) => {
     try {
-      const moved = await gameWorldService.moveDown(world.id);
+      // UI 기준으로 아래로 이동이므로, 서버 정렬이 반대라면 moveUp을 호출해 시각적으로 아래로 이동시킵니다.
+      const moved = await gameWorldService.moveUp(world.id);
       if (moved) {
-        // Update local state instead of reloading
-        setWorlds(prevWorlds => {
-          const currentIndex = prevWorlds.findIndex(w => w.id === world.id);
-          if (currentIndex >= prevWorlds.length - 1) return prevWorlds;
-
-          const newWorlds = [...prevWorlds];
-          [newWorlds[currentIndex], newWorlds[currentIndex + 1]] =
-            [newWorlds[currentIndex + 1], newWorlds[currentIndex]];
-
-          return newWorlds;
-        });
+        await loadGameWorlds();
+        // highlight recently moved row
+        setRecentlyMovedId(world.id);
+        if (highlightTimerRef.current) window.clearTimeout(highlightTimerRef.current);
+        highlightTimerRef.current = window.setTimeout(() => setRecentlyMovedId(null), 1800);
         enqueueSnackbar(t('gameWorlds.movedDown', { name: world.name }), { variant: 'success' });
       } else {
         enqueueSnackbar(t('gameWorlds.alreadyBottom'), { variant: 'info' });
@@ -838,6 +877,8 @@ const GameWorldsPage: React.FC = () => {
           onClick={handleAddWorld}
         >
           {t('gameWorlds.addGameWorld')}
+
+
         </Button>
       </Box>
 
@@ -865,7 +906,7 @@ const GameWorldsPage: React.FC = () => {
               />
               <Autocomplete
                 multiple
-                sx={{ minWidth: 320, flexShrink: 0 }}
+                sx={{ minWidth: 400, flexShrink: 0 }}
                 options={existingTags}
                 getOptionLabel={(option) => option.name}
                 filterSelectedOptions
@@ -873,7 +914,7 @@ const GameWorldsPage: React.FC = () => {
                 value={tagsFilter}
                 onChange={(_, value) => setTagsFilter(value)}
                 slotProps={autocompleteSlotProps as any}
-                renderTags={(value, getTagProps) =>
+                renderValue={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });
                     return (
@@ -958,6 +999,7 @@ const GameWorldsPage: React.FC = () => {
                           world={world}
                           index={idx}
                           total={worlds.length}
+                          highlight={recentlyMovedId === world.id}
                           onEdit={handleEditWorld}
                           onDelete={handleDeleteWorld}
                           onToggleVisibility={handleToggleVisibility}
@@ -1083,31 +1125,37 @@ const GameWorldsPage: React.FC = () => {
             </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={formData.isVisible}
-                    onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
-                  />
-                }
-                label={t('gameWorlds.visibleToUsers')}
-              />
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 6, mt: -0.5, mb: 1 }}>
-                {t('gameWorlds.form.visibleHelp')}
-              </Typography>
+              {/* 표시 여부 */}
+              <FormControl variant="standard">
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={formData.isVisible}
+                      onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
+                    />
+                  }
+                  label={t('gameWorlds.visibleToUsers')}
+                />
+                <FormHelperText sx={{ ml: 6, mt: -0.5, mb: 1 }}>
+                  {t('gameWorlds.form.visibleHelp')}
+                </FormHelperText>
+              </FormControl>
 
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={formData.isMaintenance}
-                    onChange={(e) => setFormData({ ...formData, isMaintenance: e.target.checked })}
-                  />
-                }
-                label={t('gameWorlds.underMaintenance')}
-              />
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 6, mt: -0.5 }}>
-                {t('gameWorlds.form.maintenanceHelp')}
-              </Typography>
+              {/* 점검 중 */}
+              <FormControl variant="standard">
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={formData.isMaintenance}
+                      onChange={(e) => setFormData({ ...formData, isMaintenance: e.target.checked })}
+                    />
+                  }
+                  label={t('gameWorlds.underMaintenance')}
+                />
+                <FormHelperText sx={{ ml: 6, mt: -0.5 }}>
+                  {t('gameWorlds.form.maintenanceHelp')}
+                </FormHelperText>
+              </FormControl>
             </Box>
 
             {/* 점검 설정 섹션 */}

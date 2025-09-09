@@ -48,15 +48,31 @@ export class ClientVersionService {
 
     // 필터 조건 추가
     Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        // 배열인 경우 각 요소를 개별적으로 추가
+      if (value === undefined || value === null || value === '') return;
+
+      // 태그는 백엔드에서 배열 타입으로 기대하므로 반드시 배열 파라미터로 직렬화
+      if (key === 'tags') {
         if (Array.isArray(value)) {
-          value.forEach(item => {
-            params.append(key, item.toString());
-          });
+          value.forEach((item) => params.append('tags[]', item.toString()));
+        } else if (typeof value === 'string') {
+          // 콤마 구분 문자열도 지원: "1,2,3" -> tags[]=1&tags[]=2&tags[]=3
+          const parts = value.split(',').map(s => s.trim()).filter(Boolean);
+          if (parts.length > 0) {
+            parts.forEach((p) => params.append('tags[]', p));
+          } else {
+            params.append('tags[]', value);
+          }
         } else {
-          params.append(key, value.toString());
+          params.append('tags[]', String(value));
         }
+        return;
+      }
+
+      // 배열인 경우 각 요소를 개별적으로 추가
+      if (Array.isArray(value)) {
+        value.forEach(item => params.append(key, item.toString()));
+      } else {
+        params.append(key, value.toString());
       }
     });
 

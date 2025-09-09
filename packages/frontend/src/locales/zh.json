@@ -120,6 +120,12 @@
     "scheduler": {
       "title": "调度器管理"
     },
+    "gameWorlds": {
+      "title": "游戏世界"
+    },
+    "gameWordls": {
+      "title": "游戏世界"
+    },
     "whitelist": {
       "title": "白名单管理"
     },

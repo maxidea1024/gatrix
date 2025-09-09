@@ -259,13 +259,15 @@ const ClientVersionsPage: React.FC = () => {
     updateFilters(newFilters);
   }, [updateFilters]);
 
-  // 태그 필터 변경 핸들러
+  // 태그 필터 변경 핸들러 (백엔드가 "tags"를 배열로 기대하므로 배열로 전달)
   const handleTagFilterChange = useCallback((tags: Tag[]) => {
     setTagFilter(tags);
     const tagIds = tags.map(tag => tag.id.toString());
     handleFilterChange({
       ...pageState.filters,
-      tags: tagIds.length > 0 ? tagIds : undefined
+      tags: tagIds.length > 0 ? tagIds : undefined,
+      // 더 이상 사용하지 않음
+      tagIds: undefined as any,
     });
   }, [pageState.filters, handleFilterChange]);
 
@@ -445,6 +447,12 @@ const ClientVersionsPage: React.FC = () => {
       externalClickLink: clientVersion.externalClickLink || '',
       memo: clientVersion.memo || '',
       customPayload: clientVersion.customPayload || '',
+      maintenanceStartDate: clientVersion.maintenanceStartDate || '',
+      maintenanceEndDate: clientVersion.maintenanceEndDate || '',
+      maintenanceMessage: clientVersion.maintenanceMessage || '',
+      supportsMultiLanguage: clientVersion.supportsMultiLanguage || false,
+      maintenanceLocales: clientVersion.maintenanceLocales || [],
+      tags: clientVersion.tags || [],
     };
 
     // 폼 다이얼로그를 열고 복사된 데이터로 초기화
@@ -635,13 +643,13 @@ const ClientVersionsPage: React.FC = () => {
               {/* 태그 필터 */}
               <Autocomplete
                 multiple
-                sx={{ minWidth: 200 }}
+                sx={{ minWidth: 400, flexShrink: 0 }}
                 options={allTags}
                 getOptionLabel={(option) => option.name}
                 filterSelectedOptions
                 value={tagFilter}
                 onChange={(_, value) => handleTagFilterChange(value)}
-                renderTags={(value, getTagProps) =>
+                renderValue={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });
                     return (
@@ -650,7 +658,7 @@ const ClientVersionsPage: React.FC = () => {
                           variant="outlined"
                           label={option.name}
                           size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          sx={{ bgcolor: option.color, color: '#fff', cursor: 'help' }}
                           {...chipProps}
                         />
                       </Tooltip>
@@ -867,7 +875,7 @@ const ClientVersionsPage: React.FC = () => {
                         </Typography>
                       </Tooltip>
                       <Tooltip title={t('common.copy')}>
-                        <IconButton size="small" onClick={() => navigator.clipboard.writeText(clientVersion.gameServerAddress)}>
+                        <IconButton size="small" onClick={async () => { await navigator.clipboard.writeText(clientVersion.gameServerAddress); enqueueSnackbar(t('common.copied', { type: t('clientVersions.gameServer'), value: clientVersion.gameServerAddress }), { variant: 'success' }); }}>
                           <CopyIcon fontSize="inherit" />
                         </IconButton>
                       </Tooltip>
@@ -881,7 +889,7 @@ const ClientVersionsPage: React.FC = () => {
                         </Typography>
                       </Tooltip>
                       <Tooltip title={t('common.copy')}>
-                        <IconButton size="small" onClick={() => navigator.clipboard.writeText(clientVersion.patchAddress)}>
+                        <IconButton size="small" onClick={async () => { await navigator.clipboard.writeText(clientVersion.patchAddress); enqueueSnackbar(t('common.copied', { type: t('clientVersions.patchAddress'), value: clientVersion.patchAddress }), { variant: 'success' }); }}>
                           <CopyIcon fontSize="inherit" />
                         </IconButton>
                       </Tooltip>
@@ -919,7 +927,7 @@ const ClientVersionsPage: React.FC = () => {
                             <Chip
                               label={tag.name}
                               size="small"
-                              sx={{ bgcolor: tag.color, color: '#fff' }}
+                              sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }}
                             />
                           </Tooltip>
                         ))
@@ -1171,7 +1179,7 @@ const ClientVersionsPage: React.FC = () => {
                     variant="outlined"
                     label={option.name}
                     size="small"
-                    sx={{ bgcolor: option.color, color: '#fff' }}
+                    sx={{ bgcolor: option.color, color: '#fff', cursor: 'help' }}
                     {...getTagProps({ index })}
                   />
                 </Tooltip>
@@ -1190,7 +1198,7 @@ const ClientVersionsPage: React.FC = () => {
                   <Chip
                     label={option.name}
                     size="small"
-                    sx={{ bgcolor: option.color, color: '#fff' }}
+                    sx={{ bgcolor: option.color, color: '#fff', cursor: 'help' }}
                   />
                   <Typography variant="body2" color="text.secondary">
                     {option.description || t('tags.noDescription')}

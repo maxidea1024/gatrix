@@ -186,7 +186,7 @@ const UsersManagementPage: React.FC = () => {
         page: (page + 1).toString(),
         limit: rowsPerPage.toString(),
       });
-      
+
       if (searchTerm) params.append('search', searchTerm);
       if (statusFilter) params.append('status', statusFilter);
       if (roleFilter) params.append('role', roleFilter);
@@ -529,7 +529,10 @@ const UsersManagementPage: React.FC = () => {
       fetchUsers();
       // 편집 폼이 열려있다면 데이터 업데이트
       if (editUserDialog.open && editUserDialog.user?.id === userId) {
-        setEditUserData(prev => ({ ...prev, emailVerified: true }));
+        setEditUserDialog(prev => ({
+          ...prev,
+          user: prev.user ? { ...prev.user, emailVerified: true } : prev.user,
+        }));
       }
     } catch (error: any) {
       const errorMessage = error.message || t('admin.users.emailVerificationError');
@@ -794,6 +797,66 @@ const UsersManagementPage: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* 일괄 작업 툴바 - 목록 위로 이동 */}
+      {selectedUsers.size > 0 && (
+        <Card sx={{ mb: 2, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(110, 168, 255, 0.08)' : 'rgba(25, 118, 210, 0.04)' }}>
+          <CardContent sx={{ py: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'space-between' }}>
+              <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                {selectedUsers.size} {t('admin.users.selectedUsers')}
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleBulkAction('status')}
+                  startIcon={<PersonIcon />}
+                >
+                  {t('admin.users.bulkUpdateStatus')}
+                </Button>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleBulkAction('role')}
+                  startIcon={<AdminIcon />}
+                >
+                  {t('admin.users.bulkUpdateRole')}
+                </Button>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleBulkAction('emailVerified')}
+                  startIcon={<CheckCircleIcon />}
+                >
+                  {t('admin.users.bulkVerifyEmail')}
+                </Button>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleBulkAction('tags')}
+                  startIcon={<TagIcon />}
+                >
+                  {t('admin.users.bulkUpdateTags')}
+                </Button>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="error"
+                  onClick={() => handleBulkAction('delete')}
+                  startIcon={<DeleteIcon />}
+                >
+                  {t('admin.users.bulkDelete')}
+                </Button>
+              </Box>
+            </Box>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Users Table */}
       <Card>
         <CardContent sx={{ p: 0 }}>
@@ -961,7 +1024,7 @@ const UsersManagementPage: React.FC = () => {
               </TableBody>
             </Table>
           </TableContainer>
-          
+
           <SimplePagination
             count={total}
             page={page}
@@ -976,65 +1039,6 @@ const UsersManagementPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* 일괄 작업 툴바 */}
-      {selectedUsers.size > 0 && (
-        <Card sx={{ mb: 2, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(110, 168, 255, 0.08)' : 'rgba(25, 118, 210, 0.04)' }}>
-          <CardContent sx={{ py: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'space-between' }}>
-              <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                {selectedUsers.size} {t('admin.users.selectedUsers')}
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleBulkAction('status')}
-                  startIcon={<PersonIcon />}
-                >
-                  {t('admin.users.bulkUpdateStatus')}
-                </Button>
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleBulkAction('role')}
-                  startIcon={<AdminIcon />}
-                >
-                  {t('admin.users.bulkUpdateRole')}
-                </Button>
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleBulkAction('emailVerified')}
-                  startIcon={<CheckCircleIcon />}
-                >
-                  {t('admin.users.bulkVerifyEmail')}
-                </Button>
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleBulkAction('tags')}
-                  startIcon={<TagIcon />}
-                >
-                  {t('admin.users.bulkUpdateTags')}
-                </Button>
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="error"
-                  onClick={() => handleBulkAction('delete')}
-                  startIcon={<DeleteIcon />}
-                >
-                  {t('admin.users.bulkDelete')}
-                </Button>
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Actions Menu */}
       <Menu
