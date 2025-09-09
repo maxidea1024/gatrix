@@ -152,21 +152,20 @@ export class GameWorldController {
 
     const { tagIds, ...worldValue } = value as any;
 
-    // Add createdBy from authenticated user session
-    if (!req.user || !req.user.id) {
+    // Resolve authenticated user id from middleware (supports both payload and loaded user)
+    const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
+    if (!authenticatedUserId) {
       throw new CustomError('User authentication required', 401);
     }
 
     const worldData = {
       ...worldValue,
-      createdBy: req.user.id,
+      createdBy: authenticatedUserId,
     };
-
-
 
     const world = await GameWorldService.createGameWorld(worldData);
     if (Array.isArray(tagIds)) {
-      await TagService.setTagsForEntity('game_world', world.id, tagIds, req.user!.id);
+      await TagService.setTagsForEntity('game_world', world.id, tagIds, authenticatedUserId);
     }
     const tags = await TagService.listTagsForEntity('game_world', world.id);
 
@@ -193,14 +192,15 @@ export class GameWorldController {
     const { tagIds, ...updateValue } = value as any;
 
     // Add updatedBy from authenticated user session
+    const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
     const updateData = {
       ...updateValue,
-      updatedBy: req.user!.id
+      updatedBy: authenticatedUserId
     };
 
     const world = await GameWorldService.updateGameWorld(id, updateData);
     if (Array.isArray(tagIds)) {
-      await TagService.setTagsForEntity('game_world', id, tagIds, req.user!.id);
+      await TagService.setTagsForEntity('game_world', id, tagIds, authenticatedUserId);
     }
     const tags = await TagService.listTagsForEntity('game_world', id);
 

@@ -79,34 +79,39 @@ export interface GameWorldListParams {
 export class GameWorldModel {
   static async findById(id: number): Promise<GameWorld | null> {
     try {
-      const gameWorld = await db('g_game_worlds as gw')
-        .leftJoin('g_users as c', 'gw.createdBy', 'c.id')
-        .leftJoin('g_users as u', 'gw.updatedBy', 'u.id')
-        .select([
-          'gw.*',
-          'c.name as createdByName',
-          'u.name as updatedByName'
-        ])
-        .where('gw.id', id)
-        .first();
-
-      if (!gameWorld) {
-        return null;
-      }
-
-      // 점검 메시지 로케일 정보 로드
-      const maintenanceLocales = await db('g_game_world_maintenance_locales')
-        .where('gameWorldId', id)
-        .select('lang', 'message');
-
-      return {
-        ...gameWorld,
-        maintenanceLocales: maintenanceLocales || []
-      };
+      return await this.findByIdWith(db, id);
     } catch (error) {
       logger.error('Error finding game world by ID:', error);
       throw error;
     }
+  }
+
+  // Use provided connection/transaction to ensure visibility inside transactions
+  static async findByIdWith(conn: any, id: number): Promise<GameWorld | null> {
+    const gameWorld = await conn('g_game_worlds as gw')
+      .leftJoin('g_users as c', 'gw.createdBy', 'c.id')
+      .leftJoin('g_users as u', 'gw.updatedBy', 'u.id')
+      .select([
+        'gw.*',
+        'c.name as createdByName',
+        'u.name as updatedByName'
+      ])
+      .where('gw.id', id)
+      .first();
+
+    if (!gameWorld) {
+      return null;
+    }
+
+    // 점검 메시지 로케일 정보 로드
+    const maintenanceLocales = await conn('g_game_world_maintenance_locales')
+      .where('gameWorldId', id)
+      .select('lang', 'message');
+
+    return {
+      ...gameWorld,
+      maintenanceLocales: maintenanceLocales || []
+    } as any;
   }
 
   static async findByWorldId(worldId: string): Promise<GameWorld | null> {
@@ -288,7 +293,8 @@ export class GameWorldModel {
           await trx('g_game_world_maintenance_locales').insert(localeInserts);
         }
 
-        const world = await this.findById(insertId);
+        // Use the same transaction connection to ensure visibility before commit
+        const world = await this.findByIdWith(trx, insertId);
         if (!world) {
           throw new Error('Failed to create game world');
         }

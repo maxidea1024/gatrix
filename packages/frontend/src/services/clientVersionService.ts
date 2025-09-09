@@ -125,14 +125,38 @@ export class ClientVersionService {
       data
     );
 
-    // ApiService.request()가 이미 response.data를 반환하므로
+    // 정상: { success: true, data: { ...created } }
     if (response?.success && response?.data) {
       return response.data;
+    }
+
+    // 일부 서버는 생성 시 본문 없이 { success: true }만 반환할 수 있음
+    if (response?.success && !response?.data) {
+      try {
+        const found = await this.findByPlatformAndVersion(data.platform, data.clientVersion);
+        if (found) return found;
+      } catch (e) {
+        console.warn('Fallback lookup after create failed:', e);
+      }
     }
 
     console.error('Unexpected create response structure:', response);
     throw new Error('Invalid response structure from server');
   }
+  /**
+   * 생성 직후 데이터 본문이 없는 서버 대응: 플랫폼/버전으로 재조회
+   */
+  static async findByPlatformAndVersion(platform: string, clientVersion: string): Promise<ClientVersion | null> {
+    try {
+      const result = await this.getClientVersions(1, 100, { platform, search: clientVersion });
+      const exact = result.clientVersions.find(cv => cv.platform === platform && cv.clientVersion === clientVersion);
+      return exact || null;
+    } catch (error) {
+      console.warn('findByPlatformAndVersion failed:', error);
+      return null;
+    }
+  }
+
 
   /**
    * 클라이언트 버전 간편 생성
@@ -146,6 +170,11 @@ export class ClientVersionService {
     // ApiService.request()가 이미 response.data를 반환하므로
     if (response?.success && response?.data) {
       return response.data;
+    }
+
+    // 일부 서버는 본문 없이 { success: true }만 반환할 수 있음
+    if (response?.success && !response?.data) {
+      return [];
     }
 
     console.error('Unexpected bulk create response structure:', response);
@@ -262,7 +291,7 @@ export class ClientVersionService {
   static async exportToCSV(filters: ClientVersionFilters = {}): Promise<Blob> {
     // 모든 데이터를 가져와서 CSV로 변환
     const result = await this.getClientVersions(1, 10000, filters);
-    
+
     const headers = [
       'ID',
       'Channel',

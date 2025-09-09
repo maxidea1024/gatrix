@@ -63,10 +63,21 @@ export const authenticate = async (
       throw new CustomError('User account is not active', 401);
     }
 
+    // Normalize user object on req.user to AppUser-like shape while keeping compatibility
+    const normalizedUser: any = {
+      id: user.id,
+      userId: user.id, // backward compatibility for code using userId
+      email: user.email,
+      role: user.role,
+      name: (user as any).name,
+      status: user.status,
+      createdAt: (user as any).createdAt,
+      updatedAt: (user as any).updatedAt,
+    };
 
-
-    req.user = payload;
-    req.userDetails = user;
+    // Set both for now (gradual migration to req.user only)
+    req.user = normalizedUser as any;
+    req.userDetails = normalizedUser;
     next();
   } catch (error) {
     if (error instanceof CustomError) {
@@ -95,7 +106,7 @@ export const requireRole = (roles: string | string[]) => {
 
     if (!allowedRoles.includes(userRole)) {
       logger.warn('Access denied for user:', {
-        userId: req.user.userId,
+        userId: (req.user as any)?.id ?? (req.user as any)?.userId,
         userRole,
         requiredRoles: allowedRoles,
         endpoint: req.path,
@@ -123,8 +134,18 @@ export const optionalAuth = async (
       if (payload) {
         const user = await UserModel.findById(payload.userId);
         if (user && user.status === 'active') {
-          req.user = payload;
-          req.userDetails = user;
+          const normalizedUser: any = {
+            id: user.id,
+            userId: user.id,
+            email: user.email,
+            role: user.role,
+            name: (user as any).name,
+            status: user.status,
+            createdAt: (user as any).createdAt,
+            updatedAt: (user as any).updatedAt,
+          };
+          req.user = normalizedUser as any;
+          req.userDetails = normalizedUser;
         }
       }
     }

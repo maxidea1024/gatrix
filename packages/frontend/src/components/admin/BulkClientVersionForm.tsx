@@ -28,7 +28,7 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from '@mui/material';
-import { Cancel as CancelIcon, Save as SaveIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
+import { Cancel as CancelIcon, Save as SaveIcon, ExpandMore as ExpandMoreIcon, Build as BuildIcon } from '@mui/icons-material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -241,16 +241,16 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     setSupportsMultiLanguage(enabled);
     setValue('supportsMultiLanguage', enabled);
     if (enabled) {
-      // 모든 언어를 자동으로 초기화
-      const allLanguageLocales = availableLanguages.map(lang => ({
-        lang: lang.code,
-        message: ''
-      }));
-      setMaintenanceLocales(allLanguageLocales);
-      setValue('maintenanceLocales', allLanguageLocales);
+      // 활성화 시, 기존 값을 보존하면서 누락된 언어만 추가
+      const merged = availableLanguages.map((lang) => {
+        const existing = maintenanceLocales.find(l => l.lang === lang.code);
+        return { lang: lang.code, message: existing?.message || '' } as any;
+      });
+      setMaintenanceLocales(merged);
+      setValue('maintenanceLocales', merged);
     } else {
-      setMaintenanceLocales([]);
-      setValue('maintenanceLocales', []);
+      // 비활성화 시, 입력값은 유지하고 UI만 숨김 (state/form 값은 건드리지 않음)
+      // no-op
     }
   };
 
@@ -502,125 +502,128 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                     </FormControl>
                   )}
                 />
+
+	                {isMaintenanceMode && (
+	                  <Box sx={{ mt: 2, p: 2, border: '1px solid', borderColor: 'warning.light', borderRadius: 1, bgcolor: 'background.default' }}>
+
+	                    <Typography variant="subtitle1" gutterBottom sx={{ color: 'warning.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+	                      <BuildIcon fontSize="small" sx={{ mr: 0.5 }} /> {t('clientVersions.maintenance.title')}
+	                    </Typography>
+	                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+	                      {t('clientVersions.maintenance.description')}
+	                    </Typography>
+
+	                    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
+	                      <Stack spacing={2}>
+	                        {/* 810ac80  2dc c791 c77c */}
+	                        <Controller
+	                          name="maintenanceStartDate"
+	                          control={control}
+	                          render={({ field }) => (
+	                            <DateTimePicker
+	                              label={t('clientVersions.maintenance.startDate')}
+	                              value={field.value ? dayjs(field.value) : null}
+	                              onChange={(date) => field.onChange(date ? date.toISOString() : '')}
+	                              slotProps={{
+	                                textField: {
+	                                  fullWidth: true,
+	                                  helperText: t('clientVersions.maintenance.startDateHelp'),
+	                                  error: !!errors.maintenanceStartDate,
+	                                },
+	                              }}
+	                            />
+	                          )}
+	                        />
+
+	                        {/* 810ac80  885 b8cc c77c */}
+	                        <Controller
+	                          name="maintenanceEndDate"
+	                          control={control}
+	                          render={({ field }) => (
+	                            <DateTimePicker
+	                              label={t('clientVersions.maintenance.endDate')}
+	                              value={field.value ? dayjs(field.value) : null}
+	                              onChange={(date) => field.onChange(date ? date.toISOString() : '')}
+	                              slotProps={{
+	                                textField: {
+	                                  fullWidth: true,
+	                                  helperText: t('clientVersions.maintenance.endDateHelp'),
+	                                  error: !!errors.maintenanceEndDate,
+	                                },
+	                              }}
+	                            />
+	                          )}
+	                        />
+
+	                        {/*
+cc00 b110 810ac80  911 c2dc c9c0 */}
+	                        <Controller
+	                          name="maintenanceMessage"
+	                          control={control}
+	                          render={({ field }) => (
+	                            <TextField
+	                              {...field}
+	                              fullWidth
+	                              multiline
+	                              rows={3}
+	                              label={t('clientVersions.maintenance.defaultMessage')}
+	                              helperText={t('clientVersions.maintenance.defaultMessageHelp')}
+	                              error={!!errors.maintenanceMessage}
+	                              required={watch('clientStatus') === 'maintenance'}
+	                            />
+	                          )}
+	                        />
+
+	                        {/* 5b8 c5b4 bcc4 911 c2dc c9c0 0ac c6a9 5ec bd80 */}
+	                        <FormControlLabel
+	                          control={
+	                            <Switch
+	                              checked={supportsMultiLanguage}
+	                              onChange={(e) => handleSupportsMultiLanguageChange(e.target.checked)}
+	                            />
+	                          }
+	                          label={t('clientVersions.maintenance.supportsMultiLanguage')}
+	                        />
+	                        <Typography variant="caption" color="text.secondary">
+	                          {t('clientVersions.maintenance.supportsMultiLanguageHelp')}
+	                        </Typography>
+
+	                        {/* 5b8 c5b4 bcc4 911 c2dc c9c0 */}
+	                        {supportsMultiLanguage && (
+	                          <Box>
+	                            <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
+	                              {t('clientVersions.maintenance.languageSpecificMessages')}
+	                            </Typography>
+
+	                            {/* a50 b113 5b8 c5b4 bcc4 911 c2dc c9c0 785 b825 */}
+	                            {availableLanguages.map((lang) => {
+	                              const locale = maintenanceLocales.find(l => l.lang === lang.code);
+	                              return (
+	                                <Box key={lang.code} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+	                                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
+	                                    {lang.label}
+	                                  </Typography>
+	                                  <TextField
+	                                    fullWidth
+	                                    multiline
+	                                    rows={3}
+	                                    value={locale?.message || ''}
+	                                    onChange={(e) => updateMaintenanceLocale(lang.code, e.target.value)}
+	                                    placeholder={t(`maintenanceMessage.${lang.code}Help`)}
+	                                  />
+	                                </Box>
+	                              );
+	                            })}
+	                          </Box>
+	                        )}
+	                      </Stack>
+	                    </LocalizationProvider>
+	                  </Box>
+	                )}
+
               </Stack>
             </Paper>
 
-            {/* 점검 설정 섹션 */}
-            {isMaintenanceMode && (
-              <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="h6" gutterBottom sx={{ color: 'warning.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  🔧 {t('clientVersions.maintenance.title')}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  {t('clientVersions.maintenance.description')}
-                </Typography>
-
-                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
-                  <Stack spacing={2}>
-                    {/* 점검 시작일 */}
-                    <Controller
-                      name="maintenanceStartDate"
-                      control={control}
-                      render={({ field }) => (
-                        <DateTimePicker
-                          label={t('clientVersions.maintenance.startDate')}
-                          value={field.value ? dayjs(field.value) : null}
-                          onChange={(date) => field.onChange(date ? date.toISOString() : '')}
-                          slotProps={{
-                            textField: {
-                              fullWidth: true,
-                              helperText: t('clientVersions.maintenance.startDateHelp'),
-                              error: !!errors.maintenanceStartDate,
-                            },
-                          }}
-                        />
-                      )}
-                    />
-
-                    {/* 점검 종료일 */}
-                    <Controller
-                      name="maintenanceEndDate"
-                      control={control}
-                      render={({ field }) => (
-                        <DateTimePicker
-                          label={t('clientVersions.maintenance.endDate')}
-                          value={field.value ? dayjs(field.value) : null}
-                          onChange={(date) => field.onChange(date ? date.toISOString() : '')}
-                          slotProps={{
-                            textField: {
-                              fullWidth: true,
-                              helperText: t('clientVersions.maintenance.endDateHelp'),
-                              error: !!errors.maintenanceEndDate,
-                            },
-                          }}
-                        />
-                      )}
-                    />
-
-                    {/* 기본 점검 메시지 */}
-                    <Controller
-                      name="maintenanceMessage"
-                      control={control}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          fullWidth
-                          multiline
-                          rows={3}
-                          label={t('clientVersions.maintenance.defaultMessage')}
-                          helperText={t('clientVersions.maintenance.defaultMessageHelp')}
-                          error={!!errors.maintenanceMessage}
-                          required={watch('clientStatus') === 'maintenance'}
-                        />
-                      )}
-                    />
-
-                    {/* 언어별 메시지 사용 여부 */}
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={supportsMultiLanguage}
-                          onChange={(e) => handleSupportsMultiLanguageChange(e.target.checked)}
-                        />
-                      }
-                      label={t('clientVersions.maintenance.supportsMultiLanguage')}
-                    />
-                    <Typography variant="caption" color="text.secondary">
-                      {t('clientVersions.maintenance.supportsMultiLanguageHelp')}
-                    </Typography>
-
-                    {/* 언어별 메시지 */}
-                    {supportsMultiLanguage && (
-                      <Box>
-                        <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
-                          {t('clientVersions.maintenance.languageSpecificMessages')}
-                        </Typography>
-
-                        {/* 모든 언어별 메시지 입력 */}
-                        {availableLanguages.map((lang) => {
-                          const locale = maintenanceLocales.find(l => l.lang === lang.code);
-                          return (
-                            <Box key={lang.code} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-                              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                                {lang.label}
-                              </Typography>
-                              <TextField
-                                fullWidth
-                                multiline
-                                rows={3}
-                                value={locale?.message || ''}
-                                onChange={(e) => updateMaintenanceLocale(lang.code, e.target.value)}
-                                placeholder={t(`maintenanceMessage.${lang.code}Help`)}
-                              />
-                            </Box>
-                          );
-                        })}
-                      </Box>
-                    )}
-                  </Stack>
-                </LocalizationProvider>
-              </Paper>
-            )}
 
             {/* 태그 선택 섹션: 추가 설정 위로 이동 */}
             <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>

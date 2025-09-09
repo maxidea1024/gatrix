@@ -50,7 +50,7 @@ class ApiService {
         return config;
       },
       (error) => {
-        console.log('Request interceptor error:', error);
+        console.error('Request interceptor error:', error);
         return Promise.reject(error);
       }
     );
