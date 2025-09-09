@@ -461,7 +461,7 @@ const ClientVersionsPage: React.FC = () => {
     setIsCopyMode(true);
     setFormDialogOpen(true);
 
-    enqueueSnackbar(t('clientVersions.copySuccess'), { variant: 'success' });
+
   }, [t, enqueueSnackbar]);
 
   // 태그 관련 핸들러
