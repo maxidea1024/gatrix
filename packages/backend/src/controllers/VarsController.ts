@@ -22,7 +22,8 @@ export class VarsController {
       } else {
         toStore = JSON.stringify(incoming);
       }
-      await VarsModel.set(key, toStore);
+      const userId = (req as any).user?.userId || (req as any).user?.id;
+      await VarsModel.set(key, toStore, userId);
       res.json({ success: true, message: 'Variable saved', data: { key, value: incoming } });
     } catch (e) { next(e); }
   }

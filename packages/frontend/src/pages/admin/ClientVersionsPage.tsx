@@ -47,6 +47,7 @@ import {
   ContentCopy as CopyIcon,
   Cancel as CancelIcon,
   Update as UpdateIcon,
+  Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -62,6 +63,7 @@ import {
 import { ClientVersionService } from '../../services/clientVersionService';
 import ClientVersionForm from '../../components/admin/ClientVersionForm';
 import BulkClientVersionForm from '../../components/admin/BulkClientVersionForm';
+import PlatformDefaultsDialog from '../../components/admin/PlatformDefaultsDialog';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
@@ -125,6 +127,7 @@ const ClientVersionsPage: React.FC = () => {
   const [bulkStatus, setBulkStatus] = useState<ClientStatus>(ClientStatus.ONLINE);
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [bulkFormDialogOpen, setBulkFormDialogOpen] = useState(false);
+  const [platformDefaultsDialogOpen, setPlatformDefaultsDialogOpen] = useState(false);
   const [editingClientVersion, setEditingClientVersion] = useState<ClientVersion | null>(null);
   const [isCopyMode, setIsCopyMode] = useState(false);
 
@@ -521,6 +524,16 @@ const ClientVersionsPage: React.FC = () => {
             }}
           >
             {t('clientVersions.addBulk')}
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<SettingsIcon />}
+            onClick={() => {
+              setPlatformDefaultsDialogOpen(true);
+            }}
+            sx={{ ml: 1 }}
+          >
+            {t('platformDefaults.title')}
           </Button>
         </Box>
       </Box>
@@ -1074,6 +1087,12 @@ const ClientVersionsPage: React.FC = () => {
           loadAvailableVersions(); // 버전 목록도 갱신
           setBulkFormDialogOpen(false);
         }}
+      />
+
+      {/* 플랫폼 기본값 설정 다이얼로그 */}
+      <PlatformDefaultsDialog
+        open={platformDefaultsDialogOpen}
+        onClose={() => setPlatformDefaultsDialogOpen(false)}
       />
 
       {/* 일괄 삭제 확인 다이얼로그 */}

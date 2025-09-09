@@ -10,11 +10,11 @@ export default class VarsModel {
     return result?.varValue ?? null;
   }
 
-  static async set(key: string, value: string | null): Promise<void> {
+  static async set(key: string, value: string | null, userId: number): Promise<void> {
     await db('g_vars')
-      .insert({ varKey: key, varValue: value })
+      .insert({ varKey: key, varValue: value, createdBy: userId })
       .onConflict('varKey')
-      .merge({ varValue: value });
+      .merge({ varValue: value, updatedBy: userId });
   }
 }
 

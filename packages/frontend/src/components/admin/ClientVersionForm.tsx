@@ -55,6 +55,8 @@ import {
 } from '../../types/clientVersion';
 import { ClientVersionService } from '../../services/clientVersionService';
 import { tagService } from '../../services/tagService';
+import { PlatformDefaultsService } from '../../services/platformDefaultsService';
+import { AVAILABLE_PLATFORMS } from '../../constants/platforms';
 import JsonEditor from '../common/JsonEditor';
 
 interface ClientVersionFormProps {
@@ -183,6 +185,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
     reset,
     watch,
     setValue,
+    getValues,
   } = useForm<ClientVersionFormData>({
     resolver: yupResolver(createValidationSchema(t)),
     defaultValues,
@@ -236,6 +239,26 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         setSelectedTags([]);
         setMaintenanceLocales([]);
         setSupportsMultiLanguage(false);
+
+        // 초기 플랫폼(예: 'pc')에 대한 기본값을 즉시 적용 (필드가 비어있는 경우에만)
+        (async () => {
+          try {
+            const initialPlatform = getValues('platform') || defaultValues.platform;
+            if (initialPlatform) {
+              const defaults = await PlatformDefaultsService.getPlatformDefaults(initialPlatform);
+              const currentGame = getValues('gameServerAddress');
+              const currentPatch = getValues('patchAddress');
+              if (!currentGame && defaults.gameServerAddress) {
+                setValue('gameServerAddress', defaults.gameServerAddress);
+              }
+              if (!currentPatch && defaults.patchAddress) {
+                setValue('patchAddress', defaults.patchAddress);
+              }
+            }
+          } catch (e) {
+            console.error('Failed to apply initial platform defaults:', e);
+          }
+        })();
       }
       setDuplicateError(null);
 
@@ -354,6 +377,34 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       setDuplicateError(null);
     }
   }, [watchedValues, isEdit, clientVersion?.id, t]);
+
+  // 플랫폼 변경 시 기본값 적용
+  const watchedPlatform = watch('platform');
+  useEffect(() => {
+    if (watchedPlatform && !isEdit) { // 새로 추가하는 경우에만 기본값 적용
+      const applyDefaults = async () => {
+        try {
+          const defaults = await PlatformDefaultsService.getPlatformDefaults(watchedPlatform);
+
+          // 현재 값이 비어있는 경우에만 기본값 적용
+          const currentGameServerAddress = getValues('gameServerAddress');
+          const currentPatchAddress = getValues('patchAddress');
+
+          if (!currentGameServerAddress && defaults.gameServerAddress) {
+            setValue('gameServerAddress', defaults.gameServerAddress);
+          }
+
+          if (!currentPatchAddress && defaults.patchAddress) {
+            setValue('patchAddress', defaults.patchAddress);
+          }
+        } catch (error) {
+          console.error('Failed to apply platform defaults:', error);
+        }
+      };
+
+      applyDefaults();
+    }
+  }, [watchedPlatform, isEdit, setValue, getValues]);
 
   // 폼 제출
   const onSubmit: SubmitHandler<ClientVersionFormData> = async (data) => {
@@ -537,8 +588,32 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                         labelId="cvf-platform-label"
                         {...field}
                         label={`${t('clientVersions.platform')} *`}
+                        onChange={async (e) => {
+                          field.onChange(e);
+
+                          // 새로 추가하는 경우에만 기본값 적용
+                          if (!isEdit && e.target.value) {
+                            try {
+                              const defaults = await PlatformDefaultsService.getPlatformDefaults(e.target.value as string);
+
+                              // 현재 값이 비어있는 경우에만 기본값 적용
+                              const currentGameServerAddress = getValues('gameServerAddress');
+                              const currentPatchAddress = getValues('patchAddress');
+
+                              if (!currentGameServerAddress && defaults.gameServerAddress) {
+                                setValue('gameServerAddress', defaults.gameServerAddress);
+                              }
+
+                              if (!currentPatchAddress && defaults.patchAddress) {
+                                setValue('patchAddress', defaults.patchAddress);
+                              }
+                            } catch (error) {
+                              console.error('Failed to apply platform defaults:', error);
+                            }
+                          }
+                        }}
                       >
-                        {['pc','pc-wegame','ios','android','harmonyos'].map((p) => (
+                        {AVAILABLE_PLATFORMS.map((p) => (
                           <MenuItem key={p} value={p}>
                             {p}
                           </MenuItem>

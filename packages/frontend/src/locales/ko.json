@@ -453,6 +453,8 @@
       "selectPlatforms": "플랫폼 선택",
       "serverAddresses": "서버 주소",
       "serverAddressesDescription": "게임 서버와 패치 서버의 주소를 설정하세요.",
+      "gameServerAddress": "게임 서버 주소",
+      "patchAddress": "패치 주소",
       "statusHelp": "상태를 선택하세요",
       "tagsHelp": "클라이언트 버전에 적용할 태그를 선택하세요.",
       "statusRequired": "상태가 필요합니다",
@@ -877,7 +879,7 @@
     "hiddenWorlds": "숨겨진 월드",
     "hideGameWorld": "게임 월드 숨기기",
     "loading": "로딩 중",
-    "maintenance": "점검",
+    "maintenanceLabel": "점검",
     "maintenanceToggled": "점검 모드 전환됨",
     "maintenanceWorlds": "점검 중인 월드",
     "moveDown": "아래로 이동",
@@ -1352,5 +1354,19 @@
     "koHelp": "한국어 사용자에게 표시될 점검 메시지를 입력하세요",
     "enHelp": "영어 사용자에게 표시될 점검 메시지를 입력하세요",
     "zhHelp": "중국어 사용자에게 표시될 점검 메시지를 입력하세요"
+  },
+  "platformDefaults": {
+    "title": "플랫폼별 기본값 설정",
+    "description": "각 플랫폼별로 게임서버 주소와 패치서버 주소의 기본값을 설정할 수 있습니다. 클라이언트 버전 추가/편집 시 해당 필드가 비어있으면 여기서 설정한 기본값이 자동으로 채워집니다.",
+    "addPlatform": "새 플랫폼 추가",
+    "platformName": "플랫폼 이름",
+    "platformNameRequired": "플랫폼 이름을 입력해주세요",
+    "platformExists": "이미 존재하는 플랫폼입니다",
+    "noPlatforms": "설정된 플랫폼이 없습니다. 새 플랫폼을 추가해주세요.",
+    "gameServerAddressHelp": "이 플랫폼의 기본 게임서버 주소",
+    "patchAddressHelp": "이 플랫폼의 기본 패치서버 주소",
+    "loadError": "플랫폼 기본값을 불러오는데 실패했습니다",
+    "saveSuccess": "플랫폼 기본값이 저장되었습니다",
+    "saveError": "플랫폼 기본값 저장에 실패했습니다"
   }
 }

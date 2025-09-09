@@ -228,7 +228,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
           >
             <Chip
               icon={<MaintenanceIcon />}
-              label={t('gameWorlds.maintenance')}
+              label={t('gameWorlds.maintenanceLabel')}
               color="warning"
               size="small"
               onClick={() => onToggleMaintenance(world.id)}
@@ -932,7 +932,7 @@ const GameWorldsPage: React.FC = () => {
                     <TableCell>{t('gameWorlds.worldId')}</TableCell>
                     <TableCell>{t('gameWorlds.name')}</TableCell>
                     <TableCell>{t('gameWorlds.visible')}</TableCell>
-                    <TableCell>{t('gameWorlds.maintenance')}</TableCell>
+                    <TableCell>{t('gameWorlds.maintenanceLabel')}</TableCell>
                     <TableCell>{t('gameWorlds.description')}</TableCell>
                     <TableCell>{t('gameWorlds.tags')}</TableCell>
                     <TableCell>{t('gameWorlds.creator')}</TableCell>

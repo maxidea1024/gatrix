@@ -444,6 +444,8 @@
       "selectPlatforms": "Select Platforms",
       "serverAddresses": "Server Addresses",
       "serverAddressesDescription": "Configure game server and patch server addresses.",
+      "gameServerAddress": "Game Server Address",
+      "patchAddress": "Patch Address",
       "statusHelp": "Specify the status of the game. (Online, Offline, Recommended Update, Forced Update, Under Review, Blocked & Patch Allowed, Maintenance)",
       "tagsHelp": "Select tags to apply to this client version.",
       "statusRequired": "Status is required",
@@ -826,7 +828,7 @@
     "hiddenWorlds": "Hidden Worlds",
     "hideGameWorld": "Hide Game World",
     "loading": "Loading...",
-    "maintenance": "Maintenance",
+    "maintenanceLabel": "Maintenance",
     "maintenanceToggled": "Maintenance status toggled successfully",
     "maintenanceWorlds": "Under Maintenance",
     "moveDown": "Move Down",
@@ -1209,5 +1211,19 @@
     "koHelp": "Enter maintenance message for Korean users",
     "enHelp": "Enter maintenance message for English users",
     "zhHelp": "Enter maintenance message for Chinese users"
+  },
+  "platformDefaults": {
+    "title": "Platform Default Settings",
+    "description": "Set default game server and patch server addresses for each platform. When adding/editing client versions, these default values will be automatically filled if the corresponding fields are empty.",
+    "addPlatform": "Add New Platform",
+    "platformName": "Platform Name",
+    "platformNameRequired": "Please enter platform name",
+    "platformExists": "Platform already exists",
+    "noPlatforms": "No platforms configured. Please add a new platform.",
+    "gameServerAddressHelp": "Default game server address for this platform",
+    "patchAddressHelp": "Default patch server address for this platform",
+    "loadError": "Failed to load platform defaults",
+    "saveSuccess": "Platform defaults saved successfully",
+    "saveError": "Failed to save platform defaults"
   }
 }

@@ -48,6 +48,8 @@ import {
 import { ClientVersionService } from '../../services/clientVersionService';
 import FormDialogHeader from '../common/FormDialogHeader';
 import { tagService } from '../../services/tagService';
+import { PlatformDefaultsService } from '../../services/platformDefaultsService';
+import { AVAILABLE_PLATFORMS } from '../../constants/platforms';
 
 // 클라이언트 상태 라벨 매핑
 const ClientStatusLabels = {
@@ -66,14 +68,6 @@ interface BulkClientVersionFormProps {
   onSuccess: () => void;
 }
 
-// 사용 가능한 플랫폼 목록 (기존 개별 추가 폼과 동일)
-const AVAILABLE_PLATFORMS = [
-  'pc',
-  'pc-wegame',
-  'ios',
-  'android',
-  'harmonyos',
-];
 
 // 폼 유효성 검사 스키마
 const createValidationSchema = (t: any) => yup.object({
@@ -287,16 +281,36 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   const currentStatus = watch('clientStatus');
   const isMaintenanceMode = currentStatus === ClientStatus.MAINTENANCE;
 
-  // 선택된 플랫폼이 변경될 때 platforms 배열 업데이트
+  // 선택된 플랫폼이 변경될 때 platforms 배열 업데이트 및 기본값 적용
   useEffect(() => {
-    const newPlatforms: PlatformSpecificSettings[] = selectedPlatforms.map(platform => ({
-      platform,
-      gameServerAddress: '',
-      gameServerAddressForWhiteList: '',
-      patchAddress: '',
-      patchAddressForWhiteList: '',
-    }));
-    setValue('platforms', newPlatforms);
+    const applyPlatformDefaults = async () => {
+      const newPlatforms: PlatformSpecificSettings[] = await Promise.all(
+        selectedPlatforms.map(async (platform) => {
+          try {
+            const defaults = await PlatformDefaultsService.getPlatformDefaults(platform);
+            return {
+              platform,
+              gameServerAddress: defaults.gameServerAddress || '',
+              gameServerAddressForWhiteList: '',
+              patchAddress: defaults.patchAddress || '',
+              patchAddressForWhiteList: '',
+            };
+          } catch (error) {
+            console.error(`Failed to get defaults for platform ${platform}:`, error);
+            return {
+              platform,
+              gameServerAddress: '',
+              gameServerAddressForWhiteList: '',
+              patchAddress: '',
+              patchAddressForWhiteList: '',
+            };
+          }
+        })
+      );
+      setValue('platforms', newPlatforms);
+    };
+
+    applyPlatformDefaults();
   }, [selectedPlatforms, setValue]);
 
   // 플랫폼 선택 핸들러

@@ -25,7 +25,8 @@ export class MaintenanceController {
   static async setStatus(req: Request, res: Response, next: NextFunction) {
     try {
       const payload = req.body as MaintenancePayload;
-      await VarsModel.set(KEY, payload.isMaintenance ? 'true' : 'false');
+      const userId = (req as any).user?.userId || (req as any).user?.id;
+      await VarsModel.set(KEY, payload.isMaintenance ? 'true' : 'false', userId);
       const detail = {
         type: payload.type || 'regular',
         endsAt: payload.endsAt || null,
@@ -33,7 +34,7 @@ export class MaintenanceController {
         messages: payload.messages || {},
         updatedAt: new Date().toISOString(),
       };
-      await VarsModel.set(KEY_DETAIL, JSON.stringify(detail));
+      await VarsModel.set(KEY_DETAIL, JSON.stringify(detail), userId);
       res.json({ success: true, message: 'Maintenance setting updated', data: { isUnderMaintenance: payload.isMaintenance, detail } });
     } catch (e) { next(e); }
   }
@@ -50,7 +51,8 @@ export class MaintenanceController {
     try {
       // Each template: { message?: string, messages?: { ko?: string, en?: string, zh?: string } }
       const templates = Array.isArray(req.body?.templates) ? req.body.templates : [];
-      await VarsModel.set('maintenanceTemplates', JSON.stringify(templates));
+      const userId = (req as any).user?.userId || (req as any).user?.id;
+      await VarsModel.set('maintenanceTemplates', JSON.stringify(templates), userId);
       res.json({ success: true, message: 'Templates saved', data: { templates } });
     } catch (e) { next(e); }
   }

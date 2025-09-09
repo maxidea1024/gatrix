@@ -445,6 +445,8 @@
       "selectPlatforms": "选择平台",
       "serverAddresses": "服务器地址",
       "serverAddressesDescription": "配置游戏服务器和补丁服务器地址。",
+      "gameServerAddress": "游戏服务器地址",
+      "patchAddress": "补丁地址",
       "statusHelp": "请选择状态",
       "tagsHelp": "选择要应用到此客户端版本的标签。",
       "statusRequired": "状态必填",
@@ -821,7 +823,7 @@
     "hiddenWorlds": "隐藏世界",
     "hideGameWorld": "隐藏游戏世界",
     "loading": "加载中...",
-    "maintenance": "维护",
+    "maintenanceLabel": "维护",
     "maintenanceToggled": "维护状态切换成功",
     "maintenanceWorlds": "维护中",
     "moveDown": "下移",
@@ -1186,5 +1188,19 @@
     "koHelp": "输入韩语用户的维护消息",
     "enHelp": "输入英语用户的维护消息",
     "zhHelp": "输入中文用户的维护消息"
+  },
+  "platformDefaults": {
+    "title": "平台默认设置",
+    "description": "为每个平台设置游戏服务器和补丁服务器地址的默认值。在添加/编辑客户端版本时，如果相应字段为空，将自动填入这里设置的默认值。",
+    "addPlatform": "添加新平台",
+    "platformName": "平台名称",
+    "platformNameRequired": "请输入平台名称",
+    "platformExists": "平台已存在",
+    "noPlatforms": "未配置平台。请添加新平台。",
+    "gameServerAddressHelp": "此平台的默认游戏服务器地址",
+    "patchAddressHelp": "此平台的默认补丁服务器地址",
+    "loadError": "加载平台默认值失败",
+    "saveSuccess": "平台默认值保存成功",
+    "saveError": "保存平台默认值失败"
   }
 }
