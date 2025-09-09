@@ -417,7 +417,7 @@
     "changeStatus": "상태 변경",
     "copySuccess": "복사 성공",
     "copyVersion": "버전 복사",
-    "createSuccess": "생성 성공",
+    "createSuccess": "클라이언트 버전 [{{version}}:{{platform}}] 을 등록했습니다.",
     "customPayload": "사용자 정의 페이로드",
     "deleteConfirmTitle": "삭제 확인",
     "deleteConfirmMessage": "정말로 이 클라이언트 버전을 삭제하시겠습니까?",

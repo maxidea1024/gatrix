@@ -501,7 +501,12 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         if (!clientVersionId) {
           throw new Error(t('common.cannotGetClientVersionId'));
         }
-        enqueueSnackbar(t('clientVersions.createSuccess'), { variant: 'success' });
+        enqueueSnackbar(
+          <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75 }}>
+            클라이언트 버전 <Chip size="small" color="primary" label={`${data.clientVersion}:${String(data.platform || '').toUpperCase()}`} sx={{ fontWeight: 600 }} /> 을 등록했습니다.
+          </Box>,
+          { variant: 'success' }
+        );
       }
 
       // 태그 설정

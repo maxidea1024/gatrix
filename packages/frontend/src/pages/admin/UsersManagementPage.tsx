@@ -1034,7 +1034,7 @@ const UsersManagementPage: React.FC = () => {
               setRowsPerPage(parseInt(e.target.value, 10));
               setPage(0);
             }}
-            rowsPerPageOptions={[5, 10, 25, 50]}
+            rowsPerPageOptions={[5, 10, 25, 50, 100]}
           />
         </CardContent>
       </Card>

@@ -436,6 +436,7 @@ const ClientVersionsPage: React.FC = () => {
 
     // 복사할 데이터 준비 (버전 필드는 비움)
     const copiedData = {
+      id: clientVersion.id, // 상세 재조회(maintenanceLocales 포함)를 위해 원본 id를 전달. 저장 시에는 isCopyMode로 신규 생성 처리됨
       platform: clientVersion.platform,
       clientVersion: '', // 버전은 비워둠
       clientStatus: clientVersion.clientStatus,
