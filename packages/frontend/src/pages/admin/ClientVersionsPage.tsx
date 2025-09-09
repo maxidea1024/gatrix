@@ -506,7 +506,8 @@ const ClientVersionsPage: React.FC = () => {
             {t('common.export')}
           </Button>
           <Button
-            variant="outlined"
+            variant="contained"
+            color="primary"
             startIcon={<AddIcon />}
             onClick={() => {
               setEditingClientVersion(null);
@@ -518,6 +519,7 @@ const ClientVersionsPage: React.FC = () => {
           </Button>
           <Button
             variant="contained"
+            color="primary"
             startIcon={<AddIcon />}
             onClick={() => {
               setBulkFormDialogOpen(true);
@@ -525,16 +527,18 @@ const ClientVersionsPage: React.FC = () => {
           >
             {t('clientVersions.addBulk')}
           </Button>
-          <Button
-            variant="outlined"
-            startIcon={<SettingsIcon />}
-            onClick={() => {
-              setPlatformDefaultsDialogOpen(true);
-            }}
-            sx={{ ml: 1 }}
-          >
-            {t('platformDefaults.title')}
-          </Button>
+          <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+          <Tooltip title={t('platformDefaults.title')}>
+            <IconButton
+              aria-label={t('platformDefaults.title')}
+              onClick={() => {
+                setPlatformDefaultsDialogOpen(true);
+              }}
+              size="medium"
+            >
+              <SettingsIcon />
+            </IconButton>
+          </Tooltip>
         </Box>
       </Box>
 

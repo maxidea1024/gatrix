@@ -116,9 +116,7 @@
       "verificationEmailSent": "验证邮件已发送",
       "verificationEmailError": "发送验证邮件时发生错误"
     },
-    "gameWorlds": {
-      "title": "游戏世界"
-    },
+
     "scheduler": {
       "title": "调度器管理"
     },
@@ -389,7 +387,7 @@
   "clientStatus": "客户端状态",
   "clientVersion": "客户端版本",
   "clientVersions": {
-    "description": "游戏客户端版本管理及服务器连接配置",
+    "description": "按平台新增和编辑客户端版本，管理游戏服务器与补丁服务器地址，并配置更新策略。",
     "addNew": "添加新版本",
     "addIndividual": "添加单个版本",
     "addBulk": "快速添加",
@@ -840,6 +838,7 @@
     "startMaintenance": "开始维护",
     "tags": "标签",
     "title": "游戏世界管理",
+    "subtitle": "创建和编辑游戏世界，管理可见性和维护状态，并配置描述和标签。",
     "totalWorlds": "总世界数",
     "underMaintenance": "维护中",
     "visibilityToggled": "可见性切换成功",

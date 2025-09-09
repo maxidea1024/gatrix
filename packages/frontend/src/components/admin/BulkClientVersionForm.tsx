@@ -24,6 +24,9 @@ import {
   Divider,
   Autocomplete,
   IconButton,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@mui/material';
 import { Cancel as CancelIcon, Save as SaveIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -620,13 +623,16 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
             )}
 
             {/* 추가 설정 섹션 */}
-            <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
-              <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-                ⚙️ {t('clientVersions.form.additionalSettings')}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                {t('clientVersions.form.additionalSettingsDescription')}
-              </Typography>
+            <Accordion defaultExpanded={false} disableGutters sx={{ border: '1px solid', borderColor: 'divider', bgcolor: 'background.default' }}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="subtitle1" sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  ⚙️ {t('clientVersions.form.additionalSettings')}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {t('clientVersions.form.additionalSettingsDescription')}
+                </Typography>
 
               <Stack spacing={2}>
                 {/* 게스트 모드 허용 */}
@@ -686,7 +692,8 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                   )}
                 />
               </Stack>
-            </Paper>
+            </AccordionDetails>
+            </Accordion>
 
             {/* 플랫폼별 서버 주소 설정 */}
             {selectedPlatforms.length > 0 && (

@@ -116,9 +116,7 @@
       "verificationEmailSent": "Verification email sent",
       "verificationEmailError": "Error occurred while sending verification email"
     },
-    "gameWorlds": {
-      "title": "Game Worlds"
-    },
+
     "scheduler": {
       "title": "Scheduler Management"
     },
@@ -388,7 +386,7 @@
   "clientStatus": "clientStatus",
   "clientVersion": "clientVersion",
   "clientVersions": {
-    "description": "Game client version management and server connection configuration",
+    "description": "Add and edit client versions by platform, manage game server and patch server addresses, and control update policies.",
     "addNew": "Add New Version",
     "addIndividual": "Add Individual Version",
     "addBulk": "Quick Add",
@@ -845,6 +843,7 @@
     "startMaintenance": "Start Maintenance",
     "tags": "Tags",
     "title": "Game Worlds Management",
+    "subtitle": "Create and edit game worlds, manage visibility and maintenance state, and configure descriptions and tags.",
     "totalWorlds": "Total Worlds",
     "underMaintenance": "Under maintenance",
     "visibilityToggled": "Visibility toggled successfully",

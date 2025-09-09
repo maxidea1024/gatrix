@@ -829,7 +829,7 @@ const GameWorldsPage: React.FC = () => {
             {t('gameWorlds.title')}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            {t('gameWorlds.description')}
+            {t('gameWorlds.subtitle') }
           </Typography>
         </Box>
         <Button
