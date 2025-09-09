@@ -890,7 +890,12 @@
       "englishHelp": "Maintenance message for English users",
       "chineseHelp": "Maintenance message for Chinese users",
       "messagePreview": "Maintenance Message Preview",
-      "messageRequired": "Default maintenance message is required when maintenance mode is enabled"
+      "messageRequired": "Default maintenance message is required when maintenance mode is enabled",
+      "translate": "Translate",
+      "translateTooltip": "Automatically translate the default maintenance message to multiple languages",
+      "translationCompleted": "Translation completed successfully",
+      "translationFailed": "Translation failed",
+      "noMessageToTranslate": "No message to translate"
     }
   },
   "genericWebhookUrl": "genericWebhookUrl",

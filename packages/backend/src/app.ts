@@ -34,6 +34,7 @@ import messageTemplateRoutes from './routes/messageTemplates';
 import jobRoutes from './routes/jobs';
 import varsRoutes from './routes/vars';
 import platformDefaultsRoutes from './routes/platformDefaults';
+import translationRoutes from './routes/translation';
 
 // import advancedSettingsRoutes from './routes/advancedSettings';
 import { authenticate, requireAdmin } from './middleware/auth';
@@ -196,6 +197,7 @@ app.use('/api/v1', maintenanceRoutes);
 app.use('/api/v1/message-templates', messageTemplateRoutes);
 app.use('/api/v1', jobRoutes);
 app.use('/api/v1/admin/platform-defaults', platformDefaultsRoutes);
+app.use('/api/v1/translation', translationRoutes);
 
 // app.use('/api/v1/advanced-settings', advancedSettingsRoutes);
 

@@ -49,6 +49,7 @@ import {
   Cancel as CancelIcon,
   Save as SaveIcon,
   ContentCopy as CopyIcon,
+  Translate as TranslateIcon,
   Refresh as RefreshIcon,
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
@@ -86,6 +87,7 @@ import { GameWorld, CreateGameWorldData, GameWorldMaintenanceLocale } from '../.
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
+import translationService from '../../services/translationService';
 
 // Sortable Row Component
 interface SortableRowProps {
@@ -327,7 +329,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
 };
 
 const GameWorldsPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
 
@@ -359,6 +361,9 @@ const GameWorldsPage: React.FC = () => {
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const worldIdRef = useRef<HTMLInputElement>(null);
+
+  // 번역 관련 상태
+  const [isTranslating, setIsTranslating] = useState(false);
 
 
   // Highlight & scroll for recently moved row
@@ -463,7 +468,7 @@ const GameWorldsPage: React.FC = () => {
 
   // 날짜 로케일 설정
   const getDateLocale = () => {
-    const currentLang = t('language') || 'ko';
+    const currentLang = i18n.language || 'ko';
     switch (currentLang) {
       case 'en':
         dayjs.locale('en');
@@ -476,6 +481,59 @@ const GameWorldsPage: React.FC = () => {
       default:
         dayjs.locale('ko');
         return 'ko';
+    }
+  };
+
+  // 번역 함수
+  const handleTranslateMaintenanceMessage = async () => {
+    if (!formData.maintenanceMessage || formData.maintenanceMessage.trim().length === 0) {
+      enqueueSnackbar(t('gameWorlds.maintenance.noMessageToTranslate'), { variant: 'warning' });
+      return;
+    }
+
+    setIsTranslating(true);
+    try {
+
+
+      const translations = await translationService.translateMaintenanceMessage(
+        formData.maintenanceMessage,
+        ['ko', 'en', 'zh']
+      );
+
+
+
+      // 번역 결과를 maintenanceLocales에 적용
+      const newLocales = availableLanguages.map(lang => {
+        const existingLocale = maintenanceLocales.find(l => l.lang === lang.code);
+        const translationResult = translations[lang.code];
+        const translatedMessage = translationResult?.translatedText || existingLocale?.message || '';
+
+
+
+
+        return {
+          lang: lang.code,
+          message: translatedMessage
+        };
+      });
+
+
+
+      setMaintenanceLocales(newLocales);
+      setFormData(prev => ({ ...prev, maintenanceLocales: newLocales }));
+
+      // 번역 후 자동으로 언어별 메시지 사용 활성화
+      if (!supportsMultiLanguage) {
+        setSupportsMultiLanguage(true);
+        setFormData(prev => ({ ...prev, supportsMultiLanguage: true }));
+      }
+
+      enqueueSnackbar(t('gameWorlds.maintenance.translationCompleted'), { variant: 'success' });
+    } catch (error: any) {
+      console.error('Translation error:', error);
+      enqueueSnackbar(t('gameWorlds.maintenance.translationFailed'), { variant: 'error' });
+    } finally {
+      setIsTranslating(false);
     }
   };
 
@@ -541,7 +599,7 @@ const GameWorldsPage: React.FC = () => {
 
         // 페이징 파라미터 제거: page/limit 미전송
         search: search || undefined,
-        tagIds: tagIds.length ? tagIds.join(',') : undefined,
+        tags: tagIds.length ? tagIds.join(',') : undefined,
       });
 
       setWorlds(result.worlds);
@@ -666,7 +724,7 @@ const GameWorldsPage: React.FC = () => {
         maintenanceStartDate: formData.maintenanceStartDate || undefined,
         maintenanceEndDate: formData.maintenanceEndDate || undefined,
         maintenanceMessage: formData.maintenanceMessage || undefined,
-        supportsMultiLanguage: formData.supportsMultiLanguage || false,
+        supportsMultiLanguage: Boolean(formData.supportsMultiLanguage),
         maintenanceLocales: maintenanceLocales.filter(l => l.message.trim() !== ''),
       };
 
@@ -1222,15 +1280,31 @@ const GameWorldsPage: React.FC = () => {
                     />
 
                     {/* 언어별 메시지 사용 여부 */}
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={supportsMultiLanguage}
-                          onChange={(e) => handleSupportsMultiLanguageChange(e.target.checked)}
-                        />
-                      }
-                      label={t('gameWorlds.maintenance.supportsMultiLanguage')}
-                    />
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={supportsMultiLanguage}
+                            onChange={(e) => handleSupportsMultiLanguageChange(e.target.checked)}
+                          />
+                        }
+                        label={t('gameWorlds.maintenance.supportsMultiLanguage')}
+                      />
+
+                      {/* 번역 버튼 */}
+                      <Tooltip title={t('gameWorlds.maintenance.translateTooltip')}>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          startIcon={isTranslating ? <CircularProgress size={16} /> : <TranslateIcon />}
+                          onClick={handleTranslateMaintenanceMessage}
+                          disabled={isTranslating || !formData.maintenanceMessage?.trim()}
+                          sx={{ minWidth: 'auto' }}
+                        >
+                          {t('gameWorlds.maintenance.translate')}
+                        </Button>
+                      </Tooltip>
+                    </Box>
                     <Typography variant="caption" color="text.secondary">
                       {t('gameWorlds.maintenance.supportsMultiLanguageHelp')}
                     </Typography>

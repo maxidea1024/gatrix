@@ -954,7 +954,12 @@
       "englishHelp": "영어 사용자에게 표시될 점검 메시지",
       "chineseHelp": "중국어 사용자에게 표시될 점검 메시지",
       "messagePreview": "점검 메시지 미리보기",
-      "messageRequired": "점검 모드일 때 기본 점검 메시지는 필수입니다"
+      "messageRequired": "점검 모드일 때 기본 점검 메시지는 필수입니다",
+      "translate": "번역",
+      "translateTooltip": "기본 점검 메시지를 여러 언어로 자동 번역합니다",
+      "translationCompleted": "번역이 완료되었습니다",
+      "translationFailed": "번역에 실패했습니다",
+      "noMessageToTranslate": "번역할 메시지가 없습니다"
     }
   },
   "genericWebhookUrl": "일반 웹훅 URL",
