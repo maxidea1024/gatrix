@@ -342,6 +342,7 @@ export class ClientVersionController {
 
     const updateData = {
       ...value,
+      createdBy: userId, // maintenanceLocales 새로 생성 시 필요
       updatedBy: userId,
     };
 

@@ -410,11 +410,19 @@ const GameWorldsPage: React.FC = () => {
   };
 
   const updateMaintenanceLocale = (lang: 'ko' | 'en' | 'zh', message: string) => {
-    const newLocales = maintenanceLocales.map(l =>
+    const existingIndex = maintenanceLocales.findIndex(l => l.lang === lang);
+    let newLocales;
 
+    if (existingIndex >= 0) {
+      // 기존 언어 업데이트
+      newLocales = maintenanceLocales.map(l =>
+        l.lang === lang ? { ...l, message } : l
+      );
+    } else {
+      // 새 언어 추가
+      newLocales = [...maintenanceLocales, { lang, message }];
+    }
 
-      l.lang === lang ? { ...l, message } : l
-    );
     setMaintenanceLocales(newLocales);
     setFormData(prev => ({ ...prev, maintenanceLocales: newLocales }));
   };
@@ -430,18 +438,16 @@ const GameWorldsPage: React.FC = () => {
     setSupportsMultiLanguage(enabled);
     setFormData(prev => ({ ...prev, supportsMultiLanguage: enabled }));
     if (enabled) {
-      // 모든 언어를 자동으로 초기화
-      const allLanguageLocales = availableLanguages.map(lang => ({
-        lang: lang.code,
-        message: ''
-      }));
-      setMaintenanceLocales(allLanguageLocales);
-
-
-      setFormData(prev => ({ ...prev, maintenanceLocales: allLanguageLocales }));
+      // 활성화 시, 기존 값을 보존하면서 누락된 언어만 추가
+      const merged = availableLanguages.map((lang) => {
+        const existing = maintenanceLocales.find(l => l.lang === lang.code);
+        return { lang: lang.code, message: existing?.message || '' };
+      });
+      setMaintenanceLocales(merged);
+      setFormData(prev => ({ ...prev, maintenanceLocales: merged }));
     } else {
-      setMaintenanceLocales([]);
-      setFormData(prev => ({ ...prev, maintenanceLocales: [] }));
+      // 비활성화 시, 입력값은 유지하고 UI만 숨김 (state/form 값은 건드리지 않음)
+      // no-op
     }
   };
 
@@ -587,6 +593,11 @@ const GameWorldsPage: React.FC = () => {
 
   const handleEditWorld = (world: GameWorld) => {
     setEditingWorld(world);
+
+    // 언어별 메시지가 있는지 확인
+    const hasMaintenanceLocales = world.maintenanceLocales && world.maintenanceLocales.length > 0;
+    const shouldEnableMultiLanguage = (world.supportsMultiLanguage ?? false) || hasMaintenanceLocales;
+
     setFormData({
       worldId: world.worldId,
       name: world.name,
@@ -596,13 +607,13 @@ const GameWorldsPage: React.FC = () => {
       maintenanceStartDate: world.maintenanceStartDate || '',
       maintenanceEndDate: world.maintenanceEndDate || '',
       maintenanceMessage: world.maintenanceMessage || '',
-      supportsMultiLanguage: world.supportsMultiLanguage || false,
+      supportsMultiLanguage: shouldEnableMultiLanguage,
       maintenanceLocales: world.maintenanceLocales || [],
       tagIds: (world.tags || []).map(t => t.id),
     });
     setFormTags((world.tags || []));
     setMaintenanceLocales(world.maintenanceLocales || []);
-    setSupportsMultiLanguage(world.supportsMultiLanguage || false);
+    setSupportsMultiLanguage(shouldEnableMultiLanguage);
     setFormErrors({});
     setDialogOpen(true);
   };
@@ -1160,7 +1171,7 @@ const GameWorldsPage: React.FC = () => {
             </Box>
 
             {/* 점검 설정 섹션 */}
-            {formData.isMaintenance && (
+            {!!formData.isMaintenance && (
               <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
                 <Typography variant="h6" gutterBottom sx={{ color: 'warning.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                   🔧 {t('gameWorlds.maintenance.title')}

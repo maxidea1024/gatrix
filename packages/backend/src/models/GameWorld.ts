@@ -233,7 +233,22 @@ export class GameWorldModel {
       }
 
       const worlds = await query.orderBy(`gw.${sortBy}`, sortOrder);
-      return worlds;
+
+      // 각 게임월드에 대해 maintenanceLocales 추가
+      const worldsWithLocales = await Promise.all(
+        worlds.map(async (world: any) => {
+          const maintenanceLocales = await db('g_game_world_maintenance_locales')
+            .where('gameWorldId', world.id)
+            .select('lang', 'message');
+
+          return {
+            ...world,
+            maintenanceLocales: maintenanceLocales || []
+          };
+        })
+      );
+
+      return worldsWithLocales;
     } catch (error) {
       logger.error('Error listing game worlds:', error);
       throw error;

@@ -606,7 +606,7 @@ const WhitelistPage: React.FC = () => {
                         onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
                         required
                         placeholder={t('whitelist.form.accountIdPlaceholder')}
-                        error={formData.accountId && (formData.accountId.trim().length < 4 || formData.accountId.trim().length > 36)}
+                        error={!!(formData.accountId && (formData.accountId.trim().length < 4 || formData.accountId.trim().length > 36))}
                         helperText={
                           formData.accountId && (formData.accountId.trim().length < 4 || formData.accountId.trim().length > 36)
                             ? t('whitelist.form.accountIdValidation')
