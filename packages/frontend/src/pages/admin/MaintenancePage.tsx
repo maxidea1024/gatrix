@@ -133,7 +133,7 @@ const MaintenancePage: React.FC = () => {
                   {baseMsg && (
                     <Card variant="outlined" sx={{ mt: 1 }}>
                       <CardContent>
-                        <Typography variant="subtitle2" gutterBottom>{t('admin.maintenance.defaultMessage')}</Typography>
+                        <Typography variant="subtitle2" gutterBottom>{t('clientVersions.maintenance.defaultMessage')}</Typography>
                         <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{baseMsg}</Typography>
                         {locales.length > 0 && (
                           <Stack spacing={1} sx={{ mt: 2 }}>
@@ -185,7 +185,7 @@ const MaintenancePage: React.FC = () => {
                       {tpls.find(t=>t.id===selectedTplId) && (
                         <Card variant="outlined">
                           <CardContent>
-                            <Typography variant="subtitle2" gutterBottom>{t('admin.maintenance.defaultMessage')}</Typography>
+                            <Typography variant="subtitle2" gutterBottom>{t('clientVersions.maintenance.defaultMessage')}</Typography>
                             <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{tpls.find(t=>t.id===selectedTplId)?.default_message || '-'}</Typography>
                             <Stack spacing={1} sx={{ mt: 2 }}>
                               {(tpls.find(t=>t.id===selectedTplId)?.locales || []).map(l => (
@@ -203,29 +203,70 @@ const MaintenancePage: React.FC = () => {
 
                   {inputMode === 'direct' && (
                     <Stack spacing={2}>
-                      <TextField label={t('admin.maintenance.defaultMessage')} value={baseMsg} onChange={(e)=>setBaseMsg(e.target.value)} multiline minRows={3} />
-                      {(locales.length === 0) && (
-                        <Typography variant="caption" color="text.secondary">
-                          {t('admin.maintenance.defaultMessageHint')}
-                        </Typography>
+                      {/* 기본 점검 메시지 */}
+                      <TextField
+                        label={t('clientVersions.maintenance.defaultMessage')}
+                        value={baseMsg}
+                        onChange={(e)=>setBaseMsg(e.target.value)}
+                        multiline
+                        rows={3}
+                        fullWidth
+                        required
+                        helperText={t('clientVersions.maintenance.defaultMessageHelp')}
+                      />
+
+                      {/* 언어별 메시지 사용 여부 */}
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={locales.length > 0}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                // 모든 언어 자동 추가
+                                setLocales(allLangs.map(lang => ({ lang: lang.code, message: '' })));
+                              } else {
+                                setLocales([]);
+                              }
+                            }}
+                          />
+                        }
+                        label={t('admin.maintenance.useLanguageSpecificMessages')}
+                      />
+
+                      {/* 언어별 메시지 입력 */}
+                      {locales.length > 0 && (
+                        <Box>
+                          <Typography variant="subtitle2" sx={{ mb: 2 }}>
+                            {t('admin.maintenance.languageSpecificMessages')}
+                          </Typography>
+                          {allLangs.map(lang => {
+                            const locale = locales.find(l => l.lang === lang.code);
+                            return (
+                              <Box key={lang.code} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                                  {lang.label}
+                                </Typography>
+                                <TextField
+                                  fullWidth
+                                  multiline
+                                  rows={3}
+                                  value={locale?.message || ''}
+                                  onChange={(e) => {
+                                    setLocales(prev =>
+                                      prev.map(x =>
+                                        x.lang === lang.code
+                                          ? { ...x, message: e.target.value }
+                                          : x
+                                      )
+                                    );
+                                  }}
+                                  placeholder={t(`maintenanceMessage.${lang.code}Help`)}
+                                />
+                              </Box>
+                            );
+                          })}
+                        </Box>
                       )}
-                      {/* Add per-language */}
-                      <Stack direction="row" spacing={1} alignItems="flex-start">
-                        <Select size="small" value={newLang} onChange={(e)=>setNewLang(e.target.value as any)} sx={{ minWidth: 120 }}>
-                          {allLangs.filter(l=>!locales.find(x=>x.lang===l.code)).map(l => <MenuItem key={l.code} value={l.code}>{l.label}</MenuItem>)}
-                        </Select>
-                        <TextField size="small" value={newMsg} onChange={(e)=>setNewMsg(e.target.value)} label={t('admin.maintenance.perLanguageMessage')} sx={{ flex: 1 }} multiline minRows={3} />
-                        <Button onClick={addLocale} variant="outlined" sx={{ alignSelf: 'flex-start' }}>{t('common.add')}</Button>
-                      </Stack>
-                      <Stack spacing={1}>
-                        {locales.map(l => (
-                          <Box key={l.lang} sx={{ display:'flex', gap:1, alignItems:'flex-start' }}>
-                            <Chip label={allLangs.find(x=>x.code===l.lang as any)?.label || l.lang} size="small" sx={{ width: 96, justifyContent:'flex-start' }} />
-                            <TextField fullWidth size="small" value={l.message} onChange={(e)=>setLocales(prev=> prev.map(x=> x.lang===l.lang ? { ...x, message: e.target.value } : x))} multiline minRows={3} />
-                            <IconButton size="small" onClick={()=>setLocales(prev => prev.filter(x=>x.lang!==l.lang))} sx={{ alignSelf:'flex-start' }}><CloseIcon fontSize="small" /></IconButton>
-                          </Box>
-                        ))}
-                      </Stack>
                     </Stack>
                   )}
                 </>

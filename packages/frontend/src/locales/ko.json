@@ -24,12 +24,10 @@
       "confirmStartTitle": "점검 시작 확인",
       "confirmStopMessage": "점검을 종료하려면 \"stop maintenance\"를 입력하세요.",
       "confirmStopTitle": "점검 종료 확인",
-      "defaultMessage": "기본 메시지",
-      "defaultMessageHint": "사용자에게 표시될 기본 메시지",
       "directInput": "직접 입력",
       "endsAt": "종료 시간",
       "messageSource": "메시지 소스",
-      "perLanguageMessage": "언어별 메시지",
+      "perLanguageMessage": "언어별 점검 메시지",
       "selectTemplate": "템플릿 선택",
       "start": "점검 시작",
       "statusOff": "정상",
@@ -41,7 +39,9 @@
         "emergency": "긴급 점검",
         "regular": "정기 점검"
       },
-      "useTemplate": "템플릿 사용"
+      "useTemplate": "템플릿 사용",
+      "useLanguageSpecificMessages": "언어별 점검 메시지 사용",
+      "languageSpecificMessages": "언어별 점검 메시지"
     },
     "maintenanceTemplates": {
       "title": "점검 템플릿 관리",
@@ -106,7 +106,15 @@
       "addUserDialogTitle": "사용자 추가",
       "addUserDialogDescription": "새로운 사용자 계정을 생성하고 권한을 설정할 수 있습니다.",
       "editUserDialogTitle": "사용자 편집",
-      "editUserDialogDescription": "기존 사용자의 정보와 권한을 수정할 수 있습니다."
+      "editUserDialogDescription": "기존 사용자의 정보와 권한을 수정할 수 있습니다.",
+      "emailVerification": "이메일 인증",
+      "emailVerified": "이메일이 인증되었습니다",
+      "emailNotVerified": "이메일이 인증되지 않았습니다",
+      "verifyEmail": "이메일 인증",
+      "resendVerification": "인증 메일 재전송",
+      "emailVerificationError": "이메일 인증 처리 중 오류가 발생했습니다",
+      "verificationEmailSent": "인증 메일이 전송되었습니다",
+      "verificationEmailError": "인증 메일 전송 중 오류가 발생했습니다"
     },
     "gameWorlds": {
       "title": "게임 월드"
@@ -527,12 +535,12 @@
       "endDateHelp": "점검 종료 일시를 선택하세요 (선택사항)",
       "defaultMessage": "기본 점검 메시지",
       "defaultMessageHelp": "모든 언어에 공통으로 사용될 기본 점검 메시지를 입력하세요",
-      "supportsMultiLanguage": "언어별 메시지 사용",
+      "supportsMultiLanguage": "언어별 점검 메시지 사용",
       "supportsMultiLanguageHelp": "언어별로 다른 점검 메시지를 설정할 수 있습니다",
-      "languageSpecificMessages": "언어별 메시지",
-      "korean": "한국어 메시지",
-      "english": "영어 메시지",
-      "chinese": "중국어 메시지",
+      "languageSpecificMessages": "언어별 점검 메시지",
+      "korean": "한국어 점검 메시지",
+      "english": "영어 점검 메시지",
+      "chinese": "중국어 점검 메시지",
       "koreanHelp": "한국어 사용자에게 표시될 점검 메시지",
       "englishHelp": "영어 사용자에게 표시될 점검 메시지",
       "chineseHelp": "중국어 사용자에게 표시될 점검 메시지",
@@ -927,12 +935,12 @@
       "endDateHelp": "점검 종료 일시를 선택하세요 (선택사항)",
       "defaultMessage": "기본 점검 메시지",
       "defaultMessageHelp": "모든 언어에 공통으로 사용될 기본 점검 메시지를 입력하세요",
-      "supportsMultiLanguage": "언어별 메시지 사용",
+      "supportsMultiLanguage": "언어별 점검 메시지 사용",
       "supportsMultiLanguageHelp": "언어별로 다른 점검 메시지를 설정할 수 있습니다",
-      "languageSpecificMessages": "언어별 메시지",
-      "korean": "한국어 메시지",
-      "english": "영어 메시지",
-      "chinese": "중국어 메시지",
+      "languageSpecificMessages": "언어별 점검 메시지",
+      "korean": "한국어 점검 메시지",
+      "english": "영어 점검 메시지",
+      "chinese": "중국어 점검 메시지",
       "koreanHelp": "한국어 사용자에게 표시될 점검 메시지",
       "englishHelp": "영어 사용자에게 표시될 점검 메시지",
       "chineseHelp": "중국어 사용자에게 표시될 점검 메시지",
@@ -1339,5 +1347,10 @@
     "darkTheme": "다크 테마",
     "settingsNote": "이 설정들은 나중에 시스템 설정에서 언제든지 변경할 수 있습니다.",
     "proceedToLogin": "로그인하기"
+  },
+  "maintenanceMessage": {
+    "koHelp": "한국어 사용자에게 표시될 점검 메시지를 입력하세요",
+    "enHelp": "영어 사용자에게 표시될 점검 메시지를 입력하세요",
+    "zhHelp": "중국어 사용자에게 표시될 점검 메시지를 입력하세요"
   }
 }

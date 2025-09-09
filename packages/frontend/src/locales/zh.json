@@ -27,12 +27,10 @@
       "confirmStartTitle": "确认开始维护",
       "confirmStopMessage": "请输入 \"stop maintenance\" 来结束维护。",
       "confirmStopTitle": "确认结束维护",
-      "defaultMessage": "默认消息",
-      "defaultMessageHint": "如果未添加按语言消息，将使用默认消息作为所有语言。",
       "directInput": "直接输入",
       "endsAt": "结束时间",
       "messageSource": "消息来源",
-      "perLanguageMessage": "按语言消息",
+      "perLanguageMessage": "按语言维护消息",
       "selectTemplate": "选择模板",
       "start": "开始维护",
       "statusOff": "正常",
@@ -44,7 +42,9 @@
         "emergency": "紧急维护",
         "regular": "定期维护"
       },
-      "useTemplate": "使用模板"
+      "useTemplate": "使用模板",
+      "useLanguageSpecificMessages": "使用多语言维护消息",
+      "languageSpecificMessages": "多语言维护消息"
     },
     "maintenanceTemplates": {
       "title": "消息模板管리",
@@ -106,7 +106,15 @@
       "addUserDialogTitle": "添加用户",
       "addUserDialogDescription": "创建新用户账户并设置权限。",
       "editUserDialogTitle": "编辑用户",
-      "editUserDialogDescription": "修改现有用户信息和权限。"
+      "editUserDialogDescription": "修改现有用户信息和权限。",
+      "emailVerification": "邮箱验证",
+      "emailVerified": "邮箱已验证",
+      "emailNotVerified": "邮箱未验证",
+      "verifyEmail": "验证邮箱",
+      "resendVerification": "重发验证邮件",
+      "emailVerificationError": "验证邮箱时发生错误",
+      "verificationEmailSent": "验证邮件已发送",
+      "verificationEmailError": "发送验证邮件时发生错误"
     },
     "gameWorlds": {
       "title": "游戏世界"
@@ -485,12 +493,12 @@
       "endDateHelp": "选择维护结束日期和时间（可选）",
       "defaultMessage": "默认维护消息",
       "defaultMessageHelp": "输入所有语言通用的默认维护消息",
-      "supportsMultiLanguage": "使用多语言消息",
+      "supportsMultiLanguage": "使用多语言维护消息",
       "supportsMultiLanguageHelp": "为每种语言启用不同的维护消息",
-      "languageSpecificMessages": "多语言消息",
-      "korean": "韩语消息",
-      "english": "英语消息",
-      "chinese": "中文消息",
+      "languageSpecificMessages": "多语言维护消息",
+      "korean": "韩语维护消息",
+      "english": "英语维护消息",
+      "chinese": "中文维护消息",
       "koreanHelp": "韩语用户的维护消息",
       "englishHelp": "英语用户的维护消息",
       "chineseHelp": "中文用户的维护消息",
@@ -850,12 +858,12 @@
       "endDateHelp": "选择维护结束日期和时间（可选）",
       "defaultMessage": "默认维护消息",
       "defaultMessageHelp": "输入所有语言通用的默认维护消息",
-      "supportsMultiLanguage": "使用多语言消息",
+      "supportsMultiLanguage": "使用多语言维护消息",
       "supportsMultiLanguageHelp": "为每种语言启用不同的维护消息",
-      "languageSpecificMessages": "多语言消息",
-      "korean": "韩语消息",
-      "english": "英语消息",
-      "chinese": "中文消息",
+      "languageSpecificMessages": "多语言维护消息",
+      "korean": "韩语维护消息",
+      "english": "英语维护消息",
+      "chinese": "中文维护消息",
       "koreanHelp": "韩语用户的维护消息",
       "englishHelp": "英语用户的维护消息",
       "chineseHelp": "中文用户的维护消息",
@@ -1173,5 +1181,10 @@
     "darkTheme": "深色主题",
     "settingsNote": "您可以稍后在系统设置中随时更改这些设置。",
     "proceedToLogin": "前往登录"
+  },
+  "maintenanceMessage": {
+    "koHelp": "输入韩语用户的维护消息",
+    "enHelp": "输入英语用户的维护消息",
+    "zhHelp": "输入中文用户的维护消息"
   }
 }

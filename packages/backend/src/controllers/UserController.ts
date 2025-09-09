@@ -32,6 +32,10 @@ const addUserTagSchema = Joi.object({
   tagId: Joi.number().integer().positive().required(),
 });
 
+const verifyEmailSchema = Joi.object({
+  userId: Joi.number().integer().positive().required(),
+});
+
 const createUserSchema = Joi.object({
   name: Joi.string().min(2).max(100).required(),
   email: Joi.string().email().required(),
@@ -419,6 +423,38 @@ export class UserController {
     res.json({
       success: true,
       message: 'Tag removed from user successfully',
+    });
+  });
+
+  // 관리자가 사용자 이메일을 강제 인증 처리
+  static verifyUserEmail = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const userId = parseInt(req.params.id);
+
+    if (isNaN(userId)) {
+      throw new CustomError('Invalid user ID', 400);
+    }
+
+    await UserService.verifyUserEmail(userId);
+
+    res.json({
+      success: true,
+      message: 'User email verified successfully',
+    });
+  });
+
+  // 사용자에게 이메일 인증 메일 재전송
+  static resendVerificationEmail = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const userId = parseInt(req.params.id);
+
+    if (isNaN(userId)) {
+      throw new CustomError('Invalid user ID', 400);
+    }
+
+    await UserService.resendVerificationEmail(userId);
+
+    res.json({
+      success: true,
+      message: 'Verification email sent successfully',
     });
   });
 }

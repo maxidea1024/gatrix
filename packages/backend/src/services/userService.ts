@@ -368,4 +368,61 @@ export class UserService {
       throw new CustomError('Failed to remove user tag', 500);
     }
   }
+
+  // 관리자가 사용자 이메일을 강제 인증 처리
+  static async verifyUserEmail(userId: number): Promise<void> {
+    try {
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        throw new CustomError('User not found', 404);
+      }
+
+      if (user.emailVerified) {
+        throw new CustomError('User email is already verified', 400);
+      }
+
+      await UserModel.update(userId, { emailVerified: true });
+
+      logger.info('User email verified by admin:', {
+        userId,
+        email: user.email,
+      });
+    } catch (error) {
+      logger.error('Error verifying user email:', error);
+      throw error instanceof CustomError ? error : new CustomError('Failed to verify user email', 500);
+    }
+  }
+
+  // 사용자에게 이메일 인증 메일 재전송
+  static async resendVerificationEmail(userId: number): Promise<void> {
+    try {
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        throw new CustomError('User not found', 404);
+      }
+
+      if (user.emailVerified) {
+        throw new CustomError('User email is already verified', 400);
+      }
+
+      // 이메일 인증 메일 발송 (현재는 웰컴 이메일로 대체)
+      try {
+        await EmailService.sendWelcomeEmail(user.email, user.name);
+        logger.info('Verification email sent:', {
+          userId,
+          email: user.email,
+        });
+      } catch (emailError) {
+        logger.error('Failed to send verification email:', {
+          userId,
+          email: user.email,
+          error: emailError,
+        });
+        throw new CustomError('Failed to send verification email', 500);
+      }
+    } catch (error) {
+      logger.error('Error resending verification email:', error);
+      throw error instanceof CustomError ? error : new CustomError('Failed to resend verification email', 500);
+    }
+  }
 }

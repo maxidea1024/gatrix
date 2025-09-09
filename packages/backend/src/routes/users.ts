@@ -39,4 +39,8 @@ router.put('/:id/tags', UserController.setUserTags);
 router.post('/:id/tags', UserController.addUserTag);
 router.delete('/:id/tags/:tagId', UserController.removeUserTag);
 
+// Email verification management
+router.post('/:id/verify-email', UserController.verifyUserEmail);
+router.post('/:id/resend-verification', UserController.resendVerificationEmail);
+
 export default router;

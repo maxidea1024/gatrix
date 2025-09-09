@@ -553,6 +553,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                           label={t('clientVersions.maintenance.defaultMessage')}
                           helperText={t('clientVersions.maintenance.defaultMessageHelp')}
                           error={!!errors.maintenanceMessage}
+                          required={watch('clientStatus') === 'maintenance'}
                         />
                       )}
                     />
@@ -592,7 +593,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                                 rows={3}
                                 value={locale?.message || ''}
                                 onChange={(e) => updateMaintenanceLocale(lang.code, e.target.value)}
-                                placeholder={t(`clientVersions.maintenance.${lang.code}Help`)}
+                                placeholder={t(`maintenanceMessage.${lang.code}Help`)}
                               />
                             </Box>
                           );

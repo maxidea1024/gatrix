@@ -48,12 +48,14 @@ import {
   Security as SecurityIcon,
   Person as PersonIcon,
   Cancel as CancelIcon,
+  Email as EmailIcon,
+  VerifiedUser as VerifiedUserIcon,
+  Send as SendIcon,
   Add as AddIcon,
   Save as SaveIcon,
   ContentCopy as ContentCopyIcon,
   LocalOffer as TagIcon,
   SelectAll as SelectAllIcon,
-  Email as EmailIcon,
   AdminPanelSettings as AdminIcon,
   PersonRemove as PersonRemoveIcon,
   Visibility as VisibilityIcon,
@@ -64,6 +66,7 @@ import { useSnackbar } from 'notistack';
 import { User, Tag } from '@/types';
 import { apiService } from '@/services/api';
 import { tagService } from '@/services/tagService';
+import { UserService } from '@/services/users';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
 import SimplePagination from '../../components/common/SimplePagination';
@@ -172,6 +175,9 @@ const UsersManagementPage: React.FC = () => {
     name: '',
     email: '',
   });
+
+  // 이메일 인증 관련 상태
+  const [emailVerificationLoading, setEmailVerificationLoading] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -405,6 +411,12 @@ const UsersManagementPage: React.FC = () => {
       case 'delete':
         handleDeleteUser(selectedUser);
         break;
+      case 'verifyEmail':
+        handleVerifyUserEmail(selectedUser.id);
+        break;
+      case 'resendVerification':
+        handleResendVerificationEmail(selectedUser.id);
+        break;
     }
     handleMenuClose();
   };
@@ -508,7 +520,38 @@ const UsersManagementPage: React.FC = () => {
     }
   };
 
+  // 이메일 강제 인증 처리
+  const handleVerifyUserEmail = async (userId: number) => {
+    try {
+      setEmailVerificationLoading(true);
+      await UserService.verifyUserEmail(userId);
+      enqueueSnackbar(t('admin.users.emailVerified'), { variant: 'success' });
+      fetchUsers();
+      // 편집 폼이 열려있다면 데이터 업데이트
+      if (editUserDialog.open && editUserDialog.user?.id === userId) {
+        setEditUserData(prev => ({ ...prev, emailVerified: true }));
+      }
+    } catch (error: any) {
+      const errorMessage = error.message || t('admin.users.emailVerificationError');
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    } finally {
+      setEmailVerificationLoading(false);
+    }
+  };
 
+  // 이메일 인증 메일 재전송
+  const handleResendVerificationEmail = async (userId: number) => {
+    try {
+      setEmailVerificationLoading(true);
+      await UserService.resendVerificationEmail(userId);
+      enqueueSnackbar(t('admin.users.verificationEmailSent'), { variant: 'success' });
+    } catch (error: any) {
+      const errorMessage = error.message || t('admin.users.verificationEmailError');
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    } finally {
+      setEmailVerificationLoading(false);
+    }
+  };
 
   const handleAddUser = () => {
     // 폼 데이터 초기화
@@ -1059,6 +1102,24 @@ const UsersManagementPage: React.FC = () => {
           </MenuItem>
         )}
 
+        {/* 이메일 인증 관련 메뉴 */}
+        {selectedUser && !selectedUser.emailVerified && (
+          <>
+            <MenuItem onClick={() => handleMenuAction('verifyEmail')}>
+              <ListItemIcon>
+                <VerifiedUserIcon />
+              </ListItemIcon>
+              <ListItemText>{t('admin.users.verifyEmail')}</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={() => handleMenuAction('resendVerification')}>
+              <ListItemIcon>
+                <SendIcon />
+              </ListItemIcon>
+              <ListItemText>{t('admin.users.resendVerification')}</ListItemText>
+            </MenuItem>
+          </>
+        )}
+
         <MenuItem
           onClick={() => handleMenuAction('delete')}
           disabled={isCurrentUser(selectedUser)}
@@ -1310,6 +1371,47 @@ const UsersManagementPage: React.FC = () => {
                 helperText={editUserErrors.email || t('admin.users.form.emailHelp')}
               />
             </Box>
+
+            {/* 이메일 인증 상태 및 액션 */}
+            {editUserDialog.user && !isCurrentUser(editUserDialog.user) && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1, border: 1, borderColor: 'divider' }}>
+                <EmailIcon color={editUserDialog.user.emailVerified ? 'success' : 'warning'} />
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="body2" fontWeight="medium">
+                    {t('admin.users.emailVerification')}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {editUserDialog.user.emailVerified
+                      ? t('admin.users.emailVerified')
+                      : t('admin.users.emailNotVerified')
+                    }
+                  </Typography>
+                </Box>
+                {!editUserDialog.user.emailVerified && (
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      onClick={() => handleVerifyUserEmail(editUserDialog.user!.id)}
+                      disabled={emailVerificationLoading}
+                      startIcon={emailVerificationLoading ? <CircularProgress size={16} /> : <VerifiedUserIcon />}
+                    >
+                      {t('admin.users.verifyEmail')}
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="text"
+                      onClick={() => handleResendVerificationEmail(editUserDialog.user!.id)}
+                      disabled={emailVerificationLoading}
+                      startIcon={emailVerificationLoading ? <CircularProgress size={16} /> : <SendIcon />}
+                    >
+                      {t('admin.users.resendVerification')}
+                    </Button>
+                  </Box>
+                )}
+              </Box>
+            )}
+
             {!(editUserDialog.user && isCurrentUser(editUserDialog.user)) && (
               <>
                 <FormControl fullWidth>

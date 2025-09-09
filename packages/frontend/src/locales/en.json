@@ -24,12 +24,10 @@
       "confirmStartTitle": "Confirm maintenance start",
       "confirmStopMessage": "Type \"stop maintenance\" to confirm stopping maintenance mode.",
       "confirmStopTitle": "Confirm maintenance stop",
-      "defaultMessage": "Default message",
-      "defaultMessageHint": "This default message will be used for all languages unless a per-language message is added.",
       "directInput": "Direct input",
       "endsAt": "Ends At",
       "messageSource": "Message source",
-      "perLanguageMessage": "Per-language message",
+      "perLanguageMessage": "Per-language maintenance message",
       "selectTemplate": "Select template",
       "start": "Start maintenance",
       "statusOff": "Normal",
@@ -41,7 +39,9 @@
         "emergency": "Emergency",
         "regular": "Regular"
       },
-      "useTemplate": "Use template"
+      "useTemplate": "Use template",
+      "useLanguageSpecificMessages": "Use Language-specific Maintenance Messages",
+      "languageSpecificMessages": "Language-specific Maintenance Messages"
     },
     "maintenanceTemplates": {
       "title": "Message Templates",
@@ -106,7 +106,15 @@
       "addUserDialogTitle": "Add User",
       "addUserDialogDescription": "Create a new user account and set permissions.",
       "editUserDialogTitle": "Edit User",
-      "editUserDialogDescription": "Modify existing user information and permissions."
+      "editUserDialogDescription": "Modify existing user information and permissions.",
+      "emailVerification": "Email Verification",
+      "emailVerified": "Email is verified",
+      "emailNotVerified": "Email is not verified",
+      "verifyEmail": "Verify Email",
+      "resendVerification": "Resend Verification",
+      "emailVerificationError": "Error occurred while verifying email",
+      "verificationEmailSent": "Verification email sent",
+      "verificationEmailError": "Error occurred while sending verification email"
     },
     "gameWorlds": {
       "title": "Game Worlds"
@@ -484,12 +492,12 @@
       "endDateHelp": "Select maintenance end date and time (optional)",
       "defaultMessage": "Default Maintenance Message",
       "defaultMessageHelp": "Enter the default maintenance message for all languages",
-      "supportsMultiLanguage": "Use Language-specific Messages",
+      "supportsMultiLanguage": "Use Language-specific Maintenance Messages",
       "supportsMultiLanguageHelp": "Enable different maintenance messages for each language",
-      "languageSpecificMessages": "Language-specific Messages",
-      "korean": "Korean Message",
-      "english": "English Message",
-      "chinese": "Chinese Message",
+      "languageSpecificMessages": "Language-specific Maintenance Messages",
+      "korean": "Korean Maintenance Message",
+      "english": "English Maintenance Message",
+      "chinese": "Chinese Maintenance Message",
       "koreanHelp": "Maintenance message for Korean users",
       "englishHelp": "Maintenance message for English users",
       "chineseHelp": "Maintenance message for Chinese users",
@@ -861,12 +869,12 @@
       "endDateHelp": "Select maintenance end date and time (optional)",
       "defaultMessage": "Default Maintenance Message",
       "defaultMessageHelp": "Enter the default maintenance message for all languages",
-      "supportsMultiLanguage": "Use Language-specific Messages",
+      "supportsMultiLanguage": "Use Language-specific Maintenance Messages",
       "supportsMultiLanguageHelp": "Enable different maintenance messages for each language",
-      "languageSpecificMessages": "Language-specific Messages",
-      "korean": "Korean Message",
-      "english": "English Message",
-      "chinese": "Chinese Message",
+      "languageSpecificMessages": "Language-specific Maintenance Messages",
+      "korean": "Korean Maintenance Message",
+      "english": "English Maintenance Message",
+      "chinese": "Chinese Maintenance Message",
       "koreanHelp": "Maintenance message for Korean users",
       "englishHelp": "Maintenance message for English users",
       "chineseHelp": "Maintenance message for Chinese users",
@@ -1196,5 +1204,10 @@
     "darkTheme": "Dark Theme",
     "settingsNote": "You can change these settings anytime in the system settings later.",
     "proceedToLogin": "Proceed to Login"
+  },
+  "maintenanceMessage": {
+    "koHelp": "Enter maintenance message for Korean users",
+    "enHelp": "Enter maintenance message for English users",
+    "zhHelp": "Enter maintenance message for Chinese users"
   }
 }

@@ -76,7 +76,6 @@ const menuItems = [
 ];
 
 const adminMenuItems = [
-  { text: 'admin.dashboard.title', icon: <DashboardIcon />, path: '/admin/dashboard' },
   { text: 'admin.users.title', icon: <SchoolIcon />, path: '/admin/users' },
   { text: 'clientVersions.title', icon: <WidgetsIcon />, path: '/admin/client-versions' },
   { text: 'admin.gameWorlds.title', icon: <LanguageIcon />, path: '/admin/game-worlds' },

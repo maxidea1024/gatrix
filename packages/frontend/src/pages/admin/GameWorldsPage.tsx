@@ -1157,6 +1157,8 @@ const GameWorldsPage: React.FC = () => {
                       value={formData.maintenanceMessage}
                       onChange={(e) => setFormData({ ...formData, maintenanceMessage: e.target.value })}
                       helperText={t('gameWorlds.maintenance.defaultMessageHelp')}
+                      required={formData.isMaintenance}
+                      error={!!formErrors.maintenanceMessage}
                     />
 
                     {/* 언어별 메시지 사용 여부 */}
@@ -1194,7 +1196,7 @@ const GameWorldsPage: React.FC = () => {
                                 rows={3}
                                 value={locale?.message || ''}
                                 onChange={(e) => updateMaintenanceLocale(lang.code, e.target.value)}
-                                placeholder={t(`gameWorlds.maintenance.${lang.code}Help`)}
+                                placeholder={t(`maintenanceMessage.${lang.code}Help`)}
                               />
                             </Box>
                           );

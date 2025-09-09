@@ -56,7 +56,6 @@ import SettingsPage from './pages/SettingsPage';
 import TagsPage from './pages/settings/TagsPage';
 
 // Pages - Admin
-import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import UsersManagementPage from './pages/admin/UsersManagementPage';
 import GameWorldsPage from './pages/admin/GameWorldsPage';
 import WhitelistPage from './pages/admin/WhitelistPage';
@@ -233,8 +232,7 @@ const AppContent: React.FC = () => {
                   <ProtectedRoute requiredRoles={['admin']}>
                     <MainLayout>
                       <Routes>
-                        <Route index element={<Navigate to="/admin/dashboard" replace />} />
-                        <Route path="dashboard" element={<AdminDashboardPage />} />
+                        <Route index element={<Navigate to="/admin/users" replace />} />
                         <Route path="users" element={<UsersManagementPage />} />
                         <Route path="client-versions" element={<ClientVersionsPage />} />
                         <Route path="game-worlds" element={<GameWorldsPage />} />

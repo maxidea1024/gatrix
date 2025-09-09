@@ -184,4 +184,22 @@ export class UserService {
       throw new Error(response.error?.message || 'Failed to remove user tag');
     }
   }
+
+  // 관리자가 사용자 이메일을 강제 인증 처리
+  static async verifyUserEmail(userId: number): Promise<void> {
+    const response = await apiService.post(`/users/${userId}/verify-email`);
+
+    if (!response.success) {
+      throw new Error(response.error?.message || 'Failed to verify user email');
+    }
+  }
+
+  // 사용자에게 이메일 인증 메일 재전송
+  static async resendVerificationEmail(userId: number): Promise<void> {
+    const response = await apiService.post(`/users/${userId}/resend-verification`);
+
+    if (!response.success) {
+      throw new Error(response.error?.message || 'Failed to resend verification email');
+    }
+  }
 }

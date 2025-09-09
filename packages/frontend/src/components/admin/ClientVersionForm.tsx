@@ -647,6 +647,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                           label={t('clientVersions.maintenance.defaultMessage')}
                           helperText={t('clientVersions.maintenance.defaultMessageHelp')}
                           error={!!errors.maintenanceMessage}
+                          required={watch('clientStatus') === 'maintenance'}
                         />
                       )}
                     />
@@ -686,7 +687,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                                 rows={3}
                                 value={locale?.message || ''}
                                 onChange={(e) => updateMaintenanceLocale(lang.code, e.target.value)}
-                                placeholder={t(`clientVersions.maintenance.${lang.code}Help`)}
+                                placeholder={t(`maintenanceMessage.${lang.code}Help`)}
                               />
                             </Box>
                           );
