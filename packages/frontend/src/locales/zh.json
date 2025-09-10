@@ -333,7 +333,8 @@
       "tooManyAttempts": "登录尝试次数过多。请稍后重试。",
       "serverError": "服务器发生错误。请稍后重试。",
       "networkError": "请检查您的网络连接并重试。",
-      "loginFailed": "登录失败。请重试。"
+      "loginFailed": "登录失败。请重试。",
+      "oauthFailed": "OAuth认证失败。请重试或使用邮箱/密码登录。"
     },
     "forgotPassword": "忘记密码？",
     "forgotPasswordDescription": "输入您的邮箱地址，我们将发送密码重置链接。",
@@ -366,6 +367,7 @@
     "newPassword": "新密码",
     "or": "或",
     "password": "密码",
+    "processingLogin": "正在处理登录...",
     "passwordMinLength": "密码至少需要6个字符",
     "passwordRequired": "密码是必需的",
     "passwordResetEmailSent": "密码重置邮件已发送。请检查您的邮箱。",
@@ -909,9 +911,9 @@
     "title": "页面未找到"
   },
   "pendingApproval": {
-    "additionalInfo": "附加信息",
+    "additionalInfo": "审批通常需要1-2个工作日，账户审批完成后我们会立即发送邮件通知您。",
     "backToLogin": "返回登录",
-    "message": "您的账户正在等待审批。审批完成后将通过邮件通知您。",
+    "message": "您的账户已成功创建！目前正在等待管理员审批。",
     "title": "待审批"
   },
   "platform": "平台",

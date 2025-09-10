@@ -43,6 +43,7 @@ import PendingApprovalPage from './pages/auth/PendingApprovalPage';
 import AccountSuspendedPage from './pages/auth/AccountSuspendedPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
+import OAuthCallbackPage from './pages/auth/OAuthCallbackPage';
 
 // Pages - Common
 import DashboardPage from './pages/common/DashboardPage';
@@ -182,6 +183,8 @@ const AppContent: React.FC = () => {
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/signup-prompt" element={<SignUpPromptPage />} />
                 <Route path="/pending-approval" element={<PendingApprovalPage />} />
+                <Route path="/auth/pending" element={<PendingApprovalPage />} />
+                <Route path="/auth/callback" element={<OAuthCallbackPage />} />
                 <Route path="/account-suspended" element={<AccountSuspendedPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />

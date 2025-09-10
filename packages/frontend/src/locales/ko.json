@@ -332,7 +332,8 @@
       "tooManyAttempts": "로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.",
       "serverError": "서버에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.",
       "networkError": "네트워크 연결을 확인하고 다시 시도해주세요.",
-      "loginFailed": "로그인에 실패했습니다. 다시 시도해주세요."
+      "loginFailed": "로그인에 실패했습니다. 다시 시도해주세요.",
+      "oauthFailed": "OAuth 인증에 실패했습니다. 다시 시도하거나 이메일/비밀번호로 로그인해주세요."
     },
     "forgotPassword": "비밀번호를 잊으셨나요?",
     "forgotPasswordDescription": "이메일 주소를 입력하시면 비밀번호 재설정 링크를 보내드립니다",
@@ -365,6 +366,7 @@
     "newPassword": "새 비밀번호",
     "or": "또는",
     "password": "비밀번호",
+    "processingLogin": "로그인 처리 중...",
     "passwordMinLength": "비밀번호는 최소 8자 이상이어야 합니다",
     "passwordRequired": "비밀번호가 필요합니다",
     "passwordResetEmailSent": "비밀번호 재설정 이메일이 전송되었습니다",
@@ -998,9 +1000,9 @@
     "suggestions": "제안사항"
   },
   "pendingApproval": {
-    "additionalInfo": "추가 정보",
+    "additionalInfo": "승인 처리는 보통 1-2일 정도 소요되며, 승인이 완료되는 즉시 등록하신 이메일로 알림을 보내드립니다.",
     "backToLogin": "로그인으로 돌아가기",
-    "message": "관리자의 승인을 기다리고 있습니다. 승인이 완료되면 이메일로 알려드립니다.",
+    "message": "회원가입이 완료되었습니다! 현재 관리자의 승인을 기다리고 있는 상태입니다.",
     "title": "승인 대기",
     "checkBackLater": "나중에 다시 확인해주세요",
     "contactAdmin": "관리자에게 문의하세요",

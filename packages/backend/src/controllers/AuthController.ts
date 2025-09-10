@@ -201,8 +201,21 @@ export class AuthController {
 
     // Check if user is active
     if (user.status !== 'active') {
+      // Get frontend origin dynamically
+      const referer = req.get('Referer');
+      let frontendOrigin = process.env.CORS_ORIGIN;
+
+      if (referer) {
+        try {
+          const refererUrl = new URL(referer);
+          frontendOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
+        } catch (e) {
+          // Use default if referer parsing fails
+        }
+      }
+
       // Redirect to frontend with pending status
-      return res.redirect(`${process.env.CORS_ORIGIN}/auth/pending`);
+      return res.redirect(`${frontendOrigin}/auth/pending`);
     }
 
     // Generate tokens
@@ -217,14 +230,45 @@ export class AuthController {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     });
 
+    // Get frontend origin dynamically
+    const referer = req.get('Referer');
+    let frontendOrigin = process.env.CORS_ORIGIN;
+
+    if (referer) {
+      try {
+        const refererUrl = new URL(referer);
+        frontendOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
+      } catch (e) {
+        // Use default if referer parsing fails
+      }
+    }
+
     // Redirect to frontend with access token
-    res.redirect(`${process.env.CORS_ORIGIN}/auth/callback?token=${accessToken}`);
+    res.redirect(`${frontendOrigin}/auth/callback?token=${accessToken}`);
   });
 
   // OAuth failure callback
   static oauthFailure = asyncHandler(async (req: Request, res: Response) => {
     logger.error('OAuth authentication failed');
-    res.redirect(`${process.env.CORS_ORIGIN}/auth/error`);
+
+    // Try to get the origin from referer or use default
+    const referer = req.get('Referer');
+    let frontendOrigin = process.env.CORS_ORIGIN;
+
+    if (referer) {
+      try {
+        const refererUrl = new URL(referer);
+        frontendOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
+      } catch (e) {
+        // Use default if referer parsing fails
+      }
+    }
+
+    const redirectUrl = `${frontendOrigin}/login?error=oauth_failed`;
+    console.log('OAuth failure redirect URL:', redirectUrl);
+    console.log('Referer:', referer);
+    console.log('Frontend origin:', frontendOrigin);
+    res.redirect(redirectUrl);
   });
 
   // Forgot password - request password reset

@@ -332,7 +332,8 @@
       "tooManyAttempts": "Too many login attempts. Please try again later.",
       "serverError": "Server error occurred. Please try again later.",
       "networkError": "Please check your network connection and try again.",
-      "loginFailed": "Login failed. Please try again."
+      "loginFailed": "Login failed. Please try again.",
+      "oauthFailed": "OAuth authentication failed. Please try again or use email/password login."
     },
     "forgotPassword": "Forgot Password?",
     "forgotPasswordDescription": "Enter your email address and we'll send you a password reset link.",
@@ -365,6 +366,7 @@
     "newPassword": "New Password",
     "or": "OR",
     "password": "Password",
+    "processingLogin": "Processing login...",
     "passwordMinLength": "Password must be at least 6 characters",
     "passwordRequired": "Password is required",
     "passwordResetEmailSent": "Password reset email sent. Please check your email.",
@@ -925,9 +927,9 @@
     "title": "Page Not Found"
   },
   "pendingApproval": {
-    "additionalInfo": "Additional Information",
+    "additionalInfo": "Approval typically takes 1-2 business days. You will receive an email notification as soon as your account is approved.",
     "backToLogin": "Back to Login",
-    "message": "Your account is pending approval. You will be notified by email once approved.",
+    "message": "Your account has been successfully created! It is currently pending administrator approval.",
     "title": "Pending Approval"
   },
   "platform": "platform",

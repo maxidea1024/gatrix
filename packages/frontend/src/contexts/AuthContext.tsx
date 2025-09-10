@@ -156,6 +156,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           // Use stored user data without API call to prevent infinite loop
           setUser(storedUser);
           console.log('✅ AuthContext: User authenticated from storage');
+        } else if (storedToken && !storedUser) {
+          // Token exists but no user data - fetch profile (OAuth callback scenario)
+          console.log('🔄 AuthContext: Token exists but no user data, fetching profile...');
+          AuthService.initializeAuth();
+          AuthService.getProfile()
+            .then((user) => {
+              setUser(user);
+              console.log('✅ AuthContext: User profile fetched successfully');
+            })
+            .catch((error) => {
+              console.error('❌ AuthContext: Failed to fetch user profile:', error);
+              AuthService.clearAuthData();
+              setUser(null);
+            })
+            .finally(() => {
+              setIsLoading(false);
+            });
+          return; // Don't set isLoading to false yet
         } else {
           // No stored auth data
           setUser(null);

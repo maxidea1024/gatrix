@@ -91,6 +91,18 @@ const LoginPage: React.FC = () => {
 
   const from = (location.state as any)?.from?.pathname || '/dashboard';
 
+  // Check for OAuth error in URL params
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const oauthError = urlParams.get('error');
+
+    if (oauthError === 'oauth_failed') {
+      setLoginError(t('auth.errors.oauthFailed'));
+      // Clear the error from URL
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.search, location.pathname, navigate, t]);
+
   // Validation schema with translations
   const loginSchema = useMemo(() => yup.object({
     email: yup

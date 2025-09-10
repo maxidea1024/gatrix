@@ -46,11 +46,11 @@ export class AuthService {
 
   static async register(data: RegisterData): Promise<User> {
     const response = await apiService.post<{ user: User }>('/auth/register', data);
-    
+
     if (response.success && response.data) {
       return response.data.user;
     }
-    
+
     throw new Error(response.error?.message || 'Registration failed');
   }
 
@@ -71,29 +71,29 @@ export class AuthService {
 
   static async refreshToken(): Promise<string> {
     const response = await apiService.post<{ accessToken: string }>('/auth/refresh');
-    
+
     if (response.success && response.data) {
       const { accessToken } = response.data;
-      
+
       // Update stored token
       apiService.setAccessToken(accessToken);
       localStorage.setItem('accessToken', accessToken);
-      
+
       return accessToken;
     }
-    
+
     throw new Error(response.error?.message || 'Token refresh failed');
   }
 
   static async getProfile(): Promise<User> {
     const response = await apiService.get<{ user: User }>('/auth/profile');
-    
+
     if (response.success && response.data) {
       // Update stored user data
       localStorage.setItem('user', JSON.stringify(response.data.user));
       return response.data.user;
     }
-    
+
     throw new Error(response.error?.message || 'Failed to get profile');
   }
 
@@ -105,13 +105,13 @@ export class AuthService {
     if (data.preferredLanguage !== undefined) backendData.preferredLanguage = data.preferredLanguage;
 
     const response = await apiService.put<{ user: User }>('/auth/profile', backendData);
-    
+
     if (response.success && response.data) {
       // Update stored user data
       localStorage.setItem('user', JSON.stringify(response.data.user));
       return response.data.user;
     }
-    
+
     throw new Error(response.error?.message || 'Failed to update profile');
   }
 
@@ -120,7 +120,7 @@ export class AuthService {
       currentPassword,
       newPassword,
     });
-    
+
     if (!response.success) {
       throw new Error(response.error?.message || 'Failed to change password');
     }
@@ -130,7 +130,7 @@ export class AuthService {
 
   static async verifyEmail(): Promise<void> {
     const response = await apiService.post('/auth/verify-email');
-    
+
     if (!response.success) {
       throw new Error(response.error?.message || 'Failed to verify email');
     }
@@ -209,13 +209,23 @@ export class AuthService {
   }
 
   static handleOAuthCallback(token: string): void {
-    // Store the token and redirect to dashboard
+    // Store the token and redirect based on user status
     localStorage.setItem('accessToken', token);
     apiService.setAccessToken(token);
 
     // Fetch user profile
-    this.getProfile().then(() => {
-      window.location.href = '/dashboard';
+    this.getProfile().then((user) => {
+      // Redirect based on user status
+      if (user.status === 'pending') {
+        window.location.href = '/auth/pending';
+      } else if (user.status === 'suspended') {
+        window.location.href = '/account-suspended';
+      } else if (user.status === 'active') {
+        window.location.href = '/dashboard';
+      } else {
+        // Unknown status, redirect to login
+        window.location.href = '/login';
+      }
     }).catch((error) => {
       console.error('Failed to get profile after OAuth:', error);
       window.location.href = '/login';

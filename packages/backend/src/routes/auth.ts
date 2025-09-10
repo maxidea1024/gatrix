@@ -4,6 +4,7 @@ import { AuthController } from '../controllers/AuthController';
 import { authenticate } from '../middleware/auth';
 import { authLimiter } from '../middleware/rateLimiter';
 import { auditUserLogin, auditUserRegister } from '../middleware/auditLog';
+import redisClient from '../config/redis';
 
 const router = Router();
 
@@ -46,18 +47,55 @@ router.get('/google/callback',
 
 // GitHub OAuth routes
 router.get('/github',
-  passport.authenticate('github', {
-    scope: ['user:email']
-  })
+  (req, res, next) =>
+    (passport.authenticate as any)('github', {
+      scope: ['user:email'],
+      callbackURL: `${req.protocol}://${req.get('host')}/api/v1/auth/github/callback`,
+    })(req, res, next)
 );
 
-router.get('/github/callback',
-  passport.authenticate('github', {
-    failureRedirect: '/api/v1/auth/failure',
-    session: false
-  }),
-  AuthController.oauthSuccess
-);
+router.get('/github/callback', async (req, res, next) => {
+  const callbackURL = `${req.protocol}://${req.get('host')}/api/v1/auth/github/callback`;
+  const code = req.query.code as string;
+
+  if (!code) {
+    return res.redirect('/api/v1/auth/failure');
+  }
+
+  // Check if this code has already been used
+  const cacheKey = `oauth:github:code:${code}`;
+  const alreadyUsed = await redisClient.get(cacheKey);
+
+  if (alreadyUsed) {
+    console.log('GitHub OAuth: Code already used, redirecting to failure');
+    return res.redirect('/api/v1/auth/failure');
+  }
+
+  // Mark code as used (expires in 10 minutes)
+  await redisClient.set(cacheKey, 'used', 600);
+
+  (passport.authenticate as any)(
+    'github',
+    {
+      failureRedirect: '/api/v1/auth/failure',
+      session: false,
+      callbackURL,
+    },
+    (err: any, user: any, info: any) => {
+      if (err) {
+        console.error('GitHub OAuth error:', err);
+        return res.redirect('/api/v1/auth/failure');
+      }
+      if (!user) {
+        console.error('GitHub OAuth: No user returned', info);
+        return res.redirect('/api/v1/auth/failure');
+      }
+      console.log('GitHub OAuth success:', user?.email);
+      (req as any).user = user;
+      return (AuthController.oauthSuccess as any)(req, res, next);
+    }
+  )(req, res, next);
+});
 
 // OAuth callback routes
 router.get('/success', AuthController.oauthSuccess);
