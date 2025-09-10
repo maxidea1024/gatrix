@@ -1,8 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box,
-  Card,
-  CardContent,
   TextField,
   Button,
   Typography,
@@ -14,6 +12,7 @@ import {
   Checkbox,
   FormControlLabel,
   Alert,
+  Tooltip,
 } from '@mui/material';
 import {
   Visibility,
@@ -21,10 +20,12 @@ import {
   Google,
   GitHub,
   Login as LoginIcon,
+  Apple,
 } from '@mui/icons-material';
 import QQIcon from '../../components/icons/QQIcon';
 import WeChatIcon from '../../components/icons/WeChatIcon';
 import BaiduIcon from '../../components/icons/BaiduIcon';
+import AuthLayout from '../../components/auth/AuthLayout';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -243,15 +244,13 @@ const LoginPage: React.FC = () => {
 
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'background.default',
-        p: 2,
-        position: 'relative',
+    <AuthLayout
+      title={t('auth.signIn')}
+      subtitle={t('auth.welcomeBack')}
+      leftContent={{
+        title: t('auth.welcomeTitle'),
+        subtitle: '',
+        description: t('auth.welcomeDescription')
       }}
     >
       {/* Language Selector */}
@@ -265,240 +264,368 @@ const LoginPage: React.FC = () => {
       >
         <LanguageSelector variant="icon" size="medium" />
       </Box>
-      <Card sx={{ maxWidth: 400, width: '100%' }}>
-        <CardContent sx={{ p: 4 }}>
-          {/* Header */}
-          <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <Typography variant="h4" component="h1" gutterBottom>
-              Gatrix
-            </Typography>
-            <Typography variant="h6" gutterBottom>
-              {t('auth.welcomeBack')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('auth.signIn')}
-            </Typography>
-          </Box>
 
 
 
-          {/* Login Form */}
-          <Box component="form" onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-            {/* Error Alert */}
-            {loginError && (
-              <Alert
-                severity="error"
-                sx={{ mb: 2 }}
-                onClose={() => setLoginError(null)}
-              >
-                {loginError}
-              </Alert>
-            )}
+      {/* Login Form */}
+      <Box component="form" onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+        {/* Error Alert */}
+        {loginError && (
+          <Alert
+            severity="error"
+            sx={{
+              mb: 3,
+              backgroundColor: 'rgba(244, 67, 54, 0.1)',
+              color: '#ff6b6b',
+              border: '1px solid rgba(244, 67, 54, 0.2)',
+              '& .MuiAlert-icon': {
+                color: '#ff6b6b'
+              }
+            }}
+            onClose={() => setLoginError(null)}
+          >
+            {loginError}
+          </Alert>
+        )}
 
-            <Controller
-              name="email"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  label={t('auth.email')}
-                  type="email"
-                  error={!!errors.email}
-                  helperText={errors.email?.message || ''}
-                  margin="normal"
-                  autoComplete="off"
-                  autoFocus
-                  inputProps={{
-                    autoComplete: 'new-password', // 브라우저 자동완성 방지
-                    form: {
-                      autoComplete: 'off'
-                    }
-                  }}
-                />
-              )}
-            />
-
-            <Controller
-              name="password"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  label={t('auth.password')}
-                  type={showPassword ? 'text' : 'password'}
-                  error={false}
-                  helperText=""
-                  margin="normal"
-                  autoComplete="current-password"
-                  inputProps={{
-                    autoComplete: 'current-password',
-                    'data-lpignore': 'true', // LastPass 무시
-                    'data-form-type': 'other', // 브라우저 힌트 제거
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={togglePasswordVisibility}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              )}
-            />
-
-            <Controller
-              name="rememberMe"
-              control={control}
-              render={({ field }) => (
-                <FormControlLabel
-                  control={<Checkbox {...field} checked={field.value} />}
-                  label={t('auth.rememberMe')}
-                  sx={{ mt: 1, mb: 2 }}
-                />
-              )}
-            />
-
-            <Button
-              type="submit"
+        <Controller
+          name="email"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
               fullWidth
-              variant="contained"
-              size="large"
-              disabled={isSubmitting || isLoading || !!errors.email || !!errors.password || !emailValue || !passwordValue}
-              startIcon={isSubmitting || isLoading ? <CircularProgress size={20} /> : <LoginIcon />}
-              sx={{ mt: 2, mb: 2 }}
+              label={t('auth.email')}
+              type="email"
+              error={!!errors.email}
+              helperText={errors.email?.message || ''}
+              margin="normal"
+              autoComplete="off"
+              autoFocus
+              sx={{
+                mb: 2,
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  '& fieldset': {
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#667eea',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(255, 255, 255, 0.7)',
+                },
+                '& .MuiInputBase-input': {
+                  color: 'white',
+                },
+              }}
+              inputProps={{
+                autoComplete: 'new-password',
+                form: {
+                  autoComplete: 'off'
+                }
+              }}
+            />
+          )}
+        />
+
+        <Controller
+          name="password"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              fullWidth
+              label={t('auth.password')}
+              type={showPassword ? 'text' : 'password'}
+              error={false}
+              helperText=""
+              margin="normal"
+              autoComplete="current-password"
+              sx={{
+                mb: 2,
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  '& fieldset': {
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#667eea',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(255, 255, 255, 0.7)',
+                },
+                '& .MuiInputBase-input': {
+                  color: 'white',
+                },
+              }}
+              inputProps={{
+                autoComplete: 'current-password',
+                'data-lpignore': 'true',
+                'data-form-type': 'other',
+              }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={togglePasswordVisibility}
+                      edge="end"
+                      sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          )}
+        />
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Controller
+            name="rememberMe"
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    {...field}
+                    checked={field.value}
+                    sx={{
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      '&.Mui-checked': {
+                        color: '#667eea',
+                      },
+                    }}
+                  />
+                }
+                label={
+                  <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '0.875rem' }}>
+                    {t('auth.rememberMe')}
+                  </Typography>
+                }
+              />
+            )}
+          />
+
+          <Link
+            component={RouterLink}
+            to="/forgot-password"
+            sx={{
+              color: 'rgba(255, 255, 255, 0.7)',
+              textDecoration: 'none',
+              fontSize: '0.875rem',
+              '&:hover': {
+                color: '#667eea',
+              }
+            }}
+          >
+            {t('auth.forgotPassword')}
+          </Link>
+        </Box>
+
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          size="large"
+          disabled={isSubmitting || isLoading || !!errors.email || !!errors.password || !emailValue || !passwordValue}
+          startIcon={isSubmitting || isLoading ? <CircularProgress size={20} /> : <LoginIcon />}
+          sx={{
+            mt: 1,
+            mb: 3,
+            height: 48,
+            background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+            '&:hover': {
+              background: 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)',
+            },
+            '&:disabled': {
+              background: 'rgba(255, 255, 255, 0.1)',
+              color: 'rgba(255, 255, 255, 0.3)',
+            },
+            borderRadius: 2,
+            textTransform: 'none',
+            fontSize: '1rem',
+            fontWeight: 600,
+          }}
+        >
+          {isSubmitting || isLoading ? t('auth.signingIn') : t('auth.signIn')}
+        </Button>
+
+        {/* Register Link */}
+        <Box sx={{ textAlign: 'center', mb: 3 }}>
+          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+            {t('auth.dontHaveAccount')}{' '}
+            <Link
+              component={RouterLink}
+              to="/register"
+              sx={{
+                color: '#667eea',
+                textDecoration: 'none',
+                '&:hover': {
+                  textDecoration: 'underline'
+                }
+              }}
             >
-              {isSubmitting || isLoading ? t('auth.signingIn') : t('auth.signIn')}
-            </Button>
+              {t('auth.signUp')}
+            </Link>
+          </Typography>
+        </Box>
 
-            {/* Forgot Password Link */}
-            <Box sx={{ textAlign: 'center', mb: 3 }}>
-              <Link
-                component={RouterLink}
-                to="/forgot-password"
-                variant="body2"
-                color="primary"
+        {/* Divider */}
+        <Divider sx={{
+          my: 3,
+          '&::before, &::after': {
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+          }
+        }}>
+          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+            {t('auth.or')}
+          </Typography>
+        </Divider>
+
+        {/* OAuth Buttons */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+          <Tooltip title="Google로 로그인" arrow>
+            <IconButton
+              onClick={handleGoogleLogin}
+              disabled={isSubmitting || isLoading}
+              sx={{
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                },
+                '&:disabled': {
+                  opacity: 0.7,
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  borderColor: 'rgba(255, 255, 255, 0.15)',
+                  color: 'rgba(255, 255, 255, 0.6)',
+                },
+              }}
+            >
+              <Google sx={{ fontSize: 24 }} />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="GitHub로 로그인" arrow>
+            <IconButton
+              onClick={handleGitHubLogin}
+              disabled={isSubmitting || isLoading}
+              sx={{
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                },
+                '&:disabled': {
+                  opacity: 0.7,
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  borderColor: 'rgba(255, 255, 255, 0.15)',
+                  color: 'rgba(255, 255, 255, 0.6)',
+                },
+              }}
+            >
+              <GitHub sx={{ fontSize: 24 }} />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="QQ로 로그인" arrow>
+            <IconButton
+              onClick={handleQQLogin}
+              disabled={isSubmitting || isLoading}
+              sx={{
+                width: 56,
+                height: 56,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                },
+                '&:disabled': {
+                  opacity: 0.7,
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  borderColor: 'rgba(255, 255, 255, 0.15)',
+                  color: 'rgba(255, 255, 255, 0.6)',
+                },
+              }}
+            >
+              <QQIcon sx={{ fontSize: 24 }} />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="WeChat로 로그인 (준비중)" arrow>
+            <span>
+              <IconButton
+                onClick={handleWeChatLogin}
+                disabled={true} // 임시 비활성화
+                sx={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  opacity: 0.9,
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    borderColor: 'rgba(255, 255, 255, 0.4)',
+                  },
+                }}
               >
-                {t('auth.forgotPassword')}
-              </Link>
-            </Box>
+                <WeChatIcon sx={{ fontSize: 24 }} />
+              </IconButton>
+            </span>
+          </Tooltip>
 
-            {/* Divider */}
-            <Divider sx={{ my: 3 }}>
-              <Typography variant="body2" color="text.secondary">
-                {t('auth.or')}
-              </Typography>
-            </Divider>
-
-            {/* OAuth Buttons */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {/* First Row: Google & GitHub */}
-              <Box sx={{ display: 'flex', gap: 2 }}>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  startIcon={<Google />}
-                  onClick={handleGoogleLogin}
-                  disabled={isSubmitting || isLoading}
-                >
-                  {t('auth.loginWithGoogle')}
-                </Button>
-
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  startIcon={<GitHub />}
-                  onClick={handleGitHubLogin}
-                  disabled={isSubmitting || isLoading}
-                >
-                  {t('auth.loginWithGitHub')}
-                </Button>
-              </Box>
-
-              {/* Second Row: QQ & WeChat */}
-              <Box sx={{ display: 'flex', gap: 2 }}>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  startIcon={<QQIcon sx={{ fontSize: '20px' }} />}
-                  onClick={handleQQLogin}
-                  disabled={isSubmitting || isLoading}
-                  sx={{
-                    height: '40px', // Google/GitHub 버튼과 동일한 높이
-                    minHeight: '40px',
-                    fontSize: '0.875rem',
-                    textTransform: 'none',
-                  }}
-                >
-                  {t('auth.loginWithQQ')}
-                </Button>
-
-                {/* WeChat OAuth */}
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  startIcon={<WeChatIcon sx={{ fontSize: '20px' }} />}
-                  onClick={handleWeChatLogin}
-                  disabled={isSubmitting || isLoading}
-                  sx={{
-                    height: '40px', // Google/GitHub 버튼과 동일한 높이
-                    minHeight: '40px',
-                    fontSize: '0.875rem',
-                    textTransform: 'none',
-                  }}
-                >
-                  {t('auth.loginWithWeChat')}
-                </Button>
-              </Box>
-
-              {/* Third Row: Baidu (left aligned) */}
-              <Box sx={{ display: 'flex', gap: 2 }}>
-                <Button
-                  sx={{ width: '48%' }} // 절반 너비로 좌측 정렬
-                  variant="outlined"
-                  startIcon={<BaiduIcon sx={{ fontSize: '20px' }} />}
-                  onClick={handleBaiduLogin}
-                  disabled={isSubmitting || isLoading}
-                  sx={{
-                    width: '48%',
-                    height: '40px', // Google/GitHub 버튼과 동일한 높이
-                    minHeight: '40px',
-                    fontSize: '0.875rem',
-                    textTransform: 'none',
-                  }}
-                >
-                  {t('auth.loginWithBaidu')}
-                </Button>
-                {/* Empty space to maintain layout */}
-                <Box sx={{ flex: 1 }} />
-              </Box>
-            </Box>
-
-            {/* Register Link */}
-            <Box sx={{ textAlign: 'center', mt: 3 }}>
-              <Typography variant="body2" color="text.secondary">
-                {t('auth.dontHaveAccount')}{' '}
-                <Link
-                  component={RouterLink}
-                  to="/register"
-                  color="primary"
-                  fontWeight="medium"
-                >
-                  {t('auth.signUp')}
-                </Link>
-              </Typography>
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
-    </Box>
+          <Tooltip title="Baidu로 로그인 (준비중)" arrow>
+            <span>
+              <IconButton
+                onClick={handleBaiduLogin}
+                disabled={true} // 임시 비활성화
+                sx={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  opacity: 0.9,
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    borderColor: 'rgba(255, 255, 255, 0.4)',
+                  },
+                }}
+              >
+                <BaiduIcon sx={{ fontSize: 24 }} />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </Box>
+      </Box>
+    </AuthLayout>
   );
 };
 

@@ -3,23 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
-  Card,
-  CardContent,
   Typography,
   Button,
   CircularProgress,
-  Stack,
-  Divider,
   Alert,
 } from '@mui/material';
 import {
   Logout as LogoutIcon,
   CheckCircle as CheckCircleIcon,
-  Error as ErrorIcon,
 } from '@mui/icons-material';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSnackbar } from 'notistack';
-import { LanguageSelector } from '@/components/LanguageSelector';
+import AuthLayout from '@/components/auth/AuthLayout';
 
 const LogoutPage: React.FC = () => {
   const { t } = useTranslation();
@@ -77,146 +72,139 @@ const LogoutPage: React.FC = () => {
 
   if (logoutComplete) {
     return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: 'background.default',
-          p: 2,
-          position: 'relative',
-        }}
+      <AuthLayout
+        title={t('auth.logout.completed')}
+        subtitle={t('auth.logout.redirecting')}
+        showLeftPanel={false}
       >
-        {/* Language Selector */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
-            zIndex: 1000,
-          }}
-        >
-          <LanguageSelector variant="icon" size="medium" />
+        <Box sx={{
+          textAlign: 'center',
+          py: 4,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <CheckCircleIcon
+            sx={{
+              fontSize: 64,
+              color: '#4caf50',
+              mb: 3
+            }}
+          />
+          <Box sx={{ mt: 2 }}>
+            <CircularProgress size={24} sx={{ color: 'white' }} />
+          </Box>
         </Box>
-
-        <Card sx={{ maxWidth: 400, width: '100%' }}>
-          <CardContent sx={{ textAlign: 'center', py: 4 }}>
-            <CheckCircleIcon 
-              sx={{ 
-                fontSize: 64, 
-                color: 'success.main', 
-                mb: 2 
-              }} 
-            />
-            <Typography variant="h5" gutterBottom>
-              {t('auth.logout.completed')}
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-              {t('auth.logout.redirecting')}
-            </Typography>
-            <CircularProgress size={24} />
-          </CardContent>
-        </Card>
-      </Box>
+      </AuthLayout>
     );
   }
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'background.default',
-        p: 2,
-        position: 'relative',
-      }}
+    <AuthLayout
+      title={t('auth.logout.title')}
+      subtitle={t('auth.logout.confirmation', { name: user?.name || t('common.user') })}
+      showLeftPanel={false}
     >
-      {/* Language Selector */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 16,
-          right: 16,
-          zIndex: 1000,
-        }}
-      >
-        <LanguageSelector variant="icon" size="medium" />
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <LogoutIcon
+          sx={{
+            fontSize: 64,
+            color: '#ff9800',
+            mb: 3
+          }}
+        />
       </Box>
 
-      <Card sx={{ maxWidth: 400, width: '100%' }}>
-        <CardContent sx={{ p: 4 }}>
-          <Box sx={{ textAlign: 'center', mb: 3 }}>
-            <LogoutIcon 
-              sx={{ 
-                fontSize: 64, 
-                color: 'warning.main', 
-                mb: 2 
-              }} 
-            />
-            <Typography variant="h5" gutterBottom>
-              {t('auth.logout.title')}
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              {t('auth.logout.confirmation', { name: user?.name || t('common.user') })}
-            </Typography>
-          </Box>
-
-          {logoutError && (
-            <Alert 
-              severity="error" 
-              sx={{ mb: 3 }}
-              action={
-                <Button 
-                  color="inherit" 
-                  size="small" 
-                  onClick={handleRetry}
-                  disabled={isLoggingOut}
-                >
-                  {t('common.retry')}
-                </Button>
-              }
-            >
-              {logoutError}
-            </Alert>
-          )}
-
-          <Divider sx={{ my: 3 }} />
-
-          <Stack spacing={2}>
+      {logoutError && (
+        <Alert
+          severity="error"
+          sx={{
+            mb: 3,
+            backgroundColor: 'rgba(244, 67, 54, 0.1)',
+            color: '#ff6b6b',
+            border: '1px solid rgba(244, 67, 54, 0.2)',
+            '& .MuiAlert-icon': {
+              color: '#ff6b6b'
+            }
+          }}
+          action={
             <Button
-              variant="contained"
-              color="warning"
-              size="large"
-              onClick={handleLogout}
+              color="inherit"
+              size="small"
+              onClick={handleRetry}
               disabled={isLoggingOut}
-              startIcon={isLoggingOut ? <CircularProgress size={20} /> : <LogoutIcon />}
-              fullWidth
+              sx={{ color: '#ff6b6b' }}
             >
-              {isLoggingOut ? t('auth.logout.processing') : t('auth.logout.confirm')}
+              {t('common.retry')}
             </Button>
-            
-            <Button
-              variant="outlined"
-              size="large"
-              onClick={handleCancel}
-              disabled={isLoggingOut}
-              fullWidth
-            >
-              {t('common.cancel')}
-            </Button>
-          </Stack>
+          }
+        >
+          {logoutError}
+        </Alert>
+      )}
 
-          <Box sx={{ mt: 3, textAlign: 'center' }}>
-            <Typography variant="caption" color="text.secondary">
-              {t('auth.logout.note')}
-            </Typography>
-          </Box>
-        </CardContent>
-      </Card>
-    </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Button
+          variant="contained"
+          size="large"
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          startIcon={isLoggingOut ? <CircularProgress size={20} /> : <LogoutIcon />}
+          fullWidth
+          sx={{
+            height: 48,
+            background: 'linear-gradient(45deg, #2563eb 30%, #3b82f6 90%)',
+            '&:hover': {
+              background: 'linear-gradient(45deg, #1d4ed8 30%, #2563eb 90%)',
+            },
+            '&:disabled': {
+              background: 'rgba(255, 255, 255, 0.1)',
+              color: 'rgba(255, 255, 255, 0.3)',
+            },
+            borderRadius: 2,
+            textTransform: 'none',
+            fontSize: '1rem',
+            fontWeight: 600,
+          }}
+        >
+          {isLoggingOut ? t('auth.logout.processing') : t('auth.logout.confirm')}
+        </Button>
+
+        <Button
+          variant="outlined"
+          size="large"
+          onClick={handleCancel}
+          disabled={isLoggingOut}
+          fullWidth
+          sx={{
+            height: 48,
+            borderColor: 'rgba(255, 255, 255, 0.2)',
+            color: 'rgba(255, 255, 255, 0.7)',
+            textTransform: 'none',
+            fontSize: '1rem',
+            fontWeight: 600,
+            borderRadius: 2,
+            '&:hover': {
+              borderColor: 'rgba(255, 255, 255, 0.3)',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              color: 'white',
+            },
+            '&:disabled': {
+              opacity: 0.5,
+            },
+          }}
+        >
+          {t('common.cancel')}
+        </Button>
+      </Box>
+
+      <Box sx={{ mt: 3, textAlign: 'center' }}>
+        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+          {t('auth.logout.note')}
+        </Typography>
+      </Box>
+    </AuthLayout>
   );
 };
 

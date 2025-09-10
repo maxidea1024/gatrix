@@ -1,11 +1,8 @@
 import React from 'react';
 import {
   Box,
-  Card,
-  CardContent,
   Typography,
   Button,
-  Stack,
 } from '@mui/material';
 import {
   HourglassEmpty as HourglassIcon,
@@ -14,6 +11,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import AuthLayout from '../../components/auth/AuthLayout';
 
 const PendingApprovalPage: React.FC = () => {
   const navigate = useNavigate();
@@ -28,16 +26,10 @@ const PendingApprovalPage: React.FC = () => {
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'background.default',
-        p: 2,
-        position: 'relative',
-      }}
+    <AuthLayout
+      title="Account Pending Approval"
+      subtitle="Your account has been created successfully"
+      showLeftPanel={false}
     >
       {/* Language Selector */}
       <Box
@@ -51,67 +43,69 @@ const PendingApprovalPage: React.FC = () => {
         <LanguageSelector />
       </Box>
 
-      <Card sx={{ maxWidth: 400, width: '100%' }}>
-        <CardContent sx={{ p: 4, textAlign: 'center' }}>
-          {/* Icon */}
-          <HourglassIcon 
-            sx={{ 
-              fontSize: 64, 
-              color: 'warning.main',
-              mb: 2 
-            }} 
-          />
+      <Box sx={{ textAlign: 'center' }}>
+        {/* Icon */}
+        <HourglassIcon
+          sx={{
+            fontSize: 80,
+            color: '#ffa726',
+            mb: 3,
+            opacity: 0.8
+          }}
+        />
 
-          {/* Header */}
-          <Typography variant="h4" component="h1" gutterBottom>
-            Gatrix
-          </Typography>
-          <Typography variant="h6" gutterBottom color="warning.main">
-            {t('pendingApproval.title')}
-          </Typography>
-          
-          {/* Email Display */}
-          {email && (
-            <Box
-              sx={{
-                mt: 2,
-                mb: 3,
-                p: 2,
-                backgroundColor: 'action.hover',
-                border: 1,
-                borderColor: 'divider',
-                borderRadius: 1,
-              }}
-            >
-              <Typography variant="body2" color="text.primary" fontWeight="medium">
-                {email}
-              </Typography>
-            </Box>
-          )}
-
-          {/* Message */}
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-            {t('pendingApproval.message')}
-          </Typography>
-
-          {/* Additional Info */}
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-            {t('pendingApproval.additionalInfo')}
-          </Typography>
-
-          {/* Action Button */}
-          <Button
-            variant="outlined"
-            size="large"
-            startIcon={<ArrowBackIcon />}
-            onClick={handleBackToLogin}
-            fullWidth
+        {/* Email Display */}
+        {email && (
+          <Box
+            sx={{
+              mt: 2,
+              mb: 3,
+              p: 2,
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: 2,
+            }}
           >
-            {t('pendingApproval.backToLogin')}
-          </Button>
-        </CardContent>
-      </Card>
-    </Box>
+            <Typography variant="body1" sx={{ color: 'white', fontWeight: 500 }}>
+              {email}
+            </Typography>
+          </Box>
+        )}
+
+        {/* Message */}
+        <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.8)', mb: 3, lineHeight: 1.6 }}>
+          Your account is currently pending administrator approval. You will receive an email notification once your account has been activated.
+        </Typography>
+
+        {/* Additional Info */}
+        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)', mb: 4, lineHeight: 1.5 }}>
+          This process typically takes 1-2 business days. If you have any questions, please contact our support team.
+        </Typography>
+
+        {/* Action Button */}
+        <Button
+          variant="outlined"
+          size="large"
+          startIcon={<ArrowBackIcon />}
+          onClick={handleBackToLogin}
+          fullWidth
+          sx={{
+            height: 48,
+            borderColor: 'rgba(255, 255, 255, 0.2)',
+            color: 'white',
+            textTransform: 'none',
+            fontSize: '1rem',
+            fontWeight: 500,
+            '&:hover': {
+              borderColor: 'rgba(255, 255, 255, 0.3)',
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            },
+          }}
+        >
+          Back to Login
+        </Button>
+      </Box>
+    </AuthLayout>
   );
 };
 

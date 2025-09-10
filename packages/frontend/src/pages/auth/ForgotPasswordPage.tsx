@@ -1,21 +1,19 @@
 import React, { useState } from 'react';
 import {
   Box,
-  Card,
-  CardContent,
   TextField,
   Button,
   Typography,
   Alert,
   CircularProgress,
   Link,
-  Container,
 } from '@mui/material';
 import { ArrowBack, Email } from '@mui/icons-material';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthService } from '@/services/auth';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import AuthLayout from '../../components/auth/AuthLayout';
 
 const ForgotPasswordPage: React.FC = () => {
   const navigate = useNavigate();
@@ -149,15 +147,9 @@ const ForgotPasswordPage: React.FC = () => {
   }
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        p: 2,
-        position: 'relative',
-      }}
+    <AuthLayout
+      title={t('auth.forgotPassword')}
+      showLeftPanel={false}
     >
       {/* Language Selector */}
       <Box
@@ -171,78 +163,136 @@ const ForgotPasswordPage: React.FC = () => {
         <LanguageSelector variant="icon" size="medium" />
       </Box>
 
-      <Container maxWidth="sm">
-        <Card sx={{ width: '100%', maxWidth: 400, mx: 'auto' }}>
-          <CardContent sx={{ p: 4 }}>
-            <Box sx={{ textAlign: 'center', mb: 4 }}>
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-                {t('auth.forgotPassword')}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('auth.forgotPasswordDescription')}
-              </Typography>
-            </Box>
+      {message && (
+        <Alert
+          severity={message.type}
+          sx={{
+            mb: 3,
+            backgroundColor: message.type === 'error' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(76, 175, 80, 0.1)',
+            color: message.type === 'error' ? '#ff6b6b' : '#4caf50',
+            border: `1px solid ${message.type === 'error' ? 'rgba(244, 67, 54, 0.2)' : 'rgba(76, 175, 80, 0.2)'}`,
+            '& .MuiAlert-icon': {
+              color: message.type === 'error' ? '#ff6b6b' : '#4caf50'
+            }
+          }}
+          onClose={() => setMessage(null)}
+        >
+          {message.text}
+        </Alert>
+      )}
 
-            {message && (
-              <Alert 
-                severity={message.type} 
-                sx={{ mb: 3 }}
-                onClose={() => setMessage(null)}
-              >
-                {message.text}
-              </Alert>
-            )}
+      <Box component="form" onSubmit={handleSubmit}>
+        <TextField
+          fullWidth
+          label={t('auth.email')}
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={isSubmitting}
+          required
+          autoFocus
+          sx={{
+            mb: 3,
+            '& .MuiOutlinedInput-root': {
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              '& fieldset': {
+                borderColor: 'rgba(255, 255, 255, 0.2)',
+              },
+              '&:hover fieldset': {
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#667eea',
+              },
+            },
+            '& .MuiInputLabel-root': {
+              color: 'rgba(255, 255, 255, 0.7)',
+            },
+            '& .MuiInputBase-input': {
+              color: 'white',
+            },
+          }}
+        />
 
-            <Box component="form" onSubmit={handleSubmit}>
-              <TextField
-                fullWidth
-                label={t('auth.email')}
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isSubmitting}
-                required
-                autoFocus
-                sx={{ mb: 3 }}
-              />
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          size="large"
+          disabled={isSubmitting}
+          startIcon={isSubmitting ? <CircularProgress size={20} /> : <Email />}
+          sx={{
+            mb: 3,
+            height: 48,
+            background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+            '&:hover': {
+              background: 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)',
+            },
+            '&:disabled': {
+              background: 'rgba(255, 255, 255, 0.1)',
+              color: 'rgba(255, 255, 255, 0.3)',
+            },
+            borderRadius: 2,
+            textTransform: 'none',
+            fontSize: '1rem',
+            fontWeight: 600,
+          }}
+        >
+          {isSubmitting ? t('auth.sending') : t('auth.sendResetEmail')}
+        </Button>
 
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                size="large"
-                disabled={isSubmitting}
-                sx={{ mb: 3 }}
-              >
-                {isSubmitting ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  t('auth.sendResetEmail')
-                )}
-              </Button>
+        <Box sx={{ textAlign: 'center', mb: 2 }}>
+          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+            {t('auth.rememberPassword')}{' '}
+            <Link
+              component={RouterLink}
+              to="/login"
+              sx={{
+                color: '#667eea',
+                textDecoration: 'none',
+                '&:hover': {
+                  textDecoration: 'underline'
+                }
+              }}
+            >
+              {t('auth.signIn')}
+            </Link>
+          </Typography>
+        </Box>
 
-              <Box sx={{ textAlign: 'center' }}>
-                <Link
-                  component={RouterLink}
-                  to="/login"
-                  color="primary"
-                  sx={{ 
-                    display: 'inline-flex', 
-                    alignItems: 'center', 
-                    gap: 0.5,
-                    textDecoration: 'none',
-                    '&:hover': { textDecoration: 'underline' }
-                  }}
-                >
-                  <ArrowBack sx={{ fontSize: 16 }} />
-                  {t('auth.backToLogin')}
-                </Link>
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
-      </Container>
-    </Box>
+        {/* Divider */}
+        <Box
+          sx={{
+            width: '100%',
+            height: '1px',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            mb: 3,
+          }}
+        />
+
+        <Box sx={{ textAlign: 'center' }}>
+          <Link
+            component={RouterLink}
+            to="/login"
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.5,
+              color: 'rgba(255, 255, 255, 0.7)',
+              textDecoration: 'none',
+              fontSize: '0.875rem',
+              '&:hover': {
+                color: '#667eea',
+                textDecoration: 'underline'
+              }
+            }}
+          >
+            <ArrowBack sx={{ fontSize: 16 }} />
+            {t('auth.backToLogin')}
+          </Link>
+        </Box>
+      </Box>
+    </AuthLayout>
   );
 };
 
