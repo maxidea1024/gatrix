@@ -27,8 +27,8 @@ const PendingApprovalPage: React.FC = () => {
 
   return (
     <AuthLayout
-      title="Account Pending Approval"
-      subtitle="Your account has been created successfully"
+      title={t('pendingApproval.title')}
+      subtitle=""
       showLeftPanel={false}
     >
       {/* Language Selector */}
@@ -50,7 +50,19 @@ const PendingApprovalPage: React.FC = () => {
             fontSize: 80,
             color: '#ffa726',
             mb: 3,
-            opacity: 0.8
+            opacity: 0.8,
+            animation: 'hourglassFlip 3s ease-in-out infinite',
+            '@keyframes hourglassFlip': {
+              '0%': {
+                transform: 'rotate(0deg)',
+              },
+              '50%': {
+                transform: 'rotate(180deg)',
+              },
+              '100%': {
+                transform: 'rotate(360deg)',
+              },
+            },
           }}
         />
 
@@ -74,12 +86,12 @@ const PendingApprovalPage: React.FC = () => {
 
         {/* Message */}
         <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.8)', mb: 3, lineHeight: 1.6 }}>
-          Your account is currently pending administrator approval. You will receive an email notification once your account has been activated.
+          {t('pendingApproval.message')}
         </Typography>
 
         {/* Additional Info */}
         <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)', mb: 4, lineHeight: 1.5 }}>
-          This process typically takes 1-2 business days. If you have any questions, please contact our support team.
+          {t('pendingApproval.additionalInfo')}
         </Typography>
 
         {/* Action Button */}
@@ -91,18 +103,20 @@ const PendingApprovalPage: React.FC = () => {
           fullWidth
           sx={{
             height: 48,
-            borderColor: 'rgba(255, 255, 255, 0.2)',
-            color: 'white',
+            borderColor: '#667eea',
+            color: '#667eea',
             textTransform: 'none',
             fontSize: '1rem',
-            fontWeight: 500,
+            fontWeight: 600,
+            borderRadius: 2,
             '&:hover': {
-              borderColor: 'rgba(255, 255, 255, 0.3)',
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              borderColor: '#5a6fd8',
+              backgroundColor: 'rgba(102, 126, 234, 0.1)',
+              color: '#5a6fd8',
             },
           }}
         >
-          Back to Login
+          {t('pendingApproval.backToLogin')}
         </Button>
       </Box>
     </AuthLayout>

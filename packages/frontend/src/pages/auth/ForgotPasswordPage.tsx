@@ -22,6 +22,31 @@ const ForgotPasswordPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [emailSent, setEmailSent] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
+
+  // 이메일 유효성 검사 함수
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // 이메일 입력 핸들러
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    setMessage(null); // 기존 메시지 클리어
+
+    if (value.trim() === '') {
+      setEmailError(null);
+    } else if (!validateEmail(value)) {
+      setEmailError(t('auth.emailInvalid'));
+    } else {
+      setEmailError(null);
+    }
+  };
+
+  // 버튼 활성화 조건
+  const isButtonDisabled = isSubmitting || !email.trim() || !!emailError;
 
   // 백엔드 메시지 키를 번역하는 함수
   const getTranslatedMessage = (messageKey: string): string => {
@@ -41,9 +66,9 @@ const ForgotPasswordPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email.trim()) {
-      setMessage({ type: 'error', text: t('auth.emailRequired') });
+
+    // 이미 실시간 유효성 검사로 처리되므로 추가 검사 불필요
+    if (isButtonDisabled) {
       return;
     }
 
@@ -126,6 +151,7 @@ const ForgotPasswordPage: React.FC = () => {
                     setEmailSent(false);
                     setMessage(null);
                     setEmail('');
+                    setEmailError(null);
                   }}
                 >
                   {t('auth.resendEmail')}
@@ -187,10 +213,12 @@ const ForgotPasswordPage: React.FC = () => {
           label={t('auth.email')}
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={handleEmailChange}
           disabled={isSubmitting}
           required
           autoFocus
+          error={!!emailError}
+          helperText={emailError || t('auth.emailHelp')}
           sx={{
             mb: 3,
             '& .MuiOutlinedInput-root': {
@@ -211,6 +239,9 @@ const ForgotPasswordPage: React.FC = () => {
             '& .MuiInputBase-input': {
               color: 'white',
             },
+            '& .MuiFormHelperText-root': {
+              color: emailError ? '#ff6b6b' : 'rgba(255, 255, 255, 0.6)',
+            },
           }}
         />
 
@@ -219,7 +250,7 @@ const ForgotPasswordPage: React.FC = () => {
           fullWidth
           variant="contained"
           size="large"
-          disabled={isSubmitting}
+          disabled={isButtonDisabled}
           startIcon={isSubmitting ? <CircularProgress size={20} /> : <Email />}
           sx={{
             mb: 3,

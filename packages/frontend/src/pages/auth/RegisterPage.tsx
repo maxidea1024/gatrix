@@ -234,7 +234,6 @@ const RegisterPage: React.FC = () => {
               {...field}
               fullWidth
               label={`${t('auth.name')} *`}
-              error={!!errors.name}
               helperText={errors.name?.message || t('auth.nameHelp')}
               autoComplete="name"
               autoFocus
@@ -258,6 +257,9 @@ const RegisterPage: React.FC = () => {
                 '& .MuiInputBase-input': {
                   color: 'white',
                 },
+                '& .MuiFormHelperText-root': {
+                  color: errors.name ? 'rgba(255, 182, 193, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                },
               }}
             />
           )}
@@ -273,7 +275,6 @@ const RegisterPage: React.FC = () => {
               fullWidth
               label={`${t('auth.email')} *`}
               type="email"
-              error={!!errors.email}
               helperText={errors.email?.message || t('auth.emailHelp')}
               autoComplete="email"
               sx={{
@@ -296,6 +297,9 @@ const RegisterPage: React.FC = () => {
                 '& .MuiInputBase-input': {
                   color: 'white',
                 },
+                '& .MuiFormHelperText-root': {
+                  color: errors.email ? 'rgba(255, 182, 193, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                },
               }}
             />
           )}
@@ -311,7 +315,6 @@ const RegisterPage: React.FC = () => {
               fullWidth
               label={`${t('auth.password')} *`}
               type={showPassword ? 'text' : 'password'}
-              error={!!errors.password}
               helperText={errors.password?.message || t('auth.passwordHelp')}
               autoComplete="new-password"
               sx={{
@@ -333,6 +336,9 @@ const RegisterPage: React.FC = () => {
                 },
                 '& .MuiInputBase-input': {
                   color: 'white',
+                },
+                '& .MuiFormHelperText-root': {
+                  color: errors.password ? 'rgba(255, 182, 193, 0.8)' : 'rgba(255, 255, 255, 0.6)',
                 },
               }}
               inputProps={{
@@ -358,7 +364,64 @@ const RegisterPage: React.FC = () => {
           )}
         />
 
-
+        {/* Confirm Password Field */}
+        <Controller
+          name="confirmPassword"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              fullWidth
+              label={`${t('auth.confirmPassword')} *`}
+              type={showConfirmPassword ? 'text' : 'password'}
+              helperText={errors.confirmPassword?.message || t('auth.confirmPasswordHelp')}
+              autoComplete="new-password"
+              sx={{
+                mb: 2,
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                  '& fieldset': {
+                    borderColor: 'rgba(255, 255, 255, 0.2)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#667eea',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: 'rgba(255, 255, 255, 0.7)',
+                },
+                '& .MuiInputBase-input': {
+                  color: 'white',
+                },
+                '& .MuiFormHelperText-root': {
+                  color: errors.confirmPassword ? 'rgba(255, 182, 193, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                },
+              }}
+              inputProps={{
+                autoComplete: 'new-password',
+                'data-lpignore': 'true',
+                'data-form-type': 'other',
+              }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle confirm password visibility"
+                      onClick={toggleConfirmPasswordVisibility}
+                      edge="end"
+                      sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          )}
+        />
 
         <Button
           type="submit"
@@ -422,7 +485,7 @@ const RegisterPage: React.FC = () => {
 
         {/* OAuth Buttons */}
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
-          <Tooltip title="Google로 회원가입" arrow>
+          <Tooltip title={t('auth.signUpWithGoogle')} arrow>
             <IconButton
               onClick={handleGoogleLogin}
               disabled={isSubmitting || isLoading}
@@ -449,7 +512,7 @@ const RegisterPage: React.FC = () => {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="GitHub로 회원가입" arrow>
+          <Tooltip title={t('auth.signUpWithGitHub')} arrow>
             <IconButton
               onClick={handleGitHubLogin}
               disabled={isSubmitting || isLoading}
@@ -476,7 +539,7 @@ const RegisterPage: React.FC = () => {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="QQ로 회원가입" arrow>
+          <Tooltip title={t('auth.signUpWithQQ')} arrow>
             <IconButton
               onClick={handleQQLogin}
               disabled={isSubmitting || isLoading}
@@ -503,7 +566,7 @@ const RegisterPage: React.FC = () => {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="WeChat로 회원가입 (준비중)" arrow>
+          <Tooltip title={t('auth.signUpWithWeChat')} arrow>
             <span>
               <IconButton
                 onClick={handleWeChatLogin}
@@ -512,22 +575,22 @@ const RegisterPage: React.FC = () => {
                   width: 56,
                   height: 56,
                   borderRadius: '50%',
-                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  opacity: 0.9,
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  color: '#ffffff',
+                  opacity: 1,
                   '&:hover': {
                     backgroundColor: 'rgba(255, 255, 255, 0.2)',
                     borderColor: 'rgba(255, 255, 255, 0.4)',
                   },
                 }}
               >
-                <WeChatIcon sx={{ fontSize: 24 }} />
+                <WeChatIcon sx={{ fontSize: 24, color: 'rgba(255, 255, 255, 0.8) !important' }} />
               </IconButton>
             </span>
           </Tooltip>
 
-          <Tooltip title="Baidu로 회원가입 (준비중)" arrow>
+          <Tooltip title={t('auth.signUpWithBaidu')} arrow>
             <span>
               <IconButton
                 onClick={handleBaiduLogin}
@@ -536,17 +599,17 @@ const RegisterPage: React.FC = () => {
                   width: 56,
                   height: 56,
                   borderRadius: '50%',
-                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  opacity: 0.9,
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  color: '#ffffff',
+                  opacity: 1,
                   '&:hover': {
                     backgroundColor: 'rgba(255, 255, 255, 0.2)',
                     borderColor: 'rgba(255, 255, 255, 0.4)',
                   },
                 }}
               >
-                <BaiduIcon sx={{ fontSize: 24 }} />
+                <BaiduIcon sx={{ fontSize: 24, color: 'rgba(255, 255, 255, 0.8) !important' }} />
               </IconButton>
             </span>
           </Tooltip>

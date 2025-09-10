@@ -324,6 +324,20 @@
     "completeRegistration": "Complete Registration",
     "confirmNewPassword": "Confirm New Password",
     "confirmPassword": "Confirm Password",
+    "nameHelp": "Enter your full name (2-100 characters)",
+    "emailHelp": "Enter a valid email address for login and notifications",
+    "passwordHelp": "Enter a secure password with at least 6 characters",
+    "confirmPasswordHelp": "Re-enter the same password as above",
+    "loginWithGoogle": "Sign in with Google",
+    "loginWithGitHub": "Sign in with GitHub",
+    "loginWithQQ": "Sign in with QQ",
+    "loginWithWeChat": "Sign in with WeChat (Coming Soon)",
+    "loginWithBaidu": "Sign in with Baidu (Coming Soon)",
+    "signUpWithGoogle": "Sign up with Google",
+    "signUpWithGitHub": "Sign up with GitHub",
+    "signUpWithQQ": "Sign up with QQ",
+    "signUpWithWeChat": "Sign up with WeChat (Coming Soon)",
+    "signUpWithBaidu": "Sign up with Baidu (Coming Soon)",
     "confirmPasswordRequired": "Please confirm your password.",
     "createAccount": "Create Account",
     "didntReceiveEmail": "Didn't receive the email?",
@@ -942,10 +956,11 @@
     "title": "Page Not Found"
   },
   "pendingApproval": {
-    "additionalInfo": "Approval typically takes 1-2 business days. You will receive an email notification as soon as your account is approved.",
-    "backToLogin": "Back to Login",
-    "message": "Your account has been successfully created! It is currently pending administrator approval.",
-    "title": "Pending Approval"
+    "title": "Account Pending Approval",
+    "subtitle": "Your account has been created successfully",
+    "message": "Your account is currently pending administrator approval. You will receive an email notification once your account has been activated.",
+    "additionalInfo": "This process typically takes 1-2 business days. If you have any questions, please contact our support team.",
+    "backToLogin": "Back to Login"
   },
   "platform": "platform",
   "profile": {

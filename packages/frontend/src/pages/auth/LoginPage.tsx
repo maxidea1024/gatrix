@@ -495,7 +495,7 @@ const LoginPage: React.FC = () => {
 
         {/* OAuth Buttons */}
         <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
-          <Tooltip title="Google로 로그인" arrow>
+          <Tooltip title={t('auth.loginWithGoogle')} arrow>
             <IconButton
               onClick={handleGoogleLogin}
               disabled={isSubmitting || isLoading}
@@ -522,7 +522,7 @@ const LoginPage: React.FC = () => {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="GitHub로 로그인" arrow>
+          <Tooltip title={t('auth.loginWithGitHub')} arrow>
             <IconButton
               onClick={handleGitHubLogin}
               disabled={isSubmitting || isLoading}
@@ -549,7 +549,7 @@ const LoginPage: React.FC = () => {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="QQ로 로그인" arrow>
+          <Tooltip title={t('auth.loginWithQQ')} arrow>
             <IconButton
               onClick={handleQQLogin}
               disabled={isSubmitting || isLoading}
@@ -576,7 +576,7 @@ const LoginPage: React.FC = () => {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="WeChat로 로그인 (준비중)" arrow>
+          <Tooltip title={t('auth.loginWithWeChat')} arrow>
             <span>
               <IconButton
                 onClick={handleWeChatLogin}
@@ -585,22 +585,22 @@ const LoginPage: React.FC = () => {
                   width: 56,
                   height: 56,
                   borderRadius: '50%',
-                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  opacity: 0.9,
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  color: '#ffffff',
+                  opacity: 1,
                   '&:hover': {
                     backgroundColor: 'rgba(255, 255, 255, 0.2)',
                     borderColor: 'rgba(255, 255, 255, 0.4)',
                   },
                 }}
               >
-                <WeChatIcon sx={{ fontSize: 24 }} />
+                <WeChatIcon sx={{ fontSize: 24, color: 'rgba(255, 255, 255, 0.8) !important' }} />
               </IconButton>
             </span>
           </Tooltip>
 
-          <Tooltip title="Baidu로 로그인 (준비중)" arrow>
+          <Tooltip title={t('auth.loginWithBaidu')} arrow>
             <span>
               <IconButton
                 onClick={handleBaiduLogin}
@@ -609,17 +609,17 @@ const LoginPage: React.FC = () => {
                   width: 56,
                   height: 56,
                   borderRadius: '50%',
-                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  opacity: 0.9,
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  color: '#ffffff',
+                  opacity: 1,
                   '&:hover': {
                     backgroundColor: 'rgba(255, 255, 255, 0.2)',
                     borderColor: 'rgba(255, 255, 255, 0.4)',
                   },
                 }}
               >
-                <BaiduIcon sx={{ fontSize: 24 }} />
+                <BaiduIcon sx={{ fontSize: 24, color: 'rgba(255, 255, 255, 0.8) !important' }} />
               </IconButton>
             </span>
           </Tooltip>

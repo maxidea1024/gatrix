@@ -325,6 +325,20 @@
     "confirmLogoutMessage": "您确定要退出登录吗？",
     "confirmNewPassword": "确认新密码",
     "confirmPassword": "确认密码",
+    "nameHelp": "请输入您的真实姓名（2-100个字符）",
+    "emailHelp": "请输入用于登录和通知的有效邮箱地址",
+    "passwordHelp": "请输入至少6位字符的安全密码",
+    "confirmPasswordHelp": "请重新输入与上面相同的密码",
+    "loginWithGoogle": "使用Google登录",
+    "loginWithGitHub": "使用GitHub登录",
+    "loginWithQQ": "使用QQ登录",
+    "loginWithWeChat": "使用微信登录（即将推出）",
+    "loginWithBaidu": "使用百度登录（即将推出）",
+    "signUpWithGoogle": "使用Google注册",
+    "signUpWithGitHub": "使用GitHub注册",
+    "signUpWithQQ": "使用QQ注册",
+    "signUpWithWeChat": "使用微信注册（即将推出）",
+    "signUpWithBaidu": "使用百度注册（即将推出）",
     "confirmPasswordRequired": "请确认您的密码。",
     "createAccount": "创建账户",
     "didntReceiveEmail": "没有收到邮件？",
@@ -926,10 +940,11 @@
     "title": "页面未找到"
   },
   "pendingApproval": {
-    "additionalInfo": "审批通常需要1-2个工作日，账户审批完成后我们会立即发送邮件通知您。",
-    "backToLogin": "返回登录",
-    "message": "您的账户已成功创建！目前正在等待管理员审批。",
-    "title": "待审批"
+    "title": "账户待审批",
+    "subtitle": "您的账户已成功创建",
+    "message": "您的账户目前正在等待管理员审批。账户激活后，您将收到邮件通知。",
+    "additionalInfo": "此过程通常需要1-2个工作日。如有任何疑问，请联系我们的支持团队。",
+    "backToLogin": "返回登录"
   },
   "platform": "平台",
   "profile": {

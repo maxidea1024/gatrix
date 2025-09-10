@@ -154,9 +154,9 @@ const LogoutPage: React.FC = () => {
           fullWidth
           sx={{
             height: 48,
-            background: 'linear-gradient(45deg, #2563eb 30%, #3b82f6 90%)',
+            background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
             '&:hover': {
-              background: 'linear-gradient(45deg, #1d4ed8 30%, #2563eb 90%)',
+              background: 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)',
             },
             '&:disabled': {
               background: 'rgba(255, 255, 255, 0.1)',
@@ -179,19 +179,20 @@ const LogoutPage: React.FC = () => {
           fullWidth
           sx={{
             height: 48,
-            borderColor: 'rgba(255, 255, 255, 0.2)',
-            color: 'rgba(255, 255, 255, 0.7)',
+            borderColor: '#667eea',
+            color: '#667eea',
             textTransform: 'none',
             fontSize: '1rem',
             fontWeight: 600,
             borderRadius: 2,
             '&:hover': {
-              borderColor: 'rgba(255, 255, 255, 0.3)',
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              color: 'white',
+              borderColor: '#5a6fd8',
+              backgroundColor: 'rgba(102, 126, 234, 0.1)',
+              color: '#5a6fd8',
             },
             '&:disabled': {
-              opacity: 0.5,
+              borderColor: 'rgba(255, 255, 255, 0.2)',
+              color: 'rgba(255, 255, 255, 0.3)',
             },
           }}
         >
