@@ -440,22 +440,21 @@ const LoginPage: React.FC = () => {
                   {t('auth.loginWithQQ')}
                 </Button>
 
-                {/* WeChat OAuth - Coming Soon */}
+                {/* WeChat OAuth */}
                 <Button
                   fullWidth
                   variant="outlined"
                   startIcon={<WeChatIcon sx={{ fontSize: '20px' }} />}
                   onClick={handleWeChatLogin}
-                  disabled={true}
+                  disabled={isSubmitting || isLoading}
                   sx={{
                     height: '40px', // Google/GitHub 버튼과 동일한 높이
                     minHeight: '40px',
                     fontSize: '0.875rem',
                     textTransform: 'none',
-                    opacity: 0.6,
                   }}
                 >
-                  {t('auth.loginWithWeChat')} (준비중)
+                  {t('auth.loginWithWeChat')}
                 </Button>
               </Box>
 
@@ -466,17 +465,16 @@ const LoginPage: React.FC = () => {
                   variant="outlined"
                   startIcon={<BaiduIcon sx={{ fontSize: '20px' }} />}
                   onClick={handleBaiduLogin}
-                  disabled={true}
+                  disabled={isSubmitting || isLoading}
                   sx={{
                     width: '48%',
                     height: '40px', // Google/GitHub 버튼과 동일한 높이
                     minHeight: '40px',
                     fontSize: '0.875rem',
                     textTransform: 'none',
-                    opacity: 0.6,
                   }}
                 >
-                  {t('auth.loginWithBaidu')} (준비중)
+                  {t('auth.loginWithBaidu')}
                 </Button>
                 {/* Empty space to maintain layout */}
                 <Box sx={{ flex: 1 }} />
