@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Card,
-  CardContent,
   TextField,
   Button,
   Typography,
   Alert,
   CircularProgress,
   Link,
-  Container,
   InputAdornment,
   IconButton,
 } from '@mui/material';
-import { Visibility, VisibilityOff, CheckCircle, Error } from '@mui/icons-material';
+import { Visibility, VisibilityOff, CheckCircle, Error, Lock, Login } from '@mui/icons-material';
 import { useNavigate, useSearchParams, Link as RouterLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthService } from '@/services/auth';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import AuthLayout from '../../components/auth/AuthLayout';
 
 const ResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
@@ -123,288 +121,372 @@ const ResetPasswordPage: React.FC = () => {
 
   if (isValidating) {
     return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          p: 2,
-          position: 'relative',
-        }}
+      <AuthLayout
+        title={t('auth.validatingToken')}
+        subtitle="Please wait while we verify your reset token"
+        showBackButton={false}
+        showLeftPanel={false}
       >
-        {/* Language Selector */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
-            zIndex: 1000,
-          }}
-        >
-          <LanguageSelector variant="icon" size="medium" />
+        <Box sx={{ textAlign: 'center' }}>
+          <CircularProgress
+            size={48}
+            sx={{
+              mb: 2,
+              color: '#667eea'
+            }}
+          />
+          <Typography
+            variant="body1"
+            sx={{
+              color: 'rgba(255, 255, 255, 0.7)'
+            }}
+          >
+            {t('auth.validatingToken')}
+          </Typography>
         </Box>
-
-        <Container maxWidth="sm">
-          <Box sx={{ textAlign: 'center' }}>
-            <CircularProgress size={48} sx={{ mb: 2 }} />
-            <Typography variant="body1" color="text.secondary">
-              {t('auth.validatingToken')}
-            </Typography>
-          </Box>
-        </Container>
-      </Box>
+      </AuthLayout>
     );
   }
 
   if (!tokenValid) {
     return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          p: 2,
-          position: 'relative',
-        }}
+      <AuthLayout
+        title={t('auth.invalidToken')}
+        subtitle={t('auth.invalidTokenDescription')}
+        showBackButton={true}
+        showLeftPanel={false}
       >
-        {/* Language Selector */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
-            zIndex: 1000,
-          }}
-        >
-          <LanguageSelector variant="icon" size="medium" />
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <Error sx={{
+            fontSize: 64,
+            color: '#ff6b6b',
+            mb: 2,
+            filter: 'drop-shadow(0 4px 8px rgba(255, 107, 107, 0.3))'
+          }} />
         </Box>
 
-        <Container maxWidth="sm">
-          <Card sx={{ width: '100%', maxWidth: 400, mx: 'auto' }}>
-            <CardContent sx={{ p: 4, textAlign: 'center' }}>
-              <Error sx={{ fontSize: 64, color: 'error.main', mb: 2 }} />
-              
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-                {t('auth.invalidToken')}
-              </Typography>
-              
-              {message && (
-                <Alert severity="error" sx={{ mb: 3, textAlign: 'left' }}>
-                  {message.text}
-                </Alert>
-              )}
+        {message && (
+          <Alert
+            severity="error"
+            sx={{
+              mb: 3,
+              backgroundColor: 'rgba(244, 67, 54, 0.1)',
+              color: '#ff6b6b',
+              border: '1px solid rgba(244, 67, 54, 0.2)',
+              '& .MuiAlert-icon': {
+                color: '#ff6b6b'
+              }
+            }}
+          >
+            {message.text}
+          </Alert>
+        )}
 
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                {t('auth.invalidTokenDescription')}
-              </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Button
+            variant="contained"
+            onClick={() => navigate('/forgot-password')}
+            sx={{
+              background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+              '&:hover': {
+                background: 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)',
+              },
+              borderRadius: 2,
+              textTransform: 'none',
+              fontSize: '1rem',
+              fontWeight: 600,
+            }}
+          >
+            {t('auth.requestNewReset')}
+          </Button>
 
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Button
-                  variant="contained"
-                  onClick={() => navigate('/forgot-password')}
-                >
-                  {t('auth.requestNewReset')}
-                </Button>
-                
-                <Button
-                  variant="text"
-                  onClick={() => navigate('/login')}
-                >
-                  {t('auth.backToLogin')}
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
-        </Container>
-      </Box>
+          <Button
+            variant="text"
+            onClick={() => navigate('/login')}
+            sx={{
+              color: 'rgba(255, 255, 255, 0.7)',
+              '&:hover': {
+                color: 'white',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              },
+            }}
+          >
+            {t('auth.backToLogin')}
+          </Button>
+        </Box>
+      </AuthLayout>
     );
   }
 
   if (resetSuccess) {
     return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          p: 2,
-          position: 'relative',
-        }}
+      <AuthLayout
+        title=""
+        subtitle={t('auth.passwordResetSuccessDescription')}
+        showBackButton={false}
+        showLeftPanel={false}
       >
-        {/* Language Selector */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
-            zIndex: 1000,
-          }}
-        >
-          <LanguageSelector variant="icon" size="medium" />
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <CheckCircle sx={{
+            fontSize: 64,
+            color: '#4caf50',
+            mb: 2,
+            filter: 'drop-shadow(0 4px 8px rgba(76, 175, 80, 0.3))',
+            animation: 'checkSuccess 1.5s ease-in-out',
+            '@keyframes checkSuccess': {
+              '0%': {
+                transform: 'scale(0) rotate(-180deg)',
+                opacity: 0,
+              },
+              '50%': {
+                transform: 'scale(1.2) rotate(0deg)',
+                opacity: 1,
+              },
+              '100%': {
+                transform: 'scale(1) rotate(0deg)',
+                opacity: 1,
+              },
+            },
+          }} />
         </Box>
 
-        <Container maxWidth="sm">
-          <Card sx={{ width: '100%', maxWidth: 400, mx: 'auto' }}>
-            <CardContent sx={{ p: 4, textAlign: 'center' }}>
-              <CheckCircle sx={{ fontSize: 64, color: 'success.main', mb: 2 }} />
-              
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-                {t('auth.passwordResetSuccess')}
-              </Typography>
-              
-              {message && message.type === 'success' && (
-                <Alert severity="success" sx={{ mb: 3, textAlign: 'left' }}>
-                  {message.text}
-                </Alert>
-              )}
+        {message && message.type === 'success' && (
+          <Alert
+            severity="success"
+            sx={{
+              mb: 3,
+              backgroundColor: 'rgba(76, 175, 80, 0.1)',
+              color: '#4caf50',
+              border: '1px solid rgba(76, 175, 80, 0.2)',
+              '& .MuiAlert-icon': {
+                color: '#4caf50'
+              }
+            }}
+          >
+            {message.text}
+          </Alert>
+        )}
 
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                {t('auth.passwordResetSuccessDescription')}
-              </Typography>
-
-              <Button
-                variant="contained"
-                fullWidth
-                onClick={() => navigate('/login')}
-              >
-                {t('auth.signIn')}
-              </Button>
-            </CardContent>
-          </Card>
-        </Container>
-      </Box>
+        <Button
+          variant="contained"
+          fullWidth
+          onClick={() => navigate('/login')}
+          startIcon={<Login />}
+          sx={{
+            background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+            '&:hover': {
+              background: 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)',
+            },
+            borderRadius: 2,
+            textTransform: 'none',
+            fontSize: '1rem',
+            fontWeight: 600,
+            height: 48,
+          }}
+        >
+          {t('auth.signIn')}
+        </Button>
+      </AuthLayout>
     );
   }
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        p: 2,
-        position: 'relative',
-      }}
+    <AuthLayout
+      title={t('auth.resetPassword')}
+      subtitle={t('auth.resetPasswordDescription')}
+      showBackButton={true}
+      showLeftPanel={false}
     >
-      {/* Language Selector */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 16,
-          right: 16,
-          zIndex: 1000,
-        }}
-      >
-        <LanguageSelector variant="icon" size="medium" />
+      <Box sx={{ textAlign: 'center', mb: 4 }}>
+        <Lock sx={{
+          fontSize: 64,
+          color: '#667eea',
+          mb: 2,
+          filter: 'drop-shadow(0 4px 8px rgba(102, 126, 234, 0.3))'
+        }} />
       </Box>
 
-      <Container maxWidth="sm">
-        <Card sx={{ width: '100%', maxWidth: 400, mx: 'auto' }}>
-          <CardContent sx={{ p: 4 }}>
-            <Box sx={{ textAlign: 'center', mb: 4 }}>
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-                {t('auth.resetPassword')}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('auth.resetPasswordDescription')}
-              </Typography>
-            </Box>
+      {message && (
+        <Alert
+          severity={message.type}
+          sx={{
+            mb: 3,
+            backgroundColor: message.type === 'error' ? 'rgba(244, 67, 54, 0.1)' : 'rgba(76, 175, 80, 0.1)',
+            color: message.type === 'error' ? '#ff6b6b' : '#4caf50',
+            border: `1px solid ${message.type === 'error' ? 'rgba(244, 67, 54, 0.2)' : 'rgba(76, 175, 80, 0.2)'}`,
+            '& .MuiAlert-icon': {
+              color: message.type === 'error' ? '#ff6b6b' : '#4caf50'
+            }
+          }}
+          onClose={() => setMessage(null)}
+        >
+          {message.text}
+        </Alert>
+      )}
 
-            {message && (
-              <Alert 
-                severity={message.type} 
-                sx={{ mb: 3 }}
-                onClose={() => setMessage(null)}
-              >
-                {message.text}
-              </Alert>
-            )}
-
-            <Box component="form" onSubmit={handleSubmit}>
-              <TextField
-                fullWidth
-                label={t('auth.newPassword')}
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isSubmitting}
-                required
-                autoFocus
-                sx={{ mb: 2 }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword(!showPassword)}
-                        edge="end"
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-
-              <TextField
-                fullWidth
-                label={t('auth.confirmNewPassword')}
-                type={showConfirmPassword ? 'text' : 'password'}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                disabled={isSubmitting}
-                required
-                sx={{ mb: 3 }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        edge="end"
-                      >
-                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                size="large"
-                disabled={isSubmitting}
-                sx={{ mb: 3 }}
-              >
-                {isSubmitting ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  t('auth.resetPassword')
-                )}
-              </Button>
-
-              <Box sx={{ textAlign: 'center' }}>
-                <Link
-                  component={RouterLink}
-                  to="/login"
-                  color="primary"
-                  sx={{ 
-                    textDecoration: 'none',
-                    '&:hover': { textDecoration: 'underline' }
-                  }}
+      <Box component="form" onSubmit={handleSubmit}>
+        <TextField
+          fullWidth
+          label={t('auth.newPassword')}
+          type={showPassword ? 'text' : 'password'}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          disabled={isSubmitting}
+          required
+          autoFocus
+          sx={{
+            mb: 2,
+            '& .MuiOutlinedInput-root': {
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              '& fieldset': {
+                borderColor: 'rgba(255, 255, 255, 0.2)',
+              },
+              '&:hover fieldset': {
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#667eea',
+              },
+              '&.Mui-disabled': {
+                backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                '& fieldset': {
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                },
+              },
+            },
+            '& .MuiInputLabel-root': {
+              color: 'rgba(255, 255, 255, 0.7)',
+              '&.Mui-disabled': {
+                color: 'rgba(255, 255, 255, 0.5)',
+              },
+            },
+            '& .MuiInputBase-input': {
+              color: 'white',
+              '&.Mui-disabled': {
+                color: 'rgba(255, 255, 255, 0.7)',
+                WebkitTextFillColor: 'rgba(255, 255, 255, 0.7)',
+              },
+            },
+          }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => setShowPassword(!showPassword)}
+                  edge="end"
+                  sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
                 >
-                  {t('auth.backToLogin')}
-                </Link>
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
-      </Container>
-    </Box>
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        <TextField
+          fullWidth
+          label={t('auth.confirmNewPassword')}
+          type={showConfirmPassword ? 'text' : 'password'}
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          disabled={isSubmitting}
+          required
+          sx={{
+            mb: 3,
+            '& .MuiOutlinedInput-root': {
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              '& fieldset': {
+                borderColor: 'rgba(255, 255, 255, 0.2)',
+              },
+              '&:hover fieldset': {
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#667eea',
+              },
+              '&.Mui-disabled': {
+                backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                '& fieldset': {
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                },
+              },
+            },
+            '& .MuiInputLabel-root': {
+              color: 'rgba(255, 255, 255, 0.7)',
+              '&.Mui-disabled': {
+                color: 'rgba(255, 255, 255, 0.5)',
+              },
+            },
+            '& .MuiInputBase-input': {
+              color: 'white',
+              '&.Mui-disabled': {
+                color: 'rgba(255, 255, 255, 0.7)',
+                WebkitTextFillColor: 'rgba(255, 255, 255, 0.7)',
+              },
+            },
+          }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  edge="end"
+                  sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                >
+                  {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          size="large"
+          disabled={isSubmitting}
+          sx={{
+            mb: 3,
+            height: 48,
+            background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+            '&:hover': {
+              background: 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)',
+            },
+            '&:disabled': {
+              background: 'rgba(255, 255, 255, 0.1)',
+              color: 'rgba(255, 255, 255, 0.3)',
+            },
+            borderRadius: 2,
+            textTransform: 'none',
+            fontSize: '1rem',
+            fontWeight: 600,
+          }}
+        >
+          {isSubmitting ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            t('auth.resetPassword')
+          )}
+        </Button>
+
+        <Box sx={{ textAlign: 'center' }}>
+          <Link
+            component={RouterLink}
+            to="/login"
+            sx={{
+              color: '#667eea',
+              textDecoration: 'none',
+              '&:hover': {
+                textDecoration: 'underline'
+              }
+            }}
+          >
+            {t('auth.backToLogin')}
+          </Link>
+        </Box>
+      </Box>
+    </AuthLayout>
   );
 };
 

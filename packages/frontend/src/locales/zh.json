@@ -345,9 +345,11 @@
     "dontHaveAccount": "没有账户？",
     "email": "邮箱",
     "emailInvalid": "请输入有效的邮箱地址",
+    "emailNotRegistered": "找不到使用该邮箱的账户",
     "emailRequired": "邮箱是必需的",
     "emailSendFailed": "发送邮件失败。请稍后重试。",
     "emailSent": "邮件已发送",
+    "enterEmailToReset": "输入您的邮箱地址以重置密码",
     "errors": {
       "invalidCredentials": "邮箱或密码不正确。",
       "authenticationFailed": "认证失败。请检查您的邮箱和密码。",

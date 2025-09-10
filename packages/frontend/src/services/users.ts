@@ -202,4 +202,15 @@ export class UserService {
       throw new Error(response.error?.message || 'Failed to resend verification email');
     }
   }
+
+  // 사용자 언어 설정 업데이트
+  static async updateLanguage(preferredLanguage: string): Promise<void> {
+    const response = await apiService.put('/users/me/language', {
+      preferredLanguage
+    });
+
+    if (!response.success) {
+      throw new Error(response.error?.message || 'Failed to update language preference');
+    }
+  }
 }

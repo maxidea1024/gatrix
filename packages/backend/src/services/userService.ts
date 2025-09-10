@@ -425,4 +425,27 @@ export class UserService {
       throw error instanceof CustomError ? error : new CustomError('Failed to resend verification email', 500);
     }
   }
+
+  /**
+   * Update user's preferred language
+   */
+  static async updateUserLanguage(userId: number, preferredLanguage: string): Promise<void> {
+    try {
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        throw new CustomError('User not found', 404);
+      }
+
+      await UserModel.updateLanguage(userId, preferredLanguage);
+
+      logger.info('User language updated successfully', {
+        userId,
+        preferredLanguage,
+        email: user.email
+      });
+    } catch (error) {
+      logger.error('Error updating user language:', error);
+      throw error instanceof CustomError ? error : new CustomError('Failed to update user language', 500);
+    }
+  }
 }

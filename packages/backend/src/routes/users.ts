@@ -10,6 +10,7 @@ router.use(authenticate as any);
 // Self-service routes (available to all authenticated users)
 router.get('/me', UserController.getCurrentUser);
 router.put('/me', UserController.updateCurrentUser);
+router.put('/me/language', UserController.updateLanguage);
 
 // Admin-only routes
 router.use(requireAdmin as any);

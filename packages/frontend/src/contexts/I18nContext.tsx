@@ -3,6 +3,7 @@ import i18n from 'i18next';
 import { initReactI18next, useTranslation } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { Language } from '@/types';
+import { UserService } from '@/services/users';
 
 // Import translation files
 import enTranslations from '@/locales/en.json';
@@ -67,8 +68,21 @@ interface I18nProviderProps {
 export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const { t, i18n: i18nInstance } = useTranslation();
 
-  const changeLanguage = (lang: Language) => {
+  const changeLanguage = async (lang: Language) => {
+    // 프론트엔드 언어 변경
     i18nInstance.changeLanguage(lang);
+
+    // 백엔드에 사용자 언어 설정 업데이트 (로그인된 사용자만)
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        await UserService.updateLanguage(lang);
+        console.log(`✅ User language preference updated to: ${lang}`);
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to update user language preference:', error);
+      // 백엔드 업데이트 실패해도 프론트엔드 언어 변경은 유지
+    }
   };
 
   const isRTL = false; // None of our supported languages are RTL

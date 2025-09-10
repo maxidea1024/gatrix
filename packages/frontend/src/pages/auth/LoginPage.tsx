@@ -27,6 +27,8 @@ import {
   Login as LoginIcon,
   Apple,
   Warning,
+  Cancel,
+  CheckCircle,
 } from '@mui/icons-material';
 import QQIcon from '../../components/icons/QQIcon';
 import WeChatIcon from '../../components/icons/WeChatIcon';
@@ -769,6 +771,7 @@ const LoginPage: React.FC = () => {
           <Button
             onClick={handleRememberMeCancel}
             variant="outlined"
+            startIcon={<Cancel />}
             sx={{
               borderColor: 'rgba(255, 255, 255, 0.3)',
               color: 'rgba(255, 255, 255, 0.8)',
@@ -783,6 +786,7 @@ const LoginPage: React.FC = () => {
           <Button
             onClick={handleRememberMeConfirm}
             variant="contained"
+            startIcon={<CheckCircle />}
             sx={{
               background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
               '&:hover': {

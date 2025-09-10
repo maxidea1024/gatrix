@@ -28,6 +28,10 @@ const setUserTagsSchema = Joi.object({
   tagIds: Joi.array().items(Joi.number().integer().positive()).required(),
 });
 
+const updateLanguageSchema = Joi.object({
+  preferredLanguage: Joi.string().valid('en', 'ko', 'zh').required(),
+});
+
 const addUserTagSchema = Joi.object({
   tagId: Joi.number().integer().positive().required(),
 });
@@ -455,6 +459,29 @@ export class UserController {
     res.json({
       success: true,
       message: 'Verification email sent successfully',
+    });
+  });
+
+  /**
+   * Update user's preferred language
+   */
+  static updateLanguage = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { error, value } = updateLanguageSchema.validate(req.body);
+    if (error) {
+      throw new CustomError(error.details[0].message, 400);
+    }
+
+    const { preferredLanguage } = value;
+    const userId = req.user!.id;
+
+    await UserService.updateUserLanguage(userId, preferredLanguage);
+
+    res.json({
+      success: true,
+      message: 'Language preference updated successfully',
+      data: {
+        preferredLanguage
+      }
     });
   });
 }

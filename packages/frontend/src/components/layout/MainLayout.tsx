@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Drawer,
@@ -106,12 +106,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(280);
   const [isResizing, setIsResizing] = useState(false);
+  const [avatarImageError, setAvatarImageError] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout, isAdmin } = useAuth();
   const { toggleTheme, mode, isDark } = useCustomTheme();
   const { t, i18n } = useTranslation();
+
+  // 사용자가 변경될 때마다 아바타 이미지 에러 상태 초기화
+  useEffect(() => {
+    setAvatarImageError(false);
+  }, [user?.avatarUrl]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -558,16 +564,30 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               onClick={handleUserMenuOpen}
               color="inherit"
             >
-              <Avatar
-                sx={{
-                  width: 32,
-                  height: 32,
-                  backgroundColor: 'primary.main',
-                  fontSize: '0.875rem'
-                }}
-              >
-                {user?.name?.charAt(0) || user?.email?.charAt(0)}
-              </Avatar>
+              {user?.avatarUrl && !avatarImageError ? (
+                <Avatar
+                  src={user.avatarUrl}
+                  alt={user.name || user.email}
+                  sx={{
+                    width: 32,
+                    height: 32,
+                  }}
+                  onError={() => {
+                    // 이미지 로드 실패 시 AccountCircle 아이콘으로 대체
+                    setAvatarImageError(true);
+                  }}
+                >
+                  {user?.name?.charAt(0) || user?.email?.charAt(0)}
+                </Avatar>
+              ) : (
+                <AccountCircle
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    color: 'inherit'
+                  }}
+                />
+              )}
             </IconButton>
 
             <LanguageSelector variant="text" size="medium" />

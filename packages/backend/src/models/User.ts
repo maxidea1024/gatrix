@@ -390,4 +390,20 @@ export class UserModel {
       throw error;
     }
   }
+
+  /**
+   * Update user's preferred language
+   */
+  static async updateLanguage(userId: number, preferredLanguage: string): Promise<void> {
+    try {
+      await db('g_users')
+        .where('id', userId)
+        .update({
+          preferredLanguage
+        });
+    } catch (error) {
+      logger.error('Error updating user language:', error);
+      throw error;
+    }
+  }
 }

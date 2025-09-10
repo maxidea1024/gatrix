@@ -53,6 +53,7 @@ const ForgotPasswordPage: React.FC = () => {
     const messageMap: { [key: string]: string } = {
       'PASSWORD_RESET_EMAIL_SENT': t('auth.passwordResetEmailSent'),
       'EMAIL_SEND_FAILED': t('auth.emailSendFailed'),
+      'EMAIL_NOT_REGISTERED': t('auth.emailNotRegistered'),
       'PASSWORD_RESET_REQUEST_ERROR': t('auth.passwordResetRequestError'),
       'INVALID_TOKEN': t('auth.invalidToken'),
       'TOKEN_EXPIRED': t('auth.tokenExpired'),
@@ -99,95 +100,107 @@ const ForgotPasswordPage: React.FC = () => {
 
   if (emailSent) {
     return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          p: 2,
-          position: 'relative',
-        }}
+      <AuthLayout
+        title={t('auth.emailSent')}
+        subtitle={t('auth.checkEmailForReset')}
+        showBackButton={true}
+        showLeftPanel={false}
       >
-        {/* Language Selector */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
-            zIndex: 1000,
-          }}
-        >
-          <LanguageSelector variant="icon" size="medium" />
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <Email sx={{
+            fontSize: 64,
+            color: '#667eea',
+            mb: 2,
+            filter: 'drop-shadow(0 4px 8px rgba(102, 126, 234, 0.3))',
+            animation: 'emailBounce 2s ease-in-out infinite',
+            '@keyframes emailBounce': {
+              '0%, 20%, 50%, 80%, 100%': {
+                transform: 'translateY(0)',
+              },
+              '40%': {
+                transform: 'translateY(-10px)',
+              },
+              '60%': {
+                transform: 'translateY(-5px)',
+              },
+            },
+          }} />
         </Box>
 
-        <Container maxWidth="sm">
-          <Card sx={{ width: '100%', maxWidth: 400, mx: 'auto' }}>
-            <CardContent sx={{ p: 4, textAlign: 'center' }}>
-              <Email sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
-              
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-                {t('auth.emailSent')}
-              </Typography>
-              
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                {t('auth.checkEmailForReset')}
-              </Typography>
+        {message && message.type === 'success' && (
+          <Alert
+            severity="success"
+            sx={{
+              mb: 3,
+              backgroundColor: 'rgba(76, 175, 80, 0.1)',
+              color: 'white',
+              '& .MuiAlert-icon': {
+                color: '#4caf50'
+              }
+            }}
+          >
+            {message.text}
+          </Alert>
+        )}
 
-              {message && message.type === 'success' && (
-                <Alert severity="success" sx={{ mb: 3, textAlign: 'left' }}>
-                  {message.text}
-                </Alert>
-              )}
+        <Typography
+          variant="body2"
+          sx={{
+            mb: 3,
+            color: 'rgba(255, 255, 255, 0.7)',
+            textAlign: 'center'
+          }}
+        >
+          {t('auth.didntReceiveEmail')}
+        </Typography>
 
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                {t('auth.didntReceiveEmail')}
-              </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              setEmailSent(false);
+              setMessage(null);
+              setEmail('');
+              setEmailError(null);
+            }}
+            sx={{
+              borderColor: 'rgba(255, 255, 255, 0.3)',
+              color: 'white',
+              '&:hover': {
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+              },
+            }}
+          >
+            {t('auth.resendEmail')}
+          </Button>
 
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Button
-                  variant="outlined"
-                  onClick={() => {
-                    setEmailSent(false);
-                    setMessage(null);
-                    setEmail('');
-                    setEmailError(null);
-                  }}
-                >
-                  {t('auth.resendEmail')}
-                </Button>
-                
-                <Button
-                  variant="text"
-                  startIcon={<ArrowBack />}
-                  onClick={() => navigate('/login')}
-                >
-                  {t('auth.backToLogin')}
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
-        </Container>
-      </Box>
+          <Button
+            variant="text"
+            startIcon={<ArrowBack />}
+            onClick={() => navigate('/login')}
+            sx={{
+              color: 'rgba(255, 255, 255, 0.7)',
+              '&:hover': {
+                color: 'white',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              },
+            }}
+          >
+            {t('auth.backToLogin')}
+          </Button>
+        </Box>
+      </AuthLayout>
     );
   }
 
   return (
     <AuthLayout
       title={t('auth.forgotPassword')}
+      subtitle={t('auth.enterEmailToReset')}
+      showBackButton={true}
       showLeftPanel={false}
     >
-      {/* Language Selector */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 16,
-          right: 16,
-          zIndex: 1000,
-        }}
-      >
-        <LanguageSelector variant="icon" size="medium" />
-      </Box>
 
       {message && (
         <Alert
@@ -232,15 +245,31 @@ const ForgotPasswordPage: React.FC = () => {
               '&.Mui-focused fieldset': {
                 borderColor: '#667eea',
               },
+              '&.Mui-disabled': {
+                backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                '& fieldset': {
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                },
+              },
             },
             '& .MuiInputLabel-root': {
               color: 'rgba(255, 255, 255, 0.7)',
+              '&.Mui-disabled': {
+                color: 'rgba(255, 255, 255, 0.5)',
+              },
             },
             '& .MuiInputBase-input': {
               color: 'white',
+              '&.Mui-disabled': {
+                color: 'rgba(255, 255, 255, 0.7)',
+                WebkitTextFillColor: 'rgba(255, 255, 255, 0.7)',
+              },
             },
             '& .MuiFormHelperText-root': {
               color: emailError ? '#ff6b6b' : 'rgba(255, 255, 255, 0.6)',
+              '&.Mui-disabled': {
+                color: 'rgba(255, 255, 255, 0.4)',
+              },
             },
           }}
         />

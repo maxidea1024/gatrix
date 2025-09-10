@@ -344,9 +344,11 @@
     "dontHaveAccount": "Don't have an account?",
     "email": "Email",
     "emailInvalid": "Please enter a valid email address",
+    "emailNotRegistered": "We couldn't find an account with that email address",
     "emailRequired": "Email is required",
     "emailSendFailed": "Failed to send email. Please try again later.",
     "emailSent": "Email sent",
+    "enterEmailToReset": "Enter your email address to reset your password",
     "errors": {
       "invalidCredentials": "Email or password is incorrect.",
       "authenticationFailed": "Authentication failed. Please check your email and password.",

@@ -36,10 +36,10 @@ export class PasswordResetService {
         .first();
 
       if (!user) {
-        // 보안상 사용자가 존재하지 않아도 성공 메시지 반환
+        // 등록되지 않은 이메일에 대한 오류 반환
         return {
-          success: true,
-          message: 'PASSWORD_RESET_EMAIL_SENT',
+          success: false,
+          message: 'EMAIL_NOT_REGISTERED',
         };
       }
 
@@ -57,9 +57,7 @@ export class PasswordResetService {
       await db('g_password_reset_tokens').insert({
         userId: user.id,
         token: resetToken,
-        expiresAt,
-        createdAt: db.fn.now(),
-        updatedAt: db.fn.now()
+        expiresAt
       });
 
       // 이메일 발송
@@ -145,16 +143,14 @@ export class PasswordResetService {
         await trx('g_users')
           .where('id', validation.userId)
           .update({
-            passwordHash: hashedPassword,
-            updatedAt: db.fn.now()
+            passwordHash: hashedPassword
           });
 
         // 토큰을 사용됨으로 표시
         await trx('g_password_reset_tokens')
           .where('token', token)
           .update({
-            used: true,
-            updatedAt: db.fn.now()
+            used: true
           });
 
         // 해당 사용자의 다른 모든 토큰도 사용됨으로 표시
@@ -162,8 +158,7 @@ export class PasswordResetService {
           .where('userId', validation.userId)
           .where('used', false)
           .update({
-            used: true,
-            updatedAt: db.fn.now()
+            used: true
           });
       });
 
