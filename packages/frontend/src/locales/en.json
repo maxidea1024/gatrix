@@ -347,6 +347,9 @@
     "loginSuccess": "Login successful",
     "loginWithGitHub": "Login with GitHub",
     "loginWithGoogle": "Login with Google",
+    "loginWithQQ": "Login with QQ",
+    "loginWithWeChat": "Login with WeChat",
+    "loginWithBaidu": "Login with Baidu",
     "logout": {
       "title": "Logout",
       "confirmation": "{{name}}, are you sure you want to logout?",

@@ -15,6 +15,7 @@ export class UserModel {
           'g_users.preferredLanguage',
           'g_users.role',
           'g_users.status',
+          'g_users.authType',
           'g_users.emailVerified',
           'g_users.emailVerifiedAt',
           'g_users.lastLoginAt',
@@ -97,6 +98,7 @@ export class UserModel {
         preferredLanguage: userData.preferredLanguage || 'en',
         role: userData.role || 'user',
         status: userData.status || 'pending',
+        authType: userData.authType || 'local',
         emailVerified: userData.emailVerified || false,
         createdBy: userData.createdBy || null
       });
@@ -218,6 +220,7 @@ export class UserModel {
           'g_users.preferredLanguage',
           'g_users.role',
           'g_users.status',
+          'g_users.authType',
           'g_users.emailVerified',
           'g_users.emailVerifiedAt',
           'g_users.lastLoginAt',

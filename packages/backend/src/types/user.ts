@@ -1,4 +1,5 @@
 export type SupportedLanguage = 'en' | 'ko' | 'zh';
+export type AuthType = 'local' | 'google' | 'github' | 'qq' | 'wechat' | 'baidu';
 
 export interface User {
   id: number;
@@ -9,6 +10,7 @@ export interface User {
   preferredLanguage: SupportedLanguage;
   role: 'admin' | 'user';
   status: 'pending' | 'active' | 'suspended' | 'deleted';
+  authType: AuthType;
   emailVerified: boolean;
   emailVerifiedAt?: Date;
   lastLoginAt?: Date;
@@ -29,6 +31,7 @@ export interface CreateUserData {
   preferredLanguage?: SupportedLanguage;
   role?: 'admin' | 'user';
   status?: 'pending' | 'active' | 'suspended' | 'deleted';
+  authType?: AuthType;
   emailVerified?: boolean;
   oauthProvider?: string;
   oauthId?: string;
@@ -42,6 +45,7 @@ export interface UpdateUserData {
   preferredLanguage?: SupportedLanguage;
   role?: 'admin' | 'user';
   status?: 'pending' | 'active' | 'suspended' | 'deleted';
+  authType?: AuthType;
   emailVerified?: boolean;
   lastLoginAt?: Date;
 }
@@ -51,7 +55,7 @@ export interface UserWithoutPassword extends Omit<User, 'passwordHash'> {}
 export interface OAuthAccount {
   id: number;
   userId: number;
-  provider: 'google' | 'github';
+  provider: 'google' | 'github' | 'qq' | 'wechat' | 'baidu';
   providerId: string;
   providerEmail?: string;
   providerName?: string;
@@ -65,7 +69,7 @@ export interface OAuthAccount {
 
 export interface CreateOAuthAccountData {
   userId: number;
-  provider: 'google' | 'github';
+  provider: 'google' | 'github' | 'qq' | 'wechat' | 'baidu';
   providerId: string;
   providerEmail?: string;
   providerName?: string;

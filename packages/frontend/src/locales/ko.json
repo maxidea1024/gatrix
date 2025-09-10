@@ -347,6 +347,9 @@
     "loginSuccess": "로그인 성공",
     "loginWithGitHub": "GitHub로 로그인",
     "loginWithGoogle": "Google로 로그인",
+    "loginWithQQ": "QQ로 로그인",
+    "loginWithWeChat": "WeChat으로 로그인",
+    "loginWithBaidu": "Baidu로 로그인",
     "logout": {
       "title": "로그아웃",
       "confirmation": "{{name}}님, 정말 로그아웃하시겠습니까?",

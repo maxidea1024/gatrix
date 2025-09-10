@@ -22,6 +22,9 @@ import {
   GitHub,
   Login as LoginIcon,
 } from '@mui/icons-material';
+import QQIcon from '../../components/icons/QQIcon';
+import WeChatIcon from '../../components/icons/WeChatIcon';
+import BaiduIcon from '../../components/icons/BaiduIcon';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -221,6 +224,18 @@ const LoginPage: React.FC = () => {
     window.location.href = AuthService.getGitHubAuthUrl();
   };
 
+  const handleQQLogin = () => {
+    window.location.href = AuthService.getQQAuthUrl();
+  };
+
+  const handleWeChatLogin = () => {
+    window.location.href = AuthService.getWeChatAuthUrl();
+  };
+
+  const handleBaiduLogin = () => {
+    window.location.href = AuthService.getBaiduAuthUrl();
+  };
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -384,25 +399,88 @@ const LoginPage: React.FC = () => {
 
             {/* OAuth Buttons */}
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <Button
-                fullWidth
-                variant="outlined"
-                startIcon={<Google />}
-                onClick={handleGoogleLogin}
-                disabled={isSubmitting || isLoading}
-              >
-                {t('auth.loginWithGoogle')}
-              </Button>
+              {/* First Row: Google & GitHub */}
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<Google />}
+                  onClick={handleGoogleLogin}
+                  disabled={isSubmitting || isLoading}
+                >
+                  {t('auth.loginWithGoogle')}
+                </Button>
 
-              <Button
-                fullWidth
-                variant="outlined"
-                startIcon={<GitHub />}
-                onClick={handleGitHubLogin}
-                disabled={isSubmitting || isLoading}
-              >
-                {t('auth.loginWithGitHub')}
-              </Button>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<GitHub />}
+                  onClick={handleGitHubLogin}
+                  disabled={isSubmitting || isLoading}
+                >
+                  {t('auth.loginWithGitHub')}
+                </Button>
+              </Box>
+
+              {/* Second Row: QQ & WeChat */}
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<QQIcon sx={{ fontSize: '20px' }} />}
+                  onClick={handleQQLogin}
+                  disabled={isSubmitting || isLoading}
+                  sx={{
+                    height: '40px', // Google/GitHub 버튼과 동일한 높이
+                    minHeight: '40px',
+                    fontSize: '0.875rem',
+                    textTransform: 'none',
+                  }}
+                >
+                  {t('auth.loginWithQQ')}
+                </Button>
+
+                {/* WeChat OAuth - Coming Soon */}
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<WeChatIcon sx={{ fontSize: '20px' }} />}
+                  onClick={handleWeChatLogin}
+                  disabled={true}
+                  sx={{
+                    height: '40px', // Google/GitHub 버튼과 동일한 높이
+                    minHeight: '40px',
+                    fontSize: '0.875rem',
+                    textTransform: 'none',
+                    opacity: 0.6,
+                  }}
+                >
+                  {t('auth.loginWithWeChat')} (준비중)
+                </Button>
+              </Box>
+
+              {/* Third Row: Baidu (left aligned) */}
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <Button
+                  sx={{ width: '48%' }} // 절반 너비로 좌측 정렬
+                  variant="outlined"
+                  startIcon={<BaiduIcon sx={{ fontSize: '20px' }} />}
+                  onClick={handleBaiduLogin}
+                  disabled={true}
+                  sx={{
+                    width: '48%',
+                    height: '40px', // Google/GitHub 버튼과 동일한 높이
+                    minHeight: '40px',
+                    fontSize: '0.875rem',
+                    textTransform: 'none',
+                    opacity: 0.6,
+                  }}
+                >
+                  {t('auth.loginWithBaidu')} (준비중)
+                </Button>
+                {/* Empty space to maintain layout */}
+                <Box sx={{ flex: 1 }} />
+              </Box>
             </Box>
 
             {/* Register Link */}

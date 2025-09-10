@@ -50,6 +50,18 @@ const config = {
       clientId: process.env.GITHUB_CLIENT_ID || '',
       clientSecret: process.env.GITHUB_CLIENT_SECRET || '',
     },
+    qq: {
+      clientId: process.env.QQ_CLIENT_ID || '',
+      clientSecret: process.env.QQ_CLIENT_SECRET || '',
+    },
+    wechat: {
+      clientId: process.env.WECHAT_CLIENT_ID || '',
+      clientSecret: process.env.WECHAT_CLIENT_SECRET || '',
+    },
+    baidu: {
+      clientId: process.env.BAIDU_CLIENT_ID || '',
+      clientSecret: process.env.BAIDU_CLIENT_SECRET || '',
+    },
   },
 
   // Admin configuration

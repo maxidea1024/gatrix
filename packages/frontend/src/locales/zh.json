@@ -348,6 +348,9 @@
     "loginSuccess": "登录成功",
     "loginWithGitHub": "使用GitHub登录",
     "loginWithGoogle": "使用Google登录",
+    "loginWithQQ": "使用QQ登录",
+    "loginWithWeChat": "使用微信登录",
+    "loginWithBaidu": "使用百度登录",
     "logout": {
       "title": "退出登录",
       "confirmation": "{{name}}，您确定要退出登录吗？",

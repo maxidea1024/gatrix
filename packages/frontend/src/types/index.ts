@@ -1,5 +1,6 @@
 // User types
 export type SupportedLanguage = 'en' | 'ko' | 'zh';
+export type AuthType = 'local' | 'google' | 'github' | 'qq' | 'wechat' | 'baidu';
 
 // 태그 인터페이스
 export interface Tag {
@@ -19,6 +20,7 @@ export interface User {
   preferredLanguage: SupportedLanguage;
   role: 'admin' | 'user';
   status: 'pending' | 'active' | 'suspended' | 'deleted';
+  authType: AuthType;
   emailVerified: boolean;
   emailVerifiedAt?: string;
   lastLoginAt?: string;

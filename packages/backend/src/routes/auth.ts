@@ -97,6 +97,159 @@ router.get('/github/callback', async (req, res, next) => {
   )(req, res, next);
 });
 
+// QQ OAuth routes
+router.get('/qq',
+  (req, res, next) =>
+    (passport.authenticate as any)('qq', {
+      callbackURL: `${req.protocol}://${req.get('host')}/api/v1/auth/qq/callback`,
+    })(req, res, next)
+);
+
+router.get('/qq/callback', async (req, res, next) => {
+  const callbackURL = `${req.protocol}://${req.get('host')}/api/v1/auth/qq/callback`;
+  const code = req.query.code as string;
+
+  if (!code) {
+    return res.redirect('/api/v1/auth/failure');
+  }
+
+  // Check if this code has already been used
+  const cacheKey = `oauth:qq:code:${code}`;
+  const alreadyUsed = await redisClient.get(cacheKey);
+
+  if (alreadyUsed) {
+    console.log('QQ OAuth: Code already used, redirecting to failure');
+    return res.redirect('/api/v1/auth/failure');
+  }
+
+  // Mark code as used (expires in 10 minutes)
+  await redisClient.set(cacheKey, 'used', 600);
+
+  (passport.authenticate as any)(
+    'qq',
+    {
+      failureRedirect: '/api/v1/auth/failure',
+      session: false,
+      callbackURL,
+    },
+    (err: any, user: any, info: any) => {
+      if (err) {
+        console.error('QQ OAuth error:', err);
+        return res.redirect('/api/v1/auth/failure');
+      }
+      if (!user) {
+        console.error('QQ OAuth: No user returned', info);
+        return res.redirect('/api/v1/auth/failure');
+      }
+      console.log('QQ OAuth success:', user?.email);
+      (req as any).user = user;
+      return (AuthController.oauthSuccess as any)(req, res, next);
+    }
+  )(req, res, next);
+});
+
+// WeChat OAuth routes - TODO: Implement when passport-wechat is available
+// router.get('/wechat',
+//   (req, res, next) =>
+//     (passport.authenticate as any)('wechat', {
+//       callbackURL: `${req.protocol}://${req.get('host')}/api/v1/auth/wechat/callback`,
+//     })(req, res, next)
+// );
+
+// router.get('/wechat/callback', async (req, res, next) => {
+//   const callbackURL = `${req.protocol}://${req.get('host')}/api/v1/auth/wechat/callback`;
+//   const code = req.query.code as string;
+
+//   if (!code) {
+//     return res.redirect('/api/v1/auth/failure');
+//   }
+
+//   // Check if this code has already been used
+//   const cacheKey = `oauth:wechat:code:${code}`;
+//   const alreadyUsed = await redisClient.get(cacheKey);
+
+//   if (alreadyUsed) {
+//     console.log('WeChat OAuth: Code already used, redirecting to failure');
+//     return res.redirect('/api/v1/auth/failure');
+//   }
+
+//   // Mark code as used (expires in 10 minutes)
+//   await redisClient.set(cacheKey, 'used', 600);
+
+//   (passport.authenticate as any)(
+//     'wechat',
+//     {
+//       failureRedirect: '/api/v1/auth/failure',
+//       session: false,
+//       callbackURL,
+//     },
+//     (err: any, user: any, info: any) => {
+//       if (err) {
+//         console.error('WeChat OAuth error:', err);
+//         return res.redirect('/api/v1/auth/failure');
+//       }
+//       if (!user) {
+//         console.error('WeChat OAuth: No user returned', info);
+//         return res.redirect('/api/v1/auth/failure');
+//       }
+//       console.log('WeChat OAuth success:', user?.email);
+//       (req as any).user = user;
+//       return (AuthController.oauthSuccess as any)(req, res, next);
+//     }
+//   )(req, res, next);
+// });
+
+// Baidu OAuth routes - TODO: Implement when passport-baidu is available
+// router.get('/baidu',
+//   (req, res, next) =>
+//     (passport.authenticate as any)('baidu', {
+//       callbackURL: `${req.protocol}://${req.get('host')}/api/v1/auth/baidu/callback`,
+//     })(req, res, next)
+// );
+
+// router.get('/baidu/callback', async (req, res, next) => {
+//   const callbackURL = `${req.protocol}://${req.get('host')}/api/v1/auth/baidu/callback`;
+//   const code = req.query.code as string;
+
+//   if (!code) {
+//     return res.redirect('/api/v1/auth/failure');
+//   }
+
+//   // Check if this code has already been used
+//   const cacheKey = `oauth:baidu:code:${code}`;
+//   const alreadyUsed = await redisClient.get(cacheKey);
+
+//   if (alreadyUsed) {
+//     console.log('Baidu OAuth: Code already used, redirecting to failure');
+//     return res.redirect('/api/v1/auth/failure');
+//   }
+
+//   // Mark code as used (expires in 10 minutes)
+//   await redisClient.set(cacheKey, 'used', 600);
+
+//   (passport.authenticate as any)(
+//     'baidu',
+//     {
+//       failureRedirect: '/api/v1/auth/failure',
+//       session: false,
+//       callbackURL,
+//     },
+//     (err: any, user: any, info: any) => {
+//       if (err) {
+//         console.error('Baidu OAuth error:', err);
+//         return res.redirect('/api/v1/auth/failure');
+//       }
+//       if (!user) {
+//         console.error('Baidu OAuth: No user returned', info);
+//         return res.redirect('/api/v1/auth/failure');
+//       }
+//       console.log('Baidu OAuth success:', user?.email);
+//       (req as any).user = user;
+//       return (AuthController.oauthSuccess as any)(req, res, next);
+//     }
+//   )(req, res, next);
+// });
+
 // OAuth callback routes
 router.get('/success', AuthController.oauthSuccess);
 router.get('/failure', AuthController.oauthFailure);

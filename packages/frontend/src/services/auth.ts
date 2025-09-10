@@ -208,6 +208,18 @@ export class AuthService {
     return '/api/v1/auth/github';
   }
 
+  static getQQAuthUrl(): string {
+    return '/api/v1/auth/qq';
+  }
+
+  static getWeChatAuthUrl(): string {
+    return '/api/v1/auth/wechat';
+  }
+
+  static getBaiduAuthUrl(): string {
+    return '/api/v1/auth/baidu';
+  }
+
   static handleOAuthCallback(token: string): void {
     // Store the token and redirect based on user status
     localStorage.setItem('accessToken', token);
