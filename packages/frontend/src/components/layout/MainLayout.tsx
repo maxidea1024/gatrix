@@ -249,12 +249,21 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const drawerContent = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* 로고 영역 */}
-      <Box sx={{
-        p: sidebarCollapsed ? 2 : 3,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
-      }}>
+      <Box
+        sx={{
+          p: sidebarCollapsed ? 2 : 3,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+          cursor: 'pointer',
+          '&:hover': {
+            backgroundColor: 'rgba(255,255,255,0.05)',
+          },
+          borderRadius: 1,
+          transition: 'background-color 0.2s ease'
+        }}
+        onClick={() => navigate('/dashboard')}
+      >
         <Box
           sx={{
             width: 32,
@@ -484,7 +493,22 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               </IconButton>
             )}
 
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                cursor: 'pointer',
+                '&:hover': {
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                },
+                borderRadius: 1,
+                px: 1,
+                py: 0.5,
+                transition: 'background-color 0.2s ease'
+              }}
+              onClick={() => navigate('/dashboard')}
+            >
               <Box
                 sx={{
                   width: 32,

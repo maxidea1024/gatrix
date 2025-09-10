@@ -13,6 +13,11 @@ import {
   FormControlLabel,
   Alert,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
 } from '@mui/material';
 import {
   Visibility,
@@ -21,6 +26,7 @@ import {
   GitHub,
   Login as LoginIcon,
   Apple,
+  Warning,
 } from '@mui/icons-material';
 import QQIcon from '../../components/icons/QQIcon';
 import WeChatIcon from '../../components/icons/WeChatIcon';
@@ -92,6 +98,9 @@ const LoginPage: React.FC = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [oauthLoading, setOauthLoading] = useState<string | null>(null); // 'google', 'github', 'qq', etc.
+  const [showRememberMeWarning, setShowRememberMeWarning] = useState(false);
+  const [pendingRememberMe, setPendingRememberMe] = useState(false);
 
   const from = (location.state as any)?.from?.pathname || '/dashboard';
 
@@ -104,7 +113,14 @@ const LoginPage: React.FC = () => {
       setLoginError(t('auth.errors.oauthFailed'));
       // Clear the error from URL
       navigate(location.pathname, { replace: true });
+    } else if (oauthError === 'oauth_timeout') {
+      setLoginError(t('auth.errors.oauthTimeout'));
+      // Clear the error from URL
+      navigate(location.pathname, { replace: true });
     }
+
+    // OAuth 로딩 상태 초기화
+    setOauthLoading(null);
   }, [location.search, location.pathname, navigate, t]);
 
   // Validation schema with translations
@@ -130,6 +146,7 @@ const LoginPage: React.FC = () => {
     reset,
     clearErrors,
     watch,
+    setValue,
   } = useForm<LoginCredentials & { rememberMe: boolean }>({
     resolver,
     mode: 'onChange', // 실시간 validation 활성화
@@ -149,11 +166,19 @@ const LoginPage: React.FC = () => {
     const rememberedEmail = AuthService.getRememberedEmail();
     const isRememberMeEnabled = AuthService.isRememberMeEnabled();
 
+    // 기억된 이메일과 설정이 모두 있을 때만 폼에 설정
     if (rememberedEmail && isRememberMeEnabled) {
       reset({
         email: rememberedEmail,
         password: '',
         rememberMe: true,
+      });
+    } else {
+      // 기억된 설정이 없거나 불일치하면 초기화
+      reset({
+        email: '',
+        password: '',
+        rememberMe: false,
       });
     }
   }, [reset]);
@@ -169,11 +194,25 @@ const LoginPage: React.FC = () => {
       setLoginError(null);
       clearError();
 
-      await login({
+      // 최소 2초 대기
+      const startTime = Date.now();
+
+      const loginPromise = login({
         email: data.email,
         password: data.password,
         rememberMe: data.rememberMe,
       });
+
+      // 최소 2초가 지나지 않았다면 추가 대기
+      const elapsed = Date.now() - startTime;
+      if (elapsed < 2000) {
+        await Promise.all([
+          loginPromise,
+          new Promise(resolve => setTimeout(resolve, 2000 - elapsed))
+        ]);
+      } else {
+        await loginPromise;
+      }
 
       navigate(from, { replace: true });
     } catch (err: any) {
@@ -217,28 +256,74 @@ const LoginPage: React.FC = () => {
     }
   };
 
+  const handleOAuthLogin = async (provider: string, authUrl: string) => {
+    setOauthLoading(provider);
+    setLoginError(null);
+
+    // 최소 2초 대기
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // 타임아웃 설정 (30초)
+    const timeout = setTimeout(() => {
+      setOauthLoading(null);
+      setLoginError(t('auth.errors.oauthTimeout'));
+    }, 30000);
+
+    // 페이지 이동 전에 타임아웃 정보를 sessionStorage에 저장
+    sessionStorage.setItem('oauthTimeout', timeout.toString());
+    sessionStorage.setItem('oauthProvider', provider);
+
+    window.location.href = authUrl;
+  };
+
   const handleGoogleLogin = () => {
-    window.location.href = AuthService.getGoogleAuthUrl();
+    handleOAuthLogin('google', AuthService.getGoogleAuthUrl());
   };
 
   const handleGitHubLogin = () => {
-    window.location.href = AuthService.getGitHubAuthUrl();
+    handleOAuthLogin('github', AuthService.getGitHubAuthUrl());
   };
 
   const handleQQLogin = () => {
-    window.location.href = AuthService.getQQAuthUrl();
+    handleOAuthLogin('qq', AuthService.getQQAuthUrl());
   };
 
   const handleWeChatLogin = () => {
-    window.location.href = AuthService.getWeChatAuthUrl();
+    handleOAuthLogin('wechat', AuthService.getWeChatAuthUrl());
   };
 
   const handleBaiduLogin = () => {
-    window.location.href = AuthService.getBaiduAuthUrl();
+    handleOAuthLogin('baidu', AuthService.getBaiduAuthUrl());
   };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  // 이메일 기억하기 체크박스 변경 핸들러
+  const handleRememberMeChange = (checked: boolean, onChange: (value: boolean) => void) => {
+    if (checked) {
+      // 체크하려고 할 때 보안 경고 표시
+      setPendingRememberMe(true);
+      setShowRememberMeWarning(true);
+    } else {
+      // 체크 해제할 때는 즉시 적용하고 저장된 이메일도 삭제
+      onChange(false);
+      AuthService.clearRememberedCredentials();
+    }
+  };
+
+  // 보안 경고 확인 시
+  const handleRememberMeConfirm = () => {
+    setValue('rememberMe', true);
+    setShowRememberMeWarning(false);
+    setPendingRememberMe(false);
+  };
+
+  // 보안 경고 취소 시
+  const handleRememberMeCancel = () => {
+    setShowRememberMeWarning(false);
+    setPendingRememberMe(false);
   };
 
 
@@ -398,8 +483,8 @@ const LoginPage: React.FC = () => {
               <FormControlLabel
                 control={
                   <Checkbox
-                    {...field}
                     checked={field.value}
+                    onChange={(e) => handleRememberMeChange(e.target.checked, field.onChange)}
                     sx={{
                       color: 'rgba(255, 255, 255, 0.7)',
                       '&.Mui-checked': {
@@ -498,7 +583,7 @@ const LoginPage: React.FC = () => {
           <Tooltip title={t('auth.loginWithGoogle')} arrow>
             <IconButton
               onClick={handleGoogleLogin}
-              disabled={isSubmitting || isLoading}
+              disabled={isSubmitting || isLoading || oauthLoading !== null}
               sx={{
                 width: 56,
                 height: 56,
@@ -518,14 +603,18 @@ const LoginPage: React.FC = () => {
                 },
               }}
             >
-              <Google sx={{ fontSize: 24 }} />
+              {oauthLoading === 'google' ? (
+                <CircularProgress size={24} sx={{ color: 'white' }} />
+              ) : (
+                <Google sx={{ fontSize: 24 }} />
+              )}
             </IconButton>
           </Tooltip>
 
           <Tooltip title={t('auth.loginWithGitHub')} arrow>
             <IconButton
               onClick={handleGitHubLogin}
-              disabled={isSubmitting || isLoading}
+              disabled={isSubmitting || isLoading || oauthLoading !== null}
               sx={{
                 width: 56,
                 height: 56,
@@ -545,14 +634,18 @@ const LoginPage: React.FC = () => {
                 },
               }}
             >
-              <GitHub sx={{ fontSize: 24 }} />
+              {oauthLoading === 'github' ? (
+                <CircularProgress size={24} sx={{ color: 'white' }} />
+              ) : (
+                <GitHub sx={{ fontSize: 24 }} />
+              )}
             </IconButton>
           </Tooltip>
 
           <Tooltip title={t('auth.loginWithQQ')} arrow>
             <IconButton
               onClick={handleQQLogin}
-              disabled={isSubmitting || isLoading}
+              disabled={isSubmitting || isLoading || oauthLoading !== null}
               sx={{
                 width: 56,
                 height: 56,
@@ -572,7 +665,11 @@ const LoginPage: React.FC = () => {
                 },
               }}
             >
-              <QQIcon sx={{ fontSize: 24 }} />
+              {oauthLoading === 'qq' ? (
+                <CircularProgress size={24} sx={{ color: 'white' }} />
+              ) : (
+                <QQIcon sx={{ fontSize: 24 }} />
+              )}
             </IconButton>
           </Tooltip>
 
@@ -625,6 +722,78 @@ const LoginPage: React.FC = () => {
           </Tooltip>
         </Box>
       </Box>
+
+      {/* 보안 경고 대화상자 */}
+      <Dialog
+        open={showRememberMeWarning}
+        onClose={handleRememberMeCancel}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            backgroundColor: 'rgba(30, 30, 30, 0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            color: 'white',
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          color: '#ff9800',
+          fontWeight: 'bold',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1
+        }}>
+          <Warning /> {t('auth.rememberMeWarning.title')}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ color: 'rgba(255, 255, 255, 0.9)', mb: 2 }}>
+            {t('auth.rememberMeWarning.message')}
+          </DialogContentText>
+          <Alert
+            severity="warning"
+            sx={{
+              backgroundColor: 'rgba(255, 152, 0, 0.1)',
+              color: '#ffb74d',
+              border: '1px solid rgba(255, 152, 0, 0.2)',
+              '& .MuiAlert-icon': {
+                color: '#ffb74d'
+              }
+            }}
+          >
+            {t('auth.rememberMeWarning.publicDevice')}
+          </Alert>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, gap: 1 }}>
+          <Button
+            onClick={handleRememberMeCancel}
+            variant="outlined"
+            sx={{
+              borderColor: 'rgba(255, 255, 255, 0.3)',
+              color: 'rgba(255, 255, 255, 0.8)',
+              '&:hover': {
+                borderColor: 'rgba(255, 255, 255, 0.5)',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              }
+            }}
+          >
+            {t('auth.rememberMeWarning.cancel')}
+          </Button>
+          <Button
+            onClick={handleRememberMeConfirm}
+            variant="contained"
+            sx={{
+              background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+              '&:hover': {
+                background: 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)',
+              }
+            }}
+          >
+            {t('auth.rememberMeWarning.understand')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </AuthLayout>
   );
 };

@@ -360,7 +360,8 @@
       "serverError": "服务器发生错误。请稍后重试。",
       "networkError": "请检查您的网络连接并重试。",
       "loginFailed": "登录失败。请重试。",
-      "oauthFailed": "OAuth认证失败。请重试或使用邮箱/密码登录。"
+      "oauthFailed": "OAuth认证失败。请重试或使用邮箱/密码登录。",
+      "oauthTimeout": "OAuth登录超时。请检查网络连接并重试。"
     },
     "forgotPassword": "忘记密码？",
     "forgotPasswordDescription": "输入您的邮箱地址，我们将发送密码重置链接。",
@@ -410,6 +411,13 @@
     "registerSuccess": "注册成功",
     "registerSuccessDescription": "账户创建成功。管理员审批后您可以登录。",
     "rememberMe": "记住邮箱",
+    "rememberMeWarning": {
+      "title": "安全警告",
+      "message": "使用\"记住邮箱\"功能会将您的邮箱地址存储在此设备上。在公用电脑或其他人可能使用的设备上，这可能存在安全风险。",
+      "publicDevice": "请勿在公用设备上使用",
+      "understand": "我明白了",
+      "cancel": "取消"
+    },
     "requestNewReset": "请求新的重置",
     "resendEmail": "重新发送邮件",
     "resetPassword": "重置密码",

@@ -14,11 +14,19 @@ const OAuthCallbackPage: React.FC = () => {
   const { t } = useTranslation();
 
   useEffect(() => {
+    // 타임아웃 설정 (30초)
+    const timeout = setTimeout(() => {
+      navigate('/login?error=oauth_timeout', { replace: true });
+    }, 30000);
+
     const handleCallback = async () => {
       try {
+        // 성공 시 타임아웃 클리어
+        clearTimeout(timeout);
+
         // Get token from URL parameters
         const token = searchParams.get('token');
-        
+
         if (!token) {
           // No token, redirect to login with error
           navigate('/login?error=oauth_failed', { replace: true });
@@ -50,11 +58,17 @@ const OAuthCallbackPage: React.FC = () => {
         }
       } catch (error) {
         console.error('OAuth callback error:', error);
+        clearTimeout(timeout);
         navigate('/login?error=oauth_failed', { replace: true });
       }
     };
 
     handleCallback();
+
+    // 컴포넌트 언마운트 시 타임아웃 클리어
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [navigate, searchParams]);
 
   return (

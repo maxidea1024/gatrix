@@ -49,6 +49,7 @@ const RegisterPage: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [registerSuccess, setRegisterSuccess] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<string | null>(null); // 'google', 'github', 'qq', etc.
 
   // Validation schema with translations
   const registerSchema = useMemo(() => yup.object({
@@ -102,11 +103,25 @@ const RegisterPage: React.FC = () => {
       setRegisterError(null);
       clearError();
 
-      await register({
+      // 최소 2초 대기
+      const startTime = Date.now();
+
+      const registerPromise = register({
         name: data.name,
         email: data.email,
         password: data.password,
       });
+
+      // 최소 2초가 지나지 않았다면 추가 대기
+      const elapsed = Date.now() - startTime;
+      if (elapsed < 2000) {
+        await Promise.all([
+          registerPromise,
+          new Promise(resolve => setTimeout(resolve, 2000 - elapsed))
+        ]);
+      } else {
+        await registerPromise;
+      }
 
       setRegisterSuccess(true);
       toast.success(t('auth.registerSuccess'));
@@ -126,16 +141,36 @@ const RegisterPage: React.FC = () => {
   };
 
   // OAuth handlers
+  const handleOAuthSignUp = async (provider: string, authUrl: string) => {
+    setOauthLoading(provider);
+    setRegisterError(null);
+
+    // 최소 2초 대기
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // 타임아웃 설정 (30초)
+    const timeout = setTimeout(() => {
+      setOauthLoading(null);
+      setRegisterError(t('auth.errors.oauthTimeout'));
+    }, 30000);
+
+    // 페이지 이동 전에 타임아웃 정보를 sessionStorage에 저장
+    sessionStorage.setItem('oauthTimeout', timeout.toString());
+    sessionStorage.setItem('oauthProvider', provider);
+
+    window.location.href = authUrl;
+  };
+
   const handleGoogleLogin = () => {
-    window.location.href = '/api/v1/auth/google';
+    handleOAuthSignUp('google', '/api/v1/auth/google');
   };
 
   const handleGitHubLogin = () => {
-    window.location.href = '/api/v1/auth/github';
+    handleOAuthSignUp('github', '/api/v1/auth/github');
   };
 
   const handleQQLogin = () => {
-    window.location.href = '/api/v1/auth/qq';
+    handleOAuthSignUp('qq', '/api/v1/auth/qq');
   };
 
   const handleWeChatLogin = () => {
@@ -488,7 +523,7 @@ const RegisterPage: React.FC = () => {
           <Tooltip title={t('auth.signUpWithGoogle')} arrow>
             <IconButton
               onClick={handleGoogleLogin}
-              disabled={isSubmitting || isLoading}
+              disabled={isSubmitting || isLoading || oauthLoading !== null}
               sx={{
                 width: 56,
                 height: 56,
@@ -508,14 +543,18 @@ const RegisterPage: React.FC = () => {
                 },
               }}
             >
-              <Google sx={{ fontSize: 24 }} />
+              {oauthLoading === 'google' ? (
+                <CircularProgress size={24} sx={{ color: 'white' }} />
+              ) : (
+                <Google sx={{ fontSize: 24 }} />
+              )}
             </IconButton>
           </Tooltip>
 
           <Tooltip title={t('auth.signUpWithGitHub')} arrow>
             <IconButton
               onClick={handleGitHubLogin}
-              disabled={isSubmitting || isLoading}
+              disabled={isSubmitting || isLoading || oauthLoading !== null}
               sx={{
                 width: 56,
                 height: 56,
@@ -535,14 +574,18 @@ const RegisterPage: React.FC = () => {
                 },
               }}
             >
-              <GitHub sx={{ fontSize: 24 }} />
+              {oauthLoading === 'github' ? (
+                <CircularProgress size={24} sx={{ color: 'white' }} />
+              ) : (
+                <GitHub sx={{ fontSize: 24 }} />
+              )}
             </IconButton>
           </Tooltip>
 
           <Tooltip title={t('auth.signUpWithQQ')} arrow>
             <IconButton
               onClick={handleQQLogin}
-              disabled={isSubmitting || isLoading}
+              disabled={isSubmitting || isLoading || oauthLoading !== null}
               sx={{
                 width: 56,
                 height: 56,
@@ -562,7 +605,11 @@ const RegisterPage: React.FC = () => {
                 },
               }}
             >
-              <QQIcon sx={{ fontSize: 24 }} />
+              {oauthLoading === 'qq' ? (
+                <CircularProgress size={24} sx={{ color: 'white' }} />
+              ) : (
+                <QQIcon sx={{ fontSize: 24 }} />
+              )}
             </IconButton>
           </Tooltip>
 

@@ -359,7 +359,8 @@
       "serverError": "Server error occurred. Please try again later.",
       "networkError": "Please check your network connection and try again.",
       "loginFailed": "Login failed. Please try again.",
-      "oauthFailed": "OAuth authentication failed. Please try again or use email/password login."
+      "oauthFailed": "OAuth authentication failed. Please try again or use email/password login.",
+      "oauthTimeout": "OAuth login timed out. Please check your network connection and try again."
     },
     "forgotPassword": "Forgot Password?",
     "forgotPasswordDescription": "Enter your email address and we'll send you a password reset link.",
@@ -409,6 +410,13 @@
     "registerSuccess": "Registration successful",
     "registerSuccessDescription": "Account created successfully. You can login after admin approval.",
     "rememberMe": "Remember Email",
+    "rememberMeWarning": {
+      "title": "Security Warning",
+      "message": "Using the 'Remember email' feature will store your email address on this device. This could be a security risk on public computers or devices that others may use.",
+      "publicDevice": "Do not use on public devices",
+      "understand": "I understand",
+      "cancel": "Cancel"
+    },
     "requestNewReset": "requestNewReset",
     "resendEmail": "Resend Email",
     "resetPassword": "Reset Password",

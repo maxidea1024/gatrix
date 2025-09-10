@@ -32,10 +32,9 @@ const LogoutPage: React.FC = () => {
       setLogoutError(null);
       
       await logout();
-      
+
       setLogoutComplete(true);
-      enqueueSnackbar(t('auth.logout.success'), { variant: 'success' });
-      
+
       // 2초 후 로그인 페이지로 이동
       setTimeout(() => {
         navigate('/login', { replace: true });
