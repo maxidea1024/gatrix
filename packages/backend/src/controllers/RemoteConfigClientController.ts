@@ -4,7 +4,6 @@ import ConfigRuleModel from '../models/ConfigRule';
 import logger from '../config/logger';
 import { CustomError } from '../middleware/errorHandler';
 import { TrafficSplitter, CampaignEvaluator } from '../utils/trafficSplitter';
-import { Database } from '../config/database';
 import {
   EvaluationContext,
   EvaluationResult,
@@ -245,17 +244,15 @@ export class RemoteConfigClientController {
     value: string;
   }> | null> {
     try {
-      const db = Database.getInstance();
+      const knex = require('../config/knex').default;
 
-      // Query database for active variants
-      const [rows] = await db.query(`
-        SELECT id, trafficPercentage, value
-        FROM g_remote_config_variants
-        WHERE configId = ? AND isActive = true
-        ORDER BY priority DESC
-      `, [configId]);
+      // Query database for active variants using knex
+      const variants = await knex('g_remote_config_variants')
+        .select('id', 'trafficPercentage', 'value')
+        .where('configId', configId)
+        .where('isActive', true)
+        .orderBy('priority', 'desc');
 
-      const variants = Array.isArray(rows) ? rows : [];
       return variants.length > 0 ? variants : null;
     } catch (error) {
       logger.error('Error getting active variants:', error);

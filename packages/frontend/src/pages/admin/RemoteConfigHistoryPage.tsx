@@ -10,7 +10,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TablePagination,
   IconButton,
   Chip,
   TextField,
@@ -29,13 +28,8 @@ import {
   Stack,
   Card,
   CardContent,
-  Timeline,
-  TimelineItem,
-  TimelineSeparator,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-  TimelineOppositeContent,
+  LinearProgress,
+  Badge,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -50,6 +44,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import api from '@/services/api';
+import SimplePagination from '@/components/common/SimplePagination';
+import { formatDateTimeDetailed } from '@/utils/dateFormat';
 
 // Types
 interface ConfigVersion {
@@ -63,6 +59,7 @@ interface ConfigVersion {
   createdBy: number | null;
   createdAt: string;
   createdByName?: string;
+  createdByEmail?: string;
 }
 
 interface Deployment {
@@ -74,6 +71,7 @@ interface Deployment {
   deployedAt: string;
   rollbackDeploymentId: number | null;
   deployedByName?: string;
+  deployedByEmail?: string;
 }
 
 const RemoteConfigHistoryPage: React.FC = () => {
@@ -89,6 +87,8 @@ const RemoteConfigHistoryPage: React.FC = () => {
   // Dialog states
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Deployment | ConfigVersion | null>(null);
+  const [rollbackDialogOpen, setRollbackDialogOpen] = useState(false);
+  const [rollbackTarget, setRollbackTarget] = useState<Deployment | null>(null);
 
   // Load deployments
   const loadDeployments = async () => {
@@ -109,17 +109,9 @@ const RemoteConfigHistoryPage: React.FC = () => {
   const loadVersions = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/v1/remote-config/versions?page=${page + 1}&limit=${rowsPerPage}`, {
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to load versions');
-      }
-
-      const data = await response.json();
-      setVersions(data.data.versions);
-      setTotal(data.data.total);
+      const response = await api.get(`/remote-config/versions?page=${page + 1}&limit=${rowsPerPage}`);
+      setVersions(response.data.versions);
+      setTotal(response.data.total);
     } catch (error) {
       console.error('Error loading versions:', error);
       toast.error('Failed to load version history');
@@ -137,29 +129,24 @@ const RemoteConfigHistoryPage: React.FC = () => {
   }, [page, rowsPerPage, viewMode]);
 
   // Handle rollback
-  const handleRollback = async (deployment: Deployment) => {
-    if (!confirm(`Are you sure you want to rollback to deployment "${deployment.deploymentName || deployment.id}"?`)) {
-      return;
-    }
+  const handleRollback = (deployment: Deployment) => {
+    setRollbackTarget(deployment);
+    setRollbackDialogOpen(true);
+  };
+
+  // Confirm rollback
+  const confirmRollback = async () => {
+    if (!rollbackTarget) return;
 
     try {
-      const response = await fetch(`/api/v1/remote-config/rollback`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          deploymentId: deployment.id,
-        }),
+      await api.post('/remote-config/rollback', {
+        deploymentId: rollbackTarget.id,
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to rollback');
-      }
 
       toast.success('Rollback completed successfully');
       loadDeployments();
+      setRollbackDialogOpen(false);
+      setRollbackTarget(null);
     } catch (error) {
       console.error('Error rolling back:', error);
       toast.error('Failed to rollback deployment');
@@ -184,295 +171,570 @@ const RemoteConfigHistoryPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box>
       {/* Header */}
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Button
-            startIcon={<BackIcon />}
-            onClick={() => window.location.href = '/admin/remote-config'}
-          >
-            Back to Remote Config
-          </Button>
-          <Typography variant="h4" component="h1">
-            Remote Config History
-          </Typography>
-        </Box>
-        <Stack direction="row" spacing={2}>
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>View Mode</InputLabel>
-            <Select
-              value={viewMode}
-              onChange={(e) => setViewMode(e.target.value as any)}
-              label="View Mode"
-            >
-              <MenuItem value="deployments">Deployments</MenuItem>
-              <MenuItem value="versions">Versions</MenuItem>
-            </Select>
-          </FormControl>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={viewMode === 'deployments' ? loadDeployments : loadVersions}
-          >
-            Refresh
-          </Button>
-        </Stack>
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h5" component="h2" sx={{ mb: 1 }}>
+          {t('admin.remoteConfig.history.title')}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          {t('admin.remoteConfig.history.subtitle')}
+        </Typography>
       </Box>
+
+      {/* Controls */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center">
+            <Typography variant="h6" component="h3">
+              {viewMode === 'deployments' ?
+                t('admin.remoteConfig.history.deployments') :
+                t('admin.remoteConfig.history.versions')
+              }
+            </Typography>
+            <Stack direction="row" spacing={2}>
+              <FormControl size="small" sx={{ minWidth: 150 }}>
+                <InputLabel>{t('admin.remoteConfig.history.viewMode')}</InputLabel>
+                <Select
+                  value={viewMode}
+                  onChange={(e) => setViewMode(e.target.value as any)}
+                  label={t('admin.remoteConfig.history.viewMode')}
+                >
+                  <MenuItem value="deployments">{t('admin.remoteConfig.history.deployments')}</MenuItem>
+                  <MenuItem value="versions">{t('admin.remoteConfig.history.versions')}</MenuItem>
+                </Select>
+              </FormControl>
+              <Button
+                variant="outlined"
+                onClick={viewMode === 'deployments' ? loadDeployments : loadVersions}
+                startIcon={<RefreshIcon />}
+                size="small"
+              >
+                {t('common.refresh')}
+              </Button>
+            </Stack>
+          </Stack>
+        </CardContent>
+      </Card>
 
       {/* Deployments View */}
       {viewMode === 'deployments' && (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Deployment</TableCell>
-                <TableCell>Description</TableCell>
-                <TableCell>Deployed By</TableCell>
-                <TableCell>Deployed At</TableCell>
-                <TableCell>Configs Count</TableCell>
-                <TableCell align="right">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {deployments.map((deployment) => (
-                <TableRow key={deployment.id}>
-                  <TableCell>
-                    <Typography variant="body2" fontWeight={500}>
-                      {deployment.deploymentName || `Deployment #${deployment.id}`}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {deployment.description || '-'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">
-                      {deployment.deployedByName || 'System'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">
-                      {new Date(deployment.deployedAt).toLocaleString()}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={deployment.configsSnapshot ? Object.keys(deployment.configsSnapshot).length : 0}
-                      size="small"
-                      color="primary"
-                    />
-                  </TableCell>
-                  <TableCell align="right">
-                    <Stack direction="row" spacing={1}>
-                      <Tooltip title="View Details">
-                        <IconButton size="small" onClick={() => openDetailDialog(deployment)}>
-                          <ViewIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Rollback">
-                        <IconButton size="small" onClick={() => handleRollback(deployment)} color="warning">
-                          <RestoreIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </Stack>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={total}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={(_, newPage) => setPage(newPage)}
-            onRowsPerPageChange={(e) => {
-              setRowsPerPage(parseInt(e.target.value, 10));
-              setPage(0);
-            }}
-          />
-        </TableContainer>
+        <Card>
+          <CardContent sx={{ p: 0 }}>
+            {loading && <LinearProgress />}
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.deployment')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.description')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.deployedBy')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.deployedAt')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }} align="center">{t('admin.remoteConfig.history.configsCount')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }} align="center">{t('admin.remoteConfig.actions')}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {deployments.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          {loading ? t('common.loading') : t('admin.remoteConfig.history.noDeployments')}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    deployments.map((deployment) => (
+                      <TableRow key={deployment.id} hover>
+                        <TableCell>
+                          <Typography variant="body2" fontWeight={500}>
+                            {deployment.deploymentName || `Deployment #${deployment.id}`}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              maxWidth: 250,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            {deployment.description || '-'}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          {deployment.deployedByName ? (
+                            <Box>
+                              <Typography variant="body2" fontWeight="medium">
+                                {deployment.deployedByName}
+                              </Typography>
+                              {deployment.deployedByEmail && (
+                                <Typography variant="caption" color="text.secondary">
+                                  {deployment.deployedByEmail}
+                                </Typography>
+                              )}
+                            </Box>
+                          ) : (
+                            <Typography variant="body2" color="text.secondary">
+                              System
+                            </Typography>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" color="text.secondary">
+                            {formatDateTimeDetailed(deployment.deployedAt)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Badge
+                            badgeContent={deployment.configsCount || 0}
+                            color="primary"
+                            sx={{
+                              '& .MuiBadge-badge': {
+                                fontSize: '0.75rem',
+                                minWidth: '20px',
+                                height: '20px'
+                              }
+                            }}
+                          >
+                            <Chip
+                              label={t('admin.remoteConfig.history.configs')}
+                              size="small"
+                              variant="outlined"
+                              color="primary"
+                            />
+                          </Badge>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Stack direction="row" spacing={0.5} justifyContent="center">
+                            <Tooltip title={t('admin.remoteConfig.history.viewDetails')}>
+                              <IconButton
+                                size="small"
+                                onClick={() => openDetailDialog(deployment)}
+                                sx={{
+                                  border: '1px solid',
+                                  borderColor: 'divider',
+                                  '&:hover': { borderColor: 'primary.main' }
+                                }}
+                              >
+                                <ViewIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t('admin.remoteConfig.history.rollback')}>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleRollback(deployment)}
+                                color="warning"
+                                sx={{
+                                  border: '1px solid',
+                                  borderColor: 'divider',
+                                  '&:hover': { borderColor: 'warning.main' }
+                                }}
+                              >
+                                <RestoreIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Stack>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <SimplePagination
+              count={total}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={(_, newPage) => setPage(newPage)}
+              onRowsPerPageChange={(e) => {
+                setRowsPerPage(parseInt(e.target.value, 10));
+                setPage(0);
+              }}
+              rowsPerPageOptions={[5, 10, 25, 50, 100]}
+            />
+          </CardContent>
+        </Card>
       )}
 
       {/* Versions View */}
       {viewMode === 'versions' && (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Config ID</TableCell>
-                <TableCell>Version</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Value</TableCell>
-                <TableCell>Change Description</TableCell>
-                <TableCell>Created By</TableCell>
-                <TableCell>Created At</TableCell>
-                <TableCell align="right">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {versions.map((version) => (
-                <TableRow key={version.id}>
-                  <TableCell>
-                    <Typography variant="body2" fontWeight={500}>
-                      #{version.configId}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">
-                      v{version.versionNumber}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={version.status.toUpperCase()}
-                      color={getStatusColor(version.status) as any}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {version.value || '-'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {version.changeDescription || '-'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">
-                      {version.createdByName || 'System'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">
-                      {new Date(version.createdAt).toLocaleString()}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="right">
-                    <Tooltip title="View Details">
-                      <IconButton size="small" onClick={() => openDetailDialog(version)}>
-                        <ViewIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={total}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={(_, newPage) => setPage(newPage)}
-            onRowsPerPageChange={(e) => {
-              setRowsPerPage(parseInt(e.target.value, 10));
-              setPage(0);
-            }}
-          />
-        </TableContainer>
+        <Card>
+          <CardContent sx={{ p: 0 }}>
+            {loading && <LinearProgress />}
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.configId')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.version')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.status')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.value')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.changeDescription')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.createdBy')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.createdAt')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }} align="center">{t('admin.remoteConfig.actions')}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {versions.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          {loading ? t('common.loading') : t('admin.remoteConfig.history.noVersions')}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    versions.map((version) => (
+                      <TableRow key={version.id} hover>
+                        <TableCell>
+                          <Typography variant="body2" fontWeight={500} color="primary">
+                            #{version.configId}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={`v${version.versionNumber}`}
+                            size="small"
+                            variant="outlined"
+                            color="default"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={version.status.toUpperCase()}
+                            color={getStatusColor(version.status) as any}
+                            size="small"
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              maxWidth: 150,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              fontFamily: 'monospace',
+                              fontSize: '0.75rem'
+                            }}
+                          >
+                            {version.value || '-'}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              maxWidth: 180,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            {version.changeDescription || '-'}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          {version.createdByName ? (
+                            <Box>
+                              <Typography variant="body2" fontWeight="medium">
+                                {version.createdByName}
+                              </Typography>
+                              {version.createdByEmail && (
+                                <Typography variant="caption" color="text.secondary">
+                                  {version.createdByEmail}
+                                </Typography>
+                              )}
+                            </Box>
+                          ) : (
+                            <Typography variant="body2" color="text.secondary">
+                              System
+                            </Typography>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" color="text.secondary">
+                            {formatDateTimeDetailed(version.createdAt)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Tooltip title={t('admin.remoteConfig.history.viewDetails')}>
+                            <IconButton
+                              size="small"
+                              onClick={() => openDetailDialog(version)}
+                              sx={{
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                '&:hover': { borderColor: 'primary.main' }
+                              }}
+                            >
+                              <ViewIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <SimplePagination
+              count={total}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={(_, newPage) => setPage(newPage)}
+              onRowsPerPageChange={(e) => {
+                setRowsPerPage(parseInt(e.target.value, 10));
+                setPage(0);
+              }}
+              rowsPerPageOptions={[5, 10, 25, 50, 100]}
+            />
+          </CardContent>
+        </Card>
       )}
 
       {/* Detail Dialog */}
       <Dialog open={detailDialogOpen} onClose={() => setDetailDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>
-          {selectedItem && 'deploymentName' in selectedItem ? 'Deployment Details' : 'Version Details'}
+          {selectedItem && 'deploymentName' in selectedItem ?
+            t('admin.remoteConfig.history.deploymentDetails') :
+            t('admin.remoteConfig.history.versionDetails')
+          }
         </DialogTitle>
         <DialogContent>
           {selectedItem && (
             <Box sx={{ mt: 2 }}>
               {'deploymentName' in selectedItem ? (
-                // Deployment details
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <Typography variant="h6">Deployment Information</Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">Name:</Typography>
-                    <Typography variant="body1">{selectedItem.deploymentName || `Deployment #${selectedItem.id}`}</Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">Deployed By:</Typography>
-                    <Typography variant="body1">{selectedItem.deployedByName || 'System'}</Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="body2" color="text.secondary">Description:</Typography>
-                    <Typography variant="body1">{selectedItem.description || 'No description'}</Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="body2" color="text.secondary">Deployed At:</Typography>
-                    <Typography variant="body1">{new Date(selectedItem.deployedAt).toLocaleString()}</Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="h6" sx={{ mt: 2 }}>Configs Snapshot</Typography>
-                    <Paper sx={{ p: 2, mt: 1, backgroundColor: 'grey.50' }}>
-                      <pre style={{ margin: 0, fontSize: '0.875rem', overflow: 'auto' }}>
-                        {JSON.stringify(selectedItem.configsSnapshot, null, 2)}
+                // Deployment details - vertical layout
+                <Stack spacing={3}>
+                  <Box>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                      {t('admin.remoteConfig.history.deploymentInfo')}
+                    </Typography>
+                    <Stack spacing={2}>
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                          {t('admin.remoteConfig.history.deploymentName')}:
+                        </Typography>
+                        <Typography variant="body1">
+                          {selectedItem.deploymentName || `${t('admin.remoteConfig.history.deployment')} #${selectedItem.id}`}
+                        </Typography>
+                      </Box>
+
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                          {t('admin.remoteConfig.history.deployedBy')}:
+                        </Typography>
+                        <Typography variant="body1">
+                          {selectedItem.deployedByName || t('common.system')}
+                          {selectedItem.deployedByEmail && (
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                              {selectedItem.deployedByEmail}
+                            </Typography>
+                          )}
+                        </Typography>
+                      </Box>
+
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                          {t('admin.remoteConfig.history.deployedAt')}:
+                        </Typography>
+                        <Typography variant="body1">
+                          {formatDateTimeDetailed(selectedItem.deployedAt)}
+                        </Typography>
+                      </Box>
+
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                          {t('admin.remoteConfig.description')}:
+                        </Typography>
+                        <Typography variant="body1">
+                          {selectedItem.description || t('admin.remoteConfig.history.noDescription')}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Box>
+
+                  <Box>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                      {t('admin.remoteConfig.history.configsSnapshot')}
+                    </Typography>
+                    <Paper sx={{ p: 2, backgroundColor: 'grey.50', maxHeight: 300, overflow: 'auto' }}>
+                      <pre style={{ margin: 0, fontSize: '0.875rem', fontFamily: 'monospace' }}>
+                        {selectedItem.configsSnapshot ?
+                          JSON.stringify(selectedItem.configsSnapshot, null, 2) :
+                          t('admin.remoteConfig.history.noSnapshot')
+                        }
                       </pre>
                     </Paper>
-                  </Grid>
-                </Grid>
+                  </Box>
+                </Stack>
               ) : (
-                // Version details
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <Typography variant="h6">Version Information</Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">Config ID:</Typography>
-                    <Typography variant="body1">#{selectedItem.configId}</Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">Version:</Typography>
-                    <Typography variant="body1">v{selectedItem.versionNumber}</Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">Status:</Typography>
-                    <Chip
-                      label={selectedItem.status.toUpperCase()}
-                      color={getStatusColor(selectedItem.status) as any}
-                      size="small"
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" color="text.secondary">Created By:</Typography>
-                    <Typography variant="body1">{selectedItem.createdByName || 'System'}</Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="body2" color="text.secondary">Change Description:</Typography>
-                    <Typography variant="body1">{selectedItem.changeDescription || 'No description'}</Typography>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="body2" color="text.secondary">Value:</Typography>
-                    <Paper sx={{ p: 2, mt: 1, backgroundColor: 'grey.50' }}>
-                      <pre style={{ margin: 0, fontSize: '0.875rem', overflow: 'auto' }}>
-                        {selectedItem.value || 'No value'}
+                // Version details - vertical layout
+                <Stack spacing={3}>
+                  <Box>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                      {t('admin.remoteConfig.history.versionInfo')}
+                    </Typography>
+                    <Stack spacing={2}>
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                          {t('admin.remoteConfig.history.configKey')}:
+                        </Typography>
+                        <Typography variant="body1">
+                          {selectedItem.configKeyName || `Config #${selectedItem.configId}`}
+                        </Typography>
+                      </Box>
+
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                          {t('admin.remoteConfig.history.version')}:
+                        </Typography>
+                        <Typography variant="body1">
+                          v{selectedItem.versionNumber}
+                        </Typography>
+                      </Box>
+
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                          {t('admin.remoteConfig.status')}:
+                        </Typography>
+                        <Chip
+                          label={selectedItem.status.toUpperCase()}
+                          color={getStatusColor(selectedItem.status) as any}
+                          size="small"
+                        />
+                      </Box>
+
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                          {t('admin.remoteConfig.createdBy')}:
+                        </Typography>
+                        <Typography variant="body1">
+                          {selectedItem.createdByName || t('common.system')}
+                          {selectedItem.createdByEmail && (
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                              {selectedItem.createdByEmail}
+                            </Typography>
+                          )}
+                        </Typography>
+                      </Box>
+
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                          {t('admin.remoteConfig.history.createdAt')}:
+                        </Typography>
+                        <Typography variant="body1">
+                          {formatDateTimeDetailed(selectedItem.createdAt)}
+                        </Typography>
+                      </Box>
+
+                      {selectedItem.publishedAt && (
+                        <Box>
+                          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                            {t('admin.remoteConfig.history.publishedAt')}:
+                          </Typography>
+                          <Typography variant="body1">
+                            {formatDateTimeDetailed(selectedItem.publishedAt)}
+                          </Typography>
+                        </Box>
+                      )}
+
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                          {t('admin.remoteConfig.history.changeDescription')}:
+                        </Typography>
+                        <Typography variant="body1">
+                          {selectedItem.changeDescription || t('admin.remoteConfig.history.noDescription')}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Box>
+
+                  <Box>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                      {t('admin.remoteConfig.defaultValue')}:
+                    </Typography>
+                    <Paper sx={{ p: 2, backgroundColor: 'grey.50', maxHeight: 300, overflow: 'auto' }}>
+                      <pre style={{ margin: 0, fontSize: '0.875rem', fontFamily: 'monospace' }}>
+                        {selectedItem.value || t('admin.remoteConfig.history.noValue')}
                       </pre>
                     </Paper>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="body2" color="text.secondary">Created At:</Typography>
-                    <Typography variant="body1">{new Date(selectedItem.createdAt).toLocaleString()}</Typography>
-                  </Grid>
-                  {selectedItem.publishedAt && (
-                    <Grid item xs={12}>
-                      <Typography variant="body2" color="text.secondary">Published At:</Typography>
-                      <Typography variant="body1">{new Date(selectedItem.publishedAt).toLocaleString()}</Typography>
-                    </Grid>
-                  )}
-                </Grid>
+                  </Box>
+                </Stack>
               )}
             </Box>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDetailDialogOpen(false)}>Close</Button>
+          <Button onClick={() => setDetailDialogOpen(false)}>
+            {t('common.close')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Rollback Confirmation Dialog */}
+      <Dialog
+        open={rollbackDialogOpen}
+        onClose={() => setRollbackDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          <Typography variant="h6" color="warning.main">
+            롤백 확인
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            정말로 다음 배포로 롤백하시겠습니까?
+          </Typography>
+          {rollbackTarget && (
+            <Box sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+              <Typography variant="subtitle2" gutterBottom>
+                배포 정보:
+              </Typography>
+              <Typography variant="body2">
+                <strong>이름:</strong> {rollbackTarget.deploymentName || `배포 #${rollbackTarget.id}`}
+              </Typography>
+              <Typography variant="body2">
+                <strong>배포일:</strong> {new Date(rollbackTarget.deployedAt).toLocaleString('ko-KR')}
+              </Typography>
+              <Typography variant="body2">
+                <strong>배포자:</strong> {rollbackTarget.deployedByName || '알 수 없음'}
+              </Typography>
+              {rollbackTarget.description && (
+                <Typography variant="body2">
+                  <strong>설명:</strong> {rollbackTarget.description}
+                </Typography>
+              )}
+            </Box>
+          )}
+          <Alert severity="warning" sx={{ mt: 2 }}>
+            <Typography variant="body2">
+              <strong>주의:</strong> 롤백하면 현재 설정이 선택한 배포 시점의 설정으로 되돌아갑니다.
+              이 작업은 되돌릴 수 없습니다.
+            </Typography>
+          </Alert>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setRollbackDialogOpen(false)}
+            color="inherit"
+          >
+            취소
+          </Button>
+          <Button
+            onClick={confirmRollback}
+            color="warning"
+            variant="contained"
+          >
+            롤백 실행
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

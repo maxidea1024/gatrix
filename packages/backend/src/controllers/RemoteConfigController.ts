@@ -4,6 +4,7 @@ import ConfigRuleModel from '../models/ConfigRule';
 import { RemoteConfigNotifications } from '../services/sseNotificationService';
 import logger from '../config/logger';
 import { CustomError } from '../middleware/errorHandler';
+import db from '../config/knex';
 import {
   CreateRemoteConfigData,
   UpdateRemoteConfigData,
@@ -269,11 +270,50 @@ export class RemoteConfigController {
         throw new CustomError('No staged configs to publish', 400);
       }
 
+      // Create deployment record
+      const configsSnapshot: any = {};
+      for (const configId of publishedConfigIds) {
+        const config = await RemoteConfigModel.findById(configId, false);
+        const currentVersion = await ConfigVersionModel.getCurrentVersion(configId);
+        if (config && currentVersion) {
+          configsSnapshot[config.keyName] = {
+            id: config.id,
+            keyName: config.keyName,
+            valueType: config.valueType,
+            value: currentVersion.value,
+            versionNumber: currentVersion.versionNumber,
+            publishedAt: currentVersion.publishedAt
+          };
+        }
+      }
+
+      const [deploymentId] = await db('g_remote_config_deployments').insert({
+        deploymentName: deploymentName || `Deployment ${new Date().toISOString()}`,
+        description: description || 'Automated deployment',
+        configsSnapshot: JSON.stringify(configsSnapshot),
+        deployedBy: userId,
+        deployedAt: new Date()
+      });
+
+      // Send real-time notification for each published config
+      for (const configId of publishedConfigIds) {
+        const config = await RemoteConfigModel.findById(configId, false);
+        if (config) {
+          RemoteConfigNotifications.notifyConfigChange(configId, 'updated', config);
+        }
+      }
+
       res.json({
         success: true,
         message: `Published ${publishedConfigIds.length} config(s)`,
-        data: { publishedConfigIds }
+        data: {
+          publishedConfigIds,
+          deploymentId,
+          publishedAt: new Date().toISOString()
+        }
       });
+
+      logger.info(`Published configurations: ${publishedConfigIds.join(', ')} by user ${userId}, deployment ID: ${deploymentId}`);
     } catch (error) {
       logger.error('Error in RemoteConfigController.publish:', error);
       if (error instanceof CustomError) {
@@ -282,6 +322,8 @@ export class RemoteConfigController {
       throw new CustomError('Failed to publish configs', 500);
     }
   }
+
+
 
   /**
    * Get rules for a config
@@ -308,6 +350,235 @@ export class RemoteConfigController {
         throw error;
       }
       throw new CustomError('Failed to fetch rules', 500);
+    }
+  }
+
+  /**
+   * Get deployment history
+   */
+  static async getDeployments(req: Request, res: Response): Promise<void> {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const offset = (page - 1) * limit;
+
+      // Get deployments from database
+      const deploymentsQuery = db('g_remote_config_deployments as d')
+        .leftJoin('g_users as u', 'd.deployedBy', 'u.id')
+        .select([
+          'd.id',
+          'd.deploymentName',
+          'd.description',
+          'd.configsSnapshot',
+          'd.deployedBy',
+          'd.deployedAt',
+          'd.rollbackDeploymentId',
+          'u.name as deployedByName',
+          'u.email as deployedByEmail'
+        ])
+        .orderBy('d.deployedAt', 'desc');
+
+      // Get total count
+      const totalQuery = db('g_remote_config_deployments').count('* as count');
+      const [{ count: total }] = await totalQuery;
+
+      // Get paginated results
+      const deployments = await deploymentsQuery.limit(limit).offset(offset);
+
+      // Transform and add configsCount
+      const transformedDeployments = deployments.map(deployment => ({
+        id: deployment.id,
+        deploymentName: deployment.deploymentName,
+        description: deployment.description,
+        configsSnapshot: deployment.configsSnapshot,
+        deployedBy: deployment.deployedBy,
+        deployedAt: deployment.deployedAt,
+        rollbackDeploymentId: deployment.rollbackDeploymentId,
+        deployedByName: deployment.deployedByName,
+        deployedByEmail: deployment.deployedByEmail,
+        configsCount: deployment.configsSnapshot ?
+          (typeof deployment.configsSnapshot === 'string' ?
+            Object.keys(JSON.parse(deployment.configsSnapshot)).length :
+            Object.keys(deployment.configsSnapshot).length) : 0
+      }));
+
+      res.json({
+        success: true,
+        data: {
+          deployments: transformedDeployments,
+          total: Number(total),
+          page,
+          limit
+        }
+      });
+    } catch (error) {
+      logger.error('Error in RemoteConfigController.getDeployments:', error);
+      throw new CustomError('Failed to fetch deployments', 500);
+    }
+  }
+
+  /**
+   * Get version history
+   */
+  static async getVersionHistory(req: Request, res: Response): Promise<void> {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const offset = (page - 1) * limit;
+
+      // Get versions from database with config info
+      const versionsQuery = db('g_remote_config_versions as v')
+        .leftJoin('g_users as u', 'v.createdBy', 'u.id')
+        .leftJoin('g_remote_configs as c', 'v.configId', 'c.id')
+        .select([
+          'v.id',
+          'v.configId',
+          'v.versionNumber',
+          'v.value',
+          'v.status',
+          'v.changeDescription',
+          'v.publishedAt',
+          'v.createdBy',
+          'v.createdAt',
+          'u.name as createdByName',
+          'u.email as createdByEmail',
+          'c.keyName as configKeyName'
+        ])
+        .orderBy('v.createdAt', 'desc');
+
+      // Get total count
+      const totalQuery = db('g_remote_config_versions').count('* as count');
+      const [{ count: total }] = await totalQuery;
+
+      // Get paginated results
+      const versions = await versionsQuery.limit(limit).offset(offset);
+
+      // Transform results
+      const transformedVersions = versions.map(version => ({
+        id: version.id,
+        configId: version.configId,
+        versionNumber: version.versionNumber,
+        value: version.value,
+        status: version.status,
+        changeDescription: version.changeDescription,
+        publishedAt: version.publishedAt,
+        createdBy: version.createdBy,
+        createdAt: version.createdAt,
+        createdByName: version.createdByName,
+        createdByEmail: version.createdByEmail,
+        configKeyName: version.configKeyName
+      }));
+
+      res.json({
+        success: true,
+        data: {
+          versions: transformedVersions,
+          total: Number(total),
+          page,
+          limit
+        }
+      });
+    } catch (error) {
+      logger.error('Error in RemoteConfigController.getVersionHistory:', error);
+      throw new CustomError('Failed to fetch version history', 500);
+    }
+  }
+
+  /**
+   * Rollback to a previous deployment
+   */
+  static async rollback(req: Request, res: Response): Promise<void> {
+    try {
+      const { deploymentId } = req.body as RollbackRequest;
+      const userId = (req as any).user?.id;
+
+      if (!deploymentId) {
+        throw new CustomError('Deployment ID is required', 400);
+      }
+
+      // Get the target deployment
+      const targetDeployment = await db('g_remote_config_deployments')
+        .where('id', deploymentId)
+        .first();
+
+      if (!targetDeployment) {
+        throw new CustomError('Deployment not found', 404);
+      }
+
+      // Parse the configs snapshot
+      let configsSnapshot: any;
+      try {
+        configsSnapshot = typeof targetDeployment.configsSnapshot === 'string'
+          ? JSON.parse(targetDeployment.configsSnapshot)
+          : targetDeployment.configsSnapshot;
+      } catch (error) {
+        throw new CustomError('Invalid deployment snapshot', 400);
+      }
+
+      // Start transaction
+      await db.transaction(async (trx) => {
+        // Update all configs to match the snapshot
+        for (const [keyName, configData] of Object.entries(configsSnapshot)) {
+          const config = configData as any;
+
+          // Update the config
+          await trx('g_remote_configs')
+            .where('keyName', keyName)
+            .update({
+              valueType: config.valueType,
+              defaultValue: config.value,
+              description: config.description || null,
+              isActive: config.isActive !== false, // Default to true if not specified
+              updatedBy: userId,
+              updatedAt: new Date()
+            });
+        }
+
+        // Create a new deployment record for the rollback
+        const [newDeploymentId] = await trx('g_remote_config_deployments').insert({
+          deploymentName: `Rollback to ${targetDeployment.deploymentName || `Deployment #${deploymentId}`}`,
+          description: `Rollback to deployment from ${new Date(targetDeployment.deployedAt).toLocaleString()}`,
+          configsSnapshot: targetDeployment.configsSnapshot,
+          deployedBy: userId,
+          deployedAt: new Date(),
+          rollbackDeploymentId: deploymentId
+        });
+
+        logger.info(`Rollback completed: deployment ${deploymentId} rolled back by user ${userId}`);
+
+        // Send real-time notification
+        RemoteConfigNotifications.notifyConfigChange(
+          newDeploymentId,
+          'updated',
+          {
+            action: 'rollback',
+            targetDeploymentId: deploymentId,
+            deploymentName: targetDeployment.deploymentName
+          }
+        );
+      });
+
+      res.json({
+        success: true,
+        message: 'Rollback completed successfully',
+        data: {
+          targetDeploymentId: deploymentId,
+          targetDeploymentName: targetDeployment.deploymentName
+        }
+      });
+    } catch (error) {
+      logger.error('Error in RemoteConfigController.rollback:', error);
+      if (error instanceof CustomError) {
+        res.status(error.statusCode).json({
+          success: false,
+          message: error.message
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          message: 'Failed to rollback deployment'
+        });
+      }
     }
   }
 }

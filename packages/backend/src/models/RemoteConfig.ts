@@ -30,7 +30,9 @@ export class RemoteConfigModel {
         .select([
           'rc.*',
           'creator.name as createdByName',
-          'updater.name as updatedByName'
+          'creator.email as createdByEmail',
+          'updater.name as updatedByName',
+          'updater.email as updatedByEmail'
         ]);
 
       // Apply filters
@@ -92,7 +94,9 @@ export class RemoteConfigModel {
         .select([
           'rc.*',
           'creator.name as createdByName',
-          'updater.name as updatedByName'
+          'creator.email as createdByEmail',
+          'updater.name as updatedByName',
+          'updater.email as updatedByEmail'
         ])
         .where('rc.id', id)
         .first();
@@ -171,7 +175,9 @@ export class RemoteConfigModel {
         .select([
           'rc.*',
           'creator.name as createdByName',
-          'updater.name as updatedByName'
+          'creator.email as createdByEmail',
+          'updater.name as updatedByName',
+          'updater.email as updatedByEmail'
         ])
         .where('rc.keyName', keyName)
         .first();
@@ -278,7 +284,9 @@ export class RemoteConfigModel {
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
       createdByName: row.createdByName,
-      updatedByName: row.updatedByName
+      createdByEmail: row.createdByEmail,
+      updatedByName: row.updatedByName,
+      updatedByEmail: row.updatedByEmail
     };
   }
 

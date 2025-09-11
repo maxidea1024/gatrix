@@ -1,13 +1,14 @@
 import * as cron from 'node-cron';
-import db from '../config/database';
+import knex from '../config/knex';
 import logger from '../config/logger';
-import { CampaignEvaluator } from '../utils/trafficSplitter';
+import { CampaignEvaluationEngine } from './CampaignEvaluationEngine';
 import { RemoteConfigNotifications } from './sseNotificationService';
 
 export class CampaignScheduler {
   private static instance: CampaignScheduler;
   private scheduledTasks: Map<string, cron.ScheduledTask> = new Map();
   private isRunning = false;
+  private checkInProgress = false;
 
   private constructor() {}
 
@@ -27,7 +28,7 @@ export class CampaignScheduler {
       return;
     }
 
-    logger.info('Starting campaign scheduler...');
+    logger.info('Starting enhanced campaign scheduler...');
     
     // Schedule periodic check every minute
     const mainTask = cron.schedule('* * * * *', async () => {
@@ -43,7 +44,7 @@ export class CampaignScheduler {
     // Initial check
     this.checkAndUpdateCampaigns();
 
-    logger.info('Campaign scheduler started successfully');
+    logger.info('Enhanced campaign scheduler started successfully');
   }
 
   /**
@@ -74,285 +75,224 @@ export class CampaignScheduler {
    * Check and update campaign statuses
    */
   private async checkAndUpdateCampaigns(): Promise<void> {
+    if (this.checkInProgress) {
+      logger.debug('Campaign check already in progress, skipping...');
+      return;
+    }
+
+    this.checkInProgress = true;
     try {
       const now = new Date();
       
-      // Get all campaigns that might need status updates
-      const [rows] = await db.query(`
-        SELECT * FROM g_remote_config_campaigns
-        WHERE (
-          (startDate <= ? AND endDate >= ? AND isActive = false) OR
-          (endDate < ? AND isActive = true)
-        )
-      `, [now, now, now]);
+      // Find campaigns that should start (draft/scheduled -> running)
+      const campaignsToStart = await knex('g_remote_config_campaigns')
+        .where('isActive', true)
+        .whereIn('status', ['draft', 'scheduled'])
+        .where(function() {
+          this.whereNull('startDate').orWhere('startDate', '<=', now);
+        });
 
-      const campaigns = Array.isArray(rows) ? rows : [];
+      // Find campaigns that should end (running -> completed)
+      const campaignsToEnd = await knex('g_remote_config_campaigns')
+        .where('status', 'running')
+        .where('endDate', '<=', now);
 
-      if (campaigns.length === 0) {
-        return;
+      let startedCount = 0;
+      let endedCount = 0;
+
+      // Start campaigns
+      for (const campaign of campaignsToStart) {
+        await this.startCampaign(campaign);
+        startedCount++;
       }
 
-      logger.debug(`Found ${campaigns.length} campaigns to update`);
-
-      for (const campaign of campaigns) {
-        await this.updateCampaignStatus(campaign, now);
+      // End campaigns
+      for (const campaign of campaignsToEnd) {
+        await this.endCampaign(campaign);
+        endedCount++;
       }
 
+      // Clean up expired cache
+      await this.cleanupExpiredCache();
+
+      if (startedCount > 0 || endedCount > 0) {
+        logger.info(`Campaign scheduler: started ${startedCount}, ended ${endedCount}`);
+      }
     } catch (error) {
-      logger.error('Error checking campaigns:', error);
+      logger.error('Error in checkAndUpdateCampaigns:', error);
+    } finally {
+      this.checkInProgress = false;
     }
   }
 
   /**
-   * Update individual campaign status
+   * Start a campaign
    */
-  private async updateCampaignStatus(campaign: any, now: Date): Promise<void> {
+  private async startCampaign(campaign: any): Promise<void> {
     try {
-      const startDate = new Date(campaign.startDate);
-      const endDate = new Date(campaign.endDate);
-      const shouldBeActive = CampaignEvaluator.isCampaignActive(startDate, endDate, now);
+      await knex.transaction(async (trx) => {
+        // Update campaign status
+        await trx('g_remote_config_campaigns')
+          .where('id', campaign.id)
+          .update({
+            status: 'running',
+            updatedAt: new Date()
+          });
 
-      if (campaign.isActive !== shouldBeActive) {
-        await db.query(`
-          UPDATE g_remote_config_campaigns
-          SET isActive = ?, updatedAt = ?
-          WHERE id = ?
-        `, [shouldBeActive, now, campaign.id]);
-
-        const action = shouldBeActive ? 'activated' : 'deactivated';
-        logger.info(`Campaign "${campaign.campaignName}" (ID: ${campaign.id}) ${action} automatically`);
-
-        // Send SSE notification
-        RemoteConfigNotifications.notifyCampaignStatusChange(campaign.id, shouldBeActive, 'scheduler');
-
-        // Log the status change
-        await this.logCampaignStatusChange(campaign.id, shouldBeActive, 'scheduler', now);
-
-        // If campaign was activated, check for conflicts with other campaigns
-        if (shouldBeActive) {
-          await this.resolveConflictingCampaigns(campaign, now);
-        }
-      }
-    } catch (error) {
-      logger.error(`Error updating campaign ${campaign.id}:`, error);
-    }
-  }
-
-  /**
-   * Resolve conflicts between overlapping campaigns
-   */
-  private async resolveConflictingCampaigns(activatedCampaign: any, now: Date): Promise<void> {
-    try {
-      // Get all active campaigns that might conflict
-      const [conflictingRows] = await db.query(`
-        SELECT * FROM g_remote_config_campaigns
-        WHERE isActive = true
-        AND id != ?
-        AND startDate <= ?
-        AND endDate >= ?
-      `, [activatedCampaign.id, now, now]);
-
-      const conflictingCampaigns = Array.isArray(conflictingRows) ? conflictingRows : [];
-
-      if (conflictingCampaigns.length === 0) {
-        return;
-      }
-
-      // Check if any campaigns target the same configs
-      const [activatedConfigRows] = await db.query(`
-        SELECT configId FROM g_remote_config_campaign_configs
-        WHERE campaignId = ?
-      `, [activatedCampaign.id]);
-
-      const activatedConfigs = Array.isArray(activatedConfigRows) ? activatedConfigRows : [];
-      const activatedConfigIds = activatedConfigs.map((c: any) => c.configId);
-
-      for (const conflictingCampaign of conflictingCampaigns as any[]) {
-        const [conflictingConfigRows] = await db.query(`
-          SELECT configId FROM g_remote_config_campaign_configs
-          WHERE campaignId = ?
-        `, [conflictingCampaign.id]);
-
-        const conflictingConfigs = Array.isArray(conflictingConfigRows) ? conflictingConfigRows : [];
-        const conflictingConfigIds = conflictingConfigs.map((c: any) => c.configId);
-
-        // Check for overlap
-        const hasOverlap = activatedConfigIds.some((id: any) => conflictingConfigIds.includes(id));
-
-        if (hasOverlap) {
-          // Compare priorities - higher priority wins
-          if (activatedCampaign.priority > conflictingCampaign.priority) {
-            await db.query(`
-              UPDATE g_remote_config_campaigns
-              SET isActive = false, updatedAt = ?
-              WHERE id = ?
-            `, [now, conflictingCampaign.id]);
-
-            logger.info(`Campaign "${conflictingCampaign.campaignName}" (ID: ${conflictingCampaign.id}) deactivated due to higher priority campaign`);
-            
-            await this.logCampaignStatusChange(conflictingCampaign.id, false, 'priority_conflict', now);
-          } else if (activatedCampaign.priority < conflictingCampaign.priority) {
-            // Current campaign has lower priority, deactivate it
-            await db.query(`
-              UPDATE g_remote_config_campaigns
-              SET isActive = false, updatedAt = ?
-              WHERE id = ?
-            `, [now, activatedCampaign.id]);
-
-            logger.info(`Campaign "${activatedCampaign.campaignName}" (ID: ${activatedCampaign.id}) deactivated due to lower priority`);
-            
-            await this.logCampaignStatusChange(activatedCampaign.id, false, 'priority_conflict', now);
-            break;
-          }
-        }
-      }
-    } catch (error) {
-      logger.error('Error resolving campaign conflicts:', error);
-    }
-  }
-
-  /**
-   * Log campaign status changes
-   */
-  private async logCampaignStatusChange(
-    campaignId: number,
-    isActive: boolean,
-    reason: string,
-    timestamp: Date
-  ): Promise<void> {
-    try {
-      await db.query(`
-        INSERT INTO g_remote_config_campaign_logs
-        (campaignId, action, reason, timestamp, createdAt)
-        VALUES (?, ?, ?, ?, ?)
-      `, [
-        campaignId,
-        isActive ? 'activated' : 'deactivated',
-        reason,
-        timestamp,
-        timestamp
-      ]);
-    } catch (error) {
-      logger.error('Error logging campaign status change:', error);
-    }
-  }
-
-  /**
-   * Schedule a specific campaign activation/deactivation
-   */
-  public scheduleCampaign(campaignId: number, startDate: Date, endDate: Date): void {
-    const now = new Date();
-
-    // Schedule activation if in the future
-    if (startDate > now) {
-      const activationTask = cron.schedule(this.dateToCron(startDate), async () => {
-        await this.activateCampaign(campaignId);
-        this.scheduledTasks.delete(`activate_${campaignId}`);
-      }, {
-        timezone: 'UTC'
+        // Log the activation
+        await trx('g_remote_config_campaign_logs').insert({
+          campaignId: campaign.id,
+          action: 'activated',
+          reason: 'scheduler',
+          timestamp: new Date(),
+          details: JSON.stringify({ 
+            scheduledStart: campaign.startDate,
+            actualStart: new Date()
+          })
+        });
       });
 
-      activationTask.start();
-      this.scheduledTasks.set(`activate_${campaignId}`, activationTask);
-      
-      logger.info(`Scheduled campaign ${campaignId} activation for ${startDate.toISOString()}`);
-    }
+      // Send real-time notification
+      RemoteConfigNotifications.notifyConfigChange(
+        campaign.id, 
+        'campaign_started', 
+        { campaignName: campaign.campaignName }
+      );
 
-    // Schedule deactivation if in the future
-    if (endDate > now) {
-      const deactivationTask = cron.schedule(this.dateToCron(endDate), async () => {
-        await this.deactivateCampaign(campaignId);
-        this.scheduledTasks.delete(`deactivate_${campaignId}`);
-      }, {
-        timezone: 'UTC'
-      });
-
-      deactivationTask.start();
-      this.scheduledTasks.set(`deactivate_${campaignId}`, deactivationTask);
-      
-      logger.info(`Scheduled campaign ${campaignId} deactivation for ${endDate.toISOString()}`);
+      logger.info(`Campaign started: ${campaign.campaignName} (ID: ${campaign.id})`);
+    } catch (error) {
+      logger.error(`Error starting campaign ${campaign.id}:`, error);
+      throw error;
     }
   }
 
   /**
-   * Convert Date to cron expression
+   * End a campaign
    */
-  private dateToCron(date: Date): string {
-    const minute = date.getUTCMinutes();
-    const hour = date.getUTCHours();
-    const day = date.getUTCDate();
-    const month = date.getUTCMonth() + 1;
-    
-    return `${minute} ${hour} ${day} ${month} *`;
+  private async endCampaign(campaign: any): Promise<void> {
+    try {
+      await knex.transaction(async (trx) => {
+        // Update campaign status
+        await trx('g_remote_config_campaigns')
+          .where('id', campaign.id)
+          .update({
+            status: 'completed',
+            updatedAt: new Date()
+          });
+
+        // Log the deactivation
+        await trx('g_remote_config_campaign_logs').insert({
+          campaignId: campaign.id,
+          action: 'deactivated',
+          reason: 'scheduler',
+          timestamp: new Date(),
+          details: JSON.stringify({ 
+            scheduledEnd: campaign.endDate,
+            actualEnd: new Date()
+          })
+        });
+
+        // Clear cache for this campaign
+        await trx('g_remote_config_campaign_cache')
+          .where('campaignId', campaign.id)
+          .del();
+      });
+
+      // Send real-time notification
+      RemoteConfigNotifications.notifyConfigChange(
+        campaign.id, 
+        'campaign_ended', 
+        { campaignName: campaign.campaignName }
+      );
+
+      logger.info(`Campaign ended: ${campaign.campaignName} (ID: ${campaign.id})`);
+    } catch (error) {
+      logger.error(`Error ending campaign ${campaign.id}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Clean up expired cache entries
+   */
+  private async cleanupExpiredCache(): Promise<void> {
+    try {
+      const now = new Date();
+      const deletedCount = await knex('g_remote_config_campaign_cache')
+        .where('expiresAt', '<', now)
+        .del();
+
+      if (deletedCount > 0) {
+        logger.debug(`Cleaned up ${deletedCount} expired cache entries`);
+      }
+    } catch (error) {
+      logger.error('Error cleaning up cache:', error);
+      throw error;
+    }
   }
 
   /**
    * Manually activate a campaign
    */
-  private async activateCampaign(campaignId: number): Promise<void> {
+  public async activateCampaign(campaignId: number, userId?: number): Promise<void> {
     try {
-      const now = new Date();
-      
-      await db.query(`
-        UPDATE g_remote_config_campaigns
-        SET isActive = true, updatedAt = ?
-        WHERE id = ?
-      `, [now, campaignId]);
+      await knex.transaction(async (trx) => {
+        await trx('g_remote_config_campaigns')
+          .where('id', campaignId)
+          .update({
+            status: 'running',
+            updatedBy: userId,
+            updatedAt: new Date()
+          });
 
-      logger.info(`Campaign ${campaignId} activated by scheduler`);
-      await this.logCampaignStatusChange(campaignId, true, 'scheduled_activation', now);
+        await trx('g_remote_config_campaign_logs').insert({
+          campaignId,
+          action: 'activated',
+          reason: 'manual',
+          timestamp: new Date(),
+          details: JSON.stringify({ activatedBy: userId })
+        });
+      });
 
-      // Check for conflicts
-      const [campaignRows] = await db.query(`
-        SELECT * FROM g_remote_config_campaigns
-        WHERE id = ? LIMIT 1
-      `, [campaignId]);
-
-      const campaigns = Array.isArray(campaignRows) ? campaignRows : [];
-      const campaign = campaigns[0];
-
-      if (campaign) {
-        await this.resolveConflictingCampaigns(campaign, now);
-      }
+      logger.info(`Campaign manually activated: ID ${campaignId} by user ${userId}`);
     } catch (error) {
-      logger.error(`Error activating campaign ${campaignId}:`, error);
+      logger.error(`Error manually activating campaign ${campaignId}:`, error);
+      throw error;
     }
   }
 
   /**
    * Manually deactivate a campaign
    */
-  private async deactivateCampaign(campaignId: number): Promise<void> {
+  public async deactivateCampaign(campaignId: number, userId?: number): Promise<void> {
     try {
-      const now = new Date();
-      
-      await db.query(`
-        UPDATE g_remote_config_campaigns
-        SET isActive = false, updatedAt = ?
-        WHERE id = ?
-      `, [now, campaignId]);
+      await knex.transaction(async (trx) => {
+        await trx('g_remote_config_campaigns')
+          .where('id', campaignId)
+          .update({
+            status: 'paused',
+            updatedBy: userId,
+            updatedAt: new Date()
+          });
 
-      logger.info(`Campaign ${campaignId} deactivated by scheduler`);
-      await this.logCampaignStatusChange(campaignId, false, 'scheduled_deactivation', now);
+        await trx('g_remote_config_campaign_logs').insert({
+          campaignId,
+          action: 'deactivated',
+          reason: 'manual',
+          timestamp: new Date(),
+          details: JSON.stringify({ deactivatedBy: userId })
+        });
+
+        // Clear cache for this campaign
+        await trx('g_remote_config_campaign_cache')
+          .where('campaignId', campaignId)
+          .del();
+      });
+
+      logger.info(`Campaign manually deactivated: ID ${campaignId} by user ${userId}`);
     } catch (error) {
-      logger.error(`Error deactivating campaign ${campaignId}:`, error);
+      logger.error(`Error manually deactivating campaign ${campaignId}:`, error);
+      throw error;
     }
   }
-
-  /**
-   * Get scheduler status
-   */
-  public getStatus(): {
-    isRunning: boolean;
-    scheduledTasksCount: number;
-    scheduledTasks: string[];
-  } {
-    return {
-      isRunning: this.isRunning,
-      scheduledTasksCount: this.scheduledTasks.size,
-      scheduledTasks: Array.from(this.scheduledTasks.keys())
-    };
-  }
 }
-
-export default CampaignScheduler;

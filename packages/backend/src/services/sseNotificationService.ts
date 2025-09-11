@@ -317,7 +317,7 @@ export class RemoteConfigNotifications {
   /**
    * Notify about config changes
    */
-  static notifyConfigChange(configId: number, action: 'created' | 'updated' | 'deleted', config: any): void {
+  static notifyConfigChange(configId: number, action: 'created' | 'updated' | 'deleted' | 'campaign_started' | 'campaign_ended', config: any): void {
     const event: NotificationEvent = {
       type: 'remote_config_change',
       data: {

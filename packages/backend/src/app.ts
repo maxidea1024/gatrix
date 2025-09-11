@@ -16,7 +16,7 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { generalLimiter, apiLimiter, authLimiter } from './middleware/rateLimiter';
 import { responseCache, cacheConfigs } from './middleware/responseCache';
 import { initializeJobTypes } from './services/jobs';
-import CampaignScheduler from './services/campaignScheduler';
+import { CampaignScheduler } from './services/campaignScheduler';
 
 // Import routes
 import authRoutes from './routes/auth';
@@ -37,6 +37,8 @@ import varsRoutes from './routes/vars';
 import platformDefaultsRoutes from './routes/platformDefaults';
 import translationRoutes from './routes/translation';
 import remoteConfigRoutes from './routes/remoteConfig';
+import contextFieldRoutes from './routes/contextFields';
+import campaignRoutes from './routes/campaigns';
 import notificationRoutes from './routes/notifications';
 
 // import advancedSettingsRoutes from './routes/advancedSettings';
@@ -202,6 +204,8 @@ app.use('/api/v1', jobRoutes);
 app.use('/api/v1/admin/platform-defaults', platformDefaultsRoutes);
 app.use('/api/v1/translation', translationRoutes);
 app.use('/api/v1/remote-config', remoteConfigRoutes);
+app.use('/api/v1/context-fields', contextFieldRoutes);
+app.use('/api/v1/campaigns', campaignRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 
 // app.use('/api/v1/advanced-settings', advancedSettingsRoutes);

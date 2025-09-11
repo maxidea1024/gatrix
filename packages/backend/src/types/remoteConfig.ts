@@ -23,7 +23,9 @@ export interface RemoteConfig {
   
   // Relations
   createdByName?: string;
+  createdByEmail?: string;
   updatedByName?: string;
+  updatedByEmail?: string;
   currentVersion?: ConfigVersion;
   versions?: ConfigVersion[];
   rules?: ConfigRule[];
@@ -163,13 +165,17 @@ export interface Campaign {
   startDate?: string;
   endDate?: string;
   targetConditions?: any;
+  priority: number;
+  status: 'draft' | 'scheduled' | 'running' | 'completed' | 'paused';
   isActive: boolean;
   createdBy?: number;
+  updatedBy?: number;
   createdAt: string;
   updatedAt: string;
-  
+
   // Relations
   createdByName?: string;
+  updatedByName?: string;
   configs?: CampaignConfig[];
 }
 
@@ -179,8 +185,11 @@ export interface CreateCampaignData {
   startDate?: string;
   endDate?: string;
   targetConditions?: any;
+  priority?: number;
+  status?: 'draft' | 'scheduled' | 'running' | 'completed' | 'paused';
   isActive?: boolean;
   createdBy?: number;
+  updatedBy?: number;
 }
 
 // Campaign-Config Association
@@ -190,10 +199,12 @@ export interface CampaignConfig {
   configId: number;
   campaignValue?: string;
   createdAt: string;
-  
+
   // Relations
   campaign?: Campaign;
   config?: RemoteConfig;
+  configKeyName?: string;
+  configValueType?: string;
 }
 
 export interface CreateCampaignConfigData {

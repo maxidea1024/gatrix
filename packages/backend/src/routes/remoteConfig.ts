@@ -129,11 +129,35 @@ const publishConfigsValidation = [
 router.get('/', listConfigsValidation, validateRequest, RemoteConfigController.list);
 
 /**
+ * @route GET /api/v1/remote-config/deployments
+ * @desc Get deployment history
+ * @access Admin
+ */
+router.get('/deployments',
+  query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+  validateRequest,
+  RemoteConfigController.getDeployments
+);
+
+/**
+ * @route GET /api/v1/remote-config/versions
+ * @desc Get version history
+ * @access Admin
+ */
+router.get('/versions',
+  query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
+  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
+  validateRequest,
+  RemoteConfigController.getVersionHistory
+);
+
+/**
  * @route GET /api/v1/remote-config/:id
  * @desc Get remote config by ID
  * @access Admin
  */
-router.get('/:id', 
+router.get('/:id',
   param('id').isInt({ min: 1 }).withMessage('Invalid config ID'),
   validateRequest,
   RemoteConfigController.getById
@@ -199,5 +223,24 @@ router.post('/stage', stageConfigsValidation, validateRequest, RemoteConfigContr
  * @access Admin
  */
 router.post('/publish', publishConfigsValidation, validateRequest, RemoteConfigController.publish);
+
+// Rollback validation
+const rollbackValidation = [
+  body('deploymentId')
+    .isInt({ min: 1 })
+    .withMessage('Deployment ID must be a positive integer'),
+  body('description')
+    .optional()
+    .isString()
+    .isLength({ max: 1000 })
+    .withMessage('Description must be a string with maximum 1000 characters')
+];
+
+/**
+ * @route POST /api/v1/remote-config/rollback
+ * @desc Rollback to a previous deployment
+ * @access Admin
+ */
+router.post('/rollback', rollbackValidation, validateRequest, RemoteConfigController.rollback);
 
 export default router;
