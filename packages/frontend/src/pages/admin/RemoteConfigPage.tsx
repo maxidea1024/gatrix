@@ -586,7 +586,7 @@ const RemoteConfigPage: React.FC = () => {
 
             <TextField
               fullWidth
-              label="Description"
+              label={t('admin.remoteConfig.description')}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               multiline
@@ -595,8 +595,19 @@ const RemoteConfigPage: React.FC = () => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleEdit} variant="contained">Update</Button>
+          <Button
+            onClick={() => setEditDialogOpen(false)}
+            startIcon={<CancelIcon />}
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={handleEdit}
+            variant="contained"
+            startIcon={<SaveIcon />}
+          >
+            {t('common.update')}
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
