@@ -22,6 +22,8 @@ import {
   AdminPanelSettings,
   Assessment,
   Security,
+  CloudSync,
+  History,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -41,6 +43,33 @@ const getNavigationItems = (isAdmin: boolean): NavItem[] => {
       label: 'Dashboard',
       icon: 'Dashboard',
       path: '/dashboard',
+    },
+    // 임시: 파일이 제대로 로드되는지 테스트
+    {
+      id: 'test-menu',
+      label: '🔥🔥🔥 TEST MENU 🔥🔥🔥',
+      icon: 'CloudSync',
+      path: '/test',
+    },
+    // 임시: Remote Config를 baseItems에 강제 추가 (테스트용)
+    {
+      id: 'remote-config-forced',
+      label: 'Remote Config (Forced)',
+      icon: 'CloudSync',
+      children: [
+        {
+          id: 'remote-config-main-forced',
+          label: '리모트 설정 (Forced)',
+          icon: 'Settings',
+          path: '/admin/remote-config',
+        },
+        {
+          id: 'remote-config-history-forced',
+          label: '리모트 설정 히스토리 (Forced)',
+          icon: 'History',
+          path: '/admin/remote-config/history',
+        },
+      ],
     },
   ];
 
@@ -75,6 +104,28 @@ const getNavigationItems = (isAdmin: boolean): NavItem[] => {
       ],
     },
     {
+      id: 'remote-config',
+      label: 'Remote Config',
+      icon: 'CloudSync',
+      roles: ['admin'],
+      children: [
+        {
+          id: 'remote-config-main',
+          label: '리모트 설정',
+          icon: 'Settings',
+          path: '/admin/remote-config',
+          roles: ['admin'],
+        },
+        {
+          id: 'remote-config-history',
+          label: '리모트 설정 히스토리',
+          icon: 'History',
+          path: '/admin/remote-config/history',
+          roles: ['admin'],
+        },
+      ],
+    },
+    {
       id: 'settings',
       label: 'Settings',
       icon: 'Settings',
@@ -83,7 +134,9 @@ const getNavigationItems = (isAdmin: boolean): NavItem[] => {
     },
   ];
 
-  return isAdmin ? [...baseItems, ...adminItems] : baseItems;
+  const result = isAdmin ? [...baseItems, ...adminItems] : baseItems;
+  console.log('getNavigationItems - isAdmin:', isAdmin, 'result:', result);
+  return result;
 };
 
 // Icon mapping
@@ -95,6 +148,8 @@ const iconMap: Record<string, React.ReactElement> = {
   AdminPanelSettings: <AdminPanelSettings />,
   Assessment: <Assessment />,
   Security: <Security />,
+  CloudSync: <CloudSync />,
+  History: <History />,
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
@@ -138,7 +193,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
     if (!item.roles || item.roles.length === 0) {
       return true;
     }
-    return item.roles.includes(user?.role || '');
+    const hasAccess = item.roles.includes(user?.role || '');
+    console.log(`canAccessItem - item: ${item.id}, userRole: ${user?.role}, itemRoles:`, item.roles, 'hasAccess:', hasAccess);
+    return hasAccess;
   };
 
   const renderNavItem = (item: NavItem, level: number = 0) => {

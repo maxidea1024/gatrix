@@ -55,6 +55,7 @@ import {
   Schedule as ScheduleIcon,
   Work as JobIcon,
   Monitor as MonitorIcon,
+  CloudSync as CloudSyncIcon,
 
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -87,6 +88,11 @@ const adminMenuItems = [
   { text: 'jobs.monitor', icon: <MonitorIcon />, path: '/admin/queue-monitor' },
   { text: 'admin.whitelist.title', icon: <SecurityIcon />, path: '/admin/whitelist' },
   { text: 'navigation.auditLogs', icon: <HistoryIcon />, path: '/admin/audit-logs' },
+  {
+    text: 'admin.remoteConfig.title',
+    icon: <CloudSyncIcon />,
+    path: '/admin/remote-config'
+  },
 ];
 
 const settingsMenuItems = [
@@ -196,6 +202,100 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   };
 
   const renderMenuItem = (item: any, index: number) => {
+    const isAdminItem = typeof index === 'string' && index.startsWith('admin-');
+
+    // 서브메뉴가 있는 경우
+    if (item.children) {
+      const isExpanded = expandedSections[`menu-${index}`];
+      const hasActiveChild = item.children.some((child: any) => isActivePath(child.path));
+
+      const menuButton = (
+        <ListItemButton
+          key={index}
+          onClick={() => toggleSection(`menu-${index}`)}
+          sx={{
+            color: hasActiveChild ? '#ffffff' : '#cbd5e1',
+            backgroundColor: hasActiveChild ? 'rgba(91, 106, 208, 0.2)' : 'transparent',
+            '&:hover': {
+              backgroundColor: 'rgba(255,255,255,0.1)',
+            },
+            justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+            px: sidebarCollapsed ? 1 : 2,
+            pl: isAdminItem ? 4 : (sidebarCollapsed ? 1 : 2),
+          }}
+        >
+          <ListItemIcon sx={{
+            color: 'inherit',
+            minWidth: sidebarCollapsed ? 'auto' : 40,
+            justifyContent: 'center'
+          }}>
+            {item.icon}
+          </ListItemIcon>
+          {!sidebarCollapsed && (
+            <>
+              <ListItemText
+                primary={t(item.text)}
+                primaryTypographyProps={{ fontSize: '0.875rem' }}
+              />
+              {isExpanded ? <ExpandLess /> : <ExpandMore />}
+            </>
+          )}
+        </ListItemButton>
+      );
+
+      if (sidebarCollapsed) {
+        return (
+          <Tooltip
+            key={index}
+            title={t(item.text)}
+            placement="right"
+            arrow
+          >
+            <Box sx={{ px: 1, py: 0.5 }}>
+              {item.children.map((child: any, childIndex: number) => renderMenuItem(child, `${index}-${childIndex}`))}
+            </Box>
+          </Tooltip>
+        );
+      }
+
+      return (
+        <React.Fragment key={index}>
+          {menuButton}
+          <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              {item.children.map((child: any, childIndex: number) => (
+                <ListItemButton
+                  key={childIndex}
+                  onClick={() => navigate(child.path)}
+                  sx={{
+                    pl: 4,
+                    color: isActivePath(child.path) ? '#ffffff' : '#cbd5e1',
+                    backgroundColor: isActivePath(child.path) ? 'rgba(91, 106, 208, 0.2)' : 'transparent',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255,255,255,0.1)',
+                    },
+                  }}
+                >
+                  <ListItemIcon sx={{
+                    color: 'inherit',
+                    minWidth: 40,
+                    justifyContent: 'center'
+                  }}>
+                    {child.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={t(child.text)}
+                    primaryTypographyProps={{ fontSize: '0.875rem' }}
+                  />
+                </ListItemButton>
+              ))}
+            </List>
+          </Collapse>
+        </React.Fragment>
+      );
+    }
+
+    // 일반 메뉴 아이템
     const menuButton = (
       <ListItemButton
         key={index}
@@ -208,6 +308,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           },
           justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
           px: sidebarCollapsed ? 1 : 2,
+          pl: isAdminItem ? 4 : (sidebarCollapsed ? 1 : 2),
         }}
       >
         <ListItemIcon sx={{
@@ -347,28 +448,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             )}
             {!sidebarCollapsed && (
               <Collapse in={expandedSections.admin} timeout="auto" unmountOnExit>
-                {adminMenuItems.map((item, index) => (
-                  <ListItemButton
-                    key={index}
-                    onClick={() => navigate(item.path)}
-                    sx={{
-                      pl: 4,
-                      color: isActivePath(item.path) ? '#ffffff' : '#cbd5e1',
-                      backgroundColor: isActivePath(item.path) ? 'rgba(91, 106, 208, 0.2)' : 'transparent',
-                      '&:hover': {
-                        backgroundColor: 'rgba(255,255,255,0.1)',
-                      },
-                    }}
-                  >
-                    <ListItemIcon sx={{ color: 'inherit', minWidth: 40 }}>
-                      {item.icon}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={t(item.text)}
-                      primaryTypographyProps={{ fontSize: '0.875rem' }}
-                    />
-                  </ListItemButton>
-                ))}
+                <List component="div" disablePadding>
+                  {adminMenuItems.map((item, index) => renderMenuItem(item, `admin-${index}`))}
+                </List>
               </Collapse>
             )}
 

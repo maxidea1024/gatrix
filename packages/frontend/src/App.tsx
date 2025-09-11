@@ -67,6 +67,8 @@ import SchedulerPage from './pages/admin/SchedulerPage';
 import JobsPage from './pages/admin/JobsPage';
 import QueueMonitorPage from './pages/admin/QueueMonitorPage';
 import CustomQueueMonitorPage from './pages/admin/CustomQueueMonitorPage';
+import RemoteConfigPage from './pages/admin/RemoteConfigPage';
+import RemoteConfigHistoryPage from './pages/admin/RemoteConfigHistoryPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
 // Conditional Landing Page Component
@@ -236,6 +238,8 @@ const AppContent: React.FC = () => {
                         <Route path="jobs" element={<JobsPage />} />
                         <Route path="queue-monitor" element={<QueueMonitorPage />} />
                         <Route path="audit-logs" element={<AuditLogsPage />} />
+                        <Route path="remote-config" element={<RemoteConfigPage />} />
+                        <Route path="remote-config/history" element={<RemoteConfigHistoryPage />} />
                       </Routes>
                     </MainLayout>
                   </ProtectedRoute>

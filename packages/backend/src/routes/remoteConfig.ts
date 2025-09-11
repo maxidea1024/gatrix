@@ -1,0 +1,203 @@
+import express from 'express';
+import RemoteConfigController from '../controllers/RemoteConfigController';
+import { authenticate, requireAdmin } from '../middleware/auth';
+import { body, param, query, validationResult } from 'express-validator';
+import { CustomError } from '../middleware/errorHandler';
+
+const router = express.Router();
+
+// Validation middleware
+const validateRequest = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const errorMessages = errors.array().map(err => err.msg).join(', ');
+    throw new CustomError(`Validation failed: ${errorMessages}`, 400);
+  }
+  next();
+};
+
+// Apply authentication and admin role requirement to all routes
+router.use(authenticate as any);
+router.use(requireAdmin as any);
+
+// Validation schemas
+const createConfigValidation = [
+  body('keyName')
+    .isString()
+    .isLength({ min: 1, max: 255 })
+    .matches(/^[a-zA-Z][a-zA-Z0-9_.-]*$/)
+    .withMessage('Key name must start with a letter and contain only letters, numbers, dots, hyphens, and underscores'),
+  body('valueType')
+    .isIn(['string', 'number', 'boolean', 'json', 'yaml'])
+    .withMessage('Value type must be one of: string, number, boolean, json, yaml'),
+  body('defaultValue')
+    .optional()
+    .isString(),
+  body('description')
+    .optional()
+    .isString()
+    .isLength({ max: 1000 }),
+  body('isActive')
+    .optional()
+    .isBoolean()
+];
+
+const updateConfigValidation = [
+  param('id').isInt({ min: 1 }).withMessage('Invalid config ID'),
+  body('keyName')
+    .optional()
+    .isString()
+    .isLength({ min: 1, max: 255 })
+    .matches(/^[a-zA-Z][a-zA-Z0-9_.-]*$/)
+    .withMessage('Key name must start with a letter and contain only letters, numbers, dots, hyphens, and underscores'),
+  body('valueType')
+    .optional()
+    .isIn(['string', 'number', 'boolean', 'json', 'yaml'])
+    .withMessage('Value type must be one of: string, number, boolean, json, yaml'),
+  body('defaultValue')
+    .optional()
+    .isString(),
+  body('description')
+    .optional()
+    .isString()
+    .isLength({ max: 1000 }),
+  body('isActive')
+    .optional()
+    .isBoolean()
+];
+
+const listConfigsValidation = [
+  query('page')
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage('Page must be a positive integer'),
+  query('limit')
+    .optional()
+    .isInt({ min: 1, max: 100 })
+    .withMessage('Limit must be between 1 and 100'),
+  query('search')
+    .optional()
+    .isString()
+    .isLength({ max: 255 }),
+  query('valueType')
+    .optional()
+    .isIn(['string', 'number', 'boolean', 'json', 'yaml']),
+  query('isActive')
+    .optional()
+    .isBoolean(),
+  query('sortBy')
+    .optional()
+    .isIn(['keyName', 'valueType', 'createdAt', 'updatedAt'])
+    .withMessage('Sort by must be one of: keyName, valueType, createdAt, updatedAt'),
+  query('sortOrder')
+    .optional()
+    .isIn(['asc', 'desc'])
+    .withMessage('Sort order must be asc or desc')
+];
+
+const stageConfigsValidation = [
+  body('configIds')
+    .isArray({ min: 1 })
+    .withMessage('Config IDs must be a non-empty array'),
+  body('configIds.*')
+    .isInt({ min: 1 })
+    .withMessage('Each config ID must be a positive integer'),
+  body('description')
+    .optional()
+    .isString()
+    .isLength({ max: 500 })
+];
+
+const publishConfigsValidation = [
+  body('deploymentName')
+    .optional()
+    .isString()
+    .isLength({ min: 1, max: 255 }),
+  body('description')
+    .optional()
+    .isString()
+    .isLength({ max: 1000 })
+];
+
+// Routes
+
+/**
+ * @route GET /api/v1/remote-config
+ * @desc Get all remote configs with pagination and filters
+ * @access Admin
+ */
+router.get('/', listConfigsValidation, validateRequest, RemoteConfigController.list);
+
+/**
+ * @route GET /api/v1/remote-config/:id
+ * @desc Get remote config by ID
+ * @access Admin
+ */
+router.get('/:id', 
+  param('id').isInt({ min: 1 }).withMessage('Invalid config ID'),
+  validateRequest,
+  RemoteConfigController.getById
+);
+
+/**
+ * @route POST /api/v1/remote-config
+ * @desc Create new remote config
+ * @access Admin
+ */
+router.post('/', createConfigValidation, validateRequest, RemoteConfigController.create);
+
+/**
+ * @route PUT /api/v1/remote-config/:id
+ * @desc Update remote config
+ * @access Admin
+ */
+router.put('/:id', updateConfigValidation, validateRequest, RemoteConfigController.update);
+
+/**
+ * @route DELETE /api/v1/remote-config/:id
+ * @desc Delete remote config
+ * @access Admin
+ */
+router.delete('/:id',
+  param('id').isInt({ min: 1 }).withMessage('Invalid config ID'),
+  validateRequest,
+  RemoteConfigController.delete
+);
+
+/**
+ * @route GET /api/v1/remote-config/:id/versions
+ * @desc Get versions for a config
+ * @access Admin
+ */
+router.get('/:id/versions',
+  param('id').isInt({ min: 1 }).withMessage('Invalid config ID'),
+  validateRequest,
+  RemoteConfigController.getVersions
+);
+
+/**
+ * @route GET /api/v1/remote-config/:id/rules
+ * @desc Get rules for a config
+ * @access Admin
+ */
+router.get('/:id/rules',
+  param('id').isInt({ min: 1 }).withMessage('Invalid config ID'),
+  validateRequest,
+  RemoteConfigController.getRules
+);
+
+/**
+ * @route POST /api/v1/remote-config/stage
+ * @desc Stage configs (Git-like staging)
+ * @access Admin
+ */
+router.post('/stage', stageConfigsValidation, validateRequest, RemoteConfigController.stage);
+
+/**
+ * @route POST /api/v1/remote-config/publish
+ * @desc Publish staged configs (Git-like push)
+ * @access Admin
+ */
+router.post('/publish', publishConfigsValidation, validateRequest, RemoteConfigController.publish);
+
+export default router;

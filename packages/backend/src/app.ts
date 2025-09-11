@@ -16,6 +16,7 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { generalLimiter, apiLimiter, authLimiter } from './middleware/rateLimiter';
 import { responseCache, cacheConfigs } from './middleware/responseCache';
 import { initializeJobTypes } from './services/jobs';
+import CampaignScheduler from './services/campaignScheduler';
 
 // Import routes
 import authRoutes from './routes/auth';
@@ -35,6 +36,8 @@ import jobRoutes from './routes/jobs';
 import varsRoutes from './routes/vars';
 import platformDefaultsRoutes from './routes/platformDefaults';
 import translationRoutes from './routes/translation';
+import remoteConfigRoutes from './routes/remoteConfig';
+import notificationRoutes from './routes/notifications';
 
 // import advancedSettingsRoutes from './routes/advancedSettings';
 import { authenticate, requireAdmin } from './middleware/auth';
@@ -198,6 +201,8 @@ app.use('/api/v1/message-templates', messageTemplateRoutes);
 app.use('/api/v1', jobRoutes);
 app.use('/api/v1/admin/platform-defaults', platformDefaultsRoutes);
 app.use('/api/v1/translation', translationRoutes);
+app.use('/api/v1/remote-config', remoteConfigRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 
 // app.use('/api/v1/advanced-settings', advancedSettingsRoutes);
 
@@ -221,6 +226,15 @@ try {
   initializeJobTypes();
 } catch (error) {
   logger.error('Failed to initialize job types:', error);
+}
+
+// Initialize campaign scheduler
+try {
+  const campaignScheduler = CampaignScheduler.getInstance();
+  campaignScheduler.start();
+  logger.info('Campaign scheduler initialized successfully');
+} catch (error) {
+  logger.error('Failed to initialize campaign scheduler:', error);
 }
 
 export default app;
