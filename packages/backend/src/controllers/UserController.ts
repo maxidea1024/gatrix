@@ -472,7 +472,7 @@ export class UserController {
     }
 
     const { preferredLanguage } = value;
-    const userId = req.user!.id;
+    const userId = req.user!.userId;
 
     await UserService.updateUserLanguage(userId, preferredLanguage);
 

@@ -222,12 +222,8 @@ const LoginPage: React.FC = () => {
       if (err.status === 404 ||
           err.message === 'USER_NOT_FOUND' ||
           (err.error?.message === 'USER_NOT_FOUND')) {
-        // Navigate to signup prompt page with email
-        navigate('/signup-prompt', {
-          state: {
-            email: data.email
-          }
-        });
+        // Show error message for user not found
+        setLoginError(t('auth.errors.userNotFound'));
       } else if (err.status === 403) {
         // Check specific account status
         if (err.message === 'ACCOUNT_PENDING' || err.error?.message === 'ACCOUNT_PENDING') {

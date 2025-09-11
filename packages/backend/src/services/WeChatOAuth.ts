@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { logger } from '../utils/logger';
+import logger from '../config/logger';
 import config from '../config';
 
 export interface WeChatProfile {

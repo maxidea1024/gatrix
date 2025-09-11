@@ -11,6 +11,8 @@ import {
   Divider,
   Alert,
   Tooltip,
+  Card,
+  CardContent,
 } from '@mui/material';
 import {
   Visibility,
@@ -50,6 +52,8 @@ const RegisterPage: React.FC = () => {
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [registerSuccess, setRegisterSuccess] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<string | null>(null); // 'google', 'github', 'qq', etc.
+  const [isShaking, setIsShaking] = useState(false);
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
 
   // Validation schema with translations
   const registerSchema = useMemo(() => yup.object({
@@ -81,9 +85,10 @@ const RegisterPage: React.FC = () => {
     trigger,
     reset,
     clearErrors,
+    watch,
   } = useForm<RegisterData & { confirmPassword: string }>({
     resolver,
-    mode: 'onTouched', // 필드를 터치한 후에만 검증
+    mode: 'onChange', // 실시간 검증을 위해 onChange로 변경
     defaultValues: {
       name: '',
       email: prefilledEmail,
@@ -92,43 +97,102 @@ const RegisterPage: React.FC = () => {
     },
   });
 
+  // Watch password for real-time confirmation validation
+  const watchedPassword = watch('password');
+
   // Re-validate form when language changes
   useEffect(() => {
     clearErrors();
     trigger();
   }, [clearErrors, trigger, t]);
 
+  // Re-validate confirm password when password changes
+  useEffect(() => {
+    if (watchedPassword) {
+      trigger('confirmPassword');
+    }
+  }, [watchedPassword, trigger]);
+
+  // Function to get translated error message
+  const getRegisterErrorMessage = (error: any): string => {
+    if (!error) return t('auth.errors.registrationFailed');
+
+    const errorCode = error.message || error.error?.message || '';
+    const status = error.status;
+
+    // Map backend error codes to translation keys
+    const errorMap: { [key: string]: string } = {
+      'EMAIL_ALREADY_EXISTS': t('auth.errors.emailAlreadyExists'),
+      'User with this email already exists': t('auth.errors.emailAlreadyExists'), // Legacy message
+      'REGISTRATION_FAILED': t('auth.errors.registrationFailed'),
+      'INVALID_EMAIL_FORMAT': t('auth.errors.invalidEmailFormat'),
+      'PASSWORD_TOO_SHORT': t('auth.errors.passwordTooShort'),
+      'NAME_TOO_SHORT': t('auth.errors.nameTooShort'),
+      'NAME_TOO_LONG': t('auth.errors.nameTooLong'),
+      'EMAIL_REQUIRED': t('auth.errors.emailRequired'),
+      'PASSWORD_REQUIRED': t('auth.errors.passwordRequired'),
+      'NAME_REQUIRED': t('auth.errors.nameRequired'),
+      'VALIDATION_ERROR': t('auth.errors.validationError'),
+    };
+
+    // Check for specific error codes
+    if (errorMap[errorCode]) {
+      return errorMap[errorCode];
+    }
+
+    // Handle status codes
+    if (status === 409) {
+      return t('auth.errors.emailAlreadyExists');
+    } else if (status === 400) {
+      return t('auth.errors.validationError');
+    } else if (status === 500) {
+      return t('auth.errors.registrationFailed');
+    }
+
+    // Fallback to generic error message
+    return errorCode || t('auth.errors.registrationFailed');
+  };
+
   const onSubmit = async (data: RegisterData & { confirmPassword: string }) => {
+    const startTime = Date.now();
+
     try {
-      setRegisterError(null);
-      clearError();
+      setIsSubmittingForm(true);
 
-      // 최소 2초 대기
-      const startTime = Date.now();
-
-      const registerPromise = register({
+      // API 호출
+      await register({
         name: data.name,
         email: data.email,
         password: data.password,
       });
 
-      // 최소 2초가 지나지 않았다면 추가 대기
+      // 성공 시 최소 2초 대기
       const elapsed = Date.now() - startTime;
-      if (elapsed < 2000) {
-        await Promise.all([
-          registerPromise,
-          new Promise(resolve => setTimeout(resolve, 2000 - elapsed))
-        ]);
-      } else {
-        await registerPromise;
+      const remainingTime = Math.max(0, 2000 - elapsed);
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
       }
 
+      // 성공 시에만 에러 메시지 지우기
+      setRegisterError(null);
       setRegisterSuccess(true);
       toast.success(t('auth.registerSuccess'));
     } catch (err: any) {
-      const errorMessage = err.message || t('auth.registerFailed');
+      // 에러 시에도 최소 2초 대기
+      const elapsed = Date.now() - startTime;
+      const remainingTime = Math.max(0, 2000 - elapsed);
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
+      }
+
+      const errorMessage = getRegisterErrorMessage(err);
       setRegisterError(errorMessage);
-      toast.error(errorMessage);
+
+      // Trigger shake animation
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
+    } finally {
+      setIsSubmittingForm(false);
     }
   };
 
@@ -240,25 +304,40 @@ const RegisterPage: React.FC = () => {
 
 
       {/* Register Form */}
-      <Box component="form" onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-        {/* Error Alert */}
-        {registerError && (
-          <Alert
-            severity="error"
-            sx={{
-              mb: 3,
-              backgroundColor: 'rgba(244, 67, 54, 0.1)',
-              color: '#ff6b6b',
-              border: '1px solid rgba(244, 67, 54, 0.2)',
-              '& .MuiAlert-icon': {
-                color: '#ff6b6b'
-              }
-            }}
-            onClose={() => setRegisterError(null)}
-          >
-            {registerError}
-          </Alert>
-        )}
+      <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        autoComplete="off"
+      >
+        {/* Error Alert - 항상 공간 확보로 레이아웃 안정화 */}
+        <Alert
+          severity="error"
+          sx={{
+            mb: 3,
+            backgroundColor: registerError ? 'rgba(244, 67, 54, 0.1)' : 'transparent',
+            color: registerError ? '#ff6b6b' : 'transparent',
+            border: registerError ? '1px solid rgba(244, 67, 54, 0.2)' : '1px solid transparent',
+            opacity: registerError ? 1 : 0,
+            visibility: registerError ? 'visible' : 'hidden',
+            minHeight: '52px', // Alert의 기본 높이 확보
+            transition: 'opacity 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out',
+            animation: isShaking ? 'errorShake 0.5s ease-in-out' : 'none',
+            '@keyframes errorShake': {
+              '0%, 100%': { transform: 'translateX(0)' },
+              '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-4px)' },
+              '20%, 40%, 60%, 80%': { transform: 'translateX(4px)' },
+            },
+            '& .MuiAlert-icon': {
+              color: registerError ? '#ff6b6b' : 'transparent'
+            },
+            '& .MuiAlert-message': {
+              opacity: registerError ? 1 : 0,
+            }
+          }}
+          onClose={registerError ? () => setRegisterError(null) : undefined}
+        >
+          {registerError || 'placeholder'} {/* 항상 내용이 있도록 */}
+        </Alert>
 
         {/* Name Field */}
         <Controller
@@ -403,37 +482,52 @@ const RegisterPage: React.FC = () => {
         <Controller
           name="confirmPassword"
           control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              fullWidth
-              label={`${t('auth.confirmPassword')} *`}
-              type={showConfirmPassword ? 'text' : 'password'}
-              helperText={errors.confirmPassword?.message || t('auth.confirmPasswordHelp')}
-              autoComplete="new-password"
-              sx={{
-                mb: 2,
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  '& fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.2)',
+          render={({ field }) => {
+            const isPasswordMatch = field.value && watchedPassword && field.value === watchedPassword;
+            const hasConfirmPasswordValue = field.value && field.value.length > 0;
+            const showMatchIndicator = hasConfirmPasswordValue && watchedPassword;
+
+            return (
+              <TextField
+                {...field}
+                fullWidth
+                label={`${t('auth.confirmPassword')} *`}
+                type={showConfirmPassword ? 'text' : 'password'}
+                helperText={errors.confirmPassword?.message || t('auth.confirmPasswordHelp')}
+                autoComplete="new-password"
+                sx={{
+                  mb: 2,
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    '& fieldset': {
+                      borderColor: showMatchIndicator
+                        ? (isPasswordMatch ? 'rgba(76, 175, 80, 0.5)' : 'rgba(244, 67, 54, 0.5)')
+                        : 'rgba(255, 255, 255, 0.2)',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: showMatchIndicator
+                        ? (isPasswordMatch ? 'rgba(76, 175, 80, 0.7)' : 'rgba(244, 67, 54, 0.7)')
+                        : 'rgba(255, 255, 255, 0.3)',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: showMatchIndicator
+                        ? (isPasswordMatch ? '#4caf50' : '#f44336')
+                        : '#667eea',
+                    },
                   },
-                  '&:hover fieldset': {
-                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                  '& .MuiInputLabel-root': {
+                    color: 'rgba(255, 255, 255, 0.7)',
                   },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#667eea',
+                  '& .MuiInputBase-input': {
+                    color: 'white',
                   },
-                },
-                '& .MuiInputLabel-root': {
-                  color: 'rgba(255, 255, 255, 0.7)',
-                },
-                '& .MuiInputBase-input': {
-                  color: 'white',
-                },
-                '& .MuiFormHelperText-root': {
-                  color: errors.confirmPassword ? 'rgba(255, 182, 193, 0.8)' : 'rgba(255, 255, 255, 0.6)',
-                },
+                  '& .MuiFormHelperText-root': {
+                    color: errors.confirmPassword
+                      ? 'rgba(255, 182, 193, 0.8)'
+                      : (showMatchIndicator && isPasswordMatch
+                          ? 'rgba(129, 199, 132, 0.8)'
+                          : 'rgba(255, 255, 255, 0.6)'),
+                  },
               }}
               inputProps={{
                 autoComplete: 'new-password',
@@ -455,7 +549,8 @@ const RegisterPage: React.FC = () => {
                 ),
               }}
             />
-          )}
+            );
+          }}
         />
 
         <Button
@@ -463,8 +558,8 @@ const RegisterPage: React.FC = () => {
           fullWidth
           variant="contained"
           size="large"
-          disabled={isSubmitting || isLoading || !isValid}
-          startIcon={isSubmitting || isLoading ? <CircularProgress size={20} /> : <PersonAdd />}
+          disabled={isSubmitting || isLoading || isSubmittingForm || !isValid}
+          startIcon={isSubmitting || isLoading || isSubmittingForm ? <CircularProgress size={20} /> : <PersonAdd />}
           sx={{
             mt: 3,
             mb: 2,
@@ -483,7 +578,7 @@ const RegisterPage: React.FC = () => {
             fontWeight: 600,
           }}
         >
-          {isSubmitting || isLoading ? t('auth.creatingAccount') : t('auth.createAccount')}
+          {t('auth.createAccount')}
         </Button>
 
         {/* Login Link */}

@@ -87,7 +87,7 @@ export class AuthService {
       // Check if user already exists
       const existingUser = await UserModel.findByEmail(email);
       if (existingUser) {
-        throw new CustomError('User with this email already exists', 409);
+        throw new CustomError('EMAIL_ALREADY_EXISTS', 409);
       }
 
       // Create user data
@@ -113,7 +113,7 @@ export class AuthService {
         throw error;
       }
       logger.error('Registration error:', error);
-      throw new CustomError('Registration failed', 500);
+      throw new CustomError('REGISTRATION_FAILED', 500);
     }
   }
 
@@ -160,12 +160,20 @@ export class AuthService {
         throw new CustomError('User not found', 404);
       }
 
+      // OAuth 사용자들은 비밀번호 변경 불가
+      if (user.authType !== 'local') {
+        throw new CustomError('Password change is not available for OAuth users', 400);
+      }
+
       // Verify current password
       if (user.passwordHash) {
         const isValidPassword = await UserModel.verifyPassword(user, currentPassword);
         if (!isValidPassword) {
           throw new CustomError('Current password is incorrect', 400);
         }
+      } else {
+        // local 사용자인데 passwordHash가 없는 경우 (데이터 불일치)
+        throw new CustomError('Password not set for this account', 400);
       }
 
       // Update password

@@ -15,6 +15,7 @@ export class GatrixError extends Error implements AppError {
     this.statusCode = statusCode;
     this.isOperational = isOperational;
 
+    //TODO 개발 환경에서만 callstack을 추적하는게?
     Error.captureStackTrace(this, this.constructor);
   }
 }

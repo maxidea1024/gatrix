@@ -8,7 +8,7 @@ import redisClient from '../config/redis';
 // import { WeChatOAuthService } from '../services/WeChatOAuth';
 // import { BaiduOAuthService } from '../services/BaiduOAuth';
 import { UserModel } from '../models/User';
-import { logger } from '../utils/logger';
+import logger from '../config/logger';
 
 const router = Router();
 

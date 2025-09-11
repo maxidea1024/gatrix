@@ -38,7 +38,6 @@ import { MainLayout } from './components/layout/MainLayout';
 import LoginPage from './pages/auth/LoginPage';
 import LogoutPage from './pages/auth/LogoutPage';
 import RegisterPage from './pages/auth/RegisterPage';
-import SignUpPromptPage from './pages/auth/SignUpPromptPage';
 import PendingApprovalPage from './pages/auth/PendingApprovalPage';
 import AccountSuspendedPage from './pages/auth/AccountSuspendedPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
@@ -84,16 +83,8 @@ const ConditionalLandingPage: React.FC = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Check if user has visited before (has set initial preferences)
-  const hasVisitedBefore = localStorage.getItem('hasVisitedBefore') === 'true';
-
-  if (hasVisitedBefore) {
-    // Returning user - go directly to login
-    return <Navigate to="/login" replace />;
-  }
-
-  // First-time visitor - show signup prompt
-  return <SignUpPromptPage />;
+  // Always redirect to login page for unauthenticated users
+  return <Navigate to="/login" replace />;
 };
 
 // LocalizationProvider with language support
@@ -181,7 +172,6 @@ const AppContent: React.FC = () => {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/logout" element={<LogoutPage />} />
                 <Route path="/register" element={<RegisterPage />} />
-                <Route path="/signup-prompt" element={<SignUpPromptPage />} />
                 <Route path="/pending-approval" element={<PendingApprovalPage />} />
                 <Route path="/auth/pending" element={<PendingApprovalPage />} />
                 <Route path="/auth/callback" element={<OAuthCallbackPage />} />

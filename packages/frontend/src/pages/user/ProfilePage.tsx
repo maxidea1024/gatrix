@@ -14,6 +14,11 @@ import {
   Paper,
   Stack,
   useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  InputAdornment,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -24,6 +29,9 @@ import {
   Email as EmailIcon,
   Security as SecurityIcon,
   Schedule as ScheduleIcon,
+  Lock as LockIcon,
+  Visibility,
+  VisibilityOff,
 } from '@mui/icons-material';
 import { CircularProgress } from '@mui/material';
 import { useAuth } from '@/hooks/useAuth';
@@ -42,6 +50,20 @@ const ProfilePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  // Password change dialog state
+  const [passwordDialog, setPasswordDialog] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false,
+  });
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   if (!user) {
     return (
@@ -124,6 +146,53 @@ const ProfilePage: React.FC = () => {
       enqueueSnackbar(error.message || t('profile.updateFailed'), { variant: 'error' });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Password change handlers
+  const handlePasswordDialogOpen = () => {
+    setPasswordDialog(true);
+    setPasswordData({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    });
+  };
+
+  const handlePasswordDialogClose = () => {
+    setPasswordDialog(false);
+    setPasswordData({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    });
+    setShowPasswords({
+      current: false,
+      new: false,
+      confirm: false,
+    });
+  };
+
+  const handlePasswordChange = async () => {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      enqueueSnackbar(t('auth.passwordsNotMatch'), { variant: 'error' });
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      enqueueSnackbar(t('auth.passwordTooShort'), { variant: 'error' });
+      return;
+    }
+
+    setPasswordLoading(true);
+    try {
+      await AuthService.changePassword(passwordData.currentPassword, passwordData.newPassword);
+      enqueueSnackbar(t('profile.passwordChanged'), { variant: 'success' });
+      handlePasswordDialogClose();
+    } catch (error: any) {
+      enqueueSnackbar(error.message || t('profile.passwordChangeFailed'), { variant: 'error' });
+    } finally {
+      setPasswordLoading(false);
     }
   };
 
@@ -346,8 +415,118 @@ const ProfilePage: React.FC = () => {
               </Stack>
             </CardContent>
           </Card>
+
+          {/* Security Settings - Only for local users */}
+          {user.authType === 'local' && (
+            <Card sx={{ mt: 2 }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <SecurityIcon sx={{ mr: 1, color: 'primary.main' }} />
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    {t('profile.security')}
+                  </Typography>
+                </Box>
+
+                <Stack spacing={2}>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      {t('profile.password')}
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      startIcon={<LockIcon />}
+                      onClick={handlePasswordDialogOpen}
+                      size="small"
+                    >
+                      {t('profile.changePassword')}
+                    </Button>
+                  </Box>
+                </Stack>
+              </CardContent>
+            </Card>
+          )}
         </Grid>
       </Grid>
+
+      {/* Password Change Dialog */}
+      <Dialog open={passwordDialog} onClose={handlePasswordDialogClose} maxWidth="sm" fullWidth>
+        <DialogTitle>{t('profile.changePassword')}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={3} sx={{ mt: 1 }}>
+            <TextField
+              fullWidth
+              label={t('profile.currentPassword')}
+              type={showPasswords.current ? 'text' : 'password'}
+              value={passwordData.currentPassword}
+              onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPasswords({ ...showPasswords, current: !showPasswords.current })}
+                      edge="end"
+                    >
+                      {showPasswords.current ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              fullWidth
+              label={t('profile.newPassword')}
+              type={showPasswords.new ? 'text' : 'password'}
+              value={passwordData.newPassword}
+              onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+              helperText={t('auth.passwordHelp')}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPasswords({ ...showPasswords, new: !showPasswords.new })}
+                      edge="end"
+                    >
+                      {showPasswords.new ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              fullWidth
+              label={t('profile.confirmNewPassword')}
+              type={showPasswords.confirm ? 'text' : 'password'}
+              value={passwordData.confirmPassword}
+              onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPasswords({ ...showPasswords, confirm: !showPasswords.confirm })}
+                      edge="end"
+                    >
+                      {showPasswords.confirm ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handlePasswordDialogClose}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={handlePasswordChange}
+            variant="contained"
+            disabled={passwordLoading || !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
+            startIcon={passwordLoading ? <CircularProgress size={16} /> : undefined}
+          >
+            {passwordLoading ? t('common.saving') : t('profile.changePassword')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

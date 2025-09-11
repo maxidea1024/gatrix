@@ -45,13 +45,27 @@ export class AuthService {
   }
 
   static async register(data: RegisterData): Promise<User> {
-    const response = await apiService.post<{ user: User }>('/auth/register', data);
+    try {
+      const response = await apiService.post<{ user: User }>('/auth/register', data);
 
-    if (response.success && response.data) {
-      return response.data.user;
+      if (response.success && response.data) {
+        return response.data.user;
+      }
+
+      throw new Error(response.error?.message || 'REGISTRATION_FAILED');
+    } catch (error: any) {
+      // Handle API errors
+      if (error.error?.message) {
+        // Create a custom error with the backend message and status
+        const customError = new Error(error.error.message);
+        (customError as any).status = error.status;
+        (customError as any).response = { status: error.status };
+        throw customError;
+      }
+
+      // Re-throw the original error if it's not an API error
+      throw error;
     }
-
-    throw new Error(response.error?.message || 'Registration failed');
   }
 
   static async logout(): Promise<void> {

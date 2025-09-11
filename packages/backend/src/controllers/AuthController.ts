@@ -77,7 +77,24 @@ export class AuthController {
     // Validate request body
     const { error, value } = registerSchema.validate(req.body);
     if (error) {
-      throw new CustomError(error.details[0].message, 400);
+      // Map validation errors to specific error codes
+      const field = error.details[0].path[0];
+      const type = error.details[0].type;
+
+      if (field === 'email' && type === 'string.email') {
+        throw new CustomError('INVALID_EMAIL_FORMAT', 400);
+      } else if (field === 'password' && type === 'string.min') {
+        throw new CustomError('PASSWORD_TOO_SHORT', 400);
+      } else if (field === 'name' && type === 'string.min') {
+        throw new CustomError('NAME_TOO_SHORT', 400);
+      } else if (field === 'name' && type === 'string.max') {
+        throw new CustomError('NAME_TOO_LONG', 400);
+      } else if (type === 'any.required') {
+        throw new CustomError(`${field.toUpperCase()}_REQUIRED`, 400);
+      }
+
+      // Fallback to original message
+      throw new CustomError('VALIDATION_ERROR', 400);
     }
 
     const user = await AuthService.register(value);

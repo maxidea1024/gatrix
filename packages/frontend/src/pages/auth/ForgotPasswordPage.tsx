@@ -54,6 +54,7 @@ const ForgotPasswordPage: React.FC = () => {
       'PASSWORD_RESET_EMAIL_SENT': t('auth.passwordResetEmailSent'),
       'EMAIL_SEND_FAILED': t('auth.emailSendFailed'),
       'EMAIL_NOT_REGISTERED': t('auth.emailNotRegistered'),
+      'PASSWORD_RESET_NOT_AVAILABLE_FOR_OAUTH_USERS': t('auth.passwordResetNotAvailableForOAuthUsers'),
       'PASSWORD_RESET_REQUEST_ERROR': t('auth.passwordResetRequestError'),
       'INVALID_TOKEN': t('auth.invalidToken'),
       'TOKEN_EXPIRED': t('auth.tokenExpired'),

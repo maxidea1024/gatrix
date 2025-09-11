@@ -30,7 +30,7 @@ export class PasswordResetService {
     try {
       // 사용자 확인
       const user = await db('g_users')
-        .select('id', 'email', 'name')
+        .select('id', 'email', 'name', 'authType')
         .where('email', email)
         .where('status', 'active')
         .first();
@@ -40,6 +40,14 @@ export class PasswordResetService {
         return {
           success: false,
           message: 'EMAIL_NOT_REGISTERED',
+        };
+      }
+
+      // authType이 local이 아닌 경우 비밀번호 리셋 불가
+      if (user.authType !== 'local') {
+        return {
+          success: false,
+          message: 'PASSWORD_RESET_NOT_AVAILABLE_FOR_OAUTH_USERS',
         };
       }
 
