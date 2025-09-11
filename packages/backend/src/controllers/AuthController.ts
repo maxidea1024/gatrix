@@ -90,7 +90,7 @@ export class AuthController {
       } else if (field === 'name' && type === 'string.max') {
         throw new CustomError('NAME_TOO_LONG', 400);
       } else if (type === 'any.required') {
-        throw new CustomError(`${field.toUpperCase()}_REQUIRED`, 400);
+        throw new CustomError(`${String(field).toUpperCase()}_REQUIRED`, 400);
       }
 
       // Fallback to original message
