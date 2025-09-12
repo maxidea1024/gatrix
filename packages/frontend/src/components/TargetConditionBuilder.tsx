@@ -140,7 +140,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
     if (field.type === 'boolean') {
       return (
         <FormControl size="small" sx={{ minWidth: 120 }}>
-          <InputLabel>Value</InputLabel>
+          <InputLabel>{t('admin.remoteConfig.campaigns.value')}</InputLabel>
           <Select
             value={condition.value || false}
             onChange={(e) => updateCondition(index, { value: e.target.value })}
@@ -169,7 +169,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
             }}
             disabled={disabled}
             renderInput={(params) => (
-              <TextField {...params} label="Values" sx={{ minWidth: 200 }} />
+              <TextField {...params} label={t('admin.remoteConfig.campaigns.value')} sx={{ minWidth: 200 }} />
             )}
             renderTags={(value, getTagProps) =>
               value.map((option, index) => (
@@ -186,7 +186,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
       } else {
         return (
           <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Value</InputLabel>
+            <InputLabel>{t('admin.remoteConfig.campaigns.value')}</InputLabel>
             <Select
               value={condition.value || ''}
               onChange={(e) => updateCondition(index, { value: e.target.value })}
@@ -216,7 +216,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
           }}
           disabled={disabled}
           renderInput={(params) => (
-            <TextField {...params} label="Values" sx={{ minWidth: 200 }} />
+            <TextField {...params} label={t('admin.remoteConfig.campaigns.value')} sx={{ minWidth: 200 }} />
           )}
           renderTags={(value, getTagProps) =>
             value.map((option, index) => (
@@ -235,7 +235,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
     return (
       <TextField
         size="small"
-        label="Value"
+        label={t('admin.remoteConfig.campaigns.value')}
         type={field.type === 'number' ? 'number' : 'text'}
         value={condition.value || ''}
         onChange={(e) => updateCondition(index, { value: e.target.value })}
@@ -261,7 +261,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
   };
 
   if (loading) {
-    return <Typography>Loading context fields...</Typography>;
+    return <Typography color="text.primary">Loading context fields...</Typography>;
   }
 
   return (
@@ -276,14 +276,14 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
             disabled={disabled}
             size="small"
           >
-            Add Condition
+            {t('admin.remoteConfig.campaigns.addCondition')}
           </Button>
         }
       />
       <CardContent>
         {conditions.length === 0 ? (
           <Alert severity="info">
-            No conditions set. Campaign will apply to all users.
+            {t('admin.remoteConfig.campaigns.noConditionsSet')}
           </Alert>
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -293,28 +293,28 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                     {index > 0 && (
                       <FormControl size="small" sx={{ minWidth: 80 }}>
-                        <InputLabel>Logic</InputLabel>
+                        <InputLabel>{t('admin.remoteConfig.campaigns.logicalOperator')}</InputLabel>
                         <Select
                           value={condition.logicalOperator || 'AND'}
-                          onChange={(e) => updateCondition(index, { 
-                            logicalOperator: e.target.value as 'AND' | 'OR' 
+                          onChange={(e) => updateCondition(index, {
+                            logicalOperator: e.target.value as 'AND' | 'OR'
                           })}
                           disabled={disabled}
                         >
-                          <MenuItem value="AND">AND</MenuItem>
-                          <MenuItem value="OR">OR</MenuItem>
+                          <MenuItem value="AND">{t('admin.remoteConfig.campaigns.and')}</MenuItem>
+                          <MenuItem value="OR">{t('admin.remoteConfig.campaigns.or')}</MenuItem>
                         </Select>
                       </FormControl>
                     )}
                     
                     <FormControl size="small" sx={{ minWidth: 150 }}>
-                      <InputLabel>Field</InputLabel>
+                      <InputLabel>{t('admin.remoteConfig.campaigns.field')}</InputLabel>
                       <Select
                         value={condition.field}
                         onChange={(e) => {
                           const field = fields.find(f => f.key === e.target.value);
                           const availableOperators = field ? contextFieldService.getOperatorsForField(field, operators) : [];
-                          updateCondition(index, { 
+                          updateCondition(index, {
                             field: e.target.value,
                             operator: availableOperators[0]?.key || '',
                             value: field?.defaultValue || ''
@@ -331,7 +331,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
                     </FormControl>
 
                     <FormControl size="small" sx={{ minWidth: 120 }}>
-                      <InputLabel>Operator</InputLabel>
+                      <InputLabel>{t('admin.remoteConfig.campaigns.operator')}</InputLabel>
                       <Select
                         value={condition.operator}
                         onChange={(e) => updateCondition(index, { operator: e.target.value })}
@@ -339,7 +339,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
                       >
                         {getOperatorsForField(condition.field).map((operator) => (
                           <MenuItem key={operator.key} value={operator.key}>
-                            {operator.name}
+                            {t(`admin.remoteConfig.campaigns.operators.${operator.key}`) || operator.name}
                           </MenuItem>
                         ))}
                       </Select>
@@ -364,7 +364,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
 
         {validationErrors.length > 0 && (
           <Alert severity="error" sx={{ mt: 2 }}>
-            <Typography variant="subtitle2">Validation Errors:</Typography>
+            <Typography variant="subtitle2" color="text.primary">Validation Errors:</Typography>
             <ul style={{ margin: 0, paddingLeft: 20 }}>
               {validationErrors.map((error, index) => (
                 <li key={index}>{error}</li>
@@ -381,11 +381,16 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
             onClick={() => setTestExpanded(!testExpanded)}
             size="small"
           >
-            Test Conditions
+            {t('admin.remoteConfig.campaigns.testConditions')}
           </Button>
           
           <Collapse in={testExpanded}>
-            <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+            <Box sx={{
+              mt: 2,
+              p: 2,
+              bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'grey.50',
+              borderRadius: 1
+            }}>
               <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
                 <Autocomplete
                   size="small"
@@ -411,11 +416,11 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
 
               {testResult !== null && (
                 <Alert severity={testResult ? 'success' : 'warning'}>
-                  <Typography variant="subtitle2">
+                  <Typography variant="subtitle2" color="text.primary">
                     Test Result: {testResult ? 'MATCH' : 'NO MATCH'}
                   </Typography>
-                  <Typography variant="body2">
-                    {testResult 
+                  <Typography variant="body2" color="text.primary">
+                    {testResult
                       ? 'This user would be included in the campaign.'
                       : 'This user would NOT be included in the campaign.'
                     }
@@ -425,7 +430,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
 
               {selectedSample && (
                 <Box sx={{ mt: 2 }}>
-                  <Typography variant="subtitle2" gutterBottom>
+                  <Typography variant="subtitle2" color="text.primary" gutterBottom>
                     Sample User Context:
                   </Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>

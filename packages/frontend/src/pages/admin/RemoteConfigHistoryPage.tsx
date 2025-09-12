@@ -40,6 +40,8 @@ import {
   History as HistoryIcon,
   ArrowBack as BackIcon,
   Code as CodeIcon,
+  Close as CloseIcon,
+  Cancel as CancelIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
@@ -552,7 +554,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                           {t('admin.remoteConfig.description')}:
                         </Typography>
-                        <Typography variant="body1">
+                        <Typography variant="body1" color="text.primary">
                           {selectedItem.description || t('admin.remoteConfig.history.noDescription')}
                         </Typography>
                       </Box>
@@ -560,11 +562,21 @@ const RemoteConfigHistoryPage: React.FC = () => {
                   </Box>
 
                   <Box>
-                    <Typography variant="h6" sx={{ mb: 2 }}>
+                    <Typography variant="h6" sx={{ mb: 2 }} color="text.primary">
                       {t('admin.remoteConfig.history.configsSnapshot')}
                     </Typography>
-                    <Paper sx={{ p: 2, backgroundColor: 'grey.50', maxHeight: 300, overflow: 'auto' }}>
-                      <pre style={{ margin: 0, fontSize: '0.875rem', fontFamily: 'monospace' }}>
+                    <Paper sx={{
+                      p: 2,
+                      backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'grey.50',
+                      maxHeight: 300,
+                      overflow: 'auto'
+                    }}>
+                      <pre style={{
+                        margin: 0,
+                        fontSize: '0.875rem',
+                        fontFamily: 'monospace',
+                        color: 'inherit'
+                      }}>
                         {selectedItem.configsSnapshot ?
                           JSON.stringify(selectedItem.configsSnapshot, null, 2) :
                           t('admin.remoteConfig.history.noSnapshot')
@@ -671,7 +683,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDetailDialogOpen(false)}>
+          <Button onClick={() => setDetailDialogOpen(false)} startIcon={<CloseIcon />}>
             {t('common.close')}
           </Button>
         </DialogActions>
@@ -690,25 +702,29 @@ const RemoteConfigHistoryPage: React.FC = () => {
           </Typography>
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body1" sx={{ mb: 2 }}>
+          <Typography variant="body1" sx={{ mb: 2 }} color="text.primary">
             정말로 다음 배포로 롤백하시겠습니까?
           </Typography>
           {rollbackTarget && (
-            <Box sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
-              <Typography variant="subtitle2" gutterBottom>
+            <Box sx={{
+              p: 2,
+              bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'grey.50',
+              borderRadius: 1
+            }}>
+              <Typography variant="subtitle2" gutterBottom color="text.primary">
                 배포 정보:
               </Typography>
-              <Typography variant="body2">
+              <Typography variant="body2" color="text.primary">
                 <strong>이름:</strong> {rollbackTarget.deploymentName || `배포 #${rollbackTarget.id}`}
               </Typography>
-              <Typography variant="body2">
+              <Typography variant="body2" color="text.primary">
                 <strong>배포일:</strong> {new Date(rollbackTarget.deployedAt).toLocaleString('ko-KR')}
               </Typography>
-              <Typography variant="body2">
+              <Typography variant="body2" color="text.primary">
                 <strong>배포자:</strong> {rollbackTarget.deployedByName || '알 수 없음'}
               </Typography>
               {rollbackTarget.description && (
-                <Typography variant="body2">
+                <Typography variant="body2" color="text.primary">
                   <strong>설명:</strong> {rollbackTarget.description}
                 </Typography>
               )}
@@ -725,6 +741,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
           <Button
             onClick={() => setRollbackDialogOpen(false)}
             color="inherit"
+            startIcon={<CancelIcon />}
           >
             취소
           </Button>
@@ -732,6 +749,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
             onClick={confirmRollback}
             color="warning"
             variant="contained"
+            startIcon={<RestoreIcon />}
           >
             롤백 실행
           </Button>

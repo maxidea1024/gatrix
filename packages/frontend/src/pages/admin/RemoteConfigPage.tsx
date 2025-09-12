@@ -354,6 +354,7 @@ const RemoteConfigPage: React.FC = () => {
       priority: 0,
       status: 'draft' as 'draft' | 'scheduled' | 'running' | 'completed' | 'paused',
       targetConditions: {} as any,
+      overrideConfigs: [] as Array<{configId: number, configName: string, overrideValue: string}>,
       isActive: true
     });
 
@@ -445,7 +446,7 @@ const RemoteConfigPage: React.FC = () => {
       <Paper sx={{ p: 3 }}>
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h6">
+          <Typography variant="h6" color="text.primary">
             {t('admin.remoteConfig.campaigns.title')}
           </Typography>
           <Button
@@ -489,12 +490,12 @@ const RemoteConfigPage: React.FC = () => {
                 campaigns.map((campaign) => (
                   <TableRow key={campaign.id}>
                     <TableCell>
-                      <Typography variant="body2" fontWeight="medium">
+                      <Typography variant="body2" fontWeight="medium" color="text.primary">
                         {campaign.campaignName}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2">
+                      <Typography variant="body2" color="text.primary">
                         {campaign.description || '-'}
                       </Typography>
                     </TableCell>
@@ -577,7 +578,16 @@ const RemoteConfigPage: React.FC = () => {
           maxWidth="md"
           fullWidth
         >
-          <DialogTitle>{t('admin.remoteConfig.campaigns.createCampaign')}</DialogTitle>
+          <DialogTitle>
+            <Box>
+              <Typography variant="h6" component="div" color="text.primary">
+                {t('admin.remoteConfig.campaigns.createCampaign')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                {t('admin.remoteConfig.campaigns.createCampaignSubtitle')}
+              </Typography>
+            </Box>
+          </DialogTitle>
           <DialogContent>
             <Stack spacing={3} sx={{ mt: 1 }}>
               <TextField
@@ -586,6 +596,7 @@ const RemoteConfigPage: React.FC = () => {
                 value={campaignFormData.campaignName}
                 onChange={(e) => setCampaignFormData({ ...campaignFormData, campaignName: e.target.value })}
                 required
+                helperText={t('admin.remoteConfig.campaigns.campaignNameHelp')}
               />
               <TextField
                 fullWidth
@@ -594,6 +605,8 @@ const RemoteConfigPage: React.FC = () => {
                 onChange={(e) => setCampaignFormData({ ...campaignFormData, description: e.target.value })}
                 multiline
                 rows={3}
+                required
+                helperText="캠페인의 목적과 내용을 간단히 설명해주세요"
               />
               <TextField
                 fullWidth
@@ -602,6 +615,7 @@ const RemoteConfigPage: React.FC = () => {
                 value={campaignFormData.startDate}
                 onChange={(e) => setCampaignFormData({ ...campaignFormData, startDate: e.target.value })}
                 InputLabelProps={{ shrink: true }}
+                helperText={t('admin.remoteConfig.campaigns.startDateHelp')}
               />
               <TextField
                 fullWidth
@@ -610,6 +624,7 @@ const RemoteConfigPage: React.FC = () => {
                 value={campaignFormData.endDate}
                 onChange={(e) => setCampaignFormData({ ...campaignFormData, endDate: e.target.value })}
                 InputLabelProps={{ shrink: true }}
+                helperText={t('admin.remoteConfig.campaigns.endDateHelp')}
               />
               <TextField
                 fullWidth
@@ -652,6 +667,90 @@ const RemoteConfigPage: React.FC = () => {
                   }
                 })}
               />
+
+              {/* Override Configurations Section */}
+              <Box>
+                <Typography variant="h6" gutterBottom color="text.primary">
+                  {t('admin.remoteConfig.campaigns.overrideConfigs')}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {t('admin.remoteConfig.campaigns.overrideConfigsHelp')}
+                </Typography>
+
+                {campaignFormData.overrideConfigs.map((override, index) => (
+                  <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <FormControl sx={{ minWidth: 200 }}>
+                        <InputLabel>{t('admin.remoteConfig.campaigns.selectConfig')}</InputLabel>
+                        <Select
+                          value={override.configId || ''}
+                          onChange={(e) => {
+                            const selectedConfig = configs.find(c => c.id === e.target.value);
+                            const newOverrides = [...campaignFormData.overrideConfigs];
+                            newOverrides[index] = {
+                              ...override,
+                              configId: e.target.value as number,
+                              configName: selectedConfig?.keyName || ''
+                            };
+                            setCampaignFormData({ ...campaignFormData, overrideConfigs: newOverrides });
+                          }}
+                          label={t('admin.remoteConfig.campaigns.selectConfig')}
+                        >
+                          {configs.map((config) => (
+                            <MenuItem key={config.id} value={config.id}>
+                              {config.keyName}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+
+                      <TextField
+                        label={t('admin.remoteConfig.campaigns.overrideValue')}
+                        value={override.overrideValue}
+                        onChange={(e) => {
+                          const newOverrides = [...campaignFormData.overrideConfigs];
+                          newOverrides[index] = { ...override, overrideValue: e.target.value };
+                          setCampaignFormData({ ...campaignFormData, overrideConfigs: newOverrides });
+                        }}
+                        sx={{ flexGrow: 1 }}
+                      />
+
+                      <IconButton
+                        onClick={() => {
+                          const newOverrides = campaignFormData.overrideConfigs.filter((_, i) => i !== index);
+                          setCampaignFormData({ ...campaignFormData, overrideConfigs: newOverrides });
+                        }}
+                        color="error"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Stack>
+                  </Box>
+                ))}
+
+                {campaignFormData.overrideConfigs.length === 0 && (
+                  <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
+                    {t('admin.remoteConfig.campaigns.noOverrides')}
+                  </Typography>
+                )}
+
+                <Button
+                  startIcon={<AddIcon />}
+                  onClick={() => {
+                    setCampaignFormData({
+                      ...campaignFormData,
+                      overrideConfigs: [
+                        ...campaignFormData.overrideConfigs,
+                        { configId: 0, configName: '', overrideValue: '' }
+                      ]
+                    });
+                  }}
+                  variant="outlined"
+                  sx={{ mt: 1 }}
+                >
+                  {t('admin.remoteConfig.campaigns.addOverride')}
+                </Button>
+              </Box>
             </Stack>
           </DialogContent>
           <DialogActions>
@@ -664,7 +763,7 @@ const RemoteConfigPage: React.FC = () => {
             <Button
               variant="contained"
               onClick={handleCreateCampaign}
-              disabled={!campaignFormData.campaignName.trim()}
+              disabled={!campaignFormData.campaignName.trim() || !campaignFormData.description.trim()}
               startIcon={<SaveIcon />}
             >
               {t('common.create')}
@@ -773,6 +872,167 @@ const RemoteConfigPage: React.FC = () => {
     );
   };
 
+  // Conditions Tab Component
+  const ConditionsTab = () => {
+    const [conditions, setConditions] = useState<any[]>([]);
+    const [conditionLoading, setConditionLoading] = useState(true);
+    const [createConditionDialogOpen, setCreateConditionDialogOpen] = useState(false);
+    const [conditionFormData, setConditionFormData] = useState({
+      name: '',
+      description: '',
+      conditions: [] as any[]
+    });
+
+    const loadConditions = async () => {
+      try {
+        setConditionLoading(true);
+        // TODO: API 호출로 조건 목록 로드
+        setConditions([]);
+      } catch (error) {
+        console.error('Error loading conditions:', error);
+      } finally {
+        setConditionLoading(false);
+      }
+    };
+
+    useEffect(() => {
+      loadConditions();
+    }, []);
+
+    const handleCreateCondition = async () => {
+      try {
+        // TODO: API 호출로 조건 생성
+        console.log('Creating condition:', conditionFormData);
+        setCreateConditionDialogOpen(false);
+        setConditionFormData({ name: '', description: '', conditions: [] });
+        loadConditions();
+      } catch (error) {
+        console.error('Error creating condition:', error);
+      }
+    };
+
+    return (
+      <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="h6" color="text.primary">
+            {t('admin.remoteConfig.conditions.title')}
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setCreateConditionDialogOpen(true)}
+          >
+            {t('admin.remoteConfig.conditions.createCondition')}
+          </Button>
+        </Box>
+
+        {conditionLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : conditions.length === 0 ? (
+          <Paper sx={{ p: 4, textAlign: 'center' }}>
+            <Typography variant="body1" color="text.secondary">
+              {t('admin.remoteConfig.conditions.noConditions')}
+            </Typography>
+          </Paper>
+        ) : (
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t('admin.remoteConfig.conditions.name')}</TableCell>
+                  <TableCell>{t('admin.remoteConfig.description')}</TableCell>
+                  <TableCell>{t('admin.remoteConfig.conditions.conditionsCount')}</TableCell>
+                  <TableCell align="center">{t('admin.remoteConfig.actions')}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {conditions.map((condition) => (
+                  <TableRow key={condition.id}>
+                    <TableCell>{condition.name}</TableCell>
+                    <TableCell>{condition.description}</TableCell>
+                    <TableCell>{condition.conditions?.length || 0}</TableCell>
+                    <TableCell align="center">
+                      <IconButton size="small">
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton size="small" color="error">
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+
+        {/* Create Condition Dialog */}
+        <Dialog
+          open={createConditionDialogOpen}
+          onClose={() => setCreateConditionDialogOpen(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>
+            <Box>
+              <Typography variant="h6" component="div" color="text.primary">
+                {t('admin.remoteConfig.conditions.createCondition')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                {t('admin.remoteConfig.conditions.createConditionSubtitle')}
+              </Typography>
+            </Box>
+          </DialogTitle>
+          <DialogContent>
+            <Stack spacing={3} sx={{ mt: 1 }}>
+              <TextField
+                fullWidth
+                label={t('admin.remoteConfig.conditions.name')}
+                value={conditionFormData.name}
+                onChange={(e) => setConditionFormData({ ...conditionFormData, name: e.target.value })}
+                required
+                helperText={t('admin.remoteConfig.conditions.nameHelp')}
+              />
+              <TextField
+                fullWidth
+                label={t('admin.remoteConfig.description')}
+                value={conditionFormData.description}
+                onChange={(e) => setConditionFormData({ ...conditionFormData, description: e.target.value })}
+                multiline
+                rows={2}
+                required
+                helperText={t('admin.remoteConfig.conditions.descriptionHelp')}
+              />
+
+              <TargetConditionBuilder
+                conditions={conditionFormData.conditions}
+                onChange={(conditions) => setConditionFormData({ ...conditionFormData, conditions })}
+              />
+            </Stack>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => setCreateConditionDialogOpen(false)}
+              startIcon={<CancelIcon />}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleCreateCondition}
+              disabled={!conditionFormData.name.trim() || !conditionFormData.description.trim()}
+              startIcon={<SaveIcon />}
+            >
+              {t('common.create')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    );
+  };
+
   // Variants Tab Component
   const VariantsTab = () => {
     const [selectedConfig, setSelectedConfig] = useState<RemoteConfig | null>(null);
@@ -872,7 +1132,7 @@ const RemoteConfigPage: React.FC = () => {
       <Paper sx={{ p: 3 }}>
         {/* Config Selection */}
         <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
+          <Typography variant="h6" sx={{ mb: 2 }} color="text.primary">
             {t('admin.remoteConfig.variants.title')}
           </Typography>
           <FormControl fullWidth sx={{ mb: 2 }}>
@@ -901,7 +1161,7 @@ const RemoteConfigPage: React.FC = () => {
           <>
             {/* Header */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-              <Typography variant="subtitle1">
+              <Typography variant="subtitle1" color="text.primary">
                 {selectedConfig.keyName}의 변형
               </Typography>
               <Button
@@ -944,12 +1204,12 @@ const RemoteConfigPage: React.FC = () => {
                     variants.map((variant) => (
                       <TableRow key={variant.id}>
                         <TableCell>
-                          <Typography variant="body2" fontWeight="medium">
+                          <Typography variant="body2" fontWeight="medium" color="text.primary">
                             {variant.variantName}
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }} color="text.primary">
                             {truncateValue(variant.value, 'string')}
                           </Typography>
                         </TableCell>
@@ -1212,7 +1472,7 @@ const RemoteConfigPage: React.FC = () => {
     <Box sx={{ p: 3 }}>
       {/* Header */}
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" component="h1" sx={{ mb: 1 }}>
+        <Typography variant="h4" component="h1" sx={{ mb: 1 }} color="text.primary">
           {t('admin.remoteConfig.title')}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
@@ -1226,6 +1486,8 @@ const RemoteConfigPage: React.FC = () => {
             <Tab label={t('admin.remoteConfig.history.title')} />
             <Tab label={t('admin.remoteConfig.campaigns.title')} />
             <Tab label={t('admin.remoteConfig.variants.title')} />
+            <Tab label={t('admin.remoteConfig.conditions.title')} />
+            <Tab label={t('admin.remoteConfig.contextFields.title')} />
           </Tabs>
         </Box>
 
@@ -1392,7 +1654,7 @@ const RemoteConfigPage: React.FC = () => {
                   />
                 </TableCell>
                 <TableCell>
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="body2" fontWeight={500} color="text.primary">
                     {config.keyName}
                   </Typography>
                 </TableCell>
@@ -1460,7 +1722,7 @@ const RemoteConfigPage: React.FC = () => {
                   />
                 </TableCell>
                 <TableCell>
-                  <Typography variant="body2" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <Typography variant="body2" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }} color="text.primary">
                     {config.description || '-'}
                   </Typography>
                 </TableCell>
@@ -1472,7 +1734,7 @@ const RemoteConfigPage: React.FC = () => {
                 <TableCell>
                   {config.createdByName ? (
                     <Box>
-                      <Typography variant="body2" fontWeight="medium">
+                      <Typography variant="body2" fontWeight="medium" color="text.primary">
                         {config.createdByName}
                       </Typography>
                       {config.createdByEmail && (
@@ -1526,6 +1788,10 @@ const RemoteConfigPage: React.FC = () => {
         <CampaignsTab />
       ) : currentTab === 3 ? (
         <VariantsTab />
+      ) : currentTab === 4 ? (
+        <ConditionsTab />
+      ) : currentTab === 5 ? (
+        <ContextFieldsTab />
       ) : null}
 
       {/* Create Dialog */}
@@ -1539,7 +1805,7 @@ const RemoteConfigPage: React.FC = () => {
       >
         <DialogTitle>
           <Box>
-            <Typography variant="h6" component="div">
+            <Typography variant="h6" component="div" color="text.primary">
               {t('admin.remoteConfig.createConfig')}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
