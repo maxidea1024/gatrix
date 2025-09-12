@@ -83,6 +83,7 @@ router.post('/', [
   body('description').optional().isString().withMessage('Description must be a string'),
   body('options').optional().isArray().withMessage('Options must be an array'),
   body('defaultValue').optional().isString().withMessage('Default value must be a string'),
+  body('isRequired').optional().isBoolean().withMessage('isRequired must be a boolean'),
   body('validation').optional().isObject().withMessage('Validation must be an object'),
   validateRequest
 ], ContextFieldController.createContextField);
@@ -97,6 +98,7 @@ router.put('/:id', [
   body('description').optional().isString().withMessage('Description must be a string'),
   body('options').optional().isArray().withMessage('Options must be an array'),
   body('defaultValue').optional().isString().withMessage('Default value must be a string'),
+  body('isRequired').optional().isBoolean().withMessage('isRequired must be a boolean'),
   body('validation').optional().isObject().withMessage('Validation must be an object'),
   body('isActive').optional().isBoolean().withMessage('isActive must be a boolean'),
   validateRequest

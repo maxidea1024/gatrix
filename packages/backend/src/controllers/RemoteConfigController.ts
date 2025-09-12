@@ -22,11 +22,19 @@ export class RemoteConfigController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      
+
+      // isActive 파라미터 안전하게 처리
+      let isActiveFilter: boolean | undefined = undefined;
+      const isActiveParam = req.query.isActive as string;
+
+      if (isActiveParam && isActiveParam !== '' && isActiveParam !== 'undefined') {
+        isActiveFilter = isActiveParam === 'true';
+      }
+
       const filters: RemoteConfigFilters = {
         search: req.query.search as string,
         valueType: req.query.valueType as any,
-        isActive: req.query.isActive ? req.query.isActive === 'true' : undefined,
+        isActive: isActiveFilter,
         createdBy: req.query.createdBy ? parseInt(req.query.createdBy as string) : undefined,
         sortBy: req.query.sortBy as string,
         sortOrder: req.query.sortOrder as 'asc' | 'desc'
@@ -154,15 +162,36 @@ export class RemoteConfigController {
       // Git-style update: Create new draft version instead of updating existing
       const config = await RemoteConfigModel.update(id, data);
 
-      // Create new draft version with updated value
+      // Smart version management: Check if value matches published version
       if (data.defaultValue !== undefined) {
-        await ConfigVersionModel.createVersion({
-          configId: id,
-          value: data.defaultValue,
-          status: 'draft',
-          changeDescription: 'Updated via admin interface',
-          createdBy: userId
-        });
+        // Get the latest published version
+        const publishedVersion = await ConfigVersionModel.getLatestPublishedVersion(id);
+
+        if (publishedVersion && publishedVersion.value === data.defaultValue) {
+          // Value matches published version - delete any existing draft versions
+          await ConfigVersionModel.deleteDraftVersions(id);
+        } else {
+          // Value is different - create or update draft version
+          const existingDraft = await ConfigVersionModel.getLatestDraftVersion(id);
+
+          if (existingDraft) {
+            // Update existing draft
+            await ConfigVersionModel.updateVersion(existingDraft.id, {
+              value: data.defaultValue,
+              changeDescription: 'Updated via admin interface',
+              updatedBy: userId
+            });
+          } else {
+            // Create new draft version
+            await ConfigVersionModel.createVersion({
+              configId: id,
+              value: data.defaultValue,
+              status: 'draft',
+              changeDescription: 'Updated via admin interface',
+              createdBy: userId
+            });
+          }
+        }
       }
 
       // Send SSE notification
@@ -237,6 +266,48 @@ export class RemoteConfigController {
         throw error;
       }
       throw new CustomError('Failed to fetch versions', 500);
+    }
+  }
+
+  /**
+   * Discard draft changes for a config
+   */
+  static async discardDraftVersions(req: Request, res: Response): Promise<void> {
+    try {
+      const configId = parseInt(req.params.id);
+      const userId = (req.user as any)?.userId;
+
+      // Check if config exists
+      const config = await RemoteConfigModel.findById(configId, false);
+      if (!config) {
+        throw new CustomError('Remote config not found', 404);
+      }
+
+      // Get the latest published version to restore the value
+      const publishedVersion = await ConfigVersionModel.getLatestPublishedVersion(configId);
+
+      // Delete all draft versions for this config
+      const deletedCount = await ConfigVersionModel.deleteDraftVersions(configId);
+
+      // Restore the defaultValue to the published version's value
+      if (publishedVersion) {
+        await RemoteConfigModel.update(configId, {
+          defaultValue: publishedVersion.value,
+          updatedBy: userId
+        });
+      }
+
+      res.json({
+        success: true,
+        message: `${deletedCount} draft versions discarded and value restored`,
+        data: { deletedCount, restoredValue: publishedVersion?.value || null }
+      });
+    } catch (error) {
+      logger.error('Error in RemoteConfigController.discardDraftVersions:', error);
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw new CustomError('Failed to discard draft versions', 500);
     }
   }
 

@@ -287,7 +287,7 @@
         "deleteError": "Failed to delete targeting"
       },
       "contextFields": {
-        "title": "Context Field Management",
+        "title": "Context Fields",
         "createField": "Create Field",
         "createFieldSubtitle": "Create context fields to use in campaign conditions",
         "editField": "Edit Field",

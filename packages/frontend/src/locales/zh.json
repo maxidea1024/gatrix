@@ -322,7 +322,7 @@
         "deleteError": "目标定位删除失败"
       },
       "contextFields": {
-        "title": "上下文字段管理",
+        "title": "上下文字段",
         "createField": "创建字段",
         "createFieldSubtitle": "创建在活动条件中使用的上下文字段",
         "editField": "编辑字段",

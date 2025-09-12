@@ -375,7 +375,6 @@ export class RemoteConfigModel {
       variantName: row.variantName,
       value: row.value,
       trafficPercentage: parseFloat(row.trafficPercentage),
-      conditions: typeof row.conditions === 'string' ? JSON.parse(row.conditions) : row.conditions,
       isActive: Boolean(row.isActive),
       createdBy: row.createdBy,
       createdAt: row.createdAt,
@@ -481,8 +480,11 @@ export class ConfigVersionModel {
   /**
    * Stage versions (Git-like staging)
    */
-  static async stageVersions(configIds: number[], _userId?: number): Promise<void> {
+  static async stageVersions(configIds: number[], userId?: number): Promise<void> {
     try {
+      const stagedConfigIds: number[] = [];
+      const skippedConfigIds: number[] = [];
+
       await db.transaction(async (trx) => {
         for (const configId of configIds) {
           // Get latest draft version
@@ -496,11 +498,40 @@ export class ConfigVersionModel {
             await trx('g_remote_config_versions')
               .where('id', draftVersion.id)
               .update({ status: 'staged' });
+            stagedConfigIds.push(configId);
+            logger.info(`Staged draft version ${draftVersion.versionNumber} for config ${configId}`);
+          } else {
+            // No draft version found - check if we need to create one
+            const config = await trx('g_remote_configs').where('id', configId).first();
+            if (config) {
+              // Get next version number
+              const lastVersion = await trx('g_remote_config_versions')
+                .where('configId', configId)
+                .orderBy('versionNumber', 'desc')
+                .first();
+              const nextVersionNumber = lastVersion ? lastVersion.versionNumber + 1 : 1;
+
+              // Create and immediately stage a new version
+              await trx('g_remote_config_versions').insert({
+                configId: configId,
+                versionNumber: nextVersionNumber,
+                value: config.defaultValue,
+                status: 'staged',
+                changeDescription: 'Auto-created for staging',
+                createdBy: userId || null
+              });
+
+              stagedConfigIds.push(configId);
+              logger.info(`Created and staged new version ${nextVersionNumber} for config ${configId} (no draft found)`);
+            } else {
+              skippedConfigIds.push(configId);
+              logger.warn(`Config ${configId} not found, skipping staging`);
+            }
           }
         }
       });
 
-      logger.info(`Staged versions for configs: ${configIds.join(', ')}`);
+      logger.info(`Staging completed - Staged: ${stagedConfigIds.join(', ')}, Skipped: ${skippedConfigIds.join(', ')}`);
     } catch (error) {
       logger.error('Error staging versions:', error);
       throw error;
@@ -543,6 +574,91 @@ export class ConfigVersionModel {
       return publishedConfigIds;
     } catch (error) {
       logger.error('Error publishing staged versions:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete all draft versions for a config
+   */
+  static async deleteDraftVersions(configId: number): Promise<number> {
+    try {
+      const deletedRows = await db('g_remote_config_versions')
+        .where('configId', configId)
+        .where('status', 'draft')
+        .del();
+
+      logger.info(`Deleted ${deletedRows} draft versions for config ${configId}`);
+      return deletedRows;
+    } catch (error) {
+      logger.error('Error deleting draft versions:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get latest published version for a config
+   */
+  static async getLatestPublishedVersion(configId: number): Promise<ConfigVersion | null> {
+    try {
+      const version = await db('g_remote_config_versions')
+        .where('configId', configId)
+        .where('status', 'published')
+        .orderBy('versionNumber', 'desc')
+        .first();
+
+      return version || null;
+    } catch (error) {
+      logger.error('Error getting latest published version:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get latest draft version for a config
+   */
+  static async getLatestDraftVersion(configId: number): Promise<ConfigVersion | null> {
+    try {
+      const version = await db('g_remote_config_versions')
+        .where('configId', configId)
+        .where('status', 'draft')
+        .orderBy('versionNumber', 'desc')
+        .first();
+
+      return version || null;
+    } catch (error) {
+      logger.error('Error getting latest draft version:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update a version
+   */
+  static async updateVersion(versionId: number, data: {
+    value?: string;
+    changeDescription?: string;
+    updatedBy?: number;
+  }): Promise<ConfigVersion> {
+    try {
+      await db('g_remote_config_versions')
+        .where('id', versionId)
+        .update({
+          ...data,
+          updatedAt: new Date()
+        });
+
+      const updated = await db('g_remote_config_versions')
+        .where('id', versionId)
+        .first();
+
+      if (!updated) {
+        throw new Error('Failed to retrieve updated version');
+      }
+
+      return updated;
+    } catch (error) {
+      logger.error('Error updating version:', error);
       throw error;
     }
   }

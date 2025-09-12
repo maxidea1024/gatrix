@@ -203,37 +203,13 @@ app.use('/api/v1/message-templates', messageTemplateRoutes);
 app.use('/api/v1', jobRoutes);
 app.use('/api/v1/admin/platform-defaults', platformDefaultsRoutes);
 app.use('/api/v1/translation', translationRoutes);
+
+// Campaign routes must be registered BEFORE general remote-config routes
+app.use('/api/v1/admin/remote-config/campaigns', campaignRoutes);
 app.use('/api/v1/admin/remote-config', remoteConfigRoutes);
 
-// Simple context fields route
-app.get('/api/v1/admin/remote-config/context-fields', authenticate as any, (req: any, res: any) => {
-  try {
-    const CONTEXT_FIELDS = [
-      { key: 'userLevel', name: 'User Level', type: 'number', operators: ['equals', 'not_equals', 'greater_than', 'less_than'] },
-      { key: 'isPremium', name: 'Premium Status', type: 'boolean', operators: ['equals', 'not_equals'] },
-      { key: 'platform', name: 'Platform', type: 'string', operators: ['equals', 'not_equals', 'contains'] },
-      { key: 'country', name: 'Country', type: 'string', operators: ['equals', 'not_equals', 'in', 'not_in'] }
-    ];
 
-    res.json({
-      success: true,
-      data: {
-        fields: CONTEXT_FIELDS,
-        operators: [
-          { key: 'equals', name: 'Equals', valueType: 'single' },
-          { key: 'not_equals', name: 'Not Equals', valueType: 'single' },
-          { key: 'greater_than', name: 'Greater Than', valueType: 'single' },
-          { key: 'less_than', name: 'Less Than', valueType: 'single' }
-        ],
-        pagination: { page: 1, limit: 50, total: CONTEXT_FIELDS.length, pages: 1 }
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Failed to get context fields' });
-  }
-});
 
-app.use('/api/v1/admin/remote-config/campaigns', campaignRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 
 // app.use('/api/v1/advanced-settings', advancedSettingsRoutes);

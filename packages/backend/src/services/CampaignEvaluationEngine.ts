@@ -338,6 +338,7 @@ export class CampaignEvaluationEngine {
       endDate: row.endDate,
       targetConditions: typeof row.targetConditions === 'string' ?
         JSON.parse(row.targetConditions) : row.targetConditions,
+      trafficPercentage: parseFloat(row.trafficPercentage) || 100.00,
       priority: row.priority || 0,
       status: row.status || 'draft',
       isActive: Boolean(row.isActive),

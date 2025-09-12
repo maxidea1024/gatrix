@@ -102,6 +102,16 @@ export interface CreateContextFieldData {
   createdBy?: number;
 }
 
+export interface UpdateContextFieldData {
+  fieldName?: string;
+  fieldType?: ContextFieldType;
+  description?: string;
+  isRequired?: boolean;
+  defaultValue?: string;
+  validationRules?: any;
+  updatedBy?: number;
+}
+
 // Config Rules
 export interface ConfigRule {
   id: number;
@@ -130,19 +140,18 @@ export interface CreateConfigRuleData {
   createdBy?: number;
 }
 
-// Config Variants (A/B Testing)
+// Config Variants (A/B Testing - Pure traffic split, no conditions)
 export interface ConfigVariant {
   id: number;
   configId: number;
   variantName: string;
   value?: string;
   trafficPercentage: number;
-  conditions?: any;
   isActive: boolean;
   createdBy?: number;
   createdAt: string;
   updatedAt: string;
-  
+
   // Relations
   createdByName?: string;
   config?: RemoteConfig;
@@ -153,7 +162,6 @@ export interface CreateConfigVariantData {
   variantName: string;
   value?: string;
   trafficPercentage?: number;
-  conditions?: any;
   isActive?: boolean;
   createdBy?: number;
 }
@@ -166,6 +174,7 @@ export interface Campaign {
   startDate?: string;
   endDate?: string;
   targetConditions?: any;
+  trafficPercentage: number;
   priority: number;
   status: 'draft' | 'scheduled' | 'running' | 'completed' | 'paused';
   isActive: boolean;
@@ -186,6 +195,7 @@ export interface CreateCampaignData {
   startDate?: string;
   endDate?: string;
   targetConditions?: any;
+  trafficPercentage?: number;
   priority?: number;
   status?: 'draft' | 'scheduled' | 'running' | 'completed' | 'paused';
   isActive?: boolean;

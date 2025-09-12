@@ -120,6 +120,7 @@ export class CampaignModel {
         startDate: data.startDate ? new Date(data.startDate) : null,
         endDate: data.endDate ? new Date(data.endDate) : null,
         targetConditions: data.targetConditions ? JSON.stringify(data.targetConditions) : null,
+        trafficPercentage: data.trafficPercentage ?? 100.00,
         priority: data.priority || 0,
         status: data.status || 'draft',
         isActive: data.isActive ?? true,
@@ -151,6 +152,7 @@ export class CampaignModel {
       if (data.startDate !== undefined) updateData.startDate = data.startDate ? new Date(data.startDate) : null;
       if (data.endDate !== undefined) updateData.endDate = data.endDate ? new Date(data.endDate) : null;
       if (data.targetConditions !== undefined) updateData.targetConditions = data.targetConditions ? JSON.stringify(data.targetConditions) : null;
+      if (data.trafficPercentage !== undefined) updateData.trafficPercentage = data.trafficPercentage;
       if (data.priority !== undefined) updateData.priority = data.priority;
       if (data.status !== undefined) updateData.status = data.status;
       if (data.isActive !== undefined) updateData.isActive = data.isActive;
@@ -244,6 +246,7 @@ export class CampaignModel {
       endDate: row.endDate,
       targetConditions: typeof row.targetConditions === 'string' ?
         JSON.parse(row.targetConditions) : row.targetConditions,
+      trafficPercentage: parseFloat(row.trafficPercentage) || 100.00,
       priority: row.priority || 0,
       status: row.status || 'draft',
       isActive: Boolean(row.isActive),

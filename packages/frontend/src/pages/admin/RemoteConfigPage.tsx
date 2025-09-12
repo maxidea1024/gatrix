@@ -33,7 +33,8 @@ import {
   FormControlLabel,
   Switch,
   Badge,
-  Checkbox
+  Alert,
+  Divider
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -46,9 +47,14 @@ import {
   Save as SaveIcon,
   Visibility as VisibilityIcon,
   Storage as StageIcon,
-  Undo as UndoIcon
-
-
+  Undo as UndoIcon,
+  CheckCircle as CheckCircleIcon,
+  Warning as WarningIcon,
+  FormatQuote as StringIcon,
+  Tag as NumberIcon,
+  CheckBox as BooleanIcon,
+  DataObject as JsonIcon,
+  Article as YamlIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -122,6 +128,33 @@ const RemoteConfigPage: React.FC = () => {
   const modifiedConfigs = configs.filter(config => config.status === 'draft');
   const stagedConfigs = configs.filter(config => config.status === 'staged');
   const hasChanges = modifiedConfigs.length > 0 || stagedConfigs.length > 0;
+
+  // Get icon for value type
+  const getValueTypeIcon = (valueType: string) => {
+    const iconProps = {
+      fontSize: 'inherit' as const,
+      sx: {
+        mr: 0.5,
+        fontSize: '0.875rem', // 글자 크기와 비슷하게
+        verticalAlign: 'middle'
+      }
+    };
+
+    switch (valueType) {
+      case 'string':
+        return <StringIcon {...iconProps} color="primary" title="문자열" />;
+      case 'number':
+        return <NumberIcon {...iconProps} color="success" title="숫자" />;
+      case 'boolean':
+        return <BooleanIcon {...iconProps} color="warning" title="불린" />;
+      case 'json':
+        return <JsonIcon {...iconProps} color="info" title="JSON" />;
+      case 'yaml':
+        return <YamlIcon {...iconProps} color="secondary" title="YAML" />;
+      default:
+        return <StringIcon {...iconProps} color="primary" title="문자열" />;
+    }
+  };
   
   // Form states
   const [formData, setFormData] = useState<{
@@ -137,6 +170,9 @@ const RemoteConfigPage: React.FC = () => {
     description: '',
     isActive: true,
   });
+
+  // Track original published value for comparison
+  const [originalPublishedValue, setOriginalPublishedValue] = useState<string>('');
 
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
@@ -225,13 +261,19 @@ const RemoteConfigPage: React.FC = () => {
   const loadConfigs = async () => {
     try {
       setLoading(true);
-      const params = {
+
+      // 기본 파라미터
+      const params: Record<string, string> = {
         page: (page + 1).toString(),
         limit: rowsPerPage.toString(),
-        ...Object.fromEntries(
-          Object.entries(filters).map(([key, value]) => [key, String(value)])
-        ),
       };
+
+      // 필터 파라미터 추가 (undefined 값 제외)
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params[key] = String(value);
+        }
+      });
 
       const response = await api.get('/admin/remote-config', { params });
       setConfigs(response.data.configs);
@@ -360,6 +402,8 @@ const RemoteConfigPage: React.FC = () => {
   // Publish staged configs
   const handlePublishChanges = async () => {
     try {
+      console.log('Starting publish...', { publishFormData }); // 디버깅용
+
       const response = await api.post('/admin/remote-config/publish', {
         deploymentName: publishFormData.deploymentName,
         description: publishFormData.description
@@ -370,6 +414,8 @@ const RemoteConfigPage: React.FC = () => {
         setPublishDialogOpen(false);
         setPublishFormData({ deploymentName: '', description: '' });
         loadConfigs();
+      } else {
+        enqueueSnackbar(response.data.message || t('admin.remoteConfig.publishError'), { variant: 'error' });
       }
     } catch (error: any) {
       console.error('Error publishing changes:', error);
@@ -391,7 +437,34 @@ const RemoteConfigPage: React.FC = () => {
       enqueueSnackbar(`${configsToDiscard.length}개 설정의 변경사항이 취소되었습니다.`, { variant: 'success' });
       setDiscardChangesDialogOpen(false);
       setSelectedDiscardConfigs([]);
-      loadConfigs(); // Reload configs
+
+      // Reset form state if currently editing one of the discarded configs
+      if (selectedConfig && configsToDiscard.includes(selectedConfig.id)) {
+        // Reload the original values for the config
+        const originalConfig = configs.find(c => c.id === selectedConfig.id);
+        if (originalConfig) {
+          try {
+            const originalValue = await getOriginalConfigValue(originalConfig.id);
+            setFormData({
+              keyName: originalConfig.keyName,
+              defaultValue: originalValue || originalConfig.defaultValue || '',
+              valueType: originalConfig.valueType,
+              description: originalConfig.description || '',
+              isActive: originalConfig.isActive,
+            });
+          } catch (error) {
+            console.error('Error reloading original values:', error);
+            resetForm();
+            setEditDialogOpen(false);
+          }
+        } else {
+          resetForm();
+          setEditDialogOpen(false);
+        }
+      }
+
+      // Reload configs to reflect the changes
+      await loadConfigs();
     } catch (error: any) {
       console.error('Error discarding changes:', error);
       const errorMessage = error.response?.data?.error?.message || error.message || '변경사항 취소 중 오류가 발생했습니다.';
@@ -415,6 +488,7 @@ const RemoteConfigPage: React.FC = () => {
       startDate: '',
       endDate: '',
       priority: 0,
+      trafficPercentage: 100,
       status: 'draft' as 'draft' | 'scheduled' | 'running' | 'completed' | 'paused',
       targetConditions: {} as any,
       overrideConfigs: [] as Array<{configId: number, configName: string, overrideValue: string}>,
@@ -442,7 +516,12 @@ const RemoteConfigPage: React.FC = () => {
     // Create campaign
     const handleCreateCampaign = async () => {
       try {
-        const response = await api.post('/admin/remote-config/campaigns', campaignFormData);
+        // 항상 draft 상태로 생성
+        const createData = {
+          ...campaignFormData,
+          status: 'draft' // 강제로 draft 상태로 설정
+        };
+        const response = await api.post('/admin/remote-config/campaigns', createData);
 
         if (response.data.success) {
           enqueueSnackbar(t('admin.remoteConfig.campaigns.createSuccess'), { variant: 'success' });
@@ -453,8 +532,10 @@ const RemoteConfigPage: React.FC = () => {
             startDate: '',
             endDate: '',
             priority: 0,
+            trafficPercentage: 100,
             status: 'draft',
             targetConditions: {},
+            overrideConfigs: [],
             isActive: true
           });
           loadCampaigns();
@@ -530,6 +611,7 @@ const RemoteConfigPage: React.FC = () => {
                 <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.description')}</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.campaigns.startDate')}</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.campaigns.endDate')}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }} align="center">트래픽 비율</TableCell>
                 <TableCell sx={{ fontWeight: 600 }} align="center">{t('admin.remoteConfig.status')}</TableCell>
                 <TableCell sx={{ fontWeight: 600 }} align="center">{t('admin.remoteConfig.actions')}</TableCell>
               </TableRow>
@@ -537,13 +619,13 @@ const RemoteConfigPage: React.FC = () => {
             <TableBody>
               {campaignLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                  <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
                     <CircularProgress />
                   </TableCell>
                 </TableRow>
               ) : campaigns.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                  <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
                     <Typography variant="body2" color="text.secondary">
                       {t('admin.remoteConfig.campaigns.noCampaigns')}
                     </Typography>
@@ -570,6 +652,11 @@ const RemoteConfigPage: React.FC = () => {
                     <TableCell>
                       <Typography variant="body2" color="text.secondary">
                         {campaign.endDate ? formatDateTimeDetailed(campaign.endDate) : '-'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Typography variant="body2" color="text.primary" fontWeight="medium">
+                        {campaign.trafficPercentage || 100}%
                       </Typography>
                     </TableCell>
                     <TableCell align="center">
@@ -699,17 +786,18 @@ const RemoteConfigPage: React.FC = () => {
               />
               <TextField
                 fullWidth
-                select
-                label={t('admin.remoteConfig.campaigns.status')}
-                value={campaignFormData.status}
-                onChange={(e) => setCampaignFormData({ ...campaignFormData, status: e.target.value as any })}
-              >
-                <MenuItem value="draft">{t('admin.remoteConfig.campaigns.statusDraft')}</MenuItem>
-                <MenuItem value="scheduled">{t('admin.remoteConfig.campaigns.statusScheduled')}</MenuItem>
-                <MenuItem value="running">{t('admin.remoteConfig.campaigns.statusRunning')}</MenuItem>
-                <MenuItem value="paused">{t('admin.remoteConfig.campaigns.statusPaused')}</MenuItem>
-                <MenuItem value="completed">{t('admin.remoteConfig.campaigns.statusCompleted')}</MenuItem>
-              </TextField>
+                label="트래픽 비율 (%)"
+                type="number"
+                value={campaignFormData.trafficPercentage}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value) || 0;
+                  const clampedValue = Math.min(Math.max(value, 0), 100);
+                  setCampaignFormData({ ...campaignFormData, trafficPercentage: clampedValue });
+                }}
+                inputProps={{ min: 0, max: 100, step: 0.01 }}
+                helperText="캠페인이 적용될 사용자 비율 (0-100%)"
+              />
+
               <FormControlLabel
                 control={
                   <Switch
@@ -730,6 +818,9 @@ const RemoteConfigPage: React.FC = () => {
                   }
                 })}
               />
+
+              {/* Divider */}
+              <Divider sx={{ my: 3 }} />
 
               {/* Override Configurations Section */}
               <Box>
@@ -940,7 +1031,9 @@ const RemoteConfigPage: React.FC = () => {
     const [targetings, setTargetings] = useState<any[]>([]);
     const [targetingLoading, setTargetingLoading] = useState(true);
     const [createTargetingDialogOpen, setCreateTargetingDialogOpen] = useState(false);
+    const [editTargetingDialogOpen, setEditTargetingDialogOpen] = useState(false);
     const [targetingFormData, setTargetingFormData] = useState({
+      id: '',
       name: '',
       description: '',
       conditions: [] as any[]
@@ -1006,7 +1099,7 @@ const RemoteConfigPage: React.FC = () => {
         setTargetings(prev => [...prev, newTargeting]);
 
         setCreateTargetingDialogOpen(false);
-        setTargetingFormData({ name: '', description: '', conditions: [] });
+        setTargetingFormData({ id: '', name: '', description: '', conditions: [] });
 
         // 성공 메시지 표시
         setSnackbar({
@@ -1019,6 +1112,75 @@ const RemoteConfigPage: React.FC = () => {
         setSnackbar({
           open: true,
           message: t('admin.remoteConfig.targeting.createError'),
+          severity: 'error'
+        });
+      }
+    };
+
+    const handleEditTargeting = (targeting: any) => {
+      setTargetingFormData({
+        id: targeting.id,
+        name: targeting.name,
+        description: targeting.description,
+        conditions: targeting.conditions || []
+      });
+      setEditTargetingDialogOpen(true);
+    };
+
+    const handleUpdateTargeting = async () => {
+      try {
+        // 타겟팅 업데이트 (향후 API 연동 예정)
+        setTargetings(prev => prev.map(targeting =>
+          targeting.id === targetingFormData.id
+            ? {
+                ...targeting,
+                name: targetingFormData.name,
+                description: targetingFormData.description,
+                conditions: targetingFormData.conditions,
+                updatedAt: new Date().toISOString()
+              }
+            : targeting
+        ));
+
+        setEditTargetingDialogOpen(false);
+        setTargetingFormData({ id: '', name: '', description: '', conditions: [] });
+
+        // 성공 메시지 표시
+        setSnackbar({
+          open: true,
+          message: t('admin.remoteConfig.targeting.updateSuccess'),
+          severity: 'success'
+        });
+      } catch (error) {
+        console.error('Error updating targeting:', error);
+        setSnackbar({
+          open: true,
+          message: t('admin.remoteConfig.targeting.updateError'),
+          severity: 'error'
+        });
+      }
+    };
+
+    const handleDeleteTargeting = async (targeting: any) => {
+      if (!window.confirm(t('admin.remoteConfig.targeting.deleteConfirm', { name: targeting.name }))) {
+        return;
+      }
+
+      try {
+        // 타겟팅 삭제 (향후 API 연동 예정)
+        setTargetings(prev => prev.filter(t => t.id !== targeting.id));
+
+        // 성공 메시지 표시
+        setSnackbar({
+          open: true,
+          message: t('admin.remoteConfig.targeting.deleteSuccess'),
+          severity: 'success'
+        });
+      } catch (error) {
+        console.error('Error deleting targeting:', error);
+        setSnackbar({
+          open: true,
+          message: t('admin.remoteConfig.targeting.deleteError'),
           severity: 'error'
         });
       }
@@ -1067,12 +1229,25 @@ const RemoteConfigPage: React.FC = () => {
                     <TableCell>{targeting.description}</TableCell>
                     <TableCell>{targeting.conditions?.length || 0}</TableCell>
                     <TableCell align="center">
-                      <IconButton size="small">
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton size="small" color="error">
-                        <DeleteIcon />
-                      </IconButton>
+                      <Tooltip title={t('common.edit')}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleEditTargeting(targeting)}
+                          sx={{ border: '1px solid', borderColor: 'divider', mr: 1 }}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={t('common.delete')}>
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => handleDeleteTargeting(targeting)}
+                          sx={{ border: '1px solid', borderColor: 'divider' }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -1084,7 +1259,10 @@ const RemoteConfigPage: React.FC = () => {
         {/* Create Targeting Dialog */}
         <Dialog
           open={createTargetingDialogOpen}
-          onClose={() => setCreateTargetingDialogOpen(false)}
+          onClose={() => {
+            setCreateTargetingDialogOpen(false);
+            setTargetingFormData({ id: '', name: '', description: '', conditions: [] });
+          }}
           maxWidth="md"
           fullWidth
         >
@@ -1127,7 +1305,10 @@ const RemoteConfigPage: React.FC = () => {
           </DialogContent>
           <DialogActions>
             <Button
-              onClick={() => setCreateTargetingDialogOpen(false)}
+              onClick={() => {
+                setCreateTargetingDialogOpen(false);
+                setTargetingFormData({ id: '', name: '', description: '', conditions: [] });
+              }}
               startIcon={<CancelIcon />}
             >
               {t('common.cancel')}
@@ -1139,6 +1320,74 @@ const RemoteConfigPage: React.FC = () => {
               startIcon={<SaveIcon />}
             >
               {t('common.create')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Edit Targeting Dialog */}
+        <Dialog
+          open={editTargetingDialogOpen}
+          onClose={() => {
+            setEditTargetingDialogOpen(false);
+            setTargetingFormData({ id: '', name: '', description: '', conditions: [] });
+          }}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>
+            <Box>
+              <Typography variant="h6" component="div" color="text.primary">
+                {t('admin.remoteConfig.targeting.editTargeting')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                {t('admin.remoteConfig.targeting.editTargetingSubtitle')}
+              </Typography>
+            </Box>
+          </DialogTitle>
+          <DialogContent>
+            <Stack spacing={3} sx={{ mt: 1 }}>
+              <TextField
+                fullWidth
+                label={t('admin.remoteConfig.targeting.name')}
+                value={targetingFormData.name}
+                onChange={(e) => setTargetingFormData({ ...targetingFormData, name: e.target.value })}
+                required
+                helperText={t('admin.remoteConfig.targeting.nameHelp')}
+              />
+              <TextField
+                fullWidth
+                label={t('admin.remoteConfig.description')}
+                value={targetingFormData.description}
+                onChange={(e) => setTargetingFormData({ ...targetingFormData, description: e.target.value })}
+                multiline
+                rows={2}
+                required
+                helperText={t('admin.remoteConfig.targeting.descriptionHelp')}
+              />
+
+              <TargetConditionBuilder
+                conditions={targetingFormData.conditions}
+                onChange={(conditions) => setTargetingFormData({ ...targetingFormData, conditions })}
+              />
+            </Stack>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                setEditTargetingDialogOpen(false);
+                setTargetingFormData({ id: '', name: '', description: '', conditions: [] });
+              }}
+              startIcon={<CancelIcon />}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleUpdateTargeting}
+              disabled={!targetingFormData.name.trim() || !targetingFormData.description.trim()}
+              startIcon={<SaveIcon />}
+            >
+              {t('common.save')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -1185,27 +1434,33 @@ const RemoteConfigPage: React.FC = () => {
 
     const handleCreateField = async () => {
       try {
-        const createData = {
+        const createData: any = {
           key: fieldFormData.key,
           name: fieldFormData.name,
           description: fieldFormData.description,
           type: fieldFormData.type,
-          defaultValue: fieldFormData.defaultValue || null,
           isRequired: fieldFormData.isRequired,
-          options: fieldFormData.type === 'array' && fieldFormData.options.length > 0
-            ? fieldFormData.options.map(opt => ({ value: opt, label: opt }))
-            : null
         };
+
+        // defaultValue 처리 (빈 문자열, false, 0도 유효한 기본값)
+        if (fieldFormData.defaultValue !== undefined && fieldFormData.defaultValue !== null) {
+          createData.defaultValue = fieldFormData.defaultValue;
+        }
+
+        // options가 있을 때만 추가 (array 타입이고 옵션이 있는 경우)
+        if (fieldFormData.type === 'array' && fieldFormData.options.length > 0) {
+          createData.options = fieldFormData.options.filter(opt => opt.trim());
+        }
 
         const response = await api.createContextField(createData);
         if (response.success) {
           setCreateFieldDialogOpen(false);
-          setFieldFormData({ key: '', name: '', description: '', type: 'string', defaultValue: '', options: [] });
+          setFieldFormData({ key: '', name: '', description: '', type: 'string', defaultValue: '', isRequired: false, options: [] });
           loadContextFields();
-          // Show success message
-          console.log('Context field created successfully');
+          enqueueSnackbar('컨텍스트 필드가 성공적으로 생성되었습니다.', { variant: 'success' });
         } else {
           console.error('Failed to create context field:', response.message);
+          enqueueSnackbar(response.message || '컨텍스트 필드 생성에 실패했습니다.', { variant: 'error' });
         }
       } catch (error) {
         console.error('Error creating context field:', error);
@@ -1230,15 +1485,21 @@ const RemoteConfigPage: React.FC = () => {
       try {
         if (!selectedField) return;
 
-        const updateData = {
+        const updateData: any = {
           name: fieldFormData.name,
           description: fieldFormData.description,
-          defaultValue: fieldFormData.defaultValue || null,
           isRequired: fieldFormData.isRequired,
-          options: fieldFormData.type === 'array' && fieldFormData.options.length > 0
-            ? fieldFormData.options.map(opt => ({ value: opt, label: opt }))
-            : null
         };
+
+        // defaultValue 처리 (빈 문자열, false, 0도 유효한 기본값)
+        if (fieldFormData.defaultValue !== undefined && fieldFormData.defaultValue !== null) {
+          updateData.defaultValue = fieldFormData.defaultValue;
+        }
+
+        // options가 있을 때만 추가 (array 타입이고 옵션이 있는 경우)
+        if (fieldFormData.type === 'array' && fieldFormData.options.length > 0) {
+          updateData.options = fieldFormData.options.filter(opt => opt.trim());
+        }
 
         const response = await api.updateContextField(selectedField.id, updateData);
         if (response.success) {
@@ -1246,9 +1507,10 @@ const RemoteConfigPage: React.FC = () => {
           setSelectedField(null);
           setFieldFormData({ key: '', name: '', description: '', type: 'string', defaultValue: '', isRequired: false, options: [] });
           loadContextFields();
-          console.log('Context field updated successfully');
+          enqueueSnackbar('컨텍스트 필드가 성공적으로 수정되었습니다.', { variant: 'success' });
         } else {
           console.error('Failed to update context field:', response.message);
+          enqueueSnackbar(response.message || '컨텍스트 필드 수정에 실패했습니다.', { variant: 'error' });
         }
       } catch (error) {
         console.error('Error updating context field:', error);
@@ -1419,6 +1681,36 @@ const RemoteConfigPage: React.FC = () => {
                 </Select>
               </FormControl>
 
+              {/* Default Value Field */}
+              {fieldFormData.type === 'boolean' ? (
+                <FormControl fullWidth>
+                  <InputLabel>기본값</InputLabel>
+                  <Select
+                    value={fieldFormData.defaultValue}
+                    onChange={(e) => setFieldFormData({ ...fieldFormData, defaultValue: e.target.value })}
+                    label="기본값"
+                  >
+                    <MenuItem value="true">True</MenuItem>
+                    <MenuItem value="false">False</MenuItem>
+                  </Select>
+                  <FormHelperText>컨텍스트에서 값을 받지 못했을 때 사용할 기본값</FormHelperText>
+                </FormControl>
+              ) : (
+                <TextField
+                  fullWidth
+                  label="기본값"
+                  value={fieldFormData.defaultValue}
+                  onChange={(e) => setFieldFormData({ ...fieldFormData, defaultValue: e.target.value })}
+                  type={fieldFormData.type === 'number' ? 'number' : 'text'}
+                  helperText="컨텍스트에서 값을 받지 못했을 때 사용할 기본값"
+                  placeholder={
+                    fieldFormData.type === 'string' ? '예: "default"' :
+                    fieldFormData.type === 'number' ? '예: 0' :
+                    fieldFormData.type === 'array' ? '예: []' : ''
+                  }
+                />
+              )}
+
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Checkbox
                   checked={fieldFormData.isRequired}
@@ -1510,12 +1802,35 @@ const RemoteConfigPage: React.FC = () => {
                 rows={2}
                 required
               />
-              <TextField
-                fullWidth
-                label={t('admin.remoteConfig.contextFields.defaultValue')}
-                value={fieldFormData.defaultValue}
-                onChange={(e) => setFieldFormData({ ...fieldFormData, defaultValue: e.target.value })}
-              />
+              {/* Default Value Field - Edit */}
+              {fieldFormData.type === 'boolean' ? (
+                <FormControl fullWidth>
+                  <InputLabel>기본값</InputLabel>
+                  <Select
+                    value={fieldFormData.defaultValue}
+                    onChange={(e) => setFieldFormData({ ...fieldFormData, defaultValue: e.target.value })}
+                    label="기본값"
+                  >
+                    <MenuItem value="true">True</MenuItem>
+                    <MenuItem value="false">False</MenuItem>
+                  </Select>
+                  <FormHelperText>컨텍스트에서 값을 받지 못했을 때 사용할 기본값</FormHelperText>
+                </FormControl>
+              ) : (
+                <TextField
+                  fullWidth
+                  label="기본값"
+                  value={fieldFormData.defaultValue}
+                  onChange={(e) => setFieldFormData({ ...fieldFormData, defaultValue: e.target.value })}
+                  type={fieldFormData.type === 'number' ? 'number' : 'text'}
+                  helperText="컨텍스트에서 값을 받지 못했을 때 사용할 기본값"
+                  placeholder={
+                    fieldFormData.type === 'string' ? '예: "default"' :
+                    fieldFormData.type === 'number' ? '예: 0' :
+                    fieldFormData.type === 'array' ? '예: []' : ''
+                  }
+                />
+              )}
               <FormControl fullWidth>
                 <InputLabel>{t('admin.remoteConfig.contextFields.type')}</InputLabel>
                 <Select
@@ -1988,6 +2303,23 @@ const RemoteConfigPage: React.FC = () => {
     return value;
   };
 
+  // Helper function to get original config value
+  const getOriginalConfigValue = async (configId: number): Promise<string> => {
+    try {
+      const response = await api.get(`/admin/remote-config/${configId}/versions`);
+      if (response.data.versions && response.data.versions.length > 0) {
+        const publishedVersion = response.data.versions.find((v: any) => v.status === 'published');
+        if (publishedVersion) {
+          return publishedVersion.value || '';
+        }
+      }
+      return '';
+    } catch (error) {
+      console.error('Error getting original config value:', error);
+      return '';
+    }
+  };
+
   // Reset form
   const resetForm = () => {
     setFormData({
@@ -1999,19 +2331,44 @@ const RemoteConfigPage: React.FC = () => {
     });
     setFormErrors({});
     setSelectedConfig(null);
+    setOriginalPublishedValue('');
   };
 
   // Open edit dialog
-  const openEditDialog = (config: RemoteConfig) => {
-    setSelectedConfig(config);
-    setFormData({
-      keyName: config.keyName,
-      defaultValue: config.defaultValue || '',
-      valueType: config.valueType,
-      description: config.description || '',
-      isActive: config.isActive,
-    });
-    setEditDialogOpen(true);
+  const openEditDialog = async (config: RemoteConfig) => {
+    try {
+      setSelectedConfig(config);
+
+      // Get the original published value for comparison
+      const originalValue = await getOriginalConfigValue(config.id);
+      setOriginalPublishedValue(originalValue);
+
+      // Logic for determining what value to show:
+      // 1. If config status is 'published' -> show current value (should be same as published)
+      // 2. If config status is 'draft' -> show current draft value
+      // 3. Always show what user sees in the list for consistency
+      setFormData({
+        keyName: config.keyName,
+        defaultValue: config.defaultValue || '',
+        valueType: config.valueType,
+        description: config.description || '',
+        isActive: config.isActive,
+      });
+      setEditDialogOpen(true);
+    } catch (error) {
+      console.error('Error loading config for edit:', error);
+      // Fallback to current config values
+      setSelectedConfig(config);
+      setOriginalPublishedValue(config.defaultValue || '');
+      setFormData({
+        keyName: config.keyName,
+        defaultValue: config.defaultValue || '',
+        valueType: config.valueType,
+        description: config.description || '',
+        isActive: config.isActive,
+      });
+      setEditDialogOpen(true);
+    }
   };
 
   // Get value type color
@@ -2107,7 +2464,7 @@ const RemoteConfigPage: React.FC = () => {
                   </Button>
                 </>
               )}
-              {stagedConfigs.length > 0 && (
+              {stagedConfigs.length > 0 ? (
                 <Button
                   variant="contained"
                   size="small"
@@ -2121,8 +2478,17 @@ const RemoteConfigPage: React.FC = () => {
                     setPublishDialogOpen(true);
                   }}
                 >
-                  설정 배포
+                  설정 배포 ({stagedConfigs.length}개)
                 </Button>
+              ) : modifiedConfigs.length === 0 && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    💡 배포할 스테이징된 설정이 없습니다.
+                  </Typography>
+                  <Typography variant="body2" color="primary.main" sx={{ fontWeight: 500 }}>
+                    설정을 수정한 후 "변경사항 스테이징"을 먼저 진행하세요.
+                  </Typography>
+                </Box>
               )}
             </Stack>
           </Box>
@@ -2522,7 +2888,39 @@ const RemoteConfigPage: React.FC = () => {
           sx: { width: '80%' }
         }}
       >
-        <DialogTitle>{t('admin.remoteConfig.editConfig')}</DialogTitle>
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {t('admin.remoteConfig.editConfig')}
+            {selectedConfig && (
+              <>
+                {selectedConfig.status === 'published' && (
+                  <Chip
+                    size="small"
+                    label="배포됨"
+                    color="success"
+                    variant="outlined"
+                  />
+                )}
+                {selectedConfig.status === 'draft' && (
+                  <Chip
+                    size="small"
+                    label="수정됨"
+                    color="warning"
+                    variant="outlined"
+                  />
+                )}
+                {selectedConfig.status === 'draft' && formData.defaultValue === originalPublishedValue && (
+                  <Chip
+                    size="small"
+                    label="원래 값과 동일"
+                    color="info"
+                    variant="outlined"
+                  />
+                )}
+              </>
+            )}
+          </Box>
+        </DialogTitle>
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
             <TextField
@@ -2559,24 +2957,87 @@ const RemoteConfigPage: React.FC = () => {
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                   {t('admin.remoteConfig.defaultValue')}
                 </Typography>
-                <CodeEditor
-                  value={formData.defaultValue}
-                  onChange={(value) => setFormData({ ...formData, defaultValue: value })}
-                  language={formData.valueType as 'json' | 'yaml'}
-                  height={200}
-                />
+                <Box sx={{ position: 'relative' }}>
+                  <CodeEditor
+                    value={formData.defaultValue}
+                    onChange={(value) => setFormData({ ...formData, defaultValue: value })}
+                    language={formData.valueType as 'json' | 'yaml'}
+                    height={200}
+                  />
+                  {originalPublishedValue && selectedConfig && (
+                    <Tooltip
+                      title={
+                        selectedConfig.status === 'published'
+                          ? '배포된 상태입니다'
+                          : formData.defaultValue === originalPublishedValue
+                            ? '배포된 값과 동일합니다'
+                            : '배포된 값과 다릅니다'
+                      }
+                    >
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: 8,
+                          right: 8,
+                          backgroundColor: 'background.paper',
+                          borderRadius: '50%',
+                          width: 24,
+                          height: 24,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: 1,
+                          zIndex: 10
+                        }}
+                      >
+                        {selectedConfig.status === 'published' ? (
+                          <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                        ) : formData.defaultValue === originalPublishedValue ? (
+                          <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                        ) : (
+                          <WarningIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                        )}
+                      </Box>
+                    </Tooltip>
+                  )}
+                </Box>
                 <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
                   {t('admin.remoteConfig.helpTexts.defaultValue')}
                 </Typography>
               </Box>
             ) : (
-              <TextField
-                fullWidth
-                label={t('admin.remoteConfig.defaultValue')}
-                value={formData.defaultValue}
-                onChange={(e) => setFormData({ ...formData, defaultValue: e.target.value })}
-                helperText={t('admin.remoteConfig.helpTexts.defaultValue')}
-              />
+              <Box sx={{ position: 'relative' }}>
+                <TextField
+                  fullWidth
+                  label={t('admin.remoteConfig.defaultValue')}
+                  value={formData.defaultValue}
+                  onChange={(e) => setFormData({ ...formData, defaultValue: e.target.value })}
+                  helperText={t('admin.remoteConfig.helpTexts.defaultValue')}
+                  InputProps={{
+                    endAdornment: originalPublishedValue && selectedConfig && (
+                      <Tooltip
+                        title={
+                          selectedConfig.status === 'published'
+                            ? '배포된 상태입니다'
+                            : formData.defaultValue === originalPublishedValue
+                              ? '배포된 값과 동일합니다'
+                              : '배포된 값과 다릅니다'
+                        }
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center', ml: 1 }}>
+                          {selectedConfig.status === 'published' ? (
+                            <CheckCircleIcon sx={{ fontSize: 20, color: 'success.main' }} />
+                          ) : formData.defaultValue === originalPublishedValue ? (
+                            <CheckCircleIcon sx={{ fontSize: 20, color: 'success.main' }} />
+                          ) : (
+                            <WarningIcon sx={{ fontSize: 20, color: 'warning.main' }} />
+                          )}
+                        </Box>
+                      </Tooltip>
+                    )
+                  }}
+                />
+              </Box>
             )}
 
             <TextField
@@ -2675,44 +3136,64 @@ const RemoteConfigPage: React.FC = () => {
         <DialogTitle>{t('admin.remoteConfig.stageConfigs')}</DialogTitle>
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
-            <Typography variant="body2" color="text.secondary">
-              {selectedConfigs.length}개의 설정을 스테이징합니다.
-            </Typography>
+            <Alert severity="info" sx={{ mb: 2 }}>
+              <Typography variant="body2">
+                다음 {selectedConfigs.length}개의 설정을 스테이징합니다. 스테이징된 설정은 배포 대기 상태가 됩니다.
+              </Typography>
+            </Alert>
 
             {/* Staging targets list */}
             <Box>
-              <Typography variant="subtitle2" color="text.primary" sx={{ mb: 1 }}>
-                스테이징 대상:
+              <Typography variant="subtitle1" color="text.primary" sx={{ mb: 2, fontWeight: 600 }}>
+                📋 스테이징 대상 설정
               </Typography>
-              <Box sx={{ maxHeight: 200, overflow: 'auto' }}>
-                {configs.filter(config => selectedConfigs.includes(config.id)).map((config) => (
+              <Box sx={{
+                maxHeight: 300,
+                overflow: 'auto',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: 1,
+                bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.01)'
+              }}>
+                {configs.filter(config => selectedConfigs.includes(config.id)).map((config, index) => (
                   <Box
                     key={config.id}
                     sx={{
                       display: 'flex',
                       alignItems: 'center',
-                      p: 1,
-                      border: 1,
+                      p: 2,
+                      borderBottom: index < selectedConfigs.length - 1 ? 1 : 0,
                       borderColor: 'divider',
-                      borderRadius: 1,
-                      mb: 1,
-                      bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)'
+                      '&:hover': {
+                        bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)'
+                      }
                     }}
                   >
                     <Box sx={{ flex: 1 }}>
-                      <Typography variant="subtitle2" color="text.primary">
+                      <Typography variant="subtitle2" color="text.primary" sx={{ fontWeight: 600 }}>
                         {config.keyName}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
                         {config.description || '설명 없음'}
                       </Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                        타입: {config.valueType} | 현재 값: {config.defaultValue || '(없음)'}
+                      </Typography>
                     </Box>
-                    <Chip
-                      size="small"
-                      label={config.status === 'draft' ? '수정됨' : config.status}
-                      color={config.status === 'draft' ? 'warning' : 'default'}
-                      variant="outlined"
-                    />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
+                      <Chip
+                        size="small"
+                        label={config.status === 'draft' ? '수정됨' : config.status}
+                        color={config.status === 'draft' ? 'warning' : 'default'}
+                        variant="outlined"
+                      />
+                      <Chip
+                        size="small"
+                        label={config.isActive ? '활성' : '비활성'}
+                        color={config.isActive ? 'success' : 'default'}
+                        variant="filled"
+                      />
+                    </Box>
                   </Box>
                 ))}
               </Box>
@@ -2785,6 +3266,82 @@ const RemoteConfigPage: React.FC = () => {
               helperText="이번 배포에 포함된 변경사항이나 목적을 설명해주세요."
               error={!publishFormData.description.trim()}
             />
+
+            {/* Divider */}
+            <Divider sx={{ my: 2 }} />
+
+            {/* Deployment Review Section */}
+            <Box>
+              <Typography variant="subtitle1" color="text.primary" sx={{ mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                🚀 배포 대상 설정 리뷰
+                <Chip
+                  size="small"
+                  label={`${stagedConfigs.length}개`}
+                  color="success"
+                  variant="outlined"
+                />
+              </Typography>
+
+              {stagedConfigs.length > 0 ? (
+                <Box sx={{
+                  maxHeight: 300,
+                  overflow: 'auto',
+                  border: 1,
+                  borderColor: 'divider',
+                  borderRadius: 1,
+                  bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.01)'
+                }}>
+                  {stagedConfigs.map((config, index) => (
+                    <Box
+                      key={config.id}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        p: 2,
+                        borderBottom: index < stagedConfigs.length - 1 ? 1 : 0,
+                        borderColor: 'divider',
+                        '&:hover': {
+                          bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)'
+                        }
+                      }}
+                    >
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="body1" sx={{ fontWeight: 500, mb: 0.5 }}>
+                          {config.keyName}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                          {config.description || '설명 없음'}
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            {getValueTypeIcon(config.valueType)}
+                            <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                              {config.valueType}
+                            </Typography>
+                          </Box>
+                          <Typography variant="caption" color="text.secondary">
+                            현재 값: {config.defaultValue || 'null'}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Box sx={{ ml: 2 }}>
+                        <Chip
+                          size="small"
+                          label="STAGED"
+                          color="warning"
+                          variant="filled"
+                        />
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              ) : (
+                <Alert severity="info">
+                  배포할 스테이징된 설정이 없습니다.
+                </Alert>
+              )}
+            </Box>
           </Stack>
         </DialogContent>
         <DialogActions>

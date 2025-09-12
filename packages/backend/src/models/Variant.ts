@@ -69,7 +69,6 @@ export class VariantModel {
         variantName: data.variantName,
         value: data.value || null,
         trafficPercentage: data.trafficPercentage || 0,
-        conditions: data.conditions ? JSON.stringify(data.conditions) : null,
         isActive: data.isActive ?? true,
         createdBy: data.createdBy || null
       });
@@ -116,7 +115,6 @@ export class VariantModel {
       if (data.variantName !== undefined) updateData.variantName = data.variantName;
       if (data.value !== undefined) updateData.value = data.value;
       if (data.trafficPercentage !== undefined) updateData.trafficPercentage = data.trafficPercentage;
-      if (data.conditions !== undefined) updateData.conditions = data.conditions ? JSON.stringify(data.conditions) : null;
       if (data.isActive !== undefined) updateData.isActive = data.isActive;
 
       await db('g_remote_config_variants').where('id', id).update(updateData);
@@ -244,8 +242,6 @@ export class VariantModel {
       variantName: row.variantName,
       value: row.value,
       trafficPercentage: parseFloat(row.trafficPercentage),
-      conditions: typeof row.conditions === 'string' ? 
-        JSON.parse(row.conditions) : row.conditions,
       isActive: Boolean(row.isActive),
       createdBy: row.createdBy,
       createdAt: row.createdAt,

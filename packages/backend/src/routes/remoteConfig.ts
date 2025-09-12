@@ -1,5 +1,6 @@
 import express from 'express';
 import RemoteConfigController from '../controllers/RemoteConfigController';
+import { ContextFieldController } from '../controllers/ContextFieldControllerNew';
 import { authenticate, requireAdmin } from '../middleware/auth';
 import { body, param, query, validationResult } from 'express-validator';
 import { CustomError } from '../middleware/errorHandler';
@@ -84,7 +85,17 @@ const listConfigsValidation = [
     .isIn(['string', 'number', 'boolean', 'json', 'yaml']),
   query('isActive')
     .optional()
-    .isBoolean(),
+    .custom((value) => {
+      // 빈 문자열이나 undefined는 허용
+      if (value === '' || value === undefined || value === null) {
+        return true;
+      }
+      // 'true' 또는 'false' 문자열만 허용
+      if (value === 'true' || value === 'false') {
+        return true;
+      }
+      throw new Error('isActive must be "true" or "false"');
+    }),
   query('sortBy')
     .optional()
     .isIn(['keyName', 'valueType', 'createdAt', 'updatedAt'])
@@ -119,6 +130,45 @@ const publishConfigsValidation = [
     .isLength({ max: 1000 })
 ];
 
+// Context Fields validation
+const createContextFieldValidation = [
+  body('key')
+    .isString()
+    .isLength({ min: 1, max: 255 })
+    .matches(/^[a-zA-Z][a-zA-Z0-9_]*$/)
+    .withMessage('Key must start with a letter and contain only letters, numbers, and underscores'),
+  body('name')
+    .isString()
+    .isLength({ min: 1, max: 255 })
+    .withMessage('Name is required and must be 1-255 characters'),
+  body('description')
+    .optional()
+    .isString()
+    .isLength({ max: 1000 })
+    .withMessage('Description must be a string with maximum 1000 characters'),
+  body('type')
+    .isIn(['string', 'number', 'boolean', 'array'])
+    .withMessage('Type must be one of: string, number, boolean, array'),
+  body('defaultValue')
+    .optional()
+    .isString(),
+  body('isRequired')
+    .optional()
+    .isBoolean()
+    .withMessage('isRequired must be a boolean'),
+  body('options')
+    .optional({ nullable: true })
+    .custom((value) => {
+      if (value === null || value === undefined) {
+        return true;
+      }
+      if (Array.isArray(value)) {
+        return true;
+      }
+      throw new Error('Options must be an array or null');
+    })
+];
+
 // Routes
 
 /**
@@ -151,6 +201,66 @@ router.get('/versions',
   validateRequest,
   RemoteConfigController.getVersionHistory
 );
+
+/**
+ * @route GET /api/v1/remote-config/context-fields
+ * @desc Get all context fields
+ * @access Admin
+ */
+router.get('/context-fields', ContextFieldController.getContextFields);
+
+/**
+ * @route POST /api/v1/remote-config/context-fields
+ * @desc Create new context field
+ * @access Admin
+ */
+router.post('/context-fields', createContextFieldValidation, validateRequest, ContextFieldController.createContextField);
+
+/**
+ * @route PUT /api/v1/remote-config/context-fields/:id
+ * @desc Update context field
+ * @access Admin
+ */
+router.put('/context-fields/:id', [
+  param('id').isInt({ min: 1 }).withMessage('Invalid context field ID'),
+  body('name')
+    .optional()
+    .isString()
+    .isLength({ min: 1, max: 255 })
+    .withMessage('Name must be 1-255 characters'),
+  body('description')
+    .optional()
+    .isString()
+    .isLength({ max: 1000 })
+    .withMessage('Description must be a string with maximum 1000 characters'),
+  body('defaultValue')
+    .optional()
+    .isString(),
+  body('isRequired')
+    .optional()
+    .isBoolean()
+    .withMessage('isRequired must be a boolean'),
+  body('options')
+    .optional({ nullable: true })
+    .custom((value) => {
+      if (value === null || value === undefined) {
+        return true;
+      }
+      if (Array.isArray(value)) {
+        return true;
+      }
+      throw new Error('Options must be an array or null');
+    })
+], validateRequest, ContextFieldController.updateContextField);
+
+/**
+ * @route DELETE /api/v1/remote-config/context-fields/:id
+ * @desc Delete context field
+ * @access Admin
+ */
+router.delete('/context-fields/:id', [
+  param('id').isInt({ min: 1 }).withMessage('Invalid context field ID')
+], validateRequest, ContextFieldController.deleteContextField);
 
 /**
  * @route GET /api/v1/remote-config/:id
@@ -200,6 +310,17 @@ router.get('/:id/versions',
 );
 
 /**
+ * @route DELETE /api/v1/remote-config/:id/versions/draft
+ * @desc Discard draft changes for a config
+ * @access Admin
+ */
+router.delete('/:id/versions/draft',
+  param('id').isInt({ min: 1 }).withMessage('Invalid config ID'),
+  validateRequest,
+  RemoteConfigController.discardDraftVersions
+);
+
+/**
  * @route GET /api/v1/remote-config/:id/rules
  * @desc Get rules for a config
  * @access Admin
@@ -236,11 +357,17 @@ const rollbackValidation = [
     .withMessage('Description must be a string with maximum 1000 characters')
 ];
 
+
+
+
+
 /**
  * @route POST /api/v1/remote-config/rollback
  * @desc Rollback to a previous deployment
  * @access Admin
  */
 router.post('/rollback', rollbackValidation, validateRequest, RemoteConfigController.rollback);
+
+
 
 export default router;

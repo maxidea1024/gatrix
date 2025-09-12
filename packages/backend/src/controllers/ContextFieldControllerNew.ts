@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { CONTEXT_FIELDS, CONTEXT_OPERATORS } from '../types/contextFields';
 import logger from '../config/logger';
+import { ContextFieldModel } from '../models/ContextField';
 
 export class ContextFieldController {
   /**
@@ -8,17 +9,31 @@ export class ContextFieldController {
    */
   static async getContextFields(req: Request, res: Response): Promise<void> {
     try {
-      // For now, just return predefined fields
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 50;
+      const search = req.query.search as string;
+      const type = req.query.type as string;
+      const isActive = req.query.isActive === 'true' ? true : req.query.isActive === 'false' ? false : undefined;
+
+      // Get fields from database only (no more mock data)
+      const { fields, total } = await ContextFieldModel.findAll({
+        page,
+        limit,
+        search,
+        type,
+        isActive
+      });
+
       res.json({
         success: true,
         data: {
-          fields: CONTEXT_FIELDS,
+          fields: fields,
           operators: CONTEXT_OPERATORS,
           pagination: {
-            page: 1,
-            limit: 50,
-            total: CONTEXT_FIELDS.length,
-            pages: 1
+            page,
+            limit,
+            total: total,
+            pages: Math.ceil(total / limit)
           }
         }
       });
@@ -103,13 +118,58 @@ export class ContextFieldController {
   }
 
   /**
-   * Create context field (placeholder)
+   * Create context field
    */
   static async createContextField(req: Request, res: Response): Promise<void> {
     try {
-      res.status(501).json({
-        success: false,
-        message: 'Context field creation not implemented yet'
+      const userId = (req as any).user?.id;
+      const { key, name, description, type, defaultValue, isRequired, options } = req.body;
+
+      // Validate key format
+      if (!ContextFieldModel.validateKey(key)) {
+        res.status(400).json({
+          success: false,
+          message: 'Invalid key format. Key must start with a letter and contain only letters, numbers, and underscores.'
+        });
+        return;
+      }
+
+      // Check if key already exists
+      const existing = await ContextFieldModel.findByKey(key);
+      if (existing) {
+        res.status(409).json({
+          success: false,
+          message: 'Context field with this key already exists'
+        });
+        return;
+      }
+
+      // Validate options for array type
+      if (type === 'array' && options && !ContextFieldModel.validateOptions(type, options)) {
+        res.status(400).json({
+          success: false,
+          message: 'Invalid options format for array type'
+        });
+        return;
+      }
+
+      const createData = {
+        key,
+        name,
+        description,
+        type,
+        defaultValue,
+        validation: isRequired ? { required: true } : undefined,
+        options,
+        createdBy: userId
+      };
+
+      const created = await ContextFieldModel.create(createData);
+
+      res.status(201).json({
+        success: true,
+        data: created,
+        message: 'Context field created successfully'
       });
     } catch (error) {
       logger.error('Error creating context field:', error);
@@ -121,13 +181,57 @@ export class ContextFieldController {
   }
 
   /**
-   * Update context field (placeholder)
+   * Update context field
    */
   static async updateContextField(req: Request, res: Response): Promise<void> {
     try {
-      res.status(501).json({
-        success: false,
-        message: 'Context field update not implemented yet'
+      const userId = (req as any).user?.id;
+      const fieldId = parseInt(req.params.id);
+      const { name, description, defaultValue, isRequired, options } = req.body;
+
+      // Check if field exists
+      const existing = await ContextFieldModel.findById(fieldId);
+      if (!existing) {
+        res.status(404).json({
+          success: false,
+          message: 'Context field not found'
+        });
+        return;
+      }
+
+      // Prevent updating system fields
+      if (existing.isSystem) {
+        res.status(403).json({
+          success: false,
+          message: 'Cannot update system context fields'
+        });
+        return;
+      }
+
+      // Validate options for array type
+      if (existing.type === 'array' && options && !ContextFieldModel.validateOptions(existing.type, options)) {
+        res.status(400).json({
+          success: false,
+          message: 'Invalid options format for array type'
+        });
+        return;
+      }
+
+      const updateData = {
+        name,
+        description,
+        defaultValue,
+        validation: isRequired ? { required: true } : undefined,
+        options,
+        updatedBy: userId
+      };
+
+      const updated = await ContextFieldModel.update(fieldId, updateData);
+
+      res.json({
+        success: true,
+        data: updated,
+        message: 'Context field updated successfully'
       });
     } catch (error) {
       logger.error('Error updating context field:', error);
@@ -139,14 +243,44 @@ export class ContextFieldController {
   }
 
   /**
-   * Delete context field (placeholder)
+   * Delete context field
    */
   static async deleteContextField(req: Request, res: Response): Promise<void> {
     try {
-      res.status(501).json({
-        success: false,
-        message: 'Context field deletion not implemented yet'
-      });
+      const fieldId = parseInt(req.params.id);
+
+      // Check if field exists
+      const existing = await ContextFieldModel.findById(fieldId);
+      if (!existing) {
+        res.status(404).json({
+          success: false,
+          message: 'Context field not found'
+        });
+        return;
+      }
+
+      // Prevent deleting system fields
+      if (existing.isSystem) {
+        res.status(403).json({
+          success: false,
+          message: 'Cannot delete system context fields'
+        });
+        return;
+      }
+
+      const deleted = await ContextFieldModel.delete(fieldId);
+
+      if (deleted) {
+        res.json({
+          success: true,
+          message: 'Context field deleted successfully'
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          message: 'Failed to delete context field'
+        });
+      }
     } catch (error) {
       logger.error('Error deleting context field:', error);
       res.status(500).json({

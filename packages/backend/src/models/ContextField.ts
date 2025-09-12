@@ -39,6 +39,7 @@ export interface CreateContextFieldData {
   options?: ContextFieldOption[];
   defaultValue?: string;
   validation?: ContextFieldValidation;
+  isRequired?: boolean;
   isActive?: boolean;
   isSystem?: boolean;
   createdBy?: number;
@@ -51,11 +52,34 @@ export interface UpdateContextFieldData {
   options?: ContextFieldOption[];
   defaultValue?: string;
   validation?: ContextFieldValidation;
+  isRequired?: boolean;
   isActive?: boolean;
   updatedBy?: number;
 }
 
 export class ContextFieldModel {
+  // 안전한 JSON 파싱 메서드
+  private static parseValidationRules(value: any): any {
+    if (!value) return null;
+
+    // 이미 객체인 경우 그대로 반환
+    if (typeof value === 'object') {
+      return value;
+    }
+
+    // 문자열인 경우 JSON 파싱 시도
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value);
+      } catch (error) {
+        logger.error('Failed to parse validationRules JSON:', { value, error });
+        return null;
+      }
+    }
+
+    return null;
+  }
+
   static async findAll(filters?: {
     search?: string;
     type?: string;
@@ -77,23 +101,39 @@ export class ContextFieldModel {
       // Apply filters
       if (filters?.search) {
         query = query.where(function() {
-          this.where('g_remote_config_context_fields.key', 'like', `%${filters.search}%`)
-            .orWhere('g_remote_config_context_fields.name', 'like', `%${filters.search}%`)
+          this.where('g_remote_config_context_fields.fieldName', 'like', `%${filters.search}%`)
             .orWhere('g_remote_config_context_fields.description', 'like', `%${filters.search}%`);
         });
       }
 
       if (filters?.type) {
-        query = query.where('g_remote_config_context_fields.type', filters.type);
+        query = query.where('g_remote_config_context_fields.fieldType', filters.type);
       }
 
       if (filters?.isActive !== undefined) {
-        query = query.where('g_remote_config_context_fields.isActive', filters.isActive);
+        query = query.where('g_remote_config_context_fields.isRequired', filters.isActive);
       }
 
-      // Get total count
-      const totalQuery = query.clone().count('* as count').first();
-      const totalResult = await totalQuery;
+      // Get total count with a separate simple query
+      let countQuery = db('g_remote_config_context_fields');
+
+      // Apply the same filters for count
+      if (filters?.search) {
+        countQuery = countQuery.where(function() {
+          this.where('g_remote_config_context_fields.fieldName', 'like', `%${filters.search}%`)
+            .orWhere('g_remote_config_context_fields.description', 'like', `%${filters.search}%`);
+        });
+      }
+
+      if (filters?.type) {
+        countQuery = countQuery.where('g_remote_config_context_fields.fieldType', filters.type);
+      }
+
+      if (filters?.isActive !== undefined) {
+        countQuery = countQuery.where('g_remote_config_context_fields.isRequired', filters.isActive);
+      }
+
+      const totalResult = await countQuery.count('* as count').first();
       const total = totalResult ? Number(totalResult.count) : 0;
 
       // Apply pagination
@@ -105,13 +145,22 @@ export class ContextFieldModel {
       const fields = await query;
 
       return {
-        fields: fields.map(field => ({
-          ...field,
-          options: field.options ? JSON.parse(field.options) : null,
-          validation: field.validation ? JSON.parse(field.validation) : null,
-          creator: field.creatorName ? { name: field.creatorName } : undefined,
-          updater: field.updaterName ? { name: field.updaterName } : undefined
-        })),
+        fields: fields.map(field => {
+          const validation = this.parseValidationRules(field.validationRules);
+          return {
+            ...field,
+            key: field.fieldName, // Map fieldName to key
+            name: field.fieldName, // Use fieldName as name if no separate name field
+            type: field.fieldType, // Map fieldType to type
+            options: null, // g_remote_config_context_fields doesn't have options
+            validation,
+            isRequired: field.isRequired || false,
+            isActive: true, // Default to true since table doesn't have isActive
+            isSystem: false, // Default to false since table doesn't have isSystem
+            creator: field.creatorName ? { name: field.creatorName } : undefined,
+            updater: field.updaterName ? { name: field.updaterName } : undefined
+          };
+        }),
         total
       };
     } catch (error) {
@@ -135,10 +184,17 @@ export class ContextFieldModel {
 
       if (!field) return null;
 
+      const validation = this.parseValidationRules(field.validationRules);
       return {
         ...field,
-        options: field.options ? JSON.parse(field.options) : null,
-        validation: field.validation ? JSON.parse(field.validation) : null,
+        key: field.fieldName, // Map fieldName to key
+        name: field.fieldName, // Use fieldName as name if no separate name field
+        type: field.fieldType, // Map fieldType to type
+        options: null, // g_remote_config_context_fields doesn't have options
+        validation,
+        isRequired: field.isRequired || false,
+        isActive: true, // Default to true since table doesn't have isActive
+        isSystem: false, // Default to false since table doesn't have isSystem
         creator: field.creatorName ? { name: field.creatorName } : undefined,
         updater: field.updaterName ? { name: field.updaterName } : undefined
       };
@@ -151,15 +207,33 @@ export class ContextFieldModel {
   static async findByKey(key: string): Promise<ContextField | null> {
     try {
       const field = await db('g_remote_config_context_fields')
-        .where('key', key)
+        .leftJoin('g_users as creator', 'g_remote_config_context_fields.createdBy', 'creator.id')
+        .leftJoin('g_users as updater', 'g_remote_config_context_fields.updatedBy', 'updater.id')
+        .select([
+          'g_remote_config_context_fields.*',
+          'creator.name as creatorName',
+          'updater.name as updaterName'
+        ])
+        .where('g_remote_config_context_fields.fieldName', key)
         .first();
 
-      if (!field) return null;
+      if (!field) {
+        return null;
+      }
 
+      const validation = this.parseValidationRules(field.validationRules);
       return {
         ...field,
-        options: field.options ? JSON.parse(field.options) : null,
-        validation: field.validation ? JSON.parse(field.validation) : null
+        key: field.fieldName, // Map fieldName to key
+        name: field.fieldName, // Use fieldName as name if no separate name field
+        type: field.fieldType, // Map fieldType to type
+        options: null, // g_remote_config_context_fields doesn't have options
+        validation,
+        isRequired: field.isRequired || false,
+        isActive: true, // Default to true since table doesn't have isActive
+        isSystem: false, // Default to false since table doesn't have isSystem
+        creator: field.creatorName ? { name: field.creatorName } : undefined,
+        updater: field.updaterName ? { name: field.updaterName } : undefined
       };
     } catch (error) {
       logger.error('Error finding context field by key:', error);
@@ -170,11 +244,13 @@ export class ContextFieldModel {
   static async create(data: CreateContextFieldData): Promise<ContextField> {
     try {
       const insertData = {
-        ...data,
-        options: data.options ? JSON.stringify(data.options) : null,
-        validation: data.validation ? JSON.stringify(data.validation) : null,
-        isActive: data.isActive !== undefined ? data.isActive : true,
-        isSystem: data.isSystem !== undefined ? data.isSystem : false,
+        fieldName: data.key, // Map key to fieldName
+        fieldType: data.type, // Map type to fieldType
+        description: data.description,
+        isRequired: data.isRequired || false,
+        defaultValue: data.defaultValue || null,
+        validationRules: data.validation ? JSON.stringify(data.validation) : null,
+        createdBy: data.createdBy,
         createdAt: new Date(),
         updatedAt: new Date()
       };
@@ -195,19 +271,27 @@ export class ContextFieldModel {
 
   static async update(id: number, data: UpdateContextFieldData): Promise<ContextField | null> {
     try {
-      const updateData = {
-        ...data,
-        options: data.options ? JSON.stringify(data.options) : undefined,
-        validation: data.validation ? JSON.stringify(data.validation) : undefined,
-        updatedAt: new Date()
+      const updateData: any = {
+        updatedAt: new Date(),
+        updatedBy: data.updatedBy
       };
 
-      // Remove undefined values
-      Object.keys(updateData).forEach(key => {
-        if (updateData[key as keyof UpdateContextFieldData] === undefined) {
-          delete updateData[key as keyof UpdateContextFieldData];
-        }
-      });
+      // Map fields to correct column names
+      if (data.name !== undefined) {
+        updateData.fieldName = data.name; // Map name to fieldName
+      }
+      if (data.description !== undefined) {
+        updateData.description = data.description;
+      }
+      if (data.defaultValue !== undefined) {
+        updateData.defaultValue = data.defaultValue;
+      }
+      if (data.isRequired !== undefined) {
+        updateData.isRequired = data.isRequired;
+      }
+      if (data.validation !== undefined) {
+        updateData.validationRules = data.validation ? JSON.stringify(data.validation) : null;
+      }
 
       await db('g_remote_config_context_fields')
         .where('id', id)
@@ -300,3 +384,5 @@ export class ContextFieldModel {
     );
   }
 }
+
+export default ContextField;
