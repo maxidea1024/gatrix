@@ -1042,38 +1042,23 @@ const RemoteConfigPage: React.FC = () => {
     const loadTargetings = async () => {
       try {
         setTargetingLoading(true);
-        // 사전 정의된 타겟팅 목록 로드 (향후 API 연동 예정)
-        const predefinedTargetings = [
-          {
-            id: 'vip_users',
-            name: 'VIP 사용자',
-            description: '레벨 50 이상이고 프리미엄 구독 중인 사용자',
-            conditions: [
-              { field: 'userLevel', operator: 'greater_than_or_equal', value: '50' },
-              { field: 'isPremium', operator: 'equals', value: 'true' }
-            ]
-          },
-          {
-            id: 'new_users',
-            name: '신규 사용자',
-            description: '가입 후 7일 이내이고 레벨 10 미만인 사용자',
-            conditions: [
-              { field: 'registrationDays', operator: 'less_than_or_equal', value: '7' },
-              { field: 'userLevel', operator: 'less_than', value: '10' }
-            ]
-          },
-          {
-            id: 'mobile_users',
-            name: '모바일 사용자',
-            description: 'iOS 또는 Android 플랫폼 사용자',
-            conditions: [
-              { field: 'platform', operator: 'in', value: 'ios,android' }
-            ]
-          }
-        ];
-        setTargetings(predefinedTargetings);
+        // 실제 데이터베이스의 세그먼트 로드
+        const segmentsResponse = await api.getSegments();
+        const segments = segmentsResponse.data.segments || [];
+
+        // 세그먼트 데이터를 타겟팅 형식으로 변환
+        const targetingSegments = segments.map((segment: any) => ({
+          id: segment.id,
+          name: segment.ruleName,
+          description: segment.value || '세그먼트 설명 없음',
+          conditions: segment.conditions?.conditions || []
+        }));
+
+        setTargetings(targetingSegments);
       } catch (error) {
-        console.error('Error loading targetings:', error);
+        console.error('Error loading segments:', error);
+        // 에러 시 빈 배열로 설정
+        setTargetings([]);
       } finally {
         setTargetingLoading(false);
       }
@@ -1573,6 +1558,7 @@ const RemoteConfigPage: React.FC = () => {
                   <TableCell>{t('admin.remoteConfig.contextFields.key')}</TableCell>
                   <TableCell>{t('admin.remoteConfig.contextFields.name')}</TableCell>
                   <TableCell>{t('admin.remoteConfig.contextFields.type')}</TableCell>
+                  <TableCell>기본값</TableCell>
                   <TableCell align="center">필수 여부</TableCell>
                   <TableCell>{t('admin.remoteConfig.description')}</TableCell>
                   <TableCell align="center">{t('admin.remoteConfig.actions')}</TableCell>
@@ -1593,6 +1579,14 @@ const RemoteConfigPage: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <Chip label={field.type} size="small" />
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                        {field.defaultValue !== undefined && field.defaultValue !== null && field.defaultValue !== ''
+                          ? (field.type === 'string' ? `"${field.defaultValue}"` : String(field.defaultValue))
+                          : '-'
+                        }
+                      </Typography>
                     </TableCell>
                     <TableCell align="center">
                       <Chip

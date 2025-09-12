@@ -112,10 +112,10 @@ export interface UpdateContextFieldData {
   updatedBy?: number;
 }
 
-// Config Rules
+// Config Rules (now used as Segments)
 export interface ConfigRule {
   id: number;
-  configId: number;
+  configId?: number; // Optional for backward compatibility
   ruleName: string;
   conditions: any; // JSON conditions
   value?: string;
@@ -124,14 +124,14 @@ export interface ConfigRule {
   createdBy?: number;
   createdAt: string;
   updatedAt: string;
-  
+
   // Relations
   createdByName?: string;
   config?: RemoteConfig;
 }
 
 export interface CreateConfigRuleData {
-  configId: number;
+  configId?: number; // Optional for segments
   ruleName: string;
   conditions: any;
   value?: string;

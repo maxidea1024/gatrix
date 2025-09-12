@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { RemoteConfigModel, ConfigVersionModel } from '../models/RemoteConfig';
-import ConfigRuleModel from '../models/ConfigRule';
+import SegmentModel from '../models/Segment';
 import { RemoteConfigNotifications } from '../services/sseNotificationService';
 import logger from '../config/logger';
 import { CustomError } from '../middleware/errorHandler';
@@ -409,30 +409,22 @@ export class RemoteConfigController {
 
 
   /**
-   * Get rules for a config
+   * Get all segments (formerly rules)
    */
-  static async getRules(req: Request, res: Response): Promise<void> {
+  static async getSegments(req: Request, res: Response): Promise<void> {
     try {
-      const configId = parseInt(req.params.id);
-
-      // Check if config exists
-      const config = await RemoteConfigModel.findById(configId, false);
-      if (!config) {
-        throw new CustomError('Remote config not found', 404);
-      }
-
-      const rules = await ConfigRuleModel.getRulesByConfigId(configId);
+      const segments = await SegmentModel.getAllSegments();
 
       res.json({
         success: true,
-        data: { rules }
+        data: { segments }
       });
     } catch (error) {
-      logger.error('Error in RemoteConfigController.getRules:', error);
+      logger.error('Error in RemoteConfigController.getSegments:', error);
       if (error instanceof CustomError) {
         throw error;
       }
-      throw new CustomError('Failed to fetch rules', 500);
+      throw new CustomError('Failed to fetch segments', 500);
     }
   }
 

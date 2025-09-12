@@ -321,14 +321,12 @@ router.delete('/:id/versions/draft',
 );
 
 /**
- * @route GET /api/v1/remote-config/:id/rules
- * @desc Get rules for a config
+ * @route GET /api/v1/remote-config/segments
+ * @desc Get all segments (formerly rules)
  * @access Admin
  */
-router.get('/:id/rules',
-  param('id').isInt({ min: 1 }).withMessage('Invalid config ID'),
-  validateRequest,
-  RemoteConfigController.getRules
+router.get('/segments',
+  RemoteConfigController.getSegments
 );
 
 /**

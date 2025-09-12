@@ -265,6 +265,27 @@ class ApiService {
   async getContextFieldOperatorsForType(type: string): Promise<ApiResponse<any>> {
     return this.get(`/admin/remote-config/context-fields/operators/${type}`);
   }
+
+  // Segments API (formerly Rules)
+  async getSegments(): Promise<ApiResponse<any>> {
+    return this.get('/admin/remote-config/segments');
+  }
+
+  async getSegment(id: string): Promise<ApiResponse<any>> {
+    return this.get(`/admin/remote-config/segments/${id}`);
+  }
+
+  async createSegment(data: any): Promise<ApiResponse<any>> {
+    return this.post('/admin/remote-config/segments', data);
+  }
+
+  async updateSegment(id: string, data: any): Promise<ApiResponse<any>> {
+    return this.put(`/admin/remote-config/segments/${id}`, data);
+  }
+
+  async deleteSegment(id: string): Promise<ApiResponse<any>> {
+    return this.delete(`/admin/remote-config/segments/${id}`);
+  }
 }
 
 export const apiService = new ApiService();

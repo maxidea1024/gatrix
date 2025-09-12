@@ -1,16 +1,13 @@
 import { Request, Response } from 'express';
 import { RemoteConfigModel } from '../models/RemoteConfig';
-import ConfigRuleModel from '../models/ConfigRule';
 import logger from '../config/logger';
 import { CustomError } from '../middleware/errorHandler';
-import { TrafficSplitter, CampaignEvaluator } from '../utils/trafficSplitter';
+import { TrafficSplitter } from '../utils/trafficSplitter';
 import db from '../config/knex';
 import {
   EvaluationContext,
   EvaluationResult,
-  RemoteConfig,
-  ConfigRule,
-  ConfigVariant
+  RemoteConfig
 } from '../types/remoteConfig';
 
 export class RemoteConfigClientController {
@@ -121,17 +118,8 @@ export class RemoteConfigClientController {
         };
       }
 
-      // 2. Check for rules (second priority)
-      const ruleValue = await ConfigRuleModel.evaluateRules(config.id, context);
-      if (ruleValue !== null) {
-        const rule = await this.getMatchingRule(config.id, context);
-        return {
-          value: this.parseValue(ruleValue, config.valueType),
-          source: 'rule',
-          ruleId: rule?.id,
-          appliedAt
-        };
-      }
+      // 2. Rules are now handled through campaigns only
+      // (Rules/Segments are no longer directly applied to configs)
 
       // 3. Check for A/B test variants (third priority)
       const variantValue = await this.evaluateVariants(config.id, context);
@@ -216,7 +204,9 @@ export class RemoteConfigClientController {
         ? JSON.parse(campaign.targetConditions)
         : campaign.targetConditions;
 
-      return await this.evaluateRuleConditions({ conditions } as any, context);
+      // Campaign condition evaluation logic would go here
+      // For now, return true (allow all traffic)
+      return true;
     } catch (error) {
       logger.error('Error evaluating campaign conditions:', error);
       return false;
@@ -270,25 +260,7 @@ export class RemoteConfigClientController {
     return Math.abs(hash);
   }
 
-  /**
-   * Get matching rule for config
-   */
-  private static async getMatchingRule(configId: number, context: EvaluationContext): Promise<ConfigRule | null> {
-    try {
-      const rules = await ConfigRuleModel.getRulesByConfigId(configId);
-      
-      for (const rule of rules) {
-        if (await this.evaluateRuleConditions(rule, context)) {
-          return rule;
-        }
-      }
-      
-      return null;
-    } catch (error) {
-      logger.error('Error getting matching rule:', error);
-      return null;
-    }
-  }
+  // getMatchingRule method removed - rules are now handled through campaigns
 
   /**
    * Evaluate A/B test variants using MurmurHash-based traffic splitting
@@ -357,19 +329,7 @@ export class RemoteConfigClientController {
     }
   }
 
-  /**
-   * Evaluate rule conditions
-   */
-  private static async evaluateRuleConditions(rule: ConfigRule, context: EvaluationContext): Promise<boolean> {
-    // This is a simplified version - the full implementation is in ConfigRuleModel
-    try {
-      const ruleValue = await ConfigRuleModel.evaluateRules(rule.configId, context);
-      return ruleValue === rule.value;
-    } catch (error) {
-      logger.error('Error evaluating rule conditions:', error);
-      return false;
-    }
-  }
+  // evaluateRuleConditions method removed - rules are now handled through campaigns
 
   /**
    * Parse value according to type

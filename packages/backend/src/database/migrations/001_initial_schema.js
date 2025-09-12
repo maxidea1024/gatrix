@@ -512,6 +512,28 @@ exports.up = async function() {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
 
+  // 22. Remote config segments table (formerly rules)
+  await connection.execute(`
+    CREATE TABLE IF NOT EXISTS g_remote_config_segments (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      segmentName VARCHAR(255) NOT NULL,
+      conditions JSON NOT NULL,
+      value TEXT NULL COMMENT 'Segment description',
+      priority INT NOT NULL DEFAULT 0,
+      isActive BOOLEAN NOT NULL DEFAULT TRUE,
+      createdBy INT NULL,
+      updatedBy INT NULL,
+      createdAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+      CONSTRAINT fk_segments_creator FOREIGN KEY (createdBy) REFERENCES g_users(id) ON DELETE SET NULL,
+      CONSTRAINT fk_segments_updater FOREIGN KEY (updatedBy) REFERENCES g_users(id) ON DELETE SET NULL,
+      INDEX idx_segments_active (isActive),
+      INDEX idx_segments_priority (priority),
+      INDEX idx_segments_name (segmentName)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
+
   console.log('✓ Remote config and context tables created');
 
   // Get admin credentials from environment variables
@@ -536,6 +558,48 @@ exports.up = async function() {
     ('http_request', 'HTTP Request', 'Make HTTP requests', '{"url":{"type":"string","required":true,"description":"Request URL"},"method":{"type":"select","required":true,"description":"HTTP method","options":["GET","POST","PUT","DELETE","PATCH"],"default":"GET"},"headers":{"type":"object","required":false,"description":"Request headers (JSON format)"},"body":{"type":"text","required":false,"description":"Request body"}}', TRUE),
     ('ssh_command', 'SSH Command', 'Execute SSH commands', '{"host":{"type":"string","required":true,"description":"SSH host address"},"username":{"type":"string","required":true,"description":"SSH username"},"command":{"type":"text","required":true,"description":"Command to execute"},"port":{"type":"number","required":false,"description":"SSH port","default":22}}', TRUE),
     ('log_message', 'Log Message', 'Log messages', '{"level":{"type":"select","required":true,"description":"Log level","options":["debug","info","warn","error"],"default":"info"},"message":{"type":"text","required":true,"description":"Log message content"}}', TRUE)
+  `);
+
+  // Insert sample context fields
+  await connection.execute(`
+    INSERT IGNORE INTO g_remote_config_context_fields
+    (id, fieldName, fieldType, description, isRequired, defaultValue, createdBy) VALUES
+    (1, 'player_vip_level', 'number', 'VIP 레벨 (0-10)', FALSE, '0', 1),
+    (2, 'player_level', 'number', '플레이어 레벨', FALSE, '1', 1),
+    (3, 'device_platform', 'string', '디바이스 플랫폼 (ios, android, web)', FALSE, 'web', 1),
+    (4, 'user_country', 'string', '사용자 국가 코드', FALSE, 'KR', 1),
+    (5, 'app_version', 'string', '앱 버전', FALSE, '1.0.0', 1)
+  `);
+
+  // Insert sample segments
+  await connection.execute(`
+    INSERT IGNORE INTO g_remote_config_segments
+    (id, segmentName, conditions, value, priority, isActive, createdBy) VALUES
+    (1, 'VIP 사용자',
+     JSON_OBJECT('conditions', JSON_ARRAY(
+       JSON_OBJECT('field', 'player_vip_level', 'operator', 'greater_than_or_equal', 'value', 3)
+     )),
+     'VIP 레벨 3 이상인 사용자', 1, TRUE, 1),
+    (2, '신규 사용자',
+     JSON_OBJECT('conditions', JSON_ARRAY(
+       JSON_OBJECT('field', 'player_level', 'operator', 'less_than', 'value', 10)
+     )),
+     '플레이어 레벨 10 미만인 신규 사용자', 2, TRUE, 1),
+    (3, '모바일 사용자',
+     JSON_OBJECT('conditions', JSON_ARRAY(
+       JSON_OBJECT('field', 'device_platform', 'operator', 'in', 'value', 'ios,android')
+     )),
+     'iOS 또는 Android 플랫폼 사용자', 3, TRUE, 1),
+    (4, '고레벨 사용자',
+     JSON_OBJECT('conditions', JSON_ARRAY(
+       JSON_OBJECT('field', 'player_level', 'operator', 'greater_than_or_equal', 'value', 50)
+     )),
+     '플레이어 레벨 50 이상인 고레벨 사용자', 4, TRUE, 1),
+    (5, '웹 사용자',
+     JSON_OBJECT('conditions', JSON_ARRAY(
+       JSON_OBJECT('field', 'device_platform', 'operator', 'equals', 'value', 'web')
+     )),
+     '웹 플랫폼 사용자', 5, TRUE, 1)
   `);
 
   console.log('✓ Default data inserted');
