@@ -16,11 +16,12 @@ export interface RemoteConfig {
   valueType: ConfigValueType;
   description?: string;
   isActive: boolean;
+  status?: ConfigVersionStatus; // Status from latest version
   createdBy?: number;
   updatedBy?: number;
   createdAt: string;
   updatedAt: string;
-  
+
   // Relations
   createdByName?: string;
   createdByEmail?: string;

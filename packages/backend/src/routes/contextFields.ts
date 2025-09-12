@@ -1,5 +1,5 @@
 import express from 'express';
-import { ContextFieldController } from '../controllers/ContextFieldController';
+import { ContextFieldController } from '../controllers/ContextFieldControllerNew';
 import { authenticate, requireAdmin } from '../middleware/auth';
 import { body, validationResult } from 'express-validator';
 import { CustomError } from '../middleware/errorHandler';
@@ -67,5 +67,46 @@ router.post('/test', [
  * @access Admin
  */
 router.get('/samples/contexts', ContextFieldController.getSampleContexts);
+
+// Admin-only routes for CRUD operations
+router.use(requireAdmin as any);
+
+/**
+ * @route POST /api/v1/context-fields
+ * @desc Create new context field
+ * @access Admin
+ */
+router.post('/', [
+  body('key').isString().isLength({ min: 1, max: 100 }).withMessage('Key must be 1-100 characters'),
+  body('name').isString().isLength({ min: 1, max: 200 }).withMessage('Name must be 1-200 characters'),
+  body('type').isIn(['string', 'number', 'boolean', 'array']).withMessage('Invalid field type'),
+  body('description').optional().isString().withMessage('Description must be a string'),
+  body('options').optional().isArray().withMessage('Options must be an array'),
+  body('defaultValue').optional().isString().withMessage('Default value must be a string'),
+  body('validation').optional().isObject().withMessage('Validation must be an object'),
+  validateRequest
+], ContextFieldController.createContextField);
+
+/**
+ * @route PUT /api/v1/context-fields/:id
+ * @desc Update context field
+ * @access Admin
+ */
+router.put('/:id', [
+  body('name').optional().isString().isLength({ min: 1, max: 200 }).withMessage('Name must be 1-200 characters'),
+  body('description').optional().isString().withMessage('Description must be a string'),
+  body('options').optional().isArray().withMessage('Options must be an array'),
+  body('defaultValue').optional().isString().withMessage('Default value must be a string'),
+  body('validation').optional().isObject().withMessage('Validation must be an object'),
+  body('isActive').optional().isBoolean().withMessage('isActive must be a boolean'),
+  validateRequest
+], ContextFieldController.updateContextField);
+
+/**
+ * @route DELETE /api/v1/context-fields/:id
+ * @desc Delete context field
+ * @access Admin
+ */
+router.delete('/:id', ContextFieldController.deleteContextField);
 
 export default router;

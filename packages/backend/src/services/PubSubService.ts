@@ -18,13 +18,13 @@ export class PubSubService extends EventEmitter {
 
   constructor() {
     super();
-    this.initialize();
+    // Don't initialize in constructor to avoid Promise issues
   }
 
   /**
    * Initialize BullMQ queue and worker
    */
-  private async initialize(): Promise<void> {
+  public async initialize(): Promise<void> {
     try {
       const redisConfig = {
         host: process.env.REDIS_HOST || 'localhost',

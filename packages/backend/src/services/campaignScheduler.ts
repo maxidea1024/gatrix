@@ -1,16 +1,17 @@
-import * as cron from 'node-cron';
 import knex from '../config/knex';
 import logger from '../config/logger';
-import { CampaignEvaluationEngine } from './CampaignEvaluationEngine';
 import { RemoteConfigNotifications } from './sseNotificationService';
+import { QueueService } from './QueueService';
 
 export class CampaignScheduler {
   private static instance: CampaignScheduler;
-  private scheduledTasks: Map<string, cron.ScheduledTask> = new Map();
+  private queueService: QueueService;
   private isRunning = false;
   private checkInProgress = false;
 
-  private constructor() {}
+  private constructor() {
+    this.queueService = new QueueService();
+  }
 
   public static getInstance(): CampaignScheduler {
     if (!CampaignScheduler.instance) {
@@ -22,35 +23,36 @@ export class CampaignScheduler {
   /**
    * Start the campaign scheduler
    */
-  public start(): void {
+  public async start(): Promise<void> {
     if (this.isRunning) {
       logger.warn('Campaign scheduler is already running');
       return;
     }
 
     logger.info('Starting enhanced campaign scheduler...');
-    
-    // Schedule periodic check every minute
-    const mainTask = cron.schedule('* * * * *', async () => {
+
+    try {
+      // Schedule periodic check every minute using QueueService
+      await this.queueService.addJob('scheduler', 'campaign-check', {}, {
+        repeat: { pattern: '* * * * *' } // Every minute
+      });
+
+      this.isRunning = true;
+
+      // Initial check
       await this.checkAndUpdateCampaigns();
-    }, {
-      timezone: 'UTC'
-    });
 
-    mainTask.start();
-    this.scheduledTasks.set('main', mainTask);
-    this.isRunning = true;
-
-    // Initial check
-    this.checkAndUpdateCampaigns();
-
-    logger.info('Enhanced campaign scheduler started successfully');
+      logger.info('Enhanced campaign scheduler started successfully');
+    } catch (error) {
+      logger.error('Error starting campaign scheduler:', error);
+      throw error;
+    }
   }
 
   /**
    * Stop the campaign scheduler
    */
-  public stop(): void {
+  public async stop(): Promise<void> {
     if (!this.isRunning) {
       logger.warn('Campaign scheduler is not running');
       return;
@@ -58,23 +60,26 @@ export class CampaignScheduler {
 
     logger.info('Stopping campaign scheduler...');
 
-    // Stop all scheduled tasks
-    this.scheduledTasks.forEach((task, name) => {
-      task.stop();
-      task.destroy();
-      logger.debug(`Stopped scheduled task: ${name}`);
-    });
+    try {
+      // Remove all scheduled jobs from the scheduler queue
+      const schedulerQueue = this.queueService.getQueue('scheduler');
+      if (schedulerQueue) {
+        await schedulerQueue.obliterate({ force: true });
+        logger.debug('Cleared all scheduled campaign jobs');
+      }
 
-    this.scheduledTasks.clear();
-    this.isRunning = false;
-
-    logger.info('Campaign scheduler stopped successfully');
+      this.isRunning = false;
+      logger.info('Campaign scheduler stopped successfully');
+    } catch (error) {
+      logger.error('Error stopping campaign scheduler:', error);
+      this.isRunning = false;
+    }
   }
 
   /**
    * Check and update campaign statuses
    */
-  private async checkAndUpdateCampaigns(): Promise<void> {
+  public async checkAndUpdateCampaigns(): Promise<void> {
     if (this.checkInProgress) {
       logger.debug('Campaign check already in progress, skipping...');
       return;

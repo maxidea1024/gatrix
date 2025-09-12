@@ -236,6 +236,35 @@ class ApiService {
       throw error;
     }
   }
+
+  // Context Fields API
+  async getContextFields(params?: { page?: number; limit?: number; search?: string; type?: string; isActive?: boolean }): Promise<ApiResponse<any>> {
+    return this.get('/admin/remote-config/context-fields', { params });
+  }
+
+  async getContextField(id: string): Promise<ApiResponse<any>> {
+    return this.get(`/admin/remote-config/context-fields/${id}`);
+  }
+
+  async createContextField(data: any): Promise<ApiResponse<any>> {
+    return this.post('/admin/remote-config/context-fields', data);
+  }
+
+  async updateContextField(id: string, data: any): Promise<ApiResponse<any>> {
+    return this.put(`/admin/remote-config/context-fields/${id}`, data);
+  }
+
+  async deleteContextField(id: string): Promise<ApiResponse<any>> {
+    return this.delete(`/admin/remote-config/context-fields/${id}`);
+  }
+
+  async getContextFieldOperators(): Promise<ApiResponse<any>> {
+    return this.get('/admin/remote-config/context-fields/operators/all');
+  }
+
+  async getContextFieldOperatorsForType(type: string): Promise<ApiResponse<any>> {
+    return this.get(`/admin/remote-config/context-fields/operators/${type}`);
+  }
 }
 
 export const apiService = new ApiService();

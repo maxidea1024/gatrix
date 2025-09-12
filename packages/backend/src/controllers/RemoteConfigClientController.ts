@@ -4,6 +4,7 @@ import ConfigRuleModel from '../models/ConfigRule';
 import logger from '../config/logger';
 import { CustomError } from '../middleware/errorHandler';
 import { TrafficSplitter, CampaignEvaluator } from '../utils/trafficSplitter';
+import db from '../config/knex';
 import {
   EvaluationContext,
   EvaluationResult,
@@ -168,9 +169,105 @@ export class RemoteConfigClientController {
     value: string;
     campaignId: number;
   } | null> {
-    // TODO: Implement campaign evaluation
-    // This would check active campaigns and their conditions
-    return null;
+    try {
+      // Get active campaigns for this config
+      const campaigns = await db('g_remote_config_campaigns as c')
+        .leftJoin('g_remote_config_campaign_configs as cc', 'c.id', 'cc.campaignId')
+        .where('cc.configId', configId)
+        .where('c.status', 'active')
+        .where('c.startTime', '<=', new Date())
+        .where(function() {
+          this.whereNull('c.endTime').orWhere('c.endTime', '>', new Date());
+        })
+        .orderBy('c.priority', 'desc')
+        .select('c.*');
+
+      for (const campaign of campaigns) {
+        // Check if campaign conditions match
+        if (await this.evaluateCampaignConditions(campaign, context)) {
+          // Get campaign variant value
+          const variant = await this.getCampaignVariant(campaign.id, context);
+          if (variant) {
+            return {
+              value: variant.value,
+              campaignId: campaign.id
+            };
+          }
+        }
+      }
+
+      return null;
+    } catch (error) {
+      logger.error('Error evaluating campaigns:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Evaluate campaign conditions
+   */
+  private static async evaluateCampaignConditions(campaign: any, context: EvaluationContext): Promise<boolean> {
+    try {
+      if (!campaign.targetConditions) {
+        return true; // No conditions means applies to all
+      }
+
+      const conditions = typeof campaign.targetConditions === 'string'
+        ? JSON.parse(campaign.targetConditions)
+        : campaign.targetConditions;
+
+      return await this.evaluateRuleConditions({ conditions } as any, context);
+    } catch (error) {
+      logger.error('Error evaluating campaign conditions:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get campaign variant for user
+   */
+  private static async getCampaignVariant(campaignId: number, context: EvaluationContext): Promise<any> {
+    try {
+      const variants = await db('g_remote_config_campaign_variants')
+        .where('campaignId', campaignId)
+        .where('isActive', true)
+        .orderBy('trafficPercentage', 'desc');
+
+      if (variants.length === 0) {
+        return null;
+      }
+
+      // Use traffic splitter to determine variant
+      const userId = context.userId || (context as any).sessionId || 'anonymous';
+      const hash = this.simpleHash(userId + campaignId);
+      const percentage = hash % 100;
+
+      let cumulativePercentage = 0;
+      for (const variant of variants) {
+        cumulativePercentage += variant.trafficPercentage;
+        if (percentage < cumulativePercentage) {
+          return variant;
+        }
+      }
+
+      return variants[0]; // Fallback to first variant
+    } catch (error) {
+      logger.error('Error getting campaign variant:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Simple hash function for traffic splitting
+   */
+  private static simpleHash(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash);
   }
 
   /**
@@ -286,17 +383,43 @@ export class RemoteConfigClientController {
       switch (valueType) {
         case 'string':
           return String(value);
-        case 'number':
+        case 'number': {
           const num = Number(value);
           return isNaN(num) ? 0 : num;
+        }
         case 'boolean':
           if (typeof value === 'boolean') return value;
           return value.toLowerCase() === 'true' || value === '1';
         case 'json':
           return typeof value === 'string' ? JSON.parse(value) : value;
         case 'yaml':
-          // TODO: Implement YAML parsing
-          return value;
+          try {
+            // Simple YAML-like parsing for basic key-value pairs
+            if (typeof value === 'string') {
+              const lines = value.split('\n').filter(line => line.trim());
+              const result: any = {};
+
+              for (const line of lines) {
+                const colonIndex = line.indexOf(':');
+                if (colonIndex > 0) {
+                  const key = line.substring(0, colonIndex).trim();
+                  const val = line.substring(colonIndex + 1).trim();
+
+                  // Try to parse as number or boolean
+                  if (val === 'true') result[key] = true;
+                  else if (val === 'false') result[key] = false;
+                  else if (!isNaN(Number(val))) result[key] = Number(val);
+                  else result[key] = val.replace(/^["']|["']$/g, ''); // Remove quotes
+                }
+              }
+
+              return Object.keys(result).length > 0 ? result : value;
+            }
+            return value;
+          } catch (yamlError) {
+            logger.warn('YAML parsing failed, returning as string:', yamlError);
+            return value;
+          }
         default:
           return String(value);
       }
@@ -329,19 +452,6 @@ export class RemoteConfigClientController {
       ...safeContext,
       customFields: Object.keys(safeCustomFields).length > 0 ? safeCustomFields : undefined
     };
-  }
-
-  /**
-   * Generate consistent hash for A/B testing
-   */
-  private static generateHash(input: string): number {
-    let hash = 0;
-    for (let i = 0; i < input.length; i++) {
-      const char = input.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32-bit integer
-    }
-    return Math.abs(hash);
   }
 }
 

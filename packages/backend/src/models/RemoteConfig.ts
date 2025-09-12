@@ -7,6 +7,7 @@ import {
   RemoteConfigFilters,
   RemoteConfigListResponse,
   ConfigVersion,
+  ConfigVersionStatus,
   ConfigRule,
   ConfigVariant,
   CreateConfigVersionData
@@ -67,8 +68,45 @@ export class RemoteConfigModel {
       // Apply pagination
       const configs = await query.limit(limit).offset(offset);
 
-      // Transform snake_case to camelCase
-      const transformedConfigs = configs.map(this.transformConfig);
+      // Transform snake_case to camelCase and add status from latest version
+      const transformedConfigs = await Promise.all(
+        configs.map(async (config) => {
+          const transformedConfig = this.transformConfig(config);
+
+          // Get config status based on Git-style workflow
+          // Priority: draft > staged > published > archived
+          const versions = await db('g_remote_config_versions')
+            .where('configId', config.id)
+            .orderBy('versionNumber', 'desc');
+
+          let status: ConfigVersionStatus = 'draft';
+          if (versions.length > 0) {
+            // Check for draft versions first (highest priority)
+            const draftVersion = versions.find(v => v.status === 'draft');
+            if (draftVersion) {
+              status = 'draft';
+            } else {
+              // Check for staged versions
+              const stagedVersion = versions.find(v => v.status === 'staged');
+              if (stagedVersion) {
+                status = 'staged';
+              } else {
+                // Check for published versions
+                const publishedVersion = versions.find(v => v.status === 'published');
+                if (publishedVersion) {
+                  status = 'published';
+                } else {
+                  // Default to latest version status
+                  status = versions[0]?.status || 'draft';
+                }
+              }
+            }
+          }
+
+          transformedConfig.status = status;
+          return transformedConfig;
+        })
+      );
 
       return {
         configs: transformedConfigs,
@@ -110,9 +148,9 @@ export class RemoteConfigModel {
       if (includeRelations) {
         // Get current published version
         const currentVersion = await db('g_remote_config_versions')
-          .where('config_id', id)
+          .where('configId', id)
           .where('status', 'published')
-          .orderBy('version_number', 'desc')
+          .orderBy('versionNumber', 'desc')
           .first();
 
         if (currentVersion) {
@@ -126,8 +164,8 @@ export class RemoteConfigModel {
             'cv.*',
             'creator.name as createdByName'
           ])
-          .where('cv.config_id', id)
-          .orderBy('cv.version_number', 'desc');
+          .where('cv.configId', id)
+          .orderBy('cv.versionNumber', 'desc');
 
         transformedConfig.versions = versions.map(this.transformConfigVersion);
 
@@ -138,8 +176,8 @@ export class RemoteConfigModel {
             'cr.*',
             'creator.name as createdByName'
           ])
-          .where('cr.config_id', id)
-          .where('cr.is_active', true)
+          .where('cr.configId', id)
+          .where('cr.isActive', true)
           .orderBy('cr.priority', 'desc');
 
         transformedConfig.rules = rules.map(this.transformConfigRule);
@@ -151,8 +189,8 @@ export class RemoteConfigModel {
             'cv.*',
             'creator.name as createdByName'
           ])
-          .where('cv.config_id', id)
-          .where('cv.is_active', true);
+          .where('cv.configId', id)
+          .where('cv.isActive', true);
 
         transformedConfig.variants = variants.map(this.transformConfigVariant);
       }
@@ -443,7 +481,7 @@ export class ConfigVersionModel {
   /**
    * Stage versions (Git-like staging)
    */
-  static async stageVersions(configIds: number[], userId?: number): Promise<void> {
+  static async stageVersions(configIds: number[], _userId?: number): Promise<void> {
     try {
       await db.transaction(async (trx) => {
         for (const configId of configIds) {
@@ -472,7 +510,7 @@ export class ConfigVersionModel {
   /**
    * Publish staged versions
    */
-  static async publishStagedVersions(userId?: number): Promise<number[]> {
+  static async publishStagedVersions(_userId?: number): Promise<number[]> {
     try {
       const publishedConfigIds: number[] = [];
 

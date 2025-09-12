@@ -96,7 +96,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
   const loadDeployments = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/remote-config/deployments?page=${page + 1}&limit=${rowsPerPage}`);
+      const response = await api.get(`/admin/remote-config/deployments?page=${page + 1}&limit=${rowsPerPage}`);
       setDeployments(response.data.deployments);
       setTotal(response.data.total);
     } catch (error) {
@@ -111,7 +111,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
   const loadVersions = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/remote-config/versions?page=${page + 1}&limit=${rowsPerPage}`);
+      const response = await api.get(`/admin/remote-config/versions?page=${page + 1}&limit=${rowsPerPage}`);
       setVersions(response.data.versions);
       setTotal(response.data.total);
     } catch (error) {

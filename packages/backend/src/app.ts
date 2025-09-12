@@ -10,13 +10,13 @@ import { config } from './config';
 // import redisClient from './config/redis';
 import passport from './config/passport';
 import swaggerSpec from './config/swagger';
-import logger from './config/logger';
+// import logger from './config/logger';
 import { requestLogger } from './middleware/requestLogger';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { generalLimiter, apiLimiter, authLimiter } from './middleware/rateLimiter';
 import { responseCache, cacheConfigs } from './middleware/responseCache';
-import { initializeJobTypes } from './services/jobs';
-import { CampaignScheduler } from './services/campaignScheduler';
+// import { initializeJobTypes } from './services/jobs';
+// import { CampaignScheduler } from './services/campaignScheduler';
 
 // Import routes
 import authRoutes from './routes/auth';
@@ -37,7 +37,7 @@ import varsRoutes from './routes/vars';
 import platformDefaultsRoutes from './routes/platformDefaults';
 import translationRoutes from './routes/translation';
 import remoteConfigRoutes from './routes/remoteConfig';
-import contextFieldRoutes from './routes/contextFields';
+// import contextFieldRoutes from './routes/contextFields';
 import campaignRoutes from './routes/campaigns';
 import notificationRoutes from './routes/notifications';
 
@@ -203,9 +203,37 @@ app.use('/api/v1/message-templates', messageTemplateRoutes);
 app.use('/api/v1', jobRoutes);
 app.use('/api/v1/admin/platform-defaults', platformDefaultsRoutes);
 app.use('/api/v1/translation', translationRoutes);
-app.use('/api/v1/remote-config', remoteConfigRoutes);
-app.use('/api/v1/context-fields', contextFieldRoutes);
-app.use('/api/v1/campaigns', campaignRoutes);
+app.use('/api/v1/admin/remote-config', remoteConfigRoutes);
+
+// Simple context fields route
+app.get('/api/v1/admin/remote-config/context-fields', authenticate as any, (req: any, res: any) => {
+  try {
+    const CONTEXT_FIELDS = [
+      { key: 'userLevel', name: 'User Level', type: 'number', operators: ['equals', 'not_equals', 'greater_than', 'less_than'] },
+      { key: 'isPremium', name: 'Premium Status', type: 'boolean', operators: ['equals', 'not_equals'] },
+      { key: 'platform', name: 'Platform', type: 'string', operators: ['equals', 'not_equals', 'contains'] },
+      { key: 'country', name: 'Country', type: 'string', operators: ['equals', 'not_equals', 'in', 'not_in'] }
+    ];
+
+    res.json({
+      success: true,
+      data: {
+        fields: CONTEXT_FIELDS,
+        operators: [
+          { key: 'equals', name: 'Equals', valueType: 'single' },
+          { key: 'not_equals', name: 'Not Equals', valueType: 'single' },
+          { key: 'greater_than', name: 'Greater Than', valueType: 'single' },
+          { key: 'less_than', name: 'Less Than', valueType: 'single' }
+        ],
+        pagination: { page: 1, limit: 50, total: CONTEXT_FIELDS.length, pages: 1 }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to get context fields' });
+  }
+});
+
+app.use('/api/v1/admin/remote-config/campaigns', campaignRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 
 // app.use('/api/v1/advanced-settings', advancedSettingsRoutes);
@@ -226,19 +254,23 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 // Initialize job types
-try {
-  initializeJobTypes();
-} catch (error) {
-  logger.error('Failed to initialize job types:', error);
-}
+// try {
+//   initializeJobTypes();
+// } catch (error) {
+//   logger.error('Failed to initialize job types:', error);
+// }
 
 // Initialize campaign scheduler
-try {
-  const campaignScheduler = CampaignScheduler.getInstance();
-  campaignScheduler.start();
-  logger.info('Campaign scheduler initialized successfully');
-} catch (error) {
-  logger.error('Failed to initialize campaign scheduler:', error);
-}
+// try {
+//   const campaignScheduler = CampaignScheduler.getInstance();
+//   if (campaignScheduler) {
+//     campaignScheduler.start();
+//     logger.info('Campaign scheduler initialized successfully');
+//   } else {
+//     logger.error('Campaign scheduler getInstance returned undefined');
+//   }
+// } catch (error) {
+//   logger.error('Failed to initialize campaign scheduler:', error);
+// }
 
 export default app;

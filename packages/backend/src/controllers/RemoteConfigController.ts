@@ -151,7 +151,19 @@ export class RemoteConfigController {
         }
       }
 
+      // Git-style update: Create new draft version instead of updating existing
       const config = await RemoteConfigModel.update(id, data);
+
+      // Create new draft version with updated value
+      if (data.defaultValue !== undefined) {
+        await ConfigVersionModel.createVersion({
+          configId: id,
+          value: data.defaultValue,
+          status: 'draft',
+          changeDescription: 'Updated via admin interface',
+          createdBy: userId
+        });
+      }
 
       // Send SSE notification
       RemoteConfigNotifications.notifyConfigChange(config.id, 'updated', config);

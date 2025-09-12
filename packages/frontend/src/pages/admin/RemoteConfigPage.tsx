@@ -23,6 +23,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Checkbox,
 
   Tooltip,
   Stack,
@@ -44,7 +45,8 @@ import {
   Cancel as CancelIcon,
   Save as SaveIcon,
   Visibility as VisibilityIcon,
-  Storage as StageIcon
+  Storage as StageIcon,
+  Undo as UndoIcon
 
 
 } from '@mui/icons-material';
@@ -115,6 +117,11 @@ const RemoteConfigPage: React.FC = () => {
   const [stageDialogOpen, setStageDialogOpen] = useState(false);
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
   const [selectedConfigs, setSelectedConfigs] = useState<number[]>([]);
+
+  // Git-style: Track modified configs (draft status)
+  const modifiedConfigs = configs.filter(config => config.status === 'draft');
+  const stagedConfigs = configs.filter(config => config.status === 'staged');
+  const hasChanges = modifiedConfigs.length > 0 || stagedConfigs.length > 0;
   
   // Form states
   const [formData, setFormData] = useState<{
@@ -153,9 +160,44 @@ const RemoteConfigPage: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [configToDelete, setConfigToDelete] = useState<RemoteConfig | null>(null);
 
+  // Context field delete confirmation dialog state
+  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{
+    open: boolean;
+    field: any;
+  }>({ open: false, field: null });
+
+  // Discard changes dialog state
+  const [discardChangesDialogOpen, setDiscardChangesDialogOpen] = useState(false);
+  const [selectedDiscardConfigs, setSelectedDiscardConfigs] = useState<number[]>([]);
+
   // Value detail dialog state
   const [valueDetailOpen, setValueDetailOpen] = useState(false);
   const [valueDetailContent, setValueDetailContent] = useState<{title: string, value: string, type: string}>({title: '', value: '', type: ''});
+
+  // Context field management functions
+  const handleDeleteField = (field: any) => {
+    setDeleteConfirmDialog({ open: true, field });
+  };
+
+  const handleConfirmDelete = async () => {
+    const { field } = deleteConfirmDialog;
+    if (!field) return;
+
+    try {
+      const response = await api.deleteContextField(field.id);
+      if (response.success) {
+        // loadContextFields(); // This function needs to be defined or removed
+        enqueueSnackbar(t('admin.remoteConfig.contextFields.deleteSuccess'), { variant: 'success' });
+      } else {
+        enqueueSnackbar(t('admin.remoteConfig.contextFields.deleteError'), { variant: 'error' });
+      }
+    } catch (error) {
+      console.error('Error deleting context field:', error);
+      enqueueSnackbar(t('admin.remoteConfig.contextFields.deleteError'), { variant: 'error' });
+    } finally {
+      setDeleteConfirmDialog({ open: false, field: null });
+    }
+  };
 
   // Form validation
   const validateForm = (): boolean => {
@@ -191,7 +233,7 @@ const RemoteConfigPage: React.FC = () => {
         ),
       };
 
-      const response = await api.get('/remote-config', { params });
+      const response = await api.get('/admin/remote-config', { params });
       setConfigs(response.data.configs);
       setTotal(response.data.total);
     } catch (error: any) {
@@ -214,7 +256,7 @@ const RemoteConfigPage: React.FC = () => {
     }
 
     try {
-      await api.post('/remote-config', formData);
+      await api.post('/admin/remote-config', formData);
 
       enqueueSnackbar(t('admin.remoteConfig.createSuccess'), { variant: 'success' });
       setCreateDialogOpen(false);
@@ -236,7 +278,7 @@ const RemoteConfigPage: React.FC = () => {
     }
 
     try {
-      await api.put(`/remote-config/${selectedConfig.id}`, formData);
+      await api.put(`/admin/remote-config/${selectedConfig.id}`, formData);
 
       enqueueSnackbar(t('admin.remoteConfig.updateSuccess'), { variant: 'success' });
       setEditDialogOpen(false);
@@ -260,7 +302,7 @@ const RemoteConfigPage: React.FC = () => {
     if (!configToDelete) return;
 
     try {
-      await api.delete(`/remote-config/${configToDelete.id}`);
+      await api.delete(`/admin/remote-config/${configToDelete.id}`);
 
       enqueueSnackbar(t('admin.remoteConfig.deleteSuccess'), { variant: 'success' });
       loadConfigs();
@@ -289,7 +331,7 @@ const RemoteConfigPage: React.FC = () => {
         return;
       }
 
-      const response = await api.post('/remote-config/stage', {
+      const response = await api.post('/admin/remote-config/stage', {
         configIds: selectedConfigs,
         description: stageFormData.description
       });
@@ -318,7 +360,7 @@ const RemoteConfigPage: React.FC = () => {
   // Publish staged configs
   const handlePublishChanges = async () => {
     try {
-      const response = await api.post('/remote-config/publish', {
+      const response = await api.post('/admin/remote-config/publish', {
         deploymentName: publishFormData.deploymentName,
         description: publishFormData.description
       });
@@ -332,6 +374,27 @@ const RemoteConfigPage: React.FC = () => {
     } catch (error: any) {
       console.error('Error publishing changes:', error);
       const errorMessage = error.response?.data?.message || t('admin.remoteConfig.publishError');
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    }
+  };
+
+  // Discard changes handler
+  const handleDiscardChanges = async () => {
+    try {
+      const configsToDiscard = selectedDiscardConfigs.length > 0 ? selectedDiscardConfigs : modifiedConfigs.map(c => c.id);
+
+      for (const configId of configsToDiscard) {
+        // Delete draft versions for the config
+        await api.delete(`/admin/remote-config/${configId}/versions/draft`);
+      }
+
+      enqueueSnackbar(`${configsToDiscard.length}개 설정의 변경사항이 취소되었습니다.`, { variant: 'success' });
+      setDiscardChangesDialogOpen(false);
+      setSelectedDiscardConfigs([]);
+      loadConfigs(); // Reload configs
+    } catch (error: any) {
+      console.error('Error discarding changes:', error);
+      const errorMessage = error.response?.data?.error?.message || error.message || '변경사항 취소 중 오류가 발생했습니다.';
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
@@ -362,7 +425,7 @@ const RemoteConfigPage: React.FC = () => {
     const loadCampaigns = async () => {
       try {
         setCampaignLoading(true);
-        const response = await api.get(`/campaigns?page=${campaignPage + 1}&limit=${campaignRowsPerPage}`);
+        const response = await api.get(`/admin/remote-config/campaigns?page=${campaignPage + 1}&limit=${campaignRowsPerPage}`);
 
         if (response.data.success) {
           setCampaigns(response.data.data.campaigns || []);
@@ -379,7 +442,7 @@ const RemoteConfigPage: React.FC = () => {
     // Create campaign
     const handleCreateCampaign = async () => {
       try {
-        const response = await api.post('/campaigns', campaignFormData);
+        const response = await api.post('/admin/remote-config/campaigns', campaignFormData);
 
         if (response.data.success) {
           enqueueSnackbar(t('admin.remoteConfig.campaigns.createSuccess'), { variant: 'success' });
@@ -406,7 +469,7 @@ const RemoteConfigPage: React.FC = () => {
     // Edit campaign
     const handleEditCampaign = async () => {
       try {
-        const response = await api.put(`/campaigns/${selectedCampaign.id}`, campaignFormData);
+        const response = await api.put(`/admin/remote-config/campaigns/${selectedCampaign.id}`, campaignFormData);
 
         if (response.data.success) {
           enqueueSnackbar(t('admin.remoteConfig.campaigns.updateSuccess'), { variant: 'success' });
@@ -424,7 +487,7 @@ const RemoteConfigPage: React.FC = () => {
     // Delete campaign
     const handleDeleteCampaign = async (campaign: any) => {
       try {
-        const response = await api.delete(`/campaigns/${campaign.id}`);
+        const response = await api.delete(`/admin/remote-config/campaigns/${campaign.id}`);
 
         if (response.data.success) {
           enqueueSnackbar(t('admin.remoteConfig.campaigns.deleteSuccess'), { variant: 'success' });
@@ -872,42 +935,92 @@ const RemoteConfigPage: React.FC = () => {
     );
   };
 
-  // Conditions Tab Component
-  const ConditionsTab = () => {
-    const [conditions, setConditions] = useState<any[]>([]);
-    const [conditionLoading, setConditionLoading] = useState(true);
-    const [createConditionDialogOpen, setCreateConditionDialogOpen] = useState(false);
-    const [conditionFormData, setConditionFormData] = useState({
+  // Targeting Tab Component
+  const TargetingTab = () => {
+    const [targetings, setTargetings] = useState<any[]>([]);
+    const [targetingLoading, setTargetingLoading] = useState(true);
+    const [createTargetingDialogOpen, setCreateTargetingDialogOpen] = useState(false);
+    const [targetingFormData, setTargetingFormData] = useState({
       name: '',
       description: '',
       conditions: [] as any[]
     });
 
-    const loadConditions = async () => {
+    const loadTargetings = async () => {
       try {
-        setConditionLoading(true);
-        // TODO: API 호출로 조건 목록 로드
-        setConditions([]);
+        setTargetingLoading(true);
+        // 사전 정의된 타겟팅 목록 로드 (향후 API 연동 예정)
+        const predefinedTargetings = [
+          {
+            id: 'vip_users',
+            name: 'VIP 사용자',
+            description: '레벨 50 이상이고 프리미엄 구독 중인 사용자',
+            conditions: [
+              { field: 'userLevel', operator: 'greater_than_or_equal', value: '50' },
+              { field: 'isPremium', operator: 'equals', value: 'true' }
+            ]
+          },
+          {
+            id: 'new_users',
+            name: '신규 사용자',
+            description: '가입 후 7일 이내이고 레벨 10 미만인 사용자',
+            conditions: [
+              { field: 'registrationDays', operator: 'less_than_or_equal', value: '7' },
+              { field: 'userLevel', operator: 'less_than', value: '10' }
+            ]
+          },
+          {
+            id: 'mobile_users',
+            name: '모바일 사용자',
+            description: 'iOS 또는 Android 플랫폼 사용자',
+            conditions: [
+              { field: 'platform', operator: 'in', value: 'ios,android' }
+            ]
+          }
+        ];
+        setTargetings(predefinedTargetings);
       } catch (error) {
-        console.error('Error loading conditions:', error);
+        console.error('Error loading targetings:', error);
       } finally {
-        setConditionLoading(false);
+        setTargetingLoading(false);
       }
     };
 
     useEffect(() => {
-      loadConditions();
+      loadTargetings();
     }, []);
 
-    const handleCreateCondition = async () => {
+    const handleCreateTargeting = async () => {
       try {
-        // TODO: API 호출로 조건 생성
-        console.log('Creating condition:', conditionFormData);
-        setCreateConditionDialogOpen(false);
-        setConditionFormData({ name: '', description: '', conditions: [] });
-        loadConditions();
+        // 타겟팅 생성 (향후 API 연동 예정)
+        const newTargeting = {
+          id: `custom_${Date.now()}`,
+          name: targetingFormData.name,
+          description: targetingFormData.description,
+          conditions: targetingFormData.conditions,
+          isCustom: true,
+          createdAt: new Date().toISOString()
+        };
+
+        // 임시로 로컬 상태에 추가
+        setTargetings(prev => [...prev, newTargeting]);
+
+        setCreateTargetingDialogOpen(false);
+        setTargetingFormData({ name: '', description: '', conditions: [] });
+
+        // 성공 메시지 표시
+        setSnackbar({
+          open: true,
+          message: t('admin.remoteConfig.targeting.createSuccess'),
+          severity: 'success'
+        });
       } catch (error) {
-        console.error('Error creating condition:', error);
+        console.error('Error creating targeting:', error);
+        setSnackbar({
+          open: true,
+          message: t('admin.remoteConfig.targeting.createError'),
+          severity: 'error'
+        });
       }
     };
 
@@ -915,25 +1028,25 @@ const RemoteConfigPage: React.FC = () => {
       <Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h6" color="text.primary">
-            {t('admin.remoteConfig.conditions.title')}
+            {t('admin.remoteConfig.targeting.title')}
           </Typography>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={() => setCreateConditionDialogOpen(true)}
+            onClick={() => setCreateTargetingDialogOpen(true)}
           >
-            {t('admin.remoteConfig.conditions.createCondition')}
+            {t('admin.remoteConfig.targeting.createTargeting')}
           </Button>
         </Box>
 
-        {conditionLoading ? (
+        {targetingLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
             <CircularProgress />
           </Box>
-        ) : conditions.length === 0 ? (
+        ) : targetings.length === 0 ? (
           <Paper sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="body1" color="text.secondary">
-              {t('admin.remoteConfig.conditions.noConditions')}
+              {t('admin.remoteConfig.targeting.noTargeting')}
             </Typography>
           </Paper>
         ) : (
@@ -941,18 +1054,18 @@ const RemoteConfigPage: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>{t('admin.remoteConfig.conditions.name')}</TableCell>
+                  <TableCell>{t('admin.remoteConfig.targeting.name')}</TableCell>
                   <TableCell>{t('admin.remoteConfig.description')}</TableCell>
-                  <TableCell>{t('admin.remoteConfig.conditions.conditionsCount')}</TableCell>
+                  <TableCell>{t('admin.remoteConfig.targeting.conditionsCount')}</TableCell>
                   <TableCell align="center">{t('admin.remoteConfig.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {conditions.map((condition) => (
-                  <TableRow key={condition.id}>
-                    <TableCell>{condition.name}</TableCell>
-                    <TableCell>{condition.description}</TableCell>
-                    <TableCell>{condition.conditions?.length || 0}</TableCell>
+                {targetings.map((targeting) => (
+                  <TableRow key={targeting.id}>
+                    <TableCell>{targeting.name}</TableCell>
+                    <TableCell>{targeting.description}</TableCell>
+                    <TableCell>{targeting.conditions?.length || 0}</TableCell>
                     <TableCell align="center">
                       <IconButton size="small">
                         <EditIcon />
@@ -968,20 +1081,20 @@ const RemoteConfigPage: React.FC = () => {
           </TableContainer>
         )}
 
-        {/* Create Condition Dialog */}
+        {/* Create Targeting Dialog */}
         <Dialog
-          open={createConditionDialogOpen}
-          onClose={() => setCreateConditionDialogOpen(false)}
+          open={createTargetingDialogOpen}
+          onClose={() => setCreateTargetingDialogOpen(false)}
           maxWidth="md"
           fullWidth
         >
           <DialogTitle>
             <Box>
               <Typography variant="h6" component="div" color="text.primary">
-                {t('admin.remoteConfig.conditions.createCondition')}
+                {t('admin.remoteConfig.targeting.createTargeting')}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                {t('admin.remoteConfig.conditions.createConditionSubtitle')}
+                {t('admin.remoteConfig.targeting.createTargetingSubtitle')}
               </Typography>
             </Box>
           </DialogTitle>
@@ -989,43 +1102,488 @@ const RemoteConfigPage: React.FC = () => {
             <Stack spacing={3} sx={{ mt: 1 }}>
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.conditions.name')}
-                value={conditionFormData.name}
-                onChange={(e) => setConditionFormData({ ...conditionFormData, name: e.target.value })}
+                label={t('admin.remoteConfig.targeting.name')}
+                value={targetingFormData.name}
+                onChange={(e) => setTargetingFormData({ ...targetingFormData, name: e.target.value })}
                 required
-                helperText={t('admin.remoteConfig.conditions.nameHelp')}
+                helperText={t('admin.remoteConfig.targeting.nameHelp')}
               />
               <TextField
                 fullWidth
                 label={t('admin.remoteConfig.description')}
-                value={conditionFormData.description}
-                onChange={(e) => setConditionFormData({ ...conditionFormData, description: e.target.value })}
+                value={targetingFormData.description}
+                onChange={(e) => setTargetingFormData({ ...targetingFormData, description: e.target.value })}
                 multiline
                 rows={2}
                 required
-                helperText={t('admin.remoteConfig.conditions.descriptionHelp')}
+                helperText={t('admin.remoteConfig.targeting.descriptionHelp')}
               />
 
               <TargetConditionBuilder
-                conditions={conditionFormData.conditions}
-                onChange={(conditions) => setConditionFormData({ ...conditionFormData, conditions })}
+                conditions={targetingFormData.conditions}
+                onChange={(conditions) => setTargetingFormData({ ...targetingFormData, conditions })}
               />
             </Stack>
           </DialogContent>
           <DialogActions>
             <Button
-              onClick={() => setCreateConditionDialogOpen(false)}
+              onClick={() => setCreateTargetingDialogOpen(false)}
               startIcon={<CancelIcon />}
             >
               {t('common.cancel')}
             </Button>
             <Button
               variant="contained"
-              onClick={handleCreateCondition}
-              disabled={!conditionFormData.name.trim() || !conditionFormData.description.trim()}
+              onClick={handleCreateTargeting}
+              disabled={!targetingFormData.name.trim() || !targetingFormData.description.trim()}
               startIcon={<SaveIcon />}
             >
               {t('common.create')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    );
+  };
+
+  // Context Fields Tab Component
+  const ContextFieldsTab = () => {
+    const [contextFields, setContextFields] = useState<any[]>([]);
+    const [fieldLoading, setFieldLoading] = useState(true);
+    const [createFieldDialogOpen, setCreateFieldDialogOpen] = useState(false);
+    const [editFieldDialogOpen, setEditFieldDialogOpen] = useState(false);
+    const [selectedField, setSelectedField] = useState<any>(null);
+    const [fieldFormData, setFieldFormData] = useState({
+      key: '',
+      name: '',
+      description: '',
+      type: 'string' as 'string' | 'number' | 'boolean' | 'array',
+      defaultValue: '',
+      isRequired: false,
+      options: [] as string[]
+    });
+
+    const loadContextFields = async () => {
+      try {
+        setFieldLoading(true);
+        const response = await api.getContextFields();
+        if (response.success) {
+          setContextFields(response.data.fields || []);
+        } else {
+          console.error('Failed to load context fields:', response.message);
+        }
+      } catch (error) {
+        console.error('Error loading context fields:', error);
+      } finally {
+        setFieldLoading(false);
+      }
+    };
+
+    useEffect(() => {
+      loadContextFields();
+    }, []);
+
+    const handleCreateField = async () => {
+      try {
+        const createData = {
+          key: fieldFormData.key,
+          name: fieldFormData.name,
+          description: fieldFormData.description,
+          type: fieldFormData.type,
+          defaultValue: fieldFormData.defaultValue || null,
+          isRequired: fieldFormData.isRequired,
+          options: fieldFormData.type === 'array' && fieldFormData.options.length > 0
+            ? fieldFormData.options.map(opt => ({ value: opt, label: opt }))
+            : null
+        };
+
+        const response = await api.createContextField(createData);
+        if (response.success) {
+          setCreateFieldDialogOpen(false);
+          setFieldFormData({ key: '', name: '', description: '', type: 'string', defaultValue: '', options: [] });
+          loadContextFields();
+          // Show success message
+          console.log('Context field created successfully');
+        } else {
+          console.error('Failed to create context field:', response.message);
+        }
+      } catch (error) {
+        console.error('Error creating context field:', error);
+      }
+    };
+
+    const handleEditField = (field: any) => {
+      setSelectedField(field);
+      setFieldFormData({
+        key: field.key,
+        name: field.name,
+        description: field.description,
+        type: field.type,
+        defaultValue: field.defaultValue || '',
+        isRequired: field.isRequired || false,
+        options: field.options || []
+      });
+      setEditFieldDialogOpen(true);
+    };
+
+    const handleUpdateField = async () => {
+      try {
+        if (!selectedField) return;
+
+        const updateData = {
+          name: fieldFormData.name,
+          description: fieldFormData.description,
+          defaultValue: fieldFormData.defaultValue || null,
+          isRequired: fieldFormData.isRequired,
+          options: fieldFormData.type === 'array' && fieldFormData.options.length > 0
+            ? fieldFormData.options.map(opt => ({ value: opt, label: opt }))
+            : null
+        };
+
+        const response = await api.updateContextField(selectedField.id, updateData);
+        if (response.success) {
+          setEditFieldDialogOpen(false);
+          setSelectedField(null);
+          setFieldFormData({ key: '', name: '', description: '', type: 'string', defaultValue: '', isRequired: false, options: [] });
+          loadContextFields();
+          console.log('Context field updated successfully');
+        } else {
+          console.error('Failed to update context field:', response.message);
+        }
+      } catch (error) {
+        console.error('Error updating context field:', error);
+      }
+    };
+
+    const addOption = () => {
+      setFieldFormData({
+        ...fieldFormData,
+        options: [...fieldFormData.options, '']
+      });
+    };
+
+    const updateOption = (index: number, value: string) => {
+      const newOptions = [...fieldFormData.options];
+      newOptions[index] = value;
+      setFieldFormData({
+        ...fieldFormData,
+        options: newOptions
+      });
+    };
+
+    const removeOption = (index: number) => {
+      setFieldFormData({
+        ...fieldFormData,
+        options: fieldFormData.options.filter((_, i) => i !== index)
+      });
+    };
+
+    return (
+      <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="h6" color="text.primary">
+            {t('admin.remoteConfig.contextFields.title')}
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setCreateFieldDialogOpen(true)}
+          >
+            {t('admin.remoteConfig.contextFields.createField')}
+          </Button>
+        </Box>
+
+        {fieldLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : contextFields.length === 0 ? (
+          <Paper sx={{ p: 4, textAlign: 'center' }}>
+            <Typography variant="body1" color="text.secondary">
+              {t('admin.remoteConfig.contextFields.noFields')}
+            </Typography>
+          </Paper>
+        ) : (
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t('admin.remoteConfig.contextFields.key')}</TableCell>
+                  <TableCell>{t('admin.remoteConfig.contextFields.name')}</TableCell>
+                  <TableCell>{t('admin.remoteConfig.contextFields.type')}</TableCell>
+                  <TableCell align="center">필수 여부</TableCell>
+                  <TableCell>{t('admin.remoteConfig.description')}</TableCell>
+                  <TableCell align="center">{t('admin.remoteConfig.actions')}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {contextFields.map((field) => (
+                  <TableRow key={field.key}>
+                    <TableCell>
+                      <Typography variant="body2" fontWeight="medium" color="text.primary">
+                        {field.key}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="text.primary">
+                        {field.name}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip label={field.type} size="small" />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Chip
+                        label={field.isRequired ? '필수' : '선택'}
+                        size="small"
+                        color={field.isRequired ? 'error' : 'default'}
+                        variant="outlined"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="text.primary">
+                        {field.description}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <IconButton size="small" onClick={() => handleEditField(field)}>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton size="small" color="error" onClick={() => handleDeleteField(field)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+
+        {/* Create Context Field Dialog */}
+        <Dialog
+          open={createFieldDialogOpen}
+          onClose={() => setCreateFieldDialogOpen(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>
+            <Box>
+              <Typography variant="h6" component="div" color="text.primary">
+                {t('admin.remoteConfig.contextFields.createField')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                {t('admin.remoteConfig.contextFields.createFieldSubtitle')}
+              </Typography>
+            </Box>
+          </DialogTitle>
+          <DialogContent>
+            <Stack spacing={3} sx={{ mt: 1 }}>
+              <TextField
+                fullWidth
+                label={t('admin.remoteConfig.contextFields.key')}
+                value={fieldFormData.key}
+                onChange={(e) => setFieldFormData({ ...fieldFormData, key: e.target.value })}
+                required
+                helperText={t('admin.remoteConfig.contextFields.keyHelp')}
+              />
+              <TextField
+                fullWidth
+                label={t('admin.remoteConfig.contextFields.name')}
+                value={fieldFormData.name}
+                onChange={(e) => setFieldFormData({ ...fieldFormData, name: e.target.value })}
+                required
+                helperText={t('admin.remoteConfig.contextFields.nameHelp')}
+              />
+              <TextField
+                fullWidth
+                label={t('admin.remoteConfig.description')}
+                value={fieldFormData.description}
+                onChange={(e) => setFieldFormData({ ...fieldFormData, description: e.target.value })}
+                multiline
+                rows={2}
+                required
+                helperText={t('admin.remoteConfig.contextFields.descriptionHelp')}
+              />
+              <FormControl fullWidth>
+                <InputLabel>{t('admin.remoteConfig.contextFields.type')}</InputLabel>
+                <Select
+                  value={fieldFormData.type}
+                  onChange={(e) => setFieldFormData({ ...fieldFormData, type: e.target.value as any })}
+                  label={t('admin.remoteConfig.contextFields.type')}
+                >
+                  <MenuItem value="string">String</MenuItem>
+                  <MenuItem value="number">Number</MenuItem>
+                  <MenuItem value="boolean">Boolean</MenuItem>
+                  <MenuItem value="array">Array</MenuItem>
+                </Select>
+              </FormControl>
+
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Checkbox
+                  checked={fieldFormData.isRequired}
+                  onChange={(e) => setFieldFormData({ ...fieldFormData, isRequired: e.target.checked })}
+                />
+                <Typography variant="body2" color="text.primary">
+                  필수 필드 (조건 평가 시 반드시 제공되어야 함)
+                </Typography>
+              </Box>
+
+              {fieldFormData.type === 'array' && (
+                <Box>
+                  <Typography variant="subtitle2" gutterBottom color="text.primary">
+                    {t('admin.remoteConfig.contextFields.options')}
+                  </Typography>
+                  {fieldFormData.options.map((option, index) => (
+                    <Box key={index} sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        value={option}
+                        onChange={(e) => updateOption(index, e.target.value)}
+                        placeholder={`Option ${index + 1}`}
+                      />
+                      <IconButton size="small" color="error" onClick={() => removeOption(index)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                  ))}
+                  <Button
+                    startIcon={<AddIcon />}
+                    onClick={addOption}
+                    size="small"
+                  >
+                    {t('admin.remoteConfig.contextFields.addOption')}
+                  </Button>
+                </Box>
+              )}
+            </Stack>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => setCreateFieldDialogOpen(false)}
+              startIcon={<CancelIcon />}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleCreateField}
+              disabled={!fieldFormData.key.trim() || !fieldFormData.name.trim() || !fieldFormData.description.trim()}
+              startIcon={<SaveIcon />}
+            >
+              {t('common.create')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Edit Context Field Dialog */}
+        <Dialog
+          open={editFieldDialogOpen}
+          onClose={() => setEditFieldDialogOpen(false)}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>{t('admin.remoteConfig.contextFields.editField')}</DialogTitle>
+          <DialogContent>
+            <Stack spacing={3} sx={{ mt: 1 }}>
+              <TextField
+                fullWidth
+                label={t('admin.remoteConfig.contextFields.key')}
+                value={fieldFormData.key}
+                disabled
+                helperText="키는 수정할 수 없습니다."
+              />
+              <TextField
+                fullWidth
+                label={t('admin.remoteConfig.contextFields.name')}
+                value={fieldFormData.name}
+                onChange={(e) => setFieldFormData({ ...fieldFormData, name: e.target.value })}
+                required
+              />
+              <TextField
+                fullWidth
+                label={t('admin.remoteConfig.description')}
+                value={fieldFormData.description}
+                onChange={(e) => setFieldFormData({ ...fieldFormData, description: e.target.value })}
+                multiline
+                rows={2}
+                required
+              />
+              <TextField
+                fullWidth
+                label={t('admin.remoteConfig.contextFields.defaultValue')}
+                value={fieldFormData.defaultValue}
+                onChange={(e) => setFieldFormData({ ...fieldFormData, defaultValue: e.target.value })}
+              />
+              <FormControl fullWidth>
+                <InputLabel>{t('admin.remoteConfig.contextFields.type')}</InputLabel>
+                <Select
+                  value={fieldFormData.type}
+                  disabled
+                  label={t('admin.remoteConfig.contextFields.type')}
+                >
+                  <MenuItem value="string">String</MenuItem>
+                  <MenuItem value="number">Number</MenuItem>
+                  <MenuItem value="boolean">Boolean</MenuItem>
+                  <MenuItem value="array">Array</MenuItem>
+                </Select>
+              </FormControl>
+
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Checkbox
+                  checked={fieldFormData.isRequired}
+                  onChange={(e) => setFieldFormData({ ...fieldFormData, isRequired: e.target.checked })}
+                />
+                <Typography variant="body2" color="text.primary">
+                  필수 필드 (조건 평가 시 반드시 제공되어야 함)
+                </Typography>
+              </Box>
+
+              {fieldFormData.type === 'array' && (
+                <Box>
+                  <Typography variant="subtitle2" gutterBottom color="text.primary">
+                    {t('admin.remoteConfig.contextFields.options')}
+                  </Typography>
+                  {fieldFormData.options.map((option, index) => (
+                    <Box key={index} sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        value={option}
+                        onChange={(e) => updateOption(index, e.target.value)}
+                        placeholder={`Option ${index + 1}`}
+                      />
+                      <IconButton size="small" color="error" onClick={() => removeOption(index)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                  ))}
+                  <Button
+                    startIcon={<AddIcon />}
+                    onClick={addOption}
+                    size="small"
+                  >
+                    {t('admin.remoteConfig.contextFields.addOption')}
+                  </Button>
+                </Box>
+              )}
+            </Stack>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => setEditFieldDialogOpen(false)}
+              startIcon={<CancelIcon />}
+            >
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleUpdateField}
+              disabled={!fieldFormData.name.trim() || !fieldFormData.description.trim()}
+              startIcon={<SaveIcon />}
+            >
+              {t('common.update')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -1052,7 +1610,7 @@ const RemoteConfigPage: React.FC = () => {
     const loadVariants = async (configId: number) => {
       try {
         setVariantLoading(true);
-        const response = await api.get(`/campaigns/configs/${configId}/variants`);
+        const response = await api.get(`/admin/remote-config/campaigns/configs/${configId}/variants`);
 
         if (response.data.success) {
           setVariants(response.data.data.variants || []);
@@ -1070,7 +1628,7 @@ const RemoteConfigPage: React.FC = () => {
       if (!selectedConfig) return;
 
       try {
-        const response = await api.post(`/campaigns/configs/${selectedConfig.id}/variants`, variantFormData);
+        const response = await api.post(`/admin/remote-config/campaigns/configs/${selectedConfig.id}/variants`, variantFormData);
 
         if (response.data.success) {
           enqueueSnackbar(t('admin.remoteConfig.variants.createSuccess'), { variant: 'success' });
@@ -1095,7 +1653,7 @@ const RemoteConfigPage: React.FC = () => {
       if (!selectedConfig || !selectedVariant) return;
 
       try {
-        const response = await api.put(`/campaigns/configs/${selectedConfig.id}/variants/${selectedVariant.id}`, variantFormData);
+        const response = await api.put(`/admin/remote-config/campaigns/configs/${selectedConfig.id}/variants/${selectedVariant.id}`, variantFormData);
 
         if (response.data.success) {
           enqueueSnackbar(t('admin.remoteConfig.variants.updateSuccess'), { variant: 'success' });
@@ -1115,7 +1673,7 @@ const RemoteConfigPage: React.FC = () => {
       if (!selectedConfig) return;
 
       try {
-        const response = await api.delete(`/campaigns/configs/${selectedConfig.id}/variants/${variant.id}`);
+        const response = await api.delete(`/admin/remote-config/campaigns/configs/${selectedConfig.id}/variants/${variant.id}`);
 
         if (response.data.success) {
           enqueueSnackbar(t('admin.remoteConfig.variants.deleteSuccess'), { variant: 'success' });
@@ -1486,44 +2044,86 @@ const RemoteConfigPage: React.FC = () => {
             <Tab label={t('admin.remoteConfig.history.title')} />
             <Tab label={t('admin.remoteConfig.campaigns.title')} />
             <Tab label={t('admin.remoteConfig.variants.title')} />
-            <Tab label={t('admin.remoteConfig.conditions.title')} />
+            <Tab label={t('admin.remoteConfig.targeting.title')} />
             <Tab label={t('admin.remoteConfig.contextFields.title')} />
           </Tabs>
         </Box>
 
-        {/* Action Buttons - only show on config tab */}
-        {currentTab === 0 && (
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Box>
-              {selectedConfigs.length > 0 && (
-                <Typography variant="body2" color="text.secondary">
-                  {selectedConfigs.length}개 설정 선택됨
-                </Typography>
+        {/* Git-style Action Bar - only show when there are changes */}
+        {currentTab === 0 && hasChanges && (
+          <Box sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 2,
+            p: 2,
+            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(25, 118, 210, 0.04)',
+            borderRadius: 1,
+            border: (theme) => `1px solid ${theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(25, 118, 210, 0.12)'}`
+          }}>
+            {/* Left side - Change counts */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              {modifiedConfigs.length > 0 && (
+                <Chip
+                  size="small"
+                  label={`${modifiedConfigs.length}개 수정됨`}
+                  color="warning"
+                  variant="outlined"
+                />
+              )}
+              {stagedConfigs.length > 0 && (
+                <Chip
+                  size="small"
+                  label={`${stagedConfigs.length}개 스테이징됨`}
+                  color="info"
+                  variant="outlined"
+                />
               )}
             </Box>
+
+            {/* Right side - Action buttons */}
             <Stack direction="row" spacing={2}>
-              <Button
-                variant="outlined"
-                startIcon={<StageIcon />}
-                disabled={selectedConfigs.length === 0}
-                onClick={() => setStageDialogOpen(true)}
-              >
-                {t('admin.remoteConfig.stageChanges')}
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<PublishIcon />}
-                color="success"
-                onClick={() => {
-                  setPublishFormData({
-                    deploymentName: generateDeploymentName(),
-                    description: ''
-                  });
-                  setPublishDialogOpen(true);
-                }}
-              >
-                {t('admin.remoteConfig.publishChanges')}
-              </Button>
+              {modifiedConfigs.length > 0 && (
+                <>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<UndoIcon />}
+                    onClick={() => setDiscardChangesDialogOpen(true)}
+                    color="error"
+                  >
+                    변경사항 취소
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<StageIcon />}
+                    onClick={() => {
+                      setSelectedConfigs(modifiedConfigs.map(c => c.id));
+                      setStageDialogOpen(true);
+                    }}
+                  >
+                    변경사항 스테이징
+                  </Button>
+                </>
+              )}
+              {stagedConfigs.length > 0 && (
+                <Button
+                  variant="contained"
+                  size="small"
+                  startIcon={<PublishIcon />}
+                  color="success"
+                  onClick={() => {
+                    setPublishFormData({
+                      deploymentName: generateDeploymentName(),
+                      description: ''
+                    });
+                    setPublishDialogOpen(true);
+                  }}
+                >
+                  설정 배포
+                </Button>
+              )}
             </Stack>
           </Box>
         )}
@@ -1715,8 +2315,16 @@ const RemoteConfigPage: React.FC = () => {
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label="Draft"
-                    color="warning"
+                    label={config.status === 'draft' ? t('admin.remoteConfig.statusDraft') :
+                           config.status === 'staged' ? t('admin.remoteConfig.statusStaged') :
+                           config.status === 'published' ? t('admin.remoteConfig.statusPublished') :
+                           config.status === 'archived' ? t('admin.remoteConfig.statusArchived') :
+                           t('admin.remoteConfig.statusDraft')}
+                    color={config.status === 'draft' ? 'warning' :
+                           config.status === 'staged' ? 'info' :
+                           config.status === 'published' ? 'success' :
+                           config.status === 'archived' ? 'default' :
+                           'warning'}
                     size="small"
                     variant="outlined"
                   />
@@ -1789,7 +2397,7 @@ const RemoteConfigPage: React.FC = () => {
       ) : currentTab === 3 ? (
         <VariantsTab />
       ) : currentTab === 4 ? (
-        <ConditionsTab />
+        <TargetingTab />
       ) : currentTab === 5 ? (
         <ContextFieldsTab />
       ) : null}
@@ -2061,15 +2669,55 @@ const RemoteConfigPage: React.FC = () => {
       <Dialog
         open={stageDialogOpen}
         onClose={() => setStageDialogOpen(false)}
-        maxWidth="sm"
+        maxWidth="md"
         fullWidth
       >
         <DialogTitle>{t('admin.remoteConfig.stageConfigs')}</DialogTitle>
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
             <Typography variant="body2" color="text.secondary">
-              {selectedConfigs.length}개의 선택된 설정을 스테이징합니다.
+              {selectedConfigs.length}개의 설정을 스테이징합니다.
             </Typography>
+
+            {/* Staging targets list */}
+            <Box>
+              <Typography variant="subtitle2" color="text.primary" sx={{ mb: 1 }}>
+                스테이징 대상:
+              </Typography>
+              <Box sx={{ maxHeight: 200, overflow: 'auto' }}>
+                {configs.filter(config => selectedConfigs.includes(config.id)).map((config) => (
+                  <Box
+                    key={config.id}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      p: 1,
+                      border: 1,
+                      borderColor: 'divider',
+                      borderRadius: 1,
+                      mb: 1,
+                      bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)'
+                    }}
+                  >
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="subtitle2" color="text.primary">
+                        {config.keyName}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {config.description || '설명 없음'}
+                      </Typography>
+                    </Box>
+                    <Chip
+                      size="small"
+                      label={config.status === 'draft' ? '수정됨' : config.status}
+                      color={config.status === 'draft' ? 'warning' : 'default'}
+                      variant="outlined"
+                    />
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+
             <TextField
               fullWidth
               label={t('admin.remoteConfig.stageDescription')}
@@ -2154,6 +2802,127 @@ const RemoteConfigPage: React.FC = () => {
             startIcon={<PublishIcon />}
           >
             {t('admin.remoteConfig.publishConfigs')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 컨텍스트 필드 삭제 확인 다이얼로그 */}
+      <Dialog
+        open={deleteConfirmDialog.open}
+        onClose={() => setDeleteConfirmDialog({ open: false, field: null })}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle color="text.primary">
+          {t('admin.remoteConfig.contextFields.deleteConfirmTitle')}
+        </DialogTitle>
+        <DialogContent>
+          <Typography color="text.primary">
+            {t('admin.remoteConfig.contextFields.deleteConfirmMessage', {
+              name: deleteConfirmDialog.field?.name || ''
+            })}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setDeleteConfirmDialog({ open: false, field: null })}
+            startIcon={<CancelIcon />}
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleConfirmDelete}
+            startIcon={<DeleteIcon />}
+          >
+            {t('common.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 변경사항 취소 다이얼로그 */}
+      <Dialog
+        open={discardChangesDialogOpen}
+        onClose={() => setDiscardChangesDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle color="text.primary">
+          변경사항 취소
+        </DialogTitle>
+        <DialogContent>
+          <Typography color="text.primary" sx={{ mb: 2 }}>
+            다음 설정들의 변경사항을 취소하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+          </Typography>
+
+          {/* Modified configs list */}
+          <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+            {modifiedConfigs.map((config) => (
+              <Box
+                key={config.id}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  p: 1,
+                  border: 1,
+                  borderColor: 'divider',
+                  borderRadius: 1,
+                  mb: 1,
+                  bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)'
+                }}
+              >
+                <Checkbox
+                  checked={selectedDiscardConfigs.length === 0 || selectedDiscardConfigs.includes(config.id)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedDiscardConfigs(prev =>
+                        prev.length === 0 ? [config.id] : [...prev.filter(id => id !== config.id), config.id]
+                      );
+                    } else {
+                      setSelectedDiscardConfigs(prev => prev.filter(id => id !== config.id));
+                    }
+                  }}
+                />
+                <Box sx={{ flex: 1, ml: 1 }}>
+                  <Typography variant="subtitle2" color="text.primary">
+                    {config.keyName}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {config.description || '설명 없음'}
+                  </Typography>
+                </Box>
+                <Chip
+                  size="small"
+                  label="수정됨"
+                  color="warning"
+                  variant="outlined"
+                />
+              </Box>
+            ))}
+          </Box>
+
+          {modifiedConfigs.length === 0 && (
+            <Typography color="text.secondary" align="center" sx={{ py: 2 }}>
+              취소할 변경사항이 없습니다.
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setDiscardChangesDialogOpen(false)}
+            startIcon={<CancelIcon />}
+          >
+            취소
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleDiscardChanges}
+            disabled={modifiedConfigs.length === 0}
+            startIcon={<UndoIcon />}
+          >
+            변경사항 취소
           </Button>
         </DialogActions>
       </Dialog>

@@ -77,6 +77,14 @@ const startServer = async () => {
       logger.warn('Redis connection failed, continuing without Redis:', error);
     }
 
+    // Initialize PubSub service
+    try {
+      await pubSubService.initialize();
+      logger.info('PubSub service initialized successfully');
+    } catch (error) {
+      logger.warn('PubSub service initialization failed, continuing without PubSub:', error);
+    }
+
     // Initialize Queue service
     try {
       await queueService.initialize();
