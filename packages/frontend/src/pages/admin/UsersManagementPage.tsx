@@ -73,6 +73,11 @@ import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
 import SimplePagination from '../../components/common/SimplePagination';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
+import { invitationService } from '../../services/invitationService';
+import { Invitation, CreateInvitationRequest, InvitationResponse } from '../../types/invitation';
+import InvitationForm from '../../components/admin/InvitationForm';
+import InvitationSuccess from '../../components/admin/InvitationSuccess';
+import InvitationStatusCard from '../../components/admin/InvitationStatusCard';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 
 interface UsersResponse {
@@ -134,6 +139,12 @@ const UsersManagementPage: React.FC = () => {
     action: () => {},
   });
 
+  // 초대 관련 상태
+  const [invitationDialogOpen, setInvitationDialogOpen] = useState(false);
+  const [invitationSuccessDialogOpen, setInvitationSuccessDialogOpen] = useState(false);
+  const [currentInvitation, setCurrentInvitation] = useState<Invitation | null>(null);
+  const [invitationResponse, setInvitationResponse] = useState<InvitationResponse | null>(null);
+
   const [addUserDialog, setAddUserDialog] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -180,6 +191,16 @@ const UsersManagementPage: React.FC = () => {
 
   // 이메일 인증 관련 상태
   const [emailVerificationLoading, setEmailVerificationLoading] = useState(false);
+
+  // 현재 초대 정보 로드
+  const loadCurrentInvitation = async () => {
+    try {
+      const invitation = await invitationService.getCurrentInvitation();
+      setCurrentInvitation(invitation);
+    } catch (error) {
+      console.error('Failed to load current invitation:', error);
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -231,6 +252,7 @@ const UsersManagementPage: React.FC = () => {
       }
     };
     loadTags();
+    loadCurrentInvitation();
   }, []);
 
   // 체크박스 핸들러
@@ -641,6 +663,38 @@ const UsersManagementPage: React.FC = () => {
     }
   };
 
+  // 초대 관련 핸들러
+  const handleCreateInvitation = async (data: CreateInvitationRequest) => {
+    try {
+      const response = await invitationService.createInvitation(data);
+      setInvitationResponse(response);
+      setInvitationDialogOpen(false);
+      setInvitationSuccessDialogOpen(true);
+      await loadCurrentInvitation(); // 현재 초대 정보 새로고침
+      enqueueSnackbar('초대 링크가 성공적으로 생성되었습니다.', { variant: 'success' });
+    } catch (error: any) {
+      console.error('Failed to create invitation:', error);
+      enqueueSnackbar(error.message || '초대 링크 생성에 실패했습니다.', { variant: 'error' });
+    }
+  };
+
+  const handleDeleteInvitation = async () => {
+    if (!currentInvitation) return;
+
+    try {
+      await invitationService.deleteInvitation(currentInvitation.id);
+      setCurrentInvitation(null);
+      enqueueSnackbar('초대 링크가 삭제되었습니다.', { variant: 'success' });
+    } catch (error: any) {
+      console.error('Failed to delete invitation:', error);
+      enqueueSnackbar(error.message || '초대 링크 삭제에 실패했습니다.', { variant: 'error' });
+    }
+  };
+
+  const handleUpdateInvitation = () => {
+    setInvitationDialogOpen(true);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'success';
@@ -786,14 +840,25 @@ const UsersManagementPage: React.FC = () => {
               />
             </Grid>
             <Grid item xs={12} md={2}>
-              <Button
-                fullWidth
-                variant="contained"
-                startIcon={<PersonAddIcon />}
-                onClick={handleAddUser}
-              >
-                {t('admin.users.addUser')}
-              </Button>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  variant="contained"
+                  startIcon={<PersonAddIcon />}
+                  onClick={handleAddUser}
+                  sx={{ flex: 1 }}
+                >
+                  {t('admin.users.addUser')}
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<SendIcon />}
+                  onClick={() => setInvitationDialogOpen(true)}
+                  disabled={!!currentInvitation}
+                  sx={{ minWidth: 'auto', px: 2 }}
+                >
+                  초대
+                </Button>
+              </Box>
             </Grid>
           </Grid>
         </CardContent>
@@ -857,6 +922,15 @@ const UsersManagementPage: React.FC = () => {
             </Box>
           </CardContent>
         </Card>
+      )}
+
+      {/* Current Invitation Status */}
+      {currentInvitation && (
+        <InvitationStatusCard
+          invitation={currentInvitation}
+          onUpdate={handleUpdateInvitation}
+          onDelete={handleDeleteInvitation}
+        />
       )}
 
       {/* Users Table */}
@@ -1884,6 +1958,108 @@ const UsersManagementPage: React.FC = () => {
           >
             {t('common.save')}
           </Button>
+        </Box>
+      </Drawer>
+
+      {/* Invitation Form Drawer */}
+      <Drawer
+        anchor="right"
+        open={invitationDialogOpen}
+        onClose={() => setInvitationDialogOpen(false)}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 500 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            사용자 초대
+          </Typography>
+          <IconButton
+            onClick={() => setInvitationDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+          <InvitationForm
+            onSubmit={handleCreateInvitation}
+            onCancel={() => setInvitationDialogOpen(false)}
+          />
+        </Box>
+      </Drawer>
+
+      {/* Invitation Success Drawer */}
+      <Drawer
+        anchor="right"
+        open={invitationSuccessDialogOpen}
+        onClose={() => setInvitationSuccessDialogOpen(false)}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 600 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            초대 완료
+          </Typography>
+          <IconButton
+            onClick={() => setInvitationSuccessDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+          {invitationResponse && (
+            <InvitationSuccess
+              invitationData={invitationResponse}
+              onClose={() => setInvitationSuccessDialogOpen(false)}
+            />
+          )}
         </Box>
       </Drawer>
     </Box>

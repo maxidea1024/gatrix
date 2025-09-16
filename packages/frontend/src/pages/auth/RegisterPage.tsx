@@ -34,6 +34,8 @@ import { RegisterData } from '@/types';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { useSnackbar } from 'notistack';
 import AuthLayout from '../../components/auth/AuthLayout';
+import { invitationService } from '../../services/invitationService';
+import { Invitation } from '../../types/invitation';
 
 // Validation schema - will be created inside component to access t function
 
@@ -55,6 +57,12 @@ const RegisterPage: React.FC = () => {
   const [oauthLoading, setOauthLoading] = useState<string | null>(null); // 'google', 'github', 'qq', etc.
   const [isShaking, setIsShaking] = useState(false);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+
+  // 초대 관련 상태
+  const [inviteToken, setInviteToken] = useState<string | null>(null);
+  const [invitation, setInvitation] = useState<Invitation | null>(null);
+  const [invitationLoading, setInvitationLoading] = useState(false);
+  const [invitationError, setInvitationError] = useState<string | null>(null);
 
   // Validation schema with translations
   const registerSchema = useMemo(() => yup.object({
@@ -114,6 +122,40 @@ const RegisterPage: React.FC = () => {
     }
   }, [watchedPassword, trigger]);
 
+  // 초대 토큰 확인
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const token = urlParams.get('invite');
+
+    if (token) {
+      setInviteToken(token);
+      validateInvitation(token);
+    }
+  }, [location.search]);
+
+  const validateInvitation = async (token: string) => {
+    setInvitationLoading(true);
+    setInvitationError(null);
+
+    try {
+      const result = await invitationService.validateInvitation(token);
+      if (result.valid && result.invitation) {
+        setInvitation(result.invitation);
+        // 초대받은 경우 이메일 필드를 미리 채움 (있는 경우)
+        if (result.invitation.email) {
+          setValue('email', result.invitation.email);
+        }
+      } else {
+        setInvitationError('초대 링크가 유효하지 않거나 만료되었습니다.');
+      }
+    } catch (error: any) {
+      console.error('Failed to validate invitation:', error);
+      setInvitationError(error.message || '초대 링크 확인에 실패했습니다.');
+    } finally {
+      setInvitationLoading(false);
+    }
+  };
+
   // Function to get translated error message
   const getRegisterErrorMessage = (error: any): string => {
     if (!error) return t('auth.errors.registrationFailed');
@@ -161,11 +203,22 @@ const RegisterPage: React.FC = () => {
       setIsSubmittingForm(true);
 
       // API 호출
-      await register({
-        name: data.name,
-        email: data.email,
-        password: data.password,
-      });
+      if (inviteToken && invitation) {
+        // 초대를 통한 가입
+        await invitationService.acceptInvitation(inviteToken, {
+          username: data.name,
+          password: data.password,
+          email: data.email,
+          fullName: data.name,
+        });
+      } else {
+        // 일반 가입
+        await register({
+          name: data.name,
+          email: data.email,
+          password: data.password,
+        });
+      }
 
       // 성공 시 최소 2초 대기
       const elapsed = Date.now() - startTime;
@@ -310,6 +363,33 @@ const RegisterPage: React.FC = () => {
         onSubmit={handleSubmit(onSubmit)}
         autoComplete="off"
       >
+        {/* Invitation Status */}
+        {invitationLoading && (
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <CircularProgress size={16} />
+              초대 링크를 확인하고 있습니다...
+            </Box>
+          </Alert>
+        )}
+
+        {invitation && (
+          <Alert severity="success" sx={{ mb: 3 }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+              팀 초대를 받으셨습니다!
+            </Typography>
+            <Typography variant="body2">
+              가입하시면 <strong>일반 사용자</strong> 권한으로 Gatrix에 참여하실 수 있습니다.
+            </Typography>
+          </Alert>
+        )}
+
+        {invitationError && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {invitationError}
+          </Alert>
+        )}
+
         {/* Error Alert - 항상 공간 확보로 레이아웃 안정화 */}
         <Alert
           severity="error"
