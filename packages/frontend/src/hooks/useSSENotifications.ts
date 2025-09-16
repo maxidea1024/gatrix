@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { toast } from 'react-toastify';
+import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 
 export interface SSEEvent {
@@ -20,6 +20,7 @@ export interface SSEOptions {
 
 export const useSSENotifications = (options: SSEOptions = {}) => {
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
   const {
     autoConnect = true,
     reconnectInterval = 5000,
@@ -87,7 +88,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
           scheduleReconnect();
         } else {
           console.error('Max reconnection attempts reached');
-          toast.error('Connection lost. Please refresh the page.');
+          enqueueSnackbar('Connection lost. Please refresh the page.', { variant: 'error' });
         }
       };
 
@@ -169,25 +170,25 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
   // Handle remote config change notifications
   const handleRemoteConfigChange = useCallback((data: any) => {
     const { action, config } = data;
-    
+
     switch (action) {
       case 'created':
-        toast.success(t('admin.remoteConfig.createSuccess'));
+        enqueueSnackbar(t('admin.remoteConfig.createSuccess'), { variant: 'success' });
         break;
       case 'updated':
-        toast.info(`Config "${config.keyName}" updated`);
+        enqueueSnackbar(`Config "${config.keyName}" updated`, { variant: 'info' });
         break;
       case 'deleted':
-        toast.info(`Config "${config.keyName}" deleted`);
+        enqueueSnackbar(`Config "${config.keyName}" deleted`, { variant: 'info' });
         break;
     }
-  }, [t]);
+  }, [t, enqueueSnackbar]);
 
   // Handle deployment notifications
   const handleRemoteConfigDeployment = useCallback((data: any) => {
     const { configCount } = data;
-    toast.success(`${configCount} configs deployed successfully`);
-  }, []);
+    enqueueSnackbar(`${configCount} configs deployed successfully`, { variant: 'success' });
+  }, [enqueueSnackbar]);
 
   // Handle campaign status change notifications
   const handleCampaignStatusChange = useCallback((data: any) => {

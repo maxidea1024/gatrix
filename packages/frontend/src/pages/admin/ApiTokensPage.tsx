@@ -10,6 +10,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   IconButton,
   Chip,
   TextField,
@@ -66,6 +67,8 @@ const ApiTokensPage: React.FC = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [total, setTotal] = useState(0);
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
   // Dialog states
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -107,7 +110,7 @@ const ApiTokensPage: React.FC = () => {
 
   useEffect(() => {
     loadTokens();
-  }, [page, rowsPerPage]);
+  }, [page, rowsPerPage, sortBy, sortOrder]);
 
   const loadTokens = async () => {
     try {
@@ -115,6 +118,8 @@ const ApiTokensPage: React.FC = () => {
       const response = await apiTokenService.getTokens({
         page: page + 1,
         limit: rowsPerPage,
+        sortBy,
+        sortOrder,
       });
       setTokens(response.data || []);
       setTotal(response.total || 0);
@@ -126,7 +131,15 @@ const ApiTokensPage: React.FC = () => {
     }
   };
 
-
+  const handleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortOrder('asc');
+    }
+    setPage(0); // Reset to first page when sorting
+  };
 
   const handleCreate = async () => {
     try {
@@ -472,13 +485,61 @@ const ApiTokensPage: React.FC = () => {
                     disabled={tokens.length === 0}
                   />
                 </TableCell>
-                <TableCell>{t('apiTokens.tokenName', 'Token Name')}</TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortBy === 'tokenName'}
+                    direction={sortBy === 'tokenName' ? sortOrder : 'asc'}
+                    onClick={() => handleSort('tokenName')}
+                  >
+                    {t('apiTokens.tokenName', 'Token Name')}
+                  </TableSortLabel>
+                </TableCell>
                 <TableCell>{t('apiTokens.description', 'Description')}</TableCell>
-                <TableCell>{t('apiTokens.tokenType', 'Type')}</TableCell>
-                <TableCell>{t('apiTokens.lastUsed', 'Last Used')}</TableCell>
-                <TableCell>{t('apiTokens.expiresAt', 'Expires')}</TableCell>
-                <TableCell>{t('apiTokens.createdBy', 'Created By')}</TableCell>
-                <TableCell>{t('apiTokens.createdAt', 'Created Date')}</TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortBy === 'tokenType'}
+                    direction={sortBy === 'tokenType' ? sortOrder : 'asc'}
+                    onClick={() => handleSort('tokenType')}
+                  >
+                    {t('apiTokens.tokenType', 'Type')}
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortBy === 'lastUsedAt'}
+                    direction={sortBy === 'lastUsedAt' ? sortOrder : 'asc'}
+                    onClick={() => handleSort('lastUsedAt')}
+                  >
+                    {t('apiTokens.lastUsed', 'Last Used')}
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortBy === 'expiresAt'}
+                    direction={sortBy === 'expiresAt' ? sortOrder : 'asc'}
+                    onClick={() => handleSort('expiresAt')}
+                  >
+                    {t('apiTokens.expiresAt', 'Expires')}
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortBy === 'creatorName'}
+                    direction={sortBy === 'creatorName' ? sortOrder : 'asc'}
+                    onClick={() => handleSort('creatorName')}
+                  >
+                    {t('apiTokens.createdBy', 'Created By')}
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell>
+                  <TableSortLabel
+                    active={sortBy === 'createdAt'}
+                    direction={sortBy === 'createdAt' ? sortOrder : 'asc'}
+                    onClick={() => handleSort('createdAt')}
+                  >
+                    {t('apiTokens.createdAt', 'Created Date')}
+                  </TableSortLabel>
+                </TableCell>
                 <TableCell align="center">{t('common.actions', 'Actions')}</TableCell>
               </TableRow>
             </TableHead>

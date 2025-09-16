@@ -9,7 +9,7 @@ class ApiTokensController {
    */
   async getTokens(req: Request, res: Response) {
     try {
-      const { page = 1, limit = 10, tokenType, search } = req.query;
+      const { page = 1, limit = 10, tokenType, search, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
       const offset = (Number(page) - 1) * Number(limit);
 
       // Build query with user join
@@ -42,9 +42,17 @@ class ApiTokensController {
 
       const [{ count: total }] = await countQuery.count('* as count');
 
-      // Get tokens with pagination (separate query)
+      // Validate and apply sorting
+      const validSortFields = ['tokenName', 'tokenType', 'createdAt', 'lastUsedAt', 'expiresAt', 'creatorName'];
+      const validSortOrders = ['asc', 'desc'];
+
+      const finalSortBy = validSortFields.includes(sortBy as string) ? sortBy as string : 'createdAt';
+      const finalSortOrder = validSortOrders.includes((sortOrder as string)?.toLowerCase())
+        ? (sortOrder as string).toLowerCase() : 'desc';
+
+      // Get tokens with pagination and sorting
       const tokens = await query
-        .orderBy('createdAt', 'desc')
+        .orderBy(finalSortBy === 'creatorName' ? 'creator.name' : `g_api_access_tokens.${finalSortBy}`, finalSortOrder)
         .limit(Number(limit))
         .offset(Number(offset));
 

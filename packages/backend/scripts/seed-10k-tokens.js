@@ -163,7 +163,7 @@ async function seed10kTokens() {
       }
       
       // Batch insert
-      const placeholders = tokens.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
+      const placeholders = tokens.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
       const flatValues = tokens.flat();
 
       await connection.execute(`

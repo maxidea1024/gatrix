@@ -32,7 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { RegisterData } from '@/types';
 import { LanguageSelector } from '@/components/LanguageSelector';
-import { toast } from 'react-toastify';
+import { useSnackbar } from 'notistack';
 import AuthLayout from '../../components/auth/AuthLayout';
 
 // Validation schema - will be created inside component to access t function
@@ -42,6 +42,7 @@ const RegisterPage: React.FC = () => {
   const location = useLocation();
   const { register, isLoading, error, clearError } = useAuth();
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
 
   // Get email from location state if coming from signup prompt
   const prefilledEmail = (location.state as any)?.email || '';
