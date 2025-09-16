@@ -44,6 +44,7 @@ router.use(requireRole(['admin']) as any);
 router.get('/', ApiTokensController.getTokens as any);
 router.get('/stats', ApiTokensController.getTokenStats as any);
 router.post('/', createTokenValidation, ApiTokensController.createToken as any);
+router.put('/:id', updateTokenValidation, ApiTokensController.updateToken as any);
 router.post('/:id/regenerate', ApiTokensController.regenerateToken as any);
 router.delete('/:id', ApiTokensController.deleteToken as any);
 

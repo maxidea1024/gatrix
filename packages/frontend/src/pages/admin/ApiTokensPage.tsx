@@ -18,6 +18,7 @@ import {
   RadioGroup,
   Radio,
   FormControlLabel,
+  Checkbox,
   Alert,
   Tooltip,
   Drawer,
@@ -79,10 +80,10 @@ const ApiTokensPage: React.FC = () => {
     description: '',
     tokenType: 'client',
     environmentId: 1,
+    isActive: true,
   });
   
   // UI states
-  const [visibleTokens, setVisibleTokens] = useState<Set<number>>(new Set());
   const [newTokenValue, setNewTokenValue] = useState<string>('');
   const [newTokenInfo, setNewTokenInfo] = useState<any>(null);
   const [newTokenDialogOpen, setNewTokenDialogOpen] = useState<boolean>(false);
@@ -217,6 +218,7 @@ const ApiTokensPage: React.FC = () => {
       description: '',
       tokenType: 'client',
       environmentId: 1,
+      isActive: true,
     });
   };
 
@@ -233,9 +235,11 @@ const ApiTokensPage: React.FC = () => {
     setSelectedToken(token);
     setFormData({
       tokenName: token.tokenName,
+      description: token.description || '',
       tokenType: token.tokenType,
       environmentId: token.environmentId,
       expiresAt: token.expiresAt ? new Date(token.expiresAt).toISOString().slice(0, 16) : undefined,
+      isActive: token.isActive,
     });
     setEditDialogOpen(true);
     // Focus on token name field after dialog opens
@@ -250,17 +254,12 @@ const ApiTokensPage: React.FC = () => {
     setDeleteDialogOpen(true);
   };
 
-  const toggleTokenVisibility = (tokenId: number) => {
-    setVisibleTokens(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(tokenId)) {
-        newSet.delete(tokenId);
-      } else {
-        newSet.add(tokenId);
-      }
-      return newSet;
-    });
+  const openRegenerateDialog = (token: ApiAccessToken) => {
+    setSelectedToken(token);
+    setRegenerateDialogOpen(true);
   };
+
+
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -272,13 +271,7 @@ const ApiTokensPage: React.FC = () => {
     return `${token.substring(0, 4)}${'•'.repeat(token.length - 8)}${token.substring(token.length - 4)}`;
   };
 
-  const formatTokenValue = (token: ApiAccessToken) => {
-    const isVisible = visibleTokens.has(token.id);
-    if (isVisible) {
-      return token.tokenHash.slice(0, 8) + '...';
-    }
-    return '••••••••••••••••';
-  };
+
 
   const getTokenTypeColor = (type: TokenType) => {
     switch (type) {
@@ -320,10 +313,11 @@ const ApiTokensPage: React.FC = () => {
                 <TableCell>{t('apiTokens.tokenName', 'Token Name')}</TableCell>
                 <TableCell>{t('apiTokens.description', 'Description')}</TableCell>
                 <TableCell>{t('apiTokens.tokenType', 'Type')}</TableCell>
-                <TableCell>{t('apiTokens.tokenValue', 'Token Value')}</TableCell>
                 <TableCell>{t('apiTokens.lastUsed', 'Last Used')}</TableCell>
                 <TableCell>{t('apiTokens.expiresAt', 'Expires')}</TableCell>
-                <TableCell>{t('apiTokens.status', 'Status')}</TableCell>
+                <TableCell align="center">{t('apiTokens.status', 'Status')}</TableCell>
+                <TableCell>{t('apiTokens.createdBy', 'Created By')}</TableCell>
+                <TableCell>{t('apiTokens.createdAt', 'Created Date')}</TableCell>
                 <TableCell align="center">{t('common.actions', 'Actions')}</TableCell>
               </TableRow>
             </TableHead>
@@ -354,39 +348,20 @@ const ApiTokensPage: React.FC = () => {
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Chip
-                        label={token.tokenType}
-                        color={getTokenTypeColor(token.tokenType)}
-                        size="small"
-                        variant="outlined"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="body2" fontFamily="monospace">
-                          {formatTokenValue(token)}
+                      <Box>
+                        <Chip
+                          label={t(`apiTokens.${token.tokenType}TokenType`, token.tokenType)}
+                          color={getTokenTypeColor(token.tokenType)}
+                          size="small"
+                          variant="outlined"
+                          sx={{ mb: 0.5 }}
+                        />
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.75rem' }}>
+                          {t(`apiTokens.${token.tokenType}TokenDescription`, '')}
                         </Typography>
-                        <Tooltip title={visibleTokens.has(token.id) ? t('apiTokens.hideToken', 'Hide Token') : t('apiTokens.showToken', 'Show Token')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => toggleTokenVisibility(token.id)}
-                          >
-                            {visibleTokens.has(token.id) ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('apiTokens.regenerateToken', 'Regenerate Token')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => {
-                              setSelectedToken(token);
-                              setRegenerateDialogOpen(true);
-                            }}
-                          >
-                            <RefreshIcon />
-                          </IconButton>
-                        </Tooltip>
                       </Box>
                     </TableCell>
+
                     <TableCell>
                       <Typography variant="body2">
                         {token.lastUsedAt
@@ -403,18 +378,40 @@ const ApiTokensPage: React.FC = () => {
                         }
                       </Typography>
                     </TableCell>
-                    <TableCell>
+                    <TableCell align="center">
                       <Chip
                         label={token.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
                         color={token.isActive ? 'success' : 'default'}
                         size="small"
                       />
                     </TableCell>
+                    <TableCell>
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {token.creator?.name || t('common.unknown', 'Unknown')}
+                        </Typography>
+                        {token.creator?.email && (
+                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.75rem' }}>
+                            {token.creator.email}
+                          </Typography>
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2">
+                        {formatDateTimeDetailed(token.createdAt)}
+                      </Typography>
+                    </TableCell>
                     <TableCell align="center">
                       <Box sx={{ display: 'flex', gap: 0.5 }}>
                         <Tooltip title={t('common.edit', 'Edit')}>
                           <IconButton size="small" onClick={() => openEditDialog(token)}>
                             <EditIcon />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('apiTokens.regenerateToken', 'Regenerate Token')}>
+                          <IconButton size="small" onClick={() => openRegenerateDialog(token)}>
+                            <RefreshIcon />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title={t('common.delete', 'Delete')}>
@@ -577,6 +574,17 @@ const ApiTokensPage: React.FC = () => {
               InputLabelProps={{ shrink: true }}
               helperText={t('apiTokens.expiresAtHelp', 'Leave empty for no expiration')}
             />
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+                  size="small"
+                />
+              }
+              label={t('apiTokens.isActive', 'Active')}
+            />
         </Box>
 
         {/* Actions */}
@@ -694,6 +702,17 @@ const ApiTokensPage: React.FC = () => {
               InputLabelProps={{ shrink: true }}
               helperText={t('apiTokens.expiresAtHelp', 'Leave empty for no expiration')}
             />
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
+                  size="small"
+                />
+              }
+              label={t('apiTokens.isActive', 'Active')}
+            />
         </Box>
 
         {/* Actions */}
@@ -784,39 +803,104 @@ const ApiTokensPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Regenerate Confirmation Dialog */}
-      <Dialog open={regenerateDialogOpen} onClose={() => setRegenerateDialogOpen(false)}>
-        <DialogTitle>{t('apiTokens.regenerateToken', 'Regenerate API Token')}</DialogTitle>
-        <DialogContent>
-          <Alert severity="warning" sx={{ mb: 2 }}>
+      {/* Regenerate Token Side Panel */}
+      <Drawer
+        anchor="right"
+        open={regenerateDialogOpen}
+        onClose={() => setRegenerateDialogOpen(false)}
+        PaperProps={{
+          sx: { width: 500 }
+        }}
+      >
+        <Box sx={{
+          p: 3,
+          borderBottom: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: 'background.paper',
+          position: 'sticky',
+          top: 0,
+          zIndex: 1300
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('apiTokens.regenerateToken', 'Regenerate API Token')}
+          </Typography>
+          <IconButton
+            onClick={() => setRegenerateDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ p: 3, flexGrow: 1 }}>
+          <Alert severity="warning" sx={{ mb: 3 }}>
             {t('apiTokens.regenerateWarning', 'This will generate a new token value. The old token will become invalid immediately.')}
           </Alert>
-          <Typography>
+
+          <Typography variant="body1" sx={{ mb: 3 }}>
             {t('apiTokens.regenerateConfirmation', 'Are you sure you want to regenerate this API token?')}
           </Typography>
+
           {selectedToken && (
-            <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
-              <Typography variant="body2" fontWeight={500}>
+            <Box sx={{
+              p: 3,
+              bgcolor: 'grey.50',
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: 'grey.200',
+              mb: 3
+            }}>
+              <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
                 {selectedToken.tokenName}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                 {t(`apiTokens.${selectedToken.tokenType}TokenType`, selectedToken.tokenType)}
               </Typography>
+              {selectedToken.description && (
+                <Typography variant="body2" color="text.secondary">
+                  {selectedToken.description}
+                </Typography>
+              )}
             </Box>
           )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setRegenerateDialogOpen(false)}>
+        </Box>
+
+        <Box sx={{
+          p: 3,
+          borderTop: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setRegenerateDialogOpen(false)}
+            variant="outlined"
+            startIcon={<CancelIcon />}
+          >
             {t('common.cancel', 'Cancel')}
           </Button>
-          <Button onClick={handleRegenerate} color="primary" variant="contained">
+          <Button
+            onClick={handleRegenerate}
+            color="primary"
+            variant="contained"
+            startIcon={<RefreshIcon />}
+          >
             {t('apiTokens.regenerate', 'Regenerate')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
       {/* New Token Display Dialog */}
-      <Dialog open={newTokenDialogOpen && !!newTokenValue && !!newTokenInfo} onClose={() => { setNewTokenValue(''); setNewTokenInfo(null); setNewTokenDialogOpen(false); }} maxWidth="sm" fullWidth>
+      <Dialog open={newTokenDialogOpen && !!newTokenValue && !!newTokenInfo} onClose={() => { setNewTokenValue(''); setNewTokenInfo(null); setNewTokenDialogOpen(false); }} maxWidth="md" fullWidth>
           <DialogTitle sx={{ pb: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <CheckCircleIcon color="success" sx={{ fontSize: 32 }} />

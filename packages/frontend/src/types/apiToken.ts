@@ -21,8 +21,7 @@ export interface ApiAccessToken {
     environmentName: string;
   };
   creator?: {
-    id: number;
-    username: string;
+    name: string;
     email: string;
   };
   updater?: {
@@ -38,12 +37,14 @@ export interface CreateTokenRequest {
   tokenType: TokenType;
   environmentId?: number;
   expiresAt?: string;
+  isActive?: boolean;
 }
 
 export interface UpdateTokenRequest {
   tokenName?: string;
   description?: string;
   expiresAt?: string;
+  isActive?: boolean;
 }
 
 export interface CreateTokenResponse {

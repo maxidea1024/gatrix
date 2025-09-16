@@ -12,8 +12,14 @@ class ApiTokensController {
       const { page = 1, limit = 10, tokenType, isActive, search } = req.query;
       const offset = (Number(page) - 1) * Number(limit);
 
-      // Build query
-      let query = knex('g_api_access_tokens').select('*');
+      // Build query with user join
+      let query = knex('g_api_access_tokens')
+        .select(
+          'g_api_access_tokens.*',
+          'creator.name as creatorName',
+          'creator.email as creatorEmail'
+        )
+        .leftJoin('g_users as creator', 'g_api_access_tokens.createdBy', 'creator.id');
 
       if (tokenType) {
         query = query.where('tokenType', tokenType);
@@ -55,7 +61,11 @@ class ApiTokensController {
         return {
           ...token,
           tokenHash: token.tokenHash.substring(0, 8) + '••••••••••••••••', // Show only first 8 chars
-          isActive: Boolean(token.isActive)
+          isActive: Boolean(token.isActive),
+          creator: {
+            name: token.creatorName || 'Unknown',
+            email: token.creatorEmail || ''
+          }
         };
       });
 
@@ -135,6 +145,77 @@ class ApiTokensController {
       res.status(500).json({
         success: false,
         error: { message: 'Failed to create API token' }
+      });
+    }
+  }
+
+  /**
+   * Update API token
+   */
+  async updateToken(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { tokenName, description, expiresAt, isActive } = req.body;
+      const userId = (req as any).user.id;
+
+      // Check if token exists
+      const existingToken = await knex('g_api_access_tokens').where('id', id).first();
+      if (!existingToken) {
+        return res.status(404).json({
+          success: false,
+          error: { message: 'Token not found' }
+        });
+      }
+
+      // Prepare update data
+      const updateData: any = {
+        updatedBy: userId,
+        updatedAt: knex.fn.now()
+      };
+
+      if (tokenName !== undefined) updateData.tokenName = tokenName;
+      if (description !== undefined) updateData.description = description;
+      if (expiresAt !== undefined) updateData.expiresAt = expiresAt ? new Date(expiresAt) : null;
+      if (isActive !== undefined) updateData.isActive = isActive;
+
+      // Update token
+      await knex('g_api_access_tokens')
+        .where('id', id)
+        .update(updateData);
+
+      // Get updated token with user info
+      const updatedToken = await knex('g_api_access_tokens')
+        .select(
+          'g_api_access_tokens.*',
+          'creator.name as creatorName',
+          'creator.email as creatorEmail'
+        )
+        .leftJoin('g_users as creator', 'g_api_access_tokens.createdBy', 'creator.id')
+        .where('g_api_access_tokens.id', id)
+        .first();
+
+      // Format response
+      const formattedToken = {
+        ...updatedToken,
+        tokenHash: updatedToken.tokenHash.substring(0, 8) + '••••••••••••••••',
+        isActive: Boolean(updatedToken.isActive),
+        creator: {
+          name: updatedToken.creatorName || 'Unknown',
+          email: updatedToken.creatorEmail || ''
+        }
+      };
+
+      res.json({
+        success: true,
+        data: {
+          token: formattedToken
+        }
+      });
+    } catch (error) {
+      console.error('Error updating API token:', error);
+      res.status(500).json({
+        success: false,
+        error: { message: 'Failed to update API token' }
       });
     }
   }
