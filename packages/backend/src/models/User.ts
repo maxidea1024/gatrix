@@ -1,7 +1,30 @@
 import bcrypt from 'bcryptjs';
 import db from '../config/knex';
 import logger from '../config/logger';
-import { User, CreateUserData, UpdateUserData, UserWithoutPassword } from '../types/user';
+import { User as UserType, CreateUserData, UpdateUserData, UserWithoutPassword } from '../types/user';
+import { Model } from 'objection';
+
+// Export User class for Objection.js models
+export class User extends Model {
+  static tableName = 'g_users';
+
+  id!: number;
+  email!: string;
+  name!: string;
+  passwordHash?: string;
+  role!: string;
+  status!: string;
+  authType!: string;
+  emailVerified!: boolean;
+  emailVerifiedAt?: Date;
+  lastLoginAt?: Date;
+  avatarUrl?: string;
+  preferredLanguage?: string;
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt!: Date;
+  updatedAt!: Date;
+}
 
 export class UserModel {
   static async findById(id: number): Promise<UserWithoutPassword | null> {

@@ -106,18 +106,7 @@ const listConfigsValidation = [
     .withMessage('Sort order must be asc or desc')
 ];
 
-const stageConfigsValidation = [
-  body('configIds')
-    .isArray({ min: 1 })
-    .withMessage('Config IDs must be a non-empty array'),
-  body('configIds.*')
-    .isInt({ min: 1 })
-    .withMessage('Each config ID must be a positive integer'),
-  body('description')
-    .optional()
-    .isString()
-    .isLength({ max: 500 })
-];
+// stageConfigsValidation removed - staging system deprecated
 
 const publishConfigsValidation = [
   body('deploymentName')
@@ -262,6 +251,78 @@ router.delete('/context-fields/:id', [
   param('id').isInt({ min: 1 }).withMessage('Invalid context field ID')
 ], validateRequest, ContextFieldController.deleteContextField);
 
+// getVersions route removed - using template version system instead
+
+// discardDraftVersions route removed - using template version system instead
+
+/**
+ * @route GET /api/v1/remote-config/segments
+ * @desc Get all segments (formerly rules)
+ * @access Admin
+ */
+router.get('/segments',
+  RemoteConfigController.getSegments
+);
+
+// stage route removed - staging system deprecated
+
+/**
+ * @route GET /api/v1/remote-config/template
+ * @desc Get current template data
+ * @access Admin
+ */
+router.get('/template', RemoteConfigController.getTemplate);
+
+/**
+ * @route PUT /api/v1/remote-config/template
+ * @desc Update template data directly
+ * @access Admin
+ */
+router.put('/template',
+  body('templateData').isObject().withMessage('Template data must be an object'),
+  validateRequest,
+  RemoteConfigController.updateTemplate
+);
+
+/**
+ * @route POST /api/v1/remote-config/parameter
+ * @desc Add a new parameter
+ * @access Admin
+ */
+router.post('/parameter',
+  body('key').isString().notEmpty().withMessage('Key is required'),
+  body('type').isIn(['string', 'number', 'boolean', 'json']).withMessage('Invalid type'),
+  body('defaultValue').optional(),
+  body('description').optional().isString(),
+  validateRequest,
+  RemoteConfigController.addParameter
+);
+
+/**
+ * @route PUT /api/v1/remote-config/parameter/:key
+ * @desc Update an existing parameter
+ * @access Admin
+ */
+router.put('/parameter/:key',
+  param('key').isString().notEmpty().withMessage('Key is required'),
+  body('type').optional().isIn(['string', 'number', 'boolean', 'json']).withMessage('Invalid type'),
+  body('defaultValue').optional(),
+  body('description').optional().isString(),
+  validateRequest,
+  RemoteConfigController.updateParameter
+);
+
+/**
+ * @route DELETE /api/v1/remote-config/parameter/:key
+ * @desc Delete a parameter
+ * @access Admin
+ */
+router.delete('/parameter/:key',
+  param('key').isString().notEmpty().withMessage('Key is required'),
+  validateRequest,
+  RemoteConfigController.deleteParameter
+);
+
 /**
  * @route GET /api/v1/remote-config/:id
  * @desc Get remote config by ID
@@ -299,46 +360,8 @@ router.delete('/:id',
 );
 
 /**
- * @route GET /api/v1/remote-config/:id/versions
- * @desc Get versions for a config
- * @access Admin
- */
-router.get('/:id/versions',
-  param('id').isInt({ min: 1 }).withMessage('Invalid config ID'),
-  validateRequest,
-  RemoteConfigController.getVersions
-);
-
-/**
- * @route DELETE /api/v1/remote-config/:id/versions/draft
- * @desc Discard draft changes for a config
- * @access Admin
- */
-router.delete('/:id/versions/draft',
-  param('id').isInt({ min: 1 }).withMessage('Invalid config ID'),
-  validateRequest,
-  RemoteConfigController.discardDraftVersions
-);
-
-/**
- * @route GET /api/v1/remote-config/segments
- * @desc Get all segments (formerly rules)
- * @access Admin
- */
-router.get('/segments',
-  RemoteConfigController.getSegments
-);
-
-/**
- * @route POST /api/v1/remote-config/stage
- * @desc Stage configs (Git-like staging)
- * @access Admin
- */
-router.post('/stage', stageConfigsValidation, validateRequest, RemoteConfigController.stage);
-
-/**
  * @route POST /api/v1/remote-config/publish
- * @desc Publish staged configs (Git-like push)
+ * @desc Publish template as new version
  * @access Admin
  */
 router.post('/publish', publishConfigsValidation, validateRequest, RemoteConfigController.publish);

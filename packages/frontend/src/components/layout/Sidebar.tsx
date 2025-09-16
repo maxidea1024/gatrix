@@ -24,6 +24,7 @@ import {
   Security,
   CloudSync,
   History,
+  VpnKey,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -101,6 +102,13 @@ const getNavigationItems = (isAdmin: boolean): NavItem[] => {
           path: '/admin/stats',
           roles: ['admin'],
         },
+        {
+          id: 'api-tokens',
+          label: 'API Access Tokens',
+          icon: 'VpnKey',
+          path: '/admin/api-tokens',
+          roles: ['admin'],
+        },
       ],
     },
     {
@@ -150,6 +158,7 @@ const iconMap: Record<string, React.ReactElement> = {
   Security: <Security />,
   CloudSync: <CloudSync />,
   History: <History />,
+  VpnKey: <VpnKey />,
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {

@@ -289,11 +289,7 @@ export interface RemoteConfigFilters {
   sortOrder?: 'asc' | 'desc';
 }
 
-// Staging and Publishing
-export interface StagingRequest {
-  configIds: number[];
-  description?: string;
-}
+// Publishing (staging system removed)
 
 export interface PublishRequest {
   stagedConfigIds: number[];

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate, requireAdmin } from '../middleware/auth';
 import { AdminController } from '../controllers/AdminController';
+import apiTokenRoutes from './apiTokens';
 import {
   auditUserUpdate,
   auditUserDelete,
@@ -63,5 +64,8 @@ router.post('/audit-logs/cleanup', AdminController.cleanupAuditLogs as any);
 router.get('/pending-users', AdminController.getPendingUsers as any);
 router.post('/users/:id/approve', auditUserApprove as any, AdminController.approveUser as any);
 router.post('/users/:id/reject', auditUserReject as any, AdminController.rejectUser as any);
+
+// API Token management
+router.use('/api-tokens', apiTokenRoutes);
 
 export default router;

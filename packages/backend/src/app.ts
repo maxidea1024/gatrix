@@ -37,6 +37,8 @@ import varsRoutes from './routes/vars';
 import platformDefaultsRoutes from './routes/platformDefaults';
 import translationRoutes from './routes/translation';
 import remoteConfigRoutes from './routes/remoteConfig';
+import remoteConfigV2Routes from './routes/remoteConfigV2';
+import remoteConfigSDKRoutes from './routes/remoteConfigSDK';
 // import contextFieldRoutes from './routes/contextFields';
 import campaignRoutes from './routes/campaigns';
 import notificationRoutes from './routes/notifications';
@@ -207,6 +209,12 @@ app.use('/api/v1/translation', translationRoutes);
 // Campaign routes must be registered BEFORE general remote-config routes
 app.use('/api/v1/admin/remote-config/campaigns', campaignRoutes);
 app.use('/api/v1/admin/remote-config', remoteConfigRoutes);
+
+// New Remote Config V2 routes
+app.use('/api/v1/remote-config', remoteConfigV2Routes);
+
+// Remote Config SDK routes (no authentication middleware, uses API tokens)
+app.use('/api/v1/remote-config', remoteConfigSDKRoutes);
 
 
 

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { RemoteConfigModel, ConfigVersionModel } from '../models/RemoteConfig';
+import { RemoteConfigModel } from '../models/RemoteConfig';
 import SegmentModel from '../models/Segment';
 import { RemoteConfigNotifications } from '../services/sseNotificationService';
 import logger from '../config/logger';
@@ -9,7 +9,6 @@ import {
   CreateRemoteConfigData,
   UpdateRemoteConfigData,
   RemoteConfigFilters,
-  StagingRequest,
   PublishRequest,
   RollbackRequest
 } from '../types/remoteConfig';
@@ -162,37 +161,8 @@ export class RemoteConfigController {
       // Git-style update: Create new draft version instead of updating existing
       const config = await RemoteConfigModel.update(id, data);
 
-      // Smart version management: Check if value matches published version
-      if (data.defaultValue !== undefined) {
-        // Get the latest published version
-        const publishedVersion = await ConfigVersionModel.getLatestPublishedVersion(id);
-
-        if (publishedVersion && publishedVersion.value === data.defaultValue) {
-          // Value matches published version - delete any existing draft versions
-          await ConfigVersionModel.deleteDraftVersions(id);
-        } else {
-          // Value is different - create or update draft version
-          const existingDraft = await ConfigVersionModel.getLatestDraftVersion(id);
-
-          if (existingDraft) {
-            // Update existing draft
-            await ConfigVersionModel.updateVersion(existingDraft.id, {
-              value: data.defaultValue,
-              changeDescription: 'Updated via admin interface',
-              updatedBy: userId
-            });
-          } else {
-            // Create new draft version
-            await ConfigVersionModel.createVersion({
-              configId: id,
-              value: data.defaultValue,
-              status: 'draft',
-              changeDescription: 'Updated via admin interface',
-              createdBy: userId
-            });
-          }
-        }
-      }
+      // Version management removed - configs are now managed through template versions
+      // Changes will be captured when publish is called
 
       // Send SSE notification
       RemoteConfigNotifications.notifyConfigChange(config.id, 'updated', config);
@@ -241,162 +211,411 @@ export class RemoteConfigController {
     }
   }
 
-  /**
-   * Get versions for a config
-   */
-  static async getVersions(req: Request, res: Response): Promise<void> {
-    try {
-      const configId = parseInt(req.params.id);
+  // getVersions method removed - using template version system instead
 
-      // Check if config exists
-      const config = await RemoteConfigModel.findById(configId, false);
-      if (!config) {
-        throw new CustomError('Remote config not found', 404);
-      }
+  // discardDraftVersions method removed - using template version system instead
 
-      const versions = await ConfigVersionModel.getVersionsByConfigId(configId);
-
-      res.json({
-        success: true,
-        data: { versions }
-      });
-    } catch (error) {
-      logger.error('Error in RemoteConfigController.getVersions:', error);
-      if (error instanceof CustomError) {
-        throw error;
-      }
-      throw new CustomError('Failed to fetch versions', 500);
-    }
-  }
+  // Stage method removed - using direct template version creation instead
 
   /**
-   * Discard draft changes for a config
+   * Get current template data
    */
-  static async discardDraftVersions(req: Request, res: Response): Promise<void> {
+  static async getTemplate(req: Request, res: Response): Promise<void> {
     try {
-      const configId = parseInt(req.params.id);
-      const userId = (req.user as any)?.userId;
+      // Get default template
+      const template = await db('g_remote_config_templates')
+        .where('templateName', 'default_template')
+        .first();
 
-      // Check if config exists
-      const config = await RemoteConfigModel.findById(configId, false);
-      if (!config) {
-        throw new CustomError('Remote config not found', 404);
-      }
+      if (!template) {
+        // Return empty template structure
+        const emptyTemplate = {
+          parameters: {},
+          campaigns: {},
+          segments: {},
+          contextFields: {},
+          variants: {}
+        };
 
-      // Get the latest published version to restore the value
-      const publishedVersion = await ConfigVersionModel.getLatestPublishedVersion(configId);
-
-      // Delete all draft versions for this config
-      const deletedCount = await ConfigVersionModel.deleteDraftVersions(configId);
-
-      // Restore the defaultValue to the published version's value
-      if (publishedVersion) {
-        await RemoteConfigModel.update(configId, {
-          defaultValue: publishedVersion.value,
-          updatedBy: userId
+        res.json({
+          success: true,
+          data: { templateData: emptyTemplate }
         });
+        return;
       }
+
+      const templateData = typeof template.templateData === 'string'
+        ? JSON.parse(template.templateData)
+        : template.templateData;
 
       res.json({
         success: true,
-        message: `${deletedCount} draft versions discarded and value restored`,
-        data: { deletedCount, restoredValue: publishedVersion?.value || null }
+        data: { templateData }
       });
     } catch (error) {
-      logger.error('Error in RemoteConfigController.discardDraftVersions:', error);
+      logger.error('Error in RemoteConfigController.getTemplate:', error);
       if (error instanceof CustomError) {
         throw error;
       }
-      throw new CustomError('Failed to discard draft versions', 500);
+      throw new CustomError('Failed to get template', 500);
     }
   }
 
   /**
-   * Stage configs (Git-like staging)
+   * Update template data directly (for real-time changes)
    */
-  static async stage(req: Request, res: Response): Promise<void> {
+  static async updateTemplate(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.id;
-      const { configIds, description }: StagingRequest = req.body;
+      const { templateData } = req.body;
 
-      if (!configIds || !Array.isArray(configIds) || configIds.length === 0) {
-        throw new CustomError('Config IDs are required', 400);
+      // Get or create default template
+      let template = await db('g_remote_config_templates')
+        .where('templateName', 'default_template')
+        .first();
+
+      if (!template) {
+        // Create default template if it doesn't exist
+        const [templateId] = await db('g_remote_config_templates').insert({
+          environmentId: 1, // Default environment
+          templateName: 'default_template',
+          displayName: 'Default Template',
+          description: 'Default remote config template',
+          templateType: 'client',
+          status: 'draft',
+          version: 1,
+          templateData: JSON.stringify(templateData),
+          createdBy: userId,
+          updatedBy: userId,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+
+        template = await db('g_remote_config_templates').where('id', templateId).first();
+      } else {
+        // Update existing template
+        await db('g_remote_config_templates')
+          .where('id', template.id)
+          .update({
+            templateData: JSON.stringify(templateData),
+            etag: `etag_${Date.now()}`,
+            updatedBy: userId,
+            updatedAt: new Date()
+          });
       }
-
-      await ConfigVersionModel.stageVersions(configIds, userId);
 
       res.json({
         success: true,
-        message: `Staged ${configIds.length} config(s)`,
-        data: { stagedConfigIds: configIds }
+        message: 'Template updated successfully',
+        data: { templateId: template.id }
       });
+
+      logger.info(`Template updated by user ${userId}`);
     } catch (error) {
-      logger.error('Error in RemoteConfigController.stage:', error);
+      logger.error('Error in RemoteConfigController.updateTemplate:', error);
       if (error instanceof CustomError) {
         throw error;
       }
-      throw new CustomError('Failed to stage configs', 500);
+      throw new CustomError('Failed to update template', 500);
     }
   }
 
   /**
-   * Publish staged configs (Git-like push)
+   * Add a new parameter to template
+   */
+  static async addParameter(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.id;
+      const { key, type, defaultValue, description } = req.body;
+
+      // Get current template
+      let template = await db('g_remote_config_templates')
+        .where('templateName', 'default_template')
+        .first();
+
+      let templateData: any = {
+        parameters: {},
+        campaigns: {},
+        segments: {},
+        contextFields: {},
+        variants: {}
+      };
+
+      if (template && template.templateData) {
+        templateData = typeof template.templateData === 'string'
+          ? JSON.parse(template.templateData)
+          : template.templateData;
+      }
+
+      // Check if parameter already exists
+      if (templateData.parameters[key]) {
+        throw new CustomError(`Parameter '${key}' already exists. Use PUT to update existing parameters.`, 409);
+      }
+
+      // Add new parameter
+      templateData.parameters[key] = {
+        id: Date.now(), // Simple ID generation
+        key,
+        type,
+        defaultValue,
+        description,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      // Update template
+      if (!template) {
+        const [templateId] = await db('g_remote_config_templates').insert({
+          environmentId: 1,
+          templateName: 'default_template',
+          displayName: 'Default Template',
+          description: 'Default remote config template',
+          templateType: 'client',
+          status: 'draft',
+          version: 1,
+          templateData: JSON.stringify(templateData),
+          etag: `etag_${Date.now()}`,
+          createdBy: userId,
+          updatedBy: userId,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+        template = { id: templateId };
+      } else {
+        await db('g_remote_config_templates')
+          .where('id', template.id)
+          .update({
+            templateData: JSON.stringify(templateData),
+            etag: `etag_${Date.now()}`,
+            updatedBy: userId,
+            updatedAt: new Date()
+          });
+      }
+
+      res.json({
+        success: true,
+        message: 'Parameter added successfully',
+        data: { parameter: templateData.parameters[key] }
+      });
+
+      logger.info(`Parameter ${key} added by user ${userId}`);
+    } catch (error) {
+      logger.error('Error in RemoteConfigController.addParameter:', error);
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw new CustomError('Failed to add parameter', 500);
+    }
+  }
+
+  /**
+   * Update an existing parameter in template
+   */
+  static async updateParameter(req: Request, res: Response): Promise<void> {
+    try {
+      const { key } = req.params;
+      const { type, defaultValue, description } = req.body;
+      const userId = (req as any).user?.id;
+
+      // Get existing template
+      let template = await db('g_remote_config_templates')
+        .where('environmentId', 1)
+        .where('templateName', 'default_template')
+        .first();
+
+      if (!template) {
+        throw new CustomError('Template not found', 404);
+      }
+
+      let templateData = typeof template.templateData === 'string'
+        ? JSON.parse(template.templateData)
+        : template.templateData;
+
+      // Check if parameter exists
+      if (!templateData.parameters[key]) {
+        throw new CustomError(`Parameter '${key}' not found. Use POST to create new parameters.`, 404);
+      }
+
+      // Update existing parameter
+      const existingParam = templateData.parameters[key];
+      templateData.parameters[key] = {
+        ...existingParam,
+        ...(type && { type }),
+        ...(defaultValue !== undefined && { defaultValue }),
+        ...(description !== undefined && { description }),
+        updatedAt: new Date().toISOString()
+      };
+
+      // Update template
+      await db('g_remote_config_templates')
+        .where('id', template.id)
+        .update({
+          templateData: JSON.stringify(templateData),
+          etag: `etag_${Date.now()}`,
+          updatedBy: userId,
+          updatedAt: new Date()
+        });
+
+      res.json({
+        success: true,
+        message: 'Parameter updated successfully',
+        data: { parameter: templateData.parameters[key] }
+      });
+
+      logger.info(`Parameter ${key} updated by user ${userId}`);
+    } catch (error) {
+      logger.error('Error in RemoteConfigController.updateParameter:', error);
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw new CustomError('Failed to update parameter', 500);
+    }
+  }
+
+  /**
+   * Delete a parameter from template
+   */
+  static async deleteParameter(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user?.id;
+      const { key } = req.params;
+
+      // Get current template
+      const template = await db('g_remote_config_templates')
+        .where('templateName', 'default_template')
+        .first();
+
+      if (!template || !template.templateData) {
+        throw new CustomError('Template not found', 404);
+      }
+
+      const templateData = typeof template.templateData === 'string'
+        ? JSON.parse(template.templateData)
+        : template.templateData;
+
+      if (!templateData.parameters || !templateData.parameters[key]) {
+        throw new CustomError('Parameter not found', 404);
+      }
+
+      // Delete parameter
+      delete templateData.parameters[key];
+
+      // Update template
+      await db('g_remote_config_templates')
+        .where('id', template.id)
+        .update({
+          templateData: JSON.stringify(templateData),
+          etag: `etag_${Date.now()}`,
+          updatedBy: userId,
+          updatedAt: new Date()
+        });
+
+      res.json({
+        success: true,
+        message: 'Parameter deleted successfully'
+      });
+
+      logger.info(`Parameter ${key} deleted by user ${userId}`);
+    } catch (error) {
+      logger.error('Error in RemoteConfigController.deleteParameter:', error);
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw new CustomError('Failed to delete parameter', 500);
+    }
+  }
+
+  /**
+   * Publish template as new version
    */
   static async publish(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user?.id;
       const { deploymentName, description }: PublishRequest = req.body;
 
-      const publishedConfigIds = await ConfigVersionModel.publishStagedVersions(userId);
+      // Get current template data from the latest template version
+      const latestTemplate = await db('g_remote_config_templates')
+        .where('templateName', 'default_template')
+        .first();
 
-      if (publishedConfigIds.length === 0) {
-        throw new CustomError('No staged configs to publish', 400);
+      let templateData: any = {
+        parameters: {},
+        campaigns: {},
+        segments: {},
+        contextFields: {},
+        variants: {}
+      };
+
+      if (latestTemplate && latestTemplate.templateData) {
+        // Use existing template data as base
+        templateData = typeof latestTemplate.templateData === 'string'
+          ? JSON.parse(latestTemplate.templateData)
+          : latestTemplate.templateData;
       }
 
-      // Create deployment record
-      const configsSnapshot: any = {};
-      for (const configId of publishedConfigIds) {
-        const config = await RemoteConfigModel.findById(configId, false);
-        const currentVersion = await ConfigVersionModel.getCurrentVersion(configId);
-        if (config && currentVersion) {
-          configsSnapshot[config.keyName] = {
-            id: config.id,
-            keyName: config.keyName,
-            valueType: config.valueType,
-            value: currentVersion.value,
-            versionNumber: currentVersion.versionNumber,
-            publishedAt: currentVersion.publishedAt
-          };
-        }
+      // Get or create default template
+      let template = await db('g_remote_config_templates')
+        .where('templateName', 'default_template')
+        .first();
+
+      if (!template) {
+        const [templateId] = await db('g_remote_config_templates').insert({
+          templateName: 'default_template',
+          displayName: 'Default Template',
+          description: 'Default template for remote config',
+          templateData: JSON.stringify(templateData),
+          status: 'published',
+          createdBy: userId,
+          updatedBy: userId,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+        template = { id: templateId };
+      } else {
+        // Update existing template
+        await db('g_remote_config_templates')
+          .where('id', template.id)
+          .update({
+            templateData: JSON.stringify(templateData),
+            updatedBy: userId,
+            updatedAt: new Date()
+          });
       }
 
-      const [deploymentId] = await db('g_remote_config_deployments').insert({
-        deploymentName: deploymentName || `Deployment ${new Date().toISOString()}`,
-        description: description || 'Automated deployment',
-        configsSnapshot: JSON.stringify(configsSnapshot),
-        deployedBy: userId,
-        deployedAt: new Date()
+      // Get next version number
+      const latestVersion = await db('g_remote_config_template_versions')
+        .where('templateId', template.id)
+        .orderBy('version', 'desc')
+        .first();
+
+      const nextVersion = latestVersion ? latestVersion.version + 1 : 1;
+
+      // Create new template version
+      const [versionId] = await db('g_remote_config_template_versions').insert({
+        templateId: template.id,
+        version: nextVersion,
+        templateData: JSON.stringify(templateData),
+        changeDescription: description || 'Published template version',
+        createdBy: userId,
+        createdAt: new Date()
       });
 
-      // Send real-time notification for each published config
-      for (const configId of publishedConfigIds) {
-        const config = await RemoteConfigModel.findById(configId, false);
-        if (config) {
-          RemoteConfigNotifications.notifyConfigChange(configId, 'updated', config);
-        }
-      }
+      // Send real-time notification
+      RemoteConfigNotifications.notifyConfigChange(template.id, 'updated', { templateName: 'default_template' });
 
       res.json({
         success: true,
-        message: `Published ${publishedConfigIds.length} config(s)`,
+        message: `Published template version ${nextVersion}`,
         data: {
-          publishedConfigIds,
-          deploymentId,
+          templateId: template.id,
+          versionId,
+          version: nextVersion,
           publishedAt: new Date().toISOString()
         }
       });
 
-      logger.info(`Published configurations: ${publishedConfigIds.join(', ')} by user ${userId}, deployment ID: ${deploymentId}`);
+      logger.info(`Published template version ${nextVersion} by user ${userId}`);
     } catch (error) {
       logger.error('Error in RemoteConfigController.publish:', error);
       if (error instanceof CustomError) {
@@ -493,7 +712,7 @@ export class RemoteConfigController {
   }
 
   /**
-   * Get version history
+   * Get version history from template versions
    */
   static async getVersionHistory(req: Request, res: Response): Promise<void> {
     try {
@@ -501,47 +720,48 @@ export class RemoteConfigController {
       const limit = parseInt(req.query.limit as string) || 10;
       const offset = (page - 1) * limit;
 
-      // Get versions from database with config info
-      const versionsQuery = db('g_remote_config_versions as v')
-        .leftJoin('g_users as u', 'v.createdBy', 'u.id')
-        .leftJoin('g_remote_configs as c', 'v.configId', 'c.id')
+      // Get template versions from database
+      const versionsQuery = db('g_remote_config_template_versions as tv')
+        .leftJoin('g_users as u', 'tv.createdBy', 'u.id')
+        .leftJoin('g_remote_config_templates as t', 'tv.templateId', 't.id')
         .select([
-          'v.id',
-          'v.configId',
-          'v.versionNumber',
-          'v.value',
-          'v.status',
-          'v.changeDescription',
-          'v.publishedAt',
-          'v.createdBy',
-          'v.createdAt',
+          'tv.id',
+          'tv.templateId',
+          'tv.version',
+          'tv.templateData',
+          'tv.changeDescription',
+          'tv.createdBy',
+          'tv.createdAt',
           'u.name as createdByName',
           'u.email as createdByEmail',
-          'c.keyName as configKeyName'
+          't.templateName',
+          't.status as templateStatus'
         ])
-        .orderBy('v.createdAt', 'desc');
+        .orderBy('tv.createdAt', 'desc');
 
       // Get total count
-      const totalQuery = db('g_remote_config_versions').count('* as count');
+      const totalQuery = db('g_remote_config_template_versions').count('* as count');
       const [{ count: total }] = await totalQuery;
 
       // Get paginated results
       const versions = await versionsQuery.limit(limit).offset(offset);
 
-      // Transform results
+      // Transform results to match expected format
       const transformedVersions = versions.map(version => ({
         id: version.id,
-        configId: version.configId,
-        versionNumber: version.versionNumber,
-        value: version.value,
-        status: version.status,
+        templateId: version.templateId,
+        version: version.version,
+        versionNumber: version.version, // Alias for compatibility
+        templateData: version.templateData,
+        value: version.templateData, // Alias for compatibility
         changeDescription: version.changeDescription,
-        publishedAt: version.publishedAt,
         createdBy: version.createdBy,
         createdAt: version.createdAt,
+        publishedAt: version.createdAt, // Use createdAt as publishedAt for now
+        status: version.templateStatus === 'published' ? 'published' : 'draft',
         createdByName: version.createdByName,
         createdByEmail: version.createdByEmail,
-        configKeyName: version.configKeyName
+        templateName: version.templateName
       }));
 
       res.json({
@@ -550,7 +770,8 @@ export class RemoteConfigController {
           versions: transformedVersions,
           total: Number(total),
           page,
-          limit
+          limit,
+          totalPages: Math.ceil(Number(total) / limit)
         }
       });
     } catch (error) {

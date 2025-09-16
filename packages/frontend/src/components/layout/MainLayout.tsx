@@ -56,6 +56,7 @@ import {
   Work as JobIcon,
   Monitor as MonitorIcon,
   CloudSync as CloudSyncIcon,
+  VpnKey as VpnKeyIcon,
 
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -92,6 +93,11 @@ const adminMenuItems = [
     text: 'admin.remoteConfig.title',
     icon: <CloudSyncIcon />,
     path: '/admin/remote-config'
+  },
+  {
+    text: 'apiTokens.title',
+    icon: <VpnKeyIcon />,
+    path: '/admin/api-tokens'
   },
 ];
 

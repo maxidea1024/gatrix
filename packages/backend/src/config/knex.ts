@@ -1,4 +1,5 @@
 import knex from 'knex';
+import { Model } from 'objection';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -34,6 +35,9 @@ const knexConfig = {
 
 // Knex 인스턴스 생성
 const db = knex(knexConfig);
+
+// Objection.js 초기화
+Model.knex(db);
 
 export default db;
 export { knexConfig };

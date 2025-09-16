@@ -8,12 +8,45 @@ interface CacheItem<T> {
 }
 
 export class CacheService extends EventEmitter {
+  private static instance: CacheService;
   private cache = new Map<string, CacheItem<any>>();
   private defaultTTL = 5 * 60 * 1000; // 5 minutes
 
   constructor() {
     super();
     this.setupCleanupInterval();
+  }
+
+  public static getInstance(): CacheService {
+    if (!CacheService.instance) {
+      CacheService.instance = new CacheService();
+    }
+    return CacheService.instance;
+  }
+
+  /**
+   * Static get method
+   */
+  public static async get<T>(key: string): Promise<T | null> {
+    const instance = CacheService.getInstance();
+    return instance.get<T>(key);
+  }
+
+  /**
+   * Static set method
+   */
+  public static async set<T>(key: string, data: T, ttlSeconds?: number): Promise<void> {
+    const instance = CacheService.getInstance();
+    const ttlMs = ttlSeconds ? ttlSeconds * 1000 : undefined;
+    instance.set<T>(key, data, ttlMs);
+  }
+
+  /**
+   * Static del method
+   */
+  public static async del(key: string): Promise<void> {
+    const instance = CacheService.getInstance();
+    instance.delete(key);
   }
 
   /**
