@@ -13,7 +13,6 @@ export interface ApiAccessTokenData {
   tokenHash: string;
   tokenType: TokenType;
   environmentId?: number;
-  isActive: boolean;
   expiresAt?: Date;
   lastUsedAt?: Date;
   createdBy: number;
@@ -31,7 +30,6 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   tokenHash!: string;
   tokenType!: TokenType;
   environmentId?: number;
-  isActive!: boolean;
   expiresAt?: Date;
   lastUsedAt?: Date;
   createdBy!: number;
@@ -53,7 +51,6 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
         tokenHash: { type: 'string', minLength: 1, maxLength: 255 },
         tokenType: { type: 'string', enum: ['client', 'server'] },
         environmentId: { type: ['integer', 'null'] },
-        isActive: { type: 'boolean' },
         expiresAt: { type: ['string', 'null'], format: 'date-time' },
         lastUsedAt: { type: ['string', 'null'], format: 'date-time' },
         createdBy: { type: 'integer' },
@@ -146,7 +143,6 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
       tokenHash,
       tokenType: data.tokenType,
       environmentId: data.environmentId,
-      isActive: true,
       expiresAt: data.expiresAt,
       createdBy: data.createdBy
     });
@@ -160,9 +156,8 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
    * Find token by hash
    */
   static async findByToken(token: string): Promise<ApiAccessToken | undefined> {
-    // Get all active tokens and verify against each hash
+    // Get all tokens and verify against each hash
     const tokens = await this.query()
-      .where('isActive', true)
       .where(builder => {
         builder.whereNull('expiresAt').orWhere('expiresAt', '>', new Date());
       })
@@ -202,7 +197,6 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   static async getForEnvironment(environmentId: number): Promise<ApiAccessToken[]> {
     return await this.query()
       .where('environmentId', environmentId)
-      .where('isActive', true)
       .withGraphFetched('creator(basicInfo)')
       .modifiers({
         basicInfo: (builder) => builder.select('id', 'username', 'email')
@@ -216,7 +210,6 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   static async getAdminTokens(): Promise<ApiAccessToken[]> {
     return await this.query()
       .where('tokenType', 'admin')
-      .where('isActive', true)
       .withGraphFetched('creator(basicInfo)')
       .modifiers({
         basicInfo: (builder) => builder.select('id', 'username', 'email')
@@ -225,13 +218,10 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   }
 
   /**
-   * Revoke token
+   * Revoke token (delete it)
    */
-  async revoke(): Promise<ApiAccessToken> {
-    return await this.$query().patchAndFetch({
-      isActive: false,
-      updatedAt: new Date()
-    });
+  async revoke(): Promise<void> {
+    await this.$query().delete();
   }
 
   /**
@@ -260,7 +250,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
    * Check if token is valid
    */
   isValid(): boolean {
-    return this.isActive && !this.isExpired();
+    return !this.isExpired();
   }
 
   /**
@@ -288,9 +278,8 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
    */
   static async cleanupExpired(): Promise<number> {
     const result = await this.query()
-      .where('isActive', true)
       .where('expiresAt', '<', new Date())
-      .patch({ isActive: false });
+      .delete();
 
     return result;
   }
@@ -304,7 +293,6 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
       tokenName: this.tokenName,
       tokenType: this.tokenType,
       environmentId: this.environmentId,
-      isActive: this.isActive,
       expiresAt: this.expiresAt,
       lastUsedAt: this.lastUsedAt,
       createdAt: this.createdAt,

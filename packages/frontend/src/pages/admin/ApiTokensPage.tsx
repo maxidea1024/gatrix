@@ -80,7 +80,6 @@ const ApiTokensPage: React.FC = () => {
     description: '',
     tokenType: 'client',
     environmentId: 1,
-    isActive: true,
   });
   
   // UI states
@@ -218,7 +217,6 @@ const ApiTokensPage: React.FC = () => {
       description: '',
       tokenType: 'client',
       environmentId: 1,
-      isActive: true,
     });
   };
 
@@ -239,7 +237,6 @@ const ApiTokensPage: React.FC = () => {
       tokenType: token.tokenType,
       environmentId: token.environmentId,
       expiresAt: token.expiresAt ? new Date(token.expiresAt).toISOString().slice(0, 16) : undefined,
-      isActive: token.isActive,
     });
     setEditDialogOpen(true);
     // Focus on token name field after dialog opens
@@ -315,7 +312,6 @@ const ApiTokensPage: React.FC = () => {
                 <TableCell>{t('apiTokens.tokenType', 'Type')}</TableCell>
                 <TableCell>{t('apiTokens.lastUsed', 'Last Used')}</TableCell>
                 <TableCell>{t('apiTokens.expiresAt', 'Expires')}</TableCell>
-                <TableCell align="center">{t('apiTokens.status', 'Status')}</TableCell>
                 <TableCell>{t('apiTokens.createdBy', 'Created By')}</TableCell>
                 <TableCell>{t('apiTokens.createdAt', 'Created Date')}</TableCell>
                 <TableCell align="center">{t('common.actions', 'Actions')}</TableCell>
@@ -323,10 +319,10 @@ const ApiTokensPage: React.FC = () => {
             </TableHead>
             <TableBody>
               {loading ? (
-                <EmptyTableRow colSpan={9} message={t('common.loading', 'Loading...')} />
+                <EmptyTableRow colSpan={8} message={t('common.loading', 'Loading...')} />
               ) : !tokens || tokens.length === 0 ? (
                 <EmptyTableRow
-                  colSpan={9}
+                  colSpan={8}
                   message={t('apiTokens.noTokens', 'No API tokens found')}
                   action={
                     <Button variant="outlined" startIcon={<AddIcon />} onClick={openCreateDialog}>
@@ -377,13 +373,6 @@ const ApiTokensPage: React.FC = () => {
                           : t('apiTokens.noExpiration', 'No Expiration')
                         }
                       </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Chip
-                        label={token.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
-                        color={token.isActive ? 'success' : 'default'}
-                        size="small"
-                      />
                     </TableCell>
                     <TableCell>
                       <Box>
@@ -809,7 +798,16 @@ const ApiTokensPage: React.FC = () => {
         open={regenerateDialogOpen}
         onClose={() => setRegenerateDialogOpen(false)}
         PaperProps={{
-          sx: { width: 500 }
+          sx: {
+            width: 500,
+            height: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            zIndex: 1300 // Ensure it's above the sticky header
+          }
+        }}
+        ModalProps={{
+          keepMounted: false
         }}
       >
         <Box sx={{

@@ -9,7 +9,7 @@ class ApiTokensController {
    */
   async getTokens(req: Request, res: Response) {
     try {
-      const { page = 1, limit = 10, tokenType, isActive, search } = req.query;
+      const { page = 1, limit = 10, tokenType, search } = req.query;
       const offset = (Number(page) - 1) * Number(limit);
 
       // Build query with user join
@@ -25,10 +25,6 @@ class ApiTokensController {
         query = query.where('tokenType', tokenType);
       }
 
-      if (isActive !== undefined) {
-        query = query.where('isActive', isActive === 'true' ? 1 : 0);
-      }
-
       if (search) {
         query = query.where('tokenName', 'like', `%${search}%`);
       }
@@ -38,10 +34,6 @@ class ApiTokensController {
 
       if (tokenType) {
         countQuery = countQuery.where('tokenType', tokenType);
-      }
-
-      if (isActive !== undefined) {
-        countQuery = countQuery.where('isActive', isActive === 'true' ? 1 : 0);
       }
 
       if (search) {
@@ -61,7 +53,6 @@ class ApiTokensController {
         return {
           ...token,
           tokenHash: token.tokenHash.substring(0, 8) + '••••••••••••••••', // Show only first 8 chars
-          isActive: Boolean(token.isActive),
           creator: {
             name: token.creatorName || 'Unknown',
             email: token.creatorEmail || ''
@@ -119,7 +110,6 @@ class ApiTokensController {
         tokenHash,
         tokenType,
         environmentId: null,
-        isActive: true,
         expiresAt: expiresAt || null,
         createdBy: userId,
         updatedBy: userId,
@@ -135,7 +125,6 @@ class ApiTokensController {
           tokenName,
           tokenType,
           tokenValue, // Only shown once!
-          isActive: true,
           expiresAt,
           createdAt: new Date().toISOString()
         }
@@ -155,7 +144,7 @@ class ApiTokensController {
   async updateToken(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const { tokenName, description, expiresAt, isActive } = req.body;
+      const { tokenName, description, expiresAt } = req.body;
       const userId = (req as any).user.id;
 
       // Check if token exists
@@ -176,7 +165,6 @@ class ApiTokensController {
       if (tokenName !== undefined) updateData.tokenName = tokenName;
       if (description !== undefined) updateData.description = description;
       if (expiresAt !== undefined) updateData.expiresAt = expiresAt ? new Date(expiresAt) : null;
-      if (isActive !== undefined) updateData.isActive = isActive;
 
       // Update token
       await knex('g_api_access_tokens')
@@ -198,7 +186,6 @@ class ApiTokensController {
       const formattedToken = {
         ...updatedToken,
         tokenHash: updatedToken.tokenHash.substring(0, 8) + '••••••••••••••••',
-        isActive: Boolean(updatedToken.isActive),
         creator: {
           name: updatedToken.creatorName || 'Unknown',
           email: updatedToken.creatorEmail || ''
@@ -258,7 +245,6 @@ class ApiTokensController {
           tokenName: existingToken.tokenName,
           tokenType: existingToken.tokenType,
           tokenValue, // Only shown once!
-          isActive: existingToken.isActive,
           expiresAt: existingToken.expiresAt,
           updatedAt: new Date().toISOString()
         }
@@ -315,9 +301,8 @@ class ApiTokensController {
       // Get total tokens
       const [{ count: totalTokens }] = await knex('g_api_access_tokens').count('* as count');
 
-      // Get active tokens
+      // Get all tokens (no isActive filter needed)
       const [{ count: activeTokens }] = await knex('g_api_access_tokens')
-        .where('isActive', 1)
         .count('* as count');
 
       // Get expired tokens

@@ -7,7 +7,6 @@ export interface ApiAccessToken {
   tokenHash: string;
   tokenType: TokenType;
   environmentId?: number;
-  isActive: boolean;
   expiresAt?: string;
   lastUsedAt?: string;
   createdBy: number;
@@ -37,14 +36,12 @@ export interface CreateTokenRequest {
   tokenType: TokenType;
   environmentId?: number;
   expiresAt?: string;
-  isActive?: boolean;
 }
 
 export interface UpdateTokenRequest {
   tokenName?: string;
   description?: string;
   expiresAt?: string;
-  isActive?: boolean;
 }
 
 export interface CreateTokenResponse {
@@ -57,7 +54,6 @@ export interface GetTokensRequest {
   limit?: number;
   tokenType?: TokenType;
   environmentId?: number;
-  isActive?: boolean;
 }
 
 export interface GetTokensResponse {
