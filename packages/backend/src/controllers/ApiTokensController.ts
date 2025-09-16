@@ -48,11 +48,12 @@ class ApiTokensController {
         .limit(Number(limit))
         .offset(Number(offset));
 
-      // Format tokens (hide sensitive data)
+      // Format tokens (include full token hash for copying)
       const formattedTokens = tokens.map((token: any) => {
         return {
           ...token,
-          tokenHash: token.tokenHash.substring(0, 8) + '••••••••••••••••', // Show only first 8 chars
+          // Keep the full tokenHash for copying purposes
+          tokenHash: token.tokenHash,
           creator: {
             name: token.creatorName || 'Unknown',
             email: token.creatorEmail || ''

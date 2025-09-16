@@ -579,7 +579,13 @@
     "deleteWarning": "This action cannot be undone. The token will be permanently deleted.",
     "deleteConfirmInstruction": "To confirm deletion, please type the token name:",
     "deleteConfirmPlaceholder": "Type token name here...",
-    "deleteConfirmMismatch": "Token name does not match. Please type the exact token name to confirm deletion."
+    "deleteConfirmMismatch": "Token name does not match. Please type the exact token name to confirm deletion.",
+    "copyToken": "Copy Token",
+    "tokenHashCopied": "Token hash copied to clipboard",
+    "tokenAvailable": "You can copy this token anytime from the token list or regenerate it if needed.",
+    "tokenValueError": "Failed to retrieve token value. Please try again.",
+    "bulkRegenerate": "Regenerate Selected",
+    "bulkDelete": "Delete Selected"
   },
   "auditLogs": {
     "action": "Action",
@@ -1012,6 +1018,7 @@
     "required": "Required",
     "optional": "Optional",
     "reset": "Reset",
+    "selectedItems": "{{count}} items selected",
     "retry": "Retry",
     "resource": "Resource",
     "rowsPerPage": "Rows per page",

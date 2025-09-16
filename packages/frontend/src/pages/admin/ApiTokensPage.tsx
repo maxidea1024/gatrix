@@ -88,6 +88,14 @@ const ApiTokensPage: React.FC = () => {
   const [newTokenDialogOpen, setNewTokenDialogOpen] = useState<boolean>(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState<string>('');
 
+  // Bulk selection states
+  const [selectedTokenIds, setSelectedTokenIds] = useState<number[]>([]);
+  const [selectAll, setSelectAll] = useState<boolean>(false);
+
+  // Bulk delete states
+  const [bulkDeleteDrawerOpen, setBulkDeleteDrawerOpen] = useState<boolean>(false);
+  const [bulkDeleteConfirmText, setBulkDeleteConfirmText] = useState<string>('');
+
   // Refs for focus management
   const tokenNameRef = useRef<HTMLInputElement>(null);
   const editTokenNameRef = useRef<HTMLInputElement>(null);
@@ -118,6 +126,8 @@ const ApiTokensPage: React.FC = () => {
   const handleCreate = async () => {
     try {
       const response = await apiTokenService.createToken(formData);
+      console.log('Create token response:', response); // 디버깅용
+
       // 토큰 정보를 먼저 설정
       const tokenInfo = {
         tokenName: formData.tokenName,
@@ -131,10 +141,19 @@ const ApiTokensPage: React.FC = () => {
       setCreateDialogOpen(false);
       resetForm();
 
-      // 토큰 정보 설정과 다이얼로그 표시를 동시에
-      setNewTokenValue(response.tokenValue);
+      // 백엔드 응답 구조 확인 및 토큰 값 추출
+      const tokenValue = response?.data?.tokenValue || response?.tokenValue || '';
+      console.log('Create response structure:', response); // 디버깅용
+      console.log('Extracted token value:', tokenValue); // 디버깅용
+
+      // 상태를 순서대로 설정하여 다이얼로그가 확실히 열리도록 함
       setNewTokenInfo(tokenInfo);
-      setNewTokenDialogOpen(true);
+      setNewTokenValue(tokenValue);
+
+      // 다음 렌더링 사이클에서 다이얼로그 열기
+      setTimeout(() => {
+        setNewTokenDialogOpen(true);
+      }, 0);
 
       // 토큰 목록은 백그라운드에서 새로고침 (await 제거)
       loadTokens().catch(console.error);
@@ -192,15 +211,29 @@ const ApiTokensPage: React.FC = () => {
 
     try {
       const response = await apiTokenService.regenerateToken(selectedToken.id);
-      setNewTokenValue(response.data.tokenValue);
-      setNewTokenInfo({
+      console.log('Regenerate token response:', response); // 디버깅용
+
+      // 백엔드 응답 구조 확인 및 토큰 값 추출
+      const tokenValue = response?.data?.tokenValue || response?.tokenValue || '';
+      console.log('Regenerate response structure:', response); // 디버깅용
+      console.log('Extracted token value:', tokenValue); // 디버깅용
+
+      const tokenInfo = {
         tokenName: selectedToken.tokenName,
         description: selectedToken.description,
         tokenType: selectedToken.tokenType,
         expiresAt: selectedToken.expiresAt,
         isNew: false
-      });
-      setNewTokenDialogOpen(true);
+      };
+
+      // 상태를 순서대로 설정하여 다이얼로그가 확실히 열리도록 함
+      setNewTokenInfo(tokenInfo);
+      setNewTokenValue(tokenValue);
+
+      // 다음 렌더링 사이클에서 다이얼로그 열기
+      setTimeout(() => {
+        setNewTokenDialogOpen(true);
+      }, 0);
       setRegenerateDialogOpen(false);
       setSelectedToken(null);
       loadTokens();
@@ -263,9 +296,79 @@ const ApiTokensPage: React.FC = () => {
     enqueueSnackbar(t('apiTokens.tokenCopied', 'Token copied to clipboard'), { variant: 'success' });
   };
 
+  const copyTokenHash = (token: ApiAccessToken) => {
+    navigator.clipboard.writeText(token.tokenHash);
+    enqueueSnackbar(t('apiTokens.tokenHashCopied', 'Token hash copied to clipboard'), { variant: 'success' });
+  };
+
   const maskToken = (token: string) => {
     if (!token || token.length < 8) return token;
     return `${token.substring(0, 4)}${'•'.repeat(token.length - 8)}${token.substring(token.length - 4)}`;
+  };
+
+  // Bulk selection handlers
+  const handleSelectAll = (checked: boolean) => {
+    setSelectAll(checked);
+    if (checked) {
+      setSelectedTokenIds(tokens.map(token => token.id));
+    } else {
+      setSelectedTokenIds([]);
+    }
+  };
+
+  const handleSelectToken = (tokenId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedTokenIds(prev => [...prev, tokenId]);
+    } else {
+      setSelectedTokenIds(prev => prev.filter(id => id !== tokenId));
+      setSelectAll(false);
+    }
+  };
+
+  // Update selectAll state when individual selections change
+  React.useEffect(() => {
+    if (tokens.length > 0 && selectedTokenIds.length === tokens.length) {
+      setSelectAll(true);
+    } else {
+      setSelectAll(false);
+    }
+  }, [selectedTokenIds, tokens]);
+
+  // Bulk actions
+  const handleBulkDelete = () => {
+    setBulkDeleteDrawerOpen(true);
+  };
+
+  const confirmBulkDelete = async () => {
+    try {
+      setLoading(true);
+
+      // Delete selected tokens
+      for (const tokenId of selectedTokenIds) {
+        await apiTokenService.deleteToken(tokenId);
+      }
+
+      enqueueSnackbar(t('apiTokens.bulkDeleteSuccess', 'Selected tokens deleted successfully'), { variant: 'success' });
+
+      // Reset states
+      setSelectedTokenIds([]);
+      setSelectAll(false);
+      setBulkDeleteDrawerOpen(false);
+      setBulkDeleteConfirmText('');
+
+      // Reload tokens
+      await loadTokens();
+    } catch (error) {
+      console.error('Bulk delete failed:', error);
+      enqueueSnackbar(t('apiTokens.bulkDeleteFailed', 'Failed to delete selected tokens'), { variant: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const closeBulkDeleteDrawer = () => {
+    setBulkDeleteDrawerOpen(false);
+    setBulkDeleteConfirmText('');
   };
 
 
@@ -301,12 +404,46 @@ const ApiTokensPage: React.FC = () => {
 
 
 
+      {/* Bulk Actions */}
+      {selectedTokenIds.length > 0 && (
+        <Box sx={{
+          mb: 2,
+          p: 2,
+          bgcolor: 'action.hover',
+          borderRadius: 1,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <Typography variant="body2" color="text.secondary">
+            {t('common.selectedItems', '{{count}} items selected', { count: selectedTokenIds.length })}
+          </Typography>
+          <Button
+            variant="outlined"
+            color="error"
+            size="small"
+            startIcon={<DeleteIcon />}
+            onClick={handleBulkDelete}
+          >
+            {t('apiTokens.bulkDelete', 'Delete Selected')}
+          </Button>
+        </Box>
+      )}
+
       {/* Tokens Table */}
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer>
           <Table stickyHeader>
             <TableHead>
               <TableRow>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={selectAll}
+                    indeterminate={selectedTokenIds.length > 0 && selectedTokenIds.length < tokens.length}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    disabled={tokens.length === 0}
+                  />
+                </TableCell>
                 <TableCell>{t('apiTokens.tokenName', 'Token Name')}</TableCell>
                 <TableCell>{t('apiTokens.description', 'Description')}</TableCell>
                 <TableCell>{t('apiTokens.tokenType', 'Type')}</TableCell>
@@ -319,10 +456,10 @@ const ApiTokensPage: React.FC = () => {
             </TableHead>
             <TableBody>
               {loading ? (
-                <EmptyTableRow colSpan={8} message={t('common.loading', 'Loading...')} />
+                <EmptyTableRow colSpan={9} message={t('common.loading', 'Loading...')} />
               ) : !tokens || tokens.length === 0 ? (
                 <EmptyTableRow
-                  colSpan={8}
+                  colSpan={9}
                   message={t('apiTokens.noTokens', 'No API tokens found')}
                   action={
                     <Button variant="outlined" startIcon={<AddIcon />} onClick={openCreateDialog}>
@@ -332,7 +469,13 @@ const ApiTokensPage: React.FC = () => {
                 />
               ) : (
                 tokens.map((token) => (
-                  <TableRow key={token.id} hover>
+                  <TableRow key={token.id} hover selected={selectedTokenIds.includes(token.id)}>
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        checked={selectedTokenIds.includes(token.id)}
+                        onChange={(e) => handleSelectToken(token.id, e.target.checked)}
+                      />
+                    </TableCell>
                     <TableCell>
                       <Typography variant="body2" fontWeight={500}>
                         {token.tokenName}
@@ -392,7 +535,12 @@ const ApiTokensPage: React.FC = () => {
                       </Typography>
                     </TableCell>
                     <TableCell align="center">
-                      <Box sx={{ display: 'flex', gap: 0.5 }}>
+                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                        <Tooltip title={t('apiTokens.copyToken', 'Copy Token')}>
+                          <IconButton size="small" onClick={() => copyTokenHash(token)}>
+                            <CopyIcon />
+                          </IconButton>
+                        </Tooltip>
                         <Tooltip title={t('common.edit', 'Edit')}>
                           <IconButton size="small" onClick={() => openEditDialog(token)}>
                             <EditIcon />
@@ -563,17 +711,6 @@ const ApiTokensPage: React.FC = () => {
               InputLabelProps={{ shrink: true }}
               helperText={t('apiTokens.expiresAtHelp', 'Leave empty for no expiration')}
             />
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
-                  size="small"
-                />
-              }
-              label={t('apiTokens.isActive', 'Active')}
-            />
         </Box>
 
         {/* Actions */}
@@ -691,17 +828,6 @@ const ApiTokensPage: React.FC = () => {
               InputLabelProps={{ shrink: true }}
               helperText={t('apiTokens.expiresAtHelp', 'Leave empty for no expiration')}
             />
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
-                  size="small"
-                />
-              }
-              label={t('apiTokens.isActive', 'Active')}
-            />
         </Box>
 
         {/* Actions */}
@@ -731,26 +857,82 @@ const ApiTokensPage: React.FC = () => {
         </Box>
       </Drawer>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('apiTokens.deleteToken', 'Delete API Token')}</DialogTitle>
-        <DialogContent>
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {t('apiTokens.deleteWarning', 'This action cannot be undone. The token will be permanently deleted.')}
+      {/* Delete Confirmation Drawer */}
+      <Drawer
+        anchor="right"
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 500 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column',
+            zIndex: 1300
+          }
+        }}
+      >
+        <Box sx={{
+          p: 3,
+          borderBottom: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: 'background.paper',
+          position: 'sticky',
+          top: 0,
+          zIndex: 1301
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600, color: 'error.main' }}>
+            {t('apiTokens.deleteToken', 'Delete API Token')}
+          </Typography>
+          <IconButton
+            onClick={() => setDeleteDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ p: 3, flexGrow: 1 }}>
+          <Alert severity="error" sx={{ mb: 3 }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+              {t('apiTokens.deleteWarning', 'This action cannot be undone. The token will be permanently deleted.')}
+            </Typography>
           </Alert>
 
-          <Typography sx={{ mb: 2 }}>
+          <Typography variant="body1" sx={{ mb: 3 }}>
             {t('apiTokens.deleteConfirmation', 'Are you sure you want to delete this API token?')}
           </Typography>
 
           {selectedToken && (
             <>
-              <Box sx={{ mb: 3, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
-                <Typography variant="body2" fontWeight={500}>
+              <Box sx={{
+                mb: 3,
+                p: 3,
+                bgcolor: 'background.paper',
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: 'divider'
+              }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                  {t('apiTokens.tokenName', 'Token Name')}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                   {selectedToken.tokenName}
                 </Typography>
+
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                  {t('apiTokens.tokenType', 'Type')}
+                </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {t(`apiTokens.${selectedToken.tokenType}TokenType`, selectedToken.tokenType)}
+                  {t(`apiTokens.types.${selectedToken.tokenType}`, selectedToken.tokenType)}
                 </Typography>
               </Box>
 
@@ -766,19 +948,32 @@ const ApiTokensPage: React.FC = () => {
                 value={deleteConfirmText}
                 onChange={(e) => setDeleteConfirmText(e.target.value)}
                 placeholder={t('apiTokens.deleteConfirmPlaceholder', 'Type token name here...')}
-                size="small"
+                size="medium"
                 error={deleteConfirmText.length > 0 && deleteConfirmText !== selectedToken.tokenName}
                 helperText={
                   deleteConfirmText.length > 0 && deleteConfirmText !== selectedToken.tokenName
                     ? t('apiTokens.deleteConfirmMismatch', 'Token name does not match')
                     : ''
                 }
+                sx={{ mb: 2 }}
               />
             </>
           )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>
+        </Box>
+
+        <Box sx={{
+          p: 3,
+          borderTop: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setDeleteDialogOpen(false)}
+            variant="outlined"
+            startIcon={<CancelIcon />}
+          >
             {t('common.cancel', 'Cancel')}
           </Button>
           <Button
@@ -786,11 +981,12 @@ const ApiTokensPage: React.FC = () => {
             variant="contained"
             color="error"
             disabled={!selectedToken || deleteConfirmText !== selectedToken.tokenName}
+            startIcon={<DeleteIcon />}
           >
             {t('common.delete', 'Delete')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
       {/* Regenerate Token Side Panel */}
       <Drawer
@@ -807,7 +1003,10 @@ const ApiTokensPage: React.FC = () => {
           }
         }}
         ModalProps={{
-          keepMounted: false
+          keepMounted: false,
+          sx: {
+            zIndex: 1300 // Ensure modal backdrop is also above header
+          }
         }}
       >
         <Box sx={{
@@ -850,10 +1049,10 @@ const ApiTokensPage: React.FC = () => {
           {selectedToken && (
             <Box sx={{
               p: 3,
-              bgcolor: 'grey.50',
+              bgcolor: 'background.default',
               borderRadius: 2,
               border: '1px solid',
-              borderColor: 'grey.200',
+              borderColor: 'divider',
               mb: 3
             }}>
               <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
@@ -897,8 +1096,159 @@ const ApiTokensPage: React.FC = () => {
         </Box>
       </Drawer>
 
+      {/* Bulk Delete Confirmation Drawer */}
+      <Drawer
+        anchor="right"
+        open={bulkDeleteDrawerOpen}
+        onClose={closeBulkDeleteDrawer}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 400 },
+            maxWidth: '100vw'
+          }
+        }}
+      >
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          position: 'sticky',
+          top: 0,
+          zIndex: 1300
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('apiTokens.bulkDeleteConfirmation', 'Delete Selected Tokens')}
+          </Typography>
+          <IconButton
+            onClick={closeBulkDeleteDrawer}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ p: 3, flexGrow: 1 }}>
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+              {t('apiTokens.bulkDeleteWarning', 'This action cannot be undone. The following tokens will be permanently deleted:')}
+            </Typography>
+          </Alert>
+
+          {/* Selected Tokens List */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
+              {t('apiTokens.tokensToDelete', 'Tokens to delete ({{count}})', { count: selectedTokenIds.length })}:
+            </Typography>
+            <Box sx={{
+              maxHeight: 200,
+              overflowY: 'auto',
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 1,
+              p: 1
+            }}>
+              {tokens
+                .filter(token => selectedTokenIds.includes(token.id))
+                .map(token => (
+                  <Box key={token.id} sx={{
+                    p: 1.5,
+                    mb: 1,
+                    bgcolor: 'action.hover',
+                    borderRadius: 1,
+                    '&:last-child': { mb: 0 }
+                  }}>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {token.tokenName}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {token.tokenType} • {t('apiTokens.createdBy', 'Created By')}: {token.creator?.name || 'Unknown'}
+                    </Typography>
+                  </Box>
+                ))
+              }
+            </Box>
+          </Box>
+
+          {/* Confirmation Input */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              {t('apiTokens.bulkDeleteConfirmInstruction', 'To confirm deletion, please type:')}
+            </Typography>
+            <Typography variant="body2" sx={{
+              mb: 2,
+              p: 1,
+              bgcolor: 'action.hover',
+              borderRadius: 1,
+              fontFamily: 'monospace',
+              fontWeight: 600
+            }}>
+              {t('apiTokens.deleteSelectedTokensText', 'delete selected tokens')}
+            </Typography>
+            <TextField
+              fullWidth
+              value={bulkDeleteConfirmText}
+              onChange={(e) => setBulkDeleteConfirmText(e.target.value)}
+              placeholder={t('apiTokens.bulkDeleteConfirmPlaceholder', 'Type confirmation text here...')}
+              variant="outlined"
+              size="small"
+            />
+            {bulkDeleteConfirmText && bulkDeleteConfirmText !== t('apiTokens.deleteSelectedTokensText', 'delete selected tokens') && (
+              <Typography variant="caption" color="error" sx={{ mt: 1, display: 'block' }}>
+                {t('apiTokens.bulkDeleteConfirmMismatch', 'Confirmation text does not match. Please type the exact text above.')}
+              </Typography>
+            )}
+          </Box>
+        </Box>
+
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={closeBulkDeleteDrawer}
+            variant="outlined"
+            startIcon={<CancelIcon />}
+          >
+            {t('common.cancel', 'Cancel')}
+          </Button>
+          <Button
+            onClick={confirmBulkDelete}
+            color="error"
+            variant="contained"
+            startIcon={<DeleteIcon />}
+            disabled={bulkDeleteConfirmText !== t('apiTokens.deleteSelectedTokensText', 'delete selected tokens') || loading}
+          >
+            {t('apiTokens.bulkDelete', 'Delete Selected')}
+          </Button>
+        </Box>
+      </Drawer>
+
       {/* New Token Display Dialog */}
-      <Dialog open={newTokenDialogOpen && !!newTokenValue && !!newTokenInfo} onClose={() => { setNewTokenValue(''); setNewTokenInfo(null); setNewTokenDialogOpen(false); }} maxWidth="md" fullWidth>
+      <Dialog
+        open={newTokenDialogOpen && !!newTokenInfo}
+        onClose={() => { setNewTokenValue(''); setNewTokenInfo(null); setNewTokenDialogOpen(false); }}
+        maxWidth="md"
+        fullWidth
+        sx={{
+          '& .MuiDialog-paper': {
+            maxWidth: '700px',
+            width: '90%'
+          }
+        }}
+      >
           <DialogTitle sx={{ pb: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <CheckCircleIcon color="success" sx={{ fontSize: 32 }} />
@@ -916,22 +1266,6 @@ const ApiTokensPage: React.FC = () => {
             </Box>
           </DialogTitle>
           <DialogContent sx={{ pt: 2 }}>
-            {/* Security Notice */}
-            <Alert
-              severity="error"
-              icon={<SecurityIcon />}
-              sx={{
-                mb: 3,
-                '& .MuiAlert-message': { fontWeight: 500 }
-              }}
-            >
-              <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                {t('apiTokens.tokenWarning', 'Please copy this token now. You won\'t be able to see it again!')}
-              </Typography>
-              <Typography variant="body2">
-                {t('apiTokens.tokenSecurityNotice', 'For security reasons, this token value cannot be viewed again. Please copy it now and store it in a safe place.')}
-              </Typography>
-            </Alert>
 
             {/* Token Summary */}
             {newTokenInfo && (
@@ -991,10 +1325,10 @@ const ApiTokensPage: React.FC = () => {
             )}
 
             {/* Token Value */}
-            {newTokenValue && (
+            {newTokenValue ? (
               <Box sx={{
                 p: 2,
-                bgcolor: 'grey.50',
+                bgcolor: 'action.hover',
                 borderRadius: 1,
                 border: '1px solid',
                 borderColor: 'divider'
@@ -1009,7 +1343,7 @@ const ApiTokensPage: React.FC = () => {
                   alignItems: 'center',
                   gap: 1,
                   p: 1.5,
-                  bgcolor: 'background.paper',
+                  bgcolor: 'background.default',
                   borderRadius: 1,
                   border: '1px solid',
                   borderColor: 'divider'
@@ -1037,6 +1371,12 @@ const ApiTokensPage: React.FC = () => {
                   </Tooltip>
                 </Box>
               </Box>
+            ) : (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                <Typography variant="body2">
+                  {t('apiTokens.tokenValueError', 'Failed to retrieve token value. Please try again.')}
+                </Typography>
+              </Alert>
             )}
           </DialogContent>
           <DialogActions sx={{ p: 3, pt: 2 }}>
@@ -1053,7 +1393,7 @@ const ApiTokensPage: React.FC = () => {
                 fontSize: '1rem'
               }}
             >
-              {t('apiTokens.confirmAndClose', 'Confirm & Close')}
+              {t('common.confirm', 'Confirm')}
             </Button>
           </DialogActions>
         </Dialog>

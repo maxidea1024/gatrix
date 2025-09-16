@@ -571,7 +571,13 @@
     "deleteWarning": "이 작업은 되돌릴 수 없습니다. 토큰이 영구적으로 삭제됩니다.",
     "deleteConfirmInstruction": "삭제를 확인하려면 토큰 이름을 입력하세요:",
     "deleteConfirmPlaceholder": "토큰 이름을 여기에 입력하세요...",
-    "deleteConfirmMismatch": "토큰 이름이 일치하지 않습니다. 삭제를 확인하려면 정확한 토큰 이름을 입력하세요."
+    "deleteConfirmMismatch": "토큰 이름이 일치하지 않습니다. 삭제를 확인하려면 정확한 토큰 이름을 입력하세요.",
+    "copyToken": "토큰 복사",
+    "tokenHashCopied": "토큰 해시가 클립보드에 복사되었습니다",
+    "tokenAvailable": "토큰 목록에서 언제든지 이 토큰을 복사하거나 필요시 재생성할 수 있습니다.",
+    "tokenValueError": "토큰 값을 가져오는데 실패했습니다. 다시 시도해주세요.",
+    "bulkRegenerate": "선택된 항목 재생성",
+    "bulkDelete": "선택된 항목 삭제"
   },
   "auditLogs": {
     "action": "작업",
@@ -1050,6 +1056,7 @@
     "required": "필수",
     "optional": "선택사항",
     "repeat": "반복",
+    "selectedItems": "{{count}}개 항목 선택됨",
     "retry": "다시 시도",
     "user": "사용자",
     "reset": "재설정",

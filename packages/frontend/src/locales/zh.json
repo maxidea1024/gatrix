@@ -479,7 +479,13 @@
     "deleteWarning": "此操作无法撤销。令牌将被永久删除。",
     "deleteConfirmInstruction": "要确认删除，请输入令牌名称：",
     "deleteConfirmPlaceholder": "在此输入令牌名称...",
-    "deleteConfirmMismatch": "令牌名称不匹配。请输入确切的令牌名称以确认删除。"
+    "deleteConfirmMismatch": "令牌名称不匹配。请输入确切的令牌名称以确认删除。",
+    "copyToken": "复制令牌",
+    "tokenHashCopied": "令牌哈希已复制到剪贴板",
+    "tokenAvailable": "您可以随时从令牌列表复制此令牌或根据需要重新生成。",
+    "tokenValueError": "获取令牌值失败。请重试。",
+    "bulkRegenerate": "重新生成选中项",
+    "bulkDelete": "删除选中项"
   },
   "auditLogs": {
     "action": "操作",
@@ -907,6 +913,7 @@
     "required": "必填",
     "optional": "可选",
     "reset": "重置",
+    "selectedItems": "已选择 {{count}} 项",
     "retry": "重试",
     "resource": "资源",
     "rowsPerPage": "每页行数",
