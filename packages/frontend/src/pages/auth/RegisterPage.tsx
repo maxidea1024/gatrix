@@ -177,7 +177,7 @@ const RegisterPage: React.FC = () => {
       // 성공 시에만 에러 메시지 지우기
       setRegisterError(null);
       setRegisterSuccess(true);
-      toast.success(t('auth.registerSuccess'));
+      enqueueSnackbar(t('auth.registerSuccess'), { variant: 'success' });
     } catch (err: any) {
       // 에러 시에도 최소 2초 대기
       const elapsed = Date.now() - startTime;

@@ -44,7 +44,7 @@ import {
   Cancel as CancelIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'react-toastify';
+import { useSnackbar } from 'notistack';
 import api from '@/services/api';
 import SimplePagination from '@/components/common/SimplePagination';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
@@ -78,6 +78,7 @@ interface Deployment {
 
 const RemoteConfigHistoryPage: React.FC = () => {
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
   const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [versions, setVersions] = useState<ConfigVersion[]>([]);
   const [loading, setLoading] = useState(true);
@@ -101,7 +102,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
       setTotal(response.data.total);
     } catch (error) {
       console.error('Error loading deployments:', error);
-      toast.error('Failed to load deployment history');
+      enqueueSnackbar('Failed to load deployment history', { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -116,7 +117,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
       setTotal(response.data.total);
     } catch (error) {
       console.error('Error loading versions:', error);
-      toast.error('Failed to load version history');
+      enqueueSnackbar('Failed to load version history', { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -145,13 +146,13 @@ const RemoteConfigHistoryPage: React.FC = () => {
         deploymentId: rollbackTarget.id,
       });
 
-      toast.success('Rollback completed successfully');
+      enqueueSnackbar('Rollback completed successfully', { variant: 'success' });
       loadDeployments();
       setRollbackDialogOpen(false);
       setRollbackTarget(null);
     } catch (error) {
       console.error('Error rolling back:', error);
-      toast.error('Failed to rollback deployment');
+      enqueueSnackbar('Failed to rollback deployment', { variant: 'error' });
     }
   };
 

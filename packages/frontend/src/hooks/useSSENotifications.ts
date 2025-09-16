@@ -194,8 +194,8 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
   const handleCampaignStatusChange = useCallback((data: any) => {
     const { campaignId, isActive, reason } = data;
     const status = isActive ? 'activated' : 'deactivated';
-    toast.info(`Campaign ${campaignId} ${status} (${reason})`);
-  }, []);
+    enqueueSnackbar(`Campaign ${campaignId} ${status} (${reason})`, { variant: 'info' });
+  }, [enqueueSnackbar]);
 
   // Subscribe to channels
   const subscribe = useCallback(async (channels: string[]) => {

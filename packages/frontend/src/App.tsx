@@ -2,9 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { CssBaseline } from '@mui/material';
 import { SnackbarProvider } from 'notistack';
-import { ToastContainer } from 'react-toastify';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 // MUI Date Pickers
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -253,17 +250,6 @@ const AppContent: React.FC = () => {
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Router>
-            <ToastContainer
-              position="bottom-right"
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              // pauseOnFocusLoss
-              draggable
-              pauseOnHover
-            />
           </SnackbarProvider>
         </LocalizedDatePickers>
       </AuthProvider>
