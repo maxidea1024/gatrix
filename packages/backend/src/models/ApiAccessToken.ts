@@ -4,7 +4,7 @@ import { RemoteConfigEnvironment } from './RemoteConfigEnvironment';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 
-export type TokenType = 'client' | 'server' | 'admin';
+export type TokenType = 'client' | 'server';
 
 export interface ApiAccessTokenData {
   id?: number;
@@ -13,7 +13,6 @@ export interface ApiAccessTokenData {
   tokenHash: string;
   tokenType: TokenType;
   environmentId?: number;
-  permissions: string[];
   isActive: boolean;
   expiresAt?: Date;
   lastUsedAt?: Date;
@@ -32,7 +31,6 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   tokenHash!: string;
   tokenType!: TokenType;
   environmentId?: number;
-  permissions!: string[];
   isActive!: boolean;
   expiresAt?: Date;
   lastUsedAt?: Date;
@@ -48,14 +46,13 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['tokenName', 'tokenHash', 'tokenType', 'permissions', 'createdBy'],
+      required: ['tokenName', 'tokenHash', 'tokenType', 'createdBy'],
       properties: {
         id: { type: 'integer' },
         tokenName: { type: 'string', minLength: 1, maxLength: 200 },
         tokenHash: { type: 'string', minLength: 1, maxLength: 255 },
-        tokenType: { type: 'string', enum: ['client', 'server', 'admin'] },
+        tokenType: { type: 'string', enum: ['client', 'server'] },
         environmentId: { type: ['integer', 'null'] },
-        permissions: { type: 'array', items: { type: 'string' } },
         isActive: { type: 'boolean' },
         expiresAt: { type: ['string', 'null'], format: 'date-time' },
         lastUsedAt: { type: ['string', 'null'], format: 'date-time' },
@@ -136,25 +133,12 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     tokenName: string;
     tokenType: TokenType;
     environmentId?: number;
-    permissions: string[];
     expiresAt?: Date;
     createdBy: number;
   }): Promise<{ token: ApiAccessToken; plainToken: string }> {
-    // Validate token type and environment
-    if (data.tokenType !== 'admin' && !data.environmentId) {
-      throw new Error('Client and server tokens must be associated with an environment');
-    }
-
-    if (data.tokenType === 'admin' && data.environmentId) {
-      throw new Error('Admin tokens cannot be associated with a specific environment');
-    }
-
     // Generate token
     const plainToken = this.generateToken();
     const tokenHash = await this.hashToken(plainToken);
-
-    // Set default permissions based on token type
-    const permissions = data.permissions.length > 0 ? data.permissions : this.getDefaultPermissions(data.tokenType);
 
     // Create token record
     const token = await this.query().insert({
@@ -162,7 +146,6 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
       tokenHash,
       tokenType: data.tokenType,
       environmentId: data.environmentId,
-      permissions,
       isActive: true,
       expiresAt: data.expiresAt,
       createdBy: data.createdBy
@@ -171,21 +154,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     return { token, plainToken };
   }
 
-  /**
-   * Get default permissions for token type
-   */
-  static getDefaultPermissions(tokenType: TokenType): string[] {
-    switch (tokenType) {
-      case 'client':
-        return ['remote_config:read', 'metrics:write'];
-      case 'server':
-        return ['remote_config:read', 'remote_config:evaluate', 'metrics:write'];
-      case 'admin':
-        return ['remote_config:*', 'environments:*', 'tokens:*', 'metrics:*'];
-      default:
-        return [];
-    }
-  }
+
 
   /**
    * Find token by hash
@@ -275,29 +244,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     });
   }
 
-  /**
-   * Check if token has permission
-   */
-  hasPermission(permission: string): boolean {
-    // Admin tokens have all permissions
-    if (this.tokenType === 'admin') {
-      return true;
-    }
 
-    // Check for wildcard permissions
-    for (const perm of this.permissions) {
-      if (perm.endsWith(':*')) {
-        const prefix = perm.slice(0, -1); // Remove the *
-        if (permission.startsWith(prefix)) {
-          return true;
-        }
-      } else if (perm === permission) {
-        return true;
-      }
-    }
-
-    return false;
-  }
 
   /**
    * Check if token is expired
@@ -357,7 +304,6 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
       tokenName: this.tokenName,
       tokenType: this.tokenType,
       environmentId: this.environmentId,
-      permissions: this.permissions,
       isActive: this.isActive,
       expiresAt: this.expiresAt,
       lastUsedAt: this.lastUsedAt,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -14,11 +14,11 @@ import {
   Chip,
   TextField,
   FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  FormLabel,
+  RadioGroup,
+  Radio,
+  FormControlLabel,
   Alert,
-  Snackbar,
   Tooltip,
   Drawer,
   Dialog,
@@ -38,8 +38,11 @@ import {
   Cancel as CancelIcon,
   Save as SaveIcon,
   Close as CloseIcon,
+  CheckCircle as CheckCircleIcon,
+  Security as SecurityIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
 import { ApiAccessToken, TokenType } from '@/types/apiToken';
 import { apiTokenService } from '@/services/apiTokenService';
 import SimplePagination from '@/components/common/SimplePagination';
@@ -51,12 +54,12 @@ interface CreateTokenData {
   description?: string;
   tokenType: TokenType;
   environmentId?: number;
-  permissions: string[];
   expiresAt?: string;
 }
 
 const ApiTokensPage: React.FC = () => {
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
   const [tokens, setTokens] = useState<ApiAccessToken[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -75,19 +78,19 @@ const ApiTokensPage: React.FC = () => {
     tokenName: '',
     description: '',
     tokenType: 'client',
-    permissions: ['read'],
     environmentId: 1,
   });
   
   // UI states
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
   const [visibleTokens, setVisibleTokens] = useState<Set<number>>(new Set());
   const [newTokenValue, setNewTokenValue] = useState<string>('');
   const [newTokenInfo, setNewTokenInfo] = useState<any>(null);
   const [newTokenDialogOpen, setNewTokenDialogOpen] = useState<boolean>(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState<string>('');
+
+  // Refs for focus management
+  const tokenNameRef = useRef<HTMLInputElement>(null);
+  const editTokenNameRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadTokens();
@@ -104,55 +107,42 @@ const ApiTokensPage: React.FC = () => {
       setTotal(response.total || 0);
     } catch (error) {
       console.error('Failed to load tokens:', error);
-      showSnackbar(t('apiTokens.loadFailed', 'Failed to load API tokens'), 'error');
+      enqueueSnackbar(t('apiTokens.loadFailed', 'Failed to load API tokens'), { variant: 'error' });
     } finally {
       setLoading(false);
     }
   };
 
-  const showSnackbar = (message: string, severity: 'success' | 'error' = 'success') => {
-    setSnackbarMessage(message);
-    setSnackbarSeverity(severity);
-    setSnackbarOpen(true);
-  };
+
 
   const handleCreate = async () => {
     try {
       const response = await apiTokenService.createToken(formData);
-      console.log('Token creation response:', response);
-
       // 토큰 정보를 먼저 설정
       const tokenInfo = {
         tokenName: formData.tokenName,
         description: formData.description,
         tokenType: formData.tokenType,
-        permissions: formData.permissions,
         expiresAt: formData.expiresAt,
         isNew: true
       };
 
-      setNewTokenValue(response.plainToken);
+      // 생성 다이얼로그를 먼저 닫기
+      setCreateDialogOpen(false);
+      resetForm();
+
+      // 토큰 정보 설정과 다이얼로그 표시를 동시에
+      setNewTokenValue(response.tokenValue);
       setNewTokenInfo(tokenInfo);
-
-      console.log('Setting newTokenDialogOpen to true');
-      console.log('newTokenValue:', response.plainToken);
-      console.log('newTokenInfo:', tokenInfo);
-
-      // 즉시 토큰 확인 다이얼로그 표시 (다른 작업보다 우선)
       setNewTokenDialogOpen(true);
 
-      // 잠시 후에 생성 다이얼로그 닫기 (토큰 다이얼로그가 먼저 표시되도록)
-      setTimeout(() => {
-        setCreateDialogOpen(false);
-        resetForm();
-        // 토큰 목록은 나중에 새로고침
-        loadTokens();
-      }, 100);
+      // 토큰 목록은 백그라운드에서 새로고침 (await 제거)
+      loadTokens().catch(console.error);
 
-      showSnackbar(t('apiTokens.createSuccess', 'API token created successfully'));
+      enqueueSnackbar(t('apiTokens.createSuccess', 'API token created successfully'), { variant: 'success' });
     } catch (error: any) {
       console.error('Failed to create token:', error);
-      showSnackbar(error.message || t('apiTokens.createFailed', 'Failed to create API token'), 'error');
+      enqueueSnackbar(error.message || t('apiTokens.createFailed', 'Failed to create API token'), { variant: 'error' });
     }
   };
 
@@ -162,17 +152,16 @@ const ApiTokensPage: React.FC = () => {
     try {
       await apiTokenService.updateToken(selectedToken.id, {
         tokenName: formData.tokenName,
-        permissions: formData.permissions,
         expiresAt: formData.expiresAt,
       });
       await loadTokens();
       setEditDialogOpen(false);
       setSelectedToken(null);
       resetForm();
-      showSnackbar(t('apiTokens.updateSuccess', 'API token updated successfully'));
+      enqueueSnackbar(t('apiTokens.updateSuccess', 'API token updated successfully'), { variant: 'success' });
     } catch (error: any) {
       console.error('Failed to update token:', error);
-      showSnackbar(error.message || t('apiTokens.updateFailed', 'Failed to update API token'), 'error');
+      enqueueSnackbar(error.message || t('apiTokens.updateFailed', 'Failed to update API token'), { variant: 'error' });
     }
   };
 
@@ -181,7 +170,7 @@ const ApiTokensPage: React.FC = () => {
 
     // Check if the confirmation text matches the token name
     if (deleteConfirmText !== selectedToken.tokenName) {
-      showSnackbar(t('apiTokens.deleteConfirmMismatch', 'Token name does not match. Please type the exact token name to confirm deletion.'), 'error');
+      enqueueSnackbar(t('apiTokens.deleteConfirmMismatch', 'Token name does not match. Please type the exact token name to confirm deletion.'), { variant: 'error' });
       return;
     }
 
@@ -191,10 +180,10 @@ const ApiTokensPage: React.FC = () => {
       setDeleteDialogOpen(false);
       setSelectedToken(null);
       setDeleteConfirmText('');
-      showSnackbar(t('apiTokens.deleteSuccess', 'API token deleted successfully'));
+      enqueueSnackbar(t('apiTokens.deleteSuccess', 'API token deleted successfully'), { variant: 'success' });
     } catch (error: any) {
       console.error('Failed to delete token:', error);
-      showSnackbar(error.message || t('apiTokens.deleteFailed', 'Failed to delete API token'), 'error');
+      enqueueSnackbar(error.message || t('apiTokens.deleteFailed', 'Failed to delete API token'), { variant: 'error' });
     }
   };
 
@@ -208,7 +197,6 @@ const ApiTokensPage: React.FC = () => {
         tokenName: selectedToken.tokenName,
         description: selectedToken.description,
         tokenType: selectedToken.tokenType,
-        permissions: selectedToken.permissions,
         expiresAt: selectedToken.expiresAt,
         isNew: false
       });
@@ -216,10 +204,10 @@ const ApiTokensPage: React.FC = () => {
       setRegenerateDialogOpen(false);
       setSelectedToken(null);
       loadTokens();
-      showSnackbar(t('apiTokens.regenerateSuccess', 'API token regenerated successfully'), 'success');
+      enqueueSnackbar(t('apiTokens.regenerateSuccess', 'API token regenerated successfully'), { variant: 'success' });
     } catch (error: any) {
       console.error('Failed to regenerate token:', error);
-      showSnackbar(error.message || t('apiTokens.regenerateFailed', 'Failed to regenerate API token'), 'error');
+      enqueueSnackbar(error.message || t('apiTokens.regenerateFailed', 'Failed to regenerate API token'), { variant: 'error' });
     }
   };
 
@@ -228,7 +216,6 @@ const ApiTokensPage: React.FC = () => {
       tokenName: '',
       description: '',
       tokenType: 'client',
-      permissions: ['read'],
       environmentId: 1,
     });
   };
@@ -236,6 +223,10 @@ const ApiTokensPage: React.FC = () => {
   const openCreateDialog = () => {
     resetForm();
     setCreateDialogOpen(true);
+    // Focus on token name field after dialog opens
+    setTimeout(() => {
+      tokenNameRef.current?.focus();
+    }, 100);
   };
 
   const openEditDialog = (token: ApiAccessToken) => {
@@ -243,11 +234,14 @@ const ApiTokensPage: React.FC = () => {
     setFormData({
       tokenName: token.tokenName,
       tokenType: token.tokenType,
-      permissions: token.permissions,
       environmentId: token.environmentId,
       expiresAt: token.expiresAt ? new Date(token.expiresAt).toISOString().slice(0, 16) : undefined,
     });
     setEditDialogOpen(true);
+    // Focus on token name field after dialog opens
+    setTimeout(() => {
+      editTokenNameRef.current?.focus();
+    }, 100);
   };
 
   const openDeleteDialog = (token: ApiAccessToken) => {
@@ -270,7 +264,12 @@ const ApiTokensPage: React.FC = () => {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    showSnackbar(t('apiTokens.copiedToClipboard', 'Copied to clipboard'));
+    enqueueSnackbar(t('apiTokens.tokenCopied', 'Token copied to clipboard'), { variant: 'success' });
+  };
+
+  const maskToken = (token: string) => {
+    if (!token || token.length < 8) return token;
+    return `${token.substring(0, 4)}${'•'.repeat(token.length - 8)}${token.substring(token.length - 4)}`;
   };
 
   const formatTokenValue = (token: ApiAccessToken) => {
@@ -290,17 +289,7 @@ const ApiTokensPage: React.FC = () => {
     }
   };
 
-  const getPermissionChips = (permissions: string[]) => {
-    return permissions.map((permission, index) => (
-      <Chip
-        key={index}
-        label={permission}
-        size="small"
-        variant="outlined"
-        sx={{ mr: 0.5, mb: 0.5 }}
-      />
-    ));
-  };
+
 
   return (
     <>
@@ -332,7 +321,6 @@ const ApiTokensPage: React.FC = () => {
                 <TableCell>{t('apiTokens.description', 'Description')}</TableCell>
                 <TableCell>{t('apiTokens.tokenType', 'Type')}</TableCell>
                 <TableCell>{t('apiTokens.tokenValue', 'Token Value')}</TableCell>
-                <TableCell>{t('apiTokens.permissions', 'Permissions')}</TableCell>
                 <TableCell>{t('apiTokens.lastUsed', 'Last Used')}</TableCell>
                 <TableCell>{t('apiTokens.expiresAt', 'Expires')}</TableCell>
                 <TableCell>{t('apiTokens.status', 'Status')}</TableCell>
@@ -397,11 +385,6 @@ const ApiTokensPage: React.FC = () => {
                             <RefreshIcon />
                           </IconButton>
                         </Tooltip>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {getPermissionChips(token.permissions)}
                       </Box>
                     </TableCell>
                     <TableCell>
@@ -525,6 +508,7 @@ const ApiTokensPage: React.FC = () => {
           gap: 2
         }}>
           <TextField
+              inputRef={tokenNameRef}
               label={t('apiTokens.tokenName', 'Token Name')}
               value={formData.tokenName}
               onChange={(e) => setFormData(prev => ({ ...prev, tokenName: e.target.value }))}
@@ -544,31 +528,43 @@ const ApiTokensPage: React.FC = () => {
               placeholder={t('apiTokens.descriptionPlaceholder', 'Optional description for this token')}
             />
 
-            <FormControl fullWidth size="small">
-              <InputLabel>{t('apiTokens.tokenType', 'Token Type')}</InputLabel>
-              <Select
+            <FormControl component="fieldset" fullWidth>
+              <FormLabel component="legend" sx={{ mb: 1, fontSize: '0.875rem', fontWeight: 500 }}>
+                {t('apiTokens.tokenTypeDescription', 'Select a token type')}
+              </FormLabel>
+              <RadioGroup
                 value={formData.tokenType}
                 onChange={(e) => setFormData(prev => ({ ...prev, tokenType: e.target.value as TokenType }))}
-                label={t('apiTokens.tokenType', 'Token Type')}
               >
-                <MenuItem value="client">{t('apiTokens.types.client', 'Client')}</MenuItem>
-                <MenuItem value="server">{t('apiTokens.types.server', 'Server')}</MenuItem>
-                <MenuItem value="admin">{t('apiTokens.types.admin', 'Admin')}</MenuItem>
-              </Select>
-            </FormControl>
-
-            <FormControl fullWidth size="small">
-              <InputLabel>{t('apiTokens.permissions', 'Permissions')}</InputLabel>
-              <Select
-                multiple
-                value={formData.permissions}
-                onChange={(e) => setFormData(prev => ({ ...prev, permissions: e.target.value as string[] }))}
-                label={t('apiTokens.permissions', 'Permissions')}
-              >
-                <MenuItem value="read">{t('apiTokens.permissionTypes.read', 'Read')}</MenuItem>
-                <MenuItem value="write">{t('apiTokens.permissionTypes.write', 'Write')}</MenuItem>
-                <MenuItem value="admin">{t('apiTokens.permissionTypes.admin', 'Admin')}</MenuItem>
-              </Select>
+                <FormControlLabel
+                  value="client"
+                  control={<Radio size="small" />}
+                  label={
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        {t('apiTokens.clientTokenType', 'Client Token')}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('apiTokens.clientTokenDescription', 'Token for client applications to read remote configurations. Has read-only permissions.')}
+                      </Typography>
+                    </Box>
+                  }
+                />
+                <FormControlLabel
+                  value="server"
+                  control={<Radio size="small" />}
+                  label={
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        {t('apiTokens.serverTokenType', 'Server Token')}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {t('apiTokens.serverTokenDescription', 'Token for server applications to read and evaluate remote configurations. Has access to advanced features.')}
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </RadioGroup>
             </FormControl>
 
             <TextField
@@ -670,6 +666,7 @@ const ApiTokensPage: React.FC = () => {
           gap: 2
         }}>
             <TextField
+              inputRef={editTokenNameRef}
               label={t('apiTokens.tokenName', 'Token Name')}
               value={formData.tokenName}
               onChange={(e) => setFormData(prev => ({ ...prev, tokenName: e.target.value }))}
@@ -678,19 +675,14 @@ const ApiTokensPage: React.FC = () => {
               size="small"
             />
 
-            <FormControl fullWidth size="small">
-              <InputLabel>{t('apiTokens.permissions', 'Permissions')}</InputLabel>
-              <Select
-                multiple
-                value={formData.permissions}
-                onChange={(e) => setFormData(prev => ({ ...prev, permissions: e.target.value as string[] }))}
-                label={t('apiTokens.permissions', 'Permissions')}
-              >
-                <MenuItem value="read">{t('apiTokens.permissionTypes.read', 'Read')}</MenuItem>
-                <MenuItem value="write">{t('apiTokens.permissionTypes.write', 'Write')}</MenuItem>
-                <MenuItem value="admin">{t('apiTokens.permissionTypes.admin', 'Admin')}</MenuItem>
-              </Select>
-            </FormControl>
+            <TextField
+              label={t('apiTokens.tokenType', 'Token Type')}
+              value={t(`apiTokens.${formData.tokenType}TokenType`, formData.tokenType)}
+              fullWidth
+              size="small"
+              disabled
+              helperText={t('apiTokens.tokenTypeNotEditable', 'Token type cannot be changed after creation')}
+            />
 
             <TextField
               label={t('apiTokens.expiresAt', 'Expires At')}
@@ -750,7 +742,7 @@ const ApiTokensPage: React.FC = () => {
                   {selectedToken.tokenName}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {selectedToken.tokenType} • {selectedToken.permissions.join(', ')}
+                  {t(`apiTokens.${selectedToken.tokenType}TokenType`, selectedToken.tokenType)}
                 </Typography>
               </Box>
 
@@ -808,7 +800,7 @@ const ApiTokensPage: React.FC = () => {
                 {selectedToken.tokenName}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {selectedToken.tokenType} • {selectedToken.permissions.join(', ')}
+                {t(`apiTokens.${selectedToken.tokenType}TokenType`, selectedToken.tokenType)}
               </Typography>
             </Box>
           )}
@@ -824,63 +816,86 @@ const ApiTokensPage: React.FC = () => {
       </Dialog>
 
       {/* New Token Display Dialog */}
-      {console.log('Dialog render check:', { newTokenDialogOpen, newTokenValue: !!newTokenValue, newTokenInfo: !!newTokenInfo })}
-      <Dialog open={newTokenDialogOpen && !!newTokenValue && !!newTokenInfo} onClose={() => { setNewTokenValue(''); setNewTokenInfo(null); setNewTokenDialogOpen(false); }} maxWidth="md" fullWidth>
-          <DialogTitle>
-            {newTokenInfo?.isNew
-              ? t('apiTokens.tokenCreated', 'API Token Created')
-              : t('apiTokens.tokenRegenerated', 'API Token Regenerated')
-            }
+      <Dialog open={newTokenDialogOpen && !!newTokenValue && !!newTokenInfo} onClose={() => { setNewTokenValue(''); setNewTokenInfo(null); setNewTokenDialogOpen(false); }} maxWidth="sm" fullWidth>
+          <DialogTitle sx={{ pb: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <CheckCircleIcon color="success" sx={{ fontSize: 32 }} />
+              <Box>
+                <Typography variant="h5" component="div" sx={{ fontWeight: 600 }}>
+                  {newTokenInfo?.isNew
+                    ? t('apiTokens.tokenCreated', 'API Token Created')
+                    : t('apiTokens.tokenRegenerated', 'API Token Regenerated')
+                  }
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {t('apiTokens.tokenReady', 'Your API token is ready to use')}
+                </Typography>
+              </Box>
+            </Box>
           </DialogTitle>
-          <DialogContent>
-            <Alert severity="warning" sx={{ mb: 3 }}>
-              {t('apiTokens.tokenWarning', 'Please copy this token now. You won\'t be able to see it again!')}
+          <DialogContent sx={{ pt: 2 }}>
+            {/* Security Notice */}
+            <Alert
+              severity="error"
+              icon={<SecurityIcon />}
+              sx={{
+                mb: 3,
+                '& .MuiAlert-message': { fontWeight: 500 }
+              }}
+            >
+              <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                {t('apiTokens.tokenWarning', 'Please copy this token now. You won\'t be able to see it again!')}
+              </Typography>
+              <Typography variant="body2">
+                {t('apiTokens.tokenSecurityNotice', 'For security reasons, this token value cannot be viewed again. Please copy it now and store it in a safe place.')}
+              </Typography>
             </Alert>
 
             {/* Token Summary */}
             {newTokenInfo && (
-              <Box sx={{ mb: 3, p: 2, bgcolor: 'grey.50', borderRadius: 1, border: '1px solid', borderColor: 'grey.200' }}>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+              <Box sx={{
+                mb: 3,
+                p: 3,
+                bgcolor: 'background.paper',
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              }}>
+                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
                   {t('apiTokens.tokenSummary', 'Token Summary')}
                 </Typography>
-                <Box sx={{ display: 'grid', gap: 1 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('apiTokens.tokenName', 'Token Name')}:
+                <Box sx={{ display: 'grid', gap: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                      {t('apiTokens.tokenName', 'Token Name')}
                     </Typography>
-                    <Typography variant="body2" fontWeight={500}>
-                      {newTokenInfo.tokenName}
-                    </Typography>
+                    <Chip label={newTokenInfo.tokenName} variant="outlined" size="small" />
                   </Box>
                   {newTokenInfo.description && (
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <Typography variant="body2" color="text.secondary">
-                        {t('apiTokens.description', 'Description')}:
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                        {t('apiTokens.description', 'Description')}
                       </Typography>
-                      <Typography variant="body2" fontWeight={500}>
+                      <Typography variant="body2" fontWeight={500} sx={{ maxWidth: '60%', textAlign: 'right' }}>
                         {newTokenInfo.description}
                       </Typography>
                     </Box>
                   )}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('apiTokens.tokenType', 'Type')}:
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                      {t('apiTokens.tokenType', 'Type')}
                     </Typography>
-                    <Typography variant="body2" fontWeight={500}>
-                      {t(`apiTokens.types.${newTokenInfo.tokenType}`, newTokenInfo.tokenType)}
-                    </Typography>
+                    <Chip
+                      label={t(`apiTokens.types.${newTokenInfo.tokenType}`, newTokenInfo.tokenType)}
+                      color="primary"
+                      size="small"
+                    />
                   </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('apiTokens.permissions', 'Permissions')}:
-                    </Typography>
-                    <Typography variant="body2" fontWeight={500}>
-                      {newTokenInfo.permissions.map((p: string) => t(`apiTokens.permissionTypes.${p}`, p)).join(', ')}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('apiTokens.expiresAt', 'Expires')}:
+
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                      {t('apiTokens.expiresAt', 'Expires')}
                     </Typography>
                     <Typography variant="body2" fontWeight={500}>
                       {newTokenInfo.expiresAt
@@ -895,40 +910,71 @@ const ApiTokensPage: React.FC = () => {
 
             {/* Token Value */}
             {newTokenValue && (
-              <>
-                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+              <Box sx={{
+                p: 2,
+                bgcolor: 'grey.50',
+                borderRadius: 1,
+                border: '1px solid',
+                borderColor: 'divider'
+              }}>
+                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
                   {t('apiTokens.tokenValue', 'Token Value')}
                 </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 2, bgcolor: 'grey.100', borderRadius: 1, border: '1px solid', borderColor: 'grey.300' }}>
-                  <Typography variant="body2" fontFamily="monospace" sx={{ flex: 1, wordBreak: 'break-all', fontSize: '0.875rem' }}>
-                    {newTokenValue}
+
+                {/* Token Display with Copy Button */}
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  p: 1.5,
+                  bgcolor: 'background.paper',
+                  borderRadius: 1,
+                  border: '1px solid',
+                  borderColor: 'divider'
+                }}>
+                  <Typography
+                    variant="body2"
+                    fontFamily="monospace"
+                    sx={{
+                      flex: 1,
+                      fontSize: '0.875rem',
+                      letterSpacing: '0.5px',
+                      color: 'text.primary'
+                    }}
+                  >
+                    {maskToken(newTokenValue)}
                   </Typography>
-                  <Tooltip title={t('common.copy', 'Copy')}>
-                    <IconButton onClick={() => copyToClipboard(newTokenValue)} color="primary">
-                      <CopyIcon />
+                  <Tooltip title={t('apiTokens.copyTokenValue', 'Copy Token Value')}>
+                    <IconButton
+                      onClick={() => copyToClipboard(newTokenValue)}
+                      size="small"
+                      color="primary"
+                    >
+                      <CopyIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
                 </Box>
-              </>
+              </Box>
             )}
           </DialogContent>
-          <DialogActions>
-            <Button onClick={() => { setNewTokenValue(''); setNewTokenInfo(null); setNewTokenDialogOpen(false); }} variant="contained">
-              {t('common.close', 'Close')}
+          <DialogActions sx={{ p: 3, pt: 2 }}>
+            <Button
+              onClick={() => { setNewTokenValue(''); setNewTokenInfo(null); setNewTokenDialogOpen(false); }}
+              variant="contained"
+              startIcon={<CheckCircleIcon />}
+              size="large"
+              sx={{
+                px: 4,
+                py: 1.5,
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '1rem'
+              }}
+            >
+              {t('apiTokens.confirmAndClose', 'Confirm & Close')}
             </Button>
           </DialogActions>
         </Dialog>
-
-      {/* Snackbar */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={() => setSnackbarOpen(false)}
-      >
-        <Alert severity={snackbarSeverity} onClose={() => setSnackbarOpen(false)}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </>
   );
 };

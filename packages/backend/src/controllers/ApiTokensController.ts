@@ -52,27 +52,9 @@ class ApiTokensController {
 
       // Format tokens (hide sensitive data)
       const formattedTokens = tokens.map((token: any) => {
-        let permissions = [];
-
-        // Handle different permission formats
-        if (typeof token.permissions === 'string') {
-          try {
-            // Try to parse as JSON first
-            permissions = JSON.parse(token.permissions);
-          } catch (e) {
-            // If JSON parse fails, treat as comma-separated string
-            permissions = token.permissions.split(',').map((p: string) => p.trim()).filter((p: string) => p.length > 0);
-          }
-        } else if (Array.isArray(token.permissions)) {
-          permissions = token.permissions;
-        } else {
-          permissions = [];
-        }
-
         return {
           ...token,
           tokenHash: token.tokenHash.substring(0, 8) + '••••••••••••••••', // Show only first 8 chars
-          permissions,
           isActive: Boolean(token.isActive)
         };
       });
@@ -113,7 +95,7 @@ class ApiTokensController {
         });
       }
 
-      const { tokenName, description, tokenType, permissions, expiresAt } = req.body;
+      const { tokenName, description, tokenType, expiresAt } = req.body;
       const userId = (req as any).user.id;
 
       // Generate secure token
@@ -127,7 +109,6 @@ class ApiTokensController {
         tokenHash,
         tokenType,
         environmentId: null,
-        permissions: JSON.stringify(permissions || []),
         isActive: true,
         expiresAt: expiresAt || null,
         createdBy: userId,
@@ -144,7 +125,6 @@ class ApiTokensController {
           tokenName,
           tokenType,
           tokenValue, // Only shown once!
-          permissions,
           isActive: true,
           expiresAt,
           createdAt: new Date().toISOString()
@@ -197,7 +177,6 @@ class ApiTokensController {
           tokenName: existingToken.tokenName,
           tokenType: existingToken.tokenType,
           tokenValue, // Only shown once!
-          permissions: JSON.parse(existingToken.permissions || '[]'),
           isActive: existingToken.isActive,
           expiresAt: existingToken.expiresAt,
           updatedAt: new Date().toISOString()

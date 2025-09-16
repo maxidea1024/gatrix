@@ -10,7 +10,9 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-
+  Card,
+  CardContent,
+  Container,
   IconButton,
   Chip,
   TextField,
@@ -587,7 +589,8 @@ const RemoteConfigPage: React.FC = () => {
     }, [campaignPage, campaignRowsPerPage]);
 
     return (
-      <Paper sx={{ p: 3 }}>
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h6" color="text.primary">
@@ -1022,7 +1025,8 @@ const RemoteConfigPage: React.FC = () => {
             </Button>
           </DialogActions>
         </Dialog>
-      </Paper>
+        </CardContent>
+      </Card>
     );
   };
 
@@ -1996,7 +2000,8 @@ const RemoteConfigPage: React.FC = () => {
     };
 
     return (
-      <Paper sx={{ p: 3 }}>
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
         {/* Config Selection */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2 }} color="text.primary">
@@ -2259,7 +2264,8 @@ const RemoteConfigPage: React.FC = () => {
             </Typography>
           </Box>
         )}
-      </Paper>
+        </CardContent>
+      </Card>
     );
   };
 
@@ -2380,28 +2386,29 @@ const RemoteConfigPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" component="h1" sx={{ mb: 1 }} color="text.primary">
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" component="h1" sx={{ fontWeight: 600, mb: 1 }} color="text.primary">
           {t('admin.remoteConfig.title')}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <Typography variant="body1" color="text.secondary">
           {t('admin.remoteConfig.subtitle')}
         </Typography>
+      </Box>
 
-        {/* Tabs */}
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-          <Tabs value={currentTab} onChange={(_, newValue) => setCurrentTab(newValue)}>
-            <Tab label={t('admin.remoteConfig.title')} />
-            <Tab label={t('admin.remoteConfig.history.title')} />
-            <Tab label={t('admin.remoteConfig.campaigns.title')} />
-            <Tab label={t('admin.remoteConfig.variants.title')} />
-            <Tab label={t('admin.remoteConfig.targeting.title')} />
-            <Tab label={t('admin.remoteConfig.contextFields.title')} />
-          </Tabs>
-        </Box>
+      {/* Tabs */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+        <Tabs value={currentTab} onChange={(_, newValue) => setCurrentTab(newValue)}>
+          <Tab label={t('admin.remoteConfig.title')} />
+          <Tab label={t('admin.remoteConfig.history.title')} />
+          <Tab label={t('admin.remoteConfig.campaigns.title')} />
+          <Tab label={t('admin.remoteConfig.variants.title')} />
+          <Tab label={t('admin.remoteConfig.targeting.title')} />
+          <Tab label={t('admin.remoteConfig.contextFields.title')} />
+        </Tabs>
+      </Box>
 
-        {/* Git-style Action Bar - only show when there are changes */}
-        {currentTab === 0 && hasChanges && (
+      {/* Git-style Action Bar - only show when there are changes */}
+      {currentTab === 0 && hasChanges && (
           <Box sx={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -2487,13 +2494,13 @@ const RemoteConfigPage: React.FC = () => {
             </Stack>
           </Box>
         )}
-      </Box>
 
       {/* Tab Content */}
       {currentTab === 0 ? (
-        <Paper sx={{ p: 3 }}>
+        <>
         {/* Filters */}
-        <Box sx={{ mb: 3 }}>
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
           <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="center">
             <Box sx={{ flex: 1, minWidth: 200 }}>
               <TextField
@@ -2565,12 +2572,12 @@ const RemoteConfigPage: React.FC = () => {
               </Button>
             </Stack>
           </Stack>
-        </Box>
-
-
+          </CardContent>
+        </Card>
 
       {/* Table */}
-      <TableContainer component={Paper}>
+      <Card>
+        <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
@@ -2749,7 +2756,8 @@ const RemoteConfigPage: React.FC = () => {
           rowsPerPageOptions={[5, 10, 25, 50, 100]}
         />
       </TableContainer>
-        </Paper>
+        </Card>
+        </>
       ) : currentTab === 1 ? (
         <RemoteConfigHistoryPage />
       ) : currentTab === 2 ? (

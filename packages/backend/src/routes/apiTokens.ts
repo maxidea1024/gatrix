@@ -14,17 +14,8 @@ const createTokenValidation = [
     .withMessage('Token name must be between 3 and 200 characters'),
   
   body('tokenType')
-    .isIn(['client', 'server', 'admin'])
-    .withMessage('Token type must be client, server, or admin'),
-  
-  body('permissions')
-    .isArray()
-    .withMessage('Permissions must be an array')
-    .custom((permissions) => {
-      const validPermissions = ['read', 'write', 'admin'];
-      return permissions.every((p: string) => validPermissions.includes(p));
-    })
-    .withMessage('Invalid permission values'),
+    .isIn(['client', 'server'])
+    .withMessage('Token type must be client or server'),
   
   body('expiresAt')
     .optional()
@@ -38,16 +29,7 @@ const updateTokenValidation = [
     .withMessage('Token name is required')
     .isLength({ min: 3, max: 200 })
     .withMessage('Token name must be between 3 and 200 characters'),
-  
-  body('permissions')
-    .isArray()
-    .withMessage('Permissions must be an array')
-    .custom((permissions) => {
-      const validPermissions = ['read', 'write', 'admin'];
-      return permissions.every((p: string) => validPermissions.includes(p));
-    })
-    .withMessage('Invalid permission values'),
-  
+
   body('expiresAt')
     .optional()
     .isISO8601()

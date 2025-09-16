@@ -96,30 +96,7 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
   }
 };
 
-/**
- * Middleware to check specific permissions
- */
-export const requirePermission = (permission: string) => {
-  return (req: SDKRequest, res: Response, next: NextFunction) => {
-    const apiToken = req.apiToken;
 
-    if (!apiToken) {
-      return res.status(401).json({
-        success: false,
-        message: 'API token not found'
-      });
-    }
-
-    if (!apiToken.hasPermission(permission)) {
-      return res.status(403).json({
-        success: false,
-        message: `Insufficient permissions. Required: ${permission}`
-      });
-    }
-
-    next();
-  };
-};
 
 /**
  * Middleware to check token type
@@ -188,7 +165,6 @@ export const sdkRateLimit = (req: SDKRequest, res: Response, next: NextFunction)
 export const clientSDKAuth = [
   authenticateApiToken,
   requireTokenType('client'),
-  requirePermission('remote_config:read'),
   validateApplicationName,
   sdkRateLimit
 ];
@@ -199,27 +175,15 @@ export const clientSDKAuth = [
 export const serverSDKAuth = [
   authenticateApiToken,
   requireTokenType('server'),
-  requirePermission('remote_config:read'),
   validateApplicationName,
   sdkRateLimit
 ];
 
-/**
- * Combined middleware for admin API endpoints
- */
-export const adminAPIAuth = [
-  authenticateApiToken,
-  requireTokenType('admin'),
-  requirePermission('remote_config:*')
-];
-
 export default {
   authenticateApiToken,
-  requirePermission,
   requireTokenType,
   validateApplicationName,
   sdkRateLimit,
   clientSDKAuth,
-  serverSDKAuth,
-  adminAPIAuth
+  serverSDKAuth
 };

@@ -1,4 +1,4 @@
-export type TokenType = 'client' | 'server' | 'admin';
+export type TokenType = 'client' | 'server';
 
 export interface ApiAccessToken {
   id: number;
@@ -7,7 +7,6 @@ export interface ApiAccessToken {
   tokenHash: string;
   tokenType: TokenType;
   environmentId?: number;
-  permissions: string[];
   isActive: boolean;
   expiresAt?: string;
   lastUsedAt?: string;
@@ -38,14 +37,12 @@ export interface CreateTokenRequest {
   description?: string;
   tokenType: TokenType;
   environmentId?: number;
-  permissions: string[];
   expiresAt?: string;
 }
 
 export interface UpdateTokenRequest {
   tokenName?: string;
   description?: string;
-  permissions?: string[];
   expiresAt?: string;
 }
 
