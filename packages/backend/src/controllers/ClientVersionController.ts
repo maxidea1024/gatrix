@@ -104,6 +104,31 @@ const getClientVersionsQuerySchema = Joi.object({
   _t: Joi.string().optional(), // 캐시 방지용 타임스탬프
 });
 
+// 내보내기 전용 스키마 (limit 제한 없음)
+const exportClientVersionsQuerySchema = Joi.object({
+  version: Joi.string().optional(),
+  platform: Joi.string().optional(),
+  clientStatus: Joi.string().valid(...Object.values(ClientStatus)).optional(),
+  gameServerAddress: Joi.string().optional(),
+  patchAddress: Joi.string().optional(),
+  guestModeAllowed: Joi.string().valid('true', 'false').optional().custom((value, helpers) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return helpers.error('any.invalid');
+  }),
+  externalClickLink: Joi.string().optional(),
+  memo: Joi.string().optional(),
+  customPayload: Joi.string().optional(),
+  createdBy: Joi.number().integer().optional(),
+  updatedBy: Joi.number().integer().optional(),
+  createdAtFrom: Joi.date().iso().optional(),
+  createdAtTo: Joi.date().iso().optional(),
+  updatedAtFrom: Joi.date().iso().optional(),
+  updatedAtTo: Joi.date().iso().optional(),
+  search: Joi.string().optional(),
+  tags: Joi.array().items(Joi.string()).optional(),
+});
+
 const bulkUpdateStatusSchema = Joi.object({
   ids: Joi.array().items(Joi.number().integer().positive()).min(1).required(),
   clientStatus: Joi.string().valid(...Object.values(ClientStatus)).required(),
@@ -471,6 +496,38 @@ export class ClientVersionController {
         success: false,
         message: 'Failed to get tags',
         error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+
+  // 클라이언트 버전 내보내기 (CSV)
+  static async exportClientVersions(req: Request, res: Response) {
+    const { error, value } = exportClientVersionsQuerySchema.validate(req.query);
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.details[0].message,
+      });
+    }
+
+    try {
+      // 모든 데이터를 가져오기 위해 매우 큰 limit 사용
+      const result = await ClientVersionService.getAllClientVersions(value, {
+        page: 1,
+        limit: 50000, // 충분히 큰 값
+        sortBy: 'createdAt',
+        sortOrder: 'DESC'
+      });
+
+      res.json({
+        success: true,
+        data: result,
+      });
+    } catch (error: any) {
+      logger.error('Error exporting client versions:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to export client versions',
       });
     }
   }

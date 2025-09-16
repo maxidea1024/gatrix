@@ -508,6 +508,8 @@
     "tokenCreated": "API 토큰이 생성되었습니다",
     "createFirstToken": "첫 번째 토큰 생성",
     "tokenName": "토큰 이름",
+    "tokenNameHelp": "이 토큰에 대한 설명적인 이름을 입력하세요",
+    "tokenNameMinLength": "토큰 이름은 최소 3자 이상이어야 합니다",
     "description": "설명",
     "descriptionPlaceholder": "이 토큰에 대한 선택적 설명",
     "tokenType": "토큰 유형",
@@ -1302,7 +1304,7 @@
     "form": {
       "descriptionHelp": "게임 월드 설명을 입력하세요",
       "maintenanceHelp": "점검 모드 여부를 선택하세요",
-      "nameHelp": "게임 월드 이름을 입력하세요",
+      "nameHelp": "게임 월드 이름을 입력하세요 (월드 ID 입력 시 자동으로 복사됩니다)",
       "visibleHelp": "이 월드를 표시할지 선택하세요",
       "worldIdHelp": "고유한 월드 ID를 입력하세요",
       "description": "설명",

@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Drawer,
   TextField,
   Switch,
   FormControl,
@@ -1092,23 +1093,84 @@ const GameWorldsPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Add/Edit Dialog */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-        <FormDialogHeader
-          title={editingWorld ? '게임 월드 편집' : '게임 월드 추가'}
-          description={editingWorld
-            ? '기존 게임 월드의 설정을 수정하고 업데이트할 수 있습니다.'
-            : '새로운 게임 월드를 생성하고 서버 설정 및 접속 정보를 구성할 수 있습니다.'
+      {/* Add/Edit Drawer */}
+      <Drawer
+        anchor="right"
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            width: 700,
+            height: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            zIndex: 1301 // Ensure it's above the sticky header
           }
-        />
-        <DialogContent>
+        }}
+        ModalProps={{
+          keepMounted: false,
+          sx: {
+            zIndex: 1301 // Ensure modal backdrop is also above header
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          p: 3,
+          borderBottom: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: 'background.paper',
+          position: 'sticky',
+          top: 0,
+          zIndex: 1
+        }}>
+          <Box>
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              {editingWorld ? '게임 월드 편집' : '게임 월드 추가'}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {editingWorld
+                ? '기존 게임 월드의 설정을 수정하고 업데이트할 수 있습니다.'
+                : '새로운 게임 월드를 생성하고 서버 설정 및 접속 정보를 구성할 수 있습니다.'
+              }
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={() => setDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CancelIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
             <Box>
               <TextField
                 fullWidth
                 label={t('gameWorlds.worldId')}
                 value={formData.worldId}
-                onChange={(e) => setFormData({ ...formData, worldId: e.target.value })}
+                onChange={(e) => {
+                  const newWorldId = e.target.value;
+                  const newFormData = { ...formData, worldId: newWorldId };
+
+                  // 새 게임월드 추가 시에만 자동 복사 (편집 시에는 하지 않음)
+                  // 이름이 비어있거나 이전 worldId와 동일한 경우에만 자동 복사
+                  if (!editingWorld && (formData.name === '' || formData.name === formData.worldId)) {
+                    newFormData.name = newWorldId;
+                  }
+
+                  setFormData(newFormData);
+                }}
                 error={!!formErrors.worldId}
                 helperText={formErrors.worldId}
                 required
@@ -1342,9 +1404,23 @@ const GameWorldsPage: React.FC = () => {
               </Paper>
             )}
           </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)} disabled={saving} startIcon={<CancelIcon />}>
+        </Box>
+
+        {/* Actions */}
+        <Box sx={{
+          p: 3,
+          borderTop: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setDialogOpen(false)}
+            disabled={saving}
+            startIcon={<CancelIcon />}
+            size="small"
+          >
             {t('gameWorlds.cancel')}
           </Button>
           <Button
@@ -1352,27 +1428,81 @@ const GameWorldsPage: React.FC = () => {
             variant="contained"
             disabled={saving}
             startIcon={saving ? <CircularProgress size={20} /> : (editingWorld ? <SaveIcon /> : <AddIcon />)}
+            size="small"
           >
             {saving ? t('common.saving') : (editingWorld ? '게임 월드 수정' : '게임 월드 추가')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* Confirmation Dialog */}
-      <Dialog
+      {/* Confirmation Drawer */}
+      <Drawer
+        anchor="right"
         open={confirmDialog.open}
         onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
-        maxWidth="sm"
-        fullWidth
+        PaperProps={{
+          sx: {
+            width: 400,
+            height: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            zIndex: 1301 // Ensure it's above the sticky header
+          }
+        }}
+        ModalProps={{
+          keepMounted: false,
+          sx: {
+            zIndex: 1301 // Ensure modal backdrop is also above header
+          }
+        }}
       >
-        <DialogTitle>{confirmDialog.title}</DialogTitle>
-        <DialogContent>
+        {/* Header */}
+        <Box sx={{
+          p: 3,
+          borderBottom: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: 'background.paper',
+          position: 'sticky',
+          top: 0,
+          zIndex: 1
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {confirmDialog.title}
+          </Typography>
+          <IconButton
+            onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CancelIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
           <Typography>{confirmDialog.message}</Typography>
-        </DialogContent>
-        <DialogActions>
+        </Box>
+
+        {/* Actions */}
+        <Box sx={{
+          p: 3,
+          borderTop: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
           <Button
             onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
             color="inherit"
+            size="small"
           >
             {t('gameWorlds.cancel')}
           </Button>
@@ -1380,23 +1510,65 @@ const GameWorldsPage: React.FC = () => {
             onClick={confirmDialog.onConfirm}
             color="primary"
             variant="contained"
+            size="small"
           >
             {t('gameWorlds.confirm')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog
+      {/* Delete Confirmation Drawer */}
+      <Drawer
+        anchor="right"
         open={deleteConfirmDialog.open}
         onClose={() => setDeleteConfirmDialog({ open: false, world: null, inputValue: '' })}
-        maxWidth="sm"
-        fullWidth
+        PaperProps={{
+          sx: {
+            width: 500,
+            height: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            zIndex: 1301 // Ensure it's above the sticky header
+          }
+        }}
+        ModalProps={{
+          keepMounted: false,
+          sx: {
+            zIndex: 1301 // Ensure modal backdrop is also above header
+          }
+        }}
       >
-        <DialogTitle>
-          {t('gameWorlds.deleteGameWorld')}
-        </DialogTitle>
-        <DialogContent>
+        {/* Header */}
+        <Box sx={{
+          p: 3,
+          borderBottom: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backgroundColor: 'background.paper',
+          position: 'sticky',
+          top: 0,
+          zIndex: 1
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('gameWorlds.deleteGameWorld')}
+          </Typography>
+          <IconButton
+            onClick={() => setDeleteConfirmDialog({ open: false, world: null, inputValue: '' })}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CancelIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
           <Alert severity="warning" sx={{ mb: 2 }}>
             {t('gameWorlds.confirmDelete', { name: deleteConfirmDialog.world?.name })}
           </Alert>
@@ -1412,12 +1584,23 @@ const GameWorldsPage: React.FC = () => {
             placeholder={deleteConfirmDialog.world?.name}
             error={deleteConfirmDialog.inputValue !== '' && deleteConfirmDialog.inputValue !== deleteConfirmDialog.world?.name}
             helperText={deleteConfirmDialog.inputValue !== '' && deleteConfirmDialog.inputValue !== deleteConfirmDialog.world?.name ? 'Name does not match' : ''}
+            size="small"
           />
-        </DialogContent>
-        <DialogActions>
+        </Box>
+
+        {/* Actions */}
+        <Box sx={{
+          p: 3,
+          borderTop: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
           <Button
             onClick={() => setDeleteConfirmDialog({ open: false, world: null, inputValue: '' })}
             color="inherit"
+            size="small"
           >
             {t('gameWorlds.cancel')}
           </Button>
@@ -1426,11 +1609,12 @@ const GameWorldsPage: React.FC = () => {
             color="error"
             variant="contained"
             disabled={deleteConfirmDialog.inputValue !== deleteConfirmDialog.world?.name}
+            size="small"
           >
             {t('common.delete')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
     </Box>
   );
 };

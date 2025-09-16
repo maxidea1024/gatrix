@@ -416,6 +416,8 @@
     "tokenCreated": "API 令牌已创建",
     "createFirstToken": "创建您的第一个令牌",
     "tokenName": "令牌名称",
+    "tokenNameHelp": "为此令牌输入描述性名称",
+    "tokenNameMinLength": "令牌名称至少需要3个字符",
     "description": "描述",
     "descriptionPlaceholder": "此令牌的可选描述",
     "tokenType": "令牌类型",
@@ -1159,7 +1161,7 @@
     "form": {
       "descriptionHelp": "请输入游戏世界描述",
       "maintenanceHelp": "选择是否为维护模式",
-      "nameHelp": "请输入游戏世界名称",
+      "nameHelp": "请输入游戏世界名称（输入世界ID时会自动复制）",
       "visibleHelp": "选择是否显示此世界",
       "worldIdHelp": "请输入唯一的世界ID"
     },

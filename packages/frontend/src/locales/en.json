@@ -516,6 +516,8 @@
     "tokenCreated": "API Token Created",
     "createFirstToken": "Create your first token",
     "tokenName": "Token Name",
+    "tokenNameHelp": "Enter a descriptive name for this token",
+    "tokenNameMinLength": "Token name must be at least 3 characters",
     "description": "Description",
     "descriptionPlaceholder": "Optional description for this token",
     "tokenType": "Token Type",
@@ -1263,7 +1265,7 @@
     "form": {
       "descriptionHelp": "Enter a brief description of this world",
       "maintenanceHelp": "If maintenance is on, users cannot enter this world",
-      "nameHelp": "This name will be displayed to users",
+      "nameHelp": "This name will be displayed to users (automatically copied from World ID when typing)",
       "visibleHelp": "Choose whether to show this world to users",
       "worldIdHelp": "Enter a unique world identifier"
     },

@@ -141,6 +141,11 @@ const ApiTokensPage: React.FC = () => {
     setPage(0); // Reset to first page when sorting
   };
 
+  // 토큰 이름 유효성 검사
+  const isValidTokenName = (name: string): boolean => {
+    return name.trim().length >= 3; // 최소 3자 이상
+  };
+
   const handleCreate = async () => {
     try {
       const response = await apiTokenService.createToken(formData);
@@ -738,6 +743,12 @@ const ApiTokensPage: React.FC = () => {
               fullWidth
               required
               size="small"
+              error={formData.tokenName.length > 0 && !isValidTokenName(formData.tokenName)}
+              helperText={
+                formData.tokenName.length > 0 && !isValidTokenName(formData.tokenName)
+                  ? t('apiTokens.tokenNameMinLength', 'Token name must be at least 3 characters')
+                  : t('apiTokens.tokenNameHelp', 'Enter a descriptive name for this token')
+              }
             />
 
             <TextField
@@ -823,6 +834,7 @@ const ApiTokensPage: React.FC = () => {
             variant="contained"
             startIcon={<VpnKeyIcon />}
             size="small"
+            disabled={!isValidTokenName(formData.tokenName)}
           >
             {t('apiTokens.createToken', 'Create Token')}
           </Button>
@@ -896,6 +908,12 @@ const ApiTokensPage: React.FC = () => {
               fullWidth
               required
               size="small"
+              error={formData.tokenName.length > 0 && !isValidTokenName(formData.tokenName)}
+              helperText={
+                formData.tokenName.length > 0 && !isValidTokenName(formData.tokenName)
+                  ? t('apiTokens.tokenNameMinLength', 'Token name must be at least 3 characters')
+                  : t('apiTokens.tokenNameHelp', 'Enter a descriptive name for this token')
+              }
             />
 
             <TextField
@@ -940,6 +958,7 @@ const ApiTokensPage: React.FC = () => {
             variant="contained"
             startIcon={<SaveIcon />}
             size="small"
+            disabled={!isValidTokenName(formData.tokenName)}
           >
             {t('common.save', 'Save')}
           </Button>
