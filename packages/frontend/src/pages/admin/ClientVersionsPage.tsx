@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { devLogger, prodLogger } from '../../utils/logger';
 import { usePageState } from '../../hooks/usePageState';
+import * as XLSX from 'xlsx';
 import {
   Box,
   Card,
@@ -35,6 +36,7 @@ import {
   Autocomplete,
   TextField,
   Divider,
+  Drawer,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -43,9 +45,14 @@ import {
   Delete as DeleteIcon,
   Download as DownloadIcon,
   Refresh as RefreshIcon,
+  ArrowDropDown as ArrowDropDownIcon,
+  TableChart as TableChartIcon,
+  Code as JsonIcon,
+  Description as ExcelIcon,
 
   ContentCopy as CopyIcon,
   Cancel as CancelIcon,
+  Close as CloseIcon,
   Update as UpdateIcon,
   Settings as SettingsIcon,
 } from '@mui/icons-material';
@@ -142,6 +149,10 @@ const ClientVersionsPage: React.FC = () => {
   const [clientVersionTags, setClientVersionTags] = useState<Tag[]>([]);
   const [tagFilter, setTagFilter] = useState<Tag[]>([]);
   const [versions, setVersions] = useState<string[]>([]);
+
+  // 내보내기 메뉴 상태
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
+  const [selectedExportMenuAnchor, setSelectedExportMenuAnchor] = useState<null | HTMLElement>(null);
 
   // 사용 가능한 버전 목록 로드
   const loadAvailableVersions = useCallback(async () => {
@@ -367,65 +378,208 @@ const ClientVersionsPage: React.FC = () => {
     }
   }, [selectedIds, t, enqueueSnackbar, loadClientVersions, loadAvailableVersions]);
 
-  // 선택된 항목 내보내기
-  const handleExportSelected = useCallback(async () => {
-    if (selectedIds.length === 0) return;
 
+
+  // 내보내기 함수들
+  const handleExport = useCallback(async (format: 'csv' | 'json' | 'xlsx') => {
     try {
-      const selectedVersions = clientVersions.filter(cv => selectedIds.includes(cv.id));
-      const csvContent = [
-        // CSV 헤더
-        ['ID', 'Platform', 'Version', 'Status', 'Game Server', 'Patch Address', 'Guest Mode', 'Created By', 'Created By Email', 'Created At'].join(','),
-        // CSV 데이터
-        ...selectedVersions.map(cv => [
-          cv.id,
-          cv.platform,
-          cv.clientVersion,
-          cv.clientStatus,
-          cv.gameServerAddress,
-          cv.patchAddress,
-          cv.guestModeAllowed ? 'Yes' : 'No',
-          cv.createdByName || t('dashboard.unknown'),
-          cv.createdByEmail || '',
-          new Date(cv.createdAt).toLocaleDateString()
-        ].join(','))
-      ].join('\n');
+      let blob: Blob;
+      let filename: string;
+      const now = new Date();
+      const dateTimeStr = now.toISOString().replace(/[:.]/g, '-').slice(0, 19); // YYYY-MM-DDTHH-MM-SS
 
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      if (format === 'csv') {
+        blob = await ClientVersionService.exportToCSV(pageState.filters || {});
+        filename = `client-versions-${dateTimeStr}.csv`;
+      } else if (format === 'json') {
+        // JSON 내보내기
+        const result = await ClientVersionService.exportToCSV(pageState.filters || {}); // 같은 데이터 사용
+        const text = await result.text();
+        const lines = text.split('\n');
+        const headers = lines[0].split(',');
+        const jsonData = lines.slice(1).filter(line => line.trim()).map(line => {
+          const values = line.split(',');
+          const obj: any = {};
+          headers.forEach((header, index) => {
+            obj[header.replace(/"/g, '')] = values[index]?.replace(/"/g, '') || '';
+          });
+          return obj;
+        });
+        blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+        filename = `client-versions-${dateTimeStr}.json`;
+      } else if (format === 'xlsx') {
+        // XLSX 내보내기
+        const result = await ClientVersionService.exportToCSV(pageState.filters || {});
+        const text = await result.text();
+        const lines = text.split('\n');
+        const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
+        const data = lines.slice(1).filter(line => line.trim()).map(line => {
+          const values = line.split(',');
+          const obj: any = {};
+          headers.forEach((header, index) => {
+            obj[header] = values[index]?.replace(/"/g, '') || '';
+          });
+          return obj;
+        });
+
+        // XLSX 워크북 생성
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Client Versions');
+
+        // 컬럼 너비 자동 조정
+        const colWidths = headers.map(header => ({ wch: Math.max(header.length, 15) }));
+        worksheet['!cols'] = colWidths;
+
+        // XLSX 파일 생성
+        const xlsxBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        blob = new Blob([xlsxBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        filename = `client-versions-${dateTimeStr}.xlsx`;
+      } else {
+        enqueueSnackbar('Unsupported export format', { variant: 'warning' });
+        return;
+      }
+
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `client-versions-selected-${new Date().toISOString().split('T')[0]}.csv`;
+      link.download = filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
       enqueueSnackbar(t('clientVersions.exportSuccess'), { variant: 'success' });
+      setExportMenuAnchor(null);
+    } catch (error: any) {
+      console.error('Error exporting:', error);
+      enqueueSnackbar(error.message || t('clientVersions.exportError'), { variant: 'error' });
+    }
+  }, [pageState.filters, t, enqueueSnackbar]);
+
+  // 선택된 항목 내보내기
+  const handleExportSelected = useCallback(async (format: 'csv' | 'json' | 'xlsx') => {
+    if (selectedIds.length === 0) return;
+
+    try {
+      const selectedVersions = clientVersions.filter(cv => selectedIds.includes(cv.id));
+      let blob: Blob;
+      let filename: string;
+      const now = new Date();
+      const dateTimeStr = now.toISOString().replace(/[:.]/g, '-').slice(0, 19); // YYYY-MM-DDTHH-MM-SS
+
+      if (format === 'csv') {
+        const csvContent = [
+          // CSV 헤더
+          [
+            'ID', 'Platform', 'Version', 'Status', 'Game Server', 'Game Server (Whitelist)',
+            'Patch Address', 'Patch Address (Whitelist)', 'Guest Mode', 'External Click Link',
+            'Memo', 'Custom Payload', 'Maintenance Start', 'Maintenance End', 'Maintenance Message',
+            'Multi Language', 'Tags', 'Created By', 'Created By Email', 'Created At',
+            'Updated By', 'Updated By Email', 'Updated At'
+          ].join(','),
+          // CSV 데이터
+          ...selectedVersions.map(cv => [
+            cv.id,
+            `"${cv.platform}"`,
+            `"${cv.clientVersion}"`,
+            `"${cv.clientStatus}"`,
+            `"${cv.gameServerAddress}"`,
+            `"${cv.gameServerAddressForWhiteList || ''}"`,
+            `"${cv.patchAddress}"`,
+            `"${cv.patchAddressForWhiteList || ''}"`,
+            cv.guestModeAllowed ? 'Yes' : 'No',
+            `"${cv.externalClickLink || ''}"`,
+            `"${cv.memo || ''}"`,
+            `"${cv.customPayload || ''}"`,
+            `"${cv.maintenanceStartDate || ''}"`,
+            `"${cv.maintenanceEndDate || ''}"`,
+            `"${cv.maintenanceMessage || ''}"`,
+            cv.supportsMultiLanguage ? 'Yes' : 'No',
+            `"${cv.tags ? cv.tags.map(tag => tag.name).join('; ') : ''}"`,
+            `"${cv.createdByName || t('dashboard.unknown')}"`,
+            `"${cv.createdByEmail || ''}"`,
+            `"${new Date(cv.createdAt).toLocaleDateString()}"`,
+            `"${cv.updatedByName || ''}"`,
+            `"${cv.updatedByEmail || ''}"`,
+            `"${new Date(cv.updatedAt).toLocaleDateString()}"`,
+          ].join(','))
+        ].join('\n');
+        blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        filename = `client-versions-selected-${dateTimeStr}.csv`;
+      } else if (format === 'json') {
+        blob = new Blob([JSON.stringify(selectedVersions, null, 2)], { type: 'application/json' });
+        filename = `client-versions-selected-${dateTimeStr}.json`;
+      } else if (format === 'xlsx') {
+        // XLSX 내보내기 - 선택된 항목들
+        const headers = [
+          'ID', 'Platform', 'Version', 'Status', 'Game Server', 'Game Server (Whitelist)',
+          'Patch Address', 'Patch Address (Whitelist)', 'Guest Mode', 'External Click Link',
+          'Memo', 'Custom Payload', 'Maintenance Start', 'Maintenance End', 'Maintenance Message',
+          'Multi Language', 'Tags', 'Created By', 'Created By Email', 'Created At',
+          'Updated By', 'Updated By Email', 'Updated At'
+        ];
+
+        const data = selectedVersions.map(cv => ({
+          'ID': cv.id,
+          'Platform': cv.platform,
+          'Version': cv.clientVersion,
+          'Status': cv.clientStatus,
+          'Game Server': cv.gameServerAddress,
+          'Game Server (Whitelist)': cv.gameServerAddressForWhiteList || '',
+          'Patch Address': cv.patchAddress,
+          'Patch Address (Whitelist)': cv.patchAddressForWhiteList || '',
+          'Guest Mode': cv.guestModeAllowed ? 'Yes' : 'No',
+          'External Click Link': cv.externalClickLink || '',
+          'Memo': cv.memo || '',
+          'Custom Payload': cv.customPayload || '',
+          'Maintenance Start': cv.maintenanceStartDate || '',
+          'Maintenance End': cv.maintenanceEndDate || '',
+          'Maintenance Message': cv.maintenanceMessage || '',
+          'Multi Language': cv.supportsMultiLanguage ? 'Yes' : 'No',
+          'Tags': cv.tags ? cv.tags.map(tag => tag.name).join('; ') : '',
+          'Created By': cv.createdByName || t('dashboard.unknown'),
+          'Created By Email': cv.createdByEmail || '',
+          'Created At': new Date(cv.createdAt).toLocaleDateString(),
+          'Updated By': cv.updatedByName || '',
+          'Updated By Email': cv.updatedByEmail || '',
+          'Updated At': new Date(cv.updatedAt).toLocaleDateString(),
+        }));
+
+        // XLSX 워크북 생성
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Selected Client Versions');
+
+        // 컬럼 너비 자동 조정
+        const colWidths = headers.map(header => ({ wch: Math.max(header.length, 15) }));
+        worksheet['!cols'] = colWidths;
+
+        // XLSX 파일 생성
+        const xlsxBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        blob = new Blob([xlsxBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        filename = `client-versions-selected-${dateTimeStr}.xlsx`;
+      } else {
+        enqueueSnackbar('Unsupported export format', { variant: 'warning' });
+        return;
+      }
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      enqueueSnackbar(t('clientVersions.exportSuccess'), { variant: 'success' });
+      setSelectedExportMenuAnchor(null);
     } catch (error: any) {
       console.error('Failed to export selected versions:', error);
       enqueueSnackbar(error.message || t('clientVersions.exportSelectedError'), { variant: 'error' });
     }
   }, [selectedIds, clientVersions, t, enqueueSnackbar]);
-
-  // CSV 내보내기
-  const handleExportCSV = useCallback(async () => {
-    try {
-      const blob = await ClientVersionService.exportToCSV(pageState.filters || {});
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `client-versions-${new Date().toISOString().split('T')[0]}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      enqueueSnackbar(t('clientVersions.exportSuccess'), { variant: 'success' });
-    } catch (error: any) {
-      console.error('Error exporting CSV:', error);
-      enqueueSnackbar(error.message || t('clientVersions.exportError'), { variant: 'error' });
-    }
-  }, [pageState.filters, t, enqueueSnackbar]);
 
   // 버전 복사 핸들러
   const handleCopyVersion = useCallback((clientVersion: ClientVersion) => {
@@ -510,10 +664,38 @@ const ClientVersionsPage: React.FC = () => {
           <Button
             variant="outlined"
             startIcon={<DownloadIcon />}
-            onClick={handleExportCSV}
+            endIcon={<ArrowDropDownIcon />}
+            onClick={(e) => setExportMenuAnchor(e.currentTarget)}
           >
             {t('common.export')}
           </Button>
+          <Menu
+            anchorEl={exportMenuAnchor}
+            open={Boolean(exportMenuAnchor)}
+            onClose={() => setExportMenuAnchor(null)}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+          >
+            <MenuItem onClick={() => handleExport('csv')}>
+              <TableChartIcon sx={{ mr: 1 }} />
+              CSV
+            </MenuItem>
+            <MenuItem onClick={() => handleExport('json')}>
+              <JsonIcon sx={{ mr: 1 }} />
+              JSON
+            </MenuItem>
+            <MenuItem onClick={() => handleExport('xlsx')}>
+              <ExcelIcon sx={{ mr: 1 }} />
+              Excel (XLSX)
+            </MenuItem>
+          </Menu>
+          <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
           <Button
             variant="contained"
             color="primary"
@@ -726,11 +908,38 @@ const ClientVersionsPage: React.FC = () => {
                 <Button
                   size="small"
                   variant="outlined"
-                  onClick={handleExportSelected}
+                  onClick={(e) => setSelectedExportMenuAnchor(e.currentTarget)}
                   startIcon={<DownloadIcon />}
+                  endIcon={<ArrowDropDownIcon />}
                 >
                   {t('common.export')}
                 </Button>
+                <Menu
+                  anchorEl={selectedExportMenuAnchor}
+                  open={Boolean(selectedExportMenuAnchor)}
+                  onClose={() => setSelectedExportMenuAnchor(null)}
+                  anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'left',
+                  }}
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                  }}
+                >
+                  <MenuItem onClick={() => handleExportSelected('csv')}>
+                    <TableChartIcon sx={{ mr: 1 }} />
+                    CSV
+                  </MenuItem>
+                  <MenuItem onClick={() => handleExportSelected('json')}>
+                    <JsonIcon sx={{ mr: 1 }} />
+                    JSON
+                  </MenuItem>
+                  <MenuItem onClick={() => handleExportSelected('xlsx')}>
+                    <ExcelIcon sx={{ mr: 1 }} />
+                    Excel (XLSX)
+                  </MenuItem>
+                </Menu>
                 <Button
                   size="small"
                   variant="outlined"
@@ -1019,30 +1228,126 @@ const ClientVersionsPage: React.FC = () => {
 
 
 
-      {/* 삭제 확인 다이얼로그 */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>{t('clientVersions.deleteConfirmTitle')}</DialogTitle>
-        <DialogContent>
+      {/* 삭제 확인 Drawer */}
+      <Drawer
+        anchor="right"
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 400 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('clientVersions.deleteConfirmTitle')}
+          </Typography>
+          <IconButton
+            onClick={() => setDeleteDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, p: 2 }}>
           <Typography>
-            {t('clientVersions.deleteConfirmMessage', { 
-              version: selectedClientVersion?.clientVersion 
+            {t('clientVersions.deleteConfirmMessage', {
+              version: selectedClientVersion?.clientVersion
             })}
           </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setDeleteDialogOpen(false)}
+            variant="outlined"
+          >
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleDelete} color="error" variant="contained">
+          <Button
+            onClick={handleDelete}
+            color="error"
+            variant="contained"
+            startIcon={<DeleteIcon />}
+          >
             {t('common.delete')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* 일괄 상태 변경 다이얼로그 */}
-      <Dialog open={bulkStatusDialogOpen} onClose={() => setBulkStatusDialogOpen(false)}>
-        <DialogTitle>{t('clientVersions.bulkStatusTitle')}</DialogTitle>
-        <DialogContent>
+      {/* 일괄 상태 변경 Drawer */}
+      <Drawer
+        anchor="right"
+        open={bulkStatusDialogOpen}
+        onClose={() => setBulkStatusDialogOpen(false)}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 450 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('clientVersions.bulkStatusTitle')}
+          </Typography>
+          <IconButton
+            onClick={() => setBulkStatusDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, p: 2 }}>
           <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel>{t('clientVersions.statusLabel')}</InputLabel>
             <Select
@@ -1057,16 +1362,34 @@ const ClientVersionsPage: React.FC = () => {
               ))}
             </Select>
           </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setBulkStatusDialogOpen(false)} startIcon={<CancelIcon />}>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setBulkStatusDialogOpen(false)}
+            startIcon={<CancelIcon />}
+            variant="outlined"
+          >
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleBulkStatusUpdate} variant="contained" startIcon={<UpdateIcon />}>
+          <Button
+            onClick={handleBulkStatusUpdate}
+            variant="contained"
+            startIcon={<UpdateIcon />}
+          >
             {t('common.update')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
 
 
@@ -1108,20 +1431,52 @@ const ClientVersionsPage: React.FC = () => {
         onClose={() => setPlatformDefaultsDialogOpen(false)}
       />
 
-      {/* 일괄 삭제 확인 다이얼로그 */}
-      <Dialog
+      {/* 일괄 삭제 확인 Drawer */}
+      <Drawer
+        anchor="right"
         open={bulkDeleteDialogOpen}
         onClose={() => setBulkDeleteDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 500 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
       >
-        <DialogTitle>
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <DeleteIcon color="error" />
-            {t('clientVersions.bulkDeleteTitle')}
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              {t('clientVersions.bulkDeleteTitle')}
+            </Typography>
           </Box>
-        </DialogTitle>
-        <DialogContent>
+          <IconButton
+            onClick={() => setBulkDeleteDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Alert severity="warning" sx={{ mb: 2 }}>
             {t('clientVersions.bulkDeleteWarning')}
           </Alert>
@@ -1143,9 +1498,23 @@ const ClientVersionsPage: React.FC = () => {
                 ))}
             </Box>
           </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setBulkDeleteDialogOpen(false)} startIcon={<CancelIcon />}>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setBulkDeleteDialogOpen(false)}
+            startIcon={<CancelIcon />}
+            variant="outlined"
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -1156,15 +1525,52 @@ const ClientVersionsPage: React.FC = () => {
           >
             {t('common.delete')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* 태그 관리 다이얼로그 */}
-      <Dialog open={tagDialogOpen} onClose={() => setTagDialogOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>
-          {t('common.tags')} - {selectedClientVersionForTags?.clientVersion} ({selectedClientVersionForTags?.platform})
-        </DialogTitle>
-        <DialogContent>
+      {/* 태그 관리 Drawer */}
+      <Drawer
+        anchor="right"
+        open={tagDialogOpen}
+        onClose={() => setTagDialogOpen(false)}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 600 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('common.tags')} - {selectedClientVersionForTags?.clientVersion} ({selectedClientVersionForTags?.platform})
+          </Typography>
+          <IconButton
+            onClick={() => setTagDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Autocomplete
             multiple
             options={allTags}
@@ -1208,9 +1614,22 @@ const ClientVersionsPage: React.FC = () => {
               </li>
             )}
           />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setTagDialogOpen(false)}>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setTagDialogOpen(false)}
+            variant="outlined"
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -1219,8 +1638,8 @@ const ClientVersionsPage: React.FC = () => {
           >
             {t('common.save')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
     </Box>
   );
 };

@@ -36,6 +36,7 @@ import {
   Autocomplete,
   Tooltip,
   Checkbox,
+  Drawer,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -48,6 +49,7 @@ import {
   Security as SecurityIcon,
   Person as PersonIcon,
   Cancel as CancelIcon,
+  Close as CloseIcon,
   Email as EmailIcon,
   VerifiedUser as VerifiedUserIcon,
   Send as SendIcon,
@@ -1136,19 +1138,54 @@ const UsersManagementPage: React.FC = () => {
         </MenuItem>
       </Menu>
 
-      {/* Add User Dialog */}
-      <Dialog
+      {/* Add User Drawer */}
+      <Drawer
+        anchor="right"
         open={addUserDialog}
         onClose={handleCloseAddUserDialog}
-        maxWidth="sm"
-        fullWidth
-        key={addUserDialog ? 'add-user-dialog-open' : 'add-user-dialog-closed'}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 600 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
       >
-        <FormDialogHeader
-          title={t('admin.users.addUserDialogTitle')}
-          description={t('admin.users.addUserDialogDescription')}
-        />
-        <DialogContent>
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Box>
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              {t('admin.users.addUserDialogTitle')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              {t('admin.users.addUserDialogDescription')}
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={handleCloseAddUserDialog}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Box
             component="form"
             autoComplete="off"
@@ -1271,44 +1308,150 @@ const UsersManagementPage: React.FC = () => {
               />
             </Box>
           </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseAddUserDialog} startIcon={<CancelIcon />}>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={handleCloseAddUserDialog}
+            startIcon={<CancelIcon />}
+            variant="outlined"
+          >
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleCreateUser} variant="contained" startIcon={<AddIcon />}>
+          <Button
+            onClick={handleCreateUser}
+            variant="contained"
+            startIcon={<AddIcon />}
+          >
             {t('admin.users.addUser')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* Confirmation Dialog */}
-      <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog({ ...confirmDialog, open: false })}>
-        <DialogTitle>{confirmDialog.title}</DialogTitle>
-        <DialogContent>
+      {/* Confirmation Drawer */}
+      <Drawer
+        anchor="right"
+        open={confirmDialog.open}
+        onClose={() => setConfirmDialog({ ...confirmDialog, open: false })}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 400 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {confirmDialog.title}
+          </Typography>
+          <IconButton
+            onClick={() => setConfirmDialog({ ...confirmDialog, open: false })}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, p: 2 }}>
           <Typography>{confirmDialog.message}</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmDialog({ ...confirmDialog, open: false })}>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setConfirmDialog({ ...confirmDialog, open: false })}
+            variant="outlined"
+          >
             {t('common.cancel')}
           </Button>
-          <Button onClick={confirmDialog.action} color="error" variant="contained">
+          <Button
+            onClick={confirmDialog.action}
+            color="error"
+            variant="contained"
+          >
             {t('common.confirm')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog
+      {/* Delete Confirmation Drawer */}
+      <Drawer
+        anchor="right"
         open={deleteConfirmDialog.open}
         onClose={() => setDeleteConfirmDialog({ open: false, user: null, inputValue: '' })}
-        maxWidth="sm"
-        fullWidth
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 500 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
       >
-        <DialogTitle>
-          {t('admin.users.deleteUser')}
-        </DialogTitle>
-        <DialogContent>
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('admin.users.deleteUser')}
+          </Typography>
+          <IconButton
+            onClick={() => setDeleteConfirmDialog({ open: false, user: null, inputValue: '' })}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Alert severity="warning" sx={{ mb: 2 }}>
             {t('admin.users.deleteConfirmation')}
           </Alert>
@@ -1325,12 +1468,23 @@ const UsersManagementPage: React.FC = () => {
             error={deleteConfirmDialog.inputValue !== '' && deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email}
             helperText={deleteConfirmDialog.inputValue !== '' && deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email ? t('admin.users.emailDoesNotMatch') : ''}
           />
-        </DialogContent>
-        <DialogActions>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
           <Button
             onClick={() => setDeleteConfirmDialog({ open: false, user: null, inputValue: '' })}
             color="inherit"
             startIcon={<CancelIcon />}
+            variant="outlined"
           >
             {t('common.cancel')}
           </Button>
@@ -1343,16 +1497,57 @@ const UsersManagementPage: React.FC = () => {
           >
             {t('common.delete')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* Edit User Dialog */}
-      <Dialog open={editUserDialog.open} onClose={() => setEditUserDialog({ open: false, user: null })} maxWidth="sm" fullWidth>
-        <FormDialogHeader
-          title={t('admin.users.editUserDialogTitle')}
-          description={t('admin.users.editUserDialogDescription')}
-        />
-        <DialogContent>
+      {/* Edit User Drawer */}
+      <Drawer
+        anchor="right"
+        open={editUserDialog.open}
+        onClose={() => setEditUserDialog({ open: false, user: null })}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 600 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Box>
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              {t('admin.users.editUserDialogTitle')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              {t('admin.users.editUserDialogDescription')}
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={() => setEditUserDialog({ open: false, user: null })}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             <Box>
               <TextField
@@ -1500,9 +1695,23 @@ const UsersManagementPage: React.FC = () => {
               </Alert>
             )}
           </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditUserDialog({ open: false, user: null })} startIcon={<CancelIcon />}>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setEditUserDialog({ open: false, user: null })}
+            startIcon={<CancelIcon />}
+            variant="outlined"
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -1512,15 +1721,52 @@ const UsersManagementPage: React.FC = () => {
           >
             {t('common.save')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* Bulk Action Dialog */}
-      <Dialog open={bulkActionDialogOpen} onClose={() => setBulkActionDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          {t(`admin.users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}`)} ({selectedUsers.size} {t('admin.users.selectedUsers')})
-        </DialogTitle>
-        <DialogContent>
+      {/* Bulk Action Drawer */}
+      <Drawer
+        anchor="right"
+        open={bulkActionDialogOpen}
+        onClose={() => setBulkActionDialogOpen(false)}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 500 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t(`admin.users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}`)} ({selectedUsers.size} {t('admin.users.selectedUsers')})
+          </Typography>
+          <IconButton
+            onClick={() => setBulkActionDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           {bulkActionType === 'status' && (
             <FormControl fullWidth sx={{ mt: 2 }}>
               <InputLabel>{t('users.status')}</InputLabel>
@@ -1611,9 +1857,23 @@ const UsersManagementPage: React.FC = () => {
               {t('admin.users.bulkDeleteConfirm', { count: selectedUsers.size })}
             </Typography>
           )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setBulkActionDialogOpen(false)} startIcon={<CancelIcon />}>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setBulkActionDialogOpen(false)}
+            startIcon={<CancelIcon />}
+            variant="outlined"
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -1624,8 +1884,8 @@ const UsersManagementPage: React.FC = () => {
           >
             {t('common.save')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
     </Box>
   );
 };

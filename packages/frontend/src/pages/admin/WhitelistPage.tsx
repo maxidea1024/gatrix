@@ -35,6 +35,7 @@ import {
   Tab,
   Box as MuiBox,
   Checkbox,
+  Drawer,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -45,6 +46,7 @@ import {
   Upload as UploadIcon,
   Refresh as RefreshIcon,
   Cancel as CancelIcon,
+  Close as CloseIcon,
   Save as SaveIcon,
   ContentCopy as ContentCopyIcon,
 } from '@mui/icons-material';
@@ -583,12 +585,57 @@ const WhitelistPage: React.FC = () => {
                 </MenuItem>
               </Menu>
 
-              {/* Add/Edit Dialog */}
-              <Dialog open={addDialog || editDialog} onClose={() => {
-                setSelectedWhitelist(null);
-                setAddDialog(false);
-                setEditDialog(false);
-              }} maxWidth="sm" fullWidth>
+              {/* Add/Edit Drawer */}
+              <Drawer
+                anchor="right"
+                open={addDialog || editDialog}
+                onClose={() => {
+                  setSelectedWhitelist(null);
+                  setAddDialog(false);
+                  setEditDialog(false);
+                }}
+                sx={{
+                  zIndex: 1301,
+                  '& .MuiDrawer-paper': {
+                    width: { xs: '100%', sm: 500 },
+                    maxWidth: '100vw',
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }
+                }}
+              >
+                {/* Header */}
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  p: 2,
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                  bgcolor: 'background.paper'
+                }}>
+                  <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+                    {editDialog ? t('whitelist.dialog.editTitle') : t('whitelist.dialog.addTitle')}
+                  </Typography>
+                  <IconButton
+                    onClick={() => {
+                      setSelectedWhitelist(null);
+                      setAddDialog(false);
+                      setEditDialog(false);
+                    }}
+                    size="small"
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: 'action.hover'
+                      }
+                    }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </Box>
+
+                {/* Content */}
+                <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
                 <FormDialogHeader
                   title={editDialog ? t('whitelist.dialog.editTitle') : t('whitelist.dialog.addTitle')}
                   description={editDialog
@@ -680,24 +727,82 @@ const WhitelistPage: React.FC = () => {
                     </Box>
                   </Box>
                 </DialogContent>
-                <DialogActions>
-                  <Button onClick={() => {
-                    setSelectedWhitelist(null);
-                    setAddDialog(false);
-                    setEditDialog(false);
-                  }} startIcon={<CancelIcon />}>
+                </Box>
+
+                {/* Footer */}
+                <Box sx={{
+                  p: 2,
+                  borderTop: '1px solid',
+                  borderColor: 'divider',
+                  bgcolor: 'background.paper',
+                  display: 'flex',
+                  gap: 2,
+                  justifyContent: 'flex-end'
+                }}>
+                  <Button
+                    onClick={() => {
+                      setSelectedWhitelist(null);
+                      setAddDialog(false);
+                      setEditDialog(false);
+                    }}
+                    startIcon={<CancelIcon />}
+                    variant="outlined"
+                  >
                     {t('common.cancel')}
                   </Button>
-                  <Button onClick={handleSave} variant="contained" startIcon={<SaveIcon />}>
+                  <Button
+                    onClick={handleSave}
+                    variant="contained"
+                    startIcon={<SaveIcon />}
+                  >
                     {(editDialog && selectedWhitelist) ? t('whitelist.dialog.update') : t('whitelist.dialog.add')}
                   </Button>
-                </DialogActions>
-              </Dialog>
+                </Box>
+              </Drawer>
 
-              {/* Bulk Import Dialog */}
-              <Dialog open={bulkDialog} onClose={() => setBulkDialog(false)} maxWidth="md" fullWidth>
-                <DialogTitle>{t('whitelist.dialog.bulkTitle')}</DialogTitle>
-                <DialogContent>
+              {/* Bulk Import Drawer */}
+              <Drawer
+                anchor="right"
+                open={bulkDialog}
+                onClose={() => setBulkDialog(false)}
+                sx={{
+                  zIndex: 1301,
+                  '& .MuiDrawer-paper': {
+                    width: { xs: '100%', sm: 600 },
+                    maxWidth: '100vw',
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }
+                }}
+              >
+                {/* Header */}
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  p: 2,
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                  bgcolor: 'background.paper'
+                }}>
+                  <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+                    {t('whitelist.dialog.bulkTitle')}
+                  </Typography>
+                  <IconButton
+                    onClick={() => setBulkDialog(false)}
+                    size="small"
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: 'action.hover'
+                      }
+                    }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </Box>
+
+                {/* Content */}
+                <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                       {t('whitelist.dialog.bulkHint1')}
@@ -714,32 +819,106 @@ const WhitelistPage: React.FC = () => {
                     onChange={(e) => setBulkData(e.target.value)}
                     placeholder={t('whitelist.dialog.bulkPlaceholder')}
                   />
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={() => setBulkDialog(false)}>
+                </Box>
+
+                {/* Footer */}
+                <Box sx={{
+                  p: 2,
+                  borderTop: '1px solid',
+                  borderColor: 'divider',
+                  bgcolor: 'background.paper',
+                  display: 'flex',
+                  gap: 2,
+                  justifyContent: 'flex-end'
+                }}>
+                  <Button
+                    onClick={() => setBulkDialog(false)}
+                    variant="outlined"
+                  >
                     {t('common.cancel')}
                   </Button>
-                  <Button onClick={handleBulkCreate} variant="contained">
+                  <Button
+                    onClick={handleBulkCreate}
+                    variant="contained"
+                    startIcon={<UploadIcon />}
+                  >
                     {t('whitelist.dialog.import')}
                   </Button>
-                </DialogActions>
-              </Dialog>
+                </Box>
+              </Drawer>
 
-              {/* Confirmation Dialog */}
-              <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))}>
-                <DialogTitle>{confirmDialog.title}</DialogTitle>
-                <DialogContent>
+              {/* Confirmation Drawer */}
+              <Drawer
+                anchor="right"
+                open={confirmDialog.open}
+                onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
+                sx={{
+                  zIndex: 1301,
+                  '& .MuiDrawer-paper': {
+                    width: { xs: '100%', sm: 400 },
+                    maxWidth: '100vw',
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }
+                }}
+              >
+                {/* Header */}
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  p: 2,
+                  borderBottom: '1px solid',
+                  borderColor: 'divider',
+                  bgcolor: 'background.paper'
+                }}>
+                  <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+                    {confirmDialog.title}
+                  </Typography>
+                  <IconButton
+                    onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
+                    size="small"
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: 'action.hover'
+                      }
+                    }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </Box>
+
+                {/* Content */}
+                <Box sx={{ flex: 1, p: 2 }}>
                   <Typography>{confirmDialog.message}</Typography>
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}>
+                </Box>
+
+                {/* Footer */}
+                <Box sx={{
+                  p: 2,
+                  borderTop: '1px solid',
+                  borderColor: 'divider',
+                  bgcolor: 'background.paper',
+                  display: 'flex',
+                  gap: 2,
+                  justifyContent: 'flex-end'
+                }}>
+                  <Button
+                    onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
+                    variant="outlined"
+                  >
                     {t('common.cancel')}
                   </Button>
-                  <Button onClick={confirmDialog.action} color="error" variant="contained">
+                  <Button
+                    onClick={confirmDialog.action}
+                    color="error"
+                    variant="contained"
+                    startIcon={<DeleteIcon />}
+                  >
                     {t('common.confirm')}
                   </Button>
-                </DialogActions>
-              </Dialog>
+                </Box>
+              </Drawer>
             </>
           )}
 

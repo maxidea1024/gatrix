@@ -289,53 +289,94 @@ export class ClientVersionService {
    * 클라이언트 버전 내보내기 (CSV)
    */
   static async exportToCSV(filters: ClientVersionFilters = {}): Promise<Blob> {
-    // 모든 데이터를 가져와서 CSV로 변환
-    const result = await this.getClientVersions(1, 10000, filters);
+    // 내보내기 전용 엔드포인트 사용
+    const params: Record<string, any> = {};
 
-    const headers = [
-      'ID',
-      'Channel',
-      'Sub Channel',
-      'Client Version',
-      'Status',
-      'Game Server Address',
-      'Game Server Address (Whitelist)',
-      'Patch Address',
-      'Patch Address (Whitelist)',
-      'Guest Mode Allowed',
-      'External Click Link',
-      'Memo',
-      'Custom Payload',
-      'Created At',
-      'Created By',
-      'Updated At',
-      'Updated By',
-    ];
+    // 필터 추가
+    if (filters.platform) params.platform = filters.platform;
+    if (filters.clientStatus) params.clientStatus = filters.clientStatus;
+    if (filters.gameServerAddress) params.gameServerAddress = filters.gameServerAddress;
+    if (filters.patchAddress) params.patchAddress = filters.patchAddress;
+    if (filters.search) params.search = filters.search;
+    if (filters.guestModeAllowed !== undefined) params.guestModeAllowed = filters.guestModeAllowed.toString();
+    if (filters.externalClickLink) params.externalClickLink = filters.externalClickLink;
+    if (filters.memo) params.memo = filters.memo;
+    if (filters.customPayload) params.customPayload = filters.customPayload;
+    if (filters.createdBy) params.createdBy = filters.createdBy.toString();
+    if (filters.updatedBy) params.updatedBy = filters.updatedBy.toString();
+    if (filters.createdAtFrom) params.createdAtFrom = filters.createdAtFrom;
+    if (filters.createdAtTo) params.createdAtTo = filters.createdAtTo;
+    if (filters.updatedAtFrom) params.updatedAtFrom = filters.updatedAtFrom;
+    if (filters.updatedAtTo) params.updatedAtTo = filters.updatedAtTo;
+    if (filters.tags && filters.tags.length > 0) params.tags = filters.tags;
 
-    const csvContent = [
-      headers.join(','),
-      ...result.clientVersions.map(cv => [
-        cv.id,
-        `"${cv.channel}"`,
-        `"${cv.subChannel}"`,
-        `"${cv.clientVersion}"`,
-        `"${cv.clientStatus}"`,
-        `"${cv.gameServerAddress}"`,
-        `"${cv.gameServerAddressForWhiteList || ''}"`,
-        `"${cv.patchAddress}"`,
-        `"${cv.patchAddressForWhiteList || ''}"`,
-        cv.guestModeAllowed,
-        `"${cv.externalClickLink || ''}"`,
-        `"${cv.memo || ''}"`,
-        `"${cv.customPayload || ''}"`,
-        `"${cv.createdAt}"`,
-        `"${cv.createdByName || ''}"`,
-        `"${cv.updatedAt}"`,
-        `"${cv.updatedByName || ''}"`,
-      ].join(','))
-    ].join('\n');
+    try {
+      const result = await apiService.get(`${this.BASE_URL}/export`, { params });
 
-    return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to export client versions');
+      }
+
+      const headers = [
+        'ID',
+        'Platform',
+        'Client Version',
+        'Status',
+        'Game Server Address',
+        'Game Server Address (Whitelist)',
+        'Patch Address',
+        'Patch Address (Whitelist)',
+        'Guest Mode Allowed',
+        'External Click Link',
+        'Memo',
+        'Custom Payload',
+        'Maintenance Start Date',
+        'Maintenance End Date',
+        'Maintenance Message',
+        'Supports Multi Language',
+        'Tags',
+        'Created At',
+        'Created By',
+        'Created By Email',
+        'Updated At',
+        'Updated By',
+        'Updated By Email',
+      ];
+
+      const csvContent = [
+        headers.join(','),
+        ...result.data.clientVersions.map((cv: any) => [
+          cv.id,
+          `"${cv.platform || ''}"`,
+          `"${cv.clientVersion}"`,
+          `"${cv.clientStatus}"`,
+          `"${cv.gameServerAddress}"`,
+          `"${cv.gameServerAddressForWhiteList || ''}"`,
+          `"${cv.patchAddress}"`,
+          `"${cv.patchAddressForWhiteList || ''}"`,
+          cv.guestModeAllowed,
+          `"${cv.externalClickLink || ''}"`,
+          `"${cv.memo || ''}"`,
+          `"${cv.customPayload || ''}"`,
+          `"${cv.maintenanceStartDate || ''}"`,
+          `"${cv.maintenanceEndDate || ''}"`,
+          `"${cv.maintenanceMessage || ''}"`,
+          cv.supportsMultiLanguage || false,
+          `"${cv.tags ? cv.tags.map((tag: any) => tag.name).join('; ') : ''}"`,
+          `"${cv.createdAt}"`,
+          `"${cv.createdByName || ''}"`,
+          `"${cv.createdByEmail || ''}"`,
+          `"${cv.updatedAt}"`,
+          `"${cv.updatedByName || ''}"`,
+          `"${cv.updatedByEmail || ''}"`,
+        ].join(','))
+      ].join('\n');
+
+      return new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    } catch (error: any) {
+      console.error('Error exporting client versions:', error);
+      throw new Error(error.message || 'Failed to export client versions');
+    }
   }
 
   /**

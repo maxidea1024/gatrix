@@ -30,7 +30,8 @@ import {
   Tooltip,
   Checkbox,
   Alert,
-  Autocomplete
+  Autocomplete,
+  Drawer
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -702,28 +703,64 @@ const MessageTemplatesPage: React.FC = () => {
         onRowsPerPageChange={handleRowsPerPageChange}
       />
 
-      <Dialog
+      <Drawer
+        anchor="right"
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-        TransitionProps={{
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 600 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+        SlideProps={{
           onEntered: () => {
-            // 대화상자가 열린 후 이름 필드에 포커스
+            // Drawer가 열린 후 이름 필드에 포커스
             setTimeout(() => {
               nameFieldRef.current?.focus();
             }, 100);
           }
         }}
       >
-        <FormDialogHeader
-          title={editing ? '메시지 템플릿 편집' : '메시지 템플릿 추가'}
-          description={editing
-            ? '기존 메시지 템플릿의 정보를 수정하고 다국어 메시지를 관리할 수 있습니다.'
-            : '새로운 메시지 템플릿을 생성하고 다국어 메시지를 설정할 수 있습니다.'
-          }
-        />
-        <DialogContent>
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Box>
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              {editing ? '메시지 템플릿 편집' : '메시지 템플릿 추가'}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              {editing
+                ? '기존 메시지 템플릿의 정보를 수정하고 다국어 메시지를 관리할 수 있습니다.'
+                : '새로운 메시지 템플릿을 생성하고 다국어 메시지를 설정할 수 있습니다.'
+              }
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={() => setDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
               label={t('common.name')}
@@ -820,9 +857,26 @@ const MessageTemplatesPage: React.FC = () => {
               ))}
             </TextField>
           </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)} disabled={saving} startIcon={<CancelIcon />}>{t('common.cancel')}</Button>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setDialogOpen(false)}
+            disabled={saving}
+            startIcon={<CancelIcon />}
+            variant="outlined"
+          >
+            {t('common.cancel')}
+          </Button>
           <Button
             variant="contained"
             onClick={handleSave}
@@ -831,40 +885,158 @@ const MessageTemplatesPage: React.FC = () => {
           >
             {saving ? t('common.saving') : t('common.save')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* 개별 삭제 확인 다이얼로그 */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
-        <DialogContent>
+      {/* 개별 삭제 확인 Drawer */}
+      <Drawer
+        anchor="right"
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 400 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('common.confirmDelete')}
+          </Typography>
+          <IconButton
+            onClick={() => setDeleteDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, p: 2 }}>
           <Typography>
             {t('admin.messageTemplates.confirmDelete', { name: deletingTemplate?.name })}
           </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
-          <Button onClick={confirmDelete} color="error" variant="contained">
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setDeleteDialogOpen(false)}
+            variant="outlined"
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={confirmDelete}
+            color="error"
+            variant="contained"
+            startIcon={<DeleteIcon />}
+          >
             {t('common.delete')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* 일괄 삭제 확인 다이얼로그 */}
-      <Dialog open={bulkDeleteDialogOpen} onClose={() => setBulkDeleteDialogOpen(false)}>
-        <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
-        <DialogContent>
+      {/* 일괄 삭제 확인 Drawer */}
+      <Drawer
+        anchor="right"
+        open={bulkDeleteDialogOpen}
+        onClose={() => setBulkDeleteDialogOpen(false)}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 400 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('common.confirmDelete')}
+          </Typography>
+          <IconButton
+            onClick={() => setBulkDeleteDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, p: 2 }}>
           <Typography>
             {t('admin.messageTemplates.confirmBulkDelete', { count: selectedIds.length })}
           </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setBulkDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
-          <Button onClick={confirmBulkDelete} color="error" variant="contained">
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setBulkDeleteDialogOpen(false)}
+            variant="outlined"
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={confirmBulkDelete}
+            color="error"
+            variant="contained"
+            startIcon={<DeleteIcon />}
+          >
             {t('common.delete')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
       {/* 태그 관리 다이얼로그 */}
       <Dialog open={tagDialogOpen} onClose={() => setTagDialogOpen(false)} maxWidth="md" fullWidth>

@@ -20,6 +20,9 @@ router.get('/meta/versions', requireAdmin as any, ClientVersionController.getAva
 // 클라이언트 버전 목록 조회 (관리자만)
 router.get('/', requireAdmin as any, ClientVersionController.getClientVersions);
 
+// 클라이언트 버전 내보내기 (관리자만)
+router.get('/export', requireAdmin as any, ClientVersionController.exportClientVersions);
+
 // 일괄 상태 변경 (관리자만)
 router.patch('/bulk-status', requireAdmin as any, ClientVersionController.bulkUpdateStatus);
 
