@@ -561,6 +561,9 @@
     "regenerateWarning": "This will generate a new token value. The old token will become invalid immediately.",
     "regenerateConfirmation": "Are you sure you want to regenerate this API token?",
     "regenerate": "Regenerate",
+    "regenerateConfirmInstruction": "To confirm regeneration, please type the token name:",
+    "regenerateConfirmPlaceholder": "Type token name here...",
+    "regenerateConfirmMismatch": "Token name does not match",
     "showToken": "Show Token",
     "hideToken": "Hide Token",
     "tokenReady": "API Token Ready",
@@ -584,8 +587,16 @@
     "tokenHashCopied": "Token hash copied to clipboard",
     "tokenAvailable": "You can copy this token anytime from the token list or regenerate it if needed.",
     "tokenValueError": "Failed to retrieve token value. Please try again.",
-    "bulkRegenerate": "Regenerate Selected",
-    "bulkDelete": "Delete Selected"
+    "bulkDelete": "Delete Selected",
+    "bulkDeleteConfirmation": "Delete Selected Tokens",
+    "bulkDeleteWarning": "This action cannot be undone. The following tokens will be permanently deleted:",
+    "tokensToDelete": "Tokens to delete ({{count}})",
+    "bulkDeleteConfirmInstruction": "To confirm deletion, please type:",
+    "deleteSelectedTokensText": "delete selected tokens",
+    "bulkDeleteConfirmPlaceholder": "Type confirmation text here...",
+    "bulkDeleteConfirmMismatch": "Confirmation text does not match. Please type the exact text above.",
+    "bulkDeleteSuccess": "Selected tokens deleted successfully",
+    "bulkDeleteFailed": "Failed to delete selected tokens"
   },
   "auditLogs": {
     "action": "Action",

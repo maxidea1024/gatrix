@@ -461,6 +461,9 @@
     "regenerateWarning": "这将生成新的令牌值。旧令牌将立即失效。",
     "regenerateConfirmation": "您确定要重新生成此 API 令牌吗？",
     "regenerate": "重新生成",
+    "regenerateConfirmInstruction": "要确认重新生成，请输入令牌名称：",
+    "regenerateConfirmPlaceholder": "在此输入令牌名称...",
+    "regenerateConfirmMismatch": "令牌名称不匹配",
     "showToken": "显示令牌",
     "hideToken": "隐藏令牌",
     "tokenReady": "API 令牌已准备",
@@ -484,8 +487,16 @@
     "tokenHashCopied": "令牌哈希已复制到剪贴板",
     "tokenAvailable": "您可以随时从令牌列表复制此令牌或根据需要重新生成。",
     "tokenValueError": "获取令牌值失败。请重试。",
-    "bulkRegenerate": "重新生成选中项",
-    "bulkDelete": "删除选中项"
+    "bulkDelete": "删除选中项",
+    "bulkDeleteConfirmation": "删除选中的令牌",
+    "bulkDeleteWarning": "此操作无法撤销。以下令牌将被永久删除：",
+    "tokensToDelete": "要删除的令牌 ({{count}}个)",
+    "bulkDeleteConfirmInstruction": "要确认删除，请输入：",
+    "deleteSelectedTokensText": "删除选中的令牌们",
+    "bulkDeleteConfirmPlaceholder": "在此输入确认文本...",
+    "bulkDeleteConfirmMismatch": "确认文本不匹配。请输入上面的确切文本。",
+    "bulkDeleteSuccess": "选中的令牌已成功删除",
+    "bulkDeleteFailed": "删除选中的令牌失败"
   },
   "auditLogs": {
     "action": "操作",

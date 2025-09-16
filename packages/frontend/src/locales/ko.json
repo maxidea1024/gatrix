@@ -553,6 +553,9 @@
     "regenerateWarning": "새로운 토큰 값이 생성됩니다. 기존 토큰은 즉시 무효화됩니다.",
     "regenerateConfirmation": "이 API 토큰을 재생성하시겠습니까?",
     "regenerate": "재생성",
+    "regenerateConfirmInstruction": "재생성을 확인하려면 토큰 이름을 입력하세요:",
+    "regenerateConfirmPlaceholder": "토큰 이름을 여기에 입력하세요...",
+    "regenerateConfirmMismatch": "토큰 이름이 일치하지 않습니다",
     "showToken": "토큰 표시",
     "hideToken": "토큰 숨기기",
     "tokenReady": "API 토큰 준비됨",
@@ -576,8 +579,16 @@
     "tokenHashCopied": "토큰 해시가 클립보드에 복사되었습니다",
     "tokenAvailable": "토큰 목록에서 언제든지 이 토큰을 복사하거나 필요시 재생성할 수 있습니다.",
     "tokenValueError": "토큰 값을 가져오는데 실패했습니다. 다시 시도해주세요.",
-    "bulkRegenerate": "선택된 항목 재생성",
-    "bulkDelete": "선택된 항목 삭제"
+    "bulkDelete": "선택된 항목 삭제",
+    "bulkDeleteConfirmation": "선택된 토큰 삭제",
+    "bulkDeleteWarning": "이 작업은 되돌릴 수 없습니다. 다음 토큰들이 영구적으로 삭제됩니다:",
+    "tokensToDelete": "삭제할 토큰 ({{count}}개)",
+    "bulkDeleteConfirmInstruction": "삭제를 확인하려면 다음을 입력하세요:",
+    "deleteSelectedTokensText": "선택된 토큰들 삭제",
+    "bulkDeleteConfirmPlaceholder": "확인 텍스트를 여기에 입력하세요...",
+    "bulkDeleteConfirmMismatch": "확인 텍스트가 일치하지 않습니다. 위의 정확한 텍스트를 입력하세요.",
+    "bulkDeleteSuccess": "선택된 토큰이 성공적으로 삭제되었습니다",
+    "bulkDeleteFailed": "선택된 토큰 삭제에 실패했습니다"
   },
   "auditLogs": {
     "action": "작업",

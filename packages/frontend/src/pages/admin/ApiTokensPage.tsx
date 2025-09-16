@@ -96,9 +96,14 @@ const ApiTokensPage: React.FC = () => {
   const [bulkDeleteDrawerOpen, setBulkDeleteDrawerOpen] = useState<boolean>(false);
   const [bulkDeleteConfirmText, setBulkDeleteConfirmText] = useState<string>('');
 
+  // Regenerate confirmation state
+  const [regenerateConfirmText, setRegenerateConfirmText] = useState<string>('');
+
   // Refs for focus management
   const tokenNameRef = useRef<HTMLInputElement>(null);
   const editTokenNameRef = useRef<HTMLInputElement>(null);
+  const regenerateConfirmRef = useRef<HTMLInputElement>(null);
+  const regenerateConfirmInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadTokens();
@@ -236,6 +241,7 @@ const ApiTokensPage: React.FC = () => {
       }, 0);
       setRegenerateDialogOpen(false);
       setSelectedToken(null);
+      setRegenerateConfirmText('');
       loadTokens();
       enqueueSnackbar(t('apiTokens.regenerateSuccess', 'API token regenerated successfully'), { variant: 'success' });
     } catch (error: any) {
@@ -286,7 +292,27 @@ const ApiTokensPage: React.FC = () => {
 
   const openRegenerateDialog = (token: ApiAccessToken) => {
     setSelectedToken(token);
+    setRegenerateConfirmText('');
     setRegenerateDialogOpen(true);
+    // Focus on confirm input field after dialog opens
+    setTimeout(() => {
+      if (regenerateConfirmRef.current) {
+        // Try to focus on the actual input element inside TextField
+        const inputElement = regenerateConfirmRef.current.querySelector('input');
+        if (inputElement) {
+          inputElement.focus();
+        } else {
+          // Fallback to the TextField itself
+          regenerateConfirmRef.current.focus();
+        }
+      }
+    }, 300);
+  };
+
+  const closeRegenerateDialog = () => {
+    setRegenerateDialogOpen(false);
+    setRegenerateConfirmText('');
+    setSelectedToken(null);
   };
 
 
@@ -333,6 +359,8 @@ const ApiTokensPage: React.FC = () => {
       setSelectAll(false);
     }
   }, [selectedTokenIds, tokens]);
+
+
 
   // Bulk actions
   const handleBulkDelete = () => {
@@ -593,13 +621,13 @@ const ApiTokensPage: React.FC = () => {
             height: '100vh',
             display: 'flex',
             flexDirection: 'column',
-            zIndex: 1300 // Ensure it's above the sticky header
+            zIndex: 1301 // Ensure it's above the sticky header
           }
         }}
         ModalProps={{
           keepMounted: false,
           sx: {
-            zIndex: 1300 // Ensure modal backdrop is also above header
+            zIndex: 1301 // Ensure modal backdrop is also above header
           }
         }}
       >
@@ -751,13 +779,13 @@ const ApiTokensPage: React.FC = () => {
             height: '100vh',
             display: 'flex',
             flexDirection: 'column',
-            zIndex: 1300 // Ensure it's above the sticky header
+            zIndex: 1301 // Ensure it's above the sticky header
           }
         }}
         ModalProps={{
           keepMounted: false,
           sx: {
-            zIndex: 1300 // Ensure modal backdrop is also above header
+            zIndex: 1301 // Ensure modal backdrop is also above header
           }
         }}
       >
@@ -863,12 +891,12 @@ const ApiTokensPage: React.FC = () => {
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         sx={{
+          zIndex: 1301,
           '& .MuiDrawer-paper': {
             width: { xs: '100%', sm: 500 },
             maxWidth: '100vw',
             display: 'flex',
-            flexDirection: 'column',
-            zIndex: 1300
+            flexDirection: 'column'
           }
         }}
       >
@@ -901,14 +929,8 @@ const ApiTokensPage: React.FC = () => {
         </Box>
 
         <Box sx={{ p: 3, flexGrow: 1 }}>
-          <Alert severity="error" sx={{ mb: 3 }}>
-            <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-              {t('apiTokens.deleteWarning', 'This action cannot be undone. The token will be permanently deleted.')}
-            </Typography>
-          </Alert>
-
-          <Typography variant="body1" sx={{ mb: 3 }}>
-            {t('apiTokens.deleteConfirmation', 'Are you sure you want to delete this API token?')}
+          <Typography variant="body1" sx={{ mb: 3, fontWeight: 500 }}>
+            {t('apiTokens.deleteConfirmation', 'Are you sure you want to delete this API token? This action cannot be undone.')}
           </Typography>
 
           {selectedToken && (
@@ -992,20 +1014,20 @@ const ApiTokensPage: React.FC = () => {
       <Drawer
         anchor="right"
         open={regenerateDialogOpen}
-        onClose={() => setRegenerateDialogOpen(false)}
+        onClose={closeRegenerateDialog}
         PaperProps={{
           sx: {
             width: 500,
             height: '100vh',
             display: 'flex',
             flexDirection: 'column',
-            zIndex: 1300 // Ensure it's above the sticky header
+            zIndex: 1301 // Ensure it's above the sticky header
           }
         }}
         ModalProps={{
           keepMounted: false,
           sx: {
-            zIndex: 1300 // Ensure modal backdrop is also above header
+            zIndex: 1301 // Ensure modal backdrop is also above header
           }
         }}
       >
@@ -1025,7 +1047,7 @@ const ApiTokensPage: React.FC = () => {
             {t('apiTokens.regenerateToken', 'Regenerate API Token')}
           </Typography>
           <IconButton
-            onClick={() => setRegenerateDialogOpen(false)}
+            onClick={closeRegenerateDialog}
             size="small"
             sx={{
               '&:hover': {
@@ -1047,26 +1069,52 @@ const ApiTokensPage: React.FC = () => {
           </Typography>
 
           {selectedToken && (
-            <Box sx={{
-              p: 3,
-              bgcolor: 'background.default',
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: 'divider',
-              mb: 3
-            }}>
-              <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-                {selectedToken.tokenName}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                {t(`apiTokens.${selectedToken.tokenType}TokenType`, selectedToken.tokenType)}
-              </Typography>
-              {selectedToken.description && (
-                <Typography variant="body2" color="text.secondary">
-                  {selectedToken.description}
+            <>
+              <Box sx={{
+                p: 3,
+                bgcolor: 'background.default',
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: 'divider',
+                mb: 3
+              }}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                  {selectedToken.tokenName}
                 </Typography>
-              )}
-            </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  {t(`apiTokens.${selectedToken.tokenType}TokenType`, selectedToken.tokenType)}
+                </Typography>
+                {selectedToken.description && (
+                  <Typography variant="body2" color="text.secondary">
+                    {selectedToken.description}
+                  </Typography>
+                )}
+              </Box>
+
+              {/* Confirmation Input */}
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+                  {t('apiTokens.regenerateConfirmInstruction', 'To confirm regeneration, please type the token name:')}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  <strong>{selectedToken.tokenName}</strong>
+                </Typography>
+                <TextField
+                  fullWidth
+                  ref={regenerateConfirmRef}
+                  value={regenerateConfirmText}
+                  onChange={(e) => setRegenerateConfirmText(e.target.value)}
+                  placeholder={t('apiTokens.regenerateConfirmPlaceholder', 'Type token name here...')}
+                  size="medium"
+                  error={regenerateConfirmText.length > 0 && regenerateConfirmText !== selectedToken.tokenName}
+                  helperText={
+                    regenerateConfirmText.length > 0 && regenerateConfirmText !== selectedToken.tokenName
+                      ? t('apiTokens.regenerateConfirmMismatch', 'Token name does not match')
+                      : ''
+                  }
+                />
+              </Box>
+            </>
           )}
         </Box>
 
@@ -1079,7 +1127,7 @@ const ApiTokensPage: React.FC = () => {
           justifyContent: 'flex-end'
         }}>
           <Button
-            onClick={() => setRegenerateDialogOpen(false)}
+            onClick={closeRegenerateDialog}
             variant="outlined"
             startIcon={<CancelIcon />}
           >
@@ -1090,6 +1138,7 @@ const ApiTokensPage: React.FC = () => {
             color="primary"
             variant="contained"
             startIcon={<RefreshIcon />}
+            disabled={!selectedToken || regenerateConfirmText !== selectedToken.tokenName || loading}
           >
             {t('apiTokens.regenerate', 'Regenerate')}
           </Button>
@@ -1259,9 +1308,6 @@ const ApiTokensPage: React.FC = () => {
                     : t('apiTokens.tokenRegenerated', 'API Token Regenerated')
                   }
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {t('apiTokens.tokenReady', 'Your API token is ready to use')}
-                </Typography>
               </Box>
             </Box>
           </DialogTitle>
@@ -1384,13 +1430,12 @@ const ApiTokensPage: React.FC = () => {
               onClick={() => { setNewTokenValue(''); setNewTokenInfo(null); setNewTokenDialogOpen(false); }}
               variant="contained"
               startIcon={<CheckCircleIcon />}
-              size="large"
+              size="medium"
               sx={{
-                px: 4,
-                py: 1.5,
+                px: 3,
+                py: 1,
                 fontWeight: 600,
-                textTransform: 'none',
-                fontSize: '1rem'
+                textTransform: 'none'
               }}
             >
               {t('common.confirm', 'Confirm')}
