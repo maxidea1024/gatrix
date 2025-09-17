@@ -36,50 +36,6 @@ router.post('/remote-config/evaluate',
   RemoteConfigClientController.evaluate
 );
 
-/**
- * @swagger
- * /api/v1/client/remote-config/{key}:
- *   post:
- *     summary: Get single remote config by key
- *     description: Server-side evaluation of a single remote config by key.
- *     tags: [Client]
- *     parameters:
- *       - in: path
- *         name: key
- *         required: true
- *         schema:
- *           type: string
- *         description: Config key name
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               context:
- *                 type: object
- *                 properties:
- *                   userId:
- *                     type: string
- *                   userSegment:
- *                     type: string
- *                   appVersion:
- *                     type: string
- *                   platform:
- *                     type: string
- *                   country:
- *                     type: string
- *                   language:
- *                     type: string
- *                   customFields:
- *                     type: object
- *     responses:
- *       200:
- *         description: Remote config evaluated successfully
- *       404:
- *         description: Config not found or inactive
- */
 router.post('/remote-config/:key',
   param('key').isString().isLength({ min: 1, max: 255 }),
   body('context').optional().isObject(),
@@ -88,7 +44,20 @@ router.post('/remote-config/:key',
 );
 
 // Client SDK routes (with API token authentication)
-router.get('/test', clientSDKAuth, RemoteConfigSDKController.testAuth);
+router.get('/test', clientSDKAuth, (req: any, res: any) => {
+  const apiToken = req.apiToken;
+
+  res.json({
+    success: true,
+    message: 'Client SDK authentication successful',
+    data: {
+      tokenId: apiToken?.id,
+      tokenName: apiToken?.tokenName,
+      tokenType: apiToken?.tokenType,
+      timestamp: new Date().toISOString()
+    }
+  });
+});
 router.get('/remote-config/templates', clientSDKAuth, RemoteConfigSDKController.getClientTemplates);
 router.post('/remote-config/evaluate', clientSDKAuth, RemoteConfigSDKController.evaluateConfig);
 router.post('/remote-config/metrics', clientSDKAuth, RemoteConfigSDKController.submitMetrics);

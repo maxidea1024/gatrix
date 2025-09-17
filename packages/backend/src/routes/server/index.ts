@@ -8,7 +8,20 @@ const router = express.Router();
 // These routes are for Server SDK usage
 
 // Test SDK authentication
-router.get('/test', serverSDKAuth, RemoteConfigSDKController.testAuth);
+router.get('/test', serverSDKAuth, (req: any, res: any) => {
+  const apiToken = req.apiToken;
+
+  res.json({
+    success: true,
+    message: 'Server SDK authentication successful',
+    data: {
+      tokenId: apiToken?.id,
+      tokenName: apiToken?.tokenName,
+      tokenType: apiToken?.tokenType,
+      timestamp: new Date().toISOString()
+    }
+  });
+});
 
 // Get templates for server SDK
 router.get('/templates', serverSDKAuth, RemoteConfigSDKController.getServerTemplates);

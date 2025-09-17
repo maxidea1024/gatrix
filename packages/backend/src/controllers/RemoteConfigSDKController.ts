@@ -19,23 +19,7 @@ interface UserContext {
 }
 
 export class RemoteConfigSDKController {
-  /**
-   * Simple test endpoint for SDK authentication
-   */
-  static testAuth = asyncHandler(async (req: SDKRequest, res: Response) => {
-    const apiToken = req.apiToken;
 
-    res.json({
-      success: true,
-      message: 'SDK authentication successful',
-      data: {
-        tokenId: apiToken?.id,
-        tokenName: apiToken?.tokenName,
-        tokenType: apiToken?.tokenType,
-        timestamp: new Date().toISOString()
-      }
-    });
-  });
 
   /**
    * Get client templates for SDK

@@ -11,8 +11,7 @@ router.use('/', clientRoutes);
 // SDK routes (require API token authentication)
 // These routes are for Client SDK usage
 
-// Test SDK authentication
-router.get('/test', clientSDKAuth, RemoteConfigSDKController.testAuth);
+// Test SDK authentication (handled in client routes)
 
 // Get templates for client SDK
 router.get('/templates', clientSDKAuth, RemoteConfigSDKController.getClientTemplates);
