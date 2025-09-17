@@ -536,6 +536,7 @@
     "tokenTypeNotEditable": "Token type cannot be changed after creation",
     "tokenValue": "Token Value",
     "lastUsed": "Last Used",
+    "usageCount": "Usage Count",
     "expiresAt": "Expires",
     "status": "Status",
     "totalTokens": "Total Tokens",

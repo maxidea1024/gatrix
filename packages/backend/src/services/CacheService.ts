@@ -50,6 +50,21 @@ export class CacheService extends EventEmitter {
   }
 
   /**
+   * Static delete method (alias for del)
+   */
+  public static async delete(key: string): Promise<void> {
+    return CacheService.del(key);
+  }
+
+  /**
+   * Static method to get keys by pattern
+   */
+  public static async getKeysByPattern(pattern: string): Promise<string[]> {
+    const instance = CacheService.getInstance();
+    return instance.getKeysByPattern(pattern);
+  }
+
+  /**
    * Get cached data
    */
   get<T>(key: string): T | null {
@@ -146,6 +161,34 @@ export class CacheService extends EventEmitter {
       expiredItems,
       memoryUsage: process.memoryUsage()
     };
+  }
+
+  /**
+   * Get keys by pattern (simple wildcard support)
+   */
+  public getKeysByPattern(pattern: string): string[] {
+    const keys: string[] = [];
+    const regex = this.patternToRegex(pattern);
+
+    for (const key of this.cache.keys()) {
+      if (regex.test(key)) {
+        keys.push(key);
+      }
+    }
+
+    return keys;
+  }
+
+  /**
+   * Convert wildcard pattern to regex
+   */
+  private patternToRegex(pattern: string): RegExp {
+    // 간단한 와일드카드 지원: * -> .*
+    const regexPattern = pattern
+      .replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // 특수문자 이스케이프
+      .replace(/\\\*/g, '.*'); // * -> .*
+
+    return new RegExp(`^${regexPattern}$`);
   }
 
   /**

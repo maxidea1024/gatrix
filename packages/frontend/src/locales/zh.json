@@ -436,6 +436,7 @@
     "tokenTypeNotEditable": "令牌类型在创建后无法更改",
     "tokenValue": "令牌值",
     "lastUsed": "最后使用",
+    "usageCount": "使用次数",
     "expiresAt": "过期时间",
     "status": "状态",
     "totalTokens": "总令牌数",

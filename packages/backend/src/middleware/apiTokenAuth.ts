@@ -19,14 +19,24 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
     
     // Extract token from Authorization header or X-API-Key header
     let token: string | undefined;
-    
+
+    console.log('🔍 API Token Auth Debug:', {
+      authHeader: authHeader ? `${authHeader.substring(0, 20)}...` : 'none',
+      apiKey: apiKey ? `${apiKey.substring(0, 20)}...` : 'none',
+      hasAuthHeader: !!authHeader,
+      hasApiKey: !!apiKey
+    });
+
     if (authHeader && authHeader.startsWith('Bearer ')) {
       token = authHeader.substring(7);
+      console.log('🔑 Token from Authorization header:', `${token.substring(0, 20)}...`);
     } else if (apiKey) {
       token = apiKey;
+      console.log('🔑 Token from X-API-Key header:', `${token.substring(0, 20)}...`);
     }
 
     if (!token) {
+      console.log('❌ No token found in request');
       return res.status(401).json({
         success: false,
         message: 'API token is required'
@@ -37,11 +47,26 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
     const cacheKey = `api_token:${token.substring(0, 16)}...`; // Use partial token for cache key
     let apiToken = await CacheService.get<ApiAccessToken>(cacheKey);
 
+    console.log('🔍 Token validation:', {
+      tokenPrefix: `${token.substring(0, 20)}...`,
+      cacheKey,
+      foundInCache: !!apiToken
+    });
+
     if (!apiToken) {
+      console.log('🔍 Token not in cache, validating against database...');
       // Validate token against database
       apiToken = await ApiAccessToken.validateAndUse(token);
-      
+
+      console.log('🔍 Database validation result:', {
+        found: !!apiToken,
+        tokenId: apiToken?.id,
+        tokenName: apiToken?.tokenName,
+        tokenType: apiToken?.tokenType
+      });
+
       if (!apiToken) {
+        console.log('❌ Token validation failed');
         return res.status(401).json({
           success: false,
           message: 'Invalid or expired API token'
@@ -50,6 +75,17 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
 
       // Cache the token for 5 minutes
       await CacheService.set(cacheKey, apiToken, 300);
+      console.log('✅ Token cached successfully');
+    } else {
+      console.log('✅ Token found in cache');
+
+      // 캐시에서 토큰을 찾았어도 사용량 기록
+      if (apiToken.id) {
+        const { default: apiTokenUsageService } = await import('../services/ApiTokenUsageService');
+        apiTokenUsageService.recordTokenUsage(apiToken.id).catch(error => {
+          console.error('Failed to record token usage from cache:', error);
+        });
+      }
     }
 
     // Check if token is valid

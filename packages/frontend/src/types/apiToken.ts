@@ -9,6 +9,7 @@ export interface ApiAccessToken {
   environmentId?: number;
   expiresAt?: string;
   lastUsedAt?: string;
+  usageCount?: number;
   createdBy: number;
   updatedBy?: number;
   createdAt: string;

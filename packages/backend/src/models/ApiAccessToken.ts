@@ -15,6 +15,7 @@ export interface ApiAccessTokenData {
   environmentId?: number;
   expiresAt?: Date;
   lastUsedAt?: Date;
+  usageCount?: number;
   createdBy: number;
   updatedBy?: number;
   createdAt?: Date;
@@ -32,6 +33,7 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   environmentId?: number;
   expiresAt?: Date;
   lastUsedAt?: Date;
+  usageCount?: number;
   createdBy!: number;
   updatedBy?: number;
   createdAt?: Date;
@@ -51,11 +53,12 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
         tokenHash: { type: 'string', minLength: 1, maxLength: 255 },
         tokenType: { type: 'string', enum: ['client', 'server'] },
         environmentId: { type: ['integer', 'null'] },
-        expiresAt: { type: ['string', 'null'], format: 'date-time' },
-        lastUsedAt: { type: ['string', 'null'], format: 'date-time' },
+        expiresAt: { type: ['string', 'object', 'null'], format: 'date-time' },
+        lastUsedAt: { type: ['string', 'object', 'null'], format: 'date-time' },
+        usageCount: { type: ['integer', 'null'], minimum: 0 },
         createdBy: { type: 'integer' },
-        createdAt: { type: 'string', format: 'date-time' },
-        updatedAt: { type: 'string', format: 'date-time' }
+        createdAt: { type: ['string', 'object'], format: 'date-time' },
+        updatedAt: { type: ['string', 'object'], format: 'date-time' }
       }
     };
   }
@@ -98,6 +101,26 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
     this.updatedAt = new Date();
   }
 
+  $formatDatabaseJson(json: any) {
+    json = super.$formatDatabaseJson(json);
+
+    // Convert Date objects to ISO strings for MySQL
+    if (json.lastUsedAt instanceof Date) {
+      json.lastUsedAt = json.lastUsedAt.toISOString();
+    }
+    if (json.updatedAt instanceof Date) {
+      json.updatedAt = json.updatedAt.toISOString();
+    }
+    if (json.createdAt instanceof Date) {
+      json.createdAt = json.createdAt.toISOString();
+    }
+    if (json.expiresAt instanceof Date) {
+      json.expiresAt = json.expiresAt.toISOString();
+    }
+
+    return json;
+  }
+
   /**
    * Generate a new API token
    */
@@ -117,10 +140,10 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   }
 
   /**
-   * Verify a token against its hash
+   * Verify a token against stored value (plain text comparison)
    */
-  static async verifyToken(token: string, hash: string): Promise<boolean> {
-    return await bcrypt.compare(token, hash);
+  static async verifyToken(token: string, storedTokenValue: string): Promise<boolean> {
+    return token === storedTokenValue;
   }
 
   /**
@@ -135,12 +158,11 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
   }): Promise<{ token: ApiAccessToken; plainToken: string }> {
     // Generate token
     const plainToken = this.generateToken();
-    const tokenHash = await this.hashToken(plainToken);
 
-    // Create token record
+    // Create token record (store plain token instead of hash)
     const token = await this.query().insert({
       tokenName: data.tokenName,
-      tokenHash,
+      tokenHash: plainToken, // Store plain token (using tokenHash column name for now)
       tokenType: data.tokenType,
       environmentId: data.environmentId,
       expiresAt: data.expiresAt,
@@ -153,40 +175,41 @@ export class ApiAccessToken extends Model implements ApiAccessTokenData {
 
 
   /**
-   * Find token by hash
+   * Find token by plain text comparison
    */
   static async findByToken(token: string): Promise<ApiAccessToken | undefined> {
-    // Get all tokens and verify against each hash
-    const tokens = await this.query()
+    // Direct database query for plain text token
+    const tokenRecord = await this.query()
+      .where('tokenHash', token) // Using tokenHash column name (will be renamed later)
       .where(builder => {
         builder.whereNull('expiresAt').orWhere('expiresAt', '>', new Date());
       })
-      .withGraphFetched('environment');
+      .withGraphFetched('environment')
+      .first();
 
-    for (const tokenRecord of tokens) {
-      if (await this.verifyToken(token, tokenRecord.tokenHash)) {
-        return tokenRecord;
-      }
-    }
-
-    return undefined;
+    return tokenRecord;
   }
 
   /**
-   * Validate token and update last used
+   * Validate token and record usage (캐시 기반)
    */
   static async validateAndUse(token: string): Promise<ApiAccessToken | null> {
     const tokenRecord = await this.findByToken(token);
-    
+
     if (!tokenRecord) {
       return null;
     }
 
-    // Update last used timestamp
-    await tokenRecord.$query().patch({
-      lastUsedAt: new Date(),
-      updatedAt: new Date()
-    });
+    // 캐시 기반 사용량 추적 (비동기로 처리하여 API 응답 속도에 영향 없음)
+    if (tokenRecord.id) {
+      // 동적 import로 순환 참조 방지
+      const { default: apiTokenUsageService } = await import('../services/ApiTokenUsageService');
+      apiTokenUsageService.recordTokenUsage(tokenRecord.id).catch(error => {
+        // 사용량 추적 실패가 API 요청을 방해하지 않도록 로그만 남김
+        const logger = require('../config/logger').default;
+        logger.error('Failed to record token usage:', error);
+      });
+    }
 
     return tokenRecord;
   }

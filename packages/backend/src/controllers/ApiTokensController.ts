@@ -43,7 +43,7 @@ class ApiTokensController {
       const [{ count: total }] = await countQuery.count('* as count');
 
       // Validate and apply sorting
-      const validSortFields = ['tokenName', 'tokenType', 'createdAt', 'lastUsedAt', 'expiresAt', 'creatorName'];
+      const validSortFields = ['tokenName', 'tokenType', 'createdAt', 'lastUsedAt', 'usageCount', 'expiresAt', 'creatorName'];
       const validSortOrders = ['asc', 'desc'];
 
       const finalSortBy = validSortFields.includes(sortBy as string) ? sortBy as string : 'createdAt';
@@ -108,15 +108,14 @@ class ApiTokensController {
       const { tokenName, description, tokenType, expiresAt } = req.body;
       const userId = (req as any).user.id;
 
-      // Generate secure token
+      // Generate secure token (store as plain text)
       const tokenValue = crypto.randomBytes(32).toString('hex');
-      const tokenHash = crypto.createHash('sha256').update(tokenValue).digest('hex');
 
-      // Insert token
+      // Insert token (store plain text, no hashing)
       const [id] = await knex('g_api_access_tokens').insert({
         tokenName,
         description: description || null,
-        tokenHash,
+        tokenHash: tokenValue, // Store plain token value
         tokenType,
         environmentId: null,
         expiresAt: expiresAt || null,

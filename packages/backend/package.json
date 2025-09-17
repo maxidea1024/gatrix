@@ -27,6 +27,7 @@
     "seed:clear": "ts-node src/database/seed.ts clear",
     "seed:reset": "ts-node src/database/seed.ts reset",
     "sql": "node ../../node_modules/ts-node/dist/bin.js src/scripts/executeSql.ts",
+    "migrate:add-usage-count": "node scripts/add-usage-count-column.js",
     "setup:db": "mysql -u root -p < scripts/setup-database.sql",
     "setup:db:win": "scripts\\setup-database.bat",
     "setup:db:unix": "bash scripts/setup-database.sh",
@@ -45,6 +46,7 @@
     "@types/ioredis": "^4.28.10",
     "@types/knex": "^0.15.2",
     "@types/multer": "^2.0.0",
+    "@types/uuid": "^10.0.0",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^2.4.3",
     "bullmq": "^5.1.9",
@@ -83,6 +85,7 @@
     "ssh2": "^1.17.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
+    "uuid": "^13.0.0",
     "winston": "^3.11.0",
     "winston-daily-rotate-file": "^4.7.1"
   },

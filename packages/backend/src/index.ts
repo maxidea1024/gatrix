@@ -5,6 +5,8 @@ import database from './config/database';
 import redisClient from './config/redis';
 import { pubSubService } from './services/PubSubService';
 import { queueService } from './services/QueueService';
+import apiTokenUsageService from './services/ApiTokenUsageService';
+import { appInstance } from './utils/AppInstance';
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error: Error) => {
@@ -23,6 +25,13 @@ const gracefulShutdown = async (signal: string) => {
   logger.info(`Received ${signal}. Starting graceful shutdown...`);
 
   try {
+    // Close ApiTokenUsageService
+    try {
+      await apiTokenUsageService.shutdown();
+    } catch (error) {
+      logger.warn('Error shutting down ApiTokenUsageService:', error);
+    }
+
     // Close Queue service
     try {
       await queueService.shutdown();
@@ -93,9 +102,17 @@ const startServer = async () => {
       logger.warn('Queue service initialization failed, continuing without queues:', error);
     }
 
+    // Initialize ApiTokenUsageService (QueueService 초기화 후에 실행)
+    try {
+      await apiTokenUsageService.initialize();
+      logger.info('ApiTokenUsageService initialized successfully');
+    } catch (error) {
+      logger.warn('ApiTokenUsageService initialization failed, continuing without token usage tracking:', error);
+    }
+
     // Start HTTP server
     const server = app.listen(config.port, () => {
-      logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`);
+      logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`, appInstance.getLogInfo());
       logger.info(`Health check available at http://localhost:${config.port}/health`);
       logger.info(`API available at http://localhost:${config.port}/api/v1`);
       logger.info(`Queue service ready: ${queueService.isReady()}`);

@@ -340,9 +340,9 @@ const ApiTokensPage: React.FC = () => {
     enqueueSnackbar(t('apiTokens.tokenCopied', 'Token copied to clipboard'), { variant: 'success' });
   };
 
-  const copyTokenHash = (token: ApiAccessToken) => {
-    navigator.clipboard.writeText(token.tokenHash);
-    enqueueSnackbar(t('apiTokens.tokenHashCopied', 'Token hash copied to clipboard'), { variant: 'success' });
+  const copyTokenValue = (token: ApiAccessToken) => {
+    navigator.clipboard.writeText(token.tokenHash); // tokenHash now contains the plain token
+    enqueueSnackbar(t('apiTokens.tokenCopied', 'Token copied to clipboard'), { variant: 'success' });
   };
 
   const maskToken = (token: string) => {
@@ -520,6 +520,15 @@ const ApiTokensPage: React.FC = () => {
                 </TableCell>
                 <TableCell>
                   <TableSortLabel
+                    active={sortBy === 'usageCount'}
+                    direction={sortBy === 'usageCount' ? sortOrder : 'asc'}
+                    onClick={() => handleSort('usageCount')}
+                  >
+                    {t('apiTokens.usageCount', 'Usage Count')}
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell>
+                  <TableSortLabel
                     active={sortBy === 'expiresAt'}
                     direction={sortBy === 'expiresAt' ? sortOrder : 'asc'}
                     onClick={() => handleSort('expiresAt')}
@@ -604,6 +613,11 @@ const ApiTokensPage: React.FC = () => {
                       </Typography>
                     </TableCell>
                     <TableCell>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        {(token.usageCount || 0).toLocaleString()}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
                       <Typography variant="body2">
                         {token.expiresAt
                           ? formatDateTimeDetailed(token.expiresAt)
@@ -631,7 +645,7 @@ const ApiTokensPage: React.FC = () => {
                     <TableCell align="center">
                       <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
                         <Tooltip title={t('apiTokens.copyToken', 'Copy Token')}>
-                          <IconButton size="small" onClick={() => copyTokenHash(token)}>
+                          <IconButton size="small" onClick={() => copyTokenValue(token)}>
                             <CopyIcon />
                           </IconButton>
                         </Tooltip>

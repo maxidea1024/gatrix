@@ -15,6 +15,7 @@ import { requestLogger } from './middleware/requestLogger';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { generalLimiter, apiLimiter, authLimiter } from './middleware/rateLimiter';
 import { responseCache, cacheConfigs } from './middleware/responseCache';
+import { appInstance } from './utils/AppInstance';
 // import { initializeJobTypes } from './services/jobs';
 // import { CampaignScheduler } from './services/campaignScheduler';
 
@@ -127,6 +128,7 @@ app.get('/health', (req, res) => {
     message: 'Server is healthy',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
+    ...appInstance.getHealthInfo()
   });
 });
 
@@ -191,6 +193,9 @@ const bullBoardAdapter = BullBoardConfig.initialize();
 app.use('/admin/queues', bullBoardAdapter.getRouter());
 app.use('/api/v1/admin/queues', (authenticate as any), (requireAdmin as any), bullBoardAdapter.getRouter());
 
+// Remote Config SDK routes (API token authentication) - MUST BE BEFORE general client routes
+app.use('/api/v1/remote-config', remoteConfigSDKRoutes);
+
 // Client API routes (no authentication, no rate limiting, with caching) - MUST BE BEFORE GENERAL /api/v1 routes
 app.use('/api/v1/client', clientRoutes);
 app.use('/api/v1/vars', varsRoutes);
@@ -210,11 +215,8 @@ app.use('/api/v1/translation', translationRoutes);
 app.use('/api/v1/admin/remote-config/campaigns', campaignRoutes);
 app.use('/api/v1/admin/remote-config', remoteConfigRoutes);
 
-// New Remote Config V2 routes
+// New Remote Config V2 routes (admin authentication)
 app.use('/api/v1/remote-config', remoteConfigV2Routes);
-
-// Remote Config SDK routes (no authentication middleware, uses API tokens)
-app.use('/api/v1/remote-config', remoteConfigSDKRoutes);
 
 
 
