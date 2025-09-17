@@ -4,7 +4,7 @@ import { Job, JobType, JobExecution, CreateJobData, UpdateJobData, JobFilters, J
 export const jobService = {
   // Job Types
   async getJobTypes(): Promise<JobType[]> {
-    const response = await api.get('/job-types');
+    const response = await api.get('/admin/jobs/job-types');
     console.log('jobService.getJobTypes - Raw response:', response);
     console.log('jobService.getJobTypes - Response data:', response.data);
     const result = response.data?.data || response.data || [];
@@ -13,12 +13,12 @@ export const jobService = {
   },
 
   async getJobType(id: number): Promise<JobType> {
-    const response = await api.get(`/job-types/${id}`);
+    const response = await api.get(`/admin/jobs/job-types/${id}`);
     return response.data?.data || response.data;
   },
 
   async getEnabledJobTypes(): Promise<JobType[]> {
-    const response = await api.get('/job-types?enabled=true');
+    const response = await api.get('/admin/jobs/job-types?enabled=true');
     return response.data?.data || response.data || [];
   },
 
@@ -30,7 +30,7 @@ export const jobService = {
     if (filters?.search) params.append('search', filters.search);
 
     const queryString = params.toString();
-    const url = queryString ? `/jobs?${queryString}` : '/jobs';
+    const url = queryString ? `/admin/jobs?${queryString}` : '/admin/jobs';
     const response = await api.get(url);
     return response.data?.data || response.data || [];
   },
@@ -45,7 +45,7 @@ export const jobService = {
     if (filters?.page) params.append('page', filters.page.toString());
 
     const queryString = params.toString();
-    const url = queryString ? `/jobs?${queryString}` : '/jobs';
+    const url = queryString ? `/admin/jobs?${queryString}` : '/admin/jobs';
     const response = await api.get(url);
 
     // 백엔드 응답 구조에 맞게 처리
@@ -71,27 +71,27 @@ export const jobService = {
   },
 
   async getJob(id: number): Promise<Job> {
-    const response = await api.get(`/jobs/${id}`);
+    const response = await api.get(`/admin/jobs/${id}`);
     return response.data?.data || response.data;
   },
 
   async createJob(data: CreateJobData): Promise<Job> {
-    const response = await api.post('/jobs', data);
+    const response = await api.post('/admin/jobs', data);
     return response.data?.data || response.data;
   },
 
   async updateJob(id: number, data: UpdateJobData): Promise<Job> {
-    const response = await api.put(`/jobs/${id}`, data);
+    const response = await api.put(`/admin/jobs/${id}`, data);
     return response.data?.data || response.data;
   },
 
   async deleteJob(id: number): Promise<boolean> {
-    const response = await api.delete(`/jobs/${id}`);
+    const response = await api.delete(`/admin/jobs/${id}`);
     return response.data?.success ?? true;
   },
 
   async executeJob(id: number): Promise<{ executionId: number }> {
-    const response = await api.post(`/jobs/${id}/execute`);
+    const response = await api.post(`/admin/jobs/${id}/execute`);
     return response.data?.data || response.data;
   },
 
@@ -102,7 +102,7 @@ export const jobService = {
     if (filters?.offset) params.append('offset', filters.offset.toString());
 
     const queryString = params.toString();
-    const url = queryString ? `/jobs/${jobId}/executions?${queryString}` : `/jobs/${jobId}/executions`;
+    const url = queryString ? `/admin/jobs/${jobId}/executions?${queryString}` : `/admin/jobs/${jobId}/executions`;
     const response = await api.get(url);
     return response.data?.data || response.data || [];
   },
@@ -118,13 +118,13 @@ export const jobService = {
     if (filters?.offset) params.append('offset', filters.offset.toString());
 
     const queryString = params.toString();
-    const url = queryString ? `/job-executions?${queryString}` : '/job-executions';
+    const url = queryString ? `/admin/jobs/job-executions?${queryString}` : '/admin/jobs/job-executions';
     const response = await api.get(url);
     return response.data?.data || response.data || [];
   },
 
   async getJobExecution(id: number): Promise<JobExecution> {
-    const response = await api.get(`/job-executions/${id}`);
+    const response = await api.get(`/admin/jobs/job-executions/${id}`);
     return response.data?.data || response.data;
   },
 
@@ -134,7 +134,7 @@ export const jobService = {
     if (dateTo) params.append('date_to', dateTo);
 
     const queryString = params.toString();
-    const url = queryString ? `/job-executions/statistics?${queryString}` : '/job-executions/statistics';
+    const url = queryString ? `/admin/jobs/job-executions/statistics?${queryString}` : '/admin/jobs/job-executions/statistics';
     const response = await api.get(url);
     return response.data?.data || response.data;
   }

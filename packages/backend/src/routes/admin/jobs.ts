@@ -24,26 +24,28 @@ import {
 
 const router = express.Router();
 
-// 모든 ?�우?�에 ?�증 �?관리자 권한 ?�요
+// 모든 라우트에 인증 및 관리자 권한 필요
 router.use(authenticate as any);
 router.use(requireAdmin as any);
 
-// Job Types ?�우??router.get('/job-types', getJobTypes);
+// Job Types 라우트
+router.get('/job-types', getJobTypes);
 router.get('/job-types/:id', getJobType);
 
-// Jobs ?�우??router.get('/jobs', getJobs);
-router.get('/jobs/:id', getJob);
-router.post('/jobs',
+// Jobs 라우트
+router.get('/', getJobs);
+router.get('/:id', getJob);
+router.post('/',
   auditLog({
     action: 'job_create',
     resourceType: 'job',
-    // Job ?�성 ?�에??ID가 ?�직 ?�으므�?getResourceId ?�거
+    // Job 생성 시에는 ID가 아직 없으므로 getResourceId 생략
     getNewValues: (req) => req.body,
     getResourceIdFromResponse: (res: any) => res?.data?.id,
   }) as any,
   createJob
 );
-router.put('/jobs/:id',
+router.put('/:id',
   auditLog({
     action: 'job_update',
     resourceType: 'job',
@@ -52,7 +54,7 @@ router.put('/jobs/:id',
   }) as any,
   updateJob
 );
-router.delete('/jobs/:id',
+router.delete('/:id',
   auditLog({
     action: 'job_delete',
     resourceType: 'job',
@@ -63,7 +65,7 @@ router.delete('/jobs/:id',
   }) as any,
   deleteJob
 );
-router.post('/jobs/:id/execute',
+router.post('/:id/execute',
   auditLog({
     action: 'job_execute',
     resourceType: 'job',
@@ -75,11 +77,12 @@ router.post('/jobs/:id/execute',
   }) as any,
   executeJob
 );
-router.get('/jobs/:id/executions', getJobExecutions);
+router.get('/:id/executions', getJobExecutions);
 
-// ?�버�??�우???�거??
-// Job ?�그 관???�우??router.get('/jobs/:id/tags', getJobTags);
-router.put('/jobs/:id/tags',
+// 서버별 라우트는 제거됨
+// Job 태그 관리 라우트
+router.get('/:id/tags', getJobTags);
+router.put('/:id/tags',
   auditLog({
     action: 'job_set_tags',
     resourceType: 'job',
@@ -89,7 +92,7 @@ router.put('/jobs/:id/tags',
   setJobTags
 );
 
-// Job Executions ?�우??(구체?�인 ?�우?��? 먼�? ?�의)
+// Job Executions 라우트 (구체적인 라우트를 먼저 정의)
 router.get('/job-executions/statistics', getJobExecutionStatistics);
 router.get('/job-executions', getAllJobExecutions);
 router.get('/job-executions/:id', getJobExecution);
