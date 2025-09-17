@@ -697,7 +697,7 @@ const ApiTokensPage: React.FC = () => {
         onClose={() => setCreateDialogOpen(false)}
         PaperProps={{
           sx: {
-            width: { xs: '100%', sm: 400 },
+            width: { xs: '100%', sm: 500 },
             height: '100vh',
             display: 'flex',
             flexDirection: 'column',
@@ -862,7 +862,7 @@ const ApiTokensPage: React.FC = () => {
         onClose={() => setEditDialogOpen(false)}
         PaperProps={{
           sx: {
-            width: { xs: '100%', sm: 400 },
+            width: { xs: '100%', sm: 500 },
             height: '100vh',
             display: 'flex',
             flexDirection: 'column',
