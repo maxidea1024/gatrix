@@ -232,15 +232,14 @@ class ApiTokensController {
         });
       }
 
-      // Generate new token value
+      // Generate new token value (store as plain text)
       const tokenValue = crypto.randomBytes(32).toString('hex');
-      const tokenHash = crypto.createHash('sha256').update(tokenValue).digest('hex');
 
-      // Update token with new hash
+      // Update token with new plain token value
       await knex('g_api_access_tokens')
         .where('id', id)
         .update({
-          tokenHash,
+          tokenHash: tokenValue, // Store plain token value
           updatedBy: userId,
           updatedAt: knex.fn.now()
         });

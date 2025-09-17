@@ -185,6 +185,8 @@ export class MessageTemplateModel {
             templateId: insertId,
             lang: locale.lang,
             message: locale.message,
+            createdBy: data.createdBy || data.created_by,
+            updatedBy: data.updatedBy || data.updated_by,
             createdAt: new Date(),
             updatedAt: new Date()
           }));
@@ -239,6 +241,8 @@ export class MessageTemplateModel {
             templateId: id,
             lang: locale.lang,
             message: locale.message,
+            createdBy: data.updatedBy || data.updated_by || data.createdBy || data.created_by,
+            updatedBy: data.updatedBy || data.updated_by,
             createdAt: new Date(),
             updatedAt: new Date()
           }));

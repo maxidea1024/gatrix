@@ -732,135 +732,142 @@ const UsersManagementPage: React.FC = () => {
       {/* Filters */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={3}>
-              <TextField
-                fullWidth
-                placeholder={t('admin.users.searchPlaceholder')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <FormControl fullWidth>
-                <InputLabel shrink={true}>{t('admin.users.statusFilter')}</InputLabel>
-                <Select
-                  value={statusFilter}
-                  label={t('admin.users.statusFilter')}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  displayEmpty
-                  sx={{
-                    minWidth: 120,
-                    '& .MuiSelect-select': {
-                      overflow: 'visible',
-                      textOverflow: 'clip',
-                      whiteSpace: 'nowrap',
-                    }
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {/* 필터 그룹 */}
+            <Grid container spacing={2} alignItems="center" sx={{ flex: 1 }}>
+              <Grid item xs={12} md={3}>
+                <TextField
+                  fullWidth
+                  placeholder={t('admin.users.searchPlaceholder')}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
                   }}
-                >
-                  <MenuItem value="">{t('common.allStatuses')}</MenuItem>
-                  <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
-                  <MenuItem value="pending">{t('users.statuses.pending')}</MenuItem>
-                  <MenuItem value="suspended">{t('users.statuses.suspended')}</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <FormControl fullWidth>
-                <InputLabel shrink={true}>{t('admin.users.roleFilter')}</InputLabel>
-                <Select
-                  value={roleFilter}
-                  label={t('admin.users.roleFilter')}
-                  onChange={(e) => setRoleFilter(e.target.value)}
-                  displayEmpty
-                  sx={{
-                    minWidth: 120,
-                    '& .MuiSelect-select': {
-                      overflow: 'visible',
-                      textOverflow: 'clip',
-                      whiteSpace: 'nowrap',
-                    }
-                  }}
-                >
-                  <MenuItem value="">{t('common.allRoles')}</MenuItem>
-                  <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
-                  <MenuItem value="user">{t('users.roles.user')}</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={5}>
-              <Autocomplete
-                multiple
-                sx={{ minWidth: 350 }}
-                options={availableTags}
-                getOptionLabel={(option) => option.name}
-                filterSelectedOptions
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                value={tagFilter}
-                onChange={(_, value) => setTagFilter(value)}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...chipProps } = getTagProps({ index });
+                />
+              </Grid>
+              <Grid item xs={12} md={2}>
+                <FormControl fullWidth>
+                  <InputLabel shrink={true}>{t('admin.users.statusFilter')}</InputLabel>
+                  <Select
+                    value={statusFilter}
+                    label={t('admin.users.statusFilter')}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    displayEmpty
+                    sx={{
+                      minWidth: 120,
+                      '& .MuiSelect-select': {
+                        overflow: 'visible',
+                        textOverflow: 'clip',
+                        whiteSpace: 'nowrap',
+                      }
+                    }}
+                  >
+                    <MenuItem value="">{t('common.allStatuses')}</MenuItem>
+                    <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
+                    <MenuItem value="pending">{t('users.statuses.pending')}</MenuItem>
+                    <MenuItem value="suspended">{t('users.statuses.suspended')}</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={2}>
+                <FormControl fullWidth>
+                  <InputLabel shrink={true}>{t('admin.users.roleFilter')}</InputLabel>
+                  <Select
+                    value={roleFilter}
+                    label={t('admin.users.roleFilter')}
+                    onChange={(e) => setRoleFilter(e.target.value)}
+                    displayEmpty
+                    sx={{
+                      minWidth: 120,
+                      '& .MuiSelect-select': {
+                        overflow: 'visible',
+                        textOverflow: 'clip',
+                        whiteSpace: 'nowrap',
+                      }
+                    }}
+                  >
+                    <MenuItem value="">{t('common.allRoles')}</MenuItem>
+                    <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
+                    <MenuItem value="user">{t('users.roles.user')}</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={5}>
+                <Autocomplete
+                  multiple
+                  sx={{ minWidth: 350 }}
+                  options={availableTags}
+                  getOptionLabel={(option) => option.name}
+                  filterSelectedOptions
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  value={tagFilter}
+                  onChange={(_, value) => setTagFilter(value)}
+                  renderTags={(value, getTagProps) =>
+                    value.map((option, index) => {
+                      const { key, ...chipProps } = getTagProps({ index });
+                      return (
+                        <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                          <Chip
+                            variant="outlined"
+                            label={option.name}
+                            size="small"
+                            sx={{ bgcolor: option.color, color: '#fff' }}
+                            {...chipProps}
+                          />
+                        </Tooltip>
+                      );
+                    })
+                  }
+                  renderInput={(params) => (
+                    <TextField {...params} label={t('admin.users.tagFilter')} />
+                  )}
+                  renderOption={(props, option) => {
+                    const { key, ...otherProps } = props;
                     return (
-                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                      <Box component="li" key={key} {...otherProps}>
                         <Chip
-                          variant="outlined"
                           label={option.name}
                           size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
-                          {...chipProps}
+                          sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
                         />
-                      </Tooltip>
+                        {option.description || t('common.noDescription')}
+                      </Box>
                     );
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label={t('admin.users.tagFilter')} />
-                )}
-                renderOption={(props, option) => {
-                  const { key, ...otherProps } = props;
-                  return (
-                    <Box component="li" key={key} {...otherProps}>
-                      <Chip
-                        label={option.name}
-                        size="small"
-                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
-                      />
-                      {option.description || t('common.noDescription')}
-                    </Box>
-                  );
-                }}
-              />
+                  }}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={2}>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                <Button
-                  variant="contained"
-                  startIcon={<PersonAddIcon />}
-                  onClick={handleAddUser}
-                  sx={{ flex: 1 }}
-                >
-                  {t('admin.users.addUser')}
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<SendIcon />}
-                  onClick={() => setInvitationDialogOpen(true)}
-                  disabled={!!currentInvitation}
-                  sx={{ minWidth: 'auto', px: 2 }}
-                >
-                  초대
-                </Button>
-              </Box>
-            </Grid>
-          </Grid>
+
+            {/* 버튼 그룹 */}
+            <Box sx={{ display: 'flex', gap: 1, ml: 2 }}>
+              <Button
+                variant="contained"
+                startIcon={<PersonAddIcon />}
+                onClick={handleAddUser}
+              >
+                {t('admin.users.addUser')}
+              </Button>
+              <Box sx={{
+                width: '1px',
+                bgcolor: 'divider',
+                mx: 0.5,
+                alignSelf: 'stretch'
+              }} />
+              <Button
+                variant="outlined"
+                startIcon={<SendIcon />}
+                onClick={() => setInvitationDialogOpen(true)}
+                disabled={!!currentInvitation}
+              >
+                초대
+              </Button>
+            </Box>
+          </Box>
         </CardContent>
       </Card>
 

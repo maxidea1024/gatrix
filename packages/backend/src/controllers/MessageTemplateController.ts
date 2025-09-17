@@ -69,7 +69,7 @@ export class MessageTemplateController {
         });
       }
 
-      const updated = await MessageTemplateModel.update(id, { ...body, updated_by: (req as any)?.user?.userId });
+      const updated = await MessageTemplateModel.update(id, { ...body, created_by: (req as any)?.user?.userId, updated_by: (req as any)?.user?.userId });
       res.json({ success: true, data: updated });
     } catch (e) { next(e); }
   }

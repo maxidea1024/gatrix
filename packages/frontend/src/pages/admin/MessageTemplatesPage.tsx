@@ -50,6 +50,7 @@ import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { messageTemplateService, MessageTemplate, MessageTemplateLocale, MessageTemplateType } from '@/services/messageTemplateService';
 import { tagService, Tag } from '@/services/tagService';
 import translationService from '@/services/translationService';
+import { getLanguageDisplayName } from '@/contexts/I18nContext';
 import SimplePagination from '@/components/common/SimplePagination';
 import FormDialogHeader from '@/components/common/FormDialogHeader';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
@@ -636,7 +637,7 @@ const MessageTemplatesPage: React.FC = () => {
                       </TableCell>
                       <TableCell>{(row as any).isEnabled ? t('common.available') : t('common.unavailable')}</TableCell>
                       <TableCell>{formatDateTimeDetailed((row as any).updatedAt) || '-'}</TableCell>
-                      <TableCell>{hasLocales ? langs.map(c=>getLangLabel(c as any)).join(', ') : t('admin.messageTemplates.onlyDefaultMessage')}</TableCell>
+                      <TableCell>{hasLocales ? langs.map(c=>getLanguageDisplayName(c as any)).join(', ') : t('admin.messageTemplates.onlyDefaultMessage')}</TableCell>
                       <TableCell>{(row as any).createdByName || '-'}</TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>

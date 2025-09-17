@@ -116,8 +116,6 @@ const MultiLanguageMessageInput: React.FC<MultiLanguageMessageInputProps> = ({
       if (!supportsMultiLanguage) {
         onSupportsMultiLanguageChange(true);
       }
-
-      enqueueSnackbar(t('multiLanguageMessage.translationCompleted'), { variant: 'success' });
     } catch (error: any) {
       enqueueSnackbar(error.message || t('multiLanguageMessage.translationFailed'), { variant: 'error' });
     } finally {
