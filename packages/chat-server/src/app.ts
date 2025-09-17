@@ -8,8 +8,11 @@ import { config } from './config';
 import logger from './config/logger';
 import { WebSocketService } from './services/WebSocketService';
 import { metricsService } from './services/MetricsService';
+import { gatrixApiService } from './services/GatrixApiService';
+import { userSyncService } from './services/UserSyncService';
 import { redisManager } from './config/redis';
 import { databaseManager } from './config/database';
+import apiRoutes from './routes';
 
 class ChatServerApp {
   private app: express.Application;
@@ -113,14 +116,8 @@ class ChatServerApp {
   }
 
   private setupRoutes(): void {
-    // API routes will be added here
-    this.app.use('/api/v1', (req, res) => {
-      res.json({
-        message: 'Chat Server API v1',
-        version: '1.0.0',
-        timestamp: new Date().toISOString(),
-      });
-    });
+    // API routes
+    this.app.use('/api/v1', apiRoutes);
 
     // WebSocket info endpoint
     this.app.get('/ws/info', (req, res) => {
@@ -184,6 +181,26 @@ class ChatServerApp {
       // Initialize Database
       await databaseManager.initialize();
       logger.info('Database connection established');
+
+      // Test Gatrix API connection
+      const gatrixConnected = await gatrixApiService.testConnection();
+      if (gatrixConnected) {
+        logger.info('Gatrix API connection established');
+
+        // Register chat server with Gatrix
+        const registered = await gatrixApiService.registerChatServer();
+        if (registered) {
+          logger.info('Chat server registered with Gatrix');
+        } else {
+          logger.warn('Failed to register chat server with Gatrix');
+        }
+      } else {
+        logger.warn('Gatrix API connection failed, continuing without integration');
+      }
+
+      // Start user synchronization service
+      userSyncService.start();
+      logger.info('User synchronization service started');
 
       // Initialize WebSocket service
       this.webSocketService = new WebSocketService(this.server);
@@ -255,6 +272,18 @@ class ChatServerApp {
       this.server.close(() => {
         logger.info('HTTP server closed');
       });
+
+      // Unregister chat server from Gatrix
+      try {
+        await gatrixApiService.unregisterChatServer();
+        logger.info('Chat server unregistered from Gatrix');
+      } catch (error) {
+        logger.warn('Failed to unregister chat server from Gatrix:', error);
+      }
+
+      // Stop user synchronization service
+      userSyncService.stop();
+      logger.info('User synchronization service stopped');
 
       // Shutdown WebSocket service
       if (this.webSocketService) {
