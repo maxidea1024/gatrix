@@ -7,7 +7,7 @@ const TOTAL_CALLS = 5;
 // API 호출 함수 - Client SDK 엔드포인트 사용 (API 토큰 인증)
 async function makeApiCall(callNumber) {
   try {
-    const response = await axios.get(`${BASE_URL}/api/v1/remote-config/client/templates`, {
+    const response = await axios.get(`${BASE_URL}/api/v1/client/templates`, {
       headers: {
         'X-API-Key': API_TOKEN,
         'X-Application-Name': 'test-app',

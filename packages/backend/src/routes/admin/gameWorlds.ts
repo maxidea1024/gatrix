@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { authenticate, requireAdmin } from '../middleware/auth';
-import { GameWorldController } from '../controllers/GameWorldController';
-import { auditGameWorldCreate, auditGameWorldUpdate, auditGameWorldDelete, auditGameWorldToggleVisibility, auditGameWorldToggleMaintenance, auditGameWorldUpdateOrders, auditGameWorldMoveUp, auditGameWorldMoveDown } from '../middleware/auditLog';
+import { authenticate, requireAdmin } from '../../middleware/auth';
+import { GameWorldController } from '../../controllers/GameWorldController';
+import { auditGameWorldCreate, auditGameWorldUpdate, auditGameWorldDelete, auditGameWorldToggleVisibility, auditGameWorldToggleMaintenance, auditGameWorldUpdateOrders, auditGameWorldMoveUp, auditGameWorldMoveDown } from '../../middleware/auditLog';
 
 const router = Router();
 

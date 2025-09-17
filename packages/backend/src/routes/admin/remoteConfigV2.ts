@@ -1,8 +1,8 @@
 import express from 'express';
-import { auth } from '../middleware/auth';
-import { requireAdmin } from '../middleware/requireAdmin';
-import RemoteConfigEnvironmentController from '../controllers/RemoteConfigEnvironmentController';
-import RemoteConfigTemplateController from '../controllers/RemoteConfigTemplateController';
+import { auth } from '../../middleware/auth';
+import { requireAdmin } from '../../middleware/requireAdmin';
+import RemoteConfigEnvironmentController from '../../controllers/RemoteConfigEnvironmentController';
+import RemoteConfigTemplateController from '../../controllers/RemoteConfigTemplateController';
 
 const router = express.Router();
 

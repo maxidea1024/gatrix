@@ -1,0 +1,54 @@
+import express from 'express';
+import { authenticate, requireAdmin } from '../../middleware/auth';
+
+// Import all admin-related route modules
+import adminRoutes from './admin';
+import userRoutes from './users';
+import whitelistRoutes from './whitelist';
+import ipWhitelistRoutes from './ipWhitelist';
+import clientVersionRoutes from './clientVersionRoutes';
+import auditLogRoutes from './auditLogs';
+import tagRoutes from './tags';
+import messageTemplateRoutes from './messageTemplates';
+import translationRoutes from './translation';
+import varsRoutes from './vars';
+import gameWorldRoutes from './gameWorlds';
+import apiTokenRoutes from './apiTokens';
+import campaignRoutes from './campaigns';
+import contextFieldRoutes from './contextFields';
+import notificationRoutes from './notifications';
+import platformDefaultRoutes from './platformDefaults';
+import remoteConfigRoutes from './remoteConfig';
+import remoteConfigV2Routes from './remoteConfigV2';
+import jobRoutes from './jobs';
+import maintenanceRoutes from './maintenance';
+
+const router = express.Router();
+
+// Apply authentication middleware to all admin routes
+router.use(authenticate as any);
+router.use(requireAdmin as any);
+
+// Mount all admin routes
+router.use('/', adminRoutes);
+router.use('/users', userRoutes);
+router.use('/whitelist', whitelistRoutes);
+router.use('/ip-whitelist', ipWhitelistRoutes);
+router.use('/client-versions', clientVersionRoutes);
+router.use('/audit-logs', auditLogRoutes);
+router.use('/tags', tagRoutes);
+router.use('/message-templates', messageTemplateRoutes);
+router.use('/translation', translationRoutes);
+router.use('/vars', varsRoutes);
+router.use('/game-worlds', gameWorldRoutes);
+router.use('/api-tokens', apiTokenRoutes);
+router.use('/campaigns', campaignRoutes);
+router.use('/context-fields', contextFieldRoutes);
+router.use('/notifications', notificationRoutes);
+router.use('/platform-defaults', platformDefaultRoutes);
+router.use('/remote-config', remoteConfigRoutes);
+router.use('/remote-config-v2', remoteConfigV2Routes);
+router.use('/jobs', jobRoutes);
+router.use('/maintenance', maintenanceRoutes);
+
+export default router;

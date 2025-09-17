@@ -13,7 +13,7 @@ import {
 } from '../types/clientVersion';
 
 export class ClientVersionService {
-  private static readonly BASE_URL = '/client-versions';
+  private static readonly BASE_URL = '/admin/client-versions';
 
   /**
    * 사용 가능한 버전 목록 조회

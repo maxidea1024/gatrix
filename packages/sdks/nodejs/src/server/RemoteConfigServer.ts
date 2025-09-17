@@ -204,7 +204,7 @@ export class RemoteConfigServer extends BaseSDKClient {
       }
 
       const response = await this.axiosInstance.get(
-        `/api/sdk/server/config/${this.options.environment}`,
+        `/api/v1/server/templates`,
         { headers }
       );
 
@@ -277,7 +277,7 @@ export class RemoteConfigServer extends BaseSDKClient {
     this.metricsQueue = [];
 
     try {
-      await this.axiosInstance.post('/api/sdk/metrics', {
+      await this.axiosInstance.post('/api/v1/server/metrics', {
         environment: this.options.environment,
         metrics
       });

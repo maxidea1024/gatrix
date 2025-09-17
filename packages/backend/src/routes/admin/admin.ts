@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { authenticate, requireAdmin } from '../middleware/auth';
-import { AdminController } from '../controllers/AdminController';
+import { authenticate, requireAdmin } from '../../middleware/auth';
+import { AdminController } from '../../controllers/AdminController';
 import apiTokenRoutes from './apiTokens';
 import {
   auditUserUpdate,
@@ -11,7 +11,7 @@ import {
   auditUserUnsuspend,
   auditUserPromote,
   auditUserDemote
-} from '../middleware/auditLog';
+} from '../../middleware/auditLog';
 
 
 

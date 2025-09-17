@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { authenticate, requireAdmin } from '../middleware/auth';
-import { WhitelistController } from '../controllers/WhitelistController';
-import { auditLog } from '../middleware/auditLog';
+import { authenticate, requireAdmin } from '../../middleware/auth';
+import { WhitelistController } from '../../controllers/WhitelistController';
+import { auditLog } from '../../middleware/auditLog';
 
 const router = Router();
 
@@ -16,7 +16,7 @@ router.post('/',
   auditLog({
     action: 'whitelist_create',
     resourceType: 'whitelist',
-    // 화이트리스트 생성 시에는 ID가 아직 없으므로 getResourceId 제거
+    // ?�이?�리?�트 ?�성 ?�에??ID가 ?�직 ?�으므�?getResourceId ?�거
     getNewValues: (req) => req.body,
     getResourceIdFromResponse: (res: any) => res?.data?.id,
   }) as any,
@@ -53,10 +53,9 @@ router.post('/bulk',
   WhitelistController.bulkCreateWhitelists
 );
 
-// 화이트리스트 테스트 라우트
-router.post('/test', WhitelistController.testWhitelist);
+// ?�이?�리?�트 ?�스???�우??router.post('/test', WhitelistController.testWhitelist);
 
-// 태그 관련 라우트 (관리자만)
+// ?�그 관???�우??(관리자�?
 router.get('/:id/tags', requireAdmin as any, WhitelistController.getTags);
 router.put('/:id/tags', requireAdmin as any, WhitelistController.setTags);
 

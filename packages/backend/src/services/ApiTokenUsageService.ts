@@ -227,15 +227,19 @@ export class ApiTokenUsageService {
       const newLastUsedAt = aggregate.latestUsedAt;
 
       // 사용량 업데이트 (Raw 쿼리로 날짜 형식 문제 해결)
-      // ISO 형식으로 저장하여 프론트엔드에서 올바르게 파싱되도록 함
+      // MySQL 호환 형식으로 변환 (YYYY-MM-DD HH:mm:ss)
+      const formatForMySQL = (date: Date) => {
+        return date.toISOString().slice(0, 19).replace('T', ' ');
+      };
+
       await ApiAccessToken.knex().raw(`
         UPDATE g_api_access_tokens
         SET usageCount = ?, lastUsedAt = ?, updatedAt = ?
         WHERE id = ?
       `, [
         newUsageCount,
-        newLastUsedAt.toISOString(),
-        new Date().toISOString(),
+        formatForMySQL(newLastUsedAt),
+        formatForMySQL(new Date()),
         tokenId
       ]);
 

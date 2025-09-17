@@ -1,6 +1,6 @@
 import express from 'express';
-import { authenticate, requireAdmin } from '../middleware/auth';
-import { auditLog } from '../middleware/auditLog';
+import { authenticate, requireAdmin } from '../../middleware/auth';
+import { auditLog } from '../../middleware/auditLog';
 import {
   getJobs,
   getJob,
@@ -11,35 +11,33 @@ import {
   getJobExecutions,
   setJobTags,
   getJobTags
-} from '../controllers/jobController';
+} from '../../controllers/jobController';
 import {
   getJobTypes,
   getJobType
-} from '../controllers/jobTypeController';
+} from '../../controllers/jobTypeController';
 import {
   getJobExecutions as getAllJobExecutions,
   getJobExecution,
   getJobExecutionStatistics
-} from '../controllers/jobExecutionController';
+} from '../../controllers/jobExecutionController';
 
 const router = express.Router();
 
-// 모든 라우트에 인증 및 관리자 권한 필요
+// 모든 ?�우?�에 ?�증 �?관리자 권한 ?�요
 router.use(authenticate as any);
 router.use(requireAdmin as any);
 
-// Job Types 라우트
-router.get('/job-types', getJobTypes);
+// Job Types ?�우??router.get('/job-types', getJobTypes);
 router.get('/job-types/:id', getJobType);
 
-// Jobs 라우트
-router.get('/jobs', getJobs);
+// Jobs ?�우??router.get('/jobs', getJobs);
 router.get('/jobs/:id', getJob);
 router.post('/jobs',
   auditLog({
     action: 'job_create',
     resourceType: 'job',
-    // Job 생성 시에는 ID가 아직 없으므로 getResourceId 제거
+    // Job ?�성 ?�에??ID가 ?�직 ?�으므�?getResourceId ?�거
     getNewValues: (req) => req.body,
     getResourceIdFromResponse: (res: any) => res?.data?.id,
   }) as any,
@@ -79,10 +77,8 @@ router.post('/jobs/:id/execute',
 );
 router.get('/jobs/:id/executions', getJobExecutions);
 
-// 디버그 라우트 제거됨
-
-// Job 태그 관련 라우트
-router.get('/jobs/:id/tags', getJobTags);
+// ?�버�??�우???�거??
+// Job ?�그 관???�우??router.get('/jobs/:id/tags', getJobTags);
 router.put('/jobs/:id/tags',
   auditLog({
     action: 'job_set_tags',
@@ -93,7 +89,7 @@ router.put('/jobs/:id/tags',
   setJobTags
 );
 
-// Job Executions 라우트 (구체적인 라우트를 먼저 정의)
+// Job Executions ?�우??(구체?�인 ?�우?��? 먼�? ?�의)
 router.get('/job-executions/statistics', getJobExecutionStatistics);
 router.get('/job-executions', getAllJobExecutions);
 router.get('/job-executions/:id', getJobExecution);

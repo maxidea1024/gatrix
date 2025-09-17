@@ -36,7 +36,7 @@ class TranslationService {
    */
   async translateText(request: TranslationRequest): Promise<TranslationResponse> {
     try {
-      const response = await api.post<TranslationResponse>('/translation/translate', request);
+      const response = await api.post<TranslationResponse>('/admin/translation/translate', request);
       return response.data as TranslationResponse;
     } catch (error: any) {
       console.error('Translation error:', error);
@@ -50,7 +50,7 @@ class TranslationService {
   async translateToMultipleLanguages(request: MultipleTranslationRequest): Promise<MultipleTranslationResponse> {
     try {
 
-      const response = await api.post<MultipleTranslationResponse>('/translation/translate/multiple', request);
+      const response = await api.post<MultipleTranslationResponse>('/admin/translation/translate/multiple', request);
 
       return response.data as MultipleTranslationResponse;
     } catch (error: any) {
@@ -64,7 +64,7 @@ class TranslationService {
    */
   async detectLanguage(request: LanguageDetectionRequest): Promise<LanguageDetectionResponse> {
     try {
-      const response = await api.post<LanguageDetectionResponse>('/translation/detect-language', request);
+      const response = await api.post<LanguageDetectionResponse>('/admin/translation/detect-language', request);
       return response.data as LanguageDetectionResponse;
     } catch (error: any) {
       console.error('Language detection error:', error);

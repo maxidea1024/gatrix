@@ -1,7 +1,7 @@
 import express from 'express';
 import { body } from 'express-validator';
-import ApiTokensController from '../controllers/ApiTokensController';
-import { authenticate, requireRole } from '../middleware/auth';
+import ApiTokensController from '../../controllers/ApiTokensController';
+import { authenticate, requireRole } from '../../middleware/auth';
 
 const router = express.Router();
 

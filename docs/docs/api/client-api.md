@@ -234,7 +234,7 @@ using System.Collections;
 public class ClientAPI : MonoBehaviour
 {
     private const string BASE_URL = "https://api.example.com/api/v1/client";
-    
+
     public IEnumerator GetClientVersion(string channel, string subChannel)
     {
         string url = $"{BASE_URL}/client-version";
@@ -242,16 +242,36 @@ public class ClientAPI : MonoBehaviour
             url += $"?channel={channel}";
         if (!string.IsNullOrEmpty(subChannel))
             url += $"&subChannel={subChannel}";
-            
+
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
             yield return request.SendWebRequest();
-            
+
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string json = request.downloadHandler.text;
                 // JSON parsing and processing
                 Debug.Log($"Client version data: {json}");
+            }
+        }
+    }
+
+    // Client SDK API with authentication
+    public IEnumerator GetSDKTemplates(string apiKey)
+    {
+        string url = $"{BASE_URL}/templates";
+
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            request.SetRequestHeader("X-API-Key", apiKey);
+            request.SetRequestHeader("X-Application-Name", "your-app-name");
+
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                string json = request.downloadHandler.text;
+                Debug.Log($"SDK templates: {json}");
             }
         }
     }

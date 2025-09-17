@@ -1,9 +1,9 @@
 import express from 'express';
-import RemoteConfigController from '../controllers/RemoteConfigController';
-import { ContextFieldController } from '../controllers/ContextFieldControllerNew';
-import { authenticate, requireAdmin } from '../middleware/auth';
+import RemoteConfigController from '../../controllers/RemoteConfigController';
+import { ContextFieldController } from '../../controllers/ContextFieldControllerNew';
+import { authenticate, requireAdmin } from '../../middleware/auth';
 import { body, param, query, validationResult } from 'express-validator';
-import { CustomError } from '../middleware/errorHandler';
+import { CustomError } from '../../middleware/errorHandler';
 
 const router = express.Router();
 
@@ -86,11 +86,11 @@ const listConfigsValidation = [
   query('isActive')
     .optional()
     .custom((value) => {
-      // 빈 문자열이나 undefined는 허용
+      // �?문자?�이??undefined???�용
       if (value === '' || value === undefined || value === null) {
         return true;
       }
-      // 'true' 또는 'false' 문자열만 허용
+      // 'true' ?�는 'false' 문자?�만 ?�용
       if (value === 'true' || value === 'false') {
         return true;
       }

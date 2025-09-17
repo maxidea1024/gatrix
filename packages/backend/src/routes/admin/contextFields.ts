@@ -1,8 +1,8 @@
 import express from 'express';
-import { ContextFieldController } from '../controllers/ContextFieldControllerNew';
-import { authenticate, requireAdmin } from '../middleware/auth';
+import { ContextFieldController } from '../../controllers/ContextFieldControllerNew';
+import { authenticate, requireAdmin } from '../../middleware/auth';
 import { body, validationResult } from 'express-validator';
-import { CustomError } from '../middleware/errorHandler';
+import { CustomError } from '../../middleware/errorHandler';
 
 const router = express.Router();
 

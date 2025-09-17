@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { CampaignController } from '../controllers/CampaignController';
-import { authenticate, requireAdmin } from '../middleware/auth';
-import { asyncHandler, CustomError } from '../middleware/errorHandler';
+import { CampaignController } from '../../controllers/CampaignController';
+import { authenticate, requireAdmin } from '../../middleware/auth';
+import { asyncHandler, CustomError } from '../../middleware/errorHandler';
 import { query, param, validationResult } from 'express-validator';
 
 const router = Router();

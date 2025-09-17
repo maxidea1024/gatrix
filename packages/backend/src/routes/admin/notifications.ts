@@ -1,9 +1,9 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
-import { authenticate, AuthenticatedRequest } from '../middleware/auth';
-import SSENotificationService from '../services/sseNotificationService';
-import logger from '../config/logger';
+import { authenticate, AuthenticatedRequest } from '../../middleware/auth';
+import SSENotificationService from '../../services/sseNotificationService';
+import logger from '../../config/logger';
 
 const router = Router();
 const sseService = SSENotificationService.getInstance();

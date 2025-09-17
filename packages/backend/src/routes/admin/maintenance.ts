@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { authenticate, requireAdmin } from '../middleware/auth';
-import { MaintenanceController } from '../controllers/MaintenanceController';
+import { authenticate, requireAdmin } from '../../middleware/auth';
+import { MaintenanceController } from '../../controllers/MaintenanceController';
 
 const router = Router();
 
@@ -15,4 +15,3 @@ router.post('/maintenance/templates', MaintenanceController.templatesSave as any
 router.post('/maintenance', MaintenanceController.setStatus as any);
 
 export default router;
-

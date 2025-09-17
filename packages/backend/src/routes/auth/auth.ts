@@ -1,14 +1,14 @@
 import { Router } from 'express';
-import passport from '../config/passport';
-import { AuthController } from '../controllers/AuthController';
-import { authenticate } from '../middleware/auth';
-import { authLimiter } from '../middleware/rateLimiter';
-import { auditUserLogin, auditUserRegister } from '../middleware/auditLog';
-import redisClient from '../config/redis';
-// import { WeChatOAuthService } from '../services/WeChatOAuth';
-// import { BaiduOAuthService } from '../services/BaiduOAuth';
-import { UserModel } from '../models/User';
-import logger from '../config/logger';
+import passport from '../../config/passport';
+import { AuthController } from '../../controllers/AuthController';
+import { authenticate } from '../../middleware/auth';
+import { authLimiter } from '../../middleware/rateLimiter';
+import { auditUserLogin, auditUserRegister } from '../../middleware/auditLog';
+import redisClient from '../../config/redis';
+// import { WeChatOAuthService } from '../../services/WeChatOAuth';
+// import { BaiduOAuthService } from '../../services/BaiduOAuth';
+import { UserModel } from '../../models/User';
+import logger from '../../config/logger';
 
 const router = Router();
 

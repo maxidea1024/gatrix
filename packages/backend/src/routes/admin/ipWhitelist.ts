@@ -1,7 +1,7 @@
 import express from 'express';
-import { authenticate, requireAdmin } from '../middleware/auth';
-import { auditLog } from '../middleware/auditLog';
-import { IpWhitelistController } from '../controllers/IpWhitelistController';
+import { authenticate, requireAdmin } from '../../middleware/auth';
+import { auditLog } from '../../middleware/auditLog';
+import { IpWhitelistController } from '../../controllers/IpWhitelistController';
 
 const router = express.Router();
 
@@ -68,6 +68,6 @@ router.delete('/:id',
   IpWhitelistController.deleteIpWhitelist
 );
 
-// bulk delete 기능이 구현되지 않음
+// bulk delete 기능??구현?��? ?�음
 
 export default router;
