@@ -49,15 +49,13 @@ import { useSnackbar } from 'notistack';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { messageTemplateService, MessageTemplate, MessageTemplateLocale, MessageTemplateType } from '@/services/messageTemplateService';
 import { tagService, Tag } from '@/services/tagService';
+import translationService from '@/services/translationService';
 import SimplePagination from '@/components/common/SimplePagination';
 import FormDialogHeader from '@/components/common/FormDialogHeader';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
+import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/MultiLanguageMessageInput';
 
-const allLangs: Array<{ code: 'ko' | 'en' | 'zh'; label: string }> = [
-  { code: 'ko', label: '한국어' },
-  { code: 'en', label: 'English' },
-  { code: 'zh', label: '中文' },
-];
+
 
 const MessageTemplatesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -113,11 +111,6 @@ const MessageTemplatesPage: React.FC = () => {
   const [templateTags, setTemplateTags] = useState<Tag[]>([]);
 
   const [form, setForm] = useState<MessageTemplate>({ name: '', type: 'maintenance', isEnabled: true, defaultMessage: '', locales: [] });
-  const usedLangs = useMemo(() => new Set((form.locales || []).map(l => l.lang)), [form.locales]);
-  const availableLangs = allLangs.filter(l => !usedLangs.has(l.code));
-  const [newLang, setNewLang] = useState<'ko'|'en'|'zh'>('ko');
-  const [newMsg, setNewMsg] = useState('');
-  const getLangLabel = (code: 'ko'|'en'|'zh') => allLangs.find(l=>l.code===code)?.label || code;
 
   // 폼 필드 ref들
   const nameFieldRef = useRef<HTMLInputElement>(null);
@@ -285,7 +278,6 @@ const MessageTemplatesPage: React.FC = () => {
   const handleAdd = () => {
     setEditing(null);
     setForm({ name: '', type: 'maintenance', isEnabled: true, supportsMultiLanguage: false, defaultMessage: '', locales: [], tags: [] });
-    setNewLang('ko'); setNewMsg('');
     setDialogOpen(true);
   };
 
@@ -301,7 +293,6 @@ const MessageTemplatesPage: React.FC = () => {
       locales: row.locales || [],
       tags: row.tags || []
     });
-    setNewLang('ko'); setNewMsg('');
     setDialogOpen(true);
   };
 
@@ -333,16 +324,7 @@ const MessageTemplatesPage: React.FC = () => {
     }
   }, [selectedTemplateForTags, t, enqueueSnackbar, load]);
 
-  const addLocale = () => {
-    const lang = newLang; const message = newMsg.trim();
-    if (!message) return;
-    setForm(prev => ({ ...prev, locales: [...(prev.locales||[]).filter(l=>l.lang!==lang), { lang, message }] }));
-    setNewMsg('');
-  };
 
-  const removeLocale = (lang: 'ko'|'en'|'zh') => {
-    setForm(prev => ({ ...prev, locales: (prev.locales||[]).filter(l => l.lang !== lang) }));
-  };
 
   const handleSave = async () => {
     if (!form.name.trim()) {
@@ -774,45 +756,28 @@ const MessageTemplatesPage: React.FC = () => {
               control={<Switch checked={form.isEnabled} onChange={(e) => setForm(prev => ({ ...prev, isEnabled: e.target.checked }))} />}
               label={t('admin.messageTemplates.availability')}
             />
-            <TextField
-              label={t('admin.messageTemplates.defaultMessage')}
-              value={form.defaultMessage || ''}
-              onChange={(e) => setForm(prev => ({ ...prev, defaultMessage: e.target.value }))}
-              multiline
-              minRows={3}
-              required
-              helperText={t('admin.messageTemplates.defaultMessageHelp')}
-              inputRef={defaultMessageFieldRef}
-            />
-            <FormControlLabel
-              control={<Switch checked={form.supportsMultiLanguage} onChange={(e) => setForm(prev => ({ ...prev, supportsMultiLanguage: e.target.checked }))} />}
-              label={t('admin.messageTemplates.supportsMultiLanguage')}
-            />
+            {/* 다국어 메시지 입력 컴포넌트 */}
+            <MultiLanguageMessageInput
+              defaultMessage={form.defaultMessage || ''}
+              onDefaultMessageChange={(message) => setForm(prev => ({ ...prev, defaultMessage: message }))}
+              defaultMessageLabel={t('admin.messageTemplates.defaultMessage')}
+              defaultMessageHelperText={t('admin.messageTemplates.defaultMessageHelp')}
+              defaultMessageRequired={true}
+              defaultMessageError={false}
 
-            {/* Multi-language section - only show when supportsMultiLanguage is true */}
-            {form.supportsMultiLanguage && (
-              <>
-                {/* Dynamic language entries */}
-                {availableLangs.length > 0 && (
-                  <Stack direction="row" spacing={1} alignItems="flex-start">
-                    <Select size="small" value={newLang} onChange={(e)=>setNewLang(e.target.value as any)} sx={{ minWidth: 120 }}>
-                      {availableLangs.map(l => <MenuItem key={l.code} value={l.code}>{l.label}</MenuItem>)}
-                    </Select>
-                    <TextField size="small" value={newMsg} onChange={(e)=>setNewMsg(e.target.value)} label={t('admin.maintenance.perLanguageMessage')} sx={{ flex: 1 }} multiline minRows={3} />
-                    <Button onClick={addLocale} variant="outlined" sx={{ alignSelf: 'flex-start' }}>{t('common.add')}</Button>
-                  </Stack>
-                )}
-                <Stack spacing={1}>
-                  {(form.locales||[]).map(l => (
-                    <Box key={l.lang} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
-                      <Chip label={getLangLabel(l.lang)} size="small" sx={{ width: 96, justifyContent: 'flex-start' }} />
-                      <TextField fullWidth size="small" value={l.message} onChange={(e)=>setForm(prev=>({ ...prev, locales: (prev.locales||[]).map(x=> x.lang===l.lang? { ...x, message: e.target.value }: x) }))} multiline minRows={3} />
-                      <IconButton size="small" onClick={()=>removeLocale(l.lang)} sx={{ alignSelf: 'flex-start' }}><CloseIcon fontSize="small" /></IconButton>
-                    </Box>
-                  ))}
-                </Stack>
-              </>
-            )}
+              supportsMultiLanguage={form.supportsMultiLanguage || false}
+              onSupportsMultiLanguageChange={(supports) => setForm(prev => ({ ...prev, supportsMultiLanguage: supports }))}
+              supportsMultiLanguageLabel={t('admin.messageTemplates.supportsMultiLanguage')}
+              supportsMultiLanguageHelperText={t('admin.messageTemplates.supportsMultiLanguageHelp')}
+
+              locales={(form.locales || []).map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
+              onLocalesChange={(locales) => setForm(prev => ({ ...prev, locales: locales.map(l => ({ lang: l.lang, message: l.message })) }))}
+              languageSpecificMessagesLabel={t('admin.messageTemplates.languageSpecificMessages')}
+
+              enableTranslation={true}
+              translateButtonLabel={t('admin.messageTemplates.translate')}
+              translateTooltip={t('admin.messageTemplates.translateTooltip')}
+            />
 
             {/* 태그 선택 */}
             <TextField

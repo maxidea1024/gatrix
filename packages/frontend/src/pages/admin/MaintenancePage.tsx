@@ -5,12 +5,9 @@ import { useTranslation } from 'react-i18next';
 import moment, { Moment } from 'moment';
 import { maintenanceService, MaintenanceType } from '@/services/maintenanceService';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-const allLangs: Array<{ code: 'ko'|'en'|'zh'; label: string }> = [
-  { code: 'ko', label: '한국어' },
-  { code: 'en', label: '영어' },
-  { code: 'zh', label: '중국어' },
-];
+
 import { messageTemplateService, MessageTemplate } from '@/services/messageTemplateService';
+import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/MultiLanguageMessageInput';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import CloseIcon from '@mui/icons-material/Close';
@@ -31,8 +28,7 @@ const MaintenancePage: React.FC = () => {
   // Direct input state
   const [baseMsg, setBaseMsg] = useState('');
   const [locales, setLocales] = useState<Array<{ lang: 'ko'|'en'|'zh'; message: string }>>([]);
-  const [newLang, setNewLang] = useState<'ko'|'en'|'zh'>('ko');
-  const [newMsg, setNewMsg] = useState('');
+  const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
 
   // Templates
   const [tpls, setTpls] = useState<MessageTemplate[]>([]);
@@ -137,12 +133,15 @@ const MaintenancePage: React.FC = () => {
                         <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{baseMsg}</Typography>
                         {locales.length > 0 && (
                           <Stack spacing={1} sx={{ mt: 2 }}>
-                            {locales.map(l => (
-                              <Box key={l.lang} sx={{ display:'flex', gap:1, alignItems:'flex-start' }}>
-                                <Chip label={allLangs.find(x=>x.code===l.lang as any)?.label || l.lang} size="small" sx={{ width: 96, justifyContent:'flex-start' }} />
-                                <Typography variant="body2" sx={{ whiteSpace:'pre-wrap' }}>{l.message}</Typography>
-                              </Box>
-                            ))}
+                            {locales.map(l => {
+                              const langLabels = { ko: '한국어', en: '영어', zh: '중국어' };
+                              return (
+                                <Box key={l.lang} sx={{ display:'flex', gap:1, alignItems:'flex-start' }}>
+                                  <Chip label={langLabels[l.lang] || l.lang} size="small" sx={{ width: 96, justifyContent:'flex-start' }} />
+                                  <Typography variant="body2" sx={{ whiteSpace:'pre-wrap' }}>{l.message}</Typography>
+                                </Box>
+                              );
+                            })}
                           </Stack>
                         )}
                       </CardContent>
@@ -188,12 +187,15 @@ const MaintenancePage: React.FC = () => {
                             <Typography variant="subtitle2" gutterBottom>{t('clientVersions.maintenance.defaultMessage')}</Typography>
                             <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{tpls.find(t=>t.id===selectedTplId)?.default_message || '-'}</Typography>
                             <Stack spacing={1} sx={{ mt: 2 }}>
-                              {(tpls.find(t=>t.id===selectedTplId)?.locales || []).map(l => (
-                                <Box key={l.lang} sx={{ display:'flex', gap:1, alignItems:'flex-start' }}>
-                                  <Chip label={allLangs.find(x=>x.code===l.lang as any)?.label || l.lang} size="small" sx={{ width: 96, justifyContent:'flex-start' }} />
-                                  <Typography variant="body2" sx={{ whiteSpace:'pre-wrap' }}>{l.message}</Typography>
-                                </Box>
-                              ))}
+                              {(tpls.find(t=>t.id===selectedTplId)?.locales || []).map(l => {
+                                const langLabels = { ko: '한국어', en: '영어', zh: '중국어' };
+                                return (
+                                  <Box key={l.lang} sx={{ display:'flex', gap:1, alignItems:'flex-start' }}>
+                                    <Chip label={langLabels[l.lang as keyof typeof langLabels] || l.lang} size="small" sx={{ width: 96, justifyContent:'flex-start' }} />
+                                    <Typography variant="body2" sx={{ whiteSpace:'pre-wrap' }}>{l.message}</Typography>
+                                  </Box>
+                                );
+                              })}
                             </Stack>
                           </CardContent>
                         </Card>
@@ -202,72 +204,42 @@ const MaintenancePage: React.FC = () => {
                   )}
 
                   {inputMode === 'direct' && (
-                    <Stack spacing={2}>
-                      {/* 기본 점검 메시지 */}
-                      <TextField
-                        label={t('clientVersions.maintenance.defaultMessage')}
-                        value={baseMsg}
-                        onChange={(e)=>setBaseMsg(e.target.value)}
-                        multiline
-                        rows={3}
-                        fullWidth
-                        required
-                        helperText={t('clientVersions.maintenance.defaultMessageHelp')}
-                      />
+                    <MultiLanguageMessageInput
+                      defaultMessage={baseMsg}
+                      onDefaultMessageChange={setBaseMsg}
+                      defaultMessageLabel={t('clientVersions.maintenance.defaultMessage')}
+                      defaultMessageHelperText={t('clientVersions.maintenance.defaultMessageHelp')}
+                      defaultMessageRequired={true}
+                      defaultMessageError={false}
 
-                      {/* 언어별 메시지 사용 여부 */}
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={locales.length > 0}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                // 모든 언어 자동 추가
-                                setLocales(allLangs.map(lang => ({ lang: lang.code, message: '' })));
-                              } else {
-                                setLocales([]);
-                              }
-                            }}
-                          />
+                      supportsMultiLanguage={supportsMultiLanguage}
+                      onSupportsMultiLanguageChange={(supports) => {
+                        setSupportsMultiLanguage(supports);
+                        if (supports) {
+                          // 모든 언어 자동 추가
+                          const allLangs = [
+                            { code: 'ko' as const, message: '' },
+                            { code: 'en' as const, message: '' },
+                            { code: 'zh' as const, message: '' }
+                          ];
+                          setLocales(allLangs);
+                        } else {
+                          setLocales([]);
                         }
-                        label={t('admin.maintenance.useLanguageSpecificMessages')}
-                      />
+                      }}
+                      supportsMultiLanguageLabel={t('admin.maintenance.useLanguageSpecificMessages')}
+                      supportsMultiLanguageHelperText={t('admin.maintenance.supportsMultiLanguageHelp')}
 
-                      {/* 언어별 메시지 입력 */}
-                      {locales.length > 0 && (
-                        <Box>
-                          <Typography variant="subtitle2" sx={{ mb: 2 }}>
-                            {t('admin.maintenance.languageSpecificMessages')}
-                          </Typography>
-                          {allLangs.map(lang => {
-                            const locale = locales.find(l => l.lang === lang.code);
-                            return (
-                              <Box key={lang.code} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-                                <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                                  {lang.label}
-                                </Typography>
-                                <TextField
-                                  fullWidth
-                                  multiline
-                                  rows={3}
-                                  value={locale?.message || ''}
-                                  onChange={(e) => {
-                                    setLocales(prev =>
-                                      prev.map(x =>
-                                        x.lang === lang.code
-                                          ? { ...x, message: e.target.value }
-                                          : x
-                                      )
-                                    );
-                                  }}
-                                  placeholder={t(`maintenanceMessage.${lang.code}Help`)}
-                                />
-                              </Box>
-                            );
-                          })}
-                        </Box>
-                      )}
-                    </Stack>
+                      locales={locales.map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
+                      onLocalesChange={(newLocales) => {
+                        setLocales(newLocales.map(l => ({ lang: l.lang, message: l.message })));
+                      }}
+                      languageSpecificMessagesLabel={t('admin.maintenance.languageSpecificMessages')}
+
+                      enableTranslation={true}
+                      translateButtonLabel={t('admin.maintenance.translate')}
+                      translateTooltip={t('admin.maintenance.translateTooltip')}
+                    />
                   )}
                 </>
               )}

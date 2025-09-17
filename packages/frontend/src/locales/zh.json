@@ -44,7 +44,10 @@
       },
       "useTemplate": "使用模板",
       "useLanguageSpecificMessages": "使用多语言维护消息",
-      "languageSpecificMessages": "多语言维护消息"
+      "languageSpecificMessages": "多语言维护消息",
+      "supportsMultiLanguageHelp": "为每种语言启用不同的维护消息",
+      "translate": "自动翻译",
+      "translateTooltip": "自动将默认维护消息翻译为其他语言"
     },
     "maintenanceTemplates": {
       "title": "消息模板管리",
@@ -146,6 +149,10 @@
       "makeAvailable": "设为可用",
       "makeUnavailable": "设为不可用",
       "supportsMultiLanguage": "多语言支持",
+      "supportsMultiLanguageHelp": "为每种语言启用不同的消息",
+      "languageSpecificMessages": "多语言消息",
+      "translate": "自动翻译",
+      "translateTooltip": "自动将默认消息翻译为其他语言",
       "confirmDelete": "确定要删除消息模板'{{name}}'吗？",
       "confirmBulkDelete": "确定要删除选中的{{count}}个消息模板吗？",
       "bulkDeleteSuccess": "已删除{{count}}个消息模板",
@@ -1558,5 +1565,14 @@
     "loadError": "加载平台默认值失败",
     "saveSuccess": "平台默认值保存成功",
     "saveError": "保存平台默认值失败"
+  },
+  "language": {
+    "changeLanguage": "更改语言"
+  },
+  "multiLanguageMessage": {
+    "noMessageToTranslate": "请输入要翻译的默认消息",
+    "translationCompleted": "翻译完成",
+    "translationFailed": "翻译过程中发生错误",
+    "languagePlaceholder": "输入{{language}}消息"
   }
 }

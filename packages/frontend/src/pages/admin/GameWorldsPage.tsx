@@ -89,6 +89,7 @@ import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import translationService from '../../services/translationService';
+import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/MultiLanguageMessageInput';
 
 // Sortable Row Component
 interface SortableRowProps {
@@ -363,8 +364,7 @@ const GameWorldsPage: React.FC = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const worldIdRef = useRef<HTMLInputElement>(null);
 
-  // 번역 관련 상태
-  const [isTranslating, setIsTranslating] = useState(false);
+
 
 
   // Highlight & scroll for recently moved row
@@ -415,23 +415,7 @@ const GameWorldsPage: React.FC = () => {
     }
   };
 
-  const updateMaintenanceLocale = (lang: 'ko' | 'en' | 'zh', message: string) => {
-    const existingIndex = maintenanceLocales.findIndex(l => l.lang === lang);
-    let newLocales;
 
-    if (existingIndex >= 0) {
-      // 기존 언어 업데이트
-      newLocales = maintenanceLocales.map(l =>
-        l.lang === lang ? { ...l, message } : l
-      );
-    } else {
-      // 새 언어 추가
-      newLocales = [...maintenanceLocales, { lang, message }];
-    }
-
-    setMaintenanceLocales(newLocales);
-    setFormData(prev => ({ ...prev, maintenanceLocales: newLocales }));
-  };
 
   const removeMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
     const newLocales = maintenanceLocales.filter(l => l.lang !== lang);
@@ -485,58 +469,7 @@ const GameWorldsPage: React.FC = () => {
     }
   };
 
-  // 번역 함수
-  const handleTranslateMaintenanceMessage = async () => {
-    if (!formData.maintenanceMessage || formData.maintenanceMessage.trim().length === 0) {
-      enqueueSnackbar(t('gameWorlds.maintenance.noMessageToTranslate'), { variant: 'warning' });
-      return;
-    }
 
-    setIsTranslating(true);
-    try {
-
-
-      const translations = await translationService.translateMaintenanceMessage(
-        formData.maintenanceMessage,
-        ['ko', 'en', 'zh']
-      );
-
-
-
-      // 번역 결과를 maintenanceLocales에 적용
-      const newLocales = availableLanguages.map(lang => {
-        const existingLocale = maintenanceLocales.find(l => l.lang === lang.code);
-        const translationResult = translations[lang.code];
-        const translatedMessage = translationResult?.translatedText || existingLocale?.message || '';
-
-
-
-
-        return {
-          lang: lang.code,
-          message: translatedMessage
-        };
-      });
-
-
-
-      setMaintenanceLocales(newLocales);
-      setFormData(prev => ({ ...prev, maintenanceLocales: newLocales }));
-
-      // 번역 후 자동으로 언어별 메시지 사용 활성화
-      if (!supportsMultiLanguage) {
-        setSupportsMultiLanguage(true);
-        setFormData(prev => ({ ...prev, supportsMultiLanguage: true }));
-      }
-
-      enqueueSnackbar(t('gameWorlds.maintenance.translationCompleted'), { variant: 'success' });
-    } catch (error: any) {
-      console.error('Translation error:', error);
-      enqueueSnackbar(t('gameWorlds.maintenance.translationFailed'), { variant: 'error' });
-    } finally {
-      setIsTranslating(false);
-    }
-  };
 
   useEffect(() => {
     let isMounted = true;
@@ -1328,77 +1261,32 @@ const GameWorldsPage: React.FC = () => {
                       }}
                     />
 
-                    {/* 기본 점검 메시지 */}
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={3}
-                      label={t('gameWorlds.maintenance.defaultMessage')}
-                      value={formData.maintenanceMessage}
-                      onChange={(e) => setFormData({ ...formData, maintenanceMessage: e.target.value })}
-                      helperText={t('gameWorlds.maintenance.defaultMessageHelp')}
-                      required={formData.isMaintenance}
-                      error={!!formErrors.maintenanceMessage}
+                    {/* 점검 메시지 입력 컴포넌트 */}
+                    <MultiLanguageMessageInput
+                      defaultMessage={formData.maintenanceMessage || ''}
+                      onDefaultMessageChange={(message) => setFormData({ ...formData, maintenanceMessage: message })}
+                      defaultMessageLabel={t('gameWorlds.maintenance.defaultMessage')}
+                      defaultMessageHelperText={t('gameWorlds.maintenance.defaultMessageHelp')}
+                      defaultMessageRequired={formData.isMaintenance}
+                      defaultMessageError={!!formErrors.maintenanceMessage}
+
+                      supportsMultiLanguage={supportsMultiLanguage}
+                      onSupportsMultiLanguageChange={handleSupportsMultiLanguageChange}
+                      supportsMultiLanguageLabel={t('gameWorlds.maintenance.supportsMultiLanguage')}
+                      supportsMultiLanguageHelperText={t('gameWorlds.maintenance.supportsMultiLanguageHelp')}
+
+                      locales={maintenanceLocales.map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
+                      onLocalesChange={(locales) => {
+                        const newLocales = locales.map(l => ({ lang: l.lang, message: l.message }));
+                        setMaintenanceLocales(newLocales);
+                        setFormData(prev => ({ ...prev, maintenanceLocales: newLocales }));
+                      }}
+                      languageSpecificMessagesLabel={t('gameWorlds.maintenance.languageSpecificMessages')}
+
+                      enableTranslation={true}
+                      translateButtonLabel={t('gameWorlds.maintenance.translate')}
+                      translateTooltip={t('gameWorlds.maintenance.translateTooltip')}
                     />
-
-                    {/* 언어별 메시지 사용 여부 */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={supportsMultiLanguage}
-                            onChange={(e) => handleSupportsMultiLanguageChange(e.target.checked)}
-                          />
-                        }
-                        label={t('gameWorlds.maintenance.supportsMultiLanguage')}
-                      />
-
-                      {/* 번역 버튼 */}
-                      <Tooltip title={t('gameWorlds.maintenance.translateTooltip')}>
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          startIcon={isTranslating ? <CircularProgress size={16} /> : <TranslateIcon />}
-                          onClick={handleTranslateMaintenanceMessage}
-                          disabled={isTranslating || !formData.maintenanceMessage?.trim()}
-                          sx={{ minWidth: 'auto' }}
-                        >
-                          {t('gameWorlds.maintenance.translate')}
-                        </Button>
-                      </Tooltip>
-                    </Box>
-                    <Typography variant="caption" color="text.secondary">
-                      {t('gameWorlds.maintenance.supportsMultiLanguageHelp')}
-                    </Typography>
-
-                    {/* 언어별 메시지 */}
-                    {supportsMultiLanguage && (
-                      <Box>
-                        <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
-                          {t('gameWorlds.maintenance.languageSpecificMessages')}
-                        </Typography>
-
-                        {/* 모든 언어별 메시지 입력 */}
-                        {availableLanguages.map((lang) => {
-                          const locale = maintenanceLocales.find(l => l.lang === lang.code);
-                          return (
-                            <Box key={lang.code} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-                              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                                {lang.label}
-                              </Typography>
-                              <TextField
-                                fullWidth
-                                multiline
-                                rows={3}
-                                value={locale?.message || ''}
-                                onChange={(e) => updateMaintenanceLocale(lang.code, e.target.value)}
-                                placeholder={t(`maintenanceMessage.${lang.code}Help`)}
-                              />
-                            </Box>
-                          );
-                        })}
-                      </Box>
-                    )}
                   </Stack>
                 </LocalizationProvider>
               </Paper>

@@ -41,7 +41,10 @@
       },
       "useTemplate": "Use template",
       "useLanguageSpecificMessages": "Use Language-specific Maintenance Messages",
-      "languageSpecificMessages": "Language-specific Maintenance Messages"
+      "languageSpecificMessages": "Language-specific Maintenance Messages",
+      "supportsMultiLanguageHelp": "Enable different maintenance messages for each language",
+      "translate": "Auto Translate",
+      "translateTooltip": "Automatically translate the default maintenance message to other languages"
     },
     "maintenanceTemplates": {
       "title": "Message Templates",
@@ -438,6 +441,10 @@
       "makeAvailable": "Make Available",
       "makeUnavailable": "Make Unavailable",
       "supportsMultiLanguage": "Multi-language Support",
+      "supportsMultiLanguageHelp": "Enable different messages for each language",
+      "languageSpecificMessages": "Language-specific Messages",
+      "translate": "Auto Translate",
+      "translateTooltip": "Automatically translate the default message to other languages",
       "confirmDelete": "Are you sure you want to delete message template '{{name}}'?",
       "confirmBulkDelete": "Are you sure you want to delete {{count}} selected message templates?",
       "bulkDeleteSuccess": "{{count}} message templates have been deleted",
@@ -1685,5 +1692,14 @@
     "loadError": "Failed to load platform defaults",
     "saveSuccess": "Platform defaults saved successfully",
     "saveError": "Failed to save platform defaults"
+  },
+  "language": {
+    "changeLanguage": "Change Language"
+  },
+  "multiLanguageMessage": {
+    "noMessageToTranslate": "Please enter a default message to translate",
+    "translationCompleted": "Translation completed successfully",
+    "translationFailed": "An error occurred during translation",
+    "languagePlaceholder": "Enter {{language}} message"
   }
 }
