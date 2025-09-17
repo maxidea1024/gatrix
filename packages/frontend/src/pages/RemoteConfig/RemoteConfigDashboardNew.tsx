@@ -718,7 +718,7 @@ const RemoteConfigDashboard: React.FC = () => {
 
   return (
     <EnvironmentProvider>
-      <Container maxWidth="xl" sx={{ py: 3 }}>
+      <Box sx={{ p: 3 }}>
         {/* Fixed Environment Selector */}
         <EnvironmentSelector />
 

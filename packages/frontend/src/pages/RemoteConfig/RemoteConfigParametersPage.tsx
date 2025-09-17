@@ -3604,7 +3604,7 @@ const RemoteConfigParametersPage: React.FC = () => {
   return (
     <VersionProvider>
       <EnvironmentProvider>
-        <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Box sx={{ p: 3 }}>
           {/* Simple Environment Selector */}
           <EnvironmentSelector />
 
@@ -3656,7 +3656,7 @@ const RemoteConfigParametersPage: React.FC = () => {
               {tabValue === 5 && <DeploymentHistoryManagement />}
             </Box>
           </Paper>
-        </Container>
+        </Box>
       </EnvironmentProvider>
     </VersionProvider>
   );
