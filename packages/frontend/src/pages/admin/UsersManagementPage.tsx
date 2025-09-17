@@ -758,6 +758,13 @@ const UsersManagementPage: React.FC = () => {
                     label={t('admin.users.statusFilter')}
                     onChange={(e) => setStatusFilter(e.target.value)}
                     displayEmpty
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          zIndex: 9999
+                        }
+                      }
+                    }}
                     sx={{
                       minWidth: 120,
                       '& .MuiSelect-select': {
@@ -782,6 +789,13 @@ const UsersManagementPage: React.FC = () => {
                     label={t('admin.users.roleFilter')}
                     onChange={(e) => setRoleFilter(e.target.value)}
                     displayEmpty
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          zIndex: 9999
+                        }
+                      }
+                    }}
                     sx={{
                       minWidth: 120,
                       '& .MuiSelect-select': {
@@ -807,6 +821,11 @@ const UsersManagementPage: React.FC = () => {
                   isOptionEqualToValue={(option, value) => option.id === value.id}
                   value={tagFilter}
                   onChange={(_, value) => setTagFilter(value)}
+                  PopperProps={{
+                    style: {
+                      zIndex: 9999
+                    }
+                  }}
                   renderTags={(value, getTagProps) =>
                     value.map((option, index) => {
                       const { key, ...chipProps } = getTagProps({ index });
@@ -1224,13 +1243,19 @@ const UsersManagementPage: React.FC = () => {
         anchor="right"
         open={addUserDialog}
         onClose={handleCloseAddUserDialog}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
+        PaperProps={{
+          sx: {
             width: { xs: '100%', sm: 600 },
             maxWidth: '100vw',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            zIndex: 1300
+          }
+        }}
+        ModalProps={{
+          keepMounted: false,
+          sx: {
+            zIndex: 1300
           }
         }}
       >
@@ -1333,6 +1358,13 @@ const UsersManagementPage: React.FC = () => {
                 value={newUserData.role}
                 label={t('users.role')}
                 onChange={(e) => setNewUserData({ ...newUserData, role: e.target.value as 'admin' | 'user' })}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      zIndex: 9999
+                    }
+                  }
+                }}
               >
                 <MenuItem value="user">{t('users.roles.user')}</MenuItem>
                 <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
@@ -1350,6 +1382,11 @@ const UsersManagementPage: React.FC = () => {
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={newUserTags}
                 onChange={(_, value) => setNewUserTags(value)}
+                PopperProps={{
+                  style: {
+                    zIndex: 9999
+                  }
+                }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });
@@ -1586,13 +1623,19 @@ const UsersManagementPage: React.FC = () => {
         anchor="right"
         open={editUserDialog.open}
         onClose={() => setEditUserDialog({ open: false, user: null })}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
+        PaperProps={{
+          sx: {
             width: { xs: '100%', sm: 600 },
             maxWidth: '100vw',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            zIndex: 1300
+          }
+        }}
+        ModalProps={{
+          keepMounted: false,
+          sx: {
+            zIndex: 1300
           }
         }}
       >
@@ -1700,6 +1743,13 @@ const UsersManagementPage: React.FC = () => {
                     value={editUserData.role}
                     onChange={(e) => setEditUserData({ ...editUserData, role: e.target.value as 'admin' | 'user' })}
                     label={t('users.role')}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          zIndex: 9999
+                        }
+                      }
+                    }}
                   >
                     <MenuItem value="user">{t('users.roles.user')}</MenuItem>
                     <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
@@ -1712,6 +1762,13 @@ const UsersManagementPage: React.FC = () => {
                     value={editUserData.status}
                     onChange={(e) => setEditUserData({ ...editUserData, status: e.target.value as any })}
                     label={t('users.status')}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          zIndex: 9999
+                        }
+                      }
+                    }}
                   >
                     <MenuItem value="pending">{t('users.statuses.pending')}</MenuItem>
                     <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
@@ -1732,6 +1789,11 @@ const UsersManagementPage: React.FC = () => {
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={editUserTags}
                 onChange={(_, value) => setEditUserTags(value)}
+                PopperProps={{
+                  style: {
+                    zIndex: 9999
+                  }
+                }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });
@@ -1855,6 +1917,13 @@ const UsersManagementPage: React.FC = () => {
                 value={bulkActionValue}
                 label={t('users.status')}
                 onChange={(e) => setBulkActionValue(e.target.value)}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      zIndex: 9999
+                    }
+                  }
+                }}
               >
                 <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
                 <MenuItem value="pending">{t('users.statuses.pending')}</MenuItem>
@@ -1869,6 +1938,13 @@ const UsersManagementPage: React.FC = () => {
                 value={bulkActionValue}
                 label={t('users.role')}
                 onChange={(e) => setBulkActionValue(e.target.value)}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      zIndex: 9999
+                    }
+                  }
+                }}
               >
                 <MenuItem value="user">{t('users.roles.user')}</MenuItem>
                 <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
@@ -1882,6 +1958,13 @@ const UsersManagementPage: React.FC = () => {
                 value={bulkActionValue}
                 label={t('users.emailVerified')}
                 onChange={(e) => setBulkActionValue(e.target.value)}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      zIndex: 9999
+                    }
+                  }
+                }}
               >
                 <MenuItem value="true">{t('admin.users.verified')}</MenuItem>
                 <MenuItem value="false">{t('admin.users.unverified')}</MenuItem>
@@ -1898,6 +1981,11 @@ const UsersManagementPage: React.FC = () => {
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={bulkActionTags}
                 onChange={(_, value) => setBulkActionTags(value)}
+                PopperProps={{
+                  style: {
+                    zIndex: 9999
+                  }
+                }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });

@@ -286,6 +286,11 @@ const AuditLogsPage: React.FC = () => {
                     },
                     actionBar: {
                       actions: ['cancel', 'accept']
+                    },
+                    popper: {
+                      style: {
+                        zIndex: 9999
+                      }
                     }
                   }}
                   localeText={getDatePickerLocale()}
@@ -306,6 +311,11 @@ const AuditLogsPage: React.FC = () => {
                     },
                     actionBar: {
                       actions: ['cancel', 'accept']
+                    },
+                    popper: {
+                      style: {
+                        zIndex: 9999
+                      }
                     }
                   }}
                   localeText={getDatePickerLocale()}

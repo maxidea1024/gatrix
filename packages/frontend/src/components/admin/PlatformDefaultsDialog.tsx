@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Drawer,
   Button,
   TextField,
   Box,
@@ -101,27 +98,53 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
   const platformList = AVAILABLE_PLATFORMS;
 
   return (
-    <Dialog
+    <Drawer
+      anchor="right"
       open={open}
       onClose={onClose}
-      maxWidth="md"
-      fullWidth
-      PaperProps={{
-        sx: { minHeight: '60vh' }
+      sx={{
+        zIndex: 1301,
+        '& .MuiDrawer-paper': {
+          width: { xs: '100%', sm: 600 },
+          maxWidth: '100vw',
+          display: 'flex',
+          flexDirection: 'column'
+        }
       }}
     >
-      <DialogTitle>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="h6">
+      {/* Header */}
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        p: 2,
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        bgcolor: 'background.paper'
+      }}>
+        <Box>
+          <Typography variant="h6" component="h2">
             {t('platformDefaults.title')}
           </Typography>
-          <IconButton onClick={onClose} size="small">
-            <CloseIcon />
-          </IconButton>
+          <Typography variant="body2" color="text.secondary">
+            {t('platformDefaults.description')}
+          </Typography>
         </Box>
-      </DialogTitle>
+        <IconButton
+          onClick={onClose}
+          size="small"
+          sx={{
+            '&:hover': {
+              backgroundColor: 'action.hover'
+            }
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </Box>
 
-      <DialogContent dividers>
+      {/* Content */}
+      <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           {t('platformDefaults.description')}
         </Typography>
@@ -173,9 +196,18 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
             )}
           </Stack>
         )}
-      </DialogContent>
+      </Box>
 
-      <DialogActions>
+      {/* Footer */}
+      <Box sx={{
+        p: 2,
+        borderTop: '1px solid',
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+        display: 'flex',
+        gap: 1,
+        justifyContent: 'flex-end'
+      }}>
         <Button onClick={onClose}>
           {t('common.cancel')}
         </Button>
@@ -187,8 +219,8 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
         >
           {t('common.save')}
         </Button>
-      </DialogActions>
-    </Dialog>
+      </Box>
+    </Drawer>
   );
 };
 

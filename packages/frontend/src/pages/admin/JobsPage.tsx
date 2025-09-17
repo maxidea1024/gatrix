@@ -299,6 +299,13 @@ const JobsPage: React.FC = () => {
                   onChange={(e) => setSelectedJobType(e.target.value as number | '')}
                   label={t('jobs.jobType')}
                   displayEmpty
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        zIndex: 9999
+                      }
+                    }
+                  }}
                   sx={{
                     minWidth: 120,
                     '& .MuiSelect-select': {
@@ -325,6 +332,13 @@ const JobsPage: React.FC = () => {
                   onChange={(e) => setEnabledFilter(e.target.value as boolean | '')}
                   label={t('common.usable')}
                   displayEmpty
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        zIndex: 9999
+                      }
+                    }
+                  }}
                   sx={{
                     minWidth: 120,
                     '& .MuiSelect-select': {
@@ -351,6 +365,11 @@ const JobsPage: React.FC = () => {
                 filterSelectedOptions
                 value={tagFilter}
                 onChange={(_, value) => handleTagFilterChange(value)}
+                PopperProps={{
+                  style: {
+                    zIndex: 9999
+                  }
+                }}
                 renderValue={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });
@@ -590,13 +609,19 @@ const JobsPage: React.FC = () => {
         anchor="right"
         open={formDialogOpen}
         onClose={() => setFormDialogOpen(false)}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
+        PaperProps={{
+          sx: {
             width: { xs: '100%', sm: 700 },
             maxWidth: '100vw',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            zIndex: 1300
+          }
+        }}
+        ModalProps={{
+          keepMounted: false,
+          sx: {
+            zIndex: 1300
           }
         }}
       >

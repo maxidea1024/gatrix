@@ -428,6 +428,13 @@ const MessageTemplatesPage: React.FC = () => {
                   onChange={(e) => handleFilterChange({ ...filters, type: e.target.value as MessageTemplateType || undefined })}
                   displayEmpty
                   size="small"
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        zIndex: 9999
+                      }
+                    }
+                  }}
                 >
                   <MenuItem value="">
                     <em>{t('common.all')}</em>
@@ -452,6 +459,13 @@ const MessageTemplatesPage: React.FC = () => {
                   }}
                   displayEmpty
                   size="small"
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        zIndex: 9999
+                      }
+                    }
+                  }}
                 >
                   <MenuItem value="">
                     <em>{t('common.all')}</em>
@@ -479,6 +493,11 @@ const MessageTemplatesPage: React.FC = () => {
                 filterSelectedOptions
                 value={tagFilter}
                 onChange={(_, value) => handleTagFilterChange(value)}
+                PopperProps={{
+                  style: {
+                    zIndex: 9999
+                  }
+                }}
                 renderValue={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });
@@ -690,13 +709,19 @@ const MessageTemplatesPage: React.FC = () => {
         anchor="right"
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
+        PaperProps={{
+          sx: {
             width: { xs: '100%', sm: 600 },
             maxWidth: '100vw',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            zIndex: 1300
+          }
+        }}
+        ModalProps={{
+          keepMounted: false,
+          sx: {
+            zIndex: 1300
           }
         }}
         SlideProps={{
@@ -793,6 +818,13 @@ const MessageTemplatesPage: React.FC = () => {
               }}
               SelectProps={{
                 multiple: true,
+                MenuProps: {
+                  PaperProps: {
+                    style: {
+                      zIndex: 99999
+                    }
+                  }
+                },
                 renderValue: (selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                     {(selected as number[]).map((id) => {
@@ -1023,6 +1055,13 @@ const MessageTemplatesPage: React.FC = () => {
               }}
               SelectProps={{
                 multiple: true,
+                MenuProps: {
+                  PaperProps: {
+                    style: {
+                      zIndex: 99999
+                    }
+                  }
+                },
                 renderValue: (selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                     {(selected as number[]).map((id) => {

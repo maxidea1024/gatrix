@@ -230,6 +230,13 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel }) 
               onChange={(e) => handleJobTypeChange(e.target.value)}
               label={t('jobs.jobType')}
               disabled={!!job} // Disable job type change when editing
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    zIndex: 99999
+                  }
+                }
+              }}
             >
               {console.log('JobForm - Rendering job types:', jobTypes) || jobTypes.filter(jt => jt.isEnabled).map((jobType) => (
                 <MenuItem key={jobType.id} value={jobType.id.toString()}>

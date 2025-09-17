@@ -746,6 +746,13 @@ const ClientVersionsPage: React.FC = () => {
                   onChange={(e) => handleFilterChange({ ...pageState.filters, version: e.target.value || undefined })}
                   displayEmpty
                   size="small"
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        zIndex: 9999
+                      }
+                    }
+                  }}
                 >
                   <MenuItem value="">
                     <em>{t('common.all')}</em>
@@ -766,6 +773,13 @@ const ClientVersionsPage: React.FC = () => {
                   onChange={(e) => handleFilterChange({ ...pageState.filters, platform: e.target.value || undefined })}
                   displayEmpty
                   size="small"
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        zIndex: 9999
+                      }
+                    }
+                  }}
                 >
                   <MenuItem value="">
                     <em>{t('common.all')}</em>
@@ -786,6 +800,13 @@ const ClientVersionsPage: React.FC = () => {
                   onChange={(e) => handleFilterChange({ ...pageState.filters, clientStatus: e.target.value as ClientStatus || undefined })}
                   displayEmpty
                   size="small"
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        zIndex: 9999
+                      }
+                    }
+                  }}
                 >
                   <MenuItem value="">
                     <em>{t('common.all')}</em>
@@ -814,6 +835,13 @@ const ClientVersionsPage: React.FC = () => {
                   }}
                   displayEmpty
                   size="small"
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        zIndex: 9999
+                      }
+                    }
+                  }}
                 >
                   <MenuItem value="">
                     <em>{t('common.all')}</em>
@@ -832,6 +860,11 @@ const ClientVersionsPage: React.FC = () => {
                 filterSelectedOptions
                 value={tagFilter}
                 onChange={(_, value) => handleTagFilterChange(value)}
+                PopperProps={{
+                  style: {
+                    zIndex: 9999
+                  }
+                }}
                 renderValue={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });
@@ -1354,6 +1387,13 @@ const ClientVersionsPage: React.FC = () => {
               value={bulkStatus}
               onChange={(e) => setBulkStatus(e.target.value as ClientStatus)}
               label={t('clientVersions.statusLabel')}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    zIndex: 9999
+                  }
+                }
+              }}
             >
               {Object.values(ClientStatus).map((status) => (
                 <MenuItem key={status} value={status}>
@@ -1579,6 +1619,11 @@ const ClientVersionsPage: React.FC = () => {
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={clientVersionTags}
             onChange={(_, newValue) => setClientVersionTags(newValue)}
+            PopperProps={{
+              style: {
+                zIndex: 9999
+              }
+            }}
             renderTags={(value, getTagProps) =>
               value.map((option, index) => (
                 <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>

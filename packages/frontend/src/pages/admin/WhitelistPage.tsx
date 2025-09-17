@@ -4,6 +4,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import { useI18n } from '@/contexts/I18nContext';
 import { usePageState } from '../../hooks/usePageState';
+import { useSearchParams } from 'react-router-dom';
 
 import {
   Box,
@@ -56,13 +57,13 @@ import { WhitelistService, Whitelist, CreateWhitelistData } from '../../services
 import SimplePagination from '../../components/common/SimplePagination';
 import IpWhitelistTab from '../../components/admin/IpWhitelistTab';
 import WhitelistOverview from '../../components/admin/WhitelistOverview';
-import FormDialogHeader from '../../components/common/FormDialogHeader';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 
 const WhitelistPage: React.FC = () => {
   const { t } = useTranslation();
   const { language } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Refs for form focus
   const accountIdFieldRef = useRef<HTMLInputElement>(null);
@@ -84,8 +85,41 @@ const WhitelistPage: React.FC = () => {
     storageKey: 'whitelistPage',
   });
 
+  // Tab names for URL mapping
+  const tabNames = ['account', 'ip', 'playground'];
+
+  // Get initial tab from URL, localStorage, or default to 0
+  const getInitialTab = () => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam) {
+      const tabIndex = tabNames.indexOf(tabParam);
+      if (tabIndex >= 0) {
+        return tabIndex;
+      }
+    }
+
+    // Check localStorage for saved tab
+    const savedTab = localStorage.getItem('whitelist.lastTab');
+    if (savedTab) {
+      const tabIndex = tabNames.indexOf(savedTab);
+      if (tabIndex >= 0) {
+        // Update URL to match saved tab
+        const newSearchParams = new URLSearchParams(searchParams);
+        newSearchParams.set('tab', savedTab);
+        setSearchParams(newSearchParams, { replace: true });
+        return tabIndex;
+      }
+    }
+
+    // Default to first tab
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('tab', tabNames[0]);
+    setSearchParams(newSearchParams, { replace: true });
+    return 0;
+  };
+
   // Tab state
-  const [currentTab, setCurrentTab] = useState(0);
+  const [currentTab, setCurrentTab] = useState(getInitialTab);
 
   // State
   const [whitelists, setWhitelists] = useState<Whitelist[]>([]);
@@ -171,9 +205,29 @@ const WhitelistPage: React.FC = () => {
     loadWhitelists();
   }, [pageState.page, pageState.limit, pageState.filters]);
 
+  // Update tab when URL changes (browser back/forward)
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam) {
+      const tabIndex = tabNames.indexOf(tabParam);
+      if (tabIndex >= 0 && tabIndex !== currentTab) {
+        setCurrentTab(tabIndex);
+        localStorage.setItem('whitelist.lastTab', tabParam);
+      }
+    }
+  }, [searchParams, currentTab, tabNames]);
+
   // Handlers
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
+
+    // Update URL with new tab
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('tab', tabNames[newValue]);
+    setSearchParams(newSearchParams);
+
+    // Save to localStorage
+    localStorage.setItem('whitelist.lastTab', tabNames[newValue]);
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -345,20 +399,21 @@ const WhitelistPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box>
-          <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-            {t('whitelist.title')}
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {t('whitelist.subtitle')}</Typography>
-        </Box>
-      </Box>
-
       {/* Main Card with Tabs */}
       <Card>
         <CardContent>
+          {/* Header */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
+                {t('whitelist.title')}
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                {t('whitelist.subtitle')}
+              </Typography>
+            </Box>
+          </Box>
+
           <Tabs value={currentTab} onChange={handleTabChange} sx={{ mb: 3 }}>
             <Tab label={t('whitelist.tabs.account')} />
             <Tab label={t('whitelist.tabs.ip')} />
@@ -614,9 +669,17 @@ const WhitelistPage: React.FC = () => {
                   borderColor: 'divider',
                   bgcolor: 'background.paper'
                 }}>
-                  <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-                    {editDialog ? t('whitelist.dialog.editTitle') : t('whitelist.dialog.addTitle')}
-                  </Typography>
+                  <Box>
+                    <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+                      {editDialog ? t('whitelist.dialog.editTitle') : t('whitelist.dialog.addTitle')}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {editDialog
+                        ? t('whitelist.dialog.editDescription')
+                        : t('whitelist.dialog.addDescription')
+                      }
+                    </Typography>
+                  </Box>
                   <IconButton
                     onClick={() => {
                       setSelectedWhitelist(null);
@@ -635,16 +698,8 @@ const WhitelistPage: React.FC = () => {
                 </Box>
 
                 {/* Content */}
-                <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
-                <FormDialogHeader
-                  title={editDialog ? t('whitelist.dialog.editTitle') : t('whitelist.dialog.addTitle')}
-                  description={editDialog
-                    ? t('whitelist.dialog.editDescription')
-                    : t('whitelist.dialog.addDescription')
-                  }
-                />
-                <DialogContent>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+                <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <Box>
                       <TextField
                         fullWidth
@@ -692,6 +747,11 @@ const WhitelistPage: React.FC = () => {
                           textField: {
                             fullWidth: true,
                             error: false
+                          },
+                          popper: {
+                            style: {
+                              zIndex: 9999
+                            }
                           }
                         }}
                       />
@@ -705,7 +765,14 @@ const WhitelistPage: React.FC = () => {
                         label={t('whitelist.form.endDateOpt')}
                         value={formData.endDate ? dayjs(formData.endDate) : null}
                         onChange={(date) => setFormData({ ...formData, endDate: date ? date.format('YYYY-MM-DD') : '' })}
-                        slotProps={{ textField: { fullWidth: true } }}
+                        slotProps={{
+                          textField: { fullWidth: true },
+                          popper: {
+                            style: {
+                              zIndex: 9999
+                            }
+                          }
+                        }}
                       />
                       <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
                         {t('whitelist.form.endDateHelp')}
@@ -726,7 +793,6 @@ const WhitelistPage: React.FC = () => {
                       </Typography>
                     </Box>
                   </Box>
-                </DialogContent>
                 </Box>
 
                 {/* Footer */}

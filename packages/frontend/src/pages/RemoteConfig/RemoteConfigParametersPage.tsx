@@ -661,6 +661,13 @@ const EnvironmentSelector: React.FC = () => {
                   onChange={(e) => switchEnvironment(Number(e.target.value))}
                   disabled={isLoading}
                   label={t('remoteConfig.environment', 'Environment')}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        zIndex: 9999
+                      }
+                    }
+                  }}
                 >
                   {environments.map((env) => (
                     <MenuItem key={env.id} value={env.id}>
@@ -1116,6 +1123,13 @@ const ConfigsManagement: React.FC = () => {
             defaultValue: e.target.value === 'boolean' ? 'false' : ''
           }))}
           label={t('remoteConfig.type', 'Type')}
+          MenuProps={{
+            PaperProps: {
+              style: {
+                zIndex: 9999
+              }
+            }
+          }}
         >
           <MenuItem value="string">String</MenuItem>
           <MenuItem value="number">Number</MenuItem>
@@ -1961,6 +1975,13 @@ const ContextFieldsManagement: React.FC = () => {
             value={formData.type}
             onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as any }))}
             label={t('remoteConfig.type', 'Type')}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  zIndex: 9999
+                }
+              }
+            }}
           >
             <MenuItem value="string">String</MenuItem>
             <MenuItem value="number">Number</MenuItem>
@@ -2465,6 +2486,13 @@ const SegmentsManagement: React.FC = () => {
                   value={condition.operator}
                   onChange={(e) => updateCondition(index, 'operator', e.target.value)}
                   label="Operator"
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        zIndex: 9999
+                      }
+                    }
+                  }}
                 >
                   <MenuItem value="equals">Equals</MenuItem>
                   <MenuItem value="not_equals">Not Equals</MenuItem>

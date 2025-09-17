@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Drawer,
   Button,
   TextField,
   FormControl,
@@ -28,7 +25,7 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from '@mui/material';
-import { Cancel as CancelIcon, Save as SaveIcon, ExpandMore as ExpandMoreIcon, Build as BuildIcon } from '@mui/icons-material';
+import { Cancel as CancelIcon, Save as SaveIcon, ExpandMore as ExpandMoreIcon, Build as BuildIcon, Close as CloseIcon } from '@mui/icons-material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -389,22 +386,60 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   };
 
   return (
-    <Dialog
+    <Drawer
+      anchor="right"
       open={open}
       onClose={handleClose}
-      maxWidth="md"
-      fullWidth
       PaperProps={{
-        sx: { minHeight: '80vh' }
+        sx: {
+          width: { xs: '100%', sm: 700 },
+          maxWidth: '100vw',
+          display: 'flex',
+          flexDirection: 'column',
+          zIndex: 1300
+        }
+      }}
+      ModalProps={{
+        keepMounted: false,
+        sx: {
+          zIndex: 1300
+        }
       }}
     >
-      <FormDialogHeader
-        title={t('clientVersions.bulkAdd')}
-        description={t('clientVersions.form.bulkDescription')}
-      />
+      {/* Header */}
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        p: 2,
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        bgcolor: 'background.paper'
+      }}>
+        <Box>
+          <Typography variant="h6" component="h2">
+            {t('clientVersions.bulkAdd')}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {t('clientVersions.form.bulkDescription')}
+          </Typography>
+        </Box>
+        <IconButton
+          onClick={handleClose}
+          size="small"
+          sx={{
+            '&:hover': {
+              backgroundColor: 'action.hover'
+            }
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </Box>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogContent dividers>
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Stack spacing={3} sx={{ mt: 1 }}>
             {/* 기본 정보 섹션 */}
             <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
@@ -454,6 +489,16 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                     value={selectedPlatforms}
                     onChange={handlePlatformChange}
                     input={<OutlinedInput label={`${t('clientVersions.selectPlatforms')} *`} />}
+                    MenuProps={{
+                      anchorOrigin: {
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                      },
+                      transformOrigin: {
+                        vertical: 'top',
+                        horizontal: 'left',
+                      }
+                    }}
                     renderValue={(selected) => (
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                         {selected.map((value) => (
@@ -489,6 +534,16 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                         {...field}
                         value={field.value || ClientStatus.OFFLINE}
                         label={`${t('clientVersions.statusLabel')} *`}
+                        MenuProps={{
+                          anchorOrigin: {
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                          },
+                          transformOrigin: {
+                            vertical: 'top',
+                            horizontal: 'left',
+                          }
+                        }}
                       >
                         {Object.values(ClientStatus).map((status) => (
                           <MenuItem key={status} value={status}>
@@ -644,6 +699,12 @@ cc00 b110 810ac80  911 c2dc c9c0 */}
                 onChange={(_, value) => {
                   setSelectedTags(value);
                   setValue('tags', value);
+                }}
+                PopperProps={{
+                  style: {
+                    zIndex: 99999
+                  },
+                  placement: 'bottom-start'
                 }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => {
@@ -867,9 +928,18 @@ cc00 b110 810ac80  911 c2dc c9c0 */}
             )}
 
           </Stack>
-        </DialogContent>
+        </Box>
 
-        <DialogActions>
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 1,
+          justifyContent: 'flex-end'
+        }}>
           <Button onClick={handleClose} disabled={loading} startIcon={<CancelIcon />}>
             {t('common.cancel')}
           </Button>
@@ -881,9 +951,9 @@ cc00 b110 810ac80  911 c2dc c9c0 */}
           >
             {loading ? t('clientVersions.creating') : t('clientVersions.bulkCreate')}
           </Button>
-        </DialogActions>
+        </Box>
       </form>
-    </Dialog>
+    </Drawer>
   );
 };
 

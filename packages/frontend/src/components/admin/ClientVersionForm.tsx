@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Drawer,
   Button,
   TextField,
   FormControl,
@@ -32,6 +29,7 @@ import {
   FileCopy as CopyIcon,
   ExpandMore as ExpandMoreIcon,
   Build as BuildIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -536,34 +534,72 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   };
 
   return (
-    <Dialog
+    <Drawer
+      anchor="right"
       open={open}
       onClose={handleClose}
-      maxWidth="md"
-      fullWidth
       PaperProps={{
-        sx: { minHeight: '80vh' }
+        sx: {
+          width: { xs: '100%', sm: 700 },
+          maxWidth: '100vw',
+          display: 'flex',
+          flexDirection: 'column',
+          zIndex: 1300
+        }
+      }}
+      ModalProps={{
+        keepMounted: false,
+        sx: {
+          zIndex: 1300
+        }
       }}
     >
-      <FormDialogHeader
-        title={isCopyMode
-          ? t('clientVersions.form.copyTitle')
-          : isEdit
-            ? t('clientVersions.form.editTitle')
-            : t('clientVersions.form.title')
-        }
-        description={isCopyMode
-          ? t('clientVersions.form.copyDescription')
-          : isEdit
-            ? t('clientVersions.form.editDescription')
-            : t('clientVersions.form.createDescription')
-        }
-      />
+      {/* Header */}
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        p: 2,
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        bgcolor: 'background.paper'
+      }}>
+        <Box>
+          <Typography variant="h6" component="h2">
+            {isCopyMode
+              ? t('clientVersions.form.copyTitle')
+              : isEdit
+                ? t('clientVersions.form.editTitle')
+                : t('clientVersions.form.title')
+            }
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {isCopyMode
+              ? t('clientVersions.form.copyDescription')
+              : isEdit
+                ? t('clientVersions.form.editDescription')
+                : t('clientVersions.form.createDescription')
+            }
+          </Typography>
+        </Box>
+        <IconButton
+          onClick={handleClose}
+          size="small"
+          sx={{
+            '&:hover': {
+              backgroundColor: 'action.hover'
+            }
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </Box>
 
       <form onSubmit={handleSubmit(onSubmit as SubmitHandler<ClientVersionFormData>, (errors) => {
         console.log('Form validation failed:', errors);
       })}>
-        <DialogContent dividers>
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           {duplicateError && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {duplicateError}
@@ -621,6 +657,16 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                         labelId="cvf-platform-label"
                         {...field}
                         label={`${t('clientVersions.platform')} *`}
+                        MenuProps={{
+                          anchorOrigin: {
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                          },
+                          transformOrigin: {
+                            vertical: 'top',
+                            horizontal: 'left',
+                          }
+                        }}
                         onChange={async (e) => {
                           field.onChange(e);
 
@@ -670,6 +716,16 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                         labelId="cvf-status-label"
                         {...field}
                         label={`${t('clientVersions.statusLabel')} *`}
+                        MenuProps={{
+                          anchorOrigin: {
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                          },
+                          transformOrigin: {
+                            vertical: 'top',
+                            horizontal: 'left',
+                          }
+                        }}
                       >
                         {Object.values(ClientStatus).map((status) => (
                           <MenuItem key={status} value={status}>
@@ -930,6 +986,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                   setSelectedTags(value);
                   setValue('tags', value);
                 }}
+                PopperProps={{
+                  placement: 'bottom-start'
+                }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });
@@ -1061,9 +1120,18 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             </AccordionDetails>
             </Accordion>
           </Stack>
-        </DialogContent>
+        </Box>
 
-        <DialogActions>
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 1,
+          justifyContent: 'flex-end'
+        }}>
           <Button onClick={handleClose} disabled={isSubmitting || loading} startIcon={<CancelIcon />}>
             {t('common.cancel')}
           </Button>
@@ -1090,9 +1158,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                 : t('clientVersions.form.createTitle')
             }
           </Button>
-        </DialogActions>
+        </Box>
       </form>
-    </Dialog>
+    </Drawer>
   );
 };
 

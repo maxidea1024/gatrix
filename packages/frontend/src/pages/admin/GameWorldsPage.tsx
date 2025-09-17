@@ -1037,13 +1037,13 @@ const GameWorldsPage: React.FC = () => {
             height: '100vh',
             display: 'flex',
             flexDirection: 'column',
-            zIndex: 1301 // Ensure it's above the sticky header
+            zIndex: 1300 // Ensure it's above the sticky header
           }
         }}
         ModalProps={{
           keepMounted: false,
           sx: {
-            zIndex: 1301 // Ensure modal backdrop is also above header
+            zIndex: 1300 // Ensure modal backdrop is also above header
           }
         }}
       >
@@ -1154,6 +1154,9 @@ const GameWorldsPage: React.FC = () => {
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={formTags}
                 onChange={(_, value) => setFormTags(value)}
+                slotProps={{
+                  popper: {}
+                }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });
@@ -1245,6 +1248,7 @@ const GameWorldsPage: React.FC = () => {
                           fullWidth: true,
                           helperText: t('gameWorlds.maintenance.startDateHelp'),
                         },
+                        popper: {}
                       }}
                     />
 
@@ -1258,6 +1262,7 @@ const GameWorldsPage: React.FC = () => {
                           fullWidth: true,
                           helperText: t('gameWorlds.maintenance.endDateHelp'),
                         },
+                        popper: {}
                       }}
                     />
 
