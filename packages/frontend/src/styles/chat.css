@@ -1,0 +1,312 @@
+/* Chat UI Theme Customization */
+
+/* Override chatscope default styles to match our theme */
+.cs-main-container {
+  height: 100% !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+.cs-chat-container {
+  height: 100% !important;
+}
+
+.cs-conversation-header {
+  background-color: var(--mui-palette-background-paper) !important;
+  border-bottom: 1px solid var(--mui-palette-divider) !important;
+  color: var(--mui-palette-text-primary) !important;
+}
+
+.cs-conversation-header__content {
+  color: var(--mui-palette-text-primary) !important;
+}
+
+.cs-conversation-header__info {
+  color: var(--mui-palette-text-secondary) !important;
+}
+
+.cs-message-list {
+  background-color: var(--mui-palette-background-default) !important;
+}
+
+.cs-message-list__scroll-to-bottom-button {
+  background-color: var(--mui-palette-primary-main) !important;
+  color: var(--mui-palette-primary-contrastText) !important;
+}
+
+.cs-message {
+  margin-bottom: 8px !important;
+}
+
+.cs-message--incoming .cs-message__content {
+  background-color: var(--mui-palette-background-paper) !important;
+  color: var(--mui-palette-text-primary) !important;
+  border: 1px solid var(--mui-palette-divider) !important;
+}
+
+.cs-message--outgoing .cs-message__content {
+  background-color: var(--mui-palette-primary-main) !important;
+  color: var(--mui-palette-primary-contrastText) !important;
+}
+
+.cs-message__content-wrapper {
+  max-width: 70% !important;
+}
+
+.cs-message__avatar {
+  margin-right: 8px !important;
+}
+
+.cs-message-input {
+  background-color: var(--mui-palette-background-paper) !important;
+  border-top: 1px solid var(--mui-palette-divider) !important;
+}
+
+.cs-message-input__content-editor {
+  background-color: var(--mui-palette-background-default) !important;
+  border: 1px solid var(--mui-palette-divider) !important;
+  border-radius: 20px !important;
+  color: var(--mui-palette-text-primary) !important;
+}
+
+.cs-message-input__content-editor:focus {
+  border-color: var(--mui-palette-primary-main) !important;
+  outline: none !important;
+}
+
+.cs-message-input__content-editor-wrapper {
+  padding: 8px 16px !important;
+}
+
+.cs-button {
+  background-color: transparent !important;
+  color: var(--mui-palette-primary-main) !important;
+  border: none !important;
+}
+
+.cs-button:hover {
+  background-color: var(--mui-palette-action-hover) !important;
+}
+
+.cs-button--attachment {
+  color: var(--mui-palette-text-secondary) !important;
+}
+
+.cs-button--send {
+  color: var(--mui-palette-primary-main) !important;
+}
+
+.cs-button--send:disabled {
+  color: var(--mui-palette-action-disabled) !important;
+}
+
+.cs-typing-indicator {
+  background-color: var(--mui-palette-background-paper) !important;
+  color: var(--mui-palette-text-secondary) !important;
+  padding: 8px 16px !important;
+  border-radius: 16px !important;
+  margin: 8px 0 !important;
+}
+
+.cs-typing-indicator__content {
+  color: var(--mui-palette-text-secondary) !important;
+}
+
+.cs-message-separator {
+  background-color: transparent !important;
+  color: var(--mui-palette-text-secondary) !important;
+  margin: 16px 0 !important;
+}
+
+.cs-message-separator__content {
+  background-color: var(--mui-palette-background-paper) !important;
+  border: 1px solid var(--mui-palette-divider) !important;
+  border-radius: 16px !important;
+  padding: 4px 12px !important;
+  font-size: 0.75rem !important;
+}
+
+/* Dark theme specific overrides */
+[data-mui-color-scheme="dark"] .cs-main-container {
+  background-color: var(--mui-palette-background-default) !important;
+}
+
+[data-mui-color-scheme="dark"] .cs-message--incoming .cs-message__content {
+  background-color: var(--mui-palette-grey-800) !important;
+  border-color: var(--mui-palette-grey-700) !important;
+}
+
+[data-mui-color-scheme="dark"] .cs-message-input__content-editor {
+  background-color: var(--mui-palette-grey-900) !important;
+  border-color: var(--mui-palette-grey-700) !important;
+}
+
+[data-mui-color-scheme="dark"] .cs-typing-indicator {
+  background-color: var(--mui-palette-grey-800) !important;
+}
+
+[data-mui-color-scheme="dark"] .cs-message-separator__content {
+  background-color: var(--mui-palette-grey-800) !important;
+  border-color: var(--mui-palette-grey-700) !important;
+}
+
+/* Custom animations */
+.cs-message {
+  animation: messageSlideIn 0.3s ease-out !important;
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cs-typing-indicator {
+  animation: typingFadeIn 0.2s ease-in !important;
+}
+
+@keyframes typingFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .cs-message__content-wrapper {
+    max-width: 85% !important;
+  }
+  
+  .cs-conversation-header {
+    padding: 8px 16px !important;
+  }
+  
+  .cs-message-input__content-editor-wrapper {
+    padding: 6px 12px !important;
+  }
+}
+
+/* Scrollbar styling */
+.cs-message-list::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+.cs-message-list::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.cs-message-list::-webkit-scrollbar-thumb {
+  background-color: var(--mui-palette-action-disabled) !important;
+  border-radius: 3px !important;
+}
+
+.cs-message-list::-webkit-scrollbar-thumb:hover {
+  background-color: var(--mui-palette-action-hover) !important;
+}
+
+/* Message status indicators */
+.cs-message__footer {
+  color: var(--mui-palette-text-secondary) !important;
+  font-size: 0.7rem !important;
+  margin-top: 4px !important;
+}
+
+/* File attachment styling */
+.cs-message__content--attachment {
+  border: 1px solid var(--mui-palette-divider) !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+}
+
+/* Emoji and reaction styling */
+.cs-message__reactions {
+  margin-top: 4px !important;
+}
+
+.cs-reaction {
+  background-color: var(--mui-palette-action-hover) !important;
+  border: 1px solid var(--mui-palette-divider) !important;
+  border-radius: 12px !important;
+  padding: 2px 6px !important;
+  margin-right: 4px !important;
+  font-size: 0.75rem !important;
+}
+
+.cs-reaction--active {
+  background-color: var(--mui-palette-primary-light) !important;
+  border-color: var(--mui-palette-primary-main) !important;
+  color: var(--mui-palette-primary-main) !important;
+}
+
+/* Loading states */
+.cs-message--loading {
+  opacity: 0.6 !important;
+}
+
+.cs-message--loading .cs-message__content {
+  position: relative !important;
+}
+
+.cs-message--loading .cs-message__content::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 16px !important;
+  height: 16px !important;
+  margin: -8px 0 0 -8px !important;
+  border: 2px solid var(--mui-palette-primary-main) !important;
+  border-radius: 50% !important;
+  border-top-color: transparent !important;
+  animation: spin 1s linear infinite !important;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Error states */
+.cs-message--error .cs-message__content {
+  border-color: var(--mui-palette-error-main) !important;
+  background-color: var(--mui-palette-error-light) !important;
+  color: var(--mui-palette-error-contrastText) !important;
+}
+
+/* Mention styling */
+.cs-mention {
+  background-color: var(--mui-palette-primary-light) !important;
+  color: var(--mui-palette-primary-main) !important;
+  padding: 1px 4px !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+}
+
+/* Hashtag styling */
+.cs-hashtag {
+  color: var(--mui-palette-info-main) !important;
+  font-weight: 500 !important;
+}
+
+.cs-hashtag:hover {
+  text-decoration: underline !important;
+}
+
+/* Link styling */
+.cs-message__content a {
+  color: var(--mui-palette-primary-main) !important;
+  text-decoration: none !important;
+}
+
+.cs-message__content a:hover {
+  text-decoration: underline !important;
+}

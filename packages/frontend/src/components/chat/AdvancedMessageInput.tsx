@@ -1,0 +1,299 @@
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  Box,
+  TextField,
+  IconButton,
+  Paper,
+  Chip,
+  Typography,
+  Tooltip,
+} from '@mui/material';
+import {
+  Send as SendIcon,
+  EmojiEmotions as EmojiIcon,
+  AttachFile as AttachIcon,
+  Close as CloseIcon,
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useChat } from '../../contexts/ChatContext';
+import { User } from '../../types/chat';
+import EmojiPicker from './EmojiPicker';
+import FileUpload from './FileUpload';
+import MentionAutocomplete from './MentionAutocomplete';
+
+interface AdvancedMessageInputProps {
+  channelId: number;
+  onSendMessage: (content: string, attachments?: File[]) => void;
+  placeholder?: string;
+  disabled?: boolean;
+}
+
+const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
+  channelId,
+  onSendMessage,
+  placeholder,
+  disabled = false,
+}) => {
+  const { t } = useTranslation();
+  const { state, actions } = useChat();
+  const [message, setMessage] = useState('');
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [emojiAnchorEl, setEmojiAnchorEl] = useState<HTMLElement | null>(null);
+  const [mentionQuery, setMentionQuery] = useState('');
+  const [mentionPosition, setMentionPosition] = useState({ top: 0, left: 0 });
+  const [showMentions, setShowMentions] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const textFieldRef = useRef<HTMLInputElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout>();
+
+  const currentChannel = state.channels.find(c => c.id === channelId);
+  const channelUsers = currentChannel?.members || [];
+
+  // Handle typing indicator
+  useEffect(() => {
+    if (message.trim() && !isTyping) {
+      setIsTyping(true);
+      actions.startTyping(channelId);
+    }
+
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    // Set new timeout
+    typingTimeoutRef.current = setTimeout(() => {
+      if (isTyping) {
+        setIsTyping(false);
+        actions.stopTyping(channelId);
+      }
+    }, 3000);
+
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, [message, channelId, isTyping, actions]);
+
+  // Stop typing when component unmounts
+  useEffect(() => {
+    return () => {
+      if (isTyping) {
+        actions.stopTyping(channelId);
+      }
+    };
+  }, [channelId, isTyping, actions]);
+
+  const handleMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setMessage(value);
+
+    // Check for mention trigger
+    const cursorPosition = event.target.selectionStart || 0;
+    const textBeforeCursor = value.substring(0, cursorPosition);
+    const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
+
+    if (mentionMatch) {
+      const query = mentionMatch[1];
+      setMentionQuery(query);
+      setShowMentions(true);
+
+      // Calculate position for mention dropdown
+      const textField = textFieldRef.current;
+      if (textField) {
+        const rect = textField.getBoundingClientRect();
+        setMentionPosition({
+          top: rect.top - 200,
+          left: rect.left + 10,
+        });
+      }
+    } else {
+      setShowMentions(false);
+      setMentionQuery('');
+    }
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const handleSendMessage = () => {
+    if (!message.trim() && attachments.length === 0) return;
+
+    onSendMessage(message.trim(), attachments);
+    setMessage('');
+    setAttachments([]);
+    setShowMentions(false);
+    
+    if (isTyping) {
+      setIsTyping(false);
+      actions.stopTyping(channelId);
+    }
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    const cursorPosition = textFieldRef.current?.selectionStart || message.length;
+    const newMessage = 
+      message.substring(0, cursorPosition) + 
+      emoji + 
+      message.substring(cursorPosition);
+    setMessage(newMessage);
+    
+    // Focus back to input
+    setTimeout(() => {
+      textFieldRef.current?.focus();
+      textFieldRef.current?.setSelectionRange(
+        cursorPosition + emoji.length,
+        cursorPosition + emoji.length
+      );
+    }, 0);
+  };
+
+  const handleMentionSelect = (user: User) => {
+    const cursorPosition = textFieldRef.current?.selectionStart || 0;
+    const textBeforeCursor = message.substring(0, cursorPosition);
+    const textAfterCursor = message.substring(cursorPosition);
+    
+    // Replace the @query with @username
+    const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
+    if (mentionMatch) {
+      const beforeMention = textBeforeCursor.substring(0, mentionMatch.index);
+      const newMessage = beforeMention + `@${user.username} ` + textAfterCursor;
+      setMessage(newMessage);
+      
+      // Set cursor position after the mention
+      setTimeout(() => {
+        const newPosition = beforeMention.length + user.username.length + 2;
+        textFieldRef.current?.setSelectionRange(newPosition, newPosition);
+        textFieldRef.current?.focus();
+      }, 0);
+    }
+    
+    setShowMentions(false);
+    setMentionQuery('');
+  };
+
+  const handleFileSelect = (files: File[]) => {
+    setAttachments(prev => [...prev, ...files]);
+  };
+
+  const handleRemoveAttachment = (index: number) => {
+    setAttachments(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  return (
+    <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
+      {/* Attachments Preview */}
+      {attachments.length > 0 && (
+        <Box sx={{ mb: 1 }}>
+          <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+            {t('chat.attachments', 'Attachments')} ({attachments.length})
+          </Typography>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {attachments.map((file, index) => (
+              <Chip
+                key={index}
+                label={`${file.name} (${formatFileSize(file.size)})`}
+                onDelete={() => handleRemoveAttachment(index)}
+                deleteIcon={<CloseIcon />}
+                variant="outlined"
+                size="small"
+              />
+            ))}
+          </Box>
+        </Box>
+      )}
+
+      {/* Message Input */}
+      <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1 }}>
+        <FileUpload
+          onFileSelect={handleFileSelect}
+          onLocationShare={(location) => {
+            // Handle location sharing
+            onSendMessage(`📍 ${location.name || 'Location'}: ${location.address}`);
+          }}
+        />
+
+        <IconButton
+          size="small"
+          onClick={(e) => setEmojiAnchorEl(e.currentTarget)}
+          sx={{ color: 'text.secondary' }}
+        >
+          <EmojiIcon />
+        </IconButton>
+
+        <TextField
+          ref={textFieldRef}
+          fullWidth
+          multiline
+          maxRows={4}
+          value={message}
+          onChange={handleMessageChange}
+          onKeyPress={handleKeyPress}
+          placeholder={placeholder || t('chat.typeMessage', 'Type a message...')}
+          disabled={disabled}
+          variant="outlined"
+          size="small"
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              borderRadius: 3,
+            },
+          }}
+        />
+
+        <Tooltip title={t('chat.sendMessage', 'Send message')}>
+          <span>
+            <IconButton
+              onClick={handleSendMessage}
+              disabled={disabled || (!message.trim() && attachments.length === 0)}
+              color="primary"
+              sx={{
+                '&:not(:disabled)': {
+                  backgroundColor: 'primary.main',
+                  color: 'primary.contrastText',
+                  '&:hover': {
+                    backgroundColor: 'primary.dark',
+                  },
+                },
+              }}
+            >
+              <SendIcon />
+            </IconButton>
+          </span>
+        </Tooltip>
+      </Box>
+
+      {/* Emoji Picker */}
+      <EmojiPicker
+        anchorEl={emojiAnchorEl}
+        open={Boolean(emojiAnchorEl)}
+        onClose={() => setEmojiAnchorEl(null)}
+        onEmojiSelect={handleEmojiSelect}
+      />
+
+      {/* Mention Autocomplete */}
+      <MentionAutocomplete
+        users={channelUsers}
+        query={mentionQuery}
+        position={mentionPosition}
+        visible={showMentions}
+        onSelect={handleMentionSelect}
+        onClose={() => setShowMentions(false)}
+      />
+    </Box>
+  );
+};
+
+export default AdvancedMessageInput;

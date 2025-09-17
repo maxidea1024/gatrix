@@ -25,6 +25,7 @@ import {
   CloudSync,
   History,
   VpnKey,
+  Chat,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -44,6 +45,12 @@ const getNavigationItems = (isAdmin: boolean): NavItem[] => {
       label: 'Dashboard',
       icon: 'Dashboard',
       path: '/dashboard',
+    },
+    {
+      id: 'chat',
+      label: 'Chat',
+      icon: 'Chat',
+      path: '/chat',
     },
     // 임시: 파일이 제대로 로드되는지 테스트
     {

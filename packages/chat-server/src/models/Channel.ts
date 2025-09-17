@@ -1,0 +1,360 @@
+import { Model } from 'objection';
+import { databaseManager } from '../config/database';
+import { Channel as ChannelType, CreateChannelData, UpdateChannelData, ChannelSettings } from '../types/chat';
+
+export class Channel extends Model {
+  static tableName = 'chat_channels';
+
+  id!: number;
+  name!: string;
+  description?: string;
+  type!: 'public' | 'private' | 'direct';
+  maxMembers!: number;
+  isArchived!: boolean;
+  archiveReason?: string;
+  avatarUrl?: string;
+  settings?: ChannelSettings;
+  ownerId!: number;
+  createdBy!: number;
+  updatedBy?: number;
+  createdAt!: Date;
+  updatedAt!: Date;
+  archivedAt?: Date;
+
+  static get jsonSchema() {
+    return {
+      type: 'object',
+      required: ['name', 'type', 'ownerId', 'createdBy'],
+      properties: {
+        id: { type: 'integer' },
+        name: { type: 'string', minLength: 1, maxLength: 255 },
+        description: { type: 'string', maxLength: 1000 },
+        type: { type: 'string', enum: ['public', 'private', 'direct'] },
+        maxMembers: { type: 'integer', minimum: 1, maximum: 10000 },
+        isArchived: { type: 'boolean' },
+        archiveReason: { type: 'string', maxLength: 500 },
+        avatarUrl: { type: 'string', maxLength: 500 },
+        settings: { type: 'object' },
+        ownerId: { type: 'integer' },
+        createdBy: { type: 'integer' },
+        updatedBy: { type: 'integer' },
+      },
+    };
+  }
+
+  static get relationMappings() {
+    return {
+      members: {
+        relation: Model.HasManyRelation,
+        modelClass: 'ChannelMember',
+        join: {
+          from: 'chat_channels.id',
+          to: 'chat_channel_members.channelId',
+        },
+      },
+      messages: {
+        relation: Model.HasManyRelation,
+        modelClass: 'Message',
+        join: {
+          from: 'chat_channels.id',
+          to: 'chat_messages.channelId',
+        },
+      },
+    };
+  }
+
+  $beforeInsert() {
+    this.createdAt = new Date();
+    this.updatedAt = new Date();
+  }
+
+  $beforeUpdate() {
+    this.updatedAt = new Date();
+  }
+}
+
+export class ChannelModel {
+  private static knex = databaseManager.getKnex();
+
+  // 채널 생성
+  static async create(data: CreateChannelData, createdBy: number): Promise<ChannelType> {
+    const channelData = {
+      name: data.name,
+      description: data.description,
+      type: data.type,
+      maxMembers: data.maxMembers || 1000,
+      settings: data.settings || this.getDefaultSettings(),
+      ownerId: createdBy,
+      createdBy,
+    };
+
+    const [channelId] = await this.knex('chat_channels').insert(channelData);
+    
+    // 생성자를 채널 멤버로 추가
+    await this.knex('chat_channel_members').insert({
+      channelId,
+      userId: createdBy,
+      role: 'owner',
+      status: 'active',
+      joinedAt: new Date(),
+    });
+
+    // 추가 멤버들 초대
+    if (data.memberIds && data.memberIds.length > 0) {
+      const memberInserts = data.memberIds.map(userId => ({
+        channelId,
+        userId,
+        role: 'member',
+        status: 'active',
+        joinedAt: new Date(),
+      }));
+      await this.knex('chat_channel_members').insert(memberInserts);
+    }
+
+    return await this.findById(channelId);
+  }
+
+  // 채널 조회
+  static async findById(id: number): Promise<ChannelType | null> {
+    const channel = await this.knex('chat_channels')
+      .where({ id, isArchived: false })
+      .first();
+
+    return channel || null;
+  }
+
+  // 사용자의 채널 목록 조회
+  static async findByUserId(userId: number, options: {
+    type?: string;
+    limit?: number;
+    offset?: number;
+  } = {}): Promise<{ channels: ChannelType[]; total: number }> {
+    let query = this.knex('chat_channels as c')
+      .select([
+        'c.*',
+        'cm.role',
+        'cm.unreadCount',
+        'cm.lastReadAt',
+        'cm.notificationSettings',
+      ])
+      .join('chat_channel_members as cm', 'c.id', 'cm.channelId')
+      .where({
+        'cm.userId': userId,
+        'cm.status': 'active',
+        'c.isArchived': false,
+      });
+
+    if (options.type) {
+      query = query.where('c.type', options.type);
+    }
+
+    // 총 개수 조회
+    const totalQuery = query.clone().count('* as count').first();
+    const { count: total } = await totalQuery;
+
+    // 페이지네이션
+    if (options.limit) {
+      query = query.limit(options.limit);
+    }
+    if (options.offset) {
+      query = query.offset(options.offset);
+    }
+
+    query = query.orderBy('cm.lastReadAt', 'desc');
+
+    const channels = await query;
+    return { channels, total: Number(total) };
+  }
+
+  // 채널 업데이트
+  static async update(id: number, data: UpdateChannelData, updatedBy: number): Promise<ChannelType | null> {
+    const updateData = {
+      ...data,
+      updatedBy,
+      updatedAt: new Date(),
+    };
+
+    await this.knex('chat_channels')
+      .where({ id })
+      .update(updateData);
+
+    return await this.findById(id);
+  }
+
+  // 채널 아카이브
+  static async archive(id: number, reason: string, archivedBy: number): Promise<boolean> {
+    const result = await this.knex('chat_channels')
+      .where({ id })
+      .update({
+        isArchived: true,
+        archiveReason: reason,
+        archivedAt: new Date(),
+        updatedBy: archivedBy,
+        updatedAt: new Date(),
+      });
+
+    return result > 0;
+  }
+
+  // 채널 삭제 (실제로는 아카이브)
+  static async delete(id: number, deletedBy: number): Promise<boolean> {
+    return await this.archive(id, 'Channel deleted', deletedBy);
+  }
+
+  // 채널 검색
+  static async search(query: string, userId: number, options: {
+    limit?: number;
+    offset?: number;
+  } = {}): Promise<{ channels: ChannelType[]; total: number }> {
+    let searchQuery = this.knex('chat_channels as c')
+      .select([
+        'c.*',
+        'cm.role',
+        'cm.unreadCount',
+      ])
+      .leftJoin('chat_channel_members as cm', function() {
+        this.on('c.id', '=', 'cm.channelId')
+            .andOn('cm.userId', '=', userId);
+      })
+      .where('c.isArchived', false)
+      .andWhere(function() {
+        this.where('c.type', 'public')
+            .orWhere('cm.userId', userId);
+      })
+      .andWhere(function() {
+        this.whereRaw('MATCH(c.name, c.description) AGAINST(? IN NATURAL LANGUAGE MODE)', [query])
+            .orWhere('c.name', 'like', `%${query}%`)
+            .orWhere('c.description', 'like', `%${query}%`);
+      });
+
+    // 총 개수 조회
+    const totalQuery = searchQuery.clone().count('* as count').first();
+    const { count: total } = await totalQuery;
+
+    // 페이지네이션
+    if (options.limit) {
+      searchQuery = searchQuery.limit(options.limit);
+    }
+    if (options.offset) {
+      searchQuery = searchQuery.offset(options.offset);
+    }
+
+    searchQuery = searchQuery.orderBy('c.createdAt', 'desc');
+
+    const channels = await searchQuery;
+    return { channels, total: Number(total) };
+  }
+
+  // 인기 채널 조회
+  static async getPopularChannels(limit = 10): Promise<ChannelType[]> {
+    return await this.knex('chat_channels as c')
+      .select([
+        'c.*',
+        this.knex.raw('COUNT(cm.userId) as memberCount'),
+        this.knex.raw('COUNT(m.id) as messageCount'),
+      ])
+      .leftJoin('chat_channel_members as cm', function() {
+        this.on('c.id', '=', 'cm.channelId')
+            .andOn('cm.status', '=', this.knex.raw('?', ['active']));
+      })
+      .leftJoin('chat_messages as m', function() {
+        this.on('c.id', '=', 'm.channelId')
+            .andOn('m.createdAt', '>=', this.knex.raw('DATE_SUB(NOW(), INTERVAL 7 DAY)'));
+      })
+      .where({
+        'c.type': 'public',
+        'c.isArchived': false,
+      })
+      .groupBy('c.id')
+      .orderBy('memberCount', 'desc')
+      .orderBy('messageCount', 'desc')
+      .limit(limit);
+  }
+
+  // 채널 통계 조회
+  static async getStats(channelId: number): Promise<any> {
+    const stats = await this.knex('chat_channels as c')
+      .select([
+        'c.id',
+        'c.name',
+        this.knex.raw('COUNT(DISTINCT cm.userId) as totalMembers'),
+        this.knex.raw('COUNT(DISTINCT CASE WHEN cm.status = "active" THEN cm.userId END) as activeMembers'),
+        this.knex.raw('COUNT(DISTINCT m.id) as totalMessages'),
+        this.knex.raw('COUNT(DISTINCT CASE WHEN m.createdAt >= DATE_SUB(NOW(), INTERVAL 1 DAY) THEN m.id END) as messagesToday'),
+        this.knex.raw('COUNT(DISTINCT CASE WHEN m.createdAt >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN m.id END) as messagesThisWeek'),
+        this.knex.raw('MAX(m.createdAt) as lastMessageAt'),
+      ])
+      .leftJoin('chat_channel_members as cm', 'c.id', 'cm.channelId')
+      .leftJoin('chat_messages as m', 'c.id', 'm.channelId')
+      .where('c.id', channelId)
+      .groupBy('c.id')
+      .first();
+
+    return stats;
+  }
+
+  // 기본 채널 설정
+  private static getDefaultSettings(): ChannelSettings {
+    return {
+      allowFileUploads: true,
+      allowReactions: true,
+      slowMode: 0,
+      maxMessageLength: 2000,
+      autoDeleteMessages: false,
+      autoDeleteDays: 30,
+      requireApproval: false,
+      allowedFileTypes: ['image/jpeg', 'image/png', 'image/gif', 'application/pdf'],
+      maxFileSize: 10485760, // 10MB
+    };
+  }
+
+  // 배치 작업
+  static async batchUpdate(channelIds: number[], data: Partial<UpdateChannelData>): Promise<number> {
+    const result = await this.knex('chat_channels')
+      .whereIn('id', channelIds)
+      .update({
+        ...data,
+        updatedAt: new Date(),
+      });
+
+    return result;
+  }
+
+  // 채널 존재 여부 확인
+  static async exists(id: number): Promise<boolean> {
+    const result = await this.knex('chat_channels')
+      .where({ id, isArchived: false })
+      .count('id as count')
+      .first();
+
+    return Number(result?.count) > 0;
+  }
+
+  // 사용자가 채널 멤버인지 확인
+  static async isMember(channelId: number, userId: number): Promise<boolean> {
+    const result = await this.knex('chat_channel_members')
+      .where({
+        channelId,
+        userId,
+        status: 'active',
+      })
+      .count('id as count')
+      .first();
+
+    return Number(result?.count) > 0;
+  }
+
+  // 사용자의 채널 권한 조회
+  static async getUserRole(channelId: number, userId: number): Promise<string | null> {
+    const result = await this.knex('chat_channel_members')
+      .select('role')
+      .where({
+        channelId,
+        userId,
+        status: 'active',
+      })
+      .first();
+
+    return result?.role || null;
+  }
+}

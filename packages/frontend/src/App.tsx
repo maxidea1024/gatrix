@@ -17,6 +17,8 @@ import { enUS } from '@mui/x-date-pickers/locales';
 
 // Styles
 import './styles/fullcalendar.css';
+import './styles/chat.css';
+import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 
 // Contexts
 import { AuthProvider } from './contexts/AuthContext';
@@ -68,6 +70,7 @@ import RemoteConfigPage from './pages/admin/RemoteConfigPage';
 import RemoteConfigHistoryPage from './pages/admin/RemoteConfigHistoryPage';
 import RemoteConfigDashboard from './pages/RemoteConfig/RemoteConfigParametersPage';
 import ApiTokensPage from './pages/admin/ApiTokensPage';
+import ChatPage from './pages/chat/ChatPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
 // Conditional Landing Page Component
@@ -190,6 +193,14 @@ const AppContent: React.FC = () => {
                   <ProtectedRoute>
                     <MainLayout>
                       <DashboardPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
+
+                <Route path="/chat" element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <ChatPage />
                     </MainLayout>
                   </ProtectedRoute>
                 } />
