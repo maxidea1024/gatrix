@@ -486,7 +486,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                     opacity: 1,
                   }
                 }
-              }}
+              }
+            }}
               sx={{
                 '& .MuiInputBase-input::placeholder': {
                   color: colors.placeholderText,
@@ -688,26 +689,28 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
             placeholder={t('chat.typeMessage', '메시지를 입력하세요...')}
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             disabled={!currentChannel}
             variant="standard"
             inputRef={messageInputRef}
-            InputProps={{
-              disableUnderline: true,
-              sx: {
-                fontSize: '14px',
-                color: colors.inputText,
-                '& input': {
-                  padding: '8px 0',
+            slotProps={{
+              input: {
+                disableUnderline: true,
+                sx: {
+                  fontSize: '14px',
                   color: colors.inputText,
-                },
-                '& textarea': {
-                  padding: '8px 0',
-                  color: colors.inputText,
-                },
-                '&::placeholder': {
-                  color: colors.placeholderText,
-                  opacity: 1,
+                  '& input': {
+                    padding: '8px 0',
+                    color: colors.inputText,
+                  },
+                  '& textarea': {
+                    padding: '8px 0',
+                    color: colors.inputText,
+                  },
+                  '&::placeholder': {
+                    color: colors.placeholderText,
+                    opacity: 1,
+                  }
                 }
               }
             }}
