@@ -368,4 +368,216 @@ export class ChannelController {
       });
     }
   }
+
+  // 채널의 메시지 조회
+  static async getMessages(req: Request, res: Response): Promise<void> {
+    try {
+      const channelId = parseInt(req.params.id);
+      const userId = (req as any).user.id;
+      const limit = parseInt(req.query.limit as string) || 50;
+      const offset = parseInt(req.query.offset as string) || 0;
+      const before = req.query.before ? parseInt(req.query.before as string) : undefined;
+
+      if (isNaN(channelId)) {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid channel ID',
+        });
+        return;
+      }
+
+      // 채널 접근 권한 확인
+      const hasAccess = await ChannelModel.hasAccess(channelId, userId);
+      if (!hasAccess) {
+        res.status(403).json({
+          success: false,
+          error: 'Access denied to this channel',
+        });
+        return;
+      }
+
+      // 메시지 조회 (MessageModel을 사용해야 하지만 임시로 빈 배열 반환)
+      const messages: any[] = [];
+
+      res.json({
+        success: true,
+        data: {
+          messages,
+          hasMore: false,
+          total: 0,
+        },
+      });
+    } catch (error) {
+      logger.error('Error getting channel messages:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get channel messages',
+      });
+    }
+  }
+
+  // 채널을 읽음으로 표시
+  static async markAsRead(req: Request, res: Response): Promise<void> {
+    try {
+      const channelId = parseInt(req.params.id);
+      const userId = (req as any).user.id;
+      const messageId = req.body.messageId ? parseInt(req.body.messageId) : undefined;
+
+      if (isNaN(channelId)) {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid channel ID',
+        });
+        return;
+      }
+
+      // 채널 접근 권한 확인
+      const hasAccess = await ChannelModel.hasAccess(channelId, userId);
+      if (!hasAccess) {
+        res.status(403).json({
+          success: false,
+          error: 'Access denied to this channel',
+        });
+        return;
+      }
+
+      // 읽음 표시 처리 (ChannelMember 모델을 사용해야 하지만 임시로 성공 응답)
+      // TODO: 실제 읽음 표시 로직 구현
+
+      res.json({
+        success: true,
+        message: 'Channel marked as read',
+      });
+    } catch (error) {
+      logger.error('Error marking channel as read:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to mark channel as read',
+      });
+    }
+  }
+
+  // 채널 참여
+  static async joinChannel(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user.id;
+      const channelId = parseInt(req.params.id);
+
+      if (isNaN(channelId)) {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid channel ID',
+        });
+        return;
+      }
+
+      // 채널 존재 확인
+      const channel = await ChannelModel.findById(channelId);
+      if (!channel) {
+        res.status(404).json({
+          success: false,
+          error: 'Channel not found',
+        });
+        return;
+      }
+
+      // 이미 참여했는지 확인
+      const isMember = await ChannelModel.isMember(channelId, userId);
+      if (isMember) {
+        res.status(200).json({
+          success: true,
+          message: 'Already a member of this channel',
+        });
+        return;
+      }
+
+      // 채널에 참여
+      await ChannelModel.addMember(channelId, userId, 'member');
+
+      // WebSocket을 통해 채널 참여 알림
+      const io = (req as any).io;
+      if (io) {
+        io.to(`channel:${channelId}`).emit('user_joined', {
+          channelId,
+          userId,
+          timestamp: Date.now(),
+        });
+      }
+
+      logger.info(`User ${userId} joined channel ${channelId}`);
+
+      res.status(200).json({
+        success: true,
+        message: 'Successfully joined channel',
+      });
+    } catch (error) {
+      logger.error('Error joining channel:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to join channel',
+      });
+    }
+  }
+
+  // 채널 나가기
+  static async leaveChannel(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user.id;
+      const channelId = parseInt(req.params.id);
+
+      if (isNaN(channelId)) {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid channel ID',
+        });
+        return;
+      }
+
+      // 채널 존재 확인
+      const channel = await ChannelModel.findById(channelId);
+      if (!channel) {
+        res.status(404).json({
+          success: false,
+          error: 'Channel not found',
+        });
+        return;
+      }
+
+      // 멤버인지 확인
+      const isMember = await ChannelModel.isMember(channelId, userId);
+      if (!isMember) {
+        res.status(400).json({
+          success: false,
+          error: 'Not a member of this channel',
+        });
+        return;
+      }
+
+      // 채널에서 나가기
+      await ChannelModel.removeMember(channelId, userId);
+
+      // WebSocket을 통해 채널 나가기 알림
+      const io = (req as any).io;
+      if (io) {
+        io.to(`channel:${channelId}`).emit('user_left', {
+          channelId,
+          userId,
+          timestamp: Date.now(),
+        });
+      }
+
+      logger.info(`User ${userId} left channel ${channelId}`);
+
+      res.status(200).json({
+        success: true,
+        message: 'Successfully left channel',
+      });
+    } catch (error) {
+      logger.error('Error leaving channel:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to leave channel',
+      });
+    }
+  }
 }

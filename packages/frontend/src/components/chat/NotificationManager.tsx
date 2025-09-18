@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import { useChat } from '../../contexts/ChatContext';
@@ -10,11 +10,16 @@ interface NotificationManagerProps {
   isWindowFocused: boolean;
 }
 
-const NotificationManager: React.FC<NotificationManagerProps> = ({
+export interface NotificationManagerRef {
+  showUserJoinNotification: (user: User, channelId: number) => void;
+  showUserLeaveNotification: (user: User, channelId: number) => void;
+}
+
+const NotificationManager = forwardRef<NotificationManagerRef, NotificationManagerProps>(({
   currentUserId,
   activeChannelId,
   isWindowFocused,
-}) => {
+}, ref) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { state } = useChat();
@@ -194,15 +199,12 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({
   };
 
   // Expose methods for parent component to use
-  React.useImperativeHandle(
-    React.forwardRef(() => null),
-    () => ({
-      showUserJoinNotification,
-      showUserLeaveNotification,
-    })
-  );
+  useImperativeHandle(ref, () => ({
+    showUserJoinNotification,
+    showUserLeaveNotification,
+  }));
 
   return null; // This component doesn't render anything
-};
+});
 
 export default NotificationManager;

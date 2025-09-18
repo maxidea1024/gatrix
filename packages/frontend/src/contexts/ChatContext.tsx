@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { ChatService } from '../services/chatService';
 import { getChatWebSocketService } from '../services/chatWebSocketService';
@@ -223,6 +224,7 @@ const ChatContext = createContext<ChatContextType | null>(null);
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(chatReducer, initialState);
   const { user, getToken } = useAuth();
+  const { t } = useTranslation();
   const wsService = getChatWebSocketService(getToken);
 
   // Initialize WebSocket connection
@@ -326,7 +328,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Message will be added via WebSocket event
         return message;
       } catch (error: any) {
-        dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to send message' });
+        dispatch({ type: 'SET_ERROR', payload: error.message || t('chat.sendMessageFailed', '메시지 전송에 실패했습니다') });
         throw error;
       }
     },

@@ -458,4 +458,99 @@ export class MessageController {
       });
     }
   }
+
+  // 특정 채널에 메시지 생성 (채널 ID가 URL 파라미터로 전달됨)
+  static async createInChannel(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user.id;
+      const channelId = parseInt(req.params.id);
+
+      if (isNaN(channelId)) {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid channel ID',
+        });
+        return;
+      }
+
+      // multipart/form-data 또는 JSON 데이터 처리
+      let content: string;
+      let contentType: 'text' | 'image' | 'video' | 'audio' | 'file' | 'location' = 'text';
+      let attachments: any[] = [];
+
+      if (req.body.content) {
+        // JSON 또는 form-data에서 content 추출
+        content = req.body.content;
+      } else {
+        res.status(400).json({
+          success: false,
+          error: 'Content is required',
+        });
+        return;
+      }
+
+      // 파일 첨부가 있는 경우 처리
+      if ((req as any).files && (req as any).files.length > 0) {
+        contentType = 'file';
+        attachments = (req as any).files.map((file: any) => ({
+          filename: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size,
+          path: file.path || file.buffer,
+        }));
+      }
+
+      const data: CreateMessageData = {
+        content,
+        contentType,
+        channelId,
+        replyToMessageId: req.body.replyToId ? parseInt(req.body.replyToId) : undefined,
+        messageData: req.body.metadata ? JSON.parse(req.body.metadata) : undefined,
+      };
+
+      // 채널 접근 권한 확인
+      const hasAccess = await ChannelModel.hasAccess(channelId, userId);
+      if (!hasAccess) {
+        res.status(403).json({
+          success: false,
+          error: 'Access denied to this channel',
+        });
+        return;
+      }
+
+      const startTime = Date.now();
+      // 실제 데이터베이스에 메시지 저장
+      const message = await MessageModel.create(data, userId);
+      const latency = (Date.now() - startTime) / 1000;
+
+      metricsService.recordMessage(channelId.toString(), data.contentType || 'text');
+      metricsService.recordMessageLatency('message_create', latency);
+
+      res.status(201).json({
+        success: true,
+        data: message,
+        message: 'Message created successfully',
+      });
+
+      // WebSocket을 통해 실시간으로 메시지 전송
+      const io = (req as any).io;
+      if (io) {
+        io.to(`channel:${channelId}`).emit('message', {
+          type: 'message_created',
+          data: message,
+          channelId,
+          userId
+        });
+      }
+
+      logger.info(`Message created: ${message.id} in channel ${channelId} by user ${userId}`);
+    } catch (error) {
+      logger.error('Error creating message in channel:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to create message',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
 }

@@ -1,6 +1,7 @@
 import { Model } from 'objection';
 import { databaseManager } from '../config/database';
 import { Message as MessageType, CreateMessageData, UpdateMessageData, MessageData } from '../types/chat';
+import { userSyncService } from '../services/UserSyncService';
 
 export class Message extends Model {
   static tableName = 'chat_messages';
@@ -112,21 +113,27 @@ export class MessageModel {
 
   // 메시지 조회
   static async findById(id: number): Promise<MessageType | null> {
-    const message = await this.knex('chat_messages as m')
-      .select([
-        'm.*',
-        'u.name as userName',
-        'u.avatarUrl as userAvatarUrl',
-        'rm.content as replyContent',
-        'ru.name as replyUserName',
-      ])
-      .leftJoin('users as u', 'm.userId', 'u.id')
-      .leftJoin('chat_messages as rm', 'm.replyToMessageId', 'rm.id')
-      .leftJoin('users as ru', 'rm.userId', 'ru.id')
-      .where({ 'm.id': id, 'm.isDeleted': false })
+    const message = await this.knex('chat_messages')
+      .where({ id, isDeleted: false })
       .first();
 
     if (!message) return null;
+
+    // Redis에서 사용자 정보 조회
+    const user = await userSyncService.getCachedUser(message.userId);
+
+    // 답글 메시지가 있는 경우 조회
+    let replyMessage = null;
+    let replyUser = null;
+    if (message.replyToMessageId) {
+      replyMessage = await this.knex('chat_messages')
+        .where({ id: message.replyToMessageId, isDeleted: false })
+        .first();
+
+      if (replyMessage) {
+        replyUser = await userSyncService.getCachedUser(replyMessage.userId);
+      }
+    }
 
     // 첨부파일과 반응 조회
     const [attachments, reactions] = await Promise.all([
@@ -408,9 +415,18 @@ export class MessageModel {
 
   // 메시지 첨부파일 조회
   private static async getMessageAttachments(messageId: number): Promise<any[]> {
-    return await this.knex('chat_message_attachments')
-      .where({ messageId, uploadStatus: 'completed' })
-      .orderBy('createdAt', 'asc');
+    try {
+      return await this.knex('chat_message_attachments')
+        .where({ messageId, uploadStatus: 'completed' })
+        .orderBy('createdAt', 'asc');
+    } catch (error: any) {
+      // 테이블이 없으면 빈 배열 반환
+      if (error.code === 'ER_NO_SUCH_TABLE') {
+        console.log('chat_message_attachments table does not exist, returning empty array');
+        return [];
+      }
+      throw error;
+    }
   }
 
   // 여러 메시지의 첨부파일 조회
@@ -441,7 +457,7 @@ export class MessageModel {
         'u.name as userName',
         'u.avatarUrl as userAvatarUrl',
       ])
-      .leftJoin('users as u', 'r.userId', 'u.id')
+      .leftJoin('chat_users as u', 'r.userId', 'u.id')
       .where('r.messageId', messageId)
       .orderBy('r.createdAt', 'asc');
   }

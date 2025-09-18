@@ -157,7 +157,17 @@ export class ChatWebSocketService {
 
     // 채팅 관련 이벤트들
     this.socket.on('message', (data) => {
-      this.emit('message', data);
+      // 메시지 타입에 따라 적절한 이벤트로 변환
+      if (data.type === 'message_created') {
+        this.emit('message_created', { data: data.data });
+      } else if (data.type === 'message_updated') {
+        this.emit('message_updated', { data: data.data });
+      } else if (data.type === 'message_deleted') {
+        this.emit('message_deleted', { data: data.data });
+      } else {
+        // 기본 메시지 이벤트
+        this.emit('message', data);
+      }
     });
 
     this.socket.on('user_joined', (data) => {

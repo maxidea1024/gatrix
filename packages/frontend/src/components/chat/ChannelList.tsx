@@ -214,10 +214,10 @@ const ChannelList: React.FC<ChannelListProps> = ({
                   
                   <ListItemText
                     primary={
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontWeight: 500 }}>
                           {channel.name}
-                        </Typography>
+                        </span>
                         {channel.type === 'private' && (
                           <Chip
                             label={t('chat.private', 'Private')}
@@ -226,7 +226,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
                             sx={{ height: 16, fontSize: '0.6rem' }}
                           />
                         )}
-                      </Box>
+                      </span>
                     }
                     secondary={getChannelSubtitle(channel)}
                     primaryTypographyProps={{

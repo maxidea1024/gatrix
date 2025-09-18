@@ -1,7 +1,33 @@
 import { Router } from 'express';
+import multer from 'multer';
 import { ChannelController } from '../controllers/ChannelController';
+import { MessageController } from '../controllers/MessageController';
 import { authenticate, rateLimiter, validateInput } from '../middleware/auth';
 import Joi from 'joi';
+
+// Multer 설정 - 메모리 저장소 사용 (임시)
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB
+    files: 5, // 최대 5개 파일
+  },
+  fileFilter: (req, file, cb) => {
+    // 허용할 파일 타입 (이미지, 문서, 비디오 등)
+    const allowedMimes = [
+      'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+      'application/pdf', 'text/plain', 'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'video/mp4', 'video/webm', 'audio/mpeg', 'audio/wav'
+    ];
+
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('File type not allowed'));
+    }
+  },
+});
 
 const router = Router();
 
@@ -106,6 +132,42 @@ router.get(
   '/:id/stats',
   rateLimiter(60000, 60), // 1분에 60회 요청 제한
   ChannelController.getStats
+);
+
+// 채널의 메시지 조회
+router.get(
+  '/:id/messages',
+  rateLimiter(60000, 200), // 1분에 200회 요청 제한
+  ChannelController.getMessages
+);
+
+// 채널을 읽음으로 표시
+router.post(
+  '/:id/read',
+  rateLimiter(60000, 100), // 1분에 100회 요청 제한
+  ChannelController.markAsRead
+);
+
+// 채널에 메시지 보내기
+router.post(
+  '/:id/messages',
+  rateLimiter(60000, 60), // 1분에 60개 메시지 생성 제한
+  upload.array('attachments', 5), // 최대 5개 파일 첨부 허용
+  MessageController.createInChannel
+);
+
+// 채널 참여
+router.post(
+  '/:id/join',
+  rateLimiter(60000, 30), // 1분에 30회 참여 제한
+  ChannelController.joinChannel
+);
+
+// 채널 나가기
+router.post(
+  '/:id/leave',
+  rateLimiter(60000, 30), // 1분에 30회 나가기 제한
+  ChannelController.leaveChannel
 );
 
 // 채널 존재 여부 확인

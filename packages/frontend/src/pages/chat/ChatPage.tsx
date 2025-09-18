@@ -47,6 +47,7 @@ const ChatPageContent: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { user } = useAuth();
   const { state, actions } = useChat();
+  const { joinChannel } = actions;
   const [createChannelOpen, setCreateChannelOpen] = useState(false);
   const [channelFormData, setChannelFormData] = useState<CreateChannelRequest>({
     name: '',
@@ -79,6 +80,19 @@ const ChatPageContent: React.FC = () => {
     // Channels are loaded in ChatContext when WebSocket connects
   }, []);
 
+  // Auto-join channel when selected
+  const [joinedChannels, setJoinedChannels] = useState<Set<number>>(new Set());
+
+  useEffect(() => {
+    if (state.currentChannelId && joinChannel && !joinedChannels.has(state.currentChannelId)) {
+      joinChannel(state.currentChannelId).then(() => {
+        setJoinedChannels(prev => new Set(prev).add(state.currentChannelId!));
+      }).catch((error) => {
+        console.error('Failed to join channel:', error);
+      });
+    }
+  }, [state.currentChannelId, joinChannel, joinedChannels]);
+
   const handleCreateChannel = async () => {
     try {
       if (!channelFormData.name.trim()) {
@@ -107,7 +121,8 @@ const ChatPageContent: React.FC = () => {
 
       await actions.sendMessage(state.currentChannelId, messageData);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('chat.sendMessageFailed', 'Failed to send message'), { variant: 'error' });
+      // 에러는 ChatContext에서 처리하므로 여기서는 별도 토스트 표시하지 않음
+      // ChatContext의 SET_ERROR 액션으로 에러가 설정되고 하단의 Snackbar에서 표시됨
     }
   };
 

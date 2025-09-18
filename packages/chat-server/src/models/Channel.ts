@@ -389,4 +389,34 @@ export class ChannelModel {
 
     return result?.role || null;
   }
+
+  // 사용자가 채널에 접근할 수 있는지 확인
+  static async hasAccess(channelId: number, userId: number): Promise<boolean> {
+    // 채널이 존재하는지 확인
+    const channel = await this.knex('chat_channels')
+      .select('type', 'isArchived')
+      .where('id', channelId)
+      .first();
+
+    if (!channel || channel.isArchived) {
+      return false;
+    }
+
+    // public 채널은 모든 사용자가 접근 가능
+    if (channel.type === 'public') {
+      return true;
+    }
+
+    // private 또는 direct 채널은 멤버만 접근 가능
+    const membership = await this.knex('chat_channel_members')
+      .select('id')
+      .where({
+        channelId,
+        userId,
+        status: 'active',
+      })
+      .first();
+
+    return !!membership;
+  }
 }
