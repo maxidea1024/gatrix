@@ -1,25 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Typography, Paper, IconButton, TextField, useTheme } from '@mui/material';
+import { Box, Typography, Paper, IconButton, TextField, useTheme, Avatar } from '@mui/material';
 import { Send as SendIcon, AttachFile as AttachFileIcon } from '@mui/icons-material';
-import { 
-  MessageList, 
-  Input, 
-  Button, 
-  Avatar,
-  MessageBox,
-  ChatItem,
-  SystemMessage,
-  LocationMessage,
-  PhotoMessage,
-  FileMessage,
-  AudioMessage,
-  VideoMessage,
-  MeetingMessage,
-  ReplyMessage,
-  SpotifyMessage,
-  MeetingLink
-} from 'react-chat-elements';
-import 'react-chat-elements/dist/main.css';
+// React Chat Elements는 더 이상 사용하지 않음 (슬랙 스타일로 직접 구현)
 import moment from 'moment-timezone';
 import { getStoredTimezone } from '../../utils/dateFormat';
 
@@ -103,7 +85,7 @@ const createCustomStyles = (isDark: boolean) => `
 `;
 import { useTranslation } from 'react-i18next';
 import { useChat } from '../../contexts/ChatContext';
-import { Message, MessageType } from '../../types/chat';
+import { MessageType } from '../../types/chat';
 import { format } from 'date-fns';
 import { ko, enUS, zhCN } from 'date-fns/locale';
 
@@ -417,8 +399,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
             <Avatar
               src={`https://ui-avatars.com/api/?name=${currentChannel?.name || 'Channel'}&background=random`}
               alt={currentChannel?.name || 'Channel'}
-              size="large"
-              type="circle"
+              sx={{ width: 40, height: 40 }}
             />
             <Box sx={{ flex: 1 }}>
               <Typography variant="h6">
@@ -581,8 +562,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
           <Avatar
             src={`https://ui-avatars.com/api/?name=${currentChannel?.name || 'Channel'}&background=random`}
             alt={currentChannel?.name || 'Channel'}
-            size="large"
-            type="circle"
+            sx={{ width: 40, height: 40 }}
           />
           <Box>
             <Typography variant="h6">
