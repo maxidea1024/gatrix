@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   List,
@@ -24,7 +24,6 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-  Collapse,
 } from '@mui/material';
 import {
   Tag as PublicIcon,
@@ -36,8 +35,6 @@ import {
   Settings as SettingsIcon,
   ExitToApp as LeaveIcon,
   Archive as ArchiveIcon,
-  ExpandMore as ExpandMoreIcon,
-  ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useChat } from '../../contexts/ChatContext';
@@ -61,15 +58,6 @@ const ChannelList: React.FC<ChannelListProps> = ({
   const [selectedChannel, setSelectedChannel] = useState<Channel | null>(null);
   const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const [channelToLeave, setChannelToLeave] = useState<Channel | null>(null);
-  const [isChannelsExpanded, setIsChannelsExpanded] = useState(() => {
-    const saved = localStorage.getItem('channelsExpanded');
-    return saved !== null ? JSON.parse(saved) : true; // 기본값: 펼쳐진 상태
-  });
-
-  // localStorage에 펼침/접힘 상태 저장
-  useEffect(() => {
-    localStorage.setItem('channelsExpanded', JSON.stringify(isChannelsExpanded));
-  }, [isChannelsExpanded]);
 
   const getDateLocale = () => {
     switch (i18n.language) {
@@ -77,10 +65,6 @@ const ChannelList: React.FC<ChannelListProps> = ({
       case 'zh': return zhCN;
       default: return enUS;
     }
-  };
-
-  const toggleChannelsExpanded = () => {
-    setIsChannelsExpanded(!isChannelsExpanded);
   };
 
   const filteredChannels = state.channels.filter(channel =>
@@ -178,28 +162,9 @@ const ChannelList: React.FC<ChannelListProps> = ({
       {/* Header */}
       <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              cursor: 'pointer',
-              '&:hover': {
-                backgroundColor: 'action.hover',
-                borderRadius: 1,
-              },
-              px: 1,
-              py: 0.5,
-              borderRadius: 1,
-            }}
-            onClick={toggleChannelsExpanded}
-          >
-            <IconButton size="small" sx={{ mr: 0.5 }}>
-              {isChannelsExpanded ? <ExpandMoreIcon /> : <ChevronRightIcon />}
-            </IconButton>
-            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-              {t('chat.channels', 'Channels')}
-            </Typography>
-          </Box>
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            {t('chat.channels', 'Channels')}
+          </Typography>
           {onCreateChannel && (
             <Tooltip title={t('chat.createChannel', 'Create Channel')}>
               <IconButton size="small" onClick={onCreateChannel}>
@@ -208,7 +173,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
             </Tooltip>
           )}
         </Box>
-        
+
         {/* Search */}
         <TextField
           fullWidth
@@ -231,7 +196,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
         {filteredChannels.length === 0 ? (
           <Box sx={{ p: 3, textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary">
-              {searchQuery 
+              {searchQuery
                 ? t('chat.noChannelsFound', 'No channels found')
                 : t('chat.noChannels', 'No channels available')
               }

@@ -32,6 +32,8 @@ import {
   People as PeopleIcon,
   Settings as SettingsIcon,
   Close as CloseIcon,
+  Menu as MenuIcon,
+  ChevronLeft as ChevronLeftIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -51,6 +53,10 @@ const ChatPageContent: React.FC = () => {
   const { joinChannel } = actions;
   const [createChannelOpen, setCreateChannelOpen] = useState(false);
   const [isCreatingChannel, setIsCreatingChannel] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    const saved = localStorage.getItem('chatSidebarOpen');
+    return saved !== null ? JSON.parse(saved) : true; // 기본값: 열린 상태
+  });
   const [channelFormData, setChannelFormData] = useState<CreateChannelRequest>({
     name: '',
     description: '',
@@ -122,6 +128,15 @@ const ChatPageContent: React.FC = () => {
     }
   }, [state.isConnected]);
 
+  // localStorage에 사이드바 상태 저장
+  useEffect(() => {
+    localStorage.setItem('chatSidebarOpen', JSON.stringify(isSidebarOpen));
+  }, [isSidebarOpen]);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   const handleCreateChannel = async () => {
     try {
       if (!channelFormData.name.trim()) {
@@ -181,6 +196,17 @@ const ChatPageContent: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 3, flexShrink: 0 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+          <IconButton
+            onClick={toggleSidebar}
+            sx={{
+              mr: 1,
+              '&:hover': {
+                backgroundColor: 'action.hover',
+              }
+            }}
+          >
+            {isSidebarOpen ? <ChevronLeftIcon /> : <MenuIcon />}
+          </IconButton>
           <ChatIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Typography variant="h4" sx={{ fontWeight: 600 }}>
             {t('chat.title', 'Chat')}
@@ -206,17 +232,21 @@ const ChatPageContent: React.FC = () => {
         overflow: 'hidden'
       }}>
         {/* Channel List Sidebar */}
-        <Box 
-          sx={{ 
-            width: 300, 
-            borderRight: 1, 
+        <Box
+          sx={{
+            width: isSidebarOpen ? 300 : 0,
+            borderRight: isSidebarOpen ? 1 : 0,
             borderColor: 'divider',
             height: '100%',
+            overflow: 'hidden',
+            transition: 'width 0.3s ease-in-out',
           }}
         >
-          <ChannelList 
-            onCreateChannel={() => setCreateChannelOpen(true)}
-          />
+          {isSidebarOpen && (
+            <ChannelList
+              onCreateChannel={() => setCreateChannelOpen(true)}
+            />
+          )}
         </Box>
 
         {/* Chat Area */}
