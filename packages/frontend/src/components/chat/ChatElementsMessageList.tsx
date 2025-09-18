@@ -86,8 +86,7 @@ const createCustomStyles = (isDark: boolean) => `
 import { useTranslation } from 'react-i18next';
 import { useChat } from '../../contexts/ChatContext';
 import { MessageType } from '../../types/chat';
-import { format } from 'date-fns';
-import { ko, enUS, zhCN } from 'date-fns/locale';
+
 
 interface ChatElementsMessageListProps {
   channelId: number;
@@ -285,11 +284,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     }
   };
 
-  const formatMessageTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const locale = i18n.language === 'ko' ? ko : i18n.language === 'zh' ? zhCN : enUS;
-    return format(date, 'HH:mm', { locale });
-  };
+
 
   // 상대적 시간 표시 (타임존 + 언어 지원)
   const formatRelativeTime = (timestamp: string) => {
