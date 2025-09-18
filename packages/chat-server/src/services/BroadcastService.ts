@@ -67,6 +67,11 @@ export class BroadcastService {
             : buffer;
           broadcastMessage = unpack(decompressed);
         } else {
+          // JWT 토큰이나 다른 문자열이 아닌 유효한 JSON인지 확인
+          if (!message.startsWith('{') && !message.startsWith('[')) {
+            // JSON이 아닌 메시지는 무시
+            return;
+          }
           broadcastMessage = JSON.parse(message);
         }
 

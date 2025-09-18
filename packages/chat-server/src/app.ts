@@ -18,6 +18,7 @@ class ChatServerApp {
   private app: express.Application;
   private server: http.Server;
   private webSocketService: WebSocketService | null = null;
+  private io: any = null;
 
   constructor() {
     this.app = express();
@@ -116,6 +117,12 @@ class ChatServerApp {
   }
 
   private setupRoutes(): void {
+    // Socket.IO middleware - make io available in req object
+    this.app.use((req, res, next) => {
+      (req as any).io = this.io;
+      next();
+    });
+
     // API routes
     this.app.use('/api/v1', apiRoutes);
 
@@ -216,6 +223,7 @@ class ChatServerApp {
 
       // Initialize WebSocket service
       this.webSocketService = new WebSocketService(this.server);
+      this.io = this.webSocketService.getIO();
       logger.info('WebSocket service initialized');
 
       // Start metrics service

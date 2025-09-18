@@ -66,7 +66,8 @@ const ChannelList: React.FC<ChannelListProps> = ({
 
   const handleChannelClick = (channel: Channel) => {
     actions.setCurrentChannel(channel.id);
-    actions.markAsRead(channel.id);
+    // TODO: markAsRead API 타임아웃 문제 해결 후 활성화
+    // actions.markAsRead(channel.id);
   };
 
   const handleChannelMenu = (event: React.MouseEvent<HTMLElement>, channel: Channel) => {

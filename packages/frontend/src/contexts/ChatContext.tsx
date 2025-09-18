@@ -230,6 +230,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Initialize WebSocket connection
   useEffect(() => {
     if (user) {
+      // 현재 사용자 정보를 users 상태에 추가
+      dispatch({ type: 'UPDATE_USER', payload: user });
+
       wsService.connect()
         .then(() => {
           dispatch({ type: 'SET_CONNECTED', payload: true });
@@ -242,7 +245,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Set up WebSocket event listeners
       wsService.onMessageCreated((message) => {
-        dispatch({ type: 'ADD_MESSAGE', payload: message });
+        console.log('ChatContext received message_created:', message);
+        dispatch({ type: 'ADD_MESSAGE', payload: message.data });
       });
 
       wsService.onMessageUpdated((message) => {

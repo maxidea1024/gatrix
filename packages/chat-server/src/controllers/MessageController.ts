@@ -535,12 +535,21 @@ export class MessageController {
       // WebSocket을 통해 실시간으로 메시지 전송
       const io = (req as any).io;
       if (io) {
-        io.to(`channel:${channelId}`).emit('message', {
+        const eventData = {
           type: 'message_created',
           data: message,
           channelId,
           userId
-        });
+        };
+
+        logger.info(`Emitting WebSocket event to channel:${channelId}`, { eventData });
+        io.to(`channel:${channelId}`).emit('message', eventData);
+
+        // 전체 연결된 클라이언트 수 확인
+        const connectedClients = io.engine.clientsCount;
+        logger.info(`Total connected clients: ${connectedClients}`);
+      } else {
+        logger.warn('Socket.IO instance not available for message broadcast');
       }
 
       logger.info(`Message created: ${message.id} in channel ${channelId} by user ${userId}`);

@@ -419,4 +419,59 @@ export class ChannelModel {
 
     return !!membership;
   }
+
+  // 채널에 멤버 추가
+  static async addMember(channelId: number, userId: number, role: 'owner' | 'admin' | 'member' = 'member'): Promise<void> {
+    const knex = databaseManager.getKnex();
+
+    // 이미 멤버인지 확인
+    const existingMember = await knex('chat_channel_members')
+      .select('id')
+      .where({
+        channelId,
+        userId,
+      })
+      .first();
+
+    if (existingMember) {
+      // 이미 멤버라면 상태를 active로 업데이트
+      await knex('chat_channel_members')
+        .where({
+          channelId,
+          userId,
+        })
+        .update({
+          status: 'active',
+          role,
+          updatedAt: new Date(),
+        });
+    } else {
+      // 새 멤버 추가
+      await knex('chat_channel_members').insert({
+        channelId,
+        userId,
+        role,
+        status: 'active',
+        joinedAt: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    }
+  }
+
+  // 채널에서 멤버 제거
+  static async removeMember(channelId: number, userId: number): Promise<void> {
+    const knex = databaseManager.getKnex();
+
+    await knex('chat_channel_members')
+      .where({
+        channelId,
+        userId,
+      })
+      .update({
+        status: 'left',
+        leftAt: new Date(),
+        updatedAt: new Date(),
+      });
+  }
 }

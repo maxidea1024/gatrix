@@ -501,4 +501,8 @@ export class WebSocketService {
     
     logger.info('WebSocket service shutdown complete');
   }
+
+  public getIO(): any {
+    return this.io;
+  }
 }

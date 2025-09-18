@@ -1,28 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Typography, CircularProgress } from '@mui/material';
 import {
-  MainContainer,
-  ChatContainer,
-  MessageList as ChatMessageList,
-  Message as ChatMessage,
-  MessageInput,
-  TypingIndicator as ChatTypingIndicator,
-  Avatar,
-  MessageSeparator,
-  ConversationHeader,
-  VoiceCallButton,
-  VideoCallButton,
-  InfoButton,
-  MessageModel,
-} from '@chatscope/chat-ui-kit-react';
-import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
+  Box,
+  Typography,
+  CircularProgress,
+  Paper,
+  TextField,
+  IconButton,
+  Avatar as MuiAvatar,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Divider
+} from '@mui/material';
+import { Send as SendIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useChat } from '../../contexts/ChatContext';
 import { Message, MessageType } from '../../types/chat';
 import { format } from 'date-fns';
 import { ko, enUS, zhCN } from 'date-fns/locale';
 import TypingIndicator from './TypingIndicator';
-import AdvancedMessageInput from './AdvancedMessageInput';
 import MessageContent from './MessageContent';
 
 interface MessageListProps {
@@ -78,12 +75,17 @@ const MessageList: React.FC<MessageListProps> = ({
   // Convert our Message type to ChatScope MessageModel
   const convertToChatScopeMessages = (messages: Message[]): MessageModel[] => {
     return messages.map((msg, index) => {
-      const direction = msg.userId === state.users[msg.userId]?.id ? 'outgoing' : 'incoming';
+      const currentUser = state.user;
+      const direction = msg.userId === currentUser?.id ? 'outgoing' : 'incoming';
+
+      // 사용자 정보 안전하게 가져오기
+      const messageUser = state.users[msg.userId];
+      const senderName = messageUser?.username || messageUser?.name || `User ${msg.userId}`;
 
       return {
         message: msg.content,
         sentTime: formatMessageTime(msg.createdAt),
-        sender: msg.user.username,
+        sender: senderName,
         direction: direction as any,
         position: getMessagePosition(msg, index),
         type: getMessageType(msg.type),
@@ -147,7 +149,6 @@ const MessageList: React.FC<MessageListProps> = ({
             placeholder={t('chat.typeMessage', 'Type a message...')}
             onSend={handleSendMessage}
             attachButton={true}
-            onAttachmentSend={handleAttachmentSend}
           />
         </ChatContainer>
       </MainContainer>
@@ -189,30 +190,29 @@ const MessageList: React.FC<MessageListProps> = ({
             </Box>
           )}
 
-          {chatScopeMessages.map((message, index) => (
-            <ChatMessage
-              key={index}
-              model={message}
-            >
-              <Avatar
-                src={messages[index]?.user.avatar}
-                name={messages[index]?.user.username || ''}
-              />
-            </ChatMessage>
-          ))}
+          {chatScopeMessages.map((message, index) => {
+            const originalMessage = messages[index];
+            const messageUser = originalMessage ? state.users[originalMessage.userId] : null;
+
+            return (
+              <ChatMessage
+                key={index}
+                model={message}
+              >
+                <Avatar
+                  src={messageUser?.avatar}
+                  name={messageUser?.username || messageUser?.name || `User ${originalMessage?.userId || ''}`}
+                />
+              </ChatMessage>
+            );
+          })}
         </ChatMessageList>
 
-        {/* Advanced Message Input */}
-        <AdvancedMessageInput
-          channelId={currentChannel?.id || 0}
-          onSendMessage={(content, attachments) => {
-            if (attachments && attachments.length > 0) {
-              handleAttachmentSend(attachments);
-            } else {
-              handleSendMessage(content);
-            }
-          }}
+        {/* Message Input */}
+        <MessageInput
           placeholder={t('chat.typeMessage', 'Type a message...')}
+          onSend={handleSendMessage}
+          attachButton={true}
           disabled={!currentChannel}
         />
       </ChatContainer>

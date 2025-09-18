@@ -145,10 +145,12 @@ export class ChatWebSocketService {
 
   // Join/leave channels
   joinChannel(channelId: number): void {
+    console.log(`WebSocket: Joining channel ${channelId}`);
     this.sendEvent('join_channel', { channelId });
   }
 
   leaveChannel(channelId: number): void {
+    console.log(`WebSocket: Leaving channel ${channelId}`);
     this.sendEvent('leave_channel', { channelId });
   }
 
@@ -157,14 +159,20 @@ export class ChatWebSocketService {
 
     // 채팅 관련 이벤트들
     this.socket.on('message', (data) => {
+      console.log('WebSocket message received:', data);
+
       // 메시지 타입에 따라 적절한 이벤트로 변환
       if (data.type === 'message_created') {
+        console.log('Emitting message_created event:', data.data);
         this.emit('message_created', { data: data.data });
       } else if (data.type === 'message_updated') {
+        console.log('Emitting message_updated event:', data.data);
         this.emit('message_updated', { data: data.data });
       } else if (data.type === 'message_deleted') {
+        console.log('Emitting message_deleted event:', data.data);
         this.emit('message_deleted', { data: data.data });
       } else {
+        console.log('Emitting generic message event:', data);
         // 기본 메시지 이벤트
         this.emit('message', data);
       }
