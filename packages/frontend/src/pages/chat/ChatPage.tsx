@@ -196,17 +196,6 @@ const ChatPageContent: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 3, flexShrink: 0 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-          <IconButton
-            onClick={toggleSidebar}
-            sx={{
-              mr: 1,
-              '&:hover': {
-                backgroundColor: 'action.hover',
-              }
-            }}
-          >
-            {isSidebarOpen ? <ChevronLeftIcon /> : <MenuIcon />}
-          </IconButton>
           <ChatIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Typography variant="h4" sx={{ fontWeight: 600 }}>
             {t('chat.title', 'Chat')}
@@ -234,18 +223,44 @@ const ChatPageContent: React.FC = () => {
         {/* Channel List Sidebar */}
         <Box
           sx={{
-            width: isSidebarOpen ? 300 : 0,
-            borderRight: isSidebarOpen ? 1 : 0,
+            width: isSidebarOpen ? 300 : 48, // 닫힌 상태에서도 버튼 공간 확보
+            borderRight: 1,
             borderColor: 'divider',
             height: '100%',
             overflow: 'hidden',
             transition: 'width 0.3s ease-in-out',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
+          {/* 토글 버튼 */}
+          <Box sx={{
+            p: 1,
+            borderBottom: isSidebarOpen ? 1 : 0,
+            borderColor: 'divider',
+            display: 'flex',
+            justifyContent: isSidebarOpen ? 'flex-end' : 'center',
+          }}>
+            <IconButton
+              onClick={toggleSidebar}
+              size="small"
+              sx={{
+                '&:hover': {
+                  backgroundColor: 'action.hover',
+                }
+              }}
+            >
+              {isSidebarOpen ? <ChevronLeftIcon /> : <MenuIcon />}
+            </IconButton>
+          </Box>
+
+          {/* 채널 목록 */}
           {isSidebarOpen && (
-            <ChannelList
-              onCreateChannel={() => setCreateChannelOpen(true)}
-            />
+            <Box sx={{ flex: 1, overflow: 'hidden' }}>
+              <ChannelList
+                onCreateChannel={() => setCreateChannelOpen(true)}
+              />
+            </Box>
           )}
         </Box>
 
