@@ -17,11 +17,57 @@ import {
   MessageAttachment
 } from '../types/chat';
 
+// 로컬 스토리지에서 메시지 캐시 로드
+const loadCachedMessages = (): Record<number, Message[]> => {
+  try {
+    console.log('🔍 Loading cached messages from localStorage...');
+    const cached = localStorage.getItem('chatMessages');
+    console.log('📦 Raw cached data:', cached ? 'Found' : 'Not found');
+
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      console.log('📋 Parsed cached data:', Object.keys(parsed).map(k => `${k}: ${parsed[k].length} messages`));
+
+      // 1시간 이내의 메시지만 유지
+      const oneHourAgo = Date.now() - (60 * 60 * 1000);
+      const filteredMessages: Record<number, Message[]> = {};
+
+      Object.entries(parsed).forEach(([channelId, messages]) => {
+        const recentMessages = (messages as Message[]).filter(msg =>
+          new Date(msg.createdAt).getTime() > oneHourAgo
+        );
+        console.log(`⏰ Channel ${channelId}: ${(messages as Message[]).length} total, ${recentMessages.length} recent`);
+        if (recentMessages.length > 0) {
+          filteredMessages[parseInt(channelId)] = recentMessages;
+        }
+      });
+
+      console.log('✅ Loaded cached messages for channels:', Object.keys(filteredMessages));
+      return filteredMessages;
+    } else {
+      console.log('❌ No cached messages found');
+    }
+  } catch (error) {
+    console.error('Failed to load cached messages:', error);
+  }
+  return {};
+};
+
+// 메시지를 로컬 스토리지에 저장
+const saveCachedMessages = (messages: Record<number, Message[]>) => {
+  try {
+    console.log('💾 Saving messages to cache:', Object.keys(messages).map(k => `${k}: ${messages[parseInt(k)].length} messages`));
+    localStorage.setItem('chatMessages', JSON.stringify(messages));
+  } catch (error) {
+    console.error('Failed to save cached messages:', error);
+  }
+};
+
 // Initial state
 const initialState: ChatState = {
   channels: [],
   currentChannelId: null,
-  messages: {},
+  messages: loadCachedMessages(),
   users: {},
   typingUsers: {},
   notifications: [],
@@ -91,12 +137,15 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
       return { ...state, currentChannelId: action.payload };
     
     case 'SET_MESSAGES':
+      const newMessagesState = {
+        ...state.messages,
+        [action.payload.channelId]: action.payload.messages,
+      };
+      // 메시지 상태 변경 시 localStorage에 저장
+      saveCachedMessages(newMessagesState);
       return {
         ...state,
-        messages: {
-          ...state.messages,
-          [action.payload.channelId]: action.payload.messages,
-        },
+        messages: newMessagesState,
       };
     
     case 'ADD_MESSAGE':
@@ -109,24 +158,29 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         return state;
       }
 
+      const updatedMessages = {
+        ...state.messages,
+        [channelId]: [...currentMessages, action.payload],
+      };
+
+      // 새 메시지 추가 시 localStorage에 저장
+      saveCachedMessages(updatedMessages);
+
       return {
         ...state,
-        messages: {
-          ...state.messages,
-          [channelId]: [...currentMessages, action.payload],
-        },
+        messages: updatedMessages,
       };
     
     case 'UPDATE_MESSAGE':
       const updateChannelId = action.payload.channelId;
-      const updatedMessages = (state.messages[updateChannelId] || []).map(msg =>
+      const updatedChannelMessages = (state.messages[updateChannelId] || []).map(msg =>
         msg.id === action.payload.id ? action.payload : msg
       );
       return {
         ...state,
         messages: {
           ...state.messages,
-          [updateChannelId]: updatedMessages,
+          [updateChannelId]: updatedChannelMessages,
         },
       };
     
@@ -146,12 +200,17 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
     case 'PREPEND_MESSAGES':
       const prependChannelId = action.payload.channelId;
       const existingMessages = state.messages[prependChannelId] || [];
+      const prependedMessages = {
+        ...state.messages,
+        [prependChannelId]: [...action.payload.messages, ...existingMessages],
+      };
+
+      // 이전 메시지 추가 시 localStorage에 저장
+      saveCachedMessages(prependedMessages);
+
       return {
         ...state,
-        messages: {
-          ...state.messages,
-          [prependChannelId]: [...action.payload.messages, ...existingMessages],
-        },
+        messages: prependedMessages,
       };
     
     case 'SET_USERS':
@@ -234,6 +293,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { t } = useTranslation();
   const wsService = getChatWebSocketService(getToken);
 
+  // 디버깅: 초기 상태 확인
+  console.log('🚀 ChatProvider initialized with messages:', Object.keys(state.messages).map(k => `${k}: ${state.messages[parseInt(k)].length} messages`));
+
   // Initialize WebSocket connection
   useEffect(() => {
     if (user) {
@@ -255,7 +317,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Set up WebSocket event listeners
       const setupEventListeners = () => {
         wsService.onMessageCreated((message) => {
-          console.log('ChatContext received message_created:', message);
+          console.log('📨 ChatContext received message_created:', message);
+          console.log('📨 Message data:', message.data);
           dispatch({ type: 'ADD_MESSAGE', payload: message.data });
         });
 
@@ -267,6 +330,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         wsService.on('connection_established', () => {
           console.log('WebSocket connection established');
           dispatch({ type: 'SET_CONNECTED', payload: true });
+
+          // 재연결 시 현재 채널에 다시 참여
+          if (state.currentChannelId) {
+            console.log('Rejoining current channel after reconnection:', state.currentChannelId);
+            wsService.joinChannel(state.currentChannelId);
+          }
         });
 
         wsService.on('connection_lost', () => {
@@ -277,6 +346,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         wsService.on('connection_error', (event) => {
           console.error('WebSocket connection error:', event);
           dispatch({ type: 'SET_CONNECTED', payload: false });
+        });
+
+        wsService.on('connection_failed', (event) => {
+          console.error('WebSocket connection failed permanently:', event);
+          dispatch({ type: 'SET_CONNECTED', payload: false });
+          dispatch({ type: 'SET_ERROR', payload: 'Chat service is unavailable. Please try again later.' });
         });
       };
 
@@ -551,12 +626,35 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loadMessages = async (channelId: number) => {
     try {
       console.log('Loading messages for channel:', channelId);
-      // 최근 50개 메시지 로딩 (기본 정책)
+
+      // 캐시된 메시지가 있는지 확인
+      const cachedMessages = state.messages[channelId];
+      if (cachedMessages && cachedMessages.length > 0) {
+        console.log('Using cached messages:', cachedMessages.length);
+        // 캐시된 메시지가 있으면 서버에서 최신 메시지만 확인
+        const latestCachedMessage = cachedMessages[cachedMessages.length - 1];
+        const result = await ChatService.getMessages({
+          channelId,
+          limit: 20, // 최신 20개만 확인
+          after: latestCachedMessage.id // 마지막 캐시된 메시지 이후만
+        });
+
+        if (result.messages.length > 0) {
+          console.log('Found new messages:', result.messages.length);
+          // 새 메시지가 있으면 추가
+          result.messages.forEach(message => {
+            dispatch({ type: 'ADD_MESSAGE', payload: message });
+          });
+        }
+        return;
+      }
+
+      // 캐시된 메시지가 없으면 서버에서 로딩
       const result = await ChatService.getMessages({
         channelId,
         limit: 50 // 최근 50개 메시지만 로딩
       });
-      console.log('Loaded messages:', result.messages.length);
+      console.log('Loaded messages from server:', result.messages.length);
       dispatch({ type: 'SET_MESSAGES', payload: { channelId, messages: result.messages } });
     } catch (error: any) {
       console.error('Failed to load messages for channel', channelId, ':', error);

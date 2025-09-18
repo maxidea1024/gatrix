@@ -47,13 +47,36 @@ const createCustomStyles = (isDark: boolean) => `
     padding: 20px !important;
   }
 
-  /* 메시지 리스트 배경 */
+  /* 메시지 리스트 배경 및 스크롤 */
   .rce-container-mlist {
     background-color: ${isDark ? '#1e1e1e' : '#f5f5f5'} !important;
+    overflow-y: auto !important;
+    height: 100% !important;
+    flex: 1 !important;
   }
 
   .message-list {
     background-color: ${isDark ? '#1e1e1e' : '#f5f5f5'} !important;
+    overflow-y: auto !important;
+    height: 100% !important;
+  }
+
+  /* 스크롤바 스타일링 */
+  .rce-container-mlist::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .rce-container-mlist::-webkit-scrollbar-track {
+    background: ${isDark ? '#2a2d3a' : '#f1f1f1'};
+  }
+
+  .rce-container-mlist::-webkit-scrollbar-thumb {
+    background: ${isDark ? '#5f6368' : '#c1c1c1'};
+    border-radius: 4px;
+  }
+
+  .rce-container-mlist::-webkit-scrollbar-thumb:hover {
+    background: ${isDark ? '#9aa0a6' : '#a8a8a8'};
   }
 
   /* 입력창 스타일 개선 */
@@ -95,6 +118,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   const { t, i18n } = useTranslation();
   const theme = useTheme();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageInputRef = useRef<HTMLInputElement>(null);
   const [messageInput, setMessageInput] = useState('');
 
   const currentChannel = state.channels.find(c => c.id === channelId);
@@ -124,10 +148,59 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     emptyStateSubtext: theme.palette.mode === 'dark' ? '#9aa0a6' : '#666666',
   };
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when new messages arrive (smart scroll logic)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const messageContainer = document.querySelector('.rce-container-mlist');
+    if (messageContainer && messages.length > 0) {
+      const { scrollTop, scrollHeight, clientHeight } = messageContainer;
+
+      // 스크롤바가 없는 경우 (컨텐츠가 컨테이너보다 작음)
+      const hasScrollbar = scrollHeight > clientHeight;
+
+      // 하단에 있는지 확인 (5px 여유)
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
+
+      // 개발 환경에서만 스크롤 상태 로그
+      if (process.env.NODE_ENV === 'development') {
+        console.log('📜 Scroll state:', {
+          hasScrollbar,
+          isAtBottom,
+          scrollTop,
+          scrollHeight,
+          clientHeight,
+          shouldAutoScroll: !hasScrollbar || isAtBottom
+        });
+      }
+
+      // 스크롤바가 없거나 하단에 있을 경우에만 자동 스크롤
+      if (!hasScrollbar || isAtBottom) {
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 50);
+      }
+    }
   }, [messages]);
+
+  // Auto-focus message input when channel changes or component mounts
+  useEffect(() => {
+    if (currentChannel && messageInputRef.current) {
+      // 약간의 지연을 두어 렌더링 완료 후 포커스
+      const timer = setTimeout(() => {
+        messageInputRef.current?.focus();
+        // 채널 변경 시 하단으로 스크롤
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [channelId, currentChannel]);
+
+  // Focus input when clicking anywhere in the chat area
+  const handleChatAreaClick = () => {
+    if (messageInputRef.current && currentChannel) {
+      messageInputRef.current.focus();
+    }
+  };
 
   // 테마 변경 시 스타일 업데이트
   useEffect(() => {
@@ -157,10 +230,14 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
 
   // Load messages when channel changes
   useEffect(() => {
+    console.log(`📨 Channel ${channelId} - Current messages:`, messages.length);
     if (channelId && messages.length === 0) {
+      console.log(`🔄 Loading messages for channel ${channelId}...`);
       actions.loadMessages(channelId);
+    } else if (channelId && messages.length > 0) {
+      console.log(`✅ Channel ${channelId} already has ${messages.length} messages`);
     }
-  }, [channelId]);
+  }, [channelId, messages.length]);
 
   const handleSendMessage = () => {
     if (messageInput.trim() && currentChannel) {
@@ -267,16 +344,20 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         </Paper>
 
         {/* Empty state */}
-        <Box sx={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          gap: 3,
-          p: 4,
-          backgroundColor: colors.chatBackground,
-        }}>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'column',
+            gap: 3,
+            p: 4,
+            backgroundColor: colors.chatBackground,
+            cursor: 'text'
+          }}
+          onClick={handleChatAreaClick}
+        >
           <Box sx={{
             textAlign: 'center',
             color: colors.emptyStateSubtext,
@@ -337,6 +418,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
               onKeyPress={handleKeyPress}
               disabled={!currentChannel}
               variant="standard"
+              inputRef={messageInputRef}
               InputProps={{
                 disableUnderline: true,
                 sx: {
@@ -412,15 +494,22 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       </Paper>
 
       {/* Messages */}
-      <Box sx={{
-        flex: 1,
-        overflow: 'hidden',
-        backgroundColor: colors.chatBackground
-      }}>
+      <Box
+        sx={{
+          flex: 1,
+          overflow: 'auto',
+          backgroundColor: colors.chatBackground,
+          cursor: 'text',
+          height: 0, // flex 컨테이너에서 스크롤을 위해 필요
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+        onClick={handleChatAreaClick}
+      >
         <MessageList
           className="message-list"
-          lockable={true}
-          toBottomHeight={'100%'}
+          lockable={false}
+          toBottomHeight={0}
           dataSource={chatMessages}
         />
         <div ref={messagesEndRef} />
@@ -458,6 +547,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
             onKeyPress={handleKeyPress}
             disabled={!currentChannel}
             variant="standard"
+            inputRef={messageInputRef}
             InputProps={{
               disableUnderline: true,
               sx: {

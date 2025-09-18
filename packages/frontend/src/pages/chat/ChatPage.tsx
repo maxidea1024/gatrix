@@ -82,16 +82,43 @@ const ChatPageContent: React.FC = () => {
 
   // Auto-join channel when selected
   const [joinedChannels, setJoinedChannels] = useState<Set<number>>(new Set());
+  const [joiningChannels, setJoiningChannels] = useState<Set<number>>(new Set());
 
   useEffect(() => {
-    if (state.currentChannelId && joinChannel && !joinedChannels.has(state.currentChannelId)) {
+    if (state.currentChannelId &&
+        joinChannel &&
+        !joinedChannels.has(state.currentChannelId) &&
+        !joiningChannels.has(state.currentChannelId) &&
+        state.isConnected) { // WebSocket 연결된 상태에서만 join 시도
+
+      console.log('Joining channel:', state.currentChannelId);
+      setJoiningChannels(prev => new Set(prev).add(state.currentChannelId!));
+
       joinChannel(state.currentChannelId).then(() => {
         setJoinedChannels(prev => new Set(prev).add(state.currentChannelId!));
+        setJoiningChannels(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(state.currentChannelId!);
+          return newSet;
+        });
       }).catch((error) => {
         console.error('Failed to join channel:', error);
+        setJoiningChannels(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(state.currentChannelId!);
+          return newSet;
+        });
       });
     }
-  }, [state.currentChannelId, joinChannel, joinedChannels]);
+  }, [state.currentChannelId, joinChannel, joinedChannels, joiningChannels, state.isConnected]);
+
+  // 연결이 끊어졌을 때 join 상태 초기화
+  useEffect(() => {
+    if (!state.isConnected) {
+      setJoinedChannels(new Set());
+      setJoiningChannels(new Set());
+    }
+  }, [state.isConnected]);
 
   const handleCreateChannel = async () => {
     try {

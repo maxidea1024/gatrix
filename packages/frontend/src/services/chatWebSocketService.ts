@@ -42,7 +42,7 @@ export class ChatWebSocketService {
         });
 
         this.socket.on('connect', () => {
-          console.log('Chat Socket.IO connected');
+          console.log('✅ Chat Socket.IO connected successfully');
           this.isConnecting = false;
           this.reconnectAttempts = 0;
           this.startHeartbeat();
@@ -51,13 +51,17 @@ export class ChatWebSocketService {
         });
 
         this.socket.on('disconnect', (reason) => {
-          console.log('Chat Socket.IO disconnected:', reason);
+          console.log('❌ Chat Socket.IO disconnected:', reason);
           this.isConnecting = false;
           this.stopHeartbeat();
           this.emit('connection_lost', { reason });
 
+          // 서버 종료나 네트워크 문제로 인한 연결 끊김만 재연결 시도
           if (this.shouldReconnect && reason !== 'io client disconnect') {
+            console.log('🔄 Attempting to reconnect...');
             this.scheduleReconnect();
+          } else {
+            console.log('🚫 Reconnection not attempted:', reason);
           }
         });
 
@@ -240,20 +244,30 @@ export class ChatWebSocketService {
   private scheduleReconnect(): void {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error('Max reconnection attempts reached');
-      this.emit('connection_failed', { 
+      this.emit('connection_failed', {
         reason: 'Max reconnection attempts reached',
-        attempts: this.reconnectAttempts 
+        attempts: this.reconnectAttempts
       });
       return;
     }
 
-    const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts);
+    // 지수 백오프: 1초, 2초, 4초, 8초, 16초
+    const delay = Math.min(this.reconnectDelay * Math.pow(2, this.reconnectAttempts), 30000); // 최대 30초
     console.log(`Scheduling reconnection attempt ${this.reconnectAttempts + 1} in ${delay}ms`);
 
     setTimeout(() => {
+      if (!this.shouldReconnect) {
+        console.log('Reconnection cancelled');
+        return;
+      }
+
       this.reconnectAttempts++;
       this.connect().catch(error => {
         console.error('Reconnection failed:', error);
+        // 재연결 실패 시 다시 스케줄링
+        if (this.shouldReconnect) {
+          this.scheduleReconnect();
+        }
       });
     }, delay);
   }
