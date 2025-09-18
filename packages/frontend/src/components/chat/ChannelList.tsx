@@ -64,6 +64,8 @@ const ChannelList: React.FC<ChannelListProps> = ({
     (channel.description && channel.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
+
+
   const handleChannelClick = (channel: Channel) => {
     actions.setCurrentChannel(channel.id);
     // TODO: markAsRead API 타임아웃 문제 해결 후 활성화

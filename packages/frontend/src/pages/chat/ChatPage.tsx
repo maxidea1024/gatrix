@@ -37,7 +37,7 @@ import { useSnackbar } from 'notistack';
 import { ChatProvider, useChat } from '../../contexts/ChatContext';
 import { useAuth } from '../../contexts/AuthContext';
 import ChannelList from '../../components/chat/ChannelList';
-import MessageList from '../../components/chat/MessageList';
+import ChatElementsMessageList from '../../components/chat/ChatElementsMessageList';
 import NotificationManager from '../../components/chat/NotificationManager';
 import UserPresence from '../../components/chat/UserPresence';
 import { CreateChannelRequest, SendMessageRequest } from '../../types/chat';
@@ -179,7 +179,7 @@ const ChatPageContent: React.FC = () => {
         {/* Chat Area */}
         <Box sx={{ flex: 1, height: '100%' }}>
           {state.currentChannelId ? (
-            <MessageList 
+            <ChatElementsMessageList
               channelId={state.currentChannelId}
               onSendMessage={handleSendMessage}
             />

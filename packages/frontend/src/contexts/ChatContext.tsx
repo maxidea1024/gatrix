@@ -102,6 +102,13 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
     case 'ADD_MESSAGE':
       const channelId = action.payload.channelId;
       const currentMessages = state.messages[channelId] || [];
+
+      // 중복 메시지 방지
+      const messageExists = currentMessages.some(msg => msg.id === action.payload.id);
+      if (messageExists) {
+        return state;
+      }
+
       return {
         ...state,
         messages: {
@@ -233,25 +240,48 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // 현재 사용자 정보를 users 상태에 추가
       dispatch({ type: 'UPDATE_USER', payload: user });
 
-      wsService.connect()
-        .then(() => {
+      const connectWebSocket = async () => {
+        try {
+          await wsService.connect();
+          console.log('WebSocket connected successfully');
           dispatch({ type: 'SET_CONNECTED', payload: true });
           loadChannels();
-        })
-        .catch((error) => {
+        } catch (error) {
           console.error('Failed to connect to chat WebSocket:', error);
           dispatch({ type: 'SET_ERROR', payload: 'Failed to connect to chat service' });
-        });
+        }
+      };
 
       // Set up WebSocket event listeners
-      wsService.onMessageCreated((message) => {
-        console.log('ChatContext received message_created:', message);
-        dispatch({ type: 'ADD_MESSAGE', payload: message.data });
-      });
+      const setupEventListeners = () => {
+        wsService.onMessageCreated((message) => {
+          console.log('ChatContext received message_created:', message);
+          dispatch({ type: 'ADD_MESSAGE', payload: message.data });
+        });
 
-      wsService.onMessageUpdated((message) => {
-        dispatch({ type: 'UPDATE_MESSAGE', payload: message });
-      });
+        wsService.onMessageUpdated((message) => {
+          dispatch({ type: 'UPDATE_MESSAGE', payload: message });
+        });
+
+        // 연결 상태 이벤트 리스너
+        wsService.on('connection_established', () => {
+          console.log('WebSocket connection established');
+          dispatch({ type: 'SET_CONNECTED', payload: true });
+        });
+
+        wsService.on('connection_lost', () => {
+          console.log('WebSocket connection lost');
+          dispatch({ type: 'SET_CONNECTED', payload: false });
+        });
+
+        wsService.on('connection_error', (event) => {
+          console.error('WebSocket connection error:', event);
+          dispatch({ type: 'SET_CONNECTED', payload: false });
+        });
+      };
+
+      setupEventListeners();
+      connectWebSocket();
 
       wsService.onMessageDeleted((messageId) => {
         // Find the channel for this message
@@ -310,6 +340,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dispatch({ type: 'SET_LOADING', payload: true });
       const channels = await ChatService.getChannels();
       dispatch({ type: 'SET_CHANNELS', payload: channels });
+
+      // 마지막 참여 채널 자동 선택
+      const lastChannelId = localStorage.getItem('lastChannelId');
+      if (lastChannelId && channels.length > 0) {
+        const lastChannel = channels.find(c => c.id === parseInt(lastChannelId));
+        if (lastChannel) {
+          console.log('Auto-selecting last channel:', lastChannel.name);
+          await selectChannel(lastChannel.id);
+        }
+      }
     } catch (error: any) {
       dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to load channels' });
     } finally {
@@ -321,8 +361,19 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const actions: ChatContextType['actions'] = {
     setCurrentChannel: (channelId) => {
       dispatch({ type: 'SET_CURRENT_CHANNEL', payload: channelId });
-      if (channelId && !state.messages[channelId]) {
+
+      // 마지막 채널 ID 저장
+      if (channelId) {
+        localStorage.setItem('lastChannelId', channelId.toString());
+        console.log('Saved last channel ID:', channelId);
+
+        // 채널 메시지 로딩 (항상 최신 메시지 50개 로딩)
         loadMessages(channelId);
+
+        // WebSocket 채널 참여
+        wsService.joinChannel(channelId);
+      } else {
+        localStorage.removeItem('lastChannelId');
       }
     },
 
@@ -447,6 +498,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     },
 
+    loadMessages: async (channelId) => {
+      try {
+        const result = await ChatService.getMessages({ channelId, limit: 50 });
+        dispatch({ type: 'SET_MESSAGES', payload: { channelId, messages: result.messages } });
+      } catch (error: any) {
+        dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to load messages' });
+        throw error;
+      }
+    },
+
     loadMoreMessages: async (channelId) => {
       try {
         const currentMessages = state.messages[channelId] || [];
@@ -454,11 +515,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         const oldestMessage = currentMessages[0];
         const result = await ChatService.getMessageHistory(channelId, oldestMessage.id);
-        
+
         if (result.messages.length > 0) {
-          dispatch({ 
-            type: 'PREPEND_MESSAGES', 
-            payload: { channelId, messages: result.messages } 
+          dispatch({
+            type: 'PREPEND_MESSAGES',
+            payload: { channelId, messages: result.messages }
           });
         }
       } catch (error: any) {
@@ -481,12 +542,24 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     },
   };
 
+  // Select channel (used for auto-selection)
+  const selectChannel = async (channelId: number) => {
+    actions.setCurrentChannel(channelId);
+  };
+
   // Load messages for a channel
   const loadMessages = async (channelId: number) => {
     try {
-      const result = await ChatService.getMessages({ channelId, limit: 50 });
+      console.log('Loading messages for channel:', channelId);
+      // 최근 50개 메시지 로딩 (기본 정책)
+      const result = await ChatService.getMessages({
+        channelId,
+        limit: 50 // 최근 50개 메시지만 로딩
+      });
+      console.log('Loaded messages:', result.messages.length);
       dispatch({ type: 'SET_MESSAGES', payload: { channelId, messages: result.messages } });
     } catch (error: any) {
+      console.error('Failed to load messages for channel', channelId, ':', error);
       dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to load messages' });
     }
   };

@@ -270,6 +270,7 @@ export interface ChatContextType {
     startTyping: (channelId: number) => void;
     stopTyping: (channelId: number) => void;
     searchMessages: (query: string, channelId?: number) => Promise<Message[]>;
+    loadMessages: (channelId: number) => Promise<void>;
     loadMoreMessages: (channelId: number) => Promise<void>;
     uploadFile: (file: File, channelId: number) => Promise<MessageAttachment>;
   };
