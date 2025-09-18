@@ -87,14 +87,14 @@ export class ChannelModel {
       maxMembers: data.maxMembers || 1000,
       settings: data.settings || this.getDefaultSettings(),
       ownerId: createdBy,
-      createdBy,
+      createdBy: createdBy,
     };
 
     const [channelId] = await this.knex('chat_channels').insert(channelData);
     
     // 생성자를 채널 멤버로 추가
     await this.knex('chat_channel_members').insert({
-      channelId,
+      channelId: channelId,
       userId: createdBy,
       role: 'owner',
       status: 'active',
@@ -104,8 +104,8 @@ export class ChannelModel {
     // 추가 멤버들 초대
     if (data.memberIds && data.memberIds.length > 0) {
       const memberInserts = data.memberIds.map(userId => ({
-        channelId,
-        userId,
+        channelId: channelId,
+        userId: userId,
         role: 'member',
         status: 'active',
         joinedAt: new Date(),
@@ -154,8 +154,17 @@ export class ChannelModel {
       query = query.where('c.type', options.type);
     }
 
-    // 총 개수 조회
-    const totalQuery = query.clone().count('* as count').first();
+    // 총 개수 조회 - 별도 쿼리로 분리
+    const totalQuery = this.knex('chat_channels as c')
+      .join('chat_channel_members as cm', 'c.id', 'cm.channelId')
+      .where({
+        'cm.userId': userId,
+        'cm.status': 'active',
+        'c.isArchived': false,
+      })
+      .count('* as count')
+      .first();
+
     const totalResult = await totalQuery as any;
     const total = totalResult?.count || 0;
 
@@ -177,7 +186,7 @@ export class ChannelModel {
   static async update(id: number, data: UpdateChannelData, updatedBy: number): Promise<ChannelType | null> {
     const updateData = {
       ...data,
-      updatedBy,
+      updatedBy: updatedBy,
       updatedAt: new Date(),
     };
 
@@ -234,8 +243,25 @@ export class ChannelModel {
             .orWhere('c.description', 'like', `%${query}%`);
       });
 
-    // 총 개수 조회
-    const totalQuery = searchQuery.clone().count('* as count').first();
+    // 총 개수 조회 - 별도 쿼리로 분리
+    const totalQuery = this.knex('chat_channels as c')
+      .leftJoin('chat_channel_members as cm', function() {
+        this.on('c.id', '=', 'cm.channelId')
+            .andOn('cm.userId', '=', userId.toString());
+      })
+      .where('c.isArchived', false)
+      .andWhere(function() {
+        this.where('c.type', 'public')
+            .orWhere('cm.userId', userId);
+      })
+      .andWhere(function() {
+        this.whereRaw('MATCH(c.name, c.description) AGAINST(? IN NATURAL LANGUAGE MODE)', [query])
+            .orWhere('c.name', 'like', `%${query}%`)
+            .orWhere('c.description', 'like', `%${query}%`);
+      })
+      .count('* as count')
+      .first();
+
     const totalResult = await totalQuery as any;
     const total = totalResult?.count || 0;
 

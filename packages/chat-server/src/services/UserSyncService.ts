@@ -90,62 +90,29 @@ export class UserSyncService {
     }
   }
 
-  // 사용자 데이터 업데이트
+  // 사용자 데이터 업데이트 (Redis 캐시만 사용)
   private async updateUsers(users: GatrixUser[]): Promise<void> {
-    const knex = databaseManager.getKnex();
     const redisClient = redisManager.getClient();
 
     try {
-      // 트랜잭션으로 데이터베이스 업데이트
-      await knex.transaction(async (trx) => {
-        for (const user of users) {
-          // 사용자 존재 여부 확인
-          const existingUser = await trx('chat_users')
-            .where('gatrix_user_id', user.id)
-            .first();
+      // Redis에만 사용자 정보 캐시 (데이터베이스 테이블 없이)
+      for (const user of users) {
+        await redisClient.hset(`user:${user.id}`, {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          avatarUrl: user.avatarUrl || '',
+          role: user.role,
+          status: user.status,
+          lastLoginAt: user.lastLoginAt ? (typeof user.lastLoginAt === 'string' ? user.lastLoginAt : user.lastLoginAt.toISOString()) : '',
+          updatedAt: new Date().toISOString(),
+        });
 
-          const userData = {
-            gatrix_user_id: user.id,
-            email: user.email,
-            name: user.name,
-            avatar_url: user.avatarUrl,
-            role: user.role,
-            status: user.status,
-            last_login_at: user.lastLoginAt,
-            updated_at: new Date(),
-          };
+        // 캐시 TTL 설정 (1시간)
+        await redisClient.expire(`user:${user.id}`, 3600);
+      }
 
-          if (existingUser) {
-            // 기존 사용자 업데이트
-            await trx('chat_users')
-              .where('gatrix_user_id', user.id)
-              .update(userData);
-          } else {
-            // 새 사용자 추가
-            await trx('chat_users').insert({
-              ...userData,
-              created_at: new Date(),
-            });
-          }
-
-          // Redis에 사용자 정보 캐시
-          await redisClient.hset(`user:${user.id}`, {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            avatarUrl: user.avatarUrl || '',
-            role: user.role,
-            status: user.status,
-            lastLoginAt: user.lastLoginAt?.toISOString() || '',
-            updatedAt: new Date().toISOString(),
-          });
-
-          // 캐시 TTL 설정 (1시간)
-          await redisClient.expire(`user:${user.id}`, 3600);
-        }
-      });
-
-      logger.info(`Updated ${users.length} users in database and cache`);
+      logger.info(`Updated ${users.length} users in Redis cache`);
     } catch (error) {
       logger.error('Failed to update users:', error);
       throw error;

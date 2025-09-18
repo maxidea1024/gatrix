@@ -1,9 +1,10 @@
 import { WebSocketEvent, WebSocketEventType, Message, TypingIndicator, User } from '../types/chat';
+import { io, Socket } from 'socket.io-client';
 
 export type WebSocketEventHandler = (event: WebSocketEvent) => void;
 
 export class ChatWebSocketService {
-  private ws: WebSocket | null = null;
+  private socket: Socket | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000;
@@ -30,51 +31,52 @@ export class ChatWebSocketService {
           throw new Error('No authentication token available');
         }
 
-        const wsUrl = this.getWebSocketUrl();
-        this.ws = new WebSocket(`${wsUrl}?token=${encodeURIComponent(token)}`);
+        const socketUrl = this.getSocketUrl();
+        this.socket = io(socketUrl, {
+          auth: {
+            token: token
+          },
+          transports: ['websocket', 'polling'],
+          timeout: 10000,
+          reconnection: false, // We handle reconnection manually
+        });
 
-        this.ws.onopen = () => {
-          console.log('Chat WebSocket connected');
+        this.socket.on('connect', () => {
+          console.log('Chat Socket.IO connected');
           this.isConnecting = false;
           this.reconnectAttempts = 0;
           this.startHeartbeat();
           this.emit('connection_established', {});
           resolve();
-        };
+        });
 
-        this.ws.onmessage = (event) => {
-          try {
-            const data: WebSocketEvent = JSON.parse(event.data);
-            this.handleMessage(data);
-          } catch (error) {
-            console.error('Failed to parse WebSocket message:', error);
-          }
-        };
-
-        this.ws.onclose = (event) => {
-          console.log('Chat WebSocket disconnected:', event.code, event.reason);
+        this.socket.on('disconnect', (reason) => {
+          console.log('Chat Socket.IO disconnected:', reason);
           this.isConnecting = false;
           this.stopHeartbeat();
-          this.emit('connection_lost', { code: event.code, reason: event.reason });
+          this.emit('connection_lost', { reason });
 
-          if (this.shouldReconnect && event.code !== 1000) {
+          if (this.shouldReconnect && reason !== 'io client disconnect') {
             this.scheduleReconnect();
           }
-        };
+        });
 
-        this.ws.onerror = (error) => {
-          console.error('Chat WebSocket error:', error);
+        this.socket.on('connect_error', (error) => {
+          console.error('Chat Socket.IO connection error:', error);
           this.isConnecting = false;
           this.emit('connection_error', { error });
           reject(error);
-        };
+        });
+
+        // Set up event listeners for chat events
+        this.setupSocketEventListeners();
 
         // Connection timeout
         setTimeout(() => {
           if (this.isConnecting) {
             this.isConnecting = false;
-            this.ws?.close();
-            reject(new Error('WebSocket connection timeout'));
+            this.socket?.disconnect();
+            reject(new Error('Socket.IO connection timeout'));
           }
         }, 10000);
 
@@ -90,15 +92,18 @@ export class ChatWebSocketService {
   disconnect(): void {
     this.shouldReconnect = false;
     this.stopHeartbeat();
-    
-    if (this.ws) {
-      this.ws.close(1000, 'Client disconnect');
-      this.ws = null;
+
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socket = null;
     }
+
+    this.isConnecting = false;
+    this.connectionPromise = null;
   }
 
   isConnected(): boolean {
-    return this.ws?.readyState === WebSocket.OPEN;
+    return this.socket?.connected || false;
   }
 
   // Event subscription
@@ -122,40 +127,70 @@ export class ChatWebSocketService {
   // Send events to server
   sendEvent(type: WebSocketEventType, data: any): void {
     if (!this.isConnected()) {
-      console.warn('Cannot send WebSocket event: not connected');
+      console.warn('Cannot send Socket.IO event: not connected');
       return;
     }
 
-    const event: WebSocketEvent = {
-      type,
-      data,
-      timestamp: new Date().toISOString(),
-    };
-
-    this.ws!.send(JSON.stringify(event));
+    this.socket!.emit(type, data);
   }
 
   // Typing indicators
   startTyping(channelId: number): void {
-    this.sendEvent('user_typing', { channelId });
+    this.sendEvent('start_typing', { channelId });
   }
 
   stopTyping(channelId: number): void {
-    this.sendEvent('user_stop_typing', { channelId });
+    this.sendEvent('stop_typing', { channelId });
   }
 
   // Join/leave channels
   joinChannel(channelId: number): void {
-    this.sendEvent('user_joined_channel', { channelId });
+    this.sendEvent('join_channel', { channelId });
   }
 
   leaveChannel(channelId: number): void {
-    this.sendEvent('user_left_channel', { channelId });
+    this.sendEvent('leave_channel', { channelId });
   }
 
-  private handleMessage(event: WebSocketEvent): void {
-    console.log('Received WebSocket event:', event.type, event.data);
-    this.emit(event.type, event.data);
+  private setupSocketEventListeners(): void {
+    if (!this.socket) return;
+
+    // 채팅 관련 이벤트들
+    this.socket.on('message', (data) => {
+      this.emit('message', data);
+    });
+
+    this.socket.on('user_joined', (data) => {
+      this.emit('user_joined', data);
+    });
+
+    this.socket.on('user_left', (data) => {
+      this.emit('user_left', data);
+    });
+
+    this.socket.on('typing', (data) => {
+      this.emit('typing', data);
+    });
+
+    this.socket.on('stop_typing', (data) => {
+      this.emit('stop_typing', data);
+    });
+
+    this.socket.on('presence_update', (data) => {
+      this.emit('presence_update', data);
+    });
+
+    this.socket.on('channel_joined', (data) => {
+      this.emit('channel_joined', data);
+    });
+
+    this.socket.on('channel_left', (data) => {
+      this.emit('channel_left', data);
+    });
+
+    this.socket.on('error', (data) => {
+      this.emit('error', data);
+    });
   }
 
   private emit(eventType: WebSocketEventType, data: any): void {
@@ -177,10 +212,11 @@ export class ChatWebSocketService {
     }
   }
 
-  private getWebSocketUrl(): string {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = window.location.host;
-    return `${protocol}//${host}/ws/chat`;
+  private getSocketUrl(): string {
+    // 채팅서버는 포트 3001에서 실행됨
+    const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+    const hostname = window.location.hostname;
+    return `${protocol}//${hostname}:3001`;
   }
 
   private scheduleReconnect(): void {
@@ -207,7 +243,7 @@ export class ChatWebSocketService {
   private startHeartbeat(): void {
     this.heartbeatInterval = setInterval(() => {
       if (this.isConnected()) {
-        this.sendEvent('ping' as WebSocketEventType, { timestamp: Date.now() });
+        this.socket!.emit('ping', { timestamp: Date.now() });
       }
     }, 30000); // Send ping every 30 seconds
   }

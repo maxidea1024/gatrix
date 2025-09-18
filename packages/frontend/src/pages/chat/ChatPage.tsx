@@ -114,9 +114,14 @@ const ChatPageContent: React.FC = () => {
   const currentChannel = state.channels.find(c => c.id === state.currentChannelId);
 
   return (
-    <Box sx={{ p: 3, height: 'calc(100vh - 64px)' }}>
+    <Box sx={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden'
+    }}>
       {/* Header */}
-      <Box sx={{ mb: 3 }}>
+      <Box sx={{ mb: 3, flexShrink: 0 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
           <ChatIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Typography variant="h4" sx={{ fontWeight: 600 }}>
@@ -130,13 +135,18 @@ const ChatPageContent: React.FC = () => {
 
       {/* Connection Status */}
       {!state.isConnected && (
-        <Alert severity="warning" sx={{ mb: 2 }}>
+        <Alert severity="warning" sx={{ mb: 2, flexShrink: 0 }}>
           {t('chat.disconnected', 'Disconnected from chat service. Trying to reconnect...')}
         </Alert>
       )}
 
       {/* Main Chat Interface */}
-      <Paper sx={{ height: 'calc(100% - 120px)', display: 'flex' }}>
+      <Paper sx={{
+        flex: 1,
+        display: 'flex',
+        minHeight: 0, // 중요: flex 아이템이 축소될 수 있도록 함
+        overflow: 'hidden'
+      }}>
         {/* Channel List Sidebar */}
         <Box 
           sx={{ 
@@ -275,9 +285,9 @@ const ChatPageContent: React.FC = () => {
         <Snackbar
           open={Boolean(state.error)}
           autoHideDuration={6000}
-          onClose={() => actions.setCurrentChannel(null)} // This will clear the error in a real implementation
+          onClose={() => actions.clearError()}
         >
-          <Alert severity="error" onClose={() => actions.setCurrentChannel(null)}>
+          <Alert severity="error" onClose={() => actions.clearError()}>
             {state.error}
           </Alert>
         </Snackbar>

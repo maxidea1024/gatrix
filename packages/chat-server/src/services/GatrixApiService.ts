@@ -24,6 +24,7 @@ export interface UserSyncData {
   users: GatrixUser[];
   total: number;
   lastSyncAt: Date;
+  syncAt?: Date;
 }
 
 export class GatrixApiService {
@@ -36,7 +37,8 @@ export class GatrixApiService {
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${config.gatrix.apiSecret}`,
+        'X-API-Key': config.gatrix.apiSecret, // 백엔드가 인식하는 헤더 사용
+        'X-Application-Name': 'chat-server', // 필수 헤더 추가
         'X-Chat-Server-ID': process.env.SERVER_ID || 'unknown',
       },
     });
@@ -90,11 +92,11 @@ export class GatrixApiService {
     );
   }
 
-  // 토큰 검증
+  // 토큰 검증 - Server API 사용
   public async verifyToken(token: string): Promise<TokenVerificationResponse> {
     try {
-      const response: AxiosResponse<TokenVerificationResponse> = await this.apiClient.post(
-        '/api/v1/auth/verify-token',
+      const response: AxiosResponse<{ success: boolean; user: GatrixUser }> = await this.apiClient.post(
+        '/api/v1/server/auth/verify-token',
         { token }
       );
 
@@ -108,11 +110,11 @@ export class GatrixApiService {
     }
   }
 
-  // 사용자 정보 조회
+  // 사용자 정보 조회 - Server API 사용
   public async getUserById(userId: number): Promise<GatrixUser | null> {
     try {
       const response: AxiosResponse<{ success: boolean; data: GatrixUser }> = await this.apiClient.get(
-        `/api/v1/users/${userId}`
+        `/api/v1/server/users/${userId}`
       );
 
       if (response.data.success) {
@@ -126,13 +128,13 @@ export class GatrixApiService {
     }
   }
 
-  // 여러 사용자 정보 조회
+  // 여러 사용자 정보 조회 - Server API 사용
   public async getUsersByIds(userIds: number[]): Promise<GatrixUser[]> {
     try {
       if (userIds.length === 0) return [];
 
       const response: AxiosResponse<{ success: boolean; data: GatrixUser[] }> = await this.apiClient.post(
-        '/api/v1/users/batch',
+        '/api/v1/server/users/batch',
         { userIds }
       );
 
@@ -147,20 +149,12 @@ export class GatrixApiService {
     }
   }
 
-  // 사용자 검색
-  public async searchUsers(query: string, limit = 20): Promise<GatrixUser[]> {
+  // 사용자 검색 - 현재 Server API에는 검색 기능이 없으므로 제거하거나 다른 방법 사용
+  public async searchUsers(_query: string, _limit = 20): Promise<GatrixUser[]> {
     try {
-      const response: AxiosResponse<{ success: boolean; data: GatrixUser[] }> = await this.apiClient.get(
-        '/api/v1/users/search',
-        {
-          params: { q: query, limit },
-        }
-      );
-
-      if (response.data.success) {
-        return response.data.data;
-      }
-
+      // Server API에는 사용자 검색 기능이 없으므로 빈 배열 반환
+      // 필요시 백엔드에 검색 API 추가 필요
+      logger.warn('User search not available in Server API');
       return [];
     } catch (error) {
       logger.error('Failed to search users:', error);
@@ -168,21 +162,28 @@ export class GatrixApiService {
     }
   }
 
-  // 사용자 데이터 동기화
+  // 사용자 데이터 동기화 - Server API 사용
   public async syncUsers(lastSyncAt?: Date): Promise<UserSyncData | null> {
     try {
-      const params: any = {};
-      if (lastSyncAt) {
-        params.since = lastSyncAt.toISOString();
-      }
+      const params = lastSyncAt ? { lastSyncAt: lastSyncAt.toISOString() } : {};
 
-      const response: AxiosResponse<{ success: boolean; data: UserSyncData }> = await this.apiClient.get(
-        '/api/v1/users/sync',
-        { params }
-      );
+      const response: AxiosResponse<{
+        success: boolean;
+        data: {
+          users: GatrixUser[];
+          syncAt: string;
+          lastSyncAt: string;
+          total: number;
+        }
+      }> = await this.apiClient.get('/api/v1/server/users/sync', { params });
 
       if (response.data.success) {
-        return response.data.data;
+        return {
+          users: response.data.data.users,
+          syncAt: new Date(response.data.data.syncAt),
+          lastSyncAt: new Date(response.data.data.lastSyncAt),
+          total: response.data.data.total
+        };
       }
 
       return null;
@@ -192,7 +193,7 @@ export class GatrixApiService {
     }
   }
 
-  // 채팅 활동 보고
+  // 채팅 활동 보고 - Server API 사용
   public async reportChatActivity(data: {
     userId: number;
     channelId: number;
@@ -201,7 +202,7 @@ export class GatrixApiService {
   }): Promise<boolean> {
     try {
       const response: AxiosResponse<{ success: boolean }> = await this.apiClient.post(
-        '/api/v1/chat/activity',
+        '/api/v1/server/chat/activity',
         data
       );
 
@@ -212,7 +213,7 @@ export class GatrixApiService {
     }
   }
 
-  // 채팅 통계 보고
+  // 채팅 통계 보고 - Server API 사용
   public async reportChatStats(data: {
     serverId: string;
     connectedUsers: number;
@@ -222,7 +223,7 @@ export class GatrixApiService {
   }): Promise<boolean> {
     try {
       const response: AxiosResponse<{ success: boolean }> = await this.apiClient.post(
-        '/api/v1/chat/stats',
+        '/api/v1/server/chat/stats',
         data
       );
 
@@ -233,7 +234,7 @@ export class GatrixApiService {
     }
   }
 
-  // 알림 전송 요청
+  // 알림 전송 요청 - Server API 사용
   public async sendNotification(data: {
     userId: number;
     type: 'message' | 'mention' | 'channel_invite';
@@ -245,7 +246,7 @@ export class GatrixApiService {
   }): Promise<boolean> {
     try {
       const response: AxiosResponse<{ success: boolean }> = await this.apiClient.post(
-        '/api/v1/notifications',
+        '/api/v1/server/notifications',
         data
       );
 
@@ -256,7 +257,7 @@ export class GatrixApiService {
     }
   }
 
-  // 파일 업로드 URL 요청
+  // 파일 업로드 URL 요청 - Server API 사용
   public async getUploadUrl(data: {
     fileName: string;
     fileSize: number;
@@ -267,7 +268,7 @@ export class GatrixApiService {
       const response: AxiosResponse<{
         success: boolean;
         data: { uploadUrl: string; fileUrl: string };
-      }> = await this.apiClient.post('/api/v1/files/upload-url', data);
+      }> = await this.apiClient.post('/api/v1/server/files/upload-url', data);
 
       if (response.data.success) {
         return response.data.data;
@@ -280,21 +281,20 @@ export class GatrixApiService {
     }
   }
 
-  // 사용자 권한 확인
-  public async checkUserPermission(userId: number, permission: string): Promise<boolean> {
+  // 사용자 권한 확인 - Server API에는 권한 확인 기능이 없으므로 제거
+  public async checkUserPermission(_userId: number, _permission: string): Promise<boolean> {
     try {
-      const response: AxiosResponse<{ success: boolean; hasPermission: boolean }> = await this.apiClient.get(
-        `/api/v1/users/${userId}/permissions/${permission}`
-      );
-
-      return response.data.success && response.data.hasPermission;
+      // Server API에는 권한 확인 기능이 없음
+      // 필요시 백엔드에 권한 확인 API 추가 필요
+      logger.warn('User permission check not available in Server API');
+      return false;
     } catch (error) {
       logger.error('Failed to check user permission:', error);
       return false;
     }
   }
 
-  // 헬스 체크
+  // 헬스 체크 - Server API 사용
   public async healthCheck(): Promise<boolean> {
     try {
       const response: AxiosResponse<{ success: boolean }> = await this.apiClient.get('/health');
@@ -305,10 +305,10 @@ export class GatrixApiService {
     }
   }
 
-  // 연결 테스트
+  // 연결 테스트 - Server API 사용
   public async testConnection(): Promise<boolean> {
     try {
-      const response: AxiosResponse<{ success: boolean }> = await this.apiClient.get('/api/v1/ping');
+      const response: AxiosResponse<{ success: boolean }> = await this.apiClient.get('/api/v1/server/test');
       return response.data.success;
     } catch (error) {
       logger.error('Gatrix connection test failed:', error);
@@ -316,11 +316,11 @@ export class GatrixApiService {
     }
   }
 
-  // 채팅 서버 등록
+  // 채팅 서버 등록 - Server API 사용
   public async registerChatServer(): Promise<boolean> {
     try {
       const response: AxiosResponse<{ success: boolean }> = await this.apiClient.post(
-        '/api/v1/chat/servers/register',
+        '/api/v1/server/chat/register',
         {
           serverId: process.env.SERVER_ID,
           host: config.host,
@@ -343,11 +343,14 @@ export class GatrixApiService {
     }
   }
 
-  // 채팅 서버 등록 해제
+  // 채팅 서버 등록 해제 - Server API 사용
   public async unregisterChatServer(): Promise<boolean> {
     try {
-      const response: AxiosResponse<{ success: boolean }> = await this.apiClient.delete(
-        `/api/v1/chat/servers/${process.env.SERVER_ID}`
+      const response: AxiosResponse<{ success: boolean }> = await this.apiClient.post(
+        '/api/v1/server/chat/unregister',
+        {
+          serverId: process.env.SERVER_ID,
+        }
       );
 
       return response.data.success;

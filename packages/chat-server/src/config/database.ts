@@ -26,13 +26,13 @@ class DatabaseManager {
           password: config.database.password,
           database: config.database.name,
           charset: 'utf8mb4',
-          timezone: 'UTC',
+          timezone: '+00:00', // MySQL2에서 올바른 UTC 타임존 형식
         },
         pool: {
-          min: 5,
-          max: 50, // High concurrency pool
-          acquireTimeoutMillis: 30000,
-          createTimeoutMillis: 30000,
+          min: 2,
+          max: 10, // Reduced for development
+          acquireTimeoutMillis: 10000,
+          createTimeoutMillis: 10000,
           destroyTimeoutMillis: 5000,
           idleTimeoutMillis: 30000,
           reapIntervalMillis: 1000,
@@ -73,7 +73,15 @@ class DatabaseManager {
       if (!this.knexInstance) {
         throw new Error('Database not initialized');
       }
-      await this.knexInstance.raw('SELECT 1');
+
+      // Use a timeout for the test query
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Connection test timeout')), 5000);
+      });
+
+      const testPromise = this.knexInstance.raw('SELECT 1');
+
+      await Promise.race([testPromise, timeoutPromise]);
       return true;
     } catch (error) {
       logger.error('Database connection test failed:', error);

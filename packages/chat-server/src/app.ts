@@ -178,24 +178,36 @@ class ChatServerApp {
       await redisManager.initialize();
       logger.info('Redis connection established');
 
-      // Initialize Database
-      await databaseManager.initialize();
-      logger.info('Database connection established');
+      // Initialize Database (non-blocking)
+      try {
+        await databaseManager.initialize();
+        logger.info('Database connection established');
+      } catch (dbError) {
+        logger.warn('Database connection failed, continuing without database features');
+      }
 
-      // Test Gatrix API connection
-      const gatrixConnected = await gatrixApiService.testConnection();
-      if (gatrixConnected) {
-        logger.info('Gatrix API connection established');
+      // Test Gatrix API connection (non-blocking)
+      try {
+        const gatrixConnected = await gatrixApiService.testConnection();
+        if (gatrixConnected) {
+          logger.info('Gatrix API connection established');
 
-        // Register chat server with Gatrix
-        const registered = await gatrixApiService.registerChatServer();
-        if (registered) {
-          logger.info('Chat server registered with Gatrix');
+          // Register chat server with Gatrix
+          try {
+            const registered = await gatrixApiService.registerChatServer();
+            if (registered) {
+              logger.info('Chat server registered with Gatrix');
+            } else {
+              logger.warn('Failed to register chat server with Gatrix');
+            }
+          } catch (regError) {
+            logger.warn('Chat server registration failed, continuing without registration');
+          }
         } else {
-          logger.warn('Failed to register chat server with Gatrix');
+          logger.warn('Gatrix API connection failed, continuing without integration');
         }
-      } else {
-        logger.warn('Gatrix API connection failed, continuing without integration');
+      } catch (apiError) {
+        logger.warn('Gatrix API test failed, continuing in standalone mode');
       }
 
       // Start user synchronization service

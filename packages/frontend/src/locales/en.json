@@ -1437,6 +1437,7 @@
   },
   "sidebar": {
     "adminPanel": "ADMIN PANEL",
+    "chat": "Chat",
     "dashboard": "Dashboard",
     "logout": "Logout",
     "navigation": "NAVIGATION",

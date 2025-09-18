@@ -1313,6 +1313,7 @@
   },
   "sidebar": {
     "adminPanel": "管理员面板",
+    "chat": "聊天",
     "dashboard": "仪表板",
     "logout": "退出登录",
     "navigation": "导航",

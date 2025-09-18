@@ -6,28 +6,29 @@ exports.up = function(knex) {
     table.enum('type', ['public', 'private', 'direct']).defaultTo('public');
     
     // 채널 설정
-    table.integer('max_members').unsigned().defaultTo(1000);
-    table.boolean('is_archived').defaultTo(false);
-    table.text('archive_reason');
-    
+    table.integer('maxMembers').unsigned().defaultTo(1000);
+    table.boolean('isArchived').defaultTo(false);
+    table.text('archiveReason');
+
     // 메타데이터
-    table.string('avatar_url', 500);
+    table.string('avatarUrl', 500);
     table.json('settings');
-    
+
     // 소유자 및 생성 정보
-    table.bigInteger('owner_id').unsigned().notNullable();
-    table.bigInteger('created_by').unsigned().notNullable();
-    table.bigInteger('updated_by').unsigned();
+    table.bigInteger('ownerId').unsigned().notNullable();
+    table.bigInteger('createdBy').unsigned().notNullable();
+    table.bigInteger('updatedBy').unsigned();
     
     // 타임스탬프
-    table.timestamps(true, true);
-    table.timestamp('archived_at');
-    
+    table.timestamp('createdAt').defaultTo(knex.fn.now());
+    table.timestamp('updatedAt').defaultTo(knex.fn.now());
+    table.timestamp('archivedAt');
+
     // 인덱스
     table.index(['type'], 'idx_channels_type');
-    table.index(['owner_id'], 'idx_channels_owner');
-    table.index(['created_at'], 'idx_channels_created_at');
-    table.index(['is_archived', 'type'], 'idx_channels_active');
+    table.index(['ownerId'], 'idx_channels_owner');
+    table.index(['createdAt'], 'idx_channels_created_at');
+    table.index(['isArchived', 'type'], 'idx_channels_active');
   });
 };
 

@@ -15,11 +15,11 @@ import {
 } from '../types/chat';
 
 export class ChatService {
-  private static readonly BASE_URL = '/api/v1/chat';
+  private static readonly BASE_URL = '/chat';
 
   // Channel management
   static async getChannels(params?: GetChannelsRequest): Promise<Channel[]> {
-    const response = await apiService.get<Channel[]>(`${this.BASE_URL}/channels`, { params });
+    const response = await apiService.get<Channel[]>(`${this.BASE_URL}/channels/my`, { params });
     return response.data || [];
   }
 

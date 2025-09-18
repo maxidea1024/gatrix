@@ -57,6 +57,7 @@ import {
   Monitor as MonitorIcon,
   CloudSync as CloudSyncIcon,
   VpnKey as VpnKeyIcon,
+  Chat as ChatIcon,
 
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -75,6 +76,7 @@ interface MainLayoutProps {
 // 메뉴 데이터
 const menuItems = [
   { text: 'sidebar.dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+  { text: 'sidebar.chat', icon: <ChatIcon />, path: '/chat' },
 ];
 
 const adminMenuItems = [
@@ -794,11 +796,14 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             md: `${(sidebarCollapsed ? 64 : sidebarWidth) + 24}px`
           },
           mt: 8, // AppBar height
-          minHeight: 'calc(100vh - 64px)',
+          height: 'calc(100vh - 64px)', // 정확한 높이 설정
           backgroundColor: 'background.default',
           width: '100%',
           maxWidth: '100%',
           transition: 'padding-left 0.3s ease',
+          overflow: 'hidden', // 스크롤 방지
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         {children}

@@ -469,6 +469,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw error;
       }
     },
+
+    clearError: () => {
+      dispatch({ type: 'SET_ERROR', payload: null });
+    },
   };
 
   // Load messages for a channel
