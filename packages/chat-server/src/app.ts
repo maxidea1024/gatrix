@@ -51,12 +51,12 @@ class ChatServerApp {
     }));
 
     // Compression
-    this.app.use(compression());
+    this.app.use(compression() as any);
 
     // Body parsing
     this.app.use(express.json({ limit: '10mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-    this.app.use(cookieParser());
+    this.app.use(cookieParser() as any);
 
     // Request logging
     this.app.use((req, res, next) => {
@@ -248,11 +248,9 @@ class ChatServerApp {
           case 'EACCES':
             logger.error(`${bind} requires elevated privileges`);
             process.exit(1);
-            break;
           case 'EADDRINUSE':
             logger.error(`${bind} is already in use`);
             process.exit(1);
-            break;
           default:
             throw error;
         }

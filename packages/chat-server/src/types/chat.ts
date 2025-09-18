@@ -169,6 +169,7 @@ export interface CodeBlock {
 }
 
 export interface CreateMessageData {
+  channelId: number;
   content: string;
   contentType?: 'text' | 'image' | 'video' | 'audio' | 'file' | 'location';
   messageData?: Partial<MessageData>;

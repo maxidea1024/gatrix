@@ -84,7 +84,9 @@ export class Message extends Model {
 }
 
 export class MessageModel {
-  private static knex = databaseManager.getKnex();
+  private static get knex() {
+    return databaseManager.getKnex();
+  }
 
   // 메시지 생성
   static async create(data: CreateMessageData, userId: number): Promise<MessageType> {
@@ -101,7 +103,11 @@ export class MessageModel {
     };
 
     const [messageId] = await this.knex('chat_messages').insert(messageData);
-    return await this.findById(messageId);
+    const message = await this.findById(messageId);
+    if (!message) {
+      throw new Error('Message not found');
+    }
+    return message;
   }
 
   // 메시지 조회
@@ -171,7 +177,8 @@ export class MessageModel {
 
     // 총 개수 조회
     const totalQuery = query.clone().count('* as count').first();
-    const { count: total } = await totalQuery;
+    const totalResult = await totalQuery as any;
+    const total = totalResult?.count || 0;
 
     // 페이지네이션
     const limit = options.limit || 50;
@@ -237,7 +244,7 @@ export class MessageModel {
     const message = await this.knex('chat_messages as m')
       .leftJoin('chat_channel_members as cm', function() {
         this.on('m.channelId', '=', 'cm.channelId')
-            .andOn('cm.userId', '=', userId);
+            .andOn('cm.userId', '=', userId.toString());
       })
       .where('m.id', id)
       .andWhere(function() {
@@ -267,7 +274,7 @@ export class MessageModel {
     const message = await this.knex('chat_messages as m')
       .join('chat_channel_members as cm', function() {
         this.on('m.channelId', '=', 'cm.channelId')
-            .andOn('cm.userId', '=', userId);
+            .andOn('cm.userId', '=', userId.toString());
       })
       .where('m.id', id)
       .whereIn('cm.role', ['owner', 'admin', 'moderator'])
@@ -349,7 +356,8 @@ export class MessageModel {
 
     // 총 개수 조회
     const totalQuery = searchQuery.clone().count('* as count').first();
-    const { count: total } = await totalQuery;
+    const totalResult = await totalQuery as any;
+    const total = totalResult?.count || 0;
 
     // 페이지네이션
     if (options.limit) {
@@ -381,7 +389,8 @@ export class MessageModel {
 
     // 총 개수 조회
     const totalQuery = query.clone().count('* as count').first();
-    const { count: total } = await totalQuery;
+    const totalResult = await totalQuery as any;
+    const total = totalResult?.count || 0;
 
     // 페이지네이션
     if (options.limit) {

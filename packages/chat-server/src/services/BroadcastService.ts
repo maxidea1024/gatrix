@@ -2,7 +2,7 @@ import { Server as SocketIOServer } from 'socket.io';
 import { pack, unpack } from 'msgpackr';
 import { gzip, gunzip } from 'zlib';
 import { promisify } from 'util';
-import LRU from 'lru-cache';
+import LRUCache from 'lru-cache';
 import { config } from '../config';
 import { redisManager } from '../config/redis';
 import logger from '../config/logger';
@@ -24,20 +24,20 @@ export class BroadcastService {
   private serverId: string;
   private messageQueue: Map<number, BroadcastMessage[]> = new Map();
   private batchTimer: NodeJS.Timeout | null = null;
-  private messageCache: LRU<string, any>;
-  private compressionCache: LRU<string, Buffer>;
+  private messageCache: LRUCache<string, any>;
+  private compressionCache: LRUCache<string, Buffer>;
 
   constructor(io: SocketIOServer, serverId: string) {
     this.io = io;
     this.serverId = serverId;
-    
+
     // Initialize caches for performance
-    this.messageCache = new LRU({
+    this.messageCache = new LRUCache({
       max: 10000,
       ttl: 1000 * 60 * 5, // 5 minutes
     });
 
-    this.compressionCache = new LRU({
+    this.compressionCache = new LRUCache({
       max: 1000,
       ttl: 1000 * 60 * 10, // 10 minutes
     });
@@ -48,18 +48,22 @@ export class BroadcastService {
 
   private setupRedisSubscriptions(): void {
     const subClient = redisManager.getSubClient();
-    
+
     // Subscribe to broadcast channels
-    subClient.subscribe('chat:broadcast', 'chat:channel_broadcast', 'chat:user_broadcast');
-    
+    subClient.subscribe(
+      'chat:broadcast',
+      'chat:channel_broadcast',
+      'chat:user_broadcast'
+    );
+
     subClient.on('message', async (channel: string, message: string) => {
       try {
         let broadcastMessage: BroadcastMessage;
-        
+
         if (config.broadcasting.useMessagePack) {
           const buffer = Buffer.from(message, 'base64');
-          const decompressed = config.broadcasting.compression 
-            ? await gunzipAsync(buffer) 
+          const decompressed = config.broadcasting.compression
+            ? await gunzipAsync(buffer)
             : buffer;
           broadcastMessage = unpack(decompressed);
         } else {
@@ -102,7 +106,7 @@ export class BroadcastService {
 
     // Get local users in this channel
     const localUsers = await this.getLocalChannelUsers(message.channelId);
-    
+
     if (localUsers.length > 0) {
       // Use room-based broadcasting for efficiency
       this.io.to(`channel:${message.channelId}`).emit(message.type, message.data);
@@ -165,9 +169,9 @@ export class BroadcastService {
     if (!this.messageQueue.has(channelId)) {
       this.messageQueue.set(channelId, []);
     }
-    
+
     this.messageQueue.get(channelId)!.push(message);
-    
+
     // Check if batch is full
     if (this.messageQueue.get(channelId)!.length >= config.broadcasting.batchSize) {
       this.processBatch(channelId);
@@ -203,7 +207,7 @@ export class BroadcastService {
     const serialized = await this.serializeMessage(message);
     const pubClient = redisManager.getPubClient();
     await pubClient.publish('chat:channel_broadcast', serialized);
-    
+
     // Also broadcast locally
     await this.handleChannelBroadcast(message);
   }
@@ -212,7 +216,7 @@ export class BroadcastService {
     const serialized = await this.serializeMessage(message);
     const pubClient = redisManager.getPubClient();
     await pubClient.publish('chat:user_broadcast', serialized);
-    
+
     // Also handle locally
     await this.handleUserBroadcast(message);
   }
@@ -221,23 +225,23 @@ export class BroadcastService {
     const serialized = await this.serializeMessage(message);
     const pubClient = redisManager.getPubClient();
     await pubClient.publish('chat:broadcast', serialized);
-    
+
     // Also handle locally
     await this.handleGlobalBroadcast(message);
   }
 
   private async serializeMessage(message: BroadcastMessage): Promise<string> {
     const cacheKey = `${message.type}:${message.timestamp}`;
-    
+
     if (this.compressionCache.has(cacheKey)) {
       return this.compressionCache.get(cacheKey)!.toString('base64');
     }
 
     let serialized: Buffer;
-    
+
     if (config.broadcasting.useMessagePack) {
       const packed = pack(message);
-      serialized = config.broadcasting.compression 
+      serialized = config.broadcasting.compression
         ? await gzipAsync(packed)
         : packed;
     } else {
@@ -266,10 +270,10 @@ export class BroadcastService {
     if (this.batchTimer) {
       clearInterval(this.batchTimer);
     }
-    
+
     // Process remaining batches
     this.processAllBatches();
-    
+
     // Clear caches
     this.messageCache.clear();
     this.compressionCache.clear();

@@ -23,8 +23,12 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({
 
   // Initialize notification sound
   useEffect(() => {
-    audioRef.current = new Audio('/sounds/notification.mp3');
-    audioRef.current.volume = 0.5;
+    try {
+      audioRef.current = new Audio('/sounds/notification.mp3');
+      audioRef.current.volume = 0.5;
+    } catch (error) {
+      console.warn('Notification sound file not found:', error);
+    }
   }, []);
 
   // Request notification permission
@@ -36,15 +40,15 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({
 
   // Handle new messages
   useEffect(() => {
-    const messages = state.messages;
-    if (messages.length === 0) return;
+    const allMessages = Object.values(state.messages).flat();
+    if (allMessages.length === 0) return;
 
-    const latestMessage = messages[messages.length - 1];
-    
+    const latestMessage = allMessages[allMessages.length - 1];
+
     // Skip if it's the same message or from current user
     if (
       latestMessage.id === lastMessageIdRef.current ||
-      latestMessage.user.id === currentUserId
+      latestMessage.userId === currentUserId
     ) {
       return;
     }

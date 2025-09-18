@@ -1,4 +1,5 @@
-import { register, collectDefaultMetrics, Counter, Histogram, Gauge } from 'prom-client';
+const promClient = require('prom-client');
+const { register, collectDefaultMetrics, Counter, Histogram, Gauge } = promClient;
 import express from 'express';
 import { config } from '../config';
 import logger from '../config/logger';
@@ -9,16 +10,16 @@ export class MetricsService {
   private server: any;
 
   // Metrics
-  public readonly connectedUsers: Gauge<string>;
-  public readonly activeChannels: Gauge<string>;
-  public readonly messagesPerSecond: Counter<string>;
-  public readonly messageLatency: Histogram<string>;
-  public readonly broadcastLatency: Histogram<string>;
-  public readonly redisOperations: Counter<string>;
-  public readonly memoryUsage: Gauge<string>;
-  public readonly cpuUsage: Gauge<string>;
-  public readonly websocketConnections: Gauge<string>;
-  public readonly messageQueueSize: Gauge<string>;
+  public readonly connectedUsers: any;
+  public readonly activeChannels: any;
+  public readonly messagesPerSecond: any;
+  public readonly messageLatency: any;
+  public readonly broadcastLatency: any;
+  public readonly redisOperations: any;
+  public readonly memoryUsage: any;
+  public readonly cpuUsage: any;
+  public readonly websocketConnections: any;
+  public readonly messageQueueSize: any;
 
   private constructor() {
     // Collect default metrics (CPU, memory, etc.)

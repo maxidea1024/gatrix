@@ -90,7 +90,7 @@ class DatabaseManager {
   }
 
   // High-performance query helpers
-  public async batchInsert<T>(tableName: string, data: T[], batchSize = 1000): Promise<void> {
+  public async batchInsert<T extends Record<string, any>>(tableName: string, data: T[], batchSize = 1000): Promise<void> {
     if (!this.knexInstance) {
       throw new Error('Database not initialized');
     }
@@ -101,7 +101,7 @@ class DatabaseManager {
     }
 
     for (const batch of batches) {
-      await this.knexInstance.batchInsert(tableName, batch, batchSize);
+      await this.knexInstance.batchInsert(tableName, batch as any, batchSize);
     }
   }
 

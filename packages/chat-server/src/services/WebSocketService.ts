@@ -27,10 +27,7 @@ export class WebSocketService {
       pingTimeout: config.websocket.pingTimeout,
       pingInterval: config.websocket.pingInterval,
       maxHttpBufferSize: config.websocket.maxHttpBufferSize,
-      transports: config.websocket.transports,
-      upgradeTimeout: config.websocket.upgradeTimeout,
-      compression: config.websocket.compression,
-      perMessageDeflate: config.websocket.perMessageDeflate,
+      transports: config.websocket.transports as any,
     });
 
     this.setupRedisAdapter();

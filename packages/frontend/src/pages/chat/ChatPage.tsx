@@ -35,6 +35,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { ChatProvider, useChat } from '../../contexts/ChatContext';
+import { useAuth } from '../../contexts/AuthContext';
 import ChannelList from '../../components/chat/ChannelList';
 import MessageList from '../../components/chat/MessageList';
 import NotificationManager from '../../components/chat/NotificationManager';
@@ -44,6 +45,7 @@ import { CreateChannelRequest, SendMessageRequest } from '../../types/chat';
 const ChatPageContent: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { user } = useAuth();
   const { state, actions } = useChat();
   const [createChannelOpen, setCreateChannelOpen] = useState(false);
   const [channelFormData, setChannelFormData] = useState<CreateChannelRequest>({
@@ -51,10 +53,12 @@ const ChatPageContent: React.FC = () => {
     description: '',
     type: 'public',
   });
-  const [selectedChannelId, setSelectedChannelId] = useState<number | null>(null);
+  // Get current selected channel from state
+  const selectedChannel = state.currentChannelId
+    ? state.channels.find(channel => channel.id === state.currentChannelId)
+    : null;
   const [memberListOpen, setMemberListOpen] = useState(false);
   const [isWindowFocused, setIsWindowFocused] = useState(true);
-  const notificationManagerRef = useRef<any>(null);
 
   // Track window focus for notifications
   useEffect(() => {
@@ -316,8 +320,7 @@ const ChatPageContent: React.FC = () => {
 
       {/* Notification Manager */}
       <NotificationManager
-        ref={notificationManagerRef}
-        currentUserId={currentUserId}
+        currentUserId={user?.id || 0}
         activeChannelId={state.currentChannelId || undefined}
         isWindowFocused={isWindowFocused}
       />

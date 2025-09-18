@@ -74,7 +74,9 @@ export class Channel extends Model {
 }
 
 export class ChannelModel {
-  private static knex = databaseManager.getKnex();
+  private static get knex() {
+    return databaseManager.getKnex();
+  }
 
   // 채널 생성
   static async create(data: CreateChannelData, createdBy: number): Promise<ChannelType> {
@@ -111,7 +113,11 @@ export class ChannelModel {
       await this.knex('chat_channel_members').insert(memberInserts);
     }
 
-    return await this.findById(channelId);
+    const channel = await this.findById(channelId);
+    if (!channel) {
+      throw new Error('Channel not found');
+    }
+    return channel;
   }
 
   // 채널 조회
@@ -150,7 +156,8 @@ export class ChannelModel {
 
     // 총 개수 조회
     const totalQuery = query.clone().count('* as count').first();
-    const { count: total } = await totalQuery;
+    const totalResult = await totalQuery as any;
+    const total = totalResult?.count || 0;
 
     // 페이지네이션
     if (options.limit) {
@@ -214,7 +221,7 @@ export class ChannelModel {
       ])
       .leftJoin('chat_channel_members as cm', function() {
         this.on('c.id', '=', 'cm.channelId')
-            .andOn('cm.userId', '=', userId);
+            .andOn('cm.userId', '=', userId.toString());
       })
       .where('c.isArchived', false)
       .andWhere(function() {
@@ -229,7 +236,8 @@ export class ChannelModel {
 
     // 총 개수 조회
     const totalQuery = searchQuery.clone().count('* as count').first();
-    const { count: total } = await totalQuery;
+    const totalResult = await totalQuery as any;
+    const total = totalResult?.count || 0;
 
     // 페이지네이션
     if (options.limit) {
@@ -255,16 +263,14 @@ export class ChannelModel {
       ])
       .leftJoin('chat_channel_members as cm', function() {
         this.on('c.id', '=', 'cm.channelId')
-            .andOn('cm.status', '=', this.knex.raw('?', ['active']));
+            .andOn('cm.status', '=', 'active');
       })
-      .leftJoin('chat_messages as m', function() {
-        this.on('c.id', '=', 'm.channelId')
-            .andOn('m.createdAt', '>=', this.knex.raw('DATE_SUB(NOW(), INTERVAL 7 DAY)'));
-      })
+      .leftJoin('chat_messages as m', 'c.id', 'm.channelId')
       .where({
         'c.type': 'public',
         'c.isArchived': false,
       })
+      .andWhere('m.createdAt', '>=', this.knex.raw('DATE_SUB(NOW(), INTERVAL 7 DAY)'))
       .groupBy('c.id')
       .orderBy('memberCount', 'desc')
       .orderBy('messageCount', 'desc')
