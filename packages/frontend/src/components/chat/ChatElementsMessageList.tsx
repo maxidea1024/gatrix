@@ -353,37 +353,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     };
   };
 
-  // Convert our messages to react-chat-elements format
-  const convertToReactChatElements = () => {
-    return messages.map((message) => {
-      const userInfo = getUserInfo(message.userId);
-
-      return {
-        id: message.id,
-        position: 'left', // 모든 메시지를 좌측에 표시
-        type: 'text' as const,
-        title: userInfo.name,
-        text: message.content,
-        date: new Date(message.createdAt), // 필수 속성
-        dateString: formatRelativeTime(message.createdAt), // 사용자 타임존 + 언어 적용
-        avatar: userInfo.avatar,
-        focus: false,
-        titleColor: '#000000',
-        forwarded: false,
-        replyButton: false,
-        removeButton: false,
-        status: 'sent' as const,
-        notch: true,
-        retracted: false,
-        // 텍스트 색상 명시적 설정
-        styles: {
-          color: '#000000',
-        },
-      };
-    });
-  };
-
-  const chatMessages = convertToReactChatElements();
+  // 슬랙 스타일 메시지 렌더링을 위해 직접 JSX에서 처리
 
   if (messages.length === 0 && !state.isLoading) {
     return (
@@ -493,11 +463,12 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
               placeholder={t('chat.typeMessage', '메시지를 입력하세요...')}
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyPress}
               disabled={!currentChannel}
               variant="standard"
               inputRef={messageInputRef}
-              InputProps={{
+              slotProps={{
+              input: {
                 disableUnderline: true,
                 sx: {
                   fontSize: '14px',
