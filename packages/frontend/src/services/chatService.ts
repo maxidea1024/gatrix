@@ -16,6 +16,7 @@ import {
 
 export class ChatService {
   private static readonly BASE_URL = '/chat';
+  private static readonly DIRECT_CHAT_URL = 'http://localhost:3001/api/v1'; // 임시: 직접 채팅 서버 접근
 
   // Channel management
   static async getChannels(params?: GetChannelsRequest): Promise<Channel[]> {
@@ -29,8 +30,56 @@ export class ChatService {
   }
 
   static async createChannel(data: CreateChannelRequest): Promise<Channel> {
-    const response = await apiService.post<Channel>(`${this.BASE_URL}/channels`, data);
-    return response.data;
+    console.log('🌐 ChatService: Sending create channel request...', {
+      url: `${this.DIRECT_CHAT_URL}/channels`,
+      data
+    });
+
+    try {
+      const startTime = Date.now();
+
+      // 임시: 직접 채팅 서버로 요청 (프록시 우회)
+      const token = localStorage.getItem('accessToken');
+      const response = await fetch(`${this.DIRECT_CHAT_URL}/channels`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+      });
+
+      const duration = Date.now() - startTime;
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('❌ ChatService: Create channel request failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          data: errorData,
+          duration: `${duration}ms`
+        });
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      console.log('✅ ChatService: Create channel response received:', {
+        duration: `${duration}ms`,
+        status: response.status,
+        data: result
+      });
+
+      return result.data || result;
+    } catch (error: any) {
+      console.error('❌ ChatService: Create channel request failed:', {
+        error,
+        message: error.message,
+        name: error.name,
+        stack: error.stack
+      });
+      throw error;
+    }
   }
 
   static async updateChannel(channelId: number, data: UpdateChannelRequest): Promise<Channel> {

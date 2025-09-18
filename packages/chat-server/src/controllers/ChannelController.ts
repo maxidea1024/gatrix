@@ -421,6 +421,7 @@ export class ChannelController {
     try {
       const channelId = parseInt(req.params.id);
       const userId = (req as any).user.id;
+      const { messageId } = req.body;
 
       if (isNaN(channelId)) {
         res.status(400).json({
@@ -430,13 +431,37 @@ export class ChannelController {
         return;
       }
 
-      // 임시로 권한 확인 없이 성공 응답 (타임아웃 문제 해결)
-      // TODO: 실제 읽음 표시 로직 및 권한 확인 구현
-      logger.info(`User ${userId} marked channel ${channelId} as read`);
+      // 채널 멤버십 확인
+      const userRole = await ChannelModel.getUserRole(channelId, userId);
+      if (!userRole) {
+        res.status(403).json({
+          success: false,
+          error: 'You are not a member of this channel',
+        });
+        return;
+      }
+
+      // 읽음 상태 업데이트
+      const success = await ChannelModel.markAsRead(channelId, userId, messageId);
+      if (!success) {
+        res.status(500).json({
+          success: false,
+          error: 'Failed to update read status',
+        });
+        return;
+      }
+
+      logger.info(`User ${userId} marked channel ${channelId} as read${messageId ? ` up to message ${messageId}` : ''}`);
 
       res.json({
         success: true,
         message: 'Channel marked as read',
+        data: {
+          channelId,
+          userId,
+          messageId,
+          timestamp: new Date().toISOString(),
+        },
       });
     } catch (error) {
       logger.error('Error marking channel as read:', error);

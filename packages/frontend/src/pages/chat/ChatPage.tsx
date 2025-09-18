@@ -24,6 +24,7 @@ import {
   Divider,
   IconButton,
   Tooltip,
+  CircularProgress,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -49,6 +50,7 @@ const ChatPageContent: React.FC = () => {
   const { state, actions } = useChat();
   const { joinChannel } = actions;
   const [createChannelOpen, setCreateChannelOpen] = useState(false);
+  const [isCreatingChannel, setIsCreatingChannel] = useState(false);
   const [channelFormData, setChannelFormData] = useState<CreateChannelRequest>({
     name: '',
     description: '',
@@ -127,12 +129,26 @@ const ChatPageContent: React.FC = () => {
         return;
       }
 
-      await actions.createChannel(channelFormData);
+      setIsCreatingChannel(true);
+      console.log('🚀 Creating channel:', channelFormData);
+      const startTime = Date.now();
+
+      const channel = await actions.createChannel(channelFormData);
+
+      const duration = Date.now() - startTime;
+      console.log('✅ Channel created successfully:', { channel, duration: `${duration}ms` });
+
+      // 생성된 채널로 자동 이동
+      actions.setCurrentChannel(channel.id);
+
       setCreateChannelOpen(false);
       setChannelFormData({ name: '', description: '', type: 'public' });
       enqueueSnackbar(t('chat.channelCreated', 'Channel created successfully'), { variant: 'success' });
     } catch (error: any) {
+      console.error('❌ Channel creation failed:', error);
       enqueueSnackbar(error.message || t('chat.createChannelFailed', 'Failed to create channel'), { variant: 'error' });
+    } finally {
+      setIsCreatingChannel(false);
     }
   };
 
@@ -312,12 +328,13 @@ const ChatPageContent: React.FC = () => {
           <Button onClick={() => setCreateChannelOpen(false)}>
             {t('common.cancel', 'Cancel')}
           </Button>
-          <Button 
+          <Button
             onClick={handleCreateChannel}
             variant="contained"
-            disabled={!channelFormData.name.trim()}
+            disabled={!channelFormData.name.trim() || isCreatingChannel}
+            startIcon={isCreatingChannel ? <CircularProgress size={20} /> : undefined}
           >
-            {t('chat.createChannel', 'Create Channel')}
+            {isCreatingChannel ? t('chat.creating', 'Creating...') : t('chat.createChannel', 'Create Channel')}
           </Button>
         </DialogActions>
       </Dialog>

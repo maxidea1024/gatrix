@@ -131,43 +131,16 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     emptyStateSubtext: theme.palette.mode === 'dark' ? '#9aa0a6' : '#666666',
   };
 
-  // 새 메시지가 올 때 하단에 있으면 자동 스크롤
+  // 새 메시지가 올 때 하단에 있으면 자동 스크롤 (슬랙 스타일 컨테이너용)
   useEffect(() => {
     if (messages.length === 0) return;
 
     setTimeout(() => {
-      // 여러 가능한 스크롤 컨테이너 확인
-      const selectors = [
-        '.rce-container-mlist',
-        '.rce-mlist',
-        '.message-list',
-        '.rce-mbox',
-        '[class*="mlist"]',
-        '[class*="message"]'
-      ];
-
-      let messageContainer = null;
-      for (const selector of selectors) {
-        const element = document.querySelector(selector);
-        if (element && element.scrollHeight > element.clientHeight) {
-          messageContainer = element;
-          console.log('📦 Found scrollable container:', selector);
-          break;
-        }
-      }
+      // 슬랙 스타일 메시지 컨테이너 찾기
+      const messageContainer = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement;
 
       if (!messageContainer) {
-        console.log('❌ No scrollable container found. Available elements:');
-        selectors.forEach(selector => {
-          const el = document.querySelector(selector);
-          if (el) {
-            console.log(`  ${selector}:`, {
-              scrollHeight: el.scrollHeight,
-              clientHeight: el.clientHeight,
-              hasScroll: el.scrollHeight > el.clientHeight
-            });
-          }
-        });
+        console.log('❌ Slack message container not found');
         return;
       }
 
@@ -175,8 +148,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       // 하단에서 100px 이내에 있으면 자동 스크롤
       const isAtBottom = scrollTop + clientHeight >= scrollHeight - 100;
 
-      console.log('🔍 Scroll check:', {
-        selector: messageContainer.className,
+      console.log('🔍 Slack scroll check:', {
         scrollTop,
         scrollHeight,
         clientHeight,
@@ -186,12 +158,15 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       });
 
       if (isAtBottom) {
-        console.log('📜 Auto-scrolling to bottom');
-        messageContainer.scrollTop = scrollHeight;
+        console.log('📜 Auto-scrolling to bottom with smooth animation');
+        messageContainer.scrollTo({
+          top: scrollHeight,
+          behavior: 'smooth'
+        });
       } else {
         console.log('🚫 Not at bottom, keeping scroll position');
       }
-    }, 200);
+    }, 100);
   }, [messages]);
 
   // Auto-focus message input when channel changes or component mounts
@@ -200,22 +175,14 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       const timer = setTimeout(() => {
         messageInputRef.current?.focus();
 
-        // 채널 변경 시 하단으로 스크롤
-        const selectors = [
-          '.rce-container-mlist',
-          '.rce-mlist',
-          '.message-list',
-          '.rce-mbox',
-          '[class*="mlist"]'
-        ];
-
-        for (const selector of selectors) {
-          const messageContainer = document.querySelector(selector);
-          if (messageContainer && messageContainer.scrollHeight > messageContainer.clientHeight) {
-            console.log('📜 Channel changed - scrolling to bottom using:', selector);
-            messageContainer.scrollTop = messageContainer.scrollHeight;
-            break;
-          }
+        // 채널 변경 시 하단으로 스크롤 (슬랙 스타일)
+        const messageContainer = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement;
+        if (messageContainer) {
+          console.log('📜 Channel changed - scrolling to bottom with smooth animation');
+          messageContainer.scrollTo({
+            top: messageContainer.scrollHeight,
+            behavior: 'smooth'
+          });
         }
       }, 300);
 
@@ -544,6 +511,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
 
       {/* Messages - Slack Style */}
       <Box
+        data-testid="slack-messages-container"
         sx={{
           flex: 1,
           overflow: 'auto',
@@ -553,7 +521,29 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
           padding: '16px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '8px'
+          gap: '8px',
+          // 커스텀 스크롤바 스타일
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'transparent',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+            borderRadius: '4px',
+            '&:hover': {
+              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+            },
+          },
+          '&::-webkit-scrollbar-thumb:active': {
+            background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+          },
+          // Firefox 스크롤바 스타일
+          scrollbarWidth: 'thin',
+          scrollbarColor: theme.palette.mode === 'dark'
+            ? 'rgba(255, 255, 255, 0.2) transparent'
+            : 'rgba(0, 0, 0, 0.2) transparent',
         }}
         onClick={handleChatAreaClick}
       >

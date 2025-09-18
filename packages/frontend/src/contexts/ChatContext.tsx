@@ -499,10 +499,21 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     createChannel: async (channelData) => {
       try {
+        console.log('📡 ChatContext: Creating channel via API...', channelData);
         const channel = await ChatService.createChannel(channelData);
+        console.log('✅ ChatContext: Channel created, adding to state...', channel);
         dispatch({ type: 'ADD_CHANNEL', payload: channel });
         return channel;
       } catch (error: any) {
+        console.error('❌ ChatContext: Channel creation failed:', {
+          error,
+          message: error.message,
+          status: error.status,
+          code: error.code,
+          isNetworkError: error.isNetworkError,
+          response: error.response,
+          stack: error.stack
+        });
         dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to create channel' });
         throw error;
       }

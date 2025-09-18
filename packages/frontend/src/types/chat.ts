@@ -262,7 +262,7 @@ export interface ChatContextType {
     sendMessage: (channelId: number, message: SendMessageRequest) => Promise<void>;
     editMessage: (messageId: number, content: string) => Promise<void>;
     deleteMessage: (messageId: number) => Promise<void>;
-    createChannel: (channel: CreateChannelRequest) => Promise<void>;
+    createChannel: (channel: CreateChannelRequest) => Promise<Channel>;
     updateChannel: (channelId: number, updates: UpdateChannelRequest) => Promise<void>;
     joinChannel: (channelId: number) => Promise<void>;
     leaveChannel: (channelId: number) => Promise<void>;

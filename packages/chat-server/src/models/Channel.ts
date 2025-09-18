@@ -120,10 +120,19 @@ export class ChannelModel {
     return channel;
   }
 
-  // 채널 조회
+  // 채널 조회 (멤버수 포함)
   static async findById(id: number): Promise<ChannelType | null> {
-    const channel = await this.knex('chat_channels')
-      .where({ id, isArchived: false })
+    const channel = await this.knex('chat_channels as c')
+      .select([
+        'c.*',
+        this.knex.raw('COUNT(cm.userId) as memberCount')
+      ])
+      .leftJoin('chat_channel_members as cm', function() {
+        this.on('c.id', '=', 'cm.channelId')
+            .andOnVal('cm.status', '=', 'active');
+      })
+      .where({ 'c.id': id, 'c.isArchived': false })
+      .groupBy('c.id')
       .first();
 
     return channel || null;
@@ -142,13 +151,19 @@ export class ChannelModel {
         'cm.unreadCount',
         'cm.lastReadAt',
         'cm.notificationSettings',
+        this.knex.raw('COUNT(cm2.userId) as memberCount')
       ])
       .join('chat_channel_members as cm', 'c.id', 'cm.channelId')
+      .leftJoin('chat_channel_members as cm2', function() {
+        this.on('c.id', '=', 'cm2.channelId')
+            .andOnVal('cm2.status', '=', 'active');
+      })
       .where({
         'cm.userId': userId,
         'cm.status': 'active',
         'c.isArchived': false,
-      });
+      })
+      .groupBy('c.id', 'cm.role', 'cm.unreadCount', 'cm.lastReadAt', 'cm.notificationSettings');
 
     if (options.type) {
       query = query.where('c.type', options.type);
@@ -289,7 +304,7 @@ export class ChannelModel {
       ])
       .leftJoin('chat_channel_members as cm', function() {
         this.on('c.id', '=', 'cm.channelId')
-            .andOn('cm.status', '=', 'active');
+            .andOnVal('cm.status', '=', 'active');
       })
       .leftJoin('chat_messages as m', 'c.id', 'm.channelId')
       .where({
@@ -323,6 +338,44 @@ export class ChannelModel {
       .first();
 
     return stats;
+  }
+
+  // 채널을 읽음으로 표시
+  static async markAsRead(channelId: number, userId: number, messageId?: number): Promise<boolean> {
+    try {
+      const updateData: any = {
+        lastReadAt: new Date(),
+        unreadCount: 0,
+      };
+
+      // 특정 메시지까지 읽음 처리
+      if (messageId) {
+        updateData.lastReadMessageId = messageId;
+      } else {
+        // 최신 메시지까지 읽음 처리
+        const latestMessage = await this.knex('chat_messages')
+          .where('channelId', channelId)
+          .orderBy('id', 'desc')
+          .first();
+
+        if (latestMessage) {
+          updateData.lastReadMessageId = latestMessage.id;
+        }
+      }
+
+      const result = await this.knex('chat_channel_members')
+        .where({
+          channelId,
+          userId,
+          status: 'active',
+        })
+        .update(updateData);
+
+      return result > 0;
+    } catch (error) {
+      console.error('Error marking channel as read:', error);
+      return false;
+    }
   }
 
   // 기본 채널 설정
