@@ -3,6 +3,7 @@
 export interface User {
   id: number;
   username: string;
+  name?: string;
   email: string;
   avatar?: string;
   isOnline: boolean;
@@ -246,6 +247,7 @@ export interface ChatState {
   currentChannelId: number | null;
   messages: Record<number, Message[]>; // channelId -> messages
   users: Record<number, User>; // userId -> user
+  user: User | null; // current user
   typingUsers: Record<number, TypingIndicator[]>; // channelId -> typing users
   notifications: ChatNotification[];
   isConnected: boolean;

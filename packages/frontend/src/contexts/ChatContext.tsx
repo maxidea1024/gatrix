@@ -69,6 +69,7 @@ const initialState: ChatState = {
   currentChannelId: null,
   messages: loadCachedMessages(),
   users: {},
+  user: null,
   typingUsers: {},
   notifications: [],
   isConnected: false,
@@ -93,6 +94,7 @@ type ChatAction =
   | { type: 'PREPEND_MESSAGES'; payload: { channelId: number; messages: Message[] } }
   | { type: 'SET_USERS'; payload: User[] }
   | { type: 'UPDATE_USER'; payload: User }
+  | { type: 'SET_CURRENT_USER'; payload: User }
   | { type: 'SET_TYPING_USERS'; payload: { channelId: number; users: TypingIndicator[] } }
   | { type: 'ADD_TYPING_USER'; payload: TypingIndicator }
   | { type: 'REMOVE_TYPING_USER'; payload: { channelId: number; userId: number } };
@@ -227,6 +229,17 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
           ...state.users,
           [action.payload.id]: action.payload,
         },
+        user: state.user?.id === action.payload.id ? action.payload : state.user,
+      };
+
+    case 'SET_CURRENT_USER':
+      return {
+        ...state,
+        user: action.payload,
+        users: {
+          ...state.users,
+          [action.payload.id]: action.payload,
+        },
       };
     
     case 'SET_TYPING_USERS':
@@ -299,8 +312,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Initialize WebSocket connection
   useEffect(() => {
     if (user) {
-      // 현재 사용자 정보를 users 상태에 추가
-      dispatch({ type: 'UPDATE_USER', payload: user });
+      // 현재 사용자 정보를 설정
+      dispatch({ type: 'SET_CURRENT_USER', payload: user });
 
       const connectWebSocket = async () => {
         try {

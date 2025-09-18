@@ -20,6 +20,8 @@ import {
   MeetingLink
 } from 'react-chat-elements';
 import 'react-chat-elements/dist/main.css';
+import moment from 'moment-timezone';
+import { getStoredTimezone } from '../../utils/dateFormat';
 
 // 동적 스타일 생성 함수
 const createCustomStyles = (isDark: boolean) => `
@@ -148,48 +150,93 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     emptyStateSubtext: theme.palette.mode === 'dark' ? '#9aa0a6' : '#666666',
   };
 
-  // Auto-scroll to bottom when new messages arrive (smart scroll logic)
+  // 새 메시지가 올 때 하단에 있으면 자동 스크롤
   useEffect(() => {
-    const messageContainer = document.querySelector('.rce-container-mlist');
-    if (messageContainer && messages.length > 0) {
-      const { scrollTop, scrollHeight, clientHeight } = messageContainer;
+    if (messages.length === 0) return;
 
-      // 스크롤바가 없는 경우 (컨텐츠가 컨테이너보다 작음)
-      const hasScrollbar = scrollHeight > clientHeight;
+    setTimeout(() => {
+      // 여러 가능한 스크롤 컨테이너 확인
+      const selectors = [
+        '.rce-container-mlist',
+        '.rce-mlist',
+        '.message-list',
+        '.rce-mbox',
+        '[class*="mlist"]',
+        '[class*="message"]'
+      ];
 
-      // 하단에 있는지 확인 (5px 여유)
-      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
+      let messageContainer = null;
+      for (const selector of selectors) {
+        const element = document.querySelector(selector);
+        if (element && element.scrollHeight > element.clientHeight) {
+          messageContainer = element;
+          console.log('📦 Found scrollable container:', selector);
+          break;
+        }
+      }
 
-      // 개발 환경에서만 스크롤 상태 로그
-      if (process.env.NODE_ENV === 'development') {
-        console.log('📜 Scroll state:', {
-          hasScrollbar,
-          isAtBottom,
-          scrollTop,
-          scrollHeight,
-          clientHeight,
-          shouldAutoScroll: !hasScrollbar || isAtBottom
+      if (!messageContainer) {
+        console.log('❌ No scrollable container found. Available elements:');
+        selectors.forEach(selector => {
+          const el = document.querySelector(selector);
+          if (el) {
+            console.log(`  ${selector}:`, {
+              scrollHeight: el.scrollHeight,
+              clientHeight: el.clientHeight,
+              hasScroll: el.scrollHeight > el.clientHeight
+            });
+          }
         });
+        return;
       }
 
-      // 스크롤바가 없거나 하단에 있을 경우에만 자동 스크롤
-      if (!hasScrollbar || isAtBottom) {
-        setTimeout(() => {
-          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 50);
+      const { scrollTop, scrollHeight, clientHeight } = messageContainer;
+      // 하단에서 100px 이내에 있으면 자동 스크롤
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 100;
+
+      console.log('🔍 Scroll check:', {
+        selector: messageContainer.className,
+        scrollTop,
+        scrollHeight,
+        clientHeight,
+        isAtBottom,
+        calculatedBottom: scrollHeight - clientHeight,
+        difference: (scrollHeight - clientHeight) - scrollTop
+      });
+
+      if (isAtBottom) {
+        console.log('📜 Auto-scrolling to bottom');
+        messageContainer.scrollTop = scrollHeight;
+      } else {
+        console.log('🚫 Not at bottom, keeping scroll position');
       }
-    }
+    }, 200);
   }, [messages]);
 
   // Auto-focus message input when channel changes or component mounts
   useEffect(() => {
     if (currentChannel && messageInputRef.current) {
-      // 약간의 지연을 두어 렌더링 완료 후 포커스
       const timer = setTimeout(() => {
         messageInputRef.current?.focus();
+
         // 채널 변경 시 하단으로 스크롤
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+        const selectors = [
+          '.rce-container-mlist',
+          '.rce-mlist',
+          '.message-list',
+          '.rce-mbox',
+          '[class*="mlist"]'
+        ];
+
+        for (const selector of selectors) {
+          const messageContainer = document.querySelector(selector);
+          if (messageContainer && messageContainer.scrollHeight > messageContainer.clientHeight) {
+            console.log('📜 Channel changed - scrolling to bottom using:', selector);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+            break;
+          }
+        }
+      }, 300);
 
       return () => clearTimeout(timer);
     }
@@ -262,9 +309,64 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     return format(date, 'HH:mm', { locale });
   };
 
-  const isMyMessage = (userId: number) => {
-    return userId === state.user?.id;
+  // 상대적 시간 표시 (타임존 + 언어 지원)
+  const formatRelativeTime = (timestamp: string) => {
+    const userTimezone = getStoredTimezone();
+    const now = moment().tz(userTimezone);
+    const messageTime = moment(timestamp).tz(userTimezone);
+    const diffInSeconds = now.diff(messageTime, 'seconds');
+
+    if (i18n.language === 'ko') {
+      if (diffInSeconds < 60) {
+        return '방금 전';
+      } else if (diffInSeconds < 3600) {
+        const minutes = Math.floor(diffInSeconds / 60);
+        return `${minutes}분 전`;
+      } else if (diffInSeconds < 86400) {
+        const hours = Math.floor(diffInSeconds / 3600);
+        return `${hours}시간 전`;
+      } else if (diffInSeconds < 604800) {
+        const days = Math.floor(diffInSeconds / 86400);
+        return `${days}일 전`;
+      } else {
+        // 1주일 이상이면 날짜 표시 (사용자 타임존 적용)
+        return messageTime.format('M월 D일');
+      }
+    } else if (i18n.language === 'zh') {
+      if (diffInSeconds < 60) {
+        return '刚刚';
+      } else if (diffInSeconds < 3600) {
+        const minutes = Math.floor(diffInSeconds / 60);
+        return `${minutes}分钟前`;
+      } else if (diffInSeconds < 86400) {
+        const hours = Math.floor(diffInSeconds / 3600);
+        return `${hours}小时前`;
+      } else if (diffInSeconds < 604800) {
+        const days = Math.floor(diffInSeconds / 86400);
+        return `${days}天前`;
+      } else {
+        return messageTime.format('M月D日');
+      }
+    } else {
+      // 영어 (기본값)
+      if (diffInSeconds < 60) {
+        return 'just now';
+      } else if (diffInSeconds < 3600) {
+        const minutes = Math.floor(diffInSeconds / 60);
+        return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+      } else if (diffInSeconds < 86400) {
+        const hours = Math.floor(diffInSeconds / 3600);
+        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+      } else if (diffInSeconds < 604800) {
+        const days = Math.floor(diffInSeconds / 86400);
+        return `${days} day${days > 1 ? 's' : ''} ago`;
+      } else {
+        return messageTime.format('MMM D');
+      }
+    }
   };
+
+
 
   const getUserInfo = (userId: number) => {
     const user = state.users[userId];
@@ -276,29 +378,29 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
 
   // Convert our messages to react-chat-elements format
   const convertToReactChatElements = () => {
-    return messages.map((message, index) => {
+    return messages.map((message) => {
       const userInfo = getUserInfo(message.userId);
-      const isOwn = isMyMessage(message.userId);
 
       return {
         id: message.id,
-        position: isOwn ? 'right' : 'left',
-        type: 'text',
+        position: 'left', // 모든 메시지를 좌측에 표시
+        type: 'text' as const,
         title: userInfo.name,
         text: message.content,
-        date: new Date(message.createdAt),
+        date: new Date(message.createdAt), // 필수 속성
+        dateString: formatRelativeTime(message.createdAt), // 사용자 타임존 + 언어 적용
         avatar: userInfo.avatar,
         focus: false,
-        titleColor: isOwn ? '#ffffff' : '#000000',
+        titleColor: '#000000',
         forwarded: false,
         replyButton: false,
         removeButton: false,
-        status: 'sent',
+        status: 'sent' as const,
         notch: true,
         retracted: false,
         // 텍스트 색상 명시적 설정
         styles: {
-          color: isOwn ? '#ffffff' : '#000000',
+          color: '#000000',
         },
       };
     });
@@ -493,25 +595,121 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         </Box>
       </Paper>
 
-      {/* Messages */}
+      {/* Messages - Slack Style */}
       <Box
         sx={{
           flex: 1,
           overflow: 'auto',
           backgroundColor: colors.chatBackground,
           cursor: 'text',
-          height: 0, // flex 컨테이너에서 스크롤을 위해 필요
+          height: 0,
+          padding: '16px',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          gap: '8px'
         }}
         onClick={handleChatAreaClick}
       >
-        <MessageList
-          className="message-list"
-          lockable={false}
-          toBottomHeight={0}
-          dataSource={chatMessages}
-        />
+        {messages.map((message) => {
+          const userInfo = getUserInfo(message.userId);
+          const messageTime = formatRelativeTime(message.createdAt);
+
+          return (
+            <Box
+              key={message.id}
+              sx={{
+                display: 'flex',
+                gap: '12px',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                '&:hover': {
+                  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)'
+                }
+              }}
+            >
+              {/* Avatar */}
+              <Box
+                sx={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                  backgroundColor: theme.palette.mode === 'dark' ? '#5f6368' : '#e0e0e0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <img
+                  src={userInfo.avatar}
+                  alt={userInfo.name}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                  onError={(e) => {
+                    // 이미지 로드 실패 시 이니셜 표시
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent) {
+                      parent.innerHTML = `<span style="color: white; font-weight: bold; font-size: 14px;">${userInfo.name.charAt(0).toUpperCase()}</span>`;
+                    }
+                  }}
+                />
+              </Box>
+
+              {/* Message Content */}
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                {/* Header */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: '8px',
+                    marginBottom: '4px'
+                  }}
+                >
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      fontWeight: 600,
+                      color: theme.palette.mode === 'dark' ? '#e8eaed' : '#1d1c1d',
+                      fontSize: '15px'
+                    }}
+                  >
+                    {userInfo.name}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: theme.palette.mode === 'dark' ? '#9aa0a6' : '#616061',
+                      fontSize: '12px'
+                    }}
+                  >
+                    {messageTime}
+                  </Typography>
+                </Box>
+
+                {/* Message Text */}
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: theme.palette.mode === 'dark' ? '#e8eaed' : '#1d1c1d',
+                    fontSize: '15px',
+                    lineHeight: 1.46,
+                    wordBreak: 'break-word',
+                    whiteSpace: 'pre-wrap'
+                  }}
+                >
+                  {message.content}
+                </Typography>
+              </Box>
+            </Box>
+          );
+        })}
         <div ref={messagesEndRef} />
       </Box>
 
