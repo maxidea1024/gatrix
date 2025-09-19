@@ -455,6 +455,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Actions
   const actions: ChatContextType['actions'] = {
     setCurrentChannel: (channelId) => {
+      const previousChannelId = state.currentChannelId;
       dispatch({ type: 'SET_CURRENT_CHANNEL', payload: channelId });
 
       // 마지막 채널 ID 저장
@@ -462,8 +463,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem('lastChannelId', channelId.toString());
         console.log('Saved last channel ID:', channelId);
 
-        // 채널 메시지 로딩 (항상 최신 메시지 50개 로딩)
-        loadMessages(channelId);
+        // 채널이 실제로 변경된 경우에만 메시지 로딩
+        if (previousChannelId !== channelId) {
+          console.log('Channel changed from', previousChannelId, 'to', channelId);
+          loadMessages(channelId);
+        }
 
         // WebSocket 채널 참여
         wsService.joinChannel(channelId);
@@ -604,15 +608,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     },
 
-    loadMessages: async (channelId) => {
-      try {
-        const result = await ChatService.getMessages({ channelId, limit: 50 });
-        dispatch({ type: 'SET_MESSAGES', payload: { channelId, messages: result.messages } });
-      } catch (error: any) {
-        dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to load messages' });
-        throw error;
-      }
-    },
+    loadMessages: loadMessages,
 
     loadMoreMessages: async (channelId) => {
       try {
@@ -654,15 +650,21 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Load messages for a channel
-  const loadMessages = useCallback(async (channelId: number) => {
+  const loadMessages = useCallback(async (channelId: number, forceReload = false) => {
     try {
-      console.log('Loading messages for channel:', channelId);
+      console.log('Loading messages for channel:', channelId, 'forceReload:', forceReload);
+
+      // 강제 리로드가 아니고 이미 메시지가 있다면 스킵
+      if (!forceReload && state.messages[channelId] && state.messages[channelId].length > 0) {
+        console.log('Messages already loaded for channel:', channelId, 'count:', state.messages[channelId].length);
+        return;
+      }
 
       // 현재 상태에서 캐시된 메시지 확인
       const currentCachedMessages = loadCachedMessages();
       const cachedMessages = currentCachedMessages[channelId];
 
-      if (cachedMessages && cachedMessages.length > 0) {
+      if (!forceReload && cachedMessages && cachedMessages.length > 0) {
         console.log('Using cached messages:', cachedMessages.length);
         // 캐시된 메시지를 먼저 상태에 설정
         dispatch({ type: 'SET_MESSAGES', payload: { channelId, messages: cachedMessages } });
@@ -685,7 +687,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      // 캐시된 메시지가 없으면 서버에서 로딩
+      // 캐시된 메시지가 없거나 강제 리로드인 경우 서버에서 로딩
       const result = await ChatService.getMessages({
         channelId,
         limit: 50 // 최근 50개 메시지만 로딩
@@ -696,7 +698,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Failed to load messages for channel', channelId, ':', error);
       dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to load messages' });
     }
-  }, []);
+  }, [state.messages]);
 
   return (
     <ChatContext.Provider value={{ state, actions }}>

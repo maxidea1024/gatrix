@@ -62,7 +62,7 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
           }}
         />
         {urls.length > 0 && (
-          <Box sx={{ mt: 1 }}>
+          <Box sx={{ mt: 1 }} data-link-preview="container">
             <LinkPreviewList urls={urls} />
           </Box>
         )}

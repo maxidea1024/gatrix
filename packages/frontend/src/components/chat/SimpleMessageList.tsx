@@ -39,7 +39,75 @@ const SimpleMessageList: React.FC<MessageListProps> = ({
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const scrollToBottom = () => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    // 초기 스크롤
+    scrollToBottom();
+
+    // 미디어 콘텐츠 로딩 완료를 위한 추가 체크
+    const checkForMediaContent = () => {
+      const messageContainer = messagesEndRef.current?.parentElement;
+      if (!messageContainer) return;
+
+      // 이미지, 비디오, iframe 등의 미디어 요소들 찾기
+      const mediaElements = messageContainer.querySelectorAll('img, video, iframe, [data-link-preview="container"], [data-link-preview="loaded"], [data-link-preview="loading"]');
+
+      if (mediaElements.length > 0) {
+        console.log(`🖼️ Found ${mediaElements.length} media elements in SimpleMessageList`);
+
+        let loadedCount = 0;
+        const totalElements = mediaElements.length;
+
+        const handleMediaLoad = () => {
+          loadedCount++;
+          console.log(`📸 Media loaded: ${loadedCount}/${totalElements}`);
+
+          if (loadedCount === totalElements) {
+            setTimeout(scrollToBottom, 50);
+          }
+        };
+
+        mediaElements.forEach((element) => {
+          if (element.tagName === 'IMG') {
+            const img = element as HTMLImageElement;
+            if (img.complete) {
+              handleMediaLoad();
+            } else {
+              img.addEventListener('load', handleMediaLoad, { once: true });
+              img.addEventListener('error', handleMediaLoad, { once: true });
+            }
+          } else if (element.tagName === 'VIDEO') {
+            const video = element as HTMLVideoElement;
+            if (video.readyState >= 1) {
+              handleMediaLoad();
+            } else {
+              video.addEventListener('loadedmetadata', handleMediaLoad, { once: true });
+              video.addEventListener('error', handleMediaLoad, { once: true });
+            }
+          } else if (element.tagName === 'IFRAME') {
+            const iframe = element as HTMLIFrameElement;
+            iframe.addEventListener('load', handleMediaLoad, { once: true });
+            iframe.addEventListener('error', handleMediaLoad, { once: true });
+            setTimeout(handleMediaLoad, 1000);
+          } else {
+            handleMediaLoad();
+          }
+        });
+
+        // 안전장치: 3초 후에도 모든 미디어가 로드되지 않았다면 강제로 스크롤
+        setTimeout(() => {
+          if (loadedCount < totalElements) {
+            console.log(`⏰ Timeout: Only ${loadedCount}/${totalElements} media loaded, forcing scroll`);
+            scrollToBottom();
+          }
+        }, 3000);
+      }
+    };
+
+    // 미디어 콘텐츠 체크를 위한 추가 지연
+    setTimeout(checkForMediaContent, 200);
   }, [messages]);
 
   // Load messages when channel changes

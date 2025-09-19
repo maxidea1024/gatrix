@@ -71,6 +71,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
               fullWidth
               helperText="이메일을 입력하지 않으면 링크만 생성됩니다."
               variant="outlined"
+              autoFocus
             />
 
             <FormControl fullWidth>
@@ -138,6 +139,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
         fullWidth
         helperText="이메일을 입력하지 않으면 링크만 생성됩니다."
         variant="outlined"
+        autoFocus
       />
 
       <FormControl fullWidth>

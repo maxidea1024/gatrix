@@ -1310,6 +1310,7 @@ const UsersManagementPage: React.FC = () => {
                 required
                 error={!!newUserErrors.name}
                 helperText={newUserErrors.name || t('admin.users.form.nameHelp')}
+                autoFocus
               />
             </Box>
             <Box>
@@ -1683,6 +1684,7 @@ const UsersManagementPage: React.FC = () => {
                 fullWidth
                 error={!!editUserErrors.name}
                 helperText={editUserErrors.name || t('admin.users.form.nameHelp')}
+                autoFocus
               />
             </Box>
             <Box>

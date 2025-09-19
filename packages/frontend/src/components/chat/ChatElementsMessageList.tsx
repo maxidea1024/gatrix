@@ -164,7 +164,9 @@ const MarkdownMessage: React.FC<{ content: string; theme: any }> = ({ content, t
                   fontSize: '13px',
                   lineHeight: 1.45,
                   color: theme.palette.mode === 'dark' ? '#e8eaed' : '#24292e',
-                  whiteSpace: 'pre-wrap'
+                  whiteSpace: 'pre-wrap',
+                  userSelect: 'text', // 코드 블록 텍스트 선택 허용
+                  cursor: 'text'
                 }}
               >
                 {part.content}
@@ -182,7 +184,9 @@ const MarkdownMessage: React.FC<{ content: string; theme: any }> = ({ content, t
                   padding: '2px 4px',
                   fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
                   fontSize: '13px',
-                  color: theme.palette.mode === 'dark' ? '#e8eaed' : '#24292e'
+                  color: theme.palette.mode === 'dark' ? '#e8eaed' : '#24292e',
+                  userSelect: 'text', // 인라인 코드 텍스트 선택 허용
+                  cursor: 'text'
                 }}
               >
                 {part.content}
@@ -371,8 +375,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   useEffect(() => {
     if (messages.length === 0) return;
 
-    setTimeout(() => {
-      // 슬랙 스타일 메시지 컨테이너 찾기
+    const scrollToBottom = () => {
       const messageContainer = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement;
 
       if (!messageContainer) {
@@ -402,7 +405,76 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       } else {
         console.log('🚫 Not at bottom, keeping scroll position');
       }
-    }, 100);
+    };
+
+    // 초기 스크롤 체크
+    setTimeout(scrollToBottom, 100);
+
+    // 미디어 콘텐츠 로딩 완료를 위한 추가 체크
+    const checkForMediaContent = () => {
+      const messageContainer = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement;
+      if (!messageContainer) return;
+
+      // 이미지, 비디오, iframe 등의 미디어 요소들 찾기
+      const mediaElements = messageContainer.querySelectorAll('img, video, iframe, [data-link-preview="container"], [data-link-preview="loaded"], [data-link-preview="loading"]');
+
+      if (mediaElements.length > 0) {
+        console.log(`🖼️ Found ${mediaElements.length} media elements, setting up load listeners`);
+
+        let loadedCount = 0;
+        const totalElements = mediaElements.length;
+
+        const handleMediaLoad = () => {
+          loadedCount++;
+          console.log(`📸 Media loaded: ${loadedCount}/${totalElements}`);
+
+          // 모든 미디어가 로드되었거나 마지막 요소가 로드된 후 스크롤 체크
+          if (loadedCount === totalElements) {
+            setTimeout(scrollToBottom, 50);
+          }
+        };
+
+        mediaElements.forEach((element, index) => {
+          if (element.tagName === 'IMG') {
+            const img = element as HTMLImageElement;
+            if (img.complete) {
+              handleMediaLoad();
+            } else {
+              img.addEventListener('load', handleMediaLoad, { once: true });
+              img.addEventListener('error', handleMediaLoad, { once: true });
+            }
+          } else if (element.tagName === 'VIDEO') {
+            const video = element as HTMLVideoElement;
+            if (video.readyState >= 1) {
+              handleMediaLoad();
+            } else {
+              video.addEventListener('loadedmetadata', handleMediaLoad, { once: true });
+              video.addEventListener('error', handleMediaLoad, { once: true });
+            }
+          } else if (element.tagName === 'IFRAME') {
+            const iframe = element as HTMLIFrameElement;
+            iframe.addEventListener('load', handleMediaLoad, { once: true });
+            iframe.addEventListener('error', handleMediaLoad, { once: true });
+            // iframe의 경우 타임아웃도 설정
+            setTimeout(handleMediaLoad, 1000);
+          } else {
+            // 기타 요소들 (링크 프리뷰 등)
+            handleMediaLoad();
+          }
+        });
+
+        // 안전장치: 3초 후에도 모든 미디어가 로드되지 않았다면 강제로 스크롤
+        setTimeout(() => {
+          if (loadedCount < totalElements) {
+            console.log(`⏰ Timeout: Only ${loadedCount}/${totalElements} media loaded, forcing scroll`);
+            scrollToBottom();
+          }
+        }, 3000);
+      }
+    };
+
+    // 미디어 콘텐츠 체크를 위한 추가 지연
+    setTimeout(checkForMediaContent, 200);
   }, [messages]);
 
   // Auto-focus message input when channel changes or component mounts
@@ -426,8 +498,20 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     }
   }, [channelId, currentChannel]);
 
-  // Focus input when clicking anywhere in the chat area
-  const handleChatAreaClick = () => {
+  // Focus input when clicking anywhere in the chat area (but not when selecting text)
+  const handleChatAreaClick = (e: React.MouseEvent) => {
+    // Don't focus input if user is selecting text
+    const selection = window.getSelection();
+    if (selection && selection.toString().length > 0) {
+      return;
+    }
+
+    // Don't focus input if user clicked on a link or interactive element
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'A' || target.closest('a') || target.closest('button')) {
+      return;
+    }
+
     if (messageInputRef.current && currentChannel) {
       messageInputRef.current.focus();
     }
@@ -468,7 +552,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     } else if (channelId && messages.length > 0) {
       console.log(`✅ Channel ${channelId} already has ${messages.length} messages`);
     }
-  }, [channelId, messages.length]);
+  }, [channelId]); // messages.length 의존성 제거
 
   const handleSendMessage = () => {
     if (messageInput.trim() && currentChannel) {
@@ -795,6 +879,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                 gap: '12px',
                 padding: '8px 12px',
                 borderRadius: '8px',
+                userSelect: 'text', // 메시지 컨테이너에서 텍스트 선택 허용
                 '&:hover': {
                   backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)'
                 }
@@ -874,8 +959,11 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                     fontSize: '15px',
                     lineHeight: 1.46,
                     wordBreak: 'break-word',
-                    whiteSpace: 'pre-wrap'
+                    whiteSpace: 'pre-wrap',
+                    userSelect: 'text', // 텍스트 선택 허용
+                    cursor: 'text' // 텍스트 커서 표시
                   }}
+                  onClick={(e) => e.stopPropagation()} // 클릭 이벤트 전파 방지
                 >
                   <MessageWithPreview content={message.content} theme={theme} />
                 </Typography>

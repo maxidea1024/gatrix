@@ -16,7 +16,7 @@ export interface ApiResponse<T> {
 }
 
 export class PlatformDefaultsService {
-  private static readonly BASE_URL = '/admin/client-version/platform-defaults';
+  private static readonly BASE_URL = '/admin/platform-defaults';
 
   /**
    * 모든 플랫폼의 기본값 조회

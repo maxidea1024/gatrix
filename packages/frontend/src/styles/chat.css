@@ -51,15 +51,18 @@
   background-color: var(--mui-palette-background-paper) !important;
   color: var(--mui-palette-text-primary) !important;
   border: 1px solid var(--mui-palette-divider) !important;
+  user-select: text !important; /* 수신 메시지 텍스트 선택 허용 */
 }
 
 .cs-message--outgoing .cs-message__content {
   background-color: var(--mui-palette-primary-main) !important;
   color: var(--mui-palette-primary-contrastText) !important;
+  user-select: text !important; /* 발신 메시지 텍스트 선택 허용 */
 }
 
 .cs-message__content-wrapper {
   max-width: 70% !important;
+  user-select: text !important; /* 메시지 텍스트 선택 허용 */
 }
 
 .cs-message__avatar {

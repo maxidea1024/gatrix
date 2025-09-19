@@ -44,7 +44,7 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
 
   if (loading) {
     return (
-      <div className={`link-preview loading ${className}`}>
+      <div className={`link-preview loading ${className}`} data-link-preview="loading">
         <div className="link-preview-skeleton">
           <div className="skeleton-image"></div>
           <div className="skeleton-content">
@@ -59,7 +59,7 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
 
   if (error || !preview) {
     return (
-      <div className={`link-preview error ${className}`}>
+      <div className={`link-preview error ${className}`} data-link-preview="error">
         <div className="link-preview-fallback">
           <div className="fallback-icon">🔗</div>
           <div className="fallback-content">
@@ -82,28 +82,63 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
     return description;
   };
 
+  const isYouTubeUrl = (url: string): boolean => {
+    return /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/.test(url);
+  };
+
+  const getYouTubeEmbedUrl = (url: string): string | null => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/);
+    return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+  };
+
+  const renderYouTubeEmbed = () => {
+    const embedUrl = getYouTubeEmbedUrl(url);
+    if (!embedUrl) return null;
+
+    return (
+      <div className="link-preview-youtube" style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
+        <iframe
+          src={embedUrl}
+          title={preview?.title || 'YouTube video'}
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%'
+          }}
+        />
+      </div>
+    );
+  };
+
   return (
-    <div className={`link-preview ${className}`} onClick={handleClick}>
+    <div className={`link-preview ${className}`} onClick={isYouTubeUrl(url) ? undefined : handleClick} data-link-preview="loaded">
       <div className="link-preview-card">
-        {preview.image && (
+        {isYouTubeUrl(url) ? (
+          renderYouTubeEmbed()
+        ) : preview.image ? (
           <div className="link-preview-image">
-            <img 
-              src={preview.image} 
-              alt={preview.title || 'Link preview'} 
+            <img
+              src={preview.image}
+              alt={preview.title || 'Link preview'}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.style.display = 'none';
               }}
             />
           </div>
-        )}
-        
+        ) : null}
+
         <div className="link-preview-content">
           <div className="link-preview-header">
             {preview.favicon && (
-              <img 
-                src={preview.favicon} 
-                alt="Site favicon" 
+              <img
+                src={preview.favicon}
+                alt="Site favicon"
                 className="link-preview-favicon"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
@@ -132,13 +167,13 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
                 작성자: {preview.author}
               </span>
             )}
-            
+
             {preview.readingTime && (
               <span className="link-preview-reading-time">
                 읽기 시간: {preview.readingTime}
               </span>
             )}
-            
+
             {preview.publishedTime && (
               <span className="link-preview-published-time">
                 {linkPreviewService.formatPublishedTime(preview.publishedTime)}
@@ -147,7 +182,13 @@ export const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' })
           </div>
 
           <div className="link-preview-url">
-            {url}
+            {isYouTubeUrl(url) ? (
+              <a href={url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+                {url}
+              </a>
+            ) : (
+              url
+            )}
           </div>
         </div>
       </div>

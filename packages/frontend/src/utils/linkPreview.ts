@@ -1,5 +1,5 @@
 import { LinkPreview } from '../types/chat';
-import { apiService } from '../services/apiService';
+import { apiService } from '../services/api';
 
 // URL 정규식 패턴
 const URL_REGEX = /(https?:\/\/[^\s<>"{}|\\^`[\]]+)/gi;
@@ -103,6 +103,65 @@ const extractLinkPreviewFallback = async (url: string): Promise<LinkPreview | nu
 export const extractUrlsFromMessage = (message: string): string[] => {
   const matches = message.match(URL_REGEX);
   return matches || [];
+};
+
+// 여러 URL 일괄 처리
+export const extractMultipleLinkPreviews = async (urls: string[]): Promise<LinkPreview[]> => {
+  if (urls.length === 0) return [];
+
+  try {
+    // 캐시된 결과 확인
+    const cachedResults: LinkPreview[] = [];
+    const uncachedUrls: string[] = [];
+
+    urls.forEach(url => {
+      const cached = previewCache.get(url);
+      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+        cachedResults.push(cached.data);
+      } else {
+        uncachedUrls.push(url);
+      }
+    });
+
+    // 캐시되지 않은 URL들만 API 호출
+    if (uncachedUrls.length > 0) {
+      const response = await apiService.post<{
+        success: boolean;
+        data: Array<{ url: string; success: boolean; data: LinkPreview | null }>
+      }>('/link-preview/batch', {
+        urls: uncachedUrls
+      });
+
+      if (response.success && response.data) {
+        response.data.forEach(result => {
+          if (result.success && result.data) {
+            // 캐시에 저장
+            previewCache.set(result.url, {
+              data: result.data,
+              timestamp: Date.now()
+            });
+            cachedResults.push(result.data);
+          }
+        });
+      }
+    }
+
+    return cachedResults;
+
+  } catch (error) {
+    console.error('일괄 링크 미리보기 실패:', error);
+
+    // 폴백: 개별적으로 처리
+    const results = await Promise.allSettled(
+      urls.map(url => extractLinkPreviewFallback(url))
+    );
+
+    return results
+      .filter((result): result is PromiseFulfilledResult<LinkPreview> =>
+        result.status === 'fulfilled' && result.value !== null
+      )
+      .map(result => result.value);
+  }
 };
 
 // URL에서 제목 추출 (간단한 버전)
