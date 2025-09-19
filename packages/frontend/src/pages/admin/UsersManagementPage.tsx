@@ -197,8 +197,11 @@ const UsersManagementPage: React.FC = () => {
     try {
       const invitation = await invitationService.getCurrentInvitation();
       setCurrentInvitation(invitation);
-    } catch (error) {
-      console.error('Failed to load current invitation:', error);
+    } catch (error: any) {
+      // 시스템 초대 기능이 아직 구현되지 않았으므로 404 에러는 무시
+      if (error.status !== 404) {
+        console.error('Failed to load current invitation:', error);
+      }
     }
   };
 
@@ -252,7 +255,7 @@ const UsersManagementPage: React.FC = () => {
       }
     };
     loadTags();
-    loadCurrentInvitation();
+    // loadCurrentInvitation(); // 시스템 초대 기능이 아직 구현되지 않음
   }, []);
 
   // 체크박스 핸들러
@@ -877,14 +880,15 @@ const UsersManagementPage: React.FC = () => {
                 mx: 0.5,
                 alignSelf: 'stretch'
               }} />
-              <Button
+              {/* 시스템 초대 기능은 아직 구현되지 않음 */}
+              {/* <Button
                 variant="outlined"
                 startIcon={<SendIcon />}
                 onClick={() => setInvitationDialogOpen(true)}
                 disabled={!!currentInvitation}
               >
                 초대
-              </Button>
+              </Button> */}
             </Box>
           </Box>
         </CardContent>
@@ -950,14 +954,14 @@ const UsersManagementPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Current Invitation Status */}
-      {currentInvitation && (
+      {/* Current Invitation Status - 시스템 초대 기능은 아직 구현되지 않음 */}
+      {/* {currentInvitation && (
         <InvitationStatusCard
           invitation={currentInvitation}
           onUpdate={handleUpdateInvitation}
           onDelete={handleDeleteInvitation}
         />
-      )}
+      )} */}
 
       {/* Users Table */}
       <Card>

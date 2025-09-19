@@ -61,6 +61,7 @@ export const config = {
   gatrix: {
     apiUrl: process.env.GATRIX_API_URL || 'http://localhost:3000',
     apiSecret: process.env.GATRIX_API_SECRET || 'shared-secret-between-servers',
+    connectionTimeout: parseInt(process.env.GATRIX_CONNECTION_TIMEOUT || '30000', 10),
   },
 
   // CORS

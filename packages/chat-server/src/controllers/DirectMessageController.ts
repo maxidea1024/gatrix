@@ -3,7 +3,9 @@ import { ChannelModel } from '../models/Channel';
 import { UserPrivacySettingsModel } from '../models/UserPrivacySettings';
 import { userSyncService } from '../services/UserSyncService';
 import { BroadcastService } from '../services/BroadcastService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('DirectMessageController');
 
 export class DirectMessageController {
   // 1:1 대화 시작 또는 기존 대화 조회

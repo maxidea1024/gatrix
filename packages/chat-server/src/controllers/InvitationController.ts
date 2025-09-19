@@ -3,7 +3,9 @@ import { ChannelInvitationModel } from '../models/ChannelInvitation';
 import { UserPrivacySettingsModel } from '../models/UserPrivacySettings';
 import { ChannelModel } from '../models/Channel';
 import { userSyncService } from '../services/UserSyncService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('InvitationController');
 
 export class InvitationController {
   // 채널에 사용자 초대

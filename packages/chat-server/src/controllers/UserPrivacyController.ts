@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { UserPrivacySettingsModel, UpdatePrivacySettingsData } from '../models/UserPrivacySettings';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('UserPrivacyController');
 
 export class UserPrivacyController {
   // 현재 사용자의 프라이버시 설정 조회

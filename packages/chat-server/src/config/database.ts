@@ -1,6 +1,8 @@
 import knex, { Knex } from 'knex';
 import { config } from './index';
-import logger from './logger';
+import { createLogger } from './logger';
+
+const logger = createLogger('DatabaseManager');
 
 class DatabaseManager {
   private static instance: DatabaseManager;
@@ -46,7 +48,7 @@ class DatabaseManager {
         seeds: {
           directory: './seeds',
         },
-        debug: config.isDevelopment,
+        debug: false, // SQL 로그 출력 비활성화
         asyncStackTraces: config.isDevelopment,
       };
 
@@ -85,7 +87,7 @@ class DatabaseManager {
       return true;
     } catch (error) {
       logger.error('Database connection test failed:', error);
-      return false;
+      throw error; // 실패 시 예외를 던져서 서버 시작을 중단
     }
   }
 

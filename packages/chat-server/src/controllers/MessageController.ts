@@ -3,7 +3,9 @@ import { MessageModel } from '../models/Message';
 import { ChannelModel } from '../models/Channel';
 import { CreateMessageData, UpdateMessageData, SearchQuery } from '../types/chat';
 import { metricsService } from '../services/MetricsService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('MessageController');
 
 export class MessageController {
   // 메시지 생성

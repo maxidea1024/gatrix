@@ -1,7 +1,9 @@
 import { gatrixApiService, GatrixUser } from './GatrixApiService';
 import { redisManager } from '../config/redis';
 import { databaseManager } from '../config/database';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('UserSyncService');
 
 export class UserSyncService {
   private static instance: UserSyncService;

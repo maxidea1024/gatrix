@@ -5,12 +5,11 @@ import privacyRouter from './privacy';
 import invitationsRouter from './invitations';
 import directMessagesRouter from './direct-messages';
 
-import { requestLogger, errorHandler } from '../middleware/auth';
+import { errorHandler } from '../middleware/auth';
 
 const router = Router();
 
-// 요청 로깅 미들웨어
-router.use(requestLogger);
+
 
 // API 정보 엔드포인트
 router.get('/', (req, res) => {

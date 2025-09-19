@@ -1,6 +1,8 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { config } from '../config';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('GatrixApiService');
 
 export interface GatrixUser {
   id: number;
@@ -57,7 +59,7 @@ export class GatrixApiService {
     // 요청 인터셉터
     this.apiClient.interceptors.request.use(
       (config) => {
-        logger.debug('Gatrix API Request:', {
+        logger.debug('Gatrix backend Request:', {
           method: config.method,
           url: config.url,
           headers: config.headers,
@@ -65,7 +67,7 @@ export class GatrixApiService {
         return config;
       },
       (error) => {
-        logger.error('Gatrix API Request Error:', error);
+        logger.error('Gatrix backend Request Error:', error);
         return Promise.reject(error);
       }
     );
@@ -73,7 +75,7 @@ export class GatrixApiService {
     // 응답 인터셉터
     this.apiClient.interceptors.response.use(
       (response) => {
-        logger.debug('Gatrix API Response:', {
+        logger.debug('Gatrix backend Response:', {
           status: response.status,
           url: response.config.url,
           data: response.data,
@@ -81,12 +83,16 @@ export class GatrixApiService {
         return response;
       },
       (error) => {
-        logger.error('Gatrix API Response Error:', {
-          status: error.response?.status,
-          url: error.config?.url,
-          data: error.response?.data,
-          message: error.message,
-        });
+        // 네트워크 연결 오류(ECONNREFUSED 등)는 로그를 출력하지 않음
+        // 실제 API 오류(4xx, 5xx)만 로그 출력
+        if (error.response && error.response.status >= 400) {
+          logger.error('Gatrix backend Response Error:', {
+            status: error.response.status,
+            url: error.config?.url,
+            data: error.response.data,
+            message: error.message,
+          });
+        }
         return Promise.reject(error);
       }
     );
@@ -310,6 +316,17 @@ export class GatrixApiService {
       return response.data.success;
     } catch (error) {
       logger.error('Gatrix health check failed:', error);
+      return false;
+    }
+  }
+
+  // Backend readiness 체크
+  public async checkReadiness(): Promise<boolean> {
+    try {
+      const response: AxiosResponse<{ status: string }> = await this.apiClient.get('/api/v1/ready');
+      return response.data.status === 'ready';
+    } catch (error) {
+      // 네트워크 연결 오류는 로그를 출력하지 않음 (backend가 아직 시작되지 않은 정상적인 상황)
       return false;
     }
   }

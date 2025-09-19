@@ -6,7 +6,9 @@ import { config } from '../config';
 import { redisManager } from '../config/redis';
 import { BroadcastService } from './BroadcastService';
 import { metricsService } from './MetricsService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('WebSocketService');
 import { SocketUser, WebSocketEvent } from '../types/chat';
 
 export class WebSocketService {

@@ -2,7 +2,9 @@ const promClient = require('prom-client');
 const { register, collectDefaultMetrics, Counter, Histogram, Gauge } = promClient;
 import express from 'express';
 import { config } from '../config';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('MetricsService');
 
 export class MetricsService {
   private static instance: MetricsService;

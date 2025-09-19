@@ -1,41 +1,25 @@
 import winston from 'winston';
-import { config } from './index';
+import DailyRotateFile from 'winston-daily-rotate-file';
+import path from 'path';
 
-// Safe JSON stringify to avoid circular references
-function safeStringify(obj: any): string {
-  const seen = new WeakSet();
-  return JSON.stringify(obj, (key, val) => {
-    if (val != null && typeof val === 'object') {
-      if (seen.has(val)) {
-        return '[Circular]';
-      }
-      seen.add(val);
-    }
-    return val;
-  });
-}
+const logDir = process.env.LOG_DIR || 'logs';
+const logLevel = process.env.LOG_LEVEL || 'info';
 
-// Custom format for console output with timestamp
+// Custom format for console output
 const consoleFormat = winston.format.combine(
   winston.format.colorize({ all: true }),
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  winston.format.printf(({ timestamp, level, message, stack, ...meta }) => {
-    let log = `${timestamp} [${level}]: ${message}`;
-
+  winston.format.printf(({ timestamp, level, message, ...meta }) => {
+    let metaStr = '';
     if (Object.keys(meta).length > 0) {
       try {
-        const metaStr = safeStringify(meta);
-        log += ` ${metaStr}`;
+        metaStr = '\n' + JSON.stringify(meta, null, 2);
       } catch (error) {
-        log += ` [Error serializing meta data]`;
+        metaStr = '\n[Object could not be serialized]';
       }
     }
-
-    if (stack) {
-      log += `\n${stack}`;
-    }
-
-    return log;
+    const result = `${timestamp} [${level}]: ${message}${metaStr}`;
+    return result;
   })
 );
 
@@ -43,55 +27,159 @@ const consoleFormat = winston.format.combine(
 const fileFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.errors({ stack: true }),
-  winston.format.json(),
-  winston.format.printf(({ timestamp, level, message, stack, ...meta }) => {
-    let log = `${timestamp} [${level.toUpperCase()}]: ${message}`;
-
-    if (Object.keys(meta).length > 0) {
-      try {
-        log += ` ${safeStringify(meta)}`;
-      } catch (error) {
-        log += ` [Error serializing meta data]`;
-      }
-    }
-
-    if (stack) {
-      log += `\n${stack}`;
-    }
-
-    return log;
-  })
+  winston.format.json()
 );
 
+// Create transports
+const transports: winston.transport[] = [
+  // Console transport
+  new winston.transports.Console({
+    level: logLevel,
+    format: consoleFormat,
+  }),
+];
+
+// Add file transports only in production or when LOG_DIR is specified
+if (process.env.NODE_ENV === 'production' || process.env.LOG_DIR) {
+  // Error log file
+  transports.push(
+    new DailyRotateFile({
+      filename: path.join(logDir, 'chat-error-%DATE%.log'),
+      datePattern: 'YYYY-MM-DD',
+      level: 'error',
+      format: fileFormat,
+      maxSize: '20m',
+      maxFiles: '14d',
+      zippedArchive: true,
+    })
+  );
+
+  // Combined log file
+  transports.push(
+    new DailyRotateFile({
+      filename: path.join(logDir, 'chat-combined-%DATE%.log'),
+      datePattern: 'YYYY-MM-DD',
+      format: fileFormat,
+      maxSize: '20m',
+      maxFiles: '14d',
+      zippedArchive: true,
+    })
+  );
+}
+
+// Create logger instance
 const logger = winston.createLogger({
-  level: config.logging.level,
+  level: logLevel,
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.errors({ stack: true })
   ),
-  defaultMeta: {
-    service: 'chat-server',
-    pid: process.pid,
-    serverId: process.env.SERVER_ID || 'unknown',
-  },
-  transports: [
+  transports,
+  // Handle uncaught exceptions and rejections
+  exceptionHandlers: [
+    new winston.transports.Console({
+      format: consoleFormat,
+    }),
+  ],
+  rejectionHandlers: [
     new winston.transports.Console({
       format: consoleFormat,
     }),
   ],
 });
 
-// Add file transport in production
-if (config.isProduction) {
-  logger.add(
-    new winston.transports.File({
-      filename: config.logging.file,
+// Add file exception handlers in production
+if (process.env.NODE_ENV === 'production' || process.env.LOG_DIR) {
+  logger.exceptions.handle(
+    new DailyRotateFile({
+      filename: path.join(logDir, 'chat-exceptions-%DATE%.log'),
+      datePattern: 'YYYY-MM-DD',
       format: fileFormat,
-      maxsize: 10485760, // 10MB
-      maxFiles: 5,
-      tailable: true,
+      maxSize: '20m',
+      maxFiles: '14d',
+      zippedArchive: true,
+    })
+  );
+
+  logger.rejections.handle(
+    new DailyRotateFile({
+      filename: path.join(logDir, 'chat-rejections-%DATE%.log'),
+      datePattern: 'YYYY-MM-DD',
+      format: fileFormat,
+      maxSize: '20m',
+      maxFiles: '14d',
+      zippedArchive: true,
     })
   );
 }
 
+// Category-based logger factory
+const loggers = new Map<string, winston.Logger>();
+
+const createLogger = (category: string): winston.Logger => {
+  if (loggers.has(category)) {
+    return loggers.get(category)!;
+  }
+
+  // Custom format for category-based logging
+  const categoryFormat = winston.format.combine(
+    winston.format.colorize({ all: true }),
+    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+    winston.format.printf(({ timestamp, level, message, ...meta }) => {
+      let metaStr = '';
+      if (Object.keys(meta).length > 0) {
+        try {
+          metaStr = '\n' + JSON.stringify(meta, null, 2);
+        } catch (error) {
+          metaStr = '\n[Object could not be serialized]';
+        }
+      }
+      // Apply yellow color to category name only
+      const coloredCategory = `[\x1b[33m${category}\x1b[0m]`;
+      const result = `${timestamp} [${level}] ${coloredCategory}: ${message}${metaStr}`;
+      return result;
+    })
+  );
+
+  const categoryLogger = winston.createLogger({
+    level: logLevel,
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.errors({ stack: true })
+    ),
+    transports: [
+      // Console transport with category format
+      new winston.transports.Console({
+        level: logLevel,
+        format: categoryFormat,
+      }),
+      // Add file transports only in production or when LOG_DIR is specified
+      ...(process.env.NODE_ENV === 'production' || process.env.LOG_DIR ? [
+        new DailyRotateFile({
+          filename: path.join(logDir, 'chat-error-%DATE%.log'),
+          datePattern: 'YYYY-MM-DD',
+          level: 'error',
+          format: fileFormat,
+          maxSize: '20m',
+          maxFiles: '14d',
+          zippedArchive: true,
+        }),
+        new DailyRotateFile({
+          filename: path.join(logDir, 'chat-combined-%DATE%.log'),
+          datePattern: 'YYYY-MM-DD',
+          format: fileFormat,
+          maxSize: '20m',
+          maxFiles: '14d',
+          zippedArchive: true,
+        })
+      ] : [])
+    ],
+  });
+
+  loggers.set(category, categoryLogger);
+  return categoryLogger;
+};
+
+// Export both default logger and factory function
 export default logger;
+export { createLogger };

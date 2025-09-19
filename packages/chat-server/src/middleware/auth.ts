@@ -4,7 +4,9 @@ import axios from 'axios';
 import { config } from '../config';
 import { gatrixApiService } from '../services/GatrixApiService';
 import { userSyncService } from '../services/UserSyncService';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('AuthMiddleware');
 
 export interface AuthenticatedRequest extends Request {
   user: {
@@ -180,26 +182,7 @@ export const rateLimiter = (windowMs: number, maxRequests: number) => {
   };
 };
 
-// 요청 로깅 미들웨어
-export const requestLogger = (req: Request, res: Response, next: NextFunction): void => {
-  const user = (req as AuthenticatedRequest).user;
-  const startTime = Date.now();
 
-  res.on('finish', () => {
-    const duration = Date.now() - startTime;
-    logger.info('API Request', {
-      method: req.method,
-      url: req.originalUrl,
-      statusCode: res.statusCode,
-      duration: `${duration}ms`,
-      userId: user?.id,
-      userAgent: req.get('User-Agent'),
-      ip: req.ip,
-    });
-  });
-
-  next();
-};
 
 // 에러 핸들링 미들웨어
 export const errorHandler = (error: Error, req: Request, res: Response, next: NextFunction): void => {

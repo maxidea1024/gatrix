@@ -12,6 +12,15 @@ import userRoutes from './users';
 
 const router = express.Router();
 
+// Readiness check endpoint
+router.get('/ready', (req, res) => {
+  res.json({
+    status: 'ready',
+    timestamp: new Date().toISOString(),
+    service: 'gatrix-backend'
+  });
+});
+
 // Mount all route modules
 router.use('/client', clientRoutes);
 router.use('/server', serverRoutes);

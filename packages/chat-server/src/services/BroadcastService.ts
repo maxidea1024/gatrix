@@ -5,7 +5,9 @@ import { promisify } from 'util';
 import LRUCache from 'lru-cache';
 import { config } from '../config';
 import { redisManager } from '../config/redis';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('BroadcastService');
 
 const gzipAsync = promisify(gzip);
 const gunzipAsync = promisify(gunzip);

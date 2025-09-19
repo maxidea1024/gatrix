@@ -1,5 +1,7 @@
 import { databaseManager } from '../config/database';
-import logger from '../config/logger';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('UserPrivacySettings');
 
 export type InvitePolicy = 'everyone' | 'contacts_only' | 'nobody';
 

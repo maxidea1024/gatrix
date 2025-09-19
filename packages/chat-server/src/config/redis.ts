@@ -1,6 +1,8 @@
 import Redis, { Cluster } from 'ioredis';
 import { config } from './index';
-import logger from './logger';
+import { createLogger } from './logger';
+
+const logger = createLogger('RedisManager');
 
 export class RedisManager {
   private static instance: RedisManager;

@@ -5,7 +5,10 @@ import helmet from 'helmet';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import { config } from './config';
-import logger from './config/logger';
+import { createLogger } from './config/logger';
+import { requestLogger } from './middleware/requestLogger';
+
+const logger = createLogger('ChatServerApp');
 import { WebSocketService } from './services/WebSocketService';
 import { metricsService } from './services/MetricsService';
 import { gatrixApiService } from './services/GatrixApiService';
@@ -60,14 +63,7 @@ class ChatServerApp {
     this.app.use(cookieParser() as any);
 
     // Request logging
-    this.app.use((req, res, next) => {
-      logger.info(`${req.method} ${req.path}`, {
-        ip: req.ip,
-        userAgent: req.get('User-Agent'),
-        timestamp: new Date().toISOString(),
-      });
-      next();
-    });
+    this.app.use(requestLogger);
 
     // Health check middleware
     this.app.use('/health', (req, res) => {
@@ -179,43 +175,63 @@ class ChatServerApp {
     process.on('SIGINT', () => this.gracefulShutdown('SIGINT'));
   }
 
+  private async waitForGatrixAPI(timeoutMs: number): Promise<void> {
+    const startTime = Date.now();
+    const retryInterval = 2000; // 2초마다 재시도
+    let hasLoggedWaiting = false;
+
+    while (Date.now() - startTime < timeoutMs) {
+      try {
+        // Backend readiness 체크
+        const isReady = await gatrixApiService.checkReadiness();
+        if (isReady) {
+          // 연결 테스트
+          const gatrixConnected = await gatrixApiService.testConnection();
+          if (gatrixConnected) {
+            logger.info('Gatrix backend connection established');
+
+            // Register chat server with Gatrix backend
+            try {
+              const registered = await gatrixApiService.registerChatServer();
+              if (registered) {
+                logger.info('Chat server registered with Gatrix backend');
+              } else {
+                logger.warn('Failed to register chat server with Gatrix backend');
+              }
+            } catch (regError) {
+              logger.warn('Chat server registration failed, continuing without registration');
+            }
+            return;
+          }
+        }
+      } catch (error) {
+        // 네트워크 연결 오류는 로그를 출력하지 않음 (backend가 아직 시작되지 않은 정상적인 상황)
+      }
+
+      // 처음 한 번만 대기 메시지 출력
+      if (!hasLoggedWaiting) {
+        logger.info(`Waiting for Gatrix backend connection (timeout: ${Math.round(timeoutMs/1000)}s)`);
+        hasLoggedWaiting = true;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, retryInterval));
+    }
+
+    throw new Error(`Gatrix backend connection timeout after ${Math.round(timeoutMs/1000)}s`);
+  }
+
   public async initialize(): Promise<void> {
     try {
       // Initialize Redis
       await redisManager.initialize();
       logger.info('Redis connection established');
 
-      // Initialize Database (non-blocking)
-      try {
-        await databaseManager.initialize();
-        logger.info('Database connection established');
-      } catch (dbError) {
-        logger.warn('Database connection failed, continuing without database features');
-      }
+      // Initialize Database (blocking - required for chat functionality)
+      await databaseManager.initialize();
+      logger.info('Database connection established');
 
-      // Test Gatrix API connection (non-blocking)
-      try {
-        const gatrixConnected = await gatrixApiService.testConnection();
-        if (gatrixConnected) {
-          logger.info('Gatrix API connection established');
-
-          // Register chat server with Gatrix
-          try {
-            const registered = await gatrixApiService.registerChatServer();
-            if (registered) {
-              logger.info('Chat server registered with Gatrix');
-            } else {
-              logger.warn('Failed to register chat server with Gatrix');
-            }
-          } catch (regError) {
-            logger.warn('Chat server registration failed, continuing without registration');
-          }
-        } else {
-          logger.warn('Gatrix API connection failed, continuing without integration');
-        }
-      } catch (apiError) {
-        logger.warn('Gatrix API test failed, continuing in standalone mode');
-      }
+      // Wait for Gatrix backend connection with retry (blocking - required for integration)
+      await this.waitForGatrixAPI(config.gatrix.connectionTimeout);
 
       // Start user synchronization service
       userSyncService.start();
@@ -277,7 +293,7 @@ class ChatServerApp {
       });
 
     } catch (error) {
-      logger.error('Failed to start chat server:', error);
+      // Error already logged in initialize() method
       process.exit(1);
     }
   }

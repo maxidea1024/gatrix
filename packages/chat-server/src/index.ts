@@ -1,6 +1,8 @@
 import { config } from './config';
-import logger from './config/logger';
+import { createLogger } from './config/logger';
 import ChatServerApp from './app';
+
+const logger = createLogger('ChatServer');
 
 // Set server ID for clustering
 if (!process.env.SERVER_ID) {
@@ -20,7 +22,7 @@ async function startServer(): Promise<void> {
     await app.start();
 
   } catch (error) {
-    logger.error('Failed to start server:', error);
+    // Error already logged in ChatServerApp.start()
     process.exit(1);
   }
 }
