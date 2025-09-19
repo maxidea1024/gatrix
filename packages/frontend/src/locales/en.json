@@ -1590,6 +1590,7 @@
       "purpose": "Purpose",
       "purposePlaceholder": "Enter the purpose for adding to whitelist",
       "purposeHelp": "Please record the reason or purpose for adding to the whitelist. This helps with management and tracking.",
+      "purposeRequired": "Purpose is required",
       "ipPlaceholder": "e.g., 192.168.1.100",
       "ipHelp": "Enter an IP address to allow access only from that IP. Leave empty to allow access from any IP.",
       "startDateHelp": "Select the start date when the whitelist will be activated. Leave empty for immediate activation.",

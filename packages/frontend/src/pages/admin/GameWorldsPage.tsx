@@ -1031,20 +1031,17 @@ const GameWorldsPage: React.FC = () => {
         anchor="right"
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        PaperProps={{
-          sx: {
+        sx={{
+          zIndex: 1300,
+          '& .MuiDrawer-paper': {
             width: 700,
             height: '100vh',
             display: 'flex',
-            flexDirection: 'column',
-            zIndex: 1300 // Ensure it's above the sticky header
+            flexDirection: 'column'
           }
         }}
         ModalProps={{
-          keepMounted: false,
-          sx: {
-            zIndex: 1300 // Ensure modal backdrop is also above header
-          }
+          keepMounted: false
         }}
       >
         {/* Header */}
@@ -1333,20 +1330,17 @@ const GameWorldsPage: React.FC = () => {
         anchor="right"
         open={confirmDialog.open}
         onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
-        PaperProps={{
-          sx: {
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
             width: 400,
             height: '100vh',
             display: 'flex',
-            flexDirection: 'column',
-            zIndex: 1301 // Ensure it's above the sticky header
+            flexDirection: 'column'
           }
         }}
         ModalProps={{
-          keepMounted: false,
-          sx: {
-            zIndex: 1301 // Ensure modal backdrop is also above header
-          }
+          keepMounted: false
         }}
       >
         {/* Header */}
@@ -1415,20 +1409,17 @@ const GameWorldsPage: React.FC = () => {
         anchor="right"
         open={deleteConfirmDialog.open}
         onClose={() => setDeleteConfirmDialog({ open: false, world: null, inputValue: '' })}
-        PaperProps={{
-          sx: {
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
             width: 500,
             height: '100vh',
             display: 'flex',
-            flexDirection: 'column',
-            zIndex: 1301 // Ensure it's above the sticky header
+            flexDirection: 'column'
           }
         }}
         ModalProps={{
-          keepMounted: false,
-          sx: {
-            zIndex: 1301 // Ensure modal backdrop is also above header
-          }
+          keepMounted: false
         }}
       >
         {/* Header */}

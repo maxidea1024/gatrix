@@ -538,67 +538,71 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       anchor="right"
       open={open}
       onClose={handleClose}
-      PaperProps={{
-        sx: {
+      sx={{
+        zIndex: 1300,
+        '& .MuiDrawer-paper': {
           width: { xs: '100%', sm: 700 },
           maxWidth: '100vw',
           display: 'flex',
-          flexDirection: 'column',
-          zIndex: 1300
+          flexDirection: 'column'
         }
       }}
       ModalProps={{
-        keepMounted: false,
-        sx: {
-          zIndex: 1300
-        }
+        keepMounted: false
       }}
     >
-      {/* Header */}
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        p: 2,
-        borderBottom: '1px solid',
-        borderColor: 'divider',
-        bgcolor: 'background.paper'
-      }}>
-        <Box>
-          <Typography variant="h6" component="h2">
-            {isCopyMode
-              ? t('clientVersions.form.copyTitle')
-              : isEdit
-                ? t('clientVersions.form.editTitle')
-                : t('clientVersions.form.title')
-            }
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {isCopyMode
-              ? t('clientVersions.form.copyDescription')
-              : isEdit
-                ? t('clientVersions.form.editDescription')
-                : t('clientVersions.form.createDescription')
-            }
-          </Typography>
+      <form
+        onSubmit={handleSubmit(onSubmit as SubmitHandler<ClientVersionFormData>, (errors) => {
+          console.log('Form validation failed:', errors);
+        })}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%'
+        }}
+      >
+        {/* Header - Fixed */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Box>
+            <Typography variant="h6" component="h2">
+              {isCopyMode
+                ? t('clientVersions.form.copyTitle')
+                : isEdit
+                  ? t('clientVersions.form.editTitle')
+                  : t('clientVersions.form.title')
+              }
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {isCopyMode
+                ? t('clientVersions.form.copyDescription')
+                : isEdit
+                  ? t('clientVersions.form.editDescription')
+                  : t('clientVersions.form.createDescription')
+              }
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={handleClose}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
         </Box>
-        <IconButton
-          onClick={handleClose}
-          size="small"
-          sx={{
-            '&:hover': {
-              backgroundColor: 'action.hover'
-            }
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </Box>
 
-      <form onSubmit={handleSubmit(onSubmit as SubmitHandler<ClientVersionFormData>, (errors) => {
-        console.log('Form validation failed:', errors);
-      })}>
-        {/* Content */}
+        {/* Content - Scrollable */}
         <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           {duplicateError && (
             <Alert severity="error" sx={{ mb: 2 }}>

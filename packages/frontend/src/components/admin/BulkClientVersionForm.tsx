@@ -390,55 +390,59 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
       anchor="right"
       open={open}
       onClose={handleClose}
-      PaperProps={{
-        sx: {
+      sx={{
+        zIndex: 1300,
+        '& .MuiDrawer-paper': {
           width: { xs: '100%', sm: 700 },
           maxWidth: '100vw',
           display: 'flex',
-          flexDirection: 'column',
-          zIndex: 1300
+          flexDirection: 'column'
         }
       }}
       ModalProps={{
-        keepMounted: false,
-        sx: {
-          zIndex: 1300
-        }
+        keepMounted: false
       }}
     >
-      {/* Header */}
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        p: 2,
-        borderBottom: '1px solid',
-        borderColor: 'divider',
-        bgcolor: 'background.paper'
-      }}>
-        <Box>
-          <Typography variant="h6" component="h2">
-            {t('clientVersions.bulkAdd')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('clientVersions.form.bulkDescription')}
-          </Typography>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%'
+        }}
+      >
+        {/* Header - Fixed */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Box>
+            <Typography variant="h6" component="h2">
+              {t('clientVersions.bulkAdd')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {t('clientVersions.form.bulkDescription')}
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={handleClose}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
         </Box>
-        <IconButton
-          onClick={handleClose}
-          size="small"
-          sx={{
-            '&:hover': {
-              backgroundColor: 'action.hover'
-            }
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </Box>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Content */}
+        {/* Content - Scrollable */}
         <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Stack spacing={3} sx={{ mt: 1 }}>
             {/* 기본 정보 섹션 */}

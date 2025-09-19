@@ -710,20 +710,17 @@ const MessageTemplatesPage: React.FC = () => {
         anchor="right"
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        PaperProps={{
-          sx: {
+        sx={{
+          zIndex: 1300,
+          '& .MuiDrawer-paper': {
             width: { xs: '100%', sm: 600 },
             maxWidth: '100vw',
             display: 'flex',
-            flexDirection: 'column',
-            zIndex: 1300
+            flexDirection: 'column'
           }
         }}
         ModalProps={{
-          keepMounted: false,
-          sx: {
-            zIndex: 1300
-          }
+          keepMounted: false
         }}
         SlideProps={{
           onEntered: () => {

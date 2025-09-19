@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
@@ -58,6 +58,32 @@ import SimplePagination from '../../components/common/SimplePagination';
 import IpWhitelistTab from '../../components/admin/IpWhitelistTab';
 import WhitelistOverview from '../../components/admin/WhitelistOverview';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
+
+// TabPanel 컴포넌트 정의
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other }) => {
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`whitelist-tabpanel-${index}`}
+      aria-labelledby={`whitelist-tab-${index}`}
+      {...other}
+      style={{
+        transition: 'opacity 0.3s ease-in-out',
+        opacity: value === index ? 1 : 0,
+        display: value === index ? 'block' : 'none'
+      }}
+    >
+      {children}
+    </div>
+  );
+};
 
 const WhitelistPage: React.FC = () => {
   const { t } = useTranslation();
@@ -152,6 +178,7 @@ const WhitelistPage: React.FC = () => {
     purpose: '',
   });
 
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [bulkData, setBulkData] = useState('');
 
   // Selection handlers
@@ -278,6 +305,7 @@ const WhitelistPage: React.FC = () => {
       endDate: '',
       purpose: '',
     });
+    setFormErrors({});
     setAddDialog(true);
 
     // 계정ID 필드에 포커스
@@ -295,6 +323,7 @@ const WhitelistPage: React.FC = () => {
         endDate: selectedWhitelist.endDate ? selectedWhitelist.endDate.split('T')[0] : '',
         purpose: selectedWhitelist.purpose || '',
       });
+      setFormErrors({});
       setEditDialog(true);
 
       // 계정ID 필드에 포커스
@@ -326,13 +355,29 @@ const WhitelistPage: React.FC = () => {
     handleMenuClose();
   };
 
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    // 계정 ID 유효성 검사
+    if (!formData.accountId || formData.accountId.trim().length < 4 || formData.accountId.trim().length > 36) {
+      errors.accountId = t('whitelist.form.accountIdValidation');
+    }
+
+    // 사용목적 필수 검사
+    if (!formData.purpose || formData.purpose.trim().length === 0) {
+      errors.purpose = t('whitelist.form.purposeRequired');
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSave = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
     try {
-      // 계정 ID 유효성 검사
-      if (!formData.accountId || formData.accountId.trim().length < 4 || formData.accountId.trim().length > 36) {
-        enqueueSnackbar(t('whitelist.form.accountIdValidation'), { variant: 'error' });
-        return;
-      }
 
       console.log('handleSave - Debug info:', {
         editDialog,
@@ -421,9 +466,8 @@ const WhitelistPage: React.FC = () => {
           </Tabs>
 
           {/* Tab Content */}
-          {currentTab === 0 && (
-            <>
-              {/* Nickname Whitelist Header */}
+          <TabPanel value={currentTab} index={0}>
+            {/* Nickname Whitelist Header */}
               <Box sx={{ display: 'flex', gap: 2, mb: 3, justifyContent: 'flex-end' }}>
                 <Button
                   variant="outlined"
@@ -611,14 +655,16 @@ const WhitelistPage: React.FC = () => {
               </TableBody>
             </Table>
           </TableContainer>
-          <SimplePagination
-            count={total}
-            page={pageState.page - 1} // MUI는 0부터 시작
-            rowsPerPage={pageState.limit}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[5, 10, 25, 50, 100]}
-          />
+          {total > 0 && (
+            <SimplePagination
+              count={total}
+              page={pageState.page - 1} // MUI는 0부터 시작
+              rowsPerPage={pageState.limit}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[5, 10, 25, 50, 100]}
+            />
+          )}
                 </CardContent>
               </Card>
 
@@ -706,12 +752,8 @@ const WhitelistPage: React.FC = () => {
                         onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
                         required
                         placeholder={t('whitelist.form.accountIdPlaceholder')}
-                        error={!!(formData.accountId && (formData.accountId.trim().length < 4 || formData.accountId.trim().length > 36))}
-                        helperText={
-                          formData.accountId && (formData.accountId.trim().length < 4 || formData.accountId.trim().length > 36)
-                            ? t('whitelist.form.accountIdValidation')
-                            : undefined
-                        }
+                        error={!!formErrors.accountId}
+                        helperText={formErrors.accountId || t('whitelist.form.accountIdHelp')}
                         inputRef={accountIdFieldRef}
                       />
                       <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
@@ -785,10 +827,10 @@ const WhitelistPage: React.FC = () => {
                         multiline
                         rows={3}
                         placeholder={t('whitelist.form.purposePlaceholder')}
+                        required
+                        error={!!formErrors.purpose}
+                        helperText={formErrors.purpose || t('whitelist.form.purposeHelp')}
                       />
-                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                        {t('whitelist.form.purposeHelp')}
-                      </Typography>
                     </Box>
                   </Box>
                 </Box>
@@ -983,16 +1025,15 @@ const WhitelistPage: React.FC = () => {
                   </Button>
                 </Box>
               </Drawer>
-            </>
-          )}
+          </TabPanel>
 
-          {currentTab === 1 && (
+          <TabPanel value={currentTab} index={1}>
             <IpWhitelistTab />
-          )}
+          </TabPanel>
 
-          {currentTab === 2 && (
+          <TabPanel value={currentTab} index={2}>
             <WhitelistOverview />
-          )}
+          </TabPanel>
         </CardContent>
       </Card>
     </Box>

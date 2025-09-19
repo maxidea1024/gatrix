@@ -72,20 +72,17 @@ const SidePanel: React.FC<SidePanelProps> = ({ open, onClose, title, children, a
       anchor="right"
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
+      sx={{
+        zIndex: 1300,
+        '& .MuiDrawer-paper': {
           width: { xs: '100%', sm: 480, md: 600 },
           height: '100vh',
           display: 'flex',
-          flexDirection: 'column',
-          zIndex: 1300 // Ensure it's above the sticky header
+          flexDirection: 'column'
         }
       }}
       ModalProps={{
-        keepMounted: false,
-        sx: {
-          zIndex: 1300 // Ensure modal backdrop is also above header
-        }
+        keepMounted: false
       }}
     >
       {/* Header */}

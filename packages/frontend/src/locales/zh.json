@@ -1459,6 +1459,7 @@
       "purpose": "使用目的",
       "purposePlaceholder": "请输入添加到白名单的目的",
       "purposeHelp": "请记录添加到白名单的原因或目的。这有助于管理和跟踪。",
+      "purposeRequired": "使用目的是必填项",
       "ipPlaceholder": "例如：192.168.1.100",
       "ipHelp": "输入IP地址以仅允许从该IP访问。留空则允许从任何IP访问。",
       "startDateHelp": "选择白名单激活的开始日期。留空则立即激活。",

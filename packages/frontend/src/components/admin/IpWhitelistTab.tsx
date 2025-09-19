@@ -486,14 +486,16 @@ const IpWhitelistTab: React.FC = () => {
               </TableBody>
             </Table>
           </TableContainer>
-          <SimplePagination
-            count={total}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[5, 10, 25, 50, 100]}
-          />
+          {total > 0 && (
+            <SimplePagination
+              count={total}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[5, 10, 25, 50, 100]}
+            />
+          )}
         </CardContent>
       </Card>
 
@@ -518,20 +520,17 @@ const IpWhitelistTab: React.FC = () => {
         anchor="right"
         open={addDialog || editDialog}
         onClose={() => { setAddDialog(false); setEditDialog(false); }}
-        PaperProps={{
-          sx: {
+        sx={{
+          zIndex: 1300,
+          '& .MuiDrawer-paper': {
             width: { xs: '100%', sm: 600 },
             maxWidth: '100vw',
             display: 'flex',
-            flexDirection: 'column',
-            zIndex: 1300
+            flexDirection: 'column'
           }
         }}
         ModalProps={{
-          keepMounted: false,
-          sx: {
-            zIndex: 1300
-          }
+          keepMounted: false
         }}
       >
         {/* Header */}

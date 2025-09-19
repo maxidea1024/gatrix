@@ -690,20 +690,17 @@ const ApiTokensPage: React.FC = () => {
         anchor="right"
         open={createDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
-        PaperProps={{
-          sx: {
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
             width: { xs: '100%', sm: 500 },
             height: '100vh',
             display: 'flex',
-            flexDirection: 'column',
-            zIndex: 1301 // Ensure it's above the sticky header
+            flexDirection: 'column'
           }
         }}
         ModalProps={{
-          keepMounted: false,
-          sx: {
-            zIndex: 1301 // Ensure modal backdrop is also above header
-          }
+          keepMounted: false
         }}
       >
         {/* Header */}
@@ -855,20 +852,17 @@ const ApiTokensPage: React.FC = () => {
         anchor="right"
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
-        PaperProps={{
-          sx: {
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
             width: { xs: '100%', sm: 500 },
             height: '100vh',
             display: 'flex',
-            flexDirection: 'column',
-            zIndex: 1301 // Ensure it's above the sticky header
+            flexDirection: 'column'
           }
         }}
         ModalProps={{
-          keepMounted: false,
-          sx: {
-            zIndex: 1301 // Ensure modal backdrop is also above header
-          }
+          keepMounted: false
         }}
       >
         {/* Header */}
@@ -1104,20 +1098,17 @@ const ApiTokensPage: React.FC = () => {
         anchor="right"
         open={regenerateDialogOpen}
         onClose={closeRegenerateDialog}
-        PaperProps={{
-          sx: {
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
             width: 500,
             height: '100vh',
             display: 'flex',
-            flexDirection: 'column',
-            zIndex: 1301 // Ensure it's above the sticky header
+            flexDirection: 'column'
           }
         }}
         ModalProps={{
-          keepMounted: false,
-          sx: {
-            zIndex: 1301 // Ensure modal backdrop is also above header
-          }
+          keepMounted: false
         }}
       >
         <Box sx={{
