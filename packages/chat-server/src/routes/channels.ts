@@ -153,7 +153,7 @@ router.post(
 router.post(
   '/:id/messages',
   rateLimiter(60000, 60), // 1분에 60개 메시지 생성 제한
-  upload.array('attachments', 5), // 최대 5개 파일 첨부 허용
+  upload.array('attachments', 5) as any, // 최대 5개 파일 첨부 허용
   MessageController.createInChannel
 );
 
