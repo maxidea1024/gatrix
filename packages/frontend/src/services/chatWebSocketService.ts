@@ -65,10 +65,33 @@ export class ChatWebSocketService {
           }
         });
 
-        this.socket.on('connect_error', (error) => {
-          console.error('Chat Socket.IO connection error:', error);
+        this.socket.on('connect_error', async (error: any) => {
+          console.error('❌ Chat Socket.IO connection error:', error);
           this.isConnecting = false;
-          this.emit('connection_error', { error });
+
+          if (error.message?.includes('Authentication error') || error.message?.includes('jwt') || error.message?.includes('expired')) {
+            console.log('🔄 WebSocket auth failed, attempting token refresh...');
+
+            try {
+              // 토큰 갱신 시도
+              const { AuthService } = await import('./auth');
+              await AuthService.refreshToken();
+
+              console.log('✅ Token refreshed, reconnecting WebSocket...');
+
+              // 새 토큰으로 재연결 시도
+              setTimeout(() => {
+                this.reconnect();
+              }, 1000);
+
+            } catch (refreshError) {
+              console.error('❌ Token refresh failed:', refreshError);
+              this.emit('authentication_failed', { error: error.message });
+            }
+          } else {
+            this.emit('connection_error', { error });
+          }
+
           reject(error);
         });
 
@@ -210,6 +233,22 @@ export class ChatWebSocketService {
       this.emit('channel_left', data);
     });
 
+    // 초대 관련 이벤트들
+    this.socket.on('channel_invitation', (data) => {
+      console.log('WebSocket channel_invitation received:', data);
+      this.emit('channel_invitation', data);
+    });
+
+    this.socket.on('invitation_response', (data) => {
+      console.log('WebSocket invitation_response received:', data);
+      this.emit('invitation_response', data);
+    });
+
+    this.socket.on('invitation_cancelled', (data) => {
+      console.log('WebSocket invitation_cancelled received:', data);
+      this.emit('invitation_cancelled', data);
+    });
+
     this.socket.on('error', (data) => {
       this.emit('error', data);
     });
@@ -235,10 +274,7 @@ export class ChatWebSocketService {
   }
 
   private getSocketUrl(): string {
-    // 채팅서버는 포트 3001에서 실행됨
-    const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
-    const hostname = window.location.hostname;
-    return `${protocol}//${hostname}:3001`;
+    return 'http://localhost:3004';
   }
 
   private scheduleReconnect(): void {

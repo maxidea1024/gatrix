@@ -185,9 +185,9 @@ export interface WebSocketEvent {
   timestamp: string;
 }
 
-export type WebSocketEventType = 
+export type WebSocketEventType =
   | 'message_created'
-  | 'message_updated' 
+  | 'message_updated'
   | 'message_deleted'
   | 'user_typing'
   | 'user_stop_typing'
@@ -197,7 +197,23 @@ export type WebSocketEventType =
   | 'reaction_added'
   | 'reaction_removed'
   | 'user_online'
-  | 'user_offline';
+  | 'user_offline'
+  | 'channel_invitation'
+  | 'invitation_response'
+  | 'invitation_cancelled'
+  | 'connection_established'
+  | 'connection_lost'
+  | 'connection_error'
+  | 'authentication_failed'
+  | 'message'
+  | 'user_joined'
+  | 'user_left'
+  | 'typing'
+  | 'stop_typing'
+  | 'presence_update'
+  | 'channel_joined'
+  | 'channel_left'
+  | 'error';
 
 // API request/response types
 export interface CreateChannelRequest {
@@ -280,6 +296,8 @@ export interface ChatContextType {
     loadMessages: (channelId: number) => Promise<void>;
     loadMoreMessages: (channelId: number) => Promise<void>;
     uploadFile: (file: File, channelId: number) => Promise<MessageAttachment>;
+    inviteUser: (channelId: number, userId: number, message?: string) => Promise<void>;
+    clearError: () => void;
   };
 }
 

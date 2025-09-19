@@ -58,9 +58,17 @@ export class UserPrivacySettingsModel {
         .first();
 
       if (settings) {
+        let blockedUsers = [];
+        try {
+          blockedUsers = JSON.parse(settings.blockedUsers || '[]');
+        } catch (parseError) {
+          logger.warn(`Invalid JSON in blockedUsers for user ${userId}, using empty array`);
+          blockedUsers = [];
+        }
+
         return {
           ...settings,
-          blockedUsers: JSON.parse(settings.blockedUsers || '[]'),
+          blockedUsers,
         };
       }
 

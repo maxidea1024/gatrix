@@ -15,8 +15,8 @@ import {
 } from '../types/chat';
 
 export class ChatService {
-  private static readonly BASE_URL = '/chat';
-  private static readonly DIRECT_CHAT_URL = 'http://localhost:3001/api/v1'; // 임시: 직접 채팅 서버 접근
+  private static readonly BASE_URL = 'http://localhost:3004/api/v1';
+  private static readonly DIRECT_CHAT_URL = 'http://localhost:3004/api/v1'; // 임시: 직접 채팅 서버 접근
 
   // Channel management
   static async getChannels(params?: GetChannelsRequest): Promise<Channel[]> {
@@ -216,8 +216,79 @@ export class ChatService {
   static async markAsRead(channelId: number, messageId?: number): Promise<void> {
     const data: any = {};
     if (messageId) data.messageId = messageId;
-    
-    await apiService.post(`${this.BASE_URL}/channels/${channelId}/read`, data);
+
+    console.log(`🔄 ChatService.markAsRead called:`, {
+      channelId,
+      messageId,
+      url: `${this.BASE_URL}/channels/${channelId}/read`,
+      data
+    });
+
+    try {
+      // 토큰 만료 체크 및 갱신
+      await this.ensureValidToken();
+
+      // 타임아웃을 5초로 설정하여 빠른 실패 처리
+      const response = await apiService.post(`${this.BASE_URL}/channels/${channelId}/read`, data, {
+        timeout: 5000,
+        // 재시도 없이 한 번만 시도
+        retry: 0
+      });
+
+      console.log(`✅ ChatService.markAsRead success:`, response);
+    } catch (error: any) {
+      console.error(`❌ ChatService.markAsRead failed:`, error);
+
+      // 401 오류인 경우 토큰 갱신 후 재시도
+      if (error.response?.status === 401) {
+        try {
+          console.log(`🔄 Token expired, refreshing and retrying markAsRead...`);
+          await this.refreshTokenAndRetry();
+
+          const response = await apiService.post(`${this.BASE_URL}/channels/${channelId}/read`, data, {
+            timeout: 5000,
+            retry: 0
+          });
+
+          console.log(`✅ ChatService.markAsRead retry success:`, response);
+          return;
+        } catch (retryError) {
+          console.error(`❌ ChatService.markAsRead retry failed:`, retryError);
+        }
+      }
+
+      throw error;
+    }
+  }
+
+  // 토큰 유효성 확인 및 갱신
+  private static async ensureValidToken(): Promise<void> {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      throw new Error('No access token available');
+    }
+
+    try {
+      // JWT 페이로드 디코딩하여 만료 시간 확인
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const currentTime = Date.now() / 1000;
+
+      // 토큰이 5분 이내에 만료되면 미리 갱신
+      if (payload.exp && payload.exp < currentTime + 300) {
+        console.log(`🔄 Token expires soon, refreshing...`);
+        await this.refreshTokenAndRetry();
+      }
+    } catch (error) {
+      console.warn('Failed to check token expiry:', error);
+      // 토큰 파싱 실패 시에도 갱신 시도
+      await this.refreshTokenAndRetry();
+    }
+  }
+
+  // 토큰 갱신
+  private static async refreshTokenAndRetry(): Promise<void> {
+    const { AuthService } = await import('./auth');
+    await AuthService.refreshToken();
   }
 
   // Notifications
@@ -294,8 +365,78 @@ export class ChatService {
       messages: Message[];
       hasMore: boolean;
     }>(`${this.BASE_URL}/channels/${channelId}/history`, { params });
-    
+
     return response.data;
+  }
+
+  // 사용자 초대
+  static async inviteUser(channelId: number, userId: number, message?: string): Promise<void> {
+    console.log(`🔄 ChatService.inviteUser called:`, {
+      channelId,
+      userId,
+      message,
+      url: `${this.BASE_URL}/channels/${channelId}/invite`
+    });
+
+    try {
+      // 토큰 만료 체크 및 갱신
+      await this.ensureValidToken();
+
+      const response = await fetch(`${this.BASE_URL}/channels/${channelId}/invite`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+        body: JSON.stringify({
+          inviteeId: userId,
+          message: message
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to send invitation');
+      }
+
+      console.log(`✅ ChatService.inviteUser success:`, data);
+    } catch (error: any) {
+      console.error(`❌ ChatService.inviteUser failed:`, error);
+
+      // 401 오류인 경우 토큰 갱신 후 재시도
+      if (error.status === 401) {
+        try {
+          console.log(`🔄 Token expired, refreshing and retrying inviteUser...`);
+          await this.refreshTokenAndRetry();
+
+          const response = await fetch(`${this.BASE_URL}/channels/${channelId}/invite`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+            body: JSON.stringify({
+              inviteeId: userId,
+              message: message
+            }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok || !data.success) {
+            throw new Error(data.error || 'Failed to send invitation');
+          }
+
+          console.log(`✅ ChatService.inviteUser retry success:`, data);
+          return;
+        } catch (retryError) {
+          console.error(`❌ ChatService.inviteUser retry failed:`, retryError);
+        }
+      }
+
+      throw error;
+    }
   }
 }
 

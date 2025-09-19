@@ -47,7 +47,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
   open,
   onClose,
   onInviteUser,
-  title = 'Search Users',
+  title,
   excludeUserIds = [],
 }) => {
   const { t } = useTranslation();
@@ -71,18 +71,38 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
         `/users/search?q=${encodeURIComponent(query)}`
       );
 
+      console.log('User search response:', response); // 디버깅용
+
       if (response.success && response.data) {
+        // API 응답 구조에 따라 적절히 처리
+        let users: User[] = [];
+
+        if (Array.isArray(response.data)) {
+          // response.data가 직접 배열인 경우
+          users = response.data;
+        } else if (response.data.data && Array.isArray(response.data.data)) {
+          // response.data.data가 배열인 경우
+          users = response.data.data;
+        } else {
+          console.warn('Unexpected API response structure:', response);
+          setSearchResults([]);
+          return;
+        }
+
         // 제외할 사용자들 필터링
-        const filteredUsers = response.data.data.filter((user: User) =>
+        const filteredUsers = users.filter((user: User) =>
           !excludeUserIds.includes(user.id)
         );
         setSearchResults(filteredUsers);
       } else {
+        console.error('Search API failed:', response);
         enqueueSnackbar(response.error?.message || 'Search failed', { variant: 'error' });
+        setSearchResults([]);
       }
     } catch (error: any) {
       console.error('Search error:', error);
       enqueueSnackbar(error.message || 'Search failed', { variant: 'error' });
+      setSearchResults([]);
     } finally {
       setIsSearching(false);
     }
@@ -116,16 +136,21 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
   // 사용자 초대 처리
   const handleInviteUser = async (userId: number) => {
     setInvitingUsers(prev => new Set(prev).add(userId));
-    
+
     try {
       await onInviteUser(userId);
-      enqueueSnackbar('Invitation sent successfully', { variant: 'success' });
-      
+      enqueueSnackbar(t('chat.invitationSent'), { variant: 'success' });
+
       // 초대 성공 시 검색 결과에서 제거
       setSearchResults(prev => prev.filter(user => user.id !== userId));
+
+      // 초대 성공 시 창 닫기
+      setTimeout(() => {
+        onClose();
+      }, 1000); // 1초 후 닫기 (성공 메시지를 볼 시간 제공)
     } catch (error: any) {
       console.error('Invite error:', error);
-      enqueueSnackbar(error.message || 'Failed to send invitation', { variant: 'error' });
+      enqueueSnackbar(error.message || t('chat.invitationFailed'), { variant: 'error' });
     } finally {
       setInvitingUsers(prev => {
         const newSet = new Set(prev);
@@ -149,7 +174,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
       <DialogContent>
         <TextField
           fullWidth
-          placeholder="Search by name or email..."
+          placeholder={t('chat.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           InputProps={{
@@ -161,13 +186,13 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
 
         {searchQuery.length > 0 && searchQuery.length < 2 && (
           <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-            Type at least 2 characters to search
+            최소 2글자 이상 입력하세요
           </Typography>
         )}
 
         {searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
           <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-            No users found
+            {t('chat.noUsersFound')}
           </Typography>
         )}
 
@@ -199,7 +224,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
                   onClick={() => handleInviteUser(user.id)}
                   disabled={invitingUsers.has(user.id)}
                 >
-                  {invitingUsers.has(user.id) ? 'Inviting...' : 'Invite'}
+                  {invitingUsers.has(user.id) ? t('chat.inviting') : t('chat.inviteButton')}
                 </Button>
               </ListItemSecondaryAction>
             </ListItem>

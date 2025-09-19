@@ -352,14 +352,20 @@ export class ChannelModel {
       if (messageId) {
         updateData.lastReadMessageId = messageId;
       } else {
-        // 최신 메시지까지 읽음 처리
-        const latestMessage = await this.knex('chat_messages')
-          .where('channelId', channelId)
-          .orderBy('id', 'desc')
-          .first();
+        // 최신 메시지까지 읽음 처리 (타임아웃 설정)
+        try {
+          const latestMessage = await this.knex('chat_messages')
+            .where('channelId', channelId)
+            .orderBy('id', 'desc')
+            .timeout(3000) // 3초 타임아웃
+            .first();
 
-        if (latestMessage) {
-          updateData.lastReadMessageId = latestMessage.id;
+          if (latestMessage) {
+            updateData.lastReadMessageId = latestMessage.id;
+          }
+        } catch (timeoutError) {
+          console.warn('Timeout getting latest message for markAsRead, proceeding without messageId');
+          // 최신 메시지 조회 실패 시에도 읽음 처리는 계속 진행
         }
       }
 
@@ -369,6 +375,7 @@ export class ChannelModel {
           userId,
           status: 'active',
         })
+        .timeout(3000) // 3초 타임아웃
         .update(updateData);
 
       return result > 0;
@@ -482,8 +489,8 @@ export class ChannelModel {
     const existingMember = await knex('chat_channel_members')
       .select('id')
       .where({
-        channelId,
-        userId,
+        channel_id: channelId,
+        user_id: userId,
       })
       .first();
 
@@ -491,24 +498,23 @@ export class ChannelModel {
       // 이미 멤버라면 상태를 active로 업데이트
       await knex('chat_channel_members')
         .where({
-          channelId,
-          userId,
+          channel_id: channelId,
+          user_id: userId,
         })
         .update({
           status: 'active',
           role,
-          updatedAt: new Date(),
+          updated_at: new Date(),
         });
     } else {
       // 새 멤버 추가
       await knex('chat_channel_members').insert({
-        channelId,
-        userId,
+        channel_id: channelId,
+        user_id: userId,
         role,
         status: 'active',
-        joinedAt: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        joined_at: new Date(),
+        updated_at: new Date(),
       });
     }
   }

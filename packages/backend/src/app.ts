@@ -135,6 +135,9 @@ app.use('/api/v1', apiLimiter as any, (req, res, next) => {
 // Static file serving for uploads
 app.use('/uploads', express.static('uploads'));
 
+// Static file serving for public assets (favicon, etc.)
+app.use(express.static('public'));
+
 // Routes - New organized structure
 app.use('/api/v1', routes);
 

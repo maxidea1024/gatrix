@@ -3,7 +3,6 @@ import { ChannelInvitationModel } from '../models/ChannelInvitation';
 import { UserPrivacySettingsModel } from '../models/UserPrivacySettings';
 import { ChannelModel } from '../models/Channel';
 import { userSyncService } from '../services/UserSyncService';
-import { BroadcastService } from '../services/BroadcastService';
 import logger from '../config/logger';
 
 export class InvitationController {
@@ -109,9 +108,12 @@ export class InvitationController {
       //   channelId: channelIdNum,
       //   channelName: channel.name,
       //   inviterId: userId,
+      //   inviterName: (req as any).user.name || 'Unknown User',
       //   message,
       //   timestamp: Date.now(),
       // });
+
+      logger.info(`User ${userId} invited user ${inviteeId} to channel ${channelIdNum}`);
 
       res.status(201).json({
         success: true,

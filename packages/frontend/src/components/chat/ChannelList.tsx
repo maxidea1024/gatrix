@@ -75,9 +75,16 @@ const ChannelList: React.FC<ChannelListProps> = ({
 
 
   const handleChannelClick = (channel: Channel) => {
+    // 이미 선택된 채널이면 아무것도 하지 않음
+    if (state.currentChannelId === channel.id) {
+      return;
+    }
+
+    // 새로운 채널 선택
     actions.setCurrentChannel(channel.id);
-    // 채널 선택 시 읽음 처리
-    actions.markAsRead(channel.id);
+
+    // 채널 변경 후 메시지가 로딩되면 자동으로 읽음 처리
+    // (ChatElementsMessageList에서 처리하도록 변경)
   };
 
   const handleChannelMenu = (event: React.MouseEvent<HTMLElement>, channel: Channel) => {

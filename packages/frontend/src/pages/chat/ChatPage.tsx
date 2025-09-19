@@ -206,16 +206,10 @@ const ChatPageContent: React.FC = () => {
     }
 
     try {
-      const response = await apiService.post(
-        `/channels/${state.currentChannelId}/invite`,
-        { inviteeId: userId }
-      );
-
-      if (!response.success) {
-        throw new Error(response.error?.message || 'Failed to send invitation');
-      }
+      await actions.inviteUser(state.currentChannelId, userId);
+      console.log('✅ Invitation sent successfully');
     } catch (error: any) {
-      console.error('Failed to invite user:', error);
+      console.error('❌ Failed to invite user:', error);
       throw error;
     }
   };
@@ -521,7 +515,7 @@ const ChatPageContent: React.FC = () => {
         open={userSearchOpen}
         onClose={() => setUserSearchOpen(false)}
         onInviteUser={handleInviteUser}
-        title="Invite Users to Channel"
+        title={t('chat.inviteUsersToChannel')}
         excludeUserIds={user?.id ? [user.id] : []}
       />
 

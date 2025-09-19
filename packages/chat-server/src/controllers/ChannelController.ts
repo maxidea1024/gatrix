@@ -418,12 +418,23 @@ export class ChannelController {
 
   // 채널을 읽음으로 표시
   static async markAsRead(req: Request, res: Response): Promise<void> {
+    const startTime = Date.now();
+
     try {
       const channelId = parseInt(req.params.id);
       const userId = (req as any).user.id;
       const { messageId } = req.body;
 
+      logger.info(`📖 MarkAsRead request received`, {
+        channelId,
+        userId,
+        messageId,
+        userAgent: req.get('User-Agent'),
+        ip: req.ip
+      });
+
       if (isNaN(channelId)) {
+        logger.warn(`❌ Invalid channel ID: ${req.params.id}`);
         res.status(400).json({
           success: false,
           error: 'Invalid channel ID',
@@ -431,8 +442,14 @@ export class ChannelController {
         return;
       }
 
-      // 채널 멤버십 확인
-      const userRole = await ChannelModel.getUserRole(channelId, userId);
+      // 채널 멤버십 확인 (타임아웃 설정)
+      const userRole = await Promise.race([
+        ChannelModel.getUserRole(channelId, userId),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Membership check timeout')), 3000)
+        )
+      ]) as any;
+
       if (!userRole) {
         res.status(403).json({
           success: false,
@@ -441,8 +458,14 @@ export class ChannelController {
         return;
       }
 
-      // 읽음 상태 업데이트
-      const success = await ChannelModel.markAsRead(channelId, userId, messageId);
+      // 읽음 상태 업데이트 (타임아웃 설정)
+      const success = await Promise.race([
+        ChannelModel.markAsRead(channelId, userId, messageId),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Mark as read timeout')), 4000)
+        )
+      ]) as boolean;
+
       if (!success) {
         res.status(500).json({
           success: false,
@@ -451,7 +474,8 @@ export class ChannelController {
         return;
       }
 
-      logger.info(`User ${userId} marked channel ${channelId} as read${messageId ? ` up to message ${messageId}` : ''}`);
+      const duration = Date.now() - startTime;
+      logger.info(`User ${userId} marked channel ${channelId} as read${messageId ? ` up to message ${messageId}` : ''} (${duration}ms)`);
 
       res.json({
         success: true,
@@ -464,11 +488,22 @@ export class ChannelController {
         },
       });
     } catch (error) {
-      logger.error('Error marking channel as read:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to mark channel as read',
-      });
+      const duration = Date.now() - startTime;
+      logger.error(`Error marking channel as read (${duration}ms):`, error);
+
+      // 타임아웃 에러인 경우 특별 처리
+      if (error instanceof Error && error.message.includes('timeout')) {
+        res.status(408).json({
+          success: false,
+          error: 'Request timeout',
+          code: 'TIMEOUT'
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          error: 'Failed to mark channel as read',
+        });
+      }
     }
   }
 

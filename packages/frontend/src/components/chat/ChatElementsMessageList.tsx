@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Box, Typography, Paper, IconButton, TextField, useTheme, Avatar } from '@mui/material';
 import {
   Send as SendIcon,
@@ -345,14 +345,9 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   const [messageInput, setMessageInput] = useState('');
 
   const currentChannel = state.channels.find(c => c.id === channelId);
-  const messages = state.messages[channelId] || [];
+  const messages = useMemo(() => state.messages[channelId] || [], [state.messages, channelId]);
 
-  // 디버깅용 로그 (개발 환경에서만)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('ChatElementsMessageList - channelId:', channelId);
-    console.log('ChatElementsMessageList - messages:', messages);
-    console.log('ChatElementsMessageList - isConnected:', state.isConnected);
-  }
+
 
   // 테마에 따른 색상 정의
   const colors = {
@@ -387,23 +382,13 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       // 하단에서 100px 이내에 있으면 자동 스크롤
       const isAtBottom = scrollTop + clientHeight >= scrollHeight - 100;
 
-      console.log('🔍 Slack scroll check:', {
-        scrollTop,
-        scrollHeight,
-        clientHeight,
-        isAtBottom,
-        calculatedBottom: scrollHeight - clientHeight,
-        difference: (scrollHeight - clientHeight) - scrollTop
-      });
+
 
       if (isAtBottom) {
-        console.log('📜 Auto-scrolling to bottom with smooth animation');
         messageContainer.scrollTo({
           top: scrollHeight,
           behavior: 'smooth'
         });
-      } else {
-        console.log('🚫 Not at bottom, keeping scroll position');
       }
     };
 
@@ -419,14 +404,12 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       const mediaElements = messageContainer.querySelectorAll('img, video, iframe, [data-link-preview="container"], [data-link-preview="loaded"], [data-link-preview="loading"]');
 
       if (mediaElements.length > 0) {
-        console.log(`🖼️ Found ${mediaElements.length} media elements, setting up load listeners`);
 
         let loadedCount = 0;
         const totalElements = mediaElements.length;
 
         const handleMediaLoad = () => {
           loadedCount++;
-          console.log(`📸 Media loaded: ${loadedCount}/${totalElements}`);
 
           // 모든 미디어가 로드되었거나 마지막 요소가 로드된 후 스크롤 체크
           if (loadedCount === totalElements) {
@@ -434,7 +417,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
           }
         };
 
-        mediaElements.forEach((element, index) => {
+        mediaElements.forEach((element) => {
           if (element.tagName === 'IMG') {
             const img = element as HTMLImageElement;
             if (img.complete) {
@@ -466,7 +449,6 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         // 안전장치: 3초 후에도 모든 미디어가 로드되지 않았다면 강제로 스크롤
         setTimeout(() => {
           if (loadedCount < totalElements) {
-            console.log(`⏰ Timeout: Only ${loadedCount}/${totalElements} media loaded, forcing scroll`);
             scrollToBottom();
           }
         }, 3000);
@@ -475,7 +457,19 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
 
     // 미디어 콘텐츠 체크를 위한 추가 지연
     setTimeout(checkForMediaContent, 200);
-  }, [messages]);
+
+    // 메시지 로딩 완료 후 읽음 처리 (2초 후)
+    const markAsReadTimeout = setTimeout(() => {
+      if (channelId && messages.length > 0) {
+        const latestMessage = messages[messages.length - 1];
+        actions.markAsRead(channelId, latestMessage.id);
+      }
+    }, 2000);
+
+    return () => {
+      clearTimeout(markAsReadTimeout);
+    };
+  }, [messages, channelId, actions]);
 
   // Auto-focus message input when channel changes or component mounts
   useEffect(() => {
@@ -486,7 +480,6 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         // 채널 변경 시 하단으로 스크롤 (슬랙 스타일)
         const messageContainer = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement;
         if (messageContainer) {
-          console.log('📜 Channel changed - scrolling to bottom with smooth animation');
           messageContainer.scrollTo({
             top: messageContainer.scrollHeight,
             behavior: 'smooth'
@@ -545,12 +538,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
 
   // Load messages when channel changes
   useEffect(() => {
-    console.log(`📨 Channel ${channelId} - Current messages:`, messages.length);
     if (channelId && messages.length === 0) {
-      console.log(`🔄 Loading messages for channel ${channelId}...`);
       actions.loadMessages(channelId);
-    } else if (channelId && messages.length > 0) {
-      console.log(`✅ Channel ${channelId} already has ${messages.length} messages`);
     }
   }, [channelId]); // messages.length 의존성 제거
 
@@ -561,6 +550,11 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         type: 'text' as MessageType,
       });
       setMessageInput('');
+
+      // 메시지 전송 후 입력창에 포커스 다시 주기
+      setTimeout(() => {
+        messageInputRef.current?.focus();
+      }, 50);
     }
   };
 

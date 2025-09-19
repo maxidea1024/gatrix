@@ -3,6 +3,7 @@ import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import { useChat } from '../../contexts/ChatContext';
 import { Message, User } from '../../types/chat';
+import { getChatWebSocketService } from '../../services/chatWebSocketService';
 
 interface NotificationManagerProps {
   currentUserId: number;
@@ -197,6 +198,85 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
       });
     }
   };
+
+  // Handle WebSocket invitation events
+  useEffect(() => {
+    const webSocketService = getChatWebSocketService();
+
+    const handleChannelInvitation = (event: any) => {
+      const { data } = event;
+      console.log('📨 Channel invitation received:', data);
+
+      // 브라우저 알림
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(`Channel Invitation`, {
+          body: `${data.inviterName} invited you to join "${data.channelName}"`,
+          icon: '/favicon.ico',
+          tag: `invitation-${data.invitationId}`,
+        });
+      }
+
+      // 스낵바 알림
+      enqueueSnackbar(
+        `${data.inviterName} invited you to join "${data.channelName}"`,
+        {
+          variant: 'info',
+          persist: true,
+          action: (key) => (
+            <div>
+              <button onClick={() => {
+                // TODO: 초대 수락/거절 처리
+                console.log('Accept invitation:', data.invitationId);
+              }}>
+                Accept
+              </button>
+              <button onClick={() => {
+                console.log('Decline invitation:', data.invitationId);
+              }}>
+                Decline
+              </button>
+            </div>
+          )
+        }
+      );
+
+      // 알림음 재생
+      playNotificationSound();
+    };
+
+    const handleInvitationResponse = (event: any) => {
+      const { data } = event;
+      console.log('📬 Invitation response received:', data);
+
+      const action = data.action === 'accept' ? 'accepted' : 'declined';
+      enqueueSnackbar(
+        `Your invitation was ${action}`,
+        { variant: data.action === 'accept' ? 'success' : 'info' }
+      );
+    };
+
+    const handleInvitationCancelled = (event: any) => {
+      const { data } = event;
+      console.log('❌ Invitation cancelled:', data);
+
+      enqueueSnackbar(
+        'An invitation was cancelled',
+        { variant: 'warning' }
+      );
+    };
+
+    // 이벤트 리스너 등록
+    webSocketService.on('channel_invitation', handleChannelInvitation);
+    webSocketService.on('invitation_response', handleInvitationResponse);
+    webSocketService.on('invitation_cancelled', handleInvitationCancelled);
+
+    // 클린업
+    return () => {
+      webSocketService.off('channel_invitation', handleChannelInvitation);
+      webSocketService.off('invitation_response', handleInvitationResponse);
+      webSocketService.off('invitation_cancelled', handleInvitationCancelled);
+    };
+  }, [enqueueSnackbar]);
 
   // Expose methods for parent component to use
   useImperativeHandle(ref, () => ({

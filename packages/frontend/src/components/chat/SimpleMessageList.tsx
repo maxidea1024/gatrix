@@ -55,14 +55,12 @@ const SimpleMessageList: React.FC<MessageListProps> = ({
       const mediaElements = messageContainer.querySelectorAll('img, video, iframe, [data-link-preview="container"], [data-link-preview="loaded"], [data-link-preview="loading"]');
 
       if (mediaElements.length > 0) {
-        console.log(`🖼️ Found ${mediaElements.length} media elements in SimpleMessageList`);
 
         let loadedCount = 0;
         const totalElements = mediaElements.length;
 
         const handleMediaLoad = () => {
           loadedCount++;
-          console.log(`📸 Media loaded: ${loadedCount}/${totalElements}`);
 
           if (loadedCount === totalElements) {
             setTimeout(scrollToBottom, 50);
@@ -99,7 +97,6 @@ const SimpleMessageList: React.FC<MessageListProps> = ({
         // 안전장치: 3초 후에도 모든 미디어가 로드되지 않았다면 강제로 스크롤
         setTimeout(() => {
           if (loadedCount < totalElements) {
-            console.log(`⏰ Timeout: Only ${loadedCount}/${totalElements} media loaded, forcing scroll`);
             scrollToBottom();
           }
         }, 3000);
@@ -113,6 +110,7 @@ const SimpleMessageList: React.FC<MessageListProps> = ({
   // Load messages when channel changes
   useEffect(() => {
     if (channelId && messages.length === 0) {
+      console.log(`🔄 SimpleMessageList loading messages for channel ${channelId}...`);
       actions.loadMessages(channelId);
     }
   }, [channelId]);

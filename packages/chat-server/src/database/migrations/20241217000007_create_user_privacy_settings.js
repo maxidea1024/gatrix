@@ -16,7 +16,7 @@ exports.up = function(knex) {
     table.boolean('requireFriendRequest').defaultTo(false);
     
     // 차단 목록 (JSON 배열로 사용자 ID 저장)
-    table.json('blockedUsers').defaultTo('[]');
+    table.json('blockedUsers');
     
     // 타임스탬프
     table.timestamp('createdAt').defaultTo(knex.fn.now());
