@@ -586,7 +586,6 @@ const MessageTemplatesPage: React.FC = () => {
 
       <Card>
         <CardContent sx={{ p: 0 }}>
-          {loading && <LinearProgress />}
           <TableContainer>
             <Table>
               <TableHead>
@@ -696,14 +695,16 @@ const MessageTemplatesPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* 페이지네이션 */}
-      <SimplePagination
-        count={total}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleRowsPerPageChange}
-      />
+      {/* 페이지네이션 - 데이터가 있을 때만 표시 */}
+      {total > 0 && (
+        <SimplePagination
+          count={total}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+        />
+      )}
 
       <Drawer
         anchor="right"

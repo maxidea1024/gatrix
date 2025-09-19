@@ -417,7 +417,6 @@ const JobsPage: React.FC = () => {
           overflow: 'auto'
         }}
       >
-        {loading && <LinearProgress />}
         <Table sx={{ tableLayout: 'fixed', minWidth: 1100 }}>
           <TableHead>
             <TableRow>

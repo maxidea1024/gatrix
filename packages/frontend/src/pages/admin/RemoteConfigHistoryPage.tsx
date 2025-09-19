@@ -224,7 +224,6 @@ const RemoteConfigHistoryPage: React.FC = () => {
       {viewMode === 'deployments' && (
         <Card>
           <CardContent sx={{ p: 0 }}>
-            {loading && <LinearProgress />}
             <TableContainer>
               <Table>
                 <TableHead>
@@ -366,7 +365,6 @@ const RemoteConfigHistoryPage: React.FC = () => {
       {viewMode === 'versions' && (
         <Card>
           <CardContent sx={{ p: 0 }}>
-            {loading && <LinearProgress />}
             <TableContainer>
               <Table>
                 <TableHead>

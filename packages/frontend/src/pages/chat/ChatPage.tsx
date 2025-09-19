@@ -224,14 +224,15 @@ const ChatPageContent: React.FC = () => {
   };
 
   return (
-    <Box sx={{
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden'
-    }}>
-      {/* Header */}
-      <Box sx={{ mb: 3, flexShrink: 0 }}>
+    <Box sx={{ p: 3 }}>
+      <Box sx={{
+        height: 'calc(100vh - 120px)', // 패딩을 고려한 높이 조정
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden'
+      }}>
+        {/* Header */}
+        <Box sx={{ mb: 3, flexShrink: 0 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
           <ChatIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Typography variant="h4" sx={{ fontWeight: 600 }}>
@@ -541,6 +542,7 @@ const ChatPageContent: React.FC = () => {
         open={privacySettingsOpen}
         onClose={() => setPrivacySettingsOpen(false)}
       />
+      </Box>
     </Box>
   );
 };

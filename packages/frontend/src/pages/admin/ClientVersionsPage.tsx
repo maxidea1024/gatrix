@@ -192,7 +192,7 @@ const ClientVersionsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [enqueueSnackbar, t]); // pageState 의존성 제거
+  }, [pageState.page, pageState.limit, pageState.sortBy, pageState.sortOrder, JSON.stringify(pageState.filters), enqueueSnackbar, t]);
 
   // 메타데이터 로드
   const loadMetadata = useCallback(async () => {
@@ -217,49 +217,21 @@ const ClientVersionsPage: React.FC = () => {
     }
   }, []);
 
-  // 초기 로드
+  // 초기 로드 (메타데이터와 태그만)
   useEffect(() => {
-    loadClientVersions();
     loadMetadata();
     loadTags();
-  }, [loadClientVersions, loadMetadata, loadTags]);
+  }, [loadMetadata, loadTags]);
 
   // 버전 목록 별도 로드
   useEffect(() => {
     loadAvailableVersions();
   }, [loadAvailableVersions]);
 
-  // pageState 변경 시 데이터 다시 로드
+  // pageState 변경 시 데이터 다시 로드 (클라이언트 버전 포함)
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const result = await ClientVersionService.getClientVersions(
-          pageState.page,
-          pageState.limit,
-          pageState.filters || {},
-          pageState.sortBy || 'clientVersion',
-          pageState.sortOrder || 'DESC'
-        );
-
-        if (result && result.clientVersions) {
-          setClientVersions(result.clientVersions);
-          setTotal(result.total || 0);
-        } else {
-          setClientVersions([]);
-          setTotal(0);
-        }
-      } catch (error: any) {
-        enqueueSnackbar(error.message || t('clientVersions.loadFailed'), { variant: 'error' });
-        setClientVersions([]);
-        setTotal(0);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, [pageState.page, pageState.limit, pageState.sortBy, pageState.sortOrder, JSON.stringify(pageState.filters), enqueueSnackbar, t]);
+    loadClientVersions();
+  }, [loadClientVersions]);
 
 
 
@@ -991,7 +963,6 @@ const ClientVersionsPage: React.FC = () => {
 
       {/* 테이블 */}
       <Card>
-        {loading && <LinearProgress />}
         <TableContainer>
           <Table>
             <TableHead>
@@ -1248,15 +1219,17 @@ const ClientVersionsPage: React.FC = () => {
           </Table>
         </TableContainer>
 
-        {/* 페이지네이션 */}
-        <SimplePagination
-          count={total}
-          page={pageState.page - 1} // MUI는 0부터 시작
-          rowsPerPage={pageState.limit}
-          onPageChange={handlePageChange}
-          onRowsPerPageChange={handleRowsPerPageChange}
-          rowsPerPageOptions={[5, 10, 25, 50, 100]}
-        />
+        {/* 페이지네이션 - 데이터가 있을 때만 표시 */}
+        {total > 0 && (
+          <SimplePagination
+            count={total}
+            page={pageState.page - 1} // MUI는 0부터 시작
+            rowsPerPage={pageState.limit}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+            rowsPerPageOptions={[5, 10, 25, 50, 100]}
+          />
+        )}
       </Card>
 
 

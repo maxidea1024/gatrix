@@ -336,7 +336,6 @@ const AuditLogsPage: React.FC = () => {
         {/* Audit Logs Table */}
 
         <Card>
-          {loading && <LinearProgress />}
           <TableContainer>
             <Table>
               <TableHead>

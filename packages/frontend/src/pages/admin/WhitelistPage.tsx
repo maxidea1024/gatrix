@@ -477,8 +477,6 @@ const WhitelistPage: React.FC = () => {
               {/* Nickname Whitelist Table */}
               <Card variant="outlined">
                 <CardContent sx={{ p: 0 }}>
-                  {loading && <LinearProgress />}
-
                   <TableContainer>
                     <Table>
                       <TableHead>

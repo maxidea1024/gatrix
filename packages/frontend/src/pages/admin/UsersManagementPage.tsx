@@ -962,7 +962,6 @@ const UsersManagementPage: React.FC = () => {
       {/* Users Table */}
       <Card>
         <CardContent sx={{ p: 0 }}>
-          {loading && <LinearProgress />}
           <TableContainer>
             <Table>
               <TableHead>
@@ -1127,17 +1126,20 @@ const UsersManagementPage: React.FC = () => {
             </Table>
           </TableContainer>
 
-          <SimplePagination
-            count={total}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={(_, newPage) => setPage(newPage)}
-            onRowsPerPageChange={(e) => {
-              setRowsPerPage(parseInt(e.target.value, 10));
-              setPage(0);
-            }}
-            rowsPerPageOptions={[5, 10, 25, 50, 100]}
-          />
+          {/* 페이지네이션 - 데이터가 있을 때만 표시 */}
+          {total > 0 && (
+            <SimplePagination
+              count={total}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={(_, newPage) => setPage(newPage)}
+              onRowsPerPageChange={(e) => {
+                setRowsPerPage(parseInt(e.target.value, 10));
+                setPage(0);
+              }}
+              rowsPerPageOptions={[5, 10, 25, 50, 100]}
+            />
+          )}
         </CardContent>
       </Card>
 

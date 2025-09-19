@@ -558,17 +558,12 @@ const ApiTokensPage: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {loading ? (
-                <EmptyTableRow colSpan={9} message={t('common.loading', 'Loading...')} />
-              ) : !tokens || tokens.length === 0 ? (
+              {!tokens || tokens.length === 0 ? (
                 <EmptyTableRow
                   colSpan={9}
+                  loading={loading}
                   message={t('apiTokens.noTokens', 'No API tokens found')}
-                  action={
-                    <Button variant="outlined" startIcon={<AddIcon />} onClick={openCreateDialog}>
-                      {t('apiTokens.createFirstToken', 'Create your first token')}
-                    </Button>
-                  }
+                  loadingMessage={t('common.loadingData')}
                 />
               ) : (
                 tokens.map((token) => (

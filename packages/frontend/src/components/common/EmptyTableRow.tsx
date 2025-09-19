@@ -1,5 +1,6 @@
 import React from 'react';
 import { TableRow, TableCell, Typography, CircularProgress, Box } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 interface EmptyTableRowProps {
   colSpan: number;
@@ -12,8 +13,9 @@ const EmptyTableRow: React.FC<EmptyTableRowProps> = ({
   colSpan,
   loading = false,
   message,
-  loadingMessage = "Loading..."
+  loadingMessage
 }) => {
+  const { t } = useTranslation();
   return (
     <TableRow>
       <TableCell colSpan={colSpan} align="center" sx={{ py: 8, minHeight: 150 }}>
@@ -21,7 +23,7 @@ const EmptyTableRow: React.FC<EmptyTableRowProps> = ({
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
             <CircularProgress size={24} />
             <Typography variant="body1" color="text.secondary">
-              {loadingMessage}
+              {loadingMessage || t('common.loading')}
             </Typography>
           </Box>
         ) : (

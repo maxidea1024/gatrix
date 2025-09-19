@@ -964,7 +964,6 @@ const GameWorldsPage: React.FC = () => {
       {/* Game Worlds Table */}
       <Card>
         <CardContent sx={{ p: 0 }}>
-          {loading && <LinearProgress />}
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -990,7 +989,8 @@ const GameWorldsPage: React.FC = () => {
                     <EmptyTableRow
                       colSpan={9}
                       loading={loading}
-                      message="등록된 게임 월드가 없습니다."
+                      message={t('gameWorlds.noWorldsFound')}
+                      loadingMessage={t('common.loadingData')}
                     />
                   ) : (
                     <SortableContext

@@ -387,7 +387,6 @@ const IpWhitelistTab: React.FC = () => {
       {/* Table */}
       <Card variant="outlined">
         <CardContent sx={{ p: 0 }}>
-          {loading && <LinearProgress />}
           <TableContainer>
             <Table>
               <TableHead>
