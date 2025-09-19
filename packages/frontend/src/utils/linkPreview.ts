@@ -1,10 +1,50 @@
 import { LinkPreview } from '../types/chat';
+import { apiService } from '../services/apiService';
 
 // URL 정규식 패턴
 const URL_REGEX = /(https?:\/\/[^\s<>"{}|\\^`[\]]+)/gi;
 
-// URL에서 미리보기 데이터를 추출하는 함수 (개선된 버전)
+// 캐시 저장소 (메모리 캐시)
+const previewCache = new Map<string, { data: LinkPreview; timestamp: number }>();
+const CACHE_DURATION = 1000 * 60 * 60; // 1시간
+
+// URL에서 미리보기 데이터를 추출하는 함수 (백엔드 API 사용)
 export const extractLinkPreview = async (url: string): Promise<LinkPreview | null> => {
+  try {
+    // 캐시 확인
+    const cached = previewCache.get(url);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      return cached.data;
+    }
+
+    // 백엔드 API 호출
+    const response = await apiService.post<{ success: boolean; data: LinkPreview }>('/link-preview', {
+      url
+    });
+
+    if (response.success && response.data) {
+      // 캐시에 저장
+      previewCache.set(url, {
+        data: response.data,
+        timestamp: Date.now()
+      });
+
+      return response.data;
+    }
+
+    // API 실패 시 클라이언트 사이드 폴백
+    return extractLinkPreviewFallback(url);
+
+  } catch (error) {
+    console.error('백엔드 링크 미리보기 API 실패, 폴백 사용:', error);
+
+    // 백엔드 API 실패 시 클라이언트 사이드 폴백
+    return extractLinkPreviewFallback(url);
+  }
+};
+
+// 클라이언트 사이드 폴백 함수 (기존 로직)
+const extractLinkPreviewFallback = async (url: string): Promise<LinkPreview | null> => {
   try {
     // 기본 링크 미리보기 객체
     const linkPreview: LinkPreview = {
@@ -14,7 +54,7 @@ export const extractLinkPreview = async (url: string): Promise<LinkPreview | nul
       siteName: extractSiteNameFromUrl(url)
     };
 
-    // YouTube 링크 처리 (개선됨)
+    // YouTube 링크 처리
     if (isYouTubeUrl(url)) {
       const videoId = extractYouTubeVideoId(url);
       if (videoId) {
@@ -29,7 +69,7 @@ export const extractLinkPreview = async (url: string): Promise<LinkPreview | nul
       }
     }
 
-    // GitHub 링크 처리 (개선됨)
+    // GitHub 링크 처리
     else if (isGitHubUrl(url)) {
       const repoInfo = extractGitHubRepoInfo(url);
       if (repoInfo) {
@@ -44,69 +84,17 @@ export const extractLinkPreview = async (url: string): Promise<LinkPreview | nul
       }
     }
 
-    // Twitter/X 링크 처리 (개선됨)
-    else if (isTwitterUrl(url)) {
-      linkPreview.siteName = 'X (Twitter)';
-      linkPreview.title = 'X (Twitter) 게시물';
-      linkPreview.description = 'X(구 Twitter)에서 공유된 게시물입니다.';
-      linkPreview.readingTime = '1분';
-      linkPreview.type = 'article';
-      linkPreview.image = 'https://abs.twimg.com/icons/apple-touch-icon-192x192.png';
-      linkPreview.favicon = 'https://twitter.com/favicon.ico';
-    }
-
-    // 인기 블로그 플랫폼 및 웹사이트 감지
+    // 기본 처리
     else {
       const domain = extractSiteNameFromUrl(url);
-
-      if (domain.includes('medium.com')) {
-        linkPreview.siteName = 'Medium';
-        linkPreview.description = 'Medium에서 공유된 아티클입니다.';
-        linkPreview.type = 'article';
-        linkPreview.readingTime = '5-10분';
-        linkPreview.favicon = 'https://medium.com/favicon.ico';
-      } else if (domain.includes('dev.to')) {
-        linkPreview.siteName = 'DEV Community';
-        linkPreview.description = 'DEV Community에서 공유된 개발 아티클입니다.';
-        linkPreview.type = 'article';
-        linkPreview.readingTime = '5-8분';
-        linkPreview.favicon = 'https://dev.to/favicon.ico';
-      } else if (domain.includes('hashnode.com')) {
-        linkPreview.siteName = 'Hashnode';
-        linkPreview.description = 'Hashnode에서 공유된 기술 블로그 포스트입니다.';
-        linkPreview.type = 'article';
-        linkPreview.readingTime = '5-10분';
-      } else if (domain.includes('tistory.com')) {
-        linkPreview.siteName = 'Tistory';
-        linkPreview.description = 'Tistory 블로그 포스트입니다.';
-        linkPreview.type = 'article';
-        linkPreview.readingTime = '3-7분';
-      } else if (domain.includes('velog.io')) {
-        linkPreview.siteName = 'velog';
-        linkPreview.description = 'velog에서 공유된 개발 블로그 포스트입니다.';
-        linkPreview.type = 'article';
-        linkPreview.readingTime = '5-10분';
-      } else if (domain.includes('notion.so') || domain.includes('notion.site')) {
-        linkPreview.siteName = 'Notion';
-        linkPreview.description = 'Notion에서 공유된 페이지입니다.';
-        linkPreview.readingTime = '5-15분';
-        linkPreview.favicon = 'https://www.notion.so/favicon.ico';
-      } else {
-        // 일반 웹사이트
-        linkPreview.description = `${domain}의 웹페이지입니다.`;
-        linkPreview.type = 'website';
-        linkPreview.readingTime = '3-5분';
-      }
-
-      // 파비콘 설정 (기본값)
-      if (!linkPreview.favicon) {
-        linkPreview.favicon = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
-      }
+      linkPreview.description = `${domain}의 웹페이지입니다.`;
+      linkPreview.type = 'website';
+      linkPreview.favicon = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
     }
 
     return linkPreview;
   } catch (error) {
-    console.error('Failed to extract link preview:', error);
+    console.error('폴백 링크 미리보기 실패:', error);
     return null;
   }
 };

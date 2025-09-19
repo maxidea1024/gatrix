@@ -4,6 +4,7 @@ import messagesRouter from './messages';
 import privacyRouter from './privacy';
 import invitationsRouter from './invitations';
 import directMessagesRouter from './direct-messages';
+import linkPreviewRouter from './linkPreview';
 import { requestLogger, errorHandler } from '../middleware/auth';
 
 const router = Router();
@@ -25,6 +26,7 @@ router.get('/', (req, res) => {
         privacy: '/api/v1/privacy',
         invitations: '/api/v1/invitations',
         directMessages: '/api/v1/direct-messages',
+        linkPreview: '/api/v1/link-preview',
         websocket: '/socket.io',
         health: '/health',
         metrics: '/metrics',
@@ -59,6 +61,7 @@ router.use('/messages', messagesRouter);
 router.use('/privacy', privacyRouter);
 router.use('/invitations', invitationsRouter);
 router.use('/direct-messages', directMessagesRouter);
+router.use('/link-preview', linkPreviewRouter);
 
 // 404 핸들러
 router.use('*', (req, res) => {
