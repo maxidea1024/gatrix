@@ -37,11 +37,13 @@ import {
   PersonAdd as PersonAddIcon,
   Mail as MailIcon,
   Security as SecurityIcon,
+
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { ChatProvider, useChat } from '../../contexts/ChatContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { apiService } from '../../services/api';
 import ChannelList from '../../components/chat/ChannelList';
 import ChatElementsMessageList from '../../components/chat/ChatElementsMessageList';
 import NotificationManager from '../../components/chat/NotificationManager';
@@ -204,29 +206,24 @@ const ChatPageContent: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`/api/v1/channels/${state.currentChannelId}/invite`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({ inviteeId: userId }),
-      });
+      const response = await apiService.post(
+        `/channels/${state.currentChannelId}/invite`,
+        { inviteeId: userId }
+      );
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to send invitation');
+      if (!response.success) {
+        throw new Error(response.error?.message || 'Failed to send invitation');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to invite user:', error);
       throw error;
     }
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ px: 3, py: 3, pb: 6 }}> {/* 하단 패딩을 6으로 늘림 (좌우와 동일한 24px) */}
       <Box sx={{
-        height: 'calc(100vh - 120px)', // 패딩을 고려한 높이 조정
+        height: 'calc(100vh - 160px)', // 하단 여백을 더 확보 (120px → 160px)
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden'
@@ -244,12 +241,7 @@ const ChatPageContent: React.FC = () => {
         </Typography>
       </Box>
 
-      {/* Connection Status */}
-      {!state.isConnected && (
-        <Alert severity="warning" sx={{ mb: 2, flexShrink: 0 }}>
-          {t('chat.disconnected', 'Disconnected from chat service. Trying to reconnect...')}
-        </Alert>
-      )}
+
 
       {/* Main Chat Interface */}
       <Paper sx={{

@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Typography, Paper, IconButton, TextField, useTheme, Avatar } from '@mui/material';
-import { Send as SendIcon, AttachFile as AttachFileIcon } from '@mui/icons-material';
+import {
+  Send as SendIcon,
+  AttachFile as AttachFileIcon,
+  Wifi as ConnectedIcon,
+  WifiOff as DisconnectedIcon
+} from '@mui/icons-material';
 // React Chat Elements는 더 이상 사용하지 않음 (슬랙 스타일로 직접 구현)
 import moment from 'moment-timezone';
 import { getStoredTimezone } from '../../utils/dateFormat';
@@ -342,18 +347,18 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
               </Typography>
             </Box>
             {/* 연결 상태 표시 */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box
-                sx={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: '50%',
-                  backgroundColor: state.isConnected ? '#4caf50' : '#f44336',
-                }}
-              />
-              <Typography variant="caption" color="text.secondary">
-                {state.isConnected ? '연결됨' : '연결 끊김'}
-              </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              {state.isConnected ? (
+                <ConnectedIcon sx={{
+                  color: 'success.main',
+                  fontSize: 24
+                }} />
+              ) : (
+                <DisconnectedIcon sx={{
+                  color: 'error.main',
+                  fontSize: 24
+                }} />
+              )}
             </Box>
           </Box>
         </Paper>

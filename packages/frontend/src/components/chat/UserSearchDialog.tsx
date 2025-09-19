@@ -26,6 +26,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { debounce } from 'lodash';
+import { apiService } from '../../services/api';
 
 interface User {
   id: number;
@@ -66,29 +67,22 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
 
     setIsSearching(true);
     try {
-      const response = await fetch(`/api/v1/users/search?q=${encodeURIComponent(query)}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+      const response = await apiService.get<{ success: boolean; data: User[] }>(
+        `/users/search?q=${encodeURIComponent(query)}`
+      );
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          // 제외할 사용자들 필터링
-          const filteredUsers = data.data.filter((user: User) => 
-            !excludeUserIds.includes(user.id)
-          );
-          setSearchResults(filteredUsers);
-        } else {
-          enqueueSnackbar(data.error || 'Search failed', { variant: 'error' });
-        }
+      if (response.success && response.data) {
+        // 제외할 사용자들 필터링
+        const filteredUsers = response.data.data.filter((user: User) =>
+          !excludeUserIds.includes(user.id)
+        );
+        setSearchResults(filteredUsers);
       } else {
-        enqueueSnackbar('Search failed', { variant: 'error' });
+        enqueueSnackbar(response.error?.message || 'Search failed', { variant: 'error' });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Search error:', error);
-      enqueueSnackbar('Search failed', { variant: 'error' });
+      enqueueSnackbar(error.message || 'Search failed', { variant: 'error' });
     } finally {
       setIsSearching(false);
     }
