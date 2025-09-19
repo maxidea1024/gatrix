@@ -178,8 +178,8 @@ const MessageList: React.FC<MessageListProps> = ({
             typingUsers.length > 0 ? (
               <ChatTypingIndicator content={
                 typingUsers.length === 1
-                  ? t('chat.userTyping', '{{user}} is typing...', { user: typingUsers[0].user.username })
-                  : t('chat.usersTyping', '{{count}} users are typing...', { count: typingUsers.length })
+                  ? t('chat.userTyping', { user: typingUsers[0].user.username })
+                  : t('chat.usersTyping', { count: typingUsers.length })
               } />
             ) : undefined
           }

@@ -75,7 +75,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     const oversizedFiles = files.filter(file => file.size > maxFileSize * 1024 * 1024);
     if (oversizedFiles.length > 0) {
       enqueueSnackbar(
-        t('chat.fileTooLarge', 'File is too large. Maximum size is {{size}}MB', { size: maxFileSize }),
+        t('chat.fileTooLarge', { size: maxFileSize }),
         { variant: 'error' }
       );
       return;

@@ -462,7 +462,7 @@ const ApiTokensPage: React.FC = () => {
           alignItems: 'center'
         }}>
           <Typography variant="body2" color="text.secondary">
-            {t('common.selectedItems', '{{count}} items selected', { count: selectedTokenIds.length })}
+            {t('common.selectedItems', { count: selectedTokenIds.length })}
           </Typography>
           <Button
             variant="outlined"
@@ -1273,7 +1273,7 @@ const ApiTokensPage: React.FC = () => {
           {/* Selected Tokens List */}
           <Box sx={{ mb: 3 }}>
             <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-              {t('apiTokens.tokensToDelete', 'Tokens to delete ({{count}})', { count: selectedTokenIds.length })}:
+              {t('apiTokens.tokensToDelete', { count: selectedTokenIds.length })}:
             </Typography>
             <Box sx={{
               maxHeight: 200,

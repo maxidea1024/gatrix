@@ -180,7 +180,7 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
 
       {/* Edit indicator */}
       {message.editedAt && (
-        <Tooltip title={t('chat.editedAt', 'Edited at {{time}}', {
+        <Tooltip title={t('chat.editedAt', {
           time: format(new Date(message.editedAt), 'PPp', { locale: getDateLocale() })
         })}>
           <Chip

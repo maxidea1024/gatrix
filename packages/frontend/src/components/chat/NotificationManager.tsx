@@ -143,7 +143,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
     const channelName = channel?.name || t('chat.unknownChannel');
 
     enqueueSnackbar(
-      t('chat.userJoined', '{{user}} joined #{{channel}}', {
+      t('chat.userJoined', {
         user: user.username,
         channel: channelName,
       }),
@@ -159,7 +159,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
     const channelName = channel?.name || t('chat.unknownChannel');
 
     enqueueSnackbar(
-      t('chat.userLeft', '{{user}} left #{{channel}}', {
+      t('chat.userLeft', {
         user: user.username,
         channel: channelName,
       }),

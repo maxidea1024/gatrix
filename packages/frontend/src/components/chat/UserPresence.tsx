@@ -130,7 +130,7 @@ const UserPresence: React.FC<UserPresenceProps> = ({
     if (diffInMinutes < 5) {
       return t('chat.justNow');
     } else if (diffInMinutes < 60) {
-      return t('chat.minutesAgo', '{{minutes}} minutes ago', { 
+      return t('chat.minutesAgo', { 
         minutes: Math.floor(diffInMinutes) 
       });
     } else {
