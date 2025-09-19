@@ -161,7 +161,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
       return channel.description;
     }
     
-    return t('chat.noMessages', 'No messages yet');
+    return t('chat.noMessages');
   };
 
   return (
@@ -170,10 +170,10 @@ const ChannelList: React.FC<ChannelListProps> = ({
       <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            {t('chat.channels', 'Channels')}
+            {t('chat.channels')}
           </Typography>
           {onCreateChannel && (
-            <Tooltip title={t('chat.createChannel', 'Create Channel')}>
+            <Tooltip title={t('chat.createChannel')}>
               <IconButton size="small" onClick={onCreateChannel}>
                 <AddIcon />
               </IconButton>
@@ -185,7 +185,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
         <TextField
           fullWidth
           size="small"
-          placeholder={t('chat.searchChannels', 'Search channels...')}
+          placeholder={t('chat.searchChannels')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           InputProps={{
@@ -204,8 +204,8 @@ const ChannelList: React.FC<ChannelListProps> = ({
           <Box sx={{ p: 3, textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary">
               {searchQuery
-                ? t('chat.noChannelsFound', 'No channels found')
-                : t('chat.noChannels', 'No channels available')
+                ? t('chat.noChannelsFound')
+                : t('chat.noChannels')
               }
             </Typography>
           </Box>
@@ -268,7 +268,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
                         </span>
                         {channel.type === 'private' && (
                           <Chip
-                            label={t('chat.private', 'Private')}
+                            label={t('chat.private')}
                             size="small"
                             variant="outlined"
                             sx={{ height: 16, fontSize: '0.6rem' }}
@@ -340,13 +340,13 @@ const ChannelList: React.FC<ChannelListProps> = ({
       >
         <MenuItem onClick={handleChannelSettings}>
           <SettingsIcon sx={{ mr: 1 }} />
-          {t('chat.channelSettings', 'Channel Settings')}
+          {t('chat.channelSettings')}
         </MenuItem>
         
         {selectedChannel?.type !== 'direct' && (
           <MenuItem onClick={handleLeaveChannel} sx={{ color: 'error.main' }}>
             <LeaveIcon sx={{ mr: 1 }} />
-            {t('chat.leaveChannel', 'Leave Channel')}
+            {t('chat.leaveChannel')}
           </MenuItem>
         )}
       </Menu>
@@ -359,21 +359,21 @@ const ChannelList: React.FC<ChannelListProps> = ({
         aria-describedby="leave-channel-dialog-description"
       >
         <DialogTitle id="leave-channel-dialog-title">
-          {t('chat.leaveChannelConfirm', 'Leave Channel')}
+          {t('chat.leaveChannelConfirm')}
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="leave-channel-dialog-description">
-            {t('chat.leaveChannelMessage', 'Are you sure you want to leave')} "{channelToLeave?.name}"?
+            {t('chat.leaveChannelMessage')} "{channelToLeave?.name}"?
             <br />
-            {t('chat.leaveChannelWarning', 'You will no longer receive messages from this channel.')}
+            {t('chat.leaveChannelWarning')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCancelLeave} color="primary">
-            {t('common.cancel', 'Cancel')}
+            {t('common.cancel')}
           </Button>
           <Button onClick={handleConfirmLeave} color="error" variant="contained">
-            {t('chat.leaveChannel', 'Leave Channel')}
+            {t('chat.leaveChannel')}
           </Button>
         </DialogActions>
       </Dialog>

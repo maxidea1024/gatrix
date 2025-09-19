@@ -199,7 +199,7 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
       {attachments.length > 0 && (
         <Box sx={{ mb: 1 }}>
           <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
-            {t('chat.attachments', 'Attachments')} ({attachments.length})
+            {t('chat.attachments')} ({attachments.length})
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
             {attachments.map((file, index) => (
@@ -242,7 +242,7 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
           value={message}
           onChange={handleMessageChange}
           onKeyPress={handleKeyPress}
-          placeholder={placeholder || t('chat.typeMessage', 'Type a message...')}
+          placeholder={placeholder || t('chat.typeMessage')}
           disabled={disabled}
           variant="outlined"
           size="small"
@@ -253,7 +253,7 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
           }}
         />
 
-        <Tooltip title={t('chat.sendMessage', 'Send message')}>
+        <Tooltip title={t('chat.sendMessage')}>
           <span>
             <IconButton
               onClick={handleSendMessage}

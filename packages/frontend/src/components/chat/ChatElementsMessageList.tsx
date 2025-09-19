@@ -649,7 +649,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
             />
             <Box sx={{ flex: 1 }}>
               <Typography variant="h6">
-                {currentChannel?.name || t('chat.selectChannel', 'Select a channel')}
+                {currentChannel?.name || t('chat.selectChannel')}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {currentChannel?.description || ''}
@@ -704,13 +704,13 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
               fontWeight: 500,
               color: colors.emptyStateText
             }}>
-              {t('chat.noMessages', '아직 메시지가 없습니다')}
+              {t('chat.noMessages')}
             </Typography>
             <Typography variant="body2" sx={{
               color: colors.emptyStateSubtext,
               lineHeight: 1.6
             }}>
-              {t('chat.startConversation', '첫 번째 메시지를 보내서 대화를 시작해보세요!')}
+              {t('chat.startConversation')}
             </Typography>
           </Box>
         </Box>
@@ -741,7 +741,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
               fullWidth
               multiline
               maxRows={4}
-              placeholder={t('chat.typeMessage', '메시지를 입력하세요...')}
+              placeholder={t('chat.typeMessage')}
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}
               onKeyDown={handleKeyPress}
@@ -817,7 +817,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
               {currentChannel?.name || ''}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {currentChannel?.memberCount || 0} {t('chat.members', 'members')}
+              {currentChannel?.memberCount || 0} {t('chat.members')}
             </Typography>
           </Box>
         </Box>
@@ -994,7 +994,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
             fullWidth
             multiline
             maxRows={4}
-            placeholder={t('chat.typeMessage', '메시지를 입력하세요...')}
+            placeholder={t('chat.typeMessage')}
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
             onKeyDown={handleKeyPress}

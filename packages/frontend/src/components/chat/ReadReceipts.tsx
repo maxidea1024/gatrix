@@ -65,15 +65,15 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
   const getStatusText = (status: MessageStatus) => {
     switch (status) {
       case 'sending':
-        return t('chat.sending', 'Sending');
+        return t('chat.sending');
       case 'sent':
-        return t('chat.sent', 'Sent');
+        return t('chat.sent');
       case 'delivered':
-        return t('chat.delivered', 'Delivered');
+        return t('chat.delivered');
       case 'read':
-        return t('chat.read', 'Read');
+        return t('chat.read');
       case 'failed':
-        return t('chat.failed', 'Failed');
+        return t('chat.failed');
       default:
         return '';
     }
@@ -123,7 +123,7 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
               title={
                 <Box>
                   <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
-                    {t('chat.readBy', 'Read by:')}
+                    {t('chat.readBy')}
                   </Typography>
                   {readByUsers.map((user) => (
                     <Typography key={user.id} variant="caption" sx={{ display: 'block' }}>
@@ -145,7 +145,7 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
               title={
                 <Box>
                   <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
-                    {t('chat.readBy', 'Read by:')}
+                    {t('chat.readBy')}
                   </Typography>
                   {readByUsers.map((user) => (
                     <Typography key={user.id} variant="caption" sx={{ display: 'block' }}>
@@ -184,7 +184,7 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
           time: format(new Date(message.editedAt), 'PPp', { locale: getDateLocale() })
         })}>
           <Chip
-            label={t('chat.edited', 'edited')}
+            label={t('chat.edited')}
             size="small"
             variant="outlined"
             sx={{
@@ -200,7 +200,7 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
 
       {/* Retry button for failed messages */}
       {isOwnMessage && message.status === 'failed' && (
-        <Tooltip title={t('chat.retry', 'Retry')}>
+        <Tooltip title={t('chat.retry')}>
           <Box
             component="button"
             onClick={() => {
@@ -221,7 +221,7 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
             }}
           >
             <Typography variant="caption" color="error">
-              {t('chat.retry', 'Retry')}
+              {t('chat.retry')}
             </Typography>
           </Box>
         </Tooltip>

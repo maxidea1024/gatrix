@@ -263,7 +263,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
 
   // 날짜 로케일 설정
   const getDateLocale = () => {
-    const currentLang = t('language') || 'ko';
+    const currentLang = t('language');
     switch (currentLang) {
       case 'en':
         dayjs.locale('en');

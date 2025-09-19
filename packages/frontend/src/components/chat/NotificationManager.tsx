@@ -78,7 +78,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
 
   const showMessageNotification = (message: Message) => {
     const channel = state.channels.find(c => c.id === message.channelId);
-    const channelName = channel?.name || t('chat.unknownChannel', 'Unknown Channel');
+    const channelName = channel?.name || t('chat.unknownChannel');
 
     // Browser notification
     if (
@@ -127,7 +127,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
                 cursor: 'pointer',
               }}
             >
-              {t('chat.viewMessage', 'View')}
+              {t('chat.viewMessage')}
             </button>
           ),
         }
@@ -140,7 +140,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
 
   const showUserJoinNotification = (user: User, channelId: number) => {
     const channel = state.channels.find(c => c.id === channelId);
-    const channelName = channel?.name || t('chat.unknownChannel', 'Unknown Channel');
+    const channelName = channel?.name || t('chat.unknownChannel');
 
     enqueueSnackbar(
       t('chat.userJoined', '{{user}} joined #{{channel}}', {
@@ -156,7 +156,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
 
   const showUserLeaveNotification = (user: User, channelId: number) => {
     const channel = state.channels.find(c => c.id === channelId);
-    const channelName = channel?.name || t('chat.unknownChannel', 'Unknown Channel');
+    const channelName = channel?.name || t('chat.unknownChannel');
 
     enqueueSnackbar(
       t('chat.userLeft', '{{user}} left #{{channel}}', {
@@ -173,15 +173,15 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
   const getMessagePreview = (message: Message): string => {
     switch (message.type) {
       case 'image':
-        return t('chat.sentImage', 'Sent an image');
+        return t('chat.sentImage');
       case 'video':
-        return t('chat.sentVideo', 'Sent a video');
+        return t('chat.sentVideo');
       case 'audio':
-        return t('chat.sentAudio', 'Sent an audio');
+        return t('chat.sentAudio');
       case 'file':
-        return t('chat.sentFile', 'Sent a file');
+        return t('chat.sentFile');
       case 'location':
-        return t('chat.sentLocation', 'Shared location');
+        return t('chat.sentLocation');
       case 'system':
         return message.content;
       default:

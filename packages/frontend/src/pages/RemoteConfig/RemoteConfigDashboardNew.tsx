@@ -206,13 +206,13 @@ const EnvironmentSelector: React.FC = () => {
         <Grid container alignItems="center" justifyContent="space-between">
           <Grid item>
             <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
-              {t('remoteConfig.title', 'Remote Config')}
+              {t('remoteConfig.title')}
             </Typography>
           </Grid>
           <Grid item>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Typography variant="body2" color="text.secondary">
-                {t('remoteConfig.currentEnvironment', 'Current Environment')}:
+                {t('remoteConfig.currentEnvironment')}:
               </Typography>
               <FormControl size="small" sx={{ minWidth: 200 }}>
                 <Select
@@ -274,31 +274,31 @@ const StatisticsCards: React.FC = () => {
 
   const cards = [
     {
-      title: t('remoteConfig.stats.totalTemplates', 'Total Templates'),
+      title: t('remoteConfig.stats.totalTemplates'),
       value: stats.totalTemplates,
       color: 'primary',
       icon: <CodeIcon />
     },
     {
-      title: t('remoteConfig.stats.published', 'Published'),
+      title: t('remoteConfig.stats.published'),
       value: stats.published,
       color: 'success',
       icon: <PublishIcon />
     },
     {
-      title: t('remoteConfig.stats.staged', 'Staged'),
+      title: t('remoteConfig.stats.staged'),
       value: stats.staged,
       color: 'warning',
       icon: <SettingsIcon />
     },
     {
-      title: t('remoteConfig.stats.drafts', 'Drafts'),
+      title: t('remoteConfig.stats.drafts'),
       value: stats.drafts,
       color: 'info',
       icon: <EditIcon />
     },
     {
-      title: t('remoteConfig.stats.pendingApprovals', 'Pending Approvals'),
+      title: t('remoteConfig.stats.pendingApprovals'),
       value: stats.pendingApprovals,
       color: 'error',
       icon: <ApproveIcon />
@@ -416,13 +416,13 @@ const TemplatesManagement: React.FC = () => {
   const columns: GridColDef[] = [
     {
       field: 'displayName',
-      headerName: t('remoteConfig.templateName', 'Template Name'),
+      headerName: t('remoteConfig.templateName'),
       flex: 1,
       minWidth: 200
     },
     {
       field: 'templateType',
-      headerName: t('remoteConfig.type', 'Type'),
+      headerName: t('remoteConfig.type'),
       width: 100,
       renderCell: (params) => (
         <Chip
@@ -435,7 +435,7 @@ const TemplatesManagement: React.FC = () => {
     },
     {
       field: 'status',
-      headerName: t('remoteConfig.status.title', 'Status'),
+      headerName: t('remoteConfig.status.title'),
       width: 120,
       renderCell: (params) => (
         <Chip
@@ -447,40 +447,40 @@ const TemplatesManagement: React.FC = () => {
     },
     {
       field: 'version',
-      headerName: t('remoteConfig.version', 'Version'),
+      headerName: t('remoteConfig.version'),
       width: 80,
       align: 'center'
     },
     {
       field: 'updatedAt',
-      headerName: t('remoteConfig.lastUpdated', 'Last Updated'),
+      headerName: t('remoteConfig.lastUpdated'),
       width: 160,
       renderCell: (params) => new Date(params.value).toLocaleDateString()
     },
     {
       field: 'updatedBy',
-      headerName: t('remoteConfig.updatedBy', 'Updated By'),
+      headerName: t('remoteConfig.updatedBy'),
       width: 180
     },
     {
       field: 'actions',
       type: 'actions',
-      headerName: t('common.actions', 'Actions'),
+      headerName: t('common.actions'),
       width: 120,
       getActions: (params) => [
         <GridActionsCellItem
           icon={<ViewIcon />}
-          label={t('common.view', 'View')}
+          label={t('common.view')}
           onClick={() => handleViewTemplate(params.row)}
         />,
         <GridActionsCellItem
           icon={<EditIcon />}
-          label={t('common.edit', 'Edit')}
+          label={t('common.edit')}
           onClick={() => handleEditTemplate(params.row)}
         />,
         <GridActionsCellItem
           icon={<PublishIcon />}
-          label={t('remoteConfig.publish', 'Publish')}
+          label={t('remoteConfig.publish')}
           onClick={() => {/* TODO: Implement publish */}}
           disabled={params.row.status === 'published'}
         />
@@ -493,7 +493,7 @@ const TemplatesManagement: React.FC = () => {
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6" component="h2">
-            {t('remoteConfig.templates', 'Templates')}
+            {t('remoteConfig.templates')}
           </Typography>
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button
@@ -501,14 +501,14 @@ const TemplatesManagement: React.FC = () => {
               startIcon={<ImportIcon />}
               size="small"
             >
-              {t('remoteConfig.import', 'Import')}
+              {t('remoteConfig.import')}
             </Button>
             <Button
               variant="outlined"
               startIcon={<ExportIcon />}
               size="small"
             >
-              {t('remoteConfig.export', 'Export')}
+              {t('remoteConfig.export')}
             </Button>
             <Button
               variant="contained"
@@ -516,7 +516,7 @@ const TemplatesManagement: React.FC = () => {
               onClick={handleCreateTemplate}
               size="small"
             >
-              {t('remoteConfig.createTemplate', 'Create Template')}
+              {t('remoteConfig.createTemplate')}
             </Button>
           </Box>
         </Box>
@@ -608,13 +608,13 @@ const ChangeRequestsManagement: React.FC = () => {
   const columns: GridColDef[] = [
     {
       field: 'title',
-      headerName: t('remoteConfig.changeRequest.title', 'Title'),
+      headerName: t('remoteConfig.changeRequest.title'),
       flex: 1,
       minWidth: 250
     },
     {
       field: 'requestType',
-      headerName: t('remoteConfig.changeRequest.type', 'Type'),
+      headerName: t('remoteConfig.changeRequest.type'),
       width: 120,
       renderCell: (params) => (
         <Chip
@@ -626,7 +626,7 @@ const ChangeRequestsManagement: React.FC = () => {
     },
     {
       field: 'status',
-      headerName: t('remoteConfig.status.title', 'Status'),
+      headerName: t('remoteConfig.status.title'),
       width: 120,
       renderCell: (params) => (
         <Chip
@@ -638,7 +638,7 @@ const ChangeRequestsManagement: React.FC = () => {
     },
     {
       field: 'approvals',
-      headerName: t('remoteConfig.changeRequest.approvals', 'Approvals'),
+      headerName: t('remoteConfig.changeRequest.approvals'),
       width: 120,
       renderCell: (params) => (
         <Typography variant="body2">
@@ -648,36 +648,36 @@ const ChangeRequestsManagement: React.FC = () => {
     },
     {
       field: 'createdAt',
-      headerName: t('remoteConfig.createdAt', 'Created At'),
+      headerName: t('remoteConfig.createdAt'),
       width: 160,
       renderCell: (params) => new Date(params.value).toLocaleDateString()
     },
     {
       field: 'createdBy',
-      headerName: t('remoteConfig.createdBy', 'Created By'),
+      headerName: t('remoteConfig.createdBy'),
       width: 180
     },
     {
       field: 'actions',
       type: 'actions',
-      headerName: t('common.actions', 'Actions'),
+      headerName: t('common.actions'),
       width: 120,
       getActions: (params) => [
         <GridActionsCellItem
           icon={<ApproveIcon />}
-          label={t('remoteConfig.approve', 'Approve')}
+          label={t('remoteConfig.approve')}
           onClick={() => handleApprove(params.row.id)}
           disabled={params.row.status !== 'pending'}
         />,
         <GridActionsCellItem
           icon={<RejectIcon />}
-          label={t('remoteConfig.reject', 'Reject')}
+          label={t('remoteConfig.reject')}
           onClick={() => handleReject(params.row.id)}
           disabled={params.row.status !== 'pending'}
         />,
         <GridActionsCellItem
           icon={<HistoryIcon />}
-          label={t('remoteConfig.history', 'History')}
+          label={t('remoteConfig.history')}
           onClick={() => {/* TODO: Show history */}}
         />
       ]
@@ -688,7 +688,7 @@ const ChangeRequestsManagement: React.FC = () => {
     <Card sx={{ mt: 3 }}>
       <CardContent>
         <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
-          {t('remoteConfig.changeRequests', 'Change Requests')}
+          {t('remoteConfig.changeRequests')}
         </Typography>
 
         <DataGrid
@@ -733,17 +733,17 @@ const RemoteConfigDashboard: React.FC = () => {
             sx={{ borderBottom: 1, borderColor: 'divider' }}
           >
             <Tab
-              label={t('remoteConfig.templates', 'Templates')}
+              label={t('remoteConfig.templates')}
               icon={<CodeIcon />}
               iconPosition="start"
             />
             <Tab
-              label={t('remoteConfig.changeRequests', 'Change Requests')}
+              label={t('remoteConfig.changeRequests')}
               icon={<ApproveIcon />}
               iconPosition="start"
             />
             <Tab
-              label={t('remoteConfig.environmentSettings', 'Environment Settings')}
+              label={t('remoteConfig.environmentSettings')}
               icon={<SettingsIcon />}
               iconPosition="start"
             />
@@ -754,7 +754,7 @@ const RemoteConfigDashboard: React.FC = () => {
             {tabValue === 1 && <ChangeRequestsManagement />}
             {tabValue === 2 && (
               <Alert severity="info">
-                {t('remoteConfig.environmentSettingsComingSoon', 'Environment settings management coming soon...')}
+                {t('remoteConfig.environmentSettingsComingSoon')}
               </Alert>
             )}
           </Box>

@@ -149,11 +149,11 @@ const SimpleMessageList: React.FC<MessageListProps> = ({
         <Paper elevation={1} sx={{ p: 2, borderRadius: 0 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <MuiAvatar sx={{ bgcolor: 'primary.main' }}>
-              {currentChannel?.name?.charAt(0) || 'C'}
+              {currentChannel?.name?.charAt(0)}
             </MuiAvatar>
             <Box>
               <Typography variant="h6">
-                {currentChannel?.name || t('chat.selectChannel', 'Select a channel')}
+                {currentChannel?.name || t('chat.selectChannel')}
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {currentChannel?.description || ''}
@@ -172,10 +172,10 @@ const SimpleMessageList: React.FC<MessageListProps> = ({
           gap: 2
         }}>
           <Typography variant="h6" color="text.secondary">
-            {t('chat.noMessages', 'No messages yet')}
+            {t('chat.noMessages')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {t('chat.startConversation', 'Start the conversation!')}
+            {t('chat.startConversation')}
           </Typography>
         </Box>
 
@@ -186,7 +186,7 @@ const SimpleMessageList: React.FC<MessageListProps> = ({
               fullWidth
               multiline
               maxRows={4}
-              placeholder={t('chat.typeMessage', 'Type a message...')}
+              placeholder={t('chat.typeMessage')}
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}
               onKeyPress={handleKeyPress}
@@ -211,14 +211,14 @@ const SimpleMessageList: React.FC<MessageListProps> = ({
       <Paper elevation={1} sx={{ p: 2, borderRadius: 0 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <MuiAvatar sx={{ bgcolor: 'primary.main' }}>
-            {currentChannel?.name?.charAt(0) || 'C'}
+            {currentChannel?.name?.charAt(0)}
           </MuiAvatar>
           <Box>
             <Typography variant="h6">
               {currentChannel?.name || ''}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {currentChannel?.memberCount || 0} {t('chat.members', 'members')}
+              {currentChannel?.memberCount || 0} {t('chat.members')}
             </Typography>
           </Box>
         </Box>
@@ -306,7 +306,7 @@ const SimpleMessageList: React.FC<MessageListProps> = ({
             fullWidth
             multiline
             maxRows={4}
-            placeholder={t('chat.typeMessage', 'Type a message...')}
+            placeholder={t('chat.typeMessage')}
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
             onKeyPress={handleKeyPress}

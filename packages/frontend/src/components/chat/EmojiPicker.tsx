@@ -99,16 +99,16 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
     : emojiCategories[selectedCategory as keyof typeof emojiCategories] || [];
 
   const categoryLabels = {
-    recent: t('chat.recentEmojis', 'Recent'),
-    smileys: t('chat.smileysEmojis', 'Smileys'),
-    people: t('chat.peopleEmojis', 'People'),
-    nature: t('chat.natureEmojis', 'Nature'),
-    food: t('chat.foodEmojis', 'Food'),
-    activities: t('chat.activitiesEmojis', 'Activities'),
-    travel: t('chat.travelEmojis', 'Travel'),
-    objects: t('chat.objectsEmojis', 'Objects'),
-    symbols: t('chat.symbolsEmojis', 'Symbols'),
-    flags: t('chat.flagsEmojis', 'Flags'),
+    recent: t('chat.recentEmojis'),
+    smileys: t('chat.smileysEmojis'),
+    people: t('chat.peopleEmojis'),
+    nature: t('chat.natureEmojis'),
+    food: t('chat.foodEmojis'),
+    activities: t('chat.activitiesEmojis'),
+    travel: t('chat.travelEmojis'),
+    objects: t('chat.objectsEmojis'),
+    symbols: t('chat.symbolsEmojis'),
+    flags: t('chat.flagsEmojis'),
   };
 
   return (
@@ -136,7 +136,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
         {/* Search */}
         <TextField
           size="small"
-          placeholder={t('chat.searchEmojis', 'Search emojis...')}
+          placeholder={t('chat.searchEmojis')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           InputProps={{
@@ -182,8 +182,8 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
             >
               <Typography variant="body2" color="text.secondary">
                 {searchQuery
-                  ? t('chat.noEmojisFound', 'No emojis found')
-                  : t('chat.noEmojis', 'No emojis')}
+                  ? t('chat.noEmojisFound')
+                  : t('chat.noEmojis')}
               </Typography>
             </Box>
           ) : (

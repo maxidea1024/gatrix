@@ -583,7 +583,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Message will be added via WebSocket event
         return message;
       } catch (error: any) {
-        dispatch({ type: 'SET_ERROR', payload: error.message || t('chat.sendMessageFailed', '메시지 전송에 실패했습니다') });
+        dispatch({ type: 'SET_ERROR', payload: error.message || t('chat.sendMessageFailed') });
         throw error;
       }
     },

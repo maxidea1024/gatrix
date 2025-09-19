@@ -153,7 +153,7 @@ const ChatPageContent: React.FC = () => {
   const handleCreateChannel = async () => {
     try {
       if (!channelFormData.name.trim()) {
-        enqueueSnackbar(t('chat.channelNameRequired', 'Channel name is required'), { variant: 'error' });
+        enqueueSnackbar(t('chat.channelNameRequired'), { variant: 'error' });
         return;
       }
 
@@ -171,10 +171,10 @@ const ChatPageContent: React.FC = () => {
 
       setCreateChannelOpen(false);
       setChannelFormData({ name: '', description: '', type: 'public' });
-      enqueueSnackbar(t('chat.channelCreated', 'Channel created successfully'), { variant: 'success' });
+      enqueueSnackbar(t('chat.channelCreated'), { variant: 'success' });
     } catch (error: any) {
       console.error('❌ Channel creation failed:', error);
-      enqueueSnackbar(error.message || t('chat.createChannelFailed', 'Failed to create channel'), { variant: 'error' });
+      enqueueSnackbar(error.message || t('chat.createChannelFailed'), { variant: 'error' });
     } finally {
       setIsCreatingChannel(false);
     }
@@ -227,11 +227,11 @@ const ChatPageContent: React.FC = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
           <ChatIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Typography variant="h4" sx={{ fontWeight: 600 }}>
-            {t('chat.title', 'Chat')}
+            {t('chat.title')}
           </Typography>
         </Box>
         <Typography variant="body1" color="text.secondary">
-          {t('chat.subtitle', 'Communicate with your team members in real-time')}
+          {t('chat.subtitle')}
         </Typography>
       </Box>
 
@@ -355,14 +355,14 @@ const ChatPageContent: React.FC = () => {
             >
               <ChatIcon sx={{ fontSize: 64, color: 'text.secondary' }} />
               <Typography variant="h6" color="text.secondary">
-                {t('chat.selectChannelToStart', 'Select a channel to start chatting')}
+                {t('chat.selectChannelToStart')}
               </Typography>
               <Button
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={() => setCreateChannelOpen(true)}
               >
-                {t('chat.createFirstChannel', 'Create your first channel')}
+                {t('chat.createFirstChannel')}
               </Button>
             </Box>
           )}
@@ -377,32 +377,32 @@ const ChatPageContent: React.FC = () => {
         fullWidth
       >
         <DialogTitle>
-          {t('chat.createChannel', 'Create Channel')}
+          {t('chat.createChannel')}
         </DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             <TextField
-              label={t('chat.channelName', 'Channel Name')}
+              label={t('chat.channelName')}
               value={channelFormData.name}
               onChange={(e) => setChannelFormData({ ...channelFormData, name: e.target.value })}
               fullWidth
               required
-              placeholder={t('chat.channelNamePlaceholder', 'e.g., general, random, project-alpha')}
+              placeholder={t('chat.channelNamePlaceholder')}
             />
             
             <TextField
-              label={t('chat.channelDescription', 'Description')}
+              label={t('chat.channelDescription')}
               value={channelFormData.description}
               onChange={(e) => setChannelFormData({ ...channelFormData, description: e.target.value })}
               fullWidth
               multiline
               rows={2}
-              placeholder={t('chat.channelDescriptionPlaceholder', 'What is this channel about?')}
+              placeholder={t('chat.channelDescriptionPlaceholder')}
             />
 
             <FormControl component="fieldset">
               <FormLabel component="legend">
-                {t('chat.channelType', 'Channel Type')}
+                {t('chat.channelType')}
               </FormLabel>
               <RadioGroup
                 value={channelFormData.type}
@@ -414,10 +414,10 @@ const ChatPageContent: React.FC = () => {
                   label={
                     <Box>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {t('chat.publicChannel', 'Public Channel')}
+                        {t('chat.publicChannel')}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {t('chat.publicChannelDesc', 'Anyone in the workspace can join')}
+                        {t('chat.publicChannelDesc')}
                       </Typography>
                     </Box>
                   }
@@ -428,10 +428,10 @@ const ChatPageContent: React.FC = () => {
                   label={
                     <Box>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {t('chat.privateChannel', 'Private Channel')}
+                        {t('chat.privateChannel')}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {t('chat.privateChannelDesc', 'Only invited members can join')}
+                        {t('chat.privateChannelDesc')}
                       </Typography>
                     </Box>
                   }
@@ -442,7 +442,7 @@ const ChatPageContent: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCreateChannelOpen(false)}>
-            {t('common.cancel', 'Cancel')}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleCreateChannel}
@@ -450,7 +450,7 @@ const ChatPageContent: React.FC = () => {
             disabled={!channelFormData.name.trim() || isCreatingChannel}
             startIcon={isCreatingChannel ? <CircularProgress size={20} /> : undefined}
           >
-            {isCreatingChannel ? t('chat.creating', 'Creating...') : t('chat.createChannel', 'Create Channel')}
+            {isCreatingChannel ? t('chat.creating') : t('chat.createChannel')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -479,7 +479,7 @@ const ChatPageContent: React.FC = () => {
       >
         <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography variant="h6">
-            {t('chat.memberList', 'Member List')}
+            {t('chat.memberList')}
           </Typography>
           <IconButton onClick={() => setMemberListOpen(false)}>
             <CloseIcon />

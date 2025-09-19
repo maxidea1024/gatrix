@@ -93,7 +93,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
     if (invalidFiles.length > 0) {
       enqueueSnackbar(
-        t('chat.unsupportedFileType', 'Unsupported file type'),
+        t('chat.unsupportedFileType'),
         { variant: 'error' }
       );
       return;
@@ -143,20 +143,20 @@ const FileUpload: React.FC<FileUploadProps> = ({
         onLocationShare({
           latitude,
           longitude,
-          name: t('chat.currentLocation', 'Current Location'),
+          name: t('chat.currentLocation'),
           address,
         });
       }
 
       setLocationDialog(false);
       enqueueSnackbar(
-        t('chat.locationShared', 'Location shared successfully'),
+        t('chat.locationShared'),
         { variant: 'success' }
       );
     } catch (error) {
       console.error('Error getting location:', error);
       enqueueSnackbar(
-        t('chat.locationError', 'Failed to get location. Please check your permissions.'),
+        t('chat.locationError'),
         { variant: 'error' }
       );
       setLocationDialog(false);
@@ -168,31 +168,31 @@ const FileUpload: React.FC<FileUploadProps> = ({
   const menuItems = [
     {
       icon: <ImageIcon />,
-      label: t('chat.uploadImage', 'Upload Image'),
+      label: t('chat.uploadImage'),
       accept: 'image/*',
       onClick: () => handleFileInputClick('image/*'),
     },
     {
       icon: <VideoIcon />,
-      label: t('chat.uploadVideo', 'Upload Video'),
+      label: t('chat.uploadVideo'),
       accept: 'video/*',
       onClick: () => handleFileInputClick('video/*'),
     },
     {
       icon: <AudioIcon />,
-      label: t('chat.uploadAudio', 'Upload Audio'),
+      label: t('chat.uploadAudio'),
       accept: 'audio/*',
       onClick: () => handleFileInputClick('audio/*'),
     },
     {
       icon: <FileIcon />,
-      label: t('chat.uploadFile', 'Upload File'),
+      label: t('chat.uploadFile'),
       accept: undefined,
       onClick: () => handleFileInputClick(),
     },
     {
       icon: <LocationIcon />,
-      label: t('chat.shareLocation', 'Share Location'),
+      label: t('chat.shareLocation'),
       onClick: handleLocationShare,
     },
   ];
@@ -239,25 +239,25 @@ const FileUpload: React.FC<FileUploadProps> = ({
       {/* Location Dialog */}
       <Dialog open={locationDialog} onClose={() => setLocationDialog(false)}>
         <DialogTitle>
-          {t('chat.shareLocation', 'Share Location')}
+          {t('chat.shareLocation')}
         </DialogTitle>
         <DialogContent>
           {gettingLocation ? (
             <Box sx={{ py: 2 }}>
               <Typography variant="body2" sx={{ mb: 2 }}>
-                {t('chat.gettingLocation', 'Getting your location...')}
+                {t('chat.gettingLocation')}
               </Typography>
               <LinearProgress />
             </Box>
           ) : (
             <Alert severity="info">
-              {t('chat.locationPermission', 'Please allow location access to share your current location.')}
+              {t('chat.locationPermission')}
             </Alert>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setLocationDialog(false)} startIcon={<CancelIcon />}>
-            {t('common.cancel', 'Cancel')}
+            {t('common.cancel')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -267,7 +267,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
         <Box sx={{ position: 'fixed', bottom: 16, right: 16, width: 300 }}>
           <Alert severity="info">
             <Typography variant="body2">
-              {t('chat.uploading', 'Uploading...')} {uploadProgress}%
+              {t('chat.uploading')} {uploadProgress}%
             </Typography>
             <LinearProgress variant="determinate" value={uploadProgress} sx={{ mt: 1 }} />
           </Alert>

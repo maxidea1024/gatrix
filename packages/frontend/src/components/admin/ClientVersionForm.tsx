@@ -369,7 +369,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
   // 날짜 로케일 설정
   const getDateLocale = () => {
-    const currentLang = t('language') || 'ko';
+    const currentLang = t('language');
     switch (currentLang) {
       case 'en':
         dayjs.locale('en');
@@ -521,7 +521,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       onClose();
     } catch (error: any) {
       console.error('Error saving client version:', error);
-      enqueueSnackbar(error.message || t('clientVersions.saveError', { defaultValue: 'Failed to save client version' }), { variant: 'error' });
+      enqueueSnackbar(error.message || t('clientVersions.saveError'), { variant: 'error' });
     } finally {
       setLoading(false);
     }

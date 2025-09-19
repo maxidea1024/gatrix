@@ -83,16 +83,16 @@ const UserPresence: React.FC<UserPresenceProps> = ({
   const getStatusText = (status: UserStatus) => {
     switch (status) {
       case 'online':
-        return t('chat.online', 'Online');
+        return t('chat.online');
       case 'away':
-        return t('chat.away', 'Away');
+        return t('chat.away');
       case 'busy':
-        return t('chat.busy', 'Busy');
+        return t('chat.busy');
       case 'invisible':
-        return t('chat.invisible', 'Invisible');
+        return t('chat.invisible');
       case 'offline':
       default:
-        return t('chat.offline', 'Offline');
+        return t('chat.offline');
     }
   };
 
@@ -121,14 +121,14 @@ const UserPresence: React.FC<UserPresenceProps> = ({
   };
 
   const formatLastSeen = (lastSeenAt?: string) => {
-    if (!lastSeenAt) return t('chat.neverSeen', 'Never seen');
+    if (!lastSeenAt) return t('chat.neverSeen');
     
     const lastSeen = new Date(lastSeenAt);
     const now = new Date();
     const diffInMinutes = (now.getTime() - lastSeen.getTime()) / (1000 * 60);
     
     if (diffInMinutes < 5) {
-      return t('chat.justNow', 'Just now');
+      return t('chat.justNow');
     } else if (diffInMinutes < 60) {
       return t('chat.minutesAgo', '{{minutes}} minutes ago', { 
         minutes: Math.floor(diffInMinutes) 
@@ -185,7 +185,7 @@ const UserPresence: React.FC<UserPresenceProps> = ({
         
         {user.role === 'admin' && (
           <Chip
-            label={t('chat.admin', 'Admin')}
+            label={t('chat.admin')}
             size="small"
             color="primary"
             variant="outlined"

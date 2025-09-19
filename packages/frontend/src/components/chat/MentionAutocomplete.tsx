@@ -115,7 +115,7 @@ const MentionAutocomplete: React.FC<MentionAutocompleteProps> = ({
     >
       <Box sx={{ p: 1, borderBottom: 1, borderColor: 'divider' }}>
         <Typography variant="caption" color="text.secondary">
-          {t('chat.mentionUsers', 'Mention users')}
+          {t('chat.mentionUsers')}
         </Typography>
       </Box>
       
@@ -160,7 +160,7 @@ const MentionAutocomplete: React.FC<MentionAutocompleteProps> = ({
                     </Typography>
                     {user.role === 'admin' && (
                       <Chip
-                        label={t('chat.admin', 'Admin')}
+                        label={t('chat.admin')}
                         size="small"
                         color="primary"
                         variant="outlined"
@@ -197,7 +197,7 @@ const MentionAutocomplete: React.FC<MentionAutocompleteProps> = ({
       
       <Box sx={{ p: 1, borderTop: 1, borderColor: 'divider' }}>
         <Typography variant="caption" color="text.secondary">
-          {t('chat.mentionHint', 'Use ↑↓ to navigate, Enter to select, Esc to close')}
+          {t('chat.mentionHint')}
         </Typography>
       </Box>
     </Paper>

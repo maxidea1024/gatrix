@@ -136,17 +136,17 @@ const MessageList: React.FC<MessageListProps> = ({
           <ConversationHeader>
             <Avatar name={currentChannel?.name || ''} />
             <ConversationHeader.Content
-              userName={currentChannel?.name || t('chat.selectChannel', 'Select a channel')}
+              userName={currentChannel?.name || t('chat.selectChannel')}
               info={currentChannel?.description || ''}
             />
           </ConversationHeader>
 
           <ChatMessageList>
-            <MessageSeparator content={t('chat.noMessages', 'No messages yet')} />
+            <MessageSeparator content={t('chat.noMessages')} />
           </ChatMessageList>
 
           <MessageInput
-            placeholder={t('chat.typeMessage', 'Type a message...')}
+            placeholder={t('chat.typeMessage')}
             onSend={handleSendMessage}
             attachButton={true}
           />
@@ -163,7 +163,7 @@ const MessageList: React.FC<MessageListProps> = ({
           <Avatar name={currentChannel?.name || ''} />
           <ConversationHeader.Content
             userName={currentChannel?.name || ''}
-            info={`${currentChannel?.memberCount || 0} ${t('chat.members', 'members')}`}
+            info={`${currentChannel?.memberCount || 0} ${t('chat.members')}`}
           />
           <ConversationHeader.Actions>
             <VoiceCallButton />
@@ -210,7 +210,7 @@ const MessageList: React.FC<MessageListProps> = ({
 
         {/* Message Input */}
         <MessageInput
-          placeholder={t('chat.typeMessage', 'Type a message...')}
+          placeholder={t('chat.typeMessage')}
           onSend={handleSendMessage}
           attachButton={true}
           disabled={!currentChannel}

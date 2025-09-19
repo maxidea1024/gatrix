@@ -618,11 +618,11 @@ const EnvironmentSelector: React.FC = () => {
           <Grid item>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Typography variant="h5" component="h1" sx={{ fontWeight: 600 }}>
-                {t('remoteConfig.title', 'Remote Config')}
+                {t('remoteConfig.title')}
               </Typography>
               {hasChanges && (
                 <Chip
-                  label={t('remoteConfig.pendingChanges', `${pendingChanges} pending changes`)}
+                  label={t('remoteConfig.pendingChanges')}
                   color="warning"
                   size="small"
                   variant="outlined"
@@ -640,7 +640,7 @@ const EnvironmentSelector: React.FC = () => {
                     size="small"
                     onClick={showDiscardDialog}
                   >
-                    {t('remoteConfig.discardChanges', 'Discard Changes')} ({pendingChanges})
+                    {t('remoteConfig.discardChanges')} ({pendingChanges})
                   </Button>
                   <Button
                     variant="contained"
@@ -648,17 +648,17 @@ const EnvironmentSelector: React.FC = () => {
                     size="small"
                     onClick={showDeployDialog}
                   >
-                    {t('remoteConfig.deployChanges', 'Deploy Changes')} ({pendingChanges})
+                    {t('remoteConfig.deployChanges')} ({pendingChanges})
                   </Button>
                 </>
               )}
               <FormControl size="small" sx={{ minWidth: 200 }}>
-                <InputLabel>{t('remoteConfig.environment', 'Environment')}</InputLabel>
+                <InputLabel>{t('remoteConfig.environment')}</InputLabel>
                 <Select
                   value={currentEnvironment?.id || ''}
                   onChange={(e) => switchEnvironment(Number(e.target.value))}
                   disabled={isLoading}
-                  label={t('remoteConfig.environment', 'Environment')}
+                  label={t('remoteConfig.environment')}
                   MenuProps={{
                     PaperProps: {
                       style: {
@@ -779,7 +779,7 @@ const ConfigsManagement: React.FC = () => {
       await remoteConfigService.deleteParameter(configToDelete.key);
 
       setConfigs(prev => prev.filter(c => c.id !== configToDelete.id));
-      setSnackbarMessage(t('remoteConfig.parameterDeleted', 'Parameter deleted successfully'));
+      setSnackbarMessage(t('remoteConfig.parameterDeleted'));
       setSnackbarOpen(true);
       markAsChanged({
         id: Date.now().toString(),
@@ -791,7 +791,7 @@ const ConfigsManagement: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to delete config:', error);
-      setSnackbarMessage(t('common.error', 'An error occurred'));
+      setSnackbarMessage(t('common.error'));
       setSnackbarOpen(true);
     } finally {
       setDeleteDialogOpen(false);
@@ -808,7 +808,7 @@ const ConfigsManagement: React.FC = () => {
         case 'number':
           processedValue = Number(formData.defaultValue);
           if (isNaN(processedValue)) {
-            setSnackbarMessage(t('remoteConfig.invalidNumber', 'Invalid number value'));
+            setSnackbarMessage(t('remoteConfig.invalidNumber'));
             setSnackbarOpen(true);
             return;
           }
@@ -820,7 +820,7 @@ const ConfigsManagement: React.FC = () => {
           try {
             processedValue = JSON.parse(formData.defaultValue);
           } catch (e) {
-            setSnackbarMessage(t('remoteConfig.invalidJson', 'Invalid JSON value'));
+            setSnackbarMessage(t('remoteConfig.invalidJson'));
             setSnackbarOpen(true);
             return;
           }
@@ -842,7 +842,7 @@ const ConfigsManagement: React.FC = () => {
       if (dialogType === 'create') {
         // Check for duplicate key
         if (configs.some(c => c.key === formData.key)) {
-          setSnackbarMessage(t('remoteConfig.duplicateKey', 'Parameter key already exists'));
+          setSnackbarMessage(t('remoteConfig.duplicateKey'));
           setSnackbarOpen(true);
           return;
         }
@@ -856,7 +856,7 @@ const ConfigsManagement: React.FC = () => {
         );
 
         setConfigs(prev => [...prev, { ...newConfig, id: savedParameter.id }]);
-        setSnackbarMessage(t('remoteConfig.parameterCreated', 'Parameter created successfully'));
+        setSnackbarMessage(t('remoteConfig.parameterCreated'));
         markAsChanged({
           id: Date.now().toString(),
           type: 'parameter',
@@ -875,7 +875,7 @@ const ConfigsManagement: React.FC = () => {
         );
 
         setConfigs(prev => prev.map(c => c.id === selectedConfig?.id ? newConfig : c));
-        setSnackbarMessage(t('remoteConfig.parameterUpdated', 'Parameter updated successfully'));
+        setSnackbarMessage(t('remoteConfig.parameterUpdated'));
         markAsChanged({
           id: Date.now().toString(),
           type: 'parameter',
@@ -890,7 +890,7 @@ const ConfigsManagement: React.FC = () => {
       setDialogOpen(false);
     } catch (error) {
       console.error('Failed to save config:', error);
-      setSnackbarMessage(t('common.error', 'An error occurred'));
+      setSnackbarMessage(t('common.error'));
       setSnackbarOpen(true);
     }
   };
@@ -960,7 +960,7 @@ const ConfigsManagement: React.FC = () => {
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6" component="h2">
-            {t('remoteConfig.parameters', 'Parameters')}
+            {t('remoteConfig.parameters')}
           </Typography>
           <Button
             variant="contained"
@@ -968,7 +968,7 @@ const ConfigsManagement: React.FC = () => {
             onClick={handleAddConfig}
             size="small"
           >
-            {t('remoteConfig.addParameter', 'Add Parameter')}
+            {t('remoteConfig.addParameter')}
           </Button>
         </Box>
 
@@ -976,13 +976,13 @@ const ConfigsManagement: React.FC = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>{t('remoteConfig.parameterKey', 'Parameter Key')}</TableCell>
-                <TableCell>{t('remoteConfig.type', 'Type')}</TableCell>
-                <TableCell>{t('remoteConfig.defaultValue', 'Default Value')}</TableCell>
-                <TableCell>{t('remoteConfig.description', 'Description')}</TableCell>
-                <TableCell>{t('remoteConfig.features', 'Features')}</TableCell>
-                <TableCell>{t('remoteConfig.lastUpdated', 'Last Updated')}</TableCell>
-                <TableCell>{t('common.actions', 'Actions')}</TableCell>
+                <TableCell>{t('remoteConfig.parameterKey')}</TableCell>
+                <TableCell>{t('remoteConfig.type')}</TableCell>
+                <TableCell>{t('remoteConfig.defaultValue')}</TableCell>
+                <TableCell>{t('remoteConfig.description')}</TableCell>
+                <TableCell>{t('remoteConfig.features')}</TableCell>
+                <TableCell>{t('remoteConfig.lastUpdated')}</TableCell>
+                <TableCell>{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -1082,26 +1082,26 @@ const ConfigsManagement: React.FC = () => {
       open={dialogOpen}
       onClose={() => setDialogOpen(false)}
       title={dialogType === 'create'
-        ? t('remoteConfig.addParameter', 'Add Parameter')
-        : t('remoteConfig.editParameter', 'Edit Parameter')
+        ? t('remoteConfig.addParameter')
+        : t('remoteConfig.editParameter')
       }
       actions={
         <>
           <Button onClick={() => setDialogOpen(false)}>
-            {t('common.cancel', 'Cancel')}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleSaveConfig}
             variant="contained"
             disabled={!formData.key || !formData.description}
           >
-            {dialogType === 'create' ? t('common.create', 'Create') : t('common.update', 'Update')}
+            {dialogType === 'create' ? t('common.create') : t('common.update')}
           </Button>
         </>
       }
     >
       <TextField
-        label={t('remoteConfig.parameterKey', 'Parameter Key')}
+        label={t('remoteConfig.parameterKey')}
         value={formData.key}
         onChange={(e) => setFormData(prev => ({ ...prev, key: e.target.value }))}
         fullWidth
@@ -1112,7 +1112,7 @@ const ConfigsManagement: React.FC = () => {
       />
 
       <FormControl fullWidth required>
-        <InputLabel>{t('remoteConfig.type', 'Type')}</InputLabel>
+        <InputLabel>{t('remoteConfig.type')}</InputLabel>
         <Select
           value={formData.type}
           onChange={(e) => setFormData(prev => ({
@@ -1120,7 +1120,7 @@ const ConfigsManagement: React.FC = () => {
             type: e.target.value as any,
             defaultValue: e.target.value === 'boolean' ? 'false' : ''
           }))}
-          label={t('remoteConfig.type', 'Type')}
+          label={t('remoteConfig.type')}
           MenuProps={{
             PaperProps: {
               style: {
@@ -1138,13 +1138,13 @@ const ConfigsManagement: React.FC = () => {
 
       <Box>
         <Typography variant="subtitle2" sx={{ mb: 1 }}>
-          {t('remoteConfig.defaultValue', 'Default Value')}
+          {t('remoteConfig.defaultValue')}
         </Typography>
         {renderValueInput()}
       </Box>
 
       <TextField
-        label={t('remoteConfig.description', 'Description')}
+        label={t('remoteConfig.description')}
         value={formData.description}
         onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
         fullWidth
@@ -1156,21 +1156,21 @@ const ConfigsManagement: React.FC = () => {
 
     {/* Delete Confirmation Dialog */}
     <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-      <DialogTitle>{t('remoteConfig.deleteParameter', 'Delete Parameter')}</DialogTitle>
+      <DialogTitle>{t('remoteConfig.deleteParameter')}</DialogTitle>
       <DialogContent>
         <Typography>
-          {t('remoteConfig.deleteParameterConfirm', 'Are you sure you want to delete parameter')} "{configToDelete?.key}"?
+          {t('remoteConfig.deleteParameterConfirm')} "{configToDelete?.key}"?
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {t('remoteConfig.deleteParameterWarning', 'This action cannot be undone.')}
+          {t('remoteConfig.deleteParameterWarning')}
         </Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setDeleteDialogOpen(false)}>
-          {t('common.cancel', 'Cancel')}
+          {t('common.cancel')}
         </Button>
         <Button onClick={confirmDelete} color="error" variant="contained">
-          {t('common.delete', 'Delete')}
+          {t('common.delete')}
         </Button>
       </DialogActions>
     </Dialog>
@@ -1301,7 +1301,7 @@ const CampaignsManagement: React.FC = () => {
 
     try {
       setCampaigns(prev => prev.filter(c => c.id !== campaignToDelete.id));
-      setSnackbarMessage(t('remoteConfig.campaignDeleted', 'Campaign deleted successfully'));
+      setSnackbarMessage(t('remoteConfig.campaignDeleted'));
       setSnackbarOpen(true);
       markAsChanged({
         id: Date.now().toString(),
@@ -1313,7 +1313,7 @@ const CampaignsManagement: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to delete campaign:', error);
-      setSnackbarMessage(t('common.error', 'An error occurred'));
+      setSnackbarMessage(t('common.error'));
       setSnackbarOpen(true);
     } finally {
       setDeleteDialogOpen(false);
@@ -1350,7 +1350,7 @@ const CampaignsManagement: React.FC = () => {
 
       if (dialogType === 'create') {
         setCampaigns(prev => [...prev, newCampaign]);
-        setSnackbarMessage(t('remoteConfig.campaignCreated', 'Campaign created successfully'));
+        setSnackbarMessage(t('remoteConfig.campaignCreated'));
         markAsChanged({
           id: Date.now().toString(),
           type: 'campaign',
@@ -1361,7 +1361,7 @@ const CampaignsManagement: React.FC = () => {
         });
       } else {
         setCampaigns(prev => prev.map(c => c.id === selectedCampaign?.id ? newCampaign : c));
-        setSnackbarMessage(t('remoteConfig.campaignUpdated', 'Campaign updated successfully'));
+        setSnackbarMessage(t('remoteConfig.campaignUpdated'));
         markAsChanged({
           id: Date.now().toString(),
           type: 'campaign',
@@ -1376,7 +1376,7 @@ const CampaignsManagement: React.FC = () => {
       setDialogOpen(false);
     } catch (error) {
       console.error('Failed to save campaign:', error);
-      setSnackbarMessage(t('common.error', 'An error occurred'));
+      setSnackbarMessage(t('common.error'));
       setSnackbarOpen(true);
     }
   };
@@ -1396,7 +1396,7 @@ const CampaignsManagement: React.FC = () => {
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6" component="h2">
-            {t('remoteConfig.campaigns', 'Campaigns')}
+            {t('remoteConfig.campaigns')}
           </Typography>
           <Button
             variant="contained"
@@ -1404,7 +1404,7 @@ const CampaignsManagement: React.FC = () => {
             onClick={handleAddCampaign}
             size="small"
           >
-            {t('remoteConfig.addCampaign', 'Add Campaign')}
+            {t('remoteConfig.addCampaign')}
           </Button>
         </Box>
 
@@ -1412,13 +1412,13 @@ const CampaignsManagement: React.FC = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>{t('remoteConfig.campaignName', 'Campaign Name')}</TableCell>
-                <TableCell>{t('remoteConfig.targetParameter', 'Target Parameter')}</TableCell>
-                <TableCell>{t('remoteConfig.overrideValue', 'Override Value')}</TableCell>
-                <TableCell>{t('remoteConfig.period', 'Period')}</TableCell>
-                <TableCell>{t('remoteConfig.traffic', 'Traffic %')}</TableCell>
-                <TableCell>{t('remoteConfig.status', 'Status')}</TableCell>
-                <TableCell>{t('common.actions', 'Actions')}</TableCell>
+                <TableCell>{t('remoteConfig.campaignName')}</TableCell>
+                <TableCell>{t('remoteConfig.targetParameter')}</TableCell>
+                <TableCell>{t('remoteConfig.overrideValue')}</TableCell>
+                <TableCell>{t('remoteConfig.period')}</TableCell>
+                <TableCell>{t('remoteConfig.traffic')}</TableCell>
+                <TableCell>{t('remoteConfig.status')}</TableCell>
+                <TableCell>{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -1455,7 +1455,7 @@ const CampaignsManagement: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={campaign.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
+                      label={campaign.isActive ? t('common.active') : t('common.inactive')}
                       size="small"
                       color={campaign.isActive ? 'success' : 'default'}
                     />
@@ -1500,27 +1500,27 @@ const CampaignsManagement: React.FC = () => {
       open={dialogOpen}
       onClose={() => setDialogOpen(false)}
       title={dialogType === 'create'
-        ? t('remoteConfig.addCampaign', 'Add Campaign')
-        : t('remoteConfig.editCampaign', 'Edit Campaign')
+        ? t('remoteConfig.addCampaign')
+        : t('remoteConfig.editCampaign')
       }
       actions={
         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
           <Button onClick={() => setDialogOpen(false)}>
-            {t('common.cancel', 'Cancel')}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleSaveCampaign}
             variant="contained"
             disabled={!formData.name || !formData.configKey || !formData.overrideValue || !formData.startDate || !formData.endDate}
           >
-            {dialogType === 'create' ? t('common.create', 'Create') : t('common.update', 'Update')}
+            {dialogType === 'create' ? t('common.create') : t('common.update')}
           </Button>
         </Box>
       }
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <TextField
-          label={t('remoteConfig.campaignName', 'Campaign Name')}
+          label={t('remoteConfig.campaignName')}
           value={formData.name}
           onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
           fullWidth
@@ -1529,7 +1529,7 @@ const CampaignsManagement: React.FC = () => {
         />
 
         <TextField
-          label={t('remoteConfig.targetParameter', 'Target Parameter')}
+          label={t('remoteConfig.targetParameter')}
           value={formData.configKey}
           onChange={(e) => setFormData(prev => ({ ...prev, configKey: e.target.value }))}
           fullWidth
@@ -1539,7 +1539,7 @@ const CampaignsManagement: React.FC = () => {
         />
 
         <TextField
-          label={t('remoteConfig.overrideValue', 'Override Value')}
+          label={t('remoteConfig.overrideValue')}
           value={formData.overrideValue}
           onChange={(e) => setFormData(prev => ({ ...prev, overrideValue: e.target.value }))}
           fullWidth
@@ -1551,7 +1551,7 @@ const CampaignsManagement: React.FC = () => {
 
         <Box sx={{ display: 'flex', gap: 2 }}>
           <TextField
-            label={t('remoteConfig.startDate', 'Start Date')}
+            label={t('remoteConfig.startDate')}
             type="date"
             value={formData.startDate}
             onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
@@ -1561,7 +1561,7 @@ const CampaignsManagement: React.FC = () => {
           />
 
           <TextField
-            label={t('remoteConfig.endDate', 'End Date')}
+            label={t('remoteConfig.endDate')}
             type="date"
             value={formData.endDate}
             onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
@@ -1572,7 +1572,7 @@ const CampaignsManagement: React.FC = () => {
         </Box>
 
         <TextField
-          label={t('remoteConfig.trafficPercentage', 'Traffic Percentage')}
+          label={t('remoteConfig.trafficPercentage')}
           type="number"
           value={formData.trafficPercentage}
           onChange={(e) => setFormData(prev => ({ ...prev, trafficPercentage: parseInt(e.target.value) }))}
@@ -1587,28 +1587,28 @@ const CampaignsManagement: React.FC = () => {
               onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
             />
           }
-          label={t('remoteConfig.isActive', 'Is Active')}
+          label={t('remoteConfig.isActive')}
         />
       </Box>
     </SidePanel>
 
     {/* Delete Confirmation Dialog */}
     <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-      <DialogTitle>{t('remoteConfig.deleteCampaign', 'Delete Campaign')}</DialogTitle>
+      <DialogTitle>{t('remoteConfig.deleteCampaign')}</DialogTitle>
       <DialogContent>
         <Typography>
-          {t('remoteConfig.deleteCampaignConfirm', 'Are you sure you want to delete campaign')} "{campaignToDelete?.name}"?
+          {t('remoteConfig.deleteCampaignConfirm')} "{campaignToDelete?.name}"?
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {t('remoteConfig.deleteCampaignWarning', 'This action cannot be undone.')}
+          {t('remoteConfig.deleteCampaignWarning')}
         </Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setDeleteDialogOpen(false)}>
-          {t('common.cancel', 'Cancel')}
+          {t('common.cancel')}
         </Button>
         <Button onClick={confirmDeleteCampaign} color="error" variant="contained">
-          {t('common.delete', 'Delete')}
+          {t('common.delete')}
         </Button>
       </DialogActions>
     </Dialog>
@@ -1732,7 +1732,7 @@ const ContextFieldsManagement: React.FC = () => {
 
     try {
       setContextFields(prev => prev.filter(f => f.id !== fieldToDelete.id));
-      setSnackbarMessage(t('remoteConfig.contextFieldDeleted', 'Context field deleted successfully'));
+      setSnackbarMessage(t('remoteConfig.contextFieldDeleted'));
       setSnackbarOpen(true);
       markAsChanged({
         id: Date.now().toString(),
@@ -1744,7 +1744,7 @@ const ContextFieldsManagement: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to delete context field:', error);
-      setSnackbarMessage(t('common.error', 'An error occurred'));
+      setSnackbarMessage(t('common.error'));
       setSnackbarOpen(true);
     } finally {
       setDeleteDialogOpen(false);
@@ -1765,12 +1765,12 @@ const ContextFieldsManagement: React.FC = () => {
       if (dialogType === 'create') {
         // Check for duplicate name
         if (contextFields.some(f => f.name === formData.name)) {
-          setSnackbarMessage(t('remoteConfig.duplicateFieldName', 'Context field name already exists'));
+          setSnackbarMessage(t('remoteConfig.duplicateFieldName'));
           setSnackbarOpen(true);
           return;
         }
         setContextFields(prev => [...prev, newField]);
-        setSnackbarMessage(t('remoteConfig.contextFieldCreated', 'Context field created successfully'));
+        setSnackbarMessage(t('remoteConfig.contextFieldCreated'));
         markAsChanged({
           id: Date.now().toString(),
           type: 'context_field',
@@ -1781,7 +1781,7 @@ const ContextFieldsManagement: React.FC = () => {
         });
       } else {
         setContextFields(prev => prev.map(f => f.id === selectedField?.id ? newField : f));
-        setSnackbarMessage(t('remoteConfig.contextFieldUpdated', 'Context field updated successfully'));
+        setSnackbarMessage(t('remoteConfig.contextFieldUpdated'));
         markAsChanged({
           id: Date.now().toString(),
           type: 'context_field',
@@ -1796,7 +1796,7 @@ const ContextFieldsManagement: React.FC = () => {
       setDialogOpen(false);
     } catch (error) {
       console.error('Failed to save context field:', error);
-      setSnackbarMessage(t('common.error', 'An error occurred'));
+      setSnackbarMessage(t('common.error'));
       setSnackbarOpen(true);
     }
   };
@@ -1833,7 +1833,7 @@ const ContextFieldsManagement: React.FC = () => {
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6" component="h2">
-            {t('remoteConfig.contextFields', 'Context Fields')}
+            {t('remoteConfig.contextFields')}
           </Typography>
           <Button
             variant="contained"
@@ -1841,7 +1841,7 @@ const ContextFieldsManagement: React.FC = () => {
             onClick={handleAddContextField}
             size="small"
           >
-            {t('remoteConfig.addContextField', 'Add Context Field')}
+            {t('remoteConfig.addContextField')}
           </Button>
         </Box>
 
@@ -1849,11 +1849,11 @@ const ContextFieldsManagement: React.FC = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>{t('remoteConfig.fieldName', 'Field Name')}</TableCell>
-                <TableCell>{t('remoteConfig.type', 'Type')}</TableCell>
-                <TableCell>{t('remoteConfig.description', 'Description')}</TableCell>
-                <TableCell>{t('remoteConfig.possibleValues', 'Possible Values')}</TableCell>
-                <TableCell>{t('common.actions', 'Actions')}</TableCell>
+                <TableCell>{t('remoteConfig.fieldName')}</TableCell>
+                <TableCell>{t('remoteConfig.type')}</TableCell>
+                <TableCell>{t('remoteConfig.description')}</TableCell>
+                <TableCell>{t('remoteConfig.possibleValues')}</TableCell>
+                <TableCell>{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -1937,27 +1937,27 @@ const ContextFieldsManagement: React.FC = () => {
       open={dialogOpen}
       onClose={() => setDialogOpen(false)}
       title={dialogType === 'create'
-        ? t('remoteConfig.addContextField', 'Add Context Field')
-        : t('remoteConfig.editContextField', 'Edit Context Field')
+        ? t('remoteConfig.addContextField')
+        : t('remoteConfig.editContextField')
       }
       actions={
         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
           <Button onClick={() => setDialogOpen(false)}>
-            {t('common.cancel', 'Cancel')}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleSaveContextField}
             variant="contained"
             disabled={!formData.name || !formData.description}
           >
-            {dialogType === 'create' ? t('common.create', 'Create') : t('common.update', 'Update')}
+            {dialogType === 'create' ? t('common.create') : t('common.update')}
           </Button>
         </Box>
       }
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <TextField
-          label={t('remoteConfig.fieldName', 'Field Name')}
+          label={t('remoteConfig.fieldName')}
           value={formData.name}
           onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
           fullWidth
@@ -1968,11 +1968,11 @@ const ContextFieldsManagement: React.FC = () => {
         />
 
         <FormControl fullWidth required>
-          <InputLabel>{t('remoteConfig.type', 'Type')}</InputLabel>
+          <InputLabel>{t('remoteConfig.type')}</InputLabel>
           <Select
             value={formData.type}
             onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as any }))}
-            label={t('remoteConfig.type', 'Type')}
+            label={t('remoteConfig.type')}
             MenuProps={{
               PaperProps: {
                 style: {
@@ -1988,7 +1988,7 @@ const ContextFieldsManagement: React.FC = () => {
         </FormControl>
 
         <TextField
-          label={t('remoteConfig.description', 'Description')}
+          label={t('remoteConfig.description')}
           value={formData.description}
           onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
           fullWidth
@@ -2000,7 +2000,7 @@ const ContextFieldsManagement: React.FC = () => {
 
         <Box>
           <Typography variant="subtitle2" sx={{ mb: 1 }}>
-            {t('remoteConfig.possibleValues', 'Possible Values')} ({t('remoteConfig.optional', 'Optional')})
+            {t('remoteConfig.possibleValues')} ({t('remoteConfig.optional')})
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
             <TextField
@@ -2016,7 +2016,7 @@ const ContextFieldsManagement: React.FC = () => {
               }}
             />
             <Button onClick={addPossibleValue} variant="outlined">
-              {t('common.add', 'Add')}
+              {t('common.add')}
             </Button>
           </Box>
           <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
@@ -2036,21 +2036,21 @@ const ContextFieldsManagement: React.FC = () => {
 
     {/* Delete Confirmation Dialog */}
     <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-      <DialogTitle>{t('remoteConfig.deleteContextField', 'Delete Context Field')}</DialogTitle>
+      <DialogTitle>{t('remoteConfig.deleteContextField')}</DialogTitle>
       <DialogContent>
         <Typography>
-          {t('remoteConfig.deleteContextFieldConfirm', 'Are you sure you want to delete context field')} "{fieldToDelete?.name}"?
+          {t('remoteConfig.deleteContextFieldConfirm')} "{fieldToDelete?.name}"?
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {t('remoteConfig.deleteContextFieldWarning', 'This action cannot be undone.')}
+          {t('remoteConfig.deleteContextFieldWarning')}
         </Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setDeleteDialogOpen(false)}>
-          {t('common.cancel', 'Cancel')}
+          {t('common.cancel')}
         </Button>
         <Button onClick={confirmDeleteField} color="error" variant="contained">
-          {t('common.delete', 'Delete')}
+          {t('common.delete')}
         </Button>
       </DialogActions>
     </Dialog>
@@ -2185,7 +2185,7 @@ const SegmentsManagement: React.FC = () => {
 
     try {
       setSegments(prev => prev.filter(s => s.id !== segmentToDelete.id));
-      setSnackbarMessage(t('remoteConfig.segmentDeleted', 'Segment deleted successfully'));
+      setSnackbarMessage(t('remoteConfig.segmentDeleted'));
       setSnackbarOpen(true);
       markAsChanged({
         id: Date.now().toString(),
@@ -2197,7 +2197,7 @@ const SegmentsManagement: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to delete segment:', error);
-      setSnackbarMessage(t('common.error', 'An error occurred'));
+      setSnackbarMessage(t('common.error'));
       setSnackbarOpen(true);
     } finally {
       setDeleteDialogOpen(false);
@@ -2221,12 +2221,12 @@ const SegmentsManagement: React.FC = () => {
       if (dialogType === 'create') {
         // Check for duplicate name
         if (segments.some(s => s.name === formData.name)) {
-          setSnackbarMessage(t('remoteConfig.duplicateSegmentName', 'Segment name already exists'));
+          setSnackbarMessage(t('remoteConfig.duplicateSegmentName'));
           setSnackbarOpen(true);
           return;
         }
         setSegments(prev => [...prev, newSegment]);
-        setSnackbarMessage(t('remoteConfig.segmentCreated', 'Segment created successfully'));
+        setSnackbarMessage(t('remoteConfig.segmentCreated'));
         markAsChanged({
           id: Date.now().toString(),
           type: 'segment',
@@ -2237,7 +2237,7 @@ const SegmentsManagement: React.FC = () => {
         });
       } else {
         setSegments(prev => prev.map(s => s.id === selectedSegment?.id ? newSegment : s));
-        setSnackbarMessage(t('remoteConfig.segmentUpdated', 'Segment updated successfully'));
+        setSnackbarMessage(t('remoteConfig.segmentUpdated'));
         markAsChanged({
           id: Date.now().toString(),
           type: 'segment',
@@ -2252,7 +2252,7 @@ const SegmentsManagement: React.FC = () => {
       setDialogOpen(false);
     } catch (error) {
       console.error('Failed to save segment:', error);
-      setSnackbarMessage(t('common.error', 'An error occurred'));
+      setSnackbarMessage(t('common.error'));
       setSnackbarOpen(true);
     }
   };
@@ -2295,7 +2295,7 @@ const SegmentsManagement: React.FC = () => {
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6" component="h2">
-            {t('remoteConfig.segments', 'Segments')}
+            {t('remoteConfig.segments')}
           </Typography>
           <Button
             variant="contained"
@@ -2303,7 +2303,7 @@ const SegmentsManagement: React.FC = () => {
             onClick={handleAddSegment}
             size="small"
           >
-            {t('remoteConfig.addSegment', 'Add Segment')}
+            {t('remoteConfig.addSegment')}
           </Button>
         </Box>
 
@@ -2311,13 +2311,13 @@ const SegmentsManagement: React.FC = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>{t('remoteConfig.segmentName', 'Segment Name')}</TableCell>
-                <TableCell>{t('remoteConfig.displayName', 'Display Name')}</TableCell>
-                <TableCell>{t('remoteConfig.description', 'Description')}</TableCell>
-                <TableCell>{t('remoteConfig.conditions', 'Conditions')}</TableCell>
-                <TableCell>{t('remoteConfig.status', 'Status')}</TableCell>
-                <TableCell>{t('remoteConfig.lastUpdated', 'Last Updated')}</TableCell>
-                <TableCell>{t('common.actions', 'Actions')}</TableCell>
+                <TableCell>{t('remoteConfig.segmentName')}</TableCell>
+                <TableCell>{t('remoteConfig.displayName')}</TableCell>
+                <TableCell>{t('remoteConfig.description')}</TableCell>
+                <TableCell>{t('remoteConfig.conditions')}</TableCell>
+                <TableCell>{t('remoteConfig.status')}</TableCell>
+                <TableCell>{t('remoteConfig.lastUpdated')}</TableCell>
+                <TableCell>{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -2347,7 +2347,7 @@ const SegmentsManagement: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={segment.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
+                      label={segment.isActive ? t('common.active') : t('common.inactive')}
                       size="small"
                       color={segment.isActive ? 'success' : 'default'}
                     />
@@ -2397,27 +2397,27 @@ const SegmentsManagement: React.FC = () => {
       open={dialogOpen}
       onClose={() => setDialogOpen(false)}
       title={dialogType === 'create'
-        ? t('remoteConfig.addSegment', 'Add Segment')
-        : t('remoteConfig.editSegment', 'Edit Segment')
+        ? t('remoteConfig.addSegment')
+        : t('remoteConfig.editSegment')
       }
       actions={
         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
           <Button onClick={() => setDialogOpen(false)}>
-            {t('common.cancel', 'Cancel')}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleSaveSegment}
             variant="contained"
             disabled={!formData.name || !formData.displayName || !formData.description}
           >
-            {dialogType === 'create' ? t('common.create', 'Create') : t('common.update', 'Update')}
+            {dialogType === 'create' ? t('common.create') : t('common.update')}
           </Button>
         </Box>
       }
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <TextField
-          label={t('remoteConfig.segmentName', 'Segment Name')}
+          label={t('remoteConfig.segmentName')}
           value={formData.name}
           onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
           fullWidth
@@ -2428,7 +2428,7 @@ const SegmentsManagement: React.FC = () => {
         />
 
         <TextField
-          label={t('remoteConfig.displayName', 'Display Name')}
+          label={t('remoteConfig.displayName')}
           value={formData.displayName}
           onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
           fullWidth
@@ -2437,7 +2437,7 @@ const SegmentsManagement: React.FC = () => {
         />
 
         <TextField
-          label={t('remoteConfig.description', 'Description')}
+          label={t('remoteConfig.description')}
           value={formData.description}
           onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
           fullWidth
@@ -2454,16 +2454,16 @@ const SegmentsManagement: React.FC = () => {
               onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
             />
           }
-          label={t('remoteConfig.isActive', 'Is Active')}
+          label={t('remoteConfig.isActive')}
         />
 
         <Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Typography variant="subtitle2">
-              {t('remoteConfig.conditions', 'Conditions')}
+              {t('remoteConfig.conditions')}
             </Typography>
             <Button onClick={addCondition} variant="outlined">
-              {t('remoteConfig.addCondition', 'Add Condition')}
+              {t('remoteConfig.addCondition')}
             </Button>
           </Box>
 
@@ -2524,7 +2524,7 @@ const SegmentsManagement: React.FC = () => {
 
           {formData.conditions.length === 0 && (
             <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-              {t('remoteConfig.noConditions', 'No conditions added yet')}
+              {t('remoteConfig.noConditions')}
             </Typography>
           )}
         </Box>
@@ -2533,21 +2533,21 @@ const SegmentsManagement: React.FC = () => {
 
     {/* Delete Confirmation Dialog */}
     <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-      <DialogTitle>{t('remoteConfig.deleteSegment', 'Delete Segment')}</DialogTitle>
+      <DialogTitle>{t('remoteConfig.deleteSegment')}</DialogTitle>
       <DialogContent>
         <Typography>
-          {t('remoteConfig.deleteSegmentConfirm', 'Are you sure you want to delete segment')} "{segmentToDelete?.name}"?
+          {t('remoteConfig.deleteSegmentConfirm')} "{segmentToDelete?.name}"?
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {t('remoteConfig.deleteSegmentWarning', 'This action cannot be undone.')}
+          {t('remoteConfig.deleteSegmentWarning')}
         </Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setDeleteDialogOpen(false)}>
-          {t('common.cancel', 'Cancel')}
+          {t('common.cancel')}
         </Button>
         <Button onClick={confirmDeleteSegment} color="error" variant="contained">
-          {t('common.delete', 'Delete')}
+          {t('common.delete')}
         </Button>
       </DialogActions>
     </Dialog>
@@ -2705,7 +2705,7 @@ const VariantsManagement: React.FC = () => {
 
     try {
       setVariants(prev => prev.filter(v => v.id !== variantToDelete.id));
-      setSnackbarMessage(t('remoteConfig.variantDeleted', 'Variant deleted successfully'));
+      setSnackbarMessage(t('remoteConfig.variantDeleted'));
       setSnackbarOpen(true);
       markAsChanged({
         id: Date.now().toString(),
@@ -2717,7 +2717,7 @@ const VariantsManagement: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to delete variant:', error);
-      setSnackbarMessage(t('common.error', 'An error occurred'));
+      setSnackbarMessage(t('common.error'));
       setSnackbarOpen(true);
     } finally {
       setDeleteDialogOpen(false);
@@ -2754,7 +2754,7 @@ const VariantsManagement: React.FC = () => {
 
       if (dialogType === 'create') {
         setVariants(prev => [...prev, newVariant]);
-        setSnackbarMessage(t('remoteConfig.variantCreated', 'Variant created successfully'));
+        setSnackbarMessage(t('remoteConfig.variantCreated'));
         markAsChanged({
           id: Date.now().toString(),
           type: 'variant',
@@ -2765,7 +2765,7 @@ const VariantsManagement: React.FC = () => {
         });
       } else {
         setVariants(prev => prev.map(v => v.id === selectedVariant?.id ? newVariant : v));
-        setSnackbarMessage(t('remoteConfig.variantUpdated', 'Variant updated successfully'));
+        setSnackbarMessage(t('remoteConfig.variantUpdated'));
         markAsChanged({
           id: Date.now().toString(),
           type: 'variant',
@@ -2780,7 +2780,7 @@ const VariantsManagement: React.FC = () => {
       setDialogOpen(false);
     } catch (error) {
       console.error('Failed to save variant:', error);
-      setSnackbarMessage(t('common.error', 'An error occurred'));
+      setSnackbarMessage(t('common.error'));
       setSnackbarOpen(true);
     }
   };
@@ -2810,7 +2810,7 @@ const VariantsManagement: React.FC = () => {
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6" component="h2">
-            {t('remoteConfig.variants', 'Variants')}
+            {t('remoteConfig.variants')}
           </Typography>
           <Button
             variant="contained"
@@ -2818,7 +2818,7 @@ const VariantsManagement: React.FC = () => {
             onClick={handleAddVariant}
             size="small"
           >
-            {t('remoteConfig.addVariant', 'Add Variant')}
+            {t('remoteConfig.addVariant')}
           </Button>
         </Box>
 
@@ -2826,13 +2826,13 @@ const VariantsManagement: React.FC = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>{t('remoteConfig.parameterKey', 'Parameter Key')}</TableCell>
-                <TableCell>{t('remoteConfig.variantName', 'Variant Name')}</TableCell>
-                <TableCell>{t('remoteConfig.value', 'Value')}</TableCell>
-                <TableCell>{t('remoteConfig.weight', 'Weight %')}</TableCell>
-                <TableCell>{t('remoteConfig.description', 'Description')}</TableCell>
-                <TableCell>{t('remoteConfig.status', 'Status')}</TableCell>
-                <TableCell>{t('common.actions', 'Actions')}</TableCell>
+                <TableCell>{t('remoteConfig.parameterKey')}</TableCell>
+                <TableCell>{t('remoteConfig.variantName')}</TableCell>
+                <TableCell>{t('remoteConfig.value')}</TableCell>
+                <TableCell>{t('remoteConfig.weight')}</TableCell>
+                <TableCell>{t('remoteConfig.description')}</TableCell>
+                <TableCell>{t('remoteConfig.status')}</TableCell>
+                <TableCell>{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -2883,7 +2883,7 @@ const VariantsManagement: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={variant.isActive ? t('common.active', 'Active') : t('common.inactive', 'Inactive')}
+                      label={variant.isActive ? t('common.active') : t('common.inactive')}
                       size="small"
                       color={variant.isActive ? 'success' : 'default'}
                     />
@@ -2928,27 +2928,27 @@ const VariantsManagement: React.FC = () => {
       open={dialogOpen}
       onClose={() => setDialogOpen(false)}
       title={dialogType === 'create'
-        ? t('remoteConfig.addVariant', 'Add Variant')
-        : t('remoteConfig.editVariant', 'Edit Variant')
+        ? t('remoteConfig.addVariant')
+        : t('remoteConfig.editVariant')
       }
       actions={
         <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
           <Button onClick={() => setDialogOpen(false)}>
-            {t('common.cancel', 'Cancel')}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleSaveVariant}
             variant="contained"
             disabled={!formData.parameterKey || !formData.variantName || !formData.description}
           >
-            {dialogType === 'create' ? t('common.create', 'Create') : t('common.update', 'Update')}
+            {dialogType === 'create' ? t('common.create') : t('common.update')}
           </Button>
         </Box>
       }
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <TextField
-          label={t('remoteConfig.parameterKey', 'Parameter Key')}
+          label={t('remoteConfig.parameterKey')}
           value={formData.parameterKey}
           onChange={(e) => setFormData(prev => ({ ...prev, parameterKey: e.target.value }))}
           fullWidth
@@ -2958,7 +2958,7 @@ const VariantsManagement: React.FC = () => {
         />
 
         <TextField
-          label={t('remoteConfig.variantName', 'Variant Name')}
+          label={t('remoteConfig.variantName')}
           value={formData.variantName}
           onChange={(e) => setFormData(prev => ({ ...prev, variantName: e.target.value }))}
           fullWidth
@@ -2967,7 +2967,7 @@ const VariantsManagement: React.FC = () => {
         />
 
         <TextField
-          label={t('remoteConfig.value', 'Value')}
+          label={t('remoteConfig.value')}
           value={formData.value}
           onChange={(e) => setFormData(prev => ({ ...prev, value: e.target.value }))}
           fullWidth
@@ -2975,22 +2975,22 @@ const VariantsManagement: React.FC = () => {
           multiline
           rows={3}
           placeholder="true, false, 42, 'text', or JSON object"
-          helperText={t('remoteConfig.valueHelp', 'Enter value as text, number, boolean, or JSON')}
+          helperText={t('remoteConfig.valueHelp')}
         />
 
         <TextField
-          label={t('remoteConfig.weight', 'Weight (%)')}
+          label={t('remoteConfig.weight')}
           type="number"
           value={formData.weight}
           onChange={(e) => setFormData(prev => ({ ...prev, weight: Number(e.target.value) }))}
           fullWidth
           required
           inputProps={{ min: 0, max: 100 }}
-          helperText={t('remoteConfig.weightHelp', 'Percentage of traffic for this variant (0-100)')}
+          helperText={t('remoteConfig.weightHelp')}
         />
 
         <TextField
-          label={t('remoteConfig.description', 'Description')}
+          label={t('remoteConfig.description')}
           value={formData.description}
           onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
           fullWidth
@@ -3007,28 +3007,28 @@ const VariantsManagement: React.FC = () => {
               onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.checked }))}
             />
           }
-          label={t('remoteConfig.isActive', 'Is Active')}
+          label={t('remoteConfig.isActive')}
         />
       </Box>
     </SidePanel>
 
     {/* Delete Confirmation Dialog */}
     <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-      <DialogTitle>{t('remoteConfig.deleteVariant', 'Delete Variant')}</DialogTitle>
+      <DialogTitle>{t('remoteConfig.deleteVariant')}</DialogTitle>
       <DialogContent>
         <Typography>
-          {t('remoteConfig.deleteVariantConfirm', 'Are you sure you want to delete variant')} "{variantToDelete?.variantName}"?
+          {t('remoteConfig.deleteVariantConfirm')} "{variantToDelete?.variantName}"?
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {t('remoteConfig.deleteVariantWarning', 'This action cannot be undone.')}
+          {t('remoteConfig.deleteVariantWarning')}
         </Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setDeleteDialogOpen(false)}>
-          {t('common.cancel', 'Cancel')}
+          {t('common.cancel')}
         </Button>
         <Button onClick={confirmDeleteVariant} color="error" variant="contained">
-          {t('common.delete', 'Delete')}
+          {t('common.delete')}
         </Button>
       </DialogActions>
     </Dialog>
@@ -3077,7 +3077,7 @@ const DeploymentHistoryManagement: React.FC = () => {
       setCurrentVersion(currentDeploy || null);
     } catch (error) {
       console.error('Failed to load deployments:', error);
-      setSnackbarMessage(t('remoteConfig.loadDeploymentsError', 'Failed to load deployment history'));
+      setSnackbarMessage(t('remoteConfig.loadDeploymentsError'));
       setSnackbarOpen(true);
     } finally {
       setLoading(false);
@@ -3103,14 +3103,14 @@ const DeploymentHistoryManagement: React.FC = () => {
         description: `Rollback to version #${deploymentToRollback.version}`
       });
 
-      setSnackbarMessage(t('remoteConfig.rollbackSuccess', `Successfully rolled back to version #${deploymentToRollback.version}`));
+      setSnackbarMessage(t('remoteConfig.rollbackSuccess'));
       setSnackbarOpen(true);
 
       // Reload deployments to show new rollback deployment
       loadDeployments();
     } catch (error) {
       console.error('Failed to rollback:', error);
-      setSnackbarMessage(t('remoteConfig.rollbackError', 'Failed to rollback deployment'));
+      setSnackbarMessage(t('remoteConfig.rollbackError'));
       setSnackbarOpen(true);
     } finally {
       setRollbackDialogOpen(false);
@@ -3185,7 +3185,7 @@ const DeploymentHistoryManagement: React.FC = () => {
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6" component="h2">
-            {t('remoteConfig.deploymentHistory', 'Deployment History')}
+            {t('remoteConfig.deploymentHistory')}
           </Typography>
         </Box>
 
@@ -3193,13 +3193,13 @@ const DeploymentHistoryManagement: React.FC = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>{t('remoteConfig.version', 'Version')}</TableCell>
-                <TableCell>{t('remoteConfig.message', 'Message')}</TableCell>
-                <TableCell>{t('remoteConfig.deployedBy', 'Deployed By')}</TableCell>
-                <TableCell>{t('remoteConfig.deployedAt', 'Deployed At')}</TableCell>
-                <TableCell>{t('remoteConfig.status', 'Status')}</TableCell>
-                <TableCell>{t('remoteConfig.changes', 'Changes')}</TableCell>
-                <TableCell>{t('common.actions', 'Actions')}</TableCell>
+                <TableCell>{t('remoteConfig.version')}</TableCell>
+                <TableCell>{t('remoteConfig.message')}</TableCell>
+                <TableCell>{t('remoteConfig.deployedBy')}</TableCell>
+                <TableCell>{t('remoteConfig.deployedAt')}</TableCell>
+                <TableCell>{t('remoteConfig.status')}</TableCell>
+                <TableCell>{t('remoteConfig.changes')}</TableCell>
+                <TableCell>{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -3246,7 +3246,7 @@ const DeploymentHistoryManagement: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', gap: 0.5 }}>
-                      <Tooltip title={t('remoteConfig.viewDetails', 'View Details')}>
+                      <Tooltip title={t('remoteConfig.viewDetails')}>
                         <IconButton
                           size="small"
                           onClick={() => handleViewDetails(deployment)}
@@ -3256,7 +3256,7 @@ const DeploymentHistoryManagement: React.FC = () => {
                         </IconButton>
                       </Tooltip>
                       {deployment.rollbackAvailable && deployment.status === 'success' && (
-                        <Tooltip title={t('remoteConfig.rollback', 'Rollback')}>
+                        <Tooltip title={t('remoteConfig.rollback')}>
                           <IconButton
                             size="small"
                             onClick={() => handleRollback(deployment)}
@@ -3288,7 +3288,7 @@ const DeploymentHistoryManagement: React.FC = () => {
     {/* Deployment Details Dialog */}
     <Dialog open={detailDialogOpen} onClose={() => setDetailDialogOpen(false)} maxWidth="md" fullWidth>
       <DialogTitle>
-        {t('remoteConfig.deploymentDetails', 'Deployment Details')} - #{selectedDeployment?.version}
+        {t('remoteConfig.deploymentDetails')} - #{selectedDeployment?.version}
       </DialogTitle>
       <DialogContent>
         {selectedDeployment && (
@@ -3296,7 +3296,7 @@ const DeploymentHistoryManagement: React.FC = () => {
             <Grid container spacing={2} sx={{ mb: 3 }}>
               <Grid xs={6}>
                 <Typography variant="subtitle2" color="text.secondary">
-                  {t('remoteConfig.version', 'Version')}
+                  {t('remoteConfig.version')}
                 </Typography>
                 <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>
                   #{selectedDeployment.version}
@@ -3304,7 +3304,7 @@ const DeploymentHistoryManagement: React.FC = () => {
               </Grid>
               <Grid xs={6}>
                 <Typography variant="subtitle2" color="text.secondary">
-                  {t('remoteConfig.status', 'Status')}
+                  {t('remoteConfig.status')}
                 </Typography>
                 <Chip
                   label={selectedDeployment.status}
@@ -3314,7 +3314,7 @@ const DeploymentHistoryManagement: React.FC = () => {
               </Grid>
               <Grid xs={6}>
                 <Typography variant="subtitle2" color="text.secondary">
-                  {t('remoteConfig.deployedBy', 'Deployed By')}
+                  {t('remoteConfig.deployedBy')}
                 </Typography>
                 <Box>
                   <Typography variant="body1" sx={{ fontWeight: 500 }}>
@@ -3327,7 +3327,7 @@ const DeploymentHistoryManagement: React.FC = () => {
               </Grid>
               <Grid xs={6}>
                 <Typography variant="subtitle2" color="text.secondary">
-                  {t('remoteConfig.deployedAt', 'Deployed At')}
+                  {t('remoteConfig.deployedAt')}
                 </Typography>
                 <Typography variant="body1">
                   {new Date(selectedDeployment.deployedAt).toLocaleString()}
@@ -3336,17 +3336,17 @@ const DeploymentHistoryManagement: React.FC = () => {
             </Grid>
 
             <Typography variant="h6" sx={{ mb: 2 }}>
-              {t('remoteConfig.changes', 'Changes')} ({selectedDeployment.changes.length})
+              {t('remoteConfig.changes')} ({selectedDeployment.changes.length})
             </Typography>
 
             <TableContainer>
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>{t('remoteConfig.type', 'Type')}</TableCell>
-                    <TableCell>{t('remoteConfig.action', 'Action')}</TableCell>
-                    <TableCell>{t('remoteConfig.itemName', 'Item Name')}</TableCell>
-                    <TableCell>{t('remoteConfig.changes', 'Changes')}</TableCell>
+                    <TableCell>{t('remoteConfig.type')}</TableCell>
+                    <TableCell>{t('remoteConfig.action')}</TableCell>
+                    <TableCell>{t('remoteConfig.itemName')}</TableCell>
+                    <TableCell>{t('remoteConfig.changes')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -3403,7 +3403,7 @@ const DeploymentHistoryManagement: React.FC = () => {
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setDetailDialogOpen(false)}>
-          {t('common.close', 'Close')}
+          {t('common.close')}
         </Button>
       </DialogActions>
     </Dialog>
@@ -3413,15 +3413,15 @@ const DeploymentHistoryManagement: React.FC = () => {
       <DialogTitle>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <RestoreIcon color="warning" />
-          {t('remoteConfig.rollback', 'Rollback')}
+          {t('remoteConfig.rollback')}
         </Box>
       </DialogTitle>
       <DialogContent>
         <Typography sx={{ mb: 2 }}>
-          {t('remoteConfig.rollbackConfirm', 'Are you sure you want to rollback to version')} "#{deploymentToRollback?.version}"?
+          {t('remoteConfig.rollbackConfirm')} "#{deploymentToRollback?.version}"?
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          {t('remoteConfig.rollbackWarning', 'This will create a new deployment that reverts all changes made after this version.')}
+          {t('remoteConfig.rollbackWarning')}
         </Typography>
 
         {deploymentToRollback && currentVersion && (
@@ -3432,7 +3432,7 @@ const DeploymentHistoryManagement: React.FC = () => {
                 <Grid xs={6}>
                   <Paper sx={{ p: 2, bgcolor: 'error.light', color: 'error.contrastText' }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                      {t('remoteConfig.currentVersion', 'Current Version')} (#{currentVersion.version})
+                      {t('remoteConfig.currentVersion')} (#{currentVersion.version})
                     </Typography>
                     <Typography variant="body2">
                       {currentVersion.deployedBy.name}
@@ -3445,7 +3445,7 @@ const DeploymentHistoryManagement: React.FC = () => {
                 <Grid xs={6}>
                   <Paper sx={{ p: 2, bgcolor: 'success.light', color: 'success.contrastText' }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                      {t('remoteConfig.targetVersion', 'Target Version')} (#{deploymentToRollback.version})
+                      {t('remoteConfig.targetVersion')} (#{deploymentToRollback.version})
                     </Typography>
                     <Typography variant="body2">
                       {deploymentToRollback.deployedBy.name}
@@ -3461,7 +3461,7 @@ const DeploymentHistoryManagement: React.FC = () => {
             {/* Diff Viewer */}
             <Box sx={{ mb: 3 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
-                {t('remoteConfig.configurationDiff', 'Configuration Differences')}
+                {t('remoteConfig.configurationDiff')}
               </Typography>
               <Paper sx={{ p: 1, bgcolor: 'background.default' }}>
                 {(() => {
@@ -3492,19 +3492,19 @@ const DeploymentHistoryManagement: React.FC = () => {
             {/* Rollback Details */}
             <Box sx={{ p: 2, bgcolor: 'warning.light', borderRadius: 1 }}>
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                {t('remoteConfig.rollbackDetails', 'Rollback Details')}:
+                {t('remoteConfig.rollbackDetails')}:
               </Typography>
               <Typography variant="body2">
-                • {t('remoteConfig.version', 'Version')}: #{deploymentToRollback.version}
+                • {t('remoteConfig.version')}: #{deploymentToRollback.version}
               </Typography>
               <Typography variant="body2">
-                • {t('remoteConfig.deployedBy', 'Originally deployed by')}: {deploymentToRollback.deployedBy.name} ({deploymentToRollback.deployedBy.email})
+                • {t('remoteConfig.deployedBy')}: {deploymentToRollback.deployedBy.name} ({deploymentToRollback.deployedBy.email})
               </Typography>
               <Typography variant="body2">
-                • {t('remoteConfig.deployedAt', 'Deployed at')}: {new Date(deploymentToRollback.deployedAt).toLocaleString()}
+                • {t('remoteConfig.deployedAt')}: {new Date(deploymentToRollback.deployedAt).toLocaleString()}
               </Typography>
               <Typography variant="body2">
-                • {t('remoteConfig.message', 'Message')}: {deploymentToRollback.message}
+                • {t('remoteConfig.message')}: {deploymentToRollback.message}
               </Typography>
             </Box>
           </>
@@ -3512,10 +3512,10 @@ const DeploymentHistoryManagement: React.FC = () => {
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setRollbackDialogOpen(false)}>
-          {t('common.cancel', 'Cancel')}
+          {t('common.cancel')}
         </Button>
         <Button onClick={confirmRollback} color="warning" variant="contained">
-          {t('remoteConfig.confirmRollback', 'Confirm Rollback')}
+          {t('remoteConfig.confirmRollback')}
         </Button>
       </DialogActions>
     </Dialog>
@@ -3614,32 +3614,32 @@ const RemoteConfigParametersPage: React.FC = () => {
               sx={{ borderBottom: 1, borderColor: 'divider' }}
             >
               <Tab
-                label={t('remoteConfig.parameters', 'Parameters')}
+                label={t('remoteConfig.parameters')}
                 icon={<CodeIcon />}
                 iconPosition="start"
               />
               <Tab
-                label={t('remoteConfig.campaigns', 'Campaigns')}
+                label={t('remoteConfig.campaigns')}
                 icon={<CampaignIcon />}
                 iconPosition="start"
               />
               <Tab
-                label={t('remoteConfig.contextFields', 'Context Fields')}
+                label={t('remoteConfig.contextFields')}
                 icon={<TuneIcon />}
                 iconPosition="start"
               />
               <Tab
-                label={t('remoteConfig.segments', 'Segments')}
+                label={t('remoteConfig.segments')}
                 icon={<SettingsIcon />}
                 iconPosition="start"
               />
             <Tab
-              label={t('remoteConfig.variants', 'Variants')}
+              label={t('remoteConfig.variants')}
               icon={<VariantsIcon />}
               iconPosition="start"
             />
             <Tab
-              label={t('remoteConfig.deploymentHistory', 'History')}
+              label={t('remoteConfig.deploymentHistory')}
               icon={<HistoryIcon />}
               iconPosition="start"
             />
