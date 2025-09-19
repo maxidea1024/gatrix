@@ -434,8 +434,15 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (lastChannelId && channels.length > 0) {
         const lastChannel = channels.find(c => c.id === parseInt(lastChannelId));
         if (lastChannel) {
-          console.log('Auto-selecting last channel:', lastChannel.name);
-          await selectChannel(lastChannel.id);
+          console.log('Auto-selecting last channel:', lastChannel.name, 'ID:', lastChannel.id);
+          // 직접 dispatch를 사용하여 채널 선택
+          dispatch({ type: 'SET_CURRENT_CHANNEL', payload: lastChannel.id });
+
+          // 메시지 로딩을 위해 setTimeout으로 다음 틱에 실행
+          setTimeout(() => {
+            loadMessages(lastChannel.id);
+            wsService.joinChannel(lastChannel.id);
+          }, 0);
         }
       }
     } catch (error: any) {
@@ -647,15 +654,20 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Load messages for a channel
-  const loadMessages = async (channelId: number) => {
+  const loadMessages = useCallback(async (channelId: number) => {
     try {
       console.log('Loading messages for channel:', channelId);
 
-      // 캐시된 메시지가 있는지 확인
-      const cachedMessages = state.messages[channelId];
+      // 현재 상태에서 캐시된 메시지 확인
+      const currentCachedMessages = loadCachedMessages();
+      const cachedMessages = currentCachedMessages[channelId];
+
       if (cachedMessages && cachedMessages.length > 0) {
         console.log('Using cached messages:', cachedMessages.length);
-        // 캐시된 메시지가 있으면 서버에서 최신 메시지만 확인
+        // 캐시된 메시지를 먼저 상태에 설정
+        dispatch({ type: 'SET_MESSAGES', payload: { channelId, messages: cachedMessages } });
+
+        // 그 다음 서버에서 최신 메시지만 확인
         const latestCachedMessage = cachedMessages[cachedMessages.length - 1];
         const result = await ChatService.getMessages({
           channelId,
@@ -684,7 +696,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Failed to load messages for channel', channelId, ':', error);
       dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to load messages' });
     }
-  };
+  }, []);
 
   return (
     <ChatContext.Provider value={{ state, actions }}>
