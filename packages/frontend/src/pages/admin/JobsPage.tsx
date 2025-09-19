@@ -651,12 +651,13 @@ const JobsPage: React.FC = () => {
         </Box>
 
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+        <Box sx={{ flex: 1, overflow: 'auto' }}>
           <JobForm
             job={editingJob}
             jobTypes={jobTypes}
             onSubmit={handleFormSubmit}
             onCancel={() => setFormDialogOpen(false)}
+            isDrawer={true}
           />
         </Box>
       </Drawer>

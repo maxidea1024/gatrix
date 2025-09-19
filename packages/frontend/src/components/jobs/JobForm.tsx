@@ -35,9 +35,10 @@ interface JobFormProps {
   jobTypes: JobType[];
   onSubmit: (data: CreateJobData | UpdateJobData) => void;
   onCancel: () => void;
+  isDrawer?: boolean;
 }
 
-const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel }) => {
+const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel, isDrawer = false }) => {
   const { t } = useTranslation();
 
   console.log('JobForm - Component rendered with jobTypes:', jobTypes);
@@ -202,13 +203,16 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel }) 
     onSubmit(submitData);
   };
 
-  return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        {/* Basic Information */}
-        <Typography variant="h6" gutterBottom>
-          {t('jobs.basicInformation')}
-        </Typography>
+  if (isDrawer) {
+    return (
+      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            {/* Basic Information */}
+            <Typography variant="h6" gutterBottom>
+              {t('jobs.basicInformation')}
+            </Typography>
 
         <Box>
           <TextField
@@ -336,6 +340,150 @@ const JobForm: React.FC<JobFormProps> = ({ job, jobTypes, onSubmit, onCancel }) 
                 />
               </AccordionDetails>
             </Accordion>
+          </Box>
+        )}
+
+          </Box>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 1,
+          justifyContent: 'flex-end'
+        }}>
+          <Button onClick={onCancel} startIcon={<CancelIcon />}>
+            {t('common.cancel')}
+          </Button>
+          <Button type="submit" variant="contained" startIcon={job ? <SaveIcon /> : <AddIcon />}>
+            {job ? '작업 수정' : '작업 추가'}
+          </Button>
+        </Box>
+      </Box>
+    );
+  }
+
+  return (
+    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        {/* Basic Information */}
+        <Typography variant="h6" gutterBottom>
+          {t('jobs.basicInformation')}
+        </Typography>
+
+        <Box>
+          <TextField
+            fullWidth
+            label={t('common.name')}
+            value={formData.name}
+            onChange={(e) => handleFieldChange('name', e.target.value)}
+            error={!!errors.name}
+            helperText={errors.name}
+            required
+          />
+        </Box>
+
+        <Box>
+          <FormControl fullWidth error={!!errors.jobTypeId}>
+            <InputLabel>{t('jobs.jobType')}</InputLabel>
+            <Select
+              value={formData.jobTypeId}
+              label={t('jobs.jobType')}
+              onChange={(e) => handleJobTypeChange(e.target.value)}
+            >
+              {jobTypes.map((jobType) => (
+                <MenuItem key={jobType.id} value={jobType.id.toString()}>
+                  {jobType.name}
+                </MenuItem>
+              ))}
+            </Select>
+            {errors.jobTypeId && (
+              <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
+                {errors.jobTypeId}
+              </Typography>
+            )}
+          </FormControl>
+        </Box>
+
+        <Box>
+          <TextField
+            fullWidth
+            label={t('common.memo')}
+            value={formData.memo}
+            onChange={(e) => handleFieldChange('memo', e.target.value)}
+            multiline
+            rows={2}
+          />
+        </Box>
+
+        <Box>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={formData.isEnabled}
+                onChange={(e) => handleFieldChange('isEnabled', e.target.checked)}
+                color="primary"
+              />
+            }
+            label={t('common.usable')}
+          />
+        </Box>
+
+        {/* Tags */}
+        <Box>
+          <Typography variant="subtitle2" gutterBottom>
+            {t('common.tags')}
+          </Typography>
+          <Autocomplete
+            multiple
+            options={availableTags}
+            getOptionLabel={(option) => option.name}
+            value={availableTags.filter(tag => formData.tagIds.includes(tag.id))}
+            onChange={(_, newValue) => {
+              handleFieldChange('tagIds', newValue.map(tag => tag.id));
+            }}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => {
+                const { key, ...chipProps } = getTagProps({ index });
+                return (
+                  <Chip
+                    key={option.id}
+                    variant="outlined"
+                    label={option.name}
+                    size="small"
+                    sx={{ bgcolor: option.color, color: '#fff' }}
+                    {...chipProps}
+                  />
+                );
+              })
+            }
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder={t('common.selectTags')}
+                variant="outlined"
+              />
+            )}
+          />
+        </Box>
+
+        {/* Job Data */}
+        {selectedJobType && selectedJobType.schema && (
+          <Box>
+            <Divider sx={{ my: 2 }} />
+            <Typography variant="h6" gutterBottom>
+              {t('jobs.jobData')}
+            </Typography>
+            <DynamicJobDataForm
+              jobSchema={selectedJobType.schema}
+              data={formData.jobDataMap}
+              onChange={(data) => handleFieldChange('jobDataMap', data)}
+              errors={errors}
+            />
           </Box>
         )}
 

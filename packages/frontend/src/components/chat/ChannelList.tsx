@@ -203,27 +203,29 @@ const ChannelList: React.FC<ChannelListProps> = ({
             </Typography>
           </Box>
         ) : (
-          <List disablePadding>
+          <List disablePadding sx={{ pt: 1 }}>
             {filteredChannels.map((channel) => (
               <ListItem key={channel.id} disablePadding>
                 <ListItemButton
                   selected={state.currentChannelId === channel.id}
                   onClick={() => handleChannelClick(channel)}
                   sx={{
-                    py: 1.5,
-                    mx: 1, // 좌우 여백 추가 (슬랙 스타일)
+                    py: 0.5, // 위아래 패딩 더 줄임 (1 → 0.5)
+                    px: 1, // 좌우 패딩 설정
+                    mx: 1.5, // 좌우 여백 늘림
+                    my: 0.25, // 위아래 마진 추가로 간격 조정
                     borderRadius: 1, // 슬랙 스타일 라운드
                     '&.Mui-selected': {
                       backgroundColor: (theme) =>
                         theme.palette.mode === 'dark'
                           ? 'rgba(255, 255, 255, 0.08)' // 다크 테마: 약간 밝게
-                          : 'rgba(0, 0, 0, 0.04)', // 라이트 테마: 약간 어둡게
+                          : 'rgba(0, 0, 0, 0.08)', // 라이트 테마: 더 어둡게 (0.04 → 0.08)
                       color: 'inherit', // 기본 텍스트 색상 유지
                       '&:hover': {
                         backgroundColor: (theme) =>
                           theme.palette.mode === 'dark'
                             ? 'rgba(255, 255, 255, 0.12)'
-                            : 'rgba(0, 0, 0, 0.08)',
+                            : 'rgba(0, 0, 0, 0.12)', // 라이트 테마 호버도 더 어둡게 (0.08 → 0.12)
                       },
                       '& .MuiListItemIcon-root': {
                         color: 'inherit',
@@ -236,7 +238,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
                       backgroundColor: (theme) =>
                         theme.palette.mode === 'dark'
                           ? 'rgba(255, 255, 255, 0.04)'
-                          : 'rgba(0, 0, 0, 0.02)',
+                          : 'rgba(0, 0, 0, 0.04)', // 라이트 테마 일반 호버도 더 어둡게 (0.02 → 0.04)
                       borderRadius: 1, // 호버 시에도 라운드 유지
                     },
                   }}

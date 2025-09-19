@@ -1298,18 +1298,18 @@ const GameWorldsPage: React.FC = () => {
 
         {/* Actions */}
         <Box sx={{
-          p: 3,
-          borderTop: 1,
+          p: 2,
+          borderTop: '1px solid',
           borderColor: 'divider',
+          bgcolor: 'background.paper',
           display: 'flex',
-          gap: 2,
+          gap: 1,
           justifyContent: 'flex-end'
         }}>
           <Button
             onClick={() => setDialogOpen(false)}
             disabled={saving}
             startIcon={<CancelIcon />}
-            size="small"
           >
             {t('gameWorlds.cancel')}
           </Button>
@@ -1318,7 +1318,6 @@ const GameWorldsPage: React.FC = () => {
             variant="contained"
             disabled={saving}
             startIcon={saving ? <CircularProgress size={20} /> : (editingWorld ? <SaveIcon /> : <AddIcon />)}
-            size="small"
           >
             {saving ? t('common.saving') : (editingWorld ? '게임 월드 수정' : '게임 월드 추가')}
           </Button>
@@ -1397,7 +1396,6 @@ const GameWorldsPage: React.FC = () => {
             onClick={confirmDialog.onConfirm}
             color="primary"
             variant="contained"
-            size="small"
           >
             {t('gameWorlds.confirm')}
           </Button>
@@ -1493,7 +1491,6 @@ const GameWorldsPage: React.FC = () => {
             color="error"
             variant="contained"
             disabled={deleteConfirmDialog.inputValue !== deleteConfirmDialog.world?.name}
-            size="small"
           >
             {t('common.delete')}
           </Button>

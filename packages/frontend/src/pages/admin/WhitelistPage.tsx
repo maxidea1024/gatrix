@@ -59,31 +59,7 @@ import IpWhitelistTab from '../../components/admin/IpWhitelistTab';
 import WhitelistOverview from '../../components/admin/WhitelistOverview';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 
-// TabPanel 컴포넌트 정의
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
 
-const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other }) => {
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`whitelist-tabpanel-${index}`}
-      aria-labelledby={`whitelist-tab-${index}`}
-      {...other}
-      style={{
-        transition: 'opacity 0.3s ease-in-out',
-        opacity: value === index ? 1 : 0,
-        display: value === index ? 'block' : 'none'
-      }}
-    >
-      {children}
-    </div>
-  );
-};
 
 const WhitelistPage: React.FC = () => {
   const { t } = useTranslation();
@@ -466,7 +442,7 @@ const WhitelistPage: React.FC = () => {
           </Tabs>
 
           {/* Tab Content */}
-          <TabPanel value={currentTab} index={0}>
+          <Box sx={{ display: currentTab === 0 ? 'block' : 'none' }}>
             {/* Nickname Whitelist Header */}
               <Box sx={{ display: 'flex', gap: 2, mb: 3, justifyContent: 'flex-end' }}>
                 <Button
@@ -1025,15 +1001,15 @@ const WhitelistPage: React.FC = () => {
                   </Button>
                 </Box>
               </Drawer>
-          </TabPanel>
+          </Box>
 
-          <TabPanel value={currentTab} index={1}>
+          <Box sx={{ display: currentTab === 1 ? 'block' : 'none' }}>
             <IpWhitelistTab />
-          </TabPanel>
+          </Box>
 
-          <TabPanel value={currentTab} index={2}>
+          <Box sx={{ display: currentTab === 2 ? 'block' : 'none' }}>
             <WhitelistOverview />
-          </TabPanel>
+          </Box>
         </CardContent>
       </Card>
     </Box>

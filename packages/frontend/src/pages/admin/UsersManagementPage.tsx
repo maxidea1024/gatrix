@@ -1437,7 +1437,7 @@ const UsersManagementPage: React.FC = () => {
           borderColor: 'divider',
           bgcolor: 'background.paper',
           display: 'flex',
-          gap: 2,
+          gap: 1,
           justifyContent: 'flex-end'
         }}>
           <Button
@@ -1849,7 +1849,7 @@ const UsersManagementPage: React.FC = () => {
           borderColor: 'divider',
           bgcolor: 'background.paper',
           display: 'flex',
-          gap: 2,
+          gap: 1,
           justifyContent: 'flex-end'
         }}>
           <Button
@@ -2037,7 +2037,7 @@ const UsersManagementPage: React.FC = () => {
           borderColor: 'divider',
           bgcolor: 'background.paper',
           display: 'flex',
-          gap: 2,
+          gap: 1,
           justifyContent: 'flex-end'
         }}>
           <Button
@@ -2100,10 +2100,11 @@ const UsersManagementPage: React.FC = () => {
         </Box>
 
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+        <Box sx={{ flex: 1, overflow: 'auto' }}>
           <InvitationForm
             onSubmit={handleCreateInvitation}
             onCancel={() => setInvitationDialogOpen(false)}
+            isDrawer={true}
           />
         </Box>
       </Drawer>

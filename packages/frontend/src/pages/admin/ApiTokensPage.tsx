@@ -821,17 +821,17 @@ const ApiTokensPage: React.FC = () => {
 
         {/* Actions */}
         <Box sx={{
-          p: 3,
-          borderTop: 1,
+          p: 2,
+          borderTop: '1px solid',
           borderColor: 'divider',
+          bgcolor: 'background.paper',
           display: 'flex',
-          gap: 2,
+          gap: 1,
           justifyContent: 'flex-end'
         }}>
           <Button
             onClick={() => setCreateDialogOpen(false)}
             startIcon={<CancelIcon />}
-            size="small"
           >
             {t('common.cancel', 'Cancel')}
           </Button>
@@ -839,7 +839,6 @@ const ApiTokensPage: React.FC = () => {
             onClick={handleCreate}
             variant="contained"
             startIcon={<VpnKeyIcon />}
-            size="small"
             disabled={!isValidTokenName(formData.tokenName)}
           >
             {t('apiTokens.createToken', 'Create Token')}
@@ -942,17 +941,17 @@ const ApiTokensPage: React.FC = () => {
 
         {/* Actions */}
         <Box sx={{
-          p: 3,
-          borderTop: 1,
+          p: 2,
+          borderTop: '1px solid',
           borderColor: 'divider',
+          bgcolor: 'background.paper',
           display: 'flex',
-          gap: 2,
+          gap: 1,
           justifyContent: 'flex-end'
         }}>
           <Button
             onClick={() => setEditDialogOpen(false)}
             startIcon={<CancelIcon />}
-            size="small"
           >
             {t('common.cancel', 'Cancel')}
           </Button>
@@ -960,7 +959,6 @@ const ApiTokensPage: React.FC = () => {
             onClick={handleEdit}
             variant="contained"
             startIcon={<SaveIcon />}
-            size="small"
             disabled={!isValidTokenName(formData.tokenName)}
           >
             {t('common.save', 'Save')}

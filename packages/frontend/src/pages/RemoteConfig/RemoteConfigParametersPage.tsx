@@ -129,11 +129,12 @@ const SidePanel: React.FC<SidePanelProps> = ({ open, onClose, title, children, a
       {/* Actions */}
       {actions && (
         <Box sx={{
-          p: 3,
-          borderTop: 1,
+          p: 2,
+          borderTop: '1px solid',
           borderColor: 'divider',
+          bgcolor: 'background.paper',
           display: 'flex',
-          gap: 2,
+          gap: 1,
           justifyContent: 'flex-end'
         }}>
           {actions}
@@ -2014,7 +2015,7 @@ const ContextFieldsManagement: React.FC = () => {
                 }
               }}
             />
-            <Button onClick={addPossibleValue} variant="outlined" size="small">
+            <Button onClick={addPossibleValue} variant="outlined">
               {t('common.add', 'Add')}
             </Button>
           </Box>
@@ -2461,7 +2462,7 @@ const SegmentsManagement: React.FC = () => {
             <Typography variant="subtitle2">
               {t('remoteConfig.conditions', 'Conditions')}
             </Typography>
-            <Button onClick={addCondition} variant="outlined" size="small">
+            <Button onClick={addCondition} variant="outlined">
               {t('remoteConfig.addCondition', 'Add Condition')}
             </Button>
           </Box>
