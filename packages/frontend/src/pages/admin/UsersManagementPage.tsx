@@ -738,7 +738,7 @@ const UsersManagementPage: React.FC = () => {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             {/* 필터 그룹 */}
             <Grid container spacing={2} alignItems="center" sx={{ flex: 1 }}>
-              <Grid xs={12} md={3}>
+              <Grid size={{ xs: 12, md: 3 }}>
                 <TextField
                   fullWidth
                   placeholder={t('admin.users.searchPlaceholder')}
@@ -753,7 +753,7 @@ const UsersManagementPage: React.FC = () => {
                   }}
                 />
               </Grid>
-              <Grid xs={12} md={2}>
+              <Grid size={{ xs: 12, md: 2 }}>
                 <FormControl fullWidth>
                   <InputLabel shrink={true}>{t('admin.users.statusFilter')}</InputLabel>
                   <Select
@@ -784,7 +784,7 @@ const UsersManagementPage: React.FC = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid xs={12} md={2}>
+              <Grid size={{ xs: 12, md: 2 }}>
                 <FormControl fullWidth>
                   <InputLabel shrink={true}>{t('admin.users.roleFilter')}</InputLabel>
                   <Select
@@ -814,7 +814,7 @@ const UsersManagementPage: React.FC = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid xs={12} md={5}>
+              <Grid size={{ xs: 12, md: 5 }}>
                 <Autocomplete
                   multiple
                   sx={{ minWidth: 350 }}
@@ -824,9 +824,11 @@ const UsersManagementPage: React.FC = () => {
                   isOptionEqualToValue={(option, value) => option.id === value.id}
                   value={tagFilter}
                   onChange={(_, value) => setTagFilter(value)}
-                  PopperProps={{
-                    style: {
-                      zIndex: 9999
+                  slotProps={{
+                    popper: {
+                      style: {
+                        zIndex: 9999
+                      }
                     }
                   }}
                   renderTags={(value, getTagProps) =>
