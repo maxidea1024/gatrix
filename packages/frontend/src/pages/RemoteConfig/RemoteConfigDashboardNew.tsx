@@ -308,7 +308,7 @@ const StatisticsCards: React.FC = () => {
   return (
     <Grid container spacing={3} sx={{ mb: 3 }}>
       {cards.map((card, index) => (
-        <Grid item xs={12} sm={6} md={2.4} key={index}>
+        <Grid xs={12} sm={6} md={2.4} key={index}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

@@ -704,11 +704,13 @@ cc00 b110 810ac80  911 c2dc c9c0 */}
                   setSelectedTags(value);
                   setValue('tags', value);
                 }}
-                PopperProps={{
-                  style: {
-                    zIndex: 99999
-                  },
-                  placement: 'bottom-start'
+                slotProps={{
+                  popper: {
+                    style: {
+                      zIndex: 99999
+                    },
+                    placement: 'bottom-start'
+                  }
                 }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => {

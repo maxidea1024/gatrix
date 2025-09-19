@@ -1592,9 +1592,11 @@ const ClientVersionsPage: React.FC = () => {
             isOptionEqualToValue={(option, value) => option.id === value.id}
             value={clientVersionTags}
             onChange={(_, newValue) => setClientVersionTags(newValue)}
-            PopperProps={{
-              style: {
-                zIndex: 9999
+            slotProps={{
+              popper: {
+                style: {
+                  zIndex: 9999
+                }
               }
             }}
             renderTags={(value, getTagProps) =>

@@ -189,7 +189,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
           ) : (
             <Grid container spacing={0.5}>
               {filteredEmojis.map((emoji, index) => (
-                <Grid item key={`${emoji}-${index}`}>
+                <Grid key={`${emoji}-${index}`}>
                   <IconButton
                     size="small"
                     onClick={() => handleEmojiClick(emoji)}

@@ -990,8 +990,10 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                   setSelectedTags(value);
                   setValue('tags', value);
                 }}
-                PopperProps={{
-                  placement: 'bottom-start'
+                slotProps={{
+                  popper: {
+                    placement: 'bottom-start'
+                  }
                 }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => {
