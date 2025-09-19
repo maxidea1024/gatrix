@@ -1,6 +1,7 @@
 import knex from 'knex';
 import { Model } from 'objection';
 import dotenv from 'dotenv';
+import { config } from './index';
 
 dotenv.config();
 
