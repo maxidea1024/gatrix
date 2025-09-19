@@ -9,11 +9,15 @@ import {
 // React Chat Elements는 더 이상 사용하지 않음 (슬랙 스타일로 직접 구현)
 import moment from 'moment-timezone';
 import { getStoredTimezone } from '../../utils/dateFormat';
+import { extractUrlsFromMessage, extractLinkPreview } from '../../utils/linkPreview';
+import LinkPreviewCard from './LinkPreviewCard';
+import { LinkPreview } from '../../types/chat';
 
 // 마크다운 스타일링을 위한 타입 정의
 interface MessagePart {
-  type: 'text' | 'code' | 'codeBlock' | 'bold' | 'italic' | 'strikethrough' | 'underline';
+  type: 'text' | 'code' | 'codeBlock' | 'bold' | 'italic' | 'strikethrough' | 'underline' | 'link';
   content: string;
+  url?: string;
 }
 
 // 마크다운 파싱 함수
@@ -25,6 +29,7 @@ const parseMarkdown = (text: string): MessagePart[] => {
   const patterns = [
     { type: 'codeBlock' as const, regex: /```([\s\S]*?)```/g },
     { type: 'code' as const, regex: /`([^`]+)`/g },
+    { type: 'link' as const, regex: /(https?:\/\/[^\s<>"{}|\\^`[\]]+)/g },
     { type: 'bold' as const, regex: /\*\*([^*]+)\*\*/g },
     { type: 'italic' as const, regex: /\*([^*]+)\*/g },
     { type: 'strikethrough' as const, regex: /~~([^~]+)~~/g },
@@ -78,7 +83,11 @@ const parseMarkdown = (text: string): MessagePart[] => {
     }
 
     // 매치된 부분 추가
-    parts.push({ type: match.type, content: match.content });
+    if (match.type === 'link') {
+      parts.push({ type: match.type, content: match.content, url: match.content });
+    } else {
+      parts.push({ type: match.type, content: match.content });
+    }
     currentIndex = match.end;
   });
 
@@ -91,6 +100,44 @@ const parseMarkdown = (text: string): MessagePart[] => {
   }
 
   return parts.length > 0 ? parts : [{ type: 'text', content: text }];
+};
+
+// 링크 미리보기를 포함한 메시지 컴포넌트
+const MessageWithPreview: React.FC<{ content: string; theme: any }> = ({ content, theme }) => {
+  const [linkPreviews, setLinkPreviews] = useState<LinkPreview[]>([]);
+  const [loadingPreviews, setLoadingPreviews] = useState(false);
+
+  // URL 추출 및 미리보기 로딩
+  useEffect(() => {
+    const urls = extractUrlsFromMessage(content);
+    if (urls.length > 0) {
+      setLoadingPreviews(true);
+      Promise.all(urls.map(url => extractLinkPreview(url)))
+        .then(previews => {
+          const validPreviews = previews.filter(preview => preview !== null) as LinkPreview[];
+          setLinkPreviews(validPreviews);
+        })
+        .catch(error => {
+          console.error('Failed to load link previews:', error);
+        })
+        .finally(() => {
+          setLoadingPreviews(false);
+        });
+    }
+  }, [content]);
+
+  return (
+    <>
+      <MarkdownMessage content={content} theme={theme} />
+      {linkPreviews.length > 0 && (
+        <Box sx={{ marginTop: '8px' }}>
+          {linkPreviews.map((preview, index) => (
+            <LinkPreviewCard key={index} linkPreview={preview} />
+          ))}
+        </Box>
+      )}
+    </>
+  );
 };
 
 // 마크다운 렌더링 컴포넌트
@@ -162,6 +209,25 @@ const MarkdownMessage: React.FC<{ content: string; theme: any }> = ({ content, t
           case 'underline':
             return (
               <Box key={index} component="span" sx={{ textDecoration: 'underline' }}>
+                {part.content}
+              </Box>
+            );
+          case 'link':
+            return (
+              <Box
+                key={index}
+                component="a"
+                href={part.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  color: theme.palette.mode === 'dark' ? '#8ab4f8' : '#1976d2',
+                  textDecoration: 'none',
+                  '&:hover': {
+                    textDecoration: 'underline'
+                  }
+                }}
+              >
                 {part.content}
               </Box>
             );
@@ -811,7 +877,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                     whiteSpace: 'pre-wrap'
                   }}
                 >
-                  <MarkdownMessage content={message.content} theme={theme} />
+                  <MessageWithPreview content={message.content} theme={theme} />
                 </Typography>
               </Box>
             </Box>

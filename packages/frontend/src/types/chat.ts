@@ -88,6 +88,11 @@ export interface LinkPreview {
   description?: string;
   image?: string;
   siteName?: string;
+  author?: string;
+  readingTime?: string;
+  publishedTime?: string;
+  type?: 'website' | 'article' | 'video' | 'image';
+  favicon?: string;
 }
 
 export interface LocationData {

@@ -8,6 +8,8 @@ import {
   LocationOn as LocationIcon,
 } from '@mui/icons-material';
 import { Message, MessageType } from '../../types/chat';
+import { LinkPreviewList } from '../LinkPreview';
+import { linkPreviewService } from '../../services/linkPreviewService';
 
 interface MessageContentProps {
   message: Message;
@@ -15,6 +17,9 @@ interface MessageContentProps {
 
 const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
   const renderTextContent = (content: string) => {
+    // Extract URLs for link previews
+    const urls = linkPreviewService.extractUrls(content);
+
     // Process mentions, hashtags, and links
     const processedContent = content
       .replace(/@(\w+)/g, '<span class="cs-mention">@$1</span>')
@@ -25,36 +30,43 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
       );
 
     return (
-      <Typography
-        variant="body2"
-        component="div"
-        dangerouslySetInnerHTML={{ __html: processedContent }}
-        sx={{
-          wordBreak: 'break-word',
-          '& .cs-mention': {
-            backgroundColor: 'primary.light',
-            color: 'primary.main',
-            padding: '1px 4px',
-            borderRadius: '4px',
-            fontWeight: 500,
-          },
-          '& .cs-hashtag': {
-            color: 'info.main',
-            fontWeight: 500,
-            cursor: 'pointer',
-            '&:hover': {
-              textDecoration: 'underline',
+      <Box>
+        <Typography
+          variant="body2"
+          component="div"
+          dangerouslySetInnerHTML={{ __html: processedContent }}
+          sx={{
+            wordBreak: 'break-word',
+            '& .cs-mention': {
+              backgroundColor: 'primary.light',
+              color: 'primary.main',
+              padding: '1px 4px',
+              borderRadius: '4px',
+              fontWeight: 500,
             },
-          },
-          '& a': {
-            color: 'primary.main',
-            textDecoration: 'none',
-            '&:hover': {
-              textDecoration: 'underline',
+            '& .cs-hashtag': {
+              color: 'info.main',
+              fontWeight: 500,
+              cursor: 'pointer',
+              '&:hover': {
+                textDecoration: 'underline',
+              },
             },
-          },
-        }}
-      />
+            '& a': {
+              color: 'primary.main',
+              textDecoration: 'none',
+              '&:hover': {
+                textDecoration: 'underline',
+              },
+            },
+          }}
+        />
+        {urls.length > 0 && (
+          <Box sx={{ mt: 1 }}>
+            <LinkPreviewList urls={urls} />
+          </Box>
+        )}
+      </Box>
     );
   };
 
