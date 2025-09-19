@@ -10,6 +10,171 @@ import {
 import moment from 'moment-timezone';
 import { getStoredTimezone } from '../../utils/dateFormat';
 
+// 마크다운 스타일링을 위한 타입 정의
+interface MessagePart {
+  type: 'text' | 'code' | 'codeBlock' | 'bold' | 'italic' | 'strikethrough' | 'underline';
+  content: string;
+}
+
+// 마크다운 파싱 함수
+const parseMarkdown = (text: string): MessagePart[] => {
+  const parts: MessagePart[] = [];
+  let currentIndex = 0;
+
+  // 정규식 패턴들 (우선순위 순서)
+  const patterns = [
+    { type: 'codeBlock' as const, regex: /```([\s\S]*?)```/g },
+    { type: 'code' as const, regex: /`([^`]+)`/g },
+    { type: 'bold' as const, regex: /\*\*([^*]+)\*\*/g },
+    { type: 'italic' as const, regex: /\*([^*]+)\*/g },
+    { type: 'strikethrough' as const, regex: /~~([^~]+)~~/g },
+    { type: 'underline' as const, regex: /__([^_]+)__/g },
+  ];
+
+  // 모든 매치를 찾아서 위치와 함께 저장
+  const matches: Array<{
+    type: MessagePart['type'];
+    content: string;
+    start: number;
+    end: number;
+    fullMatch: string;
+  }> = [];
+
+  patterns.forEach(({ type, regex }) => {
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(text)) !== null) {
+      matches.push({
+        type,
+        content: match[1],
+        start: match.index,
+        end: match.index + match[0].length,
+        fullMatch: match[0]
+      });
+    }
+  });
+
+  // 위치순으로 정렬
+  matches.sort((a, b) => a.start - b.start);
+
+  // 겹치는 매치 제거 (먼저 나온 것 우선)
+  const filteredMatches = [];
+  for (const match of matches) {
+    const hasOverlap = filteredMatches.some(existing =>
+      (match.start < existing.end && match.end > existing.start)
+    );
+    if (!hasOverlap) {
+      filteredMatches.push(match);
+    }
+  }
+
+  // 텍스트를 파트로 분할
+  filteredMatches.forEach(match => {
+    // 매치 이전의 일반 텍스트 추가
+    if (currentIndex < match.start) {
+      const textContent = text.slice(currentIndex, match.start);
+      if (textContent) {
+        parts.push({ type: 'text', content: textContent });
+      }
+    }
+
+    // 매치된 부분 추가
+    parts.push({ type: match.type, content: match.content });
+    currentIndex = match.end;
+  });
+
+  // 남은 텍스트 추가
+  if (currentIndex < text.length) {
+    const textContent = text.slice(currentIndex);
+    if (textContent) {
+      parts.push({ type: 'text', content: textContent });
+    }
+  }
+
+  return parts.length > 0 ? parts : [{ type: 'text', content: text }];
+};
+
+// 마크다운 렌더링 컴포넌트
+const MarkdownMessage: React.FC<{ content: string; theme: any }> = ({ content, theme }) => {
+  const parts = parseMarkdown(content);
+
+  return (
+    <>
+      {parts.map((part, index) => {
+        switch (part.type) {
+          case 'codeBlock':
+            return (
+              <Box
+                key={index}
+                component="pre"
+                sx={{
+                  backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f6f8fa',
+                  border: `1px solid ${theme.palette.mode === 'dark' ? '#444' : '#e1e4e8'}`,
+                  borderRadius: '6px',
+                  padding: '12px',
+                  margin: '8px 0',
+                  overflow: 'auto',
+                  fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
+                  fontSize: '13px',
+                  lineHeight: 1.45,
+                  color: theme.palette.mode === 'dark' ? '#e8eaed' : '#24292e',
+                  whiteSpace: 'pre-wrap'
+                }}
+              >
+                {part.content}
+              </Box>
+            );
+          case 'code':
+            return (
+              <Box
+                key={index}
+                component="code"
+                sx={{
+                  backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f6f8fa',
+                  border: `1px solid ${theme.palette.mode === 'dark' ? '#444' : '#e1e4e8'}`,
+                  borderRadius: '3px',
+                  padding: '2px 4px',
+                  fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
+                  fontSize: '13px',
+                  color: theme.palette.mode === 'dark' ? '#e8eaed' : '#24292e'
+                }}
+              >
+                {part.content}
+              </Box>
+            );
+          case 'bold':
+            return (
+              <Box key={index} component="strong" sx={{ fontWeight: 700 }}>
+                {part.content}
+              </Box>
+            );
+          case 'italic':
+            return (
+              <Box key={index} component="em" sx={{ fontStyle: 'italic' }}>
+                {part.content}
+              </Box>
+            );
+          case 'strikethrough':
+            return (
+              <Box key={index} component="span" sx={{ textDecoration: 'line-through' }}>
+                {part.content}
+              </Box>
+            );
+          case 'underline':
+            return (
+              <Box key={index} component="span" sx={{ textDecoration: 'underline' }}>
+                {part.content}
+              </Box>
+            );
+          default:
+            return <span key={index}>{part.content}</span>;
+        }
+      })}
+    </>
+  );
+};
+
+
+
 // 동적 스타일 생성 함수
 const createCustomStyles = (isDark: boolean) => `
   .rce-mbox-text {
@@ -646,7 +811,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                     whiteSpace: 'pre-wrap'
                   }}
                 >
-                  {message.content}
+                  <MarkdownMessage content={message.content} theme={theme} />
                 </Typography>
               </Box>
             </Box>
