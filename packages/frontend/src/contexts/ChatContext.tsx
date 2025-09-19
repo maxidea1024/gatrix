@@ -703,7 +703,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           clearTimeout((window as any)[debounceKey]);
         }
 
-        // 500ms 후에 실행 (디바운스)
+        // 5초 후에 실행 (디바운스 시간 대폭 증가)
         (window as any)[debounceKey] = setTimeout(async () => {
           // 요청 시작 표시
           markAsReadRequestsRef.current.add(requestKey);

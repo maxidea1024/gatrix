@@ -1,5 +1,5 @@
 import express from 'express';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
 import { authenticate } from '../../middleware/auth';
 import logger from '../../config/logger';
 
@@ -12,35 +12,46 @@ const CHAT_API_BASE = `${CHAT_SERVER_URL}/api/v1`;
 // 모든 채팅 라우트에 인증 필요
 router.use(authenticate as any);
 
-// 디버깅을 위한 미들웨어
+// 직접 라우트 제거 - 프록시로 통일 완료
+
+// 간단한 요청 로깅
 router.use((req, res, next) => {
-  (req as any).startTime = Date.now();
-  logger.info(`Chat route accessed: ${req.method} ${req.url}`, {
-    originalUrl: req.originalUrl,
-    path: req.path,
-    headers: Object.keys(req.headers),
-    hasBody: !!req.body,
-    bodyContent: req.body
-  });
+  logger.info(`Chat API: ${req.method} ${req.url}`);
   next();
 });
 
-// 채팅서버 프록시 미들웨어 설정
-const chatProxy = createProxyMiddleware({
-  target: CHAT_API_BASE,
+// 프록시 설정 (연결 누수 방지)
+const proxyOptions = {
+  target: CHAT_API_BASE, // http://localhost:3001/api/v1
   changeOrigin: true,
-  timeout: 30000, // 30초 타임아웃
-  proxyTimeout: 30000 // 프록시 타임아웃
-} as any);
+  timeout: 10000, // 타임아웃 단축
+  proxyTimeout: 10000,
 
-// 모든 채팅 관련 요청을 채팅서버로 프록시
-router.use('/', (req, res, next) => {
-  logger.info(`Before proxy: ${req.method} ${req.url}`, {
-    body: req.body,
-    headers: req.headers,
-    timestamp: new Date().toISOString()
-  });
-  next();
-}, chatProxy);
+  // 연결 풀 설정 (연결 누수 방지)
+  agent: false, // 연결 재사용 비활성화
+  keepAlive: false, // Keep-Alive 비활성화
+
+  // POST body 수정 (중요!)
+  onProxyReq: fixRequestBody,
+
+  // 에러 핸들링
+  onError: (err: Error, req: express.Request, res: express.Response) => {
+    logger.error(`Chat proxy error: ${req.method} ${req.url}`, {
+      error: err.message,
+      code: (err as any).code
+    });
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        error: 'Chat service unavailable'
+      });
+    }
+  }
+};
+
+const chatProxy = createProxyMiddleware(proxyOptions);
+
+// 모든 채팅 요청을 프록시로 전달
+router.use('/', chatProxy);
 
 export default router;

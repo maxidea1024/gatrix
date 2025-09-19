@@ -49,6 +49,27 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
   const currentChannel = state.channels.find(c => c.id === channelId);
   const channelUsers = currentChannel?.members || [];
 
+  // 컴포넌트 마운트 시 입력창에 포커스
+  useEffect(() => {
+    if (textFieldRef.current) {
+      const timer = setTimeout(() => {
+        textFieldRef.current?.focus();
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  // 채널 변경 시 입력창에 포커스
+  useEffect(() => {
+    if (channelId && textFieldRef.current) {
+      // 약간의 지연을 두어 렌더링이 완료된 후 포커스
+      const timer = setTimeout(() => {
+        textFieldRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [channelId]);
+
   // Handle typing indicator
   useEffect(() => {
     if (message.trim() && !isTyping) {
@@ -128,29 +149,55 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
     setMessage('');
     setAttachments([]);
     setShowMentions(false);
-    
+
     if (isTyping) {
       setIsTyping(false);
       actions.stopTyping(channelId);
     }
+
+    // 메시지 전송 후 입력창에 포커스 유지 (더 강화된 포커스)
+    requestAnimationFrame(() => {
+      textFieldRef.current?.focus();
+      // 추가 보장을 위한 두 번째 시도
+      setTimeout(() => {
+        if (document.activeElement !== textFieldRef.current) {
+          textFieldRef.current?.focus();
+        }
+      }, 50);
+    });
   };
 
   const handleEmojiSelect = (emoji: string) => {
     const cursorPosition = textFieldRef.current?.selectionStart || message.length;
-    const newMessage = 
-      message.substring(0, cursorPosition) + 
-      emoji + 
+    const newMessage =
+      message.substring(0, cursorPosition) +
+      emoji +
       message.substring(cursorPosition);
     setMessage(newMessage);
-    
-    // Focus back to input
-    setTimeout(() => {
+
+    // 이모지 선택창 닫기
+    setEmojiAnchorEl(null);
+
+    // Focus back to input with proper cursor position (더 강화된 포커스)
+    requestAnimationFrame(() => {
       textFieldRef.current?.focus();
+      const newCursorPosition = cursorPosition + emoji.length;
       textFieldRef.current?.setSelectionRange(
-        cursorPosition + emoji.length,
-        cursorPosition + emoji.length
+        newCursorPosition,
+        newCursorPosition
       );
-    }, 0);
+
+      // 추가 보장을 위한 두 번째 시도
+      setTimeout(() => {
+        if (document.activeElement !== textFieldRef.current) {
+          textFieldRef.current?.focus();
+          textFieldRef.current?.setSelectionRange(
+            newCursorPosition,
+            newCursorPosition
+          );
+        }
+      }, 100);
+    });
   };
 
   const handleMentionSelect = (user: User) => {

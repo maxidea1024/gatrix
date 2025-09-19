@@ -198,7 +198,7 @@ const UsersManagementPage: React.FC = () => {
       const invitation = await invitationService.getCurrentInvitation();
       setCurrentInvitation(invitation);
     } catch (error: any) {
-      // 시스템 초대 기능이 아직 구현되지 않았으므로 404 에러는 무시
+      // 초대가 없는 경우 404 에러는 정상적인 상황
       if (error.status !== 404) {
         console.error('Failed to load current invitation:', error);
       }
@@ -255,7 +255,7 @@ const UsersManagementPage: React.FC = () => {
       }
     };
     loadTags();
-    // loadCurrentInvitation(); // 시스템 초대 기능이 아직 구현되지 않음
+    loadCurrentInvitation(); // 초대 기능 활성화
   }, []);
 
   // 체크박스 핸들러
@@ -882,15 +882,14 @@ const UsersManagementPage: React.FC = () => {
                 mx: 0.5,
                 alignSelf: 'stretch'
               }} />
-              {/* 시스템 초대 기능은 아직 구현되지 않음 */}
-              {/* <Button
+              <Button
                 variant="outlined"
                 startIcon={<SendIcon />}
                 onClick={() => setInvitationDialogOpen(true)}
                 disabled={!!currentInvitation}
               >
                 초대
-              </Button> */}
+              </Button>
             </Box>
           </Box>
         </CardContent>
@@ -956,14 +955,14 @@ const UsersManagementPage: React.FC = () => {
         </Card>
       )}
 
-      {/* Current Invitation Status - 시스템 초대 기능은 아직 구현되지 않음 */}
-      {/* {currentInvitation && (
+      {/* Current Invitation Status */}
+      {currentInvitation && (
         <InvitationStatusCard
           invitation={currentInvitation}
           onUpdate={handleUpdateInvitation}
           onDelete={handleDeleteInvitation}
         />
-      )} */}
+      )}
 
       {/* Users Table */}
       <Card>
@@ -1801,9 +1800,11 @@ const UsersManagementPage: React.FC = () => {
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={editUserTags}
                 onChange={(_, value) => setEditUserTags(value)}
-                PopperProps={{
-                  style: {
-                    zIndex: 9999
+                slotProps={{
+                  popper: {
+                    style: {
+                      zIndex: 9999
+                    }
                   }
                 }}
                 renderTags={(value, getTagProps) =>
@@ -1993,9 +1994,11 @@ const UsersManagementPage: React.FC = () => {
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={bulkActionTags}
                 onChange={(_, value) => setBulkActionTags(value)}
-                PopperProps={{
-                  style: {
-                    zIndex: 9999
+                slotProps={{
+                  popper: {
+                    style: {
+                      zIndex: 9999
+                    }
                   }
                 }}
                 renderTags={(value, getTagProps) =>

@@ -78,7 +78,7 @@ const WhitelistOverview: React.FC = () => {
           </Typography>
 
           <Grid container spacing={2} sx={{ mb: 3 }}>
-            <Grid xs={12} md={3}>
+            <Grid size={{ xs: 12 , md: 3 }}>
               <TextField
                 fullWidth
                 label="테스트 계정 ID"
@@ -87,7 +87,7 @@ const WhitelistOverview: React.FC = () => {
                 placeholder="예: 28004430"
               />
             </Grid>
-            <Grid xs={12} md={3}>
+            <Grid size={{ xs: 12 , md: 3 }}>
               <TextField
                 fullWidth
                 label="테스트 IP 주소"
@@ -96,7 +96,7 @@ const WhitelistOverview: React.FC = () => {
                 placeholder="예: 127.0.0.1"
               />
             </Grid>
-            <Grid xs={12} md={3}>
+            <Grid size={{ xs: 12 , md: 3 }}>
               <Button
                 fullWidth
                 variant="contained"
@@ -108,7 +108,7 @@ const WhitelistOverview: React.FC = () => {
                 {testing ? '테스트 중...' : '테스트 실행'}
               </Button>
             </Grid>
-            <Grid xs={12} md={3}>
+            <Grid size={{ xs: 12 , md: 3 }}>
               <Button
                 fullWidth
                 variant="outlined"

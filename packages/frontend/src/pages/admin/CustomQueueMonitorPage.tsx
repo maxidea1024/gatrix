@@ -222,7 +222,7 @@ const CustomQueueMonitorPage: React.FC = () => {
       {/* 큐 통계 카드들 */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
         {queues.map((queue) => (
-          <Grid xs={12} sm={6} md={3} key={queue.name}>
+          <Grid size={{ xs: 12 , sm: 6, md: 3 }} key={queue.name}>
             <Card 
               sx={{ 
                 cursor: 'pointer',

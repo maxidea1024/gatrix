@@ -54,7 +54,9 @@
     "docs:clear": "cd docs && npm run clear",
     "docs:install": "cd docs && npm install",
     "docs:write-translations": "cd docs && npm run write-translations",
-    "docs:deploy": "cd docs && npm run deploy"
+    "docs:deploy": "cd docs && npm run deploy",
+    "chat:reset": "node scripts/reset-chat-data.js --confirm",
+    "chat:reset-safe": "node scripts/reset-chat-data.js"
   },
   "keywords": [
     "gatrix",
@@ -89,6 +91,9 @@
   },
   "homepage": "https://github.com/motifgames/gatrix#readme",
   "dependencies": {
-    "glob": "^11.0.3"
+    "glob": "^11.0.3",
+    "mysql2": "^3.15.0",
+    "ioredis": "^5.3.2",
+    "dotenv": "^16.3.1"
   }
 }

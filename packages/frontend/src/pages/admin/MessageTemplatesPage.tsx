@@ -493,9 +493,11 @@ const MessageTemplatesPage: React.FC = () => {
                 filterSelectedOptions
                 value={tagFilter}
                 onChange={(_, value) => handleTagFilterChange(value)}
-                PopperProps={{
-                  style: {
-                    zIndex: 9999
+                slotProps={{
+                  popper: {
+                    style: {
+                      zIndex: 9999
+                    }
                   }
                 }}
                 renderValue={(value, getTagProps) =>

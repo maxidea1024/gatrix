@@ -274,7 +274,7 @@ export class ChatWebSocketService {
   }
 
   private getSocketUrl(): string {
-    return 'http://localhost:3004';
+    return 'http://localhost:3001'; // 직접 채팅 서버 연결 (WebSocket은 프록시 불가)
   }
 
   private scheduleReconnect(): void {

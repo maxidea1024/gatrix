@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { Box, Typography, Paper, IconButton, TextField, useTheme, Avatar } from '@mui/material';
+import { Box, Typography, Paper, useTheme, Avatar, IconButton, Tooltip } from '@mui/material';
 import {
-  Send as SendIcon,
-  AttachFile as AttachFileIcon,
-  Wifi as ConnectedIcon,
-  WifiOff as DisconnectedIcon
+  Reply as ReplyIcon,
+  MoreVert as MoreIcon,
+  PersonAdd as PersonAddIcon
 } from '@mui/icons-material';
 // React Chat Elements는 더 이상 사용하지 않음 (슬랙 스타일로 직접 구현)
 import moment from 'moment-timezone';
@@ -12,6 +11,8 @@ import { getStoredTimezone } from '../../utils/dateFormat';
 import { extractUrlsFromMessage, extractLinkPreview } from '../../utils/linkPreview';
 import LinkPreviewCard from './LinkPreviewCard';
 import { LinkPreview } from '../../types/chat';
+import { format } from 'date-fns';
+import { ko, enUS, zhCN } from 'date-fns/locale';
 
 // 마크다운 스타일링을 위한 타입 정의
 interface MessagePart {
@@ -326,26 +327,29 @@ const createCustomStyles = (isDark: boolean) => `
 import { useTranslation } from 'react-i18next';
 import { useChat } from '../../contexts/ChatContext';
 import { MessageType } from '../../types/chat';
+import AdvancedMessageInput from './AdvancedMessageInput';
 
 
 interface ChatElementsMessageListProps {
   channelId: number;
   onSendMessage?: (message: string, attachments?: File[]) => void;
+  onInviteUser?: () => void;
 }
 
 const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   channelId,
   onSendMessage,
+  onInviteUser
 }) => {
   const { state, actions } = useChat();
   const { t, i18n } = useTranslation();
   const theme = useTheme();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const messageInputRef = useRef<HTMLInputElement>(null);
-  const [messageInput, setMessageInput] = useState('');
+  // messageInputRef와 messageInput은 AdvancedMessageInput으로 이동됨
 
   const currentChannel = state.channels.find(c => c.id === channelId);
   const messages = useMemo(() => state.messages[channelId] || [], [state.messages, channelId]);
+  const typingUsers = state.typingUsers[channelId] || [];
 
 
 
@@ -366,6 +370,10 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     emptyStateSubtext: theme.palette.mode === 'dark' ? '#9aa0a6' : '#666666',
   };
 
+  // 읽음 처리를 위한 ref (중복 방지)
+  const lastReadMessageIdRef = useRef<number | null>(null);
+  const markAsReadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // 새 메시지가 올 때 하단에 있으면 자동 스크롤 (슬랙 스타일 컨테이너용)
   useEffect(() => {
     if (messages.length === 0) return;
@@ -381,8 +389,6 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       const { scrollTop, scrollHeight, clientHeight } = messageContainer;
       // 하단에서 100px 이내에 있으면 자동 스크롤
       const isAtBottom = scrollTop + clientHeight >= scrollHeight - 100;
-
-
 
       if (isAtBottom) {
         messageContainer.scrollTo({
@@ -458,26 +464,55 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     // 미디어 콘텐츠 체크를 위한 추가 지연
     setTimeout(checkForMediaContent, 200);
 
-    // 메시지 로딩 완료 후 읽음 처리 (2초 후)
-    const markAsReadTimeout = setTimeout(() => {
-      if (channelId && messages.length > 0) {
-        const latestMessage = messages[messages.length - 1];
-        actions.markAsRead(channelId, latestMessage.id);
+    // 읽음 처리 로직 개선 (중복 방지)
+    if (channelId && messages.length > 0) {
+      const latestMessage = messages[messages.length - 1];
+
+      // 이미 읽음 처리한 메시지면 스킵
+      if (lastReadMessageIdRef.current === latestMessage.id) {
+        return;
       }
-    }, 2000);
+
+      // 기존 타임아웃 취소
+      if (markAsReadTimeoutRef.current) {
+        clearTimeout(markAsReadTimeoutRef.current);
+      }
+
+      // 새로운 타임아웃 설정 (3초 후 읽음 처리)
+      markAsReadTimeoutRef.current = setTimeout(() => {
+        // 창이 포커스되어 있고, 스크롤이 하단 근처에 있을 때만 읽음 처리
+        const messageContainer = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement;
+        if (messageContainer && document.hasFocus()) {
+          const { scrollTop, scrollHeight, clientHeight } = messageContainer;
+          const isNearBottom = scrollTop + clientHeight >= scrollHeight - 200;
+
+          if (isNearBottom) {
+            lastReadMessageIdRef.current = latestMessage.id;
+            actions.markAsRead(channelId, latestMessage.id);
+            console.log(`📖 Auto-marked channel ${channelId} as read up to message ${latestMessage.id}`);
+          }
+        }
+      }, 3000);
+    }
 
     return () => {
-      clearTimeout(markAsReadTimeout);
+      if (markAsReadTimeoutRef.current) {
+        clearTimeout(markAsReadTimeoutRef.current);
+      }
     };
   }, [messages, channelId, actions]);
 
-  // Auto-focus message input when channel changes or component mounts
+  // 채널 변경 시 하단으로 스크롤 및 읽음 상태 초기화
   useEffect(() => {
-    if (currentChannel && messageInputRef.current) {
-      const timer = setTimeout(() => {
-        messageInputRef.current?.focus();
+    if (currentChannel) {
+      // 읽음 상태 초기화
+      lastReadMessageIdRef.current = null;
+      if (markAsReadTimeoutRef.current) {
+        clearTimeout(markAsReadTimeoutRef.current);
+        markAsReadTimeoutRef.current = null;
+      }
 
-        // 채널 변경 시 하단으로 스크롤 (슬랙 스타일)
+      const timer = setTimeout(() => {
         const messageContainer = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement;
         if (messageContainer) {
           messageContainer.scrollTo({
@@ -504,10 +539,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     if (target.tagName === 'A' || target.closest('a') || target.closest('button')) {
       return;
     }
-
-    if (messageInputRef.current && currentChannel) {
-      messageInputRef.current.focus();
-    }
+    // AdvancedMessageInput이 포커스를 처리함
   };
 
   // 테마 변경 시 스타일 업데이트
@@ -543,27 +575,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     }
   }, [channelId]); // messages.length 의존성 제거
 
-  const handleSendMessage = () => {
-    if (messageInput.trim() && currentChannel) {
-      actions.sendMessage(currentChannel.id, {
-        content: messageInput.trim(),
-        type: 'text' as MessageType,
-      });
-      setMessageInput('');
-
-      // 메시지 전송 후 입력창에 포커스 다시 주기
-      setTimeout(() => {
-        messageInputRef.current?.focus();
-      }, 50);
-    }
-  };
-
-  const handleKeyPress = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      handleSendMessage();
-    }
-  };
+  // handleSendMessage와 handleKeyPress는 AdvancedMessageInput에서 처리됨
 
 
 
@@ -655,20 +667,24 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                 {currentChannel?.description || ''}
               </Typography>
             </Box>
-            {/* 연결 상태 표시 */}
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              {state.isConnected ? (
-                <ConnectedIcon sx={{
-                  color: 'success.main',
-                  fontSize: 24
-                }} />
-              ) : (
-                <DisconnectedIcon sx={{
-                  color: 'error.main',
-                  fontSize: 24
-                }} />
-              )}
-            </Box>
+            {onInviteUser && (
+              <Tooltip title={t('chat.inviteUsers')} placement="bottom">
+                <IconButton
+                  size="small"
+                  onClick={onInviteUser}
+                  sx={{
+                    border: 1,
+                    borderColor: 'divider',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      backgroundColor: 'primary.50'
+                    }
+                  }}
+                >
+                  <PersonAddIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
           </Box>
         </Paper>
 
@@ -717,86 +733,20 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
 
         {/* Message Input */}
         <Box sx={{ p: 2, backgroundColor: colors.inputBackground }}>
-          <Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            backgroundColor: colors.inputFieldBackground,
-            borderRadius: '25px',
-            border: `1px solid ${colors.inputBorder}`,
-            padding: '8px 16px',
-            boxShadow: theme.palette.mode === 'dark' ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.1)'
-          }}>
-            <IconButton
-              size="small"
-              sx={{
-                color: colors.iconColor,
-                '&:hover': { backgroundColor: colors.iconHover }
-              }}
-            >
-              <AttachFileIcon />
-            </IconButton>
-
-            <TextField
-              fullWidth
-              multiline
-              maxRows={4}
-              placeholder={t('chat.typeMessage')}
-              value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
-              onKeyDown={handleKeyPress}
-              disabled={!currentChannel}
-              variant="standard"
-              inputRef={messageInputRef}
-              slotProps={{
-              input: {
-                disableUnderline: true,
-                sx: {
-                  fontSize: '14px',
-                  color: colors.inputText,
-                  '& input': {
-                    padding: '8px 0',
-                    color: colors.inputText,
-                  },
-                  '& textarea': {
-                    padding: '8px 0',
-                    color: colors.inputText,
-                  },
-                  '&::placeholder': {
-                    color: colors.placeholderText,
-                    opacity: 1,
-                  }
-                }
+          <AdvancedMessageInput
+            channelId={channelId}
+            onSendMessage={(content, attachments) => {
+              if (currentChannel) {
+                actions.sendMessage(currentChannel.id, {
+                  content,
+                  type: 'text' as MessageType,
+                  attachments
+                });
               }
             }}
-              sx={{
-                '& .MuiInputBase-input::placeholder': {
-                  color: colors.placeholderText,
-                  opacity: 1,
-                }
-              }}
-            />
-
-            <IconButton
-              onClick={handleSendMessage}
-              disabled={!messageInput.trim() || !currentChannel}
-              sx={{
-                backgroundColor: messageInput.trim() ? colors.sendButton : colors.sendButtonDisabled,
-                color: 'white',
-                width: 36,
-                height: 36,
-                '&:hover': {
-                  backgroundColor: messageInput.trim() ? colors.sendButtonHover : colors.sendButtonDisabled
-                },
-                '&:disabled': {
-                  backgroundColor: colors.sendButtonDisabled,
-                  color: colors.placeholderText
-                }
-              }}
-            >
-              <SendIcon sx={{ fontSize: 18 }} />
-            </IconButton>
-          </Box>
+            placeholder={t('chat.typeMessage')}
+            disabled={!currentChannel}
+          />
         </Box>
       </Box>
     );
@@ -812,7 +762,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
             alt={currentChannel?.name || 'Channel'}
             sx={{ width: 40, height: 40 }}
           />
-          <Box>
+          <Box sx={{ flex: 1 }}>
             <Typography variant="h6">
               {currentChannel?.name || ''}
             </Typography>
@@ -820,6 +770,24 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
               {currentChannel?.memberCount || 0} {t('chat.members')}
             </Typography>
           </Box>
+          {onInviteUser && (
+            <Tooltip title={t('chat.inviteUsers')} placement="bottom">
+              <IconButton
+                size="small"
+                onClick={onInviteUser}
+                sx={{
+                  border: 1,
+                  borderColor: 'divider',
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                    backgroundColor: 'primary.50'
+                  }
+                }}
+              >
+                <PersonAddIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
         </Box>
       </Paper>
 
@@ -861,14 +829,62 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         }}
         onClick={handleChatAreaClick}
       >
-        {messages.map((message) => {
+        {messages.map((message, index) => {
           const userInfo = getUserInfo(message.userId);
           const messageTime = formatRelativeTime(message.createdAt);
 
+          // 날짜 구분선 체크
+          const currentDate = new Date(message.createdAt).toDateString();
+          const previousDate = index > 0 ? new Date(messages[index - 1].createdAt).toDateString() : null;
+          const showDateSeparator = index === 0 || currentDate !== previousDate;
+
           return (
+            <React.Fragment key={message.id}>
+              {/* 날짜 구분선 */}
+              {showDateSeparator && (
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  my: 2,
+                  mx: 2
+                }}>
+                  <Box sx={{
+                    flex: 1,
+                    height: '1px',
+                    backgroundColor: colors.inputBorder
+                  }} />
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      mx: 2,
+                      px: 2,
+                      py: 0.5,
+                      backgroundColor: colors.inputBackground,
+                      borderRadius: '12px',
+                      color: colors.placeholderText,
+                      fontSize: '12px',
+                      fontWeight: 500,
+                      border: `1px solid ${colors.inputBorder}`
+                    }}
+                  >
+                    {format(new Date(message.createdAt), 'yyyy년 M월 d일 EEEE', {
+                      locale: i18n.language === 'ko' ? ko : i18n.language === 'zh' ? zhCN : enUS
+                    })}
+                  </Typography>
+                  <Box sx={{
+                    flex: 1,
+                    height: '1px',
+                    backgroundColor: colors.inputBorder
+                  }} />
+                </Box>
+              )}
+
+              {/* 메시지 */}
             <Box
               key={message.id}
+              className="message-container"
               sx={{
+                position: 'relative',
                 display: 'flex',
                 gap: '12px',
                 padding: '8px 12px',
@@ -961,95 +977,262 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                 >
                   <MessageWithPreview content={message.content} theme={theme} />
                 </Typography>
+
+                {/* 리액션 표시 */}
+                {message.reactions && message.reactions.length > 0 && (
+                  <Box sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 0.5,
+                    mt: 1
+                  }}>
+                    {Object.entries(
+                      message.reactions.reduce((acc, reaction) => {
+                        if (!acc[reaction.emoji]) {
+                          acc[reaction.emoji] = [];
+                        }
+                        acc[reaction.emoji].push(reaction);
+                        return acc;
+                      }, {} as Record<string, any[]>)
+                    ).map(([emoji, reactions]) => (
+                      <Box
+                        key={emoji}
+                        onClick={() => {
+                          const userReaction = reactions.find(r => r.userId === state.user?.id);
+                          if (userReaction) {
+                            actions.removeReaction(message.id, emoji);
+                          } else {
+                            actions.addReaction(message.id, emoji);
+                          }
+                        }}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: '12px',
+                          backgroundColor: reactions.some(r => r.userId === state.user?.id)
+                            ? theme.palette.primary.main + '20'
+                            : colors.inputFieldBackground,
+                          border: `1px solid ${reactions.some(r => r.userId === state.user?.id)
+                            ? theme.palette.primary.main
+                            : colors.inputBorder}`,
+                          cursor: 'pointer',
+                          '&:hover': {
+                            backgroundColor: theme.palette.primary.main + '30'
+                          }
+                        }}
+                      >
+                        <Typography sx={{ fontSize: '14px' }}>{emoji}</Typography>
+                        <Typography sx={{
+                          fontSize: '12px',
+                          color: colors.placeholderText,
+                          fontWeight: reactions.some(r => r.userId === state.user?.id) ? 600 : 400
+                        }}>
+                          {reactions.length}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+
+                {/* 메시지 액션 버튼들 (호버 시 표시) */}
+                <Box
+                  className="message-actions"
+                  sx={{
+                    position: 'absolute',
+                    top: -8,
+                    right: 8,
+                    display: 'none',
+                    gap: 0.5,
+                    backgroundColor: colors.inputBackground,
+                    borderRadius: '8px',
+                    border: `1px solid ${colors.inputBorder}`,
+                    boxShadow: theme.palette.mode === 'dark'
+                      ? '0 2px 8px rgba(0,0,0,0.3)'
+                      : '0 2px 8px rgba(0,0,0,0.1)',
+                    '.message-container:hover &': {
+                      display: 'flex'
+                    }
+                  }}
+                >
+                  {/* 스레드 시작 버튼 */}
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      // 스레드 시작 로직 (추후 구현)
+                      console.log('Start thread for message:', message.id);
+                    }}
+                    sx={{
+                      p: 0.5,
+                      color: colors.iconColor,
+                      '&:hover': {
+                        backgroundColor: colors.iconHover
+                      }
+                    }}
+                  >
+                    <ReplyIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+
+                  {/* 더보기 버튼 */}
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      // 더보기 메뉴 (추후 구현)
+                      console.log('More actions for message:', message.id);
+                    }}
+                    sx={{
+                      p: 0.5,
+                      color: colors.iconColor,
+                      '&:hover': {
+                        backgroundColor: colors.iconHover
+                      }
+                    }}
+                  >
+                    <MoreIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+
+                  {/* 리액션 추가 버튼들 */}
+                  {['👍', '❤️', '😂', '😮', '😢', '😡'].map((emoji) => (
+                    <Box
+                      key={emoji}
+                      onClick={() => actions.addReaction(message.id, emoji)}
+                      sx={{
+                        p: 0.5,
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        '&:hover': {
+                          backgroundColor: colors.iconHover
+                        }
+                      }}
+                    >
+                      {emoji}
+                    </Box>
+                  ))}
+                </Box>
+
+                {/* 답글 정보 표시 */}
+                {message.replyToId && (
+                  <Box sx={{
+                    mt: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    color: colors.placeholderText,
+                    fontSize: '12px'
+                  }}>
+                    <ReplyIcon sx={{ fontSize: 14 }} />
+                    <Typography variant="caption" sx={{ color: colors.placeholderText }}>
+                      {message.replyTo?.user?.username || '누군가'}님에게 답장
+                    </Typography>
+                  </Box>
+                )}
+
+                {/* 스레드 답글 수 표시 (추후 구현 - 현재는 임시로 숨김) */}
+                {false && (
+                  <Box
+                    onClick={() => {
+                      // 스레드 열기 (추후 구현)
+                      console.log('Open thread for message:', message.id);
+                    }}
+                    sx={{
+                      mt: 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      color: theme.palette.primary.main,
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        textDecoration: 'underline'
+                      }
+                    }}
+                  >
+                    <ReplyIcon sx={{ fontSize: 14 }} />
+                    <Typography variant="caption" sx={{ color: theme.palette.primary.main }}>
+                      답글 보기
+                    </Typography>
+                  </Box>
+                )}
               </Box>
             </Box>
+            </React.Fragment>
           );
         })}
+
+        {/* 타이핑 인디케이터 */}
+        {typingUsers.length > 0 && (
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            px: 2,
+            py: 1,
+            mx: 2,
+            mb: 1,
+            backgroundColor: colors.inputFieldBackground,
+            borderRadius: '12px',
+            border: `1px solid ${colors.inputBorder}`
+          }}>
+            <Box sx={{
+              display: 'flex',
+              gap: 0.5,
+              alignItems: 'center'
+            }}>
+              {[0, 1, 2].map((i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    backgroundColor: colors.placeholderText,
+                    animation: 'typing-dot 1.4s infinite ease-in-out',
+                    animationDelay: `${i * 0.16}s`,
+                    '@keyframes typing-dot': {
+                      '0%, 80%, 100%': {
+                        transform: 'scale(0)',
+                        opacity: 0.5,
+                      },
+                      '40%': {
+                        transform: 'scale(1)',
+                        opacity: 1,
+                      },
+                    },
+                  }}
+                />
+              ))}
+            </Box>
+            <Typography variant="caption" sx={{ color: colors.placeholderText, fontSize: '12px' }}>
+              {typingUsers.length === 1
+                ? `${state.users[typingUsers[0].userId]?.username || 'Someone'}님이 입력 중...`
+                : `${typingUsers.length}명이 입력 중...`
+              }
+            </Typography>
+          </Box>
+        )}
+
         <div ref={messagesEndRef} />
       </Box>
 
       {/* Message Input */}
       <Box sx={{ p: 2, backgroundColor: colors.inputBackground }}>
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          backgroundColor: colors.inputFieldBackground,
-          borderRadius: '25px',
-          border: `1px solid ${colors.inputBorder}`,
-          padding: '8px 16px',
-          boxShadow: theme.palette.mode === 'dark' ? '0 2px 8px rgba(0,0,0,0.3)' : '0 2px 8px rgba(0,0,0,0.1)'
-        }}>
-          <IconButton
-            size="small"
-            sx={{
-              color: colors.iconColor,
-              '&:hover': { backgroundColor: colors.iconHover }
-            }}
-          >
-            <AttachFileIcon />
-          </IconButton>
-
-          <TextField
-            fullWidth
-            multiline
-            maxRows={4}
-            placeholder={t('chat.typeMessage')}
-            value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
-            onKeyDown={handleKeyPress}
-            disabled={!currentChannel}
-            variant="standard"
-            inputRef={messageInputRef}
-            slotProps={{
-              input: {
-                disableUnderline: true,
-                sx: {
-                  fontSize: '14px',
-                  color: colors.inputText,
-                  '& input': {
-                    padding: '8px 0',
-                    color: colors.inputText,
-                  },
-                  '& textarea': {
-                    padding: '8px 0',
-                    color: colors.inputText,
-                  },
-                  '&::placeholder': {
-                    color: colors.placeholderText,
-                    opacity: 1,
-                  }
-                }
-              }
-            }}
-            sx={{
-              '& .MuiInputBase-input::placeholder': {
-                color: colors.placeholderText,
-                opacity: 1,
-              }
-            }}
-          />
-
-          <IconButton
-            onClick={handleSendMessage}
-            disabled={!messageInput.trim() || !currentChannel}
-            sx={{
-              backgroundColor: messageInput.trim() ? colors.sendButton : colors.sendButtonDisabled,
-              color: 'white',
-              width: 36,
-              height: 36,
-              '&:hover': {
-                backgroundColor: messageInput.trim() ? colors.sendButtonHover : colors.sendButtonDisabled
-              },
-              '&:disabled': {
-                backgroundColor: colors.sendButtonDisabled,
-                color: colors.placeholderText
-              }
-            }}
-          >
-            <SendIcon sx={{ fontSize: 18 }} />
-          </IconButton>
-        </Box>
+        <AdvancedMessageInput
+          channelId={channelId}
+          onSendMessage={(content, attachments) => {
+            if (currentChannel) {
+              actions.sendMessage(currentChannel.id, {
+                content,
+                type: 'text' as MessageType,
+                attachments
+              });
+            }
+          }}
+          placeholder={t('chat.typeMessage')}
+          disabled={!currentChannel}
+        />
       </Box>
     </Box>
   );

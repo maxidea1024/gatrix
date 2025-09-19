@@ -40,6 +40,7 @@ interface UserSearchDialogProps {
   onClose: () => void;
   onInviteUser: (userId: number) => Promise<void>;
   title?: string;
+  subtitle?: string;
   excludeUserIds?: number[];
 }
 
@@ -48,6 +49,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
   onClose,
   onInviteUser,
   title,
+  subtitle,
   excludeUserIds = [],
 }) => {
   const { t } = useTranslation();
@@ -108,11 +110,11 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     }
   };
 
-  // 디바운스된 검색 함수
+  // 디바운스된 검색 함수 (0.5초 지연)
   const debouncedSearch = useCallback(
     debounce((query: string) => {
       searchUsers(query);
-    }, 300),
+    }, 500),
     [excludeUserIds]
   );
 
@@ -161,17 +163,40 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 2,
+          minHeight: 500, // 최소 높이를 늘려서 안정화
+          maxHeight: 600, // 최대 높이 제한
+        }
+      }}
+    >
       <DialogTitle>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Typography variant="h6">{title}</Typography>
+          <Box>
+            <Typography variant="h6">{title || t('chat.inviteUsers')}</Typography>
+            {subtitle && (
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                {subtitle}
+              </Typography>
+            )}
+          </Box>
           <IconButton onClick={onClose} size="small">
             <CloseIcon />
           </IconButton>
         </Box>
       </DialogTitle>
 
-      <DialogContent>
+      <DialogContent sx={{
+        minHeight: 350, // 최소 높이 설정으로 안정화
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
         <TextField
           fullWidth
           placeholder={t('chat.searchPlaceholder')}
@@ -184,57 +209,96 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
           sx={{ mb: 2 }}
         />
 
-        {searchQuery.length > 0 && searchQuery.length < 2 && (
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-            최소 2글자 이상 입력하세요
-          </Typography>
-        )}
+        {/* 검색 결과 영역 - 고정 높이로 안정화 */}
+        <Box sx={{
+          flex: 1,
+          minHeight: 280, // 고정 높이로 들썩임 방지
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
+          {searchQuery.length > 0 && searchQuery.length < 2 && (
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 1
+            }}>
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+                {t('chat.searchMinLength')}
+              </Typography>
+            </Box>
+          )}
 
-        {searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-            {t('chat.noUsersFound')}
-          </Typography>
-        )}
+          {searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 1
+            }}>
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+                {t('chat.noUsersFound')}
+              </Typography>
+            </Box>
+          )}
 
-        <List>
-          {searchResults.map((user) => (
-            <ListItem key={user.id} divider>
-              <ListItemAvatar>
-                <Avatar src={user.avatarUrl} alt={user.name}>
-                  {user.name.charAt(0).toUpperCase()}
-                </Avatar>
-              </ListItemAvatar>
-              
-              <ListItemText
-                primary={user.name}
-                secondary={user.email}
-              />
-              
-              <ListItemSecondaryAction>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={
-                    invitingUsers.has(user.id) ? (
-                      <CircularProgress size={16} />
-                    ) : (
-                      <PersonAddIcon />
-                    )
-                  }
-                  onClick={() => handleInviteUser(user.id)}
-                  disabled={invitingUsers.has(user.id)}
-                >
-                  {invitingUsers.has(user.id) ? t('chat.inviting') : t('chat.inviteButton')}
-                </Button>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-        </List>
+          {searchQuery.length === 0 && (
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 1,
+              textAlign: 'center'
+            }}>
+              <SearchIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+              <Typography variant="h6" color="text.secondary" gutterBottom>
+                {t('chat.searchUsers')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t('chat.searchUsersDescription')}
+              </Typography>
+            </Box>
+          )}
+
+          {searchResults.length > 0 && (
+            <List sx={{ flex: 1, overflow: 'auto' }}>
+              {searchResults.map((user) => (
+                <ListItem key={user.id} divider>
+                  <ListItemAvatar>
+                    <Avatar src={user.avatarUrl} alt={user.name}>
+                      {user.name.charAt(0).toUpperCase()}
+                    </Avatar>
+                  </ListItemAvatar>
+
+                  <ListItemText
+                    primary={user.name}
+                    secondary={user.email}
+                  />
+
+                  <ListItemSecondaryAction>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={
+                        invitingUsers.has(user.id) ? (
+                          <CircularProgress size={16} />
+                        ) : (
+                          <PersonAddIcon />
+                        )
+                      }
+                      onClick={() => handleInviteUser(user.id)}
+                      disabled={invitingUsers.has(user.id)}
+                    >
+                      {invitingUsers.has(user.id) ? t('chat.inviting') : t('chat.inviteButton')}
+                    </Button>
+                  </ListItemSecondaryAction>
+                </ListItem>
+              ))}
+            </List>
+          )}
+        </Box>
       </DialogContent>
-
-      <DialogActions>
-        <Button onClick={onClose}>Close</Button>
-      </DialogActions>
     </Dialog>
   );
 };

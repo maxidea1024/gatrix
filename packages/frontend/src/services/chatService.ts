@@ -15,8 +15,8 @@ import {
 } from '../types/chat';
 
 export class ChatService {
-  private static readonly BASE_URL = 'http://localhost:3004/api/v1';
-  private static readonly DIRECT_CHAT_URL = 'http://localhost:3004/api/v1'; // 임시: 직접 채팅 서버 접근
+  private static readonly BASE_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1'}/chat`;
+  private static readonly DIRECT_CHAT_URL = 'http://localhost:3001/api/v1'; // 직접 채팅 서버 접근
 
   // Channel management
   static async getChannels(params?: GetChannelsRequest): Promise<Channel[]> {
@@ -228,10 +228,9 @@ export class ChatService {
       // 토큰 만료 체크 및 갱신
       await this.ensureValidToken();
 
-      // 타임아웃을 5초로 설정하여 빠른 실패 처리
+      // 백엔드를 통해 요청 (직접 라우트 사용)
       const response = await apiService.post(`${this.BASE_URL}/channels/${channelId}/read`, data, {
-        timeout: 5000,
-        // 재시도 없이 한 번만 시도
+        timeout: 10000,
         retry: 0
       });
 

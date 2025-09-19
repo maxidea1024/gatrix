@@ -37,7 +37,9 @@ import {
   PersonAdd as PersonAddIcon,
   Mail as MailIcon,
   Security as SecurityIcon,
-
+  Wifi as ConnectedIcon,
+  WifiOff as DisconnectedIcon,
+  Circle as StatusIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -51,6 +53,7 @@ import UserPresence from '../../components/chat/UserPresence';
 import UserSearchDialog from '../../components/chat/UserSearchDialog';
 import InvitationManager from '../../components/chat/InvitationManager';
 import PrivacySettings from '../../components/chat/PrivacySettings';
+import UserStatusPicker, { UserStatus } from '../../components/chat/UserStatusPicker';
 import { CreateChannelRequest, SendMessageRequest } from '../../types/chat';
 
 const ChatPageContent: React.FC = () => {
@@ -81,6 +84,9 @@ const ChatPageContent: React.FC = () => {
   const [userSearchOpen, setUserSearchOpen] = useState(false);
   const [invitationManagerOpen, setInvitationManagerOpen] = useState(false);
   const [privacySettingsOpen, setPrivacySettingsOpen] = useState(false);
+  const [statusPickerOpen, setStatusPickerOpen] = useState(false);
+  const [userStatus, setUserStatus] = useState<UserStatus>('online');
+  const [statusMessage, setStatusMessage] = useState('');
 
   // Track window focus for notifications
   useEffect(() => {
@@ -214,6 +220,29 @@ const ChatPageContent: React.FC = () => {
     }
   };
 
+  // 사용자 상태 변경 핸들러
+  const handleStatusChange = async (status: UserStatus, message?: string) => {
+    try {
+      // TODO: API 호출로 서버에 상태 업데이트
+      setUserStatus(status);
+      setStatusMessage(message || '');
+      enqueueSnackbar(t('chat.statusUpdated'), { variant: 'success' });
+    } catch (error) {
+      console.error('Failed to update status:', error);
+      enqueueSnackbar(t('chat.statusUpdateFailed'), { variant: 'error' });
+    }
+  };
+
+  const getStatusColor = (status: UserStatus) => {
+    switch (status) {
+      case 'online': return 'success.main';
+      case 'away': return 'warning.main';
+      case 'busy': return 'error.main';
+      case 'invisible': return 'text.disabled';
+      default: return 'success.main';
+    }
+  };
+
   return (
     <Box sx={{ px: 3, py: 3, pb: 6 }}> {/* 하단 패딩을 6으로 늘림 (좌우와 동일한 24px) */}
       <Box sx={{
@@ -226,9 +255,25 @@ const ChatPageContent: React.FC = () => {
         <Box sx={{ mb: 3, flexShrink: 0 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
           <ChatIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-          <Typography variant="h4" sx={{ fontWeight: 600 }}>
+          <Typography variant="h4" sx={{ fontWeight: 600, flex: 1 }}>
             {t('chat.title')}
           </Typography>
+          {/* 웹소켓 연결 상태 */}
+          <Tooltip title={state.isConnected ? t('chat.connected') : t('chat.disconnected')} placement="bottom">
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              {state.isConnected ? (
+                <ConnectedIcon sx={{
+                  color: 'success.main',
+                  fontSize: 28
+                }} />
+              ) : (
+                <DisconnectedIcon sx={{
+                  color: 'error.main',
+                  fontSize: 28
+                }} />
+              )}
+            </Box>
+          </Tooltip>
         </Box>
         <Typography variant="body1" color="text.secondary">
           {t('chat.subtitle')}
@@ -289,45 +334,62 @@ const ChatPageContent: React.FC = () => {
 
               {/* 하단 기능 버튼들 */}
               <Box sx={{ p: 1, borderTop: 1, borderColor: 'divider' }}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  {/* 사용자 초대 버튼 */}
-                  <Tooltip title="Invite Users" placement="right">
-                    <Button
-                      variant="outlined"
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+                  {/* 내 상태 설정 버튼 */}
+                  <Tooltip title={t('chat.setStatus')} placement="top">
+                    <IconButton
                       size="small"
-                      startIcon={<PersonAddIcon />}
-                      onClick={() => setUserSearchOpen(true)}
-                      disabled={!state.currentChannelId}
-                      fullWidth
+                      onClick={() => setStatusPickerOpen(true)}
+                      sx={{
+                        border: 1,
+                        borderColor: 'divider',
+                        '&:hover': {
+                          borderColor: 'primary.main',
+                          backgroundColor: 'primary.50'
+                        }
+                      }}
                     >
-                      Invite
-                    </Button>
+                      <StatusIcon
+                        fontSize="small"
+                        sx={{ color: getStatusColor(userStatus) }}
+                      />
+                    </IconButton>
                   </Tooltip>
 
                   {/* 초대 관리 버튼 */}
-                  <Tooltip title="Manage Invitations" placement="right">
-                    <Button
-                      variant="outlined"
+                  <Tooltip title={t('chat.manageInvitations')} placement="top">
+                    <IconButton
                       size="small"
-                      startIcon={<MailIcon />}
                       onClick={() => setInvitationManagerOpen(true)}
-                      fullWidth
+                      sx={{
+                        border: 1,
+                        borderColor: 'divider',
+                        '&:hover': {
+                          borderColor: 'primary.main',
+                          backgroundColor: 'primary.50'
+                        }
+                      }}
                     >
-                      Invitations
-                    </Button>
+                      <MailIcon fontSize="small" />
+                    </IconButton>
                   </Tooltip>
 
                   {/* 프라이버시 설정 버튼 */}
-                  <Tooltip title="Privacy Settings" placement="right">
-                    <Button
-                      variant="outlined"
+                  <Tooltip title={t('chat.privacySettings')} placement="top">
+                    <IconButton
                       size="small"
-                      startIcon={<SecurityIcon />}
                       onClick={() => setPrivacySettingsOpen(true)}
-                      fullWidth
+                      sx={{
+                        border: 1,
+                        borderColor: 'divider',
+                        '&:hover': {
+                          borderColor: 'primary.main',
+                          backgroundColor: 'primary.50'
+                        }
+                      }}
                     >
-                      Privacy
-                    </Button>
+                      <SecurityIcon fontSize="small" />
+                    </IconButton>
                   </Tooltip>
                 </Box>
               </Box>
@@ -341,6 +403,7 @@ const ChatPageContent: React.FC = () => {
             <ChatElementsMessageList
               channelId={state.currentChannelId}
               onSendMessage={handleSendMessage}
+              onInviteUser={() => setUserSearchOpen(true)}
             />
           ) : (
             <Box
@@ -377,7 +440,17 @@ const ChatPageContent: React.FC = () => {
         fullWidth
       >
         <DialogTitle>
-          {t('chat.createChannel')}
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Box>
+              <Typography variant="h6">{t('chat.createChannel')}</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                {t('chat.createChannelSubtitle')}
+              </Typography>
+            </Box>
+            <IconButton onClick={() => setCreateChannelOpen(false)} size="small">
+              <CloseIcon />
+            </IconButton>
+          </Box>
         </DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
@@ -387,6 +460,7 @@ const ChatPageContent: React.FC = () => {
               onChange={(e) => setChannelFormData({ ...channelFormData, name: e.target.value })}
               fullWidth
               required
+              autoFocus
               placeholder={t('chat.channelNamePlaceholder')}
             />
             
@@ -441,14 +515,12 @@ const ChatPageContent: React.FC = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCreateChannelOpen(false)}>
-            {t('common.cancel')}
-          </Button>
           <Button
             onClick={handleCreateChannel}
             variant="contained"
             disabled={!channelFormData.name.trim() || isCreatingChannel}
             startIcon={isCreatingChannel ? <CircularProgress size={20} /> : undefined}
+            fullWidth
           >
             {isCreatingChannel ? t('chat.creating') : t('chat.createChannel')}
           </Button>
@@ -516,17 +588,32 @@ const ChatPageContent: React.FC = () => {
         onClose={() => setUserSearchOpen(false)}
         onInviteUser={handleInviteUser}
         title={t('chat.inviteUsersToChannel')}
+        subtitle={currentChannel ? t('chat.inviteUsersToChannelSubtitle', { channelName: currentChannel.name }) : undefined}
         excludeUserIds={user?.id ? [user.id] : []}
       />
 
       <InvitationManager
         open={invitationManagerOpen}
         onClose={() => setInvitationManagerOpen(false)}
+        title={t('chat.manageInvitations')}
+        subtitle={t('chat.manageInvitationsSubtitle')}
       />
 
       <PrivacySettings
         open={privacySettingsOpen}
         onClose={() => setPrivacySettingsOpen(false)}
+        title={t('chat.privacySettings')}
+        subtitle={t('chat.privacySettingsSubtitle')}
+      />
+
+      <UserStatusPicker
+        open={statusPickerOpen}
+        onClose={() => setStatusPickerOpen(false)}
+        currentStatus={userStatus}
+        currentMessage={statusMessage}
+        onStatusChange={handleStatusChange}
+        title={t('chat.setStatus')}
+        subtitle={t('chat.setStatusSubtitle')}
       />
       </Box>
     </Box>

@@ -3294,7 +3294,7 @@ const DeploymentHistoryManagement: React.FC = () => {
         {selectedDeployment && (
           <Box sx={{ pt: 2 }}>
             <Grid container spacing={2} sx={{ mb: 3 }}>
-              <Grid xs={6}>
+              <Grid size={{ xs: 6 }}>
                 <Typography variant="subtitle2" color="text.secondary">
                   {t('remoteConfig.version')}
                 </Typography>
@@ -3302,7 +3302,7 @@ const DeploymentHistoryManagement: React.FC = () => {
                   #{selectedDeployment.version}
                 </Typography>
               </Grid>
-              <Grid xs={6}>
+              <Grid size={{ xs: 6 }}>
                 <Typography variant="subtitle2" color="text.secondary">
                   {t('remoteConfig.status')}
                 </Typography>
@@ -3312,7 +3312,7 @@ const DeploymentHistoryManagement: React.FC = () => {
                   color={getStatusColor(selectedDeployment.status) as any}
                 />
               </Grid>
-              <Grid xs={6}>
+              <Grid size={{ xs: 6 }}>
                 <Typography variant="subtitle2" color="text.secondary">
                   {t('remoteConfig.deployedBy')}
                 </Typography>
@@ -3325,7 +3325,7 @@ const DeploymentHistoryManagement: React.FC = () => {
                   </Typography>
                 </Box>
               </Grid>
-              <Grid xs={6}>
+              <Grid size={{ xs: 6 }}>
                 <Typography variant="subtitle2" color="text.secondary">
                   {t('remoteConfig.deployedAt')}
                 </Typography>
@@ -3429,7 +3429,7 @@ const DeploymentHistoryManagement: React.FC = () => {
             {/* Version Comparison Info */}
             <Box sx={{ mb: 3 }}>
               <Grid container spacing={2}>
-                <Grid xs={6}>
+                <Grid size={{ xs: 6 }}>
                   <Paper sx={{ p: 2, bgcolor: 'error.light', color: 'error.contrastText' }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                       {t('remoteConfig.currentVersion')} (#{currentVersion.version})
@@ -3442,7 +3442,7 @@ const DeploymentHistoryManagement: React.FC = () => {
                     </Typography>
                   </Paper>
                 </Grid>
-                <Grid xs={6}>
+                <Grid size={{ xs: 6 }}>
                   <Paper sx={{ p: 2, bgcolor: 'success.light', color: 'success.contrastText' }}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                       {t('remoteConfig.targetVersion')} (#{deploymentToRollback.version})

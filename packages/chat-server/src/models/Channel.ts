@@ -357,30 +357,32 @@ export class ChannelModel {
           const latestMessage = await this.knex('chat_messages')
             .where('channelId', channelId)
             .orderBy('id', 'desc')
-            .timeout(3000) // 3초 타임아웃
+            .timeout(2000) // 2초로 단축
             .first();
 
           if (latestMessage) {
             updateData.lastReadMessageId = latestMessage.id;
           }
         } catch (timeoutError) {
-          console.warn('Timeout getting latest message for markAsRead, proceeding without messageId');
+          console.warn(`⚠️ Timeout getting latest message for markAsRead channel ${channelId}, proceeding without messageId`);
           // 최신 메시지 조회 실패 시에도 읽음 처리는 계속 진행
         }
       }
 
+      // 더 빠른 업데이트를 위해 타임아웃 단축
       const result = await this.knex('chat_channel_members')
         .where({
           channelId,
           userId,
           status: 'active',
         })
-        .timeout(3000) // 3초 타임아웃
+        .timeout(2000) // 2초로 단축
         .update(updateData);
 
+      console.log(`✅ MarkAsRead completed for channel ${channelId}, user ${userId}, affected rows: ${result}`);
       return result > 0;
     } catch (error) {
-      console.error('Error marking channel as read:', error);
+      console.error(`❌ Error marking channel ${channelId} as read for user ${userId}:`, error);
       return false;
     }
   }

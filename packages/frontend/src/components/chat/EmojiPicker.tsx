@@ -89,7 +89,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
 
   const handleEmojiClick = (emoji: string) => {
     onEmojiSelect(emoji);
-    onClose?.();
+    // onClose는 AdvancedMessageInput에서 처리하므로 여기서는 호출하지 않음
   };
 
   const filteredEmojis = searchQuery
@@ -123,6 +123,10 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
       transformOrigin={{
         vertical: 'bottom',
         horizontal: 'left',
+      }}
+      disableBackdropClick={false}
+      BackdropProps={{
+        invisible: true, // 백드롭을 투명하게 만들어서 보이지 않게 함
       }}
       PaperProps={{
         sx: {
@@ -193,18 +197,45 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                   <IconButton
                     size="small"
                     onClick={() => handleEmojiClick(emoji)}
+                    disableRipple
                     sx={{
                       width: 32,
                       height: 32,
                       fontSize: '1.2rem',
+                      opacity: '1 !important', // 강제로 불투명도 설정
+                      filter: 'none !important', // 강제로 필터 제거
+                      color: 'inherit !important', // 색상 상속
+                      backgroundColor: 'transparent !important',
                       '&:hover': {
-                        backgroundColor: 'action.hover',
+                        backgroundColor: 'action.hover !important',
                         transform: 'scale(1.2)',
+                        opacity: '1 !important',
+                      },
+                      '&:active': {
+                        opacity: '1 !important',
+                      },
+                      '&:focus': {
+                        opacity: '1 !important',
+                      },
+                      '&.Mui-disabled': {
+                        opacity: '1 !important',
                       },
                       transition: 'transform 0.1s ease-in-out',
+                      // 모든 상태에서 이모지가 선명하게 보이도록
+                      '& *': {
+                        opacity: '1 !important',
+                        filter: 'none !important',
+                      },
                     }}
                   >
-                    {emoji}
+                    <span style={{
+                      opacity: 1,
+                      filter: 'none',
+                      display: 'block',
+                      lineHeight: 1
+                    }}>
+                      {emoji}
+                    </span>
                   </IconButton>
                 </Grid>
               ))}

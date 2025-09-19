@@ -145,10 +145,36 @@ class ChatServerApp {
   private setupErrorHandling(): void {
     // Global error handler
     this.app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-      logger.error('Unhandled error:', error);
+      // Check if this is a client abort error (common and expected)
+      const isClientAbort = error.message?.includes('request aborted') ||
+                           error.message?.includes('aborted') ||
+                           (error as any)?.code === 'ECONNABORTED' ||
+                           (error as any)?.code === 'ECONNRESET' ||
+                           (error as any)?.code === 'EPIPE' ||
+                           (error as any)?.type === 'request.aborted' ||
+                           error.name === 'BadRequestError';
+
+      if (isClientAbort) {
+        // Log client aborts at debug level only (not error level)
+        logger.debug('Client aborted request:', {
+          method: req.method,
+          url: req.originalUrl,
+          userAgent: req.get('User-Agent'),
+          code: (error as any)?.code,
+          type: (error as any)?.type
+        });
+      } else {
+        // Log actual errors at error level
+        logger.error('Unhandled error:', error);
+      }
 
       if (res.headersSent) {
         return next(error);
+      }
+
+      // For client aborts, don't send response (connection is already closed)
+      if (isClientAbort) {
+        return;
       }
 
       res.status(500).json({

@@ -425,14 +425,6 @@ export class ChannelController {
       const userId = (req as any).user.id;
       const { messageId } = req.body;
 
-      logger.info(`📖 MarkAsRead request received`, {
-        channelId,
-        userId,
-        messageId,
-        userAgent: req.get('User-Agent'),
-        ip: req.ip
-      });
-
       if (isNaN(channelId)) {
         logger.warn(`❌ Invalid channel ID: ${req.params.id}`);
         res.status(400).json({

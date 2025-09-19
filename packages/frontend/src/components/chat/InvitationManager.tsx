@@ -58,9 +58,11 @@ interface Invitation {
 interface InvitationManagerProps {
   open: boolean;
   onClose: () => void;
+  title?: string;
+  subtitle?: string;
 }
 
-const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose }) => {
+const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, title, subtitle }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -195,15 +197,15 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose }) 
   const getStatusChip = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Chip label="Pending" color="warning" size="small" icon={<ScheduleIcon />} />;
+        return <Chip label={t('chat.pending')} color="warning" size="small" icon={<ScheduleIcon />} />;
       case 'accepted':
-        return <Chip label="Accepted" color="success" size="small" icon={<CheckIcon />} />;
+        return <Chip label={t('chat.accepted')} color="success" size="small" icon={<CheckIcon />} />;
       case 'declined':
-        return <Chip label="Declined" color="error" size="small" icon={<CloseIcon />} />;
+        return <Chip label={t('chat.declined')} color="error" size="small" icon={<CloseIcon />} />;
       case 'cancelled':
-        return <Chip label="Cancelled" color="default" size="small" icon={<CancelIcon />} />;
+        return <Chip label={t('chat.cancelled')} color="default" size="small" icon={<CancelIcon />} />;
       case 'expired':
-        return <Chip label="Expired" color="default" size="small" />;
+        return <Chip label={t('chat.expired')} color="default" size="small" />;
       default:
         return <Chip label={status} size="small" />;
     }
@@ -230,7 +232,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose }) 
         secondary={
           <Box>
             <Typography variant="body2" color="text.secondary">
-              Invited by {invitation.inviter?.name || 'Unknown User'}
+              {t('chat.invitedBy')}: {invitation.inviter?.name || t('chat.unknownUser')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
               {formatDistanceToNow(new Date(invitation.createdAt), { addSuffix: true })}
@@ -255,7 +257,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose }) 
               disabled={processingInvitations.has(invitation.id)}
               startIcon={processingInvitations.has(invitation.id) ? <CircularProgress size={16} /> : <CheckIcon />}
             >
-              Accept
+              {t('chat.accept')}
             </Button>
             <Button
               size="small"
@@ -265,7 +267,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose }) 
               disabled={processingInvitations.has(invitation.id)}
               startIcon={<CloseIcon />}
             >
-              Decline
+              {t('chat.decline')}
             </Button>
           </Box>
         </ListItemSecondaryAction>
@@ -294,7 +296,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose }) 
         secondary={
           <Box>
             <Typography variant="body2" color="text.secondary">
-              To {invitation.channel?.name || 'Unknown Channel'}
+              {t('chat.invitedTo')}: {invitation.channel?.name || t('chat.unknownChannel')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
               {formatDistanceToNow(new Date(invitation.createdAt), { addSuffix: true })}
@@ -318,7 +320,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose }) 
             disabled={processingInvitations.has(invitation.id)}
             startIcon={processingInvitations.has(invitation.id) ? <CircularProgress size={16} /> : <CancelIcon />}
           >
-            Cancel
+            {t('chat.cancel')}
           </Button>
         </ListItemSecondaryAction>
       )}
@@ -329,7 +331,14 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose }) 
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Typography variant="h6">Manage Invitations</Typography>
+          <Box>
+            <Typography variant="h6">{title || t('chat.manageInvitations')}</Typography>
+            {subtitle && (
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                {subtitle}
+              </Typography>
+            )}
+          </Box>
           <IconButton onClick={onClose} size="small">
             <CloseIcon />
           </IconButton>
@@ -338,8 +347,8 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose }) 
 
       <DialogContent>
         <Tabs value={currentTab} onChange={(_, newValue) => setCurrentTab(newValue)}>
-          <Tab label={`Received (${receivedInvitations.length})`} />
-          <Tab label={`Sent (${sentInvitations.length})`} />
+          <Tab label={`${t('chat.receivedInvitations')} (${receivedInvitations.length})`} />
+          <Tab label={`${t('chat.sentInvitations')} (${sentInvitations.length})`} />
         </Tabs>
 
         <Box sx={{ mt: 2 }}>
@@ -353,7 +362,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose }) 
                 <List>
                   {receivedInvitations.length === 0 ? (
                     <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
-                      No received invitations
+                      {t('chat.noReceivedInvitations')}
                     </Typography>
                   ) : (
                     receivedInvitations.map(renderReceivedInvitation)
@@ -365,7 +374,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose }) 
                 <List>
                   {sentInvitations.length === 0 ? (
                     <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
-                      No sent invitations
+                      {t('chat.noSentInvitations')}
                     </Typography>
                   ) : (
                     sentInvitations.map(renderSentInvitation)
@@ -376,10 +385,6 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose }) 
           )}
         </Box>
       </DialogContent>
-
-      <DialogActions>
-        <Button onClick={onClose}>Close</Button>
-      </DialogActions>
     </Dialog>
   );
 };
