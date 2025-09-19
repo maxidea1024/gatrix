@@ -18,6 +18,7 @@ const config = {
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     name: process.env.DB_NAME || 'admin_panel',
+    debug: process.env.DB_DEBUG === 'true',
   },
 
   // Redis configuration

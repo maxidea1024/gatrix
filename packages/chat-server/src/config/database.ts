@@ -48,7 +48,7 @@ class DatabaseManager {
         seeds: {
           directory: './seeds',
         },
-        debug: false, // SQL 로그 출력 비활성화
+        debug: config.database.debug, // .env의 DB_DEBUG 설정으로 제어
         asyncStackTraces: config.isDevelopment,
       };
 

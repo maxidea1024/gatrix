@@ -17,6 +17,7 @@ export const config = {
     name: process.env.DB_NAME || 'gatrix_chat',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || 'password',
+    debug: process.env.DB_DEBUG === 'true',
   },
 
   // Redis (supports cluster mode for scaling)
