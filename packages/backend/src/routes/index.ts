@@ -8,6 +8,7 @@ import adminRoutes from './admin';
 import authRoutes from './auth';
 import publicRoutes from './public';
 import chatRoutes from './chat';
+import userRoutes from './users';
 
 const router = express.Router();
 
@@ -17,6 +18,7 @@ router.use('/server', serverRoutes);
 router.use('/admin', adminRoutes);
 router.use('/auth', authLimiter as any, authRoutes);
 router.use('/chat', chatRoutes);
+router.use('/users', userRoutes);
 router.use('/', publicRoutes);
 
 export default router;

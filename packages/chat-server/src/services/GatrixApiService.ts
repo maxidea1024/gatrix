@@ -149,12 +149,21 @@ export class GatrixApiService {
     }
   }
 
-  // 사용자 검색 - 현재 Server API에는 검색 기능이 없으므로 제거하거나 다른 방법 사용
-  public async searchUsers(_query: string, _limit = 20): Promise<GatrixUser[]> {
+  // 사용자 검색 - 새로 추가된 사용자 검색 API 사용
+  public async searchUsers(query: string, limit = 20): Promise<GatrixUser[]> {
     try {
-      // Server API에는 사용자 검색 기능이 없으므로 빈 배열 반환
-      // 필요시 백엔드에 검색 API 추가 필요
-      logger.warn('User search not available in Server API');
+      const response: AxiosResponse<{ success: boolean; data: GatrixUser[] }> = await this.apiClient.get(
+        '/api/v1/users/search',
+        {
+          params: { q: query, limit },
+        }
+      );
+
+      if (response.data.success) {
+        return response.data.data;
+      }
+
+      logger.warn('User search API returned unsuccessful response');
       return [];
     } catch (error) {
       logger.error('Failed to search users:', error);

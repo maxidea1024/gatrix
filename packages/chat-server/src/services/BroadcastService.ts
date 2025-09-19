@@ -293,3 +293,6 @@ export class BroadcastService {
     };
   }
 }
+
+// Export class for instantiation
+// Note: broadcastService instance will be created in WebSocketService

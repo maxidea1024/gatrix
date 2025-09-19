@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import channelsRouter from './channels';
 import messagesRouter from './messages';
+import privacyRouter from './privacy';
+import invitationsRouter from './invitations';
+import directMessagesRouter from './direct-messages';
 import { requestLogger, errorHandler } from '../middleware/auth';
 
 const router = Router();
@@ -19,6 +22,9 @@ router.get('/', (req, res) => {
       endpoints: {
         channels: '/api/v1/channels',
         messages: '/api/v1/messages',
+        privacy: '/api/v1/privacy',
+        invitations: '/api/v1/invitations',
+        directMessages: '/api/v1/direct-messages',
         websocket: '/socket.io',
         health: '/health',
         metrics: '/metrics',
@@ -50,6 +56,9 @@ router.get('/', (req, res) => {
 // 라우트 등록
 router.use('/channels', channelsRouter);
 router.use('/messages', messagesRouter);
+router.use('/privacy', privacyRouter);
+router.use('/invitations', invitationsRouter);
+router.use('/direct-messages', directMessagesRouter);
 
 // 404 핸들러
 router.use('*', (req, res) => {

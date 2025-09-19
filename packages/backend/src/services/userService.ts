@@ -448,4 +448,17 @@ export class UserService {
       throw error instanceof CustomError ? error : new CustomError('Failed to update user language', 500);
     }
   }
+
+  /**
+   * Search users by name or email (for chat system)
+   */
+  static async searchUsers(query: string, limit: number = 20): Promise<UserWithoutPassword[]> {
+    try {
+      const users = await UserModel.searchUsers(query, limit);
+      return users;
+    } catch (error) {
+      logger.error('Error searching users:', error);
+      throw error instanceof CustomError ? error : new CustomError('Failed to search users', 500);
+    }
+  }
 }

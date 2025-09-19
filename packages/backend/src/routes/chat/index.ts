@@ -29,63 +29,9 @@ router.use((req, res, next) => {
 const chatProxy = createProxyMiddleware({
   target: CHAT_API_BASE,
   changeOrigin: true,
-  logLevel: 'debug',
   timeout: 30000, // 30초 타임아웃
-  proxyTimeout: 30000, // 프록시 타임아웃
-  onProxyReq: (proxyReq, req, res) => {
-    // 인증 헤더 전달
-    if (req.headers.authorization) {
-      proxyReq.setHeader('Authorization', req.headers.authorization);
-    }
-
-    // Content-Type 헤더 전달
-    if (req.headers['content-type']) {
-      proxyReq.setHeader('Content-Type', req.headers['content-type']);
-    }
-
-    // POST 요청의 경우 body 데이터 처리
-    if (req.method === 'POST' && req.body) {
-      const bodyData = JSON.stringify(req.body);
-      proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-      proxyReq.write(bodyData);
-    }
-
-    logger.info(`Proxying chat request: ${req.method} ${req.url} -> ${CHAT_API_BASE}${req.url}`, {
-      originalUrl: req.url,
-      targetUrl: `${CHAT_API_BASE}${req.url}`,
-      hasAuth: !!req.headers.authorization,
-      contentType: req.headers['content-type'],
-      hasBody: !!req.body,
-      bodySize: req.body ? JSON.stringify(req.body).length : 0
-    });
-  },
-  onProxyRes: (proxyRes, req, res) => {
-    logger.info(`Chat proxy response: ${proxyRes.statusCode}`, {
-      method: req.method,
-      url: req.url,
-      statusCode: proxyRes.statusCode,
-      duration: Date.now() - (req as any).startTime
-    });
-  },
-  onError: (err, req, res) => {
-    logger.error('Chat proxy error:', {
-      error: err.message,
-      url: req.url,
-      method: req.method,
-      code: (err as any).code,
-      stack: err.stack
-    });
-
-    if (!res.headersSent) {
-      res.status(503).json({
-        success: false,
-        error: 'Chat service unavailable',
-        message: 'Unable to connect to chat server',
-        details: err.message
-      });
-    }
-  }
-});
+  proxyTimeout: 30000 // 프록시 타임아웃
+} as any);
 
 // 모든 채팅 관련 요청을 채팅서버로 프록시
 router.use('/', (req, res, next) => {

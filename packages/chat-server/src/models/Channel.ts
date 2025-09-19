@@ -383,6 +383,7 @@ export class ChannelModel {
     return {
       allowFileUploads: true,
       allowReactions: true,
+      allowInvites: true,
       slowMode: 0,
       maxMessageLength: 2000,
       autoDeleteMessages: false,
@@ -526,5 +527,88 @@ export class ChannelModel {
         leftAt: new Date(),
         updatedAt: new Date(),
       });
+  }
+
+  // 채널 멤버 목록 조회
+  static async getMembers(channelId: number): Promise<Array<{
+    userId: number;
+    role: string;
+    status: string;
+    joinedAt: Date;
+  }>> {
+    const knex = databaseManager.getKnex();
+
+    const members = await knex('chat_channel_members')
+      .select('userId', 'role', 'status', 'joinedAt')
+      .where({
+        channelId,
+        status: 'active',
+      })
+      .orderBy('joinedAt', 'asc');
+
+    return members;
+  }
+
+  // 사용자의 채널 목록 조회 (멤버 정보 포함)
+  static async getUserChannels(userId: number, options: { includeMembers?: boolean } = {}): Promise<{
+    channels: Array<Channel & { members?: Array<{ userId: number; role: string; status: string; joinedAt: Date }> }>;
+    total: number;
+  }> {
+    const knex = databaseManager.getKnex();
+
+    // 사용자가 참여한 채널 조회
+    const channelsQuery = knex('chat_channels as c')
+      .select(
+        'c.id',
+        'c.name',
+        'c.description',
+        'c.type',
+        'c.maxMembers',
+        'c.isArchived',
+        'c.archiveReason',
+        'c.avatarUrl',
+        'c.settings',
+        'c.ownerId',
+        'c.createdBy',
+        'c.updatedBy',
+        'c.createdAt',
+        'c.updatedAt',
+        'c.archivedAt'
+      )
+      .join('chat_channel_members as cm', 'c.id', 'cm.channelId')
+      .where('cm.userId', userId)
+      .where('cm.status', 'active')
+      .where('c.isArchived', false)
+      .orderBy('c.updatedAt', 'desc');
+
+    const channels = await channelsQuery;
+
+    // 멤버 정보가 필요한 경우 추가 조회
+    if (options.includeMembers && channels.length > 0) {
+      const channelIds = channels.map(c => c.id);
+      const members = await knex('chat_channel_members')
+        .select('channelId', 'userId', 'role', 'status', 'joinedAt')
+        .whereIn('channelId', channelIds)
+        .where('status', 'active');
+
+      // 채널별로 멤버 그룹화
+      const membersByChannel = members.reduce((acc, member) => {
+        if (!acc[member.channelId]) {
+          acc[member.channelId] = [];
+        }
+        acc[member.channelId].push(member);
+        return acc;
+      }, {} as Record<number, any[]>);
+
+      // 채널에 멤버 정보 추가
+      channels.forEach(channel => {
+        channel.members = membersByChannel[channel.id] || [];
+      });
+    }
+
+    return {
+      channels,
+      total: channels.length
+    };
   }
 }

@@ -312,6 +312,28 @@ export class UserController {
     });
   });
 
+  // 사용자 검색 (채팅 시스템용)
+  static searchUsers = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { q: query, limit = 20 } = req.query;
+
+    if (!query || typeof query !== 'string') {
+      throw new CustomError('Search query is required', 400);
+    }
+
+    if (query.length < 2) {
+      throw new CustomError('Search query must be at least 2 characters', 400);
+    }
+
+    const searchLimit = Math.min(parseInt(limit as string) || 20, 50); // 최대 50개로 제한
+
+    const users = await UserService.searchUsers(query, searchLimit);
+
+    res.json({
+      success: true,
+      data: users,
+    });
+  });
+
   // Self-service endpoints for regular users
   static getCurrentUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {

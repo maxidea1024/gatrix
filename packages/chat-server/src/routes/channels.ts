@@ -2,6 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import { ChannelController } from '../controllers/ChannelController';
 import { MessageController } from '../controllers/MessageController';
+import { InvitationController } from '../controllers/InvitationController';
 import { authenticate, rateLimiter, validateInput } from '../middleware/auth';
 import Joi from 'joi';
 
@@ -168,6 +169,13 @@ router.post(
   '/:id/leave',
   rateLimiter(60000, 30), // 1분에 30회 나가기 제한
   ChannelController.leaveChannel
+);
+
+// 채널에 사용자 초대
+router.post(
+  '/:channelId/invite',
+  rateLimiter(60000, 20), // 1분에 20회 초대 제한
+  InvitationController.inviteUser
 );
 
 // 채널 존재 여부 확인

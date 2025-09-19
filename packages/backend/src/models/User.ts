@@ -429,4 +429,26 @@ export class UserModel {
       throw error;
     }
   }
+
+  /**
+   * Search users by name or email
+   */
+  static async searchUsers(query: string, limit: number = 20): Promise<UserWithoutPassword[]> {
+    try {
+      const users = await db('g_users')
+        .select('id', 'name', 'email', 'role', 'status', 'avatarUrl', 'createdAt', 'updatedAt')
+        .where('status', 'active') // 활성 사용자만 검색
+        .andWhere(function() {
+          this.where('name', 'like', `%${query}%`)
+              .orWhere('email', 'like', `%${query}%`);
+        })
+        .orderBy('name', 'asc')
+        .limit(limit);
+
+      return users;
+    } catch (error) {
+      logger.error('Error searching users:', error);
+      throw error;
+    }
+  }
 }

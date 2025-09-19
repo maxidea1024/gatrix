@@ -20,6 +20,7 @@ export interface Channel {
 export interface ChannelSettings {
   allowFileUploads: boolean;
   allowReactions: boolean;
+  allowInvites: boolean;
   slowMode: number; // 초 단위
   maxMessageLength: number;
   autoDeleteMessages: boolean;

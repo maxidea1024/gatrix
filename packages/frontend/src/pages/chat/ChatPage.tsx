@@ -34,6 +34,9 @@ import {
   Close as CloseIcon,
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
+  PersonAdd as PersonAddIcon,
+  Mail as MailIcon,
+  Security as SecurityIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -43,6 +46,9 @@ import ChannelList from '../../components/chat/ChannelList';
 import ChatElementsMessageList from '../../components/chat/ChatElementsMessageList';
 import NotificationManager from '../../components/chat/NotificationManager';
 import UserPresence from '../../components/chat/UserPresence';
+import UserSearchDialog from '../../components/chat/UserSearchDialog';
+import InvitationManager from '../../components/chat/InvitationManager';
+import PrivacySettings from '../../components/chat/PrivacySettings';
 import { CreateChannelRequest, SendMessageRequest } from '../../types/chat';
 
 const ChatPageContent: React.FC = () => {
@@ -68,6 +74,11 @@ const ChatPageContent: React.FC = () => {
     : null;
   const [memberListOpen, setMemberListOpen] = useState(false);
   const [isWindowFocused, setIsWindowFocused] = useState(true);
+
+  // 새로운 다이얼로그 상태들
+  const [userSearchOpen, setUserSearchOpen] = useState(false);
+  const [invitationManagerOpen, setInvitationManagerOpen] = useState(false);
+  const [privacySettingsOpen, setPrivacySettingsOpen] = useState(false);
 
   // Track window focus for notifications
   useEffect(() => {
@@ -186,6 +197,32 @@ const ChatPageContent: React.FC = () => {
 
   const currentChannel = state.channels.find(c => c.id === state.currentChannelId);
 
+  // 사용자 초대 핸들러
+  const handleInviteUser = async (userId: number) => {
+    if (!state.currentChannelId) {
+      throw new Error('No channel selected');
+    }
+
+    try {
+      const response = await fetch(`/api/v1/channels/${state.currentChannelId}/invite`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({ inviteeId: userId }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to send invitation');
+      }
+    } catch (error) {
+      console.error('Failed to invite user:', error);
+      throw error;
+    }
+  };
+
   return (
     <Box sx={{
       height: '100%',
@@ -256,11 +293,58 @@ const ChatPageContent: React.FC = () => {
 
           {/* 채널 목록 */}
           {isSidebarOpen && (
-            <Box sx={{ flex: 1, overflow: 'hidden' }}>
-              <ChannelList
-                onCreateChannel={() => setCreateChannelOpen(true)}
-              />
-            </Box>
+            <>
+              <Box sx={{ flex: 1, overflow: 'hidden' }}>
+                <ChannelList
+                  onCreateChannel={() => setCreateChannelOpen(true)}
+                />
+              </Box>
+
+              {/* 하단 기능 버튼들 */}
+              <Box sx={{ p: 1, borderTop: 1, borderColor: 'divider' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {/* 사용자 초대 버튼 */}
+                  <Tooltip title="Invite Users" placement="right">
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<PersonAddIcon />}
+                      onClick={() => setUserSearchOpen(true)}
+                      disabled={!state.currentChannelId}
+                      fullWidth
+                    >
+                      Invite
+                    </Button>
+                  </Tooltip>
+
+                  {/* 초대 관리 버튼 */}
+                  <Tooltip title="Manage Invitations" placement="right">
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<MailIcon />}
+                      onClick={() => setInvitationManagerOpen(true)}
+                      fullWidth
+                    >
+                      Invitations
+                    </Button>
+                  </Tooltip>
+
+                  {/* 프라이버시 설정 버튼 */}
+                  <Tooltip title="Privacy Settings" placement="right">
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<SecurityIcon />}
+                      onClick={() => setPrivacySettingsOpen(true)}
+                      fullWidth
+                    >
+                      Privacy
+                    </Button>
+                  </Tooltip>
+                </Box>
+              </Box>
+            </>
           )}
         </Box>
 
@@ -437,6 +521,25 @@ const ChatPageContent: React.FC = () => {
         currentUserId={user?.id || 0}
         activeChannelId={state.currentChannelId || undefined}
         isWindowFocused={isWindowFocused}
+      />
+
+      {/* 새로운 다이얼로그들 */}
+      <UserSearchDialog
+        open={userSearchOpen}
+        onClose={() => setUserSearchOpen(false)}
+        onInviteUser={handleInviteUser}
+        title="Invite Users to Channel"
+        excludeUserIds={user?.id ? [user.id] : []}
+      />
+
+      <InvitationManager
+        open={invitationManagerOpen}
+        onClose={() => setInvitationManagerOpen(false)}
+      />
+
+      <PrivacySettings
+        open={privacySettingsOpen}
+        onClose={() => setPrivacySettingsOpen(false)}
       />
     </Box>
   );
