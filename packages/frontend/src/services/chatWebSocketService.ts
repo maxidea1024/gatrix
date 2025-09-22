@@ -257,6 +257,11 @@ export class ChatWebSocketService {
       this.emit('invitation_cancelled', data);
     });
 
+    this.socket.on('user_joined_channel', (data) => {
+      console.log('WebSocket user_joined_channel received:', data);
+      this.emit('user_joined_channel', data);
+    });
+
     this.socket.on('error', (data) => {
       this.emit('error', data);
     });
