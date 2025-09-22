@@ -597,6 +597,7 @@ const ChatPageContent: React.FC = () => {
         title={t('chat.inviteUsersToChannel')}
         subtitle={currentChannel ? t('chat.inviteUsersToChannelSubtitle', { channelName: currentChannel.name }) : undefined}
         excludeUserIds={user?.id ? [user.id] : []}
+        channelId={state.currentChannelId || undefined}
       />
 
       <InvitationManager

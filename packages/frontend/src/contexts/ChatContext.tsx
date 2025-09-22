@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSnackbar } from 'notistack';
+import { useSnackbar, closeSnackbar } from 'notistack';
 import { useAuth } from '../hooks/useAuth';
 import { ChatService } from '../services/chatService';
 import { getChatWebSocketService } from '../services/chatWebSocketService';
@@ -105,7 +105,8 @@ type ChatAction =
   | { type: 'SET_CURRENT_USER'; payload: User }
   | { type: 'SET_TYPING_USERS'; payload: { channelId: number; users: TypingIndicator[] } }
   | { type: 'ADD_TYPING_USER'; payload: TypingIndicator }
-  | { type: 'REMOVE_TYPING_USER'; payload: { channelId: number; userId: number } };
+  | { type: 'REMOVE_TYPING_USER'; payload: { channelId: number; userId: number } }
+  | { type: 'REFRESH_CHANNELS' };
 
 // Reducer
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
@@ -295,7 +296,14 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
           [removeTypingChannelId]: filteredTypingUsers,
         },
       };
-    
+
+    case 'REFRESH_CHANNELS':
+      // 채널 목록 새로고침을 위한 플래그 설정
+      return {
+        ...state,
+        isLoading: true, // 새로고침 중임을 표시
+      };
+
     default:
       return state;
   }
@@ -443,6 +451,150 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         dispatch({ type: 'UPDATE_USER', payload: { ...user, isOnline: false } });
       });
 
+      // 사용자 채널 참여 이벤트 리스너
+      wsService.on('user_joined_channel', (event) => {
+        console.log('📨 User joined channel in ChatContext:', event);
+        const { data } = event;
+
+        // 현재 채널에 새 멤버가 들어온 경우
+        if (data.channelId === state.currentChannelId) {
+          // 시스템 메시지 추가
+          const systemMessage = {
+            id: Date.now(), // 임시 ID
+            content: t('chat.userJoinedChannel', { userName: data.userName }),
+            type: 'system' as const,
+            channelId: data.channelId,
+            userId: 0, // 시스템 메시지
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            isDeleted: false,
+            isEdited: false,
+          };
+
+          dispatch({ type: 'ADD_MESSAGE', payload: systemMessage });
+        }
+
+        // 채널 목록 새로고침 (멤버 수 업데이트)
+        dispatch({ type: 'REFRESH_CHANNELS' });
+      });
+
+      // 초대 응답 이벤트 리스너
+      wsService.on('invitation_response', (event) => {
+        console.log('📨 Invitation response received in ChatContext:', event);
+        const { data } = event;
+
+        if (data.action === 'accept') {
+          enqueueSnackbar(
+            t('chat.invitationAccepted', { inviteeName: data.inviteeName }),
+            { variant: 'success' }
+          );
+        } else {
+          enqueueSnackbar(
+            t('chat.invitationDeclined', { inviteeName: data.inviteeName }),
+            { variant: 'info' }
+          );
+        }
+
+        // 채널 목록 새로고침
+        dispatch({ type: 'REFRESH_CHANNELS' });
+      });
+
+      // 채널 초대 이벤트 리스너
+      wsService.on('channel_invitation', (event) => {
+        console.log('📨 Channel invitation received in ChatContext:', event);
+        const { data } = event;
+
+        // 토스트 알림 표시 (백엔드 메시지가 있으면 사용, 없으면 기본 번역 메시지 사용)
+        const displayMessage = data.message || t('chat.invitationReceived', {
+          inviterName: data.inviterName,
+          channelName: data.channelName
+        });
+
+        enqueueSnackbar(
+          displayMessage,
+          {
+            variant: 'info',
+            persist: true,
+            action: (key) => (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={async () => {
+                    try {
+                      const response = await fetch(`/api/v1/chat/invitations/${data.invitationId}/respond`, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                        },
+                        body: JSON.stringify({ action: 'accept' })
+                      });
+
+                      if (response.ok) {
+                        enqueueSnackbar(t('chat.invitationAccepted'), { variant: 'success' });
+                        // 채널 목록 새로고침
+                        loadChannels();
+                      } else {
+                        enqueueSnackbar(t('chat.invitationAcceptFailed'), { variant: 'error' });
+                      }
+                    } catch (error) {
+                      console.error('Failed to accept invitation:', error);
+                      enqueueSnackbar(t('chat.invitationAcceptFailed'), { variant: 'error' });
+                    }
+                    closeSnackbar(key);
+                  }}
+                  style={{
+                    background: '#4caf50',
+                    color: 'white',
+                    border: 'none',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  {t('chat.accept')}
+                </button>
+                <button
+                  onClick={async () => {
+                    try {
+                      const response = await fetch(`/api/v1/chat/invitations/${data.invitationId}/respond`, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                        },
+                        body: JSON.stringify({ action: 'decline' })
+                      });
+
+                      if (response.ok) {
+                        enqueueSnackbar(t('chat.invitationDeclined'), { variant: 'info' });
+                      } else {
+                        enqueueSnackbar(t('chat.invitationDeclineFailed'), { variant: 'error' });
+                      }
+                    } catch (error) {
+                      console.error('Failed to decline invitation:', error);
+                      enqueueSnackbar(t('chat.invitationDeclineFailed'), { variant: 'error' });
+                    }
+                    closeSnackbar(key);
+                  }}
+                  style={{
+                    background: '#f44336',
+                    color: 'white',
+                    border: 'none',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  {t('chat.decline')}
+                </button>
+              </div>
+            )
+          }
+        );
+      });
+
       return () => {
         // 이벤트 리스너 정리
         wsService.removeAllListeners();
@@ -516,6 +668,19 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to load messages' });
     }
   }, [state.messages]);
+
+  // REFRESH_CHANNELS 액션 처리
+  useEffect(() => {
+    if (state.isLoading && state.channels.length === 0) {
+      // 초기 로딩이 아닌 경우에만 새로고침
+      return;
+    }
+
+    if (state.isLoading) {
+      // REFRESH_CHANNELS 액션으로 인한 로딩 상태인 경우 채널 새로고침
+      loadChannels();
+    }
+  }, [state.isLoading]);
 
   // Load channels
   const loadChannels = useCallback(async () => {

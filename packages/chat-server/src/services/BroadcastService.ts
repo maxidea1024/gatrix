@@ -30,7 +30,7 @@ export class BroadcastService {
   private messageCache: LRUCache<string, any>;
   private compressionCache: LRUCache<string, Buffer>;
 
-  constructor(io: SocketIOServer, serverId: string) {
+  private constructor(io: SocketIOServer, serverId: string) {
     this.io = io;
     this.serverId = serverId;
 
@@ -295,21 +295,32 @@ export class BroadcastService {
       compressionCacheSize: this.compressionCache.size,
     };
   }
-}
 
   // Singleton 패턴 메서드들
   public static getInstance(): BroadcastService | null {
     return BroadcastService.instance;
   }
 
-  public static setInstance(instance: BroadcastService): void {
-    BroadcastService.instance = instance;
+  public static createInstance(io: SocketIOServer, serverId: string): BroadcastService {
+    if (BroadcastService.instance) {
+      logger.warn('BroadcastService instance already exists, returning existing instance');
+      return BroadcastService.instance;
+    }
+
+    BroadcastService.instance = new BroadcastService(io, serverId);
+    logger.info('BroadcastService singleton instance created', { serverId });
+    return BroadcastService.instance;
   }
 
   public static clearInstance(): void {
-    BroadcastService.instance = null;
+    if (BroadcastService.instance) {
+      BroadcastService.instance.cleanup();
+      BroadcastService.instance = null;
+      logger.info('BroadcastService singleton instance cleared');
+    }
   }
 }
 
 // Export class for instantiation
 // Note: broadcastService instance will be created in WebSocketService
+export default BroadcastService;

@@ -491,8 +491,8 @@ export class ChannelModel {
     const existingMember = await knex('chat_channel_members')
       .select('id')
       .where({
-        channel_id: channelId,
-        user_id: userId,
+        channelId: channelId,
+        userId: userId,
       })
       .first();
 
@@ -500,23 +500,23 @@ export class ChannelModel {
       // 이미 멤버라면 상태를 active로 업데이트
       await knex('chat_channel_members')
         .where({
-          channel_id: channelId,
-          user_id: userId,
+          channelId: channelId,
+          userId: userId,
         })
         .update({
           status: 'active',
           role,
-          updated_at: new Date(),
+          updatedAt: new Date(),
         });
     } else {
       // 새 멤버 추가
       await knex('chat_channel_members').insert({
-        channel_id: channelId,
-        user_id: userId,
+        channelId: channelId,
+        userId: userId,
         role,
         status: 'active',
-        joined_at: new Date(),
-        updated_at: new Date(),
+        joinedAt: new Date(),
+        updatedAt: new Date(),
       });
     }
   }

@@ -178,6 +178,13 @@ router.post(
   InvitationController.inviteUser
 );
 
+// 채널의 pending invitation 목록 조회
+router.get(
+  '/:channelId/pending-invitations',
+  rateLimiter(60000, 60), // 1분에 60회 요청 제한
+  InvitationController.getChannelPendingInvitations
+);
+
 // 채널 존재 여부 확인
 router.head(
   '/:id',

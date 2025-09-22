@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -42,6 +42,7 @@ interface UserSearchDialogProps {
   title?: string;
   subtitle?: string;
   excludeUserIds?: number[];
+  channelId?: number; // 채널 ID 추가
 }
 
 const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
@@ -51,6 +52,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
   title,
   subtitle,
   excludeUserIds = [],
+  channelId,
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -59,6 +61,33 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [invitingUsers, setInvitingUsers] = useState<Set<number>>(new Set());
+  const [pendingInvitedUsers, setPendingInvitedUsers] = useState<Set<number>>(new Set());
+
+  // 검색 입력창 ref
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // 채널의 pending invitation 조회
+  const fetchPendingInvitations = async () => {
+    if (!channelId) return;
+
+    try {
+      const response = await fetch(`http://localhost:3001/api/v1/channels/${channelId}/pending-invitations`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data) {
+          const invitedUserIds = new Set(data.data.map((invitation: any) => invitation.inviteeId));
+          setPendingInvitedUsers(invitedUserIds);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch pending invitations:', error);
+    }
+  };
 
   // 검색 API 호출
   const searchUsers = async (query: string) => {
@@ -110,21 +139,52 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     }
   };
 
-  // 디바운스된 검색 함수 (0.5초 지연)
+  // 디바운스된 검색 함수 (300ms 지연)
   const debouncedSearch = useCallback(
     debounce((query: string) => {
-      searchUsers(query);
-    }, 500),
+      if (query.trim().length >= 2) {
+        searchUsers(query.trim());
+      }
+    }, 300),
     [excludeUserIds]
   );
 
   // 검색어 변경 시 디바운스된 검색 실행
   useEffect(() => {
-    debouncedSearch(searchQuery);
+    if (searchQuery.trim().length >= 2) {
+      // 최소 2글자 이상일 때만 검색
+      debouncedSearch(searchQuery.trim());
+    } else {
+      // 검색어가 짧으면 결과 초기화
+      setSearchResults([]);
+      debouncedSearch.cancel();
+    }
+
     return () => {
       debouncedSearch.cancel();
     };
   }, [searchQuery, debouncedSearch]);
+
+  // 다이얼로그 열릴 때 pending invitation 조회
+  useEffect(() => {
+    if (open && channelId) {
+      fetchPendingInvitations();
+    }
+  }, [open, channelId]);
+
+  // 다이얼로그가 열릴 때 검색 입력창에 포커스
+  useEffect(() => {
+    if (open) {
+      // 다이얼로그 애니메이션이 완료된 후 포커스 설정
+      const timer = setTimeout(() => {
+        if (searchInputRef.current) {
+          searchInputRef.current.focus();
+        }
+      }, 200);
+
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
 
   // 다이얼로그 닫힐 때 상태 초기화
   useEffect(() => {
@@ -132,6 +192,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
       setSearchQuery('');
       setSearchResults([]);
       setInvitingUsers(new Set());
+      setPendingInvitedUsers(new Set());
     }
   }, [open]);
 
@@ -143,8 +204,8 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
       await onInviteUser(userId);
       enqueueSnackbar(t('chat.invitationSent'), { variant: 'success' });
 
-      // 초대 성공 시 검색 결과에서 제거
-      setSearchResults(prev => prev.filter(user => user.id !== userId));
+      // 초대 성공 시 pending invitation 목록에 추가
+      setPendingInvitedUsers(prev => new Set(prev).add(userId));
 
       // 초대 성공 시 창 닫기
       setTimeout(() => {
@@ -152,7 +213,13 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
       }, 1000); // 1초 후 닫기 (성공 메시지를 볼 시간 제공)
     } catch (error: any) {
       console.error('Invite error:', error);
-      enqueueSnackbar(error.message || t('chat.invitationFailed'), { variant: 'error' });
+
+      // 중복 초대 오류 처리
+      if (error.message && error.message.includes('already has a pending invitation')) {
+        enqueueSnackbar(t('chat.alreadyInvited'), { variant: 'warning' });
+      } else {
+        enqueueSnackbar(error.message || t('chat.invitationFailed'), { variant: 'error' });
+      }
     } finally {
       setInvitingUsers(prev => {
         const newSet = new Set(prev);
@@ -195,10 +262,13 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
       <DialogContent sx={{
         minHeight: 350, // 최소 높이 설정으로 안정화
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        paddingTop: 3, // 윗부분 패딩 증가로 테두리 잘림 방지
+        overflow: 'visible' // overflow 설정으로 테두리 표시 보장
       }}>
         <TextField
           fullWidth
+          inputRef={searchInputRef}
           placeholder={t('chat.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -206,7 +276,20 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
             startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
             endAdornment: isSearching && <CircularProgress size={20} />,
           }}
-          sx={{ mb: 2 }}
+          sx={{
+            mb: 2,
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderWidth: '1px',
+              },
+              '&:hover fieldset': {
+                borderWidth: '1px',
+              },
+              '&.Mui-focused fieldset': {
+                borderWidth: '2px',
+              },
+            },
+          }}
         />
 
         {/* 검색 결과 영역 - 고정 높이로 안정화 */}
@@ -277,21 +360,50 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
                   />
 
                   <ListItemSecondaryAction>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      startIcon={
-                        invitingUsers.has(user.id) ? (
-                          <CircularProgress size={16} />
-                        ) : (
-                          <PersonAddIcon />
-                        )
+                    {(() => {
+                      const isInviting = invitingUsers.has(user.id);
+                      const isPendingInvited = pendingInvitedUsers.has(user.id);
+
+                      if (isPendingInvited) {
+                        return (
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            disabled
+                            startIcon={<PersonAddIcon />}
+                            sx={{
+                              color: 'warning.main',
+                              borderColor: 'warning.main',
+                              '&.Mui-disabled': {
+                                color: 'warning.main',
+                                borderColor: 'warning.main',
+                                opacity: 0.7
+                              }
+                            }}
+                          >
+                            {t('chat.invitationPending')}
+                          </Button>
+                        );
                       }
-                      onClick={() => handleInviteUser(user.id)}
-                      disabled={invitingUsers.has(user.id)}
-                    >
-                      {invitingUsers.has(user.id) ? t('chat.inviting') : t('chat.inviteButton')}
-                    </Button>
+
+                      return (
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          startIcon={
+                            isInviting ? (
+                              <CircularProgress size={16} />
+                            ) : (
+                              <PersonAddIcon />
+                            )
+                          }
+                          onClick={() => handleInviteUser(user.id)}
+                          disabled={isInviting}
+                        >
+                          {isInviting ? t('chat.inviting') : t('chat.inviteButton')}
+                        </Button>
+                      );
+                    })()}
                   </ListItemSecondaryAction>
                 </ListItem>
               ))}

@@ -32,6 +32,19 @@ export class ChannelInvitationModel {
   // 초대 생성
   static async create(data: CreateInvitationData): Promise<ChannelInvitationType> {
     try {
+      // pending 상태의 중복 초대 체크
+      const existingPendingInvitation = await this.knex('chat_channel_invitations')
+        .where({
+          channelId: data.channelId,
+          inviteeId: data.inviteeId,
+          status: 'pending'
+        })
+        .first();
+
+      if (existingPendingInvitation) {
+        throw new Error('User already has a pending invitation to this channel');
+      }
+
       // 기본 만료 시간: 7일 후
       const defaultExpiresAt = new Date();
       defaultExpiresAt.setDate(defaultExpiresAt.getDate() + 7);
@@ -43,7 +56,7 @@ export class ChannelInvitationModel {
       };
 
       const [invitationId] = await this.knex('chat_channel_invitations').insert(invitationData);
-      
+
       const invitation = await this.findById(invitationId);
       if (!invitation) {
         throw new Error('Failed to create invitation');

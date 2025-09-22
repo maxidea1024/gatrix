@@ -75,7 +75,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
   // 받은 초대 목록 조회
   const fetchReceivedInvitations = async () => {
     try {
-      const response = await fetch('http://localhost:3004/api/v1/invitations/received', {
+      const response = await fetch('http://localhost:3001/api/v1/invitations/received', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         },
@@ -86,6 +86,8 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
         if (data.success) {
           setReceivedInvitations(data.data);
         }
+      } else {
+        console.error('Failed to fetch received invitations:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Failed to fetch received invitations:', error);
@@ -95,7 +97,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
   // 보낸 초대 목록 조회
   const fetchSentInvitations = async () => {
     try {
-      const response = await fetch('http://localhost:3004/api/v1/invitations/sent', {
+      const response = await fetch('http://localhost:3001/api/v1/invitations/sent', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         },
@@ -106,6 +108,8 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
         if (data.success) {
           setSentInvitations(data.data);
         }
+      } else {
+        console.error('Failed to fetch sent invitations:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Failed to fetch sent invitations:', error);
@@ -117,7 +121,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
     setProcessingInvitations(prev => new Set(prev).add(invitationId));
 
     try {
-      const response = await fetch(`http://localhost:3004/api/v1/invitations/${invitationId}/respond`, {
+      const response = await fetch(`http://localhost:3001/api/v1/invitations/${invitationId}/respond`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -154,7 +158,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
     setProcessingInvitations(prev => new Set(prev).add(invitationId));
 
     try {
-      const response = await fetch(`http://localhost:3004/api/v1/invitations/${invitationId}`, {
+      const response = await fetch(`http://localhost:3001/api/v1/invitations/${invitationId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,

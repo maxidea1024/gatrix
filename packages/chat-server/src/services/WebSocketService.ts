@@ -4,7 +4,7 @@ import http from 'http';
 import jwt from 'jsonwebtoken';
 import { config } from '../config';
 import { redisManager } from '../config/redis';
-import { BroadcastService } from './BroadcastService';
+import BroadcastService from './BroadcastService';
 import { metricsService } from './MetricsService';
 import { createLogger } from '../config/logger';
 
@@ -35,10 +35,9 @@ export class WebSocketService {
     this.setupRedisAdapter();
     this.setupMiddleware();
     this.setupEventHandlers();
-    this.broadcastService = new BroadcastService(this.io, this.serverId);
 
-    // BroadcastService singleton 설정
-    BroadcastService.setInstance(this.broadcastService);
+    // BroadcastService singleton 생성
+    this.broadcastService = BroadcastService.createInstance(this.io, this.serverId);
 
     logger.info(`WebSocket service initialized with server ID: ${this.serverId}`);
   }
@@ -555,12 +554,12 @@ export class WebSocketService {
     // 모든 연결 종료
     this.io.disconnectSockets(true);
     
-    // 브로드캐스트 서비스 정리
-    await this.broadcastService.cleanup();
-    
+    // BroadcastService singleton 정리
+    BroadcastService.clearInstance();
+
     // 서버 종료
     this.io.close();
-    
+
     logger.info('WebSocket service shutdown complete');
   }
 

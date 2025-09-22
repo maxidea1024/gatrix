@@ -103,19 +103,52 @@ export class InvitationController {
         message,
       });
 
-      // 초대받은 사용자에게 실시간 알림 전송
-      const { BroadcastService } = require('../services/BroadcastService');
-      const broadcastService = BroadcastService.getInstance();
+      // 초대자 정보 가져오기
+      const inviter = await userSyncService.getUser(userId);
+      if (!inviter) {
+        logger.error('Inviter not found', { userId });
+        res.status(500).json({
+          success: false,
+          error: 'Internal server error',
+        });
+        return;
+      }
 
-      await broadcastService.broadcastToUser(inviteeId, 'channel_invitation', {
-        invitationId: invitation.id,
-        channelId: channelIdNum,
-        channelName: channel.name,
-        inviterId: userId,
-        inviterName: (req as any).user.name || 'Unknown User',
-        message,
-        timestamp: Date.now(),
-      });
+      // 초대받은 사용자에게 실시간 알림 전송
+      try {
+        // BroadcastService를 동적으로 import하여 순환 import 문제 해결
+        const BroadcastServiceModule = await import('../services/BroadcastService');
+        const BroadcastService = BroadcastServiceModule.default;
+        const broadcastService = BroadcastService.getInstance();
+
+        if (broadcastService) {
+          await broadcastService.broadcastToUser(inviteeId, 'channel_invitation', {
+            invitationId: invitation.id,
+            channelId: channelIdNum,
+            channelName: channel.name,
+            inviterName: inviter.name,
+            message: message, // 사용자가 입력한 메시지만 전달 (프론트엔드에서 기본 메시지 생성)
+            expiresAt: invitation.expiresAt,
+            createdAt: invitation.createdAt
+          });
+
+          logger.info(`Real-time invitation notification sent to user ${inviteeId}`, {
+            invitationId: invitation.id,
+            channelId: channelIdNum,
+            inviterId: userId
+          });
+        } else {
+          logger.warn('BroadcastService not available for real-time notifications');
+        }
+      } catch (notificationError) {
+        logger.error('Failed to send real-time invitation notification', {
+          error: notificationError,
+          inviteeId,
+          channelId: channelIdNum
+        });
+      }
+
+      logger.info(`Channel invitation sent: user ${userId} invited user ${inviteeId} to channel ${channelIdNum}`);
 
       // Gatrix 메인 서버에도 알림 전송
       const { gatrixApiService } = require('../services/GatrixApiService');
@@ -348,6 +381,71 @@ export class InvitationController {
       res.status(500).json({
         success: false,
         error: 'Failed to get sent invitations',
+      });
+    }
+  }
+
+  // 채널의 pending invitation 목록 조회
+  static async getChannelPendingInvitations(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = (req as any).user.id;
+      const { channelId } = req.params;
+
+      const channelIdNum = parseInt(channelId);
+      if (isNaN(channelIdNum)) {
+        res.status(400).json({
+          success: false,
+          error: 'Invalid channel ID',
+        });
+        return;
+      }
+
+      // 채널 존재 여부 및 권한 확인
+      const channel = await ChannelModel.findById(channelIdNum);
+      if (!channel) {
+        res.status(404).json({
+          success: false,
+          error: 'Channel not found',
+        });
+        return;
+      }
+
+      // 사용자가 채널 멤버인지 확인
+      const isMember = await ChannelModel.isMember(channelIdNum, userId);
+      if (!isMember) {
+        res.status(403).json({
+          success: false,
+          error: 'You must be a member of the channel to view pending invitations',
+        });
+        return;
+      }
+
+      const result = await ChannelInvitationModel.findByChannelId(
+        channelIdNum,
+        'pending',
+        { limit: 100 } // 최대 100개까지
+      );
+
+      // 초대받은 사용자 정보 추가
+      const enrichedInvitations = await Promise.all(
+        result.invitations.map(async (invitation) => {
+          const invitee = await userSyncService.getUser(invitation.inviteeId);
+          return {
+            ...invitation,
+            invitee: invitee ? { id: invitee.id, name: invitee.name, email: invitee.email } : null,
+          };
+        })
+      );
+
+      res.json({
+        success: true,
+        data: enrichedInvitations,
+      });
+    } catch (error) {
+      logger.error('Failed to get channel pending invitations:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to get channel pending invitations',
       });
     }
   }
