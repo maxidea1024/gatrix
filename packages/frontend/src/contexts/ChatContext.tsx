@@ -373,6 +373,15 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const connectWebSocket = async () => {
         try {
+          // 인증 토큰 확인
+          const token = localStorage.getItem('accessToken');
+          if (!token) {
+            console.error('No authentication token found in localStorage');
+            enqueueSnackbar('로그인이 필요합니다', { variant: 'error' });
+            return;
+          }
+
+          console.log('Connecting to chat WebSocket with token...');
           await wsService.connect();
           console.log('WebSocket connected successfully');
           dispatch({ type: 'SET_CONNECTED', payload: true });
@@ -770,6 +779,17 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loadChannels = useCallback(async () => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
+
+      // 먼저 사용자를 Chat Server에 동기화
+      try {
+        console.log('🔄 Syncing current user to Chat Server...');
+        await ChatService.syncCurrentUser();
+        console.log('✅ User synced to Chat Server successfully');
+      } catch (error) {
+        console.error('❌ Failed to sync user to Chat Server:', error);
+        // 동기화 실패해도 채팅은 계속 진행
+      }
+
       const channels = await ChatService.getChannels();
       dispatch({ type: 'SET_CHANNELS', payload: channels });
 

@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { UserService } from '../services/userService';
 import { UserTagService } from '../services/UserTagService';
+import { ChatServerService } from '../services/ChatServerService';
 import { asyncHandler, CustomError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import Joi from 'joi';
@@ -366,6 +367,25 @@ export class UserController {
     }
 
     const user = await UserService.updateUser(req.user.userId, value);
+
+    // Chat Server에 사용자 정보 동기화 (백그라운드에서 실행)
+    try {
+      const chatServerService = ChatServerService.getInstance();
+      await chatServerService.syncUser({
+        id: user.id,
+        username: user.email,
+        name: user.name || user.email,
+        email: user.email,
+        avatar: '',
+        status: 'online',
+        lastSeenAt: new Date().toISOString(),
+        createdAt: user.createdAt?.toISOString(),
+        updatedAt: user.updatedAt?.toISOString(),
+      });
+    } catch (error) {
+      // Chat Server 동기화 실패는 로그만 남기고 사용자에게는 성공 응답
+      console.error('Failed to sync user to Chat Server:', error);
+    }
 
     res.json({
       success: true,

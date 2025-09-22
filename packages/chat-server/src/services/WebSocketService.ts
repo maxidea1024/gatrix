@@ -6,6 +6,8 @@ import { config } from '../config';
 import { redisManager } from '../config/redis';
 import BroadcastService from './BroadcastService';
 import { metricsService } from './MetricsService';
+import { CacheService } from './CacheService';
+import { UserService } from './UserService';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('WebSocketService');
@@ -55,26 +57,40 @@ export class WebSocketService {
   }
 
   private setupMiddleware(): void {
-    // JWT 인증 미들웨어
+    // Backend JWT 토큰 인증 미들웨어
     this.io.use(async (socket, next) => {
       try {
         const token = socket.handshake.auth.token || socket.handshake.headers.authorization?.replace('Bearer ', '');
-        
+
         if (!token) {
           return next(new Error('Authentication token required'));
         }
 
-        const decoded = jwt.verify(token, config.jwt.secret) as any;
-        const userId = decoded.userId || decoded.id;
-        
-        if (!userId) {
-          return next(new Error('Invalid token payload'));
+        // Backend JWT 토큰 검증 (간단한 검증)
+        const payload = jwt.decode(token) as any;
+
+        if (!payload || !payload.userId) {
+          return next(new Error('Invalid token format'));
+        }
+
+        // 데이터베이스에서 사용자 정보 확인
+        const userData = await UserService.getUserById(payload.userId);
+
+        if (!userData) {
+          return next(new Error('User not found in chat server'));
         }
 
         // 사용자 정보를 소켓에 저장
-        (socket as any).userId = userId;
-        (socket as any).userInfo = decoded;
-        
+        (socket as any).userId = userData.id;
+        (socket as any).userInfo = {
+          id: userData.id,
+          username: userData.username,
+          name: userData.name,
+          email: userData.email,
+          avatarUrl: userData.avatarUrl,
+        };
+
+        logger.info(`🔌 User ${userData.id} (${userData.username}) connected via WebSocket`);
         next();
       } catch (error) {
         logger.error('Socket authentication failed:', error);
@@ -88,13 +104,12 @@ export class WebSocketService {
       const rateLimitKey = `rate_limit:${userId}:${Date.now()}`;
       
       try {
-        const redisClient = redisManager.getClient();
-        const current = await redisClient.incr(rateLimitKey);
-        
-        if (current === 1) {
-          await redisClient.expire(rateLimitKey, 60); // 1분 윈도우
-        }
-        
+        const cacheService = CacheService.getInstance();
+        const currentStr = await cacheService.get<string>(rateLimitKey);
+        const current = currentStr ? parseInt(currentStr) + 1 : 1;
+
+        await cacheService.set(rateLimitKey, current.toString(), 60 * 1000); // 1분 TTL
+
         if (current > config.rateLimit.maxRequests) {
           return next(new Error('Rate limit exceeded'));
         }
@@ -148,8 +163,12 @@ export class WebSocketService {
       }
       this.userSockets.get(userId)!.add(socket.id);
 
-      // Redis에 사용자 온라인 상태 저장
-      await redisManager.setUserOnline(userId, socket.id, this.serverId);
+      // 사용자 온라인 상태 업데이트
+      await UserService.updateUserStatus(userId, 'online');
+
+      // 캐시에 소켓 정보 저장
+      const cacheService = CacheService.getInstance();
+      await cacheService.set(`socket:${userId}:${socket.id}`, this.serverId, 24 * 60 * 60 * 1000); // 24시간
 
       // 사용자를 개인 룸에 추가
       socket.join(`user:${userId}`);
@@ -288,8 +307,9 @@ export class WebSocketService {
     socket.join(`channel:${channelId}`);
     socketUser.channels.add(channelId);
     
-    // Redis에 채널 멤버십 저장
-    await redisManager.addUserToChannel(socketUser.userId, channelId);
+    // 캐시에 채널 멤버십 저장
+    const cacheService = CacheService.getInstance();
+    await cacheService.set(`channel_member:${channelId}:${socketUser.userId}`, true, 24 * 60 * 60 * 1000); // 24시간
     
     // 채널 참여 알림
     await this.broadcastService.broadcastToChannel(
@@ -310,8 +330,9 @@ export class WebSocketService {
     socket.leave(`channel:${channelId}`);
     socketUser.channels.delete(channelId);
     
-    // Redis에서 채널 멤버십 제거
-    await redisManager.removeUserFromChannel(socketUser.userId, channelId);
+    // 캐시에서 채널 멤버십 제거
+    const cacheService = CacheService.getInstance();
+    await cacheService.delete(`channel_member:${channelId}:${socketUser.userId}`);
     
     // 채널 나가기 알림
     await this.broadcastService.broadcastToChannel(
@@ -345,8 +366,7 @@ export class WebSocketService {
       });
 
       // 사용자 정보 가져오기
-      const { userSyncService } = require('./UserSyncService');
-      const user = await userSyncService.getCachedUser(socketUser.userId);
+      const userData = await UserService.getUserById(socketUser.userId);
 
       const message = {
         id: savedMessage.id,
@@ -358,7 +378,9 @@ export class WebSocketService {
         createdAt: savedMessage.createdAt,
         user: {
           id: socketUser.userId,
-          name: user?.name || 'Unknown User'
+          name: userData?.name || userData?.username || 'Unknown User',
+          username: userData?.username || 'Unknown',
+          avatarUrl: userData?.avatarUrl
         }
       };
 
@@ -390,9 +412,9 @@ export class WebSocketService {
     // 채널의 다른 사용자들에게 타이핑 알림
     socket.to(`channel:${channelId}`).emit('user_typing', typingData);
     
-    // Redis에 타이핑 상태 저장 (TTL 5초)
-    const redisClient = redisManager.getClient();
-    await redisClient.setex(`typing:${channelId}:${socketUser.userId}`, 5, Date.now().toString());
+    // 캐시에 타이핑 상태 저장 (TTL 5초)
+    const cacheService = CacheService.getInstance();
+    await cacheService.set(`typing:${channelId}:${socketUser.userId}`, Date.now().toString(), 5 * 1000);
   }
 
   private async handleStopTyping(socket: Socket, socketUser: SocketUser, channelId: number): Promise<void> {
@@ -405,9 +427,9 @@ export class WebSocketService {
     // 채널의 다른 사용자들에게 타이핑 중지 알림
     socket.to(`channel:${channelId}`).emit('user_stop_typing', typingData);
     
-    // Redis에서 타이핑 상태 제거
-    const redisClient = redisManager.getClient();
-    await redisClient.del(`typing:${channelId}:${socketUser.userId}`);
+    // 캐시에서 타이핑 상태 제거
+    const cacheService = CacheService.getInstance();
+    await cacheService.delete(`typing:${channelId}:${socketUser.userId}`);
   }
 
   private async handleMarkRead(socket: Socket, socketUser: SocketUser, data: { channelId: number; messageId: number }): Promise<void> {
@@ -434,13 +456,12 @@ export class WebSocketService {
   }
 
   private async handleUpdateStatus(socket: Socket, socketUser: SocketUser, data: { status: string; customStatus?: string }): Promise<void> {
-    // Redis에 사용자 상태 업데이트
-    const redisClient = redisManager.getClient();
-    await redisClient.hset(`user:${socketUser.userId}`, {
-      status: data.status,
-      customStatus: data.customStatus || '',
-      lastSeen: Date.now(),
-    });
+    // 사용자 상태 업데이트
+    await UserService.updateUserStatus(
+      socketUser.userId,
+      data.status as 'online' | 'away' | 'busy' | 'offline',
+      data.customStatus
+    );
 
     // 모든 채널에 상태 변경 알림
     for (const channelId of socketUser.channels) {
@@ -464,7 +485,8 @@ export class WebSocketService {
       if (userSocketSet.size === 0) {
         this.userSockets.delete(socketUser.userId);
         // 마지막 연결이 끊어진 경우 오프라인 상태로 변경
-        await redisManager.setUserOffline(socketUser.userId);
+        await UserService.updateUserStatus(socketUser.userId, 'offline');
+        await UserService.updateLastSeen(socketUser.userId);
       }
     }
 

@@ -25,6 +25,7 @@
   "author": "Gatrix Team",
   "license": "MIT",
   "dependencies": {
+    "@keyv/redis": "^5.1.2",
     "@socket.io/redis-adapter": "^8.2.1",
     "@types/cheerio": "^0.22.35",
     "axios": "^1.12.2",
@@ -39,6 +40,7 @@
     "ioredis": "^5.3.2",
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
+    "keyv": "^5.5.2",
     "knex": "^3.1.0",
     "lodash": "^4.17.21",
     "lru-cache": "^7.18.3",

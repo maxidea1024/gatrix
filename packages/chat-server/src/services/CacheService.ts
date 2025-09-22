@@ -1,37 +1,68 @@
 import { EventEmitter } from 'events';
 import Keyv from 'keyv';
-import logger from '../config/logger';
+import KeyvRedis from '@keyv/redis';
+import { config } from '../config';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('CacheService');
 
 export class CacheService extends EventEmitter {
   private static instance: CacheService;
-  private cache!: any;
-  private l1Cache!: Keyv; // Memory cache
-  private l2Cache?: Keyv; // Redis cache
-  private defaultTTL = 5 * 60 * 1000; // 5 minutes
+  private cache: any = null;
+  private l1Cache: Keyv | null = null;
+  private l2Cache: Keyv | null = null;
+  private defaultTTL = 5 * 60 * 1000; // 5 minutes (밀리초)
+  private initialized = false;
 
   constructor() {
     super();
-    this.initializeCache();
+    // 지연 초기화 - import 시점에서 실행하지 않음
   }
+
+  public static getInstance(): CacheService {
+    if (!CacheService.instance) {
+      CacheService.instance = new CacheService();
+    }
+    return CacheService.instance;
+  }
+
+
 
   /**
    * Initialize multi-layer cache with Keyv (Memory + Redis)
    */
-  private initializeCache(): void {
+  public async initializeCache(): Promise<void> {
+    if (this.initialized) return;
+
     try {
       // L1: Memory cache (fastest)
       this.l1Cache = new Keyv();
 
       // L2: Redis cache (shared, persistent) - optional
-      // Backend typically doesn't need Redis cache, but keeping for consistency
-      // You can add Redis config here if needed
+      if (config.redis.host) {
+        try {
+          // Use @keyv/redis for proper Redis support
+          const redisUrl = `redis://${config.redis.password ? `:${config.redis.password}@` : ''}${config.redis.host}:${config.redis.port}/${config.redis.db}`;
+          const redisStore = new KeyvRedis(redisUrl);
+          this.l2Cache = new Keyv({ store: redisStore });
+          logger.info('Redis cache layer initialized');
+        } catch (redisError) {
+          logger.warn('Redis cache initialization failed, using memory only:', redisError);
+          this.l2Cache = null;
+        }
+      }
 
       // Create unified cache interface
       this.cache = this.createUnifiedCache();
+      this.initialized = true;
 
-      logger.info('Cache initialized with Keyv memory cache');
+      if (this.l2Cache) {
+        logger.info('Cache initialized with Keyv multi-layer (Memory + Redis)');
+      } else {
+        logger.info('Cache initialized with Keyv memory-only');
+      }
     } catch (error) {
-      logger.error('Failed to initialize cache:', error);
+      logger.error('Failed to initialize Keyv cache:', error);
       throw error;
     }
   }
@@ -42,6 +73,8 @@ export class CacheService extends EventEmitter {
   private createUnifiedCache(): any {
     return {
       get: async (key: string) => {
+        if (!this.l1Cache) return undefined;
+
         // Try L1 (memory) first
         let value = await this.l1Cache.get(key);
         if (value !== undefined) {
@@ -62,6 +95,8 @@ export class CacheService extends EventEmitter {
       },
 
       set: async (key: string, value: any, ttl?: number) => {
+        if (!this.l1Cache) return false;
+
         const cacheTTL = ttl || this.defaultTTL;
 
         // Set in L1 (memory) always
@@ -76,6 +111,8 @@ export class CacheService extends EventEmitter {
       },
 
       delete: async (key: string) => {
+        if (!this.l1Cache) return false;
+
         // Delete from L1 (memory)
         await this.l1Cache.delete(key);
 
@@ -88,6 +125,8 @@ export class CacheService extends EventEmitter {
       },
 
       clear: async () => {
+        if (!this.l1Cache) return;
+
         // Clear L1 (memory)
         await this.l1Cache.clear();
 
@@ -99,12 +138,7 @@ export class CacheService extends EventEmitter {
     };
   }
 
-  public static getInstance(): CacheService {
-    if (!CacheService.instance) {
-      CacheService.instance = new CacheService();
-    }
-    return CacheService.instance;
-  }
+
 
   /**
    * Static get method
@@ -120,7 +154,7 @@ export class CacheService extends EventEmitter {
   public static async set<T>(key: string, data: T, ttlSeconds?: number): Promise<void> {
     const instance = CacheService.getInstance();
     const ttlMs = ttlSeconds ? ttlSeconds * 1000 : undefined;
-    await instance.set<T>(key, data, ttlMs);
+    instance.set<T>(key, data, ttlMs);
   }
 
   /**
@@ -128,7 +162,7 @@ export class CacheService extends EventEmitter {
    */
   public static async del(key: string): Promise<void> {
     const instance = CacheService.getInstance();
-    await instance.delete(key);
+    instance.delete(key);
   }
 
   /**
@@ -151,6 +185,7 @@ export class CacheService extends EventEmitter {
    */
   async get<T>(key: string): Promise<T | null> {
     try {
+      if (!this.initialized) await this.initializeCache();
       const value = await this.cache.get(key);
       return value || null;
     } catch (error) {
@@ -164,6 +199,7 @@ export class CacheService extends EventEmitter {
    */
   async set<T>(key: string, data: T, ttl?: number): Promise<void> {
     try {
+      if (!this.initialized) await this.initializeCache();
       await this.cache.set(key, data, ttl || this.defaultTTL);
       logger.debug(`Cache set: ${key}`);
     } catch (error) {
@@ -186,60 +222,12 @@ export class CacheService extends EventEmitter {
   }
 
   /**
-   * Clear all cache
+   * Get keys by pattern (not supported in Keyv)
    */
-  async clear(): Promise<void> {
+  async getKeysByPattern(pattern: string): Promise<string[]> {
     try {
-      await this.cache.clear();
-      logger.debug('Cache cleared');
-    } catch (error) {
-      logger.error('Cache clear error:', error);
-    }
-  }
-
-  /**
-   * Delete cache by pattern (limited support in cache-manager)
-   */
-  async deleteByPattern(pattern: string): Promise<number> {
-    try {
-      // cache-manager doesn't support pattern deletion directly
-      logger.warn(`Pattern deletion not fully supported: ${pattern}`);
-      return 0;
-    } catch (error) {
-      logger.error(`Cache pattern delete error for ${pattern}:`, error);
-      return 0;
-    }
-  }
-
-  /**
-   * Get cache statistics (limited in cache-manager)
-   */
-  async getStats() {
-    try {
-      return {
-        totalItems: 'unknown', // cache-manager doesn't expose size
-        validItems: 'unknown',
-        expiredItems: 'unknown',
-        memoryUsage: process.memoryUsage()
-      };
-    } catch (error) {
-      logger.error('Cache stats error:', error);
-      return {
-        totalItems: 0,
-        validItems: 0,
-        expiredItems: 0,
-        memoryUsage: process.memoryUsage()
-      };
-    }
-  }
-
-  /**
-   * Get keys by pattern (limited support in cache-manager)
-   */
-  public async getKeysByPattern(pattern: string): Promise<string[]> {
-    try {
-      // cache-manager doesn't support pattern matching directly
-      logger.warn(`Pattern matching not fully supported: ${pattern}`);
+      // Keyv doesn't support pattern matching
+      logger.warn(`Pattern matching not supported in Keyv: ${pattern}`);
       return [];
     } catch (error) {
       logger.error(`Cache pattern search error for ${pattern}:`, error);
@@ -247,8 +235,28 @@ export class CacheService extends EventEmitter {
     }
   }
 
+  /**
+   * Clear all cache
+   */
+  async clear(): Promise<void> {
+    try {
+      await this.cache.clear();
+      logger.info('Cache cleared');
+    } catch (error) {
+      logger.error('Cache clear error:', error);
+    }
+  }
 
+  /**
+   * Check if key exists
+   */
+  async has(key: string): Promise<boolean> {
+    try {
+      const value = await this.cache.get(key);
+      return value !== undefined && value !== null;
+    } catch (error) {
+      logger.error(`Cache has error for key ${key}:`, error);
+      return false;
+    }
+  }
 }
-
-// Singleton instance
-export const cacheService = new CacheService();

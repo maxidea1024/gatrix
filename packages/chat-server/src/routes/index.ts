@@ -4,6 +4,8 @@ import messagesRouter from './messages';
 import privacyRouter from './privacy';
 import invitationsRouter from './invitations';
 import directMessagesRouter from './direct-messages';
+import usersRouter from './users';
+import apiTokenRouter from './apiTokens';
 
 import { errorHandler } from '../middleware/auth';
 
@@ -25,6 +27,8 @@ router.get('/', (req, res) => {
         privacy: '/api/v1/privacy',
         invitations: '/api/v1/invitations',
         directMessages: '/api/v1/direct-messages',
+        auth: '/api/v1/auth',
+        users: '/api/v1/users',
         linkPreview: '/api/v1/link-preview',
         websocket: '/socket.io',
         health: '/health',
@@ -55,6 +59,8 @@ router.get('/', (req, res) => {
 });
 
 // 라우트 등록
+router.use('/admin/tokens', apiTokenRouter);
+router.use('/users', usersRouter);
 router.use('/channels', channelsRouter);
 router.use('/messages', messagesRouter);
 router.use('/privacy', privacyRouter);

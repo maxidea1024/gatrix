@@ -11,9 +11,9 @@ import { requestLogger } from './middleware/requestLogger';
 const logger = createLogger('ChatServerApp');
 import { WebSocketService } from './services/WebSocketService';
 import { metricsService } from './services/MetricsService';
-import { gatrixApiService } from './services/GatrixApiService';
-import { userSyncService } from './services/UserSyncService';
+
 import { redisManager } from './config/redis';
+import { ApiTokenService } from './services/ApiTokenService';
 import { databaseManager } from './config/database';
 import apiRoutes from './routes';
 
@@ -201,50 +201,7 @@ class ChatServerApp {
     process.on('SIGINT', () => this.gracefulShutdown('SIGINT'));
   }
 
-  private async waitForGatrixAPI(timeoutMs: number): Promise<void> {
-    const startTime = Date.now();
-    const retryInterval = 2000; // 2초마다 재시도
-    let hasLoggedWaiting = false;
 
-    while (Date.now() - startTime < timeoutMs) {
-      try {
-        // Backend readiness 체크
-        const isReady = await gatrixApiService.checkReadiness();
-        if (isReady) {
-          // 연결 테스트
-          const gatrixConnected = await gatrixApiService.testConnection();
-          if (gatrixConnected) {
-            logger.info('Gatrix backend connection established');
-
-            // Register chat server with Gatrix backend
-            try {
-              const registered = await gatrixApiService.registerChatServer();
-              if (registered) {
-                logger.info('Chat server registered with Gatrix backend');
-              } else {
-                logger.warn('Failed to register chat server with Gatrix backend');
-              }
-            } catch (regError) {
-              logger.warn('Chat server registration failed, continuing without registration');
-            }
-            return;
-          }
-        }
-      } catch (error) {
-        // 네트워크 연결 오류는 로그를 출력하지 않음 (backend가 아직 시작되지 않은 정상적인 상황)
-      }
-
-      // 처음 한 번만 대기 메시지 출력
-      if (!hasLoggedWaiting) {
-        logger.info(`Waiting for Gatrix backend connection (timeout: ${Math.round(timeoutMs/1000)}s)`);
-        hasLoggedWaiting = true;
-      }
-
-      await new Promise(resolve => setTimeout(resolve, retryInterval));
-    }
-
-    throw new Error(`Gatrix backend connection timeout after ${Math.round(timeoutMs/1000)}s`);
-  }
 
   public async initialize(): Promise<void> {
     try {
@@ -256,12 +213,8 @@ class ChatServerApp {
       await databaseManager.initialize();
       logger.info('Database connection established');
 
-      // Wait for Gatrix backend connection with retry (blocking - required for integration)
-      await this.waitForGatrixAPI(config.gatrix.connectionTimeout);
-
-      // Start user synchronization service
-      userSyncService.start();
-      logger.info('User synchronization service started');
+      // Chat server runs independently - no Gatrix dependency
+      logger.info('Chat server running in standalone mode');
 
       // Initialize WebSocket service
       this.webSocketService = new WebSocketService(this.server);
@@ -284,6 +237,10 @@ class ChatServerApp {
   public async start(): Promise<void> {
     try {
       await this.initialize();
+
+      // 기본 API 토큰 생성
+      const defaultToken = await ApiTokenService.ensureDefaultToken();
+      logger.info(`Default API token ready: ${defaultToken.substring(0, 12)}...`);
 
       this.server.listen(config.port, config.host, () => {
         logger.info(`Chat server running on ${config.host}:${config.port}`, {
@@ -333,17 +290,9 @@ class ChatServerApp {
         logger.info('HTTP server closed');
       });
 
-      // Unregister chat server from Gatrix
-      try {
-        await gatrixApiService.unregisterChatServer();
-        logger.info('Chat server unregistered from Gatrix');
-      } catch (error) {
-        logger.warn('Failed to unregister chat server from Gatrix:', error);
-      }
+      // Chat server shutdown - no external dependencies to unregister
 
-      // Stop user synchronization service
-      userSyncService.stop();
-      logger.info('User synchronization service stopped');
+      // User synchronization service is no longer used
 
       // Shutdown WebSocket service
       if (this.webSocketService) {

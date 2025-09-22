@@ -77,6 +77,12 @@ const config = {
     level: process.env.LOG_LEVEL || 'info',
     dir: process.env.LOG_DIR || 'logs',
   },
+
+  // Chat Server configuration
+  chatServer: {
+    url: process.env.CHAT_SERVER_URL || 'http://localhost:3001',
+    apiToken: process.env.CHAT_SERVER_API_TOKEN || 'gatrix-api-default-token',
+  },
 };
 
 // Validate required environment variables

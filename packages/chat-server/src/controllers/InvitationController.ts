@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { ChannelInvitationModel } from '../models/ChannelInvitation';
 import { UserPrivacySettingsModel } from '../models/UserPrivacySettings';
 import { ChannelModel } from '../models/Channel';
-import { userSyncService } from '../services/UserSyncService';
+import { redisClient } from '../config/redis';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('InvitationController');
@@ -103,9 +103,11 @@ export class InvitationController {
         message,
       });
 
-      // 초대자 정보 가져오기
-      const inviter = await userSyncService.getUser(userId);
-      if (!inviter) {
+      // 초대자 정보 가져오기 (Redis에서 직접 조회)
+      const userKey = `user:${userId}`;
+      const inviterData = await redisClient.hgetall(userKey);
+
+      if (!inviterData.id) {
         logger.error('Inviter not found', { userId });
         res.status(500).json({
           success: false,
@@ -113,6 +115,13 @@ export class InvitationController {
         });
         return;
       }
+
+      const inviter = {
+        id: parseInt(inviterData.id),
+        name: inviterData.name || inviterData.username || 'Unknown User',
+        email: inviterData.email,
+        avatar: inviterData.avatar
+      };
 
       // 초대받은 사용자에게 실시간 알림 전송
       try {
@@ -301,7 +310,15 @@ export class InvitationController {
         result.invitations.map(async (invitation) => {
           const [channel, inviter] = await Promise.all([
             ChannelModel.findById(invitation.channelId),
-            userSyncService.getUser(invitation.inviterId),
+            (async () => {
+              const userData = await redisClient.hgetall(`user:${invitation.inviterId}`);
+              return userData.id ? {
+                id: parseInt(userData.id),
+                name: userData.name,
+                email: userData.email,
+                avatar: userData.avatar
+              } : null;
+            })(),
           ]);
 
           return {
@@ -354,7 +371,15 @@ export class InvitationController {
         result.invitations.map(async (invitation) => {
           const [channel, invitee] = await Promise.all([
             ChannelModel.findById(invitation.channelId),
-            userSyncService.getUser(invitation.inviteeId),
+            (async () => {
+              const userData = await redisClient.hgetall(`user:${invitation.inviteeId}`);
+              return userData.id ? {
+                id: parseInt(userData.id),
+                name: userData.name,
+                email: userData.email,
+                avatar: userData.avatar
+              } : null;
+            })(),
           ]);
 
           return {
@@ -430,7 +455,13 @@ export class InvitationController {
       // 초대받은 사용자 정보 추가
       const enrichedInvitations = await Promise.all(
         result.invitations.map(async (invitation) => {
-          const invitee = await userSyncService.getUser(invitation.inviteeId);
+          const inviteeData = await redisClient.hgetall(`user:${invitation.inviteeId}`);
+          const invitee = inviteeData.id ? {
+            id: parseInt(inviteeData.id),
+            name: inviteeData.name,
+            email: inviteeData.email,
+            avatar: inviteeData.avatar
+          } : null;
           return {
             ...invitation,
             invitee: invitee ? { id: invitee.id, name: invitee.name, email: invitee.email } : null,

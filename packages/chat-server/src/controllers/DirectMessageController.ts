@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
 import { ChannelModel } from '../models/Channel';
 import { UserPrivacySettingsModel } from '../models/UserPrivacySettings';
-import { userSyncService } from '../services/UserSyncService';
-import { BroadcastService } from '../services/BroadcastService';
+import { redisClient } from '../config/redis';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('DirectMessageController');
@@ -32,7 +31,13 @@ export class DirectMessageController {
       }
 
       // 대상 사용자가 존재하는지 확인
-      const targetUser = await userSyncService.getUser(targetUserId);
+      const targetUserData = await redisClient.hgetall(`user:${targetUserId}`);
+      const targetUser = targetUserData.id ? {
+        id: parseInt(targetUserData.id),
+        name: targetUserData.name,
+        email: targetUserData.email,
+        avatar: targetUserData.avatar
+      } : null;
       if (!targetUser) {
         res.status(404).json({
           success: false,
@@ -78,7 +83,13 @@ export class DirectMessageController {
       }
 
       // 새로운 1:1 대화 채널 생성
-      const currentUser = await userSyncService.getUser(userId);
+      const currentUserData = await redisClient.hgetall(`user:${userId}`);
+      const currentUser = currentUserData.id ? {
+        id: parseInt(currentUserData.id),
+        name: currentUserData.name,
+        email: currentUserData.email,
+        avatar: currentUserData.avatar
+      } : null;
       const channelName = `${currentUser?.name || 'User'} & ${targetUser.name}`;
       
       const channel = await ChannelModel.create({
@@ -148,7 +159,13 @@ export class DirectMessageController {
           let otherUser = null;
           
           if (otherMember) {
-            otherUser = await userSyncService.getUser(otherMember.userId);
+            const otherUserData = await redisClient.hgetall(`user:${otherMember.userId}`);
+            otherUser = otherUserData.id ? {
+              id: parseInt(otherUserData.id),
+              name: otherUserData.name,
+              email: otherUserData.email,
+              avatar: otherUserData.avatar
+            } : null;
           }
 
           return {
@@ -157,7 +174,7 @@ export class DirectMessageController {
               id: otherUser.id,
               name: otherUser.name,
               email: otherUser.email,
-              avatarUrl: otherUser.avatarUrl,
+              avatarUrl: otherUser.avatar,
             } : null,
           };
         })

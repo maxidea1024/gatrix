@@ -1,5 +1,6 @@
 import { WebSocketEvent, WebSocketEventType, Message, TypingIndicator, User } from '../types/chat';
 import { io, Socket } from 'socket.io-client';
+import { ChatService } from './chatService';
 
 export type WebSocketEventHandler = (event: WebSocketEvent) => void;
 
@@ -13,6 +14,7 @@ export class ChatWebSocketService {
   private shouldReconnect = true;
   private heartbeatInterval: NodeJS.Timeout | null = null;
   private connectionPromise: Promise<void> | null = null;
+  private chatServerToken: string | null = null;
 
   constructor(private getAuthToken: () => string | null) {}
 
@@ -24,17 +26,38 @@ export class ChatWebSocketService {
     this.isConnecting = true;
     this.shouldReconnect = true;
 
-    this.connectionPromise = new Promise((resolve, reject) => {
+    this.connectionPromise = new Promise(async (resolve, reject) => {
       try {
-        const token = this.getAuthToken();
-        if (!token) {
-          throw new Error('No authentication token available');
+        // Backend에서 Chat 토큰 발급받기
+        const backendToken = localStorage.getItem('accessToken');
+        if (!backendToken) {
+          throw new Error('No authentication token found');
         }
+
+        // Backend API를 통해 Chat WebSocket 토큰 발급
+        const response = await fetch('/api/v1/chat/token', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${backendToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to get chat token: ${response.status}`);
+        }
+
+        const tokenData = await response.json();
+        if (!tokenData.success || !tokenData.data.token) {
+          throw new Error('Invalid chat token response');
+        }
+
+        const chatToken = tokenData.data.token;
 
         const socketUrl = this.getSocketUrl();
         this.socket = io(socketUrl, {
           auth: {
-            token: token
+            token: chatToken
           },
           transports: ['websocket', 'polling'],
           timeout: 10000,

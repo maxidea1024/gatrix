@@ -311,6 +311,13 @@ export class ChatService {
     return response.data || [];
   }
 
+  // User synchronization
+  static async syncCurrentUser(): Promise<void> {
+    await apiService.post(`${this.BASE_URL}/sync-user`);
+  }
+
+
+
   static async getUsersInChannel(channelId: number): Promise<User[]> {
     const response = await apiService.get<User[]>(`${this.BASE_URL}/channels/${channelId}/users`);
     return response.data || [];

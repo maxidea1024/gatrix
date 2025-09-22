@@ -48,6 +48,7 @@ export const config = {
   // JWT
   jwt: {
     secret: process.env.JWT_SECRET || 'your-super-secret-jwt-key-for-chat-server',
+    serverSecret: process.env.JWT_SERVER_SECRET || 'your-super-secret-server-key-for-chat-server',
     expiresIn: process.env.JWT_EXPIRES_IN || '24h',
   },
 

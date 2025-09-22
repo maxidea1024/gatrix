@@ -1,7 +1,7 @@
 import { Model } from 'objection';
 import { databaseManager } from '../config/database';
 import { Message as MessageType, CreateMessageData, UpdateMessageData, MessageData } from '../types/chat';
-import { userSyncService } from '../services/UserSyncService';
+import { redisClient } from '../config/redis';
 
 export class Message extends Model {
   static tableName = 'chat_messages';
@@ -120,7 +120,13 @@ export class MessageModel {
     if (!message) return null;
 
     // Redis에서 사용자 정보 조회
-    const user = await userSyncService.getCachedUser(message.userId);
+    const userData = await redisClient.hgetall(`user:${message.userId}`);
+    const user = userData.id ? {
+      id: parseInt(userData.id),
+      name: userData.name,
+      email: userData.email,
+      avatar: userData.avatar
+    } : null;
 
     // 답글 메시지가 있는 경우 조회
     let replyMessage = null;
@@ -131,7 +137,13 @@ export class MessageModel {
         .first();
 
       if (replyMessage) {
-        replyUser = await userSyncService.getCachedUser(replyMessage.userId);
+        const replyUserData = await redisClient.hgetall(`user:${replyMessage.userId}`);
+        replyUser = replyUserData.id ? {
+          id: parseInt(replyUserData.id),
+          name: replyUserData.name,
+          email: replyUserData.email,
+          avatar: replyUserData.avatar
+        } : null;
       }
     }
 

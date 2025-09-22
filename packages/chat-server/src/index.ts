@@ -10,7 +10,9 @@ if (!process.env.SERVER_ID) {
 }
 
 async function startServer(): Promise<void> {
+  console.log('=== CHAT SERVER STARTING ===');
   try {
+    console.log('Step 1: Logger info...');
     logger.info('Starting Chat Server...', {
       nodeEnv: config.nodeEnv,
       serverId: process.env.SERVER_ID,
@@ -18,11 +20,17 @@ async function startServer(): Promise<void> {
       timestamp: new Date().toISOString(),
     });
 
+    console.log('Step 2: Creating app...');
     const app = new ChatServerApp();
+
+    console.log('Step 3: Starting app...');
     await app.start();
 
+    console.log('=== CHAT SERVER STARTED ===');
+
   } catch (error) {
-    // Error already logged in ChatServerApp.start()
+    console.error('=== STARTUP ERROR ===', error);
+    logger.error('Error during server startup:', error);
     process.exit(1);
   }
 }

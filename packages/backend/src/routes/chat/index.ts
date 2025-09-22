@@ -1,6 +1,8 @@
 import express from 'express';
 import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
 import { authenticate } from '../../middleware/auth';
+import { requireAdmin } from '../../middleware/requireAdmin';
+import { ChatSyncController } from '../../controllers/ChatSyncController';
 import logger from '../../config/logger';
 
 const router = express.Router();
@@ -11,6 +13,16 @@ const CHAT_API_BASE = `${CHAT_SERVER_URL}/api/v1`;
 
 // 모든 채팅 라우트에 인증 필요
 router.use(authenticate as any);
+
+// Chat Server 동기화 엔드포인트 (프록시 전에 처리)
+router.post('/sync-user', ChatSyncController.syncCurrentUser as any);
+router.post('/sync-user/:userId', requireAdmin, ChatSyncController.syncUser as any);
+router.post('/sync-all-users', requireAdmin, ChatSyncController.syncAllUsers as any);
+router.get('/health', ChatSyncController.healthCheck);
+
+// Chat WebSocket 토큰 발급 엔드포인트
+router.post('/token', ChatSyncController.getChatToken as any);
+
 
 // 직접 라우트 제거 - 프록시로 통일 완료
 

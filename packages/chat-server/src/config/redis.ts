@@ -192,3 +192,11 @@ export class RedisManager {
 }
 
 export const redisManager = RedisManager.getInstance();
+
+// 임시 호환성을 위한 redisClient export (나중에 제거 예정)
+export const redisClient = {
+  hgetall: async (key: string) => {
+    const client = redisManager.getClient();
+    return client ? await client.hgetall(key) : {};
+  }
+};
