@@ -1,5 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
 import { config } from '../config';
+import { createLogger } from '../config/logger';
+
+const logger = createLogger('ChatServerService');
 
 interface ChatServerTokenResponse {
   success: boolean;
@@ -150,6 +153,112 @@ export class ChatServerService {
     } catch (error: any) {
       console.error(`❌ Failed to delete user ${userId} from Chat Server:`, error.message);
       throw error;
+    }
+  }
+
+  /**
+   * Chat WebSocket 토큰 생성
+   */
+  async generateChatToken(userId: number): Promise<string> {
+    try {
+      const response = await this.axiosInstance.post('/api/v1/auth/token', { userId });
+
+      if (!response.data.success || !response.data.data?.token) {
+        throw new Error('Failed to generate chat token');
+      }
+
+      return response.data.data.token;
+    } catch (error) {
+      logger.error('Error generating chat token:', error);
+      throw new Error('Failed to generate chat token');
+    }
+  }
+
+  /**
+   * 사용자 채널 목록 조회
+   */
+  async getUserChannels(userId: number): Promise<any[]> {
+    try {
+      // Chat Server의 /api/v1/channels/my 엔드포인트 사용
+      // 사용자 ID를 헤더로 전달
+      const response = await this.axiosInstance.get('/api/v1/channels/my', {
+        headers: {
+          'X-User-ID': userId.toString()
+        }
+      });
+
+      if (!response.data.success) {
+        throw new Error('Failed to get user channels');
+      }
+
+      return response.data.data?.channels || [];
+    } catch (error) {
+      logger.error('Error getting user channels:', error);
+      throw new Error('Failed to get user channels');
+    }
+  }
+
+  /**
+   * 채널 생성
+   */
+  async createChannel(channelData: {
+    name: string;
+    description?: string;
+    type: string;
+    createdBy: number;
+  }): Promise<any> {
+    try {
+      const response = await this.axiosInstance.post('/api/v1/channels', channelData);
+
+      if (!response.data.success) {
+        throw new Error('Failed to create channel');
+      }
+
+      return response.data.data?.channel;
+    } catch (error) {
+      logger.error('Error creating channel:', error);
+      throw new Error('Failed to create channel');
+    }
+  }
+
+  /**
+   * 채널 정보 조회
+   */
+  async getChannel(channelId: number): Promise<any> {
+    try {
+      const response = await this.axiosInstance.get(`/api/v1/channels/${channelId}`);
+
+      if (!response.data.success) {
+        return null;
+      }
+
+      return response.data.data?.channel;
+    } catch (error) {
+      logger.error('Error getting channel:', error);
+      return null;
+    }
+  }
+
+  /**
+   * 채널 메시지 조회
+   */
+  async getChannelMessages(channelId: number, options: {
+    page: number;
+    limit: number;
+  }): Promise<any[]> {
+    try {
+      const response = await this.axiosInstance.get(`/api/v1/channels/${channelId}/messages`, {
+        params: options
+      });
+
+      if (!response.data.success) {
+        throw new Error('Failed to get channel messages');
+      }
+
+      return response.data.data?.messages || [];
+    } catch (error) {
+      logger.error('Error getting channel messages:', error);
+      throw new Error('Failed to get channel messages');
     }
   }
 

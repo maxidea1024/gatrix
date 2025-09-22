@@ -10,7 +10,7 @@ declare global {
   namespace Express {
     interface Request {
       apiToken?: ApiToken;
-      user?: { id: number; email: string; name: string; };
+      user?: { id: number; email?: string; name?: string; };
     }
   }
 }
@@ -44,6 +44,16 @@ export const authenticateApiToken = async (req: Request, res: Response, next: Ne
 
     // 요청 객체에 토큰 정보 추가
     req.apiToken = apiToken;
+
+    // X-User-ID 헤더에서 사용자 ID 추출
+    const userIdHeader = req.headers['x-user-id'] as string;
+    if (userIdHeader) {
+      const userId = parseInt(userIdHeader);
+      if (!isNaN(userId)) {
+        req.user = { id: userId };
+      }
+    }
+
     next();
   } catch (error) {
     logger.error('API token authentication error:', error);

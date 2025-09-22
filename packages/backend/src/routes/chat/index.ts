@@ -3,6 +3,7 @@ import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
 import { authenticate } from '../../middleware/auth';
 import { requireAdmin } from '../../middleware/requireAdmin';
 import { ChatSyncController } from '../../controllers/ChatSyncController';
+import { ChatChannelController } from '../../controllers/ChatChannelController';
 import logger from '../../config/logger';
 
 const router = express.Router();
@@ -23,6 +24,11 @@ router.get('/health', ChatSyncController.healthCheck);
 // Chat WebSocket 토큰 발급 엔드포인트
 router.post('/token', ChatSyncController.getChatToken as any);
 
+// 채널 관련 엔드포인트 (프록시 대신 직접 구현)
+router.get('/channels/my', ChatChannelController.getMyChannels as any);
+router.post('/channels', ChatChannelController.createChannel as any);
+router.get('/channels/:channelId', ChatChannelController.getChannel as any);
+router.get('/channels/:channelId/messages', ChatChannelController.getChannelMessages as any);
 
 // 직접 라우트 제거 - 프록시로 통일 완료
 
