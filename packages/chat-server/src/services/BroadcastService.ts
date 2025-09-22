@@ -22,6 +22,7 @@ export interface BroadcastMessage {
 }
 
 export class BroadcastService {
+  private static instance: BroadcastService | null = null;
   private io: SocketIOServer;
   private serverId: string;
   private messageQueue: Map<number, BroadcastMessage[]> = new Map();
@@ -293,6 +294,20 @@ export class BroadcastService {
       cacheHitRate: this.messageCache.calculatedSize / (this.messageCache.calculatedSize + this.messageCache.size),
       compressionCacheSize: this.compressionCache.size,
     };
+  }
+}
+
+  // Singleton 패턴 메서드들
+  public static getInstance(): BroadcastService | null {
+    return BroadcastService.instance;
+  }
+
+  public static setInstance(instance: BroadcastService): void {
+    BroadcastService.instance = instance;
+  }
+
+  public static clearInstance(): void {
+    BroadcastService.instance = null;
   }
 }
 

@@ -444,11 +444,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       return () => {
+        // 이벤트 리스너 정리
+        wsService.removeAllListeners();
         wsService.disconnect();
         dispatch({ type: 'SET_CONNECTED', payload: false });
       };
     }
-  }, [user]);
+  }, [user?.userId]); // user 객체 전체가 아닌 userId만 의존성으로 사용
 
   // Helper function to find channel ID for a message
   const findChannelIdForMessage = (messageId: number): number | null => {

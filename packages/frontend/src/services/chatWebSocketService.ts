@@ -54,7 +54,11 @@ export class ChatWebSocketService {
           console.log('❌ Chat Socket.IO disconnected:', reason);
           this.isConnecting = false;
           this.stopHeartbeat();
-          this.emit('connection_lost', { reason });
+
+          // 의도적인 연결 해제가 아닌 경우에만 connection_lost 이벤트 발생
+          if (reason !== 'io client disconnect') {
+            this.emit('connection_lost', { reason });
+          }
 
           // 서버 종료나 네트워크 문제로 인한 연결 끊김만 재연결 시도
           if (this.shouldReconnect && reason !== 'io client disconnect') {
@@ -149,6 +153,10 @@ export class ChatWebSocketService {
         handlers.splice(index, 1);
       }
     }
+  }
+
+  removeAllListeners(): void {
+    this.eventHandlers.clear();
   }
 
   // Send events to server

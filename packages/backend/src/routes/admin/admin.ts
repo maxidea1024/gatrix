@@ -40,6 +40,7 @@ router.post('/users/:id/activate', auditUserUnsuspend as any, AdminController.ac
 router.post('/users/:id/suspend', auditUserSuspend as any, AdminController.suspendUser as any);
 router.post('/users/:id/promote', auditUserPromote as any, AdminController.promoteToAdmin as any);
 router.post('/users/:id/demote', auditUserDemote as any, AdminController.demoteFromAdmin as any);
+router.post('/users/:id/verify-email', AdminController.verifyUserEmail as any);
 
 // Bulk user operations
 router.post('/users/bulk/status', AdminController.bulkUpdateUserStatus as any);

@@ -49,26 +49,20 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
   const currentChannel = state.channels.find(c => c.id === channelId);
   const channelUsers = currentChannel?.members || [];
 
-  // 컴포넌트 마운트 시 입력창에 포커스
+  // WebSocket 연결 및 채널 준비 완료 시 입력창에 포커스
   useEffect(() => {
-    if (textFieldRef.current) {
+    if (channelId &&
+        textFieldRef.current &&
+        !disabled &&
+        state.isConnected &&
+        currentChannel) {
+      // WebSocket 연결, 채널 존재, 비활성화 상태가 아닐 때만 포커스
       const timer = setTimeout(() => {
         textFieldRef.current?.focus();
-      }, 200);
+      }, 300);
       return () => clearTimeout(timer);
     }
-  }, []);
-
-  // 채널 변경 시 입력창에 포커스
-  useEffect(() => {
-    if (channelId && textFieldRef.current) {
-      // 약간의 지연을 두어 렌더링이 완료된 후 포커스
-      const timer = setTimeout(() => {
-        textFieldRef.current?.focus();
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [channelId]);
+  }, [channelId, disabled, state.isConnected, currentChannel]);
 
   // Handle typing indicator
   useEffect(() => {

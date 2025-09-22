@@ -36,7 +36,10 @@ export class WebSocketService {
     this.setupMiddleware();
     this.setupEventHandlers();
     this.broadcastService = new BroadcastService(this.io, this.serverId);
-    
+
+    // BroadcastService singleton 설정
+    BroadcastService.setInstance(this.broadcastService);
+
     logger.info(`WebSocket service initialized with server ID: ${this.serverId}`);
   }
 
@@ -262,7 +265,7 @@ export class WebSocketService {
 
   private async handleJoinChannel(socket: Socket, socketUser: SocketUser, channelId: number): Promise<void> {
     // 채널 권한 검사
-    const { ChannelModel } = require('../models/ChannelModel');
+    const { ChannelModel } = require('../models/Channel');
 
     try {
       const channel = await ChannelModel.findById(channelId);
@@ -563,5 +566,10 @@ export class WebSocketService {
 
   public getIO(): any {
     return this.io;
+  }
+
+  // BroadcastService 인스턴스 접근을 위한 getter
+  public getBroadcastService(): BroadcastService {
+    return this.broadcastService;
   }
 }
