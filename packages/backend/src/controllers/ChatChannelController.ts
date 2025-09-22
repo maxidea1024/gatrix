@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { ChatServerService } from '../services/ChatServerService';
 import { createLogger } from '../config/logger';
+import { JWTPayload } from '../types/auth';
 
 const logger = createLogger('ChatChannelController');
 
@@ -16,7 +17,7 @@ export class ChatChannelController {
    */
   static async getMyChannels(req: Request, res: Response): Promise<void> {
     try {
-      const user = req.user;
+      const user = req.user as JWTPayload;
       if (!user) {
         res.status(401).json({
           success: false,
@@ -26,7 +27,7 @@ export class ChatChannelController {
       }
 
       // Chat Server에서 사용자 채널 목록 조회
-      const response = await ChatChannelController.chatServerService.getUserChannels(user.id);
+      const response = await ChatChannelController.chatServerService.getUserChannels(user.userId);
 
       res.json({
         success: true,
@@ -47,7 +48,7 @@ export class ChatChannelController {
    */
   static async createChannel(req: Request, res: Response): Promise<void> {
     try {
-      const user = req.user;
+      const user = req.user as JWTPayload;
       if (!user) {
         res.status(401).json({
           success: false,
@@ -71,7 +72,7 @@ export class ChatChannelController {
         name,
         description,
         type,
-        createdBy: user.id
+        createdBy: user.userId
       });
 
       res.status(201).json({
@@ -93,7 +94,7 @@ export class ChatChannelController {
    */
   static async getChannel(req: Request, res: Response): Promise<void> {
     try {
-      const user = req.user;
+      const user = req.user as JWTPayload;
       if (!user) {
         res.status(401).json({
           success: false,
@@ -134,7 +135,7 @@ export class ChatChannelController {
    */
   static async getChannelMessages(req: Request, res: Response): Promise<void> {
     try {
-      const user = req.user;
+      const user = req.user as JWTPayload;
       if (!user) {
         res.status(401).json({
           success: false,
@@ -174,7 +175,7 @@ export class ChatChannelController {
    */
   static async getUsers(req: Request, res: Response): Promise<void> {
     try {
-      const user = req.user;
+      const user = req.user as JWTPayload;
       if (!user) {
         res.status(401).json({
           success: false,
@@ -186,7 +187,7 @@ export class ChatChannelController {
       const { search } = req.query;
 
       // Chat Server에서 사용자 목록 조회
-      const users = await ChatChannelController.chatServerService.getUsers(user.id, search as string);
+      const users = await ChatChannelController.chatServerService.getUsers(user.userId, search as string);
 
       res.json({
         success: true,
