@@ -640,9 +640,10 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
 
   const getUserInfo = (userId: number) => {
     const user = state.users[userId];
+    const userName = user?.username || user?.name || `User${userId}`;
     return {
-      name: user?.username || user?.name || `User ${userId}`,
-      avatar: user?.avatar || `https://ui-avatars.com/api/?name=${user?.username || 'User'}&background=random`,
+      name: userName,
+      avatar: user?.avatar || user?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=random`,
     };
   };
 
@@ -923,7 +924,9 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                     target.style.display = 'none';
                     const parent = target.parentElement;
                     if (parent) {
-                      parent.innerHTML = `<span style="color: white; font-weight: bold; font-size: 14px;">${userInfo.name.charAt(0).toUpperCase()}</span>`;
+                      // 사용자 이름의 첫 글자만 표시 (한글, 영문 모두 지원)
+                      const firstChar = userInfo.name.trim().charAt(0).toUpperCase();
+                      parent.innerHTML = `<span style="color: white; font-weight: bold; font-size: 14px;">${firstChar}</span>`;
                     }
                   }}
                 />

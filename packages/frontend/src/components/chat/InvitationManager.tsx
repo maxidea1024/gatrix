@@ -142,10 +142,10 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
             // 채널 목록 새로고침을 위해 부모 컴포넌트에 알림
             if (onInvitationAccepted) {
               onInvitationAccepted(data.channelId);
+            } else {
+              // 콜백이 없는 경우에만 페이지 이동
+              window.location.href = `/chat?channel=${data.channelId}`;
             }
-
-            // 채팅 페이지로 이동하면서 해당 채널 선택
-            window.location.href = `/chat?channel=${data.channelId}`;
           }
         } else {
           enqueueSnackbar(data.error || `Failed to ${action} invitation`, { variant: 'error' });

@@ -297,6 +297,7 @@ export interface ChatContextType {
     loadMoreMessages: (channelId: number) => Promise<void>;
     uploadFile: (file: File, channelId: number) => Promise<MessageAttachment>;
     inviteUser: (channelId: number, userId: number, message?: string) => Promise<void>;
+    loadPendingInvitationsCount: () => Promise<void>;
     clearError: () => void;
   };
 }

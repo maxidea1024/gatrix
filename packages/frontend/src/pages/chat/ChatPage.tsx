@@ -25,6 +25,7 @@ import {
   IconButton,
   Tooltip,
   CircularProgress,
+  Badge,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -377,7 +378,14 @@ const ChatPageContent: React.FC = () => {
                         }
                       }}
                     >
-                      <MailIcon fontSize="small" />
+                      <Badge
+                        badgeContent={state.pendingInvitationsCount}
+                        color="error"
+                        max={99}
+                        invisible={state.pendingInvitationsCount === 0}
+                      >
+                        <MailIcon fontSize="small" />
+                      </Badge>
                     </IconButton>
                   </Tooltip>
 
@@ -605,6 +613,11 @@ const ChatPageContent: React.FC = () => {
         onClose={() => setInvitationManagerOpen(false)}
         title={t('chat.manageInvitations')}
         subtitle={t('chat.manageInvitationsSubtitle')}
+        onInvitationAccepted={(channelId) => {
+          // 초대 수락 후 해당 채널로 이동
+          actions.setCurrentChannel(channelId);
+          setInvitationManagerOpen(false);
+        }}
       />
 
       <PrivacySettings

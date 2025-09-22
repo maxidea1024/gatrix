@@ -21,6 +21,20 @@ import { format } from 'date-fns';
 import { ko, enUS, zhCN } from 'date-fns/locale';
 import TypingIndicator from './TypingIndicator';
 import MessageContent from './MessageContent';
+import {
+  MainContainer,
+  ChatContainer,
+  MessageList as ChatMessageList,
+  Message as ChatMessage,
+  MessageInput,
+  ConversationHeader,
+  Avatar,
+  MessageSeparator,
+  TypingIndicator as ChatTypingIndicator,
+  VoiceCallButton,
+  VideoCallButton,
+  MessageModel
+} from '@chatscope/chat-ui-kit-react';
 
 interface MessageListProps {
   channelId: number;

@@ -162,9 +162,17 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
       const channelId = action.payload.channelId;
       const currentMessages = state.messages[channelId] || [];
 
+      console.log('🔄 ADD_MESSAGE reducer:', {
+        messageId: action.payload.id,
+        channelId,
+        currentMessagesCount: currentMessages.length,
+        payload: action.payload
+      });
+
       // 중복 메시지 방지
       const messageExists = currentMessages.some(msg => msg.id === action.payload.id);
       if (messageExists) {
+        console.log('⚠️ Message already exists, skipping:', action.payload.id);
         return state;
       }
 
@@ -172,6 +180,12 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ...state.messages,
         [channelId]: [...currentMessages, action.payload],
       };
+
+      console.log('✅ Message added successfully:', {
+        messageId: action.payload.id,
+        channelId,
+        newMessagesCount: updatedMessages[channelId].length
+      });
 
       // 새 메시지 추가 시 localStorage에 저장
       saveCachedMessages(updatedMessages);
@@ -306,6 +320,12 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         isLoading: true, // 새로고침 중임을 표시
       };
 
+    case 'SET_PENDING_INVITATIONS_COUNT':
+      return {
+        ...state,
+        pendingInvitationsCount: action.payload,
+      };
+
     default:
       return state;
   }
@@ -322,14 +342,26 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { enqueueSnackbar } = useSnackbar();
   const wsService = getChatWebSocketService(getToken);
 
-  // 디버깅: 초기 상태 확인
-  console.log('🚀 ChatProvider initialized with messages:', Object.keys(state.messages).map(k => `${k}: ${state.messages[parseInt(k)].length} messages`));
+  // 디버깅: 초기 상태 확인 (한 번만 실행)
+  useEffect(() => {
+    console.log('🚀 ChatProvider initialized with messages:', Object.keys(state.messages).map(k => `${k}: ${state.messages[parseInt(k)].length} messages`));
+  }, []); // 빈 의존성 배열로 한 번만 실행
 
   // 페이지 전환 시 메시지 상태 보존을 위한 ref
   const isInitializedRef = useRef(false);
 
   // markAsRead 요청 추적을 위한 ref
   const markAsReadRequestsRef = useRef<Set<string>>(new Set());
+
+  // Helper function to find channel ID for a message
+  const findChannelIdForMessage = (messageId: number): number | null => {
+    for (const [channelId, messages] of Object.entries(state.messages)) {
+      if (messages.some(msg => msg.id === messageId)) {
+        return parseInt(channelId);
+      }
+    }
+    return null;
+  };
 
   // Initialize WebSocket connection
   useEffect(() => {
@@ -356,6 +388,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         wsService.onMessageCreated((message) => {
           console.log('📨 ChatContext received message_created:', message);
           console.log('📨 Message data:', message.data);
+          console.log('📨 Current channel ID:', state.currentChannelId);
+          console.log('📨 Message channel ID:', message.data?.channelId);
           dispatch({ type: 'ADD_MESSAGE', payload: message.data });
         });
 
@@ -414,29 +448,31 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             enqueueSnackbar(t('chat.authenticationFailed'), { variant: 'error' });
           }
         });
+
+        // 메시지 삭제 이벤트 리스너
+        wsService.onMessageDeleted((messageId) => {
+          // Find the channel for this message
+          const channelId = findChannelIdForMessage(messageId);
+          if (channelId) {
+            dispatch({ type: 'REMOVE_MESSAGE', payload: { channelId, messageId } });
+          }
+        });
+
+        // 타이핑 이벤트 리스너
+        wsService.onUserTyping((typing) => {
+          dispatch({ type: 'ADD_TYPING_USER', payload: typing });
+          // Remove typing indicator after 3 seconds
+          setTimeout(() => {
+            dispatch({
+              type: 'REMOVE_TYPING_USER',
+              payload: { channelId: typing.channelId, userId: typing.userId }
+            });
+          }, 3000);
+        });
       };
 
       setupEventListeners();
       connectWebSocket();
-
-      wsService.onMessageDeleted((messageId) => {
-        // Find the channel for this message
-        const channelId = findChannelIdForMessage(messageId);
-        if (channelId) {
-          dispatch({ type: 'REMOVE_MESSAGE', payload: { channelId, messageId } });
-        }
-      });
-
-      wsService.onUserTyping((typing) => {
-        dispatch({ type: 'ADD_TYPING_USER', payload: typing });
-        // Remove typing indicator after 3 seconds
-        setTimeout(() => {
-          dispatch({ 
-            type: 'REMOVE_TYPING_USER', 
-            payload: { channelId: typing.channelId, userId: typing.userId } 
-          });
-        }, 3000);
-      });
 
       wsService.onUserStopTyping((typing) => {
         dispatch({ 
@@ -506,6 +542,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log('📨 Channel invitation received in ChatContext:', event);
         const { data } = event;
 
+        // 초대 수 증가
+        dispatch({ type: 'SET_PENDING_INVITATIONS_COUNT', payload: state.pendingInvitationsCount + 1 });
+
         // 토스트 알림 표시 (백엔드 메시지가 있으면 사용, 없으면 기본 번역 메시지 사용)
         const displayMessage = data.message || t('chat.invitationReceived', {
           inviterName: data.inviterName,
@@ -533,6 +572,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                       if (response.ok) {
                         enqueueSnackbar(t('chat.invitationAccepted'), { variant: 'success' });
+                        // 초대 수 감소
+                        dispatch({ type: 'SET_PENDING_INVITATIONS_COUNT', payload: Math.max(0, state.pendingInvitationsCount - 1) });
                         // 채널 목록 새로고침
                         loadChannels();
                       } else {
@@ -570,6 +611,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                       if (response.ok) {
                         enqueueSnackbar(t('chat.invitationDeclined'), { variant: 'info' });
+                        // 초대 수 감소
+                        dispatch({ type: 'SET_PENDING_INVITATIONS_COUNT', payload: Math.max(0, state.pendingInvitationsCount - 1) });
                       } else {
                         enqueueSnackbar(t('chat.invitationDeclineFailed'), { variant: 'error' });
                       }
@@ -605,16 +648,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
     }
   }, [user?.userId]); // user 객체 전체가 아닌 userId만 의존성으로 사용
-
-  // Helper function to find channel ID for a message
-  const findChannelIdForMessage = (messageId: number): number | null => {
-    for (const [channelId, messages] of Object.entries(state.messages)) {
-      if (messages.some(msg => msg.id === messageId)) {
-        return parseInt(channelId);
-      }
-    }
-    return null;
-  };
 
   // Load messages for a channel
   const loadMessages = useCallback(async (channelId: number, forceReload = false) => {
@@ -684,12 +717,33 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [state.isLoading]);
 
+  // Load pending invitations count
+  const loadPendingInvitationsCount = useCallback(async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/v1/invitations/received?status=pending', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        dispatch({ type: 'SET_PENDING_INVITATIONS_COUNT', payload: data.pagination?.total || 0 });
+      }
+    } catch (error) {
+      console.error('Failed to load pending invitations count:', error);
+    }
+  }, []);
+
   // Load channels
   const loadChannels = useCallback(async () => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       const channels = await ChatService.getChannels();
       dispatch({ type: 'SET_CHANNELS', payload: channels });
+
+      // 초대 수도 함께 로드
+      await loadPendingInvitationsCount();
 
       // 마지막 참여 채널 자동 선택
       const lastChannelId = localStorage.getItem('lastChannelId');
@@ -966,6 +1020,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     clearError: () => {
       dispatch({ type: 'SET_ERROR', payload: null });
     },
+
+    loadPendingInvitationsCount: loadPendingInvitationsCount,
   };
 
   // Select channel (used for auto-selection)
