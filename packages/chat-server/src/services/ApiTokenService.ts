@@ -80,11 +80,24 @@ export class ApiTokenService {
           return null;
         }
 
+        // permissions 안전 파싱
+        let permissions: string[];
+        try {
+          permissions = JSON.parse(tokenData.permissions);
+        } catch (error) {
+          // JSON 파싱 실패 시 문자열을 배열로 변환
+          if (typeof tokenData.permissions === 'string') {
+            permissions = tokenData.permissions.split(',').map((p: string) => p.trim());
+          } else {
+            permissions = ['read']; // 기본값
+          }
+        }
+
         apiToken = {
           id: tokenData.id,
           name: tokenData.name,
           token: tokenData.token,
-          permissions: JSON.parse(tokenData.permissions),
+          permissions: permissions,
           createdAt: tokenData.createdAt.toISOString(),
           isActive: tokenData.isActive,
         };
@@ -137,14 +150,29 @@ export class ApiTokenService {
         .where({ isActive: true })
         .orderBy('createdAt', 'desc');
 
-      return tokenData.map((data: any) => ({
-        id: data.id,
-        name: data.name,
-        token: data.token,
-        permissions: JSON.parse(data.permissions),
-        createdAt: data.createdAt.toISOString(),
-        isActive: data.isActive,
-      }));
+      return tokenData.map((data: any) => {
+        // permissions 안전 파싱
+        let permissions: string[];
+        try {
+          permissions = JSON.parse(data.permissions);
+        } catch (error) {
+          // JSON 파싱 실패 시 문자열을 배열로 변환
+          if (typeof data.permissions === 'string') {
+            permissions = data.permissions.split(',').map((p: string) => p.trim());
+          } else {
+            permissions = ['read']; // 기본값
+          }
+        }
+
+        return {
+          id: data.id,
+          name: data.name,
+          token: data.token,
+          permissions: permissions,
+          createdAt: data.createdAt.toISOString(),
+          isActive: data.isActive,
+        };
+      });
     } catch (error) {
       logger.error('Error listing API tokens:', error);
       return [];

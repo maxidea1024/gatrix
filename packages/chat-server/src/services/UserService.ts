@@ -31,15 +31,39 @@ export class UserService {
    */
   static async upsertUser(userData: UserData): Promise<UserData> {
     try {
-      const now = new Date().toISOString();
-      const userToSave = {
+      // MySQL 호환 datetime 형식 (YYYY-MM-DD HH:MM:SS)
+      const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+      // datetime 변환 함수
+      const convertToMySQLDateTime = (dateValue: string | undefined): string => {
+        if (!dateValue) return now;
+        try {
+          return new Date(dateValue).toISOString().slice(0, 19).replace('T', ' ');
+        } catch {
+          return now;
+        }
+      };
+
+      // 필드 매핑 및 정리
+      const userToSave: any = {
         ...userData,
         status: userData.status || 'active',
         chatStatus: userData.chatStatus || 'offline',
-        lastActivityAt: userData.lastActivityAt || now,
-        createdAt: userData.createdAt || now,
+        lastActivityAt: convertToMySQLDateTime(userData.lastActivityAt),
+        createdAt: convertToMySQLDateTime(userData.createdAt),
         updatedAt: now
       };
+
+      // avatar 필드가 있으면 avatarUrl로 변경하고 avatar 제거
+      if ('avatar' in userToSave) {
+        if (userToSave.avatar && !userToSave.avatarUrl) {
+          userToSave.avatarUrl = userToSave.avatar;
+        }
+        delete userToSave.avatar;
+      }
+
+      // 존재하지 않는 필드들 제거
+      delete userToSave.lastSeenAt;
 
       // Database upsert
       const db = databaseManager.getKnex();
@@ -126,7 +150,7 @@ export class UserService {
   ): Promise<boolean> {
     try {
       const updates: Partial<UserData> = {
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString().slice(0, 19).replace('T', ' ')
       };
 
       if (status !== undefined) {
@@ -202,7 +226,7 @@ export class UserService {
    */
   static async updateLastSeen(userId: number): Promise<void> {
     try {
-      const now = new Date().toISOString();
+      const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
       
       // Update database
       const db = databaseManager.getKnex();

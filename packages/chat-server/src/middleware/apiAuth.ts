@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ApiTokenService, ApiToken } from '../services/ApiTokenService';
 import { createLogger } from '../config/logger';
+import jwt from 'jsonwebtoken';
 
 const logger = createLogger('ApiAuth');
 
@@ -9,6 +10,7 @@ declare global {
   namespace Express {
     interface Request {
       apiToken?: ApiToken;
+      user?: { id: number; email: string; name: string; };
     }
   }
 }
