@@ -77,8 +77,15 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
   }, []);
 
   const showMessageNotification = (message: Message) => {
+    // Safety check for message and user data
+    if (!message || !message.user) {
+      console.warn('Invalid message data for notification:', message);
+      return;
+    }
+
     const channel = state.channels.find(c => c.id === message.channelId);
     const channelName = channel?.name || t('chat.unknownChannel');
+    const username = message.user.username || message.user.name || 'Unknown User';
 
     // Browser notification
     if (
@@ -87,7 +94,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
       !isWindowFocused
     ) {
       const notification = new Notification(
-        `${message.user.username} in #${channelName}`,
+        `${username} in #${channelName}`,
         {
           body: getMessagePreview(message),
           icon: message.user.avatar || '/icons/chat-notification.png',
@@ -109,7 +116,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
     // In-app notification (snackbar)
     if (message.channelId !== activeChannelId) {
       enqueueSnackbar(
-        `${message.user.username} in #${channelName}: ${getMessagePreview(message)}`,
+        `${username} in #${channelName}: ${getMessagePreview(message)}`,
         {
           variant: 'info',
           autoHideDuration: 4000,
@@ -203,83 +210,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
   useEffect(() => {
     const webSocketService = getChatWebSocketService();
 
-    const handleChannelInvitation = (event: any) => {
-      const { data } = event;
-      console.log('📨 Channel invitation received:', data);
-
-      // 브라우저 알림
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification(`Channel Invitation`, {
-          body: `${data.inviterName} invited you to join "${data.channelName}"`,
-          icon: '/favicon.ico',
-          tag: `invitation-${data.invitationId}`,
-        });
-      }
-
-      // 스낵바 알림
-      enqueueSnackbar(
-        `${data.inviterName} invited you to join "${data.channelName}"`,
-        {
-          variant: 'info',
-          persist: true,
-          action: (key) => (
-            <div>
-              <button onClick={async () => {
-                try {
-                  const response = await fetch(`/api/v1/chat/invitations/${data.invitationId}/respond`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                    },
-                    body: JSON.stringify({ action: 'accept' })
-                  });
-
-                  if (response.ok) {
-                    enqueueSnackbar('Invitation accepted!', { variant: 'success' });
-                    closeSnackbar(key);
-                  } else {
-                    enqueueSnackbar('Failed to accept invitation', { variant: 'error' });
-                  }
-                } catch (error) {
-                  console.error('Error accepting invitation:', error);
-                  enqueueSnackbar('Failed to accept invitation', { variant: 'error' });
-                }
-              }}>
-                Accept
-              </button>
-              <button onClick={async () => {
-                try {
-                  const response = await fetch(`/api/v1/chat/invitations/${data.invitationId}/respond`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                    },
-                    body: JSON.stringify({ action: 'decline' })
-                  });
-
-                  if (response.ok) {
-                    enqueueSnackbar('Invitation declined', { variant: 'info' });
-                    closeSnackbar(key);
-                  } else {
-                    enqueueSnackbar('Failed to decline invitation', { variant: 'error' });
-                  }
-                } catch (error) {
-                  console.error('Error declining invitation:', error);
-                  enqueueSnackbar('Failed to decline invitation', { variant: 'error' });
-                }
-              }}>
-                Decline
-              </button>
-            </div>
-          )
-        }
-      );
-
-      // 알림음 재생
-      playNotificationSound();
-    };
+    // Channel invitation handling is now done in ChatContext to avoid duplicates
 
     const handleInvitationResponse = (event: any) => {
       const { data } = event;
@@ -302,14 +233,12 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
       );
     };
 
-    // 이벤트 리스너 등록
-    webSocketService.on('channel_invitation', handleChannelInvitation);
+    // 이벤트 리스너 등록 (channel_invitation은 ChatContext에서 처리)
     webSocketService.on('invitation_response', handleInvitationResponse);
     webSocketService.on('invitation_cancelled', handleInvitationCancelled);
 
     // 클린업
     return () => {
-      webSocketService.off('channel_invitation', handleChannelInvitation);
       webSocketService.off('invitation_response', handleInvitationResponse);
       webSocketService.off('invitation_cancelled', handleInvitationCancelled);
     };

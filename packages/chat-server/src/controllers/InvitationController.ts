@@ -268,6 +268,7 @@ export class InvitationController {
       res.json({
         success: true,
         data: updatedInvitation,
+        channelId: invitation.channelId, // 프론트엔드에서 채널 이동에 사용
         message: `Invitation ${action}ed successfully`,
       });
     } catch (error) {

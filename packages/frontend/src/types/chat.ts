@@ -273,6 +273,7 @@ export interface ChatState {
   notifications: ChatNotification[];
   isConnected: boolean;
   isLoading: boolean;
+  pendingInvitationsCount: number; // 받은 초대 수
 }
 
 export interface ChatContextType {

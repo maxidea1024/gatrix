@@ -60,9 +60,10 @@ interface InvitationManagerProps {
   onClose: () => void;
   title?: string;
   subtitle?: string;
+  onInvitationAccepted?: (channelId: number) => void;
 }
 
-const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, title, subtitle }) => {
+const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, title, subtitle, onInvitationAccepted }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -135,6 +136,17 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
         if (data.success) {
           enqueueSnackbar(`Invitation ${action}ed successfully`, { variant: 'success' });
           await fetchReceivedInvitations();
+
+          // 초대 수락 시 해당 채널로 자동 이동
+          if (action === 'accept' && data.channelId) {
+            // 채널 목록 새로고침을 위해 부모 컴포넌트에 알림
+            if (onInvitationAccepted) {
+              onInvitationAccepted(data.channelId);
+            }
+
+            // 채팅 페이지로 이동하면서 해당 채널 선택
+            window.location.href = `/chat?channel=${data.channelId}`;
+          }
         } else {
           enqueueSnackbar(data.error || `Failed to ${action} invitation`, { variant: 'error' });
         }

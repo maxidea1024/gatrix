@@ -84,6 +84,7 @@ const initialState: ChatState = {
   notifications: [],
   isConnected: false,
   isLoading: false,
+  pendingInvitationsCount: 0,
 };
 
 // Action types
@@ -106,7 +107,8 @@ type ChatAction =
   | { type: 'SET_TYPING_USERS'; payload: { channelId: number; users: TypingIndicator[] } }
   | { type: 'ADD_TYPING_USER'; payload: TypingIndicator }
   | { type: 'REMOVE_TYPING_USER'; payload: { channelId: number; userId: number } }
-  | { type: 'REFRESH_CHANNELS' };
+  | { type: 'REFRESH_CHANNELS' }
+  | { type: 'SET_PENDING_INVITATIONS_COUNT'; payload: number };
 
 // Reducer
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
@@ -514,7 +516,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           displayMessage,
           {
             variant: 'info',
-            persist: true,
+            autoHideDuration: 30000, // 30초 후 자동 닫힘
             action: (key) => (
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button
