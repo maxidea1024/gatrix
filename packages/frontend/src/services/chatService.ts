@@ -258,8 +258,26 @@ export class ChatService {
   // User management
   static async getUsers(search?: string): Promise<User[]> {
     const params = search ? { search } : {};
-    const response = await apiService.get<User[]>(`${this.BASE_URL}/users`, { params });
-    return response.data || [];
+    const response = await apiService.get<any>(`${this.BASE_URL}/users`, { params });
+
+    // Handle different response structures
+    if (response.data) {
+      // If response.data is an array, return it directly
+      if (Array.isArray(response.data)) {
+        return response.data as User[];
+      }
+      // If response.data has a users property, return that
+      if ((response.data as any).users && Array.isArray((response.data as any).users)) {
+        return (response.data as any).users as User[];
+      }
+      // If response.data has a data property, return that
+      if ((response.data as any).data && Array.isArray((response.data as any).data)) {
+        return (response.data as any).data as User[];
+      }
+    }
+
+    console.warn('Unexpected users response structure:', response);
+    return [];
   }
 
   // User synchronization

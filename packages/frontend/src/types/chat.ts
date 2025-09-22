@@ -274,6 +274,7 @@ export interface ChatState {
   isConnected: boolean;
   isLoading: boolean;
   pendingInvitationsCount: number; // 받은 초대 수
+  error: string | null; // error message
 }
 
 export interface ChatContextType {

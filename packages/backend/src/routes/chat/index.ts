@@ -15,18 +15,21 @@ const CHAT_API_BASE = `${CHAT_SERVER_URL}/api/v1`;
 // 모든 채팅 라우트에 인증 필요
 router.use(authenticate as any);
 
+// Body parsing이 필요한 라우트들에만 적용
+const bodyParser = express.json({ limit: '10mb' });
+
 // Chat Server 동기화 엔드포인트 (프록시 전에 처리)
-router.post('/sync-user', ChatSyncController.syncCurrentUser as any);
-router.post('/sync-user/:userId', requireAdmin, ChatSyncController.syncUser as any);
-router.post('/sync-all-users', requireAdmin, ChatSyncController.syncAllUsers as any);
+router.post('/sync-user', bodyParser, ChatSyncController.syncCurrentUser as any);
+router.post('/sync-user/:userId', requireAdmin, bodyParser, ChatSyncController.syncUser as any);
+router.post('/sync-all-users', requireAdmin, bodyParser, ChatSyncController.syncAllUsers as any);
 router.get('/health', ChatSyncController.healthCheck);
 
 // Chat WebSocket 토큰 발급 엔드포인트
-router.post('/token', ChatSyncController.getChatToken as any);
+router.post('/token', bodyParser, ChatSyncController.getChatToken as any);
 
 // 채널 관련 엔드포인트 (프록시 대신 직접 구현)
 router.get('/channels/my', ChatChannelController.getMyChannels as any);
-router.post('/channels', ChatChannelController.createChannel as any);
+router.post('/channels', bodyParser, ChatChannelController.createChannel as any);
 router.get('/channels/:channelId', ChatChannelController.getChannel as any);
 router.get('/channels/:channelId/messages', ChatChannelController.getChannelMessages as any);
 

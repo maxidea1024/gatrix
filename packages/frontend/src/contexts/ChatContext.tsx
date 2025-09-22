@@ -85,6 +85,7 @@ const initialState: ChatState = {
   isConnected: false,
   isLoading: false,
   pendingInvitationsCount: 0,
+  error: null,
 };
 
 // Action types
@@ -108,7 +109,8 @@ type ChatAction =
   | { type: 'ADD_TYPING_USER'; payload: TypingIndicator }
   | { type: 'REMOVE_TYPING_USER'; payload: { channelId: number; userId: number } }
   | { type: 'REFRESH_CHANNELS' }
-  | { type: 'SET_PENDING_INVITATIONS_COUNT'; payload: number };
+  | { type: 'SET_PENDING_INVITATIONS_COUNT'; payload: number }
+  | { type: 'SET_ERROR'; payload: string | null };
 
 // Reducer
 const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
@@ -238,6 +240,12 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
       };
     
     case 'SET_USERS':
+      // Safety check: ensure payload is an array
+      if (!Array.isArray(action.payload)) {
+        console.error('❌ SET_USERS payload is not an array:', action.payload);
+        return state;
+      }
+
       const usersMap = action.payload.reduce((acc, user) => {
         acc[user.id] = user;
         return acc;
@@ -326,6 +334,12 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         pendingInvitationsCount: action.payload,
       };
 
+    case 'SET_ERROR':
+      return {
+        ...state,
+        error: action.payload,
+      };
+
     default:
       return state;
   }
@@ -381,7 +395,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return;
           }
 
-          console.log('Connecting to chat WebSocket with token...');
+          console.log('Connecting to chat WebSocket with token...', token.substring(0, 20) + '...');
+
+          // Ensure API service has the token
+          const { apiService } = await import('../services/api');
+          apiService.setAccessToken(token);
+
           await wsService.connect();
           console.log('WebSocket connected successfully');
           dispatch({ type: 'SET_CONNECTED', payload: true });
@@ -590,16 +609,17 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 <button
                   onClick={async () => {
                     try {
-                      const response = await fetch(`/api/v1/chat/invitations/${data.invitationId}/respond`, {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                        },
-                        body: JSON.stringify({ action: 'accept' })
+                      const { apiService } = await import('../services/api');
+                      const token = localStorage.getItem('accessToken');
+                      if (token) {
+                        apiService.setAccessToken(token);
+                      }
+
+                      const response = await apiService.post(`/chat/invitations/${data.invitationId}/respond`, {
+                        action: 'accept'
                       });
 
-                      if (response.ok) {
+                      if (response.success) {
                         enqueueSnackbar(t('chat.invitationAccepted'), { variant: 'success' });
                         // 초대 수 감소
                         dispatch({ type: 'SET_PENDING_INVITATIONS_COUNT', payload: Math.max(0, state.pendingInvitationsCount - 1) });
@@ -629,16 +649,17 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 <button
                   onClick={async () => {
                     try {
-                      const response = await fetch(`/api/v1/chat/invitations/${data.invitationId}/respond`, {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                        },
-                        body: JSON.stringify({ action: 'decline' })
+                      const { apiService } = await import('../services/api');
+                      const token = localStorage.getItem('accessToken');
+                      if (token) {
+                        apiService.setAccessToken(token);
+                      }
+
+                      const response = await apiService.post(`/chat/invitations/${data.invitationId}/respond`, {
+                        action: 'decline'
                       });
 
-                      if (response.ok) {
+                      if (response.success) {
                         enqueueSnackbar(t('chat.invitationDeclined'), { variant: 'info' });
                         // 초대 수 감소
                         dispatch({ type: 'SET_PENDING_INVITATIONS_COUNT', payload: Math.max(0, state.pendingInvitationsCount - 1) });
@@ -749,29 +770,68 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Load pending invitations count
   const loadPendingInvitationsCount = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/v1/invitations/received?status=pending', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-        },
+      // Ensure we have a token before making the request
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        console.error('❌ No access token available for loading invitations');
+        return;
+      }
+
+      // Ensure API service has the token
+      const { apiService } = await import('../services/api');
+      apiService.setAccessToken(token);
+
+      console.log('🔄 Loading pending invitations count...');
+      const response = await apiService.get('/invitations/received', {
+        params: { status: 'pending' }
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        dispatch({ type: 'SET_PENDING_INVITATIONS_COUNT', payload: data.pagination?.total || 0 });
+      if (response.success && response.data) {
+        const count = response.data.pagination?.total || 0;
+        dispatch({ type: 'SET_PENDING_INVITATIONS_COUNT', payload: count });
+        console.log('✅ Pending invitations count loaded:', count);
       }
-    } catch (error) {
-      console.error('Failed to load pending invitations count:', error);
+    } catch (error: any) {
+      console.error('❌ Failed to load pending invitations count:', error);
+      if (error.status === 401) {
+        console.error('❌ Authentication error - token may be invalid');
+      }
     }
   }, []);
 
   // Load users
   const loadUsers = useCallback(async () => {
     try {
-      const users = await ChatService.getUsers();
-      console.log('🔍 Loaded users from API:', users);
-      dispatch({ type: 'SET_USERS', payload: users });
+      // Ensure we have a token before making the request
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        console.error('❌ No access token available for loading users');
+        return;
+      }
+
+      // Ensure API service has the token
+      const { apiService } = await import('../services/api');
+      apiService.setAccessToken(token);
+
+      console.log('🔄 Loading users from API...');
+      const response = await ChatService.getUsers();
+      console.log('🔍 Raw API response:', response);
+
+      // Handle both array response and object response with users property
+      const users = Array.isArray(response) ? response : (response.users || response.data || []);
+      console.log('🔍 Processed users array:', users, 'Length:', users.length);
+
+      if (Array.isArray(users)) {
+        dispatch({ type: 'SET_USERS', payload: users });
+        console.log('✅ Users dispatched successfully');
+      } else {
+        console.error('❌ Users data is not an array:', users);
+      }
     } catch (error: any) {
-      console.error('Failed to load users:', error);
+      console.error('❌ Failed to load users:', error);
+      if (error.status === 401) {
+        console.error('❌ Authentication error - token may be invalid');
+      }
     }
   }, []);
 
