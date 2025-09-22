@@ -26,11 +26,11 @@ export class ChatChannelController {
       }
 
       // Chat Server에서 사용자 채널 목록 조회
-      const channels = await ChatChannelController.chatServerService.getUserChannels(user.id);
+      const response = await ChatChannelController.chatServerService.getUserChannels(user.id);
 
       res.json({
         success: true,
-        data: { channels }
+        data: response // Chat Server의 응답을 그대로 전달 (data: [], pagination: {...})
       });
 
     } catch (error) {
@@ -165,6 +165,39 @@ export class ChatChannelController {
       res.status(500).json({
         success: false,
         error: { message: 'Failed to get messages' }
+      });
+    }
+  }
+
+  /**
+   * 사용자 목록 조회
+   */
+  static async getUsers(req: Request, res: Response): Promise<void> {
+    try {
+      const user = req.user;
+      if (!user) {
+        res.status(401).json({
+          success: false,
+          error: { message: 'Authentication required' }
+        });
+        return;
+      }
+
+      const { search } = req.query;
+
+      // Chat Server에서 사용자 목록 조회
+      const users = await ChatChannelController.chatServerService.getUsers(user.id, search as string);
+
+      res.json({
+        success: true,
+        data: users
+      });
+
+    } catch (error) {
+      logger.error('Error getting users:', error);
+      res.status(500).json({
+        success: false,
+        error: { message: 'Failed to get users' }
       });
     }
   }

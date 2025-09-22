@@ -177,7 +177,7 @@ export class ChatServerService {
   /**
    * 사용자 채널 목록 조회
    */
-  async getUserChannels(userId: number): Promise<any[]> {
+  async getUserChannels(userId: number): Promise<any> {
     try {
       // Chat Server의 /api/v1/channels/my 엔드포인트 사용
       // 사용자 ID를 헤더로 전달
@@ -191,7 +191,8 @@ export class ChatServerService {
         throw new Error('Failed to get user channels');
       }
 
-      return response.data.data?.channels || [];
+      // Chat Server의 응답 구조를 그대로 반환 (data: [], pagination: {...})
+      return response.data.data || { data: [], pagination: {} };
     } catch (error) {
       logger.error('Error getting user channels:', error);
       throw new Error('Failed to get user channels');
@@ -271,6 +272,34 @@ export class ChatServerService {
       return response.data.success === true;
     } catch (error) {
       return false;
+    }
+  }
+
+  /**
+   * 사용자 목록 조회
+   */
+  async getUsers(userId: number, search?: string): Promise<any[]> {
+    try {
+      const params: any = {};
+      if (search) {
+        params.search = search;
+      }
+
+      const response = await this.axiosInstance.get('/api/v1/users', {
+        params,
+        headers: {
+          'X-User-ID': userId.toString()
+        }
+      });
+
+      if (!response.data.success) {
+        throw new Error('Failed to get users');
+      }
+
+      return response.data.data || [];
+    } catch (error) {
+      logger.error('Error getting users:', error);
+      throw new Error('Failed to get users');
     }
   }
 

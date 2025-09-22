@@ -19,8 +19,8 @@ export class ChatService {
 
   // Channel management
   static async getChannels(params?: GetChannelsRequest): Promise<Channel[]> {
-    const response = await apiService.get<Channel[]>(`${this.BASE_URL}/channels/my`, { params });
-    return response.data || [];
+    const response = await apiService.get<{ data: Channel[]; pagination: any }>(`${this.BASE_URL}/channels/my`, { params });
+    return response.data?.data || [];
   }
 
   static async getChannel(channelId: number): Promise<Channel> {

@@ -30,6 +30,9 @@ router.post('/channels', ChatChannelController.createChannel as any);
 router.get('/channels/:channelId', ChatChannelController.getChannel as any);
 router.get('/channels/:channelId/messages', ChatChannelController.getChannelMessages as any);
 
+// 사용자 관련 엔드포인트
+router.get('/users', ChatChannelController.getUsers as any);
+
 // 직접 라우트 제거 - 프록시로 통일 완료
 
 // 간단한 요청 로깅
