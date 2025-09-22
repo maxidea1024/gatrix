@@ -104,16 +104,33 @@ export class InvitationController {
       });
 
       // 초대받은 사용자에게 실시간 알림 전송
-      // TODO: Implement broadcast service integration
-      // await broadcastService.broadcastToUser(inviteeId, 'channel_invitation', {
-      //   invitationId: invitation.id,
-      //   channelId: channelIdNum,
-      //   channelName: channel.name,
-      //   inviterId: userId,
-      //   inviterName: (req as any).user.name || 'Unknown User',
-      //   message,
-      //   timestamp: Date.now(),
-      // });
+      const { BroadcastService } = require('../services/BroadcastService');
+      const broadcastService = BroadcastService.getInstance();
+
+      await broadcastService.broadcastToUser(inviteeId, 'channel_invitation', {
+        invitationId: invitation.id,
+        channelId: channelIdNum,
+        channelName: channel.name,
+        inviterId: userId,
+        inviterName: (req as any).user.name || 'Unknown User',
+        message,
+        timestamp: Date.now(),
+      });
+
+      // Gatrix 메인 서버에도 알림 전송
+      const { gatrixApiService } = require('../services/GatrixApiService');
+      await gatrixApiService.sendNotification({
+        userId: inviteeId,
+        type: 'channel_invite',
+        title: `Channel Invitation`,
+        content: `${(req as any).user.name || 'Someone'} invited you to join "${channel.name}"`,
+        channelId: channelIdNum,
+        metadata: {
+          invitationId: invitation.id,
+          inviterName: (req as any).user.name || 'Unknown User',
+          message
+        }
+      });
 
       logger.info(`User ${userId} invited user ${inviteeId} to channel ${channelIdNum}`);
 
@@ -191,23 +208,29 @@ export class InvitationController {
         await ChannelModel.addMember(invitation.channelId, userId, 'member');
         
         // 채널 멤버들에게 새 멤버 참여 알림
-        // TODO: Implement broadcast service integration
-        // await broadcastService.broadcastToChannel(invitation.channelId, 'user_joined_channel', {
-        //   userId,
-        //   channelId: invitation.channelId,
-        //   timestamp: Date.now(),
-        // });
+        const { BroadcastService } = require('../services/BroadcastService');
+        const broadcastService = BroadcastService.getInstance();
+
+        await broadcastService.broadcastToChannel(invitation.channelId, 'user_joined_channel', {
+          userId,
+          channelId: invitation.channelId,
+          userName: (req as any).user.name || 'Unknown User',
+          timestamp: Date.now(),
+        });
       }
 
       // 초대한 사용자에게 응답 알림
-      // TODO: Implement broadcast service integration
-      // await broadcastService.broadcastToUser(invitation.inviterId, 'invitation_response', {
-      //   invitationId: invitation.id,
-      //   channelId: invitation.channelId,
-      //   inviteeId: userId,
-      //   action,
-      //   timestamp: Date.now(),
-      // });
+      const { BroadcastService } = require('../services/BroadcastService');
+      const broadcastService = BroadcastService.getInstance();
+
+      await broadcastService.broadcastToUser(invitation.inviterId, 'invitation_response', {
+        invitationId: invitation.id,
+        channelId: invitation.channelId,
+        inviteeId: userId,
+        inviteeName: (req as any).user.name || 'Unknown User',
+        action,
+        timestamp: Date.now(),
+      });
 
       res.json({
         success: true,
@@ -347,12 +370,15 @@ export class InvitationController {
       const cancelledInvitation = await ChannelInvitationModel.cancel(invitationIdNum, userId);
 
       // 초대받은 사용자에게 취소 알림
-      // TODO: Implement broadcast service integration
-      // await broadcastService.broadcastToUser(cancelledInvitation.inviteeId, 'invitation_cancelled', {
-      //   invitationId: cancelledInvitation.id,
-      //   channelId: cancelledInvitation.channelId,
-      //   timestamp: Date.now(),
-      // });
+      const { BroadcastService } = require('../services/BroadcastService');
+      const broadcastService = BroadcastService.getInstance();
+
+      await broadcastService.broadcastToUser(cancelledInvitation.inviteeId, 'invitation_cancelled', {
+        invitationId: cancelledInvitation.id,
+        channelId: cancelledInvitation.channelId,
+        inviterName: (req as any).user.name || 'Unknown User',
+        timestamp: Date.now(),
+      });
 
       res.json({
         success: true,

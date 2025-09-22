@@ -451,4 +451,35 @@ export class UserModel {
       throw error;
     }
   }
+
+  /**
+   * Get users updated since a specific date for synchronization
+   */
+  static async getUsersForSync(since: Date): Promise<UserWithoutPassword[]> {
+    try {
+      const users = await db('g_users')
+        .select([
+          'id',
+          'email',
+          'name',
+          'avatarUrl',
+          'role',
+          'status',
+          'lastLoginAt',
+          'createdAt',
+          'updatedAt'
+        ])
+        .where('status', 'active') // 활성 사용자만 동기화
+        .andWhere(function() {
+          this.where('updatedAt', '>=', since)
+              .orWhere('createdAt', '>=', since);
+        })
+        .orderBy('updatedAt', 'desc');
+
+      return users;
+    } catch (error) {
+      logger.error('Error getting users for sync:', error);
+      throw error;
+    }
+  }
 }

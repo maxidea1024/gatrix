@@ -7,7 +7,7 @@ import serverRoutes from './server';
 import adminRoutes from './admin';
 import authRoutes from './auth';
 import publicRoutes from './public';
-import chatRoutes from './chat';
+// chatRoutes are handled directly in app.ts before body parsing
 import userRoutes from './users';
 
 const router = express.Router();
@@ -26,7 +26,7 @@ router.use('/client', clientRoutes);
 router.use('/server', serverRoutes);
 router.use('/admin', adminRoutes);
 router.use('/auth', authLimiter as any, authRoutes);
-router.use('/chat', chatRoutes);
+// chat routes are handled directly in app.ts before body parsing
 router.use('/users', userRoutes);
 router.use('/', publicRoutes);
 

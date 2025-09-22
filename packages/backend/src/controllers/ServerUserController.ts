@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
+import { UserModel } from '../models/User';
 import logger from '../config/logger';
 
 export interface ServerUserRequest extends Request {
@@ -139,28 +140,29 @@ class ServerUserController {
 
       logger.info('User sync request:', { lastSyncAt, since });
 
-      // 간단한 구현: 빈 배열 반환 (테스트용)
-      const mockUsers = [
-        {
-          id: 1,
-          email: 'admin@gatrix.com',
-          name: 'Admin',
-          avatar: null,
-          role: 'admin',
-          status: 'active',
-          lastLoginAt: new Date(),
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      ];
+      // 실제 데이터베이스에서 사용자 조회
+      const users = await UserModel.getUsersForSync(since);
+
+      // 채팅 서버에서 기대하는 형식으로 변환
+      const syncUsers = users.map(user => ({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        avatarUrl: user.avatarUrl || null,
+        role: user.role,
+        status: user.status,
+        lastLoginAt: user.lastLoginAt,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }));
 
       res.json({
         success: true,
         data: {
-          users: mockUsers,
+          users: syncUsers,
           syncAt: new Date().toISOString(),
           lastSyncAt: since.toISOString(),
-          total: mockUsers.length
+          total: syncUsers.length
         }
       });
     } catch (error) {

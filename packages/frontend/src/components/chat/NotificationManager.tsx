@@ -22,7 +22,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
   isWindowFocused,
 }, ref) => {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { state } = useChat();
   const audioRef = useRef<HTMLAudioElement>();
   const lastMessageIdRef = useRef<number>();
@@ -224,14 +224,51 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
           persist: true,
           action: (key) => (
             <div>
-              <button onClick={() => {
-                // TODO: 초대 수락/거절 처리
-                console.log('Accept invitation:', data.invitationId);
+              <button onClick={async () => {
+                try {
+                  const response = await fetch(`/api/v1/chat/invitations/${data.invitationId}/respond`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    },
+                    body: JSON.stringify({ action: 'accept' })
+                  });
+
+                  if (response.ok) {
+                    enqueueSnackbar('Invitation accepted!', { variant: 'success' });
+                    closeSnackbar(key);
+                  } else {
+                    enqueueSnackbar('Failed to accept invitation', { variant: 'error' });
+                  }
+                } catch (error) {
+                  console.error('Error accepting invitation:', error);
+                  enqueueSnackbar('Failed to accept invitation', { variant: 'error' });
+                }
               }}>
                 Accept
               </button>
-              <button onClick={() => {
-                console.log('Decline invitation:', data.invitationId);
+              <button onClick={async () => {
+                try {
+                  const response = await fetch(`/api/v1/chat/invitations/${data.invitationId}/respond`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                    },
+                    body: JSON.stringify({ action: 'decline' })
+                  });
+
+                  if (response.ok) {
+                    enqueueSnackbar('Invitation declined', { variant: 'info' });
+                    closeSnackbar(key);
+                  } else {
+                    enqueueSnackbar('Failed to decline invitation', { variant: 'error' });
+                  }
+                } catch (error) {
+                  console.error('Error declining invitation:', error);
+                  enqueueSnackbar('Failed to decline invitation', { variant: 'error' });
+                }
               }}>
                 Decline
               </button>

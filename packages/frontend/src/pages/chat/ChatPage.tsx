@@ -55,6 +55,7 @@ import InvitationManager from '../../components/chat/InvitationManager';
 import PrivacySettings from '../../components/chat/PrivacySettings';
 import UserStatusPicker, { UserStatus } from '../../components/chat/UserStatusPicker';
 import { CreateChannelRequest, SendMessageRequest } from '../../types/chat';
+import { getChatWebSocketService } from '../../services/chatWebSocketService';
 
 const ChatPageContent: React.FC = () => {
   const { t } = useTranslation();
@@ -223,10 +224,16 @@ const ChatPageContent: React.FC = () => {
   // 사용자 상태 변경 핸들러
   const handleStatusChange = async (status: UserStatus, message?: string) => {
     try {
-      // TODO: API 호출로 서버에 상태 업데이트
-      setUserStatus(status);
-      setStatusMessage(message || '');
-      enqueueSnackbar(t('chat.statusUpdated'), { variant: 'success' });
+      // WebSocket을 통해 서버에 상태 업데이트
+      const wsService = getChatWebSocketService();
+      if (wsService.isConnected()) {
+        wsService.updateStatus(status, message);
+        setUserStatus(status);
+        setStatusMessage(message || '');
+        enqueueSnackbar(t('chat.statusUpdated'), { variant: 'success' });
+      } else {
+        throw new Error('WebSocket not connected');
+      }
     } catch (error) {
       console.error('Failed to update status:', error);
       enqueueSnackbar(t('chat.statusUpdateFailed'), { variant: 'error' });

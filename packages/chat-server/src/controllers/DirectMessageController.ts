@@ -102,13 +102,15 @@ export class DirectMessageController {
       }, userId);
 
       // 대상 사용자에게 새 DM 알림
-      // TODO: Implement broadcast service integration
-      // await broadcastService.broadcastToUser(targetUserId, 'new_direct_message', {
-      //   channelId: channel.id,
-      //   fromUserId: userId,
-      //   fromUserName: currentUser?.name || 'User',
-      //   timestamp: Date.now(),
-      // });
+      const { BroadcastService } = require('../services/BroadcastService');
+      const broadcastService = BroadcastService.getInstance();
+
+      await broadcastService.broadcastToUser(targetUserId, 'new_direct_message', {
+        channelId: channel.id,
+        fromUserId: userId,
+        fromUserName: currentUser?.name || 'User',
+        timestamp: Date.now(),
+      });
 
       res.status(201).json({
         success: true,
@@ -312,14 +314,30 @@ export class DirectMessageController {
         return;
       }
 
-      // TODO: 실제 온라인 상태 확인 로직 구현
-      // 현재는 기본값 반환
+      // 실제 온라인 상태 확인 로직 구현
+      const { redisManager } = require('../config/redis');
+      const redisClient = redisManager.getClient();
+
+      let isOnline = false;
+      let lastSeen = null;
+
+      try {
+        // Redis에서 사용자 상태 확인
+        const userStatus = await redisClient.hgetall(`user:${otherMember.userId}`);
+        if (userStatus && userStatus.status) {
+          isOnline = userStatus.status === 'online';
+          lastSeen = userStatus.lastSeen ? new Date(parseInt(userStatus.lastSeen)) : null;
+        }
+      } catch (error) {
+        logger.warn('Failed to get user status from Redis:', error);
+      }
+
       res.json({
         success: true,
         data: {
           otherUserId: otherMember.userId,
-          isOnline: false, // TODO: 실제 온라인 상태 확인
-          lastSeen: null, // TODO: 마지막 접속 시간
+          isOnline,
+          lastSeen,
         },
       });
     } catch (error) {

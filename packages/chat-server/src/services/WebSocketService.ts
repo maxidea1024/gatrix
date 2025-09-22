@@ -261,8 +261,28 @@ export class WebSocketService {
   }
 
   private async handleJoinChannel(socket: Socket, socketUser: SocketUser, channelId: number): Promise<void> {
-    // TODO: 채널 권한 검사
-    
+    // 채널 권한 검사
+    const { ChannelModel } = require('../models/ChannelModel');
+
+    try {
+      const channel = await ChannelModel.findById(channelId);
+      if (!channel) {
+        socket.emit('error', { message: 'Channel not found' });
+        return;
+      }
+
+      // 채널 멤버인지 확인
+      const isMember = await ChannelModel.isMember(channelId, socketUser.userId);
+      if (!isMember && channel.type !== 'public') {
+        socket.emit('error', { message: 'Access denied to channel' });
+        return;
+      }
+    } catch (error) {
+      logger.error('Error checking channel permissions:', error);
+      socket.emit('error', { message: 'Failed to join channel' });
+      return;
+    }
+
     socket.join(`channel:${channelId}`);
     socketUser.channels.add(channelId);
     
@@ -307,29 +327,55 @@ export class WebSocketService {
   }
 
   private async handleSendMessage(socket: Socket, socketUser: SocketUser, data: any): Promise<void> {
-    // TODO: 메시지 저장 로직 (ChatService 호출)
-    
-    const message = {
-      id: Date.now(), // 임시 ID
-      channelId: data.channelId,
-      userId: socketUser.userId,
-      content: data.content,
-      contentType: data.contentType || 'text',
-      messageData: data.messageData,
-      createdAt: new Date(),
-    };
+    // 메시지 저장 로직
+    const { MessageModel } = require('../models/MessageModel');
 
-    // 채널에 메시지 브로드캐스트
-    await this.broadcastService.broadcastToChannel(
-      data.channelId,
-      'new_message',
-      message
-    );
+    try {
+      // 데이터베이스에 메시지 저장
+      const savedMessage = await MessageModel.create({
+        channelId: data.channelId,
+        userId: socketUser.userId,
+        content: data.content,
+        contentType: data.contentType || 'text',
+        messageData: data.messageData,
+        parentMessageId: data.parentMessageId || null,
+        threadId: data.threadId || null
+      });
 
-    // 메트릭스 기록
-    metricsService.recordMessage(data.channelId.toString(), data.contentType || 'text');
-    
-    socket.emit('message_sent', { messageId: message.id });
+      // 사용자 정보 가져오기
+      const { userSyncService } = require('./UserSyncService');
+      const user = await userSyncService.getCachedUser(socketUser.userId);
+
+      const message = {
+        id: savedMessage.id,
+        channelId: data.channelId,
+        userId: socketUser.userId,
+        content: data.content,
+        contentType: data.contentType || 'text',
+        messageData: data.messageData,
+        createdAt: savedMessage.createdAt,
+        user: {
+          id: socketUser.userId,
+          name: user?.name || 'Unknown User'
+        }
+      };
+
+      // 채널에 메시지 브로드캐스트
+      await this.broadcastService.broadcastToChannel(
+        data.channelId,
+        'new_message',
+        message
+      );
+
+      // 메트릭스 기록
+      metricsService.recordMessage(data.channelId.toString(), data.contentType || 'text');
+
+      socket.emit('message_sent', { messageId: savedMessage.id });
+    } catch (error) {
+      logger.error('Error saving message:', error);
+      socket.emit('error', { message: 'Failed to send message' });
+      return;
+    }
   }
 
   private async handleStartTyping(socket: Socket, socketUser: SocketUser, channelId: number): Promise<void> {
@@ -363,8 +409,19 @@ export class WebSocketService {
   }
 
   private async handleMarkRead(socket: Socket, socketUser: SocketUser, data: { channelId: number; messageId: number }): Promise<void> {
-    // TODO: 데이터베이스에 읽음 상태 업데이트
-    
+    // 데이터베이스에 읽음 상태 업데이트
+    try {
+      const { MessageReadStatusModel } = require('../models/MessageReadStatusModel');
+
+      await MessageReadStatusModel.markAsRead(
+        data.messageId,
+        socketUser.userId,
+        data.channelId
+      );
+    } catch (error) {
+      logger.error('Error updating read status:', error);
+    }
+
     // 채널의 다른 사용자들에게 읽음 상태 알림
     socket.to(`channel:${data.channelId}`).emit('message_read', {
       userId: socketUser.userId,

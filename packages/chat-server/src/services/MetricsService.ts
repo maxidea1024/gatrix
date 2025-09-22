@@ -124,15 +124,36 @@ export class MetricsService {
     });
 
     // Readiness check endpoint
-    this.app.get(config.monitoring.readinessCheckPath, (req, res) => {
-      // Add checks for Redis, database, etc.
-      res.json({
-        status: 'ready',
+    this.app.get(config.monitoring.readinessCheckPath, async (req, res) => {
+      const checks: any = {};
+      let overallStatus = 'ready';
+
+      // Redis health check
+      try {
+        const { redisManager } = require('../config/redis');
+        const redisClient = redisManager.getClient();
+        await redisClient.ping();
+        checks.redis = 'ok';
+      } catch (error) {
+        checks.redis = 'error';
+        overallStatus = 'not_ready';
+      }
+
+      // Database health check
+      try {
+        const { databaseManager } = require('../config/database');
+        const db = databaseManager.getConnection();
+        await db.raw('SELECT 1');
+        checks.database = 'ok';
+      } catch (error) {
+        checks.database = 'error';
+        overallStatus = 'not_ready';
+      }
+
+      res.status(overallStatus === 'ready' ? 200 : 503).json({
+        status: overallStatus,
         timestamp: new Date().toISOString(),
-        checks: {
-          redis: 'ok', // TODO: Add actual Redis health check
-          database: 'ok', // TODO: Add actual DB health check
-        },
+        checks,
       });
     });
   }

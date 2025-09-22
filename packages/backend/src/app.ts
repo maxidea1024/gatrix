@@ -59,6 +59,10 @@ app.use(cors({
 // Compression middleware
 app.use(compression() as any);
 
+// Chat proxy routes - MUST be before body parsing to avoid consuming request stream
+import chatRoutes from './routes/chat';
+app.use('/api/v1/chat', chatRoutes);
+
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
