@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
 import { useAuth } from '../hooks/useAuth';
 import { ChatService } from '../services/chatService';
 import { getChatWebSocketService } from '../services/chatWebSocketService';
@@ -83,13 +84,11 @@ const initialState: ChatState = {
   notifications: [],
   isConnected: false,
   isLoading: false,
-  error: null,
 };
 
 // Action types
 type ChatAction =
   | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'SET_CONNECTED'; payload: boolean }
   | { type: 'SET_CHANNELS'; payload: Channel[] }
   | { type: 'ADD_CHANNEL'; payload: Channel }
@@ -113,10 +112,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload };
-    
-    case 'SET_ERROR':
-      return { ...state, error: action.payload };
-    
+
     case 'SET_CONNECTED':
       return { ...state, isConnected: action.payload };
     
@@ -313,6 +309,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [state, dispatch] = useReducer(chatReducer, initialState);
   const { user, getToken } = useAuth();
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
   const wsService = getChatWebSocketService(getToken);
 
   // 디버깅: 초기 상태 확인
@@ -340,7 +337,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           loadChannels();
         } catch (error) {
           console.error('Failed to connect to chat WebSocket:', error);
-          dispatch({ type: 'SET_ERROR', payload: 'Failed to connect to chat service' });
+          enqueueSnackbar(t('chat.connectionFailed'), { variant: 'error' });
         }
       };
 
@@ -371,17 +368,19 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         wsService.on('connection_lost', () => {
           console.log('WebSocket connection lost');
           dispatch({ type: 'SET_CONNECTED', payload: false });
+          enqueueSnackbar(t('chat.connectionLost'), { variant: 'warning' });
         });
 
         wsService.on('connection_error', (event) => {
           console.error('WebSocket connection error:', event);
           dispatch({ type: 'SET_CONNECTED', payload: false });
+          enqueueSnackbar(t('chat.connectionError'), { variant: 'error' });
         });
 
         wsService.on('connection_failed', (event) => {
           console.error('WebSocket connection failed permanently:', event);
           dispatch({ type: 'SET_CONNECTED', payload: false });
-          dispatch({ type: 'SET_ERROR', payload: 'Chat service is unavailable. Please try again later.' });
+          enqueueSnackbar(t('chat.serviceUnavailable'), { variant: 'error' });
         });
 
         wsService.on('authentication_failed', async (event) => {
@@ -402,7 +401,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           } catch (refreshError) {
             console.error('❌ Token refresh failed:', refreshError);
-            dispatch({ type: 'SET_ERROR', payload: 'Authentication failed. Please refresh the page.' });
+            enqueueSnackbar(t('chat.authenticationFailed'), { variant: 'error' });
           }
         });
       };

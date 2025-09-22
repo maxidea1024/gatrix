@@ -273,7 +273,6 @@ export interface ChatState {
   notifications: ChatNotification[];
   isConnected: boolean;
   isLoading: boolean;
-  error: string | null;
 }
 
 export interface ChatContextType {
