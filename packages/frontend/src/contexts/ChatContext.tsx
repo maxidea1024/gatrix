@@ -782,7 +782,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       apiService.setAccessToken(token);
 
       console.log('🔄 Loading pending invitations count...');
-      const response = await apiService.get('/invitations/received', {
+      const response = await apiService.get('/chat/invitations/received', {
         params: { status: 'pending' }
       });
 
