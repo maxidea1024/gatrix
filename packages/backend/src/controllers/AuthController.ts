@@ -222,12 +222,18 @@ export class AuthController {
       const referer = req.get('Referer');
       let frontendOrigin = process.env.CORS_ORIGIN;
 
+      // If CORS_ORIGIN is wildcard or invalid, use default frontend URL
+      if (!frontendOrigin || frontendOrigin === '*') {
+        frontendOrigin = 'http://localhost:3000';
+      }
+
       if (referer) {
         try {
           const refererUrl = new URL(referer);
           frontendOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
         } catch (e) {
           // Use default if referer parsing fails
+          console.log('Failed to parse referer for pending redirect, using default:', frontendOrigin);
         }
       }
 
@@ -251,14 +257,26 @@ export class AuthController {
     const referer = req.get('Referer');
     let frontendOrigin = process.env.CORS_ORIGIN;
 
+    // If CORS_ORIGIN is wildcard or invalid, use default frontend URL
+    if (!frontendOrigin || frontendOrigin === '*') {
+      frontendOrigin = 'http://localhost:3000';
+    }
+
     if (referer) {
       try {
         const refererUrl = new URL(referer);
         frontendOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
       } catch (e) {
         // Use default if referer parsing fails
+        console.log('Failed to parse referer, using default frontend origin:', frontendOrigin);
       }
     }
+
+    console.log('🔄 OAuth success redirect:', {
+      frontendOrigin,
+      referer,
+      tokenLength: accessToken.length
+    });
 
     // Redirect to frontend with access token
     res.redirect(`${frontendOrigin}/auth/callback?token=${accessToken}`);
@@ -272,12 +290,18 @@ export class AuthController {
     const referer = req.get('Referer');
     let frontendOrigin = process.env.CORS_ORIGIN;
 
+    // If CORS_ORIGIN is wildcard or invalid, use default frontend URL
+    if (!frontendOrigin || frontendOrigin === '*') {
+      frontendOrigin = 'http://localhost:3000';
+    }
+
     if (referer) {
       try {
         const refererUrl = new URL(referer);
         frontendOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
       } catch (e) {
         // Use default if referer parsing fails
+        console.log('Failed to parse referer for failure redirect, using default:', frontendOrigin);
       }
     }
 

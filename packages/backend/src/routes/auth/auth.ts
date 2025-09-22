@@ -51,18 +51,39 @@ router.get('/google/callback',
 
 // GitHub OAuth routes
 router.get('/github',
-  (req, res, next) =>
-    (passport.authenticate as any)('github', {
+  (req, res, next) => {
+    const callbackURL = `${req.protocol}://${req.get('host')}/api/v1/auth/github/callback`;
+    console.log('🚀 GitHub OAuth initiated:', {
+      callbackURL,
+      host: req.get('host'),
+      protocol: req.protocol
+    });
+
+    return (passport.authenticate as any)('github', {
       scope: ['user:email'],
-      callbackURL: `${req.protocol}://${req.get('host')}/api/v1/auth/github/callback`,
-    })(req, res, next)
+      callbackURL,
+    })(req, res, next);
+  }
 );
 
 router.get('/github/callback', async (req, res, next) => {
+  console.log('🔍 GitHub callback received:', {
+    url: req.url,
+    originalUrl: req.originalUrl,
+    path: req.path,
+    query: req.query,
+    headers: {
+      host: req.get('host'),
+      referer: req.get('referer'),
+      userAgent: req.get('user-agent')
+    }
+  });
+
   const callbackURL = `${req.protocol}://${req.get('host')}/api/v1/auth/github/callback`;
   const code = req.query.code as string;
 
   if (!code) {
+    console.log('❌ No code in GitHub callback, redirecting to failure');
     return res.redirect('/api/v1/auth/failure');
   }
 
@@ -288,5 +309,28 @@ router.get('/qq/callback', async (req, res, next) => {
 // OAuth callback routes
 router.get('/success', AuthController.oauthSuccess);
 router.get('/failure', AuthController.oauthFailure);
+
+// Catch-all route for debugging unknown auth routes
+router.all('*', (req, res) => {
+  console.log('❌ Unknown auth route accessed:', {
+    method: req.method,
+    url: req.url,
+    originalUrl: req.originalUrl,
+    path: req.path,
+    query: req.query,
+    headers: {
+      host: req.get('host'),
+      referer: req.get('referer'),
+      userAgent: req.get('user-agent')
+    }
+  });
+
+  res.status(404).json({
+    success: false,
+    error: {
+      message: `Route ${req.originalUrl} not found`
+    }
+  });
+});
 
 export default router;

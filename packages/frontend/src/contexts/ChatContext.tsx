@@ -390,6 +390,26 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('📨 Message data:', message.data);
           console.log('📨 Current channel ID:', state.currentChannelId);
           console.log('📨 Message channel ID:', message.data?.channelId);
+
+          // 메시지 작성자의 사용자 데이터가 없으면 기본 데이터 추가
+          if (message.data.userId && !state.users[message.data.userId]) {
+            console.log('🔍 Adding missing user data for userId:', message.data.userId);
+            dispatch({
+              type: 'SET_USERS',
+              payload: [{
+                id: message.data.userId,
+                username: `User${message.data.userId}`,
+                name: `User${message.data.userId}`,
+                email: `user${message.data.userId}@example.com`,
+                avatar: `https://ui-avatars.com/api/?name=User${message.data.userId}&background=random`,
+                status: 'online' as const,
+                lastSeenAt: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              }]
+            });
+          }
+
           dispatch({ type: 'ADD_MESSAGE', payload: message.data });
         });
 
@@ -735,6 +755,17 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  // Load users
+  const loadUsers = useCallback(async () => {
+    try {
+      const users = await ChatService.getUsers();
+      console.log('🔍 Loaded users from API:', users);
+      dispatch({ type: 'SET_USERS', payload: users });
+    } catch (error: any) {
+      console.error('Failed to load users:', error);
+    }
+  }, []);
+
   // Load channels
   const loadChannels = useCallback(async () => {
     try {
@@ -742,8 +773,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const channels = await ChatService.getChannels();
       dispatch({ type: 'SET_CHANNELS', payload: channels });
 
-      // 초대 수도 함께 로드
-      await loadPendingInvitationsCount();
+      // 사용자 데이터와 초대 수도 함께 로드
+      await Promise.all([
+        loadUsers(),
+        loadPendingInvitationsCount()
+      ]);
 
       // 마지막 참여 채널 자동 선택
       const lastChannelId = localStorage.getItem('lastChannelId');
@@ -770,7 +804,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
-  }, [loadMessages]);
+  }, [loadMessages, loadUsers, loadPendingInvitationsCount]);
 
   // Actions
   const actions: ChatContextType['actions'] = {

@@ -641,6 +641,12 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   const getUserInfo = (userId: number) => {
     const user = state.users[userId];
     const userName = user?.username || user?.name || `User${userId}`;
+    console.log('🔍 getUserInfo debug:', {
+      userId,
+      user,
+      userName,
+      allUsers: state.users
+    });
     return {
       name: userName,
       avatar: user?.avatar || user?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=random`,
@@ -897,40 +903,21 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
               }}
             >
               {/* Avatar */}
-              <Box
+              <Avatar
+                src={userInfo.avatar}
+                alt={userInfo.name}
                 sx={{
                   width: '36px',
                   height: '36px',
                   borderRadius: '8px',
-                  overflow: 'hidden',
-                  flexShrink: 0,
+                  fontSize: '14px',
+                  fontWeight: 'bold',
                   backgroundColor: theme.palette.mode === 'dark' ? '#5f6368' : '#e0e0e0',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
+                  color: 'white'
                 }}
               >
-                <img
-                  src={userInfo.avatar}
-                  alt={userInfo.name}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover'
-                  }}
-                  onError={(e) => {
-                    // 이미지 로드 실패 시 이니셜 표시
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    const parent = target.parentElement;
-                    if (parent) {
-                      // 사용자 이름의 첫 글자만 표시 (한글, 영문 모두 지원)
-                      const firstChar = userInfo.name.trim().charAt(0).toUpperCase();
-                      parent.innerHTML = `<span style="color: white; font-weight: bold; font-size: 14px;">${firstChar}</span>`;
-                    }
-                  }}
-                />
-              </Box>
+                {userInfo.name.trim().charAt(0).toUpperCase()}
+              </Avatar>
 
               {/* Message Content */}
               <Box sx={{ flex: 1, minWidth: 0 }}>
