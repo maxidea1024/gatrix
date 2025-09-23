@@ -31,22 +31,23 @@ export class UserService {
    */
   static async upsertUser(userData: UserData): Promise<UserData> {
     try {
-      // MySQL 호환 datetime 형식 (YYYY-MM-DD HH:MM:SS)
-      const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
-
-      // datetime 변환 함수
-      const convertToMySQLDateTime = (dateValue: string | undefined): string => {
-        if (!dateValue) return now;
+      // 공용 날짜 변환 함수 사용
+      const convertToMySQLDateTime = (dateValue: string | undefined): string | null => {
+        if (!dateValue) return null;
         try {
           return new Date(dateValue).toISOString().slice(0, 19).replace('T', ' ');
         } catch {
-          return now;
+          return null;
         }
       };
+
+      // 현재 시간을 MySQL DATETIME 형식으로 생성
+      const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
       // 필드 매핑 및 정리
       const userToSave: any = {
         ...userData,
+        gatrixUserId: userData.id, // Gatrix 사용자 ID 저장
         status: userData.status || 'active',
         chatStatus: userData.chatStatus || 'offline',
         lastActivityAt: convertToMySQLDateTime(userData.lastActivityAt),
@@ -69,8 +70,8 @@ export class UserService {
       const db = databaseManager.getKnex();
       await db('chat_users')
         .insert(userToSave)
-        .onConflict('username')
-        .merge(['email', 'name', 'avatarUrl', 'role', 'status', 'chatStatus', 'customStatus', 'lastLoginAt', 'lastActivityAt', 'updatedAt']);
+        .onConflict('gatrixUserId')
+        .merge(['gatrixUserId', 'username', 'email', 'name', 'avatarUrl', 'role', 'status', 'chatStatus', 'customStatus', 'lastLoginAt', 'lastActivityAt', 'updatedAt']);
 
       // Cache the user
       const cacheKey = `${this.CACHE_PREFIX}${userData.id}`;

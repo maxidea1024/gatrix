@@ -1,5 +1,6 @@
 import db from '../config/knex';
 import logger from '../config/logger';
+import { convertDateFieldsForMySQL, convertDateFieldsFromMySQL, COMMON_DATE_FIELDS } from '../utils/dateUtils';
 
 export interface GameWorldMaintenanceLocale {
   id?: number;
@@ -291,7 +292,10 @@ export class GameWorldModel {
           createdBy: gameWorldData.createdBy
         };
 
-        const [insertId] = await trx('g_game_worlds').insert(insertData);
+        // 날짜 필드들을 MySQL DATETIME 형식으로 변환
+        const convertedData = convertDateFieldsForMySQL(insertData, ['createdAt', 'updatedAt', 'maintenanceStartDate', 'maintenanceEndDate']);
+
+        const [insertId] = await trx('g_game_worlds').insert(convertedData);
 
         // 점검 메시지 로케일 처리
         if (maintenanceLocales && maintenanceLocales.length > 0) {
@@ -336,12 +340,15 @@ export class GameWorldModel {
           }
         });
 
-        if (Object.keys(updateData).length > 0) {
-          updateData.updatedAt = db.fn.now();
+        // 날짜 필드들을 MySQL DATETIME 형식으로 변환
+        const convertedUpdateData = convertDateFieldsForMySQL(updateData, ['createdAt', 'updatedAt', 'maintenanceStartDate', 'maintenanceEndDate']);
+
+        if (Object.keys(convertedUpdateData).length > 0) {
+          convertedUpdateData.updatedAt = db.fn.now();
 
           await trx('g_game_worlds')
             .where('id', id)
-            .update(updateData);
+            .update(convertedUpdateData);
         }
 
         // 점검 메시지 로케일 처리

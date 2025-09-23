@@ -6,6 +6,8 @@ import { asyncHandler, CustomError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import Joi from 'joi';
 
+const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+
 // Validation schemas
 const getUsersQuerySchema = Joi.object({
   page: Joi.number().integer().min(1).optional(),
@@ -376,7 +378,7 @@ export class UserController {
         username: user.email,
         name: user.name || user.email,
         email: user.email,
-        avatar: '',
+        avatarUrl: user.avatarUrl || DEFAULT_AVATAR_URL,
         status: 'online',
         lastSeenAt: new Date().toISOString(),
         createdAt: user.createdAt?.toISOString(),

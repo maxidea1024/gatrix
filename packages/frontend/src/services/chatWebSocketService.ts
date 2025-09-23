@@ -292,7 +292,10 @@ export class ChatWebSocketService {
   }
 
   private getSocketUrl(): string {
-    return 'http://localhost:3001'; // 직접 채팅 서버 연결 (WebSocket은 프록시 불가)
+    // 환경에 따라 채팅서버 URL 설정
+    return process.env.NODE_ENV === 'production'
+      ? process.env.VITE_CHAT_SERVER_URL || 'wss://chat.yourdomain.com'
+      : 'http://localhost:3001'; // 개발환경에서는 직접 연결
   }
 
   private scheduleReconnect(): void {

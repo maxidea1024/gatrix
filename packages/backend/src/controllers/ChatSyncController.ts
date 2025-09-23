@@ -4,6 +4,8 @@ import { UserModel } from '../models/User';
 import { AuthenticatedRequest } from '../middleware/auth';
 import logger from '../config/logger';
 
+const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+
 export class ChatSyncController {
   /**
    * 현재 사용자를 Chat Server에 동기화
@@ -36,7 +38,7 @@ export class ChatSyncController {
         username: user.email, // Backend User 모델에는 username이 없음
         name: user.name || user.email,
         email: user.email,
-        avatar: '', // Backend User 모델에는 avatar가 없음
+        avatarUrl: user.avatarUrl || DEFAULT_AVATAR_URL,
         status: 'online',
         lastSeenAt: new Date().toISOString(),
         createdAt: user.createdAt?.toISOString(),
@@ -93,7 +95,7 @@ export class ChatSyncController {
         username: user.email,
         name: user.name || user.email,
         email: user.email,
-        avatar: '',
+        avatarUrl: user.avatarUrl || DEFAULT_AVATAR_URL,
         status: 'offline', // 관리자가 동기화하는 경우 기본값
         lastSeenAt: new Date().toISOString(),
         createdAt: user.createdAt?.toISOString(),
@@ -148,7 +150,7 @@ export class ChatSyncController {
         username: user.email,
         name: user.name || user.email,
         email: user.email,
-        avatar: '',
+        avatarUrl: user.avatarUrl || DEFAULT_AVATAR_URL,
         status: 'offline' as const,
         lastSeenAt: new Date().toISOString(),
         createdAt: user.createdAt?.toISOString(),
@@ -157,14 +159,7 @@ export class ChatSyncController {
 
       // 프록시를 통해 bulk sync 요청
       const chatServerService = ChatServerService.getInstance();
-      const response = await chatServerService.axiosInstance.post(
-        '/api/v1/users/sync-users',
-        { users: userData }
-      );
-
-      if (!response.data.success) {
-        throw new Error(`Chat Server responded with error: ${response.data.error?.message}`);
-      }
+      await chatServerService.syncUsers(userData);
 
       logger.info(`${users.length} users synced to Chat Server by admin ${req.user?.userId}`);
 
@@ -172,8 +167,7 @@ export class ChatSyncController {
         success: true,
         data: {
           message: 'All users synchronized successfully',
-          syncedCount: users.length,
-          chatServerResponse: response.data.data
+          syncedCount: users.length
         }
       });
     } catch (error: any) {

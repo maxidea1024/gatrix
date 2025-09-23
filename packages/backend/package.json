@@ -86,6 +86,7 @@
     "passport-wechat": "^2.0.4",
     "redis": "^4.6.10",
     "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "ssh2": "^1.17.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",

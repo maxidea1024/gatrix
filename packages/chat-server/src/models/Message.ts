@@ -113,36 +113,49 @@ export class MessageModel {
 
   // 메시지 조회
   static async findById(id: number): Promise<MessageType | null> {
-    const message = await this.knex('chat_messages')
-      .where({ id, isDeleted: false })
+    const result = await this.knex('chat_messages as m')
+      .select([
+        'm.*',
+        'u.name as userName',
+        'u.avatarUrl as userAvatarUrl',
+        'u.email as userEmail'
+      ])
+      .leftJoin('chat_users as u', 'm.userId', 'u.gatrixUserId')
+      .where({ 'm.id': id, 'm.isDeleted': false })
       .first();
 
-    if (!message) return null;
+    if (!result) return null;
 
-    // Redis에서 사용자 정보 조회
-    const userData = await redisClient.hgetall(`user:${message.userId}`);
-    const user = userData.id ? {
-      id: parseInt(userData.id),
-      name: userData.name,
-      email: userData.email,
-      avatar: userData.avatar
+    // 사용자 정보 구성
+    const user = result.userName ? {
+      id: result.userId,
+      name: result.userName,
+      email: result.userEmail,
+      avatar: result.userAvatarUrl
     } : null;
 
     // 답글 메시지가 있는 경우 조회
     let replyMessage = null;
     let replyUser = null;
-    if (message.replyToMessageId) {
-      replyMessage = await this.knex('chat_messages')
-        .where({ id: message.replyToMessageId, isDeleted: false })
+    if (result.replyToMessageId) {
+      const replyResult = await this.knex('chat_messages as rm')
+        .select([
+          'rm.*',
+          'ru.name as replyUserName',
+          'ru.avatarUrl as replyUserAvatarUrl',
+          'ru.email as replyUserEmail'
+        ])
+        .leftJoin('chat_users as ru', 'rm.userId', 'ru.gatrixUserId')
+        .where({ 'rm.id': result.replyToMessageId, 'rm.isDeleted': false })
         .first();
 
-      if (replyMessage) {
-        const replyUserData = await redisClient.hgetall(`user:${replyMessage.userId}`);
-        replyUser = replyUserData.id ? {
-          id: parseInt(replyUserData.id),
-          name: replyUserData.name,
-          email: replyUserData.email,
-          avatar: replyUserData.avatar
+      if (replyResult) {
+        replyMessage = replyResult;
+        replyUser = replyResult.replyUserName ? {
+          id: replyResult.userId,
+          name: replyResult.replyUserName,
+          email: replyResult.replyUserEmail,
+          avatar: replyResult.replyUserAvatarUrl
         } : null;
       }
     }
@@ -154,8 +167,11 @@ export class MessageModel {
     ]);
 
     return {
-      ...message,
-      messageData: message.messageData ? JSON.parse(message.messageData) : null,
+      ...result,
+      messageData: result.messageData ? JSON.parse(result.messageData) : null,
+      user,
+      replyMessage,
+      replyUser,
       attachments,
       reactions,
     };
@@ -177,9 +193,9 @@ export class MessageModel {
         'rm.content as replyContent',
         'ru.name as replyUserName',
       ])
-      .leftJoin('users as u', 'm.userId', 'u.id')
+      .leftJoin('chat_users as u', 'm.userId', 'u.gatrixUserId')
       .leftJoin('chat_messages as rm', 'm.replyToMessageId', 'rm.id')
-      .leftJoin('users as ru', 'rm.userId', 'ru.id')
+      .leftJoin('chat_users as ru', 'rm.userId', 'ru.gatrixUserId')
       .where('m.channelId', channelId);
 
     if (!options.includeDeleted) {
@@ -218,12 +234,21 @@ export class MessageModel {
       this.getMessagesReactions(messageIds),
     ]);
 
-    const enrichedMessages = messages.map(message => ({
-      ...message,
-      messageData: message.messageData ? JSON.parse(message.messageData) : null,
-      attachments: attachmentsMap.get(message.id) || [],
-      reactions: reactionsMap.get(message.id) || [],
-    }));
+    const enrichedMessages = messages.map(message => {
+      const reactions = reactionsMap.get(message.id) || [];
+      console.log(`🔍 Message ${message.id} reactions:`, {
+        messageId: message.id,
+        reactionsCount: reactions.length,
+        reactions: reactions
+      });
+
+      return {
+        ...message,
+        messageData: message.messageData ? JSON.parse(message.messageData) : null,
+        attachments: attachmentsMap.get(message.id) || [],
+        reactions: reactions,
+      };
+    });
 
     return {
       messages: enrichedMessages.reverse(), // 시간순 정렬
@@ -469,7 +494,7 @@ export class MessageModel {
         'u.name as userName',
         'u.avatarUrl as userAvatarUrl',
       ])
-      .leftJoin('chat_users as u', 'r.userId', 'u.id')
+      .leftJoin('chat_users as u', 'r.userId', 'u.gatrixUserId')
       .where('r.messageId', messageId)
       .orderBy('r.createdAt', 'asc');
   }
@@ -478,15 +503,22 @@ export class MessageModel {
   private static async getMessagesReactions(messageIds: number[]): Promise<Map<number, any[]>> {
     if (messageIds.length === 0) return new Map();
 
+    console.log('🔍 Querying reactions for messages:', messageIds);
+
     const reactions = await this.knex('chat_message_reactions as r')
       .select([
         'r.*',
         'u.name as userName',
         'u.avatarUrl as userAvatarUrl',
       ])
-      .leftJoin('users as u', 'r.userId', 'u.id')
-      .whereIn('r.messageId', messageIds)
-      .orderBy('r.createdAt', 'asc');
+      .leftJoin('chat_users as u', 'r.userId', 'u.gatrixUserId')
+      .whereIn('r.messageId', messageIds);
+
+    console.log('🔍 Raw reactions query result:', {
+      messageIds,
+      reactionsCount: reactions.length,
+      reactions: reactions
+    });
 
     const reactionsMap = new Map<number, any[]>();
     for (const reaction of reactions) {

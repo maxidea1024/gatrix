@@ -130,15 +130,35 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
   };
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
+    console.log('⌨️ handleKeyPress called:', {
+      key: event.key,
+      shiftKey: event.shiftKey,
+      ctrlKey: event.ctrlKey,
+      altKey: event.altKey
+    });
+
     if (event.key === 'Enter' && !event.shiftKey) {
+      console.log('✅ Enter key pressed, calling handleSendMessage');
       event.preventDefault();
       handleSendMessage();
     }
   };
 
   const handleSendMessage = () => {
-    if (!message.trim() && attachments.length === 0) return;
+    console.log('🚀 handleSendMessage called:', {
+      message: message,
+      messageLength: message.length,
+      messageTrimmed: message.trim(),
+      attachments: attachments,
+      onSendMessage: onSendMessage
+    });
 
+    if (!message.trim() && attachments.length === 0) {
+      console.log('❌ Message empty, returning early');
+      return;
+    }
+
+    console.log('✅ Calling onSendMessage with:', message.trim(), attachments);
     onSendMessage(message.trim(), attachments);
     setMessage('');
     setAttachments([]);

@@ -6,7 +6,11 @@ import redisClient from './config/redis';
 import { pubSubService } from './services/PubSubService';
 import { queueService } from './services/QueueService';
 import apiTokenUsageService from './services/ApiTokenUsageService';
+import { checkDatabaseTimezone, setDatabaseTimezoneToUTC } from './utils/dbTimezoneCheck';
 import { appInstance } from './utils/AppInstance';
+import { Server } from 'socket.io';
+import { createServer } from 'http';
+import { io as ioClient } from 'socket.io-client';
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error: Error) => {
@@ -78,6 +82,14 @@ const startServer = async () => {
     }
     logger.info('Database connection established successfully');
 
+    // Check and configure database timezone
+    try {
+      await setDatabaseTimezoneToUTC();
+      logger.info('Database timezone configured for UTC');
+    } catch (error) {
+      logger.warn('Failed to configure database timezone, continuing:', error);
+    }
+
     // Connect to Redis (optional)
     try {
       await redisClient.connect();
@@ -110,11 +122,14 @@ const startServer = async () => {
       logger.warn('ApiTokenUsageService initialization failed, continuing without token usage tracking:', error);
     }
 
-    // Start HTTP server
-    const server = app.listen(config.port, () => {
+    // Start HTTP server (WebSocket은 채팅서버에서 직접 처리)
+    const server = createServer(app);
+
+    server.listen(config.port, () => {
       logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`, appInstance.getLogInfo());
       logger.info(`Health check available at http://localhost:${config.port}/health`);
       logger.info(`API available at http://localhost:${config.port}/api/v1`);
+      logger.info(`Chat API proxy available at http://localhost:${config.port}/api/v1/chat`);
       logger.info(`Queue service ready: ${queueService.isReady()}`);
       logger.info(`PubSub service ready: ${pubSubService.isReady()}`);
     });

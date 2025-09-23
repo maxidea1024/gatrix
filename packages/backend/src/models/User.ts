@@ -3,6 +3,7 @@ import db from '../config/knex';
 import logger from '../config/logger';
 import { User as UserType, CreateUserData, UpdateUserData, UserWithoutPassword } from '../types/user';
 import { Model } from 'objection';
+import { convertDateFieldsForMySQL, convertDateFieldsFromMySQL, COMMON_DATE_FIELDS } from '../utils/dateUtils';
 
 // Export User class for Objection.js models
 export class User extends Model {

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import channelsRouter from './channels';
 import messagesRouter from './messages';
+import messageReactionsRouter from './messageReactions';
 import privacyRouter from './privacy';
 import invitationsRouter from './invitations';
 import directMessagesRouter from './direct-messages';
@@ -63,6 +64,7 @@ router.use('/admin/tokens', apiTokenRouter);
 router.use('/users', usersRouter);
 router.use('/channels', channelsRouter);
 router.use('/messages', messagesRouter);
+router.use('/', messageReactionsRouter); // 메시지 리액션 라우트 (messages/:id/reactions)
 router.use('/privacy', privacyRouter);
 router.use('/invitations', invitationsRouter);
 router.use('/direct-messages', directMessagesRouter);

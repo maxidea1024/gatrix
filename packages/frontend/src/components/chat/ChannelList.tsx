@@ -72,15 +72,31 @@ const ChannelList: React.FC<ChannelListProps> = ({
     (channel.description && channel.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
+  // 디버깅: 채널 상태 로그
+  console.log('🔍 ChannelList Debug:', {
+    'state.channels': state.channels,
+    'state.channels.length': state.channels.length,
+    'filteredChannels.length': filteredChannels.length,
+    'searchQuery': searchQuery
+  });
+
 
 
   const handleChannelClick = (channel: Channel) => {
+    console.log('🖱️ handleChannelClick called:', {
+      clickedChannelId: channel.id,
+      currentChannelId: state.currentChannelId,
+      isAlreadySelected: state.currentChannelId === channel.id
+    });
+
     // 이미 선택된 채널이면 아무것도 하지 않음
     if (state.currentChannelId === channel.id) {
+      console.log('⏭️ Channel already selected, skipping');
       return;
     }
 
     // 새로운 채널 선택
+    console.log('✅ Calling setCurrentChannel with:', channel.id);
     actions.setCurrentChannel(channel.id);
 
     // 채널 변경 후 메시지가 로딩되면 자동으로 읽음 처리

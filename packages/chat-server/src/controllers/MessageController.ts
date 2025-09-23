@@ -37,6 +37,18 @@ export class MessageController {
       const message = await MessageModel.create(data, userId);
       const latency = (Date.now() - startTime) / 1000;
 
+      // 🔍 메시지 생성 후 사용자 정보 로깅
+      logger.info('🔍 Message created with user info:', {
+        messageId: message.id,
+        channelId: data.channelId,
+        userId: userId,
+        user: message.user,
+        messageContent: message.content,
+        hasUserInfo: !!message.user,
+        userName: message.user?.name,
+        userEmail: message.user?.email
+      });
+
       metricsService.recordMessage(data.channelId.toString(), data.contentType || 'text');
       metricsService.recordMessageLatency('message_create', latency);
 
@@ -543,6 +555,15 @@ export class MessageController {
           channelId,
           userId
         };
+
+        // 🔍 WebSocket으로 전송되는 메시지 데이터 확인
+        logger.info('🔍 WebSocket message data:', {
+          messageId: message.id,
+          hasUser: !!message.user,
+          user: message.user,
+          messageContent: message.content,
+          fullMessage: message
+        });
 
         logger.info(`Emitting WebSocket event to channel:${channelId}`, { eventData });
         io.to(`channel:${channelId}`).emit('message', eventData);

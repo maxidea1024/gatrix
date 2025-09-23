@@ -14,6 +14,8 @@ import { LinkPreview } from '../../types/chat';
 import { format } from 'date-fns';
 import { ko, enUS, zhCN } from 'date-fns/locale';
 
+const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
+
 // 마크다운 스타일링을 위한 타입 정의
 interface MessagePart {
   type: 'text' | 'code' | 'codeBlock' | 'bold' | 'italic' | 'strikethrough' | 'underline' | 'link';
@@ -649,7 +651,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     });
     return {
       name: userName,
-      avatar: user?.avatar || user?.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=random`,
+      avatar: user?.avatar || user?.avatarUrl || DEFAULT_AVATAR_URL,
     };
   };
 
@@ -969,6 +971,15 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                 </Typography>
 
                 {/* 리액션 표시 */}
+                {(() => {
+                  console.log('🔍 Message reactions check:', {
+                    messageId: message.id,
+                    hasReactions: !!message.reactions,
+                    reactionsLength: message.reactions?.length || 0,
+                    reactions: message.reactions
+                  });
+                  return null;
+                })()}
                 {message.reactions && message.reactions.length > 0 && (
                   <Box sx={{
                     display: 'flex',
@@ -1212,12 +1223,28 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         <AdvancedMessageInput
           channelId={channelId}
           onSendMessage={(content, attachments) => {
+            console.log('📨 ChatElementsMessageList onSendMessage called:', {
+              content,
+              attachments,
+              currentChannel,
+              currentChannelId: currentChannel?.id,
+              actions: actions
+            });
+
             if (currentChannel) {
+              console.log('✅ Calling actions.sendMessage with:', currentChannel.id, {
+                content,
+                type: 'text' as MessageType,
+                attachments
+              });
+
               actions.sendMessage(currentChannel.id, {
                 content,
                 type: 'text' as MessageType,
                 attachments
               });
+            } else {
+              console.log('❌ No currentChannel available');
             }
           }}
           placeholder={t('chat.typeMessage')}

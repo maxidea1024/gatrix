@@ -1,4 +1,5 @@
 import express from 'express';
+import multer from 'multer';
 import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
 import { authenticate } from '../../middleware/auth';
 import { ChatSyncController } from '../../controllers/ChatSyncController';
@@ -6,9 +7,22 @@ import logger from '../../config/logger';
 
 const router = express.Router();
 
+// Body parser for chat routes (since they're registered before main body parser)
+router.use(express.json({ limit: '10mb' }));
+router.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Multer for handling multipart/form-data (file uploads)
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+});
+router.use(upload.any() as any);
+
 // 채팅서버 설정
 const CHAT_SERVER_URL = process.env.CHAT_SERVER_URL || 'http://localhost:3001';
 const CHAT_API_BASE = `${CHAT_SERVER_URL}/api/v1`;
+const CHAT_SERVER_API_TOKEN = 'gatrix-api-180c05eb58db26b863481f5d54e657a218b54da5bfb388e9278a7eb733227aec';
+const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
 // 모든 채팅 라우트에 인증 필요 (디버깅 로깅 추가)
 router.use((req, res, next) => {
@@ -119,13 +133,24 @@ const proxyOptions = {
 
       // 사용자 동기화는 백그라운드에서 비동기로 처리 (요청을 블록하지 않음)
       const user = (req as any).user;
+
+      // 🔍 사용자 정보 디버깅
+      logger.info('🔍 User data for sync:', {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        avatarUrl: user.avatarUrl,
+        hasAvatarUrl: !!user.avatarUrl,
+        avatarUrlType: typeof user.avatarUrl
+      });
+
       const chatServerService = require('../../services/ChatServerService').ChatServerService.getInstance();
       chatServerService.ensureUserSynced({
         id: user.id,
         username: user.email,
         name: user.name,
         email: user.email,
-        avatarUrl: user.avatarUrl || undefined,
+        avatarUrl: user.avatarUrl || DEFAULT_AVATAR_URL,
         status: 'online'
       }).then(() => {
         logger.info(`✅ User ${user.id} ensured synced to Chat Server`);
@@ -142,22 +167,75 @@ const proxyOptions = {
 
   // 에러 핸들링
   onError: (err: Error, req: express.Request, res: express.Response) => {
-    logger.error(`Chat proxy error: ${req.method} ${req.url}`, {
+    logger.error(`🚨 Chat proxy error: ${req.method} ${req.url}`, {
       error: err.message,
-      code: (err as any).code
+      code: (err as any).code,
+      stack: err.stack
     });
+    console.error('🚨 Detailed proxy error:', err);
     if (!res.headersSent) {
       res.status(500).json({
         success: false,
-        error: 'Chat service unavailable'
+        error: 'Chat service unavailable',
+        details: err.message
       });
     }
   }
 };
 
-const chatProxy = createProxyMiddleware(proxyOptions);
+// 임시 테스트: 간단한 프록시 미들웨어
+router.use('/', async (req, res, next) => {
+  try {
+    console.log('🔥 SIMPLE PROXY MIDDLEWARE REACHED:', req.method, req.url);
+    console.log('📦 Request body:', JSON.stringify(req.body, null, 2));
 
-// 모든 채팅 요청을 프록시로 전달
-router.use('/', chatProxy);
+    // 채팅서버로 직접 요청
+    const axios = require('axios');
+
+    // URL 매핑: /sync-user -> /users/sync-user
+    let targetPath = req.url;
+    if (targetPath === '/sync-user') {
+      targetPath = '/users/sync-user';
+    }
+
+    const targetUrl = `${CHAT_API_BASE}${targetPath}`;
+
+    console.log('🚀 Forwarding to:', targetUrl);
+
+    // 사용자 동기화 요청인 경우 사용자 정보 추가
+    let requestData = req.body;
+    if (targetPath === '/users/sync-user' && req.user) {
+      const user = req.user as any;
+      requestData = {
+        id: user.id,
+        username: user.email,
+        name: user.name || user.email,
+        email: user.email,
+        avatarUrl: user.avatarUrl || DEFAULT_AVATAR_URL
+      };
+      console.log('📝 Adding user data for sync:', requestData);
+    }
+
+    const response = await axios({
+      method: req.method,
+      url: targetUrl,
+      headers: {
+        'X-API-Token': CHAT_SERVER_API_TOKEN,
+        'X-User-ID': (req.user as any)?.id?.toString() || '3',
+        'Content-Type': 'application/json'
+      },
+      data: requestData
+    });
+
+    console.log('✅ Chat server response:', response.status);
+    res.json(response.data);
+  } catch (error: any) {
+    console.error('❌ Simple proxy error:', error.message);
+    res.status(error.response?.status || 500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
 
 export default router;

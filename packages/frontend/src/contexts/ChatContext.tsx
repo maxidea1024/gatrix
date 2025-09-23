@@ -6,6 +6,8 @@ import { ChatService } from '../services/chatService';
 import { getChatWebSocketService } from '../services/chatWebSocketService';
 import { apiService } from '../services/api';
 import { AuthService } from '../services/auth';
+
+const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 import {
   ChatState,
   ChatContextType,
@@ -420,9 +422,35 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('📨 Current channel ID:', state.currentChannelId);
           console.log('📨 Message channel ID:', message.data?.channelId);
 
-          // 메시지 작성자의 사용자 데이터가 없으면 기본 데이터 추가
-          if (message.data.userId && !state.users[message.data.userId]) {
-            console.log('🔍 Adding missing user data for userId:', message.data.userId);
+          // 🔍 메시지에 사용자 정보가 포함되어 있는지 확인
+          console.log('🔍 Message user info check:', {
+            hasMessageUser: !!message.data.user,
+            messageUser: message.data.user,
+            userId: message.data.userId,
+            hasUserInState: !!state.users[message.data.userId]
+          });
+
+          // 메시지에 사용자 정보가 포함되어 있으면 사용
+          if (message.data.user && message.data.userId) {
+            console.log('✅ Using user info from message:', message.data.user);
+            dispatch({
+              type: 'SET_USERS',
+              payload: [{
+                id: message.data.userId,
+                username: message.data.user.name || message.data.user.username || `User${message.data.userId}`,
+                name: message.data.user.name || `User${message.data.userId}`,
+                email: message.data.user.email || `user${message.data.userId}@example.com`,
+                avatar: message.data.user.avatar || message.data.user.avatarUrl || DEFAULT_AVATAR_URL,
+                status: 'online' as const,
+                lastSeenAt: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              }]
+            });
+          }
+          // 메시지에 사용자 정보가 없고 state에도 없으면 fallback 사용
+          else if (message.data.userId && !state.users[message.data.userId]) {
+            console.log('⚠️ Using fallback user data for userId:', message.data.userId);
             dispatch({
               type: 'SET_USERS',
               payload: [{
@@ -444,6 +472,17 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         wsService.onMessageUpdated((message) => {
           dispatch({ type: 'UPDATE_MESSAGE', payload: message });
+        });
+
+        // 리액션 업데이트 이벤트 리스너
+        wsService.on('message_reaction_added', (data) => {
+          console.log('🔍 Reaction added:', data);
+          dispatch({ type: 'UPDATE_MESSAGE', payload: data.message });
+        });
+
+        wsService.on('message_reaction_removed', (data) => {
+          console.log('🔍 Reaction removed:', data);
+          dispatch({ type: 'UPDATE_MESSAGE', payload: data.message });
         });
 
         // 연결 상태 이벤트 리스너
@@ -700,7 +739,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Load messages for a channel
   const loadMessages = useCallback(async (channelId: number, forceReload = false) => {
     try {
-      console.log('Loading messages for channel:', channelId, 'forceReload:', forceReload);
+      console.log('🔄 loadMessages called for channel:', channelId, 'forceReload:', forceReload);
+      console.log('📊 Current messages state:', state.messages);
 
       // 강제 리로드가 아니고 이미 메시지가 있다면 스킵
       if (!forceReload && state.messages[channelId] && state.messages[channelId].length > 0) {
@@ -853,6 +893,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Load channels
   const loadChannels = useCallback(async () => {
+    console.log('🔄 loadChannels() called');
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
 
@@ -866,13 +907,15 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // 동기화 실패해도 채팅은 계속 진행
       }
 
+      console.log('🔄 Loading channels from API...');
       const channels = await ChatService.getChannels();
+      console.log('✅ Channels loaded:', channels);
       dispatch({ type: 'SET_CHANNELS', payload: channels });
 
-      // 사용자 데이터와 초대 수도 함께 로드
-      await Promise.all([
-        loadUsers(),
-        loadPendingInvitationsCount()
+      // 사용자 데이터와 초대 수도 함께 로드 (개별 오류 처리)
+      await Promise.allSettled([
+        loadUsers().catch(error => console.error('❌ Failed to load users:', error)),
+        loadPendingInvitationsCount().catch(error => console.error('❌ Failed to load invitations:', error))
       ]);
 
       // 마지막 참여 채널 자동 선택
@@ -915,11 +958,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // 채널이 실제로 변경된 경우에만 메시지 로딩
         if (previousChannelId !== channelId) {
-          console.log('Channel changed from', previousChannelId, 'to', channelId);
+          console.log('✅ Channel changed from', previousChannelId, 'to', channelId, '- loading messages');
           // 비동기 함수를 setTimeout으로 감싸서 안전하게 호출
           setTimeout(() => {
             loadMessages(channelId);
           }, 0);
+        } else {
+          console.log('⏭️ Same channel selected, skipping message load');
         }
 
         // WebSocket 채널 참여
@@ -930,11 +975,20 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     },
 
     sendMessage: async (channelId, messageData) => {
+      console.log('🚀 ChatContext.sendMessage called:', {
+        channelId,
+        messageData,
+        ChatService: ChatService
+      });
+
       try {
+        console.log('📡 Calling ChatService.sendMessage...');
         const message = await ChatService.sendMessage(channelId, messageData);
+        console.log('✅ ChatService.sendMessage success:', message);
         // Message will be added via WebSocket event
         return message;
       } catch (error: any) {
+        console.error('❌ ChatService.sendMessage error:', error);
         dispatch({ type: 'SET_ERROR', payload: error.message || t('chat.sendMessageFailed') });
         throw error;
       }
@@ -1158,6 +1212,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const selectChannel = async (channelId: number) => {
     actions.setCurrentChannel(channelId);
   };
+
+  // 디버깅을 위해 전역에 노출
+  React.useEffect(() => {
+    (window as any).chatState = state;
+    (window as any).chatActions = actions;
+  }, [state, actions]);
 
   return (
     <ChatContext.Provider value={{ state, actions }}>

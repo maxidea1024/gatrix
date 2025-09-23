@@ -21,7 +21,10 @@ export class ChatService {
   // Channel management
   static async getChannels(params?: GetChannelsRequest): Promise<Channel[]> {
     const response = await apiService.get<{ data: Channel[]; pagination: any }>(`${this.BASE_URL}/channels/my`, { params });
-    return response.data?.data || [];
+    console.log('🔍 ChatService.getChannels response:', response);
+    // API 응답 구조: { success: true, data: [...] }
+    // apiService는 이미 response.data를 반환하므로 response.data가 실제 데이터
+    return response.data || [];
   }
 
   static async getChannel(channelId: number): Promise<Channel> {
