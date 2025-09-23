@@ -29,36 +29,18 @@ export class ChatWebSocketService {
 
     this.connectionPromise = new Promise(async (resolve, reject) => {
       try {
-        // Backend에서 Chat 토큰 발급받기
+        // 기존 JWT 토큰 사용 (별도 채팅 토큰 불필요)
         const backendToken = localStorage.getItem('accessToken');
         if (!backendToken) {
           throw new Error('No authentication token found');
         }
 
-        // Backend API를 통해 Chat WebSocket 토큰 발급
-        const response = await fetch('/api/v1/chat/token', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${backendToken}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to get chat token: ${response.status}`);
-        }
-
-        const tokenData = await response.json();
-        if (!tokenData.success || !tokenData.data.token) {
-          throw new Error('Invalid chat token response');
-        }
-
-        const chatToken = tokenData.data.token;
+        console.log('🔗 Using existing JWT token for WebSocket connection');
 
         const socketUrl = this.getSocketUrl();
         this.socket = io(socketUrl, {
           auth: {
-            token: chatToken
+            token: backendToken
           },
           transports: ['websocket', 'polling'],
           timeout: 10000,

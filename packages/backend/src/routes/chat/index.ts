@@ -1,9 +1,7 @@
 import express from 'express';
 import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
 import { authenticate } from '../../middleware/auth';
-import { requireAdmin } from '../../middleware/requireAdmin';
 import { ChatSyncController } from '../../controllers/ChatSyncController';
-import { ChatChannelController } from '../../controllers/ChatChannelController';
 import logger from '../../config/logger';
 
 const router = express.Router();
@@ -49,44 +47,37 @@ router.get('/test-connection', async (req, res) => {
 
 router.use(authenticate as any);
 
-// Body parsing이 필요한 라우트들에만 적용
-const bodyParser = express.json({ limit: '10mb' });
-
-// Chat Server 동기화 엔드포인트 (프록시 전에 처리)
-router.post('/sync-user', bodyParser, ChatSyncController.syncCurrentUser as any);
-router.post('/sync-user/:userId', requireAdmin, bodyParser, ChatSyncController.syncUser as any);
-router.post('/sync-all-users', requireAdmin, bodyParser, ChatSyncController.syncAllUsers as any);
+// 백엔드 전용 엔드포인트 (프록시 전에 처리)
 router.get('/health', ChatSyncController.healthCheck);
 
-// Chat WebSocket 토큰 발급 엔드포인트
-router.post('/token', bodyParser, ChatSyncController.getChatToken as any);
+// 나머지 모든 채팅 요청은 프록시로 처리
+// - /sync-user, /sync-users, /channels/*, /users, /invitations/* 등
 
-// 채널 관련 엔드포인트 (프록시 대신 직접 구현)
-router.get('/channels/my', ChatChannelController.getMyChannels as any);
-router.post('/channels', bodyParser, ChatChannelController.createChannel as any);
-router.get('/channels/:channelId', ChatChannelController.getChannel as any);
-router.get('/channels/:channelId/messages', ChatChannelController.getChannelMessages as any);
+// 프록시로 전달할 요청들을 위한 로깅 미들웨어
+router.use((req, _res, next) => {
+  // 이미 처리된 라우트들은 스킵
+  const directRoutes = ['/health', '/test-connection'];
+  const isDirectRoute = directRoutes.some(route => req.url.startsWith(route));
 
-// 사용자 관련 엔드포인트
-router.get('/users', ChatChannelController.getUsers as any);
+  if (!isDirectRoute) {
+    logger.info(`🔥 Proxying Chat API Request: ${req.method} ${req.url}`, {
+      headers: {
+        authorization: req.headers.authorization ? req.headers.authorization.substring(0, 20) + '...' : 'none',
+        'user-agent': req.headers['user-agent']?.substring(0, 50) + '...',
+      },
+      user: (req as any).user ? {
+        id: (req as any).user.id,
+        email: (req as any).user.email,
+        name: (req as any).user.name
+      } : 'none',
+      query: req.query,
+      params: req.params
+    });
 
-// 직접 라우트 제거 - 프록시로 통일 완료
+    // 프록시 도달 여부 확인을 위한 로그
+    logger.info(`🚀 About to reach proxy middleware for: ${req.method} ${req.url}`);
+  }
 
-// 상세한 요청 로깅
-router.use((req, res, next) => {
-  logger.info(`🔥 Chat API Request: ${req.method} ${req.url}`, {
-    headers: {
-      authorization: req.headers.authorization ? req.headers.authorization.substring(0, 20) + '...' : 'none',
-      'user-agent': req.headers['user-agent']?.substring(0, 50) + '...',
-    },
-    user: (req as any).user ? {
-      id: (req as any).user.id,
-      email: (req as any).user.email,
-      name: (req as any).user.name
-    } : 'none',
-    query: req.query,
-    params: req.params
-  });
   next();
 });
 
@@ -108,6 +99,8 @@ const proxyOptions = {
 
   // 헤더 전달 설정
   onProxyReq: (proxyReq: any, req: express.Request) => {
+    logger.info(`🚀 PROXY MIDDLEWARE REACHED! ${req.method} ${req.url}`);
+
     // Chat Server API 토큰 추가 (가장 중요!)
     const CHAT_SERVER_API_TOKEN = process.env.CHAT_SERVER_API_TOKEN || 'gatrix-api-180c05eb58db26b863481f5d54e657a218b54da5bfb388e9278a7eb733227aec';
     proxyReq.setHeader('X-API-Token', CHAT_SERVER_API_TOKEN);

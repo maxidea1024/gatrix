@@ -122,10 +122,13 @@ export class ChatSyncController {
   /**
    * 모든 사용자를 Chat Server에 동기화 (관리자 전용)
    * POST /api/v1/chat/sync-all-users
+   *
+   * 이제 프록시를 통해 처리됩니다.
+   * 실제 요청: POST /api/v1/users/sync-users
    */
   static async syncAllUsers(req: AuthenticatedRequest, res: Response) {
     try {
-      // 모든 활성 사용자 조회 (간단한 방식으로 수정)
+      // 모든 활성 사용자 조회
       const result = await UserModel.findAll(1, 1000, { status: 'active' });
       const users = result.users;
 
@@ -139,8 +142,7 @@ export class ChatSyncController {
         });
       }
 
-      // Chat Server에 사용자 정보 동기화
-      const chatServerService = ChatServerService.getInstance();
+      // 사용자 데이터 변환
       const userData = users.map(user => ({
         id: user.id,
         username: user.email,
@@ -153,7 +155,16 @@ export class ChatSyncController {
         updatedAt: user.updatedAt?.toISOString(),
       }));
 
-      await chatServerService.syncUsers(userData);
+      // 프록시를 통해 bulk sync 요청
+      const chatServerService = ChatServerService.getInstance();
+      const response = await chatServerService.axiosInstance.post(
+        '/api/v1/users/sync-users',
+        { users: userData }
+      );
+
+      if (!response.data.success) {
+        throw new Error(`Chat Server responded with error: ${response.data.error?.message}`);
+      }
 
       logger.info(`${users.length} users synced to Chat Server by admin ${req.user?.userId}`);
 
@@ -161,7 +172,8 @@ export class ChatSyncController {
         success: true,
         data: {
           message: 'All users synchronized successfully',
-          syncedCount: users.length
+          syncedCount: users.length,
+          chatServerResponse: response.data.data
         }
       });
     } catch (error: any) {

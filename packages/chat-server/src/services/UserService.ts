@@ -88,6 +88,68 @@ export class UserService {
   }
 
   /**
+   * Bulk upsert multiple users (for admin sync)
+   */
+  static async bulkUpsertUsers(usersData: UserData[]): Promise<UserData[]> {
+    try {
+      logger.info(`Bulk upserting ${usersData.length} users...`);
+
+      const db = databaseManager.getKnex();
+      const results: UserData[] = [];
+
+      // Process in batches to avoid overwhelming the database
+      const batchSize = 50;
+      for (let i = 0; i < usersData.length; i += batchSize) {
+        const batch = usersData.slice(i, i + batchSize);
+
+        // Use transaction for each batch
+        await db.transaction(async (trx) => {
+          for (const userData of batch) {
+            const userToSave: UserData = {
+              id: userData.id,
+              username: userData.username,
+              name: userData.name || userData.username,
+              email: userData.email || userData.username,
+              avatarUrl: userData.avatarUrl || undefined,
+              status: userData.status || 'offline',
+              chatStatus: userData.chatStatus || 'offline',
+              customStatus: userData.customStatus || undefined,
+              lastActivityAt: userData.lastActivityAt || new Date().toISOString(),
+              createdAt: userData.createdAt || new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            };
+
+            const existingUser = await trx('chat_users').where('id', userData.id).first();
+
+            if (existingUser) {
+              await trx('chat_users').where('id', userData.id).update(userToSave);
+            } else {
+              await trx('chat_users').insert(userToSave);
+            }
+
+            results.push(userToSave);
+          }
+        });
+      }
+
+      // Invalidate cache
+      await this.invalidateUsersListCache();
+
+      // Clear individual user caches
+      for (const userData of usersData) {
+        const cacheKey = `${this.CACHE_PREFIX}${userData.id}`;
+        await this.cacheService.delete(cacheKey);
+      }
+
+      logger.info(`Bulk upserted ${results.length} users successfully`);
+      return results;
+    } catch (error) {
+      logger.error('Error bulk upserting users:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Get user by ID
    */
   static async getUserById(userId: number): Promise<UserData | null> {

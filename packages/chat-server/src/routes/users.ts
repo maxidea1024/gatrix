@@ -7,8 +7,11 @@ const router = Router();
 // 기존 auth 미들웨어 사용 (임시)
 router.use(authenticate);
 
-// 사용자 정보 업서트
-router.post('/upsert', UserController.upsertUser);
+// 사용자 동기화 (백엔드에서 프록시로 호출)
+router.post('/sync-user', UserController.upsertUser);
+
+// 여러 사용자 일괄 동기화 (관리자용)
+router.post('/sync-users', UserController.bulkUpsertUsers);
 
 // 사용자 존재 확인
 router.get('/check/:userId', UserController.checkUser);

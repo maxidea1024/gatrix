@@ -38,6 +38,53 @@ export class UserController {
   }
 
   /**
+   * 여러 사용자 일괄 업서트 (관리자용)
+   * POST /api/v1/users/sync-users
+   */
+  static async bulkUpsertUsers(req: Request, res: Response): Promise<void> {
+    try {
+      const usersData: UserData[] = req.body.users || req.body;
+
+      if (!Array.isArray(usersData) || usersData.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'users array is required and cannot be empty' }
+        });
+        return;
+      }
+
+      // 각 사용자 데이터 검증
+      for (const userData of usersData) {
+        if (!userData.id || !userData.username) {
+          res.status(400).json({
+            success: false,
+            error: { message: 'All users must have id and username' }
+          });
+          return;
+        }
+      }
+
+      // UserService를 통해 일괄 저장
+      const results = await UserService.bulkUpsertUsers(usersData);
+
+      res.json({
+        success: true,
+        data: {
+          processedCount: results.length,
+          users: results,
+          message: `${results.length} users synchronized successfully`
+        }
+      });
+    } catch (error: any) {
+      console.error('Error bulk upserting users:', error);
+      res.status(500).json({
+        success: false,
+        error: { message: 'Failed to bulk update user information' }
+      });
+    }
+  }
+
+  /**
    * 사용자 존재 확인
    * GET /api/v1/users/check/:userId
    */

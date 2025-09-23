@@ -121,20 +121,37 @@ export class ChatServerService {
   }
 
   /**
-   * 여러 사용자를 한 번에 동기화
+   * 여러 사용자를 한 번에 동기화 (개선된 bulk 처리)
    */
   async syncUsers(users: UserData[]): Promise<void> {
-    console.log(`🔄 Syncing ${users.length} users to Chat Server...`);
-    
-    const results = await Promise.allSettled(
-      users.map(user => this.syncUser(user))
-    );
+    console.log(`🔄 Bulk syncing ${users.length} users to Chat Server...`);
 
-    const failed = results.filter(result => result.status === 'rejected');
-    if (failed.length > 0) {
-      console.error(`❌ Failed to sync ${failed.length} out of ${users.length} users`);
-    } else {
-      console.log(`✅ All ${users.length} users synced successfully`);
+    try {
+      const response = await this.axiosInstance.post(
+        '/api/v1/users/sync-users',
+        { users }
+      );
+
+      if (!response.data.success) {
+        throw new Error(`Chat Server responded with error: ${response.data.error?.message}`);
+      }
+
+      console.log(`✅ Bulk synced ${users.length} users successfully to Chat Server`);
+    } catch (error: any) {
+      console.error(`❌ Failed to bulk sync users to Chat Server:`, error.message);
+
+      // Fallback to individual sync if bulk fails
+      console.log(`🔄 Falling back to individual sync...`);
+      const results = await Promise.allSettled(
+        users.map(user => this.syncUser(user))
+      );
+
+      const failed = results.filter(result => result.status === 'rejected');
+      if (failed.length > 0) {
+        console.error(`❌ Failed to sync ${failed.length} out of ${users.length} users`);
+      } else {
+        console.log(`✅ All ${users.length} users synced successfully (fallback)`);
+      }
     }
   }
 
