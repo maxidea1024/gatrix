@@ -12,7 +12,17 @@ const router = express.Router();
 const CHAT_SERVER_URL = process.env.CHAT_SERVER_URL || 'http://localhost:3001';
 const CHAT_API_BASE = `${CHAT_SERVER_URL}/api/v1`;
 
-// 모든 채팅 라우트에 인증 필요
+// 모든 채팅 라우트에 인증 필요 (디버깅 로깅 추가)
+router.use((req, res, next) => {
+  logger.info('🔥 Chat route authentication check:', {
+    url: req.url,
+    method: req.method,
+    hasAuthHeader: !!req.headers.authorization,
+    authHeaderPrefix: req.headers.authorization?.substring(0, 20) + '...'
+  });
+  next();
+});
+
 router.use(authenticate as any);
 
 // Body parsing이 필요한 라우트들에만 적용
@@ -38,9 +48,15 @@ router.get('/users', ChatChannelController.getUsers as any);
 
 // 직접 라우트 제거 - 프록시로 통일 완료
 
-// 간단한 요청 로깅
+// 상세한 요청 로깅
 router.use((req, res, next) => {
-  logger.info(`Chat API: ${req.method} ${req.url}`);
+  logger.info(`🔥 Chat API Request: ${req.method} ${req.url}`, {
+    headers: {
+      authorization: req.headers.authorization ? req.headers.authorization.substring(0, 20) + '...' : 'none',
+      'user-agent': req.headers['user-agent']?.substring(0, 50) + '...',
+    },
+    user: (req as any).user ? { id: (req as any).user.id, email: (req as any).user.email } : 'none'
+  });
   next();
 });
 
@@ -51,12 +67,32 @@ const proxyOptions = {
   timeout: 10000, // 타임아웃 단축
   proxyTimeout: 10000,
 
+  // 경로 재작성: /chat/* → /*
+  pathRewrite: {
+    '^/chat': '', // /chat/invitations/received → /invitations/received
+  },
+
   // 연결 풀 설정 (연결 누수 방지)
   agent: false, // 연결 재사용 비활성화
   keepAlive: false, // Keep-Alive 비활성화
 
-  // POST body 수정 (중요!)
-  onProxyReq: fixRequestBody,
+  // 헤더 전달 설정
+  onProxyReq: (proxyReq: any, req: express.Request, res: express.Response) => {
+    // Authorization 헤더 전달
+    if (req.headers.authorization) {
+      proxyReq.setHeader('Authorization', req.headers.authorization);
+      logger.debug(`Forwarding Authorization header to Chat Server: ${req.headers.authorization.substring(0, 20)}...`);
+    }
+
+    // 사용자 정보 헤더 추가 (Chat Server에서 사용)
+    if ((req as any).user?.id) {
+      proxyReq.setHeader('X-User-ID', (req as any).user.id.toString());
+      logger.debug(`Adding X-User-ID header: ${(req as any).user.id}`);
+    }
+
+    // POST body 수정 (중요!)
+    fixRequestBody(proxyReq, req, res);
+  },
 
   // 에러 핸들링
   onError: (err: Error, req: express.Request, res: express.Response) => {

@@ -4,6 +4,8 @@ import { useSnackbar, closeSnackbar } from 'notistack';
 import { useAuth } from '../hooks/useAuth';
 import { ChatService } from '../services/chatService';
 import { getChatWebSocketService } from '../services/chatWebSocketService';
+import { apiService } from '../services/api';
+import { AuthService } from '../services/auth';
 import {
   ChatState,
   ChatContextType,
@@ -398,7 +400,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('Connecting to chat WebSocket with token...', token.substring(0, 20) + '...');
 
           // Ensure API service has the token
-          const { apiService } = await import('../services/api');
           apiService.setAccessToken(token);
 
           await wsService.connect();
@@ -481,7 +482,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           try {
             // 토큰 갱신 시도
-            const { AuthService } = await import('../services/auth');
             await AuthService.refreshToken();
 
             console.log('✅ Token refreshed, reconnecting WebSocket...');
@@ -609,7 +609,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 <button
                   onClick={async () => {
                     try {
-                      const { apiService } = await import('../services/api');
                       const token = localStorage.getItem('accessToken');
                       if (token) {
                         apiService.setAccessToken(token);
@@ -649,7 +648,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 <button
                   onClick={async () => {
                     try {
-                      const { apiService } = await import('../services/api');
                       const token = localStorage.getItem('accessToken');
                       if (token) {
                         apiService.setAccessToken(token);
@@ -778,7 +776,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       // Ensure API service has the token
-      const { apiService } = await import('../services/api');
       apiService.setAccessToken(token);
 
       console.log('🔄 Loading pending invitations count...');
@@ -795,6 +792,25 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('❌ Failed to load pending invitations count:', error);
       if (error.status === 401) {
         console.error('❌ Authentication error - token may be invalid');
+        console.log('🔄 Attempting to sync user to Chat Server...');
+
+        // Chat Server 동기화 시도
+        try {
+          await apiService.post('/chat/sync-user');
+          console.log('✅ User synced to Chat Server, retrying invitations...');
+
+          // 동기화 후 재시도
+          setTimeout(() => {
+            loadPendingInvitationsCount();
+          }, 1000);
+        } catch (syncError) {
+          console.error('❌ Failed to sync user to Chat Server:', syncError);
+          // 동기화 실패해도 앱은 계속 동작하도록 함
+          dispatch({ type: 'SET_PENDING_INVITATIONS_COUNT', payload: 0 });
+        }
+      } else {
+        // 다른 오류의 경우 기본값 설정
+        dispatch({ type: 'SET_PENDING_INVITATIONS_COUNT', payload: 0 });
       }
     }
   }, []);

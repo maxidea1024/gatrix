@@ -1,4 +1,5 @@
 import { apiService } from './api';
+import { AuthService } from './auth';
 import {
   Channel,
   Message,
@@ -181,8 +182,7 @@ export class ChatService {
 
       // 백엔드를 통해 요청 (직접 라우트 사용)
       const response = await apiService.post(`${this.BASE_URL}/channels/${channelId}/read`, data, {
-        timeout: 10000,
-        retry: 0
+        timeout: 10000
       });
 
       console.log(`✅ ChatService.markAsRead success:`, response);
@@ -196,8 +196,7 @@ export class ChatService {
           await this.refreshTokenAndRetry();
 
           const response = await apiService.post(`${this.BASE_URL}/channels/${channelId}/read`, data, {
-            timeout: 5000,
-            retry: 0
+            timeout: 5000
           });
 
           console.log(`✅ ChatService.markAsRead retry success:`, response);
@@ -237,7 +236,6 @@ export class ChatService {
 
   // 토큰 갱신
   private static async refreshTokenAndRetry(): Promise<void> {
-    const { AuthService } = await import('./auth');
     await AuthService.refreshToken();
   }
 

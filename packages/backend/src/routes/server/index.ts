@@ -35,7 +35,7 @@ router.get('/templates', serverSDKAuth, RemoteConfigSDKController.getServerTempl
 router.post('/metrics', serverSDKAuth, RemoteConfigSDKController.submitMetrics);
 
 // Authentication routes
-router.post('/auth/verify-token', serverSDKAuth, ServerAuthController.verifyToken);
+router.post('/auth/verify-token', ServerAuthController.verifyToken); // JWT 토큰 검증 (API Token 불필요)
 router.get('/auth/user/:id', serverSDKAuth, ServerAuthController.getUserById);
 
 // User routes

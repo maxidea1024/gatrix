@@ -217,15 +217,15 @@ export interface MessageReaction {
 
 // 사용자 관련 타입
 export interface User {
-  id: number;
+  id: number; // Chat User ID
+  gatrixUserId: number; // Gatrix User ID
   email: string;
   name: string;
   avatarUrl?: string;
-  status: 'online' | 'away' | 'busy' | 'offline';
-  customStatus?: string;
-  lastSeenAt: Date;
   role: string;
-  isActive: boolean;
+  status: string;
+  lastSeenAt?: Date;
+  isActive?: boolean;
 }
 
 export interface UserPresence {

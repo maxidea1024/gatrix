@@ -1,6 +1,7 @@
 import { WebSocketEvent, WebSocketEventType, Message, TypingIndicator, User } from '../types/chat';
 import { io, Socket } from 'socket.io-client';
 import { ChatService } from './chatService';
+import { AuthService } from './auth';
 
 export type WebSocketEventHandler = (event: WebSocketEvent) => void;
 
@@ -101,7 +102,6 @@ export class ChatWebSocketService {
 
             try {
               // 토큰 갱신 시도
-              const { AuthService } = await import('./auth');
               await AuthService.refreshToken();
 
               console.log('✅ Token refreshed, reconnecting WebSocket...');

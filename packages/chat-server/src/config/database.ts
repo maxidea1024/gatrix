@@ -91,6 +91,13 @@ class DatabaseManager {
     }
   }
 
+  public getDatabase(): Knex {
+    if (!this.knexInstance) {
+      throw new Error('Database not initialized. Call initialize() first.');
+    }
+    return this.knexInstance;
+  }
+
   public async close(): Promise<void> {
     if (this.knexInstance) {
       await this.knexInstance.destroy();
