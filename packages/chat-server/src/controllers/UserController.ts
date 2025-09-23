@@ -38,6 +38,40 @@ export class UserController {
   }
 
   /**
+   * 사용자 존재 확인
+   * GET /api/v1/users/check/:userId
+   */
+  static async checkUser(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = parseInt(req.params.userId);
+
+      if (isNaN(userId)) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'Invalid userId' }
+        });
+        return;
+      }
+
+      const user = await UserService.getUserById(userId);
+
+      res.json({
+        success: true,
+        data: {
+          exists: !!user,
+          userId: userId
+        }
+      });
+    } catch (error: any) {
+      console.error('Error checking user:', error);
+      res.status(500).json({
+        success: false,
+        error: { message: 'Failed to check user' }
+      });
+    }
+  }
+
+  /**
    * 사용자 정보 조회
    * GET /api/v1/users/:userId
    */

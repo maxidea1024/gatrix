@@ -10,6 +10,9 @@ router.use(authenticate);
 // 사용자 정보 업서트
 router.post('/upsert', UserController.upsertUser);
 
+// 사용자 존재 확인
+router.get('/check/:userId', UserController.checkUser);
+
 // 사용자 정보 조회
 router.get('/:userId', UserController.getUser);
 

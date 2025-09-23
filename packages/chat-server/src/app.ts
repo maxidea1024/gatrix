@@ -51,7 +51,7 @@ class ChatServerApp {
       origin: config.cors.origin,
       credentials: config.cors.credentials,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-API-Token', 'X-User-ID', 'X-Application-Name'],
     }));
 
     // Compression
@@ -241,6 +241,7 @@ class ChatServerApp {
       // 기본 API 토큰 생성
       const defaultToken = await ApiTokenService.ensureDefaultToken();
       logger.info(`Default API token ready: ${defaultToken.substring(0, 12)}...`);
+      logger.info(`🔑 FULL API TOKEN FOR BACKEND: ${defaultToken}`);
 
       this.server.listen(config.port, config.host, () => {
         logger.info(`Chat server running on ${config.host}:${config.port}`, {

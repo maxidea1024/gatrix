@@ -13,9 +13,21 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
   try {
     const apiTokenHeader = req.headers['x-api-token'] as string;
     const userIdHeader = req.headers['x-user-id'] as string;
+    const authHeader = req.headers['authorization'] as string;
+
+    logger.info('🔍 Chat Server Authentication Debug:', {
+      path: req.path,
+      method: req.method,
+      hasApiToken: !!apiTokenHeader,
+      hasUserId: !!userIdHeader,
+      hasAuthHeader: !!authHeader,
+      userIdValue: userIdHeader,
+      authHeaderPrefix: authHeader ? authHeader.substring(0, 20) + '...' : 'none'
+    });
 
     // API Token이 있으면 기존 API Token 인증 사용
     if (apiTokenHeader) {
+      logger.info('🔑 Using API Token authentication');
       return authenticateApiToken(req, res, next);
     }
 

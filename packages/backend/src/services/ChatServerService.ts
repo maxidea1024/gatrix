@@ -98,6 +98,29 @@ export class ChatServerService {
   }
 
   /**
+   * 사용자가 Chat Server에 동기화되어 있는지 확인하고, 없으면 동기화
+   */
+  async ensureUserSynced(userData: UserData): Promise<void> {
+    try {
+      // 먼저 사용자가 존재하는지 확인
+      const checkResponse = await this.axiosInstance.get(
+        `/api/v1/users/check/${userData.id}`
+      );
+
+      if (checkResponse.data.success && checkResponse.data.data?.exists) {
+        // 사용자가 이미 존재하면 동기화 스킵
+        return;
+      }
+    } catch (error) {
+      // 확인 실패하면 동기화 시도
+      console.log(`🔍 Could not check user existence, proceeding with sync...`);
+    }
+
+    // 사용자가 없거나 확인 실패한 경우 동기화
+    await this.syncUser(userData);
+  }
+
+  /**
    * 여러 사용자를 한 번에 동기화
    */
   async syncUsers(users: UserData[]): Promise<void> {
