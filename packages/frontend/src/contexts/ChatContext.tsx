@@ -109,6 +109,7 @@ type ChatAction =
   | { type: 'ADD_MESSAGE'; payload: Message }
   | { type: 'UPDATE_MESSAGE'; payload: Message }
   | { type: 'UPDATE_MESSAGE_REACTIONS'; payload: { messageId: number; reactions: any; action: string; emoji: string; userId: number } }
+  | { type: 'UPDATE_MESSAGE_THREAD_INFO'; payload: { messageId: number; threadCount: number; lastThreadMessageAt: string } }
   | { type: 'REMOVE_MESSAGE'; payload: { channelId: number; messageId: number } }
   | { type: 'PREPEND_MESSAGES'; payload: { channelId: number; messages: Message[] } }
   | { type: 'SET_USERS'; payload: User[] }
@@ -274,7 +275,45 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ...state,
         messages: prependedMessages,
       };
-    
+
+    case 'UPDATE_MESSAGE_THREAD_INFO':
+      console.log('🔍 UPDATE_MESSAGE_THREAD_INFO reducer called:', action.payload);
+
+      // 모든 채널에서 해당 메시지를 찾아 스레드 정보 업데이트
+      const updatedMessagesWithThreadInfo = { ...state.messages };
+      let messageFound = false;
+
+      for (const channelId in updatedMessagesWithThreadInfo) {
+        updatedMessagesWithThreadInfo[channelId] = updatedMessagesWithThreadInfo[channelId].map(msg => {
+          if (msg.id === action.payload.messageId) {
+            messageFound = true;
+            console.log('🔍 Found message to update:', {
+              messageId: msg.id,
+              oldThreadCount: msg.threadCount,
+              newThreadCount: action.payload.threadCount,
+              oldLastThreadMessageAt: msg.lastThreadMessageAt,
+              newLastThreadMessageAt: action.payload.lastThreadMessageAt
+            });
+            return {
+              ...msg,
+              threadCount: action.payload.threadCount,
+              lastThreadMessageAt: action.payload.lastThreadMessageAt
+            };
+          }
+          return msg;
+        });
+      }
+
+      console.log('🔍 Message found for thread update:', messageFound);
+      if (!messageFound) {
+        console.warn('⚠️ Message not found for thread update:', action.payload.messageId);
+      }
+
+      return {
+        ...state,
+        messages: updatedMessagesWithThreadInfo,
+      };
+
     case 'SET_USERS':
       // Safety check: ensure payload is an array
       if (!Array.isArray(action.payload)) {
@@ -481,6 +520,39 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         wsService.onMessageUpdated((message) => {
           dispatch({ type: 'UPDATE_MESSAGE', payload: message });
+        });
+
+        // 스레드 메시지 생성 이벤트 리스너
+        wsService.on('thread_message_created', (data) => {
+          console.log('🧵 Thread message created:', data);
+          // 스레드 메시지는 메인 채팅에 추가하지 않음
+          // ThreadView 컴포넌트에서 별도로 처리
+        });
+
+        // 스레드 정보 업데이트 이벤트 리스너
+        wsService.on('thread_updated', (data) => {
+          console.log('🧵 Thread updated:', data);
+
+          // 중첩된 구조: data.data.data에 실제 스레드 정보가 있음
+          const threadInfo = data.data?.data;
+          console.log('🔍 Thread info from data.data.data:', threadInfo);
+
+          if (threadInfo) {
+            const { messageId, threadCount, lastThreadMessageAt } = threadInfo;
+            console.log('🔍 Extracted thread info:', { messageId, threadCount, lastThreadMessageAt });
+
+            // 원본 메시지의 스레드 정보 업데이트
+            dispatch({
+              type: 'UPDATE_MESSAGE_THREAD_INFO',
+              payload: {
+                messageId,
+                threadCount,
+                lastThreadMessageAt
+              }
+            });
+          } else {
+            console.error('❌ No thread info found in data.data.data');
+          }
         });
 
         // 리액션 업데이트 이벤트 리스너

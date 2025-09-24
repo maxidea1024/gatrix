@@ -109,6 +109,10 @@ export interface Message {
   attachments?: MessageAttachment[];
   reactions?: MessageReaction[];
   replyToMessage?: Message;
+
+  // 스레드 관련 필드 (조인 시 포함)
+  threadCount?: number;
+  lastThreadMessageAt?: Date;
 }
 
 export interface MessageData {

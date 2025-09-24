@@ -54,6 +54,7 @@ export interface Message {
   replyToId?: number;
   threadId?: number;
   threadCount?: number;
+  lastThreadMessageAt?: string;
   editedAt?: string;
   deletedAt?: string;
   createdAt: string;
@@ -191,6 +192,8 @@ export type WebSocketEventType =
   | 'message_created'
   | 'message_updated'
   | 'message_deleted'
+  | 'thread_message_created'
+  | 'thread_updated'
   | 'user_typing'
   | 'user_stop_typing'
   | 'user_joined_channel'

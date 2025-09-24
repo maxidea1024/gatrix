@@ -103,8 +103,26 @@ export class MessageModel {
       updatedAt: new Date(),
     };
 
+    console.log('🔍 MessageModel.create - Input data:', {
+      originalData: data,
+      userId,
+      messageDataToInsert: messageData,
+      threadIdValue: data.threadId,
+      threadIdType: typeof data.threadId
+    });
+
     const [messageId] = await this.knex('chat_messages').insert(messageData);
+
+    console.log('🔍 MessageModel.create - Inserted messageId:', messageId);
+
     const message = await this.findById(messageId);
+
+    console.log('🔍 MessageModel.create - Retrieved message:', {
+      messageId: message?.id,
+      threadId: message?.threadId,
+      threadIdType: typeof message?.threadId
+    });
+
     if (!message) {
       throw new Error('Message not found');
     }
@@ -192,7 +210,8 @@ export class MessageModel {
         'u.avatarUrl as userAvatarUrl',
         'rm.content as replyContent',
         'ru.name as replyUserName',
-        this.knex.raw('(SELECT COUNT(*) FROM chat_messages WHERE threadId = m.id AND isDeleted = false) as threadCount')
+        this.knex.raw('(SELECT COUNT(*) FROM chat_messages WHERE threadId = m.id AND isDeleted = false) as threadCount'),
+        this.knex.raw('(SELECT MAX(createdAt) FROM chat_messages WHERE threadId = m.id AND isDeleted = false) as lastThreadMessageAt')
       ])
       .leftJoin('chat_users as u', 'm.userId', 'u.gatrixUserId')
       .leftJoin('chat_messages as rm', 'm.replyToMessageId', 'rm.id')
@@ -616,5 +635,25 @@ export class MessageModel {
       });
 
     return result;
+  }
+
+  // 스레드 정보 조회
+  static async getThreadInfo(threadId: number): Promise<{ threadCount: number; lastThreadMessageAt: Date | null }> {
+    // 스레드 메시지 수 계산
+    const threadCount = await this.knex('chat_messages')
+      .where('threadId', threadId)
+      .count('id as count')
+      .first();
+
+    // 마지막 스레드 메시지 시간 조회
+    const lastThreadMessage = await this.knex('chat_messages')
+      .where('threadId', threadId)
+      .orderBy('createdAt', 'desc')
+      .first();
+
+    return {
+      threadCount: threadCount ? Number(threadCount.count) : 0,
+      lastThreadMessageAt: lastThreadMessage ? lastThreadMessage.createdAt : null
+    };
   }
 }

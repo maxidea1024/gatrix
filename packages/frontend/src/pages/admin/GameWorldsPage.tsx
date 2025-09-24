@@ -593,8 +593,8 @@ const GameWorldsPage: React.FC = () => {
     setFormData({
       worldId: world.worldId,
       name: world.name,
-      isVisible: world.isVisible,
-      isMaintenance: world.isMaintenance,
+      isVisible: Boolean(world.isVisible),
+      isMaintenance: Boolean(world.isMaintenance),
       description: world.description || '',
       maintenanceStartDate: world.maintenanceStartDate || '',
       maintenanceEndDate: world.maintenanceEndDate || '',

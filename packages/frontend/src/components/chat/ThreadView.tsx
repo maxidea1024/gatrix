@@ -57,6 +57,28 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
 
   useEffect(() => {
     loadThreadMessages();
+
+    // 스레드 메시지 실시간 업데이트 리스너 추가
+    const handleThreadMessage = (data: any) => {
+      console.log('🧵 ThreadView received thread message:', data);
+      if (data.threadId === originalMessage.id) {
+        // 새로운 스레드 메시지를 현재 목록에 추가
+        setThreadMessages(prev => [...prev, data.data]);
+      }
+    };
+
+    // WebSocket 이벤트 리스너 등록
+    const wsService = (window as any).wsService;
+    if (wsService) {
+      wsService.on('thread_message_created', handleThreadMessage);
+    }
+
+    // 컴포넌트 언마운트 시 리스너 제거
+    return () => {
+      if (wsService) {
+        wsService.off('thread_message_created', handleThreadMessage);
+      }
+    };
   }, [originalMessage.id]);
 
   const loadThreadMessages = async () => {

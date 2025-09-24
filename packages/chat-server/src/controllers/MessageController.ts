@@ -12,7 +12,42 @@ export class MessageController {
   static async create(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
-      const data: CreateMessageData = req.body;
+
+      // FormData와 JSON 요청 모두 처리
+      let data: CreateMessageData;
+
+      if (req.headers['content-type']?.includes('multipart/form-data')) {
+        // FormData 처리
+        data = {
+          channelId: parseInt(req.body.channelId),
+          content: req.body.content,
+          contentType: req.body.type || 'text',
+          replyToMessageId: req.body.replyToId ? parseInt(req.body.replyToId) : undefined,
+          threadId: req.body.threadId ? parseInt(req.body.threadId) : undefined,
+          messageData: req.body.metadata ? JSON.parse(req.body.metadata) : undefined
+        };
+      } else {
+        // JSON 처리
+        data = {
+          channelId: req.body.channelId,
+          content: req.body.content,
+          contentType: req.body.contentType || 'text',
+          replyToMessageId: req.body.replyToMessageId,
+          threadId: req.body.threadId,
+          messageData: req.body.metadata
+        };
+      }
+
+      // 🔍 요청 데이터 디버깅
+      logger.info('🔍 Message creation request:', {
+        userId,
+        contentType: req.headers['content-type'],
+        requestBody: req.body,
+        parsedData: data,
+        threadId: data.threadId,
+        hasThreadId: !!data.threadId,
+        isThreadMessage: !!data.threadId
+      });
 
       // 입력 검증
       if (!data.content || !data.channelId) {
@@ -46,8 +81,45 @@ export class MessageController {
         messageContent: message.content,
         hasUserInfo: !!message.user,
         userName: message.user?.name,
-        userEmail: message.user?.email
+        userEmail: message.user?.email,
+        isThreadMessage: !!data.threadId,
+        threadId: data.threadId
       });
+
+      // 스레드 메시지인 경우 원본 메시지의 스레드 정보 업데이트
+      if (data.threadId) {
+        const originalMessage = await MessageModel.findById(data.threadId);
+        if (originalMessage) {
+          // 스레드 정보 조회
+          const threadInfo = await MessageModel.getThreadInfo(data.threadId);
+
+          console.log('🧵 Thread info calculated:', {
+            threadId: data.threadId,
+            threadCount: threadInfo.threadCount,
+            lastThreadMessageAt: threadInfo.lastThreadMessageAt
+          });
+
+          // WebSocket으로 스레드 정보 업데이트 이벤트 전송
+          const io = (req as any).io;
+          if (io) {
+            io.to(`channel:${data.channelId}`).emit('message', {
+              type: 'thread_updated',
+              data: {
+                messageId: data.threadId,
+                threadCount: threadInfo.threadCount,
+                lastThreadMessageAt: threadInfo.lastThreadMessageAt
+              },
+              channelId: data.channelId
+            });
+
+            console.log('🧵 Thread updated event sent:', {
+              messageId: data.threadId,
+              threadCount: threadInfo.threadCount,
+              lastThreadMessageAt: threadInfo.lastThreadMessageAt
+            });
+          }
+        }
+      }
 
       metricsService.recordMessage(data.channelId.toString(), data.contentType || 'text');
       metricsService.recordMessageLatency('message_create', latency);
@@ -519,6 +591,7 @@ export class MessageController {
         contentType,
         channelId,
         replyToMessageId: req.body.replyToId ? parseInt(req.body.replyToId) : undefined,
+        threadId: req.body.threadId ? parseInt(req.body.threadId) : undefined,
         messageData: req.body.metadata ? JSON.parse(req.body.metadata) : undefined,
       };
 
@@ -546,27 +619,78 @@ export class MessageController {
         message: 'Message created successfully',
       });
 
+      // 스레드 메시지인 경우 원본 메시지의 스레드 정보 업데이트
+      if (data.threadId) {
+        const originalMessage = await MessageModel.findById(data.threadId);
+        if (originalMessage) {
+          // 스레드 정보 조회
+          const threadInfo = await MessageModel.getThreadInfo(data.threadId);
+
+          console.log('🧵 Thread info calculated:', {
+            threadId: data.threadId,
+            threadCount: threadInfo.threadCount,
+            lastThreadMessageAt: threadInfo.lastThreadMessageAt
+          });
+
+          // WebSocket으로 스레드 정보 업데이트 이벤트 전송
+          const io = (req as any).io;
+          if (io) {
+            io.to(`channel:${channelId}`).emit('message', {
+              type: 'thread_updated',
+              data: {
+                messageId: data.threadId,
+                threadCount: threadInfo.threadCount,
+                lastThreadMessageAt: threadInfo.lastThreadMessageAt
+              },
+              channelId
+            });
+
+            console.log('🧵 Thread updated event sent:', {
+              messageId: data.threadId,
+              threadCount: threadInfo.threadCount,
+              lastThreadMessageAt: threadInfo.lastThreadMessageAt
+            });
+          }
+        }
+      }
+
       // WebSocket을 통해 실시간으로 메시지 전송
       const io = (req as any).io;
       if (io) {
-        const eventData = {
-          type: 'message_created',
-          data: message,
-          channelId,
-          userId
-        };
+        // 스레드 메시지인 경우와 일반 메시지인 경우를 구분
+        if (data.threadId) {
+          // 스레드 메시지는 thread_message_created 이벤트로 전송
+          const threadEventData = {
+            type: 'thread_message_created',
+            data: message,
+            threadId: data.threadId,
+            channelId,
+            userId
+          };
 
-        // 🔍 WebSocket으로 전송되는 메시지 데이터 확인
-        logger.info('🔍 WebSocket message data:', {
-          messageId: message.id,
-          hasUser: !!message.user,
-          user: message.user,
-          messageContent: message.content,
-          fullMessage: message
-        });
+          logger.info(`Emitting thread message event to channel:${channelId}`, { threadEventData });
+          io.to(`channel:${channelId}`).emit('message', threadEventData);
+        } else {
+          // 일반 메시지는 기존대로 처리
+          const eventData = {
+            type: 'message_created',
+            data: message,
+            channelId,
+            userId
+          };
 
-        logger.info(`Emitting WebSocket event to channel:${channelId}`, { eventData });
-        io.to(`channel:${channelId}`).emit('message', eventData);
+          // 🔍 WebSocket으로 전송되는 메시지 데이터 확인
+          logger.info('🔍 WebSocket message data:', {
+            messageId: message.id,
+            hasUser: !!message.user,
+            user: message.user,
+            messageContent: message.content,
+            fullMessage: message
+          });
+
+          logger.info(`Emitting WebSocket event to channel:${channelId}`, { eventData });
+          io.to(`channel:${channelId}`).emit('message', eventData);
+        }
 
         // 전체 연결된 클라이언트 수 확인
         const connectedClients = io.engine.clientsCount;

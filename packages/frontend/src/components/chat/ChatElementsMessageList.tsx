@@ -352,7 +352,25 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   // messageInputRef와 messageInput은 AdvancedMessageInput으로 이동됨
 
   const currentChannel = state.channels.find(c => c.id === channelId);
-  const messages = useMemo(() => state.messages[channelId] || [], [state.messages, channelId]);
+  // 메인 채팅에서는 스레드 메시지(threadId가 있는 메시지)를 제외하고 표시
+  const messages = useMemo(() => {
+    const allMessages = state.messages[channelId] || [];
+    console.log('🔍 All messages in channel', channelId, ':', allMessages.map(m => ({
+      id: m.id,
+      content: m.content.substring(0, 20),
+      threadId: m.threadId,
+      hasThreadId: !!m.threadId
+    })));
+
+    const filteredMessages = allMessages.filter(message => !message.threadId);
+    console.log('🔍 Filtered messages (no threadId):', filteredMessages.map(m => ({
+      id: m.id,
+      content: m.content.substring(0, 20),
+      threadId: m.threadId
+    })));
+
+    return filteredMessages;
+  }, [state.messages, channelId]);
   const typingUsers = state.typingUsers[channelId] || [];
 
 
@@ -668,9 +686,11 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
               <Typography variant="h6">
                 {currentChannel?.name || t('chat.selectChannel')}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {currentChannel?.description || ''}
-              </Typography>
+              {currentChannel?.description && (
+                <Typography variant="body2" color="text.secondary">
+                  {currentChannel.description}
+                </Typography>
+              )}
             </Box>
             {onInviteUser && (
               <Tooltip title={t('chat.inviteUsers')} placement="bottom">
@@ -1138,15 +1158,27 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                       color: theme.palette.primary.main,
                       fontSize: '12px',
                       cursor: 'pointer',
+                      p: 1,
+                      borderRadius: '8px',
+                      border: `1px solid ${theme.palette.primary.main}20`,
+                      backgroundColor: `${theme.palette.primary.main}08`,
                       '&:hover': {
+                        backgroundColor: `${theme.palette.primary.main}15`,
                         textDecoration: 'underline'
                       }
                     }}
                   >
                     <ReplyIcon sx={{ fontSize: 14 }} />
-                    <Typography variant="caption" sx={{ color: theme.palette.primary.main }}>
-                      {message.threadCount}개 댓글
-                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                      <Typography variant="caption" sx={{ color: theme.palette.primary.main, fontWeight: 500 }}>
+                        {message.threadCount}개 댓글
+                      </Typography>
+                      {message.lastThreadMessageAt && (
+                        <Typography variant="caption" sx={{ color: colors.placeholderText, fontSize: '11px' }}>
+                          마지막 댓글: {formatRelativeTime(message.lastThreadMessageAt)}
+                        </Typography>
+                      )}
+                    </Box>
                   </Box>
                 )}
               </Box>

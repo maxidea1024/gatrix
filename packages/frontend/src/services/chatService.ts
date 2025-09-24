@@ -93,33 +93,54 @@ export class ChatService {
   }
 
   static async sendMessage(channelId: number, data: SendMessageRequest): Promise<Message> {
-    const formData = new FormData();
-    
-    // Add text content and metadata
-    formData.append('content', data.content);
-    if (data.type) formData.append('type', data.type);
-    if (data.replyToId) formData.append('replyToId', data.replyToId.toString());
-    if (data.mentions) formData.append('mentions', JSON.stringify(data.mentions));
-    if (data.hashtags) formData.append('hashtags', JSON.stringify(data.hashtags));
-    if (data.metadata) formData.append('metadata', JSON.stringify(data.metadata));
+    // 첨부파일이 있으면 FormData 사용, 없으면 JSON 사용
+    if (data.attachments && data.attachments.length > 0) {
+      const formData = new FormData();
 
-    // Add file attachments
-    if (data.attachments) {
+      // Add text content and metadata
+      formData.append('content', data.content);
+      if (data.type) formData.append('type', data.type);
+      if (data.replyToId) formData.append('replyToId', data.replyToId.toString());
+      if (data.threadId) formData.append('threadId', data.threadId.toString());
+      if (data.mentions) formData.append('mentions', JSON.stringify(data.mentions));
+      if (data.hashtags) formData.append('hashtags', JSON.stringify(data.hashtags));
+      if (data.metadata) formData.append('metadata', JSON.stringify(data.metadata));
+
+      // Add file attachments
       data.attachments.forEach((file, index) => {
         formData.append(`attachments[${index}]`, file);
       });
-    }
 
-    const response = await apiService.post<Message>(
-      `${this.BASE_URL}/channels/${channelId}/messages`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
-    );
-    return response.data;
+      const response = await apiService.post<Message>(
+        `${this.BASE_URL}/channels/${channelId}/messages`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      return response.data;
+    } else {
+      // 첨부파일이 없으면 JSON으로 전송
+      const requestData = {
+        content: data.content,
+        contentType: data.type || 'text',
+        replyToMessageId: data.replyToId,
+        threadId: data.threadId,
+        mentions: data.mentions,
+        hashtags: data.hashtags,
+        metadata: data.metadata
+      };
+
+      console.log('🔍 Sending JSON message data:', requestData);
+
+      const response = await apiService.post<Message>(
+        `${this.BASE_URL}/channels/${channelId}/messages`,
+        requestData
+      );
+      return response.data;
+    }
   }
 
   static async updateMessage(messageId: number, data: UpdateMessageRequest): Promise<Message> {

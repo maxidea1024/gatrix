@@ -211,6 +211,12 @@ export class ChatWebSocketService {
       } else if (data.type === 'message_deleted') {
         console.log('Emitting message_deleted event:', data.data);
         this.emit('message_deleted', { data: data.data });
+      } else if (data.type === 'thread_message_created') {
+        console.log('Emitting thread_message_created event:', data);
+        this.emit('thread_message_created', data);
+      } else if (data.type === 'thread_updated') {
+        console.log('Emitting thread_updated event:', data);
+        this.emit('thread_updated', data);
       } else {
         console.log('Emitting generic message event:', data);
         // 기본 메시지 이벤트
