@@ -16,17 +16,64 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import { useChat } from '../../contexts/ChatContext';
-import { Message } from '../../types/chat';
+import { Message, LinkPreview } from '../../types/chat';
 import { formatDistanceToNow } from 'date-fns';
 import { getChatWebSocketService } from '../../services/chatWebSocketService';
 import { ko, enUS, zhCN } from 'date-fns/locale';
 import AdvancedMessageInput from './AdvancedMessageInput';
+import { extractUrlsFromMessage, extractLinkPreview } from '../../utils/linkPreview';
+import LinkPreviewCard from './LinkPreviewCard';
 
 interface ThreadViewProps {
   originalMessage: Message;
   onClose: () => void;
   hideHeader?: boolean;
 }
+
+// 스레드에서도 링크 미리보기/텍스트 렌더링을 동일하게 지원하기 위한 공용 컴포넌트
+const ThreadRichMessage: React.FC<{ content: string }> = ({ content }) => {
+  const [linkPreviews, setLinkPreviews] = useState<LinkPreview[]>([]);
+  const [loadingPreviews, setLoadingPreviews] = useState(false);
+
+  useEffect(() => {
+    const urls = extractUrlsFromMessage(content);
+    if (urls.length > 0) {
+      setLoadingPreviews(true);
+      Promise.all(urls.map((url) => extractLinkPreview(url)))
+        .then((previews) => {
+          const valid = (previews.filter((p) => p !== null) as LinkPreview[]);
+          setLinkPreviews(valid);
+        })
+        .catch((err) => {
+          console.warn('Thread link preview error:', err);
+          setLinkPreviews([]);
+        })
+        .finally(() => setLoadingPreviews(false));
+    } else {
+      setLinkPreviews([]);
+      setLoadingPreviews(false);
+    }
+  }, [content]);
+
+  return (
+    <>
+      <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
+        {content}
+      </Typography>
+      {loadingPreviews && (
+        <Box sx={{ mt: 1 }} data-link-preview="loading" />
+      )}
+      {linkPreviews.length > 0 && (
+        <Box sx={{ mt: 1 }} data-link-preview="loaded">
+          {linkPreviews.map((preview, idx) => (
+            <LinkPreviewCard key={idx} linkPreview={preview} />
+          ))}
+        </Box>
+      )}
+    </>
+  );
+};
+
 
 const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideHeader = false }) => {
   const theme = useTheme();
@@ -57,7 +104,53 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
     if (isNaN(lat) || isNaN(lng)) return null;
     if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
     return { lat, lng };
+
+  // 스레드에서도 링크 미리보기/텍스트 렌더링을 동일하게 지원
+  const ThreadRichMessage: React.FC<{ content: string }> = ({ content }) => {
+    const theme = useTheme();
+    const [linkPreviews, setLinkPreviews] = useState<LinkPreview[]>([]);
+    const [loadingPreviews, setLoadingPreviews] = useState(false);
+
+    useEffect(() => {
+      const urls = extractUrlsFromMessage(content);
+      if (urls.length > 0) {
+        setLoadingPreviews(true);
+        Promise.all(urls.map((url) => extractLinkPreview(url)))
+          .then((previews) => {
+            const valid = (previews.filter((p) => p !== null) as LinkPreview[]);
+            setLinkPreviews(valid);
+          })
+          .catch((err) => {
+            console.warn('Thread link preview error:', err);
+            setLinkPreviews([]);
+          })
+          .finally(() => setLoadingPreviews(false));
+      } else {
+        setLinkPreviews([]);
+        setLoadingPreviews(false);
+      }
+    }, [content]);
+
+    return (
+      <>
+        <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
+          {content}
+        </Typography>
+        {loadingPreviews && (
+          <Box sx={{ mt: 1 }} data-link-preview="loading" />
+        )}
+        {linkPreviews.length > 0 && (
+          <Box sx={{ mt: 1 }} data-link-preview="loaded">
+            {linkPreviews.map((preview, idx) => (
+              <LinkPreviewCard key={idx} linkPreview={preview} />
+            ))}
+          </Box>
+        )}
+      </>
+    );
   };
+
+
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -208,9 +301,43 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
                 })}
               </Typography>
             </Box>
-            <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
-              {originalMessage.content}
-            </Typography>
+            {(() => {
+              const loc: any = (originalMessage as any).metadata?.location;
+              const coords = loc
+                ? { lat: loc.latitude, lng: loc.longitude }
+                : parseCoordinatesFromText(originalMessage.content);
+              if (!coords) return null;
+              return (
+                <Box sx={{ mt: 1, mb: 1, maxWidth: 360, width: '100%', borderRadius: '8px', overflow: 'hidden', border: `1px solid ${theme.palette.divider}` }}>
+                  <Box sx={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)' }}>
+                    <iframe
+                      title="google-maps-embed"
+                      src={`https://www.google.com/maps?q=${coords.lat},${coords.lng}&z=15&output=embed`}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                  </Box>
+                  <Box sx={{ px: 1, py: 0.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)' }}>
+                    <Typography variant="caption" color="text.secondary">📍 {coords.lat.toFixed(6)}, {coords.lng.toFixed(6)}</Typography>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: theme.palette.primary.main, cursor: 'pointer' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(`https://maps.google.com/?q=${coords.lat},${coords.lng}`, '_blank');
+                      }}
+                    >
+                      Google 지도에서 열기
+                    </Typography>
+                  </Box>
+                </Box>
+              );
+            })()}
+
+            <ThreadRichMessage content={originalMessage.content} />
           </Box>
         </Box>
       </Box>
@@ -318,9 +445,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
                       );
                     })()}
 
-                    <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
-                      {message.content}
-                    </Typography>
+                    <ThreadRichMessage content={message.content} />
 
                     {/* Reactions display */}
                     {message.reactions && message.reactions.length > 0 && (
