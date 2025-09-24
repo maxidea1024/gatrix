@@ -79,12 +79,25 @@ export class ChatService {
     total: number;
   }> {
     const { channelId, ...queryParams } = params;
-    const response = await apiService.get<{
-      messages: Message[];
-      hasMore: boolean;
-      total: number;
-    }>(`${this.BASE_URL}/channels/${channelId}/messages`, { params: queryParams });
-    return response.data;
+
+    // Backend shape: { success: true, data: Message[], pagination: { total, hasMore, ... } }
+    const response = await apiService.get<any>(
+      `${this.BASE_URL}/channels/${channelId}/messages`,
+      { params: queryParams }
+    );
+
+    const data = response;
+    const messages: Message[] = Array.isArray(data.data)
+      ? data.data
+      : (data.data?.messages || []);
+    const total: number = typeof data.pagination?.total === 'number'
+      ? data.pagination.total
+      : (Array.isArray(data.data) ? data.data.length : (data.data?.total || 0));
+    const hasMore: boolean = typeof data.pagination?.hasMore === 'boolean'
+      ? data.pagination.hasMore
+      : !!data.pagination?.hasNext;
+
+    return { messages, hasMore, total };
   }
 
   static async getMessage(messageId: number): Promise<Message> {
@@ -438,8 +451,15 @@ export class ChatService {
 
   // Thread messages
   static async getThreadMessages(threadId: number): Promise<{ messages: Message[]; total: number }> {
-    const response = await apiService.get<{ messages: Message[]; total: number }>(`${this.BASE_URL}/messages/thread/${threadId}`);
-    return response.data;
+    const response = await apiService.get<any>(`${this.BASE_URL}/messages/thread/${threadId}`);
+    // Backend shape: { success: true, data: Message[], pagination: { total, ... } }
+    const messages: Message[] = Array.isArray(response.data)
+      ? response.data
+      : (response.data?.messages || []);
+    const total: number = (response.pagination && typeof response.pagination.total === 'number')
+      ? response.pagination.total
+      : (Array.isArray(response.data) ? response.data.length : (response.data?.total || 0));
+    return { messages, total };
   }
 }
 

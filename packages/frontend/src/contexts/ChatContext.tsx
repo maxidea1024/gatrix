@@ -533,25 +533,31 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         wsService.on('thread_updated', (data) => {
           console.log('🧵 Thread updated:', data);
 
-          // 중첩된 구조: data.data.data에 실제 스레드 정보가 있음
-          const threadInfo = data.data?.data;
-          console.log('🔍 Thread info from data.data.data:', threadInfo);
+          // 다양한 래핑 케이스를 모두 처리
+          // 1) data.data.data (현재 구조)
+          // 2) data.data (정규화된 구조)
+          // 3) data (직접 전달된 구조)
+          const threadInfo = (data && data.data && data.data.data) || (data && data.data) || data;
+          console.log('🔍 Resolved threadInfo:', threadInfo);
 
-          if (threadInfo) {
-            const { messageId, threadCount, lastThreadMessageAt } = threadInfo;
-            console.log('🔍 Extracted thread info:', { messageId, threadCount, lastThreadMessageAt });
+          const messageId = threadInfo?.messageId;
+          const threadCount = threadInfo?.threadCount;
+          const lastThreadMessageAt = threadInfo?.lastThreadMessageAt;
 
+          console.log('🔍 Extracted thread info:', { messageId, threadCount, lastThreadMessageAt });
+
+          if (messageId != null) {
             // 원본 메시지의 스레드 정보 업데이트
             dispatch({
               type: 'UPDATE_MESSAGE_THREAD_INFO',
               payload: {
                 messageId,
-                threadCount,
-                lastThreadMessageAt
+                threadCount: threadCount ?? 0,
+                lastThreadMessageAt: lastThreadMessageAt ?? null as any,
               }
             });
           } else {
-            console.error('❌ No thread info found in data.data.data');
+            console.error('❌ Could not resolve messageId from thread_updated payload');
           }
         });
 
@@ -843,27 +849,39 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (!forceReload && cachedMessages && cachedMessages.length > 0) {
         console.log('Using cached messages:', cachedMessages.length);
-        // 캐시된 메시지를 먼저 상태에 설정
+        // 캐시된 메시지를 먼저 상태에 설정 (빠른 렌더링)
         dispatch({ type: 'SET_MESSAGES', payload: { channelId, messages: cachedMessages } });
 
-        // 그 다음 서버에서 최신 메시지만 확인
+        // 1) 최신 추가 메시지만 확인 (after)
         try {
           const latestCachedMessage = cachedMessages[cachedMessages.length - 1];
-          const result = await ChatService.getMessages({
+          const incremental = await ChatService.getMessages({
             channelId,
             limit: 20, // 최신 20개만 확인
             after: latestCachedMessage.id // 마지막 캐시된 메시지 이후만
           });
 
-          if (result.messages.length > 0) {
-            console.log('Found new messages:', result.messages.length);
+          if (incremental.messages.length > 0) {
+            console.log('Found new messages:', incremental.messages.length);
             // 새 메시지가 있으면 추가
-            result.messages.forEach(message => {
+            incremental.messages.forEach(message => {
               dispatch({ type: 'ADD_MESSAGE', payload: message });
             });
           }
         } catch (serverError) {
-          console.warn('Failed to fetch latest messages from server, using cached messages only:', serverError);
+          console.warn('Failed incremental fetch, will still do full refresh:', serverError);
+        }
+
+        // 2) 메타데이터(threadCount 등) 최신화를 위해 전체 갱신(fetch fresh)
+        try {
+          const fresh = await ChatService.getMessages({
+            channelId,
+            limit: 50
+          });
+          console.log('Refreshed messages from server (to update metadata):', fresh.messages.length);
+          dispatch({ type: 'SET_MESSAGES', payload: { channelId, messages: fresh.messages } });
+        } catch (refreshError) {
+          console.warn('Failed to refresh full message list:', refreshError);
         }
         return;
       }

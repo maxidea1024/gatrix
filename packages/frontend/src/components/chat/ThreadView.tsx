@@ -6,14 +6,11 @@ import {
   IconButton,
   Divider,
   Avatar,
-  TextField,
-  Button,
   CircularProgress,
   Tooltip,
 } from '@mui/material';
 import {
   Close as CloseIcon,
-  Send as SendIcon,
   Reply as ReplyIcon,
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
@@ -21,7 +18,9 @@ import { useTranslation } from 'react-i18next';
 import { useChat } from '../../contexts/ChatContext';
 import { Message } from '../../types/chat';
 import { formatDistanceToNow } from 'date-fns';
+import { getChatWebSocketService } from '../../services/chatWebSocketService';
 import { ko, enUS, zhCN } from 'date-fns/locale';
+import AdvancedMessageInput from './AdvancedMessageInput';
 
 interface ThreadViewProps {
   originalMessage: Message;
@@ -34,9 +33,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
   const { t, i18n } = useTranslation();
   const { state, actions } = useChat();
   const [threadMessages, setThreadMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const getDateLocale = () => {
@@ -58,26 +55,38 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
   useEffect(() => {
     loadThreadMessages();
 
-    // 스레드 메시지 실시간 업데이트 리스너 추가
-    const handleThreadMessage = (data: any) => {
-      console.log('🧵 ThreadView received thread message:', data);
-      if (data.threadId === originalMessage.id) {
+    // 스레드 메시지 및 리액션 실시간 업데이트 리스너 추가
+    const handleThreadMessage = (event: any) => {
+      console.log('🧵 ThreadView received thread message:', event);
+      const payload = event?.data || event; // 서버에서 온 원본 payload
+      const threadId = payload?.threadId;
+      const newThreadMessage = payload?.data; // 실제 새 메시지 객체
+
+      console.log('🧵 ThreadView parsed payload:', { threadId, hasMessage: !!newThreadMessage });
+
+      if (threadId === originalMessage.id && newThreadMessage) {
         // 새로운 스레드 메시지를 현재 목록에 추가
-        setThreadMessages(prev => [...prev, data.data]);
+        setThreadMessages(prev => [...prev, newThreadMessage]);
       }
     };
 
-    // WebSocket 이벤트 리스너 등록
-    const wsService = (window as any).wsService;
-    if (wsService) {
-      wsService.on('thread_message_created', handleThreadMessage);
-    }
+    const handleReactionUpdated = (event: any) => {
+      const payload = event?.data || event;
+      const { messageId, reactions } = payload || {};
+      if (!messageId) return;
+      // 해당 메시지가 스레드 목록에 있으면 리액션만 교체
+      setThreadMessages(prev => prev.map(m => (m.id === messageId ? { ...m, reactions } : m)));
+    };
+
+    // WebSocket 이벤트 리스너 등록 (싱글톤 인스턴스)
+    const wsService = getChatWebSocketService(() => localStorage.getItem('accessToken'));
+    wsService.on('thread_message_created', handleThreadMessage);
+    wsService.on('message_reaction_updated', handleReactionUpdated);
 
     // 컴포넌트 언마운트 시 리스너 제거
     return () => {
-      if (wsService) {
-        wsService.off('thread_message_created', handleThreadMessage);
-      }
+      wsService.off('thread_message_created', handleThreadMessage);
+      wsService.off('message_reaction_updated', handleReactionUpdated);
     };
   }, [originalMessage.id]);
 
@@ -95,34 +104,6 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
     }
   };
 
-  const handleSendMessage = async () => {
-    if (!newMessage.trim() || isSending) return;
-
-    setIsSending(true);
-    try {
-      // 스레드 메시지 전송
-      await actions.sendMessage({
-        content: newMessage,
-        channelId: originalMessage.channelId,
-        threadId: originalMessage.id
-      });
-
-      setNewMessage('');
-      // 스레드 메시지 다시 로드
-      await loadThreadMessages();
-    } catch (error) {
-      console.error('Failed to send thread message:', error);
-    } finally {
-      setIsSending(false);
-    }
-  };
-
-  const handleKeyPress = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      handleSendMessage();
-    }
-  };
 
   const getUserInfo = (userId: number) => {
     const user = state.users[userId];
@@ -213,7 +194,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
           threadMessages.map((message) => {
             const userInfo = getUserInfo(message.userId);
             return (
-              <Box key={message.id} sx={{ mb: 2 }}>
+              <Box key={message.id} className="message-container" sx={{ mb: 2, position: 'relative', p: 0.5, borderRadius: 1, '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)' } }}>
                 <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start' }}>
                   <Avatar
                     src={userInfo.avatarUrl}
@@ -236,7 +217,103 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
                     <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
                       {message.content}
                     </Typography>
+
+                    {/* Reactions display */}
+                    {message.reactions && message.reactions.length > 0 && (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
+                        {Object.entries(
+                          message.reactions.reduce((acc, reaction) => {
+                            if (!acc[reaction.emoji]) acc[reaction.emoji] = [];
+                            acc[reaction.emoji].push(reaction);
+                            return acc;
+                          }, {} as Record<string, any[]>)
+                        ).map(([emoji, reactions]) => (
+                          <Box
+                            key={emoji}
+                            onClick={() => {
+                              const userReaction = (reactions as any[]).find((r: any) => r.userId === state.user?.id);
+                              // Optimistic local update
+                              const currentUserId = state.user?.id;
+                              if (currentUserId) {
+                                setThreadMessages(prev => prev.map(m => {
+                                  if (m.id !== message.id) return m;
+                                  const curr = (m.reactions || []) as any[];
+                                  const next = userReaction
+                                    ? curr.filter((r: any) => !(r.userId === currentUserId && r.emoji === emoji))
+                                    : [...curr, { userId: currentUserId, emoji } as any];
+                                  return { ...m, reactions: next };
+                                }));
+                              }
+                              // Server request
+                              if (userReaction) {
+                                actions.removeReaction(message.id, emoji);
+                              } else {
+                                actions.addReaction(message.id, emoji);
+                              }
+                            }}
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                              px: 1,
+                              py: 0.5,
+                              borderRadius: '12px',
+                              backgroundColor: (reactions as any[]).some((r: any) => r.userId === state.user?.id)
+                                ? theme.palette.primary.main + '20'
+                                : (theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)'),
+                              border: `1px solid ${ (reactions as any[]).some((r: any) => r.userId === state.user?.id) ? theme.palette.primary.main : theme.palette.divider }`,
+                              cursor: 'pointer',
+                              '&:hover': { backgroundColor: theme.palette.primary.main + '30' }
+                            }}
+                          >
+                            <Typography sx={{ fontSize: '14px' }}>{emoji}</Typography>
+                            <Typography sx={{ fontSize: '12px', color: 'text.secondary', fontWeight: (reactions as any[]).some((r: any) => r.userId === state.user?.id) ? 600 : 400 }}>
+                              {(reactions as any[]).length
+                              }
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Box>
+                    )}
                   </Box>
+                </Box>
+
+                {/* Floating actions (emoji quick add) */}
+                <Box
+                  className="message-actions"
+                  sx={{
+                    position: 'absolute',
+                    top: -8,
+                    right: 8,
+                    display: 'none',
+                    gap: 0.5,
+                    backgroundColor: theme.palette.background.paper,
+                    borderRadius: '8px',
+                    border: `1px solid ${theme.palette.divider}`,
+                    boxShadow: theme.shadows[2],
+                    '.message-container:hover &': { display: 'flex' }
+                  }}
+                >
+                  {['👍', '❤️', '😂', '😮', '😢', '😡'].map((emoji) => (
+                    <Box
+                      key={emoji}
+                      onClick={() => {
+                        const currentUserId = state.user?.id;
+                        if (currentUserId) {
+                          setThreadMessages(prev => prev.map(m => {
+                            if (m.id !== message.id) return m;
+                            const curr = (m.reactions || []) as any[];
+                            if (curr.some((r: any) => r.userId === currentUserId && r.emoji === emoji)) return m;
+                            return { ...m, reactions: [...curr, { userId: currentUserId, emoji } as any] };
+                          }));
+                        }
+                        actions.addReaction(message.id, emoji);
+                      }}
+                      sx={{ p: 0.5, borderRadius: '6px', cursor: 'pointer', fontSize: '16px', '&:hover': { backgroundColor: theme.palette.action.hover } }}
+                    >
+                      {emoji}
+                    </Box>
+                  ))}
                 </Box>
               </Box>
             );
@@ -247,50 +324,19 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
 
       {/* Message Input */}
       <Box sx={{ p: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-end' }}>
-          <TextField
-            fullWidth
-            multiline
-            maxRows={4}
-            placeholder={t('chat.replyToThread')}
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={isSending}
-            size="small"
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-              },
-            }}
-          />
-          <Tooltip title={t('chat.send')}>
-            <span>
-              <IconButton
-                onClick={handleSendMessage}
-                disabled={!newMessage.trim() || isSending}
-                color="primary"
-                sx={{
-                  bgcolor: 'primary.main',
-                  color: 'white',
-                  '&:hover': {
-                    bgcolor: 'primary.dark',
-                  },
-                  '&.Mui-disabled': {
-                    bgcolor: 'action.disabled',
-                    color: 'action.disabled',
-                  },
-                }}
-              >
-                {isSending ? (
-                  <CircularProgress size={20} color="inherit" />
-                ) : (
-                  <SendIcon sx={{ fontSize: 20 }} />
-                )}
-              </IconButton>
-            </span>
-          </Tooltip>
-        </Box>
+        <AdvancedMessageInput
+          channelId={originalMessage.channelId}
+          onSendMessage={(content, attachments) => {
+            actions.sendMessage({
+              content,
+              channelId: originalMessage.channelId,
+              type: 'text',
+              threadId: originalMessage.id,
+              attachments
+            });
+          }}
+          placeholder={t('chat.replyToThread')}
+        />
       </Box>
     </Paper>
   );
