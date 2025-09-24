@@ -130,6 +130,9 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
     case 'SET_LOADING_STAGE':
       return { ...state, loadingStage: action.payload };
 
+    case 'SET_LOADING_START_TIME':
+      return { ...state, loadingStartTime: action.payload };
+
     case 'SET_CONNECTED':
       return { ...state, isConnected: action.payload };
     
@@ -937,9 +940,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loadChannels = useCallback(async () => {
     console.log('🔄 loadChannels() called');
     try {
+      const startTime = Date.now();
       dispatch({ type: 'SET_LOADING', payload: true });
       dispatch({ type: 'SET_LOADING_STAGE', payload: 'syncing' });
-      console.log('🔍 Loading state set: isLoading=true, stage=syncing');
+      dispatch({ type: 'SET_LOADING_START_TIME', payload: startTime });
+      console.log('🔍 Loading state set: isLoading=true, stage=syncing, startTime=', startTime);
 
       // 먼저 사용자를 Chat Server에 동기화
       try {
@@ -992,8 +997,26 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error: any) {
       dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to load channels' });
     } finally {
-      dispatch({ type: 'SET_LOADING', payload: false });
-      dispatch({ type: 'SET_LOADING_STAGE', payload: 'complete' });
+      // 최소 1초 이상 로딩 화면을 보여주기 위한 지연 처리
+      const finishLoading = () => {
+        dispatch({ type: 'SET_LOADING', payload: false });
+        dispatch({ type: 'SET_LOADING_STAGE', payload: 'complete' });
+        dispatch({ type: 'SET_LOADING_START_TIME', payload: null });
+      };
+
+      const currentTime = Date.now();
+      const startTime = state.loadingStartTime || currentTime;
+      const elapsedTime = currentTime - startTime;
+      const minLoadingTime = 1000; // 최소 1초
+
+      if (elapsedTime < minLoadingTime) {
+        const remainingTime = minLoadingTime - elapsedTime;
+        console.log(`🔍 Loading completed in ${elapsedTime}ms, waiting additional ${remainingTime}ms`);
+        setTimeout(finishLoading, remainingTime);
+      } else {
+        console.log(`🔍 Loading completed in ${elapsedTime}ms, finishing immediately`);
+        finishLoading();
+      }
     }
   }, [loadMessages, loadUsers, loadPendingInvitationsCount]);
 

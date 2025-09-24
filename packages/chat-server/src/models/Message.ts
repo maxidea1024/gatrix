@@ -423,6 +423,14 @@ export class MessageModel {
     limit?: number;
     offset?: number;
   } = {}): Promise<{ messages: MessageType[]; total: number }> {
+    // 총 개수 조회 (별도 쿼리로 분리)
+    const totalResult = await this.knex('chat_messages')
+      .where({ threadId: threadId, isDeleted: false })
+      .count('* as count')
+      .first() as any;
+    const total = totalResult?.count || 0;
+
+    // 메시지 조회 쿼리
     let query = this.knex('chat_messages as m')
       .select([
         'm.*',
@@ -431,11 +439,6 @@ export class MessageModel {
       ])
       .leftJoin('chat_users as u', 'm.userId', 'u.gatrixUserId')
       .where({ 'm.threadId': threadId, 'm.isDeleted': false });
-
-    // 총 개수 조회
-    const totalQuery = query.clone().count('* as count').first();
-    const totalResult = await totalQuery as any;
-    const total = totalResult?.count || 0;
 
     // 페이지네이션
     if (options.limit) {

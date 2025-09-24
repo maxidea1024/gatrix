@@ -279,6 +279,7 @@ export interface ChatState {
   isConnected: boolean;
   isLoading: boolean;
   loadingStage: 'idle' | 'syncing' | 'connecting' | 'loading_channels' | 'complete';
+  loadingStartTime: number | null; // 로딩 시작 시간
   pendingInvitationsCount: number; // 받은 초대 수
   error: string | null; // error message
 }
