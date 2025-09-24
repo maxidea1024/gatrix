@@ -861,9 +861,9 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
             <Typography variant="h6">
               {currentChannel?.name || ''}
             </Typography>
-            {currentChannel?.memberCount && currentChannel.memberCount > 0 && (
+            {(currentChannel?.memberCount ?? 0) > 0 && (
               <Typography variant="body2" color="text.secondary">
-                {currentChannel.memberCount} {t('chat.members')}
+                {currentChannel!.memberCount} {t('chat.members')}
               </Typography>
             )}
           </Box>
@@ -1214,7 +1214,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                 )}
 
                 {/* 스레드 답글 수 표시 */}
-                {message.threadCount && message.threadCount > 0 && (
+                {(message.threadCount ?? 0) > 0 && (
                   <Box
                     onClick={() => {
                       if (onOpenThread) {
