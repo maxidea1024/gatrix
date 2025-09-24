@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { ChannelModel } from '../models/Channel';
+import { MessageModel } from '../models/Message';
 import { CreateChannelData, UpdateChannelData } from '../types/chat';
 import { metricsService } from '../services/MetricsService';
 import logger from '../config/logger';
@@ -396,15 +397,20 @@ export class ChannelController {
         return;
       }
 
-      // 메시지 조회 (MessageModel을 사용해야 하지만 임시로 빈 배열 반환)
-      const messages: any[] = [];
+      // 메시지 조회 (MessageModel 사용)
+      const result = await MessageModel.findByChannelId(channelId, {
+        limit,
+        offset,
+        beforeMessageId: before,
+        includeDeleted: false,
+      });
 
       res.json({
         success: true,
         data: {
-          messages,
-          hasMore: false,
-          total: 0,
+          messages: result.messages,
+          hasMore: result.hasMore,
+          total: result.total,
         },
       });
     } catch (error) {

@@ -203,7 +203,28 @@ export class MessageModel {
     afterMessageId?: number;
     includeDeleted?: boolean;
   } = {}): Promise<{ messages: MessageType[]; total: number; hasMore: boolean }> {
-    let query = this.knex('chat_messages as m')
+    // 1) 기본 필터만 적용한 베이스 쿼리 (집계용)
+    let base = this.knex('chat_messages as m')
+      .where('m.channelId', channelId);
+
+    if (!options.includeDeleted) {
+      base = base.where('m.isDeleted', false);
+    }
+
+    if (options.beforeMessageId) {
+      base = base.where('m.id', '<', options.beforeMessageId);
+    }
+    if (options.afterMessageId) {
+      base = base.where('m.id', '>', options.afterMessageId);
+    }
+
+    // 2) 총 개수 조회 (ONLY_FULL_GROUP_BY 호환)
+    const totalRow = await base.clone().count<{ count: number }[]>({ count: '*' });
+    const total = Number((totalRow as any)[0]?.count || 0);
+
+    // 3) 실제 데이터 조회 쿼리 (SELECT 컬럼/조인 포함)
+    let query = base
+      .clone()
       .select([
         'm.*',
         'u.name as userName',
@@ -216,28 +237,10 @@ export class MessageModel {
       .leftJoin('chat_users as u', 'm.userId', 'u.gatrixUserId')
       .leftJoin('chat_messages as rm', 'm.replyToMessageId', 'rm.id')
       .leftJoin('chat_users as ru', 'rm.userId', 'ru.gatrixUserId')
-      .where('m.channelId', channelId);
+      .orderBy('m.createdAt', 'desc');
 
-    if (!options.includeDeleted) {
-      query = query.where('m.isDeleted', false);
-    }
-
-    // 커서 기반 페이지네이션
-    if (options.beforeMessageId) {
-      query = query.where('m.id', '<', options.beforeMessageId);
-    }
-    if (options.afterMessageId) {
-      query = query.where('m.id', '>', options.afterMessageId);
-    }
-
-    // 총 개수 조회
-    const totalQuery = query.clone().count('* as count').first();
-    const totalResult = await totalQuery as any;
-    const total = totalResult?.count || 0;
-
-    // 페이지네이션
     const limit = options.limit || 50;
-    query = query.orderBy('m.createdAt', 'desc').limit(limit + 1);
+    query = query.limit(limit + 1);
 
     if (options.offset) {
       query = query.offset(options.offset);
