@@ -160,34 +160,40 @@ const MessageContent: React.FC<MessageContentProps> = ({ message }) => {
     if (!location) return null;
 
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          p: 1.5,
-          border: 1,
-          borderColor: 'divider',
-          borderRadius: 1,
-          backgroundColor: 'background.paper',
-          cursor: 'pointer',
-          '&:hover': {
-            backgroundColor: 'action.hover',
-          },
-        }}
-        onClick={() => {
-          const url = `https://maps.google.com/?q=${location.latitude},${location.longitude}`;
-          window.open(url, '_blank');
-        }}
-      >
-        <LocationIcon color="primary" />
-        <Box>
-          <Typography variant="body2">
-            {location.name || 'Shared Location'}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {location.address || `${location.latitude}, ${location.longitude}`}
-          </Typography>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.0 }}>
+        <Box sx={{ border: 1, borderColor: 'divider', borderRadius: 1, overflow: 'hidden', maxWidth: 360, width: '100%' }}>
+          <Box sx={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', backgroundColor: 'background.default' }}>
+            <iframe
+              title="google-maps-location"
+              src={`https://www.google.com/maps?q=${location.latitude},${location.longitude}&z=15&output=embed`}
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 1, py: 0.75, backgroundColor: 'action.hover' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <LocationIcon color="primary" />
+              <Box>
+                <Typography variant="body2">{location.name || 'Shared Location'}</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {location.address || `${location.latitude}, ${location.longitude}`}
+                </Typography>
+              </Box>
+            </Box>
+            <Typography
+              variant="caption"
+              sx={{ color: 'primary.main', cursor: 'pointer' }}
+              onClick={() => {
+                const url = `https://maps.google.com/?q=${location.latitude},${location.longitude}`;
+                window.open(url, '_blank');
+              }}
+            >
+              Google 지도에서 열기
+            </Typography>
+          </Box>
         </Box>
       </Box>
     );

@@ -9,6 +9,7 @@ import authRoutes from './auth';
 import publicRoutes from './public';
 // chatRoutes are handled directly in app.ts before body parsing
 import userRoutes from './users';
+import linkPreviewRoutes from './linkPreview';
 
 const router = express.Router();
 
@@ -28,6 +29,7 @@ router.use('/admin', adminRoutes);
 router.use('/auth', authLimiter as any, authRoutes);
 // chat routes are handled directly in app.ts before body parsing
 router.use('/users', userRoutes);
+router.use('/link-preview', linkPreviewRoutes);
 router.use('/', publicRoutes);
 
 export default router;

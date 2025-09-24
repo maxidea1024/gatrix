@@ -44,6 +44,21 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
     }
   };
 
+
+  // 텍스트에서 좌표 추출 (예: "📍 현재 위치: 37.503400, 127.052500" 또는 "37.5034, 127.0525")
+  const parseCoordinatesFromText = (text: string): { lat: number; lng: number } | null => {
+    if (!text) return null;
+    const trimmed = text.trim();
+    const regex = /(?:📍\s*현재\s*위치[:：]?\s*)?(-?\d{1,2}(?:\.\d+)?)[,\s]+(-?\d{1,3}(?:\.\d+)?)/;
+    const m = trimmed.match(regex);
+    if (!m) return null;
+    const lat = parseFloat(m[1]);
+    const lng = parseFloat(m[2]);
+    if (isNaN(lat) || isNaN(lng)) return null;
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+    return { lat, lng };
+  };
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -249,6 +264,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
                   <Avatar
                     src={userInfo.avatarUrl}
                     sx={{ width: 28, height: 28 }}
+
                   >
                     {userInfo.name.charAt(0).toUpperCase()}
                   </Avatar>
@@ -264,6 +280,44 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
                         })}
                       </Typography>
                     </Box>
+
+                    {/* 위치/좌표가 있는 경우 구글맵 임베드 */}
+                    {(() => {
+                      const loc: any = (message as any).metadata?.location;
+                      const coords = loc
+                        ? { lat: loc.latitude, lng: loc.longitude }
+                        : parseCoordinatesFromText(message.content);
+                      if (!coords) return null;
+                      return (
+                        <Box sx={{ mt: 1, mb: 1, maxWidth: 360, width: '100%', borderRadius: '8px', overflow: 'hidden', border: `1px solid ${theme.palette.divider}` }}>
+                          <Box sx={{ position: 'relative', width: '100%', aspectRatio: '4 / 3', backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)' }}>
+                            <iframe
+                              title="google-maps-embed"
+                              src={`https://www.google.com/maps?q=${coords.lat},${coords.lng}&z=15&output=embed`}
+                              width="100%"
+                              height="100%"
+                              style={{ border: 0 }}
+                              loading="lazy"
+                              referrerPolicy="no-referrer-when-downgrade"
+                            />
+                          </Box>
+                          <Box sx={{ px: 1, py: 0.5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.02)' }}>
+                            <Typography variant="caption" color="text.secondary">📍 {coords.lat.toFixed(6)}, {coords.lng.toFixed(6)}</Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{ color: theme.palette.primary.main, cursor: 'pointer' }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(`https://maps.google.com/?q=${coords.lat},${coords.lng}`, '_blank');
+                              }}
+                            >
+                              Google 지도에서 열기
+                            </Typography>
+                          </Box>
+                        </Box>
+                      );
+                    })()}
+
                     <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
                       {message.content}
                     </Typography>
