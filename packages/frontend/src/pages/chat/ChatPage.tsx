@@ -98,23 +98,44 @@ const ChatPageContent: React.FC = () => {
   const [invitationManagerOpen, setInvitationManagerOpen] = useState(false);
   const [privacySettingsOpen, setPrivacySettingsOpen] = useState(false);
   const [statusPickerOpen, setStatusPickerOpen] = useState(false);
+  // Remember last opened thread per channel
+  const LAST_THREAD_KEY = 'chatLastThreadByChannel';
+  const loadLastThreadMap = (): Record<string, number> => {
+    try { return JSON.parse(localStorage.getItem(LAST_THREAD_KEY) || '{}') as Record<string, number>; } catch { return {}; }
+  };
+  const saveLastThreadForChannel = (channelId: number, messageId: number | null) => {
+    try {
+      const map = loadLastThreadMap();
+      if (messageId) map[String(channelId)] = messageId; else delete map[String(channelId)];
+      localStorage.setItem(LAST_THREAD_KEY, JSON.stringify(map));
+    } catch {}
+  };
+  const pendingThreadToOpenRef = useRef<number | null>(null);
+
+  // Thread sidebar width constants
+  const DEFAULT_THREAD_WIDTH = 400;
+  const THREAD_MIN_WIDTH = 300;
+  const THREAD_MAX_WIDTH = 900;
+
   // Thread sidebar width (resizable)
   const [threadWidth, setThreadWidth] = useState<number>(() => {
-    const saved = Number(localStorage.getItem('chatThreadWidth') || 400);
-    const w = isNaN(saved) ? 400 : saved;
-    return Math.min(Math.max(w, 320), 800);
+    const saved = Number(localStorage.getItem('chatThreadWidth') || DEFAULT_THREAD_WIDTH);
+    const w = isNaN(saved) ? DEFAULT_THREAD_WIDTH : saved;
+    return Math.min(Math.max(w, THREAD_MIN_WIDTH), THREAD_MAX_WIDTH);
   });
   const isResizingRef = useRef(false);
   const startXRef = useRef(0);
   const startWidthRef = useRef(0);
   const latestWidthRef = useRef(threadWidth);
   useEffect(() => { latestWidthRef.current = threadWidth; }, [threadWidth]);
+  const didForceReloadRef = useRef(false);
+
 
   function onMouseMoveThreadResizer(e: MouseEvent) {
     if (!isResizingRef.current) return;
     const dx = startXRef.current - e.clientX; // move left -> increase width
     let newWidth = startWidthRef.current + dx;
-    newWidth = Math.min(Math.max(newWidth, 320), 800);
+    newWidth = Math.min(Math.max(newWidth, THREAD_MIN_WIDTH), THREAD_MAX_WIDTH);
     latestWidthRef.current = newWidth;
     setThreadWidth(newWidth);
   }
@@ -179,6 +200,14 @@ const ChatPageContent: React.FC = () => {
     // Channels are loaded in ChatContext when WebSocket connects
   }, []);
 
+  // 페이지 재진입 시 현재 채널 메시지를 강제 새로고침하여 스레드 메타데이터 보장
+  useEffect(() => {
+    if (state.currentChannelId && !didForceReloadRef.current) {
+      didForceReloadRef.current = true;
+      actions.loadMessages(state.currentChannelId, true);
+    }
+  }, [state.currentChannelId]);
+
   // Auto-join channel when selected
   const [joinedChannels, setJoinedChannels] = useState<Set<number>>(new Set());
   const [joiningChannels, setJoiningChannels] = useState<Set<number>>(new Set());
@@ -197,6 +226,7 @@ const ChatPageContent: React.FC = () => {
         setJoinedChannels(prev => new Set(prev).add(state.currentChannelId!));
         setJoiningChannels(prev => {
           const newSet = new Set(prev);
+
           newSet.delete(state.currentChannelId!);
           return newSet;
         });
@@ -258,6 +288,48 @@ const ChatPageContent: React.FC = () => {
     }
   };
 
+  // 채널 변경 시: 이전 채널의 열린 스레드는 닫고, 새 채널에서 마지막으로 열려있던 스레드를 복원
+  useEffect(() => {
+    // 닫기 (이전 채널의 스레드가 남아있는 버그 방지)
+    setIsThreadOpen(false);
+    setThreadMessage(null);
+    pendingThreadToOpenRef.current = null;
+
+    const chId = state.currentChannelId;
+    if (!chId) return;
+
+    const map = loadLastThreadMap();
+    const lastId = map[String(chId)];
+    if (!lastId) return; // 새 채널에서 복원할 스레드가 없으면 종료
+
+    const msgs = state.messages[chId] || [];
+    const found = msgs.find(m => m.id === lastId);
+    if (found) {
+      setThreadMessage(found);
+      setIsThreadOpen(true);
+      pendingThreadToOpenRef.current = null;
+    } else {
+      // 메시지가 아직 로드되지 않은 경우, 로딩 후 열도록 예약해둠
+      pendingThreadToOpenRef.current = lastId;
+    }
+  }, [state.currentChannelId]);
+
+  // 메시지 로딩 완료 후, 대기 중인 스레드가 있으면 자동으로 열기
+  useEffect(() => {
+    const chId = state.currentChannelId;
+    const pendingId = pendingThreadToOpenRef.current;
+    if (!chId || !pendingId) return;
+
+    const msgs = state.messages[chId] || [];
+    if (!msgs.length) return;
+
+    const found = msgs.find(m => m.id === pendingId);
+    if (found) {
+      setThreadMessage(found);
+      setIsThreadOpen(true);
+      pendingThreadToOpenRef.current = null;
+    }
+  }, [state.currentChannelId, state.messages]);
   const handleSendMessage = async (message: string, attachments?: File[]) => {
     if (!state.currentChannelId) return;
 
@@ -315,11 +387,18 @@ const ChatPageContent: React.FC = () => {
   const handleOpenThread = (message: Message) => {
     setThreadMessage(message);
     setIsThreadOpen(true);
+    if (state.currentChannelId) {
+      saveLastThreadForChannel(state.currentChannelId, message.id);
+    }
   };
 
   const handleCloseThread = () => {
     setIsThreadOpen(false);
     setThreadMessage(null);
+    if (state.currentChannelId) {
+      // 사용자가 명시적으로 닫으면 해당 채널의 자동 복원은 비움
+      saveLastThreadForChannel(state.currentChannelId, null);
+    }
   };
 
   const getStatusColor = (status: UserStatus) => {
@@ -548,16 +627,31 @@ const ChatPageContent: React.FC = () => {
               {/* Resizer */}
               <Box
                 onMouseDown={onMouseDownThreadResizer}
+                onDoubleClick={() => {
+                  setThreadWidth(DEFAULT_THREAD_WIDTH);
+                  try { localStorage.setItem('chatThreadWidth', String(DEFAULT_THREAD_WIDTH)); } catch {}
+                }}
                 sx={{
-                  width: 6,
+                  width: 8,
                   cursor: 'col-resize',
                   height: '100%',
+                  position: 'relative',
                   backgroundColor: 'transparent',
+                  '&:before': {
+                    content: '""',
+                    position: 'absolute',
+                    left: '50%',
+                    top: 0,
+                    bottom: 0,
+                    transform: 'translateX(-0.5px)',
+                    width: '1px',
+                    backgroundColor: 'divider',
+                  },
                   '&:hover': { backgroundColor: 'action.hover' },
                 }}
               />
               {/* Thread Panel */}
-              <Box sx={{ width: threadWidth, minWidth: 320, maxWidth: 800, height: '100%' }}>
+              <Box sx={{ width: threadWidth, minWidth: THREAD_MIN_WIDTH, maxWidth: THREAD_MAX_WIDTH, height: '100%' }}>
                 <ThreadView
                   originalMessage={threadMessage}
                   onClose={handleCloseThread}

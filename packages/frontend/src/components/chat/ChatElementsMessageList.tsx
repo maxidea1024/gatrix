@@ -530,6 +530,20 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       }
     };
   }, [messages, channelId, actions]);
+  // 내가 보낸 새 메시지가 DOM에 반영된 직후 즉시 맨 아래로 고정 (시각적 점프 제거)
+  useEffect(() => {
+    if (messages.length === 0) return;
+    const last = messages[messages.length - 1] as any;
+    const myUserId = state.user?.id;
+    if (!myUserId) return;
+    if (last?.userId === myUserId) {
+      const container = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement | null;
+      if (container) {
+        container.scrollTop = container.scrollHeight; // 즉시 하단 정렬
+      }
+    }
+  }, [messages.length, state.user?.id]);
+
 
   // 채널 변경 시 하단으로 스크롤 및 읽음 상태 초기화
   useEffect(() => {

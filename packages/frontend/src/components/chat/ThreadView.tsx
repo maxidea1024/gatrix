@@ -59,6 +59,21 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
     scrollToBottom();
   }, [threadMessages]);
 
+
+  // 내가 보낸 스레드 메시지가 DOM에 반영되면 즉시 하단으로 고정 (시각적 점프 제거)
+  useEffect(() => {
+    if (threadMessages.length === 0) return;
+    const last = threadMessages[threadMessages.length - 1] as any;
+    const myUserId = state.user?.id;
+    if (!myUserId) return;
+    if (last?.userId === myUserId) {
+      const container = document.querySelector('[data-testid="thread-messages-container"]') as HTMLElement | null;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+    }
+  }, [threadMessages.length, state.user?.id]);
+
   useEffect(() => {
     loadThreadMessages();
 
@@ -131,7 +146,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
         display: 'flex',
         flexDirection: 'column',
         borderRadius: 0,
-        borderLeft: `1px solid ${theme.palette.divider}`,
+        borderLeft: 'none',
       }}
     >
       {/* Header */}

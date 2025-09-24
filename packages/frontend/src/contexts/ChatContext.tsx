@@ -22,10 +22,20 @@ import {
   MessageAttachment
 } from '../types/chat';
 
+// Cache schema versioning for localStorage-stored messages
+const CHAT_CACHE_VERSION = '2';
+
 // 로컬 스토리지에서 메시지 캐시 로드
 const loadCachedMessages = (): Record<number, Message[]> => {
   try {
     console.log('🔍 Loading cached messages from localStorage...');
+
+    const cacheVersion = localStorage.getItem('chatMessagesVersion');
+    if (cacheVersion !== CHAT_CACHE_VERSION) {
+      console.warn('⚠️ Chat cache version mismatch. Ignoring old cache.', { cacheVersion, expected: CHAT_CACHE_VERSION });
+      return {};
+    }
+
     const cached = localStorage.getItem('chatMessages');
     console.log('📦 Raw cached data:', cached ? 'Found' : 'Not found');
 
@@ -71,6 +81,7 @@ const saveCachedMessages = (messages: Record<number, Message[]>) => {
     saveTimeout = setTimeout(() => {
       console.log('💾 Saving messages to cache:', Object.keys(messages).map(k => `${k}: ${messages[parseInt(k)].length} messages`));
       localStorage.setItem('chatMessages', JSON.stringify(messages));
+      localStorage.setItem('chatMessagesVersion', CHAT_CACHE_VERSION);
     }, 500);
   } catch (error) {
     console.error('Failed to save cached messages:', error);
@@ -136,16 +147,16 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
 
     case 'SET_CONNECTED':
       return { ...state, isConnected: action.payload };
-    
+
     case 'SET_CHANNELS':
       return { ...state, channels: action.payload };
-    
+
     case 'ADD_CHANNEL':
-      return { 
-        ...state, 
-        channels: [...state.channels, action.payload] 
+      return {
+        ...state,
+        channels: [...state.channels, action.payload]
       };
-    
+
     case 'UPDATE_CHANNEL':
       return {
         ...state,
@@ -153,17 +164,17 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
           channel.id === action.payload.id ? action.payload : channel
         ),
       };
-    
+
     case 'REMOVE_CHANNEL':
       return {
         ...state,
         channels: state.channels.filter(channel => channel.id !== action.payload),
         currentChannelId: state.currentChannelId === action.payload ? null : state.currentChannelId,
       };
-    
+
     case 'SET_CURRENT_CHANNEL':
       return { ...state, currentChannelId: action.payload };
-    
+
     case 'SET_MESSAGES':
       const newMessagesState = {
         ...state.messages,
@@ -175,7 +186,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ...state,
         messages: newMessagesState,
       };
-    
+
     case 'ADD_MESSAGE':
       const channelId = action.payload.channelId;
       const currentMessages = state.messages[channelId] || [];
@@ -212,7 +223,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ...state,
         messages: updatedMessages,
       };
-    
+
     case 'UPDATE_MESSAGE':
       const updateChannelId = action.payload.channelId;
       const updatedChannelMessages = (state.messages[updateChannelId] || []).map(msg =>
@@ -246,7 +257,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         ...state,
         messages: updatedMessagesWithReactions,
       };
-    
+
     case 'REMOVE_MESSAGE':
       const removeChannelId = action.payload.channelId;
       const filteredMessages = (state.messages[removeChannelId] || []).filter(
@@ -259,7 +270,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
           [removeChannelId]: filteredMessages,
         },
       };
-    
+
     case 'PREPEND_MESSAGES':
       const prependChannelId = action.payload.channelId;
       const existingMessages = state.messages[prependChannelId] || [];
@@ -326,7 +337,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         return acc;
       }, {} as Record<number, User>);
       return { ...state, users: { ...state.users, ...usersMap } };
-    
+
     case 'UPDATE_USER':
       return {
         ...state,
@@ -346,7 +357,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
           [action.payload.id]: action.payload,
         },
       };
-    
+
     case 'SET_TYPING_USERS':
       return {
         ...state,
@@ -355,12 +366,12 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
           [action.payload.channelId]: action.payload.users,
         },
       };
-    
+
     case 'ADD_TYPING_USER':
       const typingChannelId = action.payload.channelId;
       const currentTypingUsers = state.typingUsers[typingChannelId] || [];
       const existingIndex = currentTypingUsers.findIndex(u => u.userId === action.payload.userId);
-      
+
       if (existingIndex >= 0) {
         // Update existing typing indicator
         const updatedTypingUsers = [...currentTypingUsers];
@@ -382,7 +393,7 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
           },
         };
       }
-    
+
     case 'REMOVE_TYPING_USER':
       const removeTypingChannelId = action.payload.channelId;
       const filteredTypingUsers = (state.typingUsers[removeTypingChannelId] || []).filter(
@@ -441,6 +452,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // markAsRead 요청 추적을 위한 ref
   const markAsReadRequestsRef = useRef<Set<string>>(new Set());
+  // 채널별 최초 새로고침 여부 (캐시 → 서버 메타데이터 동기화)
+  const refreshedChannelsRef = useRef<Set<number>>(new Set());
 
   // Helper function to find channel ID for a message
   const findChannelIdForMessage = (messageId: number): number | null => {
@@ -657,9 +670,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       loadChannels();
 
       wsService.onUserStopTyping((typing) => {
-        dispatch({ 
-          type: 'REMOVE_TYPING_USER', 
-          payload: { channelId: typing.channelId, userId: typing.userId } 
+        dispatch({
+          type: 'REMOVE_TYPING_USER',
+          payload: { channelId: typing.channelId, userId: typing.userId }
         });
       });
 
@@ -837,9 +850,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('🔄 loadMessages called for channel:', channelId, 'forceReload:', forceReload);
       console.log('📊 Current messages state:', state.messages);
 
-      // 강제 리로드가 아니고 이미 메시지가 있다면 스킵
-      if (!forceReload && state.messages[channelId] && state.messages[channelId].length > 0) {
-        console.log('Messages already loaded for channel:', channelId, 'count:', state.messages[channelId].length);
+      // 강제 리로드가 아니고 이미 메시지가 있고, 해당 채널이 이번 세션에서 한 번 이상 새로고침 되었으면 스킵
+      if (!forceReload && state.messages[channelId] && state.messages[channelId].length > 0 && refreshedChannelsRef.current.has(channelId)) {
+        console.log('Messages already loaded and refreshed for channel:', channelId, 'count:', state.messages[channelId].length);
         return;
       }
 
@@ -880,6 +893,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
           console.log('Refreshed messages from server (to update metadata):', fresh.messages.length);
           dispatch({ type: 'SET_MESSAGES', payload: { channelId, messages: fresh.messages } });
+          refreshedChannelsRef.current.add(channelId);
         } catch (refreshError) {
           console.warn('Failed to refresh full message list:', refreshError);
         }
@@ -898,6 +912,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         reactionsLength: result.messages[0]?.reactions?.length
       });
       dispatch({ type: 'SET_MESSAGES', payload: { channelId, messages: result.messages } });
+      refreshedChannelsRef.current.add(channelId);
     } catch (error: any) {
       console.error('Failed to load messages for channel', channelId, ':', error);
       dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to load messages' });
@@ -1077,11 +1092,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           // 메시지 로딩을 위해 setTimeout으로 다음 틱에 실행
           setTimeout(() => {
-            // 이미 메시지가 있는지 확인 후 로딩
-            const currentMessages = state.messages[lastChannel.id];
-            if (!currentMessages || currentMessages.length === 0) {
-              loadMessages(lastChannel.id);
-            }
+            // 항상 채널 진입 시 최신 메타데이터 확보를 위해 로딩 시도
+            loadMessages(lastChannel.id);
             wsService.joinChannel(lastChannel.id);
           }, 0);
         }
