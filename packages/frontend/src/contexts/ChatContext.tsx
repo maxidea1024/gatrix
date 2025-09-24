@@ -1002,16 +1002,15 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     },
 
-    sendMessage: async (channelId, messageData) => {
+    sendMessage: async (messageData) => {
       console.log('🚀 ChatContext.sendMessage called:', {
-        channelId,
         messageData,
         ChatService: ChatService
       });
 
       try {
         console.log('📡 Calling ChatService.sendMessage...');
-        const message = await ChatService.sendMessage(channelId, messageData);
+        const message = await ChatService.sendMessage(messageData.channelId, messageData);
         console.log('✅ ChatService.sendMessage success:', message);
         // Message will be added via WebSocket event
         return message;
@@ -1226,6 +1225,17 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (error: any) {
         dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to invite user' });
         throw error;
+      }
+    },
+
+    getThreadMessages: async (threadId: number) => {
+      try {
+        const result = await ChatService.getThreadMessages(threadId);
+        return result.messages || [];
+      } catch (error: any) {
+        console.error('Failed to load thread messages:', error);
+        dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to load thread messages' });
+        return [];
       }
     },
 

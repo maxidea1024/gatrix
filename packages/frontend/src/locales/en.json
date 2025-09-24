@@ -1986,6 +1986,10 @@
     "sentLocation": "Shared location",
     "unknownChannel": "Unknown Channel",
     "viewMessage": "View",
-    "channelDescription": "Channel description"
+    "channelDescription": "Channel description",
+    "thread": "Thread",
+    "startThread": "Start Thread",
+    "replyToThread": "Reply to thread",
+    "noThreadMessages": "No thread messages yet"
   }
 }

@@ -414,6 +414,12 @@ export class ChatService {
       throw error;
     }
   }
+
+  // Thread messages
+  static async getThreadMessages(threadId: number): Promise<{ messages: Message[]; total: number }> {
+    const response = await apiService.get<{ messages: Message[]; total: number }>(`${this.BASE_URL}/messages/thread/${threadId}`);
+    return response.data;
+  }
 }
 
 export default ChatService;

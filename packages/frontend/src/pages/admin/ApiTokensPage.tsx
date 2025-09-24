@@ -594,7 +594,7 @@ const ApiTokensPage: React.FC = () => {
                           sx={{ mb: 0.5 }}
                         />
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.75rem' }}>
-                          {t('apiTokens.${token.tokenType}TokenDescription')}
+                          {t(`apiTokens.${token.tokenType}TokenDescription`)}
                         </Typography>
                       </Box>
                     </TableCell>

@@ -161,7 +161,7 @@ const UserPresence: React.FC<UserPresenceProps> = ({
       }
     >
       <Avatar
-        src={user.avatar}
+        src={user.avatarUrl}
         sx={{
           ...getAvatarSize(),
           fontSize: size === 'small' ? '0.75rem' : '1rem',

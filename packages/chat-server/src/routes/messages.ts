@@ -184,4 +184,11 @@ router.patch(
   MessageController.togglePin
 );
 
+// 스레드 메시지 조회
+router.get(
+  '/thread/:threadId',
+  rateLimiter(60000, 100), // 1분에 100회 조회 제한
+  MessageController.getThreadMessages
+);
+
 export default router;

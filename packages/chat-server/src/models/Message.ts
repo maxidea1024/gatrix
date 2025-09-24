@@ -192,6 +192,7 @@ export class MessageModel {
         'u.avatarUrl as userAvatarUrl',
         'rm.content as replyContent',
         'ru.name as replyUserName',
+        this.knex.raw('(SELECT COUNT(*) FROM chat_messages WHERE threadId = m.id AND isDeleted = false) as threadCount')
       ])
       .leftJoin('chat_users as u', 'm.userId', 'u.gatrixUserId')
       .leftJoin('chat_messages as rm', 'm.replyToMessageId', 'rm.id')
@@ -428,7 +429,7 @@ export class MessageModel {
         'u.name as userName',
         'u.avatarUrl as userAvatarUrl',
       ])
-      .leftJoin('users as u', 'm.userId', 'u.id')
+      .leftJoin('chat_users as u', 'm.userId', 'u.gatrixUserId')
       .where({ 'm.threadId': threadId, 'm.isDeleted': false });
 
     // 총 개수 조회
@@ -446,7 +447,31 @@ export class MessageModel {
 
     query = query.orderBy('m.createdAt', 'asc');
 
-    const messages = await query;
+    const results = await query;
+
+    // 각 메시지의 첨부파일과 반응 조회
+    const messageIds = results.map(m => m.id);
+    const [attachmentsMap, reactionsMap] = await Promise.all([
+      this.getMessagesAttachments(messageIds),
+      this.getMessagesReactions(messageIds),
+    ]);
+
+    const messages = results.map(message => {
+      const reactions = reactionsMap.get(message.id) || [];
+
+      return {
+        ...message,
+        messageData: message.messageData ? JSON.parse(message.messageData) : null,
+        user: {
+          id: message.userId,
+          name: message.userName || `User${message.userId}`,
+          avatarUrl: message.userAvatarUrl,
+        },
+        attachments: attachmentsMap.get(message.id) || [],
+        reactions: reactions,
+      };
+    });
+
     return { messages, total: Number(total) };
   }
 
@@ -488,7 +513,7 @@ export class MessageModel {
 
   // 메시지 반응 조회
   private static async getMessageReactions(messageId: number): Promise<any[]> {
-    return await this.knex('chat_message_reactions as r')
+    const reactions = await this.knex('chat_message_reactions as r')
       .select([
         'r.*',
         'u.name as userName',
@@ -497,6 +522,20 @@ export class MessageModel {
       .leftJoin('chat_users as u', 'r.userId', 'u.gatrixUserId')
       .where('r.messageId', messageId)
       .orderBy('r.createdAt', 'asc');
+
+    // 리액션 데이터를 프론트엔드에서 기대하는 형태로 변환
+    return reactions.map(reaction => ({
+      id: reaction.id,
+      messageId: reaction.messageId,
+      userId: reaction.userId,
+      emoji: reaction.emoji,
+      createdAt: reaction.createdAt,
+      user: {
+        id: reaction.userId,
+        name: reaction.userName,
+        avatarUrl: reaction.userAvatarUrl
+      }
+    }));
   }
 
   // 여러 메시지의 반응 조회
@@ -525,7 +564,22 @@ export class MessageModel {
       if (!reactionsMap.has(reaction.messageId)) {
         reactionsMap.set(reaction.messageId, []);
       }
-      reactionsMap.get(reaction.messageId)!.push(reaction);
+
+      // 리액션 데이터를 프론트엔드에서 기대하는 형태로 변환
+      const formattedReaction = {
+        id: reaction.id,
+        messageId: reaction.messageId,
+        userId: reaction.userId,
+        emoji: reaction.emoji,
+        createdAt: reaction.createdAt,
+        user: {
+          id: reaction.userId,
+          name: reaction.userName,
+          avatarUrl: reaction.userAvatarUrl
+        }
+      };
+
+      reactionsMap.get(reaction.messageId)!.push(formattedReaction);
     }
 
     return reactionsMap;

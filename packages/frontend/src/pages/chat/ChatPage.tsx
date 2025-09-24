@@ -26,6 +26,9 @@ import {
   Tooltip,
   CircularProgress,
   Badge,
+  useMediaQuery,
+  Slide,
+  useTheme,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -38,6 +41,7 @@ import {
   PersonAdd as PersonAddIcon,
   Mail as MailIcon,
   Security as SecurityIcon,
+  ArrowBack as ArrowBackIcon,
   Wifi as ConnectedIcon,
   WifiOff as DisconnectedIcon,
   Circle as StatusIcon,
@@ -54,6 +58,7 @@ import UserPresence from '../../components/chat/UserPresence';
 import UserSearchDialog from '../../components/chat/UserSearchDialog';
 import InvitationManager from '../../components/chat/InvitationManager';
 import PrivacySettings from '../../components/chat/PrivacySettings';
+import ThreadView from '../../components/chat/ThreadView';
 import UserStatusPicker, { UserStatus } from '../../components/chat/UserStatusPicker';
 import { CreateChannelRequest, SendMessageRequest } from '../../types/chat';
 import { getChatWebSocketService } from '../../services/chatWebSocketService';
@@ -64,6 +69,11 @@ const ChatPageContent: React.FC = () => {
   const { user } = useAuth();
   const { state, actions } = useChat();
   const { joinChannel } = actions;
+  const theme = useTheme();
+
+  // 반응형 브레이크포인트 (1200px 이상에서 사이드바이사이드, 미만에서 스택)
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up('xl')); // 1536px+
+  const isMediumScreen = useMediaQuery(theme.breakpoints.up('lg')); // 1200px+
   const [createChannelOpen, setCreateChannelOpen] = useState(false);
   const [isCreatingChannel, setIsCreatingChannel] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
@@ -87,6 +97,13 @@ const ChatPageContent: React.FC = () => {
   const [invitationManagerOpen, setInvitationManagerOpen] = useState(false);
   const [privacySettingsOpen, setPrivacySettingsOpen] = useState(false);
   const [statusPickerOpen, setStatusPickerOpen] = useState(false);
+
+  // 스레드 관련 상태
+  const [threadMessage, setThreadMessage] = useState<Message | null>(null);
+  const [isThreadOpen, setIsThreadOpen] = useState(false);
+
+  // 스레드 뷰 모드 결정 (큰 화면: 사이드바이사이드, 작은 화면: 스택)
+  const threadViewMode = isMediumScreen ? 'sidebar' : 'stack';
   const [userStatus, setUserStatus] = useState<UserStatus>('online');
   const [statusMessage, setStatusMessage] = useState('');
 
@@ -239,6 +256,17 @@ const ChatPageContent: React.FC = () => {
       console.error('Failed to update status:', error);
       enqueueSnackbar(t('chat.statusUpdateFailed'), { variant: 'error' });
     }
+  };
+
+  // 스레드 관련 핸들러
+  const handleOpenThread = (message: Message) => {
+    setThreadMessage(message);
+    setIsThreadOpen(true);
+  };
+
+  const handleCloseThread = () => {
+    setIsThreadOpen(false);
+    setThreadMessage(null);
   };
 
   const getStatusColor = (status: UserStatus) => {
@@ -413,36 +441,101 @@ const ChatPageContent: React.FC = () => {
         </Box>
 
         {/* Chat Area */}
-        <Box sx={{ flex: 1, height: '100%' }}>
-          {state.currentChannelId ? (
-            <ChatElementsMessageList
-              channelId={state.currentChannelId}
-              onSendMessage={handleSendMessage}
-              onInviteUser={() => setUserSearchOpen(true)}
-            />
-          ) : (
-            <Box
-              sx={{
-                height: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'column',
-                gap: 2,
-              }}
-            >
-              <ChatIcon sx={{ fontSize: 64, color: 'text.secondary' }} />
-              <Typography variant="h6" color="text.secondary">
-                {t('chat.selectChannelToStart')}
-              </Typography>
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={() => setCreateChannelOpen(true)}
+        <Box sx={{ flex: 1, height: '100%', display: 'flex', position: 'relative' }}>
+          {/* Main Chat - 스택 모드에서 스레드가 열리면 숨김 */}
+          <Box
+            sx={{
+              flex: 1,
+              height: '100%',
+              display: threadViewMode === 'stack' && isThreadOpen ? 'none' : 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            {state.currentChannelId ? (
+              <ChatElementsMessageList
+                channelId={state.currentChannelId}
+                onSendMessage={handleSendMessage}
+                onInviteUser={() => setUserSearchOpen(true)}
+                onOpenThread={handleOpenThread}
+              />
+            ) : (
+              <Box
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexDirection: 'column',
+                  gap: 2,
+                }}
               >
-                {t('chat.createFirstChannel')}
-              </Button>
+                <ChatIcon sx={{ fontSize: 64, color: 'text.secondary' }} />
+                <Typography variant="h6" color="text.secondary">
+                  {t('chat.selectChannelToStart')}
+                </Typography>
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={() => setCreateChannelOpen(true)}
+                >
+                  {t('chat.createFirstChannel')}
+                </Button>
+              </Box>
+            )}
+          </Box>
+
+          {/* Thread Panel - 사이드바 모드 */}
+          {threadViewMode === 'sidebar' && isThreadOpen && threadMessage && (
+            <Box sx={{ width: 400, height: '100%' }}>
+              <ThreadView
+                originalMessage={threadMessage}
+                onClose={handleCloseThread}
+              />
             </Box>
+          )}
+
+          {/* Thread Panel - 스택 모드 (전체 화면 오버레이) */}
+          {threadViewMode === 'stack' && isThreadOpen && threadMessage && (
+            <Slide direction="left" in={isThreadOpen} mountOnEnter unmountOnExit>
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  zIndex: 10,
+                  backgroundColor: 'background.paper',
+                }}
+              >
+                {/* 뒤로가기 헤더 */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    p: 2,
+                    borderBottom: `1px solid ${theme.palette.divider}`,
+                    backgroundColor: 'background.paper',
+                  }}
+                >
+                  <IconButton onClick={handleCloseThread} sx={{ mr: 1 }}>
+                    <ArrowBackIcon />
+                  </IconButton>
+                  <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                    {t('chat.thread')}
+                  </Typography>
+                </Box>
+
+                {/* 스레드 컨텐츠 */}
+                <Box sx={{ height: 'calc(100% - 73px)' }}>
+                  <ThreadView
+                    originalMessage={threadMessage}
+                    onClose={handleCloseThread}
+                    hideHeader={true}
+                  />
+                </Box>
+              </Box>
+            </Slide>
           )}
         </Box>
       </Paper>

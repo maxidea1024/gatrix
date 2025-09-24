@@ -336,12 +336,14 @@ interface ChatElementsMessageListProps {
   channelId: number;
   onSendMessage?: (message: string, attachments?: File[]) => void;
   onInviteUser?: () => void;
+  onOpenThread?: (message: MessageType) => void;
 }
 
 const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   channelId,
   onSendMessage,
-  onInviteUser
+  onInviteUser,
+  onOpenThread
 }) => {
   const { state, actions } = useChat();
   const { t, i18n } = useTranslation();
@@ -651,7 +653,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     });
     return {
       name: userName,
-      avatar: user?.avatar || user?.avatarUrl || DEFAULT_AVATAR_URL,
+      avatar: user?.avatarUrl || DEFAULT_AVATAR_URL, // avatarUrl 필드만 사용
     };
   };
 
@@ -746,8 +748,9 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
             channelId={channelId}
             onSendMessage={(content, attachments) => {
               if (currentChannel) {
-                actions.sendMessage(currentChannel.id, {
+                actions.sendMessage({
                   content,
+                  channelId: currentChannel.id,
                   type: 'text' as MessageType,
                   attachments
                 });
@@ -906,7 +909,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
             >
               {/* Avatar */}
               <Avatar
-                src={userInfo.avatar}
+                src={userInfo.avatarUrl}
                 alt={userInfo.name}
                 sx={{
                   width: '36px',
@@ -1059,22 +1062,25 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                   }}
                 >
                   {/* 스레드 시작 버튼 */}
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      // 스레드 시작 로직 (추후 구현)
-                      console.log('Start thread for message:', message.id);
-                    }}
-                    sx={{
-                      p: 0.5,
-                      color: colors.iconColor,
-                      '&:hover': {
-                        backgroundColor: colors.iconHover
-                      }
-                    }}
-                  >
-                    <ReplyIcon sx={{ fontSize: 16 }} />
-                  </IconButton>
+                  <Tooltip title={t('chat.startThread')} placement="top">
+                    <IconButton
+                      size="small"
+                      onClick={() => {
+                        if (onOpenThread) {
+                          onOpenThread(message);
+                        }
+                      }}
+                      sx={{
+                        p: 0.5,
+                        color: colors.iconColor,
+                        '&:hover': {
+                          backgroundColor: colors.iconHover
+                        }
+                      }}
+                    >
+                      <ReplyIcon sx={{ fontSize: 16 }} />
+                    </IconButton>
+                  </Tooltip>
 
                   {/* 더보기 버튼 */}
                   <IconButton
@@ -1131,12 +1137,13 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                   </Box>
                 )}
 
-                {/* 스레드 답글 수 표시 (추후 구현 - 현재는 임시로 숨김) */}
-                {false && (
+                {/* 스레드 답글 수 표시 */}
+                {message.threadCount && message.threadCount > 0 && (
                   <Box
                     onClick={() => {
-                      // 스레드 열기 (추후 구현)
-                      console.log('Open thread for message:', message.id);
+                      if (onOpenThread) {
+                        onOpenThread(message);
+                      }
                     }}
                     sx={{
                       mt: 1,
@@ -1153,7 +1160,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                   >
                     <ReplyIcon sx={{ fontSize: 14 }} />
                     <Typography variant="caption" sx={{ color: theme.palette.primary.main }}>
-                      답글 보기
+                      {message.threadCount}개 댓글
                     </Typography>
                   </Box>
                 )}
@@ -1238,8 +1245,9 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                 attachments
               });
 
-              actions.sendMessage(currentChannel.id, {
+              actions.sendMessage({
                 content,
+                channelId: currentChannel.id,
                 type: 'text' as MessageType,
                 attachments
               });

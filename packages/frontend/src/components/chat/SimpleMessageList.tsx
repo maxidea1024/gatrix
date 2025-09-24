@@ -248,9 +248,9 @@ const SimpleMessageList: React.FC<MessageListProps> = ({
                 }}
               >
                 <ListItemAvatar sx={{ minWidth: isOwn ? 'auto' : 56, ml: isOwn ? 1 : 0, mr: isOwn ? 0 : 1 }}>
-                  <MuiAvatar 
-                    src={messageUser?.avatar}
-                    sx={{ 
+                  <MuiAvatar
+                    src={messageUser?.avatarUrl}
+                    sx={{
                       bgcolor: isOwn ? 'primary.main' : 'secondary.main',
                       width: 32,
                       height: 32,

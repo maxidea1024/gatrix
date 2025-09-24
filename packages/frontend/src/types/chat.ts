@@ -52,6 +52,8 @@ export interface Message {
   type: MessageType;
   metadata?: MessageMetadata;
   replyToId?: number;
+  threadId?: number;
+  threadCount?: number;
   editedAt?: string;
   deletedAt?: string;
   createdAt: string;
@@ -233,8 +235,10 @@ export interface UpdateChannelRequest {
 
 export interface SendMessageRequest {
   content: string;
+  channelId: number;
   type?: MessageType;
   replyToId?: number;
+  threadId?: number;
   mentions?: number[];
   hashtags?: string[];
   attachments?: File[];
