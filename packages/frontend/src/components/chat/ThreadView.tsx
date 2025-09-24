@@ -104,50 +104,6 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
     if (isNaN(lat) || isNaN(lng)) return null;
     if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
     return { lat, lng };
-
-  // 스레드에서도 링크 미리보기/텍스트 렌더링을 동일하게 지원
-  const ThreadRichMessage: React.FC<{ content: string }> = ({ content }) => {
-    const theme = useTheme();
-    const [linkPreviews, setLinkPreviews] = useState<LinkPreview[]>([]);
-    const [loadingPreviews, setLoadingPreviews] = useState(false);
-
-    useEffect(() => {
-      const urls = extractUrlsFromMessage(content);
-      if (urls.length > 0) {
-        setLoadingPreviews(true);
-        Promise.all(urls.map((url) => extractLinkPreview(url)))
-          .then((previews) => {
-            const valid = (previews.filter((p) => p !== null) as LinkPreview[]);
-            setLinkPreviews(valid);
-          })
-          .catch((err) => {
-            console.warn('Thread link preview error:', err);
-            setLinkPreviews([]);
-          })
-          .finally(() => setLoadingPreviews(false));
-      } else {
-        setLinkPreviews([]);
-        setLoadingPreviews(false);
-      }
-    }, [content]);
-
-    return (
-      <>
-        <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
-          {content}
-        </Typography>
-        {loadingPreviews && (
-          <Box sx={{ mt: 1 }} data-link-preview="loading" />
-        )}
-        {linkPreviews.length > 0 && (
-          <Box sx={{ mt: 1 }} data-link-preview="loaded">
-            {linkPreviews.map((preview, idx) => (
-              <LinkPreviewCard key={idx} linkPreview={preview} />
-            ))}
-          </Box>
-        )}
-      </>
-    );
   };
 
 

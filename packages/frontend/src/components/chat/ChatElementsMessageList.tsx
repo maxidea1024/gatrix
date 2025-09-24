@@ -1240,16 +1240,12 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                     }}
                   >
                     <ReplyIcon sx={{ fontSize: 14 }} />
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                      <Typography variant="caption" sx={{ color: theme.palette.primary.main, fontWeight: 500 }}>
-                        {message.threadCount}개 댓글
-                      </Typography>
+                    <Typography variant="caption" sx={{ color: theme.palette.primary.main, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      {message.threadCount}개 댓글
                       {message.lastThreadMessageAt && (
-                        <Typography variant="caption" sx={{ color: colors.placeholderText, fontSize: '11px' }}>
-                          마지막 댓글: {formatRelativeTime(message.lastThreadMessageAt)}
-                        </Typography>
+                        <span style={{ color: colors.placeholderText }}>· 마지막 댓글: {formatRelativeTime(message.lastThreadMessageAt)}</span>
                       )}
-                    </Box>
+                    </Typography>
                   </Box>
                 )}
               </Box>
