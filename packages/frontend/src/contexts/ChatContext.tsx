@@ -88,6 +88,8 @@ const initialState: ChatState = {
   notifications: [],
   isConnected: false,
   isLoading: false,
+  loadingStage: 'idle', // 'idle' | 'syncing' | 'connecting' | 'loading_channels' | 'complete'
+  loadingStartTime: null, // 로딩 시작 시간
   pendingInvitationsCount: 0,
   error: null,
 };
@@ -95,6 +97,8 @@ const initialState: ChatState = {
 // Action types
 type ChatAction =
   | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_LOADING_STAGE'; payload: 'idle' | 'syncing' | 'connecting' | 'loading_channels' | 'complete' }
+  | { type: 'SET_LOADING_START_TIME'; payload: number | null }
   | { type: 'SET_CONNECTED'; payload: boolean }
   | { type: 'SET_CHANNELS'; payload: Channel[] }
   | { type: 'ADD_CHANNEL'; payload: Channel }
@@ -122,6 +126,9 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload };
+
+    case 'SET_LOADING_STAGE':
+      return { ...state, loadingStage: action.payload };
 
     case 'SET_CONNECTED':
       return { ...state, isConnected: action.payload };
@@ -501,14 +508,15 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('🔍 Message reaction updated:', data);
 
           // 메시지 리액션 정보를 업데이트
+          const reactionData = data.data || data; // data.data 또는 data 직접 사용
           dispatch({
             type: 'UPDATE_MESSAGE_REACTIONS',
             payload: {
-              messageId: data.messageId,
-              reactions: data.reactions,
-              action: data.action,
-              emoji: data.emoji,
-              userId: data.userId
+              messageId: reactionData.messageId,
+              reactions: reactionData.reactions,
+              action: reactionData.action,
+              emoji: reactionData.emoji,
+              userId: reactionData.userId
             }
           });
         });
@@ -587,7 +595,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       };
 
       setupEventListeners();
-      connectWebSocket();
+      // 초기 채널 로딩 시작 (사용자 동기화 + WebSocket 연결 + 채널 로딩)
+      loadChannels();
 
       wsService.onUserStopTyping((typing) => {
         dispatch({ 
@@ -813,6 +822,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         limit: 50 // 최근 50개 메시지만 로딩
       });
       console.log('Loaded messages from server:', result.messages.length);
+      console.log('🔍 First message reactions check:', {
+        firstMessage: result.messages[0],
+        hasReactions: result.messages[0]?.reactions,
+        reactionsLength: result.messages[0]?.reactions?.length
+      });
       dispatch({ type: 'SET_MESSAGES', payload: { channelId, messages: result.messages } });
     } catch (error: any) {
       console.error('Failed to load messages for channel', channelId, ':', error);
@@ -924,17 +938,26 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('🔄 loadChannels() called');
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
+      dispatch({ type: 'SET_LOADING_STAGE', payload: 'syncing' });
+      console.log('🔍 Loading state set: isLoading=true, stage=syncing');
 
       // 먼저 사용자를 Chat Server에 동기화
       try {
         console.log('🔄 Syncing current user to Chat Server...');
         await ChatService.syncCurrentUser();
         console.log('✅ User synced to Chat Server successfully');
+
+        // 사용자 동기화 완료 후 WebSocket 연결
+        dispatch({ type: 'SET_LOADING_STAGE', payload: 'connecting' });
+        console.log('🔄 Connecting to WebSocket after user sync...');
+        await connectWebSocket();
+        console.log('✅ WebSocket connected after user sync');
       } catch (error) {
         console.error('❌ Failed to sync user to Chat Server:', error);
         // 동기화 실패해도 채팅은 계속 진행
       }
 
+      dispatch({ type: 'SET_LOADING_STAGE', payload: 'loading_channels' });
       console.log('🔄 Loading channels from API...');
       const channels = await ChatService.getChannels();
       console.log('✅ Channels loaded:', channels);
@@ -970,6 +993,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to load channels' });
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
+      dispatch({ type: 'SET_LOADING_STAGE', payload: 'complete' });
     }
   }, [loadMessages, loadUsers, loadPendingInvitationsCount]);
 

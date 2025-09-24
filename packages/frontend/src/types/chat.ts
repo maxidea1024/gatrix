@@ -278,6 +278,7 @@ export interface ChatState {
   notifications: ChatNotification[];
   isConnected: boolean;
   isLoading: boolean;
+  loadingStage: 'idle' | 'syncing' | 'connecting' | 'loading_channels' | 'complete';
   pendingInvitationsCount: number; // 받은 초대 수
   error: string | null; // error message
 }

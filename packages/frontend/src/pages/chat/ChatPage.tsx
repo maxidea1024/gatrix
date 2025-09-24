@@ -60,6 +60,7 @@ import InvitationManager from '../../components/chat/InvitationManager';
 import PrivacySettings from '../../components/chat/PrivacySettings';
 import ThreadView from '../../components/chat/ThreadView';
 import UserStatusPicker, { UserStatus } from '../../components/chat/UserStatusPicker';
+import ChatSkeleton from '../../components/chat/ChatSkeleton';
 import { CreateChannelRequest, SendMessageRequest } from '../../types/chat';
 import { getChatWebSocketService } from '../../services/chatWebSocketService';
 
@@ -97,6 +98,17 @@ const ChatPageContent: React.FC = () => {
   const [invitationManagerOpen, setInvitationManagerOpen] = useState(false);
   const [privacySettingsOpen, setPrivacySettingsOpen] = useState(false);
   const [statusPickerOpen, setStatusPickerOpen] = useState(false);
+
+  // 로딩 상태 확인 - 초기 로딩 중이거나 채널이 없으면 스켈레톤 표시
+  const isInitialLoading = state.isLoading && (state.loadingStage !== 'complete' || state.channels.length === 0);
+
+  // 디버깅용 로그
+  console.log('🔍 ChatPage loading state:', {
+    isLoading: state.isLoading,
+    loadingStage: state.loadingStage,
+    channelsLength: state.channels.length,
+    isInitialLoading
+  });
 
   // 스레드 관련 상태
   const [threadMessage, setThreadMessage] = useState<Message | null>(null);
@@ -278,6 +290,11 @@ const ChatPageContent: React.FC = () => {
       default: return 'success.main';
     }
   };
+
+  // 초기 로딩 중이면 스켈레톤 표시
+  if (isInitialLoading) {
+    return <ChatSkeleton stage={state.loadingStage} />;
+  }
 
   return (
     <Box sx={{ px: 3, py: 3, pb: 6 }}> {/* 하단 패딩을 6으로 늘림 (좌우와 동일한 24px) */}

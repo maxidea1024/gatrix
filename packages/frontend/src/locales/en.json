@@ -1708,6 +1708,12 @@
   "chat": {
     "title": "Chat",
     "subtitle": "Communicate with your team members in real-time",
+    "loading": {
+      "initializing": "Initializing chat...",
+      "syncingUser": "Syncing user information...",
+      "connecting": "Connecting to chat server...",
+      "loadingChannels": "Loading channels..."
+    },
     "channels": "Channels",
     "createChannel": "Create Channel",
     "createChannelSubtitle": "Create a new channel to communicate with your team",

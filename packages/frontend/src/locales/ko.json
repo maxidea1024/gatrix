@@ -1735,6 +1735,12 @@
   "chat": {
     "title": "채팅",
     "subtitle": "팀 멤버들과 실시간으로 소통하세요",
+    "loading": {
+      "initializing": "채팅을 초기화하는 중...",
+      "syncingUser": "사용자 정보를 동기화하는 중...",
+      "connecting": "채팅 서버에 연결하는 중...",
+      "loadingChannels": "채널 목록을 불러오는 중..."
+    },
     "channels": "채널",
     "createChannel": "채널 만들기",
     "createChannelSubtitle": "새로운 채널을 만들어 팀과 소통하세요",
