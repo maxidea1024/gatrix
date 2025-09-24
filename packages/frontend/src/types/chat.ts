@@ -196,6 +196,7 @@ export type WebSocketEventType =
   | 'channel_updated'
   | 'reaction_added'
   | 'reaction_removed'
+  | 'message_reaction_updated'
   | 'user_online'
   | 'user_offline'
   | 'channel_invitation'

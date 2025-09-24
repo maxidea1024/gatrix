@@ -267,6 +267,12 @@ export class ChatWebSocketService {
       this.emit('user_joined_channel', data);
     });
 
+    // 메시지 리액션 관련 이벤트들
+    this.socket.on('message_reaction_updated', (data) => {
+      console.log('WebSocket message_reaction_updated received:', data);
+      this.emit('message_reaction_updated', data);
+    });
+
     this.socket.on('error', (data) => {
       this.emit('error', data);
     });

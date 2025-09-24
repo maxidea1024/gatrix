@@ -104,6 +104,7 @@ type ChatAction =
   | { type: 'SET_MESSAGES'; payload: { channelId: number; messages: Message[] } }
   | { type: 'ADD_MESSAGE'; payload: Message }
   | { type: 'UPDATE_MESSAGE'; payload: Message }
+  | { type: 'UPDATE_MESSAGE_REACTIONS'; payload: { messageId: number; reactions: any; action: string; emoji: string; userId: number } }
   | { type: 'REMOVE_MESSAGE'; payload: { channelId: number; messageId: number } }
   | { type: 'PREPEND_MESSAGES'; payload: { channelId: number; messages: Message[] } }
   | { type: 'SET_USERS'; payload: User[] }
@@ -212,6 +213,27 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
           ...state.messages,
           [updateChannelId]: updatedChannelMessages,
         },
+      };
+
+    case 'UPDATE_MESSAGE_REACTIONS':
+      // 모든 채널에서 해당 메시지를 찾아 리액션 정보 업데이트
+      const updatedMessagesWithReactions = { ...state.messages };
+
+      for (const channelId in updatedMessagesWithReactions) {
+        updatedMessagesWithReactions[channelId] = updatedMessagesWithReactions[channelId].map(msg => {
+          if (msg.id === action.payload.messageId) {
+            return {
+              ...msg,
+              reactions: action.payload.reactions
+            };
+          }
+          return msg;
+        });
+      }
+
+      return {
+        ...state,
+        messages: updatedMessagesWithReactions,
       };
     
     case 'REMOVE_MESSAGE':
@@ -475,14 +497,20 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         // 리액션 업데이트 이벤트 리스너
-        wsService.on('message_reaction_added', (data) => {
-          console.log('🔍 Reaction added:', data);
-          dispatch({ type: 'UPDATE_MESSAGE', payload: data.message });
-        });
+        wsService.on('message_reaction_updated', (data) => {
+          console.log('🔍 Message reaction updated:', data);
 
-        wsService.on('message_reaction_removed', (data) => {
-          console.log('🔍 Reaction removed:', data);
-          dispatch({ type: 'UPDATE_MESSAGE', payload: data.message });
+          // 메시지 리액션 정보를 업데이트
+          dispatch({
+            type: 'UPDATE_MESSAGE_REACTIONS',
+            payload: {
+              messageId: data.messageId,
+              reactions: data.reactions,
+              action: data.action,
+              emoji: data.emoji,
+              userId: data.userId
+            }
+          });
         });
 
         // 연결 상태 이벤트 리스너
