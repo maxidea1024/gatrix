@@ -421,30 +421,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // 현재 사용자 정보를 설정
       dispatch({ type: 'SET_CURRENT_USER', payload: user });
 
-      const connectWebSocket = async () => {
-        try {
-          // 인증 토큰 확인
-          const token = localStorage.getItem('accessToken');
-          if (!token) {
-            console.error('No authentication token found in localStorage');
-            enqueueSnackbar('로그인이 필요합니다', { variant: 'error' });
-            return;
-          }
-
-          console.log('Connecting to chat WebSocket with token...', token.substring(0, 20) + '...');
-
-          // Ensure API service has the token
-          apiService.setAccessToken(token);
-
-          await wsService.connect();
-          console.log('WebSocket connected successfully');
-          dispatch({ type: 'SET_CONNECTED', payload: true });
-          loadChannels();
-        } catch (error) {
-          console.error('Failed to connect to chat WebSocket:', error);
-          enqueueSnackbar(t('chat.connectionFailed'), { variant: 'error' });
-        }
-      };
+      // WebSocket 연결 함수는 이제 위에서 useCallback으로 정의됨
 
       // Set up WebSocket event listeners
       const setupEventListeners = () => {
@@ -937,6 +914,31 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   // Load channels
+  // WebSocket 연결 함수를 별도로 분리
+  const connectWebSocket = useCallback(async () => {
+    try {
+      // 인증 토큰 확인
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        console.error('No authentication token found in localStorage');
+        enqueueSnackbar('로그인이 필요합니다', { variant: 'error' });
+        return;
+      }
+
+      console.log('🔗 Using existing JWT token for WebSocket connection');
+
+      // Ensure API service has the token
+      apiService.setAccessToken(token);
+
+      await wsService.connect();
+      console.log('✅ WebSocket connected successfully');
+      dispatch({ type: 'SET_CONNECTED', payload: true });
+    } catch (error) {
+      console.error('❌ Failed to connect to chat WebSocket:', error);
+      enqueueSnackbar(t('chat.connectionFailed'), { variant: 'error' });
+    }
+  }, [enqueueSnackbar, t]);
+
   const loadChannels = useCallback(async () => {
     console.log('🔄 loadChannels() called');
     try {
@@ -1018,7 +1020,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         finishLoading();
       }
     }
-  }, [loadMessages, loadUsers, loadPendingInvitationsCount]);
+  }, [connectWebSocket, loadMessages, loadUsers, loadPendingInvitationsCount]);
 
   // Actions
   const actions: ChatContextType['actions'] = {

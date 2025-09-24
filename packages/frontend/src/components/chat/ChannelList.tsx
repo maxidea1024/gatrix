@@ -72,13 +72,13 @@ const ChannelList: React.FC<ChannelListProps> = ({
     (channel.description && channel.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  // 디버깅: 채널 상태 로그
-  console.log('🔍 ChannelList Debug:', {
-    'state.channels': state.channels,
-    'state.channels.length': state.channels.length,
-    'filteredChannels.length': filteredChannels.length,
-    'searchQuery': searchQuery
-  });
+  // 채널 상태 디버깅 (필요시 주석 해제)
+  // console.log('🔍 ChannelList Debug:', {
+  //   'state.channels': state.channels,
+  //   'state.channels.length': state.channels.length,
+  //   'filteredChannels.length': filteredChannels.length,
+  //   'searchQuery': searchQuery
+  // });
 
 
 

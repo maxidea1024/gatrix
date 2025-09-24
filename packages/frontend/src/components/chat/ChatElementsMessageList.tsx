@@ -645,12 +645,6 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   const getUserInfo = (userId: number) => {
     const user = state.users[userId];
     const userName = user?.username || user?.name || `User${userId}`;
-    console.log('🔍 getUserInfo debug:', {
-      userId,
-      user,
-      userName,
-      allUsers: state.users
-    });
     return {
       name: userName,
       avatar: user?.avatarUrl || DEFAULT_AVATAR_URL, // avatarUrl 필드만 사용
@@ -974,15 +968,6 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                 </Typography>
 
                 {/* 리액션 표시 */}
-                {(() => {
-                  console.log('🔍 Message reactions check:', {
-                    messageId: message.id,
-                    hasReactions: !!message.reactions,
-                    reactionsLength: message.reactions?.length || 0,
-                    reactions: message.reactions
-                  });
-                  return null;
-                })()}
                 {message.reactions && message.reactions.length > 0 && (
                   <Box sx={{
                     display: 'flex',
@@ -1230,29 +1215,13 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         <AdvancedMessageInput
           channelId={channelId}
           onSendMessage={(content, attachments) => {
-            console.log('📨 ChatElementsMessageList onSendMessage called:', {
-              content,
-              attachments,
-              currentChannel,
-              currentChannelId: currentChannel?.id,
-              actions: actions
-            });
-
             if (currentChannel) {
-              console.log('✅ Calling actions.sendMessage with:', currentChannel.id, {
-                content,
-                type: 'text' as MessageType,
-                attachments
-              });
-
               actions.sendMessage({
                 content,
                 channelId: currentChannel.id,
                 type: 'text' as MessageType,
                 attachments
               });
-            } else {
-              console.log('❌ No currentChannel available');
             }
           }}
           placeholder={t('chat.typeMessage')}

@@ -145,20 +145,10 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
   };
 
   const handleSendMessage = () => {
-    console.log('🚀 handleSendMessage called:', {
-      message: message,
-      messageLength: message.length,
-      messageTrimmed: message.trim(),
-      attachments: attachments,
-      onSendMessage: onSendMessage
-    });
-
     if (!message.trim() && attachments.length === 0) {
-      console.log('❌ Message empty, returning early');
       return;
     }
 
-    console.log('✅ Calling onSendMessage with:', message.trim(), attachments);
     onSendMessage(message.trim(), attachments);
     setMessage('');
     setAttachments([]);

@@ -102,13 +102,13 @@ const ChatPageContent: React.FC = () => {
   // 로딩 상태 확인 - 초기 로딩 중이거나 채널이 없으면 스켈레톤 표시
   const isInitialLoading = state.isLoading && (state.loadingStage !== 'complete' || state.channels.length === 0);
 
-  // 디버깅용 로그
-  console.log('🔍 ChatPage loading state:', {
-    isLoading: state.isLoading,
-    loadingStage: state.loadingStage,
-    channelsLength: state.channels.length,
-    isInitialLoading
-  });
+  // 로딩 상태 디버깅 (필요시 주석 해제)
+  // console.log('🔍 ChatPage loading state:', {
+  //   isLoading: state.isLoading,
+  //   loadingStage: state.loadingStage,
+  //   channelsLength: state.channels.length,
+  //   isInitialLoading
+  // });
 
   // 스레드 관련 상태
   const [threadMessage, setThreadMessage] = useState<Message | null>(null);
