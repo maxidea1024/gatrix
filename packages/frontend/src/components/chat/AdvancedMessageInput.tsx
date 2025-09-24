@@ -26,6 +26,8 @@ interface AdvancedMessageInputProps {
   onSendMessage: (content: string, attachments?: File[]) => void;
   placeholder?: string;
   disabled?: boolean;
+  autoFocus?: boolean;
+  focusTrigger?: number;
 }
 
 const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
@@ -33,6 +35,8 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
   onSendMessage,
   placeholder,
   disabled = false,
+  autoFocus = false,
+  focusTrigger,
 }) => {
   const { t } = useTranslation();
   const { state, actions } = useChat();
@@ -43,13 +47,33 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
   const [mentionPosition, setMentionPosition] = useState({ top: 0, left: 0 });
   const [showMentions, setShowMentions] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const textFieldRef = useRef<HTMLInputElement>(null);
+  const textFieldRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
 
   const currentChannel = state.channels.find(c => c.id === channelId);
   const channelUsers = currentChannel?.members || [];
 
-  // WebSocket 연결 및 채널 준비 완료 시 입력창에 포커스
+  // ThreadView 등에서 강제로 포커스가 필요할 때
+  useEffect(() => {
+    if (autoFocus && !disabled) {
+      const t = setTimeout(() => {
+        textFieldRef.current?.focus();
+      }, 0);
+      return () => clearTimeout(t);
+    }
+  }, [autoFocus, disabled]);
+
+  // 외부에서 focusTrigger가 변경되면 포커스 시도
+  useEffect(() => {
+    if (focusTrigger !== undefined && !disabled) {
+      const t = setTimeout(() => {
+        textFieldRef.current?.focus();
+      }, 0);
+      return () => clearTimeout(t);
+    }
+  }, [focusTrigger, disabled]);
+
+  // WebSocket 연결 및 채널 준비 완료 시 입력창에 포커스(기존 동작 유지)
   useEffect(() => {
     if (channelId &&
         textFieldRef.current &&
@@ -208,14 +232,14 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
     const cursorPosition = textFieldRef.current?.selectionStart || 0;
     const textBeforeCursor = message.substring(0, cursorPosition);
     const textAfterCursor = message.substring(cursorPosition);
-    
+
     // Replace the @query with @username
     const mentionMatch = textBeforeCursor.match(/@(\w*)$/);
     if (mentionMatch) {
       const beforeMention = textBeforeCursor.substring(0, mentionMatch.index);
       const newMessage = beforeMention + `@${user.username} ` + textAfterCursor;
       setMessage(newMessage);
-      
+
       // Set cursor position after the mention
       setTimeout(() => {
         const newPosition = beforeMention.length + user.username.length + 2;
@@ -223,7 +247,7 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
         textFieldRef.current?.focus();
       }, 0);
     }
-    
+
     setShowMentions(false);
     setMentionQuery('');
   };
@@ -286,7 +310,7 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
         </IconButton>
 
         <TextField
-          ref={textFieldRef}
+          inputRef={textFieldRef}
           fullWidth
           multiline
           maxRows={4}

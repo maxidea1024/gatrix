@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import {
-  Close as CloseIcon,
+  ArrowBack as ArrowBackIcon,
   Reply as ReplyIcon,
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
@@ -46,6 +46,13 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleClose = () => {
+    try {
+      window.dispatchEvent(new CustomEvent('focus-main-chat-input'));
+    } catch {}
+    onClose();
   };
 
   useEffect(() => {
@@ -119,7 +126,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
     <Paper
       elevation={3}
       sx={{
-        width: 400,
+        width: '100%',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
@@ -139,14 +146,14 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <IconButton size="small" onClick={handleClose}>
+              <ArrowBackIcon />
+            </IconButton>
             <ReplyIcon sx={{ fontSize: 20 }} />
             <Typography variant="h6" sx={{ fontSize: '1rem' }}>
               {t('chat.thread')}
             </Typography>
           </Box>
-          <IconButton size="small" onClick={onClose}>
-            <CloseIcon />
-          </IconButton>
         </Box>
       )}
 
@@ -179,7 +186,35 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
       </Box>
 
       {/* Thread Messages */}
-      <Box sx={{ flex: 1, overflow: 'auto', p: 1 }}>
+      <Box
+        data-testid="thread-messages-container"
+        sx={{
+          flex: 1,
+          overflow: 'auto',
+          p: 1,
+          // 메인 채팅 스크롤바와 동일한 스타일
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'transparent',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+          },
+          '&::-webkit-scrollbar-thumb:active': {
+            background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+          },
+          scrollbarWidth: 'thin',
+          scrollbarColor: theme.palette.mode === 'dark'
+            ? 'rgba(255, 255, 255, 0.2) transparent'
+            : 'rgba(0, 0, 0, 0.2) transparent',
+        }}
+      >
         {isLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
             <CircularProgress size={24} />
@@ -326,6 +361,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
       <Box sx={{ p: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
         <AdvancedMessageInput
           channelId={originalMessage.channelId}
+          autoFocus
           onSendMessage={(content, attachments) => {
             actions.sendMessage({
               content,

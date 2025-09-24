@@ -98,6 +98,47 @@ const ChatPageContent: React.FC = () => {
   const [invitationManagerOpen, setInvitationManagerOpen] = useState(false);
   const [privacySettingsOpen, setPrivacySettingsOpen] = useState(false);
   const [statusPickerOpen, setStatusPickerOpen] = useState(false);
+  // Thread sidebar width (resizable)
+  const [threadWidth, setThreadWidth] = useState<number>(() => {
+    const saved = Number(localStorage.getItem('chatThreadWidth') || 400);
+    const w = isNaN(saved) ? 400 : saved;
+    return Math.min(Math.max(w, 320), 800);
+  });
+  const isResizingRef = useRef(false);
+  const startXRef = useRef(0);
+  const startWidthRef = useRef(0);
+  const latestWidthRef = useRef(threadWidth);
+  useEffect(() => { latestWidthRef.current = threadWidth; }, [threadWidth]);
+
+  function onMouseMoveThreadResizer(e: MouseEvent) {
+    if (!isResizingRef.current) return;
+    const dx = startXRef.current - e.clientX; // move left -> increase width
+    let newWidth = startWidthRef.current + dx;
+    newWidth = Math.min(Math.max(newWidth, 320), 800);
+    latestWidthRef.current = newWidth;
+    setThreadWidth(newWidth);
+  }
+
+  function onMouseUpThreadResizer() {
+    if (!isResizingRef.current) return;
+    isResizingRef.current = false;
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    window.removeEventListener('mousemove', onMouseMoveThreadResizer);
+    window.removeEventListener('mouseup', onMouseUpThreadResizer);
+    try { localStorage.setItem('chatThreadWidth', String(latestWidthRef.current)); } catch {}
+  }
+
+  const onMouseDownThreadResizer = (e: React.MouseEvent) => {
+    isResizingRef.current = true;
+    startXRef.current = e.clientX;
+    startWidthRef.current = threadWidth;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    window.addEventListener('mousemove', onMouseMoveThreadResizer);
+    window.addEventListener('mouseup', onMouseUpThreadResizer);
+  };
+
 
   // 로딩 상태 확인 - 초기 로딩 중이거나 채널이 없으면 스켈레톤 표시
   const isInitialLoading = state.isLoading && (state.loadingStage !== 'complete' || state.channels.length === 0);
@@ -501,14 +542,28 @@ const ChatPageContent: React.FC = () => {
             )}
           </Box>
 
-          {/* Thread Panel - 사이드바 모드 */}
+          {/* Thread Panel - 사이드바 모드 (리사이즈 가능) */}
           {threadViewMode === 'sidebar' && isThreadOpen && threadMessage && (
-            <Box sx={{ width: 400, height: '100%' }}>
-              <ThreadView
-                originalMessage={threadMessage}
-                onClose={handleCloseThread}
+            <>
+              {/* Resizer */}
+              <Box
+                onMouseDown={onMouseDownThreadResizer}
+                sx={{
+                  width: 6,
+                  cursor: 'col-resize',
+                  height: '100%',
+                  backgroundColor: 'transparent',
+                  '&:hover': { backgroundColor: 'action.hover' },
+                }}
               />
-            </Box>
+              {/* Thread Panel */}
+              <Box sx={{ width: threadWidth, minWidth: 320, maxWidth: 800, height: '100%' }}>
+                <ThreadView
+                  originalMessage={threadMessage}
+                  onClose={handleCloseThread}
+                />
+              </Box>
+            </>
           )}
 
           {/* Thread Panel - 스택 모드 (전체 화면 오버레이) */}
@@ -558,8 +613,8 @@ const ChatPageContent: React.FC = () => {
       </Paper>
 
       {/* Create Channel Dialog */}
-      <Dialog 
-        open={createChannelOpen} 
+      <Dialog
+        open={createChannelOpen}
         onClose={() => setCreateChannelOpen(false)}
         maxWidth="sm"
         fullWidth
@@ -588,7 +643,7 @@ const ChatPageContent: React.FC = () => {
               autoFocus
               placeholder={t('chat.channelNamePlaceholder')}
             />
-            
+
             <TextField
               label={t('chat.channelDescription')}
               value={channelFormData.description}

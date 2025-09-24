@@ -350,6 +350,13 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   const theme = useTheme();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   // messageInputRef와 messageInput은 AdvancedMessageInput으로 이동됨
+  const [focusBump, setFocusBump] = useState(0);
+  useEffect(() => {
+    const handler = () => setFocusBump(prev => prev + 1);
+    window.addEventListener('focus-main-chat-input', handler);
+    return () => window.removeEventListener('focus-main-chat-input', handler);
+  }, []);
+
 
   const currentChannel = state.channels.find(c => c.id === channelId);
   // 메인 채팅에서는 스레드 메시지(threadId가 있는 메시지)를 제외하고 표시
@@ -759,7 +766,10 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         {/* Message Input */}
         <Box sx={{ p: 2, backgroundColor: colors.inputBackground }}>
           <AdvancedMessageInput
+            key={channelId}
             channelId={channelId}
+            autoFocus
+            focusTrigger={focusBump}
             onSendMessage={(content, attachments) => {
               if (currentChannel) {
                 actions.sendMessage({
@@ -1245,7 +1255,10 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       {/* Message Input */}
       <Box sx={{ p: 2, backgroundColor: colors.inputBackground }}>
         <AdvancedMessageInput
+          key={channelId}
           channelId={channelId}
+          autoFocus
+          focusTrigger={focusBump}
           onSendMessage={(content, attachments) => {
             if (currentChannel) {
               actions.sendMessage({
