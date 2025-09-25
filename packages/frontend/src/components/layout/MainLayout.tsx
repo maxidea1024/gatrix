@@ -206,11 +206,26 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   };
 
   const isActivePath = (path: string) => {
-    return location.pathname === path || location.pathname.startsWith(path + '/');
+    // 정확한 경로 매칭을 위해 수정
+    if (location.pathname === path) {
+      return true;
+    }
+    // 하위 경로인 경우에만 true (단, 정확히 '/'로 구분되는 경우만)
+    if (path !== '/' && location.pathname.startsWith(path + '/')) {
+      return true;
+    }
+    return false;
+  };
+
+  // 설정 메뉴 전용 활성화 체크 (정확한 매칭만)
+  const isActiveSettingsPath = (path: string) => {
+    return location.pathname === path;
   };
 
   const renderMenuItem = (item: any, index: number) => {
     const isAdminItem = typeof index === 'string' && index.startsWith('admin-');
+    // 설정 메뉴 항목인지 확인
+    const isSettingsItem = settingsMenuItems.some(settingsItem => settingsItem.path === item.path);
 
     // 서브메뉴가 있는 경우
     if (item.children) {
@@ -309,8 +324,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         key={index}
         onClick={() => navigate(item.path)}
         sx={{
-          color: isActivePath(item.path) ? '#ffffff' : '#cbd5e1',
-          backgroundColor: isActivePath(item.path) ? 'rgba(91, 106, 208, 0.2)' : 'transparent',
+          color: (isSettingsItem ? isActiveSettingsPath(item.path) : isActivePath(item.path)) ? '#ffffff' : '#cbd5e1',
+          backgroundColor: (isSettingsItem ? isActiveSettingsPath(item.path) : isActivePath(item.path)) ? 'rgba(91, 106, 208, 0.2)' : 'transparent',
           '&:hover': {
             backgroundColor: 'rgba(255,255,255,0.1)',
           },
@@ -501,8 +516,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     onClick={() => navigate(item.path)}
                     sx={{
                       pl: 4,
-                      color: isActivePath(item.path) ? '#ffffff' : '#cbd5e1',
-                      backgroundColor: isActivePath(item.path) ? 'rgba(91, 106, 208, 0.2)' : 'transparent',
+                      color: isActiveSettingsPath(item.path) ? '#ffffff' : '#cbd5e1',
+                      backgroundColor: isActiveSettingsPath(item.path) ? 'rgba(91, 106, 208, 0.2)' : 'transparent',
                       '&:hover': {
                         backgroundColor: 'rgba(255,255,255,0.1)',
                       },
