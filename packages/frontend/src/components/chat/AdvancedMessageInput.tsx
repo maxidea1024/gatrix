@@ -324,6 +324,25 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
           sx={{
             '& .MuiOutlinedInput-root': {
               borderRadius: 3,
+              '& fieldset': {
+                borderWidth: '1px',
+                borderColor: 'rgba(0, 0, 0, 0.12)',
+              },
+              '&:hover fieldset': {
+                borderColor: 'rgba(0, 0, 0, 0.2)',
+              },
+              '&.Mui-focused fieldset': {
+                borderWidth: '1px', // 기본 2px에서 1px로 줄임
+                borderColor: 'rgba(25, 118, 210, 0.4)', // 투명도를 높여 더 부드럽게
+                boxShadow: '0 0 0 1px rgba(25, 118, 210, 0.1)', // 매우 부드러운 그림자 효과
+              },
+            },
+            '& .MuiInputBase-root': {
+              '&.Mui-focused': {
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderWidth: '1px !important',
+                },
+              },
             },
           }}
         />

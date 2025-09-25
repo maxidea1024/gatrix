@@ -82,7 +82,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
 
 
 
-  const handleChannelClick = (channel: Channel) => {
+  const handleChannelClick = React.useCallback((channel: Channel) => {
     console.log('🖱️ handleChannelClick called:', {
       clickedChannelId: channel.id,
       currentChannelId: state.currentChannelId,
@@ -101,7 +101,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
 
     // 채널 변경 후 메시지가 로딩되면 자동으로 읽음 처리
     // (ChatElementsMessageList에서 처리하도록 변경)
-  };
+  }, [state.currentChannelId, actions]);
 
   const handleChannelMenu = (event: React.MouseEvent<HTMLElement>, channel: Channel) => {
     event.stopPropagation();
@@ -227,29 +227,32 @@ const ChannelList: React.FC<ChannelListProps> = ({
           </Box>
         ) : (
           <List disablePadding sx={{ pt: 1 }}>
-            {filteredChannels.map((channel) => (
-              <ListItem key={channel.id} disablePadding>
-                <ListItemButton
-                  selected={state.currentChannelId === channel.id}
-                  onClick={() => handleChannelClick(channel)}
-                  sx={{
-                    py: 0.5, // 위아래 패딩 더 줄임 (1 → 0.5)
-                    px: 1, // 좌우 패딩 설정
-                    mx: 1.5, // 좌우 여백 늘림
-                    my: 0.25, // 위아래 마진 추가로 간격 조정
-                    borderRadius: 1, // 슬랙 스타일 라운드
-                    '&.Mui-selected': {
-                      backgroundColor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.08)' // 다크 테마: 약간 밝게
-                          : 'rgba(0, 0, 0, 0.08)', // 라이트 테마: 더 어둡게 (0.04 → 0.08)
-                      color: 'inherit', // 기본 텍스트 색상 유지
-                      '&:hover': {
+            {filteredChannels.map((channel) => {
+              // 각 채널 아이템을 메모화하여 불필요한 재렌더링 방지
+              const isSelected = state.currentChannelId === channel.id;
+              return (
+                <ListItem key={channel.id} disablePadding>
+                  <ListItemButton
+                    selected={isSelected}
+                    onClick={() => handleChannelClick(channel)}
+                    sx={{
+                      py: 0.5, // 위아래 패딩 더 줄임 (1 → 0.5)
+                      px: 1, // 좌우 패딩 설정
+                      mx: 1.5, // 좌우 여백 늘림
+                      my: 0.25, // 위아래 마진 추가로 간격 조정
+                      borderRadius: 1, // 슬랙 스타일 라운드
+                      '&.Mui-selected': {
                         backgroundColor: (theme) =>
                           theme.palette.mode === 'dark'
-                            ? 'rgba(255, 255, 255, 0.12)'
-                            : 'rgba(0, 0, 0, 0.12)', // 라이트 테마 호버도 더 어둡게 (0.08 → 0.12)
-                      },
+                            ? 'rgba(255, 255, 255, 0.08)' // 다크 테마: 약간 밝게
+                            : 'rgba(0, 0, 0, 0.08)', // 라이트 테마: 더 어둡게 (0.04 → 0.08)
+                        color: 'inherit', // 기본 텍스트 색상 유지
+                        '&:hover': {
+                          backgroundColor: (theme) =>
+                            theme.palette.mode === 'dark'
+                              ? 'rgba(255, 255, 255, 0.12)'
+                              : 'rgba(0, 0, 0, 0.12)', // 라이트 테마 호버도 더 어둡게 (0.08 → 0.12)
+                        },
                       '& .MuiListItemIcon-root': {
                         color: 'inherit',
                       },
@@ -335,7 +338,8 @@ const ChannelList: React.FC<ChannelListProps> = ({
                   </ListItemSecondaryAction>
                 </ListItemButton>
               </ListItem>
-            ))}
+            );
+            })}
           </List>
         )}
       </Box>

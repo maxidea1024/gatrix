@@ -1132,13 +1132,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem('lastChannelId', channelId.toString());
         console.log('Saved last channel ID:', channelId);
 
-        // 채널이 실제로 변경된 경우에만 메시지 로딩
+        // 채널이 실제로 변경된 경우에만 메시지 로딩 - 깜빡임 방지를 위해 setTimeout 제거
         if (previousChannelId !== channelId) {
           console.log('✅ Channel changed from', previousChannelId, 'to', channelId, '- loading messages');
-          // 비동기 함수를 setTimeout으로 감싸서 안전하게 호출
-          setTimeout(() => {
-            loadMessages(channelId);
-          }, 0);
+          // 즉시 메시지 로딩하여 깜빡임 방지
+          loadMessages(channelId);
         } else {
           console.log('⏭️ Same channel selected, skipping message load');
         }
@@ -1227,7 +1225,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         await ChatService.joinChannel(channelId);
         wsService.joinChannel(channelId);
-        await loadChannels(); // Refresh channels
+        // 깜빡임 방지를 위해 전체 채널 목록 재갱신 제거
+        // await loadChannels(); // Refresh channels
       } catch (error: any) {
         dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to join channel' });
         throw error;

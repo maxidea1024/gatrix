@@ -646,13 +646,15 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         markAsReadTimeoutRef.current = null;
       }
 
-      // 즉시 스크롤하여 깜빡임 방지
-      const messageContainer = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement;
-      if (messageContainer) {
-        messageContainer.scrollTop = messageContainer.scrollHeight;
-      }
+      // 즉시 스크롤하여 깜빡임 방지 - requestAnimationFrame으로 한 프레임 지연
+      requestAnimationFrame(() => {
+        const messageContainer = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement;
+        if (messageContainer) {
+          messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+      });
     }
-  }, [channelId, currentChannel]);
+  }, [channelId]);
 
   // Focus input when clicking anywhere in the chat area (but not when selecting text)
   const handleChatAreaClick = (e: React.MouseEvent) => {
@@ -783,48 +785,94 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
 
   // 슬랙 스타일 메시지 렌더링을 위해 직접 JSX에서 처리
 
+  // 헤더 컴포넌트들을 항상 메모화 (조건부 hooks 방지)
+  const EmptyStateHeader = React.useMemo(() => (
+    <Paper elevation={1} sx={{ p: 2, borderRadius: 0 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Avatar
+          src={`https://ui-avatars.com/api/?name=${currentChannel?.name || 'Channel'}&background=random`}
+          alt={currentChannel?.name || 'Channel'}
+          sx={{ width: 40, height: 40 }}
+        />
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="h6">
+            {currentChannel?.name || t('chat.selectChannel')}
+          </Typography>
+          {currentChannel?.description && (
+            <Typography variant="body2" color="text.secondary">
+              {currentChannel.description}
+            </Typography>
+          )}
+        </Box>
+        {onInviteUser && (
+          <Tooltip title={t('chat.inviteUsers')} placement="bottom">
+            <IconButton
+              size="small"
+              onClick={onInviteUser}
+              sx={{
+                border: 1,
+                borderColor: 'divider',
+                '&:hover': {
+                  borderColor: 'primary.main',
+                  backgroundColor: 'primary.50'
+                }
+              }}
+            >
+              <PersonAddIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        )}
+      </Box>
+    </Paper>
+  ), [currentChannel?.name, currentChannel?.description, t, onInviteUser]);
+
+  // 메인 헤더 컴포넌트도 항상 메모화
+  const ChatHeader = React.useMemo(() => (
+    <Paper elevation={1} sx={{ p: 2, borderRadius: 0 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Avatar
+          src={`https://ui-avatars.com/api/?name=${currentChannel?.name || 'Channel'}&background=random`}
+          alt={currentChannel?.name || 'Channel'}
+          sx={{ width: 40, height: 40 }}
+        />
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="h6">
+            {currentChannel?.name || ''}
+          </Typography>
+          {(currentChannel?.memberCount ?? 0) > 0 && (
+            <Typography variant="body2" color="text.secondary">
+              {currentChannel!.memberCount} {t('chat.members')}
+            </Typography>
+          )}
+        </Box>
+        {onInviteUser && (
+          <Tooltip title={t('chat.inviteUsers')} placement="bottom">
+            <IconButton
+              size="small"
+              onClick={onInviteUser}
+              sx={{
+                border: 1,
+                borderColor: 'divider',
+                '&:hover': {
+                  borderColor: 'primary.main',
+                  backgroundColor: 'primary.50'
+                }
+              }}
+            >
+              <PersonAddIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        )}
+      </Box>
+    </Paper>
+  ), [currentChannel?.name, currentChannel?.memberCount, t, onInviteUser]);
+
   // 깜빡임 방지를 위해 로딩 상태 체크 제거
   if (messages.length === 0) {
     return (
       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-        {/* Header */}
-        <Paper elevation={1} sx={{ p: 2, borderRadius: 0 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Avatar
-              src={`https://ui-avatars.com/api/?name=${currentChannel?.name || 'Channel'}&background=random`}
-              alt={currentChannel?.name || 'Channel'}
-              sx={{ width: 40, height: 40 }}
-            />
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="h6">
-                {currentChannel?.name || t('chat.selectChannel')}
-              </Typography>
-              {currentChannel?.description && (
-                <Typography variant="body2" color="text.secondary">
-                  {currentChannel.description}
-                </Typography>
-              )}
-            </Box>
-            {onInviteUser && (
-              <Tooltip title={t('chat.inviteUsers')} placement="bottom">
-                <IconButton
-                  size="small"
-                  onClick={onInviteUser}
-                  sx={{
-                    border: 1,
-                    borderColor: 'divider',
-                    '&:hover': {
-                      borderColor: 'primary.main',
-                      backgroundColor: 'primary.50'
-                    }
-                  }}
-                >
-                  <PersonAddIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            )}
-          </Box>
-        </Paper>
+        {/* Header - 메모화된 컴포넌트 사용 */}
+        {EmptyStateHeader}
 
         {/* Empty state */}
         <Box
@@ -896,44 +944,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
 
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Header */}
-      <Paper elevation={1} sx={{ p: 2, borderRadius: 0 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Avatar
-            src={`https://ui-avatars.com/api/?name=${currentChannel?.name || 'Channel'}&background=random`}
-            alt={currentChannel?.name || 'Channel'}
-            sx={{ width: 40, height: 40 }}
-          />
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h6">
-              {currentChannel?.name || ''}
-            </Typography>
-            {(currentChannel?.memberCount ?? 0) > 0 && (
-              <Typography variant="body2" color="text.secondary">
-                {currentChannel!.memberCount} {t('chat.members')}
-              </Typography>
-            )}
-          </Box>
-          {onInviteUser && (
-            <Tooltip title={t('chat.inviteUsers')} placement="bottom">
-              <IconButton
-                size="small"
-                onClick={onInviteUser}
-                sx={{
-                  border: 1,
-                  borderColor: 'divider',
-                  '&:hover': {
-                    borderColor: 'primary.main',
-                    backgroundColor: 'primary.50'
-                  }
-                }}
-              >
-                <PersonAddIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          )}
-        </Box>
-      </Paper>
+      {/* Header - 메모화된 컴포넌트 사용 */}
+      {ChatHeader}
 
       {/* Messages - Slack Style */}
       <Box
