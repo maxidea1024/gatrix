@@ -117,7 +117,13 @@ export class InvitationController {
 
       // Check if there's already a pending invitation
       const hasPendingInvitation = await ChannelInvitationModel.hasPendingInvitation(channelIdNum, inviteeId);
+      logger.info('Checking pending invitation', { channelId: channelIdNum, inviteeId, hasPendingInvitation });
+
       if (hasPendingInvitation) {
+        // Get existing invitation details for debugging
+        const existingInvitations = await ChannelInvitationModel.findByChannelId(channelIdNum, 'pending');
+        logger.info('Existing pending invitations for channel', { channelId: channelIdNum, invitations: existingInvitations });
+
         res.status(400).json({
           success: false,
           error: 'User already has a pending invitation to this channel',
@@ -399,6 +405,8 @@ export class InvitationController {
       const userId = (req as any).user.id;
       const { status, page = 1, limit = 20 } = req.query;
 
+      logger.info('getMySentInvitations request', { userId, status, page, limit });
+
       const pageNum = parseInt(page as string) || 1;
       const limitNum = Math.min(parseInt(limit as string) || 20, 50);
       const offset = (pageNum - 1) * limitNum;
@@ -408,6 +416,8 @@ export class InvitationController {
         status as any,
         { limit: limitNum, offset }
       );
+
+      logger.info('getMySentInvitations result', { userId, status, result });
 
       // Add channel info and invitee info
       const enrichedInvitations = await Promise.all(
@@ -452,6 +462,8 @@ export class InvitationController {
       const userId = (req as any).user.id;
       const { channelId } = req.params;
 
+      logger.info('getChannelPendingInvitations request', { userId, channelId });
+
       const channelIdNum = parseInt(channelId);
       if (isNaN(channelIdNum)) {
         res.status(400).json({
@@ -486,6 +498,8 @@ export class InvitationController {
         'pending',
         { limit: 100 } // Maximum 100 items
       );
+
+      logger.info('getChannelPendingInvitations result', { channelId: channelIdNum, result });
 
       // Add invitee info
       const enrichedInvitations = await Promise.all(

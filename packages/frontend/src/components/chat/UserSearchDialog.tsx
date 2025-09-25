@@ -71,7 +71,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     if (!channelId) return;
 
     try {
-      const response = await fetch(`http://localhost:3001/api/v1/channels/${channelId}/pending-invitations`, {
+      const response = await fetch(`/api/v1/chat/channels/${channelId}/pending-invitations`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         },
@@ -79,10 +79,14 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
 
       if (response.ok) {
         const data = await response.json();
+        console.log('Pending invitations response:', data); // 디버깅용
         if (data.success && data.data) {
           const invitedUserIds = new Set(data.data.map((invitation: any) => invitation.inviteeId));
+          console.log('Pending invited user IDs:', invitedUserIds); // 디버깅용
           setPendingInvitedUsers(invitedUserIds);
         }
+      } else {
+        console.error('Failed to fetch pending invitations:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Failed to fetch pending invitations:', error);
