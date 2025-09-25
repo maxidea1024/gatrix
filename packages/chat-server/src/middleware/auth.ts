@@ -60,7 +60,8 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       req.user = {
         id: chatUser.id, // Chat User ID
         email: chatUser.email,
-        name: chatUser.name
+        name: chatUser.name,
+        avatarUrl: chatUser.avatarUrl
       };
 
       // 마지막 활동 시간 업데이트
@@ -70,7 +71,8 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
         chatUserId: chatUser.id,
         gatrixUserId: chatUser.gatrixUserId,
         email: chatUser.email,
-        name: chatUser.name
+        name: chatUser.name,
+        avatarUrl: chatUser.avatarUrl
       });
 
       return next();
@@ -108,5 +110,3 @@ export const errorHandler = (error: Error, req: any, res: any, next: any) => {
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
-
-

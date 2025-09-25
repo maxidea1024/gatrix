@@ -10,7 +10,12 @@ declare global {
   namespace Express {
     interface Request {
       apiToken?: ApiToken;
-      user?: { id: number; email?: string; name?: string; };
+      user?: {
+        id: number;
+        email?: string;
+        name?: string;
+        avatarUrl?: string;
+      };
     }
   }
 }
