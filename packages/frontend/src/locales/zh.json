@@ -1173,7 +1173,9 @@
       "nameHelp": "请输入游戏世界名称（输入世界ID时会自动复制）",
       "visibleHelp": "选择是否显示此世界",
       "worldIdHelp": "请输入唯一的世界ID",
-      "customPayloadHelp": "游戏世界相关的额外数据（JSON格式）。留空则保存为{}。"
+      "customPayloadHelp": "游戏世界相关的额外数据（JSON格式）。留空则保存为{}。",
+      "addDescription": "创建新的游戏世界并配置服务器设置和连接信息。",
+      "editDescription": "修改现有游戏世界设置并更新配置。"
     },
     "hidden": "隐藏",
     "hiddenWorlds": "隐藏世界",
@@ -1191,6 +1193,7 @@
     "noWorldsFound": "未找到游戏世界",
     "orderUpdated": "\"{{name}}\"的顺序已更新",
     "save": "保存",
+    "saveWorld": "保存游戏世界",
     "searchPlaceholder": "按名称、世界ID或描述搜索...",
     "showGameWorld": "显示游戏世界",
     "startMaintenance": "开始维护",
@@ -1841,6 +1844,23 @@
     "sentLocation": "分享了位置",
     "unknownChannel": "未知频道",
     "viewMessage": "查看",
-    "channelDescription": "频道描述"
+    "channelDescription": "频道描述",
+    "thread": "话题",
+    "startThread": "开始话题",
+    "replyToThread": "回复话题",
+    "noThreadMessages": "暂无话题消息",
+    "someone": "某人",
+    "userTyping": "{{username}}正在输入...",
+    "multipleUsersTyping": "{{count}}人正在输入...",
+    "threadCount": "{{count}}条回复",
+    "lastReply": "最后回复",
+    "viewThread": "查看话题",
+    "invitationAcceptedSuccess": "已成功接受邀请",
+    "invitationDeclinedSuccess": "已成功拒绝邀请",
+    "invitationCancelledSuccess": "已成功取消邀请",
+    "invitationAcceptFailed": "接受邀请失败",
+    "invitationDeclineFailed": "拒绝邀请失败",
+    "invitationCancelFailed": "取消邀请失败",
+    "addReaction": "添加反应"
   }
 }

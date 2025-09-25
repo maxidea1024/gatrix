@@ -3,7 +3,8 @@ import { Box, Typography, Paper, useTheme, Avatar, IconButton, Tooltip } from '@
 import {
   Reply as ReplyIcon,
   MoreVert as MoreIcon,
-  PersonAdd as PersonAddIcon
+  PersonAdd as PersonAddIcon,
+  SentimentSatisfiedAlt as AddReactionIcon
 } from '@mui/icons-material';
 // React Chat Elements는 더 이상 사용하지 않음 (슬랙 스타일로 직접 구현)
 import moment from 'moment-timezone';
@@ -13,6 +14,7 @@ import LinkPreviewCard from './LinkPreviewCard';
 import { LinkPreview } from '../../types/chat';
 import { format } from 'date-fns';
 import { ko, enUS, zhCN } from 'date-fns/locale';
+import EmojiPicker from './EmojiPicker';
 
 const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
@@ -396,6 +398,10 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   // messageInputRef와 messageInput은 AdvancedMessageInput으로 이동됨
   const [focusBump, setFocusBump] = useState(0);
+
+  // EmojiPicker 관련 state
+  const [emojiAnchorEl, setEmojiAnchorEl] = useState<HTMLElement | null>(null);
+  const [emojiPickerMessageId, setEmojiPickerMessageId] = useState<number | null>(null);
   useEffect(() => {
     const handler = () => setFocusBump(prev => prev + 1);
     window.addEventListener('focus-main-chat-input', handler);
@@ -712,7 +718,9 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     const messageTime = moment(timestamp).tz(userTimezone);
     const diffInSeconds = now.diff(messageTime, 'seconds');
 
-    if (i18n.language === 'ko') {
+    const currentLanguage = i18n.language || 'ko'; // 기본값을 한국어로 설정
+
+    if (currentLanguage === 'ko') {
       if (diffInSeconds < 60) {
         return '방금 전';
       } else if (diffInSeconds < 3600) {
@@ -728,7 +736,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         // 1주일 이상이면 날짜 표시 (사용자 타임존 적용)
         return messageTime.format('M월 D일');
       }
-    } else if (i18n.language === 'zh') {
+    } else if (currentLanguage === 'zh') {
       if (diffInSeconds < 60) {
         return '刚刚';
       } else if (diffInSeconds < 3600) {
@@ -1109,7 +1117,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                     display: 'flex',
                     flexWrap: 'wrap',
                     gap: 0.5,
-                    mt: 1
+                    mt: 1,
+                    alignItems: 'center'
                   }}>
                     {Object.entries(
                       message.reactions.reduce((acc, reaction) => {
@@ -1159,6 +1168,30 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                         </Typography>
                       </Box>
                     ))}
+
+                    {/* 반응 추가 버튼 */}
+                    <Tooltip title={t('chat.addReaction')} arrow>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEmojiAnchorEl(e.currentTarget);
+                          setEmojiPickerMessageId(message.id);
+                        }}
+                        sx={{
+                          width: 28,
+                          height: 28,
+                          backgroundColor: colors.inputFieldBackground,
+                          border: `1px solid ${colors.inputBorder}`,
+                          '&:hover': {
+                            backgroundColor: theme.palette.primary.main + '20',
+                            borderColor: theme.palette.primary.main
+                          }
+                        }}
+                      >
+                        <AddReactionIcon sx={{ fontSize: 16, color: colors.placeholderText }} />
+                      </IconButton>
+                    </Tooltip>
                   </Box>
                 )}
 
@@ -1258,7 +1291,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                   </Box>
                 )}
 
-                {/* 스레드 답글 수 표시 */}
+                {/* 스레드 답글 수 표시 - Slack style */}
                 {(message.threadCount ?? 0) > 0 && (
                   <Box
                     onClick={() => {
@@ -1267,30 +1300,84 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                       }
                     }}
                     sx={{
-                      mt: 1,
+                      mt: 0.5, // 1 → 0.5로 줄임
                       display: 'flex',
                       alignItems: 'center',
                       gap: 1,
                       color: theme.palette.primary.main,
                       fontSize: '12px',
                       cursor: 'pointer',
-                      p: 1,
+                      px: 1, // 좌우 패딩만 유지
+                      py: 0.5, // 상하 패딩 줄임 (1 → 0.5)
                       borderRadius: '8px',
-                      border: `1px solid ${theme.palette.primary.main}20`,
-                      backgroundColor: `${theme.palette.primary.main}08`,
+                      border: '1px solid transparent', // 기본 상태에서는 투명한 테두리
+                      backgroundColor: 'transparent', // 기본 상태에서는 투명한 배경
+                      position: 'relative',
                       '&:hover': {
-                        backgroundColor: `${theme.palette.primary.main}15`,
-                        textDecoration: 'underline'
+                        border: `1px solid ${theme.palette.primary.main}20`,
+                        backgroundColor: `${theme.palette.primary.main}08`,
+                        '& .thread-time-text': {
+                          opacity: 0,
+                          visibility: 'hidden'
+                        },
+                        '& .thread-view-text': {
+                          opacity: 1,
+                          visibility: 'visible'
+                        }
                       }
                     }}
                   >
                     <ReplyIcon sx={{ fontSize: 14 }} />
-                    <Typography variant="caption" sx={{ color: theme.palette.primary.main, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      {message.threadCount}개 댓글
-                      {message.lastThreadMessageAt && (
-                        <span style={{ color: colors.placeholderText }}>· 마지막 댓글: {formatRelativeTime(message.lastThreadMessageAt)}</span>
-                      )}
-                    </Typography>
+
+                    {/* 댓글 개수와 스레드 보기 텍스트 */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      {/* 댓글 개수는 항상 표시 */}
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: theme.palette.primary.main,
+                          fontWeight: 500
+                        }}
+                      >
+                        {t('chat.threadCount', { count: message.threadCount })}
+                      </Typography>
+
+                      {/* 시간/스레드 보기 텍스트 컨테이너 - 같은 위치에서 전환 */}
+                      <Box sx={{ position: 'relative' }}>
+                        {/* 마지막 댓글 시간 (기본 상태) */}
+                        {message.lastThreadMessageAt && (
+                          <Typography
+                            variant="caption"
+                            className="thread-time-text"
+                            sx={{
+                              color: colors.placeholderText,
+                              transition: 'opacity 0.2s ease, visibility 0.2s ease'
+                            }}
+                          >
+                            · {t('chat.lastReply')}: {formatRelativeTime(message.lastThreadMessageAt)}
+                          </Typography>
+                        )}
+
+                        {/* 스레드 보기 텍스트 (호버 상태) - 시간 텍스트와 같은 위치 */}
+                        <Typography
+                          variant="caption"
+                          className="thread-view-text"
+                          sx={{
+                            color: theme.palette.primary.main,
+                            fontWeight: 500,
+                            opacity: 0,
+                            visibility: 'hidden',
+                            transition: 'opacity 0.2s ease, visibility 0.2s ease',
+                            whiteSpace: 'nowrap',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0
+                          }}
+                        >
+                          · {t('chat.viewThread')}
+                        </Typography>
+                      </Box>
+                    </Box>
                   </Box>
                 )}
               </Box>
@@ -1344,8 +1431,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
             </Box>
             <Typography variant="caption" sx={{ color: colors.placeholderText, fontSize: '12px' }}>
               {typingUsers.length === 1
-                ? `${state.users[typingUsers[0].userId]?.username || 'Someone'}님이 입력 중...`
-                : `${typingUsers.length}명이 입력 중...`
+                ? t('chat.userTyping', { username: state.users[typingUsers[0].userId]?.username || t('chat.someone') })
+                : t('chat.multipleUsersTyping', { count: typingUsers.length })
               }
             </Typography>
           </Box>
@@ -1373,6 +1460,23 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
           }}
           placeholder={t('chat.typeMessage')}
           disabled={!currentChannel}
+        />
+
+        {/* 반응 추가용 EmojiPicker */}
+        <EmojiPicker
+          anchorEl={emojiAnchorEl}
+          open={Boolean(emojiAnchorEl)}
+          onClose={() => {
+            setEmojiAnchorEl(null);
+            setEmojiPickerMessageId(null);
+          }}
+          onEmojiSelect={(emoji) => {
+            if (emojiPickerMessageId) {
+              actions.addReaction(emojiPickerMessageId, emoji);
+            }
+            setEmojiAnchorEl(null);
+            setEmojiPickerMessageId(null);
+          }}
         />
       </Box>
     </Box>

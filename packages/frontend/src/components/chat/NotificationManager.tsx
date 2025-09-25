@@ -229,12 +229,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
     const handleInvitationResponse = (event: any) => {
       const { data } = event;
       console.log('📬 Invitation response received:', data);
-
-      const action = data.action === 'accept' ? 'accepted' : 'declined';
-      enqueueSnackbar(
-        `Your invitation was ${action}`,
-        { variant: data.action === 'accept' ? 'success' : 'info' }
-      );
+      // 토스트 제거 - ChatContext에서 처리하므로 중복 방지
     };
 
     const handleInvitationCancelled = (event: any) => {

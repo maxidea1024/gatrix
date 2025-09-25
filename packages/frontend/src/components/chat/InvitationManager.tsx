@@ -134,7 +134,10 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          enqueueSnackbar(`Invitation ${action}ed successfully`, { variant: 'success' });
+          // 수락 시에는 토스트 대신 채널 진입, 거절 시에만 토스트 표시
+          if (action === 'decline') {
+            enqueueSnackbar(t('chat.invitationDeclinedSuccess'), { variant: 'success' });
+          }
           await fetchReceivedInvitations();
 
           // 초대 수락 시 해당 채널로 자동 이동
@@ -148,14 +151,29 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
             }
           }
         } else {
-          enqueueSnackbar(data.error || `Failed to ${action} invitation`, { variant: 'error' });
+          enqueueSnackbar(
+            data.error || (action === 'accept'
+              ? t('chat.invitationAcceptFailed')
+              : t('chat.invitationDeclineFailed')),
+            { variant: 'error' }
+          );
         }
       } else {
-        enqueueSnackbar(`Failed to ${action} invitation`, { variant: 'error' });
+        enqueueSnackbar(
+          action === 'accept'
+            ? t('chat.invitationAcceptFailed')
+            : t('chat.invitationDeclineFailed'),
+          { variant: 'error' }
+        );
       }
     } catch (error) {
       console.error(`Failed to ${action} invitation:`, error);
-      enqueueSnackbar(`Failed to ${action} invitation`, { variant: 'error' });
+      enqueueSnackbar(
+        action === 'accept'
+          ? t('chat.invitationAcceptFailed')
+          : t('chat.invitationDeclineFailed'),
+        { variant: 'error' }
+      );
     } finally {
       setProcessingInvitations(prev => {
         const newSet = new Set(prev);
@@ -180,17 +198,17 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          enqueueSnackbar('Invitation cancelled successfully', { variant: 'success' });
+          enqueueSnackbar(t('chat.invitationCancelledSuccess'), { variant: 'success' });
           await fetchSentInvitations();
         } else {
-          enqueueSnackbar(data.error || 'Failed to cancel invitation', { variant: 'error' });
+          enqueueSnackbar(data.error || t('chat.invitationCancelFailed'), { variant: 'error' });
         }
       } else {
-        enqueueSnackbar('Failed to cancel invitation', { variant: 'error' });
+        enqueueSnackbar(t('chat.invitationCancelFailed'), { variant: 'error' });
       }
     } catch (error) {
       console.error('Failed to cancel invitation:', error);
-      enqueueSnackbar('Failed to cancel invitation', { variant: 'error' });
+      enqueueSnackbar(t('chat.invitationCancelFailed'), { variant: 'error' });
     } finally {
       setProcessingInvitations(prev => {
         const newSet = new Set(prev);
@@ -344,7 +362,20 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
   );
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      sx={{
+        '& .MuiDialog-paper': {
+          height: '70vh', // 고정 높이
+          maxHeight: '70vh',
+          display: 'flex',
+          flexDirection: 'column'
+        }
+      }}
+    >
       <DialogTitle>
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box>
@@ -361,13 +392,31 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
         </Box>
       </DialogTitle>
 
-      <DialogContent>
-        <Tabs value={currentTab} onChange={(_, newValue) => setCurrentTab(newValue)}>
-          <Tab label={`${t('chat.receivedInvitations')} (${receivedInvitations.length})`} />
-          <Tab label={`${t('chat.sentInvitations')} (${sentInvitations.length})`} />
-        </Tabs>
+      <DialogContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', p: 0 }}>
+        <Box sx={{ px: 3, pt: 2, pb: 1, borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs value={currentTab} onChange={(_, newValue) => setCurrentTab(newValue)}>
+            <Tab label={`${t('chat.receivedInvitations')} (${receivedInvitations.length})`} />
+            <Tab label={`${t('chat.sentInvitations')} (${sentInvitations.length})`} />
+          </Tabs>
+        </Box>
 
-        <Box sx={{ mt: 2 }}>
+        <Box sx={{
+          flex: 1,
+          overflow: 'auto',
+          '&::-webkit-scrollbar': {
+            width: '6px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'transparent',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: 'rgba(0,0,0,0.2)',
+            borderRadius: '3px',
+            '&:hover': {
+              background: 'rgba(0,0,0,0.3)',
+            },
+          },
+        }}>
           {loading ? (
             <Box display="flex" justifyContent="center" py={4}>
               <CircularProgress />
@@ -375,7 +424,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
           ) : (
             <>
               {currentTab === 0 && (
-                <List>
+                <List sx={{ py: 0 }}>
                   {receivedInvitations.length === 0 ? (
                     <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
                       {t('chat.noReceivedInvitations')}
@@ -387,7 +436,7 @@ const InvitationManager: React.FC<InvitationManagerProps> = ({ open, onClose, ti
               )}
 
               {currentTab === 1 && (
-                <List>
+                <List sx={{ py: 0 }}>
                   {sentInvitations.length === 0 ? (
                     <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
                       {t('chat.noSentInvitations')}

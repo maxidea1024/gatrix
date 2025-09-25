@@ -11,7 +11,6 @@ import {
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon,
-  Reply as ReplyIcon,
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
@@ -241,7 +240,6 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
             <IconButton size="small" onClick={handleClose}>
               <ArrowBackIcon />
             </IconButton>
-            <ReplyIcon sx={{ fontSize: 20 }} />
             <Typography variant="h6" sx={{ fontSize: '1rem' }}>
               {t('chat.thread')}
             </Typography>

@@ -711,21 +711,24 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         dispatch({ type: 'REFRESH_CHANNELS' });
       });
 
-      // 초대 응답 이벤트 리스너
+      // 초대 응답 이벤트 리스너 (초대한 사람에게만 표시)
       wsService.on('invitation_response', (event) => {
         console.log('📨 Invitation response received in ChatContext:', event);
         const { data } = event;
 
-        if (data.action === 'accept') {
-          enqueueSnackbar(
-            t('chat.invitationAccepted', { inviteeName: data.inviteeName }),
-            { variant: 'success' }
-          );
-        } else {
-          enqueueSnackbar(
-            t('chat.invitationDeclined', { inviteeName: data.inviteeName }),
-            { variant: 'info' }
-          );
+        // 현재 사용자가 초대한 사람인지 확인 (백엔드에서 inviterId에게만 전송하지만 추가 확인)
+        if (user && data.inviteeId !== user.id) {
+          if (data.action === 'accept') {
+            enqueueSnackbar(
+              t('chat.invitationAccepted', { inviteeName: data.inviteeName }),
+              { variant: 'success' }
+            );
+          } else {
+            enqueueSnackbar(
+              t('chat.invitationDeclined', { inviteeName: data.inviteeName }),
+              { variant: 'info' }
+            );
+          }
         }
 
         // 채널 목록 새로고침
@@ -766,11 +769,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                       });
 
                       if (response.success) {
-                        enqueueSnackbar(t('chat.invitationAccepted'), { variant: 'success' });
+                        // 토스트 제거 - 채널 진입으로 충분
                         // 초대 수 감소
                         dispatch({ type: 'SET_PENDING_INVITATIONS_COUNT', payload: Math.max(0, state.pendingInvitationsCount - 1) });
-                        // 채널 목록 새로고침
-                        loadChannels();
+                        // 채널 목록 새로고침 후 해당 채널로 이동
+                        await loadChannels();
+                        if (response.data?.channelId) {
+                          dispatch({ type: 'SET_CURRENT_CHANNEL', payload: response.data.channelId });
+                        }
                       } else {
                         enqueueSnackbar(t('chat.invitationAcceptFailed'), { variant: 'error' });
                       }

@@ -1277,7 +1277,9 @@
       "nameHelp": "This name will be displayed to users (automatically copied from World ID when typing)",
       "visibleHelp": "Choose whether to show this world to users",
       "worldIdHelp": "Enter a unique world identifier",
-      "customPayloadHelp": "Additional game world data in JSON format. Leave empty to save as {}."
+      "customPayloadHelp": "Additional game world data in JSON format. Leave empty to save as {}.",
+      "addDescription": "Create a new game world and configure server settings and connection information.",
+      "editDescription": "Modify existing game world settings and update configurations."
     },
     "hidden": "Hidden",
     "hiddenWorlds": "Hidden Worlds",
@@ -1295,6 +1297,7 @@
     "noWorldsFound": "No game worlds found",
     "orderUpdated": "\"{{name}}\" order updated successfully",
     "save": "Save",
+    "saveWorld": "Save Game World",
     "searchPlaceholder": "Search by name, world ID, or description...",
     "showGameWorld": "Show Game World",
     "startMaintenance": "Start Maintenance",
@@ -1311,7 +1314,6 @@
     "worldId": "World ID",
     "worldName": "World Name",
     "worldUpdated": "Game world updated successfully",
-    "saveWorld": "Save Game World",
     "confirmDelete": "Are you sure you want to delete the \"{{name}}\" game world?",
     "deleteTypeToConfirm": "To confirm deletion, please type the game world name: ",
     "confirmHide": "Are you sure you want to hide the \"{{name}}\" game world?",
@@ -1998,6 +2000,19 @@
     "thread": "Thread",
     "startThread": "Start Thread",
     "replyToThread": "Reply to thread",
-    "noThreadMessages": "No thread messages yet"
+    "noThreadMessages": "No thread messages yet",
+    "someone": "Someone",
+    "userTyping": "{{username}} is typing...",
+    "multipleUsersTyping": "{{count}} people are typing...",
+    "threadCount": "{{count}} replies",
+    "lastReply": "Last reply",
+    "viewThread": "View thread",
+    "invitationAcceptedSuccess": "Invitation accepted successfully",
+    "invitationDeclinedSuccess": "Invitation declined successfully",
+    "invitationCancelledSuccess": "Invitation cancelled successfully",
+    "invitationAcceptFailed": "Failed to accept invitation",
+    "invitationDeclineFailed": "Failed to decline invitation",
+    "invitationCancelFailed": "Failed to cancel invitation",
+    "addReaction": "Add reaction"
   }
 }

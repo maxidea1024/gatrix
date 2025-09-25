@@ -1081,12 +1081,12 @@ const GameWorldsPage: React.FC = () => {
         }}>
           <Box>
             <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {editingWorld ? '게임 월드 편집' : '게임 월드 추가'}
+              {editingWorld ? t('gameWorlds.editGameWorld') : t('gameWorlds.addGameWorld')}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {editingWorld
-                ? '기존 게임 월드의 설정을 수정하고 업데이트할 수 있습니다.'
-                : '새로운 게임 월드를 생성하고 서버 설정 및 접속 정보를 구성할 수 있습니다.'
+                ? t('gameWorlds.form.editDescription')
+                : t('gameWorlds.form.addDescription')
               }
             </Typography>
           </Box>
@@ -1351,7 +1351,7 @@ const GameWorldsPage: React.FC = () => {
             disabled={saving}
             startIcon={saving ? <CircularProgress size={20} /> : (editingWorld ? <SaveIcon /> : <AddIcon />)}
           >
-            {saving ? t('common.saving') : (editingWorld ? '게임 월드 수정' : '게임 월드 추가')}
+            {saving ? t('common.saving') : (editingWorld ? t('gameWorlds.saveWorld') : t('gameWorlds.addGameWorld'))}
           </Button>
         </Box>
       </Drawer>

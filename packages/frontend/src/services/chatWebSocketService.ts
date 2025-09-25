@@ -349,7 +349,16 @@ export class ChatWebSocketService {
     }, delay);
   }
 
+  // 사용자 상태 업데이트
+  updateStatus(status: string, customStatus?: string): void {
+    if (!this.socket) {
+      console.error('❌ Cannot update status: WebSocket not connected');
+      return;
+    }
 
+    console.log('📤 Sending status update:', { status, customStatus });
+    this.socket.emit('update_status', { status, customStatus });
+  }
 
   // Convenience methods for common events
   onMessageCreated(handler: (message: Message) => void): void {

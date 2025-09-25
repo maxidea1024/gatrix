@@ -53,42 +53,50 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
   if (isDrawer) {
     return (
       <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        {/* Content */}
-        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
-          <Alert severity="info" sx={{ mb: 3 }}>
+        {/* Content - 스크롤 가능한 영역 */}
+        <Box sx={{
+          flex: 1,
+          overflow: 'auto',
+          p: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 3
+        }}>
+          <Alert severity="info">
             <Typography variant="body2">
               초대받은 사용자는 <strong>일반 유저</strong> 권한으로 가입됩니다.
               가입 후 필요시 관리자가 권한을 변경할 수 있습니다.
             </Typography>
           </Alert>
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <TextField
-              label="이메일 (선택사항)"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              fullWidth
-              helperText="이메일을 입력하지 않으면 링크만 생성됩니다."
-              variant="outlined"
-              autoFocus
-            />
+          <TextField
+            label="이메일 (선택사항)"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            fullWidth
+            helperText="이메일을 입력하지 않으면 링크만 생성됩니다."
+            variant="outlined"
+            autoFocus
+          />
 
-            <FormControl fullWidth>
-              <InputLabel>유효기간</InputLabel>
-              <Select
-                value={expirationHours}
-                label="유효기간"
-                onChange={(e) => setExpirationHours(e.target.value as number)}
-              >
-                {Object.entries(InvitationDurationLabels).map(([value, label]) => (
-                  <MenuItem key={value} value={Number(value)}>
-                    {label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
+          <FormControl fullWidth>
+            <InputLabel>유효기간</InputLabel>
+            <Select
+              value={expirationHours}
+              label="유효기간"
+              onChange={(e) => setExpirationHours(e.target.value as number)}
+            >
+              {Object.entries(InvitationDurationLabels).map(([value, label]) => (
+                <MenuItem key={value} value={Number(value)}>
+                  {label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* 추가 공간을 위한 여백 */}
+          <Box sx={{ minHeight: '200px' }} />
         </Box>
 
         {/* Footer */}

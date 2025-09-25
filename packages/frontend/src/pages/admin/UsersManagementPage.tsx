@@ -62,6 +62,7 @@ import {
   PersonRemove as PersonRemoveIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -2079,8 +2080,10 @@ const UsersManagementPage: React.FC = () => {
         sx={{
           zIndex: 1301,
           '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 500 },
+            width: { xs: '100%', sm: 400 }, // 폭을 500에서 400으로 줄임
             maxWidth: '100vw',
+            height: '80vh', // 높이를 80vh로 설정
+            top: '10vh', // 상단에서 10vh 떨어뜨림
             display: 'flex',
             flexDirection: 'column'
           }
@@ -2099,21 +2102,53 @@ const UsersManagementPage: React.FC = () => {
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
             사용자 초대
           </Typography>
-          <IconButton
-            onClick={() => setInvitationDialogOpen(false)}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover'
-              }
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <IconButton
+              onClick={loadCurrentInvitation}
+              size="small"
+              sx={{
+                '&:hover': {
+                  backgroundColor: 'action.hover'
+                }
+              }}
+              title="새로고침"
+            >
+              <RefreshIcon />
+            </IconButton>
+            <IconButton
+              onClick={() => setInvitationDialogOpen(false)}
+              size="small"
+              sx={{
+                '&:hover': {
+                  backgroundColor: 'action.hover'
+                }
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
         </Box>
 
-        {/* Content */}
-        <Box sx={{ flex: 1, overflow: 'auto' }}>
+        {/* Content - 스크롤 가능 */}
+        <Box sx={{
+          flex: 1,
+          overflow: 'auto',
+          maxHeight: 'calc(80vh - 80px)', // 헤더 높이 제외
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#f1f1f1',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: '#c1c1c1',
+            borderRadius: '4px',
+            '&:hover': {
+              background: '#a8a8a8',
+            },
+          },
+        }}>
           <InvitationForm
             onSubmit={handleCreateInvitation}
             onCancel={() => setInvitationDialogOpen(false)}
