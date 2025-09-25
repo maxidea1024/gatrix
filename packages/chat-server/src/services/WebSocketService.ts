@@ -275,10 +275,7 @@ export class WebSocketService {
       socketUser.lastActivity = new Date();
     });
 
-    // Ping/Pong for connection health
-    socket.on('ping', () => {
-      socket.emit('pong', { timestamp: Date.now() });
-    });
+    // Socket.IO handles ping/pong automatically, no manual handling needed
   }
 
   private async handleJoinChannel(socket: Socket, socketUser: SocketUser, channelId: number): Promise<void> {

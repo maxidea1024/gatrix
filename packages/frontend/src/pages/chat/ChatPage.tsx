@@ -872,10 +872,27 @@ const ChatPageContent: React.FC = () => {
         onClose={() => setInvitationManagerOpen(false)}
         title={t('chat.manageInvitations')}
         subtitle={t('chat.manageInvitationsSubtitle')}
-        onInvitationAccepted={(channelId) => {
-          // 초대 수락 후 해당 채널로 이동
-          actions.setCurrentChannel(channelId);
-          setInvitationManagerOpen(false);
+        onInvitationAccepted={async (channelId) => {
+          // 초대 수락 후 채널 목록 새로고침 후 해당 채널로 이동
+          console.log('🎉 Invitation accepted, refreshing channels and switching to channel:', channelId);
+
+          try {
+            // 채널 목록 새로고침
+            await actions.loadChannels();
+
+            // 채널 전환
+            actions.setCurrentChannel(channelId);
+
+            // 초대 관리 창 닫기
+            setInvitationManagerOpen(false);
+
+            console.log('✅ Successfully switched to accepted channel:', channelId);
+          } catch (error) {
+            console.error('❌ Failed to refresh channels after invitation acceptance:', error);
+            // 실패해도 채널 전환은 시도
+            actions.setCurrentChannel(channelId);
+            setInvitationManagerOpen(false);
+          }
         }}
       />
 

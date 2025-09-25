@@ -13,7 +13,6 @@ export class ChatWebSocketService {
   private eventHandlers: Map<WebSocketEventType, WebSocketEventHandler[]> = new Map();
   private isConnecting = false;
   private shouldReconnect = true;
-  private heartbeatInterval: NodeJS.Timeout | null = null;
   private connectionPromise: Promise<void> | null = null;
   private chatServerToken: string | null = null;
 
@@ -45,21 +44,31 @@ export class ChatWebSocketService {
           transports: ['websocket', 'polling'],
           timeout: 10000,
           reconnection: false, // We handle reconnection manually
+          forceNew: true, // Force new connection
+          upgrade: true, // Allow transport upgrades
+          rememberUpgrade: true, // Remember successful upgrades
         });
 
         this.socket.on('connect', () => {
           console.log('✅ Chat Socket.IO connected successfully');
+          console.log('🔗 Socket ID:', this.socket?.id);
+          console.log('🚀 Transport:', this.socket?.io.engine.transport.name);
           this.isConnecting = false;
           this.reconnectAttempts = 0;
-          this.startHeartbeat();
           this.emit('connection_established', {});
           resolve();
         });
 
         this.socket.on('disconnect', (reason) => {
           console.log('❌ Chat Socket.IO disconnected:', reason);
+          console.log('🔍 Disconnect details:', {
+            reason,
+            socketId: this.socket?.id,
+            transport: this.socket?.io.engine.transport.name,
+            reconnectAttempts: this.reconnectAttempts,
+            shouldReconnect: this.shouldReconnect
+          });
           this.isConnecting = false;
-          this.stopHeartbeat();
 
           // 의도적인 연결 해제가 아닌 경우에만 connection_lost 이벤트 발생
           if (reason !== 'io client disconnect') {
@@ -127,7 +136,6 @@ export class ChatWebSocketService {
 
   disconnect(): void {
     this.shouldReconnect = false;
-    this.stopHeartbeat();
 
     if (this.socket) {
       this.socket.disconnect();
@@ -341,20 +349,7 @@ export class ChatWebSocketService {
     }, delay);
   }
 
-  private startHeartbeat(): void {
-    this.heartbeatInterval = setInterval(() => {
-      if (this.isConnected()) {
-        this.socket!.emit('ping', { timestamp: Date.now() });
-      }
-    }, 30000); // Send ping every 30 seconds
-  }
 
-  private stopHeartbeat(): void {
-    if (this.heartbeatInterval) {
-      clearInterval(this.heartbeatInterval);
-      this.heartbeatInterval = null;
-    }
-  }
 
   // Convenience methods for common events
   onMessageCreated(handler: (message: Message) => void): void {

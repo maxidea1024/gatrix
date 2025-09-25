@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import {
   Box,
   Paper,
@@ -82,6 +82,9 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
   const [threadMessages, setThreadMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const wasAtBottomRef = useRef(true);
+
 
   const getDateLocale = () => {
     switch (i18n.language) {
@@ -109,7 +112,14 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
 
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const c = containerRef.current;
+    if (!c) return;
+    // Double rAF to wait for layout, then jump instantly to bottom (no smooth)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        c.scrollTop = c.scrollHeight;
+      });
+    });
   };
 
   const handleClose = () => {
@@ -119,22 +129,14 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
     onClose();
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [threadMessages]);
-
-
-  // 내가 보낸 스레드 메시지가 DOM에 반영되면 즉시 하단으로 고정 (시각적 점프 제거)
-  useEffect(() => {
+  // Stick to bottom for my messages or when user is already at bottom
+  useLayoutEffect(() => {
     if (threadMessages.length === 0) return;
     const last = threadMessages[threadMessages.length - 1] as any;
     const myUserId = state.user?.id;
-    if (!myUserId) return;
-    if (last?.userId === myUserId) {
-      const container = document.querySelector('[data-testid="thread-messages-container"]') as HTMLElement | null;
-      if (container) {
-        container.scrollTop = container.scrollHeight;
-      }
+    const shouldStick = (last?.userId && myUserId && last.userId === myUserId) || wasAtBottomRef.current;
+    if (shouldStick) {
+      scrollToBottom();
     }
   }, [threadMessages.length, state.user?.id]);
 
@@ -301,10 +303,17 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
       {/* Thread Messages */}
       <Box
         data-testid="thread-messages-container"
+        ref={containerRef}
+        onScroll={(e) => {
+          const el = e.currentTarget;
+          const threshold = 100;
+          wasAtBottomRef.current = (el.scrollTop + el.clientHeight) >= (el.scrollHeight - threshold);
+        }}
         sx={{
           flex: 1,
           overflow: 'auto',
           p: 1,
+          overflowAnchor: 'none',
           // 메인 채팅 스크롤바와 동일한 스타일
           '&::-webkit-scrollbar': {
             width: '8px',

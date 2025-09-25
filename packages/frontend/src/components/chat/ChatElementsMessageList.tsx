@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useLayoutEffect } from 'react';
 import { Box, Typography, Paper, useTheme, Avatar, IconButton, Tooltip } from '@mui/material';
 import {
   Reply as ReplyIcon,
@@ -465,10 +465,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       const isAtBottom = scrollTop + clientHeight >= scrollHeight - 100;
 
       if (isAtBottom) {
-        messageContainer.scrollTo({
-          top: scrollHeight,
-          behavior: 'smooth'
-        });
+        // Instant jump to bottom to avoid visual bouncing
+        messageContainer.scrollTop = scrollHeight;
       }
     };
 
@@ -575,16 +573,28 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       }
     };
   }, [messages, channelId, actions]);
-  // 내가 보낸 새 메시지가 DOM에 반영된 직후 즉시 맨 아래로 고정 (시각적 점프 제거)
-  useEffect(() => {
+  // 새 메시지가 DOM에 반영된 직후 스크롤 처리 (내 메시지는 즉시, 다른 사용자 메시지는 하단에 있을 때만)
+  useLayoutEffect(() => {
     if (messages.length === 0) return;
+
     const last = messages[messages.length - 1] as any;
     const myUserId = state.user?.id;
     if (!myUserId) return;
+
+    const container = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement | null;
+    if (!container) return;
+
     if (last?.userId === myUserId) {
-      const container = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement | null;
-      if (container) {
-        container.scrollTop = container.scrollHeight; // 즉시 하단 정렬
+      // 내가 보낸 메시지는 즉시 하단으로 스크롤
+      container.scrollTop = container.scrollHeight;
+    } else {
+      // 다른 사용자 메시지는 하단에 있을 때만 자동 스크롤
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 100;
+
+      if (isAtBottom) {
+        // useLayoutEffect 내에서 즉시 bottom 고정 (rAF 없이)
+        container.scrollTop = container.scrollHeight;
       }
     }
   }, [messages.length, state.user?.id]);
@@ -603,10 +613,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       const timer = setTimeout(() => {
         const messageContainer = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement;
         if (messageContainer) {
-          messageContainer.scrollTo({
-            top: messageContainer.scrollHeight,
-            behavior: 'smooth'
-          });
+          // Instant jump to bottom to avoid visual bouncing
+          messageContainer.scrollTop = messageContainer.scrollHeight;
         }
       }, 300);
 
@@ -901,6 +909,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
           display: 'flex',
           flexDirection: 'column',
           gap: '8px',
+          overflowAnchor: 'none', // disable scroll anchoring to prevent jump
           // 커스텀 스크롤바 스타일
           '&::-webkit-scrollbar': {
             width: '8px',
