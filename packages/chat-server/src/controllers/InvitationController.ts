@@ -367,7 +367,7 @@ export class InvitationController {
           return {
             ...invitation,
             channel: channel ? { id: channel.id, name: channel.name, description: channel.description } : null,
-            inviter: inviter ? { id: inviter.id, name: inviter.name, email: inviter.email } : null,
+            inviter: inviter ? { id: inviter.id, name: inviter.name, email: inviter.email, avatarUrl: inviter.avatarUrl } : null,
           };
         })
       );
@@ -420,7 +420,7 @@ export class InvitationController {
           return {
             ...invitation,
             channel: channel ? { id: channel.id, name: channel.name, description: channel.description } : null,
-            invitee: invitee ? { id: invitee.id, name: invitee.name, email: invitee.email } : null,
+            invitee: invitee ? { id: invitee.id, name: invitee.name, email: invitee.email, avatarUrl: invitee.avatarUrl } : null,
           };
         })
       );
@@ -493,7 +493,7 @@ export class InvitationController {
           const invitee = await getUserInfo(invitation.inviteeId);
           return {
             ...invitation,
-            invitee: invitee ? { id: invitee.id, name: invitee.name, email: invitee.email } : null,
+            invitee: invitee ? { id: invitee.id, name: invitee.name, email: invitee.email, avatarUrl: invitee.avatarUrl } : null,
           };
         })
       );
