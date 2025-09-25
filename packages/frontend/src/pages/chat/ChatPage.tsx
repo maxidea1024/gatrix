@@ -29,6 +29,7 @@ import {
   useMediaQuery,
   Slide,
   useTheme,
+  Fade,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -162,7 +163,8 @@ const ChatPageContent: React.FC = () => {
 
 
   // 로딩 상태 확인 - 초기 로딩 중이거나 채널이 없으면 스켈레톤 표시
-  const isInitialLoading = state.isLoading && (state.loadingStage !== 'complete' || state.channels.length === 0);
+  // 초기 진입에서만 스켈레톤을 표시하고, 채널 변경 등의 중간 단계에서는 페이드 전환으로 처리
+  const isInitialLoading = state.channels.length === 0;
 
   // 로딩 상태 디버깅 (필요시 주석 해제)
   // console.log('🔍 ChatPage loading state:', {
@@ -411,7 +413,7 @@ const ChatPageContent: React.FC = () => {
     }
   };
 
-  // 초기 로딩 중이면 스켈레톤 표시
+  // 초기 로딩 중에는 스켈레톤 유지(첫 진입만), 이후 전환은 페이드로 처리
   if (isInitialLoading) {
     return <ChatSkeleton stage={state.loadingStage} />;
   }
@@ -456,12 +458,13 @@ const ChatPageContent: React.FC = () => {
 
 
       {/* Main Chat Interface */}
-      <Paper sx={{
-        flex: 1,
-        display: 'flex',
-        minHeight: 0, // 중요: flex 아이템이 축소될 수 있도록 함
-        overflow: 'hidden'
-      }}>
+      <Fade in key={`ch-${state.currentChannelId ?? 'none'}`} timeout={150}>
+        <Paper sx={{
+          flex: 1,
+          display: 'flex',
+          minHeight: 0, // 중요: flex 아이템이 축소될 수 있도록 함
+          overflow: 'hidden'
+        }}>
         {/* Channel List Sidebar */}
         <Box
           sx={{
@@ -705,6 +708,7 @@ const ChatPageContent: React.FC = () => {
           )}
         </Box>
       </Paper>
+      </Fade>
 
       {/* Create Channel Dialog */}
       <Dialog

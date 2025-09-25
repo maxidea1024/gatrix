@@ -177,7 +177,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
       return channel.description;
     }
     
-    return t('chat.noMessages');
+    return '';
   };
 
   return (
