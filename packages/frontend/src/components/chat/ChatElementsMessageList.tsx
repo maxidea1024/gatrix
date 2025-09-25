@@ -448,6 +448,11 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   const lastReadMessageIdRef = useRef<number | null>(null);
   const markAsReadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // 하단 여부 추적 및 리사이즈 관찰용 ref
+  const wasAtBottomRef = useRef(true);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const resizeScheduledRef = useRef(false);
+
   // 새 메시지가 올 때 하단에 있으면 자동 스크롤 (슬랙 스타일 컨테이너용)
   useEffect(() => {
     if (messages.length === 0) return;
@@ -573,6 +578,31 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       }
     };
   }, [messages, channelId, actions]);
+
+  // 콘텐츠 높이 변화 시에도 하단 유지 (하단에 있었던 경우)
+  useEffect(() => {
+    const el = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement | null;
+    if (!el) return;
+
+    const ro = new ResizeObserver(() => {
+      if (!wasAtBottomRef.current) return;
+      if (!resizeScheduledRef.current) {
+        resizeScheduledRef.current = true;
+        requestAnimationFrame(() => {
+          resizeScheduledRef.current = false;
+          el.scrollTop = el.scrollHeight; // 즉시 bottom
+        });
+      }
+    });
+
+    resizeObserverRef.current = ro;
+    ro.observe(el);
+
+    return () => {
+      ro.disconnect();
+      resizeObserverRef.current = null;
+    };
+  }, []);
   // 새 메시지가 DOM에 반영된 직후 스크롤 처리 (내 메시지는 즉시, 다른 사용자 메시지는 하단에 있을 때만)
   useLayoutEffect(() => {
     if (messages.length === 0) return;
@@ -934,6 +964,11 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
             : 'rgba(0, 0, 0, 0.2) transparent',
         }}
         onClick={handleChatAreaClick}
+        onScroll={(e) => {
+          const el = e.currentTarget;
+          const threshold = 100;
+          wasAtBottomRef.current = (el.scrollTop + el.clientHeight) >= (el.scrollHeight - threshold);
+        }}
       >
         {messages.map((message, index) => {
           const userInfo = getUserInfo(message.userId);
@@ -1053,6 +1088,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                 {/* Message Text */}
                 <Typography
                   variant="body2"
+                  component="div"
                   sx={{
                     color: theme.palette.mode === 'dark' ? '#e8eaed' : '#1d1c1d',
                     fontSize: '15px',

@@ -139,6 +139,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
   useEffect(() => {
     loadThreadMessages();
 
+
     // 스레드 메시지 및 리액션 실시간 업데이트 리스너 추가
     const handleThreadMessage = (event: any) => {
       console.log('🧵 ThreadView received thread message:', event);
@@ -185,6 +186,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
       setThreadMessages([]);
     } finally {
       setIsLoading(false);
+
     }
   };
 
@@ -198,6 +200,19 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
   };
 
   const originalUserInfo = getUserInfo(originalMessage.userId);
+  // Keep bottom on content size changes when already at bottom
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      if (wasAtBottomRef.current) {
+        el.scrollTop = el.scrollHeight;
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
 
   return (
     <Paper

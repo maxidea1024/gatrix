@@ -44,8 +44,21 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
     }
   }, []);
 
-  // Handle new messages
+  // Initialize baseline to avoid notifying for cached/initial messages
   useEffect(() => {
+    const allMessages = Object.values(state.messages).flat();
+    if (allMessages.length > 0) {
+      lastMessageIdRef.current = allMessages[allMessages.length - 1].id;
+    }
+  // run once on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Handle new messages (skip until users are loaded and baseline set)
+  useEffect(() => {
+    // Require users to be loaded to resolve usernames/avatars
+    if (!state.users || Object.keys(state.users).length === 0) return;
+
     const allMessages = Object.values(state.messages).flat();
     if (allMessages.length === 0) return;
 
@@ -68,7 +81,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
 
     // Show notification
     showMessageNotification(latestMessage);
-  }, [state.messages, currentUserId, activeChannelId, isWindowFocused]);
+  }, [state.messages, state.users, currentUserId, activeChannelId, isWindowFocused]);
 
   // Handle user join/leave events
   useEffect(() => {
@@ -77,15 +90,16 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
   }, []);
 
   const showMessageNotification = (message: Message) => {
-    // Safety check for message and user data
-    if (!message || !message.user) {
-      console.warn('Invalid message data for notification:', message);
+    // Resolve user info from message or global users map
+    const user = (message as any).user || state.users[message.userId];
+    if (!message || !user) {
+      // Skip silently during initialization when users not yet loaded
       return;
     }
 
     const channel = state.channels.find(c => c.id === message.channelId);
     const channelName = channel?.name || t('chat.unknownChannel');
-    const username = message.user.username || message.user.name || 'Unknown User';
+    const username = user.username || user.name || `User${message.userId}`;
 
     // Browser notification
     if (
@@ -97,7 +111,7 @@ const NotificationManager = forwardRef<NotificationManagerRef, NotificationManag
         `${username} in #${channelName}`,
         {
           body: getMessagePreview(message),
-          icon: message.user.avatar || '/icons/chat-notification.png',
+          icon: user.avatarUrl || '/icons/chat-notification.png',
           tag: `chat-${message.channelId}`,
           requireInteraction: false,
         }
