@@ -2,13 +2,66 @@ import { Request, Response } from 'express';
 import { ChannelInvitationModel } from '../models/ChannelInvitation';
 import { UserPrivacySettingsModel } from '../models/UserPrivacySettings';
 import { ChannelModel } from '../models/Channel';
-import { redisClient } from '../config/redis';
+import { UserModel, ChatUser } from '../models/User';
+import { redisManager } from '../config/redis';
 import { createLogger } from '../config/logger';
 
 const logger = createLogger('InvitationController');
 
+// Helper function to get user info (Redis cache → DB fallback)
+async function getUserInfo(userId: number): Promise<{ id: number; name: string; email: string; avatarUrl?: string } | null> {
+  try {
+    const redisClient = redisManager.getClient();
+    const userKey = `user:${userId}`;
+
+    // 1. Try Redis first
+    const userDataRaw = await redisClient.get(userKey);
+    if (userDataRaw) {
+      try {
+        const parsedData = JSON.parse(userDataRaw);
+        const userData = parsedData.value || parsedData;
+        if (userData.id) {
+          return {
+            id: parseInt(userData.id),
+            name: userData.name,
+            email: userData.email,
+            avatarUrl: userData.avatarUrl
+          };
+        }
+      } catch (error) {
+        logger.warn('Failed to parse user data from Redis', { userId, error });
+      }
+    }
+
+    // 2. Fallback to database if not in Redis
+    const dbUser = await UserModel.findById(userId);
+    if (dbUser) {
+      const userInfo = {
+        id: dbUser.id,
+        name: dbUser.name,
+        email: dbUser.email,
+        avatarUrl: dbUser.avatarUrl
+      };
+
+      // 3. Cache the result in Redis (1 hour TTL)
+      try {
+        await redisClient.setex(userKey, 3600, JSON.stringify({ value: userInfo }));
+      } catch (error) {
+        logger.warn('Failed to cache user data to Redis', { userId, error });
+      }
+
+      return userInfo;
+    }
+
+    return null;
+  } catch (error) {
+    logger.error('Error getting user info', { userId, error });
+    return null;
+  }
+}
+
 export class InvitationController {
-  // 채널에 사용자 초대
+  // Invite user to channel
   static async inviteUser(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
@@ -32,7 +85,7 @@ export class InvitationController {
         return;
       }
 
-      // 채널 존재 여부 및 권한 확인
+      // Check channel existence and permissions
       const channel = await ChannelModel.findById(channelIdNum);
       if (!channel) {
         res.status(404).json({
@@ -42,7 +95,7 @@ export class InvitationController {
         return;
       }
 
-      // 초대자가 채널 멤버인지 확인
+      // Check if inviter is a member of the channel
       const isInviterMember = await ChannelModel.isMember(channelIdNum, userId);
       if (!isInviterMember) {
         res.status(403).json({
@@ -52,7 +105,7 @@ export class InvitationController {
         return;
       }
 
-      // 초대받을 사용자가 이미 멤버인지 확인
+      // Check if invitee is already a member
       const isAlreadyMember = await ChannelModel.isMember(channelIdNum, inviteeId);
       if (isAlreadyMember) {
         res.status(400).json({
@@ -62,7 +115,7 @@ export class InvitationController {
         return;
       }
 
-      // 이미 대기 중인 초대가 있는지 확인
+      // Check if there's already a pending invitation
       const hasPendingInvitation = await ChannelInvitationModel.hasPendingInvitation(channelIdNum, inviteeId);
       if (hasPendingInvitation) {
         res.status(400).json({
@@ -72,7 +125,7 @@ export class InvitationController {
         return;
       }
 
-      // 프라이버시 설정 확인
+      // Check privacy settings
       const invitePermission = await UserPrivacySettingsModel.canInviteUser(userId, inviteeId, 'channel');
       if (!invitePermission.canInvite) {
         let errorMessage = 'Cannot invite this user';
@@ -95,7 +148,7 @@ export class InvitationController {
         return;
       }
 
-      // 초대 생성
+      // Create invitation
       const invitation = await ChannelInvitationModel.create({
         channelId: channelIdNum,
         inviterId: userId,
@@ -103,13 +156,11 @@ export class InvitationController {
         message,
       });
 
-      // 초대자 정보 가져오기 (Redis에서 직접 조회)
-      const userKey = `user:${userId}`;
-      const inviterData = await redisClient.hgetall(userKey);
-
-      if (!inviterData.id) {
+      // Get inviter info (Redis cache → DB fallback)
+      const inviterData = await getUserInfo(userId);
+      if (!inviterData) {
         logger.error('Inviter not found', { userId });
-        res.status(500).json({
+        res.status(404).json({
           success: false,
           error: 'Internal server error',
         });
@@ -117,15 +168,15 @@ export class InvitationController {
       }
 
       const inviter = {
-        id: parseInt(inviterData.id),
-        name: inviterData.name || inviterData.username || 'Unknown User',
+        id: inviterData.id,
+        name: inviterData.name || 'Unknown User',
         email: inviterData.email,
-        avatar: inviterData.avatar
+        avatarUrl: inviterData.avatarUrl
       };
 
-      // 초대받은 사용자에게 실시간 알림 전송
+      // Send real-time notification to invitee
       try {
-        // BroadcastService를 동적으로 import하여 순환 import 문제 해결
+        // Dynamically import BroadcastService to resolve circular import issues
         const BroadcastServiceModule = await import('../services/BroadcastService');
         const BroadcastService = BroadcastServiceModule.default;
         const broadcastService = BroadcastService.getInstance();
@@ -136,7 +187,7 @@ export class InvitationController {
             channelId: channelIdNum,
             channelName: channel.name,
             inviterName: inviter.name,
-            message: message, // 사용자가 입력한 메시지만 전달 (프론트엔드에서 기본 메시지 생성)
+            message: message, // Only pass user-entered message (frontend generates default message)
             expiresAt: invitation.expiresAt,
             createdAt: invitation.createdAt
           });
@@ -159,7 +210,7 @@ export class InvitationController {
 
       logger.info(`Channel invitation sent: user ${userId} invited user ${inviteeId} to channel ${channelIdNum}`);
 
-      // Gatrix 메인 서버에도 알림 전송
+      // Send notification to Gatrix main server as well
       const { gatrixApiService } = require('../services/GatrixApiService');
       await gatrixApiService.sendNotification({
         userId: inviteeId,
@@ -190,7 +241,7 @@ export class InvitationController {
     }
   }
 
-  // 초대 응답 (수락/거절)
+  // Respond to invitation (accept/decline)
   static async respondToInvitation(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
@@ -214,7 +265,7 @@ export class InvitationController {
         return;
       }
 
-      // 초대 조회
+      // Find invitation
       const invitation = await ChannelInvitationModel.findById(invitationIdNum);
       if (!invitation) {
         res.status(404).json({
@@ -224,7 +275,7 @@ export class InvitationController {
         return;
       }
 
-      // 초대받은 사용자인지 확인
+      // Check if user is the invitee
       if (invitation.inviteeId !== userId) {
         res.status(403).json({
           success: false,
@@ -233,7 +284,7 @@ export class InvitationController {
         return;
       }
 
-      // 초대 상태 확인
+      // Check invitation status
       if (invitation.status !== 'pending') {
         res.status(400).json({
           success: false,
@@ -245,11 +296,11 @@ export class InvitationController {
       const status = action === 'accept' ? 'accepted' : 'declined';
       const updatedInvitation = await ChannelInvitationModel.respond(invitationIdNum, status);
 
-      // 수락한 경우 채널에 멤버로 추가
+      // If accepted, add user as channel member
       if (action === 'accept') {
         await ChannelModel.addMember(invitation.channelId, userId, 'member');
-        
-        // 채널 멤버들에게 새 멤버 참여 알림
+
+        // Notify channel members about new member joining
         const { BroadcastService } = require('../services/BroadcastService');
         const broadcastService = BroadcastService.getInstance();
 
@@ -261,7 +312,7 @@ export class InvitationController {
         });
       }
 
-      // 초대한 사용자에게 응답 알림
+      // Notify inviter about response
       const { BroadcastService } = require('../services/BroadcastService');
       const broadcastService = BroadcastService.getInstance();
 
@@ -277,7 +328,7 @@ export class InvitationController {
       res.json({
         success: true,
         data: updatedInvitation,
-        channelId: invitation.channelId, // 프론트엔드에서 채널 이동에 사용
+        channelId: invitation.channelId, // Used for channel navigation in frontend
         message: `Invitation ${action}ed successfully`,
       });
     } catch (error) {
@@ -289,7 +340,7 @@ export class InvitationController {
     }
   }
 
-  // 내가 받은 초대 목록 조회
+  // Get my received invitations
   static async getMyInvitations(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
@@ -305,20 +356,12 @@ export class InvitationController {
         { limit: limitNum, offset }
       );
 
-      // 채널 정보와 초대한 사용자 정보 추가
+      // Add channel info and inviter info
       const enrichedInvitations = await Promise.all(
         result.invitations.map(async (invitation) => {
           const [channel, inviter] = await Promise.all([
             ChannelModel.findById(invitation.channelId),
-            (async () => {
-              const userData = await redisClient.hgetall(`user:${invitation.inviterId}`);
-              return userData.id ? {
-                id: parseInt(userData.id),
-                name: userData.name,
-                email: userData.email,
-                avatar: userData.avatar
-              } : null;
-            })(),
+            getUserInfo(invitation.inviterId),
           ]);
 
           return {
@@ -350,7 +393,7 @@ export class InvitationController {
     }
   }
 
-  // 내가 보낸 초대 목록 조회
+  // Get my sent invitations
   static async getMySentInvitations(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
@@ -366,20 +409,12 @@ export class InvitationController {
         { limit: limitNum, offset }
       );
 
-      // 채널 정보와 초대받은 사용자 정보 추가
+      // Add channel info and invitee info
       const enrichedInvitations = await Promise.all(
         result.invitations.map(async (invitation) => {
           const [channel, invitee] = await Promise.all([
             ChannelModel.findById(invitation.channelId),
-            (async () => {
-              const userData = await redisClient.hgetall(`user:${invitation.inviteeId}`);
-              return userData.id ? {
-                id: parseInt(userData.id),
-                name: userData.name,
-                email: userData.email,
-                avatar: userData.avatar
-              } : null;
-            })(),
+            getUserInfo(invitation.inviteeId),
           ]);
 
           return {
@@ -411,7 +446,7 @@ export class InvitationController {
     }
   }
 
-  // 채널의 pending invitation 목록 조회
+  // Get channel's pending invitations
   static async getChannelPendingInvitations(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
@@ -426,7 +461,7 @@ export class InvitationController {
         return;
       }
 
-      // 채널 존재 여부 및 권한 확인
+      // Check channel existence and permissions
       const channel = await ChannelModel.findById(channelIdNum);
       if (!channel) {
         res.status(404).json({
@@ -436,7 +471,7 @@ export class InvitationController {
         return;
       }
 
-      // 사용자가 채널 멤버인지 확인
+      // Check if user is a channel member
       const isMember = await ChannelModel.isMember(channelIdNum, userId);
       if (!isMember) {
         res.status(403).json({
@@ -449,19 +484,13 @@ export class InvitationController {
       const result = await ChannelInvitationModel.findByChannelId(
         channelIdNum,
         'pending',
-        { limit: 100 } // 최대 100개까지
+        { limit: 100 } // Maximum 100 items
       );
 
-      // 초대받은 사용자 정보 추가
+      // Add invitee info
       const enrichedInvitations = await Promise.all(
         result.invitations.map(async (invitation) => {
-          const inviteeData = await redisClient.hgetall(`user:${invitation.inviteeId}`);
-          const invitee = inviteeData.id ? {
-            id: parseInt(inviteeData.id),
-            name: inviteeData.name,
-            email: inviteeData.email,
-            avatar: inviteeData.avatar
-          } : null;
+          const invitee = await getUserInfo(invitation.inviteeId);
           return {
             ...invitation,
             invitee: invitee ? { id: invitee.id, name: invitee.name, email: invitee.email } : null,
@@ -482,7 +511,7 @@ export class InvitationController {
     }
   }
 
-  // 초대 취소
+  // Cancel invitation
   static async cancelInvitation(req: Request, res: Response): Promise<void> {
     try {
       const userId = (req as any).user.id;
@@ -499,7 +528,7 @@ export class InvitationController {
 
       const cancelledInvitation = await ChannelInvitationModel.cancel(invitationIdNum, userId);
 
-      // 초대받은 사용자에게 취소 알림
+      // Notify invitee about cancellation
       const { BroadcastService } = require('../services/BroadcastService');
       const broadcastService = BroadcastService.getInstance();
 
