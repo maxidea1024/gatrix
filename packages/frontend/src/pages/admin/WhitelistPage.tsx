@@ -105,23 +105,28 @@ const WhitelistPage: React.FC = () => {
     if (savedTab) {
       const tabIndex = tabNames.indexOf(savedTab);
       if (tabIndex >= 0) {
-        // Update URL to match saved tab
-        const newSearchParams = new URLSearchParams(searchParams);
-        newSearchParams.set('tab', savedTab);
-        setSearchParams(newSearchParams, { replace: true });
         return tabIndex;
       }
     }
 
     // Default to first tab
-    const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.set('tab', tabNames[0]);
-    setSearchParams(newSearchParams, { replace: true });
     return 0;
   };
 
   // Tab state
   const [currentTab, setCurrentTab] = useState(getInitialTab);
+
+  // Effect to handle URL synchronization
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    const currentTabName = tabNames[currentTab];
+
+    if (!tabParam || tabParam !== currentTabName) {
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.set('tab', currentTabName);
+      setSearchParams(newSearchParams, { replace: true });
+    }
+  }, [currentTab, searchParams, setSearchParams, tabNames]);
 
   // State
   const [whitelists, setWhitelists] = useState<Whitelist[]>([]);

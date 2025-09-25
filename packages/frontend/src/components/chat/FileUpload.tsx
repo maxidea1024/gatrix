@@ -149,10 +149,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
       }
 
       setLocationDialog(false);
-      enqueueSnackbar(
-        t('chat.locationShared'),
-        { variant: 'success' }
-      );
+      // 위치 공유 성공 토스트 제거 - 불필요한 지저분함 방지
     } catch (error) {
       console.error('Error getting location:', error);
       enqueueSnackbar(

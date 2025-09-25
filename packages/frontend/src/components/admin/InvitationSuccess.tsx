@@ -6,14 +6,19 @@ import {
   Button,
   Alert,
   Paper,
-  Divider
+  Divider,
+  Chip,
+  Stack
 } from '@mui/material';
 import {
   ContentCopy as CopyIcon,
   CheckCircle as CheckIcon,
-  Close as CloseIcon
+  Close as CloseIcon,
+  Schedule as ScheduleIcon,
+  Email as EmailIcon
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
 import { InvitationResponse } from '../../types/invitation';
 
 interface InvitationSuccessProps {
@@ -26,92 +31,175 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({
   onClose
 }) => {
   const { enqueueSnackbar } = useSnackbar();
+  const { t } = useTranslation();
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(invitationData.inviteUrl);
-      enqueueSnackbar('초대 링크가 클립보드에 복사되었습니다.', { variant: 'success' });
+      const inviteUrl = invitationData?.inviteUrl || '';
+      if (!inviteUrl) {
+        enqueueSnackbar(t('admin.invitations.noInviteLink'), { variant: 'error' });
+        return;
+      }
+      await navigator.clipboard.writeText(inviteUrl);
+      enqueueSnackbar(t('admin.invitations.linkCopied'), { variant: 'success' });
     } catch (error) {
       console.error('Failed to copy link:', error);
-      enqueueSnackbar('링크 복사에 실패했습니다.', { variant: 'error' });
+      enqueueSnackbar(t('admin.invitations.copyFailed'), { variant: 'error' });
     }
   };
 
   const formatExpirationDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    try {
+      const date = new Date(dateString);
+
+      // 유효한 날짜인지 확인
+      if (isNaN(date.getTime())) {
+        return t('admin.invitations.invalidDate');
+      }
+
+      const now = new Date();
+      const diffTime = date.getTime() - now.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays <= 0) {
+        return t('admin.invitations.expired');
+      } else if (diffDays === 1) {
+        return t('admin.invitations.expiresInOneDay');
+      } else {
+        return t('admin.invitations.expiresInDays', { days: diffDays });
+      }
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return t('admin.invitations.dateError');
+    }
   };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <Alert severity="success" icon={<CheckIcon />}>
-        <Typography variant="h6" sx={{ mb: 1 }}>
-          초대 링크가 성공적으로 생성되었습니다!
+      {/* 성공 알림 */}
+      <Alert
+        severity="success"
+        icon={<CheckIcon />}
+        sx={{
+          bgcolor: 'success.50',
+          color: 'success.800',
+          border: '1px solid',
+          borderColor: 'success.200',
+          '& .MuiAlert-icon': {
+            color: 'success.600'
+          }
+        }}
+      >
+        <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+          {t('admin.invitations.successTitle')}
+        </Typography>
+        <Typography variant="body2">
+          {t('admin.invitations.successDescription')}
         </Typography>
       </Alert>
 
-      <Paper sx={{ p: 3, bgcolor: 'grey.50' }}>
-        <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
-          Using this link, new team members can now sign-up to Gatrix.
-        </Typography>
-        <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.6 }}>
-          Please provide them with the following link to get started. 
-          This will allow them to set up their password and get started with their Gatrix account.
-        </Typography>
+      {/* 초대 정보 카드 */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 3,
+          bgcolor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 2
+        }}
+      >
+        {/* 초대 대상 이메일 */}
+        {invitationData?.invitation?.email && (
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
+            <EmailIcon color="primary" fontSize="small" />
+            <Typography variant="body2" color="text.secondary">
+              {t('admin.invitations.invitedEmail')}:
+            </Typography>
+            <Chip
+              label={invitationData.invitation.email}
+              size="small"
+              color="primary"
+              variant="outlined"
+            />
+          </Stack>
+        )}
 
+        {/* 만료 정보 */}
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3 }}>
+          <ScheduleIcon color="warning" fontSize="small" />
+          <Typography variant="body2" color="text.secondary">
+            {t('admin.invitations.expirationLabel')}:
+          </Typography>
+          <Chip
+            label={invitationData?.invitation?.expiresAt ? formatExpirationDate(invitationData.invitation.expiresAt) : t('admin.invitations.noExpiration')}
+            size="small"
+            color="warning"
+            variant="outlined"
+          />
+        </Stack>
+
+        {/* 초대 링크 */}
         <Box sx={{ mb: 3 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-            초대 링크:
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
+            {t('admin.invitations.inviteLink')}:
           </Typography>
           <TextField
-            value={invitationData.inviteUrl}
+            value={invitationData?.inviteUrl || ''}
             fullWidth
             multiline
-            rows={2}
+            rows={3}
             variant="outlined"
             InputProps={{
               readOnly: true,
-              sx: { 
+              sx: {
                 fontFamily: 'monospace',
                 fontSize: '0.875rem',
-                bgcolor: 'background.paper'
+                bgcolor: 'grey.50',
+                borderRadius: 1,
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'grey.300'
+                }
               }
             }}
           />
         </Box>
 
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          유효기간: {formatExpirationDate(invitationData.invitation.expiresAt)}
-        </Typography>
+        {/* 액션 버튼들 */}
+        <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+          <Button
+            onClick={handleCopyLink}
+            variant="contained"
+            startIcon={<CopyIcon />}
+            sx={{
+              flex: 1,
+              bgcolor: 'primary.main',
+              '&:hover': {
+                bgcolor: 'primary.dark'
+              }
+            }}
+          >
+            {t('admin.invitations.copyLink')}
+          </Button>
 
-        <Button
-          onClick={handleCopyLink}
-          variant="contained"
-          startIcon={<CopyIcon />}
-          fullWidth
-          sx={{ mb: 2 }}
-        >
-          링크 복사
-        </Button>
+          <Button
+            onClick={onClose}
+            variant="outlined"
+            startIcon={<CloseIcon />}
+            sx={{
+              flex: 1,
+              borderColor: 'grey.300',
+              color: 'text.secondary',
+              '&:hover': {
+                borderColor: 'grey.400',
+                bgcolor: 'grey.50'
+              }
+            }}
+          >
+            {t('common.close')}
+          </Button>
+        </Stack>
       </Paper>
-
-      <Divider />
-
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Button
-          onClick={onClose}
-          variant="outlined"
-          startIcon={<CloseIcon />}
-        >
-          닫기
-        </Button>
-      </Box>
     </Box>
   );
 };
