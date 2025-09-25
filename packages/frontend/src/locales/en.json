@@ -1256,6 +1256,7 @@
     "confirm": "Confirm",
     "created": "Created",
     "creator": "Creator",
+    "customPayload": "Custom Payload",
     "deleteGameWorld": "Delete Game World",
     "editGameWorld": "Edit Game World",
     "endMaintenance": "End Maintenance",
@@ -1275,7 +1276,8 @@
       "maintenanceHelp": "If maintenance is on, users cannot enter this world",
       "nameHelp": "This name will be displayed to users (automatically copied from World ID when typing)",
       "visibleHelp": "Choose whether to show this world to users",
-      "worldIdHelp": "Enter a unique world identifier"
+      "worldIdHelp": "Enter a unique world identifier",
+      "customPayloadHelp": "Additional game world data in JSON format. Leave empty to save as {}."
     },
     "hidden": "Hidden",
     "hiddenWorlds": "Hidden Worlds",

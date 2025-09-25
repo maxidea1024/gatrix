@@ -90,6 +90,7 @@ import FormDialogHeader from '../../components/common/FormDialogHeader';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import translationService from '../../services/translationService';
 import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/MultiLanguageMessageInput';
+import JsonEditor from '@/components/common/JsonEditor';
 
 // Sortable Row Component
 interface SortableRowProps {
@@ -364,6 +365,10 @@ const GameWorldsPage: React.FC = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const worldIdRef = useRef<HTMLInputElement>(null);
 
+  // Custom payload JSON editor state
+  const [customPayloadText, setCustomPayloadText] = useState<string>('{}');
+  const [customPayloadError, setCustomPayloadError] = useState<string>('');
+
 
 
 
@@ -556,8 +561,6 @@ const GameWorldsPage: React.FC = () => {
   const handleAddWorld = () => {
     setEditingWorld(null);
     setFormData({
-
-
       worldId: '',
       name: '',
       isVisible: true,
@@ -568,10 +571,12 @@ const GameWorldsPage: React.FC = () => {
       maintenanceMessage: '',
       supportsMultiLanguage: false,
       maintenanceLocales: [],
+      customPayload: {},
       tagIds: [],
     });
 
-
+    setCustomPayloadText('{}');
+    setCustomPayloadError('');
     setFormTags([]);
     setMaintenanceLocales([]);
     setSupportsMultiLanguage(false);
@@ -601,8 +606,11 @@ const GameWorldsPage: React.FC = () => {
       maintenanceMessage: world.maintenanceMessage || '',
       supportsMultiLanguage: shouldEnableMultiLanguage,
       maintenanceLocales: world.maintenanceLocales || [],
+      customPayload: world.customPayload || {},
       tagIds: (world.tags || []).map(t => t.id),
     });
+    setCustomPayloadText(JSON.stringify(world.customPayload || {}, null, 2));
+    setCustomPayloadError('');
     setFormTags((world.tags || []));
     setMaintenanceLocales(world.maintenanceLocales || []);
     setSupportsMultiLanguage(shouldEnableMultiLanguage);
@@ -650,8 +658,24 @@ const GameWorldsPage: React.FC = () => {
       // Tag 객체에서 ID 추출
       const tagIds = (formTags || []).map(t => t.id);
 
+      // Parse custom payload JSON
+      let parsedCustomPayload: any = {};
+      const text = (customPayloadText || '').trim();
+      if (text.length > 0) {
+        try {
+          parsedCustomPayload = JSON.parse(text);
+          setCustomPayloadError('');
+        } catch (e: any) {
+          setCustomPayloadError('Invalid JSON format');
+          enqueueSnackbar('Custom payload JSON is invalid', { variant: 'error' });
+          setSaving(false);
+          return;
+        }
+      }
+
       const dataToSend = {
         ...formData,
+        customPayload: parsedCustomPayload,
         tagIds,
         isVisible: Boolean(formData.isVisible),
         isMaintenance: Boolean(formData.isMaintenance),
@@ -662,9 +686,7 @@ const GameWorldsPage: React.FC = () => {
         maintenanceLocales: maintenanceLocales.filter(l => l.message.trim() !== ''),
       };
 
-
-
-      let savedWorld;
+      let savedWorld: any;
       if (editingWorld) {
         savedWorld = await gameWorldService.updateGameWorld(editingWorld.id, dataToSend);
         enqueueSnackbar(t('gameWorlds.worldUpdated'), { variant: 'success' });
@@ -1271,7 +1293,6 @@ const GameWorldsPage: React.FC = () => {
                       defaultMessageHelperText={t('gameWorlds.maintenance.defaultMessageHelp')}
                       defaultMessageRequired={formData.isMaintenance}
                       defaultMessageError={!!formErrors.maintenanceMessage}
-
                       supportsMultiLanguage={supportsMultiLanguage}
                       onSupportsMultiLanguageChange={handleSupportsMultiLanguageChange}
                       supportsMultiLanguageLabel={t('gameWorlds.maintenance.supportsMultiLanguage')}
@@ -1293,6 +1314,17 @@ const GameWorldsPage: React.FC = () => {
                 </LocalizationProvider>
               </Paper>
             )}
+
+            {/* Custom Payload */}
+            <JsonEditor
+              value={customPayloadText}
+              onChange={(val) => setCustomPayloadText(val)}
+              height="200px"
+              label={t('gameWorlds.customPayload') || 'Custom Payload'}
+              placeholder='{\n  "key": "value"\n}'
+              error={customPayloadError}
+              helperText={t('gameWorlds.form.customPayloadHelp') || '게임월드 관련 추가 데이터(JSON). 비워두면 {}로 저장됩니다.'}
+            />
           </Box>
         </Box>
 

@@ -1152,6 +1152,7 @@
     "confirm": "确认",
     "created": "创建时间",
     "creator": "创建者",
+    "customPayload": "自定义载荷",
     "deleteGameWorld": "删除游戏世界",
     "editGameWorld": "编辑游戏世界",
     "endMaintenance": "结束维护",
@@ -1171,7 +1172,8 @@
       "maintenanceHelp": "选择是否为维护模式",
       "nameHelp": "请输入游戏世界名称（输入世界ID时会自动复制）",
       "visibleHelp": "选择是否显示此世界",
-      "worldIdHelp": "请输入唯一的世界ID"
+      "worldIdHelp": "请输入唯一的世界ID",
+      "customPayloadHelp": "游戏世界相关的额外数据（JSON格式）。留空则保存为{}。"
     },
     "hidden": "隐藏",
     "hiddenWorlds": "隐藏世界",

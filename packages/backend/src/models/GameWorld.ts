@@ -26,6 +26,7 @@ export interface GameWorld {
   maintenanceEndDate?: Date;
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
+  customPayload?: Record<string, any> | null;
   createdBy: number;
   updatedBy?: number;
   createdAt: string;
@@ -49,6 +50,7 @@ export interface CreateGameWorldData {
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
+  customPayload?: Record<string, any> | null;
   createdBy: number;
 }
 
@@ -65,6 +67,7 @@ export interface UpdateGameWorldData {
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
+  customPayload?: Record<string, any> | null;
   updatedBy?: number;
 }
 
@@ -289,6 +292,7 @@ export class GameWorldModel {
           maintenanceEndDate: gameWorldData.maintenanceEndDate || null,
           maintenanceMessage: gameWorldData.maintenanceMessage || null,
           supportsMultiLanguage: gameWorldData.supportsMultiLanguage ?? false,
+          customPayload: gameWorldData.customPayload ?? {},
           createdBy: gameWorldData.createdBy
         };
 
@@ -336,7 +340,12 @@ export class GameWorldModel {
 
         Object.entries(gameWorldUpdateData).forEach(([key, value]) => {
           if (value !== undefined) {
-            updateData[key] = value;
+            // customPayload는 JSON 문자열로 변환
+            if (key === 'customPayload') {
+              updateData[key] = JSON.stringify(value);
+            } else {
+              updateData[key] = value;
+            }
           }
         });
 

@@ -18,6 +18,7 @@ export interface GameWorld {
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
+  customPayload?: Record<string, any> | null;
   tags?: Tag[]; // normalized
   createdAt: string;
   updatedAt: string;
@@ -39,6 +40,7 @@ export interface CreateGameWorldData {
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
+  customPayload?: Record<string, any> | null;
   tagIds?: number[]; // normalized
 }
 
@@ -54,6 +56,7 @@ export interface UpdateGameWorldData {
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
+  customPayload?: Record<string, any> | null;
   tagIds?: number[]; // normalized
 }
 
