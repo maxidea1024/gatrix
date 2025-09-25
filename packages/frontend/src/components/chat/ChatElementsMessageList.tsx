@@ -636,7 +636,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   }, [messages.length, state.user?.id]);
 
 
-  // 채널 변경 시 하단으로 스크롤 및 읽음 상태 초기화
+  // 채널 변경 시 하단으로 스크롤 및 읽음 상태 초기화 - 깜빡임 방지를 위해 지연 제거
   useEffect(() => {
     if (currentChannel) {
       // 읽음 상태 초기화
@@ -646,15 +646,11 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         markAsReadTimeoutRef.current = null;
       }
 
-      const timer = setTimeout(() => {
-        const messageContainer = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement;
-        if (messageContainer) {
-          // Instant jump to bottom to avoid visual bouncing
-          messageContainer.scrollTop = messageContainer.scrollHeight;
-        }
-      }, 300);
-
-      return () => clearTimeout(timer);
+      // 즉시 스크롤하여 깜빡임 방지
+      const messageContainer = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement;
+      if (messageContainer) {
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+      }
     }
   }, [channelId, currentChannel]);
 
@@ -700,10 +696,14 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     };
   }, [theme.palette.mode]);
 
-  // Load messages when channel changes
+  // Load messages when channel changes - 깜빡임 방지를 위해 조건 완화
   useEffect(() => {
-    if (channelId && messages.length === 0) {
-      actions.loadMessages(channelId);
+    if (channelId) {
+      // 메시지가 없거나 다른 채널의 메시지인 경우에만 로드
+      const currentMessages = messages || [];
+      if (currentMessages.length === 0) {
+        actions.loadMessages(channelId);
+      }
     }
   }, [channelId]); // messages.length 의존성 제거
 
@@ -783,7 +783,8 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
 
   // 슬랙 스타일 메시지 렌더링을 위해 직접 JSX에서 처리
 
-  if (messages.length === 0 && !state.isLoading) {
+  // 깜빡임 방지를 위해 로딩 상태 체크 제거
+  if (messages.length === 0) {
     return (
       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         {/* Header */}

@@ -107,11 +107,14 @@ const SimpleMessageList: React.FC<MessageListProps> = ({
     setTimeout(checkForMediaContent, 200);
   }, [messages]);
 
-  // Load messages when channel changes
+  // Load messages when channel changes - 깜빡임 방지를 위해 조건 완화
   useEffect(() => {
-    if (channelId && messages.length === 0) {
-      console.log(`🔄 SimpleMessageList loading messages for channel ${channelId}...`);
-      actions.loadMessages(channelId);
+    if (channelId) {
+      const currentMessages = messages || [];
+      if (currentMessages.length === 0) {
+        console.log(`🔄 SimpleMessageList loading messages for channel ${channelId}...`);
+        actions.loadMessages(channelId);
+      }
     }
   }, [channelId]);
 

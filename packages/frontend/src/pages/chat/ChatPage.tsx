@@ -163,8 +163,8 @@ const ChatPageContent: React.FC = () => {
 
 
   // 로딩 상태 확인 - 초기 로딩 중이거나 채널이 없으면 스켈레톤 표시
-  // 초기 진입에서만 스켈레톤을 표시하고, 채널 변경 등의 중간 단계에서는 페이드 전환으로 처리
-  const isInitialLoading = state.channels.length === 0;
+  // 스켈레톤 완전 제거 - 바로 채팅 UI 표시
+  const isInitialLoading = false;
 
   // 로딩 상태 디버깅 (필요시 주석 해제)
   // console.log('🔍 ChatPage loading state:', {
@@ -413,10 +413,10 @@ const ChatPageContent: React.FC = () => {
     }
   };
 
-  // 초기 로딩 중에는 스켈레톤 유지(첫 진입만), 이후 전환은 페이드로 처리
-  if (isInitialLoading) {
-    return <ChatSkeleton stage={state.loadingStage} />;
-  }
+  // 스켈레톤 제거 - 항상 채팅 UI 표시
+  // if (isInitialLoading) {
+  //   return <ChatSkeleton stage={state.loadingStage} />;
+  // }
 
   return (
     <Box sx={{ px: 3, py: 3, pb: 6 }}> {/* 하단 패딩을 6으로 늘림 (좌우와 동일한 24px) */}
@@ -457,14 +457,13 @@ const ChatPageContent: React.FC = () => {
 
 
 
-      {/* Main Chat Interface */}
-      <Fade in key={`ch-${state.currentChannelId ?? 'none'}`} timeout={150}>
-        <Paper sx={{
-          flex: 1,
-          display: 'flex',
-          minHeight: 0, // 중요: flex 아이템이 축소될 수 있도록 함
-          overflow: 'hidden'
-        }}>
+      {/* Main Chat Interface - 깜빡임 방지를 위해 Fade 제거 */}
+      <Paper sx={{
+        flex: 1,
+        display: 'flex',
+        minHeight: 0, // 중요: flex 아이템이 축소될 수 있도록 함
+        overflow: 'hidden'
+      }}>
         {/* Channel List Sidebar */}
         <Box
           sx={{
@@ -708,7 +707,6 @@ const ChatPageContent: React.FC = () => {
           )}
         </Box>
       </Paper>
-      </Fade>
 
       {/* Create Channel Dialog */}
       <Dialog

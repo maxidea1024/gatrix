@@ -850,7 +850,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user?.userId]); // user 객체 전체가 아닌 userId만 의존성으로 사용
 
-  // Load messages for a channel
+  // Load messages for a channel - 깜빡임 방지를 위해 로딩 상태 설정 제거
   const loadMessages = useCallback(async (channelId: number, forceReload = false) => {
     try {
       console.log('🔄 loadMessages called for channel:', channelId, 'forceReload:', forceReload);
@@ -1054,10 +1054,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('🔄 loadChannels() called');
     try {
       const startTime = Date.now();
-      dispatch({ type: 'SET_LOADING', payload: true });
-      dispatch({ type: 'SET_LOADING_STAGE', payload: 'syncing' });
-      dispatch({ type: 'SET_LOADING_START_TIME', payload: startTime });
-      console.log('🔍 Loading state set: isLoading=true, stage=syncing, startTime=', startTime);
+      // 깜빡임 방지를 위해 로딩 상태 설정 제거
+      // dispatch({ type: 'SET_LOADING', payload: true });
+      // dispatch({ type: 'SET_LOADING_STAGE', payload: 'syncing' });
+      // dispatch({ type: 'SET_LOADING_START_TIME', payload: startTime });
+      console.log('🔍 Loading state set: isLoading=false (to prevent flashing), stage=syncing, startTime=', startTime);
 
       // 먼저 사용자를 Chat Server에 동기화
       try {
@@ -1066,7 +1067,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log('✅ User synced to Chat Server successfully');
 
         // 사용자 동기화 완료 후 WebSocket 연결
-        dispatch({ type: 'SET_LOADING_STAGE', payload: 'connecting' });
+        // dispatch({ type: 'SET_LOADING_STAGE', payload: 'connecting' });
         console.log('🔄 Connecting to WebSocket after user sync...');
         await connectWebSocket();
         console.log('✅ WebSocket connected after user sync');
@@ -1075,7 +1076,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // 동기화 실패해도 채팅은 계속 진행
       }
 
-      dispatch({ type: 'SET_LOADING_STAGE', payload: 'loading_channels' });
+      // dispatch({ type: 'SET_LOADING_STAGE', payload: 'loading_channels' });
       console.log('🔄 Loading channels from API...');
       const channels = await ChatService.getChannels();
       console.log('✅ Channels loaded:', channels);
@@ -1107,26 +1108,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error: any) {
       dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to load channels' });
     } finally {
-      // 최소 1초 이상 로딩 화면을 보여주기 위한 지연 처리
+      // 깜빡임 방지를 위해 로딩 지연 제거 - 즉시 완료 처리
       const finishLoading = () => {
-        dispatch({ type: 'SET_LOADING', payload: false });
-        dispatch({ type: 'SET_LOADING_STAGE', payload: 'complete' });
-        dispatch({ type: 'SET_LOADING_START_TIME', payload: null });
+        // dispatch({ type: 'SET_LOADING', payload: false });
+        // dispatch({ type: 'SET_LOADING_STAGE', payload: 'complete' });
+        // dispatch({ type: 'SET_LOADING_START_TIME', payload: null });
+        console.log('🔍 Loading completed immediately (no delay for smooth UX)');
       };
 
-      const currentTime = Date.now();
-      const startTime = state.loadingStartTime || currentTime;
-      const elapsedTime = currentTime - startTime;
-      const minLoadingTime = 1000; // 최소 1초
-
-      if (elapsedTime < minLoadingTime) {
-        const remainingTime = minLoadingTime - elapsedTime;
-        console.log(`🔍 Loading completed in ${elapsedTime}ms, waiting additional ${remainingTime}ms`);
-        setTimeout(finishLoading, remainingTime);
-      } else {
-        console.log(`🔍 Loading completed in ${elapsedTime}ms, finishing immediately`);
-        finishLoading();
-      }
+      // 즉시 완료 처리
+      finishLoading();
     }
   }, [connectWebSocket, loadMessages, loadUsers, loadPendingInvitationsCount]);
 
