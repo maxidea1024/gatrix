@@ -144,9 +144,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, title = 'Admin Pane
                 onClick={handleProfileMenuOpen}
                 aria-label="account menu"
               >
-                {user.avatar_url ? (
+                {user.avatarUrl ? (
                   <Avatar
-                    src={user.avatar_url}
+                    src={user.avatarUrl}
                     alt={user.name}
                     sx={{ width: 32, height: 32 }}
                   />

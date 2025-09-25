@@ -168,7 +168,7 @@ const ReadReceipts: React.FC<ReadReceiptsProps> = ({
                 }}
               >
                 {readByUsers.map((user) => (
-                  <Avatar key={user.id} src={user.avatar} alt={user.username}>
+                  <Avatar key={user.id} src={user.avatarUrl} alt={user.username}>
                     {user.username.charAt(0).toUpperCase()}
                   </Avatar>
                 ))}

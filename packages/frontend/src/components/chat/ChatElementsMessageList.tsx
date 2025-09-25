@@ -731,7 +731,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     const userName = user?.username || user?.name || `User${userId}`;
     return {
       name: userName,
-      avatar: user?.avatarUrl || DEFAULT_AVATAR_URL, // avatarUrl 필드만 사용
+      avatarUrl: user?.avatarUrl || DEFAULT_AVATAR_URL, // avatarUrl 필드만 사용
     };
   };
 
