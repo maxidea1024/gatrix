@@ -114,12 +114,8 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
   const scrollToBottom = () => {
     const c = containerRef.current;
     if (!c) return;
-    // Double rAF to wait for layout, then jump instantly to bottom (no smooth)
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        c.scrollTop = c.scrollHeight;
-      });
-    });
+    // In useLayoutEffect we can set synchronously before paint
+    c.scrollTop = c.scrollHeight;
   };
 
   const handleClose = () => {
