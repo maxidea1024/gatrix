@@ -188,7 +188,7 @@ export class CrashController {
         ClientCrash.query().where('state', CrashState.OPEN).count('id as count').first(),
         ClientCrash.query().where('state', CrashState.CLOSED).count('id as count').first(),
         ClientCrash.query()
-          .where('lastCrash', '>=', new Date(Date.now() - 24 * 60 * 60 * 1000)) // Last 24 hours
+          .where('last_occurred_at', '>=', new Date(Date.now() - 24 * 60 * 60 * 1000)) // Last 24 hours
           .count('id as count')
           .first()
       ]);
@@ -196,10 +196,10 @@ export class CrashController {
       res.json({
         success: true,
         data: {
-          total: totalCrashes?.count || 0,
-          open: openCrashes?.count || 0,
-          closed: closedCrashes?.count || 0,
-          recent: recentCrashes?.count || 0
+          total: (totalCrashes as any)?.count || 0,
+          open: (openCrashes as any)?.count || 0,
+          closed: (closedCrashes as any)?.count || 0,
+          recent: (recentCrashes as any)?.count || 0
         }
       });
     } catch (error) {
@@ -231,11 +231,8 @@ export class CrashController {
           branches: branches.map(b => b.branch),
           platforms: platforms.map(p => p.platform),
           versions: versions.map(v => ({
-            major: v.majorVer,
-            minor: v.minorVer,
-            build: v.buildNum,
-            patch: v.patchNum,
-            label: `${v.majorVer}.${v.minorVer}.${v.buildNum}.${v.patchNum}`
+            label: v.version,
+            value: v.version
           })),
           serverGroups: Object.values(ServerGroup),
           marketTypes: Object.values(MarketType),

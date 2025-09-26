@@ -5,27 +5,49 @@ export class ClientCrash extends Model {
   static tableName = 'crashes';
 
   id!: number;
-  branch!: number;
-  chash!: string;
-  firstLine!: string;
-  count!: number;
+  crash_id!: string;
+  user_id?: number;
+  user_nickname?: string;
+  platform!: string;
+  branch!: string;
+  market_type?: string;
+  server_group?: string;
+  device_type?: string;
+  version!: string;
+  crash_type!: string;
+  crash_message?: string;
+  stack_trace_file?: string;
+  logs_file?: string;
   state!: CrashState;
-  lastCrash!: Date;
+  first_occurred_at!: Date;
+  last_occurred_at!: Date;
+  occurrence_count!: number;
   createdAt!: Date;
   updatedAt!: Date;
 
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['branch', 'chash', 'firstLine'],
+      required: ['crash_id', 'platform', 'branch', 'version', 'crash_type', 'first_occurred_at', 'last_occurred_at'],
       properties: {
         id: { type: 'integer' },
-        branch: { type: 'integer' },
-        chash: { type: 'string', maxLength: 32 },
-        firstLine: { type: 'string', maxLength: 200 },
-        count: { type: 'integer', default: 1 },
+        crash_id: { type: 'string', maxLength: 255 },
+        user_id: { type: 'integer' },
+        user_nickname: { type: 'string', maxLength: 255 },
+        platform: { type: 'string', enum: ['android', 'ios', 'windows', 'macos', 'linux'] },
+        branch: { type: 'string', enum: ['release', 'patch', 'beta', 'alpha', 'dev'] },
+        market_type: { type: 'string' },
+        server_group: { type: 'string', maxLength: 100 },
+        device_type: { type: 'string', maxLength: 255 },
+        version: { type: 'string', maxLength: 100 },
+        crash_type: { type: 'string', maxLength: 100 },
+        crash_message: { type: 'string' },
+        stack_trace_file: { type: 'string', maxLength: 500 },
+        logs_file: { type: 'string', maxLength: 500 },
         state: { type: 'integer', enum: [0, 1, 2], default: 0 },
-        lastCrash: { type: 'string', format: 'date-time' },
+        first_occurred_at: { type: 'string', format: 'date-time' },
+        last_occurred_at: { type: 'string', format: 'date-time' },
+        occurrence_count: { type: 'integer', default: 1 },
         createdAt: { type: 'string', format: 'date-time' },
         updatedAt: { type: 'string', format: 'date-time' }
       }
@@ -43,6 +65,14 @@ export class ClientCrash extends Model {
         }
       }
     };
+  }
+
+  // 누락된 메서드 추가
+  static async findByHashAndBranch(crashId: string, branch: string): Promise<ClientCrash | undefined> {
+    return await this.query()
+      .where('crash_id', crashId)
+      .where('branch', branch)
+      .first();
   }
 
   $beforeInsert() {
@@ -86,7 +116,7 @@ export class ClientCrash extends Model {
     query.offset(offset).limit(limit);
 
     // Order by last crash time (most recent first)
-    query.orderBy('crashes.lastCrash', 'desc');
+    query.orderBy('crashes.last_occurred_at', 'desc');
 
     const crashes = await query;
 
@@ -107,22 +137,22 @@ export class ClientCrash extends Model {
     if (filters.search) {
       const searchTerm = `%${filters.search}%`;
       query.where(function() {
-        this.where('crash_instances.userId', 'like', searchTerm)
-            .orWhere('crash_instances.pubId', 'like', searchTerm);
+        this.where('crashes.user_id', 'like', searchTerm)
+            .orWhere('crashes.user_nickname', 'like', searchTerm);
       });
     }
 
     // Date range filter
     if (filters.dateFrom) {
-      query.where('crashes.lastCrash', '>=', filters.dateFrom);
+      query.where('crashes.last_occurred_at', '>=', filters.dateFrom);
     }
     if (filters.dateTo) {
-      query.where('crashes.lastCrash', '<=', filters.dateTo);
+      query.where('crashes.last_occurred_at', '<=', filters.dateTo);
     }
 
     // Platform filter
     if (filters.deviceType !== undefined) {
-      query.where('crash_instances.platform', filters.deviceType);
+      query.where('crashes.platform', filters.deviceType);
     }
 
     // Branch filter
@@ -130,18 +160,24 @@ export class ClientCrash extends Model {
       query.where('crashes.branch', filters.branch);
     }
 
-    // Version filters
-    if (filters.majorVer !== undefined) {
-      query.where('crash_instances.majorVer', filters.majorVer);
+    // Version filter
+    if (filters.version) {
+      query.where('crashes.version', 'like', `%${filters.version}%`);
     }
-    if (filters.minorVer !== undefined) {
-      query.where('crash_instances.minorVer', filters.minorVer);
+
+    // Server group filter
+    if (filters.serverGroup) {
+      query.where('crashes.server_group', filters.serverGroup);
     }
-    if (filters.buildNum !== undefined) {
-      query.where('crash_instances.buildNum', filters.buildNum);
+
+    // Market type filter
+    if (filters.marketType) {
+      query.where('crashes.market_type', filters.marketType);
     }
-    if (filters.patchNum !== undefined) {
-      query.where('crash_instances.patchNum', filters.patchNum);
+
+    // Device type filter
+    if (filters.deviceType) {
+      query.where('crashes.device_type', 'like', `%${filters.deviceType}%`);
     }
 
     // State filter
@@ -151,12 +187,11 @@ export class ClientCrash extends Model {
   }
 
   /**
-   * Find crash by hash and branch
+   * Find crash by crash_id
    */
-  static async findByHashAndBranch(chash: string, branch: number) {
+  static async findByCrashId(crash_id: string) {
     return await this.query()
-      .where('chash', chash)
-      .where('branch', branch)
+      .where('crash_id', crash_id)
       .first();
   }
 
@@ -166,8 +201,8 @@ export class ClientCrash extends Model {
   async incrementCount() {
     return await this.$query()
       .patch({
-        count: this.count + 1,
-        lastCrash: new Date(),
+        occurrence_count: this.occurrence_count + 1,
+        last_occurred_at: new Date(),
         updatedAt: new Date()
       });
   }

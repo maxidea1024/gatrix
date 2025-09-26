@@ -84,6 +84,7 @@ export interface CrashFilters {
   marketType?: MarketType; // 중국대응 목적. Android 마켓별 이슈파악
   deviceType?: Platform; // 운영체제 (platform)
   branch?: Branch; // 브랜치
+  version?: string; // 버전 문자열
   majorVer?: number;
   minorVer?: number;
   buildNum?: number;
@@ -103,8 +104,10 @@ export interface CrashListResponse {
 export interface CrashUploadRequest {
   pubId: string; // 퍼블리셔 ID
   userId: number; // 사용자 ID
-  platform: Platform; // 플랫폼 정보
-  branch: Branch; // 브랜치 정보
+  platform: Platform | string; // 플랫폼 정보
+  branch: Branch | string; // 브랜치 정보
+  version?: string; // 버전 문자열
+  crashType?: string; // 크래시 타입
   majorVer: number; // 메이저 버전
   minorVer: number; // 마이너 버전
   buildNum: number; // 빌드 번호

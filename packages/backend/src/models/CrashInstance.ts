@@ -6,31 +6,41 @@ export class CrashInstance extends Model {
 
   id!: number;
   cid!: number; // crash id
-  pubId!: string;
-  userId!: number;
-  platform!: number;
-  majorVer!: number;
-  minorVer!: number;
-  buildNum!: number;
-  patchNum!: number;
-  userMsg?: string;
+  user_id?: number;
+  user_nickname?: string;
+  platform!: string;
+  branch!: string;
+  market_type?: string;
+  server_group?: string;
+  device_type?: string;
+  version!: string;
+  crash_type!: string;
+  crash_message?: string;
+  stack_trace_file?: string;
+  logs_file?: string;
+  occurred_at!: Date;
   createdAt!: Date;
 
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['cid', 'pubId', 'userId', 'platform', 'majorVer', 'minorVer', 'buildNum', 'patchNum'],
+      required: ['cid', 'platform', 'branch', 'version', 'crash_type', 'occurred_at'],
       properties: {
         id: { type: 'integer' },
         cid: { type: 'integer' },
-        pubId: { type: 'string', maxLength: 50 },
-        userId: { type: 'integer' },
-        platform: { type: 'integer' },
-        majorVer: { type: 'integer' },
-        minorVer: { type: 'integer' },
-        buildNum: { type: 'integer' },
-        patchNum: { type: 'integer' },
-        userMsg: { type: 'string', maxLength: CRASH_CONSTANTS.MaxUserMsgLen },
+        user_id: { type: 'integer' },
+        user_nickname: { type: 'string', maxLength: 255 },
+        platform: { type: 'string', enum: ['android', 'ios', 'windows', 'macos', 'linux'] },
+        branch: { type: 'string', enum: ['release', 'patch', 'beta', 'alpha', 'dev'] },
+        market_type: { type: 'string' },
+        server_group: { type: 'string', maxLength: 100 },
+        device_type: { type: 'string', maxLength: 255 },
+        version: { type: 'string', maxLength: 100 },
+        crash_type: { type: 'string', maxLength: 100 },
+        crash_message: { type: 'string' },
+        stack_trace_file: { type: 'string', maxLength: 500 },
+        logs_file: { type: 'string', maxLength: 500 },
+        occurred_at: { type: 'string', format: 'date-time' },
         createdAt: { type: 'string', format: 'date-time' }
       }
     };
@@ -56,23 +66,31 @@ export class CrashInstance extends Model {
   /**
    * Create new crash instance
    */
-  static async createInstance(data: {
+  static async create(data: {
     cid: number;
-    pubId: string;
-    userId: number;
-    platform: number;
-    majorVer: number;
-    minorVer: number;
-    buildNum: number;
-    patchNum: number;
-    userMsg?: string;
+    user_id?: number;
+    user_nickname?: string;
+    platform: string;
+    branch: string;
+    market_type?: string;
+    server_group?: string;
+    device_type?: string;
+    version: string;
+    crash_type: string;
+    crash_message?: string;
+    stack_trace_file?: string;
+    logs_file?: string;
+    occurred_at?: Date;
   }) {
-    // Truncate user message if too long
-    if (data.userMsg && data.userMsg.length > CRASH_CONSTANTS.MaxUserMsgLen) {
-      data.userMsg = data.userMsg.substring(0, CRASH_CONSTANTS.MaxUserMsgLen);
+    // Truncate crash message if too long
+    if (data.crash_message && data.crash_message.length > CRASH_CONSTANTS.MaxUserMsgLen) {
+      data.crash_message = data.crash_message.substring(0, CRASH_CONSTANTS.MaxUserMsgLen);
     }
 
-    return await this.query().insert(data);
+    return await this.query().insert({
+      ...data,
+      occurred_at: data.occurred_at || new Date()
+    });
   }
 
   /**

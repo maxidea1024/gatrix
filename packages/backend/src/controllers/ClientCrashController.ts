@@ -26,8 +26,7 @@ export class ClientCrashController {
     }
 
     // Validate numeric fields
-    if (isNaN(body.userId) || isNaN(body.platform) || isNaN(body.branch) ||
-        isNaN(body.majorVer) || isNaN(body.minorVer) || 
+    if (isNaN(body.userId) || isNaN(body.majorVer) || isNaN(body.minorVer) ||
         isNaN(body.buildNum) || isNaN(body.patchNum)) {
       throw new CustomError('Bad request body: Invalid numeric fields', 400);
     }
@@ -48,7 +47,7 @@ export class ClientCrashController {
 
       if (!crashId) {
         // Check database for existing crash
-        const existingCrash = await ClientCrash.findByHashAndBranch(chash, body.branch);
+        const existingCrash = await ClientCrash.findByHashAndBranch(chash, String(body.branch));
         
         if (existingCrash) {
           crashId = existingCrash.id;
@@ -66,12 +65,16 @@ export class ClientCrashController {
         const firstLine = body.stack.split('\n')[0]?.substring(0, CRASH_CONSTANTS.MaxFirstLineLen) || '';
         
         crash = await ClientCrash.query().insert({
-          branch: body.branch,
-          chash,
-          firstLine,
-          count: 1,
+          crash_id: chash,
+          platform: String(body.platform) || 'unknown',
+          branch: String(body.branch),
+          version: body.version || `${body.majorVer}.${body.minorVer}.${body.buildNum}.${body.patchNum}`,
+          crash_type: body.crashType || 'Unknown',
+          crash_message: firstLine,
           state: CrashState.OPEN,
-          lastCrash: new Date()
+          first_occurred_at: new Date(),
+          last_occurred_at: new Date(),
+          occurrence_count: 1
         });
 
         crashId = crash.id;
@@ -100,16 +103,20 @@ export class ClientCrashController {
       }
 
       // Create crash instance
-      const instance = await CrashInstance.createInstance({
+      const instance = await CrashInstance.create({
         cid: crashId!,
-        pubId: body.pubId,
-        userId: body.userId,
-        platform: body.platform,
-        majorVer: body.majorVer,
-        minorVer: body.minorVer,
-        buildNum: body.buildNum,
-        patchNum: body.patchNum,
-        userMsg: body.userMsg
+        user_id: body.userId,
+        user_nickname: `User${body.userId}`, // 임시 닉네임
+        platform: String(body.platform),
+        branch: String(body.branch),
+        market_type: body.marketType,
+        server_group: body.serverGroup,
+        device_type: String(body.platform),
+        version: body.version || `${body.majorVer}.${body.minorVer}.${body.buildNum}.${body.patchNum}`,
+        crash_type: body.crashType || 'Unknown',
+        crash_message: body.userMsg,
+        stack_trace_file: `/crashes/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(new Date().getDate()).padStart(2, '0')}/stack_${crashId}_${Date.now()}.txt`,
+        logs_file: `/crashes/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(new Date().getDate()).padStart(2, '0')}/logs_${crashId}_${Date.now()}.txt`
       });
 
       // Save log file if provided

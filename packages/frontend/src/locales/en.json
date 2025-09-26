@@ -2065,5 +2065,8 @@
     "invitationDeclineFailed": "Failed to decline invitation",
     "invitationCancelFailed": "Failed to cancel invitation",
     "addReaction": "Add reaction"
+  },
+  "crashes": {
+    "title": "Client Crashes"
   }
 }
