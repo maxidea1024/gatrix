@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo, useLayoutEffect } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useLayoutEffect, useCallback } from 'react';
 import { Box, Typography, Paper, useTheme, Avatar, IconButton, Tooltip } from '@mui/material';
 import {
   Reply as ReplyIcon,
@@ -460,13 +460,14 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   const wasAtBottomRef = useRef(true);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const resizeScheduledRef = useRef(false);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // 새 메시지가 올 때 하단에 있으면 자동 스크롤 (슬랙 스타일 컨테이너용)
   useEffect(() => {
     if (messages.length === 0) return;
 
     const scrollToBottom = () => {
-      const messageContainer = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement;
+      const messageContainer = messagesContainerRef.current;
 
       if (!messageContainer) {
         console.log('❌ Slack message container not found');
@@ -488,7 +489,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
 
     // 미디어 콘텐츠 로딩 완료를 위한 추가 체크
     const checkForMediaContent = () => {
-      const messageContainer = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement;
+      const messageContainer = messagesContainerRef.current;
       if (!messageContainer) return;
 
       // 이미지, 비디오, iframe 등의 미디어 요소들 찾기
@@ -566,7 +567,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       // 새로운 타임아웃 설정 (3초 후 읽음 처리)
       markAsReadTimeoutRef.current = setTimeout(() => {
         // 창이 포커스되어 있고, 스크롤이 하단 근처에 있을 때만 읽음 처리
-        const messageContainer = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement;
+        const messageContainer = messagesContainerRef.current;
         if (messageContainer && document.hasFocus()) {
           const { scrollTop, scrollHeight, clientHeight } = messageContainer;
           const isNearBottom = scrollTop + clientHeight >= scrollHeight - 200;
@@ -648,9 +649,9 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         markAsReadTimeoutRef.current = null;
       }
 
-      // 즉시 스크롤하여 깜빡임 방지 - requestAnimationFrame으로 한 프레임 지연
+      // 즉시 스크롤하여 깜빡임 방지 - ref 직접 사용으로 성능 개선
       requestAnimationFrame(() => {
-        const messageContainer = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement;
+        const messageContainer = messagesContainerRef.current;
         if (messageContainer) {
           messageContainer.scrollTop = messageContainer.scrollHeight;
         }
@@ -659,7 +660,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   }, [channelId]);
 
   // Focus input when clicking anywhere in the chat area (but not when selecting text)
-  const handleChatAreaClick = (e: React.MouseEvent) => {
+  const handleChatAreaClick = useCallback((e: React.MouseEvent) => {
     // Don't focus input if user is selecting text
     const selection = window.getSelection();
     if (selection && selection.toString().length > 0) {
@@ -672,7 +673,14 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
       return;
     }
     // AdvancedMessageInput이 포커스를 처리함
-  };
+  }, []);
+
+  // 스크롤 핸들러 메모이제이션으로 성능 최적화
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const threshold = 100;
+    wasAtBottomRef.current = (el.scrollTop + el.clientHeight) >= (el.scrollHeight - threshold);
+  }, []);
 
   // 테마 변경 시 스타일 업데이트
   useEffect(() => {
@@ -954,6 +962,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
 
       {/* Messages - Slack Style */}
       <Box
+        ref={messagesContainerRef}
         data-testid="slack-messages-container"
         sx={{
           flex: 1,
@@ -990,11 +999,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
             : 'rgba(0, 0, 0, 0.2) transparent',
         }}
         onClick={handleChatAreaClick}
-        onScroll={(e) => {
-          const el = e.currentTarget;
-          const threshold = 100;
-          wasAtBottomRef.current = (el.scrollTop + el.clientHeight) >= (el.scrollHeight - threshold);
-        }}
+        onScroll={handleScroll}
       >
         {messages.map((message, index) => {
           const userInfo = getUserInfo(message.userId);
@@ -1504,4 +1509,5 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   );
 };
 
-export default ChatElementsMessageList;
+// React.memo로 불필요한 리렌더링 방지
+export default React.memo(ChatElementsMessageList);
