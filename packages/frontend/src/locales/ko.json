@@ -85,8 +85,21 @@
       "invalidDate": "유효하지 않은 날짜",
       "expiresInOneDay": "1일 후 만료",
       "expiresInDays": "{{days}}일 후 만료",
+      "inviteLinkCreated": "{{date}}에 생성된 초대 링크가 있습니다",
+      "updateInviteLink": "초대 링크 업데이트",
       "dateError": "날짜 오류",
-      "noExpiration": "만료 정보 없음"
+      "noExpiration": "만료 정보 없음",
+      "deleteConfirmTitle": "초대 링크 삭제",
+      "deleteConfirmMessage": "정말로 이 초대 링크를 삭제하시겠습니까?",
+      "deleteConfirmWarning": "삭제된 초대 링크는 복구할 수 없으며, 해당 링크를 사용한 가입이 불가능해집니다.",
+      "deleteConfirmButton": "삭제",
+      "cancelButton": "취소",
+      "invalidInviteTitle": "유효하지 않은 초대 링크",
+      "invalidInviteSubtitle": "요청하신 초대 링크를 찾을 수 없습니다",
+      "invalidInviteMessage": "이 초대 링크는 만료되었거나, 이미 사용되었거나, 삭제되었을 수 있습니다.",
+      "invalidInviteHelp": "새로운 초대 링크가 필요하시면 관리자에게 문의하세요.",
+      "goToLogin": "로그인 페이지로 이동",
+      "goToRegister": "일반 회원가입"
     },
     "remoteConfig": {
       "title": "리모트 설정",

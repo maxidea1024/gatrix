@@ -307,9 +307,12 @@ const ChatPageContent: React.FC = () => {
     const msgs = state.messages[chId] || [];
     const found = msgs.find(m => m.id === lastId);
     if (found) {
-      setThreadMessage(found);
-      setIsThreadOpen(true);
-      pendingThreadToOpenRef.current = null;
+      // 스레드 복원 시 약간의 딜레이를 주어 메인 입력창 포커스와 충돌 방지
+      setTimeout(() => {
+        setThreadMessage(found);
+        setIsThreadOpen(true);
+        pendingThreadToOpenRef.current = null;
+      }, 50);
     } else {
       // 메시지가 아직 로드되지 않은 경우, 로딩 후 열도록 예약해둠
       pendingThreadToOpenRef.current = lastId;

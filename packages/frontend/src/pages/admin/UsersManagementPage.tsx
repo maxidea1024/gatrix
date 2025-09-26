@@ -75,9 +75,8 @@ import { useAuth } from '@/hooks/useAuth';
 import SimplePagination from '../../components/common/SimplePagination';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
 import { invitationService } from '../../services/invitationService';
-import { Invitation, CreateInvitationRequest, InvitationResponse } from '../../types/invitation';
+import { Invitation, CreateInvitationRequest } from '../../types/invitation';
 import InvitationForm from '../../components/admin/InvitationForm';
-import InvitationSuccess from '../../components/admin/InvitationSuccess';
 import InvitationStatusCard from '../../components/admin/InvitationStatusCard';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 
@@ -142,9 +141,7 @@ const UsersManagementPage: React.FC = () => {
 
   // 초대 관련 상태
   const [invitationDialogOpen, setInvitationDialogOpen] = useState(false);
-  const [invitationSuccessDialogOpen, setInvitationSuccessDialogOpen] = useState(false);
   const [currentInvitation, setCurrentInvitation] = useState<Invitation | null>(null);
-  const [invitationResponse, setInvitationResponse] = useState<InvitationResponse | null>(null);
 
   const [addUserDialog, setAddUserDialog] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
@@ -197,11 +194,15 @@ const UsersManagementPage: React.FC = () => {
   const loadCurrentInvitation = async () => {
     try {
       const invitation = await invitationService.getCurrentInvitation();
+      console.log('Loaded current invitation:', invitation);
       setCurrentInvitation(invitation);
     } catch (error: any) {
       // 초대가 없는 경우 404 에러는 정상적인 상황
       if (error.status !== 404) {
         console.error('Failed to load current invitation:', error);
+      } else {
+        console.log('No active invitation found (404)');
+        setCurrentInvitation(null);
       }
     }
   };
@@ -671,9 +672,7 @@ const UsersManagementPage: React.FC = () => {
   const handleCreateInvitation = async (data: CreateInvitationRequest) => {
     try {
       const response = await invitationService.createInvitation(data);
-      setInvitationResponse(response);
-      setInvitationDialogOpen(false);
-      setInvitationSuccessDialogOpen(true);
+      setInvitationDialogOpen(false); // 초대 폼 닫기
       await loadCurrentInvitation(); // 현재 초대 정보 새로고침
       enqueueSnackbar('초대 링크가 성공적으로 생성되었습니다.', { variant: 'success' });
     } catch (error: any) {
@@ -2080,10 +2079,10 @@ const UsersManagementPage: React.FC = () => {
         sx={{
           zIndex: 1301,
           '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 400 }, // 폭을 500에서 400으로 줄임
+            width: { xs: '100%', sm: 400 },
             maxWidth: '100vw',
-            height: '80vh', // 높이를 80vh로 설정
-            top: '10vh', // 상단에서 10vh 떨어뜨림
+            height: '100vh', // 전체 화면 높이 사용
+            top: 0, // 상단에 붙임
             display: 'flex',
             flexDirection: 'column'
           }
@@ -2133,7 +2132,6 @@ const UsersManagementPage: React.FC = () => {
         <Box sx={{
           flex: 1,
           overflow: 'auto',
-          maxHeight: 'calc(80vh - 80px)', // 헤더 높이 제외
           '&::-webkit-scrollbar': {
             width: '8px',
           },
@@ -2157,57 +2155,7 @@ const UsersManagementPage: React.FC = () => {
         </Box>
       </Drawer>
 
-      {/* Invitation Success Drawer */}
-      <Drawer
-        anchor="right"
-        open={invitationSuccessDialogOpen}
-        onClose={() => setInvitationSuccessDialogOpen(false)}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 600 },
-            maxWidth: '100vw',
-            display: 'flex',
-            flexDirection: 'column'
-          }
-        }}
-      >
-        {/* Header */}
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          p: 2,
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          bgcolor: 'background.paper'
-        }}>
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            초대 완료
-          </Typography>
-          <IconButton
-            onClick={() => setInvitationSuccessDialogOpen(false)}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover'
-              }
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
 
-        {/* Content */}
-        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
-          {invitationResponse && (
-            <InvitationSuccess
-              invitationData={invitationResponse}
-              onClose={() => setInvitationSuccessDialogOpen(false)}
-            />
-          )}
-        </Box>
-      </Drawer>
     </Box>
   );
 };

@@ -19,9 +19,18 @@ class InvitationService {
   async getCurrentInvitation(): Promise<Invitation | null> {
     try {
       const response = await apiService.get(`${this.ADMIN_BASE_URL}/current`);
-      return response.data;
+      console.log('getCurrentInvitation response:', response);
+
+      // apiService는 이미 response.data를 반환하므로
+      // response는 백엔드에서 보낸 { success: true, data: {...} } 구조
+      if (response?.success && response?.data) {
+        return response.data;
+      }
+
+      return null;
     } catch (error: any) {
-      if (error.response?.status === 404) {
+      console.error('getCurrentInvitation error:', error);
+      if (error.status === 404) {
         return null;
       }
       throw error;
@@ -50,6 +59,9 @@ class InvitationService {
   }
 
   generateInviteUrl(token: string): string {
+    if (!token) {
+      return 'Invalid invitation token';
+    }
     const baseUrl = window.location.origin;
     return `${baseUrl}/signup?invite=${token}`;
   }

@@ -86,7 +86,20 @@
       "expiresInOneDay": "Expires in 1 day",
       "expiresInDays": "Expires in {{days}} days",
       "dateError": "Date error",
-      "noExpiration": "No expiration info"
+      "noExpiration": "No expiration info",
+      "inviteLinkCreated": "Invitation created on {{date}}",
+      "updateInviteLink": "Update Invitation",
+      "deleteConfirmTitle": "Delete Invitation Link",
+      "deleteConfirmMessage": "Are you sure you want to delete this invitation link?",
+      "deleteConfirmWarning": "Deleted invitation links cannot be recovered and the link will no longer be usable for registration.",
+      "deleteConfirmButton": "Delete",
+      "cancelButton": "Cancel",
+      "invalidInviteTitle": "Invalid Invitation Link",
+      "invalidInviteSubtitle": "The requested invitation link could not be found",
+      "invalidInviteMessage": "This invitation link may have expired, already been used, or been deleted.",
+      "invalidInviteHelp": "If you need a new invitation link, please contact an administrator.",
+      "goToLogin": "Go to Login",
+      "goToRegister": "Regular Registration"
     },
     "remoteConfig": {
       "title": "Remote Config",

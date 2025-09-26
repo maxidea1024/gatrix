@@ -146,11 +146,17 @@ const RegisterPage: React.FC = () => {
           setValue('email', result.invitation.email);
         }
       } else {
-        setInvitationError('초대 링크가 유효하지 않거나 만료되었습니다.');
+        // 초대 링크가 유효하지 않은 경우 전용 페이지로 리다이렉트
+        navigate('/invalid-invite', { replace: true });
       }
     } catch (error: any) {
       console.error('Failed to validate invitation:', error);
-      setInvitationError(error.message || '초대 링크 확인에 실패했습니다.');
+      // 404나 기타 에러의 경우도 유효하지 않은 초대로 처리
+      if (error.status === 404 || error.status === 400) {
+        navigate('/invalid-invite', { replace: true });
+      } else {
+        setInvitationError(error.message || '초대 링크 확인에 실패했습니다.');
+      }
     } finally {
       setInvitationLoading(false);
     }

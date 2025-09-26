@@ -42,6 +42,7 @@ import AccountSuspendedPage from './pages/auth/AccountSuspendedPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import OAuthCallbackPage from './pages/auth/OAuthCallbackPage';
+import InvalidInvitePage from './pages/auth/InvalidInvitePage';
 
 // Pages - Common
 import DashboardPage from './pages/common/DashboardPage';
@@ -176,6 +177,8 @@ const AppContent: React.FC = () => {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/logout" element={<LogoutPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+                <Route path="/signup" element={<RegisterPage />} />
+                <Route path="/invalid-invite" element={<InvalidInvitePage />} />
                 <Route path="/pending-approval" element={<PendingApprovalPage />} />
                 <Route path="/auth/pending" element={<PendingApprovalPage />} />
                 <Route path="/auth/callback" element={<OAuthCallbackPage />} />

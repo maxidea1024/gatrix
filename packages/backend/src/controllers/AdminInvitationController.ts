@@ -20,7 +20,7 @@ export class AdminInvitationController {
       });
     }
 
-    const { email, role = 'user' } = req.body;
+    const { email, role = 'user', expirationHours = 168 } = req.body; // 기본값: 168시간(7일)
     const userId = req.user?.id;
 
     if (!userId) {
@@ -41,30 +41,32 @@ export class AdminInvitationController {
       }
     }
 
-    // 이미 존재하는 초대인지 확인
-    const existingInvitation = await db('g_invitations')
-      .where('email', email)
-      .where('isActive', true)
-      .where('expiresAt', '>', new Date())
-      .first();
+    // 이메일이 제공된 경우에만 기존 초대 확인
+    if (email) {
+      const existingInvitation = await db('g_invitations')
+        .where('email', email)
+        .where('isActive', true)
+        .where('expiresAt', '>', new Date())
+        .first();
 
-    if (existingInvitation) {
-      return res.status(409).json({
-        success: false,
-        error: 'An active invitation already exists for this email'
-      });
+      if (existingInvitation) {
+        return res.status(409).json({
+          success: false,
+          error: 'An active invitation already exists for this email'
+        });
+      }
     }
 
     // 새 초대 생성
     const invitationId = uuidv4();
     const token = uuidv4();
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // 7일 후 만료
+    expiresAt.setTime(expiresAt.getTime() + (expirationHours * 60 * 60 * 1000)); // 설정된 시간 후 만료
 
     await db('g_invitations').insert({
       id: invitationId,
       token,
-      email,
+      email: email || null, // 이메일이 없으면 null로 저장
       role,
       createdBy: userId,
       createdAt: new Date(),
@@ -91,13 +93,14 @@ export class AdminInvitationController {
   // 현재 활성 초대 조회
   static getCurrent = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const activeInvitations = await db('g_invitations')
+      const activeInvitation = await db('g_invitations')
         .select(['id', 'token', 'email', 'role', 'expiresAt', 'createdAt', 'createdBy', 'isActive'])
         .where('isActive', true)
         .where('expiresAt', '>', new Date())
-        .orderBy('createdAt', 'desc');
+        .orderBy('createdAt', 'desc')
+        .first(); // 가장 최근의 활성 초대 하나만 가져오기
 
-      if (activeInvitations.length === 0) {
+      if (!activeInvitation) {
         return res.status(404).json({
           success: false,
           error: 'No active invitation'
@@ -106,16 +109,16 @@ export class AdminInvitationController {
 
       res.json({
         success: true,
-        data: activeInvitations.map(inv => ({
-          id: inv.id,
-          token: inv.token,
-          email: inv.email,
-          role: inv.role,
-          createdAt: inv.createdAt,
-          expiresAt: inv.expiresAt,
-          createdBy: inv.createdBy,
-          isActive: inv.isActive
-        }))
+        data: {
+          id: activeInvitation.id,
+          token: activeInvitation.token,
+          email: activeInvitation.email,
+          role: activeInvitation.role,
+          createdAt: activeInvitation.createdAt,
+          expiresAt: activeInvitation.expiresAt,
+          createdBy: activeInvitation.createdBy,
+          isActive: activeInvitation.isActive
+        }
       });
     } catch (error) {
       logger.error('Error fetching current invitations:', error);
@@ -193,12 +196,17 @@ export class AdminInvitationController {
 // 입력 검증 미들웨어
 export const createInvitationValidation = [
   body('email')
+    .optional()
     .isEmail()
-    .withMessage('Valid email is required')
+    .withMessage('Valid email is required when provided')
     .normalizeEmail(),
   body('role')
     .optional()
     .isIn(['user', 'admin'])
-    .withMessage('Role must be either user or admin')
+    .withMessage('Role must be either user or admin'),
+  body('expirationHours')
+    .optional()
+    .isInt({ min: 1, max: 8760 }) // 최소 1시간, 최대 1년(365*24)
+    .withMessage('Expiration hours must be between 1 and 8760 (1 year)')
 ];
 

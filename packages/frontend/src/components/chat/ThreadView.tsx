@@ -138,15 +138,17 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
 
   // 스레드가 열릴 때 입력창에 포커스 설정
   useEffect(() => {
+    // 스레드가 처음 마운트될 때만 포커스 설정
     const timer = setTimeout(() => {
       const input = inputRef.current?.querySelector('input, textarea') as HTMLElement;
-      if (input) {
+      if (input && !input.matches(':focus')) {
+        // 이미 포커스가 있지 않을 때만 포커스 설정
         input.focus();
       }
-    }, 100); // 주 메시지창의 포커스 설정 후에 실행
+    }, 150); // 메인 입력창의 포커스 설정보다 늦게 실행
 
     return () => clearTimeout(timer);
-  }, []);
+  }, []); // 의존성 배열을 비워서 마운트 시에만 실행
 
   useEffect(() => {
     loadThreadMessages();

@@ -653,13 +653,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // 타이핑 이벤트 리스너
         wsService.onUserTyping((typing) => {
           dispatch({ type: 'ADD_TYPING_USER', payload: typing });
-          // Remove typing indicator after 3 seconds
+          // 5초 후 자동으로 타이핑 인디케이터 제거 (백업 안전장치)
           setTimeout(() => {
             dispatch({
               type: 'REMOVE_TYPING_USER',
               payload: { channelId: typing.channelId, userId: typing.userId }
             });
-          }, 3000);
+          }, 5000);
         });
       };
 

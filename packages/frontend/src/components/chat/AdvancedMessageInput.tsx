@@ -28,6 +28,7 @@ interface AdvancedMessageInputProps {
   disabled?: boolean;
   autoFocus?: boolean;
   focusTrigger?: number;
+  isThreadOpen?: boolean; // 스레드 열림 상태를 전달받아 포커스 관리에 활용
 }
 
 const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
@@ -37,6 +38,7 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
   disabled = false,
   autoFocus = false,
   focusTrigger,
+  isThreadOpen = false,
 }) => {
   const { t } = useTranslation();
   const { state, actions } = useChat();
@@ -55,23 +57,24 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
 
   // ThreadView 등에서 강제로 포커스가 필요할 때
   useEffect(() => {
-    if (autoFocus && !disabled) {
+    if (autoFocus && !disabled && !isThreadOpen) {
+      // 스레드가 열려있지 않을 때만 포커스
       const t = setTimeout(() => {
         textFieldRef.current?.focus();
       }, 0);
       return () => clearTimeout(t);
     }
-  }, [autoFocus, disabled]);
+  }, [autoFocus, disabled, isThreadOpen]);
 
-  // 외부에서 focusTrigger가 변경되면 포커스 시도
+  // 외부에서 focusTrigger가 변경되면 포커스 시도 (스레드가 열려있지 않을 때만)
   useEffect(() => {
-    if (focusTrigger !== undefined && !disabled) {
+    if (focusTrigger !== undefined && !disabled && !isThreadOpen) {
       const t = setTimeout(() => {
         textFieldRef.current?.focus();
       }, 0);
       return () => clearTimeout(t);
     }
-  }, [focusTrigger, disabled]);
+  }, [focusTrigger, disabled, isThreadOpen]);
 
   // WebSocket 연결 및 채널 준비 완료 시 입력창에 포커스(기존 동작 유지)
   useEffect(() => {
@@ -79,41 +82,57 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
         textFieldRef.current &&
         !disabled &&
         state.isConnected &&
-        currentChannel) {
+        currentChannel &&
+        autoFocus &&
+        !isThreadOpen) { // 스레드가 열려있지 않을 때만 자동 포커스
       // WebSocket 연결, 채널 존재, 비활성화 상태가 아닐 때만 포커스
       const timer = setTimeout(() => {
         textFieldRef.current?.focus();
-      }, 300);
+      }, 50); // 딜레이를 더 줄임
       return () => clearTimeout(timer);
     }
-  }, [channelId, disabled, state.isConnected, currentChannel]);
+  }, [channelId, disabled, state.isConnected, currentChannel, autoFocus, isThreadOpen]);
 
   // Handle typing indicator
   useEffect(() => {
-    if (message.trim() && !isTyping) {
+    const hasContent = message.trim().length > 0;
+
+    if (hasContent && !isTyping) {
+      // 타이핑 시작
       setIsTyping(true);
       actions.startTyping(channelId);
+    } else if (!hasContent && isTyping) {
+      // 메시지가 비어있으면 즉시 타이핑 중지
+      setIsTyping(false);
+      actions.stopTyping(channelId);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+      return;
     }
 
-    // Clear existing timeout
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
+    // 타이핑 중일 때만 타임아웃 설정
+    if (hasContent && isTyping) {
+      // 기존 타임아웃 클리어
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
 
-    // Set new timeout
-    typingTimeoutRef.current = setTimeout(() => {
-      if (isTyping) {
+      // 3초 후 타이핑 중지
+      typingTimeoutRef.current = setTimeout(() => {
         setIsTyping(false);
         actions.stopTyping(channelId);
-      }
-    }, 3000);
+        typingTimeoutRef.current = null;
+      }, 3000);
+    }
 
     return () => {
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
     };
-  }, [message, channelId, isTyping, actions]);
+  }, [message, channelId, actions]); // isTyping 의존성 제거로 무한 루프 방지
 
   // Stop typing when component unmounts
   useEffect(() => {

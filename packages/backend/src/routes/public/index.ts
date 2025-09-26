@@ -1,10 +1,12 @@
 import express from 'express';
 import uploadRoutes from './upload';
+import invitationRoutes from './invitations';
 
 const router = express.Router();
 
 // Public routes that don't require authentication
 router.use('/upload', uploadRoutes);
+router.use('/invitations', invitationRoutes);
 
 // Health check endpoint
 router.get('/health', (req, res) => {
