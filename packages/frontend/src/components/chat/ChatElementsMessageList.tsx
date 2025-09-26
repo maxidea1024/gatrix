@@ -587,9 +587,9 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     };
   }, [messages, channelId, actions]);
 
-  // 콘텐츠 높이 변화 시에도 하단 유지 (하단에 있었던 경우)
+  // 콘텐츠 높이 변화 시에도 하단 유지 (하단에 있었던 경우) - ref 직접 사용으로 깜빡임 방지
   useEffect(() => {
-    const el = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement | null;
+    const el = messagesContainerRef.current;
     if (!el) return;
 
     const ro = new ResizeObserver(() => {
@@ -619,7 +619,7 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
     const myUserId = state.user?.id;
     if (!myUserId) return;
 
-    const container = document.querySelector('[data-testid="slack-messages-container"]') as HTMLElement | null;
+    const container = messagesContainerRef.current;
     if (!container) return;
 
     if (last?.userId === myUserId) {
@@ -1407,62 +1407,6 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         <div ref={messagesEndRef} />
       </Box>
 
-      {/* 타이핑 인디케이터 - 입력창 바로 위에 위치 */}
-      {typingUsers.length > 0 && (
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          px: 2,
-          py: 1,
-          mx: 2,
-          backgroundColor: colors.inputFieldBackground,
-          borderRadius: '12px',
-          border: `1px solid ${colors.inputBorder}`,
-          animation: 'fadeInUp 0.2s ease-out',
-          '@keyframes fadeInUp': {
-            from: { opacity: 0, transform: 'translateY(10px)' },
-            to: { opacity: 1, transform: 'translateY(0)' },
-          },
-        }}>
-          <Box sx={{
-            display: 'flex',
-            gap: 0.5,
-            alignItems: 'center'
-          }}>
-            {[0, 1, 2].map((i) => (
-              <Box
-                key={i}
-                sx={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: '50%',
-                  backgroundColor: colors.placeholderText,
-                  animation: 'typing-dot 1.4s infinite ease-in-out',
-                  animationDelay: `${i * 0.16}s`,
-                  '@keyframes typing-dot': {
-                    '0%, 80%, 100%': {
-                      transform: 'scale(0)',
-                      opacity: 0.5,
-                    },
-                    '40%': {
-                      transform: 'scale(1)',
-                      opacity: 1,
-                    },
-                  },
-                }}
-              />
-            ))}
-          </Box>
-          <Typography variant="caption" sx={{ color: colors.placeholderText, fontSize: '12px' }}>
-            {typingUsers.length === 1
-              ? t('chat.userTyping', { username: state.users[typingUsers[0].userId]?.name || state.users[typingUsers[0].userId]?.username || t('chat.someone') })
-              : t('chat.multipleUsersTyping', { count: typingUsers.length })
-            }
-          </Typography>
-        </Box>
-      )}
-
       {/* Message Input */}
       <Box sx={{ p: 2, backgroundColor: colors.inputBackground }}>
         <AdvancedMessageInput
@@ -1503,6 +1447,58 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
             setEmojiPickerMessageId(null);
           }}
         />
+
+        {/* 타이핑 인디케이터 - 입력창 아래에 위치 */}
+        {typingUsers.length > 0 && (
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            px: 1,
+            py: 0.5,
+            animation: 'fadeIn 0.2s ease-out',
+            '@keyframes fadeIn': {
+              from: { opacity: 0 },
+              to: { opacity: 1 },
+            },
+          }}>
+            <Box sx={{
+              display: 'flex',
+              gap: 0.5,
+              alignItems: 'center'
+            }}>
+              {[0, 1, 2].map((i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    width: 4,
+                    height: 4,
+                    borderRadius: '50%',
+                    backgroundColor: colors.placeholderText,
+                    animation: 'typing-dot 1.4s infinite ease-in-out',
+                    animationDelay: `${i * 0.16}s`,
+                    '@keyframes typing-dot': {
+                      '0%, 80%, 100%': {
+                        transform: 'scale(0)',
+                        opacity: 0.5,
+                      },
+                      '40%': {
+                        transform: 'scale(1)',
+                        opacity: 1,
+                      },
+                    },
+                  }}
+                />
+              ))}
+            </Box>
+            <Typography variant="caption" sx={{ color: colors.placeholderText, fontSize: '11px' }}>
+              {typingUsers.length === 1
+                ? t('chat.userTyping', { username: state.users[typingUsers[0].userId]?.name || state.users[typingUsers[0].userId]?.username || t('chat.someone') })
+                : t('chat.multipleUsersTyping', { count: typingUsers.length })
+              }
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Box>
   );

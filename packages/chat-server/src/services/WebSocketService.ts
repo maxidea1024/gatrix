@@ -226,18 +226,18 @@ export class WebSocketService {
     });
 
     // 타이핑 시작
-    socket.on('start_typing', async (data: { channelId: number }) => {
+    socket.on('start_typing', async (data: { channelId: number; threadId?: number }) => {
       try {
-        await this.handleStartTyping(socket, socketUser, data.channelId);
+        await this.handleStartTyping(socket, socketUser, data.channelId, data.threadId);
       } catch (error) {
         logger.error('Error starting typing:', error);
       }
     });
 
     // 타이핑 중지
-    socket.on('stop_typing', async (data: { channelId: number }) => {
+    socket.on('stop_typing', async (data: { channelId: number; threadId?: number }) => {
       try {
-        await this.handleStopTyping(socket, socketUser, data.channelId);
+        await this.handleStopTyping(socket, socketUser, data.channelId, data.threadId);
       } catch (error) {
         logger.error('Error stopping typing:', error);
       }
@@ -399,34 +399,40 @@ export class WebSocketService {
     }
   }
 
-  private async handleStartTyping(socket: Socket, socketUser: SocketUser, channelId: number): Promise<void> {
+  private async handleStartTyping(socket: Socket, socketUser: SocketUser, channelId: number, threadId?: number): Promise<void> {
     const typingData = {
       userId: socketUser.userId,
       channelId,
+      threadId,
       timestamp: Date.now(),
     };
 
-    // 채널의 다른 사용자들에게 타이핑 알림
-    socket.to(`channel:${channelId}`).emit('user_typing', typingData);
-    
+    // 스레드 타이핑인지 일반 채팅 타이핑인지 구분하여 이벤트 전송
+    const eventName = threadId ? 'user_typing_thread' : 'user_typing';
+    socket.to(`channel:${channelId}`).emit(eventName, typingData);
+
     // 캐시에 타이핑 상태 저장 (TTL 5초)
     const cacheService = CacheService.getInstance();
-    await cacheService.set(`typing:${channelId}:${socketUser.userId}`, Date.now().toString(), 5 * 1000);
+    const cacheKey = threadId ? `typing:thread:${threadId}:${socketUser.userId}` : `typing:${channelId}:${socketUser.userId}`;
+    await cacheService.set(cacheKey, Date.now().toString(), 5 * 1000);
   }
 
-  private async handleStopTyping(socket: Socket, socketUser: SocketUser, channelId: number): Promise<void> {
+  private async handleStopTyping(socket: Socket, socketUser: SocketUser, channelId: number, threadId?: number): Promise<void> {
     const typingData = {
       userId: socketUser.userId,
       channelId,
+      threadId,
       timestamp: Date.now(),
     };
 
-    // 채널의 다른 사용자들에게 타이핑 중지 알림
-    socket.to(`channel:${channelId}`).emit('user_stop_typing', typingData);
-    
+    // 스레드 타이핑인지 일반 채팅 타이핑인지 구분하여 이벤트 전송
+    const eventName = threadId ? 'user_stop_typing_thread' : 'user_stop_typing';
+    socket.to(`channel:${channelId}`).emit(eventName, typingData);
+
     // 캐시에서 타이핑 상태 제거
     const cacheService = CacheService.getInstance();
-    await cacheService.delete(`typing:${channelId}:${socketUser.userId}`);
+    const cacheKey = threadId ? `typing:thread:${threadId}:${socketUser.userId}` : `typing:${channelId}:${socketUser.userId}`;
+    await cacheService.delete(cacheKey);
   }
 
   private async handleMarkRead(socket: Socket, socketUser: SocketUser, data: { channelId: number; messageId: number }): Promise<void> {

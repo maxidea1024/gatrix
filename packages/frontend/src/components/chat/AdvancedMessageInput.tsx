@@ -29,6 +29,7 @@ interface AdvancedMessageInputProps {
   autoFocus?: boolean;
   focusTrigger?: number;
   isThreadOpen?: boolean; // 스레드 열림 상태를 전달받아 포커스 관리에 활용
+  threadId?: number; // 스레드 메시지인 경우 threadId
 }
 
 const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
@@ -39,6 +40,7 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
   autoFocus = false,
   focusTrigger,
   isThreadOpen = false,
+  threadId,
 }) => {
   const { t } = useTranslation();
   const { state, actions } = useChat();
@@ -100,11 +102,11 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
     if (hasContent && !isTyping) {
       // 타이핑 시작
       setIsTyping(true);
-      actions.startTyping(channelId);
+      actions.startTyping(channelId, threadId);
     } else if (!hasContent && isTyping) {
       // 메시지가 비어있으면 즉시 타이핑 중지
       setIsTyping(false);
-      actions.stopTyping(channelId);
+      actions.stopTyping(channelId, threadId);
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
         typingTimeoutRef.current = null;
@@ -122,7 +124,7 @@ const AdvancedMessageInput: React.FC<AdvancedMessageInputProps> = ({
       // 3초 후 타이핑 중지
       typingTimeoutRef.current = setTimeout(() => {
         setIsTyping(false);
-        actions.stopTyping(channelId);
+        actions.stopTyping(channelId, threadId);
         typingTimeoutRef.current = null;
       }, 3000);
     }

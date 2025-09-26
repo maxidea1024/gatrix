@@ -156,6 +156,7 @@ export interface TypingIndicator {
   userId: number;
   user: User;
   timestamp: string;
+  threadId?: number; // 스레드 타이핑인 경우
 }
 
 export interface ChatNotification {
@@ -195,6 +196,8 @@ export type WebSocketEventType =
   | 'message_sent'                // 메시지 전송 완료
   | 'user_typing'                 // 타이핑 시작 알림
   | 'user_stop_typing'            // 타이핑 중지 알림
+  | 'user_typing_thread'          // 스레드 타이핑 시작 알림
+  | 'user_stop_typing_thread'     // 스레드 타이핑 중지 알림
   | 'user_status_changed'         // 사용자 상태 변경 알림
   | 'user_left'                   // 사용자 채널 퇴장 알림
   | 'message'                     // 일반 메시지 (MessageController)
@@ -291,6 +294,7 @@ export interface ChatState {
   users: Record<number, User>; // userId -> user
   user: User | null; // current user
   typingUsers: Record<number, TypingIndicator[]>; // channelId -> typing users
+  threadTypingUsers: Record<number, TypingIndicator[]>; // threadId -> typing users
   notifications: ChatNotification[];
   isConnected: boolean;
   isLoading: boolean;
@@ -314,8 +318,8 @@ export interface ChatContextType {
     addReaction: (messageId: number, emoji: string) => Promise<void>;
     removeReaction: (messageId: number, emoji: string) => Promise<void>;
     markAsRead: (channelId: number, messageId?: number) => Promise<void>;
-    startTyping: (channelId: number) => void;
-    stopTyping: (channelId: number) => void;
+    startTyping: (channelId: number, threadId?: number) => void;
+    stopTyping: (channelId: number, threadId?: number) => void;
     searchMessages: (query: string, channelId?: number) => Promise<Message[]>;
     loadMessages: (channelId: number) => Promise<void>;
     loadMoreMessages: (channelId: number) => Promise<void>;

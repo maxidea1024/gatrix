@@ -99,6 +99,7 @@ const initialState: ChatState = {
   users: {},
   user: null,
   typingUsers: {},
+  threadTypingUsers: {},
   notifications: [],
   isConnected: false,
   isLoading: false,
@@ -132,6 +133,8 @@ type ChatAction =
   | { type: 'SET_TYPING_USERS'; payload: { channelId: number; users: TypingIndicator[] } }
   | { type: 'ADD_TYPING_USER'; payload: TypingIndicator }
   | { type: 'REMOVE_TYPING_USER'; payload: { channelId: number; userId: number } }
+  | { type: 'ADD_THREAD_TYPING_USER'; payload: TypingIndicator }
+  | { type: 'REMOVE_THREAD_TYPING_USER'; payload: { threadId: number; userId: number } }
   | { type: 'REFRESH_CHANNELS' }
   | { type: 'SET_PENDING_INVITATIONS_COUNT'; payload: number }
   | { type: 'SET_ERROR'; payload: string | null };
@@ -410,6 +413,48 @@ const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
         },
       };
 
+    case 'ADD_THREAD_TYPING_USER':
+      const threadId = action.payload.threadId;
+      if (!threadId) return state;
+
+      const currentThreadTypingUsers = state.threadTypingUsers[threadId] || [];
+      const existingThreadIndex = currentThreadTypingUsers.findIndex(u => u.userId === action.payload.userId);
+
+      if (existingThreadIndex >= 0) {
+        // Update existing typing indicator
+        const updatedThreadTypingUsers = [...currentThreadTypingUsers];
+        updatedThreadTypingUsers[existingThreadIndex] = action.payload;
+        return {
+          ...state,
+          threadTypingUsers: {
+            ...state.threadTypingUsers,
+            [threadId]: updatedThreadTypingUsers,
+          },
+        };
+      } else {
+        // Add new typing indicator
+        return {
+          ...state,
+          threadTypingUsers: {
+            ...state.threadTypingUsers,
+            [threadId]: [...currentThreadTypingUsers, action.payload],
+          },
+        };
+      }
+
+    case 'REMOVE_THREAD_TYPING_USER':
+      const removeThreadId = action.payload.threadId;
+      const filteredThreadTypingUsers = (state.threadTypingUsers[removeThreadId] || []).filter(
+        u => u.userId !== action.payload.userId
+      );
+      return {
+        ...state,
+        threadTypingUsers: {
+          ...state.threadTypingUsers,
+          [removeThreadId]: filteredThreadTypingUsers,
+        },
+      };
+
     case 'REFRESH_CHANNELS':
       // 채널 목록 새로고침을 위한 플래그 설정
       return {
@@ -672,6 +717,29 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           type: 'REMOVE_TYPING_USER',
           payload: { channelId: typing.channelId, userId: typing.userId }
         });
+      });
+
+      // 스레드 타이핑 이벤트 리스너
+      wsService.onUserTypingThread((typing) => {
+        dispatch({ type: 'ADD_THREAD_TYPING_USER', payload: typing });
+        // 5초 후 자동으로 타이핑 인디케이터 제거 (백업 안전장치)
+        setTimeout(() => {
+          if (typing.threadId) {
+            dispatch({
+              type: 'REMOVE_THREAD_TYPING_USER',
+              payload: { threadId: typing.threadId, userId: typing.userId }
+            });
+          }
+        }, 5000);
+      });
+
+      wsService.onUserStopTypingThread((typing) => {
+        if (typing.threadId) {
+          dispatch({
+            type: 'REMOVE_THREAD_TYPING_USER',
+            payload: { threadId: typing.threadId, userId: typing.userId }
+          });
+        }
       });
 
       wsService.onUserOnline((user) => {
@@ -1315,12 +1383,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     },
 
-    startTyping: (channelId) => {
-      wsService.startTyping(channelId);
+    startTyping: (channelId, threadId) => {
+      wsService.startTyping(channelId, threadId);
     },
 
-    stopTyping: (channelId) => {
-      wsService.stopTyping(channelId);
+    stopTyping: (channelId, threadId) => {
+      wsService.stopTyping(channelId, threadId);
     },
 
     searchMessages: async (query, channelId) => {

@@ -183,12 +183,12 @@ export class ChatWebSocketService {
   }
 
   // Typing indicators
-  startTyping(channelId: number): void {
-    this.sendEvent('start_typing', { channelId });
+  startTyping(channelId: number, threadId?: number): void {
+    this.sendEvent('start_typing', { channelId, threadId });
   }
 
-  stopTyping(channelId: number): void {
-    this.sendEvent('stop_typing', { channelId });
+  stopTyping(channelId: number, threadId?: number): void {
+    this.sendEvent('stop_typing', { channelId, threadId });
   }
 
   // Join/leave channels
@@ -244,6 +244,15 @@ export class ChatWebSocketService {
 
     this.socket.on('user_stop_typing', (data) => {
       this.emit('user_stop_typing', data);
+    });
+
+    // 스레드 타이핑 이벤트
+    this.socket.on('user_typing_thread', (data) => {
+      this.emit('user_typing_thread', data);
+    });
+
+    this.socket.on('user_stop_typing_thread', (data) => {
+      this.emit('user_stop_typing_thread', data);
     });
 
     // 메시지 전송 완료 이벤트
@@ -400,6 +409,14 @@ export class ChatWebSocketService {
 
   onUserStopTyping(handler: (typing: TypingIndicator) => void): void {
     this.on('user_stop_typing', (event) => handler(event.data));
+  }
+
+  onUserTypingThread(handler: (typing: TypingIndicator) => void): void {
+    this.on('user_typing_thread', (event) => handler(event.data));
+  }
+
+  onUserStopTypingThread(handler: (typing: TypingIndicator) => void): void {
+    this.on('user_stop_typing_thread', (event) => handler(event.data));
   }
 
   onUserJoinedChannel(handler: (data: { channelId: number; user: User }) => void): void {

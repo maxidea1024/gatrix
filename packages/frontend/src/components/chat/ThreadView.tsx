@@ -85,6 +85,9 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
   const containerRef = useRef<HTMLDivElement | null>(null);
   const wasAtBottomRef = useRef(true);
 
+  // 스레드 타이핑 사용자들
+  const threadTypingUsers = state.threadTypingUsers[originalMessage.id] || [];
+
 
   const getDateLocale = () => {
     switch (i18n.language) {
@@ -544,6 +547,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
       <Box sx={{ p: 2, borderTop: `1px solid ${theme.palette.divider}` }} ref={inputRef}>
         <AdvancedMessageInput
           channelId={originalMessage.channelId}
+          threadId={originalMessage.id}
           autoFocus
           onSendMessage={(content, attachments) => {
             actions.sendMessage(originalMessage.channelId, {
@@ -556,6 +560,58 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
           }}
           placeholder={t('chat.replyToThread')}
         />
+
+        {/* 스레드 타이핑 인디케이터 - 입력창 아래에 위치 */}
+        {threadTypingUsers.length > 0 && (
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            px: 1,
+            py: 0.5,
+            animation: 'fadeIn 0.2s ease-out',
+            '@keyframes fadeIn': {
+              from: { opacity: 0 },
+              to: { opacity: 1 },
+            },
+          }}>
+            <Box sx={{
+              display: 'flex',
+              gap: 0.5,
+              alignItems: 'center'
+            }}>
+              {[0, 1, 2].map((i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    width: 4,
+                    height: 4,
+                    borderRadius: '50%',
+                    backgroundColor: 'text.secondary',
+                    animation: 'typing-dot 1.4s infinite ease-in-out',
+                    animationDelay: `${i * 0.16}s`,
+                    '@keyframes typing-dot': {
+                      '0%, 80%, 100%': {
+                        transform: 'scale(0)',
+                        opacity: 0.5,
+                      },
+                      '40%': {
+                        transform: 'scale(1)',
+                        opacity: 1,
+                      },
+                    },
+                  }}
+                />
+              ))}
+            </Box>
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '11px' }}>
+              {threadTypingUsers.length === 1
+                ? t('chat.userTyping', { username: state.users[threadTypingUsers[0].userId]?.name || state.users[threadTypingUsers[0].userId]?.username || t('chat.someone') })
+                : t('chat.multipleUsersTyping', { count: threadTypingUsers.length })
+              }
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Paper>
   );
