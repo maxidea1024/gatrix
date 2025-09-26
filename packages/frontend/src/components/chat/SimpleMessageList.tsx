@@ -1,11 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { 
-  Box, 
-  Typography, 
-  CircularProgress, 
-  Paper, 
-  TextField, 
-  IconButton, 
+import React, { useEffect, useRef } from 'react';
+import {
+  Box,
+  Typography,
+  CircularProgress,
   Avatar as MuiAvatar,
   List,
   ListItem,
@@ -13,12 +10,12 @@ import {
   ListItemText,
   Divider
 } from '@mui/material';
-import { Send as SendIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useChat } from '../../contexts/ChatContext';
 import { Message, MessageType } from '../../types/chat';
 import { format } from 'date-fns';
 import { ko, enUS, zhCN } from 'date-fns/locale';
+import AdvancedMessageInput from './AdvancedMessageInput';
 
 interface MessageListProps {
   channelId: number;
@@ -32,7 +29,6 @@ const SimpleMessageList: React.FC<MessageListProps> = ({
   const { state, actions } = useChat();
   const { t, i18n } = useTranslation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [messageInput, setMessageInput] = useState('');
 
   const currentChannel = state.channels.find(c => c.id === channelId);
   const messages = state.messages[channelId] || [];
@@ -118,22 +114,7 @@ const SimpleMessageList: React.FC<MessageListProps> = ({
     }
   }, [channelId]);
 
-  const handleSendMessage = () => {
-    if (messageInput.trim() && currentChannel) {
-      actions.sendMessage(currentChannel.id, {
-        content: messageInput.trim(),
-        type: 'text' as MessageType,
-      });
-      setMessageInput('');
-    }
-  };
 
-  const handleKeyPress = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      handleSendMessage();
-    }
-  };
 
   const formatMessageTime = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -183,27 +164,21 @@ const SimpleMessageList: React.FC<MessageListProps> = ({
         </Box>
 
         {/* Message Input */}
-        <Paper elevation={1} sx={{ p: 2, borderRadius: 0 }}>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <TextField
-              fullWidth
-              multiline
-              maxRows={4}
-              placeholder={t('chat.typeMessage')}
-              value={messageInput}
-              onChange={(e) => setMessageInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              disabled={!currentChannel}
-            />
-            <IconButton 
-              color="primary" 
-              onClick={handleSendMessage}
-              disabled={!messageInput.trim() || !currentChannel}
-            >
-              <SendIcon />
-            </IconButton>
-          </Box>
-        </Paper>
+        <AdvancedMessageInput
+          channelId={channelId}
+          onSendMessage={(content, attachments) => {
+            if (currentChannel) {
+              actions.sendMessage({
+                content,
+                channelId: currentChannel.id,
+                type: 'text' as MessageType,
+                attachments
+              });
+            }
+          }}
+          placeholder={t('chat.typeMessage')}
+          disabled={!currentChannel}
+        />
       </Box>
     );
   }
@@ -303,27 +278,21 @@ const SimpleMessageList: React.FC<MessageListProps> = ({
       </Box>
 
       {/* Message Input */}
-      <Paper elevation={1} sx={{ p: 2, borderRadius: 0 }}>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <TextField
-            fullWidth
-            multiline
-            maxRows={4}
-            placeholder={t('chat.typeMessage')}
-            value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={!currentChannel}
-          />
-          <IconButton 
-            color="primary" 
-            onClick={handleSendMessage}
-            disabled={!messageInput.trim() || !currentChannel}
-          >
-            <SendIcon />
-          </IconButton>
-        </Box>
-      </Paper>
+      <AdvancedMessageInput
+        channelId={channelId}
+        onSendMessage={(content, attachments) => {
+          if (currentChannel) {
+            actions.sendMessage({
+              content,
+              channelId: currentChannel.id,
+              type: 'text' as MessageType,
+              attachments
+            });
+          }
+        }}
+        placeholder={t('chat.typeMessage')}
+        disabled={!currentChannel}
+      />
     </Box>
   );
 };

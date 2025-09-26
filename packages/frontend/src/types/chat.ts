@@ -5,7 +5,7 @@ export interface User {
   username: string;
   name?: string;
   email: string;
-  avatar?: string;
+  avatarUrl?: string;
   isOnline: boolean;
   lastSeen?: string;
 }
@@ -189,37 +189,50 @@ export interface WebSocketEvent {
 }
 
 export type WebSocketEventType =
-  | 'message_created'
-  | 'message_updated'
-  | 'message_deleted'
-  | 'thread_message_created'
-  | 'thread_updated'
-  | 'user_typing'
-  | 'user_stop_typing'
-  | 'user_joined_channel'
-  | 'user_left_channel'
-  | 'channel_updated'
-  | 'reaction_added'
-  | 'reaction_removed'
-  | 'message_reaction_updated'
-  | 'user_online'
-  | 'user_offline'
-  | 'channel_invitation'
-  | 'invitation_response'
-  | 'invitation_cancelled'
-  | 'connection_established'
-  | 'connection_lost'
-  | 'connection_error'
-  | 'authentication_failed'
-  | 'message'
-  | 'user_joined'
-  | 'user_left'
-  | 'typing'
-  | 'stop_typing'
-  | 'presence_update'
-  | 'channel_joined'
-  | 'channel_left'
-  | 'error';
+  // 서버 → 클라이언트 이벤트 (서버에서 실제로 emit하는 이벤트들)
+  | 'connected'                    // 연결 성공
+  | 'error'                       // 오류 발생
+  | 'message_sent'                // 메시지 전송 완료
+  | 'user_typing'                 // 타이핑 시작 알림
+  | 'user_stop_typing'            // 타이핑 중지 알림
+  | 'user_status_changed'         // 사용자 상태 변경 알림
+  | 'user_left'                   // 사용자 채널 퇴장 알림
+  | 'message'                     // 일반 메시지 (MessageController)
+  | 'new_message'                 // 새 메시지 (BroadcastService)
+
+  // 클라이언트 → 서버 이벤트 (클라이언트에서 서버로 보내는 이벤트들)
+  | 'join_channel'               // 채널 입장
+  | 'leave_channel'              // 채널 퇴장
+  | 'send_message'               // 메시지 전송
+  | 'start_typing'               // 타이핑 시작
+  | 'stop_typing'                // 타이핑 중지
+  | 'mark_read'                  // 메시지 읽음 처리
+  | 'update_status'              // 상태 업데이트
+  | 'activity'                   // 활동 업데이트
+
+  // 클라이언트 내부 이벤트 (프론트엔드에서만 사용)
+  | 'message_created'            // 메시지 생성 (message 이벤트에서 파싱)
+  | 'message_updated'            // 메시지 수정 (message 이벤트에서 파싱)
+  | 'message_deleted'            // 메시지 삭제 (message 이벤트에서 파싱)
+  | 'thread_message_created'     // 스레드 메시지 생성 (message 이벤트에서 파싱)
+  | 'thread_updated'             // 스레드 업데이트 (message 이벤트에서 파싱)
+  | 'message_reaction_updated'   // 리액션 업데이트
+  | 'connection_established'     // 연결 설정됨
+  | 'connection_lost'            // 연결 끊어짐
+  | 'connection_error'           // 연결 오류
+  | 'connection_failed'          // 연결 실패
+  | 'authentication_failed'      // 인증 실패
+  | 'channel_invitation'         // 채널 초대
+  | 'invitation_response'        // 초대 응답
+  | 'invitation_cancelled'       // 초대 취소
+  | 'user_joined_channel'        // 사용자 채널 입장
+  | 'user_left_channel'          // 사용자 채널 퇴장
+  | 'channel_updated'            // 채널 업데이트
+  | 'reaction_added'             // 리액션 추가
+  | 'reaction_removed'           // 리액션 제거
+  | 'user_online'                // 사용자 온라인
+  | 'user_offline'               // 사용자 오프라인
+  | 'presence_update';           // 상태 업데이트
 
 // API request/response types
 export interface CreateChannelRequest {
@@ -291,11 +304,11 @@ export interface ChatContextType {
   state: ChatState;
   actions: {
     setCurrentChannel: (channelId: number | null) => void;
-    sendMessage: (channelId: number, message: SendMessageRequest) => Promise<void>;
-    editMessage: (messageId: number, content: string) => Promise<void>;
+    sendMessage: (channelId: number, message: SendMessageRequest) => Promise<Message>;
+    editMessage: (messageId: number, content: string) => Promise<Message>;
     deleteMessage: (messageId: number) => Promise<void>;
     createChannel: (channel: CreateChannelRequest) => Promise<Channel>;
-    updateChannel: (channelId: number, updates: UpdateChannelRequest) => Promise<void>;
+    updateChannel: (channelId: number, updates: UpdateChannelRequest) => Promise<Channel>;
     joinChannel: (channelId: number) => Promise<void>;
     leaveChannel: (channelId: number) => Promise<void>;
     addReaction: (messageId: number, emoji: string) => Promise<void>;

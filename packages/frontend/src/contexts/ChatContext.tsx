@@ -79,7 +79,10 @@ const saveCachedMessages = (messages: Record<number, Message[]>) => {
 
     // 500ms 후에 저장 (디바운스)
     saveTimeout = setTimeout(() => {
-      console.log('💾 Saving messages to cache:', Object.keys(messages).map(k => `${k}: ${messages[parseInt(k)].length} messages`));
+      console.log('💾 Saving messages to cache:', Object.keys(messages).map(k => {
+        const channelMessages = messages[parseInt(k)];
+        return `${k}: ${channelMessages?.length || 0} messages`;
+      }));
       localStorage.setItem('chatMessages', JSON.stringify(messages));
       localStorage.setItem('chatMessagesVersion', CHAT_CACHE_VERSION);
     }, 500);
@@ -479,56 +482,51 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const setupEventListeners = () => {
         wsService.onMessageCreated((message) => {
           console.log('📨 ChatContext received message_created:', message);
-          console.log('📨 Message data:', message.data);
           console.log('📨 Current channel ID:', state.currentChannelId);
-          console.log('📨 Message channel ID:', message.data?.channelId);
+          console.log('📨 Message channel ID:', message.channelId);
 
           // 🔍 메시지에 사용자 정보가 포함되어 있는지 확인
           console.log('🔍 Message user info check:', {
-            hasMessageUser: !!message.data.user,
-            messageUser: message.data.user,
-            userId: message.data.userId,
-            hasUserInState: !!state.users[message.data.userId]
+            hasMessageUser: !!message.user,
+            messageUser: message.user,
+            userId: message.userId,
+            hasUserInState: !!state.users[message.userId]
           });
 
           // 메시지에 사용자 정보가 포함되어 있으면 사용
-          if (message.data.user && message.data.userId) {
-            console.log('✅ Using user info from message:', message.data.user);
+          if (message.user && message.userId) {
+            console.log('✅ Using user info from message:', message.user);
             dispatch({
               type: 'SET_USERS',
               payload: [{
-                id: message.data.userId,
-                username: message.data.user.name || message.data.user.username || `User${message.data.userId}`,
-                name: message.data.user.name || `User${message.data.userId}`,
-                email: message.data.user.email || `user${message.data.userId}@example.com`,
-                avatarUrl: message.data.user.avatar || message.data.user.avatarUrl || DEFAULT_AVATAR_URL,
-                status: 'online' as const,
-                lastSeenAt: new Date().toISOString(),
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
+                id: message.userId,
+                username: message.user.name || message.user.username || `User${message.userId}`,
+                name: message.user.name || `User${message.userId}`,
+                email: message.user.email || `user${message.userId}@example.com`,
+                avatarUrl: message.user.avatarUrl || DEFAULT_AVATAR_URL,
+                isOnline: true,
+                lastSeen: new Date().toISOString()
               }]
             });
           }
           // 메시지에 사용자 정보가 없고 state에도 없으면 fallback 사용
-          else if (message.data.userId && !state.users[message.data.userId]) {
-            console.log('⚠️ Using fallback user data for userId:', message.data.userId);
+          else if (message.userId && !state.users[message.userId]) {
+            console.log('⚠️ Using fallback user data for userId:', message.userId);
             dispatch({
               type: 'SET_USERS',
               payload: [{
-                id: message.data.userId,
-                username: `User${message.data.userId}`,
-                name: `User${message.data.userId}`,
-                email: `user${message.data.userId}@example.com`,
-                avatarUrl: `https://ui-avatars.com/api/?name=User${message.data.userId}&background=random`,
-                status: 'online' as const,
-                lastSeenAt: new Date().toISOString(),
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
+                id: message.userId,
+                username: `User${message.userId}`,
+                name: `User${message.userId}`,
+                email: `user${message.userId}@example.com`,
+                avatarUrl: `https://ui-avatars.com/api/?name=User${message.userId}&background=random`,
+                isOnline: true,
+                lastSeen: new Date().toISOString()
               }]
             });
           }
 
-          dispatch({ type: 'ADD_MESSAGE', payload: message.data });
+          dispatch({ type: 'ADD_MESSAGE', payload: message });
         });
 
         wsService.onMessageUpdated((message) => {
@@ -1148,15 +1146,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     },
 
-    sendMessage: async (messageData) => {
+    sendMessage: async (channelId, messageData) => {
       console.log('🚀 ChatContext.sendMessage called:', {
+        channelId,
         messageData,
         ChatService: ChatService
       });
 
       try {
         console.log('📡 Calling ChatService.sendMessage...');
-        const message = await ChatService.sendMessage(messageData.channelId, messageData);
+        const message = await ChatService.sendMessage(channelId, messageData);
         console.log('✅ ChatService.sendMessage success:', message);
         // Message will be added via WebSocket event
         return message;

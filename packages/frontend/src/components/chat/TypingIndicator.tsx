@@ -85,7 +85,7 @@ const TypingIndicator: React.FC<TypingIndicatorProps> = ({ users }) => {
         {users.slice(0, 3).map((user, index) => (
           <Avatar
             key={user.id}
-            src={user.avatar}
+            src={user.avatarUrl}
             sx={{
               width: 20,
               height: 20,

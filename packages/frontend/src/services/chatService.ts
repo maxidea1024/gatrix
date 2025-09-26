@@ -106,6 +106,12 @@ export class ChatService {
   }
 
   static async sendMessage(channelId: number, data: SendMessageRequest): Promise<Message> {
+    console.log('🔍 ChatService.sendMessage called with:', {
+      channelId,
+      data,
+      url: `${this.BASE_URL}/channels/${channelId}/messages`
+    });
+
     // 첨부파일이 있으면 FormData 사용, 없으면 JSON 사용
     if (data.attachments && data.attachments.length > 0) {
       const formData = new FormData();

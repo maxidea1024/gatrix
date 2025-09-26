@@ -338,6 +338,7 @@ const ChatPageContent: React.FC = () => {
     try {
       const messageData: SendMessageRequest = {
         content: message,
+        channelId: state.currentChannelId,
         type: attachments && attachments.length > 0 ? 'file' : 'text',
         attachments,
       };
@@ -596,6 +597,7 @@ const ChatPageContent: React.FC = () => {
                 onSendMessage={handleSendMessage}
                 onInviteUser={() => setUserSearchOpen(true)}
                 onOpenThread={handleOpenThread}
+                isThreadOpen={isThreadOpen}
               />
             ) : (
               <Box

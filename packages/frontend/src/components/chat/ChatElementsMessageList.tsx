@@ -384,13 +384,15 @@ interface ChatElementsMessageListProps {
   onSendMessage?: (message: string, attachments?: File[]) => void;
   onInviteUser?: () => void;
   onOpenThread?: (message: MessageType) => void;
+  isThreadOpen?: boolean;
 }
 
 const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
   channelId,
   onSendMessage,
   onInviteUser,
-  onOpenThread
+  onOpenThread,
+  isThreadOpen = false
 }) => {
   const { state, actions } = useChat();
   const { t, i18n } = useTranslation();
@@ -922,11 +924,13 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
           <AdvancedMessageInput
             key={channelId}
             channelId={channelId}
-            autoFocus
+            autoFocus={!isThreadOpen}
             focusTrigger={focusBump}
             onSendMessage={(content, attachments) => {
-              if (currentChannel) {
-                actions.sendMessage({
+              if (onSendMessage) {
+                onSendMessage(content, attachments);
+              } else if (currentChannel) {
+                actions.sendMessage(currentChannel.id, {
                   content,
                   channelId: currentChannel.id,
                   type: 'text' as MessageType,
@@ -1459,11 +1463,13 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
         <AdvancedMessageInput
           key={channelId}
           channelId={channelId}
-          autoFocus
+          autoFocus={!isThreadOpen}
           focusTrigger={focusBump}
           onSendMessage={(content, attachments) => {
-            if (currentChannel) {
-              actions.sendMessage({
+            if (onSendMessage) {
+              onSendMessage(content, attachments);
+            } else if (currentChannel) {
+              actions.sendMessage(currentChannel.id, {
                 content,
                 channelId: currentChannel.id,
                 type: 'text' as MessageType,

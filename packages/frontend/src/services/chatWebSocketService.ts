@@ -212,13 +212,13 @@ export class ChatWebSocketService {
       // 메시지 타입에 따라 적절한 이벤트로 변환
       if (data.type === 'message_created') {
         console.log('Emitting message_created event:', data.data);
-        this.emit('message_created', { data: data.data });
+        this.emit('message_created', data.data);
       } else if (data.type === 'message_updated') {
         console.log('Emitting message_updated event:', data.data);
-        this.emit('message_updated', { data: data.data });
+        this.emit('message_updated', data.data);
       } else if (data.type === 'message_deleted') {
         console.log('Emitting message_deleted event:', data.data);
-        this.emit('message_deleted', { data: data.data });
+        this.emit('message_deleted', data.data);
       } else if (data.type === 'thread_message_created') {
         console.log('Emitting thread_message_created event:', data);
         this.emit('thread_message_created', data);
@@ -232,32 +232,30 @@ export class ChatWebSocketService {
       }
     });
 
-    this.socket.on('user_joined', (data) => {
-      this.emit('user_joined', data);
-    });
-
+    // 백엔드에서 실제로 보내는 이벤트들만 처리
     this.socket.on('user_left', (data) => {
       this.emit('user_left', data);
     });
 
-    this.socket.on('typing', (data) => {
-      this.emit('typing', data);
+    // 서버에서 보내는 타이핑 이벤트 (user_typing, user_stop_typing)
+    this.socket.on('user_typing', (data) => {
+      this.emit('user_typing', data);
     });
 
-    this.socket.on('stop_typing', (data) => {
-      this.emit('stop_typing', data);
+    this.socket.on('user_stop_typing', (data) => {
+      this.emit('user_stop_typing', data);
     });
 
-    this.socket.on('presence_update', (data) => {
-      this.emit('presence_update', data);
+    // 메시지 전송 완료 이벤트
+    this.socket.on('message_sent', (data) => {
+      console.log('WebSocket message_sent received:', data);
+      this.emit('message_sent', data);
     });
 
-    this.socket.on('channel_joined', (data) => {
-      this.emit('channel_joined', data);
-    });
-
-    this.socket.on('channel_left', (data) => {
-      this.emit('channel_left', data);
+    // 새 메시지 이벤트 (BroadcastService에서)
+    this.socket.on('new_message', (data) => {
+      console.log('WebSocket new_message received:', data);
+      this.emit('new_message', data);
     });
 
     // 초대 관련 이벤트들
@@ -285,6 +283,18 @@ export class ChatWebSocketService {
     this.socket.on('message_reaction_updated', (data) => {
       console.log('WebSocket message_reaction_updated received:', data);
       this.emit('message_reaction_updated', data);
+    });
+
+    // 사용자 상태 변경 이벤트
+    this.socket.on('user_status_changed', (data) => {
+      console.log('WebSocket user_status_changed received:', data);
+      this.emit('presence_update', data);
+    });
+
+    // 연결 관련 이벤트
+    this.socket.on('connected', (data) => {
+      console.log('WebSocket connected event received:', data);
+      this.emit('connection_established', data);
     });
 
     this.socket.on('error', (data) => {
@@ -316,6 +326,17 @@ export class ChatWebSocketService {
     return process.env.NODE_ENV === 'production'
       ? process.env.VITE_CHAT_SERVER_URL || 'wss://chat.yourdomain.com'
       : 'http://localhost:3001'; // 개발환경에서는 직접 연결
+  }
+
+  private reconnect(): void {
+    console.log('🔄 Attempting to reconnect WebSocket...');
+    this.disconnect();
+    this.connect().catch(error => {
+      console.error('❌ Reconnection failed:', error);
+      if (this.shouldReconnect) {
+        this.scheduleReconnect();
+      }
+    });
   }
 
   private scheduleReconnect(): void {

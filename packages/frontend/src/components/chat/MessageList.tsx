@@ -214,7 +214,7 @@ const MessageList: React.FC<MessageListProps> = ({
                 model={message}
               >
                 <Avatar
-                  src={messageUser?.avatar}
+                  src={messageUser?.avatarUrl}
                   name={messageUser?.username || messageUser?.name || `User ${originalMessage?.userId || ''}`}
                 />
               </ChatMessage>

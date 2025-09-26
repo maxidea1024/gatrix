@@ -78,6 +78,7 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
   const theme = useTheme();
   const { t, i18n } = useTranslation();
   const { state, actions } = useChat();
+  const inputRef = useRef<HTMLDivElement>(null);
   const [threadMessages, setThreadMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -134,6 +135,18 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
       scrollToBottom();
     }
   }, [threadMessages.length, state.user?.id]);
+
+  // 스레드가 열릴 때 입력창에 포커스 설정
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const input = inputRef.current?.querySelector('input, textarea') as HTMLElement;
+      if (input) {
+        input.focus();
+      }
+    }, 100); // 주 메시지창의 포커스 설정 후에 실행
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     loadThreadMessages();
@@ -526,12 +539,12 @@ const ThreadView: React.FC<ThreadViewProps> = ({ originalMessage, onClose, hideH
       </Box>
 
       {/* Message Input */}
-      <Box sx={{ p: 2, borderTop: `1px solid ${theme.palette.divider}` }}>
+      <Box sx={{ p: 2, borderTop: `1px solid ${theme.palette.divider}` }} ref={inputRef}>
         <AdvancedMessageInput
           channelId={originalMessage.channelId}
           autoFocus
           onSendMessage={(content, attachments) => {
-            actions.sendMessage({
+            actions.sendMessage(originalMessage.channelId, {
               content,
               channelId: originalMessage.channelId,
               type: 'text',

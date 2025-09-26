@@ -145,7 +145,7 @@ const MentionAutocomplete: React.FC<MentionAutocompleteProps> = ({
             >
               <ListItemAvatar sx={{ minWidth: 36 }}>
                 <Avatar
-                  src={user.avatar}
+                  src={user.avatarUrl}
                   sx={{ width: 24, height: 24, fontSize: '0.75rem' }}
                 >
                   {user.username.charAt(0).toUpperCase()}

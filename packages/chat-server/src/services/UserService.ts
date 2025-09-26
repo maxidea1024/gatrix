@@ -55,14 +55,6 @@ export class UserService {
         updatedAt: now
       };
 
-      // avatar 필드가 있으면 avatarUrl로 변경하고 avatar 제거
-      if ('avatar' in userToSave) {
-        if (userToSave.avatar && !userToSave.avatarUrl) {
-          userToSave.avatarUrl = userToSave.avatar;
-        }
-        delete userToSave.avatar;
-      }
-
       // 존재하지 않는 필드들 제거
       delete userToSave.lastSeenAt;
 

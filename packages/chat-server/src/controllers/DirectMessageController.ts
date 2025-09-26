@@ -36,7 +36,7 @@ export class DirectMessageController {
         id: parseInt(targetUserData.id),
         name: targetUserData.name,
         email: targetUserData.email,
-        avatar: targetUserData.avatar
+        avatar: targetUserData.avatarUrl
       } : null;
       if (!targetUser) {
         res.status(404).json({
@@ -88,7 +88,7 @@ export class DirectMessageController {
         id: parseInt(currentUserData.id),
         name: currentUserData.name,
         email: currentUserData.email,
-        avatar: currentUserData.avatar
+        avatar: currentUserData.avatarUrl
       } : null;
       const channelName = `${currentUser?.name || 'User'} & ${targetUser.name}`;
       
@@ -164,7 +164,7 @@ export class DirectMessageController {
               id: parseInt(otherUserData.id),
               name: otherUserData.name,
               email: otherUserData.email,
-              avatar: otherUserData.avatar
+              avatarUrl: otherUserData.avatarUrl
             } : null;
           }
 
@@ -174,7 +174,7 @@ export class DirectMessageController {
               id: otherUser.id,
               name: otherUser.name,
               email: otherUser.email,
-              avatarUrl: otherUser.avatar,
+              avatarUrl: otherUser.avatarUrl,
             } : null,
           };
         })
