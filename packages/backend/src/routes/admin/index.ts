@@ -23,6 +23,7 @@ import remoteConfigV2Routes from './remoteConfigV2';
 import jobRoutes from './jobs';
 import maintenanceRoutes from './maintenance';
 import invitationRoutes from './invitations';
+import crashRoutes from './crashes';
 
 const router = express.Router();
 
@@ -52,5 +53,6 @@ router.use('/remote-config-v2', remoteConfigV2Routes);
 router.use('/jobs', jobRoutes);
 router.use('/maintenance', maintenanceRoutes);
 router.use('/invitations', invitationRoutes);
+router.use('/crashes', crashRoutes);
 
 export default router;

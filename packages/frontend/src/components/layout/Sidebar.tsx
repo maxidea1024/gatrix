@@ -26,6 +26,7 @@ import {
   History,
   VpnKey,
   Chat,
+  BugReport,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -94,6 +95,13 @@ const getNavigationItems = (isAdmin: boolean): NavItem[] => {
       label: 'Audit Logs',
       icon: 'Security',
       path: '/admin/audit-logs',
+      roles: ['admin'],
+    },
+    {
+      id: 'crashes',
+      label: 'Client Crashes',
+      icon: 'BugReport',
+      path: '/admin/crashes',
       roles: ['admin'],
     },
     {
@@ -166,6 +174,8 @@ const iconMap: Record<string, React.ReactElement> = {
   CloudSync: <CloudSync />,
   History: <History />,
   VpnKey: <VpnKey />,
+  BugReport: <BugReport />,
+  Chat: <Chat />,
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {

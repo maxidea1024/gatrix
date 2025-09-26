@@ -58,6 +58,7 @@ import {
   CloudSync as CloudSyncIcon,
   VpnKey as VpnKeyIcon,
   Chat as ChatIcon,
+  BugReport as BugReportIcon,
 
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -91,6 +92,7 @@ const adminMenuItems = [
   { text: 'jobs.monitor', icon: <MonitorIcon />, path: '/admin/queue-monitor' },
   { text: 'admin.whitelist.title', icon: <SecurityIcon />, path: '/admin/whitelist' },
   { text: 'navigation.auditLogs', icon: <HistoryIcon />, path: '/admin/audit-logs' },
+  { text: 'crashes.title', icon: <BugReportIcon />, path: '/admin/crashes' },
   {
     text: 'admin.remoteConfig.title',
     icon: <CloudSyncIcon />,

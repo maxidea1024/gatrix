@@ -71,6 +71,7 @@ import RemoteConfigPage from './pages/admin/RemoteConfigPage';
 import RemoteConfigHistoryPage from './pages/admin/RemoteConfigHistoryPage';
 import RemoteConfigDashboard from './pages/RemoteConfig/RemoteConfigParametersPage';
 import ApiTokensPage from './pages/admin/ApiTokensPage';
+import CrashesPage from './pages/admin/CrashesPage';
 import ChatPage from './pages/chat/ChatPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
@@ -251,6 +252,7 @@ const AppContent: React.FC = () => {
                         <Route path="jobs" element={<JobsPage />} />
                         <Route path="queue-monitor" element={<QueueMonitorPage />} />
                         <Route path="audit-logs" element={<AuditLogsPage />} />
+                        <Route path="crashes" element={<CrashesPage />} />
                         <Route path="remote-config" element={<RemoteConfigDashboard />} />
                         <Route path="remote-config-old" element={<RemoteConfigPage />} />
                         <Route path="remote-config/history" element={<RemoteConfigHistoryPage />} />

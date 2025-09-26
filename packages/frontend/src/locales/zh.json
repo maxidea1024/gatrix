@@ -410,6 +410,129 @@
         "selectConfigFirst": "请先选择配置",
         "comingSoon": "变体管理功能即将推出"
       }
+    },
+    "crashes": {
+      "title": "客户端崩溃",
+      "subtitle": "监控和管理客户端崩溃报告",
+      "description": "跟踪客户端崩溃事件，分析错误模式，管理崩溃状态",
+      "searchPlaceholder": "按用户昵称或用户ID搜索...",
+      "noResults": "未找到崩溃记录",
+      "loading": "加载崩溃记录中...",
+      "loadError": "加载崩溃记录失败",
+      "summary": {
+        "title": "崩溃摘要",
+        "total": "总崩溃数",
+        "open": "开放崩溃",
+        "closed": "已关闭崩溃",
+        "recent": "最近(24小时)"
+      },
+      "filters": {
+        "title": "筛选器",
+        "clear": "清除筛选器",
+        "apply": "应用筛选器",
+        "dateRange": "日期范围",
+        "dateFrom": "开始日期",
+        "dateTo": "结束日期",
+        "serverGroup": "服务器组",
+        "marketType": "市场类型",
+        "deviceType": "设备类型",
+        "branch": "分支",
+        "version": "版本",
+        "state": "状态",
+        "allServerGroups": "所有服务器组",
+        "allMarketTypes": "所有市场类型",
+        "allDeviceTypes": "所有设备类型",
+        "allBranches": "所有分支",
+        "allStates": "所有状态"
+      },
+      "columns": {
+        "id": "ID",
+        "firstLine": "错误摘要",
+        "count": "发生次数",
+        "state": "状态",
+        "lastCrash": "最后崩溃",
+        "branch": "分支",
+        "platform": "平台",
+        "version": "版本",
+        "actions": "操作"
+      },
+      "states": {
+        "open": "开放",
+        "closed": "已关闭",
+        "deleted": "已删除"
+      },
+      "platforms": {
+        "unknown": "未知",
+        "android": "安卓",
+        "ios": "iOS",
+        "windows": "Windows",
+        "mac": "Mac",
+        "linux": "Linux",
+        "web": "网页"
+      },
+      "serverGroups": {
+        "global": "全球",
+        "korea": "韩国",
+        "china": "中国",
+        "japan": "日本",
+        "sea": "东南亚",
+        "na": "北美",
+        "eu": "欧洲",
+        "other": "其他"
+      },
+      "marketTypes": {
+        "google_play": "Google Play",
+        "huawei": "华为",
+        "xiaomi": "小米",
+        "oppo": "OPPO",
+        "vivo": "Vivo",
+        "baidu": "百度",
+        "tencent": "腾讯",
+        "samsung": "三星",
+        "other": "其他"
+      },
+      "actions": {
+        "viewDetails": "查看详情",
+        "viewInstances": "查看实例",
+        "viewStats": "查看统计",
+        "markClosed": "标记为已关闭",
+        "markOpen": "标记为开放",
+        "markDeleted": "标记为已删除"
+      },
+      "details": {
+        "title": "崩溃详情",
+        "crashInfo": "崩溃信息",
+        "stackTrace": "堆栈跟踪",
+        "instances": "崩溃实例",
+        "statistics": "统计信息",
+        "noStackTrace": "堆栈跟踪不可用",
+        "loadInstancesError": "加载崩溃实例失败",
+        "loadStatsError": "加载崩溃统计失败"
+      },
+      "instances": {
+        "title": "崩溃实例",
+        "userId": "用户ID",
+        "pubId": "发布者ID",
+        "platform": "平台",
+        "version": "版本",
+        "userMessage": "用户消息",
+        "createdAt": "发生时间",
+        "noUserMessage": "无用户消息"
+      },
+      "stats": {
+        "title": "崩溃统计",
+        "versionDistribution": "版本分布",
+        "platformDistribution": "平台分布",
+        "affectedUsers": "受影响用户",
+        "latestInstances": "最新实例"
+      },
+      "updateState": {
+        "success": "崩溃状态更新成功",
+        "error": "崩溃状态更新失败",
+        "confirmClose": "确定要将此崩溃标记为已关闭吗？",
+        "confirmOpen": "确定要将此崩溃标记为开放吗？",
+        "confirmDelete": "确定要将此崩溃标记为已删除吗？"
+      }
     }
   },
   "scheduler": {

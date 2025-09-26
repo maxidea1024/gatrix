@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { ClientController } from '../../controllers/ClientController';
 import RemoteConfigClientController from '../../controllers/RemoteConfigClientController';
 import RemoteConfigSDKController from '../../controllers/RemoteConfigSDKController';
+import { ClientCrashController } from '../../controllers/ClientCrashController';
 import { requestLogger } from '../../middleware/requestLogger';
 import { clientSDKAuth } from '../../middleware/apiTokenAuth';
 import { body, param, validationResult } from 'express-validator';
@@ -61,5 +62,25 @@ router.get('/test', clientSDKAuth, (req: any, res: any) => {
 router.get('/remote-config/templates', clientSDKAuth, RemoteConfigSDKController.getClientTemplates);
 router.post('/remote-config/evaluate', clientSDKAuth, RemoteConfigSDKController.evaluateConfig);
 router.post('/remote-config/metrics', clientSDKAuth, RemoteConfigSDKController.submitMetrics);
+
+// Crash upload endpoint (requires client API token)
+router.post('/crashes/upload',
+  body('pubId').isString().notEmpty(),
+  body('userId').isInt(),
+  body('platform').isInt(),
+  body('branch').isInt(),
+  body('majorVer').isInt(),
+  body('minorVer').isInt(),
+  body('buildNum').isInt(),
+  body('patchNum').isInt(),
+  body('stack').isString().notEmpty(),
+  body('userMsg').optional().isString(),
+  body('log').optional().isString(),
+  body('serverGroup').optional().isString(),
+  body('marketType').optional().isString(),
+  validateRequest,
+  clientSDKAuth,
+  ClientCrashController.uploadCrash
+);
 
 export default router;
