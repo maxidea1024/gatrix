@@ -84,13 +84,13 @@ export const HEADER_VALUES = {
 /**
  * CORS에서 허용할 헤더 목록
  */
-export const ALLOWED_HEADERS = [
+export const ALLOWED_HEADERS: string[] = [
   HEADERS.CONTENT_TYPE,
   HEADERS.AUTHORIZATION,
   HEADERS.X_REQUESTED_WITH,
   HEADERS.X_API_TOKEN,
   HEADERS.X_USER_ID,
   HEADERS.X_APPLICATION_NAME,
-] as const;
+];
 
 export default HEADERS;

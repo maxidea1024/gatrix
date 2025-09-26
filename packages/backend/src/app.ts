@@ -15,6 +15,7 @@ import { requestLogger } from './middleware/requestLogger';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { generalLimiter, apiLimiter } from './middleware/rateLimiter';
 import { appInstance } from './utils/AppInstance';
+import { ALLOWED_HEADERS } from './constants/headers';
 // import { initializeJobTypes } from './services/jobs';
 // import { CampaignScheduler } from './services/campaignScheduler';
 
@@ -53,7 +54,7 @@ app.use(cors({
   origin: true, // Allow all origins in development
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Request-ID'],
+  allowedHeaders: ALLOWED_HEADERS,
 }));
 
 // Compression middleware

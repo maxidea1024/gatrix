@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import { config } from './config';
 import { createLogger } from './config/logger';
 import { requestLogger } from './middleware/requestLogger';
+import { ALLOWED_HEADERS } from './constants/headers';
 
 const logger = createLogger('ChatServerApp');
 import { WebSocketService } from './services/WebSocketService';
@@ -51,7 +52,7 @@ class ChatServerApp {
       origin: config.cors.origin,
       credentials: config.cors.credentials,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-API-Token', 'X-User-ID', 'X-Application-Name'],
+      allowedHeaders: ALLOWED_HEADERS,
     }));
 
     // Compression

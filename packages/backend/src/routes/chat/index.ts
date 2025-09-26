@@ -4,6 +4,7 @@ import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
 import { authenticate } from '../../middleware/auth';
 import { ChatSyncController } from '../../controllers/ChatSyncController';
 import logger from '../../config/logger';
+import { HEADERS } from '../../constants/headers';
 
 const router = express.Router();
 
@@ -117,7 +118,7 @@ const proxyOptions = {
 
     // Chat Server API 토큰 추가 (가장 중요!)
     const CHAT_SERVER_API_TOKEN = process.env.CHAT_SERVER_API_TOKEN || 'gatrix-api-180c05eb58db26b863481f5d54e657a218b54da5bfb388e9278a7eb733227aec';
-    proxyReq.setHeader('X-API-Token', CHAT_SERVER_API_TOKEN);
+    proxyReq.setHeader(HEADERS.X_API_TOKEN, CHAT_SERVER_API_TOKEN);
     logger.info(`✅ Adding Chat Server API Token: ${CHAT_SERVER_API_TOKEN.substring(0, 20)}...`);
 
     // 사용자 정보 헤더 추가 (Chat Server에서 사용)
@@ -128,7 +129,7 @@ const proxyOptions = {
     });
 
     if ((req as any).user?.id) {
-      proxyReq.setHeader('X-User-ID', (req as any).user.id.toString());
+      proxyReq.setHeader(HEADERS.X_USER_ID, (req as any).user.id.toString());
       logger.info(`✅ Adding X-User-ID header: ${(req as any).user.id}`);
 
       // 사용자 동기화는 백그라운드에서 비동기로 처리 (요청을 블록하지 않음)

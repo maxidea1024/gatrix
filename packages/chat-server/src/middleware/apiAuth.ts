@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ApiTokenService, ApiToken } from '../services/ApiTokenService';
 import { createLogger } from '../config/logger';
+import { HEADERS, HEADER_VALUES } from '../constants/headers';
 import jwt from 'jsonwebtoken';
 
 const logger = createLogger('ApiAuth');
@@ -26,8 +27,8 @@ declare global {
 export const authenticateApiToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     // 헤더에서 API 토큰 추출
-    const token = req.headers['x-api-token'] as string || 
-                  req.headers['authorization']?.replace('Bearer ', '');
+    const token = req.headers[HEADERS.X_API_TOKEN] as string ||
+                  req.headers[HEADERS.AUTHORIZATION]?.replace(HEADER_VALUES.BEARER_PREFIX, '');
 
     if (!token) {
       res.status(401).json({

@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { config } from '../config';
 import { createLogger } from '../config/logger';
+import { HEADERS, HEADER_VALUES } from '../constants/headers';
 
 const logger = createLogger('GatrixApiService');
 
@@ -38,10 +39,10 @@ export class GatrixApiService {
       baseURL: config.gatrix.apiUrl,
       timeout: 10000,
       headers: {
-        'Content-Type': 'application/json',
-        'X-API-Token': config.gatrix.apiSecret, // 백엔드가 인식하는 헤더 사용
-        'X-Application-Name': 'chat-server', // 필수 헤더 추가
-        'X-Chat-Server-ID': process.env.SERVER_ID || 'unknown',
+        [HEADERS.CONTENT_TYPE]: HEADER_VALUES.APPLICATION_JSON,
+        [HEADERS.X_API_TOKEN]: config.gatrix.apiSecret, // 백엔드가 인식하는 헤더 사용
+        [HEADERS.X_APPLICATION_NAME]: 'chat-server', // 필수 헤더 추가
+        [HEADERS.X_CHAT_SERVER_ID]: process.env.SERVER_ID || 'unknown',
       },
     });
 

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { authenticateApiToken } from './apiAuth';
 import { UserModel } from '../models/User';
 import { createLogger } from '../config/logger';
+import { HEADERS } from '../constants/headers';
 
 const logger = createLogger('Auth');
 
@@ -11,9 +12,9 @@ export * from './apiAuth';
 // 간소화된 인증 미들웨어 (User ID 헤더 기반)
 export const authenticate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const apiTokenHeader = req.headers['x-api-token'] as string;
-    const userIdHeader = req.headers['x-user-id'] as string;
-    const authHeader = req.headers['authorization'] as string;
+    const apiTokenHeader = req.headers[HEADERS.X_API_TOKEN] as string;
+    const userIdHeader = req.headers[HEADERS.X_USER_ID] as string;
+    const authHeader = req.headers[HEADERS.AUTHORIZATION] as string;
 
     logger.info('🔍 Chat Server Authentication Debug:', {
       path: req.path,

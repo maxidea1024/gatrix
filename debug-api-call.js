@@ -11,7 +11,7 @@ async function debugApiCall() {
   try {
     const response = await axios.get(`${BASE_URL}/api/v1/client/templates`, {
       headers: {
-        'X-API-Key': API_TOKEN,
+        'X-API-Token': API_TOKEN,
         'X-Application-Name': 'test-app',
         'Content-Type': 'application/json'
       },
