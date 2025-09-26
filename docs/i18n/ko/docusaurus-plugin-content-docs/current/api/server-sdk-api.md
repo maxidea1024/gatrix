@@ -18,7 +18,7 @@ sidebar_position: 3
 
 ```
 Headers:
-X-API-Key: your-server-api-token
+X-API-Token: your-server-api-token
 X-Application-Name: your-application-name
 ```
 
@@ -154,7 +154,7 @@ const serverSDK = {
     try {
       const response = await axios.get(`${this.baseURL}/templates`, {
         headers: {
-          'X-API-Key': this.apiKey,
+          'X-API-Token': this.apiKey,
           'X-Application-Name': this.appName,
           'Content-Type': 'application/json'
         }

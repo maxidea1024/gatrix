@@ -3,6 +3,7 @@ import { ApiAccessToken } from '../models/ApiAccessToken';
 import { RemoteConfigEnvironment } from '../models/RemoteConfigEnvironment';
 import { CacheService } from '../services/CacheService';
 import logger from '../config/logger';
+import { HEADERS, HEADER_VALUES } from '../constants/headers';
 
 interface SDKRequest extends Request {
   apiToken?: ApiAccessToken;
@@ -14,29 +15,19 @@ interface SDKRequest extends Request {
  */
 export const authenticateApiToken = async (req: SDKRequest, res: Response, next: NextFunction) => {
   try {
-    const authHeader = req.headers.authorization;
-    const apiKey = req.headers['x-api-key'] as string;
-    
-    // Extract token from Authorization header or X-API-Key header
+    const authHeader = req.headers[HEADERS.AUTHORIZATION];
+    const apiTokenHeader = req.headers[HEADERS.X_API_TOKEN] as string;
+
+    // Extract token from Authorization header or X-API-Token header
     let token: string | undefined;
 
-    console.log('🔍 API Token Auth Debug:', {
-      authHeader: authHeader ? `${authHeader.substring(0, 20)}...` : 'none',
-      apiKey: apiKey ? `${apiKey.substring(0, 20)}...` : 'none',
-      hasAuthHeader: !!authHeader,
-      hasApiKey: !!apiKey
-    });
-
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      token = authHeader.substring(7);
-      console.log('🔑 Token from Authorization header:', `${token.substring(0, 20)}...`);
-    } else if (apiKey) {
-      token = apiKey;
-      console.log('🔑 Token from X-API-Key header:', `${token.substring(0, 20)}...`);
+    if (authHeader && authHeader.startsWith(HEADER_VALUES.BEARER_PREFIX)) {
+      token = authHeader.substring(HEADER_VALUES.BEARER_PREFIX.length);
+    } else if (apiTokenHeader) {
+      token = apiTokenHeader;
     }
 
     if (!token) {
-      console.log('❌ No token found in request');
       return res.status(401).json({
         success: false,
         message: 'API token is required'
@@ -47,26 +38,11 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
     const cacheKey = `api_token:${token.substring(0, 16)}...`; // Use partial token for cache key
     let apiToken = await CacheService.get<ApiAccessToken>(cacheKey);
 
-    console.log('🔍 Token validation:', {
-      tokenPrefix: `${token.substring(0, 20)}...`,
-      cacheKey,
-      foundInCache: !!apiToken
-    });
-
     if (!apiToken) {
-      console.log('🔍 Token not in cache, validating against database...');
       // Validate token against database
       apiToken = await ApiAccessToken.validateAndUse(token);
 
-      console.log('🔍 Database validation result:', {
-        found: !!apiToken,
-        tokenId: apiToken?.id,
-        tokenName: apiToken?.tokenName,
-        tokenType: apiToken?.tokenType
-      });
-
       if (!apiToken) {
-        console.log('❌ Token validation failed');
         return res.status(401).json({
           success: false,
           message: 'Invalid or expired API token'
@@ -75,15 +51,12 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
 
       // Cache the token for 5 minutes
       await CacheService.set(cacheKey, apiToken, 300);
-      console.log('✅ Token cached successfully');
     } else {
-      console.log('✅ Token found in cache');
-
       // 캐시에서 토큰을 찾았어도 사용량 기록
       if (apiToken.id) {
         const { default: apiTokenUsageService } = await import('../services/ApiTokenUsageService');
         apiTokenUsageService.recordTokenUsage(apiToken.id).catch(error => {
-          console.error('Failed to record token usage from cache:', error);
+          logger.error('Failed to record token usage from cache:', error);
         });
       }
     }
@@ -98,11 +71,11 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
 
     // Get environment if token is environment-specific
     let environment: RemoteConfigEnvironment | undefined;
-    
+
     if (apiToken.environmentId) {
       const envCacheKey = `environment:${apiToken.environmentId}`;
       environment = await CacheService.get<RemoteConfigEnvironment>(envCacheKey) || undefined;
-      
+
       if (!environment) {
         environment = await RemoteConfigEnvironment.query().findById(apiToken.environmentId);
         if (environment) {
@@ -131,8 +104,6 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
     });
   }
 };
-
-
 
 /**
  * Middleware to check token type
@@ -163,7 +134,7 @@ export const requireTokenType = (tokenType: 'client' | 'server' | 'admin') => {
  * Middleware to validate application name header
  */
 export const validateApplicationName = (req: SDKRequest, res: Response, next: NextFunction) => {
-  const appName = req.headers['x-application-name'] as string;
+  const appName = req.headers[HEADERS.X_APPLICATION_NAME] as string;
 
   if (!appName) {
     return res.status(400).json({
@@ -206,27 +177,64 @@ export const clientSDKAuth = [
 ];
 
 /**
- * Temporary bypass for chat server testing
+ * Server API 토큰 인증 미들웨어
+ * X-API-Token 헤더를 사용하여 서버 간 통신을 인증합니다.
  */
-export const tempServerSDKAuth = (req: SDKRequest, res: Response, next: NextFunction) => {
-  const apiKey = req.headers['x-api-key'] as string;
-  const appName = req.headers['x-application-name'] as string;
+export const authenticateServerApiToken = async (req: SDKRequest, res: Response, next: NextFunction) => {
+  try {
+    const apiToken = req.headers[HEADERS.X_API_TOKEN] as string;
+    const appName = req.headers[HEADERS.X_APPLICATION_NAME] as string;
 
-  // For testing, accept the specific token we generated
-  if (apiKey === '8b89ad53927a29ab6dbfb0569af5020d4dc81ecef08ec1d70439cd80fda465c9' && appName === 'chat-server') {
-    // Mock API token object
-    req.apiToken = {
-      id: 1,
-      tokenName: 'Test Chat Server Token',
-      tokenType: 'server',
-      isValid: () => true
-    } as any;
+    if (!apiToken) {
+      return res.status(401).json({
+        success: false,
+        message: 'API token is required'
+      });
+    }
+
+    if (!appName) {
+      return res.status(401).json({
+        success: false,
+        message: 'Application name is required'
+      });
+    }
+
+    // Try to get token from cache first
+    const cacheKey = `server_api_token:${apiToken.substring(0, 16)}...`;
+    let validatedToken = await CacheService.get<ApiAccessToken>(cacheKey);
+
+    if (!validatedToken) {
+      // Validate token against database
+      validatedToken = await ApiAccessToken.validateAndUse(apiToken);
+
+      if (!validatedToken) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid or expired API token'
+        });
+      }
+
+      // 서버 토큰인지 확인
+      if (validatedToken.tokenType !== 'server') {
+        return res.status(403).json({
+          success: false,
+          message: 'Server API token required'
+        });
+      }
+
+      // Cache the validated token for 5 minutes
+      await CacheService.set(cacheKey, validatedToken, 5 * 60 * 1000);
+    }
+
+    // 요청 객체에 토큰 정보 추가
+    req.apiToken = validatedToken;
 
     next();
-  } else {
-    return res.status(401).json({
+  } catch (error) {
+    logger.error('Server API token authentication error:', error);
+    return res.status(500).json({
       success: false,
-      message: 'API token is required'
+      message: 'Authentication failed'
     });
   }
 };
@@ -235,15 +243,13 @@ export const tempServerSDKAuth = (req: SDKRequest, res: Response, next: NextFunc
  * Combined middleware for server SDK endpoints
  */
 export const serverSDKAuth = [
-  tempServerSDKAuth  // Use temporary bypass for testing
-  // authenticateApiToken,
-  // requireTokenType('server'),
-  // validateApplicationName,
-  // sdkRateLimit
+  authenticateServerApiToken,
+  sdkRateLimit
 ];
 
 export default {
   authenticateApiToken,
+  authenticateServerApiToken,
   requireTokenType,
   validateApplicationName,
   sdkRateLimit,

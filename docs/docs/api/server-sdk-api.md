@@ -18,7 +18,7 @@ All Server SDK endpoints require API token authentication:
 
 ```
 Headers:
-X-API-Key: your-server-api-token
+X-API-Token: your-server-api-token
 X-Application-Name: your-application-name
 ```
 

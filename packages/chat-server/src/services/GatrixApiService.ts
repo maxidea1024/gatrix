@@ -39,7 +39,7 @@ export class GatrixApiService {
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Key': config.gatrix.apiSecret, // 백엔드가 인식하는 헤더 사용
+        'X-API-Token': config.gatrix.apiSecret, // 백엔드가 인식하는 헤더 사용
         'X-Application-Name': 'chat-server', // 필수 헤더 추가
         'X-Chat-Server-ID': process.env.SERVER_ID || 'unknown',
       },
