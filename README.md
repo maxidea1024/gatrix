@@ -12,6 +12,7 @@ A comprehensive online game platform management system built with TypeScript, Re
 - 🏷️ **Tagging System**: Flexible tagging for content organization
 - 📝 **Message Templates**: Multi-language message template management
 - 🛡️ **IP Whitelisting**: Advanced IP access control and management
+- 💬 **Real-time Chat**: High-performance chat server with Socket.IO and Redis clustering
 
 ### Authentication & Security
 - 🔐 **Multi-Auth Support**: Password, Google OAuth, GitHub OAuth with JWT & refresh tokens
@@ -26,6 +27,14 @@ A comprehensive online game platform management system built with TypeScript, Re
 - 🖥️ **SSH Command Jobs**: Remote server command execution
 - 📝 **Log Message Jobs**: Structured logging and message handling
 - 📊 **Queue Monitoring**: Real-time job queue monitoring with Bull Board
+
+### Real-time Communication
+- 💬 **Chat Server**: High-performance real-time messaging with Socket.IO
+- 🔄 **Message Broadcasting**: Optimized batch processing for 100,000+ messages/second
+- 📡 **WebSocket Management**: Efficient connection handling with Redis clustering
+- 🏷️ **Channel Management**: Multi-channel support with user presence tracking
+- 📊 **Performance Monitoring**: Real-time metrics with Prometheus and Grafana
+- 🔒 **Secure Messaging**: JWT authentication and rate limiting
 
 ### User Interface & Experience
 - 🎨 **Theme Support**: Dark, Light, and Auto themes with system preference detection
@@ -78,6 +87,17 @@ A comprehensive online game platform management system built with TypeScript, Re
 - SSH2 for remote server command execution
 - Nodemailer & SendGrid for email services
 - Cron-parser for job scheduling
+
+### Chat Server
+- Socket.IO for real-time WebSocket communication
+- Redis Adapter for multi-instance synchronization
+- BullMQ for message queue processing
+- Prometheus for performance metrics
+- Winston for structured logging
+- JWT for authentication
+- Rate limiting for DDoS protection
+- MessagePack for efficient serialization
+- LRU Cache for message optimization
 
 ### DevOps & Tools
 - Docker & docker-compose for containerization
@@ -134,37 +154,51 @@ gatrix/
 │   │   │   ├── utils/           # Helper functions
 │   │   │   └── types/           # TypeScript definitions
 │   │   └── package.json
-│   └── frontend/         # React frontend
-│       ├── src/
-│       │   ├── components/
-│       │   │   ├── admin/       # Admin-specific components
-│       │   │   ├── jobs/        # Job management components
-│       │   │   └── common/      # Shared components
-│       │   ├── pages/
-│       │   │   ├── admin/       # Admin pages
-│       │   │   │   ├── JobsPage.tsx
-│       │   │   │   ├── SchedulerPage.tsx
-│       │   │   │   ├── QueueMonitorPage.tsx
-│       │   │   │   ├── MaintenancePage.tsx
-│       │   │   │   └── MessageTemplatesPage.tsx
-│       │   │   ├── settings/    # Settings pages
-│       │   │   └── common/      # Common pages
-│       │   ├── services/        # API services
-│       │   │   ├── jobService.ts
-│       │   │   ├── maintenanceService.ts
-│       │   │   ├── messageTemplateService.ts
-│       │   │   ├── tagService.ts
-│       │   │   └── timeService.ts
-│       │   ├── types/           # TypeScript definitions
-│       │   ├── contexts/        # React contexts
-│       │   ├── locales/         # i18n translations
-│       │   └── utils/           # Helper functions
-│       └── package.json
+│   ├── frontend/         # React frontend
+│   │   ├── src/
+│   │   │   ├── components/
+│   │   │   │   ├── admin/       # Admin-specific components
+│   │   │   │   ├── jobs/        # Job management components
+│   │   │   │   └── common/      # Shared components
+│   │   │   ├── pages/
+│   │   │   │   ├── admin/       # Admin pages
+│   │   │   │   │   ├── JobsPage.tsx
+│   │   │   │   │   ├── SchedulerPage.tsx
+│   │   │   │   │   ├── QueueMonitorPage.tsx
+│   │   │   │   │   ├── MaintenancePage.tsx
+│   │   │   │   │   └── MessageTemplatesPage.tsx
+│   │   │   │   ├── settings/    # Settings pages
+│   │   │   │   └── common/      # Common pages
+│   │   │   ├── services/        # API services
+│   │   │   │   ├── jobService.ts
+│   │   │   │   ├── maintenanceService.ts
+│   │   │   │   ├── messageTemplateService.ts
+│   │   │   │   ├── tagService.ts
+│   │   │   │   └── timeService.ts
+│   │   │   ├── types/           # TypeScript definitions
+│   │   │   ├── contexts/        # React contexts
+│   │   │   ├── locales/         # i18n translations
+│   │   │   └── utils/           # Helper functions
+│   │   └── package.json
+│   ├── chat-server/      # Real-time chat server
+│   │   ├── src/
+│   │   │   ├── controllers/     # Chat controllers
+│   │   │   ├── services/        # Chat services
+│   │   │   ├── models/          # Chat data models
+│   │   │   ├── middleware/      # Chat middleware
+│   │   │   ├── routes/          # Chat API routes
+│   │   │   ├── websocket/       # Socket.IO handlers
+│   │   │   ├── database/        # Chat DB migrations
+│   │   │   └── utils/           # Helper functions
+│   │   └── package.json
+│   └── sdks/             # Client SDKs
+│       └── nodejs/       # Node.js SDK
 ├── scripts/              # Utility scripts
 │   ├── translation scripts     # i18n management
 │   ├── setup.sh               # Environment setup
 │   └── deploy.sh              # Deployment script
 ├── docker/               # Docker configurations
+├── docs/                 # Documentation site (Docusaurus)
 └── package.json          # Root package.json
 ```
 
@@ -203,7 +237,7 @@ gatrix/
 
 ### Development
 
-Start both frontend and backend in development mode:
+Start all services in development mode:
 ```bash
 npm run dev
 ```
@@ -212,6 +246,7 @@ Or start them separately:
 ```bash
 npm run dev:backend
 npm run dev:frontend
+npm run dev:chat
 ```
 
 ### Building for Production

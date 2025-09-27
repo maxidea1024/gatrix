@@ -21,6 +21,7 @@ Gatrix is a modern, full-stack platform that provides robust user management, au
 - 🛡️ **IP Whitelisting**: Advanced IP access control and management
 - ⚙️ **Job Scheduler**: Advanced job scheduling with cron-like syntax
 - 📊 **Queue Monitoring**: Real-time job queue monitoring with Bull Board
+- 💬 **Real-time Chat**: High-performance chat server with Socket.IO and Redis clustering
 
 ## Prerequisites
 
@@ -83,3 +84,4 @@ The application will be available at:
 - 🔧 [Learn about the Cache System](./backend/cache-keys.md)
 - 🚀 [Explore Job Management](./features/job-management.md)
 - 🌍 [Configure Game Worlds](./features/game-worlds.md)
+- 💬 [Set up Chat Server](../packages/chat-server/README.md)

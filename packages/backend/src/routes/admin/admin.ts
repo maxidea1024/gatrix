@@ -13,8 +13,6 @@ import {
   auditUserDemote
 } from '../../middleware/auditLog';
 
-
-
 const router = Router();
 
 // All admin routes require authentication and admin privileges
@@ -54,10 +52,6 @@ router.get('/audit-logs', AdminController.getAuditLogs as any);
 router.get('/audit-logs/stats', AdminController.getAuditStats as any);
 
 // System management
-
-
-
-
 router.post('/cache/clear', AdminController.clearCache as any);
 router.post('/audit-logs/cleanup', AdminController.cleanupAuditLogs as any);
 
