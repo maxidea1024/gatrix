@@ -792,7 +792,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 borderRadius: 1,
                 fontWeight: 600
               }}>
-                {maintenanceStatus.detail.type === 'emergency' ? '긴급 점검' : '정기 점검'}
+                {t(`admin.maintenance.types.${maintenanceStatus.detail.type}`)}
               </Typography>
             )}
           </Box>
@@ -801,17 +801,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           {(maintenanceStatus.detail?.startsAt || maintenanceStatus.detail?.endsAt) && (
             <Box sx={{ mb: 1 }}>
               <Typography variant="caption" sx={{ opacity: 0.9, fontSize: '0.75rem', fontWeight: 600 }}>
-                📅 점검 기간: {(() => {
+                📅 {t('admin.maintenance.maintenancePeriodLabel')}: {(() => {
                   const start = maintenanceStatus.detail?.startsAt;
                   const end = maintenanceStatus.detail?.endsAt;
                   if (start && end) {
                     return `${formatDateTimeDetailed(start)} ~ ${formatDateTimeDetailed(end)}`;
                   } else if (start) {
-                    return `${formatDateTimeDetailed(start)} 시작`;
+                    return `${formatDateTimeDetailed(start)} ${t('admin.maintenance.start')}`;
                   } else if (end) {
-                    return `${formatDateTimeDetailed(end)} 종료 예정`;
+                    return `${formatDateTimeDetailed(end)} ${t('admin.maintenance.stop')}`;
                   }
-                  return '즉시 시작';
+                  return t('admin.maintenance.immediateStartLabel');
                 })()}
               </Typography>
             </Box>

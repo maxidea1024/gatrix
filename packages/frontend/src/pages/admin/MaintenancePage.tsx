@@ -2,9 +2,13 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Box, Card, CardContent, Stack, TextField, Switch, FormControlLabel, Button, Typography, MenuItem, Select, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
 import dayjs, { Dayjs } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import 'dayjs/locale/ko';
+import 'dayjs/locale/en';
+import 'dayjs/locale/zh';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -21,7 +25,20 @@ import { formatDateTimeDetailed, getStoredTimezone } from '@/utils/dateFormat';
 
 
 const MaintenancePage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
+
+  // Set dayjs locale based on current language
+  React.useEffect(() => {
+    const currentLang = i18n.language;
+    if (currentLang === 'ko') {
+      dayjs.locale('ko');
+    } else if (currentLang === 'zh') {
+      dayjs.locale('zh');
+    } else {
+      dayjs.locale('en');
+    }
+  }, [i18n.language]);
   const [tab, setTab] = useState(0);
   const [editMode, setEditMode] = useState(false);
 
@@ -30,6 +47,10 @@ const MaintenancePage: React.FC = () => {
   const [type, setType] = useState<MaintenanceType>('regular');
   const [startsAt, setStartsAt] = useState<Dayjs | null>(null);
   const updatedBySSE = useRef(false);
+
+  // DateTimePicker refs for focus
+  const startsAtRef = useRef<HTMLInputElement>(null);
+  const endsAtRef = useRef<HTMLInputElement>(null);
 
   const [endsAt, setEndsAt] = useState<Dayjs | null>(null);
   const [kickExistingPlayers, setKickExistingPlayers] = useState(false);
@@ -132,30 +153,35 @@ const MaintenancePage: React.FC = () => {
 
     // 시작 시간이 과거인지 확인
     if (startsAt && startsAt.isBefore(now)) {
-      return { valid: false, message: '시작 시간이 과거입니다. 현재 시간 이후로 설정해주세요.' };
+      enqueueSnackbar(t('admin.maintenance.validationTimeInPast'), { variant: 'error' });
+      startsAtRef.current?.focus();
+      return { valid: false };
     }
 
     // 종료 시간이 시작 시간보다 이른지 확인
     if (startsAt && endsAt && endsAt.isBefore(startsAt)) {
-      return { valid: false, message: '종료 시간이 시작 시간보다 이릅니다.' };
+      enqueueSnackbar(t('admin.maintenance.validationEndBeforeStart'), { variant: 'error' });
+      endsAtRef.current?.focus();
+      return { valid: false };
     }
 
     // 점검 시간이 너무 짧은지 확인 (5분 미만)
     if (startsAt && endsAt) {
       const duration = endsAt.diff(startsAt, 'minute');
       if (duration < 5) {
-        return { valid: false, message: '점검 시간이 너무 짧습니다. 최소 5분 이상 설정해주세요.' };
+        enqueueSnackbar(t('admin.maintenance.validationTooShort'), { variant: 'error' });
+        endsAtRef.current?.focus();
+        return { valid: false };
       }
     }
 
-    return { valid: true, message: '' };
+    return { valid: true };
   };
 
   const startMaintenance = async () => {
     // 시간 검증
     const validation = validateMaintenanceTime();
     if (!validation.valid) {
-      alert(validation.message);
       return;
     }
     const payload = inputMode === 'template' ? (() => {
@@ -221,24 +247,137 @@ const MaintenancePage: React.FC = () => {
               <Stack spacing={2} sx={{ mt: 1 }}>
               {isMaintenance && !editMode ? (
                 <>
-                  <Typography variant="subtitle1" color="error" sx={{ fontWeight: 600 }}>
+                  <Typography variant="subtitle1" color="error" sx={{ fontWeight: 600, mb: 2 }}>
                     {t('admin.maintenance.statusOn')}
                   </Typography>
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <Typography variant="body2" color="text.secondary">
-                      {t('admin.maintenance.type')}: {t(`admin.maintenance.types.${type}`)}
+
+                  {/* Current Maintenance Summary */}
+                  <Box sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(244, 67, 54, 0.08)' : 'rgba(244, 67, 54, 0.04)',
+                    border: '1px solid',
+                    borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(244, 67, 54, 0.3)' : 'rgba(244, 67, 54, 0.2)',
+                    mb: 2
+                  }}>
+                    <Typography variant="h6" sx={{ mb: 1.5, fontWeight: 600, color: 'error.main' }}>
+                      {t('admin.maintenance.currentSettingsTitle')}
                     </Typography>
-                    {startsAt && (
-                      <Typography variant="body2" color="text.secondary">
-                        {t('admin.maintenance.startsAt')}: {startsAt.format('YYYY년 M월 D일 A h:mm')} ({startsAt.toISOString()})
-                      </Typography>
-                    )}
-                    {endsAt && (
-                      <Typography variant="body2" color="text.secondary">
-                        {t('admin.maintenance.endsAt')}: {endsAt.format('YYYY년 M월 D일 A h:mm')} ({endsAt.toISOString()})
-                      </Typography>
-                    )}
-                  </Stack>
+
+                    <Box component="table" sx={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 8px' }}>
+                      <Box component="tbody">
+                        <Box component="tr">
+                          <Box component="td" sx={{
+                            fontWeight: 500,
+                            fontSize: '0.875rem',
+                            width: '140px',
+                            verticalAlign: 'top',
+                            pr: 2
+                          }}>
+                            {t('admin.maintenance.type')}:
+                          </Box>
+                          <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                            {type === 'regular' ? t('admin.maintenance.types.regular') : t('admin.maintenance.types.emergency')}
+                          </Box>
+                        </Box>
+
+                        {/* 점검 기간 */}
+                        <Box component="tr">
+                          <Box component="td" sx={{
+                            fontWeight: 500,
+                            fontSize: '0.875rem',
+                            width: '140px',
+                            verticalAlign: 'top',
+                            pr: 2
+                          }}>
+                            {t('admin.maintenance.maintenancePeriodLabel')}:
+                          </Box>
+                          <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                            {(() => {
+                              if (startsAt && endsAt) {
+                                const duration = endsAt.diff(startsAt, 'minute');
+                                const hours = Math.floor(duration / 60);
+                                const minutes = duration % 60;
+                                const durationText = `${hours > 0 ? `${hours}${t('admin.maintenance.hoursUnit')} ` : ''}${minutes}${t('admin.maintenance.minutesUnit')}`;
+                                return (
+                                  <Box component="span">
+                                    {startsAt.format('YYYY-MM-DD A h:mm')} ~ {endsAt.format('YYYY-MM-DD A h:mm')}
+                                    <Box component="span" sx={{ color: 'primary.main', fontWeight: 600, ml: 0.5 }}>
+                                      ({durationText})
+                                    </Box>
+                                  </Box>
+                                );
+                              } else if (startsAt && !endsAt) {
+                                return `${startsAt.format('YYYY-MM-DD A h:mm')} ~ ${t('admin.maintenance.manualStopLabel')}`;
+                              } else if (!startsAt && endsAt) {
+                                return `${t('admin.maintenance.immediateStartLabel')} ~ ${endsAt.format('YYYY-MM-DD A h:mm')}`;
+                              } else {
+                                return `${t('admin.maintenance.immediateStartLabel')} ~ ${t('admin.maintenance.manualStopLabel')}`;
+                              }
+                            })()}
+                          </Box>
+                        </Box>
+
+                        {startsAt && (
+                          <Box component="tr">
+                            <Box component="td" sx={{
+                              fontWeight: 500,
+                              fontSize: '0.875rem',
+                              width: '140px',
+                              verticalAlign: 'top',
+                              pr: 2
+                            }}>
+                              {t('admin.maintenance.startsAt')}:
+                            </Box>
+                            <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                              {startsAt.format('YYYY-MM-DD A h:mm')} ({startsAt.toISOString()})
+                            </Box>
+                          </Box>
+                        )}
+
+                        {endsAt && (
+                          <Box component="tr">
+                            <Box component="td" sx={{
+                              fontWeight: 500,
+                              fontSize: '0.875rem',
+                              width: '140px',
+                              verticalAlign: 'top',
+                              pr: 2
+                            }}>
+                              {t('admin.maintenance.endsAt')}:
+                            </Box>
+                            <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                              {endsAt.format('YYYY-MM-DD A h:mm')} ({endsAt.toISOString()})
+                            </Box>
+                          </Box>
+                        )}
+
+                        {(baseMsg || (inputMode === 'template' && selectedTpl?.defaultMessage)) && (
+                          <Box component="tr">
+                            <Box component="td" sx={{
+                              fontWeight: 500,
+                              fontSize: '0.875rem',
+                              width: '140px',
+                              verticalAlign: 'top',
+                              pr: 2
+                            }}>
+                              {t('clientVersions.maintenance.defaultMessage')}:
+                            </Box>
+                            <Box component="td" sx={{
+                              fontSize: '0.875rem',
+                              verticalAlign: 'top',
+                              maxWidth: 300,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {inputMode === 'template' ? selectedTpl?.defaultMessage : baseMsg}
+                            </Box>
+                          </Box>
+                        )}
+                      </Box>
+                    </Box>
+                  </Box>
 
                   {/* Quick preview of current messages */}
                   {baseMsg && (
@@ -290,7 +429,8 @@ const MaintenancePage: React.FC = () => {
                         slotProps={{
                           textField: {
                             fullWidth: true,
-                            placeholder: t('admin.maintenance.selectDateTime')
+                            placeholder: t('admin.maintenance.selectDateTime'),
+                            inputRef: startsAtRef
                           },
                           actionBar: {
                             actions: ['clear', 'cancel', 'accept']
@@ -315,7 +455,8 @@ const MaintenancePage: React.FC = () => {
                         slotProps={{
                           textField: {
                             fullWidth: true,
-                            placeholder: t('admin.maintenance.selectDateTime')
+                            placeholder: t('admin.maintenance.selectDateTime'),
+                            inputRef: endsAtRef
                           },
                           actionBar: {
                             actions: ['clear', 'cancel', 'accept']
@@ -437,223 +578,8 @@ const MaintenancePage: React.FC = () => {
 
               {/* Actions는 우측 영역으로 이동 */}
 
-              {/* Confirm dialog */}
-              <Dialog
-                open={confirmOpen}
-                onClose={()=>setConfirmOpen(false)}
-                maxWidth="md"
-                fullWidth
-              >
-                <DialogTitle sx={{ pb: 1 }}>
-                  {confirmMode === 'start' ? (t('admin.maintenance.confirmStartTitle')) : (t('admin.maintenance.confirmStopTitle'))}
-                </DialogTitle>
-                <DialogContent sx={{ pt: 2 }}>
-                  {/* Settings Summary */}
-                  <Box sx={{
-                    mb: 3,
-                    p: 2,
-                    borderRadius: 2,
-                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(144, 202, 249, 0.08)' : 'rgba(25, 118, 210, 0.04)',
-                    border: '1px solid',
-                    borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(144, 202, 249, 0.3)' : 'rgba(25, 118, 210, 0.2)'
-                  }}>
-                    <Typography variant="h6" sx={{ mb: 1.5, fontWeight: 600, color: 'primary.main' }}>
-                      {confirmMode === 'start' ? t('admin.maintenance.settingsSummaryTitle') : t('admin.maintenance.currentSettingsTitle')}
-                    </Typography>
 
-                    <Stack spacing={1}>
-                      <Box sx={{ display: 'flex', gap: 2 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 500, minWidth: 80 }}>
-                          {t('admin.maintenance.type')}:
-                        </Typography>
-                        <Typography variant="body2">
-                          {type === 'regular' ? t('admin.maintenance.types.regular') : t('admin.maintenance.types.emergency')}
-                        </Typography>
-                      </Box>
 
-                      {/* 점검 기간 또는 즉시/수동 표시 */}
-                      <Box sx={{ display: 'flex', gap: 2 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 500, minWidth: 80 }}>
-                          점검 기간:
-                        </Typography>
-                        <Typography variant="body2">
-                          {(() => {
-                            if (startsAt && endsAt) {
-                              const duration = endsAt.diff(startsAt, 'minute');
-                              const hours = Math.floor(duration / 60);
-                              const minutes = duration % 60;
-                              return `${startsAt.format('YYYY년 M월 D일 A h:mm')} ~ ${endsAt.format('YYYY년 M월 D일 A h:mm')} (${hours > 0 ? `${hours}시간 ` : ''}${minutes}분)`;
-                            } else if (startsAt && !endsAt) {
-                              return `${startsAt.format('YYYY년 M월 D일 A h:mm')} ~ 수동 종료`;
-                            } else if (!startsAt && endsAt) {
-                              return `즉시 시작 ~ ${endsAt.format('YYYY년 M월 D일 A h:mm')}`;
-                            } else {
-                              return '즉시 시작 ~ 수동 종료';
-                            }
-                          })()}
-                        </Typography>
-                      </Box>
-
-                      {/* 개별 시간 표시 (ISO8601 포함) */}
-                      {startsAt && (
-                        <Box sx={{ display: 'flex', gap: 2 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 500, minWidth: 80 }}>
-                            {t('admin.maintenance.startsAt')}:
-                          </Typography>
-                          <Typography variant="body2">
-                            {startsAt.format('YYYY년 M월 D일 A h:mm')} ({startsAt.toISOString()})
-                          </Typography>
-                        </Box>
-                      )}
-
-                      {endsAt && (
-                        <Box sx={{ display: 'flex', gap: 2 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 500, minWidth: 80 }}>
-                            {t('admin.maintenance.endsAt')}:
-                          </Typography>
-                          <Typography variant="body2">
-                            {endsAt.format('YYYY년 M월 D일 A h:mm')} ({endsAt.toISOString()})
-                          </Typography>
-                        </Box>
-                      )}
-
-                      {confirmMode === 'start' && (
-                        <Box sx={{ display: 'flex', gap: 2 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 500, minWidth: 80 }}>
-                            {t('admin.maintenance.kickExistingPlayers')}:
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: kickExistingPlayers ? 'warning.main' : 'success.main' }}>
-                            {kickExistingPlayers ? t('common.yes') : t('common.no')}
-                          </Typography>
-                        </Box>
-                      )}
-
-                      {(baseMsg || (inputMode === 'template' && selectedTpl?.defaultMessage)) && (
-                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-                          <Typography variant="body2" sx={{ fontWeight: 500, minWidth: 80 }}>
-                            {t('clientVersions.maintenance.defaultMessage')}:
-                          </Typography>
-                          <Typography variant="body2" sx={{
-                            maxWidth: 300,
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
-                          }}>
-                            {inputMode === 'template' ? selectedTpl?.defaultMessage : baseMsg}
-                          </Typography>
-                        </Box>
-                      )}
-                    </Stack>
-                  </Box>
-
-                  {/* Impact Warning */}
-                  <Box sx={{
-                    mb: 3,
-                    p: 2.5,
-                    borderRadius: 2,
-                    backgroundColor: confirmMode === 'start'
-                      ? (theme) => theme.palette.mode === 'dark' ? 'rgba(244, 67, 54, 0.08)' : 'rgba(244, 67, 54, 0.04)'
-                      : (theme) => theme.palette.mode === 'dark' ? 'rgba(76, 175, 80, 0.08)' : 'rgba(76, 175, 80, 0.04)',
-                    border: '1px solid',
-                    borderColor: confirmMode === 'start'
-                      ? (theme) => theme.palette.mode === 'dark' ? 'rgba(244, 67, 54, 0.3)' : 'rgba(244, 67, 54, 0.2)'
-                      : (theme) => theme.palette.mode === 'dark' ? 'rgba(76, 175, 80, 0.3)' : 'rgba(76, 175, 80, 0.2)'
-                  }}>
-                    <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-                      {confirmMode === 'start'
-                        ? t('admin.maintenance.impactWarningTitle')
-                        : t('admin.maintenance.impactRestoreTitle')}
-                    </Typography>
-                    <Typography variant="body2" sx={{ mb: 1 }}>
-                      {confirmMode === 'start'
-                        ? t('admin.maintenance.impactWarningDescription')
-                        : t('admin.maintenance.impactRestoreDescription')}
-                    </Typography>
-                    <Box component="ul" sx={{ pl: 2, mb: 0 }}>
-                      {confirmMode === 'start' ? (
-                        <>
-                          {kickExistingPlayers ? (
-                            <>
-                              <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                                {t('admin.maintenance.impactItemKick1')}
-                              </Typography>
-                              <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                                {t('admin.maintenance.impactItemKick2')}
-                              </Typography>
-                              <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                                {t('admin.maintenance.impactItemKick3')}
-                              </Typography>
-                              <Typography component="li" variant="body2">
-                                {t('admin.maintenance.impactItemKick4')}
-                              </Typography>
-                            </>
-                          ) : (
-                            <>
-                              <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                                {t('admin.maintenance.impactItemNoKick1')}
-                              </Typography>
-                              <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                                {t('admin.maintenance.impactItemNoKick2')}
-                              </Typography>
-                              <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                                {t('admin.maintenance.impactItemNoKick3')}
-                              </Typography>
-                              <Typography component="li" variant="body2">
-                                {t('admin.maintenance.impactItemNoKick4')}
-                              </Typography>
-                            </>
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                            {t('admin.maintenance.restoreItem1')}
-                          </Typography>
-                          <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                            {t('admin.maintenance.restoreItem2')}
-                          </Typography>
-                          <Typography component="li" variant="body2">
-                            {t('admin.maintenance.restoreItem3')}
-                          </Typography>
-                        </>
-                      )}
-                    </Box>
-                  </Box>
-
-                  {/* Confirmation Input */}
-                  <Typography sx={{ mb: 2, fontWeight: 500 }}>
-                    {confirmMode === 'start'
-                      ? t('admin.maintenance.confirmStartMessage', { keyword: t('admin.maintenance.confirmStartKeyword') })
-                      : t('admin.maintenance.confirmStopMessage', { keyword: t('admin.maintenance.confirmStopKeyword') })}
-                  </Typography>
-                  <TextField
-                    autoFocus
-                    fullWidth
-                    size="medium"
-                    value={confirmInput}
-                    onChange={(e)=>setConfirmInput(e.target.value)}
-                    placeholder={confirmMode === 'start' ? t('admin.maintenance.confirmStartKeyword') : t('admin.maintenance.confirmStopKeyword')}
-                    sx={{ mb: 1 }}
-                  />
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={()=>setConfirmOpen(false)}>{t('common.cancel')}</Button>
-                  <Button
-                    color={confirmMode==='start' ? 'error' : 'success'}
-                    variant="contained"
-                    onClick={async()=>{
-                      const expected = confirmMode==='start' ? t('admin.maintenance.confirmStartKeyword') : t('admin.maintenance.confirmStopKeyword');
-                      if (confirmInput.trim().toLowerCase() !== expected.toLowerCase()) return;
-                      setConfirmOpen(false);
-                      if (confirmMode==='start') await startMaintenance();
-                      if (confirmMode==='stop') await stopMaintenance();
-                    }}
-                    disabled={confirmInput.trim().toLowerCase() !== (confirmMode==='start' ? t('admin.maintenance.confirmStartKeyword') : t('admin.maintenance.confirmStopKeyword')).toLowerCase()}
-                  >
-                    {confirmMode==='start' ? (t('admin.maintenance.start')) : (t('admin.maintenance.stop'))}
-                  </Button>
-                </DialogActions>
-              </Dialog>
 
             </Stack>
           </CardContent>
@@ -667,7 +593,16 @@ const MaintenancePage: React.FC = () => {
               color="error"
               size="large"
               startIcon={<PlayArrowIcon />}
-              onClick={() => { setConfirmMode('start'); setConfirmInput(''); setConfirmOpen(true); }}
+              onClick={() => {
+                // 시간 검증 먼저 실행
+                const validation = validateMaintenanceTime();
+                if (!validation.valid) {
+                  return;
+                }
+                setConfirmMode('start');
+                setConfirmInput('');
+                setConfirmOpen(true);
+              }}
               disabled={!hasMessageForStart}
               sx={{
                 width: 160,
@@ -728,6 +663,13 @@ const MaintenancePage: React.FC = () => {
           onClose={()=>setConfirmOpen(false)}
           maxWidth="md"
           fullWidth
+          sx={{
+            '& .MuiBackdrop-root': {
+              backgroundColor: (theme) => theme.palette.mode === 'dark'
+                ? 'rgba(0, 0, 0, 0.2)'
+                : 'rgba(0, 0, 0, 0.3)',
+            }
+          }}
         >
           <DialogTitle sx={{ pb: 1 }}>
             <Typography variant="h6" component="div">
@@ -768,6 +710,45 @@ const MaintenancePage: React.FC = () => {
                     </Box>
                   </Box>
 
+                  {/* 점검 기간 */}
+                  <Box component="tr">
+                    <Box component="td" sx={{
+                      fontWeight: 500,
+                      fontSize: '0.875rem',
+                      width: '140px',
+                      verticalAlign: 'top',
+                      pr: 2
+                    }}>
+                      {t('admin.maintenance.maintenancePeriodLabel')}:
+                    </Box>
+                    <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                      {(() => {
+                        if (startsAt && endsAt) {
+                          const duration = endsAt.diff(startsAt, 'minute');
+                          const hours = Math.floor(duration / 60);
+                          const minutes = duration % 60;
+                          const durationText = `${hours > 0 ? `${hours}${t('admin.maintenance.hoursUnit')} ` : ''}${minutes}${t('admin.maintenance.minutesUnit')}`;
+                          return (
+                            <Box component="span">
+                              {startsAt.format('YYYY-MM-DD A h:mm')} ~ {endsAt.format('YYYY-MM-DD A h:mm')}
+                              <Box component="span" sx={{ color: 'primary.main', fontWeight: 600, ml: 0.5 }}>
+                                ({durationText})
+                              </Box>
+                            </Box>
+                          );
+                        } else if (startsAt && !endsAt) {
+                          return `${startsAt.format('YYYY-MM-DD A h:mm')} ~ ${t('admin.maintenance.manualStopLabel')}`;
+                        } else if (!startsAt && endsAt) {
+                          return `${t('admin.maintenance.immediateStartLabel')} ~ ${endsAt.format('YYYY-MM-DD A h:mm')}`;
+                        } else {
+                          return `${t('admin.maintenance.immediateStartLabel')} ~ ${t('admin.maintenance.manualStopLabel')}`;
+                        }
+                      })()}
+                    </Box>
+                  </Box>
+
+
+
                   {startsAt && (
                     <Box component="tr">
                       <Box component="td" sx={{
@@ -780,7 +761,7 @@ const MaintenancePage: React.FC = () => {
                         {t('admin.maintenance.startsAt')}:
                       </Box>
                       <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
-                        {startsAt.format('YYYY년 M월 D일 A h:mm')} ({startsAt.toISOString()})
+                        {startsAt.format('YYYY-MM-DD A h:mm')} ({startsAt.toISOString()})
                       </Box>
                     </Box>
                   )}
@@ -797,7 +778,7 @@ const MaintenancePage: React.FC = () => {
                         {t('admin.maintenance.endsAt')}:
                       </Box>
                       <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
-                        {endsAt.format('YYYY년 M월 D일 A h:mm')} ({endsAt.toISOString()})
+                        {endsAt.format('YYYY-MM-DD A h:mm')} ({endsAt.toISOString()})
                       </Box>
                     </Box>
                   )}

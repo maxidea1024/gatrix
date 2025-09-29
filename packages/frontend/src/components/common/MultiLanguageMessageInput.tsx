@@ -178,10 +178,12 @@ const MultiLanguageMessageInput: React.FC<MultiLanguageMessageInputProps> = ({
             </Tooltip>
           )}
         </Box>
-        
-        <Typography variant="caption" color="text.secondary">
-          {supportsMultiLanguageHelperText}
-        </Typography>
+
+        {supportsMultiLanguage && (
+          <Typography variant="caption" color="text.secondary">
+            {supportsMultiLanguageHelperText}
+          </Typography>
+        )}
 
         {/* 언어별 메시지 */}
         {supportsMultiLanguage && (
