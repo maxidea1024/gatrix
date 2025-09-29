@@ -71,6 +71,7 @@
       "confirmUpdateTitle": "确认更新维护设置",
       "confirmUpdateSubtitle": "是否要更新维护设置？",
       "confirmUpdateKeyword": "更新",
+      "confirmUpdateMessage": "请输入 \"{{keyword}}\" 来确认更新维护设置。",
       "update": "更新",
       "updateSuccess": "维护设置已成功更新。",
       "updateFailedWarning": "维护设置更新失败。",

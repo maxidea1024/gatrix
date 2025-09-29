@@ -1046,6 +1046,8 @@ const MaintenancePage: React.FC = () => {
             <Typography sx={{ mb: 2, fontWeight: 500 }}>
               {confirmMode === 'start'
                 ? t('admin.maintenance.confirmStartMessage', { keyword: t('admin.maintenance.confirmStartKeyword') })
+                : confirmMode === 'update'
+                ? t('admin.maintenance.confirmUpdateMessage', { keyword: t('admin.maintenance.confirmUpdateKeyword') })
                 : t('admin.maintenance.confirmStopMessage', { keyword: t('admin.maintenance.confirmStopKeyword') })}
             </Typography>
             <TextField

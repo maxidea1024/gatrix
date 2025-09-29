@@ -148,6 +148,7 @@
       "confirmUpdateTitle": "Confirm Maintenance Settings Update",
       "confirmUpdateSubtitle": "Do you want to update the maintenance settings?",
       "confirmUpdateKeyword": "update",
+      "confirmUpdateMessage": "Type \"{{keyword}}\" to confirm updating maintenance settings.",
       "update": "Update",
       "updateSuccess": "Maintenance settings have been successfully updated.",
       "updateFailedWarning": "Failed to update maintenance settings.",

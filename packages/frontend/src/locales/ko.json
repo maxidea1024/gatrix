@@ -68,6 +68,7 @@
       "confirmUpdateTitle": "점검 설정 업데이트 확인",
       "confirmUpdateSubtitle": "점검 설정을 업데이트하시겠습니까?",
       "confirmUpdateKeyword": "업데이트",
+      "confirmUpdateMessage": "점검 설정을 업데이트하려면 \"{{keyword}}\"를 입력하세요.",
       "update": "업데이트",
       "updateSuccess": "점검 설정이 성공적으로 업데이트되었습니다.",
       "updateFailedWarning": "점검 설정 업데이트에 실패했습니다.",
