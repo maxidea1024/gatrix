@@ -58,6 +58,14 @@
       "emailPlaceholder": "초대할 사용자의 이메일을 입력하세요",
       "expirationHours": "유효 시간 (시간)",
       "create": "초대 생성",
+      "drawerTitle": "사용자 초대",
+      "info": "초대받은 사용자는 일반 유저 권한으로 가입됩니다. 가입 후 필요시 관리자가 권한을 변경할 수 있습니다.",
+      "emailOptionalHelp": "이메일을 비워두면 링크만 생성됩니다.",
+      "duration": {
+        "48h": "48시간",
+        "1w": "1주일",
+        "1m": "1개월"
+      },
       "cancel": "취소",
       "noInvitations": "생성된 초대가 없습니다",
       "createdAt": "생성일",
@@ -504,7 +512,7 @@
       "addTemplate": "메시지 템플릿 추가"
     },
     "crashes": {
-      "title": "클라이언트 크래시",
+      "title": "클라이언트 크래쉬",
       "subtitle": "클라이언트 크래시 리포트 모니터링 및 관리",
       "description": "클라이언트 크래시 이벤트를 추적하고, 오류 패턴을 분석하며, 크래시 상태를 관리합니다",
       "searchPlaceholder": "사용자 닉네임 또는 사용자 ID로 검색...",
@@ -535,16 +543,39 @@
         "allMarketTypes": "모든 마켓 타입",
         "allDeviceTypes": "모든 디바이스 타입",
         "allBranches": "모든 브랜치",
-        "allStates": "모든 상태"
+        "allStates": "모든 상태",
+        "presets": {
+          "last15m": "최근 15분",
+          "last1h": "최근 1시간",
+          "last24h": "최근 24시간",
+          "last7d": "최근 7일",
+          "last30d": "최근 30일",
+          "custom": "사용자 지정"
+        }
+      },
+      "sort": {
+        "sortBy": "정렬 기준",
+        "sortOrder": "정렬 순서",
+        "by": {
+          "firstCrash": "첫번째 크래시",
+          "lastCrash": "마지막 크래시",
+          "count": "발생 횟수",
+          "firstVersion": "첫번째 버전",
+          "lastVersion": "마지막 버전",
+          "branch": "브랜치"
+        }
       },
       "columns": {
         "id": "ID",
         "firstLine": "오류 요약",
         "count": "발생 횟수",
         "state": "상태",
-        "lastCrash": "마지막 크래시",
-        "branch": "브랜치",
         "platform": "플랫폼",
+        "branch": "브랜치",
+        "firstCrash": "첫번째 크래시",
+        "lastCrash": "마지막 크래시",
+        "firstVersion": "첫번째 버전",
+        "lastVersion": "마지막 버전",
         "version": "버전",
         "actions": "작업"
       },
@@ -561,6 +592,12 @@
         "mac": "맥",
         "linux": "리눅스",
         "web": "웹"
+      },
+      "branches": {
+        "production": "운영",
+        "staging": "스테이징",
+        "development": "개발",
+        "editor": "에디터"
       },
       "serverGroups": {
         "global": "글로벌",
@@ -626,6 +663,11 @@
         "confirmDelete": "이 크래시를 삭제됨으로 표시하시겠습니까?"
       }
     }
+  },
+  "common": {
+    "perPage": "개씩 보기",
+    "asc": "오름차순",
+    "desc": "내림차순"
   },
   "scheduler": {
     "title": "스케줄 관리",

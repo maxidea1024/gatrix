@@ -31,6 +31,8 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { NavItem } from '@/types';
+import { useTranslation } from 'react-i18next';
+
 
 interface SidebarProps {
   open: boolean;
@@ -180,9 +182,11 @@ const iconMap: Record<string, React.ReactElement> = {
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
   const location = useLocation();
   const { user, isAdmin } = useAuth();
-  
+
   const [expandedItems, setExpandedItems] = React.useState<string[]>([]);
 
   const navigationItems = getNavigationItems(isAdmin());
@@ -193,8 +197,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
       onClose(); // Close sidebar on mobile after navigation
     } else if (item.children) {
       // Toggle expansion for items with children
-      setExpandedItems(prev => 
-        prev.includes(item.id) 
+      setExpandedItems(prev =>
+        prev.includes(item.id)
           ? prev.filter(id => id !== item.id)
           : [...prev, item.id]
       );
@@ -258,8 +262,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
             <ListItemIcon sx={{ minWidth: 40 }}>
               {iconMap[item.icon || 'Dashboard']}
             </ListItemIcon>
-            <ListItemText 
-              primary={item.label}
+            <ListItemText
+              primary={item.id === 'crashes' ? t('admin.crashes.title') : item.label}
               primaryTypographyProps={{
                 fontSize: '0.875rem',
                 fontWeight: isActive ? 600 : 400,
@@ -292,9 +296,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
           </Typography>
         </Box>
       </Toolbar>
-      
+
       <Divider />
-      
+
       <Box sx={{ flex: 1, overflow: 'auto', py: 1 }}>
         <List>
           {navigationItems.map(item => renderNavItem(item))}
@@ -346,7 +350,9 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAdmin } = useAuth();
-  
+
+  const { t } = useTranslation();
+
   const [expandedItems, setExpandedItems] = React.useState<string[]>([]);
 
   const navigationItems = getNavigationItems(isAdmin());
@@ -355,8 +361,8 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
     if (item.path) {
       navigate(item.path);
     } else if (item.children) {
-      setExpandedItems(prev => 
-        prev.includes(item.id) 
+      setExpandedItems(prev =>
+        prev.includes(item.id)
           ? prev.filter(id => id !== item.id)
           : [...prev, item.id]
       );
@@ -418,8 +424,8 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
             <ListItemIcon sx={{ minWidth: 40 }}>
               {iconMap[item.icon || 'Dashboard']}
             </ListItemIcon>
-            <ListItemText 
-              primary={item.label}
+            <ListItemText
+              primary={item.id === 'crashes' ? t('admin.crashes.title') : item.label}
               primaryTypographyProps={{
                 fontSize: '0.875rem',
                 fontWeight: isActive ? 600 : 400,
@@ -461,9 +467,9 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
           </Typography>
         </Box>
       </Toolbar>
-      
+
       <Divider />
-      
+
       <Box sx={{ flex: 1, overflow: 'auto', py: 1 }}>
         <List>
           {navigationItems.map(item => renderNavItem(item))}

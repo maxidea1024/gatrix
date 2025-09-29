@@ -360,6 +360,7 @@ const IpWhitelistTab: React.FC = () => {
                 placeholder={t('ipWhitelist.searchPlaceholder')}
                 value={search}
                 onChange={handleSearchChange}
+                size="small"
                 slotProps={{
                   input: {
                     startAdornment: (

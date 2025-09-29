@@ -92,7 +92,7 @@ const adminMenuItems = [
   { text: 'jobs.monitor', icon: <MonitorIcon />, path: '/admin/queue-monitor' },
   { text: 'admin.whitelist.title', icon: <SecurityIcon />, path: '/admin/whitelist' },
   { text: 'navigation.auditLogs', icon: <HistoryIcon />, path: '/admin/audit-logs' },
-  { text: 'crashes.title', icon: <BugReportIcon />, path: '/admin/crashes' },
+  { text: 'admin.crashes.title', icon: <BugReportIcon />, path: '/admin/crashes' },
   {
     text: 'admin.remoteConfig.title',
     icon: <CloudSyncIcon />,
@@ -818,7 +818,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           width: '100%',
           maxWidth: '100%',
           transition: 'padding-left 0.3s ease',
-          overflow: 'hidden', // 스크롤 방지
+          overflowX: 'hidden',
+          overflowY: 'auto', // 세로 스크롤 허용
           display: 'flex',
           flexDirection: 'column',
         }}

@@ -61,6 +61,14 @@
       "emailPlaceholder": "输入要邀请的用户邮箱",
       "expirationHours": "有效时间（小时）",
       "create": "创建邀请",
+      "drawerTitle": "邀请用户",
+      "info": "被邀请的用户将以普通用户权限加入。注册后，如有需要，管理员可以更改其权限。",
+      "emailOptionalHelp": "如果不填写邮箱，将只生成链接。",
+      "duration": {
+        "48h": "48小时",
+        "1w": "1周",
+        "1m": "1个月"
+      },
       "cancel": "取消",
       "noInvitations": "没有创建的邀请",
       "createdAt": "创建时间",

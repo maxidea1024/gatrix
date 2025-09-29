@@ -278,6 +278,7 @@ const JobsPage: React.FC = () => {
             <Grid size={{ xs: 12, md: 3 }}>
               <TextField
                 fullWidth
+                size="small"
                 label={t('common.search')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -292,13 +293,14 @@ const JobsPage: React.FC = () => {
               />
             </Grid>
             <Grid size={{ xs: 12, md: 2 }}>
-              <FormControl fullWidth>
+              <FormControl fullWidth size="small">
                 <InputLabel shrink={true}>{t('jobs.jobType')}</InputLabel>
                 <Select
                   value={selectedJobType}
                   onChange={(e) => setSelectedJobType(e.target.value as number | '')}
                   label={t('jobs.jobType')}
                   displayEmpty
+                  size="small"
                   MenuProps={{
                     PaperProps: {
                       style: {
@@ -325,13 +327,14 @@ const JobsPage: React.FC = () => {
               </FormControl>
             </Grid>
             <Grid size={{ xs: 12, md: 2 }}>
-              <FormControl fullWidth>
+              <FormControl fullWidth size="small">
                 <InputLabel shrink={true}>{t('common.usable')}</InputLabel>
                 <Select
                   value={enabledFilter}
                   onChange={(e) => setEnabledFilter(e.target.value as boolean | '')}
                   label={t('common.usable')}
                   displayEmpty
+                  size="small"
                   MenuProps={{
                     PaperProps: {
                       style: {
@@ -389,7 +392,7 @@ const JobsPage: React.FC = () => {
                   })
                 }
                 renderInput={(params) => (
-                  <TextField {...params} label={t('common.tags')} />
+                  <TextField {...params} label={t('common.tags')} size="small" />
                 )}
                 renderOption={(props, option) => {
                   const { key, ...otherProps } = props;

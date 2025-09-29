@@ -856,7 +856,7 @@ const ClientVersionsPage: React.FC = () => {
                   })
                 }
                 renderInput={(params) => (
-                  <TextField {...params} label={t('common.tags')} />
+                  <TextField {...params} label={t('common.tags')} size="small" />
                 )}
                 renderOption={(props, option) => {
                   const { key, ...otherProps } = props;
@@ -1619,6 +1619,7 @@ const ClientVersionsPage: React.FC = () => {
                 {...params}
                 label={t('common.tags')}
                 placeholder={t('common.selectTags')}
+                size="small"
               />
             )}
             renderOption={(props, option) => (

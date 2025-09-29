@@ -105,6 +105,7 @@ interface SortableRowProps {
   onMoveUp: (world: GameWorld) => void;
   onMoveDown: (world: GameWorld) => void;
   onCopy: (text: string, type: string) => void;
+  onDuplicate: (world: GameWorld) => void;
   t: (key: string) => string;
 }
 
@@ -117,6 +118,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
   onMoveUp,
   onMoveDown,
   onCopy,
+  onDuplicate,
   t,
   index,
   total,
@@ -310,6 +312,13 @@ const SortableRow: React.FC<SortableRowProps> = ({
               <ArrowDownIcon />
             </IconButton>
           </span>
+        </Tooltip>
+
+        {/* Duplicate world (copy values into new form, worldId cleared) */}
+        <Tooltip title={t('common.copy')}>
+          <IconButton size="small" onClick={() => onDuplicate(world)}>
+            <CopyIcon />
+          </IconButton>
         </Tooltip>
 
         <Tooltip title={t('gameWorlds.editGameWorld')}>
@@ -534,11 +543,9 @@ const GameWorldsPage: React.FC = () => {
       const tagIds = tagsFilter.length > 0 ? tagsFilter.map(tag => tag.id) : [];
 
       const result = await gameWorldService.getGameWorlds({
-
-
-        // 페이징 파라미터 제거: page/limit 미전송
+        // 서버 컨트롤러는 tagIds(쉼표구분)를 기대함
         search: search || undefined,
-        tags: tagIds.length ? tagIds.join(',') : undefined,
+        tagIds: tagIds.length ? tagIds.join(',') : undefined,
       });
 
       setWorlds(result.worlds);
@@ -616,6 +623,44 @@ const GameWorldsPage: React.FC = () => {
     setSupportsMultiLanguage(shouldEnableMultiLanguage);
     setFormErrors({});
     setDialogOpen(true);
+  };
+
+
+  const handleDuplicateWorld = (world: GameWorld) => {
+    // Duplicate: open in create mode with fields copied, but clear worldId
+    setEditingWorld(null);
+
+    const hasMaintenanceLocales = world.maintenanceLocales && world.maintenanceLocales.length > 0;
+    const shouldEnableMultiLanguage = (world.supportsMultiLanguage ?? false) || hasMaintenanceLocales;
+
+    setFormData({
+      worldId: '', // must be empty for new world
+      name: world.name || '',
+      isVisible: Boolean(world.isVisible),
+      isMaintenance: Boolean(world.isMaintenance),
+      description: world.description || '',
+      maintenanceStartDate: world.maintenanceStartDate || '',
+      maintenanceEndDate: world.maintenanceEndDate || '',
+      maintenanceMessage: world.maintenanceMessage || '',
+      supportsMultiLanguage: shouldEnableMultiLanguage,
+      maintenanceLocales: world.maintenanceLocales || [],
+      customPayload: world.customPayload || {},
+      tagIds: (world.tags || []).map(t => t.id),
+    });
+
+    setCustomPayloadText(JSON.stringify(world.customPayload || {}, null, 2));
+    setCustomPayloadError('');
+    setFormTags(world.tags || []);
+    setMaintenanceLocales(world.maintenanceLocales || []);
+    setSupportsMultiLanguage(shouldEnableMultiLanguage);
+    setFormErrors({});
+    setDialogOpen(true);
+
+    // Focus worldId for quick entry
+    setTimeout(() => {
+      worldIdRef.current?.focus();
+      worldIdRef.current?.select();
+    }, 100);
   };
 
   const validateForm = (): boolean => {
@@ -919,6 +964,7 @@ const GameWorldsPage: React.FC = () => {
                 placeholder={t('gameWorlds.searchPlaceholder')}
                 value={search}
                 onChange={handleSearchChange}
+                size="small"
                 slotProps={{
                   input: {
                     startAdornment: (
@@ -957,7 +1003,7 @@ const GameWorldsPage: React.FC = () => {
                   })
                 }
                 renderInput={(params) => (
-                  <TextField {...params} label={t('gameWorlds.tags')} />
+                  <TextField {...params} label={t('gameWorlds.tags')} size="small" />
                 )}
                 renderOption={(props, option) => (
                   <Box component="li" {...props}>
@@ -1033,6 +1079,7 @@ const GameWorldsPage: React.FC = () => {
                           onMoveUp={handleMoveUp}
                           onMoveDown={handleMoveDown}
                           onCopy={handleCopy}
+                          onDuplicate={handleDuplicateWorld}
                           t={t}
                         />
                       ))}

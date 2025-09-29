@@ -464,6 +464,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                       {...field}
                       value={field.value || ''}
                       fullWidth
+                      autoFocus
                       label={
                         <Box component="span">
                           {t('clientVersions.version')} <Typography component="span" color="error">*</Typography>

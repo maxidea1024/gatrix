@@ -208,6 +208,7 @@ export class ClientVersionService {
       clientVersion: filters.version,
       platform: filters.platform,
       clientStatus: filters.clientStatus,
+      tags: (filters as any).tags,
       limit,
       offset,
       sortBy,

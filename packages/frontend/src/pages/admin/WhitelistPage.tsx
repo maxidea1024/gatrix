@@ -87,8 +87,8 @@ const WhitelistPage: React.FC = () => {
     storageKey: 'whitelistPage',
   });
 
-  // Tab names for URL mapping
-  const tabNames = ['account', 'ip', 'playground'];
+  // Tab names for URL mapping (stable)
+  const tabNames = React.useMemo(() => ['account', 'ip', 'playground'], []);
 
   // Get initial tab from URL, localStorage, or default to 0
   const getInitialTab = () => {
@@ -116,17 +116,6 @@ const WhitelistPage: React.FC = () => {
   // Tab state
   const [currentTab, setCurrentTab] = useState(getInitialTab);
 
-  // Effect to handle URL synchronization
-  useEffect(() => {
-    const tabParam = searchParams.get('tab');
-    const currentTabName = tabNames[currentTab];
-
-    if (!tabParam || tabParam !== currentTabName) {
-      const newSearchParams = new URLSearchParams(searchParams);
-      newSearchParams.set('tab', currentTabName);
-      setSearchParams(newSearchParams, { replace: true });
-    }
-  }, [currentTab, searchParams, setSearchParams, tabNames]);
 
   // State
   const [whitelists, setWhitelists] = useState<Whitelist[]>([]);
@@ -227,15 +216,15 @@ const WhitelistPage: React.FC = () => {
 
   // Handlers
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setCurrentTab(newValue);
+    const name = tabNames[newValue];
 
-    // Update URL with new tab
+    // Update URL with new tab (single source of truth)
     const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.set('tab', tabNames[newValue]);
-    setSearchParams(newSearchParams);
+    newSearchParams.set('tab', name);
+    setSearchParams(newSearchParams, { replace: true });
 
-    // Save to localStorage
-    localStorage.setItem('whitelist.lastTab', tabNames[newValue]);
+    // Persist selection
+    localStorage.setItem('whitelist.lastTab', name);
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -475,6 +464,7 @@ const WhitelistPage: React.FC = () => {
                         placeholder={t('whitelist.searchPlaceholder')}
                         value={pageState.filters?.search || ''}
                         onChange={handleSearchChange}
+                        size="small"
                         slotProps={{
                           input: {
                             startAdornment: (

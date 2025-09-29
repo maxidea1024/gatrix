@@ -741,6 +741,7 @@ const UsersManagementPage: React.FC = () => {
               <Grid size={{ xs: 12, md: 3 }}>
                 <TextField
                   fullWidth
+                  size="small"
                   placeholder={t('admin.users.searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -754,13 +755,14 @@ const UsersManagementPage: React.FC = () => {
                 />
               </Grid>
               <Grid size={{ xs: 12, md: 2 }}>
-                <FormControl fullWidth>
+                <FormControl fullWidth size="small">
                   <InputLabel shrink={true}>{t('admin.users.statusFilter')}</InputLabel>
                   <Select
                     value={statusFilter}
                     label={t('admin.users.statusFilter')}
                     onChange={(e) => setStatusFilter(e.target.value)}
                     displayEmpty
+                    size="small"
                     MenuProps={{
                       PaperProps: {
                         style: {
@@ -785,13 +787,14 @@ const UsersManagementPage: React.FC = () => {
                 </FormControl>
               </Grid>
               <Grid size={{ xs: 12, md: 2 }}>
-                <FormControl fullWidth>
+                <FormControl fullWidth size="small">
                   <InputLabel shrink={true}>{t('admin.users.roleFilter')}</InputLabel>
                   <Select
                     value={roleFilter}
                     label={t('admin.users.roleFilter')}
                     onChange={(e) => setRoleFilter(e.target.value)}
                     displayEmpty
+                    size="small"
                     MenuProps={{
                       PaperProps: {
                         style: {
@@ -848,7 +851,7 @@ const UsersManagementPage: React.FC = () => {
                     })
                   }
                   renderInput={(params) => (
-                    <TextField {...params} label={t('admin.users.tagFilter')} />
+                    <TextField {...params} label={t('admin.users.tagFilter')} size="small" />
                   )}
                   renderOption={(props, option) => {
                     const { key, ...otherProps } = props;
@@ -888,7 +891,7 @@ const UsersManagementPage: React.FC = () => {
                 onClick={() => setInvitationDialogOpen(true)}
                 disabled={!!currentInvitation}
               >
-                초대
+                {t('admin.invitations.createInvitation')}
               </Button>
             </Box>
           </Box>
@@ -2077,7 +2080,7 @@ const UsersManagementPage: React.FC = () => {
         open={invitationDialogOpen}
         onClose={() => setInvitationDialogOpen(false)}
         sx={{
-          zIndex: 1301,
+          zIndex: 1300,
           '& .MuiDrawer-paper': {
             width: { xs: '100%', sm: 400 },
             maxWidth: '100vw',
@@ -2099,7 +2102,7 @@ const UsersManagementPage: React.FC = () => {
           bgcolor: 'background.paper'
         }}>
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            사용자 초대
+            {t('admin.invitations.drawerTitle')}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <IconButton
@@ -2110,7 +2113,7 @@ const UsersManagementPage: React.FC = () => {
                   backgroundColor: 'action.hover'
                 }
               }}
-              title="새로고침"
+              title={t('common.refresh')}
             >
               <RefreshIcon />
             </IconButton>

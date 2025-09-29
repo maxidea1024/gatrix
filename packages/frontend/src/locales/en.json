@@ -17,6 +17,86 @@
       "title": "Admin Dashboard",
       "totalSessions": "Total Sessions"
     },
+    "crashes": {
+      "title": "Client Crashes",
+      "searchPlaceholder": "Search crashes...",
+      "filters": {
+        "title": "Filters",
+        "dateRange": "Date Range",
+        "dateFrom": "Start Date",
+        "dateTo": "End Date",
+        "state": "State",
+        "deviceType": "Device",
+        "version": "Version",
+        "branch": "Branch",
+
+        "allStates": "All States",
+        "allDeviceTypes": "All Devices",
+        "clear": "Clear",
+        "allBranches": "All Branches",
+
+        "presets": {
+          "last15m": "Last 15 minutes",
+          "last1h": "Last 1 hour",
+          "last24h": "Last 24 hours",
+          "last7d": "Last 7 days",
+          "last30d": "Last 30 days",
+          "custom": "Custom"
+        }
+      },
+      "platforms": {
+        "android": "Android",
+        "ios": "iOS",
+        "windows": "Windows",
+        "mac": "macOS",
+        "linux": "Linux",
+        "web": "Web"
+      },
+      "states": {
+        "open": "Open",
+        "closed": "Closed",
+        "deleted": "Deleted"
+      },
+      "branches": {
+        "production": "Production",
+        "staging": "Staging",
+        "development": "Development",
+        "editor": "Editor"
+      },
+      "sort": {
+        "sortBy": "Sort By",
+        "sortOrder": "Order",
+        "by": {
+          "firstCrash": "First Crash",
+          "lastCrash": "Last Crash",
+          "count": "Count",
+          "firstVersion": "First Version",
+          "lastVersion": "Last Version",
+          "branch": "Branch"
+        }
+      },
+      "columns": {
+        "id": "ID",
+        "firstLine": "Summary",
+        "count": "Count",
+        "state": "State",
+        "platform": "Platform",
+        "branch": "Branch",
+        "firstCrash": "First Crash",
+        "lastCrash": "Last Crash",
+        "firstVersion": "First Version",
+        "lastVersion": "Last Version",
+        "version": "Version",
+        "actions": "Actions"
+      },
+      "actions": {
+        "viewDetails": "View Details",
+        "reopen": "Reopen",
+        "close": "Close",
+        "delete": "Delete"
+      }
+    },
+
     "maintenance": {
       "description": "System maintenance mode management and user notification settings",
       "applyEndsAt": "Apply ends at",
@@ -58,6 +138,14 @@
       "emailPlaceholder": "Enter email address to invite",
       "expirationHours": "Expiration Hours",
       "create": "Create Invitation",
+      "drawerTitle": "Invite User",
+      "info": "Invited users will join with regular user permissions. After sign-up, an administrator can change their role if needed.",
+      "emailOptionalHelp": "If you leave the email empty, only a link will be generated.",
+      "duration": {
+        "48h": "48 hours",
+        "1w": "1 week",
+        "1m": "1 month"
+      },
       "cancel": "Cancel",
       "noInvitations": "No invitations created",
       "createdAt": "Created",
@@ -2066,7 +2154,9 @@
     "invitationCancelFailed": "Failed to cancel invitation",
     "addReaction": "Add reaction"
   },
-  "crashes": {
-    "title": "Client Crashes"
+  "common": {
+    "perPage": "per page",
+    "asc": "Ascending",
+    "desc": "Descending"
   }
 }

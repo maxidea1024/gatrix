@@ -64,32 +64,38 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
         }}>
           <Alert severity="info">
             <Typography variant="body2">
-              초대받은 사용자는 <strong>일반 유저</strong> 권한으로 가입됩니다.
-              가입 후 필요시 관리자가 권한을 변경할 수 있습니다.
+              {t('admin.invitations.info')}
             </Typography>
           </Alert>
 
           <TextField
-            label="이메일 (선택사항)"
+            label={`${t('admin.invitations.email')} (${t('common.optional')})`}
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             fullWidth
-            helperText="이메일을 입력하지 않으면 링크만 생성됩니다."
+            helperText={t('admin.invitations.emailOptionalHelp')}
             variant="outlined"
             autoFocus
           />
 
           <FormControl fullWidth>
-            <InputLabel>유효기간</InputLabel>
+            <InputLabel>{t('admin.invitations.expirationLabel')}</InputLabel>
             <Select
               value={expirationHours}
-              label="유효기간"
+              label={t('admin.invitations.expirationLabel')}
               onChange={(e) => setExpirationHours(e.target.value as number)}
+              MenuProps={{
+                sx: { zIndex: 2000 },
+                anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+                transformOrigin: { vertical: 'top', horizontal: 'left' },
+              }}
             >
-              {Object.entries(InvitationDurationLabels).map(([value, label]) => (
+              {Object.entries(InvitationDurationLabels).map(([value]) => (
                 <MenuItem key={value} value={Number(value)}>
-                  {label}
+                  {Number(value) === InvitationDuration.HOURS_48 && t('admin.invitations.duration.48h')}
+                  {Number(value) === InvitationDuration.WEEK && t('admin.invitations.duration.1w')}
+                  {Number(value) === InvitationDuration.MONTH && t('admin.invitations.duration.1m')}
                 </MenuItem>
               ))}
             </Select>
@@ -123,7 +129,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
             startIcon={<PersonAddIcon />}
             disabled={loading}
           >
-            초대 링크 생성
+            {t('admin.invitations.create')}
           </Button>
         </Box>
       </Box>
@@ -134,32 +140,38 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
     <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       <Alert severity="info" sx={{ mb: 2 }}>
         <Typography variant="body2">
-          초대받은 사용자는 <strong>일반 유저</strong> 권한으로 가입됩니다.
-          가입 후 필요시 관리자가 권한을 변경할 수 있습니다.
+          {t('admin.invitations.info')}
         </Typography>
       </Alert>
 
       <TextField
-        label="이메일 (선택사항)"
+        label={`${t('admin.invitations.email')} (${t('common.optional')})`}
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         fullWidth
-        helperText="이메일을 입력하지 않으면 링크만 생성됩니다."
+        helperText={t('admin.invitations.emailOptionalHelp')}
         variant="outlined"
         autoFocus
       />
 
       <FormControl fullWidth>
-        <InputLabel>유효기간</InputLabel>
+        <InputLabel>{t('admin.invitations.expirationLabel')}</InputLabel>
         <Select
           value={expirationHours}
-          label="유효기간"
+          label={t('admin.invitations.expirationLabel')}
           onChange={(e) => setExpirationHours(e.target.value as number)}
+          MenuProps={{
+            sx: { zIndex: 2000 },
+            anchorOrigin: { vertical: 'bottom', horizontal: 'left' },
+            transformOrigin: { vertical: 'top', horizontal: 'left' },
+          }}
         >
-          {Object.entries(InvitationDurationLabels).map(([value, label]) => (
+          {Object.entries(InvitationDurationLabels).map(([value]) => (
             <MenuItem key={value} value={Number(value)}>
-              {label}
+              {Number(value) === InvitationDuration.HOURS_48 && t('admin.invitations.duration.48h')}
+              {Number(value) === InvitationDuration.WEEK && t('admin.invitations.duration.1w')}
+              {Number(value) === InvitationDuration.MONTH && t('admin.invitations.duration.1m')}
             </MenuItem>
           ))}
         </Select>
@@ -182,7 +194,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
           startIcon={<PersonAddIcon />}
           disabled={loading}
         >
-          초대 링크 생성
+          {t('admin.invitations.create')}
         </Button>
       </Box>
     </Box>

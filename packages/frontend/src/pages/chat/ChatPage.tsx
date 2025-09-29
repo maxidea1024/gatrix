@@ -197,6 +197,13 @@ const ChatPageContent: React.FC = () => {
     };
   }, []);
 
+  // Prevent page-level vertical scroll on Chat page; scroll is managed inside the chat layout
+  useEffect(() => {
+    const prevOverflowY = document.body.style.overflowY;
+    document.body.style.overflowY = 'hidden';
+    return () => { document.body.style.overflowY = prevOverflowY; };
+  }, []);
+
   // Load channels on mount
   useEffect(() => {
     // Channels are loaded in ChatContext when WebSocket connects

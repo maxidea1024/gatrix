@@ -145,9 +145,6 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
 
       {/* Content */}
       <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          {t('platformDefaults.description')}
-        </Typography>
 
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
