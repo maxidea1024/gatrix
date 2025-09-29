@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Drawer,
@@ -67,6 +67,9 @@ import { useTheme as useCustomTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import TimezoneSelector from '../common/TimezoneSelector';
+import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceService';
+import { useSSENotifications } from '@/hooks/useSSENotifications';
+import { formatDateTimeDetailed } from '@/utils/dateFormat';
 
 // Sidebar width is now dynamic
 
@@ -129,6 +132,43 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const { user, logout, isAdmin } = useAuth();
   const { toggleTheme, mode, isDark } = useCustomTheme();
   const { t, i18n } = useTranslation();
+
+  // Maintenance banner state
+  const [maintenanceStatus, setMaintenanceStatus] = useState<{ active: boolean; detail: MaintenanceDetail | null }>({ active: false, detail: null });
+  // If SSE already updated the status, avoid overwriting with initial fetch result
+  const maintenanceUpdatedBySSE = useRef(false);
+
+  // Initial load
+  useEffect(() => {
+    let cancelled = false;
+    maintenanceService.getStatus().then(({ isUnderMaintenance, detail }) => {
+      if (cancelled) return;
+      if (maintenanceUpdatedBySSE.current) return; // keep SSE-updated status
+      setMaintenanceStatus({ active: !!isUnderMaintenance, detail: detail || null });
+    }).catch(() => {
+      if (cancelled) return;
+      if (maintenanceUpdatedBySSE.current) return;
+      setMaintenanceStatus({ active: false, detail: null });
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  // SSE updates - 백엔드 연결 실패 시 적절히 처리
+  const sseConnection = useSSENotifications({
+    autoConnect: true, // 자동 연결 활성화
+    maxReconnectAttempts: 3, // 재연결 시도 횟수 줄임
+    reconnectInterval: 10000, // 재연결 간격 늘림 (10초)
+    onEvent: (event) => {
+      if (event.type === 'maintenance_status_change') {
+        const { isUnderMaintenance, detail } = event.data || {};
+        maintenanceUpdatedBySSE.current = true;
+        setMaintenanceStatus({ active: !!isUnderMaintenance, detail: detail || null });
+      }
+    },
+    onError: (error) => {
+      console.warn('SSE connection error in MainLayout:', error);
+    }
+  });
 
   // 사용자가 변경될 때마다 아바타 이미지 에러 상태 초기화
   useEffect(() => {
@@ -380,47 +420,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   const drawerContent = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* 로고 영역 */}
-      <Box
-        sx={{
-          p: sidebarCollapsed ? 2 : 3,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
-          cursor: 'pointer',
-          '&:hover': {
-            backgroundColor: 'rgba(255,255,255,0.05)',
-          },
-          borderRadius: 1,
-          transition: 'background-color 0.2s ease'
-        }}
-        onClick={() => navigate('/dashboard')}
-      >
-        <Box
-          sx={{
-            width: 32,
-            height: 32,
-            backgroundColor: '#5b6ad0',
-            borderRadius: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            mr: sidebarCollapsed ? 0 : 2
-          }}
-        >
-          <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
-            G
-          </Typography>
-        </Box>
-        {!sidebarCollapsed && (
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Gatrix
-          </Typography>
-        )}
-      </Box>
-      
+      {/* 사이드바에서는 로고 제거 - AppBar에만 표시 */}
+
       <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
-      
+
       {/* 메뉴 영역 */}
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         <List sx={{ px: 1, flexGrow: 1 }}>
@@ -441,7 +444,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </Typography>
         )}
         {menuItems.map((item, index) => renderMenuItem(item, index))}
-        
+
         {/* 관리자 메뉴 */}
         {isAdmin() && (
           <>
@@ -578,7 +581,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         position="fixed"
         sx={{
           width: '100%',
-          zIndex: (theme) => theme.zIndex.drawer + 1,
+          zIndex: (theme) => theme.zIndex.drawer + 2,
           backgroundColor: '#1e293b',
           color: '#ffffff',
           boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
@@ -643,7 +646,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               </Typography>
             </Box>
           </Box>
-          
+
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <TimezoneSelector />
 
@@ -698,7 +701,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             </IconButton>
 
             <LanguageSelector variant="text" size="medium" />
-            
+
             <Menu
               anchorEl={userMenuAnchor}
               open={Boolean(userMenuAnchor)}
@@ -724,7 +727,72 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </Box>
         </Toolbar>
       </AppBar>
-      
+      {/* Maintenance banner (full-width under AppBar) */}
+      {maintenanceStatus.active && (
+        <Box sx={{
+          position: 'fixed',
+          top: '64px',
+          left: 0,
+          right: 0,
+          minHeight: '48px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          px: 2,
+          py: 1,
+          color: '#fff',
+          fontWeight: 700,
+          background: (theme) => theme.palette.mode === 'dark'
+            ? 'linear-gradient(90deg, #d32f2f, #f44336, #d32f2f)'
+            : 'linear-gradient(90deg, #ff4d4f, #ff7875, #ff4d4f)',
+          backgroundSize: '200% 100%',
+          borderBottom: (theme) => `2px solid ${theme.palette.mode === 'dark' ? '#d32f2f' : '#ff4d4f'}`,
+          boxShadow: (theme) => theme.palette.mode === 'dark'
+            ? '0 2px 8px rgba(211,47,47,0.4)'
+            : '0 2px 8px rgba(255,77,79,0.3)',
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          animation: 'maintenancePulse 2s ease-in-out infinite',
+          '@keyframes maintenancePulse': {
+            '0%': {
+              backgroundPosition: '0% 50%',
+            },
+            '50%': {
+              backgroundPosition: '100% 50%',
+            },
+            '100%': {
+              backgroundPosition: '0% 50%',
+            }
+          }
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+            <Typography variant="body2" sx={{ fontWeight: 800, fontSize: '0.95rem' }}>
+              {t('common.maintenance.bannerActive')}
+            </Typography>
+            {maintenanceStatus.detail?.baseMessage && (
+              <Typography variant="body2" sx={{
+                fontSize: '0.85rem',
+                opacity: 0.95,
+                fontStyle: 'italic',
+                maxWidth: '400px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
+                - {maintenanceStatus.detail.baseMessage}
+              </Typography>
+            )}
+          </Box>
+          {(maintenanceStatus.detail?.startsAt || maintenanceStatus.detail?.endsAt) && (
+            <Typography variant="caption" sx={{ mt: 0.5, opacity: 0.9, fontSize: '0.75rem' }}>
+              {maintenanceStatus.detail?.startsAt ? `${t('admin.maintenance.startsAt')}: ${formatDateTimeDetailed(maintenanceStatus.detail.startsAt)}` : ''}
+              {maintenanceStatus.detail?.startsAt && maintenanceStatus.detail?.endsAt ? ' · ' : ''}
+              {maintenanceStatus.detail?.endsAt ? `${t('admin.maintenance.endsAt')}: ${formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}` : ''}
+            </Typography>
+          )}
+        </Box>
+      )}
+
       {/* 사이드바 */}
       <Box
         component="nav"
@@ -733,7 +801,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           flexShrink: { md: 0 },
           transition: 'width 0.3s ease',
           position: 'fixed',
-          height: '100vh',
+          top: maintenanceStatus.active ? '112px' : '64px', // AppBar + banner height when active (dynamic based on content)
+          height: maintenanceStatus.active ? 'calc(100vh - 112px)' : 'calc(100vh - 64px)',
           zIndex: (theme) => theme.zIndex.drawer,
         }}
       >
@@ -758,7 +827,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         >
           {drawerContent}
         </Drawer>
-        
+
         {/* 데스크톱 드로어 */}
         <Drawer
           variant="permanent"
@@ -801,7 +870,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           )}
         </Drawer>
       </Box>
-      
+
       {/* 메인 컨텐츠 */}
       <Box
         component="main"
@@ -812,8 +881,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             xs: 3,
             md: `${(sidebarCollapsed ? 64 : sidebarWidth) + 24}px`
           },
-          mt: 8, // AppBar height
-          height: 'calc(100vh - 64px)', // 정확한 높이 설정
+          mt: maintenanceStatus.active ? 14 : 8, // 64px app bar + ~48px banner when active (dynamic)
+          height: maintenanceStatus.active ? 'calc(100vh - 112px)' : 'calc(100vh - 64px)',
           backgroundColor: 'background.default',
           width: '100%',
           maxWidth: '100%',
@@ -824,6 +893,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           flexDirection: 'column',
         }}
       >
+        {/* Maintenance banner */}
+
+
+
         {children}
       </Box>
 

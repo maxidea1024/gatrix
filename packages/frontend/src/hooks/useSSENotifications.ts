@@ -34,10 +34,33 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
   const [lastEvent, setLastEvent] = useState<SSEEvent | null>(null);
-  
+
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const maxReconnectReachedRef = useRef(false); // 최대 재연결 시도 도달 여부 추적
+
+
+  // Stable callback refs to avoid re-creating connect on every render
+  const onConnectRef = useRef<typeof onConnect>();
+  const onDisconnectRef = useRef<typeof onDisconnect>();
+  const onErrorRef = useRef<typeof onError>();
+  const onEventRef = useRef<typeof onEvent>();
+  const connectRef = useRef<() => void>(() => {});
+  const isConnectingRef = useRef(false);
+
+  useEffect(() => {
+    onConnectRef.current = onConnect;
+  }, [onConnect]);
+  useEffect(() => {
+    onDisconnectRef.current = onDisconnect;
+  }, [onDisconnect]);
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
+  useEffect(() => {
+    onEventRef.current = onEvent;
+  }, [onEvent]);
 
   // Connect to SSE
   const connect = useCallback(() => {
@@ -45,32 +68,55 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
       return; // Already connected
     }
 
+    // 최대 재연결 시도에 도달했다면 연결 시도하지 않음
+    if (maxReconnectReachedRef.current) {
+      return;
+    }
+
+    if (isConnectingRef.current) {
+      return;
+    }
+
+    isConnectingRef.current = true;
     setConnectionStatus('connecting');
 
     try {
-      // Get token from localStorage
-      const token = localStorage.getItem('token');
-      const url = token
-        ? `/api/v1/notifications/sse?token=${encodeURIComponent(token)}`
-        : '/api/v1/notifications/sse';
+      // Get token from localStorage (올바른 키 사용)
+      const token = localStorage.getItem('accessToken');
 
-      const eventSource = new EventSource(url, {
-        withCredentials: true,
-      });
+      // Build absolute URL to bypass dev proxy for SSE (more reliable)
+      const defaultBackendBase = 'http://localhost:5001';
+      const apiBase = (import.meta as any).env?.VITE_API_URL || `${defaultBackendBase}/api/v1`;
+      let backendBase = apiBase.replace(/\/api\/v1\/?$/, '');
+      // Dev safeguard: if env still points to :5000, override to :5001
+      if (((import.meta as any).env?.DEV === true) && backendBase.includes('localhost:5000')) {
+        backendBase = defaultBackendBase;
+      }
+      const url = token
+        ? `${backendBase}/api/v1/admin/notifications/sse?token=${encodeURIComponent(token)}`
+        : `${backendBase}/api/v1/admin/notifications/sse`;
+
+
+
+      const eventSource = new EventSource(url);
+
+
+
 
       eventSource.onopen = () => {
         setIsConnected(true);
         setConnectionStatus('connected');
         reconnectAttemptsRef.current = 0;
-        onConnect?.();
-        console.log('SSE connection established');
+        maxReconnectReachedRef.current = false; // 연결 성공 시 플래그 리셋
+        isConnectingRef.current = false;
+        onConnectRef.current?.();
       };
 
       eventSource.onmessage = (event) => {
         try {
           const data: SSEEvent = JSON.parse(event.data);
           setLastEvent(data);
-          onEvent?.(data);
+          onEventRef.current?.(data);
           handleEvent(data);
         } catch (error) {
           console.error('Error parsing SSE event:', error);
@@ -81,23 +127,35 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
         console.error('SSE connection error:', error);
         setIsConnected(false);
         setConnectionStatus('error');
-        onError?.(error);
-        
+        onErrorRef.current?.(error as any);
+
+        // EventSource가 자동으로 재연결을 시도하므로 여기서는 연결을 닫고 수동으로 재연결 관리
+        if (eventSourceRef.current) {
+          eventSourceRef.current.close();
+          eventSourceRef.current = null;
+        }
+
+        // 이미 최대 재연결 시도에 도달했다면 더 이상 시도하지 않음
+        if (maxReconnectReachedRef.current) {
+
+          return;
+        }
+
+        isConnectingRef.current = false;
+
         // Attempt to reconnect
         if (reconnectAttemptsRef.current < maxReconnectAttempts) {
           scheduleReconnect();
         } else {
+          // 최대 재연결 시도에 도달했을 때 한 번만 에러 토스트 표시
           console.error('Max reconnection attempts reached');
-          enqueueSnackbar('Connection lost. Please refresh the page.', { variant: 'error' });
+          maxReconnectReachedRef.current = true;
+          enqueueSnackbar(t('connectionLostRefresh'), { variant: 'error' });
         }
       };
 
-      eventSource.onclose = () => {
-        setIsConnected(false);
-        setConnectionStatus('disconnected');
-        onDisconnect?.();
-        console.log('SSE connection closed');
-      };
+      // Reset connecting flag on successful open
+      eventSource.onopen && eventSource.onopen.bind(eventSource);
 
       eventSourceRef.current = eventSource;
 
@@ -106,7 +164,12 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
       setConnectionStatus('error');
       scheduleReconnect();
     }
-  }, [maxReconnectAttempts, onConnect, onDisconnect, onError, onEvent]);
+  }, [maxReconnectAttempts, reconnectInterval]);
+
+  // Keep a stable ref to the latest connect function
+  useEffect(() => {
+    connectRef.current = connect;
+  }, [connect]);
 
   // Disconnect from SSE
   const disconnect = useCallback(() => {
@@ -124,26 +187,45 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
     setConnectionStatus('disconnected');
   }, []);
 
+  // 수동으로 연결 재시작 (최대 재연결 시도 플래그 리셋)
+  const restart = useCallback(() => {
+
+    disconnect();
+    reconnectAttemptsRef.current = 0;
+    maxReconnectReachedRef.current = false;
+    setTimeout(() => {
+      connect();
+    }, 1000);
+  }, [connect, disconnect]);
+
   // Schedule reconnection
   const scheduleReconnect = useCallback(() => {
+    // 이미 최대 재연결 시도에 도달했다면 더 이상 시도하지 않음
+    if (maxReconnectReachedRef.current) {
+      return;
+    }
+
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
     }
 
     reconnectAttemptsRef.current++;
-    console.log(`Scheduling reconnection attempt ${reconnectAttemptsRef.current}/${maxReconnectAttempts}`);
+
 
     reconnectTimeoutRef.current = setTimeout(() => {
-      disconnect();
+      // 재연결 시도 전에 기존 연결 정리 (disconnect 함수 사용하지 않음 - 플래그 리셋 방지)
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
       connect();
     }, reconnectInterval);
-  }, [connect, disconnect, reconnectInterval, maxReconnectAttempts]);
+  }, [connect, reconnectInterval, maxReconnectAttempts]);
 
   // Handle different event types
   const handleEvent = useCallback((event: SSEEvent) => {
     switch (event.type) {
       case 'connection':
-        console.log('SSE connection confirmed:', event.data);
         break;
 
       case 'ping':
@@ -162,8 +244,12 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
         handleCampaignStatusChange(event.data);
         break;
 
+      case 'maintenance_status_change':
+        // Handled by MainLayout via onEvent. We still acknowledge to avoid noisy logs.
+        break;
+
       default:
-        console.log('Unknown SSE event type:', event.type, event.data);
+        break;
     }
   }, [t]);
 
@@ -205,7 +291,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
     }
 
     try {
-      const response = await fetch('/api/v1/notifications/sse/subscribe', {
+      const response = await fetch('/api/v1/admin/notifications/sse/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -218,7 +304,6 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
       });
 
       if (response.ok) {
-        console.log('Subscribed to channels:', channels);
         return true;
       } else {
         console.error('Failed to subscribe to channels');
@@ -238,7 +323,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
     }
 
     try {
-      const response = await fetch('/api/v1/notifications/sse/unsubscribe', {
+      const response = await fetch('/api/v1/admin/notifications/sse/unsubscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -251,7 +336,6 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
       });
 
       if (response.ok) {
-        console.log('Unsubscribed from channels:', channels);
         return true;
       } else {
         console.error('Failed to unsubscribe from channels');
@@ -266,14 +350,14 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
   // Auto-connect on mount
   useEffect(() => {
     if (autoConnect) {
-      connect();
+      connectRef.current();
     }
 
     // Cleanup on unmount
     return () => {
       disconnect();
     };
-  }, [autoConnect, connect, disconnect]);
+  }, [autoConnect, disconnect]);
 
   // Handle page visibility changes
   useEffect(() => {
@@ -283,7 +367,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
       } else {
         // Page is visible, ensure connection is active
         if (!isConnected && autoConnect) {
-          connect();
+          connectRef.current();
         }
       }
     };
@@ -292,7 +376,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [isConnected, autoConnect, connect]);
+  }, [isConnected, autoConnect]);
 
   return {
     isConnected,
@@ -300,6 +384,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
     lastEvent,
     connect,
     disconnect,
+    restart,
     subscribe,
     unsubscribe,
   };

@@ -49,6 +49,18 @@ export class SSENotificationService extends EventEmitter {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Headers': 'Cache-Control',
     });
+    // Immediately flush headers and send a comment to start the stream
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (response as any).flushHeaders?.();
+    try {
+      response.write(': connected\n\n');
+    } catch (_) {
+      // ignore
+    }
+
+    // Ensure headers are flushed immediately (important for SSE)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (response as any).flushHeaders?.();
 
     const client: SSEClient = {
       id: clientId,
@@ -61,11 +73,13 @@ export class SSENotificationService extends EventEmitter {
     this.clients.set(clientId, client);
 
     // Send initial connection event
+    logger.info(`Sending initial connection event to client ${clientId}`);
     this.sendToClient(clientId, {
       type: 'connection',
       data: { clientId, connected: true },
       timestamp: new Date(),
     });
+    logger.info(`Initial connection event sent to client ${clientId}`);
 
     // Handle client disconnect
     response.on('close', () => {
@@ -123,11 +137,18 @@ export class SSENotificationService extends EventEmitter {
     }
 
     try {
+      // SSE 표준 형식: data: {JSON}\n\n
       const eventData = `data: ${JSON.stringify({
         type: event.type,
         data: event.data,
         timestamp: event.timestamp.toISOString(),
       })}\n\n`;
+
+      logger.debug(`Sending SSE event to client ${clientId}:`, {
+        type: event.type,
+        data: event.data,
+        eventData: eventData.replace(/\n/g, '\\n')
+      });
 
       client.response.write(eventData);
       return true;

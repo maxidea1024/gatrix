@@ -27,11 +27,15 @@ import crashRoutes from './crashes';
 
 const router = express.Router();
 
-// Apply authentication middleware to all admin routes
+// Mount notification routes first (before authentication middleware)
+// This allows SSE endpoint to use its own authentication
+router.use('/notifications', notificationRoutes);
+
+// Apply authentication middleware to all other admin routes
 router.use(authenticate as any);
 router.use(requireAdmin as any);
 
-// Mount all admin routes
+// Mount all other admin routes
 router.use('/', adminRoutes);
 router.use('/users', userRoutes);
 router.use('/whitelist', whitelistRoutes);
@@ -46,7 +50,6 @@ router.use('/game-worlds', gameWorldRoutes);
 router.use('/api-tokens', apiTokenRoutes);
 router.use('/campaigns', campaignRoutes);
 router.use('/context-fields', contextFieldRoutes);
-router.use('/notifications', notificationRoutes);
 router.use('/platform-defaults', platformDefaultRoutes);
 router.use('/remote-config', remoteConfigRoutes);
 router.use('/remote-config-v2', remoteConfigV2Routes);

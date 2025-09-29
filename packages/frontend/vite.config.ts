@@ -31,6 +31,24 @@ export default defineConfig({
         target: 'http://localhost:5001',
         changeOrigin: true,
         secure: false,
+        // SSE 지원을 위한 설정
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            // SSE 요청인 경우 특별 처리
+            if (req.url?.includes('/notifications/sse')) {
+              proxyReq.setHeader('Cache-Control', 'no-cache');
+              proxyReq.setHeader('Connection', 'keep-alive');
+            }
+          });
+          proxy.on('proxyRes', (proxyRes, req, res) => {
+            // SSE 응답인 경우 특별 처리
+            if (req.url?.includes('/notifications/sse')) {
+              proxyRes.headers['cache-control'] = 'no-cache';
+              proxyRes.headers['connection'] = 'keep-alive';
+              proxyRes.headers['content-type'] = 'text/event-stream';
+            }
+          });
+        },
       },
       '/admin/queues': {
         target: 'http://localhost:5001',

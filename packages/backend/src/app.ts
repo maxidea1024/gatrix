@@ -57,8 +57,16 @@ app.use(cors({
   allowedHeaders: ALLOWED_HEADERS,
 }));
 
-// Compression middleware
-app.use(compression() as any);
+// Compression middleware (disable for SSE streams)
+app.use(compression({
+  filter: (req, res) => {
+    const accept = req.headers['accept'];
+    const url = req.url || '';
+    if (typeof accept === 'string' && accept.includes('text/event-stream')) return false;
+    if (url.includes('/api/v1/admin/notifications/sse')) return false;
+    return compression.filter(req, res);
+  }
+}) as any);
 
 // Chat proxy routes - MUST be before body parsing to avoid consuming request stream
 import chatRoutes from './routes/chat';

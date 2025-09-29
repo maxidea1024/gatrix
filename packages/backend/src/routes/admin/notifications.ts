@@ -80,10 +80,13 @@ router.get('/sse', authenticateSSE, (req: Request, res: Response) => {
   }
 });
 
+// Apply authentication middleware to non-SSE routes
+router.use(['/sse/subscribe', '/sse/unsubscribe', '/test', '/stats'], authenticate as any);
+
 /**
  * Subscribe to specific channels
  */
-router.post('/sse/subscribe', authenticate as any, (req: Request, res: Response) => {
+router.post('/sse/subscribe', (req: Request, res: Response) => {
   const { clientId, channels } = req.body;
 
   if (!clientId || !Array.isArray(channels)) {
@@ -102,7 +105,7 @@ router.post('/sse/subscribe', authenticate as any, (req: Request, res: Response)
 /**
  * Unsubscribe from specific channels
  */
-router.post('/sse/unsubscribe', authenticate as any, (req: Request, res: Response) => {
+router.post('/sse/unsubscribe', (req: Request, res: Response) => {
   const { clientId, channels } = req.body;
 
   if (!clientId || !Array.isArray(channels)) {
@@ -121,7 +124,7 @@ router.post('/sse/unsubscribe', authenticate as any, (req: Request, res: Respons
 /**
  * Send test notification (admin only)
  */
-router.post('/test', authenticate as any, (req: Request, res: Response) => {
+router.post('/test', (req: Request, res: Response) => {
   if ((req as any).user?.role !== 'admin') {
     return res.status(403).json({ error: 'Admin access required' });
   }
@@ -137,10 +140,10 @@ router.post('/test', authenticate as any, (req: Request, res: Response) => {
       targetChannels,
     });
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: `Test notification sent to ${sentCount} clients`,
-      sentCount 
+      sentCount
     });
   } catch (error) {
     logger.error('Error sending test notification:', error);
@@ -151,7 +154,7 @@ router.post('/test', authenticate as any, (req: Request, res: Response) => {
 /**
  * Get SSE service statistics (admin only)
  */
-router.get('/stats', authenticate as any, (req: Request, res: Response) => {
+router.get('/stats', (req: Request, res: Response) => {
   if ((req as any).user?.role !== 'admin') {
     return res.status(403).json({ error: 'Admin access required' });
   }

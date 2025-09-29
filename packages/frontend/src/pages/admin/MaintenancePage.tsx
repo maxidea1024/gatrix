@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, Card, CardContent, Stack, TextField, Switch, FormControlLabel, Button, Typography, MenuItem, Select, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
@@ -11,16 +11,22 @@ import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/Mu
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import CloseIcon from '@mui/icons-material/Close';
+import { useSSENotifications } from '@/hooks/useSSENotifications';
+
 
 const MaintenancePage: React.FC = () => {
   const { t } = useTranslation();
   const [tab, setTab] = useState(0);
+  const [editMode, setEditMode] = useState(false);
 
   // Status
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [type, setType] = useState<MaintenanceType>('regular');
+  const [startsAt, setStartsAt] = useState<Moment | null>(null);
+  const updatedBySSE = useRef(false);
+
   const [endsAt, setEndsAt] = useState<Moment | null>(null);
-  const [applyEndsAt, setApplyEndsAt] = useState(false);
+  const [kickExistingPlayers, setKickExistingPlayers] = useState(false);
 
   // Input mode
   const [inputMode, setInputMode] = useState<'direct'|'template'|''>('');
@@ -34,6 +40,15 @@ const MaintenancePage: React.FC = () => {
   const [tpls, setTpls] = useState<MessageTemplate[]>([]);
   const [selectedTplId, setSelectedTplId] = useState<number | ''>('');
 
+  // Derived
+  const selectedTpl = tpls.find(t => t.id === selectedTplId);
+  const hasMessageForStart = inputMode === 'template'
+    ? !!(selectedTpl && (
+        (selectedTpl.defaultMessage && selectedTpl.defaultMessage.trim()) ||
+        (selectedTpl.locales && selectedTpl.locales.some(l => l.message && l.message.trim()))
+      ))
+    : !!((baseMsg && baseMsg.trim()) || locales.some(l => l.message && l.message.trim()));
+
   // Confirm dialog
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmMode, setConfirmMode] = useState<'start'|'stop'|null>(null);
@@ -41,9 +56,11 @@ const MaintenancePage: React.FC = () => {
 
   useEffect(() => {
     maintenanceService.getStatus().then(({ isUnderMaintenance, detail }) => {
+      if (updatedBySSE.current) return; // keep SSE-updated status
       setIsMaintenance(isUnderMaintenance);
       if (detail) {
         setType(detail.type);
+        setStartsAt(detail.startsAt ? moment(detail.startsAt) : null);
         setEndsAt(detail.endsAt ? moment(detail.endsAt) : null);
         setBaseMsg(detail.message || '');
         const d: any[] = [];
@@ -55,11 +72,40 @@ const MaintenancePage: React.FC = () => {
     }).catch(() => {});
 
     messageTemplateService.list({ isEnabled: true }).then(response => {
+
       setTpls(response.templates || []);
     }).catch(() => {
       setTpls([]);
     });
   }, []);
+
+  // Sync status with SSE
+  useSSENotifications({
+    autoConnect: true,
+    onEvent: (event) => {
+      if (event.type === 'maintenance_status_change') {
+        const { isUnderMaintenance, detail } = event.data || {};
+        updatedBySSE.current = true;
+        setIsMaintenance(!!isUnderMaintenance);
+        if (detail) {
+          setType(detail.type);
+          setStartsAt(detail.startsAt ? moment(detail.startsAt) : null);
+          setEndsAt(detail.endsAt ? moment(detail.endsAt) : null);
+          setBaseMsg(detail.message || '');
+          const d: any[] = [];
+          if (detail.messages?.ko) d.push({ lang: 'ko', message: detail.messages.ko });
+          if (detail.messages?.en) d.push({ lang: 'en', message: detail.messages.en });
+          if (detail.messages?.zh) d.push({ lang: 'zh', message: detail.messages.zh });
+          setLocales(d as any);
+        } else {
+          setStartsAt(null);
+          setEndsAt(null);
+          setBaseMsg('');
+          setLocales([]);
+        }
+      }
+    }
+  });
 
   const startMaintenance = async () => {
     const payload = inputMode === 'template' ? (() => {
@@ -67,8 +113,9 @@ const MaintenancePage: React.FC = () => {
       return {
         isMaintenance: true,
         type,
-        endsAt: applyEndsAt && endsAt ? endsAt.toISOString() : null,
-        message: tpl?.default_message || undefined,
+        startsAt: startsAt ? startsAt.toISOString() : null,
+        endsAt: endsAt ? endsAt.toISOString() : null,
+        message: tpl?.defaultMessage || undefined,
         messages: {
           ko: tpl?.locales?.find(l=>l.lang==='ko')?.message || undefined,
           en: tpl?.locales?.find(l=>l.lang==='en')?.message || undefined,
@@ -78,7 +125,8 @@ const MaintenancePage: React.FC = () => {
     })() : {
       isMaintenance: true,
       type,
-      endsAt: applyEndsAt && endsAt ? endsAt.toISOString() : null,
+      startsAt: startsAt ? startsAt.toISOString() : null,
+      endsAt: endsAt ? endsAt.toISOString() : null,
       message: baseMsg || undefined,
       messages: Object.fromEntries(locales.map(l => [l.lang, l.message])) as any,
     };
@@ -91,13 +139,6 @@ const MaintenancePage: React.FC = () => {
     setIsMaintenance(false);
   };
 
-  const addLocale = () => {
-    const msg = newMsg.trim(); if (!msg) return;
-    setLocales(prev => [...prev.filter(l=>l.lang!==newLang), { lang: newLang, message: msg }]);
-    setNewMsg('');
-  };
-  const removeLocale = (lang: 'ko'|'en'|'zh') => setLocales(prev => prev.filter(l => l.lang !== lang));
-
   return (
     <Box sx={{ p: 3, transition:'background-color 0.2s ease', backgroundColor: (theme)=> isMaintenance ? alpha(theme.palette.error.light, 0.08) : alpha(theme.palette.success.light, 0.06) }}>
       <Box sx={{ mb: 3 }}>
@@ -106,10 +147,18 @@ const MaintenancePage: React.FC = () => {
           {t('admin.maintenance.description')}
         </Typography>
       </Box>
-      <Card sx={{ borderColor: (theme)=> isMaintenance ? theme.palette.error.main : theme.palette.success.main, borderWidth: 1, borderStyle: 'solid' }}>
-        <CardContent>
-            <Stack spacing={2} sx={{ mt: 1 }}>
-              {isMaintenance ? (
+      <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
+        {/* 좌측 설정 영역 */}
+        <Card sx={{
+          borderColor: (theme)=> isMaintenance ? theme.palette.error.main : theme.palette.success.main,
+          borderWidth: 1,
+          borderStyle: 'solid',
+          flex: 1,
+          maxWidth: 800
+        }}>
+          <CardContent>
+              <Stack spacing={2} sx={{ mt: 1 }}>
+              {isMaintenance && !editMode ? (
                 <>
                   <Typography variant="subtitle1" color="error" sx={{ fontWeight: 600 }}>
                     {t('admin.maintenance.statusOn')}
@@ -118,6 +167,11 @@ const MaintenancePage: React.FC = () => {
                     <Typography variant="body2" color="text.secondary">
                       {t('admin.maintenance.type')}: {t(`admin.maintenance.types.${type}`)}
                     </Typography>
+                    {startsAt && (
+                      <Typography variant="body2" color="text.secondary">
+                        {t('admin.maintenance.startsAt')}: {startsAt.format('YYYY-MM-DD HH:mm')}
+                      </Typography>
+                    )}
                     {endsAt && (
                       <Typography variant="body2" color="text.secondary">
                         {t('admin.maintenance.endsAt')}: {endsAt.format('YYYY-MM-DD HH:mm')}
@@ -150,42 +204,89 @@ const MaintenancePage: React.FC = () => {
                 </>
               ) : (
                 <>
-                  {/* Type and endsAt */}
-                  <TextField select label={t('admin.maintenance.type')} value={type} onChange={(e) => setType(e.target.value as MaintenanceType)} sx={{ width: 320 }}>
-                    <MenuItem value="regular">{t('admin.maintenance.types.regular')}</MenuItem>
-                    <MenuItem value="emergency">{t('admin.maintenance.types.emergency')}</MenuItem>
-                  </TextField>
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <DateTimePicker
-                      label={t('admin.maintenance.endsAt')}
-                      value={endsAt}
-                      onChange={setEndsAt}
-                      slotProps={{ textField: { sx: { width: 320 } } }}
-                    />
-                    <FormControlLabel control={<Switch checked={applyEndsAt} onChange={(e)=>setApplyEndsAt(e.target.checked)} />} label={t('admin.maintenance.applyEndsAt')} />
+                  {/* Type and schedule */}
+                  <Box sx={{ width: 320 }}>
+                    <TextField select label={t('admin.maintenance.type')} value={type} onChange={(e) => setType(e.target.value as MaintenanceType)} fullWidth>
+                      <MenuItem value="regular">{t('admin.maintenance.types.regular')}</MenuItem>
+                      <MenuItem value="emergency">{t('admin.maintenance.types.emergency')}</MenuItem>
+                    </TextField>
+                    <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
+                      {t('admin.maintenance.typeHelp')}
+                    </Typography>
+                  </Box>
+                  <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ flexWrap: 'wrap' }}>
+                    <Box sx={{ width: 320 }}>
+                      <DateTimePicker
+                        label={t('admin.maintenance.startsAt')}
+                        value={startsAt}
+                        onChange={setStartsAt}
+                        slotProps={{ textField: { fullWidth: true } }}
+                      />
+                      <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
+                        {t('admin.maintenance.startsAtHelp')}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ width: 320 }}>
+                      <DateTimePicker
+                        label={t('admin.maintenance.endsAt')}
+                        value={endsAt}
+                        onChange={setEndsAt}
+                        slotProps={{ textField: { fullWidth: true } }}
+                      />
+                      <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
+                        {t('admin.maintenance.endsAtHelp')}
+                      </Typography>
+                    </Box>
                   </Stack>
 
+                  {/* Kick existing players option */}
+                  <Box sx={{ alignSelf: 'flex-start' }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={kickExistingPlayers}
+                          onChange={(e) => setKickExistingPlayers(e.target.checked)}
+                          color="warning"
+                        />
+                      }
+                      label={t('admin.maintenance.kickExistingPlayers')}
+                    />
+                    <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary', maxWidth: 500 }}>
+                      {t('admin.maintenance.kickExistingPlayersHelp')}
+                    </Typography>
+                  </Box>
+
                   {/* Input mode */}
-                  <TextField select label={t('admin.maintenance.messageSource')} value={inputMode} onChange={(e)=>setInputMode(e.target.value as any)} sx={{ width: 320 }}>
-                    <MenuItem value="">{t('common.select')}</MenuItem>
-                    <MenuItem value="direct">{t('admin.maintenance.directInput')}</MenuItem>
-                    <MenuItem value="template">{t('admin.maintenance.useTemplate')}</MenuItem>
-                  </TextField>
+                  <Box sx={{ width: 320 }}>
+                    <TextField select label={t('admin.maintenance.messageSource')} value={inputMode} onChange={(e)=>setInputMode(e.target.value as any)} fullWidth>
+                      <MenuItem value="">{t('common.select')}</MenuItem>
+                      <MenuItem value="direct">{t('admin.maintenance.directInput')}</MenuItem>
+                      <MenuItem value="template">{t('admin.maintenance.useTemplate')}</MenuItem>
+                    </TextField>
+                    <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
+                      {t('admin.maintenance.messageSourceHelp')}
+                    </Typography>
+                  </Box>
 
                   {inputMode === 'template' && (
                     <Stack spacing={2}>
-                      <TextField select label={t('admin.maintenance.selectTemplate')} value={selectedTplId} onChange={(e)=>setSelectedTplId(Number(e.target.value))} sx={{ width: 320 }}>
-                        <MenuItem value="">{t('common.select')}</MenuItem>
-                        {tpls.map(tpl => (
-                          <MenuItem key={tpl.id} value={tpl.id}>{tpl.name}</MenuItem>
-                        ))}
-                      </TextField>
+                      <Box sx={{ width: 320 }}>
+                        <TextField select label={t('admin.maintenance.selectTemplate')} value={selectedTplId} onChange={(e)=>setSelectedTplId(Number(e.target.value))} fullWidth>
+                          <MenuItem value="">{t('common.select')}</MenuItem>
+                          {tpls.map(tpl => (
+                            <MenuItem key={tpl.id} value={tpl.id}>{tpl.name}</MenuItem>
+                          ))}
+                        </TextField>
+                        <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
+                          {t('admin.maintenance.selectTemplateHelp')}
+                        </Typography>
+                      </Box>
 
                       {tpls.find(t=>t.id===selectedTplId) && (
                         <Card variant="outlined">
                           <CardContent>
                             <Typography variant="subtitle2" gutterBottom>{t('clientVersions.maintenance.defaultMessage')}</Typography>
-                            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{tpls.find(t=>t.id===selectedTplId)?.default_message || '-'}</Typography>
+                            <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{tpls.find(t=>t.id===selectedTplId)?.defaultMessage || '-'}</Typography>
                             <Stack spacing={1} sx={{ mt: 2 }}>
                               {(tpls.find(t=>t.id===selectedTplId)?.locales || []).map(l => {
                                 const langLabels = { ko: '한국어', en: '영어', zh: '중국어' };
@@ -246,29 +347,119 @@ const MaintenancePage: React.FC = () => {
 
               {/* Actions: start/stop */}
               <Stack direction="row" spacing={2}>
-                <Button variant="contained" color="error" startIcon={<PlayArrowIcon />} onClick={()=>{ setConfirmMode('start'); setConfirmInput(''); setConfirmOpen(true); }}>
+                <Button variant="contained" color="error" startIcon={<PlayArrowIcon />} onClick={()=>{ setConfirmMode('start'); setConfirmInput(''); setConfirmOpen(true); }} disabled={isMaintenance || !hasMessageForStart}>
                   {t('admin.maintenance.start')}
                 </Button>
-                <Button variant="outlined" color="success" startIcon={<StopIcon />} onClick={()=>{ setConfirmMode('stop'); setConfirmInput(''); setConfirmOpen(true); }}>
+                <Button variant="outlined" color="success" startIcon={<StopIcon />} onClick={()=>{ setConfirmMode('stop'); setConfirmInput(''); setConfirmOpen(true); }} disabled={!isMaintenance}>
                   {t('admin.maintenance.stop')}
                 </Button>
-                <Typography variant="body2" sx={{ ml: 1, alignSelf:'center' }} color={isMaintenance ? 'error' : 'success'}>
-                  {isMaintenance ? (t('admin.maintenance.statusOn')) : (t('admin.maintenance.statusOff'))}
-                </Typography>
+                {isMaintenance && (
+                  <Button variant="outlined" onClick={()=>setEditMode(v=>!v)}>
+                    {editMode ? t('common.cancel') : t('common.edit')}
+                  </Button>
+                )}
               </Stack>
 
               {/* Confirm dialog */}
-              <Dialog open={confirmOpen} onClose={()=>setConfirmOpen(false)}>
-                <DialogTitle>
+              <Dialog
+                open={confirmOpen}
+                onClose={()=>setConfirmOpen(false)}
+                maxWidth="md"
+                fullWidth
+              >
+                <DialogTitle sx={{ pb: 1 }}>
                   {confirmMode === 'start' ? (t('admin.maintenance.confirmStartTitle')) : (t('admin.maintenance.confirmStopTitle'))}
                 </DialogTitle>
-                <DialogContent>
-                  <Typography sx={{ mb: 1 }}>
+                <DialogContent sx={{ pt: 2 }}>
+                  {/* Impact Warning */}
+                  <Box sx={{
+                    mb: 3,
+                    p: 2.5,
+                    borderRadius: 2,
+                    backgroundColor: confirmMode === 'start'
+                      ? (theme) => theme.palette.mode === 'dark' ? 'rgba(244, 67, 54, 0.08)' : 'rgba(244, 67, 54, 0.04)'
+                      : (theme) => theme.palette.mode === 'dark' ? 'rgba(76, 175, 80, 0.08)' : 'rgba(76, 175, 80, 0.04)',
+                    border: '1px solid',
+                    borderColor: confirmMode === 'start'
+                      ? (theme) => theme.palette.mode === 'dark' ? 'rgba(244, 67, 54, 0.3)' : 'rgba(244, 67, 54, 0.2)'
+                      : (theme) => theme.palette.mode === 'dark' ? 'rgba(76, 175, 80, 0.3)' : 'rgba(76, 175, 80, 0.2)'
+                  }}>
+                    <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                      {confirmMode === 'start'
+                        ? t('admin.maintenance.impactWarningTitle')
+                        : t('admin.maintenance.impactRestoreTitle')}
+                    </Typography>
+                    <Typography variant="body2" sx={{ mb: 1 }}>
+                      {confirmMode === 'start'
+                        ? t('admin.maintenance.impactWarningDescription')
+                        : t('admin.maintenance.impactRestoreDescription')}
+                    </Typography>
+                    <Box component="ul" sx={{ pl: 2, mb: 0 }}>
+                      {confirmMode === 'start' ? (
+                        <>
+                          {kickExistingPlayers ? (
+                            <>
+                              <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                                {t('admin.maintenance.impactItemKick1')}
+                              </Typography>
+                              <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                                {t('admin.maintenance.impactItemKick2')}
+                              </Typography>
+                              <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                                {t('admin.maintenance.impactItemKick3')}
+                              </Typography>
+                              <Typography component="li" variant="body2">
+                                {t('admin.maintenance.impactItemKick4')}
+                              </Typography>
+                            </>
+                          ) : (
+                            <>
+                              <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                                {t('admin.maintenance.impactItemNoKick1')}
+                              </Typography>
+                              <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                                {t('admin.maintenance.impactItemNoKick2')}
+                              </Typography>
+                              <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                                {t('admin.maintenance.impactItemNoKick3')}
+                              </Typography>
+                              <Typography component="li" variant="body2">
+                                {t('admin.maintenance.impactItemNoKick4')}
+                              </Typography>
+                            </>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                            {t('admin.maintenance.restoreItem1')}
+                          </Typography>
+                          <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                            {t('admin.maintenance.restoreItem2')}
+                          </Typography>
+                          <Typography component="li" variant="body2">
+                            {t('admin.maintenance.restoreItem3')}
+                          </Typography>
+                        </>
+                      )}
+                    </Box>
+                  </Box>
+
+                  {/* Confirmation Input */}
+                  <Typography sx={{ mb: 2, fontWeight: 500 }}>
                     {confirmMode === 'start'
-                      ? t('admin.maintenance.confirmStartMessage')
-                      : t('admin.maintenance.confirmStopMessage')}
+                      ? t('admin.maintenance.confirmStartMessage', { keyword: t('admin.maintenance.confirmStartKeyword') })
+                      : t('admin.maintenance.confirmStopMessage', { keyword: t('admin.maintenance.confirmStopKeyword') })}
                   </Typography>
-                  <TextField autoFocus fullWidth size="small" value={confirmInput} onChange={(e)=>setConfirmInput(e.target.value)} placeholder={confirmMode === 'start' ? 'start maintenance' : 'stop maintenance'} />
+                  <TextField
+                    autoFocus
+                    fullWidth
+                    size="medium"
+                    value={confirmInput}
+                    onChange={(e)=>setConfirmInput(e.target.value)}
+                    placeholder={confirmMode === 'start' ? t('admin.maintenance.confirmStartKeyword') : t('admin.maintenance.confirmStopKeyword')}
+                    sx={{ mb: 1 }}
+                  />
                 </DialogContent>
                 <DialogActions>
                   <Button onClick={()=>setConfirmOpen(false)}>{t('common.cancel')}</Button>
@@ -276,13 +467,13 @@ const MaintenancePage: React.FC = () => {
                     color={confirmMode==='start' ? 'error' : 'success'}
                     variant="contained"
                     onClick={async()=>{
-                      const expected = confirmMode==='start' ? 'start maintenance' : 'stop maintenance';
-                      if (confirmInput.trim().toLowerCase() !== expected) return;
+                      const expected = confirmMode==='start' ? t('admin.maintenance.confirmStartKeyword') : t('admin.maintenance.confirmStopKeyword');
+                      if (confirmInput.trim().toLowerCase() !== expected.toLowerCase()) return;
                       setConfirmOpen(false);
                       if (confirmMode==='start') await startMaintenance();
                       if (confirmMode==='stop') await stopMaintenance();
                     }}
-                    disabled={confirmInput.trim().toLowerCase() !== (confirmMode==='start' ? 'start maintenance' : 'stop maintenance')}
+                    disabled={confirmInput.trim().toLowerCase() !== (confirmMode==='start' ? t('admin.maintenance.confirmStartKeyword') : t('admin.maintenance.confirmStopKeyword')).toLowerCase()}
                   >
                     {confirmMode==='start' ? (t('admin.maintenance.start')) : (t('admin.maintenance.stop'))}
                   </Button>
