@@ -70,6 +70,7 @@ import TimezoneSelector from '../common/TimezoneSelector';
 import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceService';
 import { useSSENotifications } from '@/hooks/useSSENotifications';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
+import moment from 'moment';
 
 // Sidebar width is now dynamic
 
@@ -127,16 +128,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [isResizing, setIsResizing] = useState(false);
   const [avatarImageError, setAvatarImageError] = useState(false);
 
-  // 점검 배너 높이 계산
-  const bannerHeight = useMemo(() => {
-    if (!maintenanceStatus.active) return 0;
-
-    // 기본 높이 (48px) + 시간 정보가 있을 때 추가 높이 (24px)
-    const baseHeight = 48;
-    const hasTimeInfo = maintenanceStatus.detail?.startsAt || maintenanceStatus.detail?.endsAt;
-    return hasTimeInfo ? baseHeight + 24 : baseHeight;
-  }, [maintenanceStatus.active, maintenanceStatus.detail?.startsAt, maintenanceStatus.detail?.endsAt]);
-
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout, isAdmin } = useAuth();
@@ -145,6 +136,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   // Maintenance banner state
   const [maintenanceStatus, setMaintenanceStatus] = useState<{ active: boolean; detail: MaintenanceDetail | null }>({ active: false, detail: null });
+
+  // 점검 배너 높이 계산
+  const bannerHeight = useMemo(() => {
+    if (!maintenanceStatus.active) return 0;
+
+    // 기본 높이: 패딩(8px * 2) + 메인 텍스트 라인(24px) = 40px
+    // 시간 정보가 있을 때: 추가로 시간 텍스트 라인(18px) + 여백(4px) = 22px
+    const baseHeight = 40;
+    const hasTimeInfo = maintenanceStatus.detail?.startsAt || maintenanceStatus.detail?.endsAt;
+    return hasTimeInfo ? baseHeight + 22 : baseHeight;
+  }, [maintenanceStatus.active, maintenanceStatus.detail?.startsAt, maintenanceStatus.detail?.endsAt]);
   // If SSE already updated the status, avoid overwriting with initial fetch result
   const maintenanceUpdatedBySSE = useRef(false);
 
@@ -744,7 +746,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           top: '64px',
           left: 0,
           right: 0,
-          minHeight: '48px',
+          minHeight: `${bannerHeight}px`,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -757,7 +759,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             ? 'linear-gradient(90deg, #d32f2f, #f44336, #d32f2f)'
             : 'linear-gradient(90deg, #ff4d4f, #ff7875, #ff4d4f)',
           backgroundSize: '200% 100%',
-          borderBottom: (theme) => `2px solid ${theme.palette.mode === 'dark' ? '#d32f2f' : '#ff4d4f'}`,
+
           boxShadow: (theme) => theme.palette.mode === 'dark'
             ? '0 2px 8px rgba(211,47,47,0.4)'
             : '0 2px 8px rgba(255,77,79,0.3)',
@@ -775,29 +777,58 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             }
           }
         }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
+          {/* 점검 상태 및 유형 */}
+          <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 1 }}>
             <Typography variant="body2" sx={{ fontWeight: 800, fontSize: '0.95rem' }}>
-              {t('common.maintenance.bannerActive')}
+              🔧 {t('common.maintenance.bannerActive')}
             </Typography>
-            {maintenanceStatus.detail?.baseMessage && (
+            {maintenanceStatus.detail?.type && (
               <Typography variant="body2" sx={{
-                fontSize: '0.85rem',
-                opacity: 0.95,
-                fontStyle: 'italic',
-                maxWidth: '400px',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap'
+                fontSize: '0.8rem',
+                opacity: 0.9,
+                backgroundColor: 'rgba(255,255,255,0.2)',
+                px: 1,
+                py: 0.5,
+                borderRadius: 1,
+                fontWeight: 600
               }}>
-                - {maintenanceStatus.detail.baseMessage}
+                {maintenanceStatus.detail.type === 'emergency' ? '긴급 점검' : '정기 점검'}
               </Typography>
             )}
           </Box>
+
+          {/* 점검 기간 */}
           {(maintenanceStatus.detail?.startsAt || maintenanceStatus.detail?.endsAt) && (
-            <Typography variant="caption" sx={{ mt: 0.5, opacity: 0.9, fontSize: '0.75rem' }}>
-              {maintenanceStatus.detail?.startsAt ? `${t('admin.maintenance.startsAt')}: ${formatDateTimeDetailed(maintenanceStatus.detail.startsAt)}` : ''}
-              {maintenanceStatus.detail?.startsAt && maintenanceStatus.detail?.endsAt ? ' · ' : ''}
-              {maintenanceStatus.detail?.endsAt ? `${t('admin.maintenance.endsAt')}: ${formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}` : ''}
+            <Box sx={{ mb: 1 }}>
+              <Typography variant="caption" sx={{ opacity: 0.9, fontSize: '0.75rem', fontWeight: 600 }}>
+                📅 점검 기간: {(() => {
+                  const start = maintenanceStatus.detail?.startsAt;
+                  const end = maintenanceStatus.detail?.endsAt;
+                  if (start && end) {
+                    return `${formatDateTimeDetailed(start)} ~ ${formatDateTimeDetailed(end)}`;
+                  } else if (start) {
+                    return `${formatDateTimeDetailed(start)} 시작`;
+                  } else if (end) {
+                    return `${formatDateTimeDetailed(end)} 종료 예정`;
+                  }
+                  return '즉시 시작';
+                })()}
+              </Typography>
+            </Box>
+          )}
+
+          {/* 점검 메시지 */}
+          {maintenanceStatus.detail?.message && (
+            <Typography variant="body2" sx={{
+              fontSize: '0.85rem',
+              opacity: 0.95,
+              fontStyle: 'italic',
+              maxWidth: '600px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}>
+              💬 {maintenanceStatus.detail.message}
             </Typography>
           )}
         </Box>
@@ -891,14 +922,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             xs: 3,
             md: `${(sidebarCollapsed ? 64 : sidebarWidth) + 24}px`
           },
-          mt: `${(64 + bannerHeight) / 8}rem`, // AppBar + dynamic banner height converted to rem
-          height: `calc(100vh - ${64 + bannerHeight}px)`,
+          mt: `${64 + bannerHeight}px`, // AppBar + dynamic banner height
+          minHeight: `calc(100vh - ${64 + bannerHeight}px)`,
+          height: 'auto',
           backgroundColor: 'background.default',
           width: '100%',
           maxWidth: '100%',
           transition: 'padding-left 0.3s ease',
           overflowX: 'hidden',
-          overflowY: 'auto', // 세로 스크롤 허용
+          overflow: 'visible', // 스크롤 제거
           display: 'flex',
           flexDirection: 'column',
         }}

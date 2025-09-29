@@ -133,6 +133,18 @@
       "messageSourceHelp": "Direct input or select pre-written templates",
       "selectTemplateHelp": "Select message template (includes default + multi-language messages)",
       "edit": "Edit",
+      "settingsSummaryTitle": "Maintenance Settings to Apply",
+      "currentSettingsTitle": "Current Maintenance Settings",
+      "validation": {
+        "startTimeInPast": "Start time is set in the past. Maintenance will start immediately.",
+        "endTimeInPast": "End time is set in the past. Maintenance will end immediately.",
+        "endTimeBeforeStart": "End time is before start time. Please set correct times.",
+        "sameStartEndTime": "Start and end times are the same. Maintenance may end immediately."
+      },
+      "startFailedWarning": "Failed to start maintenance. Please check your time settings. If the end time is in the past or before the start time, maintenance may end immediately.",
+      "selectDateTime": "Select date and time",
+      "confirmStartSubtitle": "Please review the settings below and consider the impact before starting maintenance.",
+      "confirmStopSubtitle": "Stopping maintenance will restore normal service. Do you want to proceed?",
       "directInput": "Direct input",
       "startsAt": "Starts At",
       "endsAt": "Ends At",

@@ -56,6 +56,18 @@
       "messageSourceHelp": "直接输入或选择预先编写的模板",
       "selectTemplateHelp": "选择消息模板（包含默认消息+多语言消息）",
       "edit": "编辑",
+      "settingsSummaryTitle": "将应用的维护设置",
+      "currentSettingsTitle": "当前维护设置",
+      "validation": {
+        "startTimeInPast": "开始时间设置在过去。维护将立即开始。",
+        "endTimeInPast": "结束时间设置在过去。维护将立即结束。",
+        "endTimeBeforeStart": "结束时间早于开始时间。请设置正确的时间。",
+        "sameStartEndTime": "开始和结束时间相同。维护可能立即结束。"
+      },
+      "startFailedWarning": "维护启动失败。请检查时间设置。如果结束时间在过去或早于开始时间，维护可能立即结束。",
+      "selectDateTime": "选择日期和时间",
+      "confirmStartSubtitle": "开始维护前，请检查以下设置并考虑影响。",
+      "confirmStopSubtitle": "停止维护将恢复正常服务。是否继续？",
       "typeHelp": "定期维护：用于计划的服务器更新或例行维护 / 紧急维护：用于错误修复或紧急情况响应。",
       "startsAtHelp": "设置维护开始时间。留空则立即开始。设置未来时间将在该时间自动开始维护。",
       "endsAtHelp": "设置维护结束时间。留空则需要手动结束。设置时间将在该时间自动结束维护。",
