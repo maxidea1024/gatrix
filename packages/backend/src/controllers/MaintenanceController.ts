@@ -51,6 +51,7 @@ export class MaintenanceController {
       }
 
       const userId = (req as any).user?.userId || (req as any).user?.id;
+      const user = (req as any).user;
       await VarsModel.set(KEY, payload.isMaintenance ? 'true' : 'false', userId);
       const detail = {
         type: payload.type || 'regular',
@@ -59,6 +60,11 @@ export class MaintenanceController {
         message: payload.message || '',
         messages: payload.messages || {},
         updatedAt: new Date().toISOString(),
+        updatedBy: user ? {
+          id: userId,
+          name: user.name || user.email || 'Unknown',
+          email: user.email || 'unknown@example.com'
+        } : null,
       };
       await VarsModel.set(KEY_DETAIL, JSON.stringify(detail), userId);
 

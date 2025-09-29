@@ -3,6 +3,7 @@ import { Box, Card, CardContent, Stack, TextField, Switch, FormControlLabel, But
 import { alpha } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { useAuth } from '@/hooks/useAuth';
 import dayjs, { Dayjs } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
@@ -19,6 +20,7 @@ import { messageTemplateService, MessageTemplate } from '@/services/messageTempl
 import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/MultiLanguageMessageInput';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
+import SaveIcon from '@mui/icons-material/Save';
 import CloseIcon from '@mui/icons-material/Close';
 import { useSSENotifications } from '@/hooks/useSSENotifications';
 import { formatDateTimeDetailed, getStoredTimezone } from '@/utils/dateFormat';
@@ -27,6 +29,7 @@ import { formatDateTimeDetailed, getStoredTimezone } from '@/utils/dateFormat';
 const MaintenancePage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { user } = useAuth();
 
   // Set dayjs locale based on current language
   React.useEffect(() => {
@@ -44,6 +47,7 @@ const MaintenancePage: React.FC = () => {
 
   // Status
   const [isMaintenance, setIsMaintenance] = useState(false);
+  const [currentMaintenanceDetail, setCurrentMaintenanceDetail] = useState<any>(null);
   const [type, setType] = useState<MaintenanceType>('regular');
   const [startsAt, setStartsAt] = useState<Dayjs | null>(null);
   const updatedBySSE = useRef(false);
@@ -80,13 +84,14 @@ const MaintenancePage: React.FC = () => {
 
   // Confirm dialog
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [confirmMode, setConfirmMode] = useState<'start'|'stop'|null>(null);
+  const [confirmMode, setConfirmMode] = useState<'start'|'stop'|'update'|null>(null);
   const [confirmInput, setConfirmInput] = useState('');
 
   useEffect(() => {
     maintenanceService.getStatus().then(({ isUnderMaintenance, detail }) => {
       if (updatedBySSE.current) return; // keep SSE-updated status
       setIsMaintenance(isUnderMaintenance);
+      setCurrentMaintenanceDetail(detail);
       // 점검 중일 때만 기존 설정을 불러옴
       if (detail && isUnderMaintenance) {
         setType(detail.type);
@@ -124,6 +129,7 @@ const MaintenancePage: React.FC = () => {
         const { isUnderMaintenance, detail } = event.data || {};
         updatedBySSE.current = true;
         setIsMaintenance(!!isUnderMaintenance);
+        setCurrentMaintenanceDetail(detail);
         // 점검 중일 때만 기존 설정을 불러옴 (SSE)
         if (detail && !!isUnderMaintenance) {
           setType(detail.type);
@@ -224,6 +230,50 @@ const MaintenancePage: React.FC = () => {
   const stopMaintenance = async () => {
     await maintenanceService.setStatus({ isMaintenance: false, type });
     setIsMaintenance(false);
+  };
+
+  const updateMaintenance = async () => {
+    // 시간 검증
+    const validation = validateMaintenanceTime();
+    if (!validation.valid) {
+      return;
+    }
+
+    const payload = inputMode === 'template' ? (() => {
+      const tpl = tpls.find(t => t.id === selectedTplId);
+      return {
+        isMaintenance: true,
+        type,
+        startsAt: startsAt ? startsAt.toISOString() : null,
+        endsAt: endsAt ? endsAt.toISOString() : null,
+        kickExistingPlayers,
+        message: tpl?.defaultMessage || undefined,
+        messages: {
+          ko: tpl?.locales?.find(l=>l.lang==='ko')?.message || undefined,
+          en: tpl?.locales?.find(l=>l.lang==='en')?.message || undefined,
+          zh: tpl?.locales?.find(l=>l.lang==='zh')?.message || undefined,
+        }
+      };
+    })() : {
+      isMaintenance: true,
+      type,
+      startsAt: startsAt ? startsAt.toISOString() : null,
+      endsAt: endsAt ? endsAt.toISOString() : null,
+      kickExistingPlayers,
+      message: baseMsg || undefined,
+      messages: Object.fromEntries(locales.map(l => [l.lang, l.message])) as any,
+    };
+
+    const result = await maintenanceService.setStatus(payload);
+
+    if (!result.isUnderMaintenance) {
+      // 점검이 업데이트되지 않은 경우 경고
+      enqueueSnackbar(t('admin.maintenance.updateFailedWarning'), { variant: 'warning' });
+      return;
+    }
+
+    setEditMode(false);
+    enqueueSnackbar(t('admin.maintenance.updateSuccess'), { variant: 'success' });
   };
 
   return (
@@ -375,32 +425,45 @@ const MaintenancePage: React.FC = () => {
                             </Box>
                           </Box>
                         )}
+
+                        {/* 설정자 정보 */}
+                        {currentMaintenanceDetail?.updatedBy && (
+                          <Box component="tr">
+                            <Box component="td" sx={{
+                              fontWeight: 500,
+                              fontSize: '0.875rem',
+                              width: '140px',
+                              verticalAlign: 'top',
+                              pr: 2
+                            }}>
+                              {t('admin.maintenance.updatedBy')}:
+                            </Box>
+                            <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                              {currentMaintenanceDetail.updatedBy.name} ({currentMaintenanceDetail.updatedBy.email})
+                            </Box>
+                          </Box>
+                        )}
+
+                        {/* 설정 시간 */}
+                        {currentMaintenanceDetail?.updatedAt && (
+                          <Box component="tr">
+                            <Box component="td" sx={{
+                              fontWeight: 500,
+                              fontSize: '0.875rem',
+                              width: '140px',
+                              verticalAlign: 'top',
+                              pr: 2
+                            }}>
+                              {t('admin.maintenance.updatedAt')}:
+                            </Box>
+                            <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                              {dayjs(currentMaintenanceDetail.updatedAt).format('YYYY-MM-DD A h:mm')} ({currentMaintenanceDetail.updatedAt})
+                            </Box>
+                          </Box>
+                        )}
                       </Box>
                     </Box>
                   </Box>
-
-                  {/* Quick preview of current messages */}
-                  {baseMsg && (
-                    <Card variant="outlined" sx={{ mt: 1 }}>
-                      <CardContent>
-                        <Typography variant="subtitle2" gutterBottom>{t('clientVersions.maintenance.defaultMessage')}</Typography>
-                        <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{baseMsg}</Typography>
-                        {locales.length > 0 && (
-                          <Stack spacing={1} sx={{ mt: 2 }}>
-                            {locales.map(l => {
-                              const langLabels = { ko: '한국어', en: '영어', zh: '중국어' };
-                              return (
-                                <Box key={l.lang} sx={{ display:'flex', gap:1, alignItems:'flex-start' }}>
-                                  <Chip label={langLabels[l.lang] || l.lang} size="small" sx={{ width: 96, justifyContent:'flex-start' }} />
-                                  <Typography variant="body2" sx={{ whiteSpace:'pre-wrap' }}>{l.message}</Typography>
-                                </Box>
-                              );
-                            })}
-                          </Stack>
-                        )}
-                      </CardContent>
-                    </Card>
-                  )}
                 </>
               ) : (
                 <>
@@ -623,29 +686,65 @@ const MaintenancePage: React.FC = () => {
             </Button>
           ) : (
             <>
-              <Button
-                variant="contained"
-                color="success"
-                size="large"
-                startIcon={<StopIcon />}
-                onClick={() => { setConfirmMode('stop'); setConfirmInput(''); setConfirmOpen(true); }}
-                sx={{
-                  width: 160,
-                  height: 160,
-                  borderRadius: '50%',
-                  fontSize: '1.1rem',
-                  fontWeight: 600,
-                  flexDirection: 'column',
-                  gap: 1,
-                  '& .MuiButton-startIcon': {
-                    margin: 0,
-                    fontSize: '2rem'
-                  }
-                }}
-              >
-                <StopIcon sx={{ fontSize: '2.5rem' }} />
-                {t('admin.maintenance.stop')}
-              </Button>
+              {editMode ? (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  startIcon={<SaveIcon />}
+                  onClick={() => {
+                    // 시간 검증 먼저 실행
+                    const validation = validateMaintenanceTime();
+                    if (!validation.valid) {
+                      return;
+                    }
+                    setConfirmMode('update');
+                    setConfirmInput('');
+                    setConfirmOpen(true);
+                  }}
+                  disabled={!hasMessageForStart}
+                  sx={{
+                    width: 160,
+                    height: 160,
+                    borderRadius: '50%',
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                    flexDirection: 'column',
+                    gap: 1,
+                    '& .MuiButton-startIcon': {
+                      margin: 0,
+                      fontSize: '2rem'
+                    }
+                  }}
+                >
+                  <SaveIcon sx={{ fontSize: '2.5rem' }} />
+                  {t('admin.maintenance.update')}
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  color="success"
+                  size="large"
+                  startIcon={<StopIcon />}
+                  onClick={() => { setConfirmMode('stop'); setConfirmInput(''); setConfirmOpen(true); }}
+                  sx={{
+                    width: 160,
+                    height: 160,
+                    borderRadius: '50%',
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                    flexDirection: 'column',
+                    gap: 1,
+                    '& .MuiButton-startIcon': {
+                      margin: 0,
+                      fontSize: '2rem'
+                    }
+                  }}
+                >
+                  <StopIcon sx={{ fontSize: '2.5rem' }} />
+                  {t('admin.maintenance.stop')}
+                </Button>
+              )}
               <Button
                 variant="outlined"
                 onClick={() => setEditMode(v => !v)}
@@ -673,10 +772,14 @@ const MaintenancePage: React.FC = () => {
         >
           <DialogTitle sx={{ pb: 1 }}>
             <Typography variant="h6" component="div">
-              {confirmMode === 'start' ? t('admin.maintenance.confirmStartTitle') : t('admin.maintenance.confirmStopTitle')}
+              {confirmMode === 'start' ? t('admin.maintenance.confirmStartTitle') :
+               confirmMode === 'update' ? t('admin.maintenance.confirmUpdateTitle') :
+               t('admin.maintenance.confirmStopTitle')}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-              {confirmMode === 'start' ? t('admin.maintenance.confirmStartSubtitle') : t('admin.maintenance.confirmStopSubtitle')}
+              {confirmMode === 'start' ? t('admin.maintenance.confirmStartSubtitle') :
+               confirmMode === 'update' ? t('admin.maintenance.confirmUpdateSubtitle') :
+               t('admin.maintenance.confirmStopSubtitle')}
             </Typography>
           </DialogTitle>
           <DialogContent sx={{ pt: 2 }}>
@@ -827,6 +930,40 @@ const MaintenancePage: React.FC = () => {
                       </Box>
                     </Box>
                   )}
+
+                  {/* 설정자 정보 (Dialog에서는 현재 사용자) */}
+                  {user && (
+                    <Box component="tr">
+                      <Box component="td" sx={{
+                        fontWeight: 500,
+                        fontSize: '0.875rem',
+                        width: '140px',
+                        verticalAlign: 'top',
+                        pr: 2
+                      }}>
+                        {confirmMode === 'update' ? t('admin.maintenance.updatedBy') : t('admin.maintenance.setBy')}:
+                      </Box>
+                      <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                        {user.name} ({user.email})
+                      </Box>
+                    </Box>
+                  )}
+
+                  {/* 설정 시간 (Dialog에서는 현재 시간) */}
+                  <Box component="tr">
+                    <Box component="td" sx={{
+                      fontWeight: 500,
+                      fontSize: '0.875rem',
+                      width: '140px',
+                      verticalAlign: 'top',
+                      pr: 2
+                    }}>
+                      {confirmMode === 'update' ? t('admin.maintenance.updatedAt') : t('admin.maintenance.setAt')}:
+                    </Box>
+                    <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
+                      {dayjs().format('YYYY-MM-DD A h:mm')} ({dayjs().toISOString()})
+                    </Box>
+                  </Box>
                 </Box>
               </Box>
             </Box>
@@ -917,25 +1054,34 @@ const MaintenancePage: React.FC = () => {
               size="medium"
               value={confirmInput}
               onChange={(e)=>setConfirmInput(e.target.value)}
-              placeholder={confirmMode === 'start' ? t('admin.maintenance.confirmStartKeyword') : t('admin.maintenance.confirmStopKeyword')}
+              placeholder={confirmMode === 'start' ? t('admin.maintenance.confirmStartKeyword') :
+                         confirmMode === 'update' ? t('admin.maintenance.confirmUpdateKeyword') :
+                         t('admin.maintenance.confirmStopKeyword')}
               sx={{ mb: 1 }}
             />
           </DialogContent>
           <DialogActions>
             <Button onClick={()=>setConfirmOpen(false)}>{t('common.cancel')}</Button>
             <Button
-              color={confirmMode==='start' ? 'error' : 'success'}
+              color={confirmMode==='start' ? 'error' : confirmMode==='update' ? 'primary' : 'success'}
               variant="contained"
               onClick={async()=>{
-                const expected = confirmMode==='start' ? t('admin.maintenance.confirmStartKeyword') : t('admin.maintenance.confirmStopKeyword');
+                const expected = confirmMode==='start' ? t('admin.maintenance.confirmStartKeyword') :
+                                confirmMode==='update' ? t('admin.maintenance.confirmUpdateKeyword') :
+                                t('admin.maintenance.confirmStopKeyword');
                 if (confirmInput.trim().toLowerCase() !== expected.toLowerCase()) return;
                 setConfirmOpen(false);
                 if (confirmMode==='start') await startMaintenance();
+                if (confirmMode==='update') await updateMaintenance();
                 if (confirmMode==='stop') await stopMaintenance();
               }}
-              disabled={confirmInput.trim().toLowerCase() !== (confirmMode==='start' ? t('admin.maintenance.confirmStartKeyword') : t('admin.maintenance.confirmStopKeyword')).toLowerCase()}
+              disabled={confirmInput.trim().toLowerCase() !== (confirmMode==='start' ? t('admin.maintenance.confirmStartKeyword') :
+                                                              confirmMode==='update' ? t('admin.maintenance.confirmUpdateKeyword') :
+                                                              t('admin.maintenance.confirmStopKeyword')).toLowerCase()}
             >
-              {confirmMode==='start' ? (t('admin.maintenance.start')) : (t('admin.maintenance.stop'))}
+              {confirmMode==='start' ? t('admin.maintenance.start') :
+               confirmMode==='update' ? t('admin.maintenance.update') :
+               t('admin.maintenance.stop')}
             </Button>
           </DialogActions>
         </Dialog>

@@ -748,60 +748,56 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           right: 0,
           minHeight: `${bannerHeight}px`,
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           px: 2,
           py: 1,
           color: '#fff',
-          fontWeight: 700,
-          background: (theme) => theme.palette.mode === 'dark'
-            ? 'linear-gradient(90deg, #d32f2f, #f44336, #d32f2f)'
-            : 'linear-gradient(90deg, #ff4d4f, #ff7875, #ff4d4f)',
-          backgroundSize: '200% 100%',
-
+          fontWeight: 600,
+          backgroundColor: (theme) => theme.palette.mode === 'dark'
+            ? 'rgba(244, 67, 54, 0.9)'
+            : 'rgba(244, 67, 54, 0.85)',
+          backdropFilter: 'blur(8px)',
+          borderBottom: '1px solid',
+          borderBottomColor: (theme) => theme.palette.mode === 'dark'
+            ? 'rgba(244, 67, 54, 0.3)'
+            : 'rgba(244, 67, 54, 0.2)',
           boxShadow: (theme) => theme.palette.mode === 'dark'
-            ? '0 2px 8px rgba(211,47,47,0.4)'
-            : '0 2px 8px rgba(255,77,79,0.3)',
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          animation: 'maintenancePulse 2s ease-in-out infinite',
-          '@keyframes maintenancePulse': {
-            '0%': {
-              backgroundPosition: '0% 50%',
-            },
-            '50%': {
-              backgroundPosition: '100% 50%',
-            },
-            '100%': {
-              backgroundPosition: '0% 50%',
-            }
-          }
+            ? '0 2px 8px rgba(211,47,47,0.3)'
+            : '0 2px 8px rgba(255,77,79,0.2)',
+          zIndex: (theme) => theme.zIndex.drawer + 1
         }}>
-          {/* 점검 상태 및 유형 */}
-          <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 1 }}>
-            <Typography variant="body2" sx={{ fontWeight: 800, fontSize: '0.95rem' }}>
-              🔧 {t('common.maintenance.bannerActive')}
-            </Typography>
-            {maintenanceStatus.detail?.type && (
-              <Typography variant="body2" sx={{
-                fontSize: '0.8rem',
-                opacity: 0.9,
-                backgroundColor: 'rgba(255,255,255,0.2)',
-                px: 1,
-                py: 0.5,
-                borderRadius: 1,
-                fontWeight: 600
-              }}>
-                {t(`admin.maintenance.types.${maintenanceStatus.detail.type}`)}
+          {/* 한 줄로 정리된 점검 정보 */}
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 2,
+            fontSize: '0.875rem'
+          }}>
+            {/* 점검 상태 */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.875rem' }}>
+                🔧 {t('common.maintenance.bannerActive')}
               </Typography>
-            )}
-          </Box>
+              {maintenanceStatus.detail?.type && (
+                <Typography variant="body2" sx={{
+                  fontSize: '0.75rem',
+                  backgroundColor: 'rgba(255,255,255,0.25)',
+                  px: 1,
+                  py: 0.25,
+                  borderRadius: 0.5,
+                  fontWeight: 600
+                }}>
+                  {t(`admin.maintenance.types.${maintenanceStatus.detail.type}`)}
+                </Typography>
+              )}
+            </Box>
 
-          {/* 점검 기간 */}
-          {(maintenanceStatus.detail?.startsAt || maintenanceStatus.detail?.endsAt) && (
-            <Box sx={{ mb: 1 }}>
-              <Typography variant="caption" sx={{ opacity: 0.9, fontSize: '0.75rem', fontWeight: 600 }}>
-                📅 {t('admin.maintenance.maintenancePeriodLabel')}: {(() => {
+            {/* 점검 기간 */}
+            {(maintenanceStatus.detail?.startsAt || maintenanceStatus.detail?.endsAt) && (
+              <Typography variant="body2" sx={{ fontSize: '0.8rem', opacity: 0.95 }}>
+                📅 {(() => {
                   const start = maintenanceStatus.detail?.startsAt;
                   const end = maintenanceStatus.detail?.endsAt;
                   if (start && end) {
@@ -814,23 +810,23 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   return t('admin.maintenance.immediateStartLabel');
                 })()}
               </Typography>
-            </Box>
-          )}
+            )}
 
-          {/* 점검 메시지 */}
-          {maintenanceStatus.detail?.message && (
-            <Typography variant="body2" sx={{
-              fontSize: '0.85rem',
-              opacity: 0.95,
-              fontStyle: 'italic',
-              maxWidth: '600px',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
-            }}>
-              💬 {maintenanceStatus.detail.message}
-            </Typography>
-          )}
+            {/* 점검 메시지 */}
+            {maintenanceStatus.detail?.message && (
+              <Typography variant="body2" sx={{
+                fontSize: '0.8rem',
+                opacity: 0.9,
+                fontStyle: 'italic',
+                maxWidth: '400px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
+                💬 {maintenanceStatus.detail.message}
+              </Typography>
+            )}
+          </Box>
         </Box>
       )}
 

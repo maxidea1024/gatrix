@@ -9,6 +9,11 @@ export interface MaintenanceDetail {
   message?: string; // default message
   messages?: { ko?: string; en?: string; zh?: string }; // per-language overrides
   updatedAt?: string;
+  updatedBy?: {
+    id: number;
+    name: string;
+    email: string;
+  } | null;
 }
 
 export const maintenanceService = {
