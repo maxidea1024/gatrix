@@ -164,7 +164,7 @@ export class SSENotificationService extends EventEmitter {
    */
   public sendToUser(userId: number, event: NotificationEvent): number {
     let sentCount = 0;
-    
+
     this.clients.forEach((client) => {
       if (client.userId === userId) {
         if (this.sendToClient(client.id, event)) {

@@ -345,20 +345,7 @@ const MaintenancePage: React.FC = () => {
                 </>
               )}
 
-              {/* Actions: start/stop */}
-              <Stack direction="row" spacing={2}>
-                <Button variant="contained" color="error" startIcon={<PlayArrowIcon />} onClick={()=>{ setConfirmMode('start'); setConfirmInput(''); setConfirmOpen(true); }} disabled={isMaintenance || !hasMessageForStart}>
-                  {t('admin.maintenance.start')}
-                </Button>
-                <Button variant="outlined" color="success" startIcon={<StopIcon />} onClick={()=>{ setConfirmMode('stop'); setConfirmInput(''); setConfirmOpen(true); }} disabled={!isMaintenance}>
-                  {t('admin.maintenance.stop')}
-                </Button>
-                {isMaintenance && (
-                  <Button variant="outlined" onClick={()=>setEditMode(v=>!v)}>
-                    {editMode ? t('common.cancel') : t('common.edit')}
-                  </Button>
-                )}
-              </Stack>
+              {/* Actions는 우측 영역으로 이동 */}
 
               {/* Confirm dialog */}
               <Dialog
@@ -481,8 +468,192 @@ const MaintenancePage: React.FC = () => {
               </Dialog>
 
             </Stack>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        {/* 우측 액션 버튼 영역 */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, minWidth: 200 }}>
+          {!isMaintenance ? (
+            <Button
+              variant="contained"
+              color="error"
+              size="large"
+              startIcon={<PlayArrowIcon />}
+              onClick={() => { setConfirmMode('start'); setConfirmInput(''); setConfirmOpen(true); }}
+              disabled={!hasMessageForStart}
+              sx={{
+                width: 160,
+                height: 160,
+                borderRadius: '50%',
+                fontSize: '1.1rem',
+                fontWeight: 600,
+                flexDirection: 'column',
+                gap: 1,
+                '& .MuiButton-startIcon': {
+                  margin: 0,
+                  fontSize: '2rem'
+                }
+              }}
+            >
+              <PlayArrowIcon sx={{ fontSize: '2.5rem' }} />
+              {t('admin.maintenance.start')}
+            </Button>
+          ) : (
+            <>
+              <Button
+                variant="contained"
+                color="success"
+                size="large"
+                startIcon={<StopIcon />}
+                onClick={() => { setConfirmMode('stop'); setConfirmInput(''); setConfirmOpen(true); }}
+                sx={{
+                  width: 160,
+                  height: 160,
+                  borderRadius: '50%',
+                  fontSize: '1.1rem',
+                  fontWeight: 600,
+                  flexDirection: 'column',
+                  gap: 1,
+                  '& .MuiButton-startIcon': {
+                    margin: 0,
+                    fontSize: '2rem'
+                  }
+                }}
+              >
+                <StopIcon sx={{ fontSize: '2.5rem' }} />
+                {t('admin.maintenance.stop')}
+              </Button>
+              <Button
+                variant="outlined"
+                onClick={() => setEditMode(v => !v)}
+                sx={{ width: 140 }}
+              >
+                {editMode ? t('common.cancel') : t('admin.maintenance.edit')}
+              </Button>
+            </>
+          )}
+        </Box>
+
+        {/* Confirm dialog */}
+        <Dialog
+          open={confirmOpen}
+          onClose={()=>setConfirmOpen(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle sx={{ pb: 1 }}>
+            {confirmMode === 'start' ? (t('admin.maintenance.confirmStartTitle')) : (t('admin.maintenance.confirmStopTitle'))}
+          </DialogTitle>
+          <DialogContent sx={{ pt: 2 }}>
+            {/* Impact Warning */}
+            <Box sx={{
+              mb: 3,
+              p: 2.5,
+              borderRadius: 2,
+              backgroundColor: confirmMode === 'start'
+                ? (theme) => theme.palette.mode === 'dark' ? 'rgba(244, 67, 54, 0.08)' : 'rgba(244, 67, 54, 0.04)'
+                : (theme) => theme.palette.mode === 'dark' ? 'rgba(76, 175, 80, 0.08)' : 'rgba(76, 175, 80, 0.04)',
+              border: '1px solid',
+              borderColor: confirmMode === 'start'
+                ? (theme) => theme.palette.mode === 'dark' ? 'rgba(244, 67, 54, 0.3)' : 'rgba(244, 67, 54, 0.2)'
+                : (theme) => theme.palette.mode === 'dark' ? 'rgba(76, 175, 80, 0.3)' : 'rgba(76, 175, 80, 0.2)'
+            }}>
+              <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                {confirmMode === 'start'
+                  ? t('admin.maintenance.impactWarningTitle')
+                  : t('admin.maintenance.impactRestoreTitle')}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                {confirmMode === 'start'
+                  ? t('admin.maintenance.impactWarningDescription')
+                  : t('admin.maintenance.impactRestoreDescription')}
+              </Typography>
+              <Box component="ul" sx={{ pl: 2, mb: 0 }}>
+                {confirmMode === 'start' ? (
+                  <>
+                    {kickExistingPlayers ? (
+                      <>
+                        <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                          {t('admin.maintenance.impactItemKick1')}
+                        </Typography>
+                        <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                          {t('admin.maintenance.impactItemKick2')}
+                        </Typography>
+                        <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                          {t('admin.maintenance.impactItemKick3')}
+                        </Typography>
+                        <Typography component="li" variant="body2">
+                          {t('admin.maintenance.impactItemKick4')}
+                        </Typography>
+                      </>
+                    ) : (
+                      <>
+                        <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                          {t('admin.maintenance.impactItemNoKick1')}
+                        </Typography>
+                        <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                          {t('admin.maintenance.impactItemNoKick2')}
+                        </Typography>
+                        <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                          {t('admin.maintenance.impactItemNoKick3')}
+                        </Typography>
+                        <Typography component="li" variant="body2">
+                          {t('admin.maintenance.impactItemNoKick4')}
+                        </Typography>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                      {t('admin.maintenance.restoreItem1')}
+                    </Typography>
+                    <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
+                      {t('admin.maintenance.restoreItem2')}
+                    </Typography>
+                    <Typography component="li" variant="body2">
+                      {t('admin.maintenance.restoreItem3')}
+                    </Typography>
+                  </>
+                )}
+              </Box>
+            </Box>
+
+            {/* Confirmation Input */}
+            <Typography sx={{ mb: 2, fontWeight: 500 }}>
+              {confirmMode === 'start'
+                ? t('admin.maintenance.confirmStartMessage', { keyword: t('admin.maintenance.confirmStartKeyword') })
+                : t('admin.maintenance.confirmStopMessage', { keyword: t('admin.maintenance.confirmStopKeyword') })}
+            </Typography>
+            <TextField
+              autoFocus
+              fullWidth
+              size="medium"
+              value={confirmInput}
+              onChange={(e)=>setConfirmInput(e.target.value)}
+              placeholder={confirmMode === 'start' ? t('admin.maintenance.confirmStartKeyword') : t('admin.maintenance.confirmStopKeyword')}
+              sx={{ mb: 1 }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={()=>setConfirmOpen(false)}>{t('common.cancel')}</Button>
+            <Button
+              color={confirmMode==='start' ? 'error' : 'success'}
+              variant="contained"
+              onClick={async()=>{
+                const expected = confirmMode==='start' ? t('admin.maintenance.confirmStartKeyword') : t('admin.maintenance.confirmStopKeyword');
+                if (confirmInput.trim().toLowerCase() !== expected.toLowerCase()) return;
+                setConfirmOpen(false);
+                if (confirmMode==='start') await startMaintenance();
+                if (confirmMode==='stop') await stopMaintenance();
+              }}
+              disabled={confirmInput.trim().toLowerCase() !== (confirmMode==='start' ? t('admin.maintenance.confirmStartKeyword') : t('admin.maintenance.confirmStopKeyword')).toLowerCase()}
+            >
+              {confirmMode==='start' ? (t('admin.maintenance.start')) : (t('admin.maintenance.stop'))}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
     </Box>
   );
 };

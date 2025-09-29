@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Box,
   Drawer,
@@ -126,6 +126,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [sidebarWidth, setSidebarWidth] = useState(280);
   const [isResizing, setIsResizing] = useState(false);
   const [avatarImageError, setAvatarImageError] = useState(false);
+
+  // 점검 배너 높이 계산
+  const bannerHeight = useMemo(() => {
+    if (!maintenanceStatus.active) return 0;
+
+    // 기본 높이 (48px) + 시간 정보가 있을 때 추가 높이 (24px)
+    const baseHeight = 48;
+    const hasTimeInfo = maintenanceStatus.detail?.startsAt || maintenanceStatus.detail?.endsAt;
+    return hasTimeInfo ? baseHeight + 24 : baseHeight;
+  }, [maintenanceStatus.active, maintenanceStatus.detail?.startsAt, maintenanceStatus.detail?.endsAt]);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -801,8 +811,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           flexShrink: { md: 0 },
           transition: 'width 0.3s ease',
           position: 'fixed',
-          top: maintenanceStatus.active ? '112px' : '64px', // AppBar + banner height when active (dynamic based on content)
-          height: maintenanceStatus.active ? 'calc(100vh - 112px)' : 'calc(100vh - 64px)',
+          top: `${64 + bannerHeight}px`, // AppBar + dynamic banner height
+          height: `calc(100vh - ${64 + bannerHeight}px)`,
           zIndex: (theme) => theme.zIndex.drawer,
         }}
       >
@@ -881,8 +891,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             xs: 3,
             md: `${(sidebarCollapsed ? 64 : sidebarWidth) + 24}px`
           },
-          mt: maintenanceStatus.active ? 14 : 8, // 64px app bar + ~48px banner when active (dynamic)
-          height: maintenanceStatus.active ? 'calc(100vh - 112px)' : 'calc(100vh - 64px)',
+          mt: `${(64 + bannerHeight) / 8}rem`, // AppBar + dynamic banner height converted to rem
+          height: `calc(100vh - ${64 + bannerHeight}px)`,
           backgroundColor: 'background.default',
           width: '100%',
           maxWidth: '100%',
