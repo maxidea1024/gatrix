@@ -175,6 +175,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         const { isUnderMaintenance, detail } = event.data || {};
         maintenanceUpdatedBySSE.current = true;
         setMaintenanceStatus({ active: !!isUnderMaintenance, detail: detail || null });
+      } else if (event.type === 'invitation_created' || event.type === 'invitation_deleted') {
+        // 초대링크 이벤트를 다른 컴포넌트에 전달
+        window.dispatchEvent(new CustomEvent('invitation-change', { detail: event }));
       }
     },
     onError: (error) => {
@@ -597,7 +600,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         position="fixed"
         sx={{
           width: '100%',
-          zIndex: (theme) => theme.zIndex.drawer + 2,
+          zIndex: (theme) => theme.zIndex.appBar,
           backgroundColor: '#1e293b',
           color: '#ffffff',
           boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
@@ -1064,8 +1067,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             xs: 3,
             md: `${(sidebarCollapsed ? 64 : sidebarWidth) + 24}px`
           },
-          mt: `${64 + bannerHeight}px`, // AppBar + dynamic banner height
-          minHeight: `calc(100vh - ${64 + bannerHeight}px)`,
+          mt: `64px`, // AppBar height only (no banner)
+          minHeight: `calc(100vh - 64px)`,
           height: 'auto',
           backgroundColor: 'background.default',
           width: '100%',

@@ -41,6 +41,13 @@ export interface BulkStatusUpdateRequest {
   ids: number[];
   clientStatus: ClientStatus;
   updatedBy: number;
+  // 점검 관련 필드들
+  maintenanceStartDate?: string;
+  maintenanceEndDate?: string;
+  maintenanceMessage?: string;
+  supportsMultiLanguage?: boolean;
+  maintenanceLocales?: Array<{lang: 'ko' | 'en' | 'zh', message: string}>;
+  messageTemplateId?: number;
 }
 
 export class ClientVersionService {
@@ -334,7 +341,7 @@ export class ClientVersionService {
   }
 
   static async bulkUpdateStatus(data: BulkStatusUpdateRequest): Promise<number> {
-    const result = await ClientVersionModel.bulkUpdateStatus(data.ids, data.clientStatus, data.updatedBy);
+    const result = await ClientVersionModel.bulkUpdateStatus(data);
 
     if (result > 0) {
       // Invalidate client version cache

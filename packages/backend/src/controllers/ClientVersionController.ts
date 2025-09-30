@@ -132,6 +132,18 @@ const exportClientVersionsQuerySchema = Joi.object({
 const bulkUpdateStatusSchema = Joi.object({
   ids: Joi.array().items(Joi.number().integer().positive()).min(1).required(),
   clientStatus: Joi.string().valid(...Object.values(ClientStatus)).required(),
+  // 점검 관련 필드들
+  maintenanceStartDate: Joi.string().isoDate().optional(),
+  maintenanceEndDate: Joi.string().isoDate().optional(),
+  maintenanceMessage: Joi.string().max(1000).optional(),
+  supportsMultiLanguage: Joi.boolean().optional(),
+  maintenanceLocales: Joi.array().items(
+    Joi.object({
+      lang: Joi.string().valid('ko', 'en', 'zh').required(),
+      message: Joi.string().max(1000).required(),
+    })
+  ).optional(),
+  messageTemplateId: Joi.number().integer().positive().optional(),
 });
 
 const bulkCreateClientVersionSchema = Joi.object({
@@ -438,7 +450,6 @@ export class ClientVersionController {
       success: true,
       data: {
         updatedCount,
-        message: `${updatedCount} client versions updated successfully`,
       },
     });
   }

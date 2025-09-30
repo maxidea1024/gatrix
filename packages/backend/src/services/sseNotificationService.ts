@@ -16,6 +16,7 @@ export interface NotificationEvent {
   timestamp: Date;
   targetUsers?: number[];
   targetChannels?: string[];
+  excludeUsers?: number[];
 }
 
 export class SSENotificationService extends EventEmitter {

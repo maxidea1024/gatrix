@@ -161,6 +161,13 @@ export interface ClientVersionListResponse {
 export interface BulkStatusUpdateRequest {
   ids: number[];
   clientStatus: ClientStatus;
+  // 점검 관련 필드들
+  maintenanceStartDate?: string;
+  maintenanceEndDate?: string;
+  maintenanceMessage?: string;
+  supportsMultiLanguage?: boolean;
+  maintenanceLocales?: ClientVersionMaintenanceLocale[];
+  messageTemplateId?: number;
 }
 
 // 페이지네이션 설정

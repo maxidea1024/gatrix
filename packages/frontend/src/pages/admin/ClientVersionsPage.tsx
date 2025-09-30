@@ -37,6 +37,9 @@ import {
   TextField,
   Divider,
   Drawer,
+  Switch,
+  FormControlLabel,
+  Stack,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -55,9 +58,16 @@ import {
   Close as CloseIcon,
   Update as UpdateIcon,
   Settings as SettingsIcon,
+  Build as BuildIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import { messageTemplateService, MessageTemplate } from '@/services/messageTemplateService';
+import MultiLanguageMessageInput, { MessageLocale, MultiLanguageMessageInputRef } from '@/components/common/MultiLanguageMessageInput';
 import { useTheme } from '@mui/material/styles';
 import { tagService, Tag } from '../../services/tagService';
 import { 
@@ -216,6 +226,22 @@ const ClientVersionsPage: React.FC = () => {
   const [bulkStatusDialogOpen, setBulkStatusDialogOpen] = useState(false);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [bulkStatus, setBulkStatus] = useState<ClientStatus>(ClientStatus.ONLINE);
+
+  // 점검 관련 상태
+  const [maintenanceStartDate, setMaintenanceStartDate] = useState<string>('');
+  const [maintenanceEndDate, setMaintenanceEndDate] = useState<string>('');
+
+  // 메시지 입력 방식
+  const [inputMode, setInputMode] = useState<'direct' | 'template'>('direct');
+
+  // 직접 입력
+  const [maintenanceMessage, setMaintenanceMessage] = useState<string>('');
+  const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
+  const [maintenanceLocales, setMaintenanceLocales] = useState<MessageLocale[]>([]);
+
+  // 템플릿 선택
+  const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | ''>('');
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [bulkFormDialogOpen, setBulkFormDialogOpen] = useState(false);
   const [platformDefaultsDialogOpen, setPlatformDefaultsDialogOpen] = useState(false);
@@ -305,6 +331,13 @@ const ClientVersionsPage: React.FC = () => {
   useEffect(() => {
     loadMetadata();
     loadTags();
+
+    // 메시지 템플릿 로드
+    messageTemplateService.list({ isEnabled: true }).then(response => {
+      setMessageTemplates(response.templates || []);
+    }).catch(() => {
+      setMessageTemplates([]);
+    });
   }, [loadMetadata, loadTags]);
 
   // 버전 목록 별도 로드
@@ -394,25 +427,62 @@ const ClientVersionsPage: React.FC = () => {
   const handleBulkStatusUpdate = useCallback(async () => {
     if (selectedIds.length === 0) return;
 
+    // 점검 상태일 때 필수 필드 검증
+    if (bulkStatus === ClientStatus.MAINTENANCE) {
+      if (inputMode === 'direct' && !maintenanceMessage.trim()) {
+        enqueueSnackbar(t('clientVersions.maintenance.messageRequired'), { variant: 'error' });
+        return;
+      }
+      if (inputMode === 'template' && !selectedTemplateId) {
+        enqueueSnackbar(t('admin.maintenance.selectTemplateRequired'), { variant: 'error' });
+        return;
+      }
+    }
+
     try {
       const request: BulkStatusUpdateRequest = {
         ids: selectedIds,
         clientStatus: bulkStatus,
+        // 점검 상태일 때만 점검 관련 데이터 포함
+        ...(bulkStatus === ClientStatus.MAINTENANCE && {
+          maintenanceStartDate: maintenanceStartDate || undefined,
+          maintenanceEndDate: maintenanceEndDate || undefined,
+          ...(inputMode === 'direct' ? {
+            maintenanceMessage: maintenanceMessage || undefined,
+            supportsMultiLanguage: supportsMultiLanguage,
+            maintenanceLocales: maintenanceLocales.filter(l => l.message.trim() !== ''),
+          } : {
+            messageTemplateId: selectedTemplateId,
+          }),
+        }),
       };
 
       const result = await ClientVersionService.bulkUpdateStatus(request);
       console.log('🔍 Bulk update result:', result);
-      enqueueSnackbar(result?.message || t('clientVersions.statusUpdated'), { variant: 'success' });
+
+      // 로컬라이징된 메시지 생성
+      const updatedCount = result?.updatedCount || selectedIds.length;
+      const successMessage = t('clientVersions.bulkStatusUpdated', { count: updatedCount });
+
+      enqueueSnackbar(successMessage, { variant: 'success' });
       setBulkStatusDialogOpen(false);
       setSelectedIds([]);
       setSelectAll(false);
+      // 점검 관련 상태 초기화
+      setMaintenanceStartDate('');
+      setMaintenanceEndDate('');
+      setMaintenanceMessage('');
+      setSupportsMultiLanguage(false);
+      setMaintenanceLocales([]);
+      setInputMode('direct');
+      setSelectedTemplateId('');
       loadClientVersions();
       loadAvailableVersions(); // 버전 목록도 갱신
     } catch (error: any) {
       console.error('Error updating status:', error);
       enqueueSnackbar(error.message || t('clientVersions.statusUpdateError'), { variant: 'error' });
     }
-  }, [selectedIds, bulkStatus, enqueueSnackbar, loadClientVersions, loadAvailableVersions]);
+  }, [selectedIds, bulkStatus, inputMode, maintenanceStartDate, maintenanceEndDate, maintenanceMessage, supportsMultiLanguage, maintenanceLocales, selectedTemplateId, enqueueSnackbar, loadClientVersions, loadAvailableVersions, t]);
 
 
 
@@ -1395,12 +1465,12 @@ const ClientVersionsPage: React.FC = () => {
         open={bulkStatusDialogOpen}
         onClose={() => setBulkStatusDialogOpen(false)}
         sx={{
-          zIndex: 1301,
+          zIndex: (theme) => theme.zIndex.drawer + 3, // AppBar(theme.zIndex.drawer+2)
           '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 450 },
+            width: { xs: '100%', sm: 600 },
             maxWidth: '100vw',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
           }
         }}
       >
@@ -1431,20 +1501,14 @@ const ClientVersionsPage: React.FC = () => {
         </Box>
 
         {/* Content */}
-        <Box sx={{ flex: 1, p: 2 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <FormControl fullWidth sx={{ mt: 2 }}>
             <InputLabel>{t('clientVersions.statusLabel')}</InputLabel>
             <Select
               value={bulkStatus}
               onChange={(e) => setBulkStatus(e.target.value as ClientStatus)}
               label={t('clientVersions.statusLabel')}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    zIndex: 9999
-                  }
-                }
-              }}
+
             >
               {Object.values(ClientStatus).map((status) => (
                 <MenuItem key={status} value={status}>
@@ -1453,6 +1517,116 @@ const ClientVersionsPage: React.FC = () => {
               ))}
             </Select>
           </FormControl>
+
+          {/* 점검 관련 필드들 */}
+          {bulkStatus === ClientStatus.MAINTENANCE && (
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Box sx={{ mt: 3, p: 2, border: '1px solid', borderColor: 'warning.light', borderRadius: 1, bgcolor: 'background.default' }}>
+                <Typography variant="subtitle1" gutterBottom sx={{ color: 'warning.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <BuildIcon fontSize="small" sx={{ mr: 0.5 }} /> {t('clientVersions.maintenance.title')}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {t('clientVersions.maintenance.description')}
+                </Typography>
+
+                <Stack spacing={2}>
+                  {/* 점검 시작일 */}
+                  <DateTimePicker
+                    label={t('clientVersions.maintenance.startDate')}
+                    value={maintenanceStartDate ? dayjs(maintenanceStartDate) : null}
+                    onChange={(date) => setMaintenanceStartDate(date ? date.toISOString() : '')}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        helperText: t('clientVersions.maintenance.startDateHelp'),
+                      },
+                    }}
+                  />
+
+                  {/* 점검 종료일 */}
+                  <DateTimePicker
+                    label={t('clientVersions.maintenance.endDate')}
+                    value={maintenanceEndDate ? dayjs(maintenanceEndDate) : null}
+                    onChange={(date) => setMaintenanceEndDate(date ? date.toISOString() : '')}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        helperText: t('clientVersions.maintenance.endDateHelp'),
+                      },
+                    }}
+                  />
+
+                  {/* 구분선 */}
+                  <Box sx={{ width: '100%', my: 5 }}>
+                    <Box sx={{
+                      height: '1px',
+                      backgroundColor: 'divider',
+                      width: '100%'
+                    }} />
+                  </Box>
+
+                  {/* 메시지 소스 선택 */}
+                  <TextField
+                    select
+                    label={t('admin.maintenance.messageSource')}
+                    value={inputMode}
+                    onChange={(e) => setInputMode(e.target.value as 'direct' | 'template')}
+                    fullWidth
+
+                  >
+                    <MenuItem value="direct">{t('admin.maintenance.directInput')}</MenuItem>
+                    <MenuItem value="template">{t('admin.maintenance.useTemplate')}</MenuItem>
+                  </TextField>
+                  <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
+                    {t('admin.maintenance.messageSourceHelp')}
+                  </Typography>
+
+                  {/* 템플릿 선택 */}
+                  {inputMode === 'template' && (
+                    <Box>
+                      <TextField
+                        select
+                        label={t('admin.maintenance.selectTemplate')}
+                        value={selectedTemplateId}
+                        onChange={(e) => setSelectedTemplateId(Number(e.target.value))}
+                        fullWidth
+
+                      >
+                        <MenuItem value="">{t('common.select')}</MenuItem>
+                        {messageTemplates.map(tpl => (
+                          <MenuItem key={tpl.id} value={tpl.id}>{tpl.name}</MenuItem>
+                        ))}
+                      </TextField>
+                      <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
+                        {t('admin.maintenance.selectTemplateHelp')}
+                      </Typography>
+                    </Box>
+                  )}
+
+                  {/* 직접 입력 */}
+                  {inputMode === 'direct' && (
+                    <MultiLanguageMessageInput
+                      defaultMessage={maintenanceMessage}
+                      onDefaultMessageChange={setMaintenanceMessage}
+                      defaultMessageLabel={t('clientVersions.maintenance.defaultMessage')}
+                      defaultMessageHelperText={t('clientVersions.maintenance.defaultMessageHelp')}
+                      defaultMessageRequired={true}
+                      supportsMultiLanguage={supportsMultiLanguage}
+                      onSupportsMultiLanguageChange={setSupportsMultiLanguage}
+                      supportsMultiLanguageLabel={t('clientVersions.maintenance.supportsMultiLanguage')}
+                      supportsMultiLanguageHelperText={t('clientVersions.maintenance.supportsMultiLanguageHelp')}
+                      locales={maintenanceLocales}
+                      onLocalesChange={setMaintenanceLocales}
+                      languageSpecificMessagesLabel={t('clientVersions.maintenance.languageSpecificMessages')}
+                      enableTranslation={true}
+                      translateButtonLabel={t('common.autoTranslate')}
+                      translateTooltip={t('admin.maintenance.autoTranslateTooltip')}
+                    />
+                  )}
+                </Stack>
+              </Box>
+            </LocalizationProvider>
+          )}
         </Box>
 
         {/* Footer */}

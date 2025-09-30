@@ -85,7 +85,7 @@ export class AdminInvitationController {
       isActive: true
     };
 
-    // SSE를 통한 실시간 전파
+    // SSE를 통한 실시간 전파 (자신 제외)
     try {
       const sseService = SSENotificationService.getInstance();
       sseService.sendNotification({
@@ -95,6 +95,7 @@ export class AdminInvitationController {
           inviteUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/signup?invite=${token}`
         },
         targetChannels: ['admin'],
+        excludeUsers: [req.user!.id], // 자신은 제외
         timestamp: new Date()
       });
       logger.info(`SSE notification sent for invitation creation: ${invitationId}`);
@@ -200,7 +201,7 @@ export class AdminInvitationController {
         .where('id', id)
         .del();
 
-      // SSE를 통한 실시간 전파
+      // SSE를 통한 실시간 전파 (자신 제외)
       try {
         const sseService = SSENotificationService.getInstance();
         sseService.sendNotification({
@@ -210,6 +211,7 @@ export class AdminInvitationController {
             invitation: invitation
           },
           targetChannels: ['admin'],
+          excludeUsers: [req.user!.id], // 자신은 제외
           timestamp: new Date()
         });
         logger.info(`SSE notification sent for invitation deletion: ${id}`);

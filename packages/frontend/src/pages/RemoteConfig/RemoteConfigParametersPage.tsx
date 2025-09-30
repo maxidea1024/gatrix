@@ -73,7 +73,6 @@ const SidePanel: React.FC<SidePanelProps> = ({ open, onClose, title, children, a
       open={open}
       onClose={onClose}
       sx={{
-        zIndex: 1300,
         '& .MuiDrawer-paper': {
           width: { xs: '100%', sm: 480, md: 600 },
           height: '100vh',

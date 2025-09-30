@@ -80,7 +80,7 @@ import InvitationForm from '../../components/admin/InvitationForm';
 import InvitationStatusCard from '../../components/admin/InvitationStatusCard';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import { useDebounce } from '../../hooks/useDebounce';
-import { useSSENotifications } from '../../hooks/useSSENotifications';
+// SSE는 MainLayout에서 전역으로 처리하므로 여기서는 제거
 
 interface UsersResponse {
   users: User[];
@@ -251,16 +251,22 @@ const UsersManagementPage: React.FC = () => {
     fetchUsers();
   }, [page, rowsPerPage, debouncedSearchTerm, statusFilter, roleFilter, tagFilter]);
 
-  // SSE 이벤트 처리 (알림 없이 데이터만 새로고침)
-  useSSENotifications({
-    onEvent: (event) => {
-      if (event.type === 'invitation_created' || event.type === 'invitation_deleted') {
+  // 초대링크 이벤트 처리 (MainLayout에서 전달받음)
+  useEffect(() => {
+    const handleInvitationChange = (event: CustomEvent) => {
+      const sseEvent = event.detail;
+      if (sseEvent.type === 'invitation_created' || sseEvent.type === 'invitation_deleted') {
         // 초대링크 상태가 변경되면 현재 초대 정보를 다시 로드
         loadCurrentInvitation();
       }
-    },
-    skipInvitationNotifications: true // 이 페이지에서는 초대링크 알림 스킵
-  });
+    };
+
+    window.addEventListener('invitation-change', handleInvitationChange as EventListener);
+
+    return () => {
+      window.removeEventListener('invitation-change', handleInvitationChange as EventListener);
+    };
+  }, []);
 
   // Load available tags
   useEffect(() => {
@@ -707,7 +713,7 @@ const UsersManagementPage: React.FC = () => {
       const response = await invitationService.createInvitation(data);
       setInvitationDialogOpen(false); // 초대 폼 닫기
       await loadCurrentInvitation(); // 현재 초대 정보 새로고침
-      enqueueSnackbar('초대 링크가 성공적으로 생성되었습니다.', { variant: 'success' });
+      // 성공 토스트는 SSE 이벤트에서 처리 (중복 방지)
     } catch (error: any) {
       console.error('Failed to create invitation:', error);
       enqueueSnackbar(error.message || '초대 링크 생성에 실패했습니다.', { variant: 'error' });
@@ -720,7 +726,7 @@ const UsersManagementPage: React.FC = () => {
     try {
       await invitationService.deleteInvitation(currentInvitation.id);
       setCurrentInvitation(null);
-      enqueueSnackbar('초대 링크가 삭제되었습니다.', { variant: 'success' });
+      // 성공 토스트는 SSE 이벤트에서 처리 (중복 방지)
     } catch (error: any) {
       console.error('Failed to delete invitation:', error);
       enqueueSnackbar(error.message || '초대 링크 삭제에 실패했습니다.', { variant: 'error' });
@@ -796,13 +802,7 @@ const UsersManagementPage: React.FC = () => {
                     onChange={(e) => setStatusFilter(e.target.value)}
                     displayEmpty
                     size="small"
-                    MenuProps={{
-                      PaperProps: {
-                        style: {
-                          zIndex: 9999
-                        }
-                      }
-                    }}
+
                     sx={{
                       minWidth: 120,
                       '& .MuiSelect-select': {
@@ -828,13 +828,7 @@ const UsersManagementPage: React.FC = () => {
                     onChange={(e) => setRoleFilter(e.target.value)}
                     displayEmpty
                     size="small"
-                    MenuProps={{
-                      PaperProps: {
-                        style: {
-                          zIndex: 9999
-                        }
-                      }
-                    }}
+
                     sx={{
                       minWidth: 120,
                       '& .MuiSelect-select': {
@@ -1291,15 +1285,11 @@ const UsersManagementPage: React.FC = () => {
             width: { xs: '100%', sm: 600 },
             maxWidth: '100vw',
             display: 'flex',
-            flexDirection: 'column',
-            zIndex: 1300
+            flexDirection: 'column'
           }
         }}
         ModalProps={{
-          keepMounted: false,
-          sx: {
-            zIndex: 1300
-          }
+          keepMounted: false
         }}
       >
         {/* Header */}
@@ -1402,13 +1392,7 @@ const UsersManagementPage: React.FC = () => {
                 value={newUserData.role}
                 label={t('users.role')}
                 onChange={(e) => setNewUserData({ ...newUserData, role: e.target.value as 'admin' | 'user' })}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      zIndex: 9999
-                    }
-                  }
-                }}
+
               >
                 <MenuItem value="user">{t('users.roles.user')}</MenuItem>
                 <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
@@ -1674,15 +1658,11 @@ const UsersManagementPage: React.FC = () => {
             width: { xs: '100%', sm: 600 },
             maxWidth: '100vw',
             display: 'flex',
-            flexDirection: 'column',
-            zIndex: 1300
+            flexDirection: 'column'
           }
         }}
         ModalProps={{
-          keepMounted: false,
-          sx: {
-            zIndex: 1300
-          }
+          keepMounted: false
         }}
       >
         {/* Header */}
@@ -1790,13 +1770,7 @@ const UsersManagementPage: React.FC = () => {
                     value={editUserData.role}
                     onChange={(e) => setEditUserData({ ...editUserData, role: e.target.value as 'admin' | 'user' })}
                     label={t('users.role')}
-                    MenuProps={{
-                      PaperProps: {
-                        style: {
-                          zIndex: 9999
-                        }
-                      }
-                    }}
+
                   >
                     <MenuItem value="user">{t('users.roles.user')}</MenuItem>
                     <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
@@ -1809,13 +1783,7 @@ const UsersManagementPage: React.FC = () => {
                     value={editUserData.status}
                     onChange={(e) => setEditUserData({ ...editUserData, status: e.target.value as any })}
                     label={t('users.status')}
-                    MenuProps={{
-                      PaperProps: {
-                        style: {
-                          zIndex: 9999
-                        }
-                      }
-                    }}
+
                   >
                     <MenuItem value="pending">{t('users.statuses.pending')}</MenuItem>
                     <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
@@ -1922,39 +1890,46 @@ const UsersManagementPage: React.FC = () => {
         open={bulkActionDialogOpen}
         onClose={() => setBulkActionDialogOpen(false)}
         sx={{
-          zIndex: 1301,
+          zIndex: (theme) => theme.zIndex.drawer + 3, // AppBar(theme.zIndex.drawer+2)보다 높게
           '& .MuiDrawer-paper': {
             width: { xs: '100%', sm: 500 },
             maxWidth: '100vw',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
           }
         }}
       >
         {/* Header */}
         <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
           p: 2,
           borderBottom: '1px solid',
           borderColor: 'divider',
           bgcolor: 'background.paper'
         }}>
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t(`admin.users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}`)} ({selectedUsers.size} {t('admin.users.selectedUsers')})
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            mb: 1
+          }}>
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              {t(`admin.users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}`)} ({selectedUsers.size} {t('admin.users.selectedUsers')})
+            </Typography>
+            <IconButton
+              onClick={() => setBulkActionDialogOpen(false)}
+              size="small"
+              sx={{
+                '&:hover': {
+                  backgroundColor: 'action.hover'
+                }
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+          <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
+            {t(`admin.users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}Subtitle`)}
           </Typography>
-          <IconButton
-            onClick={() => setBulkActionDialogOpen(false)}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover'
-              }
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
         </Box>
 
         {/* Content */}
@@ -1966,13 +1941,6 @@ const UsersManagementPage: React.FC = () => {
                 value={bulkActionValue}
                 label={t('users.status')}
                 onChange={(e) => setBulkActionValue(e.target.value)}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      zIndex: 9999
-                    }
-                  }
-                }}
               >
                 <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
                 <MenuItem value="pending">{t('users.statuses.pending')}</MenuItem>
@@ -1987,13 +1955,6 @@ const UsersManagementPage: React.FC = () => {
                 value={bulkActionValue}
                 label={t('users.role')}
                 onChange={(e) => setBulkActionValue(e.target.value)}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      zIndex: 9999
-                    }
-                  }
-                }}
               >
                 <MenuItem value="user">{t('users.roles.user')}</MenuItem>
                 <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
@@ -2007,13 +1968,6 @@ const UsersManagementPage: React.FC = () => {
                 value={bulkActionValue}
                 label={t('users.emailVerified')}
                 onChange={(e) => setBulkActionValue(e.target.value)}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      zIndex: 9999
-                    }
-                  }
-                }}
               >
                 <MenuItem value="true">{t('admin.users.verified')}</MenuItem>
                 <MenuItem value="false">{t('admin.users.unverified')}</MenuItem>
@@ -2033,7 +1987,7 @@ const UsersManagementPage: React.FC = () => {
                 slotProps={{
                   popper: {
                     style: {
-                      zIndex: 9999
+                      zIndex: 1500 // Drawer보다 높은 zIndex
                     }
                   }
                 }}

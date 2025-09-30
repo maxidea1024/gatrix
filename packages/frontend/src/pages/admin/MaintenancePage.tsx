@@ -542,43 +542,57 @@ const MaintenancePage: React.FC = () => {
                   </Stack>
 
                   {/* Kick existing players option */}
-                  <Box sx={{ alignSelf: 'flex-start' }}>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={kickExistingPlayers}
-                          onChange={(e) => setKickExistingPlayers(e.target.checked)}
-                          color="warning"
+                  <Box sx={{ alignSelf: 'flex-start', width: '100%' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 3, flexWrap: 'wrap' }}>
+                      {/* 체크박스 영역 */}
+                      <Box sx={{ flex: '0 0 auto' }}>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={kickExistingPlayers}
+                              onChange={(e) => setKickExistingPlayers(e.target.checked)}
+                              color="warning"
+                            />
+                          }
+                          label={t('admin.maintenance.kickExistingPlayers')}
                         />
-                      }
-                      label={t('admin.maintenance.kickExistingPlayers')}
-                    />
-                    <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary', maxWidth: 500 }}>
-                      {t('admin.maintenance.kickExistingPlayersHelp')}
-                    </Typography>
-
-                    {/* Kick delay option */}
-                    {kickExistingPlayers && (
-                      <Box sx={{ mt: 2, width: 300 }}>
-                        <TextField
-                          select
-                          label={t('admin.maintenance.kickDelayMinutes')}
-                          value={kickDelayMinutes}
-                          onChange={(e) => setKickDelayMinutes(Number(e.target.value))}
-                          fullWidth
-                          size="small"
-                        >
-                          <MenuItem value={0}>{t('admin.maintenance.kickDelayImmediate')}</MenuItem>
-                          <MenuItem value={1}>{t('admin.maintenance.kickDelay1Min')}</MenuItem>
-                          <MenuItem value={5}>{t('admin.maintenance.kickDelay5Min')}</MenuItem>
-                          <MenuItem value={10}>{t('admin.maintenance.kickDelay10Min')}</MenuItem>
-                          <MenuItem value={30}>{t('admin.maintenance.kickDelay30Min')}</MenuItem>
-                        </TextField>
-                        <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
-                          {t('admin.maintenance.kickDelayHelp')}
+                        <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary', maxWidth: 300 }}>
+                          {t('admin.maintenance.kickExistingPlayersHelp')}
                         </Typography>
                       </Box>
-                    )}
+
+                      {/* 유예시간 설정 영역 */}
+                      {kickExistingPlayers && (
+                        <Box sx={{ flex: '0 0 auto', minWidth: 250 }}>
+                          <TextField
+                            select
+                            label={t('admin.maintenance.kickDelayMinutes')}
+                            value={kickDelayMinutes}
+                            onChange={(e) => setKickDelayMinutes(Number(e.target.value))}
+                            fullWidth
+                            size="small"
+                          >
+                            <MenuItem value={0}>{t('admin.maintenance.kickDelayImmediate')}</MenuItem>
+                            <MenuItem value={1}>{t('admin.maintenance.kickDelay1Min')}</MenuItem>
+                            <MenuItem value={5}>{t('admin.maintenance.kickDelay5Min')}</MenuItem>
+                            <MenuItem value={10}>{t('admin.maintenance.kickDelay10Min')}</MenuItem>
+                            <MenuItem value={30}>{t('admin.maintenance.kickDelay30Min')}</MenuItem>
+                          </TextField>
+                          <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
+                            {t('admin.maintenance.kickDelayHelp')}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+                  </Box>
+
+                  {/* 구분선 */}
+                  <Box sx={{ width: '100%', my: 5 }}>
+                    <Box sx={{
+                      height: '1px',
+                      backgroundColor: 'divider',
+                      width: '100%'
+                    }} />
                   </Box>
 
                   {/* Input mode */}

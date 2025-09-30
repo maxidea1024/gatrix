@@ -618,15 +618,11 @@ const JobsPage: React.FC = () => {
             width: { xs: '100%', sm: 700 },
             maxWidth: '100vw',
             display: 'flex',
-            flexDirection: 'column',
-            zIndex: 1300
+            flexDirection: 'column'
           }
         }}
         ModalProps={{
-          keepMounted: false,
-          sx: {
-            zIndex: 1300
-          }
+          keepMounted: false
         }}
       >
         {/* Header */}
