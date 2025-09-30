@@ -481,14 +481,6 @@ const WhitelistPage: React.FC = () => {
                         sx={{ minWidth: 300 }}
                       />
                     </Box>
-
-                    <Tooltip title={t('common.refresh')}>
-                      <span>
-                        <IconButton onClick={loadWhitelists} disabled={loading} sx={{ ml: 2 }}>
-                          <RefreshIcon />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
                   </Box>
                 </CardContent>
               </Card>

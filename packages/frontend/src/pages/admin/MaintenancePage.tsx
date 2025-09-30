@@ -17,7 +17,7 @@ import { maintenanceService, MaintenanceType } from '@/services/maintenanceServi
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
 import { messageTemplateService, MessageTemplate } from '@/services/messageTemplateService';
-import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/MultiLanguageMessageInput';
+import MultiLanguageMessageInput, { MessageLocale, MultiLanguageMessageInputRef } from '@/components/common/MultiLanguageMessageInput';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import SaveIcon from '@mui/icons-material/Save';
@@ -55,6 +55,7 @@ const MaintenancePage: React.FC = () => {
   // DateTimePicker refs for focus
   const startsAtRef = useRef<HTMLInputElement>(null);
   const endsAtRef = useRef<HTMLInputElement>(null);
+  const messageInputRef = useRef<MultiLanguageMessageInputRef>(null);
 
   const [endsAt, setEndsAt] = useState<Dayjs | null>(null);
   const [kickExistingPlayers, setKickExistingPlayers] = useState(false);
@@ -110,6 +111,11 @@ const MaintenancePage: React.FC = () => {
         setEndsAt(null);
         setBaseMsg('');
         setLocales([]);
+
+        // 점검 중이 아닐 때 기본 메시지 입력 필드에 포커스
+        setTimeout(() => {
+          messageInputRef.current?.focus();
+        }, 100);
       }
     }).catch(() => {});
 
@@ -634,6 +640,7 @@ const MaintenancePage: React.FC = () => {
                       enableTranslation={true}
                       translateButtonLabel={t('admin.maintenance.translate')}
                       translateTooltip={t('admin.maintenance.translateTooltip')}
+                      ref={messageInputRef}
                     />
                   )}
                 </>

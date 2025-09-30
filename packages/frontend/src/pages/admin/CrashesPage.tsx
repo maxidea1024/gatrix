@@ -414,11 +414,6 @@ const CrashesPage: React.FC = () => {
             <Button variant="outlined" onClick={handleClearFilters} size="small" sx={{ flexShrink: 0 }}>
               {t('admin.crashes.filters.clear')}
             </Button>
-
-            {/* Refresh */}
-            <IconButton onClick={loadCrashes} sx={{ flexShrink: 0 }}>
-              <RefreshIcon />
-            </IconButton>
           </Box>
 
         </CardContent>

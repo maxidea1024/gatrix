@@ -79,6 +79,7 @@ import { Invitation, CreateInvitationRequest } from '../../types/invitation';
 import InvitationForm from '../../components/admin/InvitationForm';
 import InvitationStatusCard from '../../components/admin/InvitationStatusCard';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
+import { useDebounce } from '../../hooks/useDebounce';
 
 interface UsersResponse {
   users: User[];
@@ -120,6 +121,9 @@ const UsersManagementPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [tagFilter, setTagFilter] = useState<Tag[]>([]);
+
+  // 디바운싱된 검색어
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   // 일괄 선택 관련 상태
   const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
@@ -215,7 +219,7 @@ const UsersManagementPage: React.FC = () => {
         limit: rowsPerPage.toString(),
       });
 
-      if (searchTerm) params.append('search', searchTerm);
+      if (debouncedSearchTerm) params.append('search', debouncedSearchTerm);
       if (statusFilter) params.append('status', statusFilter);
       if (roleFilter) params.append('role', roleFilter);
 
@@ -244,7 +248,7 @@ const UsersManagementPage: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [page, rowsPerPage, searchTerm, statusFilter, roleFilter, tagFilter]);
+  }, [page, rowsPerPage, debouncedSearchTerm, statusFilter, roleFilter, tagFilter]);
 
   // Load available tags
   useEffect(() => {
@@ -283,6 +287,23 @@ const UsersManagementPage: React.FC = () => {
   const handleBulkAction = (actionType: 'status' | 'role' | 'tags' | 'emailVerified' | 'delete') => {
     setBulkActionType(actionType);
     setBulkActionDialogOpen(true);
+  };
+
+  // 일괄 작업 저장 버튼 활성화 조건 확인
+  const isBulkActionValid = () => {
+    switch (bulkActionType) {
+      case 'status':
+      case 'role':
+      case 'emailVerified':
+        return bulkActionValue !== '';
+      case 'tags':
+        // 태그는 빈 배열도 허용 (태그 제거 목적)
+        return true;
+      case 'delete':
+        return true;
+      default:
+        return false;
+    }
   };
 
   const executeBulkAction = async () => {
@@ -2021,7 +2042,11 @@ const UsersManagementPage: React.FC = () => {
                   })
                 }
                 renderInput={(params) => (
-                  <TextField {...params} label={t('users.tags')} />
+                  <TextField
+                    {...params}
+                    label={t('users.tags')}
+                    helperText={t('admin.users.bulkTagsHelperText')}
+                  />
                 )}
                 renderOption={(props, option) => {
                   const { key, ...otherProps } = props;
@@ -2040,9 +2065,57 @@ const UsersManagementPage: React.FC = () => {
             </Box>
           )}
           {bulkActionType === 'delete' && (
-            <Typography sx={{ mt: 2 }}>
-              {t('admin.users.bulkDeleteConfirm', { count: selectedUsers.size })}
-            </Typography>
+            <Box sx={{ mt: 2 }}>
+              <Typography sx={{ mb: 2, fontWeight: 'medium' }}>
+                {t('admin.users.bulkDeleteConfirm', { count: selectedUsers.size })}
+              </Typography>
+
+              {/* 삭제 대상 사용자 목록 */}
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'medium' }}>
+                {t('admin.users.deleteTargetUsers')}:
+              </Typography>
+              <Box sx={{
+                maxHeight: 300,
+                overflow: 'auto',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: 1,
+                bgcolor: 'background.paper'
+              }}>
+                {users
+                  .filter(user => selectedUsers.has(user.id))
+                  .map(user => (
+                    <Box
+                      key={user.id}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        p: 2,
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                        '&:last-child': { borderBottom: 0 }
+                      }}
+                    >
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                          {user.name}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {user.email}
+                        </Typography>
+                      </Box>
+                      <Chip
+                        label={t(`users.roles.${user.role}`)}
+                        size="small"
+                        color={user.role === 'admin' ? 'error' : 'default'}
+                        variant="outlined"
+                      />
+                    </Box>
+                  ))
+                }
+              </Box>
+            </Box>
           )}
         </Box>
 
@@ -2068,6 +2141,7 @@ const UsersManagementPage: React.FC = () => {
             variant="contained"
             color={bulkActionType === 'delete' ? 'error' : 'primary'}
             startIcon={bulkActionType === 'delete' ? <DeleteIcon /> : <SaveIcon />}
+            disabled={!isBulkActionValid()}
           >
             {t('common.save')}
           </Button>

@@ -550,14 +550,6 @@ const MessageTemplatesPage: React.FC = () => {
                 }}
               />
             </Box>
-
-            <Tooltip title={t('common.refresh')}>
-              <span>
-                <IconButton onClick={load} disabled={loading}>
-                  <RefreshIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
           </Box>
         </CardContent>
       </Card>

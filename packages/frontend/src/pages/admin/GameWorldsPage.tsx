@@ -1021,14 +1021,6 @@ const GameWorldsPage: React.FC = () => {
                 )}
               />
             </Box>
-
-            <Tooltip title={t('common.refresh')}>
-              <span>
-                <IconButton onClick={loadGameWorlds} disabled={loading} sx={{ ml: 2 }}>
-                  <RefreshIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
           </Box>
         </CardContent>
       </Card>

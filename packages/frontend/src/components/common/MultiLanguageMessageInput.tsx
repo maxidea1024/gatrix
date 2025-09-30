@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import {
   Box,
   TextField,
@@ -51,13 +51,17 @@ export interface MultiLanguageMessageInputProps {
   paperSx?: any;
 }
 
+export interface MultiLanguageMessageInputRef {
+  focus: () => void;
+}
+
 const availableLanguages = [
   { code: 'ko' as const, label: '한국어' },
   { code: 'en' as const, label: 'English' },
   { code: 'zh' as const, label: '中文' }
 ];
 
-const MultiLanguageMessageInput: React.FC<MultiLanguageMessageInputProps> = ({
+const MultiLanguageMessageInput = forwardRef<MultiLanguageMessageInputRef, MultiLanguageMessageInputProps>(({
   defaultMessage,
   onDefaultMessageChange,
   defaultMessageLabel,
@@ -80,10 +84,18 @@ const MultiLanguageMessageInput: React.FC<MultiLanguageMessageInputProps> = ({
   
   sx,
   paperSx
-}) => {
+}, ref) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [isTranslating, setIsTranslating] = useState(false);
+  const defaultMessageRef = useRef<HTMLInputElement>(null);
+
+  // Expose focus method to parent
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      defaultMessageRef.current?.focus();
+    }
+  }));
 
   const handleTranslate = async () => {
     if (!defaultMessage || defaultMessage.trim().length === 0) {
@@ -148,6 +160,7 @@ const MultiLanguageMessageInput: React.FC<MultiLanguageMessageInputProps> = ({
           helperText={defaultMessageHelperText}
           required={defaultMessageRequired}
           error={defaultMessageError}
+          inputRef={defaultMessageRef}
         />
 
         {/* 언어별 메시지 사용 여부 및 번역 버튼 */}
@@ -227,6 +240,8 @@ const MultiLanguageMessageInput: React.FC<MultiLanguageMessageInputProps> = ({
       </Stack>
     </Box>
   );
-};
+});
+
+MultiLanguageMessageInput.displayName = 'MultiLanguageMessageInput';
 
 export default MultiLanguageMessageInput;

@@ -8,19 +8,28 @@ import {
   TextField,
   Chip,
   IconButton,
-  Tooltip
+  Tooltip,
+  Drawer,
+  Alert,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper
 } from '@mui/material';
 import {
   ContentCopy as CopyIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
-  Schedule as ScheduleIcon
+  Schedule as ScheduleIcon,
+  Close as CloseIcon,
+  Warning as WarningIcon
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import { Invitation } from '../../types/invitation';
 import { invitationService } from '../../services/invitationService';
-import ConfirmDeleteDialog from '../common/ConfirmDeleteDialog';
 
 interface InvitationStatusCardProps {
   invitation: Invitation;
@@ -35,7 +44,7 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const { t } = useTranslation();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteDrawerOpen, setDeleteDrawerOpen] = useState(false);
 
   const inviteUrl = invitationService.generateInviteUrl(invitation.token);
 
@@ -92,30 +101,20 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
   const isExpired = invitation.expiresAt ? new Date(invitation.expiresAt) <= new Date() : false;
 
   const handleDeleteClick = () => {
-    setDeleteDialogOpen(true);
+    setDeleteDrawerOpen(true);
   };
 
   const handleDeleteConfirm = () => {
-    setDeleteDialogOpen(false);
+    setDeleteDrawerOpen(false);
     onDelete();
   };
 
   const handleDeleteCancel = () => {
-    setDeleteDialogOpen(false);
+    setDeleteDrawerOpen(false);
   };
 
   return (
     <>
-      <ConfirmDeleteDialog
-        open={deleteDialogOpen}
-        onClose={handleDeleteCancel}
-        onConfirm={handleDeleteConfirm}
-        title={t('admin.invitations.deleteConfirmTitle')}
-        message={t('admin.invitations.deleteConfirmMessage')}
-        warning={t('admin.invitations.deleteConfirmWarning')}
-        confirmButtonText={t('admin.invitations.deleteConfirmButton')}
-        cancelButtonText={t('admin.invitations.cancelButton')}
-      />
     <Card
       sx={{
         mb: 1.5,
@@ -205,6 +204,140 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
         </Box>
       </CardContent>
     </Card>
+
+    {/* Delete Confirmation Drawer */}
+    <Drawer
+      anchor="right"
+      open={deleteDrawerOpen}
+      onClose={handleDeleteCancel}
+      sx={{
+        zIndex: 1301,
+        '& .MuiDrawer-paper': {
+          width: { xs: '100%', sm: 400 },
+          maxWidth: '100vw',
+        }
+      }}
+    >
+      {/* Header */}
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        p: 2,
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        bgcolor: 'background.paper'
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <WarningIcon color="error" />
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('admin.invitations.deleteConfirmTitle')}
+          </Typography>
+        </Box>
+        <IconButton
+          onClick={handleDeleteCancel}
+          size="small"
+          sx={{
+            '&:hover': {
+              backgroundColor: 'action.hover'
+            }
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </Box>
+
+      {/* Content */}
+      <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
+        <Typography variant="body1" sx={{ mb: 3, color: 'text.primary' }}>
+          {t('admin.invitations.deleteConfirmMessage')}
+        </Typography>
+
+        <Alert
+          severity="warning"
+          sx={{
+            mb: 3,
+            '& .MuiAlert-message': {
+              fontSize: '0.875rem'
+            }
+          }}
+        >
+          {t('admin.invitations.deleteConfirmWarning')}
+        </Alert>
+
+        {/* Invitation Details */}
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'medium' }}>
+            {t('admin.invitations.invitationDetails')}
+          </Typography>
+          <TableContainer component={Paper} variant="outlined">
+            <Table size="small">
+              <TableBody>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ fontWeight: 'medium', width: '40%' }}>
+                    {t('admin.invitations.email')}
+                  </TableCell>
+                  <TableCell>{invitation.email}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ fontWeight: 'medium' }}>
+                    {t('admin.invitations.createdAt')}
+                  </TableCell>
+                  <TableCell>{formatDate(invitation.createdAt)}</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ fontWeight: 'medium' }}>
+                    {t('admin.invitations.expiresAt')}
+                  </TableCell>
+                  <TableCell>
+                    {invitation.expiresAt ? formatDate(invitation.expiresAt) : t('admin.invitations.noExpiration')}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell component="th" scope="row" sx={{ fontWeight: 'medium' }}>
+                    {t('admin.invitations.status')}
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={isExpired ? t('admin.invitations.expired') : t('admin.invitations.active')}
+                      color={isExpired ? 'error' : 'success'}
+                      size="small"
+                      variant="outlined"
+                    />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Box>
+
+      {/* Actions */}
+      <Box sx={{
+        p: 2,
+        borderTop: '1px solid',
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+        display: 'flex',
+        gap: 1,
+        justifyContent: 'flex-end'
+      }}>
+        <Button
+          onClick={handleDeleteCancel}
+          variant="outlined"
+        >
+          {t('admin.invitations.cancelButton')}
+        </Button>
+        <Button
+          onClick={handleDeleteConfirm}
+          variant="contained"
+          color="error"
+          startIcon={<DeleteIcon />}
+        >
+          {t('admin.invitations.deleteConfirmButton')}
+        </Button>
+      </Box>
+    </Drawer>
     </>
   );
 };
