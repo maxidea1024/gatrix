@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useDebounce } from '../../hooks/useDebounce';
 import {
   Box,
   Typography,
@@ -71,6 +72,9 @@ const IpWhitelistTab: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState('');
 
+  // 디바운싱된 검색어 (500ms 지연)
+  const debouncedSearch = useDebounce(search, 500);
+
   // Menu state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedIpWhitelist, setSelectedIpWhitelist] = useState<IpWhitelist | null>(null);
@@ -103,7 +107,7 @@ const IpWhitelistTab: React.FC = () => {
     try {
       setLoading(true);
       const filters: any = {};
-      if (search) filters.search = search;
+      if (debouncedSearch) filters.search = debouncedSearch;
       const result = await IpWhitelistService.getIpWhitelists(page + 1, rowsPerPage, filters);
 
       if (result && typeof result === 'object' && Array.isArray(result.ipWhitelists)) {
@@ -122,7 +126,7 @@ const IpWhitelistTab: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, search, t, enqueueSnackbar]);
+  }, [page, rowsPerPage, debouncedSearch, t, enqueueSnackbar]);
 
   useEffect(() => {
     loadIpWhitelists();

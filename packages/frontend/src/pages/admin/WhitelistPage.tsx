@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useDebounce } from '../../hooks/useDebounce';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
@@ -116,6 +117,9 @@ const WhitelistPage: React.FC = () => {
   // Tab state
   const [currentTab, setCurrentTab] = useState(getInitialTab);
 
+  // 디바운싱된 검색어 (500ms 지연)
+  const debouncedSearch = useDebounce(pageState.filters?.search || '', 500);
+
 
   // State
   const [whitelists, setWhitelists] = useState<Whitelist[]>([]);
@@ -173,7 +177,7 @@ const WhitelistPage: React.FC = () => {
     try {
       setLoading(true);
       const filters: any = {};
-      if (pageState.filters?.search) filters.search = pageState.filters.search;
+      if (debouncedSearch) filters.search = debouncedSearch;
       const result = await WhitelistService.getWhitelists(pageState.page, pageState.limit, filters);
 
       console.log('Whitelist load result:', result);
@@ -200,7 +204,7 @@ const WhitelistPage: React.FC = () => {
 
   useEffect(() => {
     loadWhitelists();
-  }, [pageState.page, pageState.limit, pageState.filters]);
+  }, [pageState.page, pageState.limit, debouncedSearch]);
 
   // Update tab when URL changes (browser back/forward)
   useEffect(() => {

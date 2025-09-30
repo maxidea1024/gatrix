@@ -547,6 +547,7 @@
       "type": "유형",
       "availability": "사용 가능",
       "searchPlaceholder": "이름 또는 메시지로 검색...",
+      "searchPlaceholderDetailed": "템플릿 이름, 유형 또는 메시지 내용으로 검색...",
       "defaultMessage": "기본 메시지",
 
       "defaultMessageRequired": "기본 메시지는 필수입니다",

@@ -274,6 +274,7 @@
       "type": "类型",
       "availability": "可用性",
       "searchPlaceholder": "按名称或消息搜索...",
+      "searchPlaceholderDetailed": "按模板名称、类型或消息内容搜索...",
       "defaultMessageRequired": "默认消息是必需的",
       "defaultMessageHelp": "未指定特定语言时默认显示的消息",
       "defaultMessage": "默认消息",

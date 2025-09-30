@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useDebounce } from '../../hooks/useDebounce';
 import { usePageState } from '../../hooks/usePageState';
 import {
   Box,
@@ -94,6 +95,10 @@ const AuditLogsPage: React.FC = () => {
   const [userFilter, setUserFilter] = useState<string>(pageState.filters?.user || '');
   const [ipFilter, setIpFilter] = useState<string>(pageState.filters?.ip || '');
 
+  // 디바운싱된 검색어들 (500ms 지연)
+  const debouncedUserFilter = useDebounce(userFilter, 500);
+  const debouncedIpFilter = useDebounce(ipFilter, 500);
+
   // Load audit logs
   const loadAuditLogs = useCallback(async () => {
     try {
@@ -106,11 +111,11 @@ const AuditLogsPage: React.FC = () => {
       if (endDate) {
         dateFilters.end_date = endDate.toISOString();
       }
-      if (userFilter) {
-        (dateFilters as any).user = userFilter.trim();
+      if (debouncedUserFilter) {
+        (dateFilters as any).user = debouncedUserFilter.trim();
       }
-      if (ipFilter) {
-        (dateFilters as any).ip_address = ipFilter;
+      if (debouncedIpFilter) {
+        (dateFilters as any).ip_address = debouncedIpFilter;
       }
 
       const result = await AuditLogService.getAuditLogs(
@@ -134,7 +139,7 @@ const AuditLogsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [pageState, startDate, endDate, userFilter, ipFilter, enqueueSnackbar, t]);
+  }, [pageState, startDate, endDate, debouncedUserFilter, debouncedIpFilter, enqueueSnackbar, t]);
 
   useEffect(() => {
     loadAuditLogs();

@@ -636,6 +636,7 @@
       "type": "Type",
       "availability": "Availability",
       "searchPlaceholder": "Search by name or message...",
+      "searchPlaceholderDetailed": "Search by template name, type, or message content...",
       "defaultMessageRequired": "Default message is required",
       "defaultMessage": "Default Message",
 

@@ -32,7 +32,8 @@ import {
   Checkbox,
   Alert,
   Autocomplete,
-  Drawer
+  Drawer,
+  InputAdornment
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -43,7 +44,8 @@ import {
   Save as SaveIcon,
   Refresh as RefreshIcon,
   LocalOffer as LocalOfferIcon,
-  ContentCopy as ContentCopyIcon
+  ContentCopy as ContentCopyIcon,
+  Search as SearchIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -143,7 +145,7 @@ const MessageTemplatesPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, filters, enqueueSnackbar, t]);
+  }, [page, rowsPerPage, filters.type, filters.isEnabled, filters.tags, debouncedSearchQuery, enqueueSnackbar, t]);
 
   // 태그 로딩
   const loadTags = useCallback(async () => {
@@ -425,6 +427,24 @@ const MessageTemplatesPage: React.FC = () => {
         <CardContent>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+              {/* 검색 컨트롤을 맨 앞으로 이동하고 개선 */}
+              <TextField
+                placeholder={t('admin.messageTemplates.searchPlaceholderDetailed')}
+                size="small"
+                sx={{ minWidth: 300 }}
+                value={filters.q || ''}
+                onChange={(e) => handleFilterChange({ ...filters, q: e.target.value || undefined })}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+
               <FormControl size="small" sx={{ minWidth: 120 }}>
                 <InputLabel shrink={true}>{t('admin.messageTemplates.type')}</InputLabel>
                 <Select
@@ -479,15 +499,6 @@ const MessageTemplatesPage: React.FC = () => {
                   <MenuItem value="false">{t('common.unavailable')}</MenuItem>
                 </Select>
               </FormControl>
-
-              <TextField
-                label={t('common.search')}
-                placeholder={t('admin.messageTemplates.searchPlaceholder')}
-                size="small"
-                sx={{ minWidth: 200 }}
-                value={filters.q || ''}
-                onChange={(e) => handleFilterChange({ ...filters, q: e.target.value || undefined })}
-              />
 
               {/* 태그 필터 */}
               <Autocomplete
