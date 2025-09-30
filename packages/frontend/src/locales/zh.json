@@ -254,6 +254,7 @@
       "bulkActionFailed": "批量操作失败",
       "bulkDeleteConfirm": "确定要删除{{count}}个用户吗？",
       "deleteTargetUsers": "待删除用户",
+      "targetList": "目标用户",
       "bulkTagsHelperText": "选择要分配给用户的标签。留空将删除所选用户的所有标签。",
       "selectedUsers": "个用户已选择",
       "bulkStatusSubtitle": "批量更新所选用户的账户状态。您可以选择活跃、待审核或暂停状态应用到所有选定的用户。",

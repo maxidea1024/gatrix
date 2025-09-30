@@ -616,6 +616,7 @@
       "bulkActionFailed": "Bulk action failed",
       "bulkDeleteConfirm": "Are you sure you want to delete {{count}} users?",
       "deleteTargetUsers": "Users to be deleted",
+      "targetList": "Target users",
       "bulkTagsHelperText": "Select tags to assign to users. Leave empty to remove all tags from selected users.",
       "selectedUsers": "selected users",
       "bulkStatusSubtitle": "Bulk update the account status of selected users. You can choose from active, pending, or suspended status to apply to all selected users.",

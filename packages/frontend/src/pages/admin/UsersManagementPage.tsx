@@ -303,7 +303,10 @@ const UsersManagementPage: React.FC = () => {
 
   // 일괄 처리 핸들러
   const handleBulkAction = (actionType: 'status' | 'role' | 'tags' | 'emailVerified' | 'delete') => {
+    // 오픈 시 값 초기화 (이전에 선택한 값 유지 방지)
     setBulkActionType(actionType);
+    setBulkActionValue('');
+    setBulkActionTags([]);
     setBulkActionDialogOpen(true);
   };
 
@@ -2030,6 +2033,63 @@ const UsersManagementPage: React.FC = () => {
               />
             </Box>
           )}
+
+          {/* 공통 대상 미리보기 (삭제 외 액션에도 표시) */}
+          {bulkActionType !== 'delete' && selectedUsers.size > 0 && (
+            <Box sx={{ mt: 3 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'medium' }}>
+                {t('admin.users.targetList')}:
+              </Typography>
+              <Box sx={{
+                maxHeight: 300,
+                overflow: 'auto',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: 1,
+                bgcolor: 'background.paper'
+              }}>
+                {users
+                  .filter(user => selectedUsers.has(user.id))
+                  .map(user => (
+                    <Box
+                      key={user.id}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        p: 2,
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                        '&:last-child': { borderBottom: 0 }
+                      }}
+                    >
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                          {user.name}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {user.email}
+                        </Typography>
+                      </Box>
+                      <Chip
+                        label={t(`users.statuses.${user.status}`)}
+                        size="small"
+                        variant="outlined"
+                        sx={{ mr: 1 }}
+                      />
+                      <Chip
+                        label={t(`users.roles.${user.role}`)}
+                        size="small"
+                        color={user.role === 'admin' ? 'error' : 'default'}
+                        variant="outlined"
+                      />
+                    </Box>
+                  ))
+                }
+              </Box>
+            </Box>
+          )}
+
           {bulkActionType === 'delete' && (
             <Box sx={{ mt: 2 }}>
               <Typography sx={{ mb: 2, fontWeight: 'medium' }}>

@@ -137,15 +137,14 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Maintenance banner state
   const [maintenanceStatus, setMaintenanceStatus] = useState<{ active: boolean; detail: MaintenanceDetail | null }>({ active: false, detail: null });
 
-  // 점검 배너 높이 계산
+  // 점검 배너 높이 계산 (전체 높이의 70%로 축소)
   const bannerHeight = useMemo(() => {
     if (!maintenanceStatus.active) return 0;
 
-    // 기본 높이: 패딩(8px * 2) + 메인 텍스트 라인(24px) = 40px
-    // 시간 정보가 있을 때: 추가로 시간 텍스트 라인(18px) + 여백(4px) = 22px
     const baseHeight = 40;
     const hasTimeInfo = maintenanceStatus.detail?.startsAt || maintenanceStatus.detail?.endsAt;
-    return hasTimeInfo ? baseHeight + 22 : baseHeight;
+    const raw = hasTimeInfo ? baseHeight + 22 : baseHeight;
+    return Math.round(raw * 0.7);
   }, [maintenanceStatus.active, maintenanceStatus.detail?.startsAt, maintenanceStatus.detail?.endsAt]);
   // If SSE already updated the status, avoid overwriting with initial fetch result
   const maintenanceUpdatedBySSE = useRef(false);
@@ -441,7 +440,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* 사이드바에서는 로고 제거 - AppBar에만 표시 */}
 
-      <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+
 
       {/* 메뉴 영역 */}
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
@@ -887,7 +886,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           boxShadow: (theme) => theme.palette.mode === 'dark'
             ? '0 2px 8px rgba(211,47,47,0.3)'
             : '0 2px 8px rgba(255,77,79,0.2)',
-          zIndex: (theme) => theme.zIndex.drawer + 1,
+          zIndex: (theme) => theme.zIndex.appBar + 1,
           overflow: 'hidden',
           cursor: 'pointer',
           transition: 'all 0.3s ease',
@@ -1025,16 +1024,21 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               backgroundColor: '#1e293b',
               color: '#ffffff',
               borderRight: 'none',
-              transition: 'width 0.3s ease',
+              transition: 'width 220ms ease-out',
               position: 'relative',
               height: '100vh',
               display: 'flex',
               flexDirection: 'column',
+              overflow: 'hidden',
+              willChange: 'width',
+              backfaceVisibility: 'hidden',
+              transform: 'translateZ(0)'
             },
           }}
           open
         >
           {drawerContent}
+
           {/* 리사이즈 핸들 */}
           {!sidebarCollapsed && (
             <Box
@@ -1067,8 +1071,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             xs: 3,
             md: `${(sidebarCollapsed ? 64 : sidebarWidth) + 24}px`
           },
-          mt: `64px`, // AppBar height only (no banner)
-          minHeight: `calc(100vh - 64px)`,
+          mt: `${64 + bannerHeight}px`, // AppBar + dynamic banner height
+          minHeight: `calc(100vh - ${64 + bannerHeight}px)`,
           height: 'auto',
           backgroundColor: 'background.default',
           width: '100%',
@@ -1080,6 +1084,36 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           flexDirection: 'column',
         }}
       >
+
+      {/* 접힘 상태 전용: 화면 고정(FAB 스타일) 확장 버튼 */}
+      {sidebarCollapsed && (
+        <Tooltip title={t('common.expand')} placement="right" arrow>
+          <IconButton
+            onClick={handleSidebarToggle}
+            sx={{
+              position: 'fixed',
+              top: '50%',
+              left: 60, // 접힘 너비(64) 근처에 노출
+              transform: 'translateY(-50%)',
+              width: 40,
+              height: 40,
+              borderRadius: '50%',
+              bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.04)',
+              color: (theme) => theme.palette.mode === 'dark' ? '#e2e8f0' : '#334155',
+              border: '1px solid',
+              borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.15)',
+              boxShadow: 6,
+              zIndex: (theme) => theme.zIndex.drawer + 6,
+              '&:hover': {
+                bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.08)'
+              }
+            }}
+          >
+            <ChevronRightIcon />
+          </IconButton>
+        </Tooltip>
+      )}
+
         {/* Maintenance banner */}
 
 
