@@ -6,6 +6,15 @@
       "updated": "Maintenance settings updated"
     }
   },
+  "console": {
+    "title": "System Console",
+    "subtitle": "Run server commands, view outputs, and manage tasks",
+    "placeholder": "Type a command and press Enter",
+    "hint": "Example",
+    "run": "Run",
+    "backendError": "backend error: ",
+    "cannotExecute": "Cannot execute command."
+  },
   "accountSuspended": {
     "additionalInfo": "additionalInfo",
     "backToLogin": "backToLogin",
@@ -1246,6 +1255,7 @@
     "copied": "{{type}} \"{{value}}\" copied to clipboard",
     "typeToConfirm": "Type \"{{name}}\" to confirm deletion:",
     "copy": "Copy",
+    "paste": "Paste",
     "copyFailed": "Failed to copy to clipboard",
     "create": "Create",
     "createdAt": "Created At",

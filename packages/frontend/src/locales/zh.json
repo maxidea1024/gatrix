@@ -9,6 +9,15 @@
     "message": "您的账户已被暂停",
     "title": "账户已暂停"
   },
+  "console": {
+    "title": "系统控制台",
+    "subtitle": "运行服务器命令、查看输出并管理任务",
+    "placeholder": "输入命令并按 Enter",
+    "hint": "示例",
+    "run": "运行",
+    "backendError": "后端错误: ",
+    "cannotExecute": "无法执行命令。"
+  },
   "admin": {
     "dashboard": {
       "avgResponseTime": "平均响应时间",
@@ -1193,6 +1202,7 @@
     "copied": "{{type}} \"{{value}}\" 已复制到剪贴板",
     "typeToConfirm": "输入 \"{{name}}\" 确认删除：",
     "copy": "复制",
+    "paste": "粘贴",
     "copyFailed": "复制到剪贴板失败",
     "create": "创建",
     "createdAt": "创建时间",

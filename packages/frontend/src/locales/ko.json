@@ -6,6 +6,15 @@
       "updated": "점검 설정이 업데이트되었습니다"
     }
   },
+  "console": {
+    "title": "시스템 콘솔",
+    "subtitle": "서버 명령 실행 및 출력 확인",
+    "placeholder": "명령어를 입력하고 Enter를 누르세요",
+    "hint": "예시",
+    "run": "실행",
+    "backendError": "백엔드 오류: ",
+    "cannotExecute": "명령을 실행할 수 없습니다."
+  },
   "accountSuspended": {
     "additionalInfo": "추가 정보",
     "backToLogin": "로그인으로 돌아가기",
@@ -1355,6 +1364,7 @@
     "copied": "{{type}} \"{{value}}\"이(가) 클립보드에 복사되었습니다",
     "typeToConfirm": "삭제를 확인하려면 \"{{name}}\"을(를) 입력하세요:",
     "copy": "복사",
+    "paste": "붙여넣기",
     "copyFailed": "클립보드 복사에 실패했습니다",
     "create": "생성",
     "createSuccess": "성공적으로 생성되었습니다",

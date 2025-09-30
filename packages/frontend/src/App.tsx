@@ -73,6 +73,7 @@ import RemoteConfigDashboard from './pages/RemoteConfig/RemoteConfigParametersPa
 import ApiTokensPage from './pages/admin/ApiTokensPage';
 import CrashesPage from './pages/admin/CrashesPage';
 import ChatPage from './pages/chat/ChatPage';
+import SystemConsolePage from './pages/admin/SystemConsolePage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
 // Conditional Landing Page Component
@@ -257,6 +258,7 @@ const AppContent: React.FC = () => {
                         <Route path="remote-config-old" element={<RemoteConfigPage />} />
                         <Route path="remote-config/history" element={<RemoteConfigHistoryPage />} />
                         <Route path="api-tokens" element={<ApiTokensPage />} />
+                        <Route path="console" element={<SystemConsolePage />} />
                       </Routes>
                     </MainLayout>
                   </ProtectedRoute>

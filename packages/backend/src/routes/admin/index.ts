@@ -24,6 +24,7 @@ import jobRoutes from './jobs';
 import maintenanceRoutes from './maintenance';
 import invitationRoutes from './invitations';
 import crashRoutes from './crashes';
+import consoleRoutes from './console';
 
 const router = express.Router();
 
@@ -57,5 +58,6 @@ router.use('/jobs', jobRoutes);
 router.use('/maintenance', maintenanceRoutes);
 router.use('/invitations', invitationRoutes);
 router.use('/crashes', crashRoutes);
+router.use('/console', consoleRoutes);
 
 export default router;

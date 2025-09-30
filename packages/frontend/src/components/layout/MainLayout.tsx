@@ -61,6 +61,7 @@ import {
   Chat as ChatIcon,
   BugReport as BugReportIcon,
 
+  Terminal as TerminalIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -107,6 +108,11 @@ const adminMenuItems = [
     text: 'apiTokens.title',
     icon: <VpnKeyIcon />,
     path: '/admin/api-tokens'
+  },
+  {
+    text: 'console.title',
+    icon: <TerminalIcon />,
+    path: '/admin/console'
   },
 ];
 
