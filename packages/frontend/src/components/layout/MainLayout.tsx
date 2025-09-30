@@ -117,6 +117,7 @@ const settingsMenuItems = [
 
 export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
@@ -128,7 +129,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [isResizing, setIsResizing] = useState(false);
   const [avatarImageError, setAvatarImageError] = useState(false);
 
-  const navigate = useNavigate();
   const location = useLocation();
   const { user, logout, isAdmin } = useAuth();
   const { toggleTheme, mode, isDark } = useCustomTheme();
@@ -193,6 +193,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   const handleSidebarToggle = () => {
     setSidebarCollapsed(!sidebarCollapsed);
+  };
+
+  const handleMaintenanceBannerClick = () => {
+    navigate('/admin/maintenance');
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -741,7 +745,122 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       </AppBar>
       {/* Maintenance banner (full-width under AppBar) */}
       {maintenanceStatus.active && (
-        <Box sx={{
+        <Tooltip
+          title={
+            <Box sx={{ p: 1.5, minWidth: 300 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1.5, color: '#ff6b6b' }}>
+                🔧 {t('admin.maintenance.tooltipTitle')}
+              </Typography>
+
+              {/* 상태 */}
+              <Typography variant="body2" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+                <strong style={{ minWidth: '60px' }}>{t('admin.maintenance.tooltipStatus')}:</strong>
+                <Box component="span" sx={{
+                  ml: 1,
+                  px: 1,
+                  py: 0.25,
+                  borderRadius: 1,
+                  backgroundColor: maintenanceStatus.active ? '#ff6b6b' : '#ffa726',
+                  color: 'white',
+                  fontSize: '0.75rem',
+                  fontWeight: 'bold'
+                }}>
+                  {maintenanceStatus.active ? t('admin.maintenance.statusActive') : t('admin.maintenance.statusScheduled')}
+                </Box>
+              </Typography>
+
+              {/* 유형 */}
+              {maintenanceStatus.detail?.type && (
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  <strong style={{ minWidth: '60px' }}>{t('admin.maintenance.tooltipType')}:</strong> {(() => {
+                    switch (maintenanceStatus.detail.type) {
+                      case 'scheduled':
+                        return t('admin.maintenance.scheduledLabel');
+                      case 'emergency':
+                        return t('admin.maintenance.emergencyLabel');
+                      case 'regular':
+                        return t('admin.maintenance.regularLabel');
+                      default:
+                        return t('admin.maintenance.immediateStartLabel');
+                    }
+                  })()}
+                </Typography>
+              )}
+
+              {/* 시작 시간 */}
+              {maintenanceStatus.detail?.startsAt && (
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  <strong style={{ minWidth: '60px' }}>{t('admin.maintenance.tooltipStartTime')}:</strong> {formatDateTimeDetailed(maintenanceStatus.detail.startsAt)}
+                </Typography>
+              )}
+
+              {/* 종료 시간 */}
+              {maintenanceStatus.detail?.endsAt && (
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  <strong style={{ minWidth: '60px' }}>{t('admin.maintenance.tooltipEndTime')}:</strong> {formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}
+                </Typography>
+              )}
+
+              {/* 소요 시간 */}
+              {maintenanceStatus.detail?.startsAt && maintenanceStatus.detail?.endsAt && (
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  <strong style={{ minWidth: '60px' }}>{t('admin.maintenance.tooltipDuration')}:</strong> {
+                    (() => {
+                      const start = new Date(maintenanceStatus.detail.startsAt);
+                      const end = new Date(maintenanceStatus.detail.endsAt);
+                      const diffMs = end.getTime() - start.getTime();
+                      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                      const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+                      if (diffHours > 0) {
+                        return `${diffHours}${t('admin.maintenance.hoursUnit')} ${diffMinutes}${t('admin.maintenance.minutesUnit')}`;
+                      } else {
+                        return `${diffMinutes}${t('admin.maintenance.minutesUnit')}`;
+                      }
+                    })()
+                  }
+                </Typography>
+              )}
+
+              {/* 메시지 */}
+              {maintenanceStatus.detail?.message && (
+                <Typography variant="body2" sx={{ mb: 1.5 }}>
+                  <strong style={{ minWidth: '60px' }}>{t('admin.maintenance.tooltipMessage')}:</strong>
+                  <Box component="div" sx={{
+                    mt: 0.5,
+                    p: 1,
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: 1,
+                    fontStyle: 'italic',
+                    maxWidth: '250px',
+                    wordBreak: 'break-word'
+                  }}>
+                    {maintenanceStatus.detail.message}
+                  </Box>
+                </Typography>
+              )}
+
+              <Typography variant="caption" sx={{
+                fontStyle: 'italic',
+                opacity: 0.8,
+                display: 'flex',
+                alignItems: 'center',
+                mt: 1,
+                pt: 1,
+                borderTop: '1px solid rgba(255, 255, 255, 0.2)'
+              }}>
+                💡 {t('admin.maintenance.clickToManageTooltip')}
+              </Typography>
+            </Box>
+          }
+          arrow
+          placement="bottom"
+          enterDelay={500}
+          leaveDelay={200}
+        >
+          <Box
+            onClick={handleMaintenanceBannerClick}
+            sx={{
           position: 'fixed',
           top: '64px',
           left: 0,
@@ -765,19 +884,37 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           boxShadow: (theme) => theme.palette.mode === 'dark'
             ? '0 2px 8px rgba(211,47,47,0.3)'
             : '0 2px 8px rgba(255,77,79,0.2)',
-          zIndex: (theme) => theme.zIndex.drawer + 1
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          overflow: 'hidden',
+          cursor: 'pointer',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            backgroundColor: (theme) => theme.palette.mode === 'dark'
+              ? 'rgba(244, 67, 54, 0.95)'
+              : 'rgba(244, 67, 54, 0.9)',
+          },
+
+
         }}>
+
+
           {/* 한 줄로 정리된 점검 정보 */}
           <Box sx={{
             display: 'flex',
             alignItems: 'center',
             flexWrap: 'wrap',
             gap: 2,
-            fontSize: '0.875rem'
+            fontSize: '0.875rem',
+            position: 'relative',
+            zIndex: 3
           }}>
             {/* 점검 상태 */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="body2" sx={{ fontWeight: 700, fontSize: '0.875rem' }}>
+              <Typography variant="body2" sx={{
+                fontWeight: 700,
+                fontSize: '0.875rem',
+                textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
+              }}>
                 🔧 {t('common.maintenance.bannerActive')}
               </Typography>
               {maintenanceStatus.detail?.type && (
@@ -786,6 +923,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   backgroundColor: 'rgba(255,255,255,0.25)',
                   px: 1,
                   py: 0.25,
+                  textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
                   borderRadius: 0.5,
                   fontWeight: 600
                 }}>
@@ -796,7 +934,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
             {/* 점검 기간 */}
             {(maintenanceStatus.detail?.startsAt || maintenanceStatus.detail?.endsAt) && (
-              <Typography variant="body2" sx={{ fontSize: '0.8rem', opacity: 0.95 }}>
+              <Typography variant="body2" sx={{
+                fontSize: '0.8rem',
+                opacity: 0.95,
+                textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
+              }}>
                 📅 {(() => {
                   const start = maintenanceStatus.detail?.startsAt;
                   const end = maintenanceStatus.detail?.endsAt;
@@ -821,13 +963,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 maxWidth: '400px',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                position: 'relative',
+                zIndex: 3,
+                textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
               }}>
                 💬 {maintenanceStatus.detail.message}
               </Typography>
             )}
           </Box>
         </Box>
+        </Tooltip>
       )}
 
       {/* 사이드바 */}

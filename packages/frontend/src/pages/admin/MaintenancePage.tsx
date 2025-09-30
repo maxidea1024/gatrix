@@ -59,6 +59,7 @@ const MaintenancePage: React.FC = () => {
 
   const [endsAt, setEndsAt] = useState<Dayjs | null>(null);
   const [kickExistingPlayers, setKickExistingPlayers] = useState(false);
+  const [kickDelayMinutes, setKickDelayMinutes] = useState<number>(0); // 유예시간 (분)
 
   // Input mode
   const [inputMode, setInputMode] = useState<'direct'|'template'|''>('direct');
@@ -253,6 +254,7 @@ const MaintenancePage: React.FC = () => {
         startsAt: startsAt ? startsAt.toISOString() : null,
         endsAt: endsAt ? endsAt.toISOString() : null,
         kickExistingPlayers,
+        kickDelayMinutes: kickExistingPlayers ? kickDelayMinutes : undefined,
         message: tpl?.defaultMessage || undefined,
         messages: {
           ko: tpl?.locales?.find(l=>l.lang==='ko')?.message || undefined,
@@ -266,6 +268,7 @@ const MaintenancePage: React.FC = () => {
       startsAt: startsAt ? startsAt.toISOString() : null,
       endsAt: endsAt ? endsAt.toISOString() : null,
       kickExistingPlayers,
+      kickDelayMinutes: kickExistingPlayers ? kickDelayMinutes : undefined,
       message: baseMsg || undefined,
       messages: Object.fromEntries(locales.map(l => [l.lang, l.message])) as any,
     };
@@ -553,6 +556,29 @@ const MaintenancePage: React.FC = () => {
                     <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary', maxWidth: 500 }}>
                       {t('admin.maintenance.kickExistingPlayersHelp')}
                     </Typography>
+
+                    {/* Kick delay option */}
+                    {kickExistingPlayers && (
+                      <Box sx={{ mt: 2, width: 300 }}>
+                        <TextField
+                          select
+                          label={t('admin.maintenance.kickDelayMinutes')}
+                          value={kickDelayMinutes}
+                          onChange={(e) => setKickDelayMinutes(Number(e.target.value))}
+                          fullWidth
+                          size="small"
+                        >
+                          <MenuItem value={0}>{t('admin.maintenance.kickDelayImmediate')}</MenuItem>
+                          <MenuItem value={1}>{t('admin.maintenance.kickDelay1Min')}</MenuItem>
+                          <MenuItem value={5}>{t('admin.maintenance.kickDelay5Min')}</MenuItem>
+                          <MenuItem value={10}>{t('admin.maintenance.kickDelay10Min')}</MenuItem>
+                          <MenuItem value={30}>{t('admin.maintenance.kickDelay30Min')}</MenuItem>
+                        </TextField>
+                        <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
+                          {t('admin.maintenance.kickDelayHelp')}
+                        </Typography>
+                      </Box>
+                    )}
                   </Box>
 
                   {/* Input mode */}
@@ -894,24 +920,50 @@ const MaintenancePage: React.FC = () => {
                   )}
 
                   {confirmMode === 'start' && (
-                    <Box component="tr">
-                      <Box component="td" sx={{
-                        fontWeight: 500,
-                        fontSize: '0.875rem',
-                        width: '140px',
-                        verticalAlign: 'top',
-                        pr: 2
-                      }}>
-                        {t('admin.maintenance.kickExistingPlayers')}:
+                    <>
+                      <Box component="tr">
+                        <Box component="td" sx={{
+                          fontWeight: 500,
+                          fontSize: '0.875rem',
+                          width: '140px',
+                          verticalAlign: 'top',
+                          pr: 2
+                        }}>
+                          {t('admin.maintenance.kickExistingPlayers')}:
+                        </Box>
+                        <Box component="td" sx={{
+                          fontSize: '0.875rem',
+                          verticalAlign: 'top',
+                          color: kickExistingPlayers ? 'warning.main' : 'success.main'
+                        }}>
+                          {kickExistingPlayers ? t('common.yes') : t('common.no')}
+                        </Box>
                       </Box>
-                      <Box component="td" sx={{
-                        fontSize: '0.875rem',
-                        verticalAlign: 'top',
-                        color: kickExistingPlayers ? 'warning.main' : 'success.main'
-                      }}>
-                        {kickExistingPlayers ? t('common.yes') : t('common.no')}
-                      </Box>
-                    </Box>
+
+                      {kickExistingPlayers && (
+                        <Box component="tr">
+                          <Box component="td" sx={{
+                            fontWeight: 500,
+                            fontSize: '0.875rem',
+                            width: '140px',
+                            verticalAlign: 'top',
+                            pr: 2
+                          }}>
+                            {t('admin.maintenance.kickDelayMinutes')}:
+                          </Box>
+                          <Box component="td" sx={{
+                            fontSize: '0.875rem',
+                            verticalAlign: 'top',
+                            color: 'warning.main'
+                          }}>
+                            {kickDelayMinutes === 0
+                              ? t('admin.maintenance.kickDelayImmediate')
+                              : t('admin.maintenance.kickDelayMinutesValue', { minutes: kickDelayMinutes })
+                            }
+                          </Box>
+                        </Box>
+                      )}
+                    </>
                   )}
 
                   {(baseMsg || (inputMode === 'template' && selectedTpl?.defaultMessage)) && (

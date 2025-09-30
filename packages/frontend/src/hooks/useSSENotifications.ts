@@ -16,6 +16,7 @@ export interface SSEOptions {
   onDisconnect?: () => void;
   onError?: (error: Event) => void;
   onEvent?: (event: SSEEvent) => void;
+  skipInvitationNotifications?: boolean; // 초대링크 알림 스킵 옵션
 }
 
 export const useSSENotifications = (options: SSEOptions = {}) => {
@@ -29,6 +30,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
     onDisconnect,
     onError,
     onEvent,
+    skipInvitationNotifications = false,
   } = options;
 
   const [isConnected, setIsConnected] = useState(false);
@@ -248,6 +250,18 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
         // Handled by MainLayout via onEvent. We still acknowledge to avoid noisy logs.
         break;
 
+      case 'invitation_created':
+        if (!skipInvitationNotifications) {
+          handleInvitationCreated(event.data);
+        }
+        break;
+
+      case 'invitation_deleted':
+        if (!skipInvitationNotifications) {
+          handleInvitationDeleted(event.data);
+        }
+        break;
+
       default:
         break;
     }
@@ -282,6 +296,24 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
     const status = isActive ? 'activated' : 'deactivated';
     enqueueSnackbar(`Campaign ${campaignId} ${status} (${reason})`, { variant: 'info' });
   }, [enqueueSnackbar]);
+
+  // Handle invitation created notifications
+  const handleInvitationCreated = useCallback((data: any) => {
+    const { invitation } = data;
+    const message = invitation.email
+      ? t('admin.users.invitationCreatedForEmail', { email: invitation.email })
+      : t('admin.users.invitationCreated');
+    enqueueSnackbar(message, { variant: 'success' });
+  }, [enqueueSnackbar, t]);
+
+  // Handle invitation deleted notifications
+  const handleInvitationDeleted = useCallback((data: any) => {
+    const { invitation } = data;
+    const message = invitation.email
+      ? t('admin.users.invitationDeletedForEmail', { email: invitation.email })
+      : t('admin.users.invitationDeleted');
+    enqueueSnackbar(message, { variant: 'success' });
+  }, [enqueueSnackbar, t]);
 
   // Subscribe to channels
   const subscribe = useCallback(async (channels: string[]) => {

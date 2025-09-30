@@ -58,6 +58,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { useTheme } from '@mui/material/styles';
 import { tagService, Tag } from '../../services/tagService';
 import { 
   ClientVersion, 
@@ -75,7 +76,89 @@ import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 
-// 버전별 색상을 일관되게 생성하는 함수
+// HSV를 RGB로 변환하는 함수
+const hsvToRgb = (h: number, s: number, v: number): [number, number, number] => {
+  const c = v * s;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = v - c;
+
+  let r = 0, g = 0, b = 0;
+
+  if (0 <= h && h < 60) {
+    r = c; g = x; b = 0;
+  } else if (60 <= h && h < 120) {
+    r = x; g = c; b = 0;
+  } else if (120 <= h && h < 180) {
+    r = 0; g = c; b = x;
+  } else if (180 <= h && h < 240) {
+    r = 0; g = x; b = c;
+  } else if (240 <= h && h < 300) {
+    r = x; g = 0; b = c;
+  } else if (300 <= h && h < 360) {
+    r = c; g = 0; b = x;
+  }
+
+  return [
+    Math.round((r + m) * 255),
+    Math.round((g + m) * 255),
+    Math.round((b + m) * 255)
+  ];
+};
+
+// 버전별 색상을 HSV 기반으로 다양하게 생성하는 함수 (황금비 활용)
+const getVersionColorStyle = (version: string, isDarkMode: boolean = false): { backgroundColor: string; color: string } => {
+  // 개선된 해시 함수 (더 균등한 분포)
+  let hash = 0;
+  for (let i = 0; i < version.length; i++) {
+    const char = version.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // 32비트 정수로 변환
+  }
+
+  // 황금비(φ ≈ 0.618)를 활용한 색상 분포로 더 균등하고 아름다운 색상 생성
+  const goldenRatio = 0.618033988749;
+  const baseHue = (Math.abs(hash) * goldenRatio) % 1; // 0-1 사이 값
+  const hue = baseHue * 360; // 0-359도로 변환
+
+  // 해시의 다른 부분을 활용해 채도와 명도 변화
+  const saturationSeed = Math.abs(hash >> 8);
+  const valueSeed = Math.abs(hash >> 16);
+
+  // 다크모드에 따라 채도와 명도 조정
+  let saturation, value;
+  if (isDarkMode) {
+    // 다크모드: 선명하면서도 눈에 부담 없는 색상
+    saturation = 0.75 + (saturationSeed % 20) / 100; // 75-95% 채도
+    value = 0.65 + (valueSeed % 25) / 100; // 65-90% 명도
+  } else {
+    // 라이트모드: 밝고 깔끔한 색상
+    saturation = 0.70 + (saturationSeed % 25) / 100; // 70-95% 채도
+    value = 0.80 + (valueSeed % 15) / 100; // 80-95% 명도
+  }
+
+  // HSV를 RGB로 변환
+  const [r, g, b] = hsvToRgb(hue, saturation, value);
+
+  // 배경색 생성
+  const backgroundColor = `rgb(${r}, ${g}, ${b})`;
+
+  // WCAG 2.1 기준에 따른 더 정확한 대비 계산
+  const sRGB = [r, g, b].map(c => {
+    c = c / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  const luminance = 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2];
+
+  // 4.5:1 대비율을 위한 텍스트 색상 결정
+  const textColor = luminance > 0.179 ? '#000000' : '#ffffff';
+
+  return {
+    backgroundColor,
+    color: textColor
+  };
+};
+
+// 기존 MUI 색상 시스템과의 호환성을 위한 함수 (fallback용)
 const getVersionColor = (version: string): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
   // 간단한 해시 함수
   let hash = 0;
@@ -98,6 +181,7 @@ const getVersionColor = (version: string): 'default' | 'primary' | 'secondary' |
 const ClientVersionsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const theme = useTheme();
 
   // 페이지 상태 관리 (localStorage 연동)
   const {
@@ -1014,7 +1098,6 @@ const ClientVersionsPage: React.FC = () => {
                   <TableCell>
                     <Chip
                       label={clientVersion.clientVersion}
-                      color={getVersionColor(clientVersion.clientVersion)}
                       variant="filled"
                       size="small"
                       sx={{
@@ -1023,7 +1106,8 @@ const ClientVersionsPage: React.FC = () => {
                         borderRadius: '4px',
                         fontFamily: 'monospace',
                         fontWeight: 700,
-                        fontSize: '0.75rem'
+                        fontSize: '0.75rem',
+                        ...getVersionColorStyle(clientVersion.clientVersion, theme.palette.mode === 'dark')
                       }}
                     />
                   </TableCell>

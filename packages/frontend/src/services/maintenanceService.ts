@@ -21,7 +21,7 @@ export const maintenanceService = {
     const res = await apiService.get<{ isUnderMaintenance: boolean; detail: MaintenanceDetail | null }>(`/admin/maintenance/isUnderMaintenance`);
     return res.data as any;
   },
-  async setStatus(payload: { isMaintenance: boolean; type?: MaintenanceType; startsAt?: string | null; endsAt?: string | null; message?: string; messages?: MaintenanceDetail['messages'] }) {
+  async setStatus(payload: { isMaintenance: boolean; type?: MaintenanceType; startsAt?: string | null; endsAt?: string | null; kickExistingPlayers?: boolean; kickDelayMinutes?: number; message?: string; messages?: MaintenanceDetail['messages'] }) {
     return apiService.post(`/admin/maintenance`, payload);
   },
   async getTemplates(): Promise<{ templates: Array<{ message?: string; messages?: MaintenanceDetail['messages'] }> }> {

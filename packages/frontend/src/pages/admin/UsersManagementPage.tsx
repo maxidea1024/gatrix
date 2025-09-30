@@ -80,6 +80,7 @@ import InvitationForm from '../../components/admin/InvitationForm';
 import InvitationStatusCard from '../../components/admin/InvitationStatusCard';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useSSENotifications } from '../../hooks/useSSENotifications';
 
 interface UsersResponse {
   users: User[];
@@ -249,6 +250,17 @@ const UsersManagementPage: React.FC = () => {
   useEffect(() => {
     fetchUsers();
   }, [page, rowsPerPage, debouncedSearchTerm, statusFilter, roleFilter, tagFilter]);
+
+  // SSE 이벤트 처리 (알림 없이 데이터만 새로고침)
+  useSSENotifications({
+    onEvent: (event) => {
+      if (event.type === 'invitation_created' || event.type === 'invitation_deleted') {
+        // 초대링크 상태가 변경되면 현재 초대 정보를 다시 로드
+        loadCurrentInvitation();
+      }
+    },
+    skipInvitationNotifications: true // 이 페이지에서는 초대링크 알림 스킵
+  });
 
   // Load available tags
   useEffect(() => {

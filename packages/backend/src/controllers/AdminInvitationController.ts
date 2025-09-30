@@ -6,6 +6,7 @@ import { body, validationResult } from 'express-validator';
 import { UserModel } from '../models/User';
 import db from '../config/knex';
 import logger from '../config/logger';
+import { SSENotificationService } from '../services/sseNotificationService';
 
 export class AdminInvitationController {
   // 사용자 초대 생성
@@ -74,17 +75,37 @@ export class AdminInvitationController {
       isActive: true
     });
 
+    const invitationData = {
+      id: invitationId,
+      token,
+      email,
+      expiresAt: expiresAt.toISOString(),
+      createdAt: new Date().toISOString(),
+      createdBy: userId.toString(),
+      isActive: true
+    };
+
+    // SSE를 통한 실시간 전파
+    try {
+      const sseService = SSENotificationService.getInstance();
+      sseService.sendNotification({
+        type: 'invitation_created',
+        data: {
+          invitation: invitationData,
+          inviteUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/signup?invite=${token}`
+        },
+        targetChannels: ['admin'],
+        timestamp: new Date()
+      });
+      logger.info(`SSE notification sent for invitation creation: ${invitationId}`);
+    } catch (sseError) {
+      logger.error('Failed to send SSE notification for invitation creation:', sseError);
+      // SSE 실패해도 응답은 정상적으로 보냄
+    }
+
     res.status(201).json({
       success: true,
-      invitation: {
-        id: invitationId,
-        token,
-        email,
-        expiresAt: expiresAt.toISOString(),
-        createdAt: new Date().toISOString(),
-        createdBy: userId.toString(),
-        isActive: true
-      },
+      invitation: invitationData,
       inviteUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/signup?invite=${token}`,
       message: 'Invitation created successfully'
     });
@@ -178,6 +199,24 @@ export class AdminInvitationController {
       await db('g_invitations')
         .where('id', id)
         .del();
+
+      // SSE를 통한 실시간 전파
+      try {
+        const sseService = SSENotificationService.getInstance();
+        sseService.sendNotification({
+          type: 'invitation_deleted',
+          data: {
+            invitationId: id,
+            invitation: invitation
+          },
+          targetChannels: ['admin'],
+          timestamp: new Date()
+        });
+        logger.info(`SSE notification sent for invitation deletion: ${id}`);
+      } catch (sseError) {
+        logger.error('Failed to send SSE notification for invitation deletion:', sseError);
+        // SSE 실패해도 응답은 정상적으로 보냄
+      }
 
       res.json({
         success: true,
