@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { RemoteConfigModel } from '../models/RemoteConfig';
 import SegmentModel from '../models/Segment';
-import { RemoteConfigNotifications } from '../services/sseNotificationService';
+import { pubSubService } from '../services/PubSubService';
 import logger from '../config/logger';
 import { CustomError } from '../middleware/errorHandler';
 import db from '../config/knex';
@@ -111,8 +111,12 @@ export class RemoteConfigController {
 
       const config = await RemoteConfigModel.create(data);
 
-      // Send SSE notification
-      RemoteConfigNotifications.notifyConfigChange(config.id, 'created', config);
+      // Send notification via PubSub (multi-instance)
+      await pubSubService.publishNotification({
+        type: 'remote_config_change',
+        data: { configId: config.id, action: 'created', config },
+        targetChannels: ['remote_config', 'admin']
+      });
 
       res.status(201).json({
         success: true,
@@ -164,8 +168,12 @@ export class RemoteConfigController {
       // Version management removed - configs are now managed through template versions
       // Changes will be captured when publish is called
 
-      // Send SSE notification
-      RemoteConfigNotifications.notifyConfigChange(config.id, 'updated', config);
+      // Send notification via PubSub (multi-instance)
+      await pubSubService.publishNotification({
+        type: 'remote_config_change',
+        data: { configId: config.id, action: 'updated', config },
+        targetChannels: ['remote_config', 'admin']
+      });
 
       res.json({
         success: true,
@@ -195,8 +203,12 @@ export class RemoteConfigController {
 
       await RemoteConfigModel.delete(id);
 
-      // Send SSE notification
-      RemoteConfigNotifications.notifyConfigChange(id, 'deleted', { id, keyName: existing.keyName });
+      // Send notification via PubSub (multi-instance)
+      await pubSubService.publishNotification({
+        type: 'remote_config_change',
+        data: { configId: id, action: 'deleted', id, keyName: existing.keyName },
+        targetChannels: ['remote_config', 'admin']
+      });
 
       res.json({
         success: true,
@@ -601,8 +613,12 @@ export class RemoteConfigController {
         createdAt: new Date()
       });
 
-      // Send real-time notification
-      RemoteConfigNotifications.notifyConfigChange(template.id, 'updated', { templateName: 'default_template' });
+      // Send real-time notification via PubSub (multi-instance)
+      await pubSubService.publishNotification({
+        type: 'remote_config_change',
+        data: { configId: template.id, action: 'updated', templateName: 'default_template' },
+        targetChannels: ['remote_config', 'admin']
+      });
 
       res.json({
         success: true,
@@ -842,16 +858,20 @@ export class RemoteConfigController {
 
         logger.info(`Rollback completed: deployment ${deploymentId} rolled back by user ${userId}`);
 
-        // Send real-time notification
-        RemoteConfigNotifications.notifyConfigChange(
-          newDeploymentId,
-          'updated',
-          {
-            action: 'rollback',
-            targetDeploymentId: deploymentId,
-            deploymentName: targetDeployment.deploymentName
-          }
-        );
+        // Send real-time notification via PubSub (multi-instance)
+        await pubSubService.publishNotification({
+          type: 'remote_config_change',
+          data: {
+            configId: newDeploymentId,
+            action: 'updated',
+            details: {
+              action: 'rollback',
+              targetDeploymentId: deploymentId,
+              deploymentName: targetDeployment.deploymentName
+            }
+          },
+          targetChannels: ['remote_config', 'admin']
+        });
       });
 
       res.json({

@@ -20,6 +20,7 @@ import {
   MenuItem,
   Tooltip,
 } from '@mui/material';
+import { useSnackbar } from 'notistack';
 import {
   Dashboard as DashboardIcon,
   Widgets as WidgetsIcon,
@@ -133,9 +134,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const { user, logout, isAdmin } = useAuth();
   const { toggleTheme, mode, isDark } = useCustomTheme();
   const { t, i18n } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
 
   // Maintenance banner state
   const [maintenanceStatus, setMaintenanceStatus] = useState<{ active: boolean; detail: MaintenanceDetail | null }>({ active: false, detail: null });
+  const prevMaintenanceRef = useRef<{ active: boolean; updatedAt?: string | null } | null>(null);
 
   // 점검 배너 높이 계산 (전체 높이의 70%로 축소)
   const bannerHeight = useMemo(() => {
@@ -173,7 +176,23 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       if (event.type === 'maintenance_status_change') {
         const { isUnderMaintenance, detail } = event.data || {};
         maintenanceUpdatedBySSE.current = true;
-        setMaintenanceStatus({ active: !!isUnderMaintenance, detail: detail || null });
+
+        // Toast: started / stopped / updated
+        const prev = prevMaintenanceRef.current;
+        const nextActive = !!isUnderMaintenance;
+        const nextUpdatedAt = detail?.updatedAt || null;
+        if (prev) {
+          if (prev.active !== nextActive) {
+            enqueueSnackbar(nextActive ? t('notifications.maintenance.started') : t('notifications.maintenance.stopped'), {
+              variant: nextActive ? 'warning' : 'success'
+            });
+          } else if (nextActive && prev.updatedAt !== nextUpdatedAt) {
+            enqueueSnackbar(t('notifications.maintenance.updated'), { variant: 'info' });
+          }
+        }
+        prevMaintenanceRef.current = { active: nextActive, updatedAt: nextUpdatedAt };
+
+        setMaintenanceStatus({ active: nextActive, detail: detail || null });
       } else if (event.type === 'invitation_created' || event.type === 'invitation_deleted') {
         // 초대링크 이벤트를 다른 컴포넌트에 전달
         window.dispatchEvent(new CustomEvent('invitation-change', { detail: event }));
@@ -886,7 +905,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           boxShadow: (theme) => theme.palette.mode === 'dark'
             ? '0 2px 8px rgba(211,47,47,0.3)'
             : '0 2px 8px rgba(255,77,79,0.2)',
-          zIndex: (theme) => theme.zIndex.appBar + 1,
+          zIndex: (theme) => theme.zIndex.appBar,
           overflow: 'hidden',
           cursor: 'pointer',
           transition: 'all 0.3s ease',
@@ -988,7 +1007,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           position: 'fixed',
           top: `${64 + bannerHeight}px`, // AppBar + dynamic banner height
           height: `calc(100vh - ${64 + bannerHeight}px)`,
-          zIndex: (theme) => theme.zIndex.drawer,
+          zIndex: (theme) => theme.zIndex.appBar - 1,
         }}
       >
         {/* 모바일 드로어 */}
@@ -1007,6 +1026,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               backgroundColor: '#1e293b',
               color: '#ffffff',
               borderRight: 'none',
+              zIndex: (theme) => theme.zIndex.appBar - 1,
             },
           }}
         >
@@ -1032,7 +1052,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               overflow: 'hidden',
               willChange: 'width',
               backfaceVisibility: 'hidden',
-              transform: 'translateZ(0)'
+              transform: 'translateZ(0)',
+              zIndex: (theme) => theme.zIndex.appBar - 1,
             },
           }}
           open

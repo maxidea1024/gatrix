@@ -6,7 +6,7 @@ import { body, validationResult } from 'express-validator';
 import { UserModel } from '../models/User';
 import db from '../config/knex';
 import logger from '../config/logger';
-import { SSENotificationService } from '../services/sseNotificationService';
+import { pubSubService } from '../services/PubSubService';
 
 export class AdminInvitationController {
   // 사용자 초대 생성
@@ -85,10 +85,9 @@ export class AdminInvitationController {
       isActive: true
     };
 
-    // SSE를 통한 실시간 전파 (자신 제외)
+    // PubSub을 통해 모든 인스턴스가 수신 후 각자 SSE로 전파 (자신 제외)
     try {
-      const sseService = SSENotificationService.getInstance();
-      sseService.sendNotification({
+      await pubSubService.publishNotification({
         type: 'invitation_created',
         data: {
           invitation: invitationData,
@@ -96,12 +95,11 @@ export class AdminInvitationController {
         },
         targetChannels: ['admin'],
         excludeUsers: [req.user!.id], // 자신은 제외
-        timestamp: new Date()
       });
-      logger.info(`SSE notification sent for invitation creation: ${invitationId}`);
-    } catch (sseError) {
-      logger.error('Failed to send SSE notification for invitation creation:', sseError);
-      // SSE 실패해도 응답은 정상적으로 보냄
+      logger.info(`PubSub notification queued for invitation creation: ${invitationId}`);
+    } catch (err) {
+      logger.error('Failed to enqueue PubSub notification for invitation creation:', err);
+      // 실패해도 초대 생성 응답은 정상 반환
     }
 
     res.status(201).json({
@@ -201,10 +199,9 @@ export class AdminInvitationController {
         .where('id', id)
         .del();
 
-      // SSE를 통한 실시간 전파 (자신 제외)
+      // PubSub을 통해 모든 인스턴스가 수신 후 각자 SSE로 전파 (자신 제외)
       try {
-        const sseService = SSENotificationService.getInstance();
-        sseService.sendNotification({
+        await pubSubService.publishNotification({
           type: 'invitation_deleted',
           data: {
             invitationId: id,
@@ -212,12 +209,11 @@ export class AdminInvitationController {
           },
           targetChannels: ['admin'],
           excludeUsers: [req.user!.id], // 자신은 제외
-          timestamp: new Date()
         });
-        logger.info(`SSE notification sent for invitation deletion: ${id}`);
-      } catch (sseError) {
-        logger.error('Failed to send SSE notification for invitation deletion:', sseError);
-        // SSE 실패해도 응답은 정상적으로 보냄
+        logger.info(`PubSub notification queued for invitation deletion: ${id}`);
+      } catch (err) {
+        logger.error('Failed to enqueue PubSub notification for invitation deletion:', err);
+        // 실패해도 응답은 정상적으로 보냄
       }
 
       res.json({

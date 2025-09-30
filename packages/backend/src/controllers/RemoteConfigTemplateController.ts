@@ -5,7 +5,7 @@ import { RemoteConfigChangeRequest } from '../models/RemoteConfigChangeRequest';
 import { RemoteConfigTemplateVersion } from '../models/RemoteConfigTemplateVersion';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
-import { SSENotificationService } from '../services/sseNotificationService';
+import { pubSubService } from '../services/PubSubService';
 import logger from '../config/logger';
 
 export class RemoteConfigTemplateController {
@@ -116,9 +116,8 @@ export class RemoteConfigTemplateController {
           requestedBy: userId
         });
 
-        // Send notification
-        const sseService = SSENotificationService.getInstance();
-        sseService.sendNotification({
+        // Send notification via PubSub so all instances fan-out
+        await pubSubService.publishNotification({
           type: 'remote_config_approval_request',
           data: {
             templateId: template.id,
@@ -127,7 +126,6 @@ export class RemoteConfigTemplateController {
             requestType: 'create',
             requestedBy: userId
           },
-          timestamp: new Date(),
           targetChannels: ['remote_config_approvals', 'admin']
         });
       } else {
@@ -197,9 +195,8 @@ export class RemoteConfigTemplateController {
           requestedBy: userId
         });
 
-        // Send notification
-        const sseService = SSENotificationService.getInstance();
-        sseService.sendNotification({
+        // Send notification via PubSub so all instances fan-out
+        await pubSubService.publishNotification({
           type: 'remote_config_approval_request',
           data: {
             templateId: template.id,
@@ -208,7 +205,6 @@ export class RemoteConfigTemplateController {
             requestType: 'update',
             requestedBy: userId
           },
-          timestamp: new Date(),
           targetChannels: ['remote_config_approvals', 'admin']
         });
 
@@ -269,16 +265,14 @@ export class RemoteConfigTemplateController {
     try {
       const publishedTemplate = await template.publish(userId);
 
-      // Send notification
-      const sseService = SSENotificationService.getInstance();
-      sseService.sendNotification({
+      // Send notification via PubSub so all instances fan-out
+      await pubSubService.publishNotification({
         type: 'remote_config_published',
         data: {
           templateId: template.id,
           templateName: template.templateName,
           publishedBy: userId
         },
-        timestamp: new Date(),
         targetChannels: ['remote_config', 'admin']
       });
 

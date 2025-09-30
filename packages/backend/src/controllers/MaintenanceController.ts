@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import VarsModel from '../models/Vars';
-import SSENotificationService from '../services/sseNotificationService';
+import { pubSubService } from '../services/PubSubService';
 import logger from '../config/logger';
 
 export interface MaintenancePayload {
@@ -70,14 +70,13 @@ export class MaintenanceController {
 
       const isUnderMaintenance = computeActive(payload.isMaintenance ? 'true' : 'false', detail);
 
-      // Broadcast via SSE to admins and general channel
-      const sse = SSENotificationService.getInstance();
-      const sentCount = sse.sendNotification({
+      // Broadcast via PubSub so all instances fan-out to their SSE clients
+      await pubSubService.publishNotification({
         type: 'maintenance_status_change',
         data: { isUnderMaintenance, detail },
-        timestamp: new Date(),
         targetChannels: ['admin', 'general']
       });
+      const sentCount = 0; // fan-out happens asynchronously per instance
 
       logger.info(`Maintenance status change notification sent to ${sentCount} clients`, {
         isUnderMaintenance,

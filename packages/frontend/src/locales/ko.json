@@ -1,4 +1,11 @@
 {
+  "notifications": {
+    "maintenance": {
+      "started": "서비스 점검이 시작되었습니다",
+      "stopped": "서비스 점검이 종료되었습니다",
+      "updated": "점검 설정이 업데이트되었습니다"
+    }
+  },
   "accountSuspended": {
     "additionalInfo": "추가 정보",
     "backToLogin": "로그인으로 돌아가기",

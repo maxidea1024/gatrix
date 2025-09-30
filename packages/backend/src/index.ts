@@ -3,7 +3,7 @@ import { config } from './config';
 import logger from './config/logger';
 import database from './config/database';
 import redisClient from './config/redis';
-import { pubSubService } from './services/PubSubService';
+import { pubSubService, SSENotificationBusMessage } from './services/PubSubService';
 import { queueService } from './services/QueueService';
 import apiTokenUsageService from './services/ApiTokenUsageService';
 import { checkDatabaseTimezone, setDatabaseTimezoneToUTC } from './utils/dbTimezoneCheck';
@@ -11,6 +11,7 @@ import { appInstance } from './utils/AppInstance';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
 import { io as ioClient } from 'socket.io-client';
+import SSENotificationService from './services/sseNotificationService';
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error: Error) => {
@@ -104,6 +105,28 @@ const startServer = async () => {
       logger.info('PubSub service initialized successfully');
     } catch (error) {
       logger.warn('PubSub service initialization failed, continuing without PubSub:', error);
+    }
+
+    // Bridge PubSub SSE messages to local SSE service fan-out
+    try {
+      pubSubService.on('sse-notification', (msg: SSENotificationBusMessage) => {
+        try {
+          const sse = SSENotificationService.getInstance();
+          sse.sendNotification({
+            type: msg.type,
+            data: msg.data,
+            timestamp: new Date(msg.timestamp || Date.now()),
+            targetUsers: msg.targetUsers,
+            targetChannels: msg.targetChannels,
+            excludeUsers: msg.excludeUsers,
+          });
+        } catch (err) {
+          logger.error('Failed to fan-out SSE from PubSub message:', err);
+        }
+      });
+      logger.info('SSE PubSub bridge is set up');
+    } catch (error) {
+      logger.warn('Failed to set up SSE PubSub bridge:', error);
     }
 
     // Initialize Queue service

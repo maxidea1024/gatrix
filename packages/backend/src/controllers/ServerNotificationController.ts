@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import SSENotificationService from '../services/sseNotificationService';
+import { pubSubService } from '../services/PubSubService';
 import logger from '../config/logger';
 
 export interface ServerNotificationRequest extends Request {
@@ -37,7 +37,6 @@ class ServerNotificationController {
         });
       }
 
-      const sseService = SSENotificationService.getInstance();
 
       // 알림 데이터 구성
       const notificationData = {
@@ -56,8 +55,9 @@ class ServerNotificationController {
         targetUsers: [userId] // 특정 사용자에게만 전송
       };
 
-      // SSE를 통해 알림 전송
-      const sentCount = sseService.sendNotification(notificationData);
+      // PubSub을 통해 전 인스턴스에 전파 → 각 인스턴스가 자신의 SSE 클라이언트로 팬아웃
+      await pubSubService.publishNotification(notificationData);
+      const sentCount = 0; // fan-out은 비동기적으로 각 인스턴스에서 처리됨
 
       logger.info(`Notification sent to user ${userId}:`, {
         type,
@@ -123,7 +123,6 @@ class ServerNotificationController {
         });
       }
 
-      const sseService = SSENotificationService.getInstance();
 
       // 알림 데이터 구성
       const notificationData = {
@@ -141,8 +140,9 @@ class ServerNotificationController {
         targetUsers: userIds
       };
 
-      // SSE를 통해 알림 전송
-      const sentCount = sseService.sendNotification(notificationData);
+      // PubSub으로 전 인스턴스에 전파 → 각 인스턴스가 자신의 SSE 클라이언트로 팬아웃
+      await pubSubService.publishNotification(notificationData);
+      const sentCount = 0; // fan-out은 비동기적으로 각 인스턴스에서 처리됨
 
       logger.info(`Bulk notification sent to ${userIds.length} users:`, {
         type,

@@ -1,6 +1,8 @@
 import { Response } from 'express';
 import { EventEmitter } from 'events';
 import logger from '../config/logger';
+import { pubSubService } from './PubSubService';
+
 
 export interface SSEClient {
   id: string;
@@ -339,7 +341,7 @@ export class RemoteConfigNotifications {
   /**
    * Notify about config changes
    */
-  static notifyConfigChange(configId: number, action: 'created' | 'updated' | 'deleted' | 'campaign_started' | 'campaign_ended', config: any): void {
+  static async notifyConfigChange(configId: number, action: 'created' | 'updated' | 'deleted' | 'campaign_started' | 'campaign_ended', config: any): Promise<void> {
     const event: NotificationEvent = {
       type: 'remote_config_change',
       data: {
@@ -351,8 +353,8 @@ export class RemoteConfigNotifications {
       targetChannels: ['remote_config', 'admin'],
     };
 
-    const sentCount = this.sseService.sendNotification(event);
-    logger.info(`Remote config change notification sent to ${sentCount} clients`);
+    await pubSubService.publishNotification(event);
+    logger.info('Remote config change notification published via PubSub');
   }
 
   /**

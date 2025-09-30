@@ -1,4 +1,11 @@
 {
+  "notifications": {
+    "maintenance": {
+      "started": "Service maintenance started",
+      "stopped": "Service maintenance stopped",
+      "updated": "Maintenance settings updated"
+    }
+  },
   "accountSuspended": {
     "additionalInfo": "additionalInfo",
     "backToLogin": "backToLogin",

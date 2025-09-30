@@ -1,6 +1,6 @@
 import knex from '../config/knex';
 import logger from '../config/logger';
-import { RemoteConfigNotifications } from './sseNotificationService';
+import { pubSubService } from './PubSubService';
 import { QueueService } from './QueueService';
 
 export class CampaignScheduler {
@@ -157,12 +157,16 @@ export class CampaignScheduler {
         });
       });
 
-      // Send real-time notification
-      RemoteConfigNotifications.notifyConfigChange(
-        campaign.id, 
-        'campaign_started', 
-        { campaignName: campaign.campaignName }
-      );
+      // Send real-time notification via PubSub (multi-instance)
+      await pubSubService.publishNotification({
+        type: 'remote_config_change',
+        data: {
+          configId: campaign.id,
+          action: 'campaign_started',
+          campaignName: campaign.campaignName
+        },
+        targetChannels: ['remote_config', 'admin']
+      });
 
       logger.info(`Campaign started: ${campaign.campaignName} (ID: ${campaign.id})`);
     } catch (error) {
@@ -203,12 +207,16 @@ export class CampaignScheduler {
           .del();
       });
 
-      // Send real-time notification
-      RemoteConfigNotifications.notifyConfigChange(
-        campaign.id, 
-        'campaign_ended', 
-        { campaignName: campaign.campaignName }
-      );
+      // Send real-time notification via PubSub (multi-instance)
+      await pubSubService.publishNotification({
+        type: 'remote_config_change',
+        data: {
+          configId: campaign.id,
+          action: 'campaign_ended',
+          campaignName: campaign.campaignName
+        },
+        targetChannels: ['remote_config', 'admin']
+      });
 
       logger.info(`Campaign ended: ${campaign.campaignName} (ID: ${campaign.id})`);
     } catch (error) {

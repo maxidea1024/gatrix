@@ -2,6 +2,7 @@ import { Model } from 'objection';
 import { User } from './User';
 import { RemoteConfigTemplate, TemplateData } from './RemoteConfigTemplate';
 import { RemoteConfigEnvironment } from './RemoteConfigEnvironment';
+import { pubSubService } from '../services/PubSubService';
 
 export type ChangeRequestType = 'create' | 'update' | 'delete' | 'import';
 export type ChangeRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
@@ -286,9 +287,6 @@ export class RemoteConfigChangeRequest extends Model implements RemoteConfigChan
    * Send approval notification
    */
   async sendApprovalNotification(action: 'approved' | 'rejected'): Promise<void> {
-    const { SSENotificationService } = require('../services/sseNotificationService');
-    const sseService = SSENotificationService.getInstance();
-
     const notification = {
       type: 'remote_config_approval',
       data: {
@@ -300,12 +298,11 @@ export class RemoteConfigChangeRequest extends Model implements RemoteConfigChan
         approvedBy: this.approvedBy,
         rejectionReason: this.rejectionReason
       },
-      timestamp: new Date(),
       targetChannels: ['remote_config_approvals', 'admin'],
-      targetUsers: [this.requestedBy] // Notify the requester
+      targetUsers: [this.requestedBy]
     };
 
-    sseService.sendNotification(notification);
+    await pubSubService.publishNotification(notification);
   }
 
   /**
