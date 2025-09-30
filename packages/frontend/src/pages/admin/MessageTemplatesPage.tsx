@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
+import { useDebounce } from '../../hooks/useDebounce';
 import {
   Box,
   Card,
@@ -93,6 +94,9 @@ const MessageTemplatesPage: React.FC = () => {
     q?: string;
     tags?: string[];
   }>({});
+
+  // 디바운싱된 검색어 (500ms 지연)
+  const debouncedSearchQuery = useDebounce(filters.q || '', 500);
   const [tagFilter, setTagFilter] = useState<Tag[]>([]);
 
   // 선택 관련
@@ -123,6 +127,7 @@ const MessageTemplatesPage: React.FC = () => {
       const offset = page * rowsPerPage;
       const params = {
         ...filters,
+        q: debouncedSearchQuery || undefined, // 디바운싱된 검색어 사용
         limit: rowsPerPage,
         offset
       };

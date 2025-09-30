@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useDebounce } from '../../hooks/useDebounce';
 import {
   Box,
   Typography,
@@ -352,6 +353,9 @@ const GameWorldsPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [tagsFilter, setTagsFilter] = useState<Tag[]>([]);
 
+  // 디바운싱된 검색어 (500ms 지연)
+  const debouncedSearch = useDebounce(search, 500);
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingWorld, setEditingWorld] = useState<GameWorld | null>(null);
   const [formData, setFormData] = useState<CreateGameWorldData>({
@@ -504,7 +508,7 @@ const GameWorldsPage: React.FC = () => {
     };
 
 
-  }, [search, tagsFilter.map(t => t.id).join(','), allRegistryTags.length]);
+  }, [debouncedSearch, tagsFilter.map(t => t.id).join(','), allRegistryTags.length]);
 
 
   // Scroll moved row into view when worlds reload and highlight is set
@@ -544,7 +548,7 @@ const GameWorldsPage: React.FC = () => {
 
       const result = await gameWorldService.getGameWorlds({
         // 서버 컨트롤러는 tagIds(쉼표구분)를 기대함
-        search: search || undefined,
+        search: debouncedSearch || undefined,
         tagIds: tagIds.length ? tagIds.join(',') : undefined,
       });
 
