@@ -423,13 +423,11 @@ const SystemConsolePage: React.FC = () => {
     if (!term) return;
     // xterm v5+: setOption removed; use options/theme instead. Guard until opened.
     if (!term.element) return;
-    term.options = {
-      ...term.options,
-      theme: {
-        background: (theme.palette.background?.paper as any) || '#000000',
-        foreground: (theme.palette.text?.primary as any) || '#d1d5db',
-        cursor: (theme.palette.text?.secondary as any) || '#9ca3af',
-      } as any,
+    // Update only the theme to avoid touching read-only options like cols/rows
+    term.options.theme = {
+      background: (theme.palette.background?.paper as any) || '#000000',
+      foreground: (theme.palette.text?.primary as any) || '#d1d5db',
+      cursor: (theme.palette.text?.secondary as any) || '#9ca3af',
     } as any;
   }, [theme]);
 
