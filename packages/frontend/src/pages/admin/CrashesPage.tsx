@@ -483,7 +483,7 @@ const CrashesPage: React.FC = () => {
                       </TableCell>
                       <TableCell align="center">
                         <Chip
-                          label={t(`admin.crashes.states.${getStateName(crash.state).toLowerCase()}`)}
+                          label={t(`crashes.states.${getStateName(crash.state).toLowerCase()}`)}
                           size="small"
                           color={getStateChipColor(crash.state)}
                         />
