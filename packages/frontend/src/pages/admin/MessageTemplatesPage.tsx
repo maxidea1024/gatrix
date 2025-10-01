@@ -139,7 +139,7 @@ const MessageTemplatesPage: React.FC = () => {
       setItems(result.templates);
       setTotal(result.total);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('admin.messageTemplates.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(error.message || t('messageTemplates.loadFailed'), { variant: 'error' });
       setItems([]);
       setTotal(0);
     } finally {
@@ -223,14 +223,14 @@ const MessageTemplatesPage: React.FC = () => {
   const confirmBulkDelete = useCallback(async () => {
     try {
       await messageTemplateService.bulkDelete(selectedIds);
-      enqueueSnackbar(t('admin.messageTemplates.bulkDeleteSuccess', { count: selectedIds.length }), { variant: 'success' });
+      enqueueSnackbar(t('messageTemplates.bulkDeleteSuccess', { count: selectedIds.length }), { variant: 'success' });
       setSelectedIds([]);
       setSelectAll(false);
       setBulkDeleteDialogOpen(false);
       load();
     } catch (error: any) {
       console.error('Error bulk deleting templates:', error);
-      enqueueSnackbar(error.message || t('admin.messageTemplates.bulkDeleteFailed'), { variant: 'error' });
+      enqueueSnackbar(error.message || t('messageTemplates.bulkDeleteFailed'), { variant: 'error' });
     }
   }, [selectedIds, t, enqueueSnackbar, load]);
 
@@ -247,7 +247,7 @@ const MessageTemplatesPage: React.FC = () => {
       }));
 
       enqueueSnackbar(
-        t('admin.messageTemplates.bulkUpdateSuccess', {
+        t('messageTemplates.bulkUpdateSuccess', {
           count: selectedIds.length,
           status: isEnabled ? t('common.available') : t('common.unavailable')
         }),
@@ -258,7 +258,7 @@ const MessageTemplatesPage: React.FC = () => {
       load();
     } catch (error: any) {
       console.error('Error bulk updating templates:', error);
-      enqueueSnackbar(error.message || t('admin.messageTemplates.bulkUpdateFailed'), { variant: 'error' });
+      enqueueSnackbar(error.message || t('messageTemplates.bulkUpdateFailed'), { variant: 'error' });
     }
   }, [selectedIds, items, t, enqueueSnackbar, load]);
 
@@ -411,14 +411,14 @@ const MessageTemplatesPage: React.FC = () => {
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
           <Typography variant="h4" sx={{ fontWeight: 600 }}>
-            {t('admin.messageTemplates.title')}
+            {t('messageTemplates.title')}
           </Typography>
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-            {t('admin.messageTemplates.addTemplate')}
+            {t('messageTemplates.addTemplate')}
           </Button>
         </Box>
         <Typography variant="body1" color="text.secondary">
-          {t('admin.messageTemplates.subtitle')}
+          {t('messageTemplates.subtitle')}
         </Typography>
       </Box>
 
@@ -429,7 +429,7 @@ const MessageTemplatesPage: React.FC = () => {
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
               {/* 검색 컨트롤을 맨 앞으로 이동하고 개선 */}
               <TextField
-                placeholder={t('admin.messageTemplates.searchPlaceholderDetailed')}
+                placeholder={t('messageTemplates.searchPlaceholderDetailed')}
                 size="small"
                 sx={{ minWidth: 300 }}
                 value={filters.q || ''}
@@ -446,10 +446,10 @@ const MessageTemplatesPage: React.FC = () => {
               />
 
               <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel shrink={true}>{t('admin.messageTemplates.type')}</InputLabel>
+                <InputLabel shrink={true}>{t('messageTemplates.type')}</InputLabel>
                 <Select
                   value={filters.type || ''}
-                  label={t('admin.messageTemplates.type')}
+                  label={t('messageTemplates.type')}
                   onChange={(e) => handleFilterChange({ ...filters, type: e.target.value as MessageTemplateType || undefined })}
                   displayEmpty
                   size="small"
@@ -464,17 +464,17 @@ const MessageTemplatesPage: React.FC = () => {
                   <MenuItem value="">
                     <em>{t('common.all')}</em>
                   </MenuItem>
-                  <MenuItem value="maintenance">{t('admin.messageTemplates.types.maintenance')}</MenuItem>
-                  <MenuItem value="general">{t('admin.messageTemplates.types.general')}</MenuItem>
-                  <MenuItem value="notification">{t('admin.messageTemplates.types.notification')}</MenuItem>
+                  <MenuItem value="maintenance">{t('messageTemplates.types.maintenance')}</MenuItem>
+                  <MenuItem value="general">{t('messageTemplates.types.general')}</MenuItem>
+                  <MenuItem value="notification">{t('messageTemplates.types.notification')}</MenuItem>
                 </Select>
               </FormControl>
 
               <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel shrink={true}>{t('admin.messageTemplates.availability')}</InputLabel>
+                <InputLabel shrink={true}>{t('messageTemplates.availability')}</InputLabel>
                 <Select
                   value={filters.isEnabled?.toString() || ''}
-                  label={t('admin.messageTemplates.availability')}
+                  label={t('messageTemplates.availability')}
                   onChange={(e) => {
                     const value = e.target.value;
                     handleFilterChange({
@@ -560,7 +560,7 @@ const MessageTemplatesPage: React.FC = () => {
           <CardContent sx={{ py: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'space-between' }}>
               <Typography variant="body2" color="primary" sx={{ fontWeight: 500 }}>
-                {t('admin.messageTemplates.selectedCount', { count: selectedIds.length })}
+                {t('messageTemplates.selectedCount', { count: selectedIds.length })}
               </Typography>
               <Box sx={{ display: 'flex', gap: 1 }}>
                 <Button
@@ -569,7 +569,7 @@ const MessageTemplatesPage: React.FC = () => {
                   onClick={() => handleBulkToggleAvailability(true)}
                   sx={{ minWidth: 'auto' }}
                 >
-                  {t('admin.messageTemplates.makeAvailable')}
+                  {t('messageTemplates.makeAvailable')}
                 </Button>
                 <Button
                   size="small"
@@ -577,7 +577,7 @@ const MessageTemplatesPage: React.FC = () => {
                   onClick={() => handleBulkToggleAvailability(false)}
                   sx={{ minWidth: 'auto' }}
                 >
-                  {t('admin.messageTemplates.makeUnavailable')}
+                  {t('messageTemplates.makeUnavailable')}
                 </Button>
                 <Button
                   size="small"
@@ -608,8 +608,8 @@ const MessageTemplatesPage: React.FC = () => {
                     />
                   </TableCell>
                   <TableCell>{t('common.name')}</TableCell>
-                  <TableCell>{t('admin.messageTemplates.defaultMessage')}</TableCell>
-                  <TableCell>{t('admin.messageTemplates.availability')}</TableCell>
+                  <TableCell>{t('messageTemplates.defaultMessage')}</TableCell>
+                  <TableCell>{t('messageTemplates.availability')}</TableCell>
                   <TableCell>{t('common.updatedAt')}</TableCell>
                   <TableCell>{t('common.languages')}</TableCell>
                   <TableCell>{t('common.creator')}</TableCell>
@@ -622,14 +622,14 @@ const MessageTemplatesPage: React.FC = () => {
                   <EmptyTableRow
                     colSpan={9}
                     loading={loading}
-                    message={t('admin.messageTemplates.noTemplatesFound')}
+                    message={t('messageTemplates.noTemplatesFound')}
                     loadingMessage={t('common.loadingData')}
                   />
                 ) : (
                   items.map(row => {
                   const langs = (row.locales||[]).map(l=>l.lang);
                   const hasLocales = langs.length > 0;
-                  const langsLabel = hasLocales ? langs.join(', ') : t('admin.messageTemplates.onlyDefaultMessage');
+                  const langsLabel = hasLocales ? langs.join(', ') : t('messageTemplates.onlyDefaultMessage');
                   return (
                     <TableRow key={row.id} hover>
                       <TableCell padding="checkbox">
@@ -653,19 +653,19 @@ const MessageTemplatesPage: React.FC = () => {
                             <Typography variant="body2" sx={{ whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
                               {String((row as any).defaultMessage).replace(/\n/g, ' ')}
                             </Typography>
-                            <IconButton size="small" onClick={() => copyWithToast(String((row as any).defaultMessage), t('admin.messageTemplates.defaultMessage'), false)} sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}>
+                            <IconButton size="small" onClick={() => copyWithToast(String((row as any).defaultMessage), t('messageTemplates.defaultMessage'), false)} sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}>
                               <ContentCopyIcon fontSize="small" />
                             </IconButton>
                           </Box>
                         ) : (
                           <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                            {t('admin.messageTemplates.onlyDefaultMessage')}
+                            {t('messageTemplates.onlyDefaultMessage')}
                           </Typography>
                         )}
                       </TableCell>
                       <TableCell>{(row as any).isEnabled ? t('common.available') : t('common.unavailable')}</TableCell>
                       <TableCell>{formatDateTimeDetailed((row as any).updatedAt) || '-'}</TableCell>
-                      <TableCell>{hasLocales ? langs.map(c=>getLanguageDisplayName(c as any)).join(', ') : t('admin.messageTemplates.onlyDefaultMessage')}</TableCell>
+                      <TableCell>{hasLocales ? langs.map(c=>getLanguageDisplayName(c as any)).join(', ') : t('messageTemplates.onlyDefaultMessage')}</TableCell>
                       <TableCell>{(row as any).createdByName || '-'}</TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -753,12 +753,12 @@ const MessageTemplatesPage: React.FC = () => {
         }}>
           <Box>
             <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {editing ? t('admin.messageTemplates.editTitle') : t('admin.messageTemplates.addTitle')}
+              {editing ? t('messageTemplates.editTitle') : t('messageTemplates.addTitle')}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
               {editing
-                ? t('admin.messageTemplates.editDescription')
-                : t('admin.messageTemplates.addDescription')
+                ? t('messageTemplates.editDescription')
+                : t('messageTemplates.addDescription')
               }
             </Typography>
           </Box>
@@ -788,25 +788,25 @@ const MessageTemplatesPage: React.FC = () => {
             />
             <FormControlLabel
               control={<Switch checked={form.isEnabled} onChange={(e) => setForm(prev => ({ ...prev, isEnabled: e.target.checked }))} />}
-              label={t('admin.messageTemplates.availability')}
+              label={t('messageTemplates.availability')}
             />
             {/* 다국어 메시지 입력 컴포넌트 */}
             <MultiLanguageMessageInput
               defaultMessage={form.defaultMessage || ''}
               onDefaultMessageChange={(message) => setForm(prev => ({ ...prev, defaultMessage: message }))}
-              defaultMessageLabel={t('admin.messageTemplates.defaultMessage')}
-              defaultMessageHelperText={t('admin.messageTemplates.defaultMessageHelp')}
+              defaultMessageLabel={t('messageTemplates.defaultMessage')}
+              defaultMessageHelperText={t('messageTemplates.defaultMessageHelp')}
               defaultMessageRequired={true}
               defaultMessageError={false}
 
               supportsMultiLanguage={form.supportsMultiLanguage || false}
               onSupportsMultiLanguageChange={(supports) => setForm(prev => ({ ...prev, supportsMultiLanguage: supports }))}
-              supportsMultiLanguageLabel={t('admin.messageTemplates.supportsMultiLanguage')}
-              supportsMultiLanguageHelperText={t('admin.messageTemplates.supportsMultiLanguageHelp')}
+              supportsMultiLanguageLabel={t('messageTemplates.supportsMultiLanguage')}
+              supportsMultiLanguageHelperText={t('messageTemplates.supportsMultiLanguageHelp')}
 
               locales={(form.locales || []).map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
               onLocalesChange={(locales) => setForm(prev => ({ ...prev, locales: locales.map(l => ({ lang: l.lang, message: l.message })) }))}
-              languageSpecificMessagesLabel={t('admin.messageTemplates.languageSpecificMessages')}
+              languageSpecificMessagesLabel={t('messageTemplates.languageSpecificMessages')}
 
               enableTranslation={true}
               translateButtonLabel={t('common.autoTranslate')}
@@ -938,7 +938,7 @@ const MessageTemplatesPage: React.FC = () => {
         {/* Content */}
         <Box sx={{ flex: 1, p: 2 }}>
           <Typography>
-            {t('admin.messageTemplates.confirmDelete', { name: deletingTemplate?.name })}
+            {t('messageTemplates.confirmDelete', { name: deletingTemplate?.name })}
           </Typography>
         </Box>
 
@@ -1013,7 +1013,7 @@ const MessageTemplatesPage: React.FC = () => {
         {/* Content */}
         <Box sx={{ flex: 1, p: 2 }}>
           <Typography>
-            {t('admin.messageTemplates.confirmBulkDelete', { count: selectedIds.length })}
+            {t('messageTemplates.confirmBulkDelete', { count: selectedIds.length })}
           </Typography>
         </Box>
 

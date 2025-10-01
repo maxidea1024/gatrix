@@ -385,7 +385,7 @@ const SchedulerPage: React.FC = () => {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Box>
             <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-              {t('admin.scheduler.title')}
+              {t('scheduler.title')}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {t('scheduler.subtitle')}

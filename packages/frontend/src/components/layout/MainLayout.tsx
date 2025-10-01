@@ -87,16 +87,16 @@ const menuItems = [
 ];
 
 const adminMenuItems = [
-  { text: 'admin.users.title', icon: <SchoolIcon />, path: '/admin/users' },
+  { text: 'users.title', icon: <SchoolIcon />, path: '/admin/users' },
   { text: 'clientVersions.title', icon: <WidgetsIcon />, path: '/admin/client-versions' },
-  { text: 'admin.gameWorlds.title', icon: <LanguageIcon />, path: '/admin/game-worlds' },
-  { text: 'admin.maintenance.title', icon: <BuildIcon />, path: '/admin/maintenance' },
-  { text: 'admin.messageTemplates.title', icon: <TextIcon />, path: '/admin/maintenance-templates' },
-  { text: 'admin.scheduler.title', icon: <ScheduleIcon />, path: '/admin/scheduler' },
+  { text: 'gameWorlds.title', icon: <LanguageIcon />, path: '/admin/game-worlds' },
+  { text: 'maintenance.title', icon: <BuildIcon />, path: '/admin/maintenance' },
+  { text: 'messageTemplates.title', icon: <TextIcon />, path: '/admin/maintenance-templates' },
+  { text: 'scheduler.title', icon: <ScheduleIcon />, path: '/admin/scheduler' },
 
   { text: 'jobs.title', icon: <JobIcon />, path: '/admin/jobs' },
   { text: 'jobs.monitor', icon: <MonitorIcon />, path: '/admin/queue-monitor' },
-  { text: 'admin.whitelist.title', icon: <SecurityIcon />, path: '/admin/whitelist' },
+  { text: 'whitelist.title', icon: <SecurityIcon />, path: '/admin/whitelist' },
   { text: 'navigation.auditLogs', icon: <HistoryIcon />, path: '/admin/audit-logs' },
   { text: 'admin.crashes.title', icon: <BugReportIcon />, path: '/admin/crashes' },
   {

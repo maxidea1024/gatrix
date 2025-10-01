@@ -1620,7 +1620,7 @@ const ClientVersionsPage: React.FC = () => {
                       languageSpecificMessagesLabel={t('clientVersions.maintenance.languageSpecificMessages')}
                       enableTranslation={true}
                       translateButtonLabel={t('common.autoTranslate')}
-                      translateTooltip={t('admin.maintenance.autoTranslateTooltip')}
+                      translateTooltip={t('maintenance.translateTooltip')}
                     />
                   )}
                 </Stack>

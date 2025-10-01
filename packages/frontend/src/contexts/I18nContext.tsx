@@ -35,7 +35,7 @@ i18n
     fallbackLng: defaultLanguage,
     supportedLngs: supportedLanguages,
     debug: process.env.NODE_ENV === 'development',
-    
+
     detection: {
       order: ['localStorage', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
@@ -68,6 +68,28 @@ interface I18nProviderProps {
 export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const { t, i18n: i18nInstance } = useTranslation();
 
+
+  // Fallback mapping between legacy admin.* and root-level keys in both directions
+  const tWithFallback = (key: string, options?: any) => {
+    const val = t(key as any, options);
+
+    if (val === key && typeof key === 'string') {
+      // Case 1: admin.* → try root-level
+      if (key.startsWith('admin.')) {
+        const rootKey = key.replace(/^admin\./, '');
+        const alt = t(rootKey as any, options);
+        if (alt !== rootKey) return alt;
+      } else {
+        // Case 2: root-level → try admin.*
+        const adminKey = `admin.${key}`;
+        const alt2 = t(adminKey as any, options);
+        if (alt2 !== adminKey) return alt2;
+      }
+    }
+
+    return val;
+  };
+
   const changeLanguage = async (lang: Language) => {
     // 프론트엔드 언어 변경
     i18nInstance.changeLanguage(lang);
@@ -90,7 +112,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const value: I18nContextType = {
     language: i18nInstance.language as Language,
     changeLanguage,
-    t,
+    t: tWithFallback,
     isRTL,
     supportedLanguages,
   };

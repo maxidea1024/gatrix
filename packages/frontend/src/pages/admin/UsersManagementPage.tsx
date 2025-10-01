@@ -241,7 +241,7 @@ const UsersManagementPage: React.FC = () => {
       setUsers(response.data.users);
       setTotal(response.data.total);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('admin.users.fetchError'), { variant: 'error' });
+      enqueueSnackbar(error.message || t('users.fetchError'), { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -339,32 +339,32 @@ const UsersManagementPage: React.FC = () => {
             userIds,
             status: bulkActionValue
           });
-          enqueueSnackbar(t('admin.users.bulkStatusUpdated'), { variant: 'success' });
+          enqueueSnackbar(t('users.bulkStatusUpdated'), { variant: 'success' });
           break;
         case 'role':
           await apiService.post('/admin/users/bulk/role', {
             userIds,
             role: bulkActionValue
           });
-          enqueueSnackbar(t('admin.users.bulkRoleUpdated'), { variant: 'success' });
+          enqueueSnackbar(t('users.bulkRoleUpdated'), { variant: 'success' });
           break;
         case 'emailVerified':
           await apiService.post('/admin/users/bulk/email-verified', {
             userIds,
             emailVerified: bulkActionValue === 'true'
           });
-          enqueueSnackbar(t('admin.users.bulkEmailVerifiedUpdated'), { variant: 'success' });
+          enqueueSnackbar(t('users.bulkEmailVerifiedUpdated'), { variant: 'success' });
           break;
         case 'tags':
           await apiService.post('/admin/users/bulk/tags', {
             userIds,
             tagIds: bulkActionTags.map(tag => tag.id)
           });
-          enqueueSnackbar(t('admin.users.bulkTagsUpdated'), { variant: 'success' });
+          enqueueSnackbar(t('users.bulkTagsUpdated'), { variant: 'success' });
           break;
         case 'delete':
           await apiService.post('/admin/users/bulk/delete', { userIds });
-          enqueueSnackbar(t('admin.users.bulkDeleted'), { variant: 'success' });
+          enqueueSnackbar(t('users.bulkDeleted'), { variant: 'success' });
           break;
       }
 
@@ -374,7 +374,7 @@ const UsersManagementPage: React.FC = () => {
       setBulkActionValue('');
       setBulkActionTags([]);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('admin.users.bulkActionFailed'), { variant: 'error' });
+      enqueueSnackbar(error.message || t('users.bulkActionFailed'), { variant: 'error' });
     }
   };
 
@@ -518,10 +518,10 @@ const UsersManagementPage: React.FC = () => {
     };
 
     if (!editUserData.name.trim()) {
-      errors.name = t('admin.users.form.nameRequired');
+      errors.name = t('users.form.nameRequired');
     }
     if (!editUserData.email.trim()) {
-      errors.email = t('admin.users.form.emailRequired');
+      errors.email = t('users.form.emailRequired');
     }
 
     setEditUserErrors(errors);
@@ -552,12 +552,12 @@ const UsersManagementPage: React.FC = () => {
         await apiService.put(`/admin/users/${editUserDialog.user.id}`, updateData);
       }
 
-      enqueueSnackbar(t('admin.users.userUpdated'), { variant: 'success' });
+      enqueueSnackbar(t('users.userUpdated'), { variant: 'success' });
       fetchUsers();
       setEditUserDialog({ open: false, user: null });
     } catch (error: any) {
       // API 오류 응답에서 구체적인 메시지 추출
-      const errorMessage = error.error?.message || error.message || t('admin.users.updateError');
+      const errorMessage = error.error?.message || error.message || t('users.updateError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
@@ -565,7 +565,7 @@ const UsersManagementPage: React.FC = () => {
   const handleDeleteUser = (user: User) => {
     // Prevent deleting own account
     if (isCurrentUser(user)) {
-      enqueueSnackbar(t('admin.users.cannotModifyOwnAccount'), { variant: 'error' });
+      enqueueSnackbar(t('users.cannotModifyOwnAccount'), { variant: 'error' });
       return;
     }
 
@@ -596,7 +596,7 @@ const UsersManagementPage: React.FC = () => {
     try {
       setEmailVerificationLoading(true);
       await UserService.verifyUserEmail(userId);
-      enqueueSnackbar(t('admin.users.emailVerified'), { variant: 'success' });
+      enqueueSnackbar(t('users.emailVerified'), { variant: 'success' });
       fetchUsers();
       // 편집 폼이 열려있다면 데이터 업데이트
       if (editUserDialog.open && editUserDialog.user?.id === userId) {
@@ -606,7 +606,7 @@ const UsersManagementPage: React.FC = () => {
         }));
       }
     } catch (error: any) {
-      const errorMessage = error.message || t('admin.users.emailVerificationError');
+      const errorMessage = error.message || t('users.emailVerificationError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setEmailVerificationLoading(false);
@@ -618,9 +618,9 @@ const UsersManagementPage: React.FC = () => {
     try {
       setEmailVerificationLoading(true);
       await UserService.resendVerificationEmail(userId);
-      enqueueSnackbar(t('admin.users.verificationEmailSent'), { variant: 'success' });
+      enqueueSnackbar(t('users.verificationEmailSent'), { variant: 'success' });
     } catch (error: any) {
-      const errorMessage = error.message || t('admin.users.verificationEmailError');
+      const errorMessage = error.message || t('users.verificationEmailError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setEmailVerificationLoading(false);
@@ -675,13 +675,13 @@ const UsersManagementPage: React.FC = () => {
     };
 
     if (!newUserData.name.trim()) {
-      errors.name = t('admin.users.form.nameRequired');
+      errors.name = t('users.form.nameRequired');
     }
     if (!newUserData.email.trim()) {
-      errors.email = t('admin.users.form.emailRequired');
+      errors.email = t('users.form.emailRequired');
     }
     if (!newUserData.password.trim()) {
-      errors.password = t('admin.users.form.passwordRequired');
+      errors.password = t('users.form.passwordRequired');
     }
 
     setNewUserErrors(errors);
@@ -767,10 +767,10 @@ const UsersManagementPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-          {t('admin.users.title')}
+          {t('users.title')}
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          {t('admin.users.subtitle')}
+          {t('users.subtitle')}
         </Typography>
       </Box>
 
@@ -784,7 +784,7 @@ const UsersManagementPage: React.FC = () => {
                 <TextField
                   fullWidth
                   size="small"
-                  placeholder={t('admin.users.searchPlaceholder')}
+                  placeholder={t('users.searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   InputProps={{
@@ -798,10 +798,10 @@ const UsersManagementPage: React.FC = () => {
               </Grid>
               <Grid size={{ xs: 12, md: 2 }}>
                 <FormControl fullWidth size="small">
-                  <InputLabel shrink={true}>{t('admin.users.statusFilter')}</InputLabel>
+                  <InputLabel shrink={true}>{t('users.statusFilter')}</InputLabel>
                   <Select
                     value={statusFilter}
-                    label={t('admin.users.statusFilter')}
+                    label={t('users.statusFilter')}
                     onChange={(e) => setStatusFilter(e.target.value)}
                     displayEmpty
                     size="small"
@@ -824,10 +824,10 @@ const UsersManagementPage: React.FC = () => {
               </Grid>
               <Grid size={{ xs: 12, md: 2 }}>
                 <FormControl fullWidth size="small">
-                  <InputLabel shrink={true}>{t('admin.users.roleFilter')}</InputLabel>
+                  <InputLabel shrink={true}>{t('users.roleFilter')}</InputLabel>
                   <Select
                     value={roleFilter}
-                    label={t('admin.users.roleFilter')}
+                    label={t('users.roleFilter')}
                     onChange={(e) => setRoleFilter(e.target.value)}
                     displayEmpty
                     size="small"
@@ -881,7 +881,7 @@ const UsersManagementPage: React.FC = () => {
                     })
                   }
                   renderInput={(params) => (
-                    <TextField {...params} label={t('admin.users.tagFilter')} size="small" />
+                    <TextField {...params} label={t('users.tagFilter')} size="small" />
                   )}
                   renderOption={(props, option) => {
                     const { key, ...otherProps } = props;
@@ -907,7 +907,7 @@ const UsersManagementPage: React.FC = () => {
                 startIcon={<PersonAddIcon />}
                 onClick={handleAddUser}
               >
-                {t('admin.users.addUser')}
+                {t('users.addUser')}
               </Button>
               <Box sx={{
                 width: '1px',
@@ -921,7 +921,7 @@ const UsersManagementPage: React.FC = () => {
                 onClick={() => setInvitationDialogOpen(true)}
                 disabled={!!currentInvitation}
               >
-                {t('admin.invitations.createInvitation')}
+                {t('invitations.createInvitation')}
               </Button>
             </Box>
           </Box>
@@ -934,7 +934,7 @@ const UsersManagementPage: React.FC = () => {
           <CardContent sx={{ py: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'space-between' }}>
               <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                {selectedUsers.size} {t('admin.users.selectedUsers')}
+                {selectedUsers.size} {t('users.selectedUsers')}
               </Typography>
               <Box sx={{ display: 'flex', gap: 1 }}>
                 <Button
@@ -944,7 +944,7 @@ const UsersManagementPage: React.FC = () => {
                   onClick={() => handleBulkAction('status')}
                   startIcon={<PersonIcon />}
                 >
-                  {t('admin.users.bulkUpdateStatus')}
+                  {t('users.bulkUpdateStatus')}
                 </Button>
                 <Button
                   size="small"
@@ -953,7 +953,7 @@ const UsersManagementPage: React.FC = () => {
                   onClick={() => handleBulkAction('role')}
                   startIcon={<AdminIcon />}
                 >
-                  {t('admin.users.bulkUpdateRole')}
+                  {t('users.bulkUpdateRole')}
                 </Button>
                 <Button
                   size="small"
@@ -962,7 +962,7 @@ const UsersManagementPage: React.FC = () => {
                   onClick={() => handleBulkAction('emailVerified')}
                   startIcon={<CheckCircleIcon />}
                 >
-                  {t('admin.users.bulkVerifyEmail')}
+                  {t('users.bulkVerifyEmail')}
                 </Button>
                 <Button
                   size="small"
@@ -971,7 +971,7 @@ const UsersManagementPage: React.FC = () => {
                   onClick={() => handleBulkAction('tags')}
                   startIcon={<TagIcon />}
                 >
-                  {t('admin.users.bulkUpdateTags')}
+                  {t('users.bulkUpdateTags')}
                 </Button>
                 <Button
                   size="small"
@@ -980,7 +980,7 @@ const UsersManagementPage: React.FC = () => {
                   onClick={() => handleBulkAction('delete')}
                   startIcon={<DeleteIcon />}
                 >
-                  {t('admin.users.bulkDelete')}
+                  {t('users.bulkDelete')}
                 </Button>
               </Box>
             </Box>
@@ -1076,14 +1076,14 @@ const UsersManagementPage: React.FC = () => {
                     <TableCell align="center">
                       {user.emailVerified ? (
                         <Chip
-                          label={t('admin.users.verified')}
+                          label={t('users.verified')}
                           color="success"
                           size="small"
                           variant="outlined"
                         />
                       ) : (
                         <Chip
-                          label={t('admin.users.unverified')}
+                          label={t('users.unverified')}
                           color="warning"
                           size="small"
                           variant="outlined"
@@ -1255,13 +1255,13 @@ const UsersManagementPage: React.FC = () => {
               <ListItemIcon>
                 <VerifiedUserIcon />
               </ListItemIcon>
-              <ListItemText>{t('admin.users.verifyEmail')}</ListItemText>
+              <ListItemText>{t('users.verifyEmail')}</ListItemText>
             </MenuItem>
             <MenuItem onClick={() => handleMenuAction('resendVerification')}>
               <ListItemIcon>
                 <SendIcon />
               </ListItemIcon>
-              <ListItemText>{t('admin.users.resendVerification')}</ListItemText>
+              <ListItemText>{t('users.resendVerification')}</ListItemText>
             </MenuItem>
           </>
         )}
@@ -1307,10 +1307,10 @@ const UsersManagementPage: React.FC = () => {
         }}>
           <Box>
             <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {t('admin.users.addUserDialogTitle')}
+              {t('users.addUserDialogTitle')}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              {t('admin.users.addUserDialogDescription')}
+              {t('users.addUserDialogDescription')}
             </Typography>
           </Box>
           <IconButton
@@ -1343,7 +1343,7 @@ const UsersManagementPage: React.FC = () => {
                 placeholder=""
                 required
                 error={!!newUserErrors.name}
-                helperText={newUserErrors.name || t('admin.users.form.nameHelp')}
+                helperText={newUserErrors.name || t('users.form.nameHelp')}
                 autoFocus
               />
             </Box>
@@ -1358,7 +1358,7 @@ const UsersManagementPage: React.FC = () => {
                 placeholder=""
                 required
                 error={!!newUserErrors.email}
-                helperText={newUserErrors.email || t('admin.users.form.emailHelp')}
+                helperText={newUserErrors.email || t('users.form.emailHelp')}
               />
             </Box>
             <Box>
@@ -1372,7 +1372,7 @@ const UsersManagementPage: React.FC = () => {
                 placeholder=""
                 required
                 error={!!newUserErrors.password}
-                helperText={newUserErrors.password || t('admin.users.form.passwordHelp')}
+                helperText={newUserErrors.password || t('users.form.passwordHelp')}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -1380,7 +1380,7 @@ const UsersManagementPage: React.FC = () => {
                         onClick={() => setShowPassword(!showPassword)}
                         edge="end"
                         size="small"
-                        aria-label={showPassword ? t('admin.users.hidePassword') : t('admin.users.showPassword')}
+                        aria-label={showPassword ? t('users.hidePassword') : t('users.showPassword')}
                       >
                         {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                       </IconButton>
@@ -1483,7 +1483,7 @@ const UsersManagementPage: React.FC = () => {
             variant="contained"
             startIcon={<AddIcon />}
           >
-            {t('admin.users.addUser')}
+            {t('users.addUser')}
           </Button>
         </Box>
       </Drawer>
@@ -1586,7 +1586,7 @@ const UsersManagementPage: React.FC = () => {
           bgcolor: 'background.paper'
         }}>
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t('admin.users.deleteUser')}
+            {t('users.deleteUser')}
           </Typography>
           <IconButton
             onClick={() => setDeleteConfirmDialog({ open: false, user: null, inputValue: '' })}
@@ -1604,10 +1604,10 @@ const UsersManagementPage: React.FC = () => {
         {/* Content */}
         <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Alert severity="warning" sx={{ mb: 2 }}>
-            {t('admin.users.deleteConfirmation')}
+            {t('users.deleteConfirmation')}
           </Alert>
           <Typography variant="body2" sx={{ mb: 2 }}>
-            {t('admin.users.deleteConfirmationInput')}
+            {t('users.deleteConfirmationInput')}
             <strong> {deleteConfirmDialog.user?.email}</strong>
           </Typography>
           <TextField
@@ -1617,7 +1617,7 @@ const UsersManagementPage: React.FC = () => {
             onChange={(e) => setDeleteConfirmDialog(prev => ({ ...prev, inputValue: e.target.value }))}
             placeholder={deleteConfirmDialog.user?.email}
             error={deleteConfirmDialog.inputValue !== '' && deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email}
-            helperText={deleteConfirmDialog.inputValue !== '' && deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email ? t('admin.users.emailDoesNotMatch') : ''}
+            helperText={deleteConfirmDialog.inputValue !== '' && deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email ? t('users.emailDoesNotMatch') : ''}
           />
         </Box>
 
@@ -1680,10 +1680,10 @@ const UsersManagementPage: React.FC = () => {
         }}>
           <Box>
             <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {t('admin.users.editUserDialogTitle')}
+              {t('users.editUserDialogTitle')}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              {t('admin.users.editUserDialogDescription')}
+              {t('users.editUserDialogDescription')}
             </Typography>
           </Box>
           <IconButton
@@ -1709,7 +1709,7 @@ const UsersManagementPage: React.FC = () => {
                 onChange={(e) => setEditUserData({ ...editUserData, name: e.target.value })}
                 fullWidth
                 error={!!editUserErrors.name}
-                helperText={editUserErrors.name || t('admin.users.form.nameHelp')}
+                helperText={editUserErrors.name || t('users.form.nameHelp')}
                 autoFocus
               />
             </Box>
@@ -1721,7 +1721,7 @@ const UsersManagementPage: React.FC = () => {
                 fullWidth
                 disabled={editUserDialog.user && isCurrentUser(editUserDialog.user)}
                 error={!!editUserErrors.email}
-                helperText={editUserErrors.email || t('admin.users.form.emailHelp')}
+                helperText={editUserErrors.email || t('users.form.emailHelp')}
               />
             </Box>
 
@@ -1731,12 +1731,12 @@ const UsersManagementPage: React.FC = () => {
                 <EmailIcon color={editUserDialog.user.emailVerified ? 'success' : 'warning'} />
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="body2" fontWeight="medium">
-                    {t('admin.users.emailVerification')}
+                    {t('users.emailVerification')}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     {editUserDialog.user.emailVerified
-                      ? t('admin.users.emailVerified')
-                      : t('admin.users.emailNotVerified')
+                      ? t('users.emailVerified')
+                      : t('users.emailNotVerified')
                     }
                   </Typography>
                 </Box>
@@ -1749,7 +1749,7 @@ const UsersManagementPage: React.FC = () => {
                       disabled={emailVerificationLoading}
                       startIcon={emailVerificationLoading ? <CircularProgress size={16} /> : <VerifiedUserIcon />}
                     >
-                      {t('admin.users.verifyEmail')}
+                      {t('users.verifyEmail')}
                     </Button>
                     <Button
                       size="small"
@@ -1758,7 +1758,7 @@ const UsersManagementPage: React.FC = () => {
                       disabled={emailVerificationLoading}
                       startIcon={emailVerificationLoading ? <CircularProgress size={16} /> : <SendIcon />}
                     >
-                      {t('admin.users.resendVerification')}
+                      {t('users.resendVerification')}
                     </Button>
                   </Box>
                 )}
@@ -1854,7 +1854,7 @@ const UsersManagementPage: React.FC = () => {
             </Box>
             {editUserDialog.user && isCurrentUser(editUserDialog.user) && (
               <Alert severity="info">
-                {t('admin.users.canOnlyModifyOwnName')}
+                {t('users.canOnlyModifyOwnName')}
               </Alert>
             )}
           </Box>
@@ -1916,7 +1916,7 @@ const UsersManagementPage: React.FC = () => {
             mb: 1
           }}>
             <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {t(`admin.users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}`)} ({selectedUsers.size} {t('admin.users.selectedUsers')})
+              {t(`users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}`)} ({selectedUsers.size} {t('users.selectedUsers')})
             </Typography>
             <IconButton
               onClick={() => setBulkActionDialogOpen(false)}
@@ -1931,7 +1931,7 @@ const UsersManagementPage: React.FC = () => {
             </IconButton>
           </Box>
           <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
-            {t(`admin.users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}Subtitle`)}
+            {t(`users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}Subtitle`)}
           </Typography>
         </Box>
 
@@ -1972,8 +1972,8 @@ const UsersManagementPage: React.FC = () => {
                 label={t('users.emailVerified')}
                 onChange={(e) => setBulkActionValue(e.target.value)}
               >
-                <MenuItem value="true">{t('admin.users.verified')}</MenuItem>
-                <MenuItem value="false">{t('admin.users.unverified')}</MenuItem>
+                <MenuItem value="true">{t('users.verified')}</MenuItem>
+                <MenuItem value="false">{t('users.unverified')}</MenuItem>
               </Select>
             </FormControl>
           )}
@@ -2014,7 +2014,7 @@ const UsersManagementPage: React.FC = () => {
                   <TextField
                     {...params}
                     label={t('users.tags')}
-                    helperText={t('admin.users.bulkTagsHelperText')}
+                    helperText={t('users.bulkTagsHelperText')}
                   />
                 )}
                 renderOption={(props, option) => {
@@ -2038,7 +2038,7 @@ const UsersManagementPage: React.FC = () => {
           {bulkActionType !== 'delete' && selectedUsers.size > 0 && (
             <Box sx={{ mt: 3 }}>
               <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'medium' }}>
-                {t('admin.users.targetList')}:
+                {t('users.targetList')}:
               </Typography>
               <Box sx={{
                 maxHeight: 300,
@@ -2093,12 +2093,12 @@ const UsersManagementPage: React.FC = () => {
           {bulkActionType === 'delete' && (
             <Box sx={{ mt: 2 }}>
               <Typography sx={{ mb: 2, fontWeight: 'medium' }}>
-                {t('admin.users.bulkDeleteConfirm', { count: selectedUsers.size })}
+                {t('users.bulkDeleteConfirm', { count: selectedUsers.size })}
               </Typography>
 
               {/* 삭제 대상 사용자 목록 */}
               <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'medium' }}>
-                {t('admin.users.deleteTargetUsers')}:
+                {t('users.deleteTargetUsers')}:
               </Typography>
               <Box sx={{
                 maxHeight: 300,
@@ -2202,7 +2202,7 @@ const UsersManagementPage: React.FC = () => {
           bgcolor: 'background.paper'
         }}>
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t('admin.invitations.drawerTitle')}
+            {t('invitations.drawerTitle')}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <IconButton
