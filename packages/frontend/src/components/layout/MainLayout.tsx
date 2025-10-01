@@ -66,7 +66,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme as useCustomTheme } from '@/contexts/ThemeContext';
-import { useI18n } from '@/contexts/I18nContext';
+import { useTranslation } from 'react-i18next';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import TimezoneSelector from '../common/TimezoneSelector';
 import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceService';
@@ -87,20 +87,20 @@ const menuItems = [
 ];
 
 const adminMenuItems = [
-  { text: 'users.title', icon: <SchoolIcon />, path: '/admin/users' },
-  { text: 'clientVersions.title', icon: <WidgetsIcon />, path: '/admin/client-versions' },
-  { text: 'gameWorlds.title', icon: <LanguageIcon />, path: '/admin/game-worlds' },
-  { text: 'maintenance.title', icon: <BuildIcon />, path: '/admin/maintenance' },
-  { text: 'messageTemplates.title', icon: <TextIcon />, path: '/admin/maintenance-templates' },
-  { text: 'scheduler.title', icon: <ScheduleIcon />, path: '/admin/scheduler' },
+  { text: 'sidebar.userManagement', icon: <SchoolIcon />, path: '/admin/users' },
+  { text: 'sidebar.clientVersions', icon: <WidgetsIcon />, path: '/admin/client-versions' },
+  { text: 'sidebar.gameWorlds', icon: <LanguageIcon />, path: '/admin/game-worlds' },
+  { text: 'sidebar.maintenance', icon: <BuildIcon />, path: '/admin/maintenance' },
+  { text: 'sidebar.maintenanceTemplates', icon: <TextIcon />, path: '/admin/maintenance-templates' },
+  { text: 'sidebar.scheduler', icon: <ScheduleIcon />, path: '/admin/scheduler' },
 
   { text: 'jobs.title', icon: <JobIcon />, path: '/admin/jobs' },
   { text: 'jobs.monitor', icon: <MonitorIcon />, path: '/admin/queue-monitor' },
-  { text: 'whitelist.title', icon: <SecurityIcon />, path: '/admin/whitelist' },
+  { text: 'sidebar.whitelist', icon: <SecurityIcon />, path: '/admin/whitelist' },
   { text: 'navigation.auditLogs', icon: <HistoryIcon />, path: '/admin/audit-logs' },
-  { text: 'admin.crashes.title', icon: <BugReportIcon />, path: '/admin/crashes' },
+  { text: 'sidebar.crashes', icon: <BugReportIcon />, path: '/admin/crashes' },
   {
-    text: 'admin.remoteConfig.title',
+    text: 'remoteConfig.title',
     icon: <CloudSyncIcon />,
     path: '/admin/remote-config'
   },
@@ -113,7 +113,7 @@ const adminMenuItems = [
     text: 'console.title',
     icon: <TerminalIcon />,
     path: '/admin/console'
-  },
+  }
 ];
 
 const settingsMenuItems = [
@@ -139,7 +139,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const location = useLocation();
   const { user, logout, isAdmin } = useAuth();
   const { toggleTheme, mode, isDark } = useCustomTheme();
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
   // Maintenance banner state
@@ -776,12 +776,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           title={
             <Box sx={{ p: 1.5, minWidth: 300 }}>
               <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1.5, color: '#ff6b6b' }}>
-                🔧 {t('admin.maintenance.tooltipTitle')}
+                🔧 {t('maintenance.tooltipTitle')}
               </Typography>
 
               {/* 상태 */}
               <Typography variant="body2" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
-                <strong style={{ minWidth: '60px' }}>{t('admin.maintenance.tooltipStatus')}:</strong>
+                <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipStatus')}:</strong>
                 <Box component="span" sx={{
                   ml: 1,
                   px: 1,
@@ -792,23 +792,23 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   fontSize: '0.75rem',
                   fontWeight: 'bold'
                 }}>
-                  {maintenanceStatus.active ? t('admin.maintenance.statusActive') : t('admin.maintenance.statusScheduled')}
+                  {maintenanceStatus.active ? t('maintenance.statusActive') : t('maintenance.statusScheduled')}
                 </Box>
               </Typography>
 
               {/* 유형 */}
               {maintenanceStatus.detail?.type && (
                 <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong style={{ minWidth: '60px' }}>{t('admin.maintenance.tooltipType')}:</strong> {(() => {
+                  <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipType')}:</strong> {(() => {
                     switch (maintenanceStatus.detail.type) {
                       case 'scheduled':
-                        return t('admin.maintenance.scheduledLabel');
+                        return t('maintenance.scheduledLabel');
                       case 'emergency':
-                        return t('admin.maintenance.emergencyLabel');
+                        return t('maintenance.emergencyLabel');
                       case 'regular':
-                        return t('admin.maintenance.regularLabel');
+                        return t('maintenance.regularLabel');
                       default:
-                        return t('admin.maintenance.immediateStartLabel');
+                        return t('maintenance.immediateStartLabel');
                     }
                   })()}
                 </Typography>
@@ -817,21 +817,21 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               {/* 시작 시간 */}
               {maintenanceStatus.detail?.startsAt && (
                 <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong style={{ minWidth: '60px' }}>{t('admin.maintenance.tooltipStartTime')}:</strong> {formatDateTimeDetailed(maintenanceStatus.detail.startsAt)}
+                  <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipStartTime')}:</strong> {formatDateTimeDetailed(maintenanceStatus.detail.startsAt)}
                 </Typography>
               )}
 
               {/* 종료 시간 */}
               {maintenanceStatus.detail?.endsAt && (
                 <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong style={{ minWidth: '60px' }}>{t('admin.maintenance.tooltipEndTime')}:</strong> {formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}
+                  <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipEndTime')}:</strong> {formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}
                 </Typography>
               )}
 
               {/* 소요 시간 */}
               {maintenanceStatus.detail?.startsAt && maintenanceStatus.detail?.endsAt && (
                 <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong style={{ minWidth: '60px' }}>{t('admin.maintenance.tooltipDuration')}:</strong> {
+                  <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipDuration')}:</strong> {
                     (() => {
                       const start = new Date(maintenanceStatus.detail.startsAt);
                       const end = new Date(maintenanceStatus.detail.endsAt);
@@ -840,9 +840,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                       const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 
                       if (diffHours > 0) {
-                        return `${diffHours}${t('admin.maintenance.hoursUnit')} ${diffMinutes}${t('admin.maintenance.minutesUnit')}`;
+                        return `${diffHours}${t('maintenance.hoursUnit')} ${diffMinutes}${t('maintenance.minutesUnit')}`;
                       } else {
-                        return `${diffMinutes}${t('admin.maintenance.minutesUnit')}`;
+                        return `${diffMinutes}${t('maintenance.minutesUnit')}`;
                       }
                     })()
                   }
@@ -852,7 +852,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               {/* 메시지 */}
               {maintenanceStatus.detail?.message && (
                 <Typography variant="body2" sx={{ mb: 1.5 }}>
-                  <strong style={{ minWidth: '60px' }}>{t('admin.maintenance.tooltipMessage')}:</strong>
+                  <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipMessage')}:</strong>
                   <Box component="div" sx={{
                     mt: 0.5,
                     p: 1,
@@ -876,7 +876,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 pt: 1,
                 borderTop: '1px solid rgba(255, 255, 255, 0.2)'
               }}>
-                💡 {t('admin.maintenance.clickToManageTooltip')}
+                💡 {t('maintenance.clickToManageTooltip')}
               </Typography>
             </Box>
           }
@@ -954,7 +954,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   borderRadius: 0.5,
                   fontWeight: 600
                 }}>
-                  {t(`admin.maintenance.types.${maintenanceStatus.detail.type}`)}
+                  {t(`maintenance.types.${maintenanceStatus.detail.type}`)}
                 </Typography>
               )}
             </Box>
@@ -972,11 +972,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   if (start && end) {
                     return `${formatDateTimeDetailed(start)} ~ ${formatDateTimeDetailed(end)}`;
                   } else if (start) {
-                    return `${formatDateTimeDetailed(start)} ${t('admin.maintenance.start')}`;
+                    return `${formatDateTimeDetailed(start)} ${t('maintenance.start')}`;
                   } else if (end) {
-                    return `${formatDateTimeDetailed(end)} ${t('admin.maintenance.stop')}`;
+                    return `${formatDateTimeDetailed(end)} ${t('maintenance.stop')}`;
                   }
-                  return t('admin.maintenance.immediateStartLabel');
+                  return t('maintenance.immediateStartLabel');
                 })()}
               </Typography>
             )}

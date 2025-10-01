@@ -47,7 +47,7 @@ import {
   ContentCopy as ContentCopyIcon,
   Search as SearchIcon
 } from '@mui/icons-material';
-import { useI18n } from '@/contexts/I18nContext';
+import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { messageTemplateService, MessageTemplate, MessageTemplateLocale, MessageTemplateType } from '@/services/messageTemplateService';
@@ -62,7 +62,7 @@ import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/Mu
 
 
 const MessageTemplatesPage: React.FC = () => {
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [items, setItems] = useState<MessageTemplate[]>([]);
   const [total, setTotal] = useState(0);
@@ -431,7 +431,7 @@ const MessageTemplatesPage: React.FC = () => {
               <TextField
                 placeholder={t('messageTemplates.searchPlaceholderDetailed')}
                 size="small"
-                sx={{ minWidth: 300 }}
+                sx={{ minWidth: 500 }}
                 value={filters.q || ''}
                 onChange={(e) => handleFilterChange({ ...filters, q: e.target.value || undefined })}
                 slotProps={{

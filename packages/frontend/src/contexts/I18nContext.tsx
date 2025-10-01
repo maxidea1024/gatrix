@@ -71,29 +71,8 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const { t, i18n: i18nInstance } = useTranslation();
 
 
-  // Fallback mapping between legacy admin.* and root-level keys in both directions
-  const tWithFallback = (key: string, options?: any) => {
-    // Use the i18next instance directly to avoid any stale closures
-    const baseT = i18nInstance.t.bind(i18nInstance);
+  // Using i18next t directly (legacy admin.* fallback removed as requested)
 
-    let val = baseT(key as any, options);
-
-    if (val === key && typeof key === 'string') {
-      // Case 1: admin.* → try root-level
-      if (key.startsWith('admin.')) {
-        const rootKey = key.replace(/^admin\./, '');
-        const alt = baseT(rootKey as any, options);
-        if (alt !== rootKey) return alt;
-      } else {
-        // Case 2: root-level → try admin.*
-        const adminKey = `admin.${key}`;
-        const alt2 = baseT(adminKey as any, options);
-        if (alt2 !== adminKey) return alt2;
-      }
-    }
-
-    return val;
-  };
 
   const changeLanguage = async (lang: Language) => {
     // 프론트엔드 언어 변경
@@ -117,7 +96,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const value: I18nContextType = {
     language: i18nInstance.language as Language,
     changeLanguage,
-    t: tWithFallback,
+    t,
     isRTL,
     supportedLanguages,
   };

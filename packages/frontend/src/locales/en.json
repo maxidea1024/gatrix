@@ -22,18 +22,7 @@
     "message": "message",
     "title": "title"
   },
-  "admin": {
-    "dashboard": {
-      "avgResponseTime": "Average Response Time",
-      "errorRate": "Error Rate",
-      "recentActivities": "Recent Activities",
-      "serverUptime": "Server Uptime",
-      "subtitle": "Manage your admin panel and monitor system activity",
-      "systemPerformance": "System Performance",
-      "title": "Admin Dashboard",
-      "totalSessions": "Total Sessions"
-    },
-"crashes": {
+  "crashes": {
       "title": "Client Crashes",
       "subtitle": "Monitor, analyze, and manage client application crashes with detailed error tracking and statistics",
       "searchPlaceholder": "Search crashes...",
@@ -983,8 +972,8 @@
         "updated": "Whitelist entry updated successfully",
         "bulkCreated": "Bulk imported {{count}} whitelist entries"
       }
-    }
-  },
+    },
+
   "admindUrl": "admindUrl",
   "apiTokens": {
     "title": "API Access Tokens",
@@ -1811,7 +1800,10 @@
     "logout": "Logout",
     "navigation": "NAVIGATION",
     "profile": "Profile",
-    "settingsPanel": "SETTINGS PANEL"
+    "settingsPanel": "SETTINGS PANEL",
+    "systemStats": "System Statistics",
+    "settings": "Settings",
+    "crashes": "Client Crashes"
   },
   "signUpPrompt": {
     "backToLogin": "Back to Login",

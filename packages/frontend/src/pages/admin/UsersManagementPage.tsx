@@ -64,7 +64,7 @@ import {
   VisibilityOff as VisibilityOffIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
-import { useI18n } from '@/contexts/I18nContext';
+import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { User, Tag } from '@/types';
 import { apiService } from '@/services/api';
@@ -91,7 +91,7 @@ interface UsersResponse {
 }
 
 const UsersManagementPage: React.FC = () => {
-  const { t } = useI18n();
+  const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { user: currentUser, isLoading: authLoading } = useAuth();
 

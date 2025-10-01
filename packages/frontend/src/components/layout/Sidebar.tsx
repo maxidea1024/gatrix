@@ -45,83 +45,58 @@ const getNavigationItems = (isAdmin: boolean): NavItem[] => {
   const baseItems: NavItem[] = [
     {
       id: 'dashboard',
-      label: 'Dashboard',
+      label: 'sidebar.dashboard',
       icon: 'Dashboard',
       path: '/dashboard',
     },
     {
       id: 'chat',
-      label: 'Chat',
+      label: 'sidebar.chat',
       icon: 'Chat',
       path: '/chat',
     },
-    // 임시: 파일이 제대로 로드되는지 테스트
-    {
-      id: 'test-menu',
-      label: '🔥🔥🔥 TEST MENU 🔥🔥🔥',
-      icon: 'CloudSync',
-      path: '/test',
-    },
-    // 임시: Remote Config를 baseItems에 강제 추가 (테스트용)
-    {
-      id: 'remote-config-forced',
-      label: 'Remote Config (Forced)',
-      icon: 'CloudSync',
-      children: [
-        {
-          id: 'remote-config-main-forced',
-          label: '리모트 설정 (Forced)',
-          icon: 'Settings',
-          path: '/admin/remote-config',
-        },
-        {
-          id: 'remote-config-history-forced',
-          label: '리모트 설정 히스토리 (Forced)',
-          icon: 'History',
-          path: '/admin/remote-config/history',
-        },
-      ],
-    },
+
+
   ];
 
   const adminItems: NavItem[] = [
     {
       id: 'users',
-      label: 'User Management',
+      label: 'users.title',
       icon: 'People',
       path: '/users',
       roles: ['admin'],
     },
     {
       id: 'audit-logs',
-      label: 'Audit Logs',
+      label: 'navigation.auditLogs',
       icon: 'Security',
       path: '/admin/audit-logs',
       roles: ['admin'],
     },
     {
       id: 'crashes',
-      label: 'Client Crashes',
+      label: 'crashes.title',
       icon: 'BugReport',
       path: '/admin/crashes',
       roles: ['admin'],
     },
     {
       id: 'admin',
-      label: 'Administration',
+      label: 'navigation.administration',
       icon: 'AdminPanelSettings',
       roles: ['admin'],
       children: [
         {
           id: 'system-stats',
-          label: 'System Statistics',
+          label: 'sidebar.systemStats',
           icon: 'Assessment',
           path: '/admin/stats',
           roles: ['admin'],
         },
         {
           id: 'api-tokens',
-          label: 'API Access Tokens',
+          label: 'apiTokens.title',
           icon: 'VpnKey',
           path: '/admin/api-tokens',
           roles: ['admin'],
@@ -130,29 +105,14 @@ const getNavigationItems = (isAdmin: boolean): NavItem[] => {
     },
     {
       id: 'remote-config',
-      label: 'Remote Config',
+      label: 'remoteConfig.title',
       icon: 'CloudSync',
+      path: '/admin/remote-config',
       roles: ['admin'],
-      children: [
-        {
-          id: 'remote-config-main',
-          label: '리모트 설정',
-          icon: 'Settings',
-          path: '/admin/remote-config',
-          roles: ['admin'],
-        },
-        {
-          id: 'remote-config-history',
-          label: '리모트 설정 히스토리',
-          icon: 'History',
-          path: '/admin/remote-config/history',
-          roles: ['admin'],
-        },
-      ],
     },
     {
       id: 'settings',
-      label: 'Settings',
+      label: 'sidebar.settings',
       icon: 'Settings',
       path: '/settings',
       roles: ['admin'],
@@ -263,7 +223,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
               {iconMap[item.icon || 'Dashboard']}
             </ListItemIcon>
             <ListItemText
-              primary={item.id === 'crashes' ? t('admin.crashes.title') : item.label}
+              primary={t(item.label)}
               primaryTypographyProps={{
                 fontSize: '0.875rem',
                 fontWeight: isActive ? 600 : 400,
@@ -292,7 +252,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <AdminPanelSettings color="primary" />
           <Typography variant="h6" noWrap component="div">
-            Admin Panel
+            {t('sidebar.adminPanel')}
           </Typography>
         </Box>
       </Toolbar>
@@ -310,7 +270,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
           <Divider />
           <Box sx={{ p: 2 }}>
             <Typography variant="caption" color="text.secondary">
-              Logged in as
+              {t('common.loggedInAs')}
             </Typography>
             <Typography variant="body2" fontWeight={500}>
               {user.name}
@@ -425,7 +385,7 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
               {iconMap[item.icon || 'Dashboard']}
             </ListItemIcon>
             <ListItemText
-              primary={item.id === 'crashes' ? t('admin.crashes.title') : item.label}
+              primary={t(item.label)}
               primaryTypographyProps={{
                 fontSize: '0.875rem',
                 fontWeight: isActive ? 600 : 400,
@@ -463,7 +423,7 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <AdminPanelSettings color="primary" />
           <Typography variant="h6" noWrap component="div">
-            Admin Panel
+            {t('sidebar.adminPanel')}
           </Typography>
         </Box>
       </Toolbar>
@@ -481,7 +441,7 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
           <Divider />
           <Box sx={{ p: 2 }}>
             <Typography variant="caption" color="text.secondary">
-              Logged in as
+              {t('common.loggedInAs')}
             </Typography>
             <Typography variant="body2" fontWeight={500}>
               {user.name}

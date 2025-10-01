@@ -18,7 +18,7 @@
     "backendError": "后端错误: ",
     "cannotExecute": "无法执行命令。"
   },
-  "admin": {
+
     "dashboard": {
       "avgResponseTime": "平均响应时间",
       "errorRate": "错误率",
@@ -917,8 +917,9 @@
         "confirmOpen": "确定要将此崩溃标记为开放吗？",
         "confirmDelete": "确定要将此崩溃标记为已删除吗？"
       }
-    }
-  },
+    },
+
+
   "admindUrl": "管理员URL",
   "apiTokens": {
     "title": "API 访问令牌",
@@ -1532,8 +1533,8 @@
     "suspended": "已暂停",
     "maintenance": {
       "bannerActive": "服务当前处于维护中"
-    }
-  },
+    },
+
   "createdAt": "创建时间",
   "dashboard": {
     "accountCreated": "账户创建",
@@ -1739,7 +1740,10 @@
     "logout": "退出登录",
     "navigation": "导航",
     "profile": "个人资料",
-    "settingsPanel": "设置面板"
+    "settingsPanel": "设置面板",
+    "systemStats": "系统统计",
+    "settings": "设置",
+    "crashes": "客户端崩溃"
   },
   "signUpPrompt": {
     "backToLogin": "返回登录",
@@ -2139,4 +2143,5 @@
     "invitationCancelFailed": "取消邀请失败",
     "addReaction": "添加反应"
   }
+}
 }
