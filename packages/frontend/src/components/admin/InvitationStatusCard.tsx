@@ -59,13 +59,13 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
   };
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return t('admin.invitations.invalidDate');
+    if (!dateString) return t('invitations.invalidDate');
 
     const date = new Date(dateString);
 
     // 유효한 날짜인지 확인
     if (isNaN(date.getTime())) {
-      return t('admin.invitations.invalidDate');
+      return t('invitations.invalidDate');
     }
 
     return date.toLocaleDateString('ko-KR', {
@@ -76,25 +76,25 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
   };
 
   const getTimeUntilExpiration = () => {
-    if (!invitation.expiresAt) return t('admin.invitations.noExpiration');
+    if (!invitation.expiresAt) return t('invitations.noExpiration');
 
     const now = new Date();
     const expiresAt = new Date(invitation.expiresAt);
 
     // 유효한 날짜인지 확인
     if (isNaN(expiresAt.getTime())) {
-      return t('admin.invitations.invalidDate');
+      return t('invitations.invalidDate');
     }
 
     const diffMs = expiresAt.getTime() - now.getTime();
     const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
     if (diffDays <= 0) {
-      return t('admin.invitations.expired');
+      return t('invitations.expired');
     } else if (diffDays === 1) {
-      return t('admin.invitations.expiresInOneDay');
+      return t('invitations.expiresInOneDay');
     } else {
-      return t('admin.invitations.expiresInDays', { days: diffDays });
+      return t('invitations.expiresInDays', { days: diffDays });
     }
   };
 
@@ -139,7 +139,7 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
                 whiteSpace: 'nowrap'
               }}
             >
-              {t('admin.invitations.inviteLinkCreated', { date: formatDate(invitation.createdAt) })}
+              {t('invitations.inviteLinkCreated', { date: formatDate(invitation.createdAt) })}
             </Typography>
             {!isExpired && (
               <Chip
@@ -156,7 +156,7 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
             )}
             {isExpired && (
               <Chip
-                label={t('admin.invitations.expired')}
+                label={t('invitations.expired')}
                 size="small"
                 color="error"
                 variant="filled"
@@ -170,7 +170,7 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
           </Box>
 
           <Box sx={{ display: 'flex', gap: 0.5, ml: 1 }}>
-            <Tooltip title={t('admin.invitations.copyLink')}>
+            <Tooltip title={t('invitations.copyLink')}>
               <IconButton
                 onClick={handleCopyLink}
                 size="small"
@@ -180,7 +180,7 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
                 <CopyIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-            <Tooltip title={t('admin.invitations.updateInviteLink')}>
+            <Tooltip title={t('invitations.updateInviteLink')}>
               <IconButton
                 onClick={onUpdate}
                 size="small"
@@ -190,7 +190,7 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
                 <EditIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-            <Tooltip title={t('admin.invitations.delete')}>
+            <Tooltip title={t('invitations.delete')}>
               <IconButton
                 onClick={handleDeleteClick}
                 size="small"
@@ -231,7 +231,7 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <WarningIcon color="error" />
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t('admin.invitations.deleteConfirmTitle')}
+            {t('invitations.deleteConfirmTitle')}
           </Typography>
         </Box>
         <IconButton
@@ -250,7 +250,7 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
       {/* Content */}
       <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
         <Typography variant="body1" sx={{ mb: 3, color: 'text.primary' }}>
-          {t('admin.invitations.deleteConfirmMessage')}
+          {t('invitations.deleteConfirmMessage')}
         </Typography>
 
         <Alert
@@ -262,44 +262,44 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
             }
           }}
         >
-          {t('admin.invitations.deleteConfirmWarning')}
+          {t('invitations.deleteConfirmWarning')}
         </Alert>
 
         {/* Invitation Details */}
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'medium' }}>
-            {t('admin.invitations.invitationDetails')}
+            {t('invitations.invitationDetails')}
           </Typography>
           <TableContainer component={Paper} variant="outlined">
             <Table size="small">
               <TableBody>
                 <TableRow>
                   <TableCell component="th" scope="row" sx={{ fontWeight: 'medium', width: '40%' }}>
-                    {t('admin.invitations.email')}
+                    {t('invitations.email')}
                   </TableCell>
                   <TableCell>{invitation.email}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell component="th" scope="row" sx={{ fontWeight: 'medium' }}>
-                    {t('admin.invitations.createdAt')}
+                    {t('invitations.createdAt')}
                   </TableCell>
                   <TableCell>{formatDate(invitation.createdAt)}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell component="th" scope="row" sx={{ fontWeight: 'medium' }}>
-                    {t('admin.invitations.expiresAt')}
+                    {t('invitations.expiresAt')}
                   </TableCell>
                   <TableCell>
-                    {invitation.expiresAt ? formatDate(invitation.expiresAt) : t('admin.invitations.noExpiration')}
+                    {invitation.expiresAt ? formatDate(invitation.expiresAt) : t('invitations.noExpiration')}
                   </TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell component="th" scope="row" sx={{ fontWeight: 'medium' }}>
-                    {t('admin.invitations.status')}
+                    {t('invitations.status')}
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={isExpired ? t('admin.invitations.expired') : t('admin.invitations.active')}
+                      label={isExpired ? t('invitations.expired') : t('invitations.active')}
                       color={isExpired ? 'error' : 'success'}
                       size="small"
                       variant="outlined"
@@ -326,7 +326,7 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
           onClick={handleDeleteCancel}
           variant="outlined"
         >
-          {t('admin.invitations.cancelButton')}
+          {t('invitations.cancelButton')}
         </Button>
         <Button
           onClick={handleDeleteConfirm}
@@ -334,7 +334,7 @@ const InvitationStatusCard: React.FC<InvitationStatusCardProps> = ({
           color="error"
           startIcon={<DeleteIcon />}
         >
-          {t('admin.invitations.deleteConfirmButton')}
+          {t('invitations.deleteConfirmButton')}
         </Button>
       </Box>
     </Drawer>

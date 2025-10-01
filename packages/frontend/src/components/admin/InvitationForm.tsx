@@ -64,26 +64,26 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
         }}>
           <Alert severity="info">
             <Typography variant="body2">
-              {t('admin.invitations.info')}
+              {t('invitations.info')}
             </Typography>
           </Alert>
 
           <TextField
-            label={`${t('admin.invitations.email')} (${t('common.optional')})`}
+            label={`${t('invitations.email')} (${t('common.optional')})`}
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             fullWidth
-            helperText={t('admin.invitations.emailOptionalHelp')}
+            helperText={t('invitations.emailOptionalHelp')}
             variant="outlined"
             autoFocus
           />
 
           <FormControl fullWidth>
-            <InputLabel>{t('admin.invitations.expirationLabel')}</InputLabel>
+            <InputLabel>{t('invitations.expirationLabel')}</InputLabel>
             <Select
               value={expirationHours}
-              label={t('admin.invitations.expirationLabel')}
+              label={t('invitations.expirationLabel')}
               onChange={(e) => setExpirationHours(e.target.value as number)}
               MenuProps={{
                 sx: { zIndex: 2000 },
@@ -93,9 +93,9 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
             >
               {Object.entries(InvitationDurationLabels).map(([value]) => (
                 <MenuItem key={value} value={Number(value)}>
-                  {Number(value) === InvitationDuration.HOURS_48 && t('admin.invitations.duration.48h')}
-                  {Number(value) === InvitationDuration.WEEK && t('admin.invitations.duration.1w')}
-                  {Number(value) === InvitationDuration.MONTH && t('admin.invitations.duration.1m')}
+                  {Number(value) === InvitationDuration.HOURS_48 && t('invitations.duration.48h')}
+                  {Number(value) === InvitationDuration.WEEK && t('invitations.duration.1w')}
+                  {Number(value) === InvitationDuration.MONTH && t('invitations.duration.1m')}
                 </MenuItem>
               ))}
             </Select>
@@ -129,7 +129,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
             startIcon={<PersonAddIcon />}
             disabled={loading}
           >
-            {t('admin.invitations.create')}
+            {t('invitations.create')}
           </Button>
         </Box>
       </Box>
@@ -140,26 +140,26 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
     <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       <Alert severity="info" sx={{ mb: 2 }}>
         <Typography variant="body2">
-          {t('admin.invitations.info')}
+          {t('invitations.info')}
         </Typography>
       </Alert>
 
       <TextField
-        label={`${t('admin.invitations.email')} (${t('common.optional')})`}
+        label={`${t('invitations.email')} (${t('common.optional')})`}
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         fullWidth
-        helperText={t('admin.invitations.emailOptionalHelp')}
+        helperText={t('invitations.emailOptionalHelp')}
         variant="outlined"
         autoFocus
       />
 
       <FormControl fullWidth>
-        <InputLabel>{t('admin.invitations.expirationLabel')}</InputLabel>
+        <InputLabel>{t('invitations.expirationLabel')}</InputLabel>
         <Select
           value={expirationHours}
-          label={t('admin.invitations.expirationLabel')}
+          label={t('invitations.expirationLabel')}
           onChange={(e) => setExpirationHours(e.target.value as number)}
           MenuProps={{
             sx: { zIndex: 2000 },
@@ -169,9 +169,9 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
         >
           {Object.entries(InvitationDurationLabels).map(([value]) => (
             <MenuItem key={value} value={Number(value)}>
-              {Number(value) === InvitationDuration.HOURS_48 && t('admin.invitations.duration.48h')}
-              {Number(value) === InvitationDuration.WEEK && t('admin.invitations.duration.1w')}
-              {Number(value) === InvitationDuration.MONTH && t('admin.invitations.duration.1m')}
+              {Number(value) === InvitationDuration.HOURS_48 && t('invitations.duration.48h')}
+              {Number(value) === InvitationDuration.WEEK && t('invitations.duration.1w')}
+              {Number(value) === InvitationDuration.MONTH && t('invitations.duration.1m')}
             </MenuItem>
           ))}
         </Select>
@@ -194,7 +194,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
           startIcon={<PersonAddIcon />}
           disabled={loading}
         >
-          {t('admin.invitations.create')}
+          {t('invitations.create')}
         </Button>
       </Box>
     </Box>

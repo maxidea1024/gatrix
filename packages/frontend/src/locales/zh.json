@@ -1743,7 +1743,18 @@
     "settingsPanel": "设置面板",
     "systemStats": "系统统计",
     "settings": "设置",
-    "crashes": "客户端崩溃"
+    "crashes": "客户端崩溃",
+
+    "userManagement": "用户管理",
+    "clientVersions": "客户端版本",
+    "gameWorlds": "游戏世界",
+    "maintenance": "服务维护",
+    "maintenanceTemplates": "消息模板",
+    "scheduler": "计划管理",
+    "whitelist": "账户白名单",
+    "auditLogs": "审计日志",
+    "apiTokens": "API令牌",
+    "remoteConfig": "远程配置"
   },
   "signUpPrompt": {
     "backToLogin": "返回登录",

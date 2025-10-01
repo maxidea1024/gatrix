@@ -62,21 +62,21 @@ const getNavigationItems = (isAdmin: boolean): NavItem[] => {
   const adminItems: NavItem[] = [
     {
       id: 'users',
-      label: 'users.title',
+      label: 'sidebar.userManagement',
       icon: 'People',
       path: '/users',
       roles: ['admin'],
     },
     {
       id: 'audit-logs',
-      label: 'navigation.auditLogs',
+      label: 'sidebar.auditLogs',
       icon: 'Security',
       path: '/admin/audit-logs',
       roles: ['admin'],
     },
     {
       id: 'crashes',
-      label: 'crashes.title',
+      label: 'sidebar.crashes',
       icon: 'BugReport',
       path: '/admin/crashes',
       roles: ['admin'],
@@ -96,7 +96,7 @@ const getNavigationItems = (isAdmin: boolean): NavItem[] => {
         },
         {
           id: 'api-tokens',
-          label: 'apiTokens.title',
+          label: 'sidebar.apiTokens',
           icon: 'VpnKey',
           path: '/admin/api-tokens',
           roles: ['admin'],
@@ -105,7 +105,7 @@ const getNavigationItems = (isAdmin: boolean): NavItem[] => {
     },
     {
       id: 'remote-config',
-      label: 'remoteConfig.title',
+      label: 'sidebar.remoteConfig',
       icon: 'CloudSync',
       path: '/admin/remote-config',
       roles: ['admin'],

@@ -178,10 +178,10 @@ const RemoteConfigHistoryPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5" component="h2" sx={{ mb: 1 }}>
-          {t('admin.remoteConfig.history.title')}
+          {t('remoteConfig.history.title')}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          {t('admin.remoteConfig.history.subtitle')}
+          {t('remoteConfig.history.subtitle')}
         </Typography>
       </Box>
 
@@ -191,20 +191,20 @@ const RemoteConfigHistoryPage: React.FC = () => {
           <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center">
             <Typography variant="h6" component="h3">
               {viewMode === 'deployments' ?
-                t('admin.remoteConfig.history.deployments') :
-                t('admin.remoteConfig.history.versions')
+                t('remoteConfig.history.deployments') :
+                t('remoteConfig.history.versions')
               }
             </Typography>
             <Stack direction="row" spacing={2}>
               <FormControl size="small" sx={{ minWidth: 150 }}>
-                <InputLabel>{t('admin.remoteConfig.history.viewMode')}</InputLabel>
+                <InputLabel>{t('remoteConfig.history.viewMode')}</InputLabel>
                 <Select
                   value={viewMode}
                   onChange={(e) => setViewMode(e.target.value as any)}
-                  label={t('admin.remoteConfig.history.viewMode')}
+                  label={t('remoteConfig.history.viewMode')}
                 >
-                  <MenuItem value="deployments">{t('admin.remoteConfig.history.deployments')}</MenuItem>
-                  <MenuItem value="versions">{t('admin.remoteConfig.history.versions')}</MenuItem>
+                  <MenuItem value="deployments">{t('remoteConfig.history.deployments')}</MenuItem>
+                  <MenuItem value="versions">{t('remoteConfig.history.versions')}</MenuItem>
                 </Select>
               </FormControl>
               <Button
@@ -228,12 +228,12 @@ const RemoteConfigHistoryPage: React.FC = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.deployment')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.description')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.deployedBy')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.deployedAt')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }} align="center">{t('admin.remoteConfig.history.configsCount')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }} align="center">{t('admin.remoteConfig.actions')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.history.deployment')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.description')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.history.deployedBy')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.history.deployedAt')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }} align="center">{t('remoteConfig.history.configsCount')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }} align="center">{t('remoteConfig.actions')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -241,7 +241,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
                     <TableRow>
                       <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
                         <Typography variant="body2" color="text.secondary">
-                          {loading ? t('common.loading') : t('admin.remoteConfig.history.noDeployments')}
+                          {loading ? t('common.loading') : t('remoteConfig.history.noDeployments')}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -302,7 +302,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
                             }}
                           >
                             <Chip
-                              label={t('admin.remoteConfig.history.configs')}
+                              label={t('remoteConfig.history.configs')}
                               size="small"
                               variant="outlined"
                               color="primary"
@@ -311,7 +311,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
                         </TableCell>
                         <TableCell align="center">
                           <Stack direction="row" spacing={0.5} justifyContent="center">
-                            <Tooltip title={t('admin.remoteConfig.history.viewDetails')}>
+                            <Tooltip title={t('remoteConfig.history.viewDetails')}>
                               <IconButton
                                 size="small"
                                 onClick={() => openDetailDialog(deployment)}
@@ -324,7 +324,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
                                 <ViewIcon fontSize="small" />
                               </IconButton>
                             </Tooltip>
-                            <Tooltip title={t('admin.remoteConfig.history.rollback')}>
+                            <Tooltip title={t('remoteConfig.history.rollback')}>
                               <IconButton
                                 size="small"
                                 onClick={() => handleRollback(deployment)}
@@ -369,14 +369,14 @@ const RemoteConfigHistoryPage: React.FC = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.configId')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.version')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.status')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.value')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.changeDescription')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.createdBy')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.history.createdAt')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }} align="center">{t('admin.remoteConfig.actions')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.history.configId')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.history.version')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.status')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.history.value')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.history.changeDescription')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.history.createdBy')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.history.createdAt')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }} align="center">{t('remoteConfig.actions')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -384,7 +384,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
                     <TableRow>
                       <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
                         <Typography variant="body2" color="text.secondary">
-                          {loading ? t('common.loading') : t('admin.remoteConfig.history.noVersions')}
+                          {loading ? t('common.loading') : t('remoteConfig.history.noVersions')}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -463,7 +463,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
                           </Typography>
                         </TableCell>
                         <TableCell align="center">
-                          <Tooltip title={t('admin.remoteConfig.history.viewDetails')}>
+                          <Tooltip title={t('remoteConfig.history.viewDetails')}>
                             <IconButton
                               size="small"
                               onClick={() => openDetailDialog(version)}
@@ -502,8 +502,8 @@ const RemoteConfigHistoryPage: React.FC = () => {
       <Dialog open={detailDialogOpen} onClose={() => setDetailDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>
           {selectedItem && 'deploymentName' in selectedItem ?
-            t('admin.remoteConfig.history.deploymentDetails') :
-            t('admin.remoteConfig.history.versionDetails')
+            t('remoteConfig.history.deploymentDetails') :
+            t('remoteConfig.history.versionDetails')
           }
         </DialogTitle>
         <DialogContent>
@@ -514,21 +514,21 @@ const RemoteConfigHistoryPage: React.FC = () => {
                 <Stack spacing={3}>
                   <Box>
                     <Typography variant="h6" sx={{ mb: 2 }}>
-                      {t('admin.remoteConfig.history.deploymentInfo')}
+                      {t('remoteConfig.history.deploymentInfo')}
                     </Typography>
                     <Stack spacing={2}>
                       <Box>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                          {t('admin.remoteConfig.history.deploymentName')}:
+                          {t('remoteConfig.history.deploymentName')}:
                         </Typography>
                         <Typography variant="body1">
-                          {selectedItem.deploymentName || `${t('admin.remoteConfig.history.deployment')} #${selectedItem.id}`}
+                          {selectedItem.deploymentName || `${t('remoteConfig.history.deployment')} #${selectedItem.id}`}
                         </Typography>
                       </Box>
 
                       <Box>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                          {t('admin.remoteConfig.history.deployedBy')}:
+                          {t('remoteConfig.history.deployedBy')}:
                         </Typography>
                         <Typography variant="body1">
                           {selectedItem.deployedByName || t('common.system')}
@@ -542,7 +542,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
 
                       <Box>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                          {t('admin.remoteConfig.history.deployedAt')}:
+                          {t('remoteConfig.history.deployedAt')}:
                         </Typography>
                         <Typography variant="body1">
                           {formatDateTimeDetailed(selectedItem.deployedAt)}
@@ -551,10 +551,10 @@ const RemoteConfigHistoryPage: React.FC = () => {
 
                       <Box>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                          {t('admin.remoteConfig.description')}:
+                          {t('remoteConfig.description')}:
                         </Typography>
                         <Typography variant="body1" color="text.primary">
-                          {selectedItem.description || t('admin.remoteConfig.history.noDescription')}
+                          {selectedItem.description || t('remoteConfig.history.noDescription')}
                         </Typography>
                       </Box>
                     </Stack>
@@ -562,7 +562,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
 
                   <Box>
                     <Typography variant="h6" sx={{ mb: 2 }} color="text.primary">
-                      {t('admin.remoteConfig.history.configsSnapshot')}
+                      {t('remoteConfig.history.configsSnapshot')}
                     </Typography>
                     <Paper sx={{
                       p: 2,
@@ -578,7 +578,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
                       }}>
                         {selectedItem.configsSnapshot ?
                           JSON.stringify(selectedItem.configsSnapshot, null, 2) :
-                          t('admin.remoteConfig.history.noSnapshot')
+                          t('remoteConfig.history.noSnapshot')
                         }
                       </pre>
                     </Paper>
@@ -589,12 +589,12 @@ const RemoteConfigHistoryPage: React.FC = () => {
                 <Stack spacing={3}>
                   <Box>
                     <Typography variant="h6" sx={{ mb: 2 }}>
-                      {t('admin.remoteConfig.history.versionInfo')}
+                      {t('remoteConfig.history.versionInfo')}
                     </Typography>
                     <Stack spacing={2}>
                       <Box>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                          {t('admin.remoteConfig.history.configKey')}:
+                          {t('remoteConfig.history.configKey')}:
                         </Typography>
                         <Typography variant="body1">
                           {selectedItem.configKeyName || `Config #${selectedItem.configId}`}
@@ -603,7 +603,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
 
                       <Box>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                          {t('admin.remoteConfig.history.version')}:
+                          {t('remoteConfig.history.version')}:
                         </Typography>
                         <Typography variant="body1">
                           v{selectedItem.versionNumber}
@@ -612,7 +612,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
 
                       <Box>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                          {t('admin.remoteConfig.status')}:
+                          {t('remoteConfig.status')}:
                         </Typography>
                         <Chip
                           label={selectedItem.status.toUpperCase()}
@@ -623,7 +623,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
 
                       <Box>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                          {t('admin.remoteConfig.createdBy')}:
+                          {t('remoteConfig.createdBy')}:
                         </Typography>
                         <Typography variant="body1">
                           {selectedItem.createdByName || t('common.system')}
@@ -637,7 +637,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
 
                       <Box>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                          {t('admin.remoteConfig.history.createdAt')}:
+                          {t('remoteConfig.history.createdAt')}:
                         </Typography>
                         <Typography variant="body1">
                           {formatDateTimeDetailed(selectedItem.createdAt)}
@@ -647,7 +647,7 @@ const RemoteConfigHistoryPage: React.FC = () => {
                       {selectedItem.publishedAt && (
                         <Box>
                           <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                            {t('admin.remoteConfig.history.publishedAt')}:
+                            {t('remoteConfig.history.publishedAt')}:
                           </Typography>
                           <Typography variant="body1">
                             {formatDateTimeDetailed(selectedItem.publishedAt)}
@@ -657,10 +657,10 @@ const RemoteConfigHistoryPage: React.FC = () => {
 
                       <Box>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                          {t('admin.remoteConfig.history.changeDescription')}:
+                          {t('remoteConfig.history.changeDescription')}:
                         </Typography>
                         <Typography variant="body1">
-                          {selectedItem.changeDescription || t('admin.remoteConfig.history.noDescription')}
+                          {selectedItem.changeDescription || t('remoteConfig.history.noDescription')}
                         </Typography>
                       </Box>
                     </Stack>
@@ -668,11 +668,11 @@ const RemoteConfigHistoryPage: React.FC = () => {
 
                   <Box>
                     <Typography variant="h6" sx={{ mb: 2 }}>
-                      {t('admin.remoteConfig.defaultValue')}:
+                      {t('remoteConfig.defaultValue')}:
                     </Typography>
                     <Paper sx={{ p: 2, backgroundColor: 'grey.50', maxHeight: 300, overflow: 'auto' }}>
                       <pre style={{ margin: 0, fontSize: '0.875rem', fontFamily: 'monospace' }}>
-                        {selectedItem.value || t('admin.remoteConfig.history.noValue')}
+                        {selectedItem.value || t('remoteConfig.history.noValue')}
                       </pre>
                     </Paper>
                   </Box>

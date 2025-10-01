@@ -107,7 +107,6 @@ interface SortableRowProps {
   onMoveDown: (world: GameWorld) => void;
   onCopy: (text: string, type: string) => void;
   onDuplicate: (world: GameWorld) => void;
-  t: (key: string) => string;
 }
 
 const SortableRow: React.FC<SortableRowProps> = ({
@@ -120,7 +119,6 @@ const SortableRow: React.FC<SortableRowProps> = ({
   onMoveDown,
   onCopy,
   onDuplicate,
-  t,
   index,
   total,
   highlight,
@@ -139,6 +137,8 @@ const SortableRow: React.FC<SortableRowProps> = ({
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
+
+  const { t } = useTranslation();
 
   const renderTags = (tags?: Tag[] | null) => {
     const items = (tags || []).slice(0, 6);
@@ -460,11 +460,11 @@ const GameWorldsPage: React.FC = () => {
   };
 
   // 사용 가능한 언어 목록
-  const availableLanguages = [
+  const availableLanguages = useMemo(() => ([
     { code: 'ko' as const, label: t('gameWorlds.maintenance.korean') },
     { code: 'en' as const, label: t('gameWorlds.maintenance.english') },
     { code: 'zh' as const, label: t('gameWorlds.maintenance.chinese') },
-  ];
+  ]), [t]);
 
   const usedLanguages = new Set(maintenanceLocales.map(l => l.lang));
   const availableToAdd = availableLanguages.filter(l => !usedLanguages.has(l.code));
@@ -671,11 +671,11 @@ const GameWorldsPage: React.FC = () => {
     const errors: Record<string, string> = {};
 
     if (!formData.worldId.trim()) {
-      errors.worldId = 'World ID is required';
+      errors.worldId = t('validation.fieldRequired', { field: t('gameWorlds.worldId') });
     }
 
     if (!formData.name.trim()) {
-      errors.name = 'Name is required';
+      errors.name = t('validation.fieldRequired', { field: t('gameWorlds.name') });
     }
 
     // 점검 모드일 때 기본 점검 메시지 필수 체크
@@ -935,7 +935,7 @@ const GameWorldsPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box key={i18n.language} sx={{ p: 3 }}>
       {/* Header */}
       <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box>
@@ -978,7 +978,7 @@ const GameWorldsPage: React.FC = () => {
                     ),
                   },
                 }}
-                sx={{ minWidth: 300 }}
+                sx={{ minWidth: 500 }}
               />
               <Autocomplete
                 multiple
@@ -1076,7 +1076,6 @@ const GameWorldsPage: React.FC = () => {
                           onMoveDown={handleMoveDown}
                           onCopy={handleCopy}
                           onDuplicate={handleDuplicateWorld}
-                          t={t}
                         />
                       ))}
                     </SortableContext>

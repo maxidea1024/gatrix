@@ -31,8 +31,8 @@ const InvalidInvitePage: React.FC = () => {
 
   return (
     <AuthLayout
-      title={t('admin.invitations.invalidInviteTitle')}
-      subtitle={t('admin.invitations.invalidInviteSubtitle')}
+      title={t('invitations.invalidInviteTitle')}
+      subtitle={t('invitations.invalidInviteSubtitle')}
       showLeftPanel={false}
     >
       {/* Language Selector */}
@@ -74,10 +74,10 @@ const InvalidInvitePage: React.FC = () => {
         }}
       >
         <Typography variant="body1" sx={{ mb: 1, fontWeight: 500 }}>
-          {t('admin.invitations.invalidInviteMessage')}
+          {t('invitations.invalidInviteMessage')}
         </Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {t('admin.invitations.invalidInviteHelp')}
+          {t('invitations.invalidInviteHelp')}
         </Typography>
       </Alert>
 
@@ -99,7 +99,7 @@ const InvalidInvitePage: React.FC = () => {
             }
           }}
         >
-          {t('admin.invitations.goToLogin')}
+          {t('invitations.goToLogin')}
         </Button>
 
         <Button
@@ -120,7 +120,7 @@ const InvalidInvitePage: React.FC = () => {
             }
           }}
         >
-          {t('admin.invitations.goToRegister')}
+          {t('invitations.goToRegister')}
         </Button>
       </Box>
 
@@ -132,7 +132,7 @@ const InvalidInvitePage: React.FC = () => {
             fontSize: '0.875rem'
           }}
         >
-          {t('admin.invitations.invalidInviteHelp')}
+          {t('invitations.invalidInviteHelp')}
         </Typography>
       </Box>
     </AuthLayout>

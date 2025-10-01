@@ -273,7 +273,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
 
     switch (action) {
       case 'created':
-        enqueueSnackbar(t('admin.remoteConfig.createSuccess'), { variant: 'success' });
+        enqueueSnackbar(t('remoteConfig.createSuccess'), { variant: 'success' });
         break;
       case 'updated':
         enqueueSnackbar(`Config "${config.keyName}" updated`, { variant: 'info' });
@@ -301,8 +301,8 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
   const handleInvitationCreated = useCallback((data: any) => {
     const { invitation } = data;
     const message = invitation.email
-      ? t('admin.users.invitationCreatedForEmail', { email: invitation.email })
-      : t('admin.users.invitationCreated');
+      ? t('users.invitationCreatedForEmail', { email: invitation.email })
+      : t('users.invitationCreated');
     enqueueSnackbar(message, { variant: 'success' });
   }, [enqueueSnackbar, t]);
 
@@ -310,8 +310,8 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
   const handleInvitationDeleted = useCallback((data: any) => {
     const { invitation } = data;
     const message = invitation.email
-      ? t('admin.users.invitationDeletedForEmail', { email: invitation.email })
-      : t('admin.users.invitationDeleted');
+      ? t('users.invitationDeletedForEmail', { email: invitation.email })
+      : t('users.invitationDeleted');
     enqueueSnackbar(message, { variant: 'success' });
   }, [enqueueSnackbar, t]);
 

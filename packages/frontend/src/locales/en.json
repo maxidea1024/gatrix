@@ -1803,7 +1803,18 @@
     "settingsPanel": "SETTINGS PANEL",
     "systemStats": "System Statistics",
     "settings": "Settings",
-    "crashes": "Client Crashes"
+    "crashes": "Client Crashes",
+
+    "userManagement": "User Management",
+    "clientVersions": "Client Versions",
+    "gameWorlds": "Game Worlds",
+    "maintenance": "Service Maintenance",
+    "maintenanceTemplates": "Message Templates",
+    "scheduler": "Schedule Management",
+    "whitelist": "Account Whitelist",
+    "auditLogs": "Audit Logs",
+    "apiTokens": "API Tokens",
+    "remoteConfig": "Remote Config"
   },
   "signUpPrompt": {
     "backToLogin": "Back to Login",

@@ -70,9 +70,14 @@ interface I18nProviderProps {
 export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const { t, i18n: i18nInstance } = useTranslation();
 
-
-  // Using i18next t directly (legacy admin.* fallback removed as requested)
-
+  // Migrate legacy localStorage key if present (i8nextLng -> i18nextLng)
+  try {
+    const legacy = localStorage.getItem('i8nextLng');
+    if (legacy && !localStorage.getItem('i18nextLng')) {
+      localStorage.setItem('i18nextLng', legacy);
+      i18nInstance.changeLanguage(legacy as Language);
+    }
+  } catch {}
 
   const changeLanguage = async (lang: Language) => {
     // 프론트엔드 언어 변경

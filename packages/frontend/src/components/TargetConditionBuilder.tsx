@@ -140,7 +140,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
     if (field.type === 'boolean') {
       return (
         <FormControl size="small" sx={{ minWidth: 120 }}>
-          <InputLabel>{t('admin.remoteConfig.campaigns.value')}</InputLabel>
+          <InputLabel>{t('remoteConfig.campaigns.value')}</InputLabel>
           <Select
             value={condition.value || false}
             onChange={(e) => updateCondition(index, { value: e.target.value })}
@@ -169,7 +169,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
             }}
             disabled={disabled}
             renderInput={(params) => (
-              <TextField {...params} label={t('admin.remoteConfig.campaigns.value')} sx={{ minWidth: 200 }} />
+              <TextField {...params} label={t('remoteConfig.campaigns.value')} sx={{ minWidth: 200 }} />
             )}
             renderTags={(value, getTagProps) =>
               value.map((option, index) => (
@@ -186,7 +186,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
       } else {
         return (
           <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>{t('admin.remoteConfig.campaigns.value')}</InputLabel>
+            <InputLabel>{t('remoteConfig.campaigns.value')}</InputLabel>
             <Select
               value={condition.value || ''}
               onChange={(e) => updateCondition(index, { value: e.target.value })}
@@ -216,7 +216,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
           }}
           disabled={disabled}
           renderInput={(params) => (
-            <TextField {...params} label={t('admin.remoteConfig.campaigns.value')} sx={{ minWidth: 200 }} />
+            <TextField {...params} label={t('remoteConfig.campaigns.value')} sx={{ minWidth: 200 }} />
           )}
           renderTags={(value, getTagProps) =>
             value.map((option, index) => (
@@ -235,7 +235,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
     return (
       <TextField
         size="small"
-        label={t('admin.remoteConfig.campaigns.value')}
+        label={t('remoteConfig.campaigns.value')}
         type={field.type === 'number' ? 'number' : 'text'}
         value={condition.value || ''}
         onChange={(e) => updateCondition(index, { value: e.target.value })}
@@ -267,8 +267,8 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
   return (
     <Card>
       <CardHeader
-        title={t('admin.remoteConfig.campaigns.targetConditions')}
-        subheader={t('admin.remoteConfig.campaigns.targetConditionsHelp')}
+        title={t('remoteConfig.campaigns.targetConditions')}
+        subheader={t('remoteConfig.campaigns.targetConditionsHelp')}
         action={
           <Button
             startIcon={<AddIcon />}
@@ -276,14 +276,14 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
             disabled={disabled}
             size="small"
           >
-            {t('admin.remoteConfig.campaigns.addCondition')}
+            {t('remoteConfig.campaigns.addCondition')}
           </Button>
         }
       />
       <CardContent>
         {conditions.length === 0 ? (
           <Alert severity="info">
-            {t('admin.remoteConfig.campaigns.noConditionsSet')}
+            {t('remoteConfig.campaigns.noConditionsSet')}
           </Alert>
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -293,7 +293,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                     {index > 0 && (
                       <FormControl size="small" sx={{ minWidth: 80 }}>
-                        <InputLabel>{t('admin.remoteConfig.campaigns.logicalOperator')}</InputLabel>
+                        <InputLabel>{t('remoteConfig.campaigns.logicalOperator')}</InputLabel>
                         <Select
                           value={condition.logicalOperator || 'AND'}
                           onChange={(e) => updateCondition(index, {
@@ -301,14 +301,14 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
                           })}
                           disabled={disabled}
                         >
-                          <MenuItem value="AND">{t('admin.remoteConfig.campaigns.and')}</MenuItem>
-                          <MenuItem value="OR">{t('admin.remoteConfig.campaigns.or')}</MenuItem>
+                          <MenuItem value="AND">{t('remoteConfig.campaigns.and')}</MenuItem>
+                          <MenuItem value="OR">{t('remoteConfig.campaigns.or')}</MenuItem>
                         </Select>
                       </FormControl>
                     )}
                     
                     <FormControl size="small" sx={{ minWidth: 150 }}>
-                      <InputLabel>{t('admin.remoteConfig.campaigns.field')}</InputLabel>
+                      <InputLabel>{t('remoteConfig.campaigns.field')}</InputLabel>
                       <Select
                         value={condition.field}
                         onChange={(e) => {
@@ -331,7 +331,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
                     </FormControl>
 
                     <FormControl size="small" sx={{ minWidth: 120 }}>
-                      <InputLabel>{t('admin.remoteConfig.campaigns.operator')}</InputLabel>
+                      <InputLabel>{t('remoteConfig.campaigns.operator')}</InputLabel>
                       <Select
                         value={condition.operator}
                         onChange={(e) => updateCondition(index, { operator: e.target.value })}
@@ -381,7 +381,7 @@ const TargetConditionBuilder: React.FC<TargetConditionBuilderProps> = ({
             onClick={() => setTestExpanded(!testExpanded)}
             size="small"
           >
-            {t('admin.remoteConfig.campaigns.testConditions')}
+            {t('remoteConfig.campaigns.testConditions')}
           </Button>
           
           <Collapse in={testExpanded}>

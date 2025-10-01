@@ -115,7 +115,7 @@ const CrashesPage: React.FC = () => {
       setTotal(response.total);
     } catch (error) {
       console.error('Error loading crashes:', error);
-      enqueueSnackbar(t('admin.crashes.loadError'), { variant: 'error' });
+      enqueueSnackbar(t('crashes.loadError'), { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -214,11 +214,11 @@ const CrashesPage: React.FC = () => {
   const handleUpdateCrashState = async (crashId: number, newState: CrashState) => {
     try {
       await crashService.updateCrashState(crashId, { state: newState });
-      enqueueSnackbar(t('admin.crashes.updateState.success'), { variant: 'success' });
+      enqueueSnackbar(t('crashes.updateState.success'), { variant: 'success' });
       loadCrashes(); // Reload data
     } catch (error) {
       console.error('Error updating crash state:', error);
-      enqueueSnackbar(t('admin.crashes.updateState.error'), { variant: 'error' });
+      enqueueSnackbar(t('crashes.updateState.error'), { variant: 'error' });
     }
     handleMenuClose();
   };
@@ -235,11 +235,11 @@ const CrashesPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" component="h1" gutterBottom>
-        {t('admin.crashes.title')}
+        {t('crashes.title')}
       </Typography>
 
       <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-        {t('admin.crashes.subtitle')}
+        {t('crashes.subtitle')}
       </Typography>
 
       {/* Search and Filters */}
@@ -249,7 +249,7 @@ const CrashesPage: React.FC = () => {
 
             {/* 사용자 닉네임 검색 (왼쪽 첫 번째, 넓게) */}
             <TextField
-              placeholder={t('admin.crashes.searchPlaceholder')}
+              placeholder={t('crashes.searchPlaceholder')}
               value={searchTerm}
               onChange={handleSearchChange}
               sx={{ minWidth: 340, width: 420, flexShrink: 0 }}
@@ -265,21 +265,21 @@ const CrashesPage: React.FC = () => {
 
             {/* Date Range Preset */}
             <FormControl size="small" sx={{ minWidth: 160, flexShrink: 0 }}>
-              <InputLabel id="crash-date-range-label" shrink>{t('admin.crashes.filters.dateRange')}</InputLabel>
+              <InputLabel id="crash-date-range-label" shrink>{t('crashes.filters.dateRange')}</InputLabel>
               <Select
                 labelId="crash-date-range-label"
                 id="crash-date-range"
                 value={dateRangePreset}
-                label={t('admin.crashes.filters.dateRange')}
+                label={t('crashes.filters.dateRange')}
                 onChange={(e) => setDateRangePreset(e.target.value as any)}
                 size="small"
               >
-                <MenuItem value="last15m">{t('admin.crashes.filters.presets.last15m')}</MenuItem>
-                <MenuItem value="last1h">{t('admin.crashes.filters.presets.last1h')}</MenuItem>
-                <MenuItem value="last24h">{t('admin.crashes.filters.presets.last24h')}</MenuItem>
-                <MenuItem value="last7d">{t('admin.crashes.filters.presets.last7d')}</MenuItem>
-                <MenuItem value="last30d">{t('admin.crashes.filters.presets.last30d')}</MenuItem>
-                <MenuItem value="custom">{t('admin.crashes.filters.presets.custom')}</MenuItem>
+                <MenuItem value="last15m">{t('crashes.filters.presets.last15m')}</MenuItem>
+                <MenuItem value="last1h">{t('crashes.filters.presets.last1h')}</MenuItem>
+                <MenuItem value="last24h">{t('crashes.filters.presets.last24h')}</MenuItem>
+                <MenuItem value="last7d">{t('crashes.filters.presets.last7d')}</MenuItem>
+                <MenuItem value="last30d">{t('crashes.filters.presets.last30d')}</MenuItem>
+                <MenuItem value="custom">{t('crashes.filters.presets.custom')}</MenuItem>
               </Select>
             </FormControl>
 
@@ -287,13 +287,13 @@ const CrashesPage: React.FC = () => {
             {dateRangePreset === 'custom' && (
               <>
                 <DateTimePicker
-                  label={t('admin.crashes.filters.dateFrom')}
+                  label={t('crashes.filters.dateFrom')}
                   value={dateFrom}
                   onChange={setDateFrom}
                   slotProps={{ textField: { size: 'small', sx: { minWidth: 220, flexShrink: 0 }, inputProps: { 'aria-label': 'date-from' } } }}
                 />
                 <DateTimePicker
-                  label={t('admin.crashes.filters.dateTo')}
+                  label={t('crashes.filters.dateTo')}
                   value={dateTo}
                   onChange={setDateTo}
                   slotProps={{ textField: { size: 'small', sx: { minWidth: 220, flexShrink: 0 }, inputProps: { 'aria-label': 'date-to' } } }}
@@ -305,48 +305,48 @@ const CrashesPage: React.FC = () => {
 
             {/* State Filter */}
             <FormControl size="small" sx={{ minWidth: 180, flexShrink: 0 }}>
-              <InputLabel id="crash-state-label" shrink>{t('admin.crashes.filters.state')}</InputLabel>
+              <InputLabel id="crash-state-label" shrink>{t('crashes.filters.state')}</InputLabel>
               <Select
                 labelId="crash-state-label"
                 id="crash-state-select"
                 value={filters.state ?? ''}
                 onChange={(e) => handleFilterChange('state', e.target.value)}
-                label={t('admin.crashes.filters.state')}
+                label={t('crashes.filters.state')}
                 displayEmpty
                 size="small"
               >
-                <MenuItem value="">{t('admin.crashes.filters.allStates')}</MenuItem>
-                <MenuItem value={CrashState.OPEN}>{t('admin.crashes.states.open')}</MenuItem>
-                <MenuItem value={CrashState.CLOSED}>{t('admin.crashes.states.closed')}</MenuItem>
-                <MenuItem value={CrashState.DELETED}>{t('admin.crashes.states.deleted')}</MenuItem>
+                <MenuItem value="">{t('crashes.filters.allStates')}</MenuItem>
+                <MenuItem value={CrashState.OPEN}>{t('crashes.states.open')}</MenuItem>
+                <MenuItem value={CrashState.CLOSED}>{t('crashes.states.closed')}</MenuItem>
+                <MenuItem value={CrashState.DELETED}>{t('crashes.states.deleted')}</MenuItem>
               </Select>
             </FormControl>
 
             {/* Device Type Filter */}
             <FormControl size="small" sx={{ minWidth: 180, flexShrink: 0 }}>
-              <InputLabel id="crash-device-label" shrink>{t('admin.crashes.filters.deviceType')}</InputLabel>
+              <InputLabel id="crash-device-label" shrink>{t('crashes.filters.deviceType')}</InputLabel>
               <Select
                 labelId="crash-device-label"
                 id="crash-device-select"
                 value={filters.deviceType ?? ''}
                 onChange={(e) => handleFilterChange('deviceType', e.target.value)}
-                label={t('admin.crashes.filters.deviceType')}
+                label={t('crashes.filters.deviceType')}
                 displayEmpty
                 size="small"
               >
-                <MenuItem value="">{t('admin.crashes.filters.allDeviceTypes')}</MenuItem>
-                <MenuItem value={Platform.ANDROID}>{t('admin.crashes.platforms.android')}</MenuItem>
-                <MenuItem value={Platform.IOS}>{t('admin.crashes.platforms.ios')}</MenuItem>
-                <MenuItem value={Platform.WINDOWS}>{t('admin.crashes.platforms.windows')}</MenuItem>
-                <MenuItem value={Platform.MAC}>{t('admin.crashes.platforms.mac')}</MenuItem>
-                <MenuItem value={Platform.LINUX}>{t('admin.crashes.platforms.linux')}</MenuItem>
-                <MenuItem value={Platform.WEB}>{t('admin.crashes.platforms.web')}</MenuItem>
+                <MenuItem value="">{t('crashes.filters.allDeviceTypes')}</MenuItem>
+                <MenuItem value={Platform.ANDROID}>{t('crashes.platforms.android')}</MenuItem>
+                <MenuItem value={Platform.IOS}>{t('crashes.platforms.ios')}</MenuItem>
+                <MenuItem value={Platform.WINDOWS}>{t('crashes.platforms.windows')}</MenuItem>
+                <MenuItem value={Platform.MAC}>{t('crashes.platforms.mac')}</MenuItem>
+                <MenuItem value={Platform.LINUX}>{t('crashes.platforms.linux')}</MenuItem>
+                <MenuItem value={Platform.WEB}>{t('crashes.platforms.web')}</MenuItem>
               </Select>
             </FormControl>
 
             {/* Version Filter */}
             <TextField
-              label={t('admin.crashes.filters.version')}
+              label={t('crashes.filters.version')}
               value={versionInput}
               onChange={(e) => updateVersionFilters(e.target.value)}
               size="small"
@@ -356,51 +356,51 @@ const CrashesPage: React.FC = () => {
 
             {/* Branch Filter */}
             <FormControl size="small" sx={{ minWidth: 160, flexShrink: 0 }}>
-              <InputLabel id="crash-branch-label" shrink>{t('admin.crashes.filters.branch')}</InputLabel>
+              <InputLabel id="crash-branch-label" shrink>{t('crashes.filters.branch')}</InputLabel>
               <Select
                 labelId="crash-branch-label"
                 id="crash-branch-select"
                 value={filters.branch ?? ''}
                 onChange={(e) => handleFilterChange('branch', e.target.value ? Number(e.target.value) : undefined)}
-                label={t('admin.crashes.filters.branch')}
+                label={t('crashes.filters.branch')}
                 displayEmpty
                 size="small"
               >
-                <MenuItem value="">{t('admin.crashes.filters.allBranches')}</MenuItem>
-                <MenuItem value={1}>{t('admin.crashes.branches.production')}</MenuItem>
-                <MenuItem value={2}>{t('admin.crashes.branches.staging')}</MenuItem>
-                <MenuItem value={3}>{t('admin.crashes.branches.development')}</MenuItem>
-                <MenuItem value={9}>{t('admin.crashes.branches.editor')}</MenuItem>
+                <MenuItem value="">{t('crashes.filters.allBranches')}</MenuItem>
+                <MenuItem value={1}>{t('crashes.branches.production')}</MenuItem>
+                <MenuItem value={2}>{t('crashes.branches.staging')}</MenuItem>
+                <MenuItem value={3}>{t('crashes.branches.development')}</MenuItem>
+                <MenuItem value={9}>{t('crashes.branches.editor')}</MenuItem>
               </Select>
             </FormControl>
 
             {/* Sort Options */}
             <FormControl size="small" sx={{ minWidth: 160, flexShrink: 0 }}>
-              <InputLabel id="crash-sortby-label" shrink>{t('admin.crashes.sort.sortBy')}</InputLabel>
+              <InputLabel id="crash-sortby-label" shrink>{t('crashes.sort.sortBy')}</InputLabel>
               <Select
                 labelId="crash-sortby-label"
                 id="crash-sortby-select"
                 value={sortBy}
-                label={t('admin.crashes.sort.sortBy')}
+                label={t('crashes.sort.sortBy')}
                 onChange={(e) => setSortBy(e.target.value as any)}
                 size="small"
               >
-                <MenuItem value="createdAt">{t('admin.crashes.sort.by.firstCrash')}</MenuItem>
-                <MenuItem value="lastCrash">{t('admin.crashes.sort.by.lastCrash')}</MenuItem>
-                <MenuItem value="count">{t('admin.crashes.sort.by.count')}</MenuItem>
-                <MenuItem value="firstVersion">{t('admin.crashes.sort.by.firstVersion')}</MenuItem>
-                <MenuItem value="lastVersion">{t('admin.crashes.sort.by.lastVersion')}</MenuItem>
-                <MenuItem value="branch">{t('admin.crashes.sort.by.branch')}</MenuItem>
+                <MenuItem value="createdAt">{t('crashes.sort.by.firstCrash')}</MenuItem>
+                <MenuItem value="lastCrash">{t('crashes.sort.by.lastCrash')}</MenuItem>
+                <MenuItem value="count">{t('crashes.sort.by.count')}</MenuItem>
+                <MenuItem value="firstVersion">{t('crashes.sort.by.firstVersion')}</MenuItem>
+                <MenuItem value="lastVersion">{t('crashes.sort.by.lastVersion')}</MenuItem>
+                <MenuItem value="branch">{t('crashes.sort.by.branch')}</MenuItem>
               </Select>
             </FormControl>
 
             <FormControl size="small" sx={{ minWidth: 140, flexShrink: 0 }}>
-              <InputLabel id="crash-sortorder-label" shrink>{t('admin.crashes.sort.sortOrder')}</InputLabel>
+              <InputLabel id="crash-sortorder-label" shrink>{t('crashes.sort.sortOrder')}</InputLabel>
               <Select
                 labelId="crash-sortorder-label"
                 id="crash-sortorder-select"
                 value={sortOrder}
-                label={t('admin.crashes.sort.sortOrder')}
+                label={t('crashes.sort.sortOrder')}
                 onChange={(e) => setSortOrder(e.target.value as any)}
                 renderValue={(value) => (value === 'DESC' ? t('common.desc') : t('common.asc'))}
                 size="small"
@@ -412,7 +412,7 @@ const CrashesPage: React.FC = () => {
 
             {/* Clear */}
             <Button variant="outlined" onClick={handleClearFilters} size="small" sx={{ flexShrink: 0 }}>
-              {t('admin.crashes.filters.clear')}
+              {t('crashes.filters.clear')}
             </Button>
           </Box>
 
@@ -429,17 +429,17 @@ const CrashesPage: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>{t('admin.crashes.columns.id')}</TableCell>
-                  <TableCell>{t('admin.crashes.columns.firstLine')}</TableCell>
-                  <TableCell align="center">{t('admin.crashes.columns.count')}</TableCell>
-                  <TableCell align="center">{t('admin.crashes.columns.state')}</TableCell>
-                  <TableCell>{t('admin.crashes.columns.platform')}</TableCell>
-                  <TableCell>{t('admin.crashes.columns.branch')}</TableCell>
-                  <TableCell>{t('admin.crashes.columns.firstCrash')}</TableCell>
-                  <TableCell>{t('admin.crashes.columns.lastCrash')}</TableCell>
-                  <TableCell>{t('admin.crashes.columns.firstVersion')}</TableCell>
-                  <TableCell>{t('admin.crashes.columns.lastVersion')}</TableCell>
-                  <TableCell align="center">{t('admin.crashes.columns.actions')}</TableCell>
+                  <TableCell>{t('crashes.columns.id')}</TableCell>
+                  <TableCell>{t('crashes.columns.firstLine')}</TableCell>
+                  <TableCell align="center">{t('crashes.columns.count')}</TableCell>
+                  <TableCell align="center">{t('crashes.columns.state')}</TableCell>
+                  <TableCell>{t('crashes.columns.platform')}</TableCell>
+                  <TableCell>{t('crashes.columns.branch')}</TableCell>
+                  <TableCell>{t('crashes.columns.firstCrash')}</TableCell>
+                  <TableCell>{t('crashes.columns.lastCrash')}</TableCell>
+                  <TableCell>{t('crashes.columns.firstVersion')}</TableCell>
+                  <TableCell>{t('crashes.columns.lastVersion')}</TableCell>
+                  <TableCell align="center">{t('crashes.columns.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -447,7 +447,7 @@ const CrashesPage: React.FC = () => {
                   <TableRow>
                     <TableCell colSpan={11} align="center" sx={{ py: 4 }}>
                       <Typography variant="body2" color="text.secondary">
-                        {t('admin.crashes.noResults')}
+                        {t('crashes.noResults')}
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -568,7 +568,7 @@ const CrashesPage: React.FC = () => {
           <ListItemIcon>
             <VisibilityIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>{t('admin.crashes.actions.viewDetails')}</ListItemText>
+          <ListItemText>{t('crashes.actions.viewDetails')}</ListItemText>
         </MenuItem>
 
         {selectedCrash?.state === CrashState.OPEN && (
@@ -576,7 +576,7 @@ const CrashesPage: React.FC = () => {
             <ListItemIcon>
               <CloseIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText>{t('admin.crashes.actions.markClosed')}</ListItemText>
+            <ListItemText>{t('crashes.actions.markClosed')}</ListItemText>
           </MenuItem>
         )}
 
@@ -585,7 +585,7 @@ const CrashesPage: React.FC = () => {
             <ListItemIcon>
               <BugReportIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText>{t('admin.crashes.actions.markOpen')}</ListItemText>
+            <ListItemText>{t('crashes.actions.markOpen')}</ListItemText>
           </MenuItem>
         )}
 
@@ -594,7 +594,7 @@ const CrashesPage: React.FC = () => {
             <ListItemIcon>
               <CloseIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText>{t('admin.crashes.actions.markDeleted')}</ListItemText>
+            <ListItemText>{t('crashes.actions.markDeleted')}</ListItemText>
           </MenuItem>
         )}
       </Menu>

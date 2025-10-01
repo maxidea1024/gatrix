@@ -37,14 +37,14 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({
     try {
       const inviteUrl = invitationData?.inviteUrl || '';
       if (!inviteUrl) {
-        enqueueSnackbar(t('admin.invitations.noInviteLink'), { variant: 'error' });
+        enqueueSnackbar(t('invitations.noInviteLink'), { variant: 'error' });
         return;
       }
       await navigator.clipboard.writeText(inviteUrl);
-      enqueueSnackbar(t('admin.invitations.linkCopied'), { variant: 'success' });
+      enqueueSnackbar(t('invitations.linkCopied'), { variant: 'success' });
     } catch (error) {
       console.error('Failed to copy link:', error);
-      enqueueSnackbar(t('admin.invitations.copyFailed'), { variant: 'error' });
+      enqueueSnackbar(t('invitations.copyFailed'), { variant: 'error' });
     }
   };
 
@@ -54,7 +54,7 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({
 
       // 유효한 날짜인지 확인
       if (isNaN(date.getTime())) {
-        return t('admin.invitations.invalidDate');
+        return t('invitations.invalidDate');
       }
 
       const now = new Date();
@@ -62,15 +62,15 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
       if (diffDays <= 0) {
-        return t('admin.invitations.expired');
+        return t('invitations.expired');
       } else if (diffDays === 1) {
-        return t('admin.invitations.expiresInOneDay');
+        return t('invitations.expiresInOneDay');
       } else {
-        return t('admin.invitations.expiresInDays', { days: diffDays });
+        return t('invitations.expiresInDays', { days: diffDays });
       }
     } catch (error) {
       console.error('Date formatting error:', error);
-      return t('admin.invitations.dateError');
+      return t('invitations.dateError');
     }
   };
 
@@ -91,10 +91,10 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({
         }}
       >
         <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-          {t('admin.invitations.successTitle')}
+          {t('invitations.successTitle')}
         </Typography>
         <Typography variant="body2">
-          {t('admin.invitations.successDescription')}
+          {t('invitations.successDescription')}
         </Typography>
       </Alert>
 
@@ -114,7 +114,7 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({
           <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
             <EmailIcon color="primary" fontSize="small" />
             <Typography variant="body2" color="text.secondary">
-              {t('admin.invitations.invitedEmail')}:
+              {t('invitations.invitedEmail')}:
             </Typography>
             <Chip
               label={invitationData.invitation.email}
@@ -129,10 +129,10 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({
         <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3 }}>
           <ScheduleIcon color="warning" fontSize="small" />
           <Typography variant="body2" color="text.secondary">
-            {t('admin.invitations.expirationLabel')}:
+            {t('invitations.expirationLabel')}:
           </Typography>
           <Chip
-            label={invitationData?.invitation?.expiresAt ? formatExpirationDate(invitationData.invitation.expiresAt) : t('admin.invitations.noExpiration')}
+            label={invitationData?.invitation?.expiresAt ? formatExpirationDate(invitationData.invitation.expiresAt) : t('invitations.noExpiration')}
             size="small"
             color="warning"
             variant="outlined"
@@ -142,7 +142,7 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({
         {/* 초대 링크 */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
-            {t('admin.invitations.inviteLink')}:
+            {t('invitations.inviteLink')}:
           </Typography>
           <TextField
             value={invitationData?.inviteUrl || ''}
@@ -179,7 +179,7 @@ const InvitationSuccess: React.FC<InvitationSuccessProps> = ({
               }
             }}
           >
-            {t('admin.invitations.copyLink')}
+            {t('invitations.copyLink')}
           </Button>
 
           <Button

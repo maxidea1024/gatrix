@@ -166,14 +166,14 @@ const MaintenancePage: React.FC = () => {
 
     // 시작 시간이 과거인지 확인
     if (startsAt && startsAt.isBefore(now)) {
-      enqueueSnackbar(t('admin.maintenance.validationTimeInPast'), { variant: 'error' });
+      enqueueSnackbar(t('maintenance.validationTimeInPast'), { variant: 'error' });
       startsAtRef.current?.focus();
       return { valid: false };
     }
 
     // 종료 시간이 시작 시간보다 이른지 확인
     if (startsAt && endsAt && endsAt.isBefore(startsAt)) {
-      enqueueSnackbar(t('admin.maintenance.validationEndBeforeStart'), { variant: 'error' });
+      enqueueSnackbar(t('maintenance.validationEndBeforeStart'), { variant: 'error' });
       endsAtRef.current?.focus();
       return { valid: false };
     }
@@ -182,7 +182,7 @@ const MaintenancePage: React.FC = () => {
     if (startsAt && endsAt) {
       const duration = endsAt.diff(startsAt, 'minute');
       if (duration < 5) {
-        enqueueSnackbar(t('admin.maintenance.validationTooShort'), { variant: 'error' });
+        enqueueSnackbar(t('maintenance.validationTooShort'), { variant: 'error' });
         endsAtRef.current?.focus();
         return { valid: false };
       }
@@ -227,7 +227,7 @@ const MaintenancePage: React.FC = () => {
 
     if (!isUnderMaintenance) {
       // 점검이 시작되지 않은 경우 경고
-      alert(t('admin.maintenance.startFailedWarning'));
+      alert(t('maintenance.startFailedWarning'));
       return;
     }
 
@@ -277,20 +277,20 @@ const MaintenancePage: React.FC = () => {
 
     if (!result.isUnderMaintenance) {
       // 점검이 업데이트되지 않은 경우 경고
-      enqueueSnackbar(t('admin.maintenance.updateFailedWarning'), { variant: 'warning' });
+      enqueueSnackbar(t('maintenance.updateFailedWarning'), { variant: 'warning' });
       return;
     }
 
     setEditMode(false);
-    enqueueSnackbar(t('admin.maintenance.updateSuccess'), { variant: 'success' });
+    enqueueSnackbar(t('maintenance.updateSuccess'), { variant: 'success' });
   };
 
   return (
     <Box sx={{ p: 3, transition:'background-color 0.2s ease', backgroundColor: (theme)=> isMaintenance ? alpha(theme.palette.error.light, 0.08) : alpha(theme.palette.success.light, 0.06) }}>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" sx={{ mb: 1 }}>{t('admin.maintenance.title')}</Typography>
+        <Typography variant="h4" sx={{ mb: 1 }}>{t('maintenance.title')}</Typography>
         <Typography variant="body1" color="text.secondary">
-          {t('admin.maintenance.description')}
+          {t('maintenance.description')}
         </Typography>
       </Box>
       <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
@@ -307,7 +307,7 @@ const MaintenancePage: React.FC = () => {
               {isMaintenance && !editMode ? (
                 <>
                   <Typography variant="subtitle1" color="error" sx={{ fontWeight: 600, mb: 2 }}>
-                    {t('admin.maintenance.statusOn')}
+                    {t('maintenance.statusOn')}
                   </Typography>
 
                   {/* Current Maintenance Summary */}
@@ -320,7 +320,7 @@ const MaintenancePage: React.FC = () => {
                     mb: 2
                   }}>
                     <Typography variant="h6" sx={{ mb: 1.5, fontWeight: 600, color: 'error.main' }}>
-                      {t('admin.maintenance.currentSettingsTitle')}
+                      {t('maintenance.currentSettingsTitle')}
                     </Typography>
 
                     <Box component="table" sx={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 8px' }}>
@@ -333,10 +333,10 @@ const MaintenancePage: React.FC = () => {
                             verticalAlign: 'top',
                             pr: 2
                           }}>
-                            {t('admin.maintenance.type')}:
+                            {t('maintenance.type')}:
                           </Box>
                           <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
-                            {type === 'regular' ? t('admin.maintenance.types.regular') : t('admin.maintenance.types.emergency')}
+                            {type === 'regular' ? t('maintenance.types.regular') : t('maintenance.types.emergency')}
                           </Box>
                         </Box>
 
@@ -349,7 +349,7 @@ const MaintenancePage: React.FC = () => {
                             verticalAlign: 'top',
                             pr: 2
                           }}>
-                            {t('admin.maintenance.maintenancePeriodLabel')}:
+                            {t('maintenance.maintenancePeriodLabel')}:
                           </Box>
                           <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
                             {(() => {
@@ -357,7 +357,7 @@ const MaintenancePage: React.FC = () => {
                                 const duration = endsAt.diff(startsAt, 'minute');
                                 const hours = Math.floor(duration / 60);
                                 const minutes = duration % 60;
-                                const durationText = `${hours > 0 ? `${hours}${t('admin.maintenance.hoursUnit')} ` : ''}${minutes}${t('admin.maintenance.minutesUnit')}`;
+                                const durationText = `${hours > 0 ? `${hours}${t('maintenance.hoursUnit')} ` : ''}${minutes}${t('maintenance.minutesUnit')}`;
                                 return (
                                   <Box component="span">
                                     {startsAt.format('YYYY-MM-DD A h:mm')} ~ {endsAt.format('YYYY-MM-DD A h:mm')}
@@ -367,11 +367,11 @@ const MaintenancePage: React.FC = () => {
                                   </Box>
                                 );
                               } else if (startsAt && !endsAt) {
-                                return `${startsAt.format('YYYY-MM-DD A h:mm')} ~ ${t('admin.maintenance.manualStopLabel')}`;
+                                return `${startsAt.format('YYYY-MM-DD A h:mm')} ~ ${t('maintenance.manualStopLabel')}`;
                               } else if (!startsAt && endsAt) {
-                                return `${t('admin.maintenance.immediateStartLabel')} ~ ${endsAt.format('YYYY-MM-DD A h:mm')}`;
+                                return `${t('maintenance.immediateStartLabel')} ~ ${endsAt.format('YYYY-MM-DD A h:mm')}`;
                               } else {
-                                return `${t('admin.maintenance.immediateStartLabel')} ~ ${t('admin.maintenance.manualStopLabel')}`;
+                                return `${t('maintenance.immediateStartLabel')} ~ ${t('maintenance.manualStopLabel')}`;
                               }
                             })()}
                           </Box>
@@ -386,7 +386,7 @@ const MaintenancePage: React.FC = () => {
                               verticalAlign: 'top',
                               pr: 2
                             }}>
-                              {t('admin.maintenance.startsAt')}:
+                              {t('maintenance.startsAt')}:
                             </Box>
                             <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
                               {startsAt.format('YYYY-MM-DD A h:mm')} ({startsAt.toISOString()})
@@ -403,7 +403,7 @@ const MaintenancePage: React.FC = () => {
                               verticalAlign: 'top',
                               pr: 2
                             }}>
-                              {t('admin.maintenance.endsAt')}:
+                              {t('maintenance.endsAt')}:
                             </Box>
                             <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
                               {endsAt.format('YYYY-MM-DD A h:mm')} ({endsAt.toISOString()})
@@ -445,7 +445,7 @@ const MaintenancePage: React.FC = () => {
                               verticalAlign: 'top',
                               pr: 2
                             }}>
-                              {t('admin.maintenance.updatedBy')}:
+                              {t('maintenance.updatedBy')}:
                             </Box>
                             <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
                               {currentMaintenanceDetail.updatedBy.name} ({currentMaintenanceDetail.updatedBy.email})
@@ -463,7 +463,7 @@ const MaintenancePage: React.FC = () => {
                               verticalAlign: 'top',
                               pr: 2
                             }}>
-                              {t('admin.maintenance.updatedAt')}:
+                              {t('maintenance.updatedAt')}:
                             </Box>
                             <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
                               {dayjs(currentMaintenanceDetail.updatedAt).format('YYYY-MM-DD A h:mm')} ({currentMaintenanceDetail.updatedAt})
@@ -478,18 +478,18 @@ const MaintenancePage: React.FC = () => {
                 <>
                   {/* Type and schedule */}
                   <Box sx={{ width: 320 }}>
-                    <TextField select label={t('admin.maintenance.type')} value={type} onChange={(e) => setType(e.target.value as MaintenanceType)} fullWidth>
-                      <MenuItem value="regular">{t('admin.maintenance.types.regular')}</MenuItem>
-                      <MenuItem value="emergency">{t('admin.maintenance.types.emergency')}</MenuItem>
+                    <TextField select label={t('maintenance.type')} value={type} onChange={(e) => setType(e.target.value as MaintenanceType)} fullWidth>
+                      <MenuItem value="regular">{t('maintenance.types.regular')}</MenuItem>
+                      <MenuItem value="emergency">{t('maintenance.types.emergency')}</MenuItem>
                     </TextField>
                     <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
-                      {t('admin.maintenance.typeHelp')}
+                      {t('maintenance.typeHelp')}
                     </Typography>
                   </Box>
                   <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ flexWrap: 'wrap' }}>
                     <Box sx={{ width: 320 }}>
                       <DateTimePicker
-                        label={t('admin.maintenance.startsAt')}
+                        label={t('maintenance.startsAt')}
                         value={startsAt}
                         onChange={(newValue) => {
                           console.log('DateTimePicker startsAt changed:', newValue?.format(), newValue?.toISOString());
@@ -501,7 +501,7 @@ const MaintenancePage: React.FC = () => {
                         slotProps={{
                           textField: {
                             fullWidth: true,
-                            placeholder: t('admin.maintenance.selectDateTime'),
+                            placeholder: t('maintenance.selectDateTime'),
                             inputRef: startsAtRef
                           },
                           actionBar: {
@@ -510,12 +510,12 @@ const MaintenancePage: React.FC = () => {
                         }}
                       />
                       <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
-                        {t('admin.maintenance.startsAtHelp')}
+                        {t('maintenance.startsAtHelp')}
                       </Typography>
                     </Box>
                     <Box sx={{ width: 320 }}>
                       <DateTimePicker
-                        label={t('admin.maintenance.endsAt')}
+                        label={t('maintenance.endsAt')}
                         value={endsAt}
                         onChange={(newValue) => {
                           console.log('DateTimePicker endsAt changed:', newValue?.format(), newValue?.toISOString());
@@ -527,7 +527,7 @@ const MaintenancePage: React.FC = () => {
                         slotProps={{
                           textField: {
                             fullWidth: true,
-                            placeholder: t('admin.maintenance.selectDateTime'),
+                            placeholder: t('maintenance.selectDateTime'),
                             inputRef: endsAtRef
                           },
                           actionBar: {
@@ -536,7 +536,7 @@ const MaintenancePage: React.FC = () => {
                         }}
                       />
                       <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
-                        {t('admin.maintenance.endsAtHelp')}
+                        {t('maintenance.endsAtHelp')}
                       </Typography>
                     </Box>
                   </Stack>
@@ -554,10 +554,10 @@ const MaintenancePage: React.FC = () => {
                               color="warning"
                             />
                           }
-                          label={t('admin.maintenance.kickExistingPlayers')}
+                          label={t('maintenance.kickExistingPlayers')}
                         />
                         <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary', maxWidth: 300 }}>
-                          {t('admin.maintenance.kickExistingPlayersHelp')}
+                          {t('maintenance.kickExistingPlayersHelp')}
                         </Typography>
                       </Box>
 
@@ -566,20 +566,20 @@ const MaintenancePage: React.FC = () => {
                         <Box sx={{ flex: '0 0 auto', minWidth: 250 }}>
                           <TextField
                             select
-                            label={t('admin.maintenance.kickDelayMinutes')}
+                            label={t('maintenance.kickDelayMinutes')}
                             value={kickDelayMinutes}
                             onChange={(e) => setKickDelayMinutes(Number(e.target.value))}
                             fullWidth
                             size="small"
                           >
-                            <MenuItem value={0}>{t('admin.maintenance.kickDelayImmediate')}</MenuItem>
-                            <MenuItem value={1}>{t('admin.maintenance.kickDelay1Min')}</MenuItem>
-                            <MenuItem value={5}>{t('admin.maintenance.kickDelay5Min')}</MenuItem>
-                            <MenuItem value={10}>{t('admin.maintenance.kickDelay10Min')}</MenuItem>
-                            <MenuItem value={30}>{t('admin.maintenance.kickDelay30Min')}</MenuItem>
+                            <MenuItem value={0}>{t('maintenance.kickDelayImmediate')}</MenuItem>
+                            <MenuItem value={1}>{t('maintenance.kickDelay1Min')}</MenuItem>
+                            <MenuItem value={5}>{t('maintenance.kickDelay5Min')}</MenuItem>
+                            <MenuItem value={10}>{t('maintenance.kickDelay10Min')}</MenuItem>
+                            <MenuItem value={30}>{t('maintenance.kickDelay30Min')}</MenuItem>
                           </TextField>
                           <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
-                            {t('admin.maintenance.kickDelayHelp')}
+                            {t('maintenance.kickDelayHelp')}
                           </Typography>
                         </Box>
                       )}
@@ -597,26 +597,26 @@ const MaintenancePage: React.FC = () => {
 
                   {/* Input mode */}
                   <Box sx={{ width: 320 }}>
-                    <TextField select label={t('admin.maintenance.messageSource')} value={inputMode} onChange={(e)=>setInputMode(e.target.value as any)} fullWidth>
-                      <MenuItem value="direct">{t('admin.maintenance.directInput')}</MenuItem>
-                      <MenuItem value="template">{t('admin.maintenance.useTemplate')}</MenuItem>
+                    <TextField select label={t('maintenance.messageSource')} value={inputMode} onChange={(e)=>setInputMode(e.target.value as any)} fullWidth>
+                      <MenuItem value="direct">{t('maintenance.directInput')}</MenuItem>
+                      <MenuItem value="template">{t('maintenance.useTemplate')}</MenuItem>
                     </TextField>
                     <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
-                      {t('admin.maintenance.messageSourceHelp')}
+                      {t('maintenance.messageSourceHelp')}
                     </Typography>
                   </Box>
 
                   {inputMode === 'template' && (
                     <Stack spacing={2}>
                       <Box sx={{ width: 320 }}>
-                        <TextField select label={t('admin.maintenance.selectTemplate')} value={selectedTplId} onChange={(e)=>setSelectedTplId(Number(e.target.value))} fullWidth>
+                        <TextField select label={t('maintenance.selectTemplate')} value={selectedTplId} onChange={(e)=>setSelectedTplId(Number(e.target.value))} fullWidth>
                           <MenuItem value="">{t('common.select')}</MenuItem>
                           {tpls.map(tpl => (
                             <MenuItem key={tpl.id} value={tpl.id}>{tpl.name}</MenuItem>
                           ))}
                         </TextField>
                         <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
-                          {t('admin.maintenance.selectTemplateHelp')}
+                          {t('maintenance.selectTemplateHelp')}
                         </Typography>
                       </Box>
 
@@ -668,14 +668,14 @@ const MaintenancePage: React.FC = () => {
                           setLocales([]);
                         }
                       }}
-                      supportsMultiLanguageLabel={t('admin.maintenance.useLanguageSpecificMessages')}
-                      supportsMultiLanguageHelperText={t('admin.maintenance.supportsMultiLanguageHelp')}
+                      supportsMultiLanguageLabel={t('maintenance.useLanguageSpecificMessages')}
+                      supportsMultiLanguageHelperText={t('maintenance.supportsMultiLanguageHelp')}
 
                       locales={locales.map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
                       onLocalesChange={(newLocales) => {
                         setLocales(newLocales.map(l => ({ lang: l.lang, message: l.message })));
                       }}
-                      languageSpecificMessagesLabel={t('admin.maintenance.languageSpecificMessages')}
+                      languageSpecificMessagesLabel={t('maintenance.languageSpecificMessages')}
 
                       enableTranslation={true}
                       translateButtonLabel={t('common.autoTranslate')}
@@ -729,7 +729,7 @@ const MaintenancePage: React.FC = () => {
               }}
             >
               <PlayArrowIcon sx={{ fontSize: '2.5rem' }} />
-              {t('admin.maintenance.start')}
+              {t('maintenance.start')}
             </Button>
           ) : (
             <>
@@ -765,7 +765,7 @@ const MaintenancePage: React.FC = () => {
                   }}
                 >
                   <SaveIcon sx={{ fontSize: '2.5rem' }} />
-                  {t('admin.maintenance.update')}
+                  {t('maintenance.update')}
                 </Button>
               ) : (
                 <Button
@@ -789,7 +789,7 @@ const MaintenancePage: React.FC = () => {
                   }}
                 >
                   <StopIcon sx={{ fontSize: '2.5rem' }} />
-                  {t('admin.maintenance.stop')}
+                  {t('maintenance.stop')}
                 </Button>
               )}
               <Button
@@ -797,7 +797,7 @@ const MaintenancePage: React.FC = () => {
                 onClick={() => setEditMode(v => !v)}
                 sx={{ width: 140 }}
               >
-                {editMode ? t('common.cancel') : t('admin.maintenance.edit')}
+                {editMode ? t('common.cancel') : t('maintenance.edit')}
               </Button>
             </>
           )}
@@ -819,14 +819,14 @@ const MaintenancePage: React.FC = () => {
         >
           <DialogTitle sx={{ pb: 1 }}>
             <Typography variant="h6" component="div">
-              {confirmMode === 'start' ? t('admin.maintenance.confirmStartTitle') :
-               confirmMode === 'update' ? t('admin.maintenance.confirmUpdateTitle') :
-               t('admin.maintenance.confirmStopTitle')}
+              {confirmMode === 'start' ? t('maintenance.confirmStartTitle') :
+               confirmMode === 'update' ? t('maintenance.confirmUpdateTitle') :
+               t('maintenance.confirmStopTitle')}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-              {confirmMode === 'start' ? t('admin.maintenance.confirmStartSubtitle') :
-               confirmMode === 'update' ? t('admin.maintenance.confirmUpdateSubtitle') :
-               t('admin.maintenance.confirmStopSubtitle')}
+              {confirmMode === 'start' ? t('maintenance.confirmStartSubtitle') :
+               confirmMode === 'update' ? t('maintenance.confirmUpdateSubtitle') :
+               t('maintenance.confirmStopSubtitle')}
             </Typography>
           </DialogTitle>
           <DialogContent sx={{ pt: 2 }}>
@@ -840,7 +840,7 @@ const MaintenancePage: React.FC = () => {
               borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(144, 202, 249, 0.3)' : 'rgba(25, 118, 210, 0.2)'
             }}>
               <Typography variant="h6" sx={{ mb: 1.5, fontWeight: 600, color: 'primary.main' }}>
-                {confirmMode === 'start' ? t('admin.maintenance.settingsSummaryTitle') : t('admin.maintenance.currentSettingsTitle')}
+                {confirmMode === 'start' ? t('maintenance.settingsSummaryTitle') : t('maintenance.currentSettingsTitle')}
               </Typography>
 
               <Box component="table" sx={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 8px' }}>
@@ -853,10 +853,10 @@ const MaintenancePage: React.FC = () => {
                       verticalAlign: 'top',
                       pr: 2
                     }}>
-                      {t('admin.maintenance.type')}:
+                      {t('maintenance.type')}:
                     </Box>
                     <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
-                      {type === 'regular' ? t('admin.maintenance.types.regular') : t('admin.maintenance.types.emergency')}
+                      {type === 'regular' ? t('maintenance.types.regular') : t('maintenance.types.emergency')}
                     </Box>
                   </Box>
 
@@ -869,7 +869,7 @@ const MaintenancePage: React.FC = () => {
                       verticalAlign: 'top',
                       pr: 2
                     }}>
-                      {t('admin.maintenance.maintenancePeriodLabel')}:
+                      {t('maintenance.maintenancePeriodLabel')}:
                     </Box>
                     <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
                       {(() => {
@@ -877,7 +877,7 @@ const MaintenancePage: React.FC = () => {
                           const duration = endsAt.diff(startsAt, 'minute');
                           const hours = Math.floor(duration / 60);
                           const minutes = duration % 60;
-                          const durationText = `${hours > 0 ? `${hours}${t('admin.maintenance.hoursUnit')} ` : ''}${minutes}${t('admin.maintenance.minutesUnit')}`;
+                          const durationText = `${hours > 0 ? `${hours}${t('maintenance.hoursUnit')} ` : ''}${minutes}${t('maintenance.minutesUnit')}`;
                           return (
                             <Box component="span">
                               {startsAt.format('YYYY-MM-DD A h:mm')} ~ {endsAt.format('YYYY-MM-DD A h:mm')}
@@ -887,11 +887,11 @@ const MaintenancePage: React.FC = () => {
                             </Box>
                           );
                         } else if (startsAt && !endsAt) {
-                          return `${startsAt.format('YYYY-MM-DD A h:mm')} ~ ${t('admin.maintenance.manualStopLabel')}`;
+                          return `${startsAt.format('YYYY-MM-DD A h:mm')} ~ ${t('maintenance.manualStopLabel')}`;
                         } else if (!startsAt && endsAt) {
-                          return `${t('admin.maintenance.immediateStartLabel')} ~ ${endsAt.format('YYYY-MM-DD A h:mm')}`;
+                          return `${t('maintenance.immediateStartLabel')} ~ ${endsAt.format('YYYY-MM-DD A h:mm')}`;
                         } else {
-                          return `${t('admin.maintenance.immediateStartLabel')} ~ ${t('admin.maintenance.manualStopLabel')}`;
+                          return `${t('maintenance.immediateStartLabel')} ~ ${t('maintenance.manualStopLabel')}`;
                         }
                       })()}
                     </Box>
@@ -908,7 +908,7 @@ const MaintenancePage: React.FC = () => {
                         verticalAlign: 'top',
                         pr: 2
                       }}>
-                        {t('admin.maintenance.startsAt')}:
+                        {t('maintenance.startsAt')}:
                       </Box>
                       <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
                         {startsAt.format('YYYY-MM-DD A h:mm')} ({startsAt.toISOString()})
@@ -925,7 +925,7 @@ const MaintenancePage: React.FC = () => {
                         verticalAlign: 'top',
                         pr: 2
                       }}>
-                        {t('admin.maintenance.endsAt')}:
+                        {t('maintenance.endsAt')}:
                       </Box>
                       <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
                         {endsAt.format('YYYY-MM-DD A h:mm')} ({endsAt.toISOString()})
@@ -943,7 +943,7 @@ const MaintenancePage: React.FC = () => {
                           verticalAlign: 'top',
                           pr: 2
                         }}>
-                          {t('admin.maintenance.kickExistingPlayers')}:
+                          {t('maintenance.kickExistingPlayers')}:
                         </Box>
                         <Box component="td" sx={{
                           fontSize: '0.875rem',
@@ -963,7 +963,7 @@ const MaintenancePage: React.FC = () => {
                             verticalAlign: 'top',
                             pr: 2
                           }}>
-                            {t('admin.maintenance.kickDelayMinutes')}:
+                            {t('maintenance.kickDelayMinutes')}:
                           </Box>
                           <Box component="td" sx={{
                             fontSize: '0.875rem',
@@ -971,8 +971,8 @@ const MaintenancePage: React.FC = () => {
                             color: 'warning.main'
                           }}>
                             {kickDelayMinutes === 0
-                              ? t('admin.maintenance.kickDelayImmediate')
-                              : t('admin.maintenance.kickDelayMinutesValue', { minutes: kickDelayMinutes })
+                              ? t('maintenance.kickDelayImmediate')
+                              : t('maintenance.kickDelayMinutesValue', { minutes: kickDelayMinutes })
                             }
                           </Box>
                         </Box>
@@ -1014,7 +1014,7 @@ const MaintenancePage: React.FC = () => {
                         verticalAlign: 'top',
                         pr: 2
                       }}>
-                        {confirmMode === 'update' ? t('admin.maintenance.updatedBy') : t('admin.maintenance.setBy')}:
+                        {confirmMode === 'update' ? t('maintenance.updatedBy') : t('maintenance.setBy')}:
                       </Box>
                       <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
                         {user.name} ({user.email})
@@ -1031,7 +1031,7 @@ const MaintenancePage: React.FC = () => {
                       verticalAlign: 'top',
                       pr: 2
                     }}>
-                      {confirmMode === 'update' ? t('admin.maintenance.updatedAt') : t('admin.maintenance.setAt')}:
+                      {confirmMode === 'update' ? t('maintenance.updatedAt') : t('maintenance.setAt')}:
                     </Box>
                     <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
                       {dayjs().format('YYYY-MM-DD A h:mm')} ({dayjs().toISOString()})
@@ -1056,13 +1056,13 @@ const MaintenancePage: React.FC = () => {
             }}>
               <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
                 {confirmMode === 'start'
-                  ? t('admin.maintenance.impactWarningTitle')
-                  : t('admin.maintenance.impactRestoreTitle')}
+                  ? t('maintenance.impactWarningTitle')
+                  : t('maintenance.impactRestoreTitle')}
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
                 {confirmMode === 'start'
-                  ? t('admin.maintenance.impactWarningDescription')
-                  : t('admin.maintenance.impactRestoreDescription')}
+                  ? t('maintenance.impactWarningDescription')
+                  : t('maintenance.impactRestoreDescription')}
               </Typography>
               <Box component="ul" sx={{ pl: 2, mb: 0 }}>
                 {confirmMode === 'start' ? (
@@ -1070,31 +1070,31 @@ const MaintenancePage: React.FC = () => {
                     {kickExistingPlayers ? (
                       <>
                         <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                          {t('admin.maintenance.impactItemKick1')}
+                          {t('maintenance.impactItemKick1')}
                         </Typography>
                         <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                          {t('admin.maintenance.impactItemKick2')}
+                          {t('maintenance.impactItemKick2')}
                         </Typography>
                         <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                          {t('admin.maintenance.impactItemKick3')}
+                          {t('maintenance.impactItemKick3')}
                         </Typography>
                         <Typography component="li" variant="body2">
-                          {t('admin.maintenance.impactItemKick4')}
+                          {t('maintenance.impactItemKick4')}
                         </Typography>
                       </>
                     ) : (
                       <>
                         <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                          {t('admin.maintenance.impactItemNoKick1')}
+                          {t('maintenance.impactItemNoKick1')}
                         </Typography>
                         <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                          {t('admin.maintenance.impactItemNoKick2')}
+                          {t('maintenance.impactItemNoKick2')}
                         </Typography>
                         <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                          {t('admin.maintenance.impactItemNoKick3')}
+                          {t('maintenance.impactItemNoKick3')}
                         </Typography>
                         <Typography component="li" variant="body2">
-                          {t('admin.maintenance.impactItemNoKick4')}
+                          {t('maintenance.impactItemNoKick4')}
                         </Typography>
                       </>
                     )}
@@ -1102,13 +1102,13 @@ const MaintenancePage: React.FC = () => {
                 ) : (
                   <>
                     <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                      {t('admin.maintenance.restoreItem1')}
+                      {t('maintenance.restoreItem1')}
                     </Typography>
                     <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                      {t('admin.maintenance.restoreItem2')}
+                      {t('maintenance.restoreItem2')}
                     </Typography>
                     <Typography component="li" variant="body2">
-                      {t('admin.maintenance.restoreItem3')}
+                      {t('maintenance.restoreItem3')}
                     </Typography>
                   </>
                 )}
@@ -1118,10 +1118,10 @@ const MaintenancePage: React.FC = () => {
             {/* Confirmation Input */}
             <Typography sx={{ mb: 2, fontWeight: 500 }}>
               {confirmMode === 'start'
-                ? t('admin.maintenance.confirmStartMessage', { keyword: t('admin.maintenance.confirmStartKeyword') })
+                ? t('maintenance.confirmStartMessage', { keyword: t('maintenance.confirmStartKeyword') })
                 : confirmMode === 'update'
-                ? t('admin.maintenance.confirmUpdateMessage', { keyword: t('admin.maintenance.confirmUpdateKeyword') })
-                : t('admin.maintenance.confirmStopMessage', { keyword: t('admin.maintenance.confirmStopKeyword') })}
+                ? t('maintenance.confirmUpdateMessage', { keyword: t('maintenance.confirmUpdateKeyword') })
+                : t('maintenance.confirmStopMessage', { keyword: t('maintenance.confirmStopKeyword') })}
             </Typography>
             <TextField
               autoFocus
@@ -1129,9 +1129,9 @@ const MaintenancePage: React.FC = () => {
               size="medium"
               value={confirmInput}
               onChange={(e)=>setConfirmInput(e.target.value)}
-              placeholder={confirmMode === 'start' ? t('admin.maintenance.confirmStartKeyword') :
-                         confirmMode === 'update' ? t('admin.maintenance.confirmUpdateKeyword') :
-                         t('admin.maintenance.confirmStopKeyword')}
+              placeholder={confirmMode === 'start' ? t('maintenance.confirmStartKeyword') :
+                         confirmMode === 'update' ? t('maintenance.confirmUpdateKeyword') :
+                         t('maintenance.confirmStopKeyword')}
               sx={{ mb: 1 }}
             />
           </DialogContent>
@@ -1141,22 +1141,22 @@ const MaintenancePage: React.FC = () => {
               color={confirmMode==='start' ? 'error' : confirmMode==='update' ? 'primary' : 'success'}
               variant="contained"
               onClick={async()=>{
-                const expected = confirmMode==='start' ? t('admin.maintenance.confirmStartKeyword') :
-                                confirmMode==='update' ? t('admin.maintenance.confirmUpdateKeyword') :
-                                t('admin.maintenance.confirmStopKeyword');
+                const expected = confirmMode==='start' ? t('maintenance.confirmStartKeyword') :
+                                confirmMode==='update' ? t('maintenance.confirmUpdateKeyword') :
+                                t('maintenance.confirmStopKeyword');
                 if (confirmInput.trim().toLowerCase() !== expected.toLowerCase()) return;
                 setConfirmOpen(false);
                 if (confirmMode==='start') await startMaintenance();
                 if (confirmMode==='update') await updateMaintenance();
                 if (confirmMode==='stop') await stopMaintenance();
               }}
-              disabled={confirmInput.trim().toLowerCase() !== (confirmMode==='start' ? t('admin.maintenance.confirmStartKeyword') :
-                                                              confirmMode==='update' ? t('admin.maintenance.confirmUpdateKeyword') :
-                                                              t('admin.maintenance.confirmStopKeyword')).toLowerCase()}
+              disabled={confirmInput.trim().toLowerCase() !== (confirmMode==='start' ? t('maintenance.confirmStartKeyword') :
+                                                              confirmMode==='update' ? t('maintenance.confirmUpdateKeyword') :
+                                                              t('maintenance.confirmStopKeyword')).toLowerCase()}
             >
-              {confirmMode==='start' ? t('admin.maintenance.start') :
-               confirmMode==='update' ? t('admin.maintenance.update') :
-               t('admin.maintenance.stop')}
+              {confirmMode==='start' ? t('maintenance.start') :
+               confirmMode==='update' ? t('maintenance.update') :
+               t('maintenance.stop')}
             </Button>
           </DialogActions>
         </Dialog>

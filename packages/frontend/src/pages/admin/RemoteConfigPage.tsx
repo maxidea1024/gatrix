@@ -225,13 +225,13 @@ const RemoteConfigPage: React.FC = () => {
       const response = await api.deleteContextField(field.id);
       if (response.success) {
         // loadContextFields(); // This function needs to be defined or removed
-        enqueueSnackbar(t('admin.remoteConfig.contextFields.deleteSuccess'), { variant: 'success' });
+        enqueueSnackbar(t('remoteConfig.contextFields.deleteSuccess'), { variant: 'success' });
       } else {
-        enqueueSnackbar(t('admin.remoteConfig.contextFields.deleteError'), { variant: 'error' });
+        enqueueSnackbar(t('remoteConfig.contextFields.deleteError'), { variant: 'error' });
       }
     } catch (error) {
       console.error('Error deleting context field:', error);
-      enqueueSnackbar(t('admin.remoteConfig.contextFields.deleteError'), { variant: 'error' });
+      enqueueSnackbar(t('remoteConfig.contextFields.deleteError'), { variant: 'error' });
     } finally {
       setDeleteConfirmDialog({ open: false, field: null });
     }
@@ -242,13 +242,13 @@ const RemoteConfigPage: React.FC = () => {
     const errors: {[key: string]: string} = {};
 
     if (!formData.keyName.trim()) {
-      errors.keyName = t('admin.remoteConfig.validation.keyNameRequired');
+      errors.keyName = t('remoteConfig.validation.keyNameRequired');
     } else if (!/^[a-zA-Z][a-zA-Z0-9_]{0,255}$/.test(formData.keyName)) {
-      errors.keyName = t('admin.remoteConfig.validation.keyNameInvalid');
+      errors.keyName = t('remoteConfig.validation.keyNameInvalid');
     }
 
     if (!formData.defaultValue.trim()) {
-      errors.defaultValue = t('admin.remoteConfig.validation.defaultValueRequired');
+      errors.defaultValue = t('remoteConfig.validation.defaultValueRequired');
     }
 
     if (!formData.description.trim()) {
@@ -282,7 +282,7 @@ const RemoteConfigPage: React.FC = () => {
       setTotal(response.data.total);
     } catch (error: any) {
       console.error('Error loading configs:', error);
-      const errorMessage = error.error?.message || error.message || t('admin.remoteConfig.loadError');
+      const errorMessage = error.error?.message || error.message || t('remoteConfig.loadError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setLoading(false);
@@ -302,13 +302,13 @@ const RemoteConfigPage: React.FC = () => {
     try {
       await api.post('/admin/remote-config', formData);
 
-      enqueueSnackbar(t('admin.remoteConfig.createSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('remoteConfig.createSuccess'), { variant: 'success' });
       setCreateDialogOpen(false);
       resetForm();
       loadConfigs();
     } catch (error: any) {
       console.error('Error creating config:', error);
-      const errorMessage = error.error?.message || error.message || t('admin.remoteConfig.createError');
+      const errorMessage = error.error?.message || error.message || t('remoteConfig.createError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
@@ -324,13 +324,13 @@ const RemoteConfigPage: React.FC = () => {
     try {
       await api.put(`/admin/remote-config/${selectedConfig.id}`, formData);
 
-      enqueueSnackbar(t('admin.remoteConfig.updateSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('remoteConfig.updateSuccess'), { variant: 'success' });
       setEditDialogOpen(false);
       resetForm();
       loadConfigs();
     } catch (error: any) {
       console.error('Error updating config:', error);
-      const errorMessage = error.error?.message || error.message || t('admin.remoteConfig.updateError');
+      const errorMessage = error.error?.message || error.message || t('remoteConfig.updateError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
@@ -348,13 +348,13 @@ const RemoteConfigPage: React.FC = () => {
     try {
       await api.delete(`/admin/remote-config/${configToDelete.id}`);
 
-      enqueueSnackbar(t('admin.remoteConfig.deleteSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('remoteConfig.deleteSuccess'), { variant: 'success' });
       loadConfigs();
       setDeleteDialogOpen(false);
       setConfigToDelete(null);
     } catch (error: any) {
       console.error('Error deleting config:', error);
-      const errorMessage = error.error?.message || error.message || t('admin.remoteConfig.deleteError');
+      const errorMessage = error.error?.message || error.message || t('remoteConfig.deleteError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
@@ -371,7 +371,7 @@ const RemoteConfigPage: React.FC = () => {
       console.log('Starting stage configs...', { selectedConfigs, stageFormData }); // 디버깅용
 
       if (selectedConfigs.length === 0) {
-        enqueueSnackbar(t('admin.remoteConfig.selectConfigsFirst'), { variant: 'warning' });
+        enqueueSnackbar(t('remoteConfig.selectConfigsFirst'), { variant: 'warning' });
         return;
       }
 
@@ -385,18 +385,18 @@ const RemoteConfigPage: React.FC = () => {
 
       // 성공 조건: success가 true이거나, stagedConfigIds가 있으면 성공으로 간주
       if (response.data.success || response.data.stagedConfigIds) {
-        enqueueSnackbar(t('admin.remoteConfig.stageSuccess'), { variant: 'success' });
+        enqueueSnackbar(t('remoteConfig.stageSuccess'), { variant: 'success' });
         setStageDialogOpen(false);
         setStageFormData({ description: '' });
         setSelectedConfigs([]);
         loadConfigs();
       } else {
         console.log('Stage failed - success is false'); // 디버깅용
-        enqueueSnackbar(response.data.message || t('admin.remoteConfig.stageError'), { variant: 'error' });
+        enqueueSnackbar(response.data.message || t('remoteConfig.stageError'), { variant: 'error' });
       }
     } catch (error: any) {
       console.error('Error staging configs:', error);
-      const errorMessage = error.response?.data?.message || t('admin.remoteConfig.stageError');
+      const errorMessage = error.response?.data?.message || t('remoteConfig.stageError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
@@ -412,16 +412,16 @@ const RemoteConfigPage: React.FC = () => {
       });
 
       if (response.data.success) {
-        enqueueSnackbar(t('admin.remoteConfig.publishSuccess'), { variant: 'success' });
+        enqueueSnackbar(t('remoteConfig.publishSuccess'), { variant: 'success' });
         setPublishDialogOpen(false);
         setPublishFormData({ deploymentName: '', description: '' });
         loadConfigs();
       } else {
-        enqueueSnackbar(response.data.message || t('admin.remoteConfig.publishError'), { variant: 'error' });
+        enqueueSnackbar(response.data.message || t('remoteConfig.publishError'), { variant: 'error' });
       }
     } catch (error: any) {
       console.error('Error publishing changes:', error);
-      const errorMessage = error.response?.data?.message || t('admin.remoteConfig.publishError');
+      const errorMessage = error.response?.data?.message || t('remoteConfig.publishError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
@@ -509,7 +509,7 @@ const RemoteConfigPage: React.FC = () => {
         }
       } catch (error) {
         console.error('Error loading campaigns:', error);
-        enqueueSnackbar(t('admin.remoteConfig.campaigns.loadError'), { variant: 'error' });
+        enqueueSnackbar(t('remoteConfig.campaigns.loadError'), { variant: 'error' });
       } finally {
         setCampaignLoading(false);
       }
@@ -526,7 +526,7 @@ const RemoteConfigPage: React.FC = () => {
         const response = await api.post('/admin/remote-config/campaigns', createData);
 
         if (response.data.success) {
-          enqueueSnackbar(t('admin.remoteConfig.campaigns.createSuccess'), { variant: 'success' });
+          enqueueSnackbar(t('remoteConfig.campaigns.createSuccess'), { variant: 'success' });
           setCreateCampaignDialogOpen(false);
           setCampaignFormData({
             campaignName: '',
@@ -544,7 +544,7 @@ const RemoteConfigPage: React.FC = () => {
         }
       } catch (error: any) {
         console.error('Error creating campaign:', error);
-        const errorMessage = error.response?.data?.message || t('admin.remoteConfig.campaigns.createError');
+        const errorMessage = error.response?.data?.message || t('remoteConfig.campaigns.createError');
         enqueueSnackbar(errorMessage, { variant: 'error' });
       }
     };
@@ -555,14 +555,14 @@ const RemoteConfigPage: React.FC = () => {
         const response = await api.put(`/admin/remote-config/campaigns/${selectedCampaign.id}`, campaignFormData);
 
         if (response.data.success) {
-          enqueueSnackbar(t('admin.remoteConfig.campaigns.updateSuccess'), { variant: 'success' });
+          enqueueSnackbar(t('remoteConfig.campaigns.updateSuccess'), { variant: 'success' });
           setEditCampaignDialogOpen(false);
           setSelectedCampaign(null);
           loadCampaigns();
         }
       } catch (error: any) {
         console.error('Error updating campaign:', error);
-        const errorMessage = error.response?.data?.message || t('admin.remoteConfig.campaigns.updateError');
+        const errorMessage = error.response?.data?.message || t('remoteConfig.campaigns.updateError');
         enqueueSnackbar(errorMessage, { variant: 'error' });
       }
     };
@@ -573,12 +573,12 @@ const RemoteConfigPage: React.FC = () => {
         const response = await api.delete(`/admin/remote-config/campaigns/${campaign.id}`);
 
         if (response.data.success) {
-          enqueueSnackbar(t('admin.remoteConfig.campaigns.deleteSuccess'), { variant: 'success' });
+          enqueueSnackbar(t('remoteConfig.campaigns.deleteSuccess'), { variant: 'success' });
           loadCampaigns();
         }
       } catch (error: any) {
         console.error('Error deleting campaign:', error);
-        const errorMessage = error.response?.data?.message || t('admin.remoteConfig.campaigns.deleteError');
+        const errorMessage = error.response?.data?.message || t('remoteConfig.campaigns.deleteError');
         enqueueSnackbar(errorMessage, { variant: 'error' });
       }
     };
@@ -594,14 +594,14 @@ const RemoteConfigPage: React.FC = () => {
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h6" color="text.primary">
-            {t('admin.remoteConfig.campaigns.title')}
+            {t('remoteConfig.campaigns.title')}
           </Typography>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => setCreateCampaignDialogOpen(true)}
           >
-            {t('admin.remoteConfig.campaigns.createCampaign')}
+            {t('remoteConfig.campaigns.createCampaign')}
           </Button>
         </Box>
 
@@ -610,13 +610,13 @@ const RemoteConfigPage: React.FC = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.campaigns.campaignName')}</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.description')}</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.campaigns.startDate')}</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.campaigns.endDate')}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.campaigns.campaignName')}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.description')}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.campaigns.startDate')}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.campaigns.endDate')}</TableCell>
                 <TableCell sx={{ fontWeight: 600 }} align="center">트래픽 비율</TableCell>
-                <TableCell sx={{ fontWeight: 600 }} align="center">{t('admin.remoteConfig.status')}</TableCell>
-                <TableCell sx={{ fontWeight: 600 }} align="center">{t('admin.remoteConfig.actions')}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }} align="center">{t('remoteConfig.status')}</TableCell>
+                <TableCell sx={{ fontWeight: 600 }} align="center">{t('remoteConfig.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -630,7 +630,7 @@ const RemoteConfigPage: React.FC = () => {
                 <TableRow>
                   <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
                     <Typography variant="body2" color="text.secondary">
-                      {t('admin.remoteConfig.campaigns.noCampaigns')}
+                      {t('remoteConfig.campaigns.noCampaigns')}
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -664,7 +664,7 @@ const RemoteConfigPage: React.FC = () => {
                     </TableCell>
                     <TableCell align="center">
                       <Chip
-                        label={campaign.isActive ? t('admin.remoteConfig.active') : t('admin.remoteConfig.inactive')}
+                        label={campaign.isActive ? t('remoteConfig.active') : t('remoteConfig.inactive')}
                         color={campaign.isActive ? 'success' : 'default'}
                         size="small"
                       />
@@ -734,10 +734,10 @@ const RemoteConfigPage: React.FC = () => {
           <DialogTitle>
             <Box>
               <Typography variant="h6" component="div" color="text.primary">
-                {t('admin.remoteConfig.campaigns.createCampaign')}
+                {t('remoteConfig.campaigns.createCampaign')}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                {t('admin.remoteConfig.campaigns.createCampaignSubtitle')}
+                {t('remoteConfig.campaigns.createCampaignSubtitle')}
               </Typography>
             </Box>
           </DialogTitle>
@@ -745,15 +745,15 @@ const RemoteConfigPage: React.FC = () => {
             <Stack spacing={3} sx={{ mt: 1 }}>
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.campaigns.campaignName')}
+                label={t('remoteConfig.campaigns.campaignName')}
                 value={campaignFormData.campaignName}
                 onChange={(e) => setCampaignFormData({ ...campaignFormData, campaignName: e.target.value })}
                 required
-                helperText={t('admin.remoteConfig.campaigns.campaignNameHelp')}
+                helperText={t('remoteConfig.campaigns.campaignNameHelp')}
               />
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.description')}
+                label={t('remoteConfig.description')}
                 value={campaignFormData.description}
                 onChange={(e) => setCampaignFormData({ ...campaignFormData, description: e.target.value })}
                 multiline
@@ -763,29 +763,29 @@ const RemoteConfigPage: React.FC = () => {
               />
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.campaigns.startDate')}
+                label={t('remoteConfig.campaigns.startDate')}
                 type="datetime-local"
                 value={campaignFormData.startDate}
                 onChange={(e) => setCampaignFormData({ ...campaignFormData, startDate: e.target.value })}
                 InputLabelProps={{ shrink: true }}
-                helperText={t('admin.remoteConfig.campaigns.startDateHelp')}
+                helperText={t('remoteConfig.campaigns.startDateHelp')}
               />
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.campaigns.endDate')}
+                label={t('remoteConfig.campaigns.endDate')}
                 type="datetime-local"
                 value={campaignFormData.endDate}
                 onChange={(e) => setCampaignFormData({ ...campaignFormData, endDate: e.target.value })}
                 InputLabelProps={{ shrink: true }}
-                helperText={t('admin.remoteConfig.campaigns.endDateHelp')}
+                helperText={t('remoteConfig.campaigns.endDateHelp')}
               />
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.campaigns.priority')}
+                label={t('remoteConfig.campaigns.priority')}
                 type="number"
                 value={campaignFormData.priority}
                 onChange={(e) => setCampaignFormData({ ...campaignFormData, priority: parseInt(e.target.value) || 0 })}
-                helperText={t('admin.remoteConfig.campaigns.priorityHelp')}
+                helperText={t('remoteConfig.campaigns.priorityHelp')}
               />
               <TextField
                 fullWidth
@@ -808,7 +808,7 @@ const RemoteConfigPage: React.FC = () => {
                     onChange={(e) => setCampaignFormData({ ...campaignFormData, isActive: e.target.checked })}
                   />
                 }
-                label={t('admin.remoteConfig.active')}
+                label={t('remoteConfig.active')}
               />
 
               <TargetConditionBuilder
@@ -828,17 +828,17 @@ const RemoteConfigPage: React.FC = () => {
               {/* Override Configurations Section */}
               <Box>
                 <Typography variant="h6" gutterBottom color="text.primary">
-                  {t('admin.remoteConfig.campaigns.overrideConfigs')}
+                  {t('remoteConfig.campaigns.overrideConfigs')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  {t('admin.remoteConfig.campaigns.overrideConfigsHelp')}
+                  {t('remoteConfig.campaigns.overrideConfigsHelp')}
                 </Typography>
 
                 {campaignFormData.overrideConfigs.map((override, index) => (
                   <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
                     <Stack direction="row" spacing={2} alignItems="center">
                       <FormControl sx={{ minWidth: 200 }}>
-                        <InputLabel>{t('admin.remoteConfig.campaigns.selectConfig')}</InputLabel>
+                        <InputLabel>{t('remoteConfig.campaigns.selectConfig')}</InputLabel>
                         <Select
                           value={override.configId || ''}
                           onChange={(e) => {
@@ -851,7 +851,7 @@ const RemoteConfigPage: React.FC = () => {
                             };
                             setCampaignFormData({ ...campaignFormData, overrideConfigs: newOverrides });
                           }}
-                          label={t('admin.remoteConfig.campaigns.selectConfig')}
+                          label={t('remoteConfig.campaigns.selectConfig')}
                         >
                           {configs.map((config) => (
                             <MenuItem key={config.id} value={config.id}>
@@ -862,7 +862,7 @@ const RemoteConfigPage: React.FC = () => {
                       </FormControl>
 
                       <TextField
-                        label={t('admin.remoteConfig.campaigns.overrideValue')}
+                        label={t('remoteConfig.campaigns.overrideValue')}
                         value={override.overrideValue}
                         onChange={(e) => {
                           const newOverrides = [...campaignFormData.overrideConfigs];
@@ -887,7 +887,7 @@ const RemoteConfigPage: React.FC = () => {
 
                 {campaignFormData.overrideConfigs.length === 0 && (
                   <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-                    {t('admin.remoteConfig.campaigns.noOverrides')}
+                    {t('remoteConfig.campaigns.noOverrides')}
                   </Typography>
                 )}
 
@@ -905,7 +905,7 @@ const RemoteConfigPage: React.FC = () => {
                   variant="outlined"
                   sx={{ mt: 1 }}
                 >
-                  {t('admin.remoteConfig.campaigns.addOverride')}
+                  {t('remoteConfig.campaigns.addOverride')}
                 </Button>
               </Box>
             </Stack>
@@ -935,19 +935,19 @@ const RemoteConfigPage: React.FC = () => {
           maxWidth="md"
           fullWidth
         >
-          <DialogTitle>{t('admin.remoteConfig.campaigns.editCampaign')}</DialogTitle>
+          <DialogTitle>{t('remoteConfig.campaigns.editCampaign')}</DialogTitle>
           <DialogContent>
             <Stack spacing={3} sx={{ mt: 1 }}>
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.campaigns.campaignName')}
+                label={t('remoteConfig.campaigns.campaignName')}
                 value={campaignFormData.campaignName}
                 onChange={(e) => setCampaignFormData({ ...campaignFormData, campaignName: e.target.value })}
                 required
               />
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.description')}
+                label={t('remoteConfig.description')}
                 value={campaignFormData.description}
                 onChange={(e) => setCampaignFormData({ ...campaignFormData, description: e.target.value })}
                 multiline
@@ -955,7 +955,7 @@ const RemoteConfigPage: React.FC = () => {
               />
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.campaigns.startDate')}
+                label={t('remoteConfig.campaigns.startDate')}
                 type="datetime-local"
                 value={campaignFormData.startDate}
                 onChange={(e) => setCampaignFormData({ ...campaignFormData, startDate: e.target.value })}
@@ -963,7 +963,7 @@ const RemoteConfigPage: React.FC = () => {
               />
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.campaigns.endDate')}
+                label={t('remoteConfig.campaigns.endDate')}
                 type="datetime-local"
                 value={campaignFormData.endDate}
                 onChange={(e) => setCampaignFormData({ ...campaignFormData, endDate: e.target.value })}
@@ -971,24 +971,24 @@ const RemoteConfigPage: React.FC = () => {
               />
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.campaigns.priority')}
+                label={t('remoteConfig.campaigns.priority')}
                 type="number"
                 value={campaignFormData.priority}
                 onChange={(e) => setCampaignFormData({ ...campaignFormData, priority: parseInt(e.target.value) || 0 })}
-                helperText={t('admin.remoteConfig.campaigns.priorityHelp')}
+                helperText={t('remoteConfig.campaigns.priorityHelp')}
               />
               <TextField
                 fullWidth
                 select
-                label={t('admin.remoteConfig.campaigns.status')}
+                label={t('remoteConfig.campaigns.status')}
                 value={campaignFormData.status}
                 onChange={(e) => setCampaignFormData({ ...campaignFormData, status: e.target.value as any })}
               >
-                <MenuItem value="draft">{t('admin.remoteConfig.campaigns.statusDraft')}</MenuItem>
-                <MenuItem value="scheduled">{t('admin.remoteConfig.campaigns.statusScheduled')}</MenuItem>
-                <MenuItem value="running">{t('admin.remoteConfig.campaigns.statusRunning')}</MenuItem>
-                <MenuItem value="paused">{t('admin.remoteConfig.campaigns.statusPaused')}</MenuItem>
-                <MenuItem value="completed">{t('admin.remoteConfig.campaigns.statusCompleted')}</MenuItem>
+                <MenuItem value="draft">{t('remoteConfig.campaigns.statusDraft')}</MenuItem>
+                <MenuItem value="scheduled">{t('remoteConfig.campaigns.statusScheduled')}</MenuItem>
+                <MenuItem value="running">{t('remoteConfig.campaigns.statusRunning')}</MenuItem>
+                <MenuItem value="paused">{t('remoteConfig.campaigns.statusPaused')}</MenuItem>
+                <MenuItem value="completed">{t('remoteConfig.campaigns.statusCompleted')}</MenuItem>
               </TextField>
               <FormControlLabel
                 control={
@@ -997,7 +997,7 @@ const RemoteConfigPage: React.FC = () => {
                     onChange={(e) => setCampaignFormData({ ...campaignFormData, isActive: e.target.checked })}
                   />
                 }
-                label={t('admin.remoteConfig.active')}
+                label={t('remoteConfig.active')}
               />
 
               <TargetConditionBuilder
@@ -1093,14 +1093,14 @@ const RemoteConfigPage: React.FC = () => {
         // 성공 메시지 표시
         setSnackbar({
           open: true,
-          message: t('admin.remoteConfig.targeting.createSuccess'),
+          message: t('remoteConfig.targeting.createSuccess'),
           severity: 'success'
         });
       } catch (error) {
         console.error('Error creating targeting:', error);
         setSnackbar({
           open: true,
-          message: t('admin.remoteConfig.targeting.createError'),
+          message: t('remoteConfig.targeting.createError'),
           severity: 'error'
         });
       }
@@ -1137,21 +1137,21 @@ const RemoteConfigPage: React.FC = () => {
         // 성공 메시지 표시
         setSnackbar({
           open: true,
-          message: t('admin.remoteConfig.targeting.updateSuccess'),
+          message: t('remoteConfig.targeting.updateSuccess'),
           severity: 'success'
         });
       } catch (error) {
         console.error('Error updating targeting:', error);
         setSnackbar({
           open: true,
-          message: t('admin.remoteConfig.targeting.updateError'),
+          message: t('remoteConfig.targeting.updateError'),
           severity: 'error'
         });
       }
     };
 
     const handleDeleteTargeting = async (targeting: any) => {
-      if (!window.confirm(t('admin.remoteConfig.targeting.deleteConfirm', { name: targeting.name }))) {
+      if (!window.confirm(t('remoteConfig.targeting.deleteConfirm', { name: targeting.name }))) {
         return;
       }
 
@@ -1162,14 +1162,14 @@ const RemoteConfigPage: React.FC = () => {
         // 성공 메시지 표시
         setSnackbar({
           open: true,
-          message: t('admin.remoteConfig.targeting.deleteSuccess'),
+          message: t('remoteConfig.targeting.deleteSuccess'),
           severity: 'success'
         });
       } catch (error) {
         console.error('Error deleting targeting:', error);
         setSnackbar({
           open: true,
-          message: t('admin.remoteConfig.targeting.deleteError'),
+          message: t('remoteConfig.targeting.deleteError'),
           severity: 'error'
         });
       }
@@ -1179,14 +1179,14 @@ const RemoteConfigPage: React.FC = () => {
       <Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h6" color="text.primary">
-            {t('admin.remoteConfig.targeting.title')}
+            {t('remoteConfig.targeting.title')}
           </Typography>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => setCreateTargetingDialogOpen(true)}
           >
-            {t('admin.remoteConfig.targeting.createTargeting')}
+            {t('remoteConfig.targeting.createTargeting')}
           </Button>
         </Box>
 
@@ -1197,7 +1197,7 @@ const RemoteConfigPage: React.FC = () => {
         ) : targetings.length === 0 ? (
           <Paper sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="body1" color="text.secondary">
-              {t('admin.remoteConfig.targeting.noTargeting')}
+              {t('remoteConfig.targeting.noTargeting')}
             </Typography>
           </Paper>
         ) : (
@@ -1205,10 +1205,10 @@ const RemoteConfigPage: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>{t('admin.remoteConfig.targeting.name')}</TableCell>
-                  <TableCell>{t('admin.remoteConfig.description')}</TableCell>
-                  <TableCell>{t('admin.remoteConfig.targeting.conditionsCount')}</TableCell>
-                  <TableCell align="center">{t('admin.remoteConfig.actions')}</TableCell>
+                  <TableCell>{t('remoteConfig.targeting.name')}</TableCell>
+                  <TableCell>{t('remoteConfig.description')}</TableCell>
+                  <TableCell>{t('remoteConfig.targeting.conditionsCount')}</TableCell>
+                  <TableCell align="center">{t('remoteConfig.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -1258,10 +1258,10 @@ const RemoteConfigPage: React.FC = () => {
           <DialogTitle>
             <Box>
               <Typography variant="h6" component="div" color="text.primary">
-                {t('admin.remoteConfig.targeting.createTargeting')}
+                {t('remoteConfig.targeting.createTargeting')}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                {t('admin.remoteConfig.targeting.createTargetingSubtitle')}
+                {t('remoteConfig.targeting.createTargetingSubtitle')}
               </Typography>
             </Box>
           </DialogTitle>
@@ -1269,21 +1269,21 @@ const RemoteConfigPage: React.FC = () => {
             <Stack spacing={3} sx={{ mt: 1 }}>
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.targeting.name')}
+                label={t('remoteConfig.targeting.name')}
                 value={targetingFormData.name}
                 onChange={(e) => setTargetingFormData({ ...targetingFormData, name: e.target.value })}
                 required
-                helperText={t('admin.remoteConfig.targeting.nameHelp')}
+                helperText={t('remoteConfig.targeting.nameHelp')}
               />
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.description')}
+                label={t('remoteConfig.description')}
                 value={targetingFormData.description}
                 onChange={(e) => setTargetingFormData({ ...targetingFormData, description: e.target.value })}
                 multiline
                 rows={2}
                 required
-                helperText={t('admin.remoteConfig.targeting.descriptionHelp')}
+                helperText={t('remoteConfig.targeting.descriptionHelp')}
               />
 
               <TargetConditionBuilder
@@ -1326,10 +1326,10 @@ const RemoteConfigPage: React.FC = () => {
           <DialogTitle>
             <Box>
               <Typography variant="h6" component="div" color="text.primary">
-                {t('admin.remoteConfig.targeting.editTargeting')}
+                {t('remoteConfig.targeting.editTargeting')}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                {t('admin.remoteConfig.targeting.editTargetingSubtitle')}
+                {t('remoteConfig.targeting.editTargetingSubtitle')}
               </Typography>
             </Box>
           </DialogTitle>
@@ -1337,21 +1337,21 @@ const RemoteConfigPage: React.FC = () => {
             <Stack spacing={3} sx={{ mt: 1 }}>
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.targeting.name')}
+                label={t('remoteConfig.targeting.name')}
                 value={targetingFormData.name}
                 onChange={(e) => setTargetingFormData({ ...targetingFormData, name: e.target.value })}
                 required
-                helperText={t('admin.remoteConfig.targeting.nameHelp')}
+                helperText={t('remoteConfig.targeting.nameHelp')}
               />
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.description')}
+                label={t('remoteConfig.description')}
                 value={targetingFormData.description}
                 onChange={(e) => setTargetingFormData({ ...targetingFormData, description: e.target.value })}
                 multiline
                 rows={2}
                 required
-                helperText={t('admin.remoteConfig.targeting.descriptionHelp')}
+                helperText={t('remoteConfig.targeting.descriptionHelp')}
               />
 
               <TargetConditionBuilder
@@ -1533,14 +1533,14 @@ const RemoteConfigPage: React.FC = () => {
       <Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h6" color="text.primary">
-            {t('admin.remoteConfig.contextFields.title')}
+            {t('remoteConfig.contextFields.title')}
           </Typography>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => setCreateFieldDialogOpen(true)}
           >
-            {t('admin.remoteConfig.contextFields.createField')}
+            {t('remoteConfig.contextFields.createField')}
           </Button>
         </Box>
 
@@ -1551,7 +1551,7 @@ const RemoteConfigPage: React.FC = () => {
         ) : contextFields.length === 0 ? (
           <Paper sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="body1" color="text.secondary">
-              {t('admin.remoteConfig.contextFields.noFields')}
+              {t('remoteConfig.contextFields.noFields')}
             </Typography>
           </Paper>
         ) : (
@@ -1559,13 +1559,13 @@ const RemoteConfigPage: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>{t('admin.remoteConfig.contextFields.key')}</TableCell>
-                  <TableCell>{t('admin.remoteConfig.contextFields.name')}</TableCell>
-                  <TableCell>{t('admin.remoteConfig.contextFields.type')}</TableCell>
+                  <TableCell>{t('remoteConfig.contextFields.key')}</TableCell>
+                  <TableCell>{t('remoteConfig.contextFields.name')}</TableCell>
+                  <TableCell>{t('remoteConfig.contextFields.type')}</TableCell>
                   <TableCell>기본값</TableCell>
                   <TableCell align="center">필수 여부</TableCell>
-                  <TableCell>{t('admin.remoteConfig.description')}</TableCell>
-                  <TableCell align="center">{t('admin.remoteConfig.actions')}</TableCell>
+                  <TableCell>{t('remoteConfig.description')}</TableCell>
+                  <TableCell align="center">{t('remoteConfig.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -1630,10 +1630,10 @@ const RemoteConfigPage: React.FC = () => {
           <DialogTitle>
             <Box>
               <Typography variant="h6" component="div" color="text.primary">
-                {t('admin.remoteConfig.contextFields.createField')}
+                {t('remoteConfig.contextFields.createField')}
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                {t('admin.remoteConfig.contextFields.createFieldSubtitle')}
+                {t('remoteConfig.contextFields.createFieldSubtitle')}
               </Typography>
             </Box>
           </DialogTitle>
@@ -1641,36 +1641,36 @@ const RemoteConfigPage: React.FC = () => {
             <Stack spacing={3} sx={{ mt: 1 }}>
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.contextFields.key')}
+                label={t('remoteConfig.contextFields.key')}
                 value={fieldFormData.key}
                 onChange={(e) => setFieldFormData({ ...fieldFormData, key: e.target.value })}
                 required
-                helperText={t('admin.remoteConfig.contextFields.keyHelp')}
+                helperText={t('remoteConfig.contextFields.keyHelp')}
               />
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.contextFields.name')}
+                label={t('remoteConfig.contextFields.name')}
                 value={fieldFormData.name}
                 onChange={(e) => setFieldFormData({ ...fieldFormData, name: e.target.value })}
                 required
-                helperText={t('admin.remoteConfig.contextFields.nameHelp')}
+                helperText={t('remoteConfig.contextFields.nameHelp')}
               />
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.description')}
+                label={t('remoteConfig.description')}
                 value={fieldFormData.description}
                 onChange={(e) => setFieldFormData({ ...fieldFormData, description: e.target.value })}
                 multiline
                 rows={2}
                 required
-                helperText={t('admin.remoteConfig.contextFields.descriptionHelp')}
+                helperText={t('remoteConfig.contextFields.descriptionHelp')}
               />
               <FormControl fullWidth>
-                <InputLabel>{t('admin.remoteConfig.contextFields.type')}</InputLabel>
+                <InputLabel>{t('remoteConfig.contextFields.type')}</InputLabel>
                 <Select
                   value={fieldFormData.type}
                   onChange={(e) => setFieldFormData({ ...fieldFormData, type: e.target.value as any })}
-                  label={t('admin.remoteConfig.contextFields.type')}
+                  label={t('remoteConfig.contextFields.type')}
                 >
                   <MenuItem value="string">String</MenuItem>
                   <MenuItem value="number">Number</MenuItem>
@@ -1722,7 +1722,7 @@ const RemoteConfigPage: React.FC = () => {
               {fieldFormData.type === 'array' && (
                 <Box>
                   <Typography variant="subtitle2" gutterBottom color="text.primary">
-                    {t('admin.remoteConfig.contextFields.options')}
+                    {t('remoteConfig.contextFields.options')}
                   </Typography>
                   {fieldFormData.options.map((option, index) => (
                     <Box key={index} sx={{ display: 'flex', gap: 1, mb: 1 }}>
@@ -1743,7 +1743,7 @@ const RemoteConfigPage: React.FC = () => {
                     onClick={addOption}
                     size="small"
                   >
-                    {t('admin.remoteConfig.contextFields.addOption')}
+                    {t('remoteConfig.contextFields.addOption')}
                   </Button>
                 </Box>
               )}
@@ -1774,26 +1774,26 @@ const RemoteConfigPage: React.FC = () => {
           maxWidth="sm"
           fullWidth
         >
-          <DialogTitle>{t('admin.remoteConfig.contextFields.editField')}</DialogTitle>
+          <DialogTitle>{t('remoteConfig.contextFields.editField')}</DialogTitle>
           <DialogContent>
             <Stack spacing={3} sx={{ mt: 1 }}>
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.contextFields.key')}
+                label={t('remoteConfig.contextFields.key')}
                 value={fieldFormData.key}
                 disabled
                 helperText="키는 수정할 수 없습니다."
               />
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.contextFields.name')}
+                label={t('remoteConfig.contextFields.name')}
                 value={fieldFormData.name}
                 onChange={(e) => setFieldFormData({ ...fieldFormData, name: e.target.value })}
                 required
               />
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.description')}
+                label={t('remoteConfig.description')}
                 value={fieldFormData.description}
                 onChange={(e) => setFieldFormData({ ...fieldFormData, description: e.target.value })}
                 multiline
@@ -1830,11 +1830,11 @@ const RemoteConfigPage: React.FC = () => {
                 />
               )}
               <FormControl fullWidth>
-                <InputLabel>{t('admin.remoteConfig.contextFields.type')}</InputLabel>
+                <InputLabel>{t('remoteConfig.contextFields.type')}</InputLabel>
                 <Select
                   value={fieldFormData.type}
                   disabled
-                  label={t('admin.remoteConfig.contextFields.type')}
+                  label={t('remoteConfig.contextFields.type')}
                 >
                   <MenuItem value="string">String</MenuItem>
                   <MenuItem value="number">Number</MenuItem>
@@ -1856,7 +1856,7 @@ const RemoteConfigPage: React.FC = () => {
               {fieldFormData.type === 'array' && (
                 <Box>
                   <Typography variant="subtitle2" gutterBottom color="text.primary">
-                    {t('admin.remoteConfig.contextFields.options')}
+                    {t('remoteConfig.contextFields.options')}
                   </Typography>
                   {fieldFormData.options.map((option, index) => (
                     <Box key={index} sx={{ display: 'flex', gap: 1, mb: 1 }}>
@@ -1877,7 +1877,7 @@ const RemoteConfigPage: React.FC = () => {
                     onClick={addOption}
                     size="small"
                   >
-                    {t('admin.remoteConfig.contextFields.addOption')}
+                    {t('remoteConfig.contextFields.addOption')}
                   </Button>
                 </Box>
               )}
@@ -1930,7 +1930,7 @@ const RemoteConfigPage: React.FC = () => {
         }
       } catch (error) {
         console.error('Error loading variants:', error);
-        enqueueSnackbar(t('admin.remoteConfig.variants.loadError'), { variant: 'error' });
+        enqueueSnackbar(t('remoteConfig.variants.loadError'), { variant: 'error' });
       } finally {
         setVariantLoading(false);
       }
@@ -1944,7 +1944,7 @@ const RemoteConfigPage: React.FC = () => {
         const response = await api.post(`/admin/remote-config/campaigns/configs/${selectedConfig.id}/variants`, variantFormData);
 
         if (response.data.success) {
-          enqueueSnackbar(t('admin.remoteConfig.variants.createSuccess'), { variant: 'success' });
+          enqueueSnackbar(t('remoteConfig.variants.createSuccess'), { variant: 'success' });
           setCreateVariantDialogOpen(false);
           setVariantFormData({
             variantName: '',
@@ -1956,7 +1956,7 @@ const RemoteConfigPage: React.FC = () => {
         }
       } catch (error: any) {
         console.error('Error creating variant:', error);
-        const errorMessage = error.response?.data?.message || t('admin.remoteConfig.variants.createError');
+        const errorMessage = error.response?.data?.message || t('remoteConfig.variants.createError');
         enqueueSnackbar(errorMessage, { variant: 'error' });
       }
     };
@@ -1969,14 +1969,14 @@ const RemoteConfigPage: React.FC = () => {
         const response = await api.put(`/admin/remote-config/campaigns/configs/${selectedConfig.id}/variants/${selectedVariant.id}`, variantFormData);
 
         if (response.data.success) {
-          enqueueSnackbar(t('admin.remoteConfig.variants.updateSuccess'), { variant: 'success' });
+          enqueueSnackbar(t('remoteConfig.variants.updateSuccess'), { variant: 'success' });
           setEditVariantDialogOpen(false);
           setSelectedVariant(null);
           loadVariants(selectedConfig.id);
         }
       } catch (error: any) {
         console.error('Error updating variant:', error);
-        const errorMessage = error.response?.data?.message || t('admin.remoteConfig.variants.updateError');
+        const errorMessage = error.response?.data?.message || t('remoteConfig.variants.updateError');
         enqueueSnackbar(errorMessage, { variant: 'error' });
       }
     };
@@ -1989,12 +1989,12 @@ const RemoteConfigPage: React.FC = () => {
         const response = await api.delete(`/admin/remote-config/campaigns/configs/${selectedConfig.id}/variants/${variant.id}`);
 
         if (response.data.success) {
-          enqueueSnackbar(t('admin.remoteConfig.variants.deleteSuccess'), { variant: 'success' });
+          enqueueSnackbar(t('remoteConfig.variants.deleteSuccess'), { variant: 'success' });
           loadVariants(selectedConfig.id);
         }
       } catch (error: any) {
         console.error('Error deleting variant:', error);
-        const errorMessage = error.response?.data?.message || t('admin.remoteConfig.variants.deleteError');
+        const errorMessage = error.response?.data?.message || t('remoteConfig.variants.deleteError');
         enqueueSnackbar(errorMessage, { variant: 'error' });
       }
     };
@@ -2005,10 +2005,10 @@ const RemoteConfigPage: React.FC = () => {
         {/* Config Selection */}
         <Box sx={{ mb: 3 }}>
           <Typography variant="h6" sx={{ mb: 2 }} color="text.primary">
-            {t('admin.remoteConfig.variants.title')}
+            {t('remoteConfig.variants.title')}
           </Typography>
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>{t('admin.remoteConfig.variants.selectConfig')}</InputLabel>
+            <InputLabel>{t('remoteConfig.variants.selectConfig')}</InputLabel>
             <Select
               value={selectedConfig?.id || ''}
               onChange={(e) => {
@@ -2018,7 +2018,7 @@ const RemoteConfigPage: React.FC = () => {
                   loadVariants(config.id);
                 }
               }}
-              label={t('admin.remoteConfig.variants.selectConfig')}
+              label={t('remoteConfig.variants.selectConfig')}
             >
               {configs.map((config) => (
                 <MenuItem key={config.id} value={config.id}>
@@ -2041,7 +2041,7 @@ const RemoteConfigPage: React.FC = () => {
                 startIcon={<AddIcon />}
                 onClick={() => setCreateVariantDialogOpen(true)}
               >
-                {t('admin.remoteConfig.variants.createVariant')}
+                {t('remoteConfig.variants.createVariant')}
               </Button>
             </Box>
 
@@ -2050,11 +2050,11 @@ const RemoteConfigPage: React.FC = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.variants.variantName')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>{t('admin.remoteConfig.defaultValue')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }} align="center">{t('admin.remoteConfig.variants.trafficPercentage')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }} align="center">{t('admin.remoteConfig.status')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }} align="center">{t('admin.remoteConfig.actions')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.variants.variantName')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>{t('remoteConfig.defaultValue')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }} align="center">{t('remoteConfig.variants.trafficPercentage')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }} align="center">{t('remoteConfig.status')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }} align="center">{t('remoteConfig.actions')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -2068,7 +2068,7 @@ const RemoteConfigPage: React.FC = () => {
                     <TableRow>
                       <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
                         <Typography variant="body2" color="text.secondary">
-                          {t('admin.remoteConfig.variants.noVariants')}
+                          {t('remoteConfig.variants.noVariants')}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -2094,7 +2094,7 @@ const RemoteConfigPage: React.FC = () => {
                         </TableCell>
                         <TableCell align="center">
                           <Chip
-                            label={variant.isActive ? t('admin.remoteConfig.active') : t('admin.remoteConfig.inactive')}
+                            label={variant.isActive ? t('remoteConfig.active') : t('remoteConfig.inactive')}
                             color={variant.isActive ? 'success' : 'default'}
                             size="small"
                           />
@@ -2144,33 +2144,33 @@ const RemoteConfigPage: React.FC = () => {
               maxWidth="md"
               fullWidth
             >
-              <DialogTitle>{t('admin.remoteConfig.variants.createVariant')}</DialogTitle>
+              <DialogTitle>{t('remoteConfig.variants.createVariant')}</DialogTitle>
               <DialogContent>
                 <Stack spacing={3} sx={{ mt: 1 }}>
                   <TextField
                     fullWidth
-                    label={t('admin.remoteConfig.variants.variantName')}
+                    label={t('remoteConfig.variants.variantName')}
                     value={variantFormData.variantName}
                     onChange={(e) => setVariantFormData({ ...variantFormData, variantName: e.target.value })}
                     required
                   />
                   <TextField
                     fullWidth
-                    label={t('admin.remoteConfig.defaultValue')}
+                    label={t('remoteConfig.defaultValue')}
                     value={variantFormData.value}
                     onChange={(e) => setVariantFormData({ ...variantFormData, value: e.target.value })}
                     multiline
                     rows={4}
-                    helperText={t('admin.remoteConfig.variants.valueHelp')}
+                    helperText={t('remoteConfig.variants.valueHelp')}
                   />
                   <TextField
                     fullWidth
-                    label={t('admin.remoteConfig.variants.trafficPercentage')}
+                    label={t('remoteConfig.variants.trafficPercentage')}
                     type="number"
                     value={variantFormData.trafficPercentage}
                     onChange={(e) => setVariantFormData({ ...variantFormData, trafficPercentage: parseFloat(e.target.value) || 0 })}
                     inputProps={{ min: 0, max: 100, step: 0.1 }}
-                    helperText={t('admin.remoteConfig.variants.trafficHelp')}
+                    helperText={t('remoteConfig.variants.trafficHelp')}
                   />
                   <FormControlLabel
                     control={
@@ -2179,7 +2179,7 @@ const RemoteConfigPage: React.FC = () => {
                         onChange={(e) => setVariantFormData({ ...variantFormData, isActive: e.target.checked })}
                       />
                     }
-                    label={t('admin.remoteConfig.active')}
+                    label={t('remoteConfig.active')}
                   />
                 </Stack>
               </DialogContent>
@@ -2204,33 +2204,33 @@ const RemoteConfigPage: React.FC = () => {
               maxWidth="md"
               fullWidth
             >
-              <DialogTitle>{t('admin.remoteConfig.variants.editVariant')}</DialogTitle>
+              <DialogTitle>{t('remoteConfig.variants.editVariant')}</DialogTitle>
               <DialogContent>
                 <Stack spacing={3} sx={{ mt: 1 }}>
                   <TextField
                     fullWidth
-                    label={t('admin.remoteConfig.variants.variantName')}
+                    label={t('remoteConfig.variants.variantName')}
                     value={variantFormData.variantName}
                     onChange={(e) => setVariantFormData({ ...variantFormData, variantName: e.target.value })}
                     required
                   />
                   <TextField
                     fullWidth
-                    label={t('admin.remoteConfig.defaultValue')}
+                    label={t('remoteConfig.defaultValue')}
                     value={variantFormData.value}
                     onChange={(e) => setVariantFormData({ ...variantFormData, value: e.target.value })}
                     multiline
                     rows={4}
-                    helperText={t('admin.remoteConfig.variants.valueHelp')}
+                    helperText={t('remoteConfig.variants.valueHelp')}
                   />
                   <TextField
                     fullWidth
-                    label={t('admin.remoteConfig.variants.trafficPercentage')}
+                    label={t('remoteConfig.variants.trafficPercentage')}
                     type="number"
                     value={variantFormData.trafficPercentage}
                     onChange={(e) => setVariantFormData({ ...variantFormData, trafficPercentage: parseFloat(e.target.value) || 0 })}
                     inputProps={{ min: 0, max: 100, step: 0.1 }}
-                    helperText={t('admin.remoteConfig.variants.trafficHelp')}
+                    helperText={t('remoteConfig.variants.trafficHelp')}
                   />
                   <FormControlLabel
                     control={
@@ -2239,7 +2239,7 @@ const RemoteConfigPage: React.FC = () => {
                         onChange={(e) => setVariantFormData({ ...variantFormData, isActive: e.target.checked })}
                       />
                     }
-                    label={t('admin.remoteConfig.active')}
+                    label={t('remoteConfig.active')}
                   />
                 </Stack>
               </DialogContent>
@@ -2260,7 +2260,7 @@ const RemoteConfigPage: React.FC = () => {
         ) : (
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <Typography variant="body2" color="text.secondary">
-              {t('admin.remoteConfig.variants.selectConfigFirst')}
+              {t('remoteConfig.variants.selectConfigFirst')}
             </Typography>
           </Box>
         )}
@@ -2388,22 +2388,22 @@ const RemoteConfigPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" component="h1" sx={{ fontWeight: 600, mb: 1 }} color="text.primary">
-          {t('admin.remoteConfig.title')}
+          {t('remoteConfig.title')}
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          {t('admin.remoteConfig.subtitle')}
+          {t('remoteConfig.subtitle')}
         </Typography>
       </Box>
 
       {/* Tabs */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={currentTab} onChange={(_, newValue) => setCurrentTab(newValue)}>
-          <Tab label={t('admin.remoteConfig.title')} />
-          <Tab label={t('admin.remoteConfig.history.title')} />
-          <Tab label={t('admin.remoteConfig.campaigns.title')} />
-          <Tab label={t('admin.remoteConfig.variants.title')} />
-          <Tab label={t('admin.remoteConfig.targeting.title')} />
-          <Tab label={t('admin.remoteConfig.contextFields.title')} />
+          <Tab label={t('remoteConfig.title')} />
+          <Tab label={t('remoteConfig.history.title')} />
+          <Tab label={t('remoteConfig.campaigns.title')} />
+          <Tab label={t('remoteConfig.variants.title')} />
+          <Tab label={t('remoteConfig.targeting.title')} />
+          <Tab label={t('remoteConfig.contextFields.title')} />
         </Tabs>
       </Box>
 
@@ -2505,7 +2505,7 @@ const RemoteConfigPage: React.FC = () => {
             <Box sx={{ flex: 1, minWidth: 200 }}>
               <TextField
                 fullWidth
-                placeholder={t('admin.remoteConfig.search')}
+                placeholder={t('remoteConfig.search')}
                 value={filters.search || ''}
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                 InputProps={{
@@ -2519,35 +2519,35 @@ const RemoteConfigPage: React.FC = () => {
             </Box>
             <Box sx={{ minWidth: 150 }}>
               <FormControl fullWidth size="small">
-                <InputLabel>{t('admin.remoteConfig.valueType')}</InputLabel>
+                <InputLabel>{t('remoteConfig.valueType')}</InputLabel>
                 <Select
                   value={filters.valueType || ''}
                   onChange={(e) => setFilters({ ...filters, valueType: e.target.value })}
-                  label={t('admin.remoteConfig.valueType')}
+                  label={t('remoteConfig.valueType')}
                 >
-                  <MenuItem value="">{t('admin.remoteConfig.allTypes')}</MenuItem>
-                  <MenuItem value="string">{t('admin.remoteConfig.valueTypes.string')}</MenuItem>
-                  <MenuItem value="number">{t('admin.remoteConfig.valueTypes.number')}</MenuItem>
-                  <MenuItem value="boolean">{t('admin.remoteConfig.valueTypes.boolean')}</MenuItem>
-                  <MenuItem value="json">{t('admin.remoteConfig.valueTypes.json')}</MenuItem>
-                  <MenuItem value="yaml">{t('admin.remoteConfig.valueTypes.yaml')}</MenuItem>
+                  <MenuItem value="">{t('remoteConfig.allTypes')}</MenuItem>
+                  <MenuItem value="string">{t('remoteConfig.valueTypes.string')}</MenuItem>
+                  <MenuItem value="number">{t('remoteConfig.valueTypes.number')}</MenuItem>
+                  <MenuItem value="boolean">{t('remoteConfig.valueTypes.boolean')}</MenuItem>
+                  <MenuItem value="json">{t('remoteConfig.valueTypes.json')}</MenuItem>
+                  <MenuItem value="yaml">{t('remoteConfig.valueTypes.yaml')}</MenuItem>
                 </Select>
               </FormControl>
             </Box>
             <Box sx={{ minWidth: 120 }}>
               <FormControl fullWidth size="small">
-                <InputLabel>{t('admin.remoteConfig.status')}</InputLabel>
+                <InputLabel>{t('remoteConfig.status')}</InputLabel>
                 <Select
                   value={filters.isActive?.toString() || ''}
                   onChange={(e) => setFilters({
                     ...filters,
                     isActive: e.target.value === '' ? undefined : e.target.value === 'true'
                   })}
-                  label={t('admin.remoteConfig.status')}
+                  label={t('remoteConfig.status')}
                 >
-                  <MenuItem value="">{t('admin.remoteConfig.allStatuses')}</MenuItem>
-                  <MenuItem value="true">{t('admin.remoteConfig.active')}</MenuItem>
-                  <MenuItem value="false">{t('admin.remoteConfig.inactive')}</MenuItem>
+                  <MenuItem value="">{t('remoteConfig.allStatuses')}</MenuItem>
+                  <MenuItem value="true">{t('remoteConfig.active')}</MenuItem>
+                  <MenuItem value="false">{t('remoteConfig.inactive')}</MenuItem>
                 </Select>
               </FormControl>
             </Box>
@@ -2568,7 +2568,7 @@ const RemoteConfigPage: React.FC = () => {
                 startIcon={<AddIcon />}
                 onClick={() => setCreateDialogOpen(true)}
               >
-                {t('admin.remoteConfig.createConfig')}
+                {t('remoteConfig.createConfig')}
               </Button>
             </Stack>
           </Stack>
@@ -2594,15 +2594,15 @@ const RemoteConfigPage: React.FC = () => {
                   }}
                 />
               </TableCell>
-              <TableCell>{t('admin.remoteConfig.keyName')}</TableCell>
-              <TableCell>{t('admin.remoteConfig.valueType')}</TableCell>
-              <TableCell>{t('admin.remoteConfig.defaultValue')}</TableCell>
-              <TableCell>{t('admin.remoteConfig.status')}</TableCell>
+              <TableCell>{t('remoteConfig.keyName')}</TableCell>
+              <TableCell>{t('remoteConfig.valueType')}</TableCell>
+              <TableCell>{t('remoteConfig.defaultValue')}</TableCell>
+              <TableCell>{t('remoteConfig.status')}</TableCell>
               <TableCell>버전 상태</TableCell>
-              <TableCell>{t('admin.remoteConfig.description')}</TableCell>
-              <TableCell>{t('admin.remoteConfig.updated')}</TableCell>
-              <TableCell>{t('admin.remoteConfig.createdBy')}</TableCell>
-              <TableCell align="center">{t('admin.remoteConfig.actions')}</TableCell>
+              <TableCell>{t('remoteConfig.description')}</TableCell>
+              <TableCell>{t('remoteConfig.updated')}</TableCell>
+              <TableCell>{t('remoteConfig.createdBy')}</TableCell>
+              <TableCell align="center">{t('remoteConfig.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -2650,7 +2650,7 @@ const RemoteConfigPage: React.FC = () => {
                       <IconButton
                         size="small"
                         onClick={() => showValueDetail(
-                          `${config.keyName} - ${t('admin.remoteConfig.defaultValue')}`,
+                          `${config.keyName} - ${t('remoteConfig.defaultValue')}`,
                           config.defaultValue,
                           config.valueType
                         )}
@@ -2675,18 +2675,18 @@ const RemoteConfigPage: React.FC = () => {
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label={config.isActive ? t('admin.remoteConfig.active') : t('admin.remoteConfig.inactive')}
+                    label={config.isActive ? t('remoteConfig.active') : t('remoteConfig.inactive')}
                     color={config.isActive ? 'success' : 'default'}
                     size="small"
                   />
                 </TableCell>
                 <TableCell>
                   <Chip
-                    label={config.status === 'draft' ? t('admin.remoteConfig.statusDraft') :
-                           config.status === 'staged' ? t('admin.remoteConfig.statusStaged') :
-                           config.status === 'published' ? t('admin.remoteConfig.statusPublished') :
-                           config.status === 'archived' ? t('admin.remoteConfig.statusArchived') :
-                           t('admin.remoteConfig.statusDraft')}
+                    label={config.status === 'draft' ? t('remoteConfig.statusDraft') :
+                           config.status === 'staged' ? t('remoteConfig.statusStaged') :
+                           config.status === 'published' ? t('remoteConfig.statusPublished') :
+                           config.status === 'archived' ? t('remoteConfig.statusArchived') :
+                           t('remoteConfig.statusDraft')}
                     color={config.status === 'draft' ? 'warning' :
                            config.status === 'staged' ? 'info' :
                            config.status === 'published' ? 'success' :
@@ -2782,10 +2782,10 @@ const RemoteConfigPage: React.FC = () => {
         <DialogTitle>
           <Box>
             <Typography variant="h6" component="div" color="text.primary">
-              {t('admin.remoteConfig.createConfig')}
+              {t('remoteConfig.createConfig')}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              {t('admin.remoteConfig.createConfigSubtitle')}
+              {t('remoteConfig.createConfigSubtitle')}
             </Typography>
           </Box>
         </DialogTitle>
@@ -2793,37 +2793,37 @@ const RemoteConfigPage: React.FC = () => {
           <Stack spacing={3} sx={{ mt: 1 }}>
             <TextField
               fullWidth
-              label={t('admin.remoteConfig.keyName')}
+              label={t('remoteConfig.keyName')}
               value={formData.keyName}
               onChange={(e) => setFormData({ ...formData, keyName: e.target.value })}
               required
               error={!!formErrors.keyName}
-              helperText={formErrors.keyName || t('admin.remoteConfig.helpTexts.keyNameCreate')}
+              helperText={formErrors.keyName || t('remoteConfig.helpTexts.keyNameCreate')}
               autoFocus
             />
 
             <FormControl fullWidth required>
-              <InputLabel>{t('admin.remoteConfig.valueType')}</InputLabel>
+              <InputLabel>{t('remoteConfig.valueType')}</InputLabel>
               <Select
                 value={formData.valueType}
                 onChange={(e) => setFormData({ ...formData, valueType: e.target.value as any })}
-                label={t('admin.remoteConfig.valueType')}
+                label={t('remoteConfig.valueType')}
               >
-                <MenuItem value="string">{t('admin.remoteConfig.valueTypes.string')}</MenuItem>
-                <MenuItem value="number">{t('admin.remoteConfig.valueTypes.number')}</MenuItem>
-                <MenuItem value="boolean">{t('admin.remoteConfig.valueTypes.boolean')}</MenuItem>
-                <MenuItem value="json">{t('admin.remoteConfig.valueTypes.json')}</MenuItem>
-                <MenuItem value="yaml">{t('admin.remoteConfig.valueTypes.yaml')}</MenuItem>
+                <MenuItem value="string">{t('remoteConfig.valueTypes.string')}</MenuItem>
+                <MenuItem value="number">{t('remoteConfig.valueTypes.number')}</MenuItem>
+                <MenuItem value="boolean">{t('remoteConfig.valueTypes.boolean')}</MenuItem>
+                <MenuItem value="json">{t('remoteConfig.valueTypes.json')}</MenuItem>
+                <MenuItem value="yaml">{t('remoteConfig.valueTypes.yaml')}</MenuItem>
               </Select>
               <Typography variant="caption" color="text.secondary" sx={{ mt: 1, ml: 2 }}>
-                {t('admin.remoteConfig.helpTexts.valueType')}
+                {t('remoteConfig.helpTexts.valueType')}
               </Typography>
             </FormControl>
 
             {formData.valueType === 'json' || formData.valueType === 'yaml' ? (
               <Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  {t('admin.remoteConfig.defaultValue')} *
+                  {t('remoteConfig.defaultValue')} *
                 </Typography>
                 <CodeEditor
                   value={formData.defaultValue}
@@ -2836,31 +2836,31 @@ const RemoteConfigPage: React.FC = () => {
                   color={formErrors.defaultValue ? 'error' : 'text.secondary'}
                   sx={{ mt: 1, display: 'block' }}
                 >
-                  {formErrors.defaultValue || t('admin.remoteConfig.helpTexts.defaultValue')}
+                  {formErrors.defaultValue || t('remoteConfig.helpTexts.defaultValue')}
                 </Typography>
               </Box>
             ) : (
               <TextField
                 fullWidth
-                label={t('admin.remoteConfig.defaultValue')}
+                label={t('remoteConfig.defaultValue')}
                 value={formData.defaultValue}
                 onChange={(e) => setFormData({ ...formData, defaultValue: e.target.value })}
                 required
                 error={!!formErrors.defaultValue}
-                helperText={formErrors.defaultValue || t('admin.remoteConfig.helpTexts.defaultValue')}
+                helperText={formErrors.defaultValue || t('remoteConfig.helpTexts.defaultValue')}
               />
             )}
 
             <TextField
               fullWidth
-              label={t('admin.remoteConfig.description')}
+              label={t('remoteConfig.description')}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               multiline
               rows={2}
               required
               error={!!formErrors.description}
-              helperText={formErrors.description || t('admin.remoteConfig.helpTexts.description')}
+              helperText={formErrors.description || t('remoteConfig.helpTexts.description')}
             />
           </Stack>
         </DialogContent>
@@ -2892,7 +2892,7 @@ const RemoteConfigPage: React.FC = () => {
       >
         <DialogTitle>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {t('admin.remoteConfig.editConfig')}
+            {t('remoteConfig.editConfig')}
             {selectedConfig && (
               <>
                 {selectedConfig.status === 'published' && (
@@ -2927,37 +2927,37 @@ const RemoteConfigPage: React.FC = () => {
           <Stack spacing={3} sx={{ mt: 1 }}>
             <TextField
               fullWidth
-              label={t('admin.remoteConfig.keyName')}
+              label={t('remoteConfig.keyName')}
               value={formData.keyName}
               onChange={(e) => setFormData({ ...formData, keyName: e.target.value })}
               required
               disabled
               error={!!formErrors.keyName}
-              helperText={formErrors.keyName || t('admin.remoteConfig.helpTexts.keyNameEdit')}
+              helperText={formErrors.keyName || t('remoteConfig.helpTexts.keyNameEdit')}
             />
 
             <FormControl fullWidth required>
-              <InputLabel>{t('admin.remoteConfig.valueType')}</InputLabel>
+              <InputLabel>{t('remoteConfig.valueType')}</InputLabel>
               <Select
                 value={formData.valueType}
                 onChange={(e) => setFormData({ ...formData, valueType: e.target.value as any })}
-                label={t('admin.remoteConfig.valueType')}
+                label={t('remoteConfig.valueType')}
               >
-                <MenuItem value="string">{t('admin.remoteConfig.valueTypes.string')}</MenuItem>
-                <MenuItem value="number">{t('admin.remoteConfig.valueTypes.number')}</MenuItem>
-                <MenuItem value="boolean">{t('admin.remoteConfig.valueTypes.boolean')}</MenuItem>
-                <MenuItem value="json">{t('admin.remoteConfig.valueTypes.json')}</MenuItem>
-                <MenuItem value="yaml">{t('admin.remoteConfig.valueTypes.yaml')}</MenuItem>
+                <MenuItem value="string">{t('remoteConfig.valueTypes.string')}</MenuItem>
+                <MenuItem value="number">{t('remoteConfig.valueTypes.number')}</MenuItem>
+                <MenuItem value="boolean">{t('remoteConfig.valueTypes.boolean')}</MenuItem>
+                <MenuItem value="json">{t('remoteConfig.valueTypes.json')}</MenuItem>
+                <MenuItem value="yaml">{t('remoteConfig.valueTypes.yaml')}</MenuItem>
               </Select>
               <Typography variant="caption" color="text.secondary" sx={{ mt: 1, ml: 2 }}>
-                {t('admin.remoteConfig.helpTexts.valueType')}
+                {t('remoteConfig.helpTexts.valueType')}
               </Typography>
             </FormControl>
 
             {formData.valueType === 'json' || formData.valueType === 'yaml' ? (
               <Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  {t('admin.remoteConfig.defaultValue')}
+                  {t('remoteConfig.defaultValue')}
                 </Typography>
                 <Box sx={{ position: 'relative' }}>
                   <CodeEditor
@@ -3004,17 +3004,17 @@ const RemoteConfigPage: React.FC = () => {
                   )}
                 </Box>
                 <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                  {t('admin.remoteConfig.helpTexts.defaultValue')}
+                  {t('remoteConfig.helpTexts.defaultValue')}
                 </Typography>
               </Box>
             ) : (
               <Box sx={{ position: 'relative' }}>
                 <TextField
                   fullWidth
-                  label={t('admin.remoteConfig.defaultValue')}
+                  label={t('remoteConfig.defaultValue')}
                   value={formData.defaultValue}
                   onChange={(e) => setFormData({ ...formData, defaultValue: e.target.value })}
-                  helperText={t('admin.remoteConfig.helpTexts.defaultValue')}
+                  helperText={t('remoteConfig.helpTexts.defaultValue')}
                   InputProps={{
                     endAdornment: originalPublishedValue && selectedConfig && (
                       <Tooltip
@@ -3044,12 +3044,12 @@ const RemoteConfigPage: React.FC = () => {
 
             <TextField
               fullWidth
-              label={t('admin.remoteConfig.description')}
+              label={t('remoteConfig.description')}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               multiline
               rows={2}
-              helperText={t('admin.remoteConfig.helpTexts.description')}
+              helperText={t('remoteConfig.helpTexts.description')}
             />
           </Stack>
         </DialogContent>
@@ -3078,11 +3078,11 @@ const RemoteConfigPage: React.FC = () => {
         fullWidth
       >
         <DialogTitle>
-          {t('admin.remoteConfig.deleteConfirmTitle')}
+          {t('remoteConfig.deleteConfirmTitle')}
         </DialogTitle>
         <DialogContent>
           <Typography>
-            {configToDelete && t('admin.remoteConfig.confirmDelete', { keyName: configToDelete.keyName })}
+            {configToDelete && t('remoteConfig.confirmDelete', { keyName: configToDelete.keyName })}
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -3135,7 +3135,7 @@ const RemoteConfigPage: React.FC = () => {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle>{t('admin.remoteConfig.stageConfigs')}</DialogTitle>
+        <DialogTitle>{t('remoteConfig.stageConfigs')}</DialogTitle>
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
             <Alert severity="info" sx={{ mb: 2 }}>
@@ -3203,12 +3203,12 @@ const RemoteConfigPage: React.FC = () => {
 
             <TextField
               fullWidth
-              label={t('admin.remoteConfig.stageDescription')}
+              label={t('remoteConfig.stageDescription')}
               value={stageFormData.description}
               onChange={(e) => setStageFormData({ ...stageFormData, description: e.target.value })}
               multiline
               rows={3}
-              placeholder={t('admin.remoteConfig.stageDescriptionPlaceholder')}
+              placeholder={t('remoteConfig.stageDescriptionPlaceholder')}
               required
               helperText="스테이징하는 이유나 변경 내용을 간단히 설명해주세요."
               error={!stageFormData.description.trim()}
@@ -3228,7 +3228,7 @@ const RemoteConfigPage: React.FC = () => {
             disabled={selectedConfigs.length === 0 || !stageFormData.description.trim()}
             startIcon={<StageIcon />}
           >
-            {t('admin.remoteConfig.stageConfigs')}
+            {t('remoteConfig.stageConfigs')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -3240,30 +3240,30 @@ const RemoteConfigPage: React.FC = () => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>{t('admin.remoteConfig.publishConfigs')}</DialogTitle>
+        <DialogTitle>{t('remoteConfig.publishConfigs')}</DialogTitle>
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
             <Typography variant="body2" color="text.secondary">
-              {t('admin.remoteConfig.publishConfigsDescription')}
+              {t('remoteConfig.publishConfigsDescription')}
             </Typography>
             <TextField
               fullWidth
-              label={t('admin.remoteConfig.deploymentName')}
+              label={t('remoteConfig.deploymentName')}
               value={publishFormData.deploymentName}
               onChange={(e) => setPublishFormData({ ...publishFormData, deploymentName: e.target.value })}
-              placeholder={t('admin.remoteConfig.deploymentNamePlaceholder')}
+              placeholder={t('remoteConfig.deploymentNamePlaceholder')}
               required
               helperText="배포를 식별할 수 있는 고유한 이름을 입력하세요. (예: v1.2.0_release)"
               error={!publishFormData.deploymentName.trim()}
             />
             <TextField
               fullWidth
-              label={t('admin.remoteConfig.deploymentDescription')}
+              label={t('remoteConfig.deploymentDescription')}
               value={publishFormData.description}
               onChange={(e) => setPublishFormData({ ...publishFormData, description: e.target.value })}
               multiline
               rows={3}
-              placeholder={t('admin.remoteConfig.deploymentDescriptionPlaceholder')}
+              placeholder={t('remoteConfig.deploymentDescriptionPlaceholder')}
               required
               helperText="이번 배포에 포함된 변경사항이나 목적을 설명해주세요."
               error={!publishFormData.description.trim()}
@@ -3360,7 +3360,7 @@ const RemoteConfigPage: React.FC = () => {
             disabled={!publishFormData.deploymentName.trim() || !publishFormData.description.trim()}
             startIcon={<PublishIcon />}
           >
-            {t('admin.remoteConfig.publishConfigs')}
+            {t('remoteConfig.publishConfigs')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -3373,11 +3373,11 @@ const RemoteConfigPage: React.FC = () => {
         fullWidth
       >
         <DialogTitle color="text.primary">
-          {t('admin.remoteConfig.contextFields.deleteConfirmTitle')}
+          {t('remoteConfig.contextFields.deleteConfirmTitle')}
         </DialogTitle>
         <DialogContent>
           <Typography color="text.primary">
-            {t('admin.remoteConfig.contextFields.deleteConfirmMessage', {
+            {t('remoteConfig.contextFields.deleteConfirmMessage', {
               name: deleteConfirmDialog.field?.name || ''
             })}
           </Typography>

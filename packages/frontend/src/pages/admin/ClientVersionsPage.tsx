@@ -434,7 +434,7 @@ const ClientVersionsPage: React.FC = () => {
         return;
       }
       if (inputMode === 'template' && !selectedTemplateId) {
-        enqueueSnackbar(t('admin.maintenance.selectTemplateRequired'), { variant: 'error' });
+        enqueueSnackbar(t('maintenance.selectTemplateRequired'), { variant: 'error' });
         return;
       }
     }
@@ -1568,17 +1568,17 @@ const ClientVersionsPage: React.FC = () => {
                   {/* 메시지 소스 선택 */}
                   <TextField
                     select
-                    label={t('admin.maintenance.messageSource')}
+                    label={t('maintenance.messageSource')}
                     value={inputMode}
                     onChange={(e) => setInputMode(e.target.value as 'direct' | 'template')}
                     fullWidth
 
                   >
-                    <MenuItem value="direct">{t('admin.maintenance.directInput')}</MenuItem>
-                    <MenuItem value="template">{t('admin.maintenance.useTemplate')}</MenuItem>
+                    <MenuItem value="direct">{t('maintenance.directInput')}</MenuItem>
+                    <MenuItem value="template">{t('maintenance.useTemplate')}</MenuItem>
                   </TextField>
                   <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
-                    {t('admin.maintenance.messageSourceHelp')}
+                    {t('maintenance.messageSourceHelp')}
                   </Typography>
 
                   {/* 템플릿 선택 */}
@@ -1586,7 +1586,7 @@ const ClientVersionsPage: React.FC = () => {
                     <Box>
                       <TextField
                         select
-                        label={t('admin.maintenance.selectTemplate')}
+                        label={t('maintenance.selectTemplate')}
                         value={selectedTemplateId}
                         onChange={(e) => setSelectedTemplateId(Number(e.target.value))}
                         fullWidth
@@ -1598,7 +1598,7 @@ const ClientVersionsPage: React.FC = () => {
                         ))}
                       </TextField>
                       <Typography variant="caption" sx={{ mt: 0.5, display: 'block', color: 'text.secondary' }}>
-                        {t('admin.maintenance.selectTemplateHelp')}
+                        {t('maintenance.selectTemplateHelp')}
                       </Typography>
                     </Box>
                   )}

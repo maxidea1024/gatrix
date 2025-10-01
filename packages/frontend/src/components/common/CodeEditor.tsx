@@ -164,14 +164,14 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       >
         <Typography variant="subtitle2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <CodeIcon fontSize="small" />
-          {language === 'json' ? t('admin.remoteConfig.editor.jsonEditor') : t('admin.remoteConfig.editor.yamlEditor')}
+          {language === 'json' ? t('remoteConfig.editor.jsonEditor') : t('remoteConfig.editor.yamlEditor')}
         </Typography>
         
         <Stack direction="row" spacing={1}>
           {showValidation && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               {isValid ? (
-                <Tooltip title={t('admin.remoteConfig.editor.syntaxValid')}>
+                <Tooltip title={t('remoteConfig.editor.syntaxValid')}>
                   <ValidIcon color="success" fontSize="small" />
                 </Tooltip>
               ) : (
@@ -183,14 +183,14 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
           )}
           
           {showFormatButton && !readOnly && (
-            <Tooltip title={t('admin.remoteConfig.editor.formatCode')}>
+            <Tooltip title={t('remoteConfig.editor.formatCode')}>
               <IconButton size="small" onClick={formatCode}>
                 <FormatIcon />
               </IconButton>
             </Tooltip>
           )}
           
-          <Tooltip title={isFullscreen ? t('admin.remoteConfig.editor.exitFullscreen') : t('admin.remoteConfig.editor.fullscreen')}>
+          <Tooltip title={isFullscreen ? t('remoteConfig.editor.exitFullscreen') : t('remoteConfig.editor.fullscreen')}>
             <IconButton size="small" onClick={toggleFullscreen}>
               {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
             </IconButton>
@@ -227,7 +227,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
             zIndex: 1000,
           }}
         >
-          {t('admin.remoteConfig.editor.syntaxError', { error: validationError })}
+          {t('remoteConfig.editor.syntaxError', { error: validationError })}
         </Alert>
       )}
     </Box>
