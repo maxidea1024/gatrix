@@ -94,23 +94,23 @@ const adminMenuItems = [
   { text: 'sidebar.maintenanceTemplates', icon: <TextIcon />, path: '/admin/maintenance-templates' },
   { text: 'sidebar.scheduler', icon: <ScheduleIcon />, path: '/admin/scheduler' },
 
-  { text: 'jobs.title', icon: <JobIcon />, path: '/admin/jobs' },
-  { text: 'jobs.monitor', icon: <MonitorIcon />, path: '/admin/queue-monitor' },
+  { text: 'sidebar.jobs', icon: <JobIcon />, path: '/admin/jobs' },
+  { text: 'sidebar.queueMonitor', icon: <MonitorIcon />, path: '/admin/queue-monitor' },
   { text: 'sidebar.whitelist', icon: <SecurityIcon />, path: '/admin/whitelist' },
-  { text: 'navigation.auditLogs', icon: <HistoryIcon />, path: '/admin/audit-logs' },
+  { text: 'sidebar.auditLogs', icon: <HistoryIcon />, path: '/admin/audit-logs' },
   { text: 'sidebar.crashes', icon: <BugReportIcon />, path: '/admin/crashes' },
   {
-    text: 'remoteConfig.title',
+    text: 'sidebar.remoteConfig',
     icon: <CloudSyncIcon />,
     path: '/admin/remote-config'
   },
   {
-    text: 'apiTokens.title',
+    text: 'sidebar.apiTokens',
     icon: <VpnKeyIcon />,
     path: '/admin/api-tokens'
   },
   {
-    text: 'console.title',
+    text: 'sidebar.console',
     icon: <TerminalIcon />,
     path: '/admin/console'
   }

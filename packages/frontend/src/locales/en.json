@@ -1804,7 +1804,6 @@
     "systemStats": "System Statistics",
     "settings": "Settings",
     "crashes": "Client Crashes",
-
     "userManagement": "User Management",
     "clientVersions": "Client Versions",
     "gameWorlds": "Game Worlds",
@@ -1814,7 +1813,12 @@
     "whitelist": "Account Whitelist",
     "auditLogs": "Audit Logs",
     "apiTokens": "API Tokens",
-    "remoteConfig": "Remote Config"
+    "remoteConfig": "Remote Config",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "jobs": "Job Management",
+    "queueMonitor": "Queue Monitor",
+    "console": "System Console"
   },
   "signUpPrompt": {
     "backToLogin": "Back to Login",

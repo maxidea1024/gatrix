@@ -32,7 +32,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    fallbackLng: defaultLanguage,
+    fallbackLng: false, // Disable fallback to show missing keys
     supportedLngs: supportedLanguages,
     nonExplicitSupportedLngs: true,
     load: 'languageOnly',
@@ -51,6 +51,11 @@ i18n
     react: {
       useSuspense: false,
     },
+
+    // Show the key itself when translation is missing
+    saveMissing: false,
+    returnEmptyString: false,
+    returnNull: false,
   });
 
 interface I18nContextType {
