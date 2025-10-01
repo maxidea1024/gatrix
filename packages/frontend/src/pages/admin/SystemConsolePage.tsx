@@ -219,7 +219,23 @@ const SystemConsolePage: React.FC = () => {
         background: (theme.palette.background?.paper as any) || '#000000',
         foreground: (theme.palette.text?.primary as any) || '#d1d5db',
         cursor: (theme.palette.text?.secondary as any) || '#9ca3af',
-      },
+        black: '#000000',
+        red: '#ef4444',
+        green: '#22c55e',
+        yellow: '#eab308',
+        blue: '#3b82f6',
+        magenta: '#d946ef',
+        cyan: '#06b6d4',
+        white: '#e5e7eb',
+        brightBlack: '#6b7280',
+        brightRed: '#f87171',
+        brightGreen: '#4ade80',
+        brightYellow: '#facc15',
+        brightBlue: '#60a5fa',
+        brightMagenta: '#f0abfc',
+        brightCyan: '#67e8f9',
+        brightWhite: '#ffffff',
+      }
     });
     const fit = new FitAddon();
     const links = new WebLinksAddon();

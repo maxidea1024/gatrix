@@ -753,12 +753,12 @@ const MessageTemplatesPage: React.FC = () => {
         }}>
           <Box>
             <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {editing ? '메시지 템플릿 편집' : '메시지 템플릿 추가'}
+              {editing ? t('admin.messageTemplates.editTitle') : t('admin.messageTemplates.addTitle')}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
               {editing
-                ? '기존 메시지 템플릿의 정보를 수정하고 다국어 메시지를 관리할 수 있습니다.'
-                : '새로운 메시지 템플릿을 생성하고 다국어 메시지를 설정할 수 있습니다.'
+                ? t('admin.messageTemplates.editDescription')
+                : t('admin.messageTemplates.addDescription')
               }
             </Typography>
           </Box>
@@ -809,8 +809,8 @@ const MessageTemplatesPage: React.FC = () => {
               languageSpecificMessagesLabel={t('admin.messageTemplates.languageSpecificMessages')}
 
               enableTranslation={true}
-              translateButtonLabel={t('admin.messageTemplates.translate')}
-              translateTooltip={t('admin.messageTemplates.translateTooltip')}
+              translateButtonLabel={t('common.autoTranslate')}
+              translateTooltip={t('common.autoTranslate')}
             />
 
             {/* 태그 선택 */}

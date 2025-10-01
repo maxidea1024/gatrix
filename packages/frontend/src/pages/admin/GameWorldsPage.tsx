@@ -1350,8 +1350,8 @@ const GameWorldsPage: React.FC = () => {
                       languageSpecificMessagesLabel={t('gameWorlds.maintenance.languageSpecificMessages')}
 
                       enableTranslation={true}
-                      translateButtonLabel={t('gameWorlds.maintenance.translate')}
-                      translateTooltip={t('gameWorlds.maintenance.translateTooltip')}
+                      translateButtonLabel={t('common.autoTranslate')}
+                      translateTooltip={t('common.autoTranslate')}
                     />
                   </Stack>
                 </LocalizationProvider>

@@ -18,6 +18,7 @@ import { enUS } from '@mui/x-date-pickers/locales';
 // Styles
 import './styles/fullcalendar.css';
 import './styles/chat.css';
+import './styles/scrollbar.css';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 
 // Contexts

@@ -678,8 +678,8 @@ const MaintenancePage: React.FC = () => {
                       languageSpecificMessagesLabel={t('admin.maintenance.languageSpecificMessages')}
 
                       enableTranslation={true}
-                      translateButtonLabel={t('admin.maintenance.translate')}
-                      translateTooltip={t('admin.maintenance.translateTooltip')}
+                      translateButtonLabel={t('common.autoTranslate')}
+                      translateTooltip={t('common.autoTranslate')}
                       ref={messageInputRef}
                     />
                   )}

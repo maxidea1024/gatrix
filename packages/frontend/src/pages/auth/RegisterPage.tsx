@@ -155,7 +155,7 @@ const RegisterPage: React.FC = () => {
       if (error.status === 404 || error.status === 400) {
         navigate('/invalid-invite', { replace: true });
       } else {
-        setInvitationError(error.message || '초대 링크 확인에 실패했습니다.');
+        setInvitationError(error.message || t('auth.invitation.checkFailed'));
       }
     } finally {
       setInvitationLoading(false);
@@ -382,10 +382,10 @@ const RegisterPage: React.FC = () => {
         {invitation && (
           <Alert severity="success" sx={{ mb: 3 }}>
             <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-              팀 초대를 받으셨습니다!
+              {t('auth.invitation.receivedTitle')}
             </Typography>
             <Typography variant="body2">
-              가입하시면 <strong>일반 사용자</strong> 권한으로 Gatrix에 참여하실 수 있습니다.
+              {t('auth.invitation.receivedDesc')}
             </Typography>
           </Alert>
         )}
