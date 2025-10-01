@@ -785,11 +785,6 @@
       }
     }
   },
-  "common": {
-    "perPage": "개씩 보기",
-    "asc": "오름차순",
-    "desc": "내림차순"
-  },
   "scheduler": {
     "title": "스케줄 관리",
     "subtitle": "게임 이벤트 및 자동화 작업을 스케줄링합니다",
@@ -1427,6 +1422,10 @@
     "search": "검색",
     "select": "선택",
     "selectTags": "태그 선택...",
+    "perPage": "개씩 보기",
+    "asc": "오름차순",
+    "desc": "내림차순",
+
     "sort": "정렬",
     "status": "상태",
     "submit": "제출",

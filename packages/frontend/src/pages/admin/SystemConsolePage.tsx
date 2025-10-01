@@ -75,14 +75,59 @@ const SystemConsolePage: React.FC = () => {
   const fitRef = useRef<FitAddon | null>(null);
   const inputBufRef = useRef<string>('');
   const historyRef = useRef<string[]>([]);
-  // Simple tab-completion candidates (sync with backend commands)
-  const completionsRef = useRef<string[]>([
-    'help','clear','whoami','sysinfo','env','uuid','base64','health','date','time','timezone','uptime'
-  ]);
+  // Tab-completion candidates fetched from backend (cached with ETag)
+  const completionsRef = useRef<string[]>([]);
+
+  // Load commands from cache, then refresh from server using ETag
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem('console:commands:v1');
+      if (cached) {
+        const arr: string[] = JSON.parse(cached);
+        if (Array.isArray(arr)) {
+          completionsRef.current = arr;
+        }
+      }
+    } catch {}
+
+    const token = localStorage.getItem('accessToken');
+    const etag = localStorage.getItem('console:commands:etag') || '';
+
+    fetch('/api/v1/admin/console/commands', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        ...(etag ? { 'If-None-Match': etag } : {}),
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      },
+      credentials: 'include',
+    }).then(async (res) => {
+      if (res.status === 304) return; // Not modified; keep cache
+      if (!res.ok) return;
+      const json = await res.json().catch(() => null);
+      const list: string[] = json?.commands || [];
+      if (Array.isArray(list) && list.length >= 0) {
+        completionsRef.current = list;
+        try {
+          localStorage.setItem('console:commands:v1', JSON.stringify(list));
+          const newTag = res.headers.get('ETag');
+          if (newTag) localStorage.setItem('console:commands:etag', newTag);
+        } catch {}
+      }
+    }).catch(() => {});
+  }, []);
 
   const historyIndexRef = useRef<number>(-1);
 
   const cursorRef = useRef<number>(0);
+  // Simple undo/redo stacks for input line
+  const undoStackRef = useRef<{ buf: string; cursor: number }[]>([]);
+  const redoStackRef = useRef<{ buf: string; cursor: number }[]>([]);
+  const saveUndo = () => {
+    undoStackRef.current.push({ buf: inputBufRef.current, cursor: cursorRef.current });
+    if (undoStackRef.current.length > 200) undoStackRef.current.shift();
+    redoStackRef.current = [];
+  };
 
   const redrawLine = (term: Terminal) => {
     term.write('\u001b[2K\r');
@@ -119,6 +164,7 @@ const SystemConsolePage: React.FC = () => {
     try {
       const text = await navigator.clipboard.readText();
       if (termRef.current && text) {
+        saveUndo();
         const before = inputBufRef.current.slice(0, cursorRef.current);
         const after = inputBufRef.current.slice(cursorRef.current);
         inputBufRef.current = before + text + after;
@@ -186,6 +232,73 @@ const SystemConsolePage: React.FC = () => {
       term.focus();
     }
 
+    // Clipboard and common shortcuts: Ctrl/Cmd+C/V/X, Undo/Redo
+    term.attachCustomKeyEventHandler((ev: any) => {
+      const e = ev as KeyboardEvent;
+      const isMac = navigator.platform.toLowerCase().includes('mac');
+      const ctrlOrMeta = isMac ? e.metaKey : e.ctrlKey;
+      const key = e.key?.toLowerCase?.() || '';
+      // Copy
+      if (ctrlOrMeta && key === 'c') {
+        const sel = term.getSelection();
+        if (sel) {
+          navigator.clipboard?.writeText(sel).catch(() => {});
+          return false; // prevent ^C input
+        }
+        // Treat as interrupt: new line + prompt
+        term.write('\r\n');
+        inputBufRef.current = '';
+        cursorRef.current = 0;
+        writePrompt(term);
+        return false;
+      }
+      // Paste
+      if (ctrlOrMeta && key === 'v') {
+        navigator.clipboard?.readText?.().then((text) => {
+          if (!text) return;
+          saveUndo();
+          const before = inputBufRef.current.slice(0, cursorRef.current);
+          const after = inputBufRef.current.slice(cursorRef.current);
+          inputBufRef.current = before + text + after;
+          cursorRef.current += text.length;
+          if (after) { term.write(text + after); term.write(`\u001b[${after.length}D`); }
+          else { term.write(text); }
+        }).catch(() => {});
+        return false;
+      }
+      // Cut (limit: behaves like copy; terminals generally don't cut past output)
+      if (ctrlOrMeta && key === 'x') {
+        const sel = term.getSelection();
+        if (sel) {
+          navigator.clipboard?.writeText(sel).catch(() => {});
+          // Not removing selection from buffer/output to avoid corrupting history
+          return false;
+        }
+      }
+      // Undo / Redo for current input line
+      if (ctrlOrMeta && key === 'z') {
+        const prev = undoStackRef.current.pop();
+        if (prev) {
+          redoStackRef.current.push({ buf: inputBufRef.current, cursor: cursorRef.current });
+          inputBufRef.current = prev.buf;
+          cursorRef.current = prev.cursor;
+          redrawLine(term);
+        }
+        return false;
+      }
+      if (ctrlOrMeta && key === 'y') {
+        const next = redoStackRef.current.pop();
+        if (next) {
+          undoStackRef.current.push({ buf: inputBufRef.current, cursor: cursorRef.current });
+          inputBufRef.current = next.buf;
+          cursorRef.current = next.cursor;
+          redrawLine(term);
+        }
+        return false;
+      }
+      return true;
+    });
+
     termRef.current = term;
     fitRef.current = fit;
 
@@ -236,30 +349,34 @@ const SystemConsolePage: React.FC = () => {
             if (!res.ok) {
               const json = await res.json().catch(() => null);
               const msg = json?.message || res.statusText || 'Unknown error';
-              const errLine = `${t('console.backendError')}${msg}`;
-              term.write(errLine.replace(/\n/g, '\r\n') + '\r\n');
-              pushRaw(errLine + '\r\n', false);
-              const cannot = t('console.cannotExecute');
+              const errAnsi = `\u001b[31m[Backend Error]\u001b[0m ${msg}`;
+              term.write(errAnsi.replace(/\n/g, '\r\n') + '\r\n');
+              pushRaw(errAnsi + '\r\n', false);
+              const cannot = `\u001b[33m${t('console.cannotExecute')}\u001b[0m`;
               term.write(cannot + '\r\n');
               pushRaw(cannot + '\r\n', false);
               writePrompt(term);
             }
           }).catch(() => {
-            const errLine = `${t('console.backendError')}${t('common.error')}`;
-            term.write(errLine + '\r\n'); pushRaw(errLine + '\r\n', false);
-            const cannot = t('console.cannotExecute');
+            const errAnsi = `\u001b[31m[Backend Error]\u001b[0m ${t('common.error')}`;
+            term.write(errAnsi + '\r\n'); pushRaw(errAnsi + '\r\n', false);
+            const cannot = `\u001b[33m${t('console.cannotExecute')}\u001b[0m`;
             term.write(cannot + '\r\n'); pushRaw(cannot + '\r\n', false);
             writePrompt(term);
           });
         }
+        // reset buffer and undo/redo after enter
         inputBufRef.current = '';
         cursorRef.current = 0;
+        undoStackRef.current = [];
+        redoStackRef.current = [];
         return;
       }
 
       // Backspace
       if (data === '\u007f') {
         if (cursorRef.current > 0) {
+          saveUndo();
           const i = cursorRef.current;
           const before = inputBufRef.current.slice(0, i - 1);
           const after = inputBufRef.current.slice(i);
@@ -284,6 +401,7 @@ const SystemConsolePage: React.FC = () => {
           const idx = historyIndexRef.current === -1 ? h.length - 1 : Math.max(0, historyIndexRef.current - 1);
           historyIndexRef.current = idx;
           setHistoryIndex(idx);
+          saveUndo();
           inputBufRef.current = h[idx] || '';
           cursorRef.current = inputBufRef.current.length;
           redrawLine(term);
@@ -298,12 +416,14 @@ const SystemConsolePage: React.FC = () => {
           if (next >= h.length) {
             historyIndexRef.current = -1;
             setHistoryIndex(-1);
+            saveUndo();
             inputBufRef.current = '';
             cursorRef.current = 0;
             redrawLine(term);
           } else {
             historyIndexRef.current = next;
             setHistoryIndex(next);
+            saveUndo();
             inputBufRef.current = h[next] || '';
             cursorRef.current = inputBufRef.current.length;
             redrawLine(term);
@@ -331,6 +451,7 @@ const SystemConsolePage: React.FC = () => {
         const cand = completionsRef.current.filter(c => c.startsWith(prefix));
         if (cand.length === 1) {
           const rest = cand[0].slice(prefix.length);
+          saveUndo();
           inputBufRef.current = buf.slice(0, cur) + rest + buf.slice(cur);
           cursorRef.current = cur + rest.length;
           // Echo minimal
@@ -364,6 +485,7 @@ const SystemConsolePage: React.FC = () => {
       if (data === '\u001b[3~') {
         const i = cursorRef.current;
         if (i < inputBufRef.current.length) {
+          saveUndo();
           const before = inputBufRef.current.slice(0, i);
           const after = inputBufRef.current.slice(i + 1);
           inputBufRef.current = before + after;
@@ -382,6 +504,7 @@ const SystemConsolePage: React.FC = () => {
       // Printable chunk (may contain multiple chars)
       const printable = data.replace(/[\x00-\x1F\x7F]/g, '');
       if (printable) {
+        saveUndo();
         const before = inputBufRef.current.slice(0, cursorRef.current);
         const after = inputBufRef.current.slice(cursorRef.current);
         inputBufRef.current = before + printable + after;

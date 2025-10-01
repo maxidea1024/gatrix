@@ -89,14 +89,14 @@ class ConsoleService {
       .option('--cyan', 'Cyan color')
       .option('--white', 'White color')
       .register()
-      .action(async (args) => this.echoCommand(args));
+      .action(async (args, ctx, opts) => this.echoCommand(args, ctx, opts));
 
     this.command('base64')
       .description('Base64 encode/decode')
       .option('--encode', 'Encode text to base64')
       .option('--decode', 'Decode base64 to text')
       .register()
-      .action(async (args) => this.base64Command(args));
+      .action(async (args, ctx, opts) => this.base64Command(args, ctx, opts));
   }
 
 
@@ -174,22 +174,30 @@ class ConsoleService {
   };
 
   // Built-in: echo
-  private echoCommand = async (args: string[]): Promise<ConsoleExecutionResult> => {
+  private echoCommand = async (args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
     // Color flags: --red, --green, --yellow, --blue, --magenta, --cyan, --white
     const colorMap: Record<string, string> = {
-      '--red': '\u001b[31m',
-      '--green': '\u001b[32m',
-      '--yellow': '\u001b[33m',
-      '--blue': '\u001b[34m',
-      '--magenta': '\u001b[35m',
-      '--cyan': '\u001b[36m',
-      '--white': '\u001b[37m',
+      red: '\u001b[31m',
+      green: '\u001b[32m',
+      yellow: '\u001b[33m',
+      blue: '\u001b[34m',
+      magenta: '\u001b[35m',
+      cyan: '\u001b[36m',
+      white: '\u001b[37m',
     };
     let color = '';
     const rest: string[] = [];
+
+    // Determine color from opts first (builder path), fallback to args flags (legacy path)
+    const colorFlag = (['red','green','yellow','blue','magenta','cyan','white'] as const)
+      .find((name) => opts?.[name] === true || args.includes(`--${name}`));
+    if (colorFlag) color = colorMap[colorFlag];
+
     for (const a of args) {
-      if (colorMap[a]) color = colorMap[a]; else rest.push(a);
+      if (a.startsWith('--') && a.slice(2) in colorMap) continue; // skip color flags in args
+      rest.push(a);
     }
+
     const text = rest.join(' ');
     const output = color ? `${color}${text}\u001b[0m` : text;
     return { output };
@@ -312,9 +320,9 @@ class ConsoleService {
   };
 
   // Extra: base64
-  private base64Command = async (args: string[]): Promise<ConsoleExecutionResult> => {
-    const hasEncode = args.includes('--encode');
-    const hasDecode = args.includes('--decode');
+  private base64Command = async (args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
+    const hasEncode = opts?.encode === true || args.includes('--encode');
+    const hasDecode = opts?.decode === true || args.includes('--decode');
     const rest = args.filter(a => a !== '--encode' && a !== '--decode');
     const text = rest.join(' ');
     if (hasEncode && !hasDecode) {

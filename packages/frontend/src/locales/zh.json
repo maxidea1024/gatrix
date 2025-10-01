@@ -1248,6 +1248,10 @@
     "retry": "重试",
     "resource": "资源",
     "rowsPerPage": "每页行数",
+    "perPage": "每页",
+    "asc": "升序",
+    "desc": "降序",
+
     "save": "保存",
     "saving": "保存中...",
     "search": "搜索",

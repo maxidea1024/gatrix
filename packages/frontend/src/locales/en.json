@@ -1308,6 +1308,10 @@
     "retry": "Retry",
     "resource": "Resource",
     "rowsPerPage": "Rows per page",
+    "perPage": "per page",
+    "asc": "Ascending",
+    "desc": "Descending",
+
     "save": "Save",
     "saving": "Saving...",
     "search": "Search",
@@ -2283,10 +2287,5 @@
     "invitationDeclineFailed": "Failed to decline invitation",
     "invitationCancelFailed": "Failed to cancel invitation",
     "addReaction": "Add reaction"
-  },
-  "common": {
-    "perPage": "per page",
-    "asc": "Ascending",
-    "desc": "Descending"
   }
 }
