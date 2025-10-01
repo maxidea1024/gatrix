@@ -52,7 +52,7 @@ import {
   Save as SaveIcon,
   ContentCopy as ContentCopyIcon,
 } from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
+
 import { useSnackbar } from 'notistack';
 import { WhitelistService, Whitelist, CreateWhitelistData } from '../../services/whitelistService';
 import SimplePagination from '../../components/common/SimplePagination';
@@ -63,8 +63,7 @@ import EmptyTableRow from '../../components/common/EmptyTableRow';
 
 
 const WhitelistPage: React.FC = () => {
-  const { t } = useTranslation();
-  const { language } = useI18n();
+  const { t, language } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
   const [searchParams, setSearchParams] = useSearchParams();
 

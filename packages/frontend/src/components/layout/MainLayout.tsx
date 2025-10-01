@@ -66,7 +66,7 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme as useCustomTheme } from '@/contexts/ThemeContext';
-import { useTranslation } from 'react-i18next';
+import { useI18n } from '@/contexts/I18nContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import TimezoneSelector from '../common/TimezoneSelector';
 import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceService';
@@ -139,7 +139,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const location = useLocation();
   const { user, logout, isAdmin } = useAuth();
   const { toggleTheme, mode, isDark } = useCustomTheme();
-  const { t, i18n } = useTranslation();
+  const { t } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
 
   // Maintenance banner state

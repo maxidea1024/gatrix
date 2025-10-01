@@ -47,7 +47,7 @@ import {
   ContentCopy as ContentCopyIcon,
   Search as SearchIcon
 } from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
+import { useI18n } from '@/contexts/I18nContext';
 import { useSnackbar } from 'notistack';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { messageTemplateService, MessageTemplate, MessageTemplateLocale, MessageTemplateType } from '@/services/messageTemplateService';
@@ -62,7 +62,7 @@ import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/Mu
 
 
 const MessageTemplatesPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
   const [items, setItems] = useState<MessageTemplate[]>([]);
   const [total, setTotal] = useState(0);

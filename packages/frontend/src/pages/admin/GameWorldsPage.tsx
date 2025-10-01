@@ -74,7 +74,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { useTranslation } from 'react-i18next';
+import { useI18n } from '@/contexts/I18nContext';
 import { useSnackbar } from 'notistack';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -342,7 +342,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
 };
 
 const GameWorldsPage: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { t, language } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
 
 
@@ -471,7 +471,7 @@ const GameWorldsPage: React.FC = () => {
 
   // 날짜 로케일 설정
   const getDateLocale = () => {
-    const currentLang = i18n.language || 'ko';
+    const currentLang = language || 'ko';
     switch (currentLang) {
       case 'en':
         dayjs.locale('en');

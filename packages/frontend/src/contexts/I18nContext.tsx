@@ -34,6 +34,8 @@ i18n
     resources,
     fallbackLng: defaultLanguage,
     supportedLngs: supportedLanguages,
+    nonExplicitSupportedLngs: true,
+    load: 'languageOnly',
     debug: process.env.NODE_ENV === 'development',
 
     detection: {
@@ -71,18 +73,21 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
 
   // Fallback mapping between legacy admin.* and root-level keys in both directions
   const tWithFallback = (key: string, options?: any) => {
-    const val = t(key as any, options);
+    // Use the i18next instance directly to avoid any stale closures
+    const baseT = i18nInstance.t.bind(i18nInstance);
+
+    let val = baseT(key as any, options);
 
     if (val === key && typeof key === 'string') {
       // Case 1: admin.* → try root-level
       if (key.startsWith('admin.')) {
         const rootKey = key.replace(/^admin\./, '');
-        const alt = t(rootKey as any, options);
+        const alt = baseT(rootKey as any, options);
         if (alt !== rootKey) return alt;
       } else {
         // Case 2: root-level → try admin.*
         const adminKey = `admin.${key}`;
-        const alt2 = t(adminKey as any, options);
+        const alt2 = baseT(adminKey as any, options);
         if (alt2 !== adminKey) return alt2;
       }
     }
