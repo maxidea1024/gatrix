@@ -1,7 +1,31 @@
 import bcrypt from 'bcryptjs';
 import db from '../config/knex';
 import logger from '../config/logger';
-import { User, CreateUserData, UpdateUserData, UserWithoutPassword } from '../types/user';
+import { User as UserType, CreateUserData, UpdateUserData, UserWithoutPassword } from '../types/user';
+import { Model } from 'objection';
+import { convertDateFieldsForMySQL, convertDateFieldsFromMySQL, COMMON_DATE_FIELDS } from '../utils/dateUtils';
+
+// Export User class for Objection.js models
+export class User extends Model {
+  static tableName = 'g_users';
+
+  id!: number;
+  email!: string;
+  name!: string;
+  passwordHash?: string;
+  role!: string;
+  status!: string;
+  authType!: string;
+  emailVerified!: boolean;
+  emailVerifiedAt?: Date;
+  lastLoginAt?: Date;
+  avatarUrl?: string;
+  preferredLanguage?: string;
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt!: Date;
+  updatedAt!: Date;
+}
 
 export class UserModel {
   static async findById(id: number): Promise<UserWithoutPassword | null> {
@@ -403,6 +427,59 @@ export class UserModel {
         });
     } catch (error) {
       logger.error('Error updating user language:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Search users by name or email
+   */
+  static async searchUsers(query: string, limit: number = 20): Promise<UserWithoutPassword[]> {
+    try {
+      const users = await db('g_users')
+        .select('id', 'name', 'email', 'role', 'status', 'avatarUrl', 'createdAt', 'updatedAt')
+        .where('status', 'active') // 활성 사용자만 검색
+        .andWhere(function() {
+          this.where('name', 'like', `%${query}%`)
+              .orWhere('email', 'like', `%${query}%`);
+        })
+        .orderBy('name', 'asc')
+        .limit(limit);
+
+      return users;
+    } catch (error) {
+      logger.error('Error searching users:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get users updated since a specific date for synchronization
+   */
+  static async getUsersForSync(since: Date): Promise<UserWithoutPassword[]> {
+    try {
+      const users = await db('g_users')
+        .select([
+          'id',
+          'email',
+          'name',
+          'avatarUrl',
+          'role',
+          'status',
+          'lastLoginAt',
+          'createdAt',
+          'updatedAt'
+        ])
+        .where('status', 'active') // 활성 사용자만 동기화
+        .andWhere(function() {
+          this.where('updatedAt', '>=', since)
+              .orWhere('createdAt', '>=', since);
+        })
+        .orderBy('updatedAt', 'desc');
+
+      return users;
+    } catch (error) {
+      logger.error('Error getting users for sync:', error);
       throw error;
     }
   }

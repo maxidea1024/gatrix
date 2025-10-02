@@ -1,19 +1,44 @@
-facebook:
-  label: Facebook
-  permalink: /facebook
-  description: Facebook tag description
+gatrix:
+  label: Gatrix
+  permalink: /gatrix
+  description: Gatrix game platform management system
 
-hello:
-  label: Hello
-  permalink: /hello
-  description: Hello tag description
+tutorial:
+  label: Tutorial
+  permalink: /tutorial
+  description: Step-by-step tutorials and guides
 
-docusaurus:
-  label: Docusaurus
-  permalink: /docusaurus
-  description: Docusaurus tag description
+features:
+  label: Features
+  permalink: /features
+  description: Platform features and capabilities
 
-hola:
-  label: Hola
-  permalink: /hola
-  description: Hola tag description
+setup:
+  label: Setup
+  permalink: /setup
+  description: Installation and configuration guides
+
+chat:
+  label: Chat
+  permalink: /chat
+  description: Real-time chat server features
+
+jobs:
+  label: Jobs
+  permalink: /jobs
+  description: Job management and automation
+
+api:
+  label: API
+  permalink: /api
+  description: API documentation and usage
+
+tips:
+  label: Tips
+  permalink: /tips
+  description: Tips and best practices
+
+announcement:
+  label: Announcement
+  permalink: /announcement
+  description: Important announcements and updates

@@ -18,6 +18,7 @@ export interface GameWorld {
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
+  customPayload?: Record<string, any> | null;
   tags?: Tag[]; // normalized
   createdAt: string;
   updatedAt: string;
@@ -39,6 +40,7 @@ export interface CreateGameWorldData {
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
+  customPayload?: Record<string, any> | null;
   tagIds?: number[]; // normalized
 }
 
@@ -54,6 +56,7 @@ export interface UpdateGameWorldData {
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
+  customPayload?: Record<string, any> | null;
   tagIds?: number[]; // normalized
 }
 
@@ -63,7 +66,9 @@ export interface GameWorldListParams {
   sortOrder?: 'ASC' | 'DESC';
   isVisible?: boolean;
   isMaintenance?: boolean;
-  tags?: string; // for filtering; comma-separated (server still supports LIKE on world.tags string if needed)
+  // Prefer tagIds for server-side filtering; keep tags for backward compatibility
+  tagIds?: string; // comma-separated IDs, e.g., "1,2,3"
+  tags?: string; // deprecated: comma-separated names or legacy filter
 }
 
 export interface GameWorldListResult {

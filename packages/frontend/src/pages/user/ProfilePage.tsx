@@ -303,7 +303,7 @@ const ProfilePage: React.FC = () => {
 
       <Grid container spacing={3}>
         {/* Personal Information */}
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12 , md: 8 }}>
           <Card sx={{ height: 'fit-content' }}>
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
@@ -364,7 +364,7 @@ const ProfilePage: React.FC = () => {
         </Grid>
 
         {/* Account Information */}
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12 , md: 4 }}>
           <Card>
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>

@@ -21,30 +21,30 @@ export interface TagListParams {
 
 export const tagService = {
   async list(params?: TagListParams): Promise<Tag[]> {
-    const res = await apiService.get<{ tags: Tag[] }>('/tags', { params });
+    const res = await apiService.get<{ tags: Tag[] }>('/admin/tags', { params });
     return res.data?.tags || [];
   },
 
   async create(payload: { name: string; color?: string; description?: string | null; }): Promise<Tag> {
-    const res = await apiService.post<{ tag: Tag }>('/tags', payload);
+    const res = await apiService.post<{ tag: Tag }>('/admin/tags', payload);
     return res.data!.tag;
   },
 
   async update(id: number, payload: Partial<{ name: string; color: string; description: string | null; }>): Promise<Tag> {
-    const res = await apiService.put<{ tag: Tag }>(`/tags/${id}`, payload);
+    const res = await apiService.put<{ tag: Tag }>(`/admin/tags/${id}`, payload);
     return res.data!.tag;
   },
 
   async remove(id: number): Promise<void> {
-    await apiService.delete(`/tags/${id}`);
+    await apiService.delete(`/admin/tags/${id}`);
   },
 
   async listForEntity(entityType: string, entityId: number): Promise<Tag[]> {
-    const res = await apiService.get<{ tags: Tag[] }>(`/tags/assignments`, { params: { entityType, entityId } });
+    const res = await apiService.get<{ tags: Tag[] }>(`/admin/tags/assignments`, { params: { entityType, entityId } });
     return res.data?.tags || [];
   },
 
   async setForEntity(entityType: string, entityId: number, tagIds: number[]): Promise<void> {
-    await apiService.put(`/tags/assignments`, { entityType, entityId, tagIds });
+    await apiService.put(`/admin/tags/assignments`, { entityType, entityId, tagIds });
   },
 };

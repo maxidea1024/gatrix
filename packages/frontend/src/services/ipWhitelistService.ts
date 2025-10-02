@@ -97,7 +97,7 @@ export class IpWhitelistService {
       filters.tags.forEach(tag => params.append('tags', tag));
     }
 
-    const response = await apiService.get<{ success: boolean; data: IpWhitelistListResponse }>(`/ip-whitelist?${params}`);
+    const response = await apiService.get<{ success: boolean; data: IpWhitelistListResponse }>(`/admin/ip-whitelist?${params}`);
 
     if (response?.success && response?.data) {
       return response.data;
@@ -115,7 +115,7 @@ export class IpWhitelistService {
   }
 
   static async getIpWhitelistById(id: number): Promise<IpWhitelist> {
-    const response = await apiService.get<{ success: boolean; data: IpWhitelist }>(`/ip-whitelist/${id}`);
+    const response = await apiService.get<{ success: boolean; data: IpWhitelist }>(`/admin/ip-whitelist/${id}`);
     
     if (response?.success && response?.data) {
       return response.data;
@@ -125,7 +125,7 @@ export class IpWhitelistService {
   }
 
   static async createIpWhitelist(data: CreateIpWhitelistData): Promise<IpWhitelist> {
-    const response = await apiService.post<{ success: boolean; data: IpWhitelist }>('/ip-whitelist', data);
+    const response = await apiService.post<{ success: boolean; data: IpWhitelist }>('/admin/ip-whitelist', data);
     
     if (response?.success && response?.data) {
       return response.data;
@@ -135,7 +135,7 @@ export class IpWhitelistService {
   }
 
   static async updateIpWhitelist(id: number, data: UpdateIpWhitelistData): Promise<IpWhitelist> {
-    const response = await apiService.put<{ success: boolean; data: IpWhitelist }>(`/ip-whitelist/${id}`, data);
+    const response = await apiService.put<{ success: boolean; data: IpWhitelist }>(`/admin/ip-whitelist/${id}`, data);
     
     if (response?.success && response?.data) {
       return response.data;
@@ -145,7 +145,7 @@ export class IpWhitelistService {
   }
 
   static async deleteIpWhitelist(id: number): Promise<void> {
-    const response = await apiService.delete<{ success: boolean; message: string }>(`/ip-whitelist/${id}`);
+    const response = await apiService.delete<{ success: boolean; message: string }>(`/admin/ip-whitelist/${id}`);
     
     if (!response?.success) {
       throw new Error('Failed to delete IP whitelist entry');
@@ -153,7 +153,7 @@ export class IpWhitelistService {
   }
 
   static async toggleIpWhitelistStatus(id: number): Promise<IpWhitelist> {
-    const response = await apiService.patch<{ success: boolean; data: IpWhitelist }>(`/ip-whitelist/${id}/toggle`);
+    const response = await apiService.patch<{ success: boolean; data: IpWhitelist }>(`/admin/ip-whitelist/${id}/toggle`);
     
     if (response?.success && response?.data) {
       return response.data;
@@ -167,7 +167,7 @@ export class IpWhitelistService {
       success: boolean; 
       data: BulkCreateResponse;
       message: string;
-    }>('/ip-whitelist/bulk', { entries });
+    }>('/admin/ip-whitelist/bulk', { entries });
     
     if (response?.success && response?.data) {
       return response.data;
@@ -178,7 +178,7 @@ export class IpWhitelistService {
 
   static async checkIpWhitelist(ipAddress: string): Promise<IpCheckResponse> {
     const params = new URLSearchParams({ ipAddress });
-    const response = await apiService.get<{ success: boolean; data: IpCheckResponse }>(`/ip-whitelist/check?${params}`);
+    const response = await apiService.get<{ success: boolean; data: IpCheckResponse }>(`/admin/ip-whitelist/check?${params}`);
     
     if (response?.success && response?.data) {
       return response.data;

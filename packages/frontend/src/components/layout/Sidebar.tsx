@@ -22,69 +22,25 @@ import {
   AdminPanelSettings,
   Assessment,
   Security,
+  CloudSync,
+  History,
+  VpnKey,
+  Chat,
+  BugReport,
+  Timeline,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { NavItem } from '@/types';
+import { useTranslation } from 'react-i18next';
+import { getNavigationItems } from '@/config/navigation';
+
 
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
   width: number;
 }
-
-// Navigation configuration
-const getNavigationItems = (isAdmin: boolean): NavItem[] => {
-  const baseItems: NavItem[] = [
-    {
-      id: 'dashboard',
-      label: 'Dashboard',
-      icon: 'Dashboard',
-      path: '/dashboard',
-    },
-  ];
-
-  const adminItems: NavItem[] = [
-    {
-      id: 'users',
-      label: 'User Management',
-      icon: 'People',
-      path: '/users',
-      roles: ['admin'],
-    },
-    {
-      id: 'audit-logs',
-      label: 'Audit Logs',
-      icon: 'Security',
-      path: '/admin/audit-logs',
-      roles: ['admin'],
-    },
-    {
-      id: 'admin',
-      label: 'Administration',
-      icon: 'AdminPanelSettings',
-      roles: ['admin'],
-      children: [
-        {
-          id: 'system-stats',
-          label: 'System Statistics',
-          icon: 'Assessment',
-          path: '/admin/stats',
-          roles: ['admin'],
-        },
-      ],
-    },
-    {
-      id: 'settings',
-      label: 'Settings',
-      icon: 'Settings',
-      path: '/settings',
-      roles: ['admin'],
-    },
-  ];
-
-  return isAdmin ? [...baseItems, ...adminItems] : baseItems;
-};
 
 // Icon mapping
 const iconMap: Record<string, React.ReactElement> = {
@@ -95,13 +51,21 @@ const iconMap: Record<string, React.ReactElement> = {
   AdminPanelSettings: <AdminPanelSettings />,
   Assessment: <Assessment />,
   Security: <Security />,
+  CloudSync: <CloudSync />,
+  History: <History />,
+  VpnKey: <VpnKey />,
+  BugReport: <BugReport />,
+  Chat: <Chat />,
+  Timeline: <Timeline />,
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
   const location = useLocation();
   const { user, isAdmin } = useAuth();
-  
+
   const [expandedItems, setExpandedItems] = React.useState<string[]>([]);
 
   const navigationItems = getNavigationItems(isAdmin());
@@ -112,8 +76,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
       onClose(); // Close sidebar on mobile after navigation
     } else if (item.children) {
       // Toggle expansion for items with children
-      setExpandedItems(prev => 
-        prev.includes(item.id) 
+      setExpandedItems(prev =>
+        prev.includes(item.id)
           ? prev.filter(id => id !== item.id)
           : [...prev, item.id]
       );
@@ -138,7 +102,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
     if (!item.roles || item.roles.length === 0) {
       return true;
     }
-    return item.roles.includes(user?.role || '');
+    const hasAccess = item.roles.includes(user?.role || '');
+    console.log(`canAccessItem - item: ${item.id}, userRole: ${user?.role}, itemRoles:`, item.roles, 'hasAccess:', hasAccess);
+    return hasAccess;
   };
 
   const renderNavItem = (item: NavItem, level: number = 0) => {
@@ -175,8 +141,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
             <ListItemIcon sx={{ minWidth: 40 }}>
               {iconMap[item.icon || 'Dashboard']}
             </ListItemIcon>
-            <ListItemText 
-              primary={item.label}
+            <ListItemText
+              primary={t(item.label)}
               primaryTypographyProps={{
                 fontSize: '0.875rem',
                 fontWeight: isActive ? 600 : 400,
@@ -205,13 +171,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <AdminPanelSettings color="primary" />
           <Typography variant="h6" noWrap component="div">
-            Admin Panel
+            {t('sidebar.adminPanel')}
           </Typography>
         </Box>
       </Toolbar>
-      
+
       <Divider />
-      
+
       <Box sx={{ flex: 1, overflow: 'auto', py: 1 }}>
         <List>
           {navigationItems.map(item => renderNavItem(item))}
@@ -223,7 +189,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
           <Divider />
           <Box sx={{ p: 2 }}>
             <Typography variant="caption" color="text.secondary">
-              Logged in as
+              {t('common.loggedInAs')}
             </Typography>
             <Typography variant="body2" fontWeight={500}>
               {user.name}
@@ -263,7 +229,9 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAdmin } = useAuth();
-  
+
+  const { t } = useTranslation();
+
   const [expandedItems, setExpandedItems] = React.useState<string[]>([]);
 
   const navigationItems = getNavigationItems(isAdmin());
@@ -272,8 +240,8 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
     if (item.path) {
       navigate(item.path);
     } else if (item.children) {
-      setExpandedItems(prev => 
-        prev.includes(item.id) 
+      setExpandedItems(prev =>
+        prev.includes(item.id)
           ? prev.filter(id => id !== item.id)
           : [...prev, item.id]
       );
@@ -335,8 +303,8 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
             <ListItemIcon sx={{ minWidth: 40 }}>
               {iconMap[item.icon || 'Dashboard']}
             </ListItemIcon>
-            <ListItemText 
-              primary={item.label}
+            <ListItemText
+              primary={t(item.label)}
               primaryTypographyProps={{
                 fontSize: '0.875rem',
                 fontWeight: isActive ? 600 : 400,
@@ -374,13 +342,13 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <AdminPanelSettings color="primary" />
           <Typography variant="h6" noWrap component="div">
-            Admin Panel
+            {t('sidebar.adminPanel')}
           </Typography>
         </Box>
       </Toolbar>
-      
+
       <Divider />
-      
+
       <Box sx={{ flex: 1, overflow: 'auto', py: 1 }}>
         <List>
           {navigationItems.map(item => renderNavItem(item))}
@@ -392,7 +360,7 @@ export const DesktopSidebar: React.FC<{ width: number }> = ({ width }) => {
           <Divider />
           <Box sx={{ p: 2 }}>
             <Typography variant="caption" color="text.secondary">
-              Logged in as
+              {t('common.loggedInAs')}
             </Typography>
             <Typography variant="body2" fontWeight={500}>
               {user.name}

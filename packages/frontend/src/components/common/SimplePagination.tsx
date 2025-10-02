@@ -8,6 +8,7 @@ import {
   Typography,
   Divider,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 interface SimplePaginationProps {
   count: number;
@@ -28,6 +29,7 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
   rowsPerPageOptions = [5, 10, 20, 25, 50, 100],
   showRowsPerPage = true,
 }) => {
+  const { t } = useTranslation();
   const totalPages = Math.max(1, Math.ceil(count / rowsPerPage));
   const currentPage = page + 1; // Convert 0-based to 1-based
 
@@ -95,7 +97,7 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
               </Select>
             </FormControl>
             <Typography variant="body2" color="text.secondary">
-              / page
+              {t('common.perPage')}
             </Typography>
           </Box>
         </>

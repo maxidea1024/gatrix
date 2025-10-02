@@ -24,7 +24,7 @@ export interface AuditLogStats {
 }
 
 export class AuditLogService {
-  private static readonly BASE_URL = '/audit-logs';
+  private static readonly BASE_URL = '/admin/audit-logs';
 
   /**
    * Get audit logs with pagination and filters

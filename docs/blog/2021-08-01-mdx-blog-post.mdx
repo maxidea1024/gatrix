@@ -1,24 +1,420 @@
 ---
-slug: mdx-blog-post
-title: MDX Blog Post
-authors: [slorber]
-tags: [docusaurus]
+slug: real-time-chat-server-setup
+title: Gatrix 실시간 채팅 서버 완전 설정 가이드
+authors: [gatrix-team]
+tags: [gatrix, chat, tutorial, setup]
 ---
 
-Blog posts support [Docusaurus Markdown features](https://docusaurus.io/docs/markdown-features), such as [MDX](https://mdxjs.com/).
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
 
-:::tip
+Gatrix의 실시간 채팅 서버는 Socket.IO와 Redis 클러스터링을 사용하여 고성능 메시징을 제공합니다. 이 가이드에서는 채팅 서버를 설정하고 최적화하는 방법을 단계별로 알아보겠습니다.
 
-Use the power of React to create interactive blog posts.
+export const Highlight = ({children, color}) => (
+  <span
+    style={{
+      backgroundColor: color,
+      borderRadius: '2px',
+      color: '#fff',
+      padding: '0.2rem',
+    }}>
+    {children}
+  </span>
+);
 
-:::
+<Highlight color="#25c2a0">고성능</Highlight> 실시간 채팅 서버로 게임 커뮤니티를 강화하세요!
 
 {/* truncate */}
 
-For example, use JSX to create an interactive button:
+## 🚀 채팅 서버 아키텍처
 
-```js
-<button onClick={() => alert('button clicked!')}>Click me!</button>
-```
+Gatrix 채팅 서버는 다음과 같은 고급 기능을 제공합니다:
 
-<button onClick={() => alert('button clicked!')}>Click me!</button>
+- **Socket.IO 기반**: WebSocket과 폴링을 자동으로 처리
+- **Redis 클러스터링**: 다중 인스턴스 동기화
+- **메시지 브로드캐스팅**: 100,000+ 메시지/초 처리
+- **실시간 모니터링**: Prometheus 메트릭 수집
+- **자동 확장**: 수평적 확장 지원
+
+## 📦 설치 및 설정
+
+### 1. 기본 설치
+
+<Tabs>
+  <TabItem value="npm" label="npm" default>
+    ```bash
+    # 채팅 서버 패키지로 이동
+    cd packages/chat-server
+    
+    # 의존성 설치
+    npm install
+    
+    # 환경 변수 설정
+    cp .env.example .env
+    ```
+  </TabItem>
+  <TabItem value="yarn" label="yarn">
+    ```bash
+    # 채팅 서버 패키지로 이동
+    cd packages/chat-server
+    
+    # 의존성 설치
+    yarn install
+    
+    # 환경 변수 설정
+    cp .env.example .env
+    ```
+  </TabItem>
+  <TabItem value="docker" label="Docker">
+    ```bash
+    # Docker Compose로 전체 스택 실행
+    docker-compose up -d
+    
+    # 또는 채팅 서버만 실행
+    docker-compose up chat-server
+    ```
+  </TabItem>
+</Tabs>
+
+### 2. 환경 변수 설정
+
+<CodeBlock language="bash">
+{`# 서버 설정
+NODE_ENV=production
+PORT=3001
+HOST=0.0.0.0
+
+# 데이터베이스
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=gatrix_chat
+DB_USER=chat_user
+DB_PASSWORD=your_password
+
+# Redis 클러스터
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=your_redis_password
+
+# Gatrix 메인 서버 연동
+GATRIX_API_URL=http://localhost:5001
+GATRIX_API_SECRET=shared_secret
+
+# 성능 튜닝
+CLUSTER_ENABLED=true
+WS_MAX_CONNECTIONS=10000
+BROADCAST_BATCH_SIZE=1000`}
+</CodeBlock>
+
+## 🔧 핵심 기능 설정
+
+### 1. 채널 관리
+
+<Tabs>
+  <TabItem value="create" label="채널 생성" default>
+    ```javascript
+    // 채널 생성 API
+    POST /api/v1/channels
+    {
+      "name": "일반 채팅",
+      "description": "모든 사용자가 참여할 수 있는 채널",
+      "type": "public",
+      "maxMembers": 1000
+    }
+    ```
+  </TabItem>
+  <TabItem value="join" label="채널 참여">
+    ```javascript
+    // WebSocket으로 채널 참여
+    socket.emit('join_channel', {
+      channelId: 'channel_123',
+      userId: 'user_456'
+    });
+    ```
+  </TabItem>
+  <TabItem value="leave" label="채널 나가기">
+    ```javascript
+    // WebSocket으로 채널 나가기
+    socket.emit('leave_channel', {
+      channelId: 'channel_123',
+      userId: 'user_456'
+    });
+    ```
+  </TabItem>
+</Tabs>
+
+### 2. 메시지 전송
+
+<CodeBlock language="javascript">
+{`// 메시지 전송
+socket.emit('send_message', {
+  channelId: 'channel_123',
+  content: '안녕하세요!',
+  type: 'text',
+  metadata: {
+    mentions: ['user_456'],
+    replyTo: 'message_789'
+  }
+});
+
+// 서버에서 메시지 수신
+socket.on('message', (data) => {
+  console.log('새 메시지:', data);
+  // {
+  //   id: 'msg_123',
+  //   channelId: 'channel_123',
+  //   userId: 'user_456',
+  //   content: '안녕하세요!',
+  //   timestamp: '2024-01-15T10:30:00Z',
+  //   type: 'text'
+  // }
+});`}
+</CodeBlock>
+
+### 3. 실시간 기능
+
+<Tabs>
+  <TabItem value="typing" label="타이핑 인디케이터" default>
+    ```javascript
+    // 타이핑 시작
+    socket.emit('typing_start', {
+      channelId: 'channel_123',
+      userId: 'user_456'
+    });
+    
+    // 타이핑 중지
+    socket.emit('typing_stop', {
+      channelId: 'channel_123',
+      userId: 'user_456'
+    });
+    ```
+  </TabItem>
+  <TabItem value="presence" label="사용자 상태">
+    ```javascript
+    // 온라인 상태 업데이트
+    socket.emit('presence_update', {
+      status: 'online',
+      lastSeen: new Date().toISOString()
+    });
+    ```
+  </TabItem>
+  <TabItem value="reactions" label="메시지 반응">
+    ```javascript
+    // 메시지에 반응 추가
+    socket.emit('add_reaction', {
+      messageId: 'msg_123',
+      emoji: '👍',
+      userId: 'user_456'
+    });
+    ```
+  </TabItem>
+</Tabs>
+
+## 📊 성능 최적화
+
+### 1. 메시지 브로드캐스팅 최적화
+
+<CodeBlock language="javascript">
+{`// 배치 처리로 메시지 전송
+const broadcastService = {
+  async broadcastMessage(channelId, message) {
+    const members = await this.getChannelMembers(channelId);
+    
+    // 1000개씩 배치로 나누어 전송
+    const batches = this.chunkArray(members, 1000);
+    
+    for (const batch of batches) {
+      await this.sendBatch(batch, message);
+    }
+  },
+  
+  async sendBatch(members, message) {
+    const promises = members.map(member => 
+      this.sendToUser(member.userId, message)
+    );
+    
+    await Promise.all(promises);
+  }
+};`}
+</CodeBlock>
+
+### 2. Redis 클러스터 설정
+
+<CodeBlock language="yaml">
+{`# docker-compose.yml
+version: '3.8'
+services:
+  redis-cluster:
+    image: redis:7-alpine
+    command: redis-server --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly yes
+    ports:
+      - "7000:7000"
+      - "7001:7001"
+      - "7002:7002"
+    volumes:
+      - redis-data:/data
+
+  chat-server:
+    build: ./packages/chat-server
+    environment:
+      - REDIS_CLUSTER_NODES=redis-cluster:7000,redis-cluster:7001,redis-cluster:7002
+    depends_on:
+      - redis-cluster`}
+</CodeBlock>
+
+### 3. 모니터링 설정
+
+<Tabs>
+  <TabItem value="prometheus" label="Prometheus 메트릭" default>
+    ```javascript
+    // 메트릭 수집
+    const prometheus = require('prom-client');
+    
+    const messageCounter = new prometheus.Counter({
+      name: 'chat_messages_total',
+      help: 'Total number of messages sent',
+      labelNames: ['channel', 'type']
+    });
+    
+    const connectionGauge = new prometheus.Gauge({
+      name: 'chat_connections_active',
+      help: 'Number of active connections'
+    });
+    ```
+  </TabItem>
+  <TabItem value="grafana" label="Grafana 대시보드">
+    ```json
+    {
+      "dashboard": {
+        "title": "Gatrix Chat Server",
+        "panels": [
+          {
+            "title": "Active Connections",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "chat_connections_active"
+              }
+            ]
+          },
+          {
+            "title": "Messages per Second",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(chat_messages_total[5m])"
+              }
+            ]
+          }
+        ]
+      }
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+## 🔒 보안 설정
+
+### 1. JWT 인증
+
+<CodeBlock language="javascript">
+{`// JWT 토큰 검증 미들웨어
+const jwt = require('jsonwebtoken');
+
+const authenticateSocket = (socket, next) => {
+  const token = socket.handshake.auth.token;
+  
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    socket.userId = decoded.userId;
+    socket.userRole = decoded.role;
+    next();
+  } catch (error) {
+    next(new Error('Authentication failed'));
+  }
+};
+
+io.use(authenticateSocket);`}
+</CodeBlock>
+
+### 2. Rate Limiting
+
+<CodeBlock language="javascript">
+{`// 메시지 전송 제한
+const rateLimiter = new RateLimiter({
+  keyGenerator: (socket) => socket.userId,
+  points: 10, // 10개 메시지
+  duration: 60, // 1분 동안
+});
+
+socket.on('send_message', async (data) => {
+  try {
+    await rateLimiter.consume(socket.userId);
+    // 메시지 처리
+  } catch (rejRes) {
+    socket.emit('rate_limit_exceeded', {
+      retryAfter: rejRes.msBeforeNext
+    });
+  }
+});`}
+</CodeBlock>
+
+## 🚀 배포 및 확장
+
+### 1. Docker 배포
+
+<CodeBlock language="dockerfile">
+{`# Dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY . .
+RUN npm run build
+
+EXPOSE 3001
+
+CMD ["npm", "start"]`}
+</CodeBlock>
+
+### 2. 로드 밸런싱
+
+<CodeBlock language="nginx">
+{`# nginx.conf
+upstream chat_servers {
+    ip_hash; # Sticky session
+    server chat-server-1:3001;
+    server chat-server-2:3001;
+    server chat-server-3:3001;
+}
+
+server {
+    listen 80;
+    server_name chat.gatrix.com;
+    
+    location / {
+        proxy_pass http://chat_servers;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}`}
+</CodeBlock>
+
+## 🎯 결론
+
+Gatrix 채팅 서버는 고성능 실시간 통신을 위한 완전한 솔루션을 제공합니다. 이 가이드를 따라 설정하면 확장 가능하고 안정적인 채팅 시스템을 구축할 수 있습니다.
+
+다음 포스트에서는 API 통합과 웹훅 설정에 대해 알아보겠습니다!
+
+---
+
+**관련 자료**:
+- [채팅 서버 문서](/packages/chat-server/README.md)
+- [API 문서](/docs/api/client-api)
+- [GitHub 저장소](https://github.com/motifgames/gatrix)

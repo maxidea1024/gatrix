@@ -36,6 +36,16 @@ const getTheme = (mode: 'light' | 'dark'): Theme => {
         secondary: mode === 'dark' ? '#9AA4AF' : '#666666',
       },
     },
+    zIndex: {
+      mobileStepper: 1000,
+      fab: 1050,
+      speedDial: 1050,
+      appBar: 1100,
+      drawer: 1300,
+      modal: 1500,       // Popover/Menu가 Drawer 위로 오도록
+      snackbar: 1400,
+      tooltip: 1600,
+    },
     typography: {
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       h1: {
@@ -225,6 +235,7 @@ const getTheme = (mode: 'light' | 'dark'): Theme => {
         defaultProps: {
           MenuProps: {
             disableScrollLock: true,
+            // Portal은 기본값(false)을 사용하고, z-index는 theme.zIndex.modal을 따르게 함
             BackdropProps: {
               style: {
                 backgroundColor: 'transparent',

@@ -9,7 +9,7 @@ export interface AuthenticatedRequest extends Request {
   userDetails?: any;
 }
 
-export const authenticate = async (
+export const auth = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
@@ -193,3 +193,6 @@ export const requireEmailVerified = (
 
   next();
 };
+
+// Export authenticate as alias for auth
+export const authenticate = auth;

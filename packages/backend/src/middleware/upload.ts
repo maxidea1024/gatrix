@@ -1,6 +1,7 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { Request, Response, NextFunction } from 'express';
 import { Express } from 'express-serve-static-core';
 import { CustomError } from './errorHandler';
 
@@ -44,4 +45,4 @@ export const upload = multer({
 });
 
 // Avatar upload middleware
-export const uploadAvatar = upload.single('avatar');
+export const uploadAvatar = upload.single('avatar') as any;

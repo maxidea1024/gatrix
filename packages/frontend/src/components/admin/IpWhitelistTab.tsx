@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useDebounce } from '../../hooks/useDebounce';
 import {
   Box,
   Typography,
@@ -25,6 +26,7 @@ import {
   Tooltip,
   Switch,
   FormControlLabel,
+  Drawer,
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import {
@@ -39,6 +41,7 @@ import {
   Cancel as CancelIcon,
   Save as SaveIcon,
   ContentCopy as ContentCopyIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -68,6 +71,9 @@ const IpWhitelistTab: React.FC = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState('');
+
+  // 디바운싱된 검색어 (500ms 지연)
+  const debouncedSearch = useDebounce(search, 500);
 
   // Menu state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -101,7 +107,7 @@ const IpWhitelistTab: React.FC = () => {
     try {
       setLoading(true);
       const filters: any = {};
-      if (search) filters.search = search;
+      if (debouncedSearch) filters.search = debouncedSearch;
       const result = await IpWhitelistService.getIpWhitelists(page + 1, rowsPerPage, filters);
 
       if (result && typeof result === 'object' && Array.isArray(result.ipWhitelists)) {
@@ -120,7 +126,7 @@ const IpWhitelistTab: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, search, t, enqueueSnackbar]);
+  }, [page, rowsPerPage, debouncedSearch, t, enqueueSnackbar]);
 
   useEffect(() => {
     loadIpWhitelists();
@@ -358,6 +364,7 @@ const IpWhitelistTab: React.FC = () => {
                 placeholder={t('ipWhitelist.searchPlaceholder')}
                 value={search}
                 onChange={handleSearchChange}
+                size="small"
                 slotProps={{
                   input: {
                     startAdornment: (
@@ -370,14 +377,6 @@ const IpWhitelistTab: React.FC = () => {
                 sx={{ minWidth: 300 }}
               />
             </Box>
-
-            <Tooltip title={t('common.refresh')}>
-              <span>
-                <IconButton onClick={loadIpWhitelists} disabled={loading} sx={{ ml: 2 }}>
-                  <RefreshIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
           </Box>
         </CardContent>
       </Card>
@@ -385,7 +384,6 @@ const IpWhitelistTab: React.FC = () => {
       {/* Table */}
       <Card variant="outlined">
         <CardContent sx={{ p: 0 }}>
-          {loading && <LinearProgress />}
           <TableContainer>
             <Table>
               <TableHead>
@@ -485,14 +483,16 @@ const IpWhitelistTab: React.FC = () => {
               </TableBody>
             </Table>
           </TableContainer>
-          <SimplePagination
-            count={total}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[5, 10, 25, 50, 100]}
-          />
+          {total > 0 && (
+            <SimplePagination
+              count={total}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[5, 10, 25, 50, 100]}
+            />
+          )}
         </CardContent>
       </Card>
 
@@ -512,22 +512,56 @@ const IpWhitelistTab: React.FC = () => {
         </MenuItem>
       </Menu>
 
-      {/* Add/Edit Dialog */}
-      <Dialog 
-        open={addDialog || editDialog} 
-        onClose={() => { setAddDialog(false); setEditDialog(false); }} 
-        maxWidth="sm" 
-        fullWidth
-      >
-        <FormDialogHeader
-          title={editDialog ? t('ipWhitelist.dialog.editTitle') : t('ipWhitelist.dialog.addTitle')}
-          description={editDialog
-            ? t('ipWhitelist.dialog.editDescription')
-            : t('ipWhitelist.dialog.addDescription')
+      {/* Add/Edit Drawer */}
+      <Drawer
+        anchor="right"
+        open={addDialog || editDialog}
+        onClose={() => { setAddDialog(false); setEditDialog(false); }}
+        sx={{
+          zIndex: 1300,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 600 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
           }
-        />
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+        }}
+        ModalProps={{
+          keepMounted: false
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Box>
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              {editDialog ? t('ipWhitelist.dialog.editTitle') : t('ipWhitelist.dialog.addTitle')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {editDialog
+                ? t('ipWhitelist.dialog.editDescription')
+                : t('ipWhitelist.dialog.addDescription')
+              }
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={() => { setAddDialog(false); setEditDialog(false); }}
+            size="small"
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, p: 3, overflow: 'auto' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Box>
               <TextField
                 fullWidth
@@ -613,16 +647,26 @@ const IpWhitelistTab: React.FC = () => {
               </Typography>
             </Box>
           </Box>
-        </DialogContent>
-        <DialogActions>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 3,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
           <Button onClick={() => { setAddDialog(false); setEditDialog(false); }} startIcon={<CancelIcon />}>
             {t('common.cancel')}
           </Button>
           <Button onClick={handleSave} variant="contained" startIcon={<SaveIcon />}>
             {editDialog ? t('ipWhitelist.dialog.editTitle') : t('ipWhitelist.dialog.addTitle')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
       {/* Bulk Import Dialog */}
       <Dialog open={bulkDialog} onClose={() => setBulkDialog(false)} maxWidth="md" fullWidth>

@@ -2,9 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { CssBaseline } from '@mui/material';
 import { SnackbarProvider } from 'notistack';
-import { ToastContainer } from 'react-toastify';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 // MUI Date Pickers
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -20,6 +17,9 @@ import { enUS } from '@mui/x-date-pickers/locales';
 
 // Styles
 import './styles/fullcalendar.css';
+import './styles/chat.css';
+import './styles/scrollbar.css';
+import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 
 // Contexts
 import { AuthProvider } from './contexts/AuthContext';
@@ -43,6 +43,7 @@ import AccountSuspendedPage from './pages/auth/AccountSuspendedPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import OAuthCallbackPage from './pages/auth/OAuthCallbackPage';
+import InvalidInvitePage from './pages/auth/InvalidInvitePage';
 
 // Pages - Common
 import DashboardPage from './pages/common/DashboardPage';
@@ -67,6 +68,14 @@ import SchedulerPage from './pages/admin/SchedulerPage';
 import JobsPage from './pages/admin/JobsPage';
 import QueueMonitorPage from './pages/admin/QueueMonitorPage';
 import CustomQueueMonitorPage from './pages/admin/CustomQueueMonitorPage';
+import RemoteConfigPage from './pages/admin/RemoteConfigPage';
+import RemoteConfigHistoryPage from './pages/admin/RemoteConfigHistoryPage';
+import RemoteConfigDashboard from './pages/RemoteConfig/RemoteConfigParametersPage';
+import ApiTokensPage from './pages/admin/ApiTokensPage';
+import CrashesPage from './pages/admin/CrashesPage';
+import ChatPage from './pages/chat/ChatPage';
+import SystemConsolePage from './pages/admin/SystemConsolePage';
+import RealtimeEventsPage from './pages/admin/RealtimeEventsPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
 // Conditional Landing Page Component
@@ -172,6 +181,8 @@ const AppContent: React.FC = () => {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/logout" element={<LogoutPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+                <Route path="/signup" element={<RegisterPage />} />
+                <Route path="/invalid-invite" element={<InvalidInvitePage />} />
                 <Route path="/pending-approval" element={<PendingApprovalPage />} />
                 <Route path="/auth/pending" element={<PendingApprovalPage />} />
                 <Route path="/auth/callback" element={<OAuthCallbackPage />} />
@@ -189,6 +200,14 @@ const AppContent: React.FC = () => {
                   <ProtectedRoute>
                     <MainLayout>
                       <DashboardPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
+
+                <Route path="/chat" element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <ChatPage />
                     </MainLayout>
                   </ProtectedRoute>
                 } />
@@ -236,6 +255,13 @@ const AppContent: React.FC = () => {
                         <Route path="jobs" element={<JobsPage />} />
                         <Route path="queue-monitor" element={<QueueMonitorPage />} />
                         <Route path="audit-logs" element={<AuditLogsPage />} />
+                        <Route path="realtime-events" element={<RealtimeEventsPage />} />
+                        <Route path="crashes" element={<CrashesPage />} />
+                        <Route path="remote-config" element={<RemoteConfigDashboard />} />
+                        <Route path="remote-config-old" element={<RemoteConfigPage />} />
+                        <Route path="remote-config/history" element={<RemoteConfigHistoryPage />} />
+                        <Route path="api-tokens" element={<ApiTokensPage />} />
+                        <Route path="console" element={<SystemConsolePage />} />
                       </Routes>
                     </MainLayout>
                   </ProtectedRoute>
@@ -245,17 +271,6 @@ const AppContent: React.FC = () => {
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Router>
-            <ToastContainer
-              position="bottom-right"
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              // pauseOnFocusLoss
-              draggable
-              pauseOnHover
-            />
           </SnackbarProvider>
         </LocalizedDatePickers>
       </AuthProvider>

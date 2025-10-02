@@ -18,6 +18,7 @@ const config = {
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     name: process.env.DB_NAME || 'admin_panel',
+    debug: process.env.DB_DEBUG === 'true',
   },
 
   // Redis configuration
@@ -75,6 +76,12 @@ const config = {
   logging: {
     level: process.env.LOG_LEVEL || 'info',
     dir: process.env.LOG_DIR || 'logs',
+  },
+
+  // Chat Server configuration
+  chatServer: {
+    url: process.env.CHAT_SERVER_URL || 'http://localhost:3001',
+    apiToken: process.env.CHAT_SERVER_API_TOKEN || 'gatrix-api-default-token',
   },
 };
 

@@ -1,5 +1,6 @@
 import db from '../config/knex';
 import logger from '../config/logger';
+import { convertDateFieldsForMySQL, convertDateFieldsFromMySQL, COMMON_DATE_FIELDS } from '../utils/dateUtils';
 
 export interface GameWorldMaintenanceLocale {
   id?: number;
@@ -25,6 +26,7 @@ export interface GameWorld {
   maintenanceEndDate?: Date;
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
+  customPayload?: Record<string, any> | null;
   createdBy: number;
   updatedBy?: number;
   createdAt: string;
@@ -48,6 +50,7 @@ export interface CreateGameWorldData {
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
+  customPayload?: Record<string, any> | null;
   createdBy: number;
 }
 
@@ -64,6 +67,7 @@ export interface UpdateGameWorldData {
   maintenanceMessage?: string;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
+  customPayload?: Record<string, any> | null;
   updatedBy?: number;
 }
 
@@ -288,10 +292,14 @@ export class GameWorldModel {
           maintenanceEndDate: gameWorldData.maintenanceEndDate || null,
           maintenanceMessage: gameWorldData.maintenanceMessage || null,
           supportsMultiLanguage: gameWorldData.supportsMultiLanguage ?? false,
+          customPayload: gameWorldData.customPayload ?? {},
           createdBy: gameWorldData.createdBy
         };
 
-        const [insertId] = await trx('g_game_worlds').insert(insertData);
+        // 날짜 필드들을 MySQL DATETIME 형식으로 변환
+        const convertedData = convertDateFieldsForMySQL(insertData, ['createdAt', 'updatedAt', 'maintenanceStartDate', 'maintenanceEndDate']);
+
+        const [insertId] = await trx('g_game_worlds').insert(convertedData);
 
         // 점검 메시지 로케일 처리
         if (maintenanceLocales && maintenanceLocales.length > 0) {
@@ -332,16 +340,24 @@ export class GameWorldModel {
 
         Object.entries(gameWorldUpdateData).forEach(([key, value]) => {
           if (value !== undefined) {
-            updateData[key] = value;
+            // customPayload는 JSON 문자열로 변환
+            if (key === 'customPayload') {
+              updateData[key] = JSON.stringify(value);
+            } else {
+              updateData[key] = value;
+            }
           }
         });
 
-        if (Object.keys(updateData).length > 0) {
-          updateData.updatedAt = db.fn.now();
+        // 날짜 필드들을 MySQL DATETIME 형식으로 변환
+        const convertedUpdateData = convertDateFieldsForMySQL(updateData, ['createdAt', 'updatedAt', 'maintenanceStartDate', 'maintenanceEndDate']);
+
+        if (Object.keys(convertedUpdateData).length > 0) {
+          convertedUpdateData.updatedAt = db.fn.now();
 
           await trx('g_game_worlds')
             .where('id', id)
-            .update(updateData);
+            .update(convertedUpdateData);
         }
 
         // 점검 메시지 로케일 처리

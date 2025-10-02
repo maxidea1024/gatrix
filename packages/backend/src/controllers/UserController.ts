@@ -1,9 +1,12 @@
 import { Response } from 'express';
 import { UserService } from '../services/userService';
 import { UserTagService } from '../services/UserTagService';
+import { ChatServerService } from '../services/ChatServerService';
 import { asyncHandler, CustomError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import Joi from 'joi';
+
+const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
 // Validation schemas
 const getUsersQuerySchema = Joi.object({
@@ -312,6 +315,28 @@ export class UserController {
     });
   });
 
+  // 사용자 검색 (채팅 시스템용)
+  static searchUsers = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { q: query, limit = 20 } = req.query;
+
+    if (!query || typeof query !== 'string') {
+      throw new CustomError('Search query is required', 400);
+    }
+
+    if (query.length < 2) {
+      throw new CustomError('Search query must be at least 2 characters', 400);
+    }
+
+    const searchLimit = Math.min(parseInt(limit as string) || 20, 50); // 최대 50개로 제한
+
+    const users = await UserService.searchUsers(query, searchLimit);
+
+    res.json({
+      success: true,
+      data: users,
+    });
+  });
+
   // Self-service endpoints for regular users
   static getCurrentUser = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     if (!req.user) {
@@ -344,6 +369,25 @@ export class UserController {
     }
 
     const user = await UserService.updateUser(req.user.userId, value);
+
+    // Chat Server에 사용자 정보 동기화 (백그라운드에서 실행)
+    try {
+      const chatServerService = ChatServerService.getInstance();
+      await chatServerService.syncUser({
+        id: user.id,
+        username: user.email,
+        name: user.name || user.email,
+        email: user.email,
+        avatarUrl: user.avatarUrl || DEFAULT_AVATAR_URL,
+        status: 'online',
+        lastSeenAt: new Date().toISOString(),
+        createdAt: user.createdAt?.toISOString(),
+        updatedAt: user.updatedAt?.toISOString(),
+      });
+    } catch (error) {
+      // Chat Server 동기화 실패는 로그만 남기고 사용자에게는 성공 응답
+      console.error('Failed to sync user to Chat Server:', error);
+    }
 
     res.json({
       success: true,
