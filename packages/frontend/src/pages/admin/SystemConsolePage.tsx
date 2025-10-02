@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Typography, Menu, MenuItem, alpha } from '@mui/material';
+import { Terminal as TerminalIcon } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useSSENotifications } from '@/hooks/useSSENotifications';
@@ -83,12 +84,8 @@ const SystemConsolePage: React.FC = () => {
   // Selection state for Shift+Arrow keys
   const selectionStartRef = useRef<number | null>(null);
   const selectionEndRef = useRef<number | null>(null);
-  // Fullscreen state
-  const [isFullscreen, setIsFullscreen] = useState(false);
   // Paste handling flag to prevent duplicate paste
   const isPastingRef = useRef<boolean>(false);
-  // Fullscreen toggle flag to prevent double-trigger
-  const isTogglingFullscreenRef = useRef<boolean>(false);
 
   // Load commands from cache, then refresh from server using ETag
   useEffect(() => {
@@ -216,18 +213,6 @@ const SystemConsolePage: React.FC = () => {
   useEffect(() => { historyRef.current = history; }, [history]);
   useEffect(() => { historyIndexRef.current = historyIndex; }, [historyIndex]);
 
-  // Handle body overflow when entering/exiting fullscreen
-  useEffect(() => {
-    if (isFullscreen) {
-      // Prevent body scroll in fullscreen
-      document.body.style.overflow = 'hidden';
-
-      return () => {
-        // Restore body scroll
-        document.body.style.overflow = '';
-      };
-    }
-  }, [isFullscreen]);
 
   const getPromptAnsi = useCallback(() => {
     const username = (user?.name || user?.email || 'user').split('@')[0];
@@ -337,31 +322,6 @@ const SystemConsolePage: React.FC = () => {
       const ctrlOrMeta = isMac ? e.metaKey : e.ctrlKey;
       const key = e.key?.toLowerCase?.() || '';
 
-      // Ctrl+Enter: Toggle fullscreen
-      if (ctrlOrMeta && key === 'enter') {
-        e.preventDefault();
-        e.stopPropagation();
-
-        // Prevent double-trigger
-        if (isTogglingFullscreenRef.current) {
-          return false;
-        }
-
-        isTogglingFullscreenRef.current = true;
-        setIsFullscreen(prev => !prev);
-
-        setTimeout(() => {
-          if (termRef.current && fitRef.current) {
-            try { fitRef.current.fit(); } catch {}
-          }
-          // Reset flag after transition
-          setTimeout(() => {
-            isTogglingFullscreenRef.current = false;
-          }, 200);
-        }, 100);
-
-        return false;
-      }
 
       // Allow Shift+Arrow keys for selection (don't intercept)
       if (e.shiftKey && (key === 'arrowleft' || key === 'arrowright' || key === 'arrowup' || key === 'arrowdown')) {
@@ -712,6 +672,36 @@ const SystemConsolePage: React.FC = () => {
           } else {
             term.write(' \b');
           }
+        }
+        return;
+      }
+
+      // Delete key: delete character at cursor position
+      if (data === '\u001b[3~') {
+        // If there's a selection, delete it
+        if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
+          saveUndo();
+          const start = Math.min(selectionStartRef.current, selectionEndRef.current);
+          const end = Math.max(selectionStartRef.current, selectionEndRef.current);
+          const before = inputBufRef.current.slice(0, start);
+          const after = inputBufRef.current.slice(end);
+          inputBufRef.current = before + after;
+          cursorRef.current = start;
+          selectionStartRef.current = null;
+          selectionEndRef.current = null;
+          redrawLine(term);
+          return;
+        }
+
+        // Normal delete
+        if (cursorRef.current < inputBufRef.current.length) {
+          saveUndo();
+          const i = cursorRef.current;
+          const before = inputBufRef.current.slice(0, i);
+          const after = inputBufRef.current.slice(i + 1);
+          inputBufRef.current = before + after;
+          // Redraw from cursor position
+          redrawLine(term);
         }
         return;
       }
@@ -1092,95 +1082,36 @@ const SystemConsolePage: React.FC = () => {
   return (
     <Box
       sx={{
-        p: isFullscreen ? 0 : 2,
-        height: isFullscreen ? '100vh' : '100%',
         display: 'flex',
         flexDirection: 'column',
-        ...(isFullscreen && {
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 9999,
-          bgcolor: 'background.default',
-          width: '100vw'
-        })
+        p: 2,
+        flex: 1,
+        minHeight: 0,
+        overflow: 'hidden'
       }}
       onKeyDown={(e) => {
         // [ ignore default browser find etc.
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') e.preventDefault();
       }}
     >
-      {!isFullscreen && (
-        <>
-          <Typography variant="h6" sx={{ mb: 0.5 }}>{t('console.title')}</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{t('console.subtitle')}</Typography>
-        </>
-      )}
-
-      {/* Fullscreen exit button - appears on hover at top */}
-      {isFullscreen && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 10000,
-            opacity: 0,
-            transition: 'opacity 0.3s ease',
-            '&:hover': {
-              opacity: 1
-            },
-            // Trigger area - invisible but detects hover
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '200px',
-              height: '50px',
-              zIndex: -1
-            }
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.opacity = '1';
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.opacity = '0';
-          }}
-        >
-          <Box
-            onClick={() => setIsFullscreen(false)}
-            sx={{
-              mt: 1,
-              px: 2,
-              py: 1,
-              bgcolor: 'primary.main',
-              color: 'primary.contrastText',
-              borderRadius: '0 0 8px 8px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              boxShadow: 3,
-              '&:hover': {
-                bgcolor: 'primary.dark'
-              }
-            }}
-          >
-            <Typography variant="body2">Exit Fullscreen (Ctrl+Enter)</Typography>
-          </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+        <TerminalIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+        <Box>
+          <Typography variant="h5" sx={{ fontWeight: 700 }}>
+            {t('console.title')}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {t('console.subtitle')}
+          </Typography>
         </Box>
-      )}
+      </Box>
+
 
       <Box sx={(th) => ({
         flex: 1,
         bgcolor: th.palette.background.paper,
         color: th.palette.text.primary,
-        borderRadius: isFullscreen ? 0 : 1,
+        borderRadius: 1,
         p: 1,
         minHeight: 0,
         fontFamily: 'D2Coding, "NanumGothicCoding", "Source Han Mono", "Noto Sans Mono CJK KR", Menlo, Monaco, "Courier New", monospace',
@@ -1201,17 +1132,71 @@ const SystemConsolePage: React.FC = () => {
         onClose={() => setCtxMenu(null)}
         anchorReference="anchorPosition"
         anchorPosition={ctxMenu ? { top: ctxMenu.y, left: ctxMenu.x } : undefined}
+        slotProps={{
+          paper: {
+            sx: (th) => ({
+              minWidth: 180,
+              borderRadius: 2,
+              boxShadow: th.palette.mode === 'dark'
+                ? '0 10px 40px rgba(0, 0, 0, 0.5), 0 0 0 0.5px rgba(255, 255, 255, 0.1)'
+                : '0 10px 40px rgba(0, 0, 0, 0.15), 0 0 0 0.5px rgba(0, 0, 0, 0.05)',
+              backdropFilter: 'blur(20px)',
+              backgroundColor: th.palette.mode === 'dark'
+                ? alpha(th.palette.background.paper, 0.85)
+                : alpha(th.palette.background.paper, 0.95),
+              py: 0.5,
+            })
+          }
+        }}
       >
-        <MenuItem onClick={handleCopy} disabled={!canCopy}>{t('common.copy')}</MenuItem>
-        <MenuItem onClick={handlePaste} disabled={!canPaste}>{t('common.paste')}</MenuItem>
+        <MenuItem
+          onClick={handleCopy}
+          disabled={!canCopy}
+          sx={(th) => ({
+            fontSize: '0.875rem',
+            py: 1,
+            px: 2,
+            borderRadius: 1,
+            mx: 0.5,
+            '&:hover': {
+              backgroundColor: th.palette.mode === 'dark'
+                ? alpha(th.palette.primary.main, 0.15)
+                : alpha(th.palette.primary.main, 0.08),
+            },
+            '&.Mui-disabled': {
+              opacity: 0.4,
+            }
+          })}
+        >
+          {t('common.copy')}
+        </MenuItem>
+        <MenuItem
+          onClick={handlePaste}
+          disabled={!canPaste}
+          sx={(th) => ({
+            fontSize: '0.875rem',
+            py: 1,
+            px: 2,
+            borderRadius: 1,
+            mx: 0.5,
+            '&:hover': {
+              backgroundColor: th.palette.mode === 'dark'
+                ? alpha(th.palette.primary.main, 0.15)
+                : alpha(th.palette.primary.main, 0.08),
+            },
+            '&.Mui-disabled': {
+              opacity: 0.4,
+            }
+          })}
+        >
+          {t('common.paste')}
+        </MenuItem>
       </Menu>
-      {!isFullscreen && (
-        <Box sx={{ mt: 1 }}>
-          <Typography variant="caption" color="text.secondary">
-            {t('console.hint')}: echo --green "Hello World" | help | date | time | timezone | uptime | Ctrl+Enter: Toggle Fullscreen
-          </Typography>
-        </Box>
-      )}
+      <Box sx={{ mt: 1 }}>
+        <Typography variant="caption" color="text.secondary">
+          {t('console.hint')}: echo --green "Hello World" | help | date | time | timezone | uptime
+        </Typography>
+      </Box>
     </Box>
   );
 };

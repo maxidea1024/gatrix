@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Box, Card, CardContent, Stack, TextField, Switch, FormControlLabel, Button, Typography, MenuItem, Select, Chip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Build as BuildIcon } from '@mui/icons-material';
 import { alpha } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -283,10 +284,18 @@ const MaintenancePage: React.FC = () => {
   return (
     <Box sx={{ p: 3, transition:'background-color 0.2s ease', backgroundColor: (theme)=> isMaintenance ? alpha(theme.palette.error.light, 0.08) : alpha(theme.palette.success.light, 0.06) }}>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" sx={{ mb: 1 }}>{t('maintenance.title')}</Typography>
-        <Typography variant="body1" color="text.secondary">
-          {t('maintenance.description')}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <BuildIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+          <Box>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>
+              {t('maintenance.title')}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {t('maintenance.description')}
+            </Typography>
+          </Box>
+        </Box>
+
       </Box>
       <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start' }}>
         {/* 좌측 설정 영역 */}

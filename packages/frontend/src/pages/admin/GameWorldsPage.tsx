@@ -1019,13 +1019,16 @@ const GameWorldsPage: React.FC = () => {
     <Box key={i18n.language} sx={{ p: 3 }}>
       {/* Header */}
       <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box>
-          <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-            {t('gameWorlds.title')}
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {t('gameWorlds.subtitle') }
-          </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <WorldIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+          <Box>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>
+              {t('gameWorlds.title')}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {t('gameWorlds.subtitle') }
+            </Typography>
+          </Box>
         </Box>
         <Button
           variant="contained"

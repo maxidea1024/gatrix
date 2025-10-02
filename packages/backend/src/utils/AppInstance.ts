@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { ulid } from 'ulid';
 import os from 'os';
 import logger from '../config/logger';
 
@@ -26,7 +26,7 @@ class AppInstance {
     const packageJson = require('../../package.json');
     
     this._instanceInfo = {
-      instanceId: uuidv4(),
+      instanceId: ulid(),
       processId: process.pid,
       hostname: os.hostname(),
       platform: `${os.platform()}-${os.arch()}`,

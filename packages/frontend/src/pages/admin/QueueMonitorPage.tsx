@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Card, CardContent, Alert, CircularProgress } from '@mui/material';
+import { Monitor as MonitorIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -33,12 +34,17 @@ const QueueMonitorPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-          {t('jobs.monitor')}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          {t('jobs.monitorDescription')}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <MonitorIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+          <Box>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>
+              {t('jobs.monitor')}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {t('jobs.monitorDescription')}
+            </Typography>
+          </Box>
+        </Box>
       </Box>
 
       <Card>

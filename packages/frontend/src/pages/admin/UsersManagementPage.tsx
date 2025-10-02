@@ -48,6 +48,7 @@ import {
   CheckCircle as CheckCircleIcon,
   Security as SecurityIcon,
   Person as PersonIcon,
+  People as PeopleIcon,
   Cancel as CancelIcon,
   Close as CloseIcon,
   Email as EmailIcon,
@@ -766,12 +767,17 @@ const UsersManagementPage: React.FC = () => {
     <Box sx={{ p: 3 }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-          {t('users.title')}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          {t('users.subtitle')}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <PeopleIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+          <Box>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>
+              {t('users.title')}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {t('users.subtitle')}
+            </Typography>
+          </Box>
+        </Box>
       </Box>
 
       {/* Filters */}

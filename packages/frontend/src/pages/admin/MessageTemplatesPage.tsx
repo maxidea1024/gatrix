@@ -45,7 +45,8 @@ import {
   Refresh as RefreshIcon,
   LocalOffer as LocalOfferIcon,
   ContentCopy as ContentCopyIcon,
-  Search as SearchIcon
+  Search as SearchIcon,
+  TextFields as TextFieldsIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -410,16 +411,22 @@ const MessageTemplatesPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-          <Typography variant="h4" sx={{ fontWeight: 600 }}>
-            {t('messageTemplates.title')}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <TextFieldsIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                {t('messageTemplates.title')}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {t('messageTemplates.subtitle')}
+              </Typography>
+            </Box>
+          </Box>
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
             {t('messageTemplates.addTemplate')}
           </Button>
         </Box>
-        <Typography variant="body1" color="text.secondary">
-          {t('messageTemplates.subtitle')}
-        </Typography>
+
       </Box>
 
       {/* 필터 */}

@@ -38,12 +38,12 @@ import {
   Save as SaveIcon,
   Cancel as CancelIcon,
   Delete as DeleteIcon,
+  Schedule as ScheduleIcon,
   Edit as EditIcon,
   PlayArrow as PlayIcon,
   Pause as PauseIcon,
   Stop as StopIcon,
   ExpandMore as ExpandMoreIcon,
-  Schedule as ScheduleIcon,
   History as HistoryIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -383,13 +383,16 @@ const SchedulerPage: React.FC = () => {
     <Box sx={{ p: 3 }}>
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Box>
-            <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-              {t('scheduler.title')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('scheduler.subtitle')}
-            </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <ScheduleIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                {t('scheduler.title')}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {t('scheduler.subtitle')}
+              </Typography>
+            </Box>
           </Box>
           <Button
             variant="contained"

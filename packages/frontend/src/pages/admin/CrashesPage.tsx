@@ -234,13 +234,20 @@ const CrashesPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        {t('crashes.title')}
-      </Typography>
+      <Box sx={{ mb: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <BugReportIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+          <Box>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>
+              {t('crashes.title')}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {t('crashes.subtitle')}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
 
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-        {t('crashes.subtitle')}
-      </Typography>
 
       {/* Search and Filters */}
       <Card sx={{ mb: 3 }}>

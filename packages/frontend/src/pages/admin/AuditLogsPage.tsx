@@ -30,6 +30,7 @@ import {
   Refresh as RefreshIcon,
   Info as InfoIcon,
   ContentCopy as ContentCopyIcon,
+  History as HistoryIcon,
 } from '@mui/icons-material';
 
 import { useTranslation } from 'react-i18next';
@@ -200,14 +201,19 @@ const AuditLogsPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-          <Typography variant="h4" sx={{ fontWeight: 600 }}>
-            {t('auditLogs.title')}
-          </Typography>
-
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <HistoryIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                {t('auditLogs.title')}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {t('auditLogs.subtitle')}
+              </Typography>
+            </Box>
+          </Box>
         </Box>
-        <Typography variant="body1" color="text.secondary">
-          {t('auditLogs.subtitle')}
-        </Typography>
+
       </Box>
 
         {/* Filters */}

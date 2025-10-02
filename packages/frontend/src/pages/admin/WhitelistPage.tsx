@@ -51,6 +51,7 @@ import {
   Close as CloseIcon,
   Save as SaveIcon,
   ContentCopy as ContentCopyIcon,
+  Security as SecurityIcon,
 } from '@mui/icons-material';
 
 import { useSnackbar } from 'notistack';
@@ -422,13 +423,16 @@ const WhitelistPage: React.FC = () => {
         <CardContent>
           {/* Header */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-            <Box>
-              <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-                {t('whitelist.title')}
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                {t('whitelist.subtitle')}
-              </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <SecurityIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+              <Box>
+                <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                  {t('whitelist.title')}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {t('whitelist.subtitle')}
+                </Typography>
+              </Box>
             </Box>
           </Box>
 

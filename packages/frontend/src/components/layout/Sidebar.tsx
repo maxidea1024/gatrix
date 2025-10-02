@@ -28,6 +28,15 @@ import {
   Chat,
   BugReport,
   Timeline,
+  Terminal,
+  Widgets,
+  Language,
+  Build,
+  TextFields,
+  Schedule,
+  Work,
+  Monitor,
+  Label,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -42,7 +51,7 @@ interface SidebarProps {
   width: number;
 }
 
-// Icon mapping
+// Icon mapping - must include all icons used in navigation.tsx
 const iconMap: Record<string, React.ReactElement> = {
   Dashboard: <Dashboard />,
   People: <People />,
@@ -57,6 +66,15 @@ const iconMap: Record<string, React.ReactElement> = {
   BugReport: <BugReport />,
   Chat: <Chat />,
   Timeline: <Timeline />,
+  Terminal: <Terminal />,
+  Widgets: <Widgets />,
+  Language: <Language />,
+  Build: <Build />,
+  TextFields: <TextFields />,
+  Schedule: <Schedule />,
+  Work: <Work />,
+  Monitor: <Monitor />,
+  Label: <Label />,
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {

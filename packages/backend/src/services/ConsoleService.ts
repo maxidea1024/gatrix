@@ -137,6 +137,13 @@ class ConsoleService {
       .register()
       .action(async (args, ctx, opts) => this.apiKeyCommand(args, ctx, opts));
 
+    this.command('api-token-delete')
+      .description('Delete API access token')
+      .option('--id', 'Token ID (required)')
+      .option('--name', 'Token name (alternative to ID)')
+      .register()
+      .action(async (args, ctx, opts) => this.apiTokenDeleteCommand(args, ctx, opts));
+
     this.command('random')
       .description('Generate random string')
       .option('--length', 'Length in bytes (default: 32)')
@@ -145,6 +152,21 @@ class ConsoleService {
       .option('--alphanumeric', 'Output as alphanumeric')
       .register()
       .action(async (args, ctx, opts) => this.randomCommand(args, ctx, opts));
+
+    this.command('gen-login-id')
+      .description('Generate login-friendly user ID (starts with a letter, contains digits)')
+      .option('--length', 'Total length (default: 12)')
+      .option('--count', 'How many to generate (default: 1)')
+      .register()
+      .action(async (args, ctx, opts) => this.genLoginIdCommand(args, ctx, opts));
+
+    this.command('gen-login-password')
+      .description('Generate login-friendly password (starts with a letter; includes digits and symbols)')
+      .option('--length', 'Total length (default: 14)')
+      .option('--count', 'How many to generate (default: 1)')
+      .register()
+      .action(async (args, ctx, opts) => this.genLoginPasswordCommand(args, ctx, opts));
+
 
     this.command('db-stats')
       .description('Show database statistics')
@@ -162,7 +184,7 @@ class ConsoleService {
       .register()
       .action(async (args, ctx, opts) => this.cacheStatsCommand(args, ctx, opts));
 
-    this.command('token-list')
+    this.command('api-token-list')
       .description('List API tokens')
       .option('--type', 'Filter by type (client|server)')
       .option('--limit', 'Limit results (default: 10)')
@@ -197,59 +219,7 @@ class ConsoleService {
       .register()
       .action(async (args, ctx, opts) => this.sha256Command(args, ctx, opts));
 
-    // Service Discovery commands
-    this.command('sd')
-      .description('Service Discovery management')
-      .register()
-      .action(async (args, ctx, opts) => this.sdCommand(args, ctx, opts));
 
-    this.command('sd-list')
-      .description('List all registered services')
-      .option('--filter', 'Filter by service name or tag')
-      .option('--status', 'Filter by status (healthy|unhealthy|all)')
-      .register()
-      .action(async (args, ctx, opts) => this.sdListCommand(args, ctx, opts));
-
-    this.command('sd-register')
-      .description('Register a new service')
-      .option('--name', 'Service name (required)')
-      .option('--host', 'Service host (required)')
-      .option('--port', 'Service port (required)')
-      .option('--tags', 'Service tags (comma-separated)')
-      .option('--meta', 'Service metadata (JSON string)')
-      .register()
-      .action(async (args, ctx, opts) => this.sdRegisterCommand(args, ctx, opts));
-
-    this.command('sd-deregister')
-      .description('Deregister a service')
-      .option('--id', 'Service ID (required)')
-      .register()
-      .action(async (args, ctx, opts) => this.sdDeregisterCommand(args, ctx, opts));
-
-    this.command('sd-health')
-      .description('Check service health status')
-      .option('--id', 'Service ID')
-      .option('--name', 'Service name')
-      .register()
-      .action(async (args, ctx, opts) => this.sdHealthCommand(args, ctx, opts));
-
-    this.command('sd-discover')
-      .description('Discover services by name or tag')
-      .option('--name', 'Service name')
-      .option('--tag', 'Service tag')
-      .register()
-      .action(async (args, ctx, opts) => this.sdDiscoverCommand(args, ctx, opts));
-
-    this.command('sd-watch')
-      .description('Watch for service changes')
-      .option('--name', 'Service name to watch')
-      .register()
-      .action(async (args, ctx, opts) => this.sdWatchCommand(args, ctx, opts));
-
-    this.command('sd-stats')
-      .description('Show service discovery statistics')
-      .register()
-      .action(async (args, ctx, opts) => this.sdStatsCommand(args, ctx, opts));
   }
 
 
@@ -343,12 +313,12 @@ class ConsoleService {
       'Basic': ['help', 'echo', 'clear', 'whoami'],
       'Date & Time': ['date', 'time', 'timezone', 'uptime', 'timestamp', 'unixtimestamp'],
       'ID Generation': ['uuid', 'ulid'],
+      'Auth Utilities': ['gen-login-id', 'gen-login-password'],
       'Security & Crypto': ['jwt-secret', 'hash', 'encrypt', 'decrypt', 'random', 'md5', 'sha256'],
-      'API Management': ['api-token', 'token-list'],
+      'API Management': ['api-token', 'api-token-delete', 'api-token-list'],
       'Database': ['db-stats'],
       'Cache': ['cache-clear', 'cache-stats'],
       'User Management': ['user-info'],
-      'Service Discovery': ['sd', 'sd-list', 'sd-register', 'sd-deregister', 'sd-health', 'sd-discover', 'sd-watch', 'sd-stats'],
       'System Info': ['sysinfo', 'env', 'health'],
       'Utilities': ['base64']
     };
@@ -868,6 +838,51 @@ class ConsoleService {
     }
   };
 
+  // Command: api-token-delete - Delete API access token
+  private apiTokenDeleteCommand = async (args: string[], ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
+    const tokenId = opts?.id;
+    const tokenName = opts?.name;
+
+    if (!tokenId && !tokenName) {
+      return { output: '\u001b[31mError:\u001b[0m Either --id or --name is required' };
+    }
+
+    try {
+      let query = db('g_api_access_tokens');
+
+      if (tokenId) {
+        query = query.where('id', tokenId);
+      } else if (tokenName) {
+        query = query.where('tokenName', tokenName);
+      }
+
+      // Check if token exists
+      const existingToken = await query.first();
+
+      if (!existingToken) {
+        return { output: '\u001b[31mError:\u001b[0m Token not found' };
+      }
+
+      // Delete token
+      await query.del();
+
+      const lines = [
+        '\u001b[32mAPI Token Deleted:\u001b[0m',
+        '',
+        `ID: ${existingToken.id}`,
+        `Name: ${existingToken.tokenName}`,
+        `Type: ${existingToken.tokenType}`,
+        '',
+        '\u001b[32m✓ Token has been permanently deleted\u001b[0m'
+      ];
+
+      return { output: lines.join('\n') };
+    } catch (error: any) {
+      logger.error('API token deletion error:', error);
+      return { output: `\u001b[31mError:\u001b[0m ${error?.message || 'Failed to delete API token'}` };
+    }
+  };
+
   // Command: random - Generate random string
   private randomCommand = async (args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
     const length = opts?.length ? parseInt(opts.length, 10) : 32;
@@ -967,7 +982,7 @@ class ConsoleService {
     }
   };
 
-  // Command: token-list - List API tokens
+  // Command: api-token-list - List API tokens
   private tokenListCommand = async (args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
     try {
       const tokenType = opts?.type;
@@ -1119,9 +1134,90 @@ class ConsoleService {
     if (!text) {
       return { output: '\u001b[31mError:\u001b[0m Please provide text to hash' };
     }
-
     const hash = crypto.createHash('md5').update(text).digest('hex');
     return { output: hash };
+  };
+
+  // Command: gen-login-id - Generate login-friendly user ID
+  private genLoginIdCommand = async (_args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
+    const length = opts?.length ? parseInt(opts.length, 10) : 12;
+    const count = opts?.count ? parseInt(opts.count, 10) : 1;
+    if (isNaN(length) || length < 6 || length > 32) {
+      return { output: '\u001b[31mError:\u001b[0m Length must be between 6 and 32' };
+    }
+    if (isNaN(count) || count < 1 || count > 100) {
+      return { output: '\u001b[31mError:\u001b[0m Count must be between 1 and 100' };
+    }
+
+    const letters = 'abcdefghijklmnopqrstuvwxyz';
+    const alnum = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const digits = '0123456789';
+
+    const makeOne = (): string => {
+      // First char: letter
+      let out = letters[crypto.randomBytes(1)[0] % letters.length];
+      // Ensure at least one digit in the remaining part
+      const remaining = length - 1;
+      const requiredDigitPos = remaining > 0 ? crypto.randomBytes(1)[0] % remaining : 0;
+      for (let i = 0; i < remaining; i++) {
+        if (i === requiredDigitPos) {
+          out += digits[crypto.randomBytes(1)[0] % digits.length];
+        } else {
+          out += alnum[crypto.randomBytes(1)[0] % alnum.length];
+        }
+      }
+      return out;
+    };
+
+    const lines: string[] = [];
+    for (let i = 0; i < count; i++) lines.push(makeOne());
+    return { output: lines.join('\n') };
+  };
+
+  // Command: gen-login-password - Generate login-friendly password
+  private genLoginPasswordCommand = async (_args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
+    const length = opts?.length ? parseInt(opts.length, 10) : 14;
+    const count = opts?.count ? parseInt(opts.count, 10) : 1;
+    if (isNaN(length) || length < 8 || length > 64) {
+      return { output: '\u001b[31mError:\u001b[0m Length must be between 8 and 64' };
+    }
+    if (isNaN(count) || count < 1 || count > 100) {
+      return { output: '\u001b[31mError:\u001b[0m Count must be between 1 and 100' };
+    }
+
+    const lettersLower = 'abcdefghijklmnopqrstuvwxyz';
+    const lettersUpper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const lettersAll = lettersLower + lettersUpper;
+    const digits = '0123456789';
+    const symbols = '!@#$%^&*()-_=+[]{}.,?';
+    const pool = lettersAll + digits + symbols;
+
+    const randFrom = (s: string) => s[crypto.randomBytes(1)[0] % s.length];
+
+    const makeOne = (): string => {
+      // First char must be a letter (upper/lower)
+      let out = randFrom(lettersAll);
+      const remaining = length - 1;
+
+      // Ensure at least one digit and one symbol in the remaining part
+      let chars: string[] = new Array(remaining).fill('');
+      if (remaining >= 1) chars[0] = randFrom(digits);
+      if (remaining >= 2) chars[1] = randFrom(symbols);
+      for (let i = 0; i < remaining; i++) {
+        if (!chars[i]) chars[i] = randFrom(pool);
+      }
+      // Shuffle remaining chars
+      for (let i = chars.length - 1; i > 0; i--) {
+        const j = crypto.randomBytes(1)[0] % (i + 1);
+        [chars[i], chars[j]] = [chars[j], chars[i]];
+      }
+      out += chars.join('');
+      return out;
+    };
+
+    const lines: string[] = [];
+    for (let i = 0; i < count; i++) lines.push(makeOne());
+    return { output: lines.join('\n') };
   };
 
   // Command: sha256 - Generate SHA256 hash
@@ -1146,199 +1242,7 @@ class ConsoleService {
     }
   };
 
-  // ============================================================================
-  // Service Discovery Commands (Placeholder implementations)
-  // ============================================================================
 
-  // Command: sd - Service Discovery main command
-  private sdCommand = async (args: string[], _ctx?: ConsoleContext, _opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
-    const subcommand = args[0];
-
-    if (!subcommand) {
-      const lines = [
-        '\u001b[1mService Discovery\u001b[0m',
-        '',
-        'Available subcommands:',
-        '  \u001b[36msd-list\u001b[0m          List all registered services',
-        '  \u001b[36msd-register\u001b[0m      Register a new service',
-        '  \u001b[36msd-deregister\u001b[0m    Deregister a service',
-        '  \u001b[36msd-health\u001b[0m        Check service health status',
-        '  \u001b[36msd-discover\u001b[0m      Discover services by name or tag',
-        '  \u001b[36msd-watch\u001b[0m         Watch for service changes',
-        '  \u001b[36msd-stats\u001b[0m         Show service discovery statistics',
-        '',
-        'Use "sd-<command> --help" for more information about a command.',
-        '',
-        '\u001b[33mNote:\u001b[0m Service Discovery feature is not yet implemented.'
-      ];
-      return { output: lines.join('\n') };
-    }
-
-    return { output: '\u001b[33mService Discovery feature is not yet implemented.\u001b[0m' };
-  };
-
-  // Command: sd-list - List all registered services
-  private sdListCommand = async (_args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
-    const lines = [
-      '\u001b[1mRegistered Services\u001b[0m',
-      '',
-      '\u001b[33mService Discovery feature is not yet implemented.\u001b[0m',
-      '',
-      'This command will list all registered services with the following information:',
-      '  • Service ID',
-      '  • Service Name',
-      '  • Host:Port',
-      '  • Status (healthy/unhealthy)',
-      '  • Tags',
-      '  • Last Health Check',
-      ''
-    ];
-
-    if (opts?.filter) {
-      lines.push(`Filter: ${opts.filter}`);
-    }
-    if (opts?.status) {
-      lines.push(`Status Filter: ${opts.status}`);
-    }
-
-    return { output: lines.join('\n') };
-  };
-
-  // Command: sd-register - Register a new service
-  private sdRegisterCommand = async (_args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
-    const lines = [
-      '\u001b[1mRegister Service\u001b[0m',
-      '',
-      '\u001b[33mService Discovery feature is not yet implemented.\u001b[0m',
-      ''
-    ];
-
-    if (opts?.name && opts?.host && opts?.port) {
-      lines.push('Would register service with:');
-      lines.push(`  Name: ${opts.name}`);
-      lines.push(`  Host: ${opts.host}`);
-      lines.push(`  Port: ${opts.port}`);
-      if (opts?.tags) lines.push(`  Tags: ${opts.tags}`);
-      if (opts?.meta) lines.push(`  Metadata: ${opts.meta}`);
-    } else {
-      lines.push('\u001b[31mError:\u001b[0m --name, --host, and --port are required');
-      lines.push('');
-      lines.push('Example:');
-      lines.push('  sd-register --name "api-server" --host "localhost" --port "3000" --tags "api,backend"');
-    }
-
-    return { output: lines.join('\n') };
-  };
-
-  // Command: sd-deregister - Deregister a service
-  private sdDeregisterCommand = async (_args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
-    const lines = [
-      '\u001b[1mDeregister Service\u001b[0m',
-      '',
-      '\u001b[33mService Discovery feature is not yet implemented.\u001b[0m',
-      ''
-    ];
-
-    if (opts?.id) {
-      lines.push(`Would deregister service with ID: ${opts.id}`);
-    } else {
-      lines.push('\u001b[31mError:\u001b[0m --id is required');
-      lines.push('');
-      lines.push('Example:');
-      lines.push('  sd-deregister --id "service-123"');
-    }
-
-    return { output: lines.join('\n') };
-  };
-
-  // Command: sd-health - Check service health status
-  private sdHealthCommand = async (_args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
-    const lines = [
-      '\u001b[1mService Health Check\u001b[0m',
-      '',
-      '\u001b[33mService Discovery feature is not yet implemented.\u001b[0m',
-      ''
-    ];
-
-    if (opts?.id || opts?.name) {
-      lines.push('Would check health for:');
-      if (opts?.id) lines.push(`  Service ID: ${opts.id}`);
-      if (opts?.name) lines.push(`  Service Name: ${opts.name}`);
-    } else {
-      lines.push('This command will show health status for all services or a specific service.');
-      lines.push('');
-      lines.push('Example:');
-      lines.push('  sd-health --id "service-123"');
-      lines.push('  sd-health --name "api-server"');
-    }
-
-    return { output: lines.join('\n') };
-  };
-
-  // Command: sd-discover - Discover services by name or tag
-  private sdDiscoverCommand = async (_args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
-    const lines = [
-      '\u001b[1mDiscover Services\u001b[0m',
-      '',
-      '\u001b[33mService Discovery feature is not yet implemented.\u001b[0m',
-      ''
-    ];
-
-    if (opts?.name || opts?.tag) {
-      lines.push('Would discover services matching:');
-      if (opts?.name) lines.push(`  Name: ${opts.name}`);
-      if (opts?.tag) lines.push(`  Tag: ${opts.tag}`);
-    } else {
-      lines.push('This command will discover services by name or tag.');
-      lines.push('');
-      lines.push('Example:');
-      lines.push('  sd-discover --name "api-server"');
-      lines.push('  sd-discover --tag "backend"');
-    }
-
-    return { output: lines.join('\n') };
-  };
-
-  // Command: sd-watch - Watch for service changes
-  private sdWatchCommand = async (_args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
-    const lines = [
-      '\u001b[1mWatch Service Changes\u001b[0m',
-      '',
-      '\u001b[33mService Discovery feature is not yet implemented.\u001b[0m',
-      ''
-    ];
-
-    if (opts?.name) {
-      lines.push(`Would watch for changes to service: ${opts.name}`);
-    } else {
-      lines.push('This command will watch for service registration/deregistration events.');
-      lines.push('');
-      lines.push('Example:');
-      lines.push('  sd-watch --name "api-server"');
-      lines.push('  sd-watch (watch all services)');
-    }
-
-    return { output: lines.join('\n') };
-  };
-
-  // Command: sd-stats - Show service discovery statistics
-  private sdStatsCommand = async (_args: string[], _ctx?: ConsoleContext, _opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
-    const lines = [
-      '\u001b[1mService Discovery Statistics\u001b[0m',
-      '',
-      '\u001b[33mService Discovery feature is not yet implemented.\u001b[0m',
-      '',
-      'This command will show:',
-      '  • Total registered services',
-      '  • Healthy services count',
-      '  • Unhealthy services count',
-      '  • Services by tag',
-      '  • Recent registration/deregistration events',
-      '  • Health check statistics'
-    ];
-
-    return { output: lines.join('\n') };
-  };
 }
 
 export const consoleService = new ConsoleService();

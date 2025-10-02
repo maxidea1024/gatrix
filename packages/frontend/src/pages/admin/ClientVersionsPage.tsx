@@ -59,6 +59,7 @@ import {
   Update as UpdateIcon,
   Settings as SettingsIcon,
   Build as BuildIcon,
+  Widgets as WidgetsIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -778,13 +779,16 @@ const ClientVersionsPage: React.FC = () => {
     <Box sx={{ p: 3 }}>
       {/* 헤더 */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
-        <Box>
-          <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-            {t('clientVersions.title')}
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {t('clientVersions.description')}
-          </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <WidgetsIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+          <Box>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>
+              {t('clientVersions.title')}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {t('clientVersions.description')}
+            </Typography>
+          </Box>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button

@@ -38,7 +38,8 @@ import {
   Close as CloseIcon,
   PlayArrow as ExecuteIcon,
   History as HistoryIcon,
-  Search as SearchIcon
+  Search as SearchIcon,
+  Work as WorkIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -256,11 +257,16 @@ const JobsPage: React.FC = () => {
     <Box sx={{ p: 3 }}>
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
-        <Box>
-          <Typography variant="h4" sx={{ mb: 1 }}>{t('jobs.title')}</Typography>
-          <Typography variant="body1" color="text.secondary">
-            {t('jobs.description')}
-          </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <WorkIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+          <Box>
+            <Typography variant="h5" sx={{ fontWeight: 700 }}>
+              {t('jobs.title')}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {t('jobs.description')}
+            </Typography>
+          </Box>
         </Box>
         <Button
           variant="contained"

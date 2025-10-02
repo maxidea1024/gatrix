@@ -56,7 +56,8 @@ import {
   Tag as NumberIcon,
   CheckBox as BooleanIcon,
   DataObject as JsonIcon,
-  Article as YamlIcon
+  Article as YamlIcon,
+  CloudSync as CloudSyncIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -2387,12 +2388,18 @@ const RemoteConfigPage: React.FC = () => {
     <Box sx={{ p: 3 }}>
       {/* Header */}
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" sx={{ fontWeight: 600, mb: 1 }} color="text.primary">
-          {t('remoteConfig.title')}
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          {t('remoteConfig.subtitle')}
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <CloudSyncIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+          <Box>
+            <Typography variant="h5" sx={{ fontWeight: 700 }} color="text.primary">
+              {t('remoteConfig.title')}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {t('remoteConfig.subtitle')}
+            </Typography>
+          </Box>
+        </Box>
+
       </Box>
 
       {/* Tabs */}
