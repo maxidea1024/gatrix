@@ -2258,7 +2258,7 @@
   },
   "realtimeEvents": {
     "title": "Realtime Events",
-    "subtitle": "Monitor system events in real-time with Firebase-style event stream visualization",
+    "subtitle": "Monitor system events in real-time with event stream visualization",
     "timeline": "Timeline",
     "eventStream": "Event Stream",
     "topEvents": "TOP EVENTS",

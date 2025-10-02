@@ -2255,7 +2255,7 @@
   },
   "realtimeEvents": {
     "title": "实时事件",
-    "subtitle": "使用Firebase风格的事件流可视化实时监控系统事件",
+    "subtitle": "使用事件流可视化实时监控系统事件",
     "timeline": "时间线",
     "eventStream": "事件流",
     "topEvents": "热门事件",

@@ -31,6 +31,7 @@ import {
   useTheme,
   Tab,
   Tabs,
+  CircularProgress,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -237,7 +238,10 @@ const RealtimeEventsPage: React.FC = () => {
       // Update progress every 50ms (5000ms / 100 = 50ms per 1%)
       progressIntervalRef.current = setInterval(() => {
         setRefreshProgress((prev) => {
-          if (prev >= 100) return 0;
+          if (prev >= 100) {
+            // Reset to 0 when reaching 100%
+            return 0;
+          }
           return prev + 1;
         });
       }, 50);
@@ -245,7 +249,6 @@ const RealtimeEventsPage: React.FC = () => {
       // Refresh data every 5 seconds
       intervalRef.current = setInterval(() => {
         loadEvents();
-        setRefreshProgress(0);
       }, 5000);
     } else {
       setRefreshProgress(0);
@@ -334,59 +337,62 @@ const RealtimeEventsPage: React.FC = () => {
           </Box>
 
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            {/* Auto-refresh indicator with progress */}
+            {/* Auto-refresh indicator with circular progress */}
             <Box
               sx={{
-                position: 'relative',
-                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                px: 2,
+                py: 0.5,
                 borderRadius: 2,
+                bgcolor: autoRefresh ? alpha(theme.palette.success.main, 0.1) : alpha(theme.palette.grey[500], 0.1),
+                border: 1,
+                borderColor: autoRefresh ? 'success.main' : 'divider',
               }}
             >
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  px: 2,
-                  py: 0.5,
-                  bgcolor: autoRefresh ? alpha(theme.palette.success.main, 0.1) : alpha(theme.palette.grey[500], 0.1),
-                  border: 1,
-                  borderColor: autoRefresh ? 'success.main' : 'divider',
-                  position: 'relative',
-                  zIndex: 1,
-                }}
-              >
-                <DotIcon
-                  sx={{
-                    fontSize: 12,
-                    color: autoRefresh ? 'success.main' : 'grey.500',
-                    animation: autoRefresh ? 'pulse 2s infinite' : 'none',
-                    '@keyframes pulse': {
-                      '0%, 100%': { opacity: 1 },
-                      '50%': { opacity: 0.3 },
-                    },
-                  }}
-                />
-                <Typography variant="caption" sx={{ fontWeight: 600 }}>
-                  {autoRefresh ? 'LIVE' : 'PAUSED'}
-                </Typography>
+              {/* Circular progress indicator */}
+              <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {autoRefresh ? (
+                  <>
+                    {/* Background circle */}
+                    <CircularProgress
+                      variant="determinate"
+                      value={100}
+                      size={16}
+                      thickness={6}
+                      sx={{
+                        color: alpha(theme.palette.success.main, 0.2),
+                        position: 'absolute',
+                      }}
+                    />
+                    {/* Progress circle */}
+                    <CircularProgress
+                      variant="determinate"
+                      value={refreshProgress}
+                      size={16}
+                      thickness={6}
+                      sx={{
+                        color: 'success.main',
+                        '& .MuiCircularProgress-circle': {
+                          strokeLinecap: 'round',
+                        },
+                      }}
+                    />
+                  </>
+                ) : (
+                  <DotIcon
+                    sx={{
+                      fontSize: 16,
+                      color: 'grey.500',
+                    }}
+                  />
+                )}
               </Box>
 
-              {/* Progress bar */}
-              {autoRefresh && (
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    height: '2px',
-                    width: `${refreshProgress}%`,
-                    bgcolor: 'success.main',
-                    transition: 'width 0.05s linear',
-                    opacity: 0.6,
-                  }}
-                />
-              )}
+              <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                {autoRefresh ? 'LIVE' : 'PAUSED'}
+              </Typography>
             </Box>
 
             <Tooltip title={autoRefresh ? t('common.pause') : t('common.play')}>
