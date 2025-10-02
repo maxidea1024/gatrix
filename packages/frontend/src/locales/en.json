@@ -518,7 +518,7 @@
       "editUserDialogTitle": "Edit User",
       "editUserDialogDescription": "Modify existing user information and permissions.",
       "emailVerification": "Email Verification",
-      "emailVerified": "Email is verified",
+      "emailVerified": "Email Verification",
       "emailNotVerified": "Email is not verified",
       "verifyEmail": "Verify Email",
       "resendVerification": "Resend Verification",
@@ -615,6 +615,13 @@
       "searchPlaceholder": "Search by name, world ID, or description...",
       "showGameWorld": "Show Game World",
       "startMaintenance": "Start Maintenance",
+      "maintenanceStarted": "Maintenance started",
+      "maintenanceEnded": "Maintenance ended",
+      "confirmMaintenanceStart": "Confirm Maintenance Start",
+      "confirmMaintenanceEnd": "Confirm Maintenance End",
+      "typeWorldIdToConfirm": "Type world ID \"{{worldId}}\" to confirm",
+      "maintenanceSettings": "Maintenance Settings",
+      "configureMaintenanceSettings": "Configure maintenance settings",
       "tags": "Tags",
       "title": "Game Worlds Management",
       "subtitle": "Create and edit game worlds, manage visibility and maintenance state, and configure descriptions and tags.",
@@ -818,7 +825,9 @@
       "statusActive": "Active",
       "statusScheduled": "Scheduled",
       "durationIndefinite": "Indefinite",
-      "clickToManageTooltip": "Click to open maintenance settings"
+      "clickToManageTooltip": "Click to open maintenance settings",
+      "templatePreview": "Template Preview",
+      "noTemplateSelected": "Please select a template"
     },
     "scheduler": {
       "title": "Schedule Management",
@@ -1392,6 +1401,7 @@
     "title": "Client Version Management",
     "updateSuccess": "Client version updated successfully",
     "version": "Version",
+    "selectPlatforms": "Select Platforms",
     "maintenance": {
       "title": "Maintenance Settings",
       "description": "Configure maintenance period and messages.",
@@ -1942,7 +1952,8 @@
     "noMessageToTranslate": "Please enter a default message to translate",
     "translationCompleted": "Translation completed successfully",
     "translationFailed": "An error occurred during translation",
-    "languagePlaceholder": "Enter {{language}} message"
+    "languagePlaceholder": "Enter {{language}} message",
+    "emptyUsesDefault": "If empty, the default message will be used"
   },
   "chat": {
     "title": "Chat",

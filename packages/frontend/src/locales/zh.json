@@ -517,7 +517,7 @@
     "editUserDialogTitle": "编辑用户",
     "editUserDialogDescription": "修改现有用户信息和权限。",
     "emailVerification": "邮箱验证",
-    "emailVerified": "邮箱已验证",
+    "emailVerified": "邮箱验证",
     "emailNotVerified": "邮箱未验证",
     "verifyEmail": "验证邮箱",
     "resendVerification": "重发验证邮件",
@@ -613,6 +613,13 @@
     "searchPlaceholder": "按名称、世界ID或描述搜索...",
     "showGameWorld": "显示游戏世界",
     "startMaintenance": "开始维护",
+    "maintenanceStarted": "维护已开始",
+    "maintenanceEnded": "维护已结束",
+    "confirmMaintenanceStart": "确认开始维护",
+    "confirmMaintenanceEnd": "确认结束维护",
+    "typeWorldIdToConfirm": "输入世界ID \"{{worldId}}\" 以确认",
+    "maintenanceSettings": "维护设置",
+    "configureMaintenanceSettings": "配置维护设置",
     "tags": "标签",
     "title": "游戏世界",
     "subtitle": "创建和编辑游戏世界，管理可见性和维护状态，并配置描述和标签。",
@@ -816,7 +823,9 @@
     "statusActive": "进行中",
     "statusScheduled": "已安排",
     "durationIndefinite": "无限期",
-    "clickToManageTooltip": "点击打开维护设置"
+    "clickToManageTooltip": "点击打开维护设置",
+    "templatePreview": "模板预览",
+    "noTemplateSelected": "请选择模板"
   },
   "scheduler": {
     "title": "调度器管理",
@@ -1389,6 +1398,7 @@
     "title": "客户端版本",
     "updateSuccess": "更新成功",
     "version": "版本",
+    "selectPlatforms": "选择平台",
     "maintenance": {
       "title": "维护设置",
       "description": "配置维护期间和消息。",
@@ -1939,7 +1949,8 @@
     "noMessageToTranslate": "请输入要翻译的默认消息",
     "translationCompleted": "翻译完成",
     "translationFailed": "翻译过程中发生错误",
-    "languagePlaceholder": "输入{{language}}消息"
+    "languagePlaceholder": "输入{{language}}消息",
+    "emptyUsesDefault": "如果为空，将使用默认消息"
   },
   "chat": {
     "title": "Chat",

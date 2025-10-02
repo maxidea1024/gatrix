@@ -110,11 +110,15 @@ const MultiLanguageMessageInput = forwardRef<MultiLanguageMessageInputRef, Multi
         ['ko', 'en', 'zh']
       );
 
+      console.log('Translation results:', translations);
+
       // 번역 결과를 locales에 적용
       const newLocales = availableLanguages.map(lang => {
         const existingLocale = locales.find(l => l.lang === lang.code);
         const translationResult = translations[lang.code];
         const translatedMessage = translationResult?.translatedText || existingLocale?.message || '';
+
+        console.log(`Language ${lang.code}: translatedMessage = "${translatedMessage}"`);
 
         return {
           lang: lang.code,
@@ -122,12 +126,12 @@ const MultiLanguageMessageInput = forwardRef<MultiLanguageMessageInputRef, Multi
         };
       });
 
+      console.log('New locales:', newLocales);
+
+      // 번역 결과 적용 (부모 컴포넌트에서 자동으로 supportsMultiLanguage를 true로 설정함)
       onLocalesChange(newLocales);
 
-      // 번역 후 자동으로 언어별 메시지 사용 활성화
-      if (!supportsMultiLanguage) {
-        onSupportsMultiLanguageChange(true);
-      }
+      enqueueSnackbar(t('multiLanguageMessage.translationCompleted'), { variant: 'success' });
     } catch (error: any) {
       enqueueSnackbar(error.message || t('multiLanguageMessage.translationFailed'), { variant: 'error' });
     } finally {
@@ -230,6 +234,7 @@ const MultiLanguageMessageInput = forwardRef<MultiLanguageMessageInputRef, Multi
                       value={locale?.message || ''}
                       onChange={(e) => updateLocale(lang.code, e.target.value)}
                       placeholder={t('multiLanguageMessage.languagePlaceholder', { language: lang.label })}
+                      helperText={t('multiLanguageMessage.emptyUsesDefault')}
                     />
                   </Box>
                 );

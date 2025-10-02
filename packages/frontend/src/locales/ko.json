@@ -517,7 +517,7 @@
     "editUserDialogTitle": "사용자 편집",
     "editUserDialogDescription": "기존 사용자의 정보와 권한을 수정할 수 있습니다.",
     "emailVerification": "이메일 인증",
-    "emailVerified": "이메일이 인증되었습니다",
+    "emailVerified": "이메일 인증",
     "emailNotVerified": "이메일이 인증되지 않았습니다",
     "verifyEmail": "이메일 인증",
     "resendVerification": "인증 메일 재전송",
@@ -613,6 +613,13 @@
     "searchPlaceholder": "게임 월드 검색",
     "showGameWorld": "게임 월드 표시",
     "startMaintenance": "점검 시작",
+    "maintenanceStarted": "점검이 시작되었습니다",
+    "maintenanceEnded": "점검이 종료되었습니다",
+    "confirmMaintenanceStart": "점검 시작 확인",
+    "confirmMaintenanceEnd": "점검 종료 확인",
+    "typeWorldIdToConfirm": "확인을 위해 월드 ID \"{{worldId}}\"를 입력하세요",
+    "maintenanceSettings": "점검 설정",
+    "configureMaintenanceSettings": "점검 설정을 구성하세요",
     "tags": "태그",
     "title": "게임 월드",
     "subtitle": "게임 월드를 생성·편집하고 표시 여부와 점검 상태를 관리하며, 설명과 태그를 설정합니다.",
@@ -816,7 +823,9 @@
     "statusActive": "진행중",
     "statusScheduled": "예약됨",
     "durationIndefinite": "무기한",
-    "clickToManageTooltip": "클릭하여 점검 설정 열기"
+    "clickToManageTooltip": "클릭하여 점검 설정 열기",
+    "templatePreview": "템플릿 미리보기",
+    "noTemplateSelected": "템플릿을 선택해주세요"
   },
   "scheduler": {
     "title": "스케줄 관리",
@@ -1389,6 +1398,7 @@
     "title": "클라이언트 버전",
     "updateSuccess": "업데이트 성공",
     "version": "버전",
+    "selectPlatforms": "플랫폼 선택",
     "maintenance": {
       "title": "점검 설정",
       "description": "점검 기간과 메시지를 설정하세요.",
@@ -1939,7 +1949,8 @@
     "noMessageToTranslate": "번역할 기본 메시지를 입력해주세요",
     "translationCompleted": "번역이 완료되었습니다",
     "translationFailed": "번역 중 오류가 발생했습니다",
-    "languagePlaceholder": "{{language}} 메시지를 입력하세요"
+    "languagePlaceholder": "{{language}} 메시지를 입력하세요",
+    "emptyUsesDefault": "내용이 없으면 기본 메시지를 사용합니다"
   },
   "chat": {
     "title": "채팅",

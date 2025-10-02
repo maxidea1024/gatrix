@@ -25,7 +25,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useSSENotifications } from '@/hooks/useSSENotifications';
 import { formatDateTimeDetailed, getStoredTimezone } from '@/utils/dateFormat';
 
-
 const MaintenancePage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -81,8 +80,6 @@ const MaintenancePage: React.FC = () => {
         (selectedTpl.locales && selectedTpl.locales.some(l => l.message && l.message.trim()))
       ))
     : !!((baseMsg && baseMsg.trim()) || locales.some(l => l.message && l.message.trim()));
-
-
 
   // Confirm dialog
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -219,8 +216,6 @@ const MaintenancePage: React.FC = () => {
       message: baseMsg || undefined,
       messages: Object.fromEntries(locales.map(l => [l.lang, l.message])) as any,
     };
-
-
 
     const response = await maintenanceService.setStatus(payload as any);
     const { isUnderMaintenance } = response.data;
@@ -619,9 +614,6 @@ const MaintenancePage: React.FC = () => {
                           {t('maintenance.selectTemplateHelp')}
                         </Typography>
                       </Box>
-
-
-
                       {tpls.find(t=>t.id===selectedTplId) && (
                         <Card variant="outlined">
                           <CardContent>
@@ -674,12 +666,17 @@ const MaintenancePage: React.FC = () => {
                       locales={locales.map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
                       onLocalesChange={(newLocales) => {
                         setLocales(newLocales.map(l => ({ lang: l.lang, message: l.message })));
+                        // 번역 결과가 있으면 자동으로 다국어 지원 활성화
+                        const hasNonEmptyLocales = newLocales.some(l => l.message && l.message.trim() !== '');
+                        if (hasNonEmptyLocales && !supportsMultiLanguage) {
+                          setSupportsMultiLanguage(true);
+                        }
                       }}
                       languageSpecificMessagesLabel={t('maintenance.languageSpecificMessages')}
 
                       enableTranslation={true}
                       translateButtonLabel={t('common.autoTranslate')}
-                      translateTooltip={t('common.autoTranslate')}
+                      translateTooltip={t('maintenance.translateTooltip')}
                       ref={messageInputRef}
                     />
                   )}
@@ -687,9 +684,6 @@ const MaintenancePage: React.FC = () => {
               )}
 
               {/* Actions는 우측 영역으로 이동 */}
-
-
-
 
             </Stack>
           </CardContent>
@@ -896,8 +890,6 @@ const MaintenancePage: React.FC = () => {
                       })()}
                     </Box>
                   </Box>
-
-
 
                   {startsAt && (
                     <Box component="tr">

@@ -2,6 +2,10 @@
  * 날짜/시간 포맷 유틸 - 사용자 설정(timezone, datetimeFormat)에 따라 출력
  */
 import moment from 'moment-timezone';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+import 'dayjs/locale/en';
+import 'dayjs/locale/zh-cn';
 
 const DEFAULT_TZ = 'Asia/Seoul';
 const DEFAULT_FORMAT = 'YYYY-MM-DD HH:mm:ss';
@@ -253,3 +257,24 @@ function parseDateString(input: string): Date | null {
   const fallback = new Date(input);
   return isNaN(fallback.getTime()) ? null : fallback;
 }
+
+/**
+ * Get dayjs locale based on current language
+ * This function is used by DateTimePicker components
+ */
+export const getDateLocale = (currentLang?: string): string => {
+  // If no language is provided, try to get it from i18n
+  const lang = currentLang || (typeof window !== 'undefined' && (window as any).i18n?.language) || 'ko';
+
+  switch (lang) {
+    case 'en':
+      dayjs.locale('en');
+      return 'en';
+    case 'zh':
+      dayjs.locale('zh-cn');
+      return 'zh-cn';
+    default:
+      dayjs.locale('ko');
+      return 'ko';
+  }
+};

@@ -37,7 +37,9 @@ class TranslationService {
   async translateText(request: TranslationRequest): Promise<TranslationResponse> {
     try {
       const response = await api.post<TranslationResponse>('/admin/translation/translate', request);
-      return response.data as TranslationResponse;
+      // API service already returns response.data, so response is ApiResponse<TranslationResponse>
+      // We need to access response.data to get the actual TranslationResponse
+      return (response as any).data as TranslationResponse;
     } catch (error: any) {
       console.error('Translation error:', error);
       throw new Error(error.response?.data?.message || 'Translation failed');
@@ -49,10 +51,11 @@ class TranslationService {
    */
   async translateToMultipleLanguages(request: MultipleTranslationRequest): Promise<MultipleTranslationResponse> {
     try {
-
       const response = await api.post<MultipleTranslationResponse>('/admin/translation/translate/multiple', request);
-
-      return response.data as MultipleTranslationResponse;
+      // API service already returns response.data, so response is ApiResponse<MultipleTranslationResponse>
+      // We need to access response.data to get the actual MultipleTranslationResponse
+      console.log('Translation API response:', response);
+      return (response as any).data as MultipleTranslationResponse;
     } catch (error: any) {
       console.error('Multiple translation error:', error);
       throw new Error(error.response?.data?.message || 'Multiple translation failed');
@@ -65,7 +68,9 @@ class TranslationService {
   async detectLanguage(request: LanguageDetectionRequest): Promise<LanguageDetectionResponse> {
     try {
       const response = await api.post<LanguageDetectionResponse>('/admin/translation/detect-language', request);
-      return response.data as LanguageDetectionResponse;
+      // API service already returns response.data, so response is ApiResponse<LanguageDetectionResponse>
+      // We need to access response.data to get the actual LanguageDetectionResponse
+      return (response as any).data as LanguageDetectionResponse;
     } catch (error: any) {
       console.error('Language detection error:', error);
       throw new Error(error.response?.data?.message || 'Language detection failed');

@@ -663,7 +663,14 @@ const MessageTemplatesPage: React.FC = () => {
                           </Typography>
                         )}
                       </TableCell>
-                      <TableCell>{(row as any).isEnabled ? t('common.available') : t('common.unavailable')}</TableCell>
+                      <TableCell>
+                        <Chip
+                          label={(row as any).isEnabled ? t('common.available') : t('common.unavailable')}
+                          color={(row as any).isEnabled ? 'success' : 'default'}
+                          size="small"
+                          variant={(row as any).isEnabled ? 'filled' : 'outlined'}
+                        />
+                      </TableCell>
                       <TableCell>{formatDateTimeDetailed((row as any).updatedAt) || '-'}</TableCell>
                       <TableCell>{hasLocales ? langs.map(c=>getLanguageDisplayName(c as any)).join(', ') : t('messageTemplates.onlyDefaultMessage')}</TableCell>
                       <TableCell>{(row as any).createdByName || '-'}</TableCell>
@@ -805,12 +812,19 @@ const MessageTemplatesPage: React.FC = () => {
               supportsMultiLanguageHelperText={t('messageTemplates.supportsMultiLanguageHelp')}
 
               locales={(form.locales || []).map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
-              onLocalesChange={(locales) => setForm(prev => ({ ...prev, locales: locales.map(l => ({ lang: l.lang, message: l.message })) }))}
+              onLocalesChange={(locales) => {
+                setForm(prev => ({ ...prev, locales: locales.map(l => ({ lang: l.lang, message: l.message })) }));
+                // 번역 결과가 있으면 자동으로 다국어 지원 활성화
+                const hasNonEmptyLocales = locales.some(l => l.message && l.message.trim() !== '');
+                if (hasNonEmptyLocales && !form.supportsMultiLanguage) {
+                  setForm(prev => ({ ...prev, supportsMultiLanguage: true }));
+                }
+              }}
               languageSpecificMessagesLabel={t('messageTemplates.languageSpecificMessages')}
 
               enableTranslation={true}
               translateButtonLabel={t('common.autoTranslate')}
-              translateTooltip={t('common.autoTranslate')}
+              translateTooltip={t('maintenance.translateTooltip')}
             />
 
             {/* 태그 선택 */}
