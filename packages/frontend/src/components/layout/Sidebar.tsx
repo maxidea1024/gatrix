@@ -27,11 +27,13 @@ import {
   VpnKey,
   Chat,
   BugReport,
+  Timeline,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { NavItem } from '@/types';
 import { useTranslation } from 'react-i18next';
+import { getNavigationItems } from '@/config/navigation';
 
 
 interface SidebarProps {
@@ -39,90 +41,6 @@ interface SidebarProps {
   onClose: () => void;
   width: number;
 }
-
-// Navigation configuration
-const getNavigationItems = (isAdmin: boolean): NavItem[] => {
-  const baseItems: NavItem[] = [
-    {
-      id: 'dashboard',
-      label: 'sidebar.dashboard',
-      icon: 'Dashboard',
-      path: '/dashboard',
-    },
-    {
-      id: 'chat',
-      label: 'sidebar.chat',
-      icon: 'Chat',
-      path: '/chat',
-    },
-
-
-  ];
-
-  const adminItems: NavItem[] = [
-    {
-      id: 'users',
-      label: 'sidebar.userManagement',
-      icon: 'People',
-      path: '/users',
-      roles: ['admin'],
-    },
-    {
-      id: 'audit-logs',
-      label: 'sidebar.auditLogs',
-      icon: 'Security',
-      path: '/admin/audit-logs',
-      roles: ['admin'],
-    },
-    {
-      id: 'crashes',
-      label: 'sidebar.crashes',
-      icon: 'BugReport',
-      path: '/admin/crashes',
-      roles: ['admin'],
-    },
-    {
-      id: 'admin',
-      label: 'navigation.administration',
-      icon: 'AdminPanelSettings',
-      roles: ['admin'],
-      children: [
-        {
-          id: 'system-stats',
-          label: 'sidebar.systemStats',
-          icon: 'Assessment',
-          path: '/admin/stats',
-          roles: ['admin'],
-        },
-        {
-          id: 'api-tokens',
-          label: 'sidebar.apiTokens',
-          icon: 'VpnKey',
-          path: '/admin/api-tokens',
-          roles: ['admin'],
-        },
-      ],
-    },
-    {
-      id: 'remote-config',
-      label: 'sidebar.remoteConfig',
-      icon: 'CloudSync',
-      path: '/admin/remote-config',
-      roles: ['admin'],
-    },
-    {
-      id: 'settings',
-      label: 'sidebar.settings',
-      icon: 'Settings',
-      path: '/settings',
-      roles: ['admin'],
-    },
-  ];
-
-  const result = isAdmin ? [...baseItems, ...adminItems] : baseItems;
-  console.log('getNavigationItems - isAdmin:', isAdmin, 'result:', result);
-  return result;
-};
 
 // Icon mapping
 const iconMap: Record<string, React.ReactElement> = {
@@ -138,6 +56,7 @@ const iconMap: Record<string, React.ReactElement> = {
   VpnKey: <VpnKey />,
   BugReport: <BugReport />,
   Chat: <Chat />,
+  Timeline: <Timeline />,
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {

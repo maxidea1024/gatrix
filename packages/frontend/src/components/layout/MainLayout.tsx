@@ -60,7 +60,7 @@ import {
   VpnKey as VpnKeyIcon,
   Chat as ChatIcon,
   BugReport as BugReportIcon,
-
+  Timeline as TimelineIcon,
   Terminal as TerminalIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -73,6 +73,7 @@ import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceSer
 import { useSSENotifications } from '@/hooks/useSSENotifications';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import moment from 'moment';
+import { baseMenuItems, adminMenuItems as configAdminMenuItems, settingsMenuItems as configSettingsMenuItems } from '@/config/navigation';
 
 // Sidebar width is now dynamic
 
@@ -80,47 +81,13 @@ interface MainLayoutProps {
   children: React.ReactNode;
 }
 
-// 메뉴 데이터
-const menuItems = [
-  { text: 'sidebar.dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-  { text: 'sidebar.chat', icon: <ChatIcon />, path: '/chat' },
-];
-
-const adminMenuItems = [
-  { text: 'sidebar.userManagement', icon: <SchoolIcon />, path: '/admin/users' },
-  { text: 'sidebar.clientVersions', icon: <WidgetsIcon />, path: '/admin/client-versions' },
-  { text: 'sidebar.gameWorlds', icon: <LanguageIcon />, path: '/admin/game-worlds' },
-  { text: 'sidebar.maintenance', icon: <BuildIcon />, path: '/admin/maintenance' },
-  { text: 'sidebar.maintenanceTemplates', icon: <TextIcon />, path: '/admin/maintenance-templates' },
-  { text: 'sidebar.scheduler', icon: <ScheduleIcon />, path: '/admin/scheduler' },
-
-  { text: 'sidebar.jobs', icon: <JobIcon />, path: '/admin/jobs' },
-  { text: 'sidebar.queueMonitor', icon: <MonitorIcon />, path: '/admin/queue-monitor' },
-  { text: 'sidebar.whitelist', icon: <SecurityIcon />, path: '/admin/whitelist' },
-  { text: 'sidebar.auditLogs', icon: <HistoryIcon />, path: '/admin/audit-logs' },
-  { text: 'sidebar.crashes', icon: <BugReportIcon />, path: '/admin/crashes' },
-  {
-    text: 'sidebar.remoteConfig',
-    icon: <CloudSyncIcon />,
-    path: '/admin/remote-config'
-  },
-  {
-    text: 'sidebar.apiTokens',
-    icon: <VpnKeyIcon />,
-    path: '/admin/api-tokens'
-  },
-  {
-    text: 'sidebar.console',
-    icon: <TerminalIcon />,
-    path: '/admin/console'
-  }
-];
-
-const settingsMenuItems = [
-  { text: 'settings.general.title', icon: <SettingsIcon />, path: '/settings' },
-  { text: 'tags.title', icon: <LabelIcon />, path: '/settings/tags', requireAdmin: true },
-  // { text: 'advancedSettings.title', icon: <SettingsIcon />, path: '/settings/advanced', requireAdmin: true },
-];
+// 중앙 설정에서 메뉴 가져오기
+const menuItems = baseMenuItems;
+const adminMenuItems = configAdminMenuItems;
+const settingsMenuItems = configSettingsMenuItems.map(item => ({
+  ...item,
+  requireAdmin: item.path !== '/settings', // settings 페이지는 모든 사용자 접근 가능
+}));
 
 export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const theme = useTheme();

@@ -75,6 +75,7 @@ import ApiTokensPage from './pages/admin/ApiTokensPage';
 import CrashesPage from './pages/admin/CrashesPage';
 import ChatPage from './pages/chat/ChatPage';
 import SystemConsolePage from './pages/admin/SystemConsolePage';
+import RealtimeEventsPage from './pages/admin/RealtimeEventsPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
 // Conditional Landing Page Component
@@ -254,6 +255,7 @@ const AppContent: React.FC = () => {
                         <Route path="jobs" element={<JobsPage />} />
                         <Route path="queue-monitor" element={<QueueMonitorPage />} />
                         <Route path="audit-logs" element={<AuditLogsPage />} />
+                        <Route path="realtime-events" element={<RealtimeEventsPage />} />
                         <Route path="crashes" element={<CrashesPage />} />
                         <Route path="remote-config" element={<RemoteConfigDashboard />} />
                         <Route path="remote-config-old" element={<RemoteConfigPage />} />

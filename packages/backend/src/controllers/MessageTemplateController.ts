@@ -4,12 +4,20 @@ import { MessageTemplateModel, MessageTemplate } from '../models/MessageTemplate
 export class MessageTemplateController {
   static async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const { type, isEnabled, q, limit, offset } = req.query as any;
+      const { type, isEnabled, q, limit, offset, tags } = req.query as any;
+
+      // tags 파라미터 처리 (배열로 변환)
+      let tagIds: string[] | undefined;
+      if (tags) {
+        tagIds = Array.isArray(tags) ? tags : [tags];
+      }
+
       // MessageTemplateModel 사용
       const result = await MessageTemplateModel.findAllWithPagination({
         type,
         isEnabled: isEnabled === undefined ? undefined : (isEnabled === '1' || isEnabled === 'true'),
         search: q,
+        tags: tagIds,
         limit: Number(limit) || 50,
         offset: Number(offset) || 0
       });

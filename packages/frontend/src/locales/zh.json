@@ -1498,6 +1498,8 @@
     "no": "否",
     "of": "的",
     "ok": "确定",
+    "pause": "暂停",
+    "play": "播放",
     "previous": "上一个",
     "refresh": "刷新",
     "repeat": "重复",
@@ -1825,7 +1827,8 @@
     "expand": "展开",
     "jobs": "作业管理",
     "queueMonitor": "队列监控",
-    "console": "系统控制台"
+    "console": "系统控制台",
+    "realtimeEvents": "实时事件"
   },
   "signUpPrompt": {
     "backToLogin": "返回登录",
@@ -2249,5 +2252,42 @@
     "invitationCancelledSuccess": "Invitation cancelled successfully",
     "invitationCancelFailed": "Failed to cancel invitation",
     "addReaction": "Add reaction"
+  },
+  "realtimeEvents": {
+    "title": "实时事件",
+    "subtitle": "使用Firebase风格的事件流可视化实时监控系统事件",
+    "timeline": "时间线",
+    "eventStream": "事件流",
+    "topEvents": "热门事件",
+    "last30Minutes": "最近30分钟",
+    "total": "总计",
+    "userPropertiesActiveNow": "当前活跃用户属性",
+    "noEventsYet": "暂无事件",
+    "noEventsDescription": "最近30分钟内没有发生事件",
+    "eventsGeneratedBy": "事件由用户登录、数据创建/修改/删除等操作生成",
+    "waitingForEvents": "等待事件中...",
+    "eventDetails": "事件详情",
+    "eventType": "事件类型",
+    "timestamp": "时间戳",
+    "user": "用户",
+    "ipAddress": "IP地址",
+    "resource": "资源",
+    "oldValues": "旧值",
+    "newValues": "新值",
+    "userAgent": "用户代理",
+    "filters": {
+      "title": "筛选",
+      "eventType": "事件类型",
+      "allEventTypes": "所有事件类型",
+      "user": "用户",
+      "userPlaceholder": "按用户邮箱或名称筛选",
+      "dateRange": "日期范围",
+      "clear": "清除筛选"
+    },
+    "stats": {
+      "totalEvents": "总事件数",
+      "uniqueUsers": "唯一用户",
+      "eventTypes": "事件类型"
+    }
   }
 }
