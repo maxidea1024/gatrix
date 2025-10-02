@@ -77,6 +77,9 @@ const SystemConsolePage: React.FC = () => {
   const historyRef = useRef<string[]>([]);
   // Tab-completion candidates fetched from backend (cached with ETag)
   const completionsRef = useRef<string[]>([]);
+  // IME composition state for Korean/Chinese/Japanese input
+  const isComposingRef = useRef<boolean>(false);
+  const compositionTextRef = useRef<string>('');
 
   // Load commands from cache, then refresh from server using ETag
   useEffect(() => {
@@ -215,6 +218,7 @@ const SystemConsolePage: React.FC = () => {
       fontSize: 14,
       // Prefer CJK-friendly monospace fonts first
       fontFamily: 'D2Coding, "NanumGothicCoding", "Source Han Mono", "Noto Sans Mono CJK KR", Menlo, Monaco, "Courier New", monospace',
+      allowProposedApi: true, // Enable IME support
       theme: {
         background: (theme.palette.background?.paper as any) || '#000000',
         foreground: (theme.palette.text?.primary as any) || '#d1d5db',
@@ -246,6 +250,36 @@ const SystemConsolePage: React.FC = () => {
       term.open(containerRef.current);
       try { fit.fit(); } catch {}
       term.focus();
+
+      // Add IME composition event listeners
+      const textarea = containerRef.current.querySelector('textarea');
+      if (textarea) {
+        textarea.addEventListener('compositionstart', () => {
+          isComposingRef.current = true;
+          compositionTextRef.current = '';
+        });
+
+        textarea.addEventListener('compositionupdate', (e: any) => {
+          compositionTextRef.current = e.data || '';
+        });
+
+        textarea.addEventListener('compositionend', (e: any) => {
+          isComposingRef.current = false;
+          const text = e.data || compositionTextRef.current;
+          compositionTextRef.current = '';
+
+          // Insert composed text
+          if (text) {
+            const before = inputBufRef.current.slice(0, cursorRef.current);
+            const after = inputBufRef.current.slice(cursorRef.current);
+            inputBufRef.current = before + text + after;
+            cursorRef.current += text.length;
+
+            // Redraw the line to show the composed text
+            redrawLine(term);
+          }
+        });
+      }
     }
 
     // Clipboard and common shortcuts: Ctrl/Cmd+C/V/X, Undo/Redo
@@ -254,6 +288,12 @@ const SystemConsolePage: React.FC = () => {
       const isMac = navigator.platform.toLowerCase().includes('mac');
       const ctrlOrMeta = isMac ? e.metaKey : e.ctrlKey;
       const key = e.key?.toLowerCase?.() || '';
+
+      // Allow Shift+Arrow keys for selection (don't intercept)
+      if (e.shiftKey && (key === 'arrowleft' || key === 'arrowright' || key === 'arrowup' || key === 'arrowdown')) {
+        return true; // Let xterm handle selection
+      }
+
       // Copy
       if (ctrlOrMeta && key === 'c') {
         const sel = term.getSelection();
@@ -333,6 +373,11 @@ const SystemConsolePage: React.FC = () => {
     window.addEventListener('resize', onResize);
 
     term.onData((data) => {
+      // Skip processing during IME composition
+      if (isComposingRef.current) {
+        return;
+      }
+
       // Enter
       if (data === '\r') {
         const line = inputBufRef.current.trim();
@@ -344,6 +389,15 @@ const SystemConsolePage: React.FC = () => {
           try { localStorage.removeItem('console:raw:v2'); } catch {}
           writePrompt(term);
         } else {
+          // Check for |clip suffix for clipboard copy (with or without spaces)
+          let actualLine = line;
+          let shouldCopyToClipboard = false;
+          const clipMatch = line.match(/^(.+?)\s*\|\s*clip\s*$/);
+          if (clipMatch) {
+            actualLine = clipMatch[1].trim();
+            shouldCopyToClipboard = true;
+          }
+
           // history update
           const next = [...historyRef.current, line];
           setHistory(next);
@@ -354,14 +408,24 @@ const SystemConsolePage: React.FC = () => {
           pushRaw(`${getPromptAnsi()}${line}\r\n`, false);
 
           // execute backend
-          const { command, args } = splitCommand(line);
+          const { command, args } = splitCommand(actualLine);
           const token = localStorage.getItem('accessToken');
+
+          // Track if we received SSE output
+          let sseReceived = false;
+          const sseTimeout = setTimeout(() => {
+            // If no SSE received within 500ms, we'll use HTTP response
+            sseReceived = false;
+          }, 500);
+
           fetch('/api/v1/admin/console/execute', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
             credentials: 'include',
             body: JSON.stringify({ command, args })
           }).then(async (res) => {
+            clearTimeout(sseTimeout);
+
             if (!res.ok) {
               const json = await res.json().catch(() => null);
               const msg = json?.message || res.statusText || 'Unknown error';
@@ -372,6 +436,32 @@ const SystemConsolePage: React.FC = () => {
               term.write(cannot + '\r\n');
               pushRaw(cannot + '\r\n', false);
               writePrompt(term);
+            } else {
+              const json = await res.json();
+              const output = json?.output || '';
+
+              // Always write output from HTTP response (SSE might not work)
+              if (output) {
+                const normalized = output.replace(/\r?\n/g, '\r\n');
+                term.write(normalized + '\r\n');
+                pushRaw(normalized + '\r\n', false);
+              }
+
+              // Show prompt after output
+              writePrompt(term);
+
+              // If clipboard copy requested, copy the output
+              if (shouldCopyToClipboard && output) {
+                // Remove ANSI codes for clipboard
+                const plainText = output.replace(/\u001b\[[0-9;]*m/g, '');
+                navigator.clipboard?.writeText(plainText).then(() => {
+                  term.write('\u001b[32m✓ Copied to clipboard\u001b[0m\r\n');
+                  writePrompt(term);
+                }).catch(() => {
+                  term.write('\u001b[33m⚠ Failed to copy to clipboard\u001b[0m\r\n');
+                  writePrompt(term);
+                });
+              }
             }
           }).catch(() => {
             const errAnsi = `\u001b[31m[Backend Error]\u001b[0m ${t('common.error')}`;
@@ -732,23 +822,24 @@ const SystemConsolePage: React.FC = () => {
     }
   };
 
-  // SSE listen for console_output events
-  useSSENotifications({
-    autoConnect: true,
-    onEvent: (evt) => {
-      if (evt.type === 'console_output') {
-        const raw = String(evt.data?.output ?? '');
-        const normalized = raw.replace(/\r?\n/g, '\r\n');
-        if (termRef.current) {
-          termRef.current.write(normalized + '\r\n');
-          // persist output only (already written to term)
-          pushRaw(normalized + '\r\n', false);
-          // show next prompt
-          termRef.current.write(getPromptAnsi());
-        }
-      }
-    }
-  });
+  // SSE listen for console_output events (disabled - using HTTP response instead)
+  // This prevents duplicate output since we're now handling output in HTTP response
+  // useSSENotifications({
+  //   autoConnect: true,
+  //   onEvent: (evt) => {
+  //     if (evt.type === 'console_output') {
+  //       const raw = String(evt.data?.output ?? '');
+  //       const normalized = raw.replace(/\r?\n/g, '\r\n');
+  //       if (termRef.current) {
+  //         termRef.current.write(normalized + '\r\n');
+  //         // persist output only (already written to term)
+  //         pushRaw(normalized + '\r\n', false);
+  //         // show next prompt
+  //         termRef.current.write(getPromptAnsi());
+  //       }
+  //     }
+  //   }
+  // });
 
   return (
     <Box sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }} onKeyDown={(e) => {
