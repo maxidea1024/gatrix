@@ -268,6 +268,46 @@ export class AdminController {
     }
   }
 
+  static async verifyUserEmail(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = parseInt(req.params.id);
+
+      if (!userId || isNaN(userId)) {
+        throw new CustomError('Invalid user ID', 400);
+      }
+
+      // 사용자 존재 확인
+      const user = await db('g_users').where('id', userId).first();
+      if (!user) {
+        throw new CustomError('User not found', 404);
+      }
+
+      // 이미 인증된 경우 확인
+      if (user.emailVerified) {
+        throw new CustomError('Email is already verified', 400);
+      }
+
+      // 이메일 인증 상태 업데이트
+      await db('g_users')
+        .where('id', userId)
+        .update({
+          emailVerified: 1,
+          emailVerifiedAt: new Date(),
+          updatedAt: new Date()
+        });
+
+      // 캐시 클리어
+      clearAllCache();
+
+      res.json({
+        success: true,
+        message: 'User email verified successfully'
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   // Audit logs
   static async getAuditLogs(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {

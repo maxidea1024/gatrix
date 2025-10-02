@@ -103,7 +103,7 @@ export class WhitelistService {
       filters.tags.forEach(tag => params.append('tags', tag));
     }
 
-    const response = await apiService.get<{ success: boolean; data: WhitelistListResponse }>(`/whitelist?${params}`);
+    const response = await apiService.get<{ success: boolean; data: WhitelistListResponse }>(`/admin/whitelist?${params}`);
 
     // ApiService.request()가 이미 response.data를 반환하므로
     if (response?.success && response?.data) {
@@ -122,7 +122,7 @@ export class WhitelistService {
   }
 
   static async getWhitelistById(id: number): Promise<Whitelist> {
-    const response = await apiService.get<{ success: boolean; data: { whitelist: Whitelist } }>(`/whitelist/${id}`);
+    const response = await apiService.get<{ success: boolean; data: { whitelist: Whitelist } }>(`/admin/whitelist/${id}`);
 
     // ApiService.request()가 이미 response.data를 반환하므로
     if (response?.success && response?.data?.whitelist) {
@@ -136,7 +136,7 @@ export class WhitelistService {
   }
 
   static async createWhitelist(data: CreateWhitelistData): Promise<Whitelist> {
-    const response = await apiService.post<{ success: boolean; data: { whitelist: Whitelist } }>('/whitelist', data);
+    const response = await apiService.post<{ success: boolean; data: { whitelist: Whitelist } }>('/admin/whitelist', data);
 
     console.log('Create whitelist response:', response);
     console.log('Response structure:', JSON.stringify(response, null, 2));
@@ -156,7 +156,7 @@ export class WhitelistService {
   }
 
   static async updateWhitelist(id: number, data: UpdateWhitelistData): Promise<Whitelist> {
-    const response = await apiService.put<{ success: boolean; data: { whitelist: Whitelist } }>(`/whitelist/${id}`, data);
+    const response = await apiService.put<{ success: boolean; data: { whitelist: Whitelist } }>(`/admin/whitelist/${id}`, data);
 
     console.log('Update whitelist response:', response);
 
@@ -173,11 +173,11 @@ export class WhitelistService {
   }
 
   static async deleteWhitelist(id: number): Promise<void> {
-    await apiService.delete(`/whitelist/${id}`);
+    await apiService.delete(`/admin/whitelist/${id}`);
   }
 
   static async bulkCreateWhitelists(entries: BulkCreateEntry[]): Promise<{ createdCount: number; requestedCount: number }> {
-    const response = await apiService.post<{ success: boolean; data: { createdCount: number; requestedCount: number } }>('/whitelist/bulk', { entries });
+    const response = await apiService.post<{ success: boolean; data: { createdCount: number; requestedCount: number } }>('/admin/whitelist/bulk', { entries });
 
     // ApiService.request()가 이미 response.data를 반환하므로
     if (response?.success && response?.data) {
@@ -189,7 +189,7 @@ export class WhitelistService {
   }
 
   static async testWhitelist(request: WhitelistTestRequest): Promise<WhitelistTestResult> {
-    const response = await apiService.post<{ success: boolean; data: WhitelistTestResult }>('/whitelist/test', request);
+    const response = await apiService.post<{ success: boolean; data: WhitelistTestResult }>('/admin/whitelist/test', request);
 
     if (response?.success && response?.data) {
       return response.data;

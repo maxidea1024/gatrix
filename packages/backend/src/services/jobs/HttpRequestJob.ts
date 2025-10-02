@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { BaseJob, JobExecutionResult } from './JobFactory';
 import logger from '../../config/logger';
+import { HEADERS, HEADER_VALUES } from '../../constants/headers';
 
 export class HttpRequestJob extends BaseJob {
   async execute(): Promise<JobExecutionResult> {
@@ -34,10 +35,10 @@ export class HttpRequestJob extends BaseJob {
         } else {
           config.data = body;
           // JSON 요청인 경우 Content-Type 설정
-          if (!headers['Content-Type'] && !headers['content-type']) {
+          if (!headers[HEADERS.CONTENT_TYPE] && !headers['content-type']) {
             config.headers = {
               ...config.headers,
-              'Content-Type': 'application/json'
+              [HEADERS.CONTENT_TYPE]: HEADER_VALUES.APPLICATION_JSON
             };
           }
         }
@@ -53,7 +54,7 @@ export class HttpRequestJob extends BaseJob {
         } else if (auth.type === 'bearer' && auth.token) {
           config.headers = {
             ...config.headers,
-            'Authorization': `Bearer ${auth.token}`
+            [HEADERS.AUTHORIZATION]: `${HEADER_VALUES.BEARER_PREFIX}${auth.token}`
           };
         }
       }

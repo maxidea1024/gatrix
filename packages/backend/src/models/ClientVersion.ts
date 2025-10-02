@@ -351,16 +351,63 @@ export class ClientVersionModel {
     }
   }
 
-  static async bulkUpdateStatus(ids: number[], clientStatus: ClientStatus, updatedBy: number): Promise<any> {
+  static async bulkUpdateStatus(data: any): Promise<any> {
     try {
+      const updateData: any = {
+        clientStatus: data.clientStatus,
+        updatedBy: data.updatedBy,
+        updatedAt: new Date()
+      };
+
+      // 점검 관련 필드들 추가
+      if (data.maintenanceStartDate) {
+        updateData.maintenanceStartDate = data.maintenanceStartDate;
+      }
+      if (data.maintenanceEndDate) {
+        updateData.maintenanceEndDate = data.maintenanceEndDate;
+      }
+      if (data.maintenanceMessage) {
+        updateData.maintenanceMessage = data.maintenanceMessage;
+      }
+      if (data.supportsMultiLanguage !== undefined) {
+        updateData.supportsMultiLanguage = data.supportsMultiLanguage;
+      }
+      if (data.messageTemplateId) {
+        updateData.messageTemplateId = data.messageTemplateId;
+      }
+
       await db('g_client_versions')
-        .whereIn('id', ids)
-        .update({
-          clientStatus,
-          updatedBy,
-          updatedAt: new Date()
-        });
-      return { affectedRows: ids.length };
+        .whereIn('id', data.ids)
+        .update(updateData);
+
+      // 언어별 메시지 처리
+      if (data.maintenanceLocales && Array.isArray(data.maintenanceLocales)) {
+        // 기존 언어별 메시지 삭제
+        await db('g_client_version_maintenance_locales')
+          .whereIn('clientVersionId', data.ids)
+          .del();
+
+        // 새로운 언어별 메시지 추가
+        if (data.maintenanceLocales.length > 0) {
+          const localeInserts = [];
+          for (const id of data.ids) {
+            for (const locale of data.maintenanceLocales) {
+              localeInserts.push({
+                clientVersionId: id,
+                lang: locale.lang,
+                message: locale.message,
+                createdAt: new Date(),
+                updatedAt: new Date()
+              });
+            }
+          }
+          if (localeInserts.length > 0) {
+            await db('g_client_version_maintenance_locales').insert(localeInserts);
+          }
+        }
+      }
+
+      return data.ids.length;
     } catch (error) {
       logger.error('Error bulk updating client version status:', error);
       throw error;

@@ -385,7 +385,7 @@ const SchedulerPage: React.FC = () => {
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Box>
             <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-              {t('admin.scheduler.title')}
+              {t('scheduler.title')}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {t('scheduler.subtitle')}
@@ -449,7 +449,7 @@ const SchedulerPage: React.FC = () => {
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
               {/* 기본 정보 */}
               <Grid container spacing={2}>
-                <Grid item xs={6}>
+                <Grid size={{ xs: 6 }}>
                   <DateTimePicker
                     label="Start Date/Time"
                     value={formData.start ? moment(formData.start) : null}
@@ -457,7 +457,7 @@ const SchedulerPage: React.FC = () => {
                     slotProps={{ textField: { fullWidth: true } }}
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid size={{ xs: 6 }}>
                   <DateTimePicker
                     label="End Date/Time"
                     value={formData.end ? moment(formData.end) : null}
@@ -482,7 +482,7 @@ const SchedulerPage: React.FC = () => {
               </FormControl>
 
               <Grid container spacing={2}>
-                <Grid item xs={6}>
+                <Grid size={{ xs: 6 }}>
                   <FormControl fullWidth>
                     <InputLabel>Misfire Instruction</InputLabel>
                     <Select
@@ -497,7 +497,7 @@ const SchedulerPage: React.FC = () => {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid size={{ xs: 6 }}>
                   <FormControl fullWidth>
                     <InputLabel>Priority</InputLabel>
                     <Select
@@ -519,7 +519,7 @@ const SchedulerPage: React.FC = () => {
               </Typography>
 
               <Grid container spacing={2}>
-                <Grid item xs={4}>
+                <Grid size={{ xs: 4 }}>
                   <TextField
                     fullWidth
                     label="Repeat Interval"
@@ -529,7 +529,7 @@ const SchedulerPage: React.FC = () => {
                     inputProps={{ min: 1 }}
                   />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid size={{ xs: 4 }}>
                   <FormControl fullWidth>
                     <InputLabel>Unit</InputLabel>
                     <Select
@@ -542,7 +542,7 @@ const SchedulerPage: React.FC = () => {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid size={{ xs: 4 }}>
                   <FormControl fullWidth>
                     <InputLabel>Time Zone</InputLabel>
                     <Select
@@ -559,7 +559,7 @@ const SchedulerPage: React.FC = () => {
               </Grid>
 
               <Grid container spacing={2} sx={{ mt: 1 }}>
-                <Grid item xs={6}>
+                <Grid size={{ xs: 6 }}>
                   <TextField
                     fullWidth
                     label="Repeat Count"
@@ -569,7 +569,7 @@ const SchedulerPage: React.FC = () => {
                     placeholder="Leave empty for infinite"
                   />
                 </Grid>
-                <Grid item xs={6} sx={{ display: 'flex', alignItems: 'center' }}>
+                <Grid size={{ xs: 6 }} sx={{ display: 'flex', alignItems: 'center' }}>
                   <FormControl>
                     <Stack direction="row" spacing={2} alignItems="center">
                       <Typography variant="body2">Repeat Forever</Typography>
@@ -589,7 +589,7 @@ const SchedulerPage: React.FC = () => {
 
               {/* 시간 범위 설정 */}
               <Grid container spacing={2} sx={{ mt: 1 }}>
-                <Grid item xs={6}>
+                <Grid size={{ xs: 6 }}>
                   <TextField
                     fullWidth
                     label="Start Time of Day"
@@ -599,7 +599,7 @@ const SchedulerPage: React.FC = () => {
                     InputLabelProps={{ shrink: true }}
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid size={{ xs: 6 }}>
                   <TextField
                     fullWidth
                     label="End Time of Day"
@@ -616,7 +616,7 @@ const SchedulerPage: React.FC = () => {
                 <Typography variant="body2" sx={{ mb: 1 }}>Days of Week</Typography>
                 <Grid container spacing={1}>
                   {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => (
-                    <Grid item key={day}>
+                    <Grid key={day}>
                       <FormControl>
                         <Stack direction="row" spacing={1} alignItems="center">
                           <input
@@ -646,20 +646,20 @@ const SchedulerPage: React.FC = () => {
 
               <Box sx={{ border: '1px solid #ddd', borderRadius: 1, p: 2 }}>
                 <Grid container spacing={2} sx={{ mb: 2 }}>
-                  <Grid item xs={4}>
+                  <Grid size={{ xs: 4 }}>
                     <Typography variant="body2" fontWeight="bold">Name</Typography>
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid size={{ xs: 4 }}>
                     <Typography variant="body2" fontWeight="bold">Value</Typography>
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid size={{ xs: 4 }}>
                     <Typography variant="body2" fontWeight="bold">Type</Typography>
                   </Grid>
                 </Grid>
 
                 {/* 기본 Count 파라미터 */}
                 <Grid container spacing={2} sx={{ mb: 1 }}>
-                  <Grid item xs={4}>
+                  <Grid size={{ xs: 4 }}>
                     <TextField
                       fullWidth
                       size="small"
@@ -667,7 +667,7 @@ const SchedulerPage: React.FC = () => {
                       disabled
                     />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid size={{ xs: 4 }}>
                     <TextField
                       fullWidth
                       size="small"
@@ -679,7 +679,7 @@ const SchedulerPage: React.FC = () => {
                       }}
                     />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid size={{ xs: 4 }}>
                     <FormControl fullWidth size="small">
                       <Select value="Integer">
                         <MenuItem value="String">String</MenuItem>
@@ -693,21 +693,21 @@ const SchedulerPage: React.FC = () => {
 
                 {/* 추가 파라미터 */}
                 <Grid container spacing={2}>
-                  <Grid item xs={4}>
+                  <Grid size={{ xs: 4 }}>
                     <TextField
                       fullWidth
                       size="small"
                       placeholder="Parameter Name"
                     />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid size={{ xs: 4 }}>
                     <TextField
                       fullWidth
                       size="small"
                       placeholder="String"
                     />
                   </Grid>
-                  <Grid item xs={4}>
+                  <Grid size={{ xs: 4 }}>
                     <FormControl fullWidth size="small">
                       <Select value="String">
                         <MenuItem value="String">String</MenuItem>

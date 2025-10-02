@@ -2,6 +2,10 @@
  * 날짜/시간 포맷 유틸 - 사용자 설정(timezone, datetimeFormat)에 따라 출력
  */
 import moment from 'moment-timezone';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+import 'dayjs/locale/en';
+import 'dayjs/locale/zh-cn';
 
 const DEFAULT_TZ = 'Asia/Seoul';
 const DEFAULT_FORMAT = 'YYYY-MM-DD HH:mm:ss';
@@ -32,11 +36,22 @@ export const setStoredDateTimeFormat = (fmt: string) => {
   try { localStorage.setItem('settings.datetimeFormat', fmt); } catch {}
 };
 
-// 내부: 다양한 문자열을 Date로 파싱 후 moment.tz로 변환
+// 내부: 다양한 문자열을 Date로 파싱 후 moment로 변환
 function toMoment(date: string | Date): moment.Moment | null {
-  const dateObj = typeof date === 'string' ? parseDateString(date) : date;
+  let dateObj: Date | null;
+
+  if (typeof date === 'string') {
+    dateObj = parseDateString(date);
+  } else if (date instanceof Date) {
+    dateObj = date;
+  } else {
+    return null;
+  }
+
   if (!dateObj || isNaN(dateObj.getTime())) return null;
-  return moment(dateObj).tz(getStoredTimezone());
+
+  // parseDateString에서 이미 timezone 변환이 완료되었으므로 그대로 사용
+  return moment(dateObj);
 }
 
 /**
@@ -210,17 +225,56 @@ export const isYesterday = (date: string | Date | null | undefined): boolean => 
 };
 
 // 기존 파서 유지: ISO 또는 'YYYY-MM-DD HH:mm:ss' 지원
+// UTC 시간을 timezone에 맞춰 변환
 function parseDateString(input: string): Date | null {
   if (!input) return null;
+
+  const timezone = getStoredTimezone();
+
+  // ISO 형식 (T가 포함된 경우) - UTC를 timezone으로 변환
   if (/[Tt]/.test(input)) {
-    const d = new Date(input);
-    return isNaN(d.getTime()) ? null : d;
+    const utcDate = new Date(input);
+    if (isNaN(utcDate.getTime())) return null;
+
+    // timezone 변환 후 offset을 적용한 새로운 Date 생성
+    const converted = moment.utc(utcDate).tz(timezone);
+    const offsetMinutes = converted.utcOffset();
+    return new Date(utcDate.getTime() + (offsetMinutes * 60 * 1000));
   }
+
+  // 'YYYY-MM-DD HH:mm:ss' 형식 - 데이터베이스에서 오는 UTC 시간으로 처리
   const m = input.match(/^(\d{4})-(\d{2})-(\d{2})[\s](\d{2}):(\d{2}):(\d{2})$/);
   if (m) {
     const [, y, mo, d, h, mi, s] = m;
-    return new Date(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(s));
+    const utcDate = new Date(Date.UTC(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(s)));
+
+    // timezone 변환 후 offset을 적용한 새로운 Date 생성
+    const converted = moment.utc(utcDate).tz(timezone);
+    const offsetMinutes = converted.utcOffset();
+    return new Date(utcDate.getTime() + (offsetMinutes * 60 * 1000));
   }
+
   const fallback = new Date(input);
   return isNaN(fallback.getTime()) ? null : fallback;
 }
+
+/**
+ * Get dayjs locale based on current language
+ * This function is used by DateTimePicker components
+ */
+export const getDateLocale = (currentLang?: string): string => {
+  // If no language is provided, try to get it from i18n
+  const lang = currentLang || (typeof window !== 'undefined' && (window as any).i18n?.language) || 'ko';
+
+  switch (lang) {
+    case 'en':
+      dayjs.locale('en');
+      return 'en';
+    case 'zh':
+      dayjs.locale('zh-cn');
+      return 'zh-cn';
+    default:
+      dayjs.locale('ko');
+      return 'ko';
+  }
+};

@@ -5,6 +5,7 @@ export interface MessageTemplateFilters {
   type?: string;
   isEnabled?: boolean;
   search?: string;
+  tags?: string[];
   limit?: number;
   offset?: number;
 }
@@ -63,6 +64,16 @@ export class MessageTemplateModel {
           query.where(function(this: any) {
             this.where('mt.name', 'like', `%${filters.search}%`)
                 .orWhere('mt.defaultMessage', 'like', `%${filters.search}%`);
+          });
+        }
+
+        // 태그 필터 처리
+        if (filters?.tags && filters.tags.length > 0) {
+          query.whereIn('mt.id', function(this: any) {
+            this.select('ta.entityId')
+              .from('g_tag_assignments as ta')
+              .where('ta.entityType', 'message_template')
+              .whereIn('ta.tagId', filters.tags);
           });
         }
 
@@ -185,6 +196,8 @@ export class MessageTemplateModel {
             templateId: insertId,
             lang: locale.lang,
             message: locale.message,
+            createdBy: data.createdBy || data.created_by,
+            updatedBy: data.updatedBy || data.updated_by,
             createdAt: new Date(),
             updatedAt: new Date()
           }));
@@ -239,6 +252,8 @@ export class MessageTemplateModel {
             templateId: id,
             lang: locale.lang,
             message: locale.message,
+            createdBy: data.updatedBy || data.updated_by || data.createdBy || data.created_by,
+            updatedBy: data.updatedBy || data.updated_by,
             createdAt: new Date(),
             updatedAt: new Date()
           }));

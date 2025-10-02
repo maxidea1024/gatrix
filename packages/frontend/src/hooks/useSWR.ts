@@ -62,7 +62,7 @@ export function useUsers(
   },
   config?: SWRConfiguration
 ) {
-  return usePaginatedApi('/users', page, limit, filters, config);
+  return usePaginatedApi('/admin/users', page, limit, filters, config);
 }
 
 // Hook for current user profile
@@ -82,7 +82,7 @@ export function useUserStats(config?: SWRConfiguration) {
 
 // Hook for pending users
 export function usePendingUsers(config?: SWRConfiguration) {
-  return useApi<{ users: any[] }>('/users/pending', config);
+  return useApi<{ users: any[] }>('/admin/pending-users', config);
 }
 
 // Hook for audit logs
@@ -106,9 +106,9 @@ export function useUserMutations() {
   const mutateUsers = () => {
     // Mutate all user-related cache keys
     return Promise.all([
-      mutate('/users'),
-      mutate('/users/stats'),
-      mutate('/users/pending'),
+      mutate('/admin/users'),
+      mutate('/admin/stats/users'),
+      mutate('/admin/pending-users'),
     ]);
   };
 

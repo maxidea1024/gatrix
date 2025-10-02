@@ -124,7 +124,7 @@ const DashboardPage: React.FC = () => {
               <Typography color="error">{t('dashboard.loadStatsError')}</Typography>
             ) : (
               <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                   <StatsCard
                     title={t('dashboard.totalUsers')}
                     value={stats.total}
@@ -132,7 +132,7 @@ const DashboardPage: React.FC = () => {
                     color="primary"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                   <StatsCard
                     title={t('dashboard.activeUsers')}
                     value={stats.active}
@@ -140,7 +140,7 @@ const DashboardPage: React.FC = () => {
                     color="success"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                   <StatsCard
                     title={t('dashboard.pendingApproval')}
                     value={stats.pending}
@@ -149,7 +149,7 @@ const DashboardPage: React.FC = () => {
                     subtitle={stats.pending > 0 ? t('dashboard.requiresAttention') : t('dashboard.allCaughtUp')}
                   />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                   <StatsCard
                     title={t('dashboard.administrators')}
                     value={stats.admins}
@@ -168,7 +168,7 @@ const DashboardPage: React.FC = () => {
         </Typography>
         
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Card>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
@@ -193,7 +193,7 @@ const DashboardPage: React.FC = () => {
           </Grid>
 
           {isAdmin() && (
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>

@@ -109,7 +109,7 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
     return (
       <Box sx={{ p: 2 }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12 , md: 6 }}>
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="subtitle2" gutterBottom>
@@ -135,7 +135,7 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
           </Grid>
           
           {execution.result && (
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12 , md: 6 }}>
               <Card variant="outlined">
                 <CardContent>
                   <Typography variant="subtitle2" gutterBottom>
@@ -160,7 +160,7 @@ const JobExecutionHistory: React.FC<JobExecutionHistoryProps> = ({ jobId }) => {
           )}
           
           {execution.error_message && (
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Alert severity="error">
                 <Typography variant="subtitle2" gutterBottom>
                   {t('jobs.errorMessage')}

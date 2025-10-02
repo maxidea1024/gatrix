@@ -17,4 +17,3 @@ export default class VarsModel {
       .merge({ varValue: value, updatedBy: userId });
   }
 }
-

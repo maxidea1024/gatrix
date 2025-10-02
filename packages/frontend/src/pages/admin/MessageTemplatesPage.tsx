@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
+import { useDebounce } from '../../hooks/useDebounce';
 import {
   Box,
   Card,
@@ -30,7 +31,9 @@ import {
   Tooltip,
   Checkbox,
   Alert,
-  Autocomplete
+  Autocomplete,
+  Drawer,
+  InputAdornment
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -41,22 +44,22 @@ import {
   Save as SaveIcon,
   Refresh as RefreshIcon,
   LocalOffer as LocalOfferIcon,
-  ContentCopy as ContentCopyIcon
+  ContentCopy as ContentCopyIcon,
+  Search as SearchIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { messageTemplateService, MessageTemplate, MessageTemplateLocale, MessageTemplateType } from '@/services/messageTemplateService';
 import { tagService, Tag } from '@/services/tagService';
+import translationService from '@/services/translationService';
+import { getLanguageDisplayName } from '@/contexts/I18nContext';
 import SimplePagination from '@/components/common/SimplePagination';
 import FormDialogHeader from '@/components/common/FormDialogHeader';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
+import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/MultiLanguageMessageInput';
 
-const allLangs: Array<{ code: 'ko' | 'en' | 'zh'; label: string }> = [
-  { code: 'ko', label: '한국어' },
-  { code: 'en', label: 'English' },
-  { code: 'zh', label: '中文' },
-];
+
 
 const MessageTemplatesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -93,6 +96,9 @@ const MessageTemplatesPage: React.FC = () => {
     q?: string;
     tags?: string[];
   }>({});
+
+  // 디바운싱된 검색어 (500ms 지연)
+  const debouncedSearchQuery = useDebounce(filters.q || '', 500);
   const [tagFilter, setTagFilter] = useState<Tag[]>([]);
 
   // 선택 관련
@@ -112,11 +118,6 @@ const MessageTemplatesPage: React.FC = () => {
   const [templateTags, setTemplateTags] = useState<Tag[]>([]);
 
   const [form, setForm] = useState<MessageTemplate>({ name: '', type: 'maintenance', isEnabled: true, defaultMessage: '', locales: [] });
-  const usedLangs = useMemo(() => new Set((form.locales || []).map(l => l.lang)), [form.locales]);
-  const availableLangs = allLangs.filter(l => !usedLangs.has(l.code));
-  const [newLang, setNewLang] = useState<'ko'|'en'|'zh'>('ko');
-  const [newMsg, setNewMsg] = useState('');
-  const getLangLabel = (code: 'ko'|'en'|'zh') => allLangs.find(l=>l.code===code)?.label || code;
 
   // 폼 필드 ref들
   const nameFieldRef = useRef<HTMLInputElement>(null);
@@ -128,6 +129,7 @@ const MessageTemplatesPage: React.FC = () => {
       const offset = page * rowsPerPage;
       const params = {
         ...filters,
+        q: debouncedSearchQuery || undefined, // 디바운싱된 검색어 사용
         limit: rowsPerPage,
         offset
       };
@@ -137,13 +139,13 @@ const MessageTemplatesPage: React.FC = () => {
       setItems(result.templates);
       setTotal(result.total);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('admin.messageTemplates.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(error.message || t('messageTemplates.loadFailed'), { variant: 'error' });
       setItems([]);
       setTotal(0);
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, filters, enqueueSnackbar, t]);
+  }, [page, rowsPerPage, filters.type, filters.isEnabled, filters.tags, debouncedSearchQuery, enqueueSnackbar, t]);
 
   // 태그 로딩
   const loadTags = useCallback(async () => {
@@ -221,14 +223,14 @@ const MessageTemplatesPage: React.FC = () => {
   const confirmBulkDelete = useCallback(async () => {
     try {
       await messageTemplateService.bulkDelete(selectedIds);
-      enqueueSnackbar(t('admin.messageTemplates.bulkDeleteSuccess', { count: selectedIds.length }), { variant: 'success' });
+      enqueueSnackbar(t('messageTemplates.bulkDeleteSuccess', { count: selectedIds.length }), { variant: 'success' });
       setSelectedIds([]);
       setSelectAll(false);
       setBulkDeleteDialogOpen(false);
       load();
     } catch (error: any) {
       console.error('Error bulk deleting templates:', error);
-      enqueueSnackbar(error.message || t('admin.messageTemplates.bulkDeleteFailed'), { variant: 'error' });
+      enqueueSnackbar(error.message || t('messageTemplates.bulkDeleteFailed'), { variant: 'error' });
     }
   }, [selectedIds, t, enqueueSnackbar, load]);
 
@@ -245,7 +247,7 @@ const MessageTemplatesPage: React.FC = () => {
       }));
 
       enqueueSnackbar(
-        t('admin.messageTemplates.bulkUpdateSuccess', {
+        t('messageTemplates.bulkUpdateSuccess', {
           count: selectedIds.length,
           status: isEnabled ? t('common.available') : t('common.unavailable')
         }),
@@ -256,7 +258,7 @@ const MessageTemplatesPage: React.FC = () => {
       load();
     } catch (error: any) {
       console.error('Error bulk updating templates:', error);
-      enqueueSnackbar(error.message || t('admin.messageTemplates.bulkUpdateFailed'), { variant: 'error' });
+      enqueueSnackbar(error.message || t('messageTemplates.bulkUpdateFailed'), { variant: 'error' });
     }
   }, [selectedIds, items, t, enqueueSnackbar, load]);
 
@@ -284,7 +286,6 @@ const MessageTemplatesPage: React.FC = () => {
   const handleAdd = () => {
     setEditing(null);
     setForm({ name: '', type: 'maintenance', isEnabled: true, supportsMultiLanguage: false, defaultMessage: '', locales: [], tags: [] });
-    setNewLang('ko'); setNewMsg('');
     setDialogOpen(true);
   };
 
@@ -300,7 +301,6 @@ const MessageTemplatesPage: React.FC = () => {
       locales: row.locales || [],
       tags: row.tags || []
     });
-    setNewLang('ko'); setNewMsg('');
     setDialogOpen(true);
   };
 
@@ -332,16 +332,7 @@ const MessageTemplatesPage: React.FC = () => {
     }
   }, [selectedTemplateForTags, t, enqueueSnackbar, load]);
 
-  const addLocale = () => {
-    const lang = newLang; const message = newMsg.trim();
-    if (!message) return;
-    setForm(prev => ({ ...prev, locales: [...(prev.locales||[]).filter(l=>l.lang!==lang), { lang, message }] }));
-    setNewMsg('');
-  };
 
-  const removeLocale = (lang: 'ko'|'en'|'zh') => {
-    setForm(prev => ({ ...prev, locales: (prev.locales||[]).filter(l => l.lang !== lang) }));
-  };
 
   const handleSave = async () => {
     if (!form.name.trim()) {
@@ -420,14 +411,14 @@ const MessageTemplatesPage: React.FC = () => {
       <Box sx={{ mb: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
           <Typography variant="h4" sx={{ fontWeight: 600 }}>
-            {t('admin.messageTemplates.title')}
+            {t('messageTemplates.title')}
           </Typography>
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-            {t('admin.messageTemplates.addTemplate')}
+            {t('messageTemplates.addTemplate')}
           </Button>
         </Box>
         <Typography variant="body1" color="text.secondary">
-          {t('admin.messageTemplates.subtitle')}
+          {t('messageTemplates.subtitle')}
         </Typography>
       </Box>
 
@@ -436,29 +427,54 @@ const MessageTemplatesPage: React.FC = () => {
         <CardContent>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+              {/* 검색 컨트롤을 맨 앞으로 이동하고 개선 */}
+              <TextField
+                placeholder={t('messageTemplates.searchPlaceholderDetailed')}
+                size="small"
+                sx={{ minWidth: 500 }}
+                value={filters.q || ''}
+                onChange={(e) => handleFilterChange({ ...filters, q: e.target.value || undefined })}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+
               <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel shrink={true}>{t('admin.messageTemplates.type')}</InputLabel>
+                <InputLabel shrink={true}>{t('messageTemplates.type')}</InputLabel>
                 <Select
                   value={filters.type || ''}
-                  label={t('admin.messageTemplates.type')}
+                  label={t('messageTemplates.type')}
                   onChange={(e) => handleFilterChange({ ...filters, type: e.target.value as MessageTemplateType || undefined })}
                   displayEmpty
                   size="small"
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        zIndex: 9999
+                      }
+                    }
+                  }}
                 >
                   <MenuItem value="">
                     <em>{t('common.all')}</em>
                   </MenuItem>
-                  <MenuItem value="maintenance">{t('admin.messageTemplates.types.maintenance')}</MenuItem>
-                  <MenuItem value="general">{t('admin.messageTemplates.types.general')}</MenuItem>
-                  <MenuItem value="notification">{t('admin.messageTemplates.types.notification')}</MenuItem>
+                  <MenuItem value="maintenance">{t('messageTemplates.types.maintenance')}</MenuItem>
+                  <MenuItem value="general">{t('messageTemplates.types.general')}</MenuItem>
+                  <MenuItem value="notification">{t('messageTemplates.types.notification')}</MenuItem>
                 </Select>
               </FormControl>
 
               <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel shrink={true}>{t('admin.messageTemplates.availability')}</InputLabel>
+                <InputLabel shrink={true}>{t('messageTemplates.availability')}</InputLabel>
                 <Select
                   value={filters.isEnabled?.toString() || ''}
-                  label={t('admin.messageTemplates.availability')}
+                  label={t('messageTemplates.availability')}
                   onChange={(e) => {
                     const value = e.target.value;
                     handleFilterChange({
@@ -468,6 +484,13 @@ const MessageTemplatesPage: React.FC = () => {
                   }}
                   displayEmpty
                   size="small"
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        zIndex: 9999
+                      }
+                    }
+                  }}
                 >
                   <MenuItem value="">
                     <em>{t('common.all')}</em>
@@ -476,15 +499,6 @@ const MessageTemplatesPage: React.FC = () => {
                   <MenuItem value="false">{t('common.unavailable')}</MenuItem>
                 </Select>
               </FormControl>
-
-              <TextField
-                label={t('common.search')}
-                placeholder={t('admin.messageTemplates.searchPlaceholder')}
-                size="small"
-                sx={{ minWidth: 200 }}
-                value={filters.q || ''}
-                onChange={(e) => handleFilterChange({ ...filters, q: e.target.value || undefined })}
-              />
 
               {/* 태그 필터 */}
               <Autocomplete
@@ -495,6 +509,13 @@ const MessageTemplatesPage: React.FC = () => {
                 filterSelectedOptions
                 value={tagFilter}
                 onChange={(_, value) => handleTagFilterChange(value)}
+                slotProps={{
+                  popper: {
+                    style: {
+                      zIndex: 9999
+                    }
+                  }
+                }}
                 renderValue={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });
@@ -512,7 +533,7 @@ const MessageTemplatesPage: React.FC = () => {
                   })
                 }
                 renderInput={(params) => (
-                  <TextField {...params} label={t('common.tags')} />
+                  <TextField {...params} label={t('common.tags')} size="small" />
                 )}
                 renderOption={(props, option) => {
                   const { key, ...otherProps } = props;
@@ -529,14 +550,6 @@ const MessageTemplatesPage: React.FC = () => {
                 }}
               />
             </Box>
-
-            <Tooltip title={t('common.refresh')}>
-              <span>
-                <IconButton onClick={load} disabled={loading}>
-                  <RefreshIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
           </Box>
         </CardContent>
       </Card>
@@ -547,7 +560,7 @@ const MessageTemplatesPage: React.FC = () => {
           <CardContent sx={{ py: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'space-between' }}>
               <Typography variant="body2" color="primary" sx={{ fontWeight: 500 }}>
-                {t('admin.messageTemplates.selectedCount', { count: selectedIds.length })}
+                {t('messageTemplates.selectedCount', { count: selectedIds.length })}
               </Typography>
               <Box sx={{ display: 'flex', gap: 1 }}>
                 <Button
@@ -556,7 +569,7 @@ const MessageTemplatesPage: React.FC = () => {
                   onClick={() => handleBulkToggleAvailability(true)}
                   sx={{ minWidth: 'auto' }}
                 >
-                  {t('admin.messageTemplates.makeAvailable')}
+                  {t('messageTemplates.makeAvailable')}
                 </Button>
                 <Button
                   size="small"
@@ -564,7 +577,7 @@ const MessageTemplatesPage: React.FC = () => {
                   onClick={() => handleBulkToggleAvailability(false)}
                   sx={{ minWidth: 'auto' }}
                 >
-                  {t('admin.messageTemplates.makeUnavailable')}
+                  {t('messageTemplates.makeUnavailable')}
                 </Button>
                 <Button
                   size="small"
@@ -583,7 +596,6 @@ const MessageTemplatesPage: React.FC = () => {
 
       <Card>
         <CardContent sx={{ p: 0 }}>
-          {loading && <LinearProgress />}
           <TableContainer>
             <Table>
               <TableHead>
@@ -596,8 +608,8 @@ const MessageTemplatesPage: React.FC = () => {
                     />
                   </TableCell>
                   <TableCell>{t('common.name')}</TableCell>
-                  <TableCell>{t('admin.messageTemplates.defaultMessage')}</TableCell>
-                  <TableCell>{t('admin.messageTemplates.availability')}</TableCell>
+                  <TableCell>{t('messageTemplates.defaultMessage')}</TableCell>
+                  <TableCell>{t('messageTemplates.availability')}</TableCell>
                   <TableCell>{t('common.updatedAt')}</TableCell>
                   <TableCell>{t('common.languages')}</TableCell>
                   <TableCell>{t('common.creator')}</TableCell>
@@ -610,14 +622,14 @@ const MessageTemplatesPage: React.FC = () => {
                   <EmptyTableRow
                     colSpan={9}
                     loading={loading}
-                    message={t('admin.messageTemplates.noTemplatesFound')}
+                    message={t('messageTemplates.noTemplatesFound')}
                     loadingMessage={t('common.loadingData')}
                   />
                 ) : (
                   items.map(row => {
                   const langs = (row.locales||[]).map(l=>l.lang);
                   const hasLocales = langs.length > 0;
-                  const langsLabel = hasLocales ? langs.join(', ') : t('admin.messageTemplates.onlyDefaultMessage');
+                  const langsLabel = hasLocales ? langs.join(', ') : t('messageTemplates.onlyDefaultMessage');
                   return (
                     <TableRow key={row.id} hover>
                       <TableCell padding="checkbox">
@@ -641,19 +653,26 @@ const MessageTemplatesPage: React.FC = () => {
                             <Typography variant="body2" sx={{ whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
                               {String((row as any).defaultMessage).replace(/\n/g, ' ')}
                             </Typography>
-                            <IconButton size="small" onClick={() => copyWithToast(String((row as any).defaultMessage), t('admin.messageTemplates.defaultMessage'), false)} sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}>
+                            <IconButton size="small" onClick={() => copyWithToast(String((row as any).defaultMessage), t('messageTemplates.defaultMessage'), false)} sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}>
                               <ContentCopyIcon fontSize="small" />
                             </IconButton>
                           </Box>
                         ) : (
                           <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                            {t('admin.messageTemplates.onlyDefaultMessage')}
+                            {t('messageTemplates.onlyDefaultMessage')}
                           </Typography>
                         )}
                       </TableCell>
-                      <TableCell>{(row as any).isEnabled ? t('common.available') : t('common.unavailable')}</TableCell>
+                      <TableCell>
+                        <Chip
+                          label={(row as any).isEnabled ? t('common.available') : t('common.unavailable')}
+                          color={(row as any).isEnabled ? 'success' : 'default'}
+                          size="small"
+                          variant={(row as any).isEnabled ? 'filled' : 'outlined'}
+                        />
+                      </TableCell>
                       <TableCell>{formatDateTimeDetailed((row as any).updatedAt) || '-'}</TableCell>
-                      <TableCell>{hasLocales ? langs.map(c=>getLangLabel(c as any)).join(', ') : t('admin.messageTemplates.onlyDefaultMessage')}</TableCell>
+                      <TableCell>{hasLocales ? langs.map(c=>getLanguageDisplayName(c as any)).join(', ') : t('messageTemplates.onlyDefaultMessage')}</TableCell>
                       <TableCell>{(row as any).createdByName || '-'}</TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -693,37 +712,78 @@ const MessageTemplatesPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* 페이지네이션 */}
-      <SimplePagination
-        count={total}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleRowsPerPageChange}
-      />
+      {/* 페이지네이션 - 데이터가 있을 때만 표시 */}
+      {total > 0 && (
+        <SimplePagination
+          count={total}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+        />
+      )}
 
-      <Dialog
+      <Drawer
+        anchor="right"
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-        TransitionProps={{
+        sx={{
+          zIndex: 1300,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 600 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+        ModalProps={{
+          keepMounted: false
+        }}
+        SlideProps={{
           onEntered: () => {
-            // 대화상자가 열린 후 이름 필드에 포커스
+            // Drawer가 열린 후 이름 필드에 포커스
             setTimeout(() => {
               nameFieldRef.current?.focus();
             }, 100);
           }
         }}
       >
-        <FormDialogHeader
-          title={editing ? '메시지 템플릿 편집' : '메시지 템플릿 추가'}
-          description={editing
-            ? '기존 메시지 템플릿의 정보를 수정하고 다국어 메시지를 관리할 수 있습니다.'
-            : '새로운 메시지 템플릿을 생성하고 다국어 메시지를 설정할 수 있습니다.'
-          }
-        />
-        <DialogContent>
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Box>
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              {editing ? t('messageTemplates.editTitle') : t('messageTemplates.addTitle')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              {editing
+                ? t('messageTemplates.editDescription')
+                : t('messageTemplates.addDescription')
+              }
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={() => setDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
               label={t('common.name')}
@@ -735,47 +795,37 @@ const MessageTemplatesPage: React.FC = () => {
             />
             <FormControlLabel
               control={<Switch checked={form.isEnabled} onChange={(e) => setForm(prev => ({ ...prev, isEnabled: e.target.checked }))} />}
-              label={t('admin.messageTemplates.availability')}
+              label={t('messageTemplates.availability')}
             />
-            <TextField
-              label={t('admin.messageTemplates.defaultMessage')}
-              value={form.defaultMessage || ''}
-              onChange={(e) => setForm(prev => ({ ...prev, defaultMessage: e.target.value }))}
-              multiline
-              minRows={3}
-              required
-              helperText={t('admin.messageTemplates.defaultMessageHelp')}
-              inputRef={defaultMessageFieldRef}
-            />
-            <FormControlLabel
-              control={<Switch checked={form.supportsMultiLanguage} onChange={(e) => setForm(prev => ({ ...prev, supportsMultiLanguage: e.target.checked }))} />}
-              label={t('admin.messageTemplates.supportsMultiLanguage')}
-            />
+            {/* 다국어 메시지 입력 컴포넌트 */}
+            <MultiLanguageMessageInput
+              defaultMessage={form.defaultMessage || ''}
+              onDefaultMessageChange={(message) => setForm(prev => ({ ...prev, defaultMessage: message }))}
+              defaultMessageLabel={t('messageTemplates.defaultMessage')}
+              defaultMessageHelperText={t('messageTemplates.defaultMessageHelp')}
+              defaultMessageRequired={true}
+              defaultMessageError={false}
 
-            {/* Multi-language section - only show when supportsMultiLanguage is true */}
-            {form.supportsMultiLanguage && (
-              <>
-                {/* Dynamic language entries */}
-                {availableLangs.length > 0 && (
-                  <Stack direction="row" spacing={1} alignItems="flex-start">
-                    <Select size="small" value={newLang} onChange={(e)=>setNewLang(e.target.value as any)} sx={{ minWidth: 120 }}>
-                      {availableLangs.map(l => <MenuItem key={l.code} value={l.code}>{l.label}</MenuItem>)}
-                    </Select>
-                    <TextField size="small" value={newMsg} onChange={(e)=>setNewMsg(e.target.value)} label={t('admin.maintenance.perLanguageMessage')} sx={{ flex: 1 }} multiline minRows={3} />
-                    <Button onClick={addLocale} variant="outlined" sx={{ alignSelf: 'flex-start' }}>{t('common.add')}</Button>
-                  </Stack>
-                )}
-                <Stack spacing={1}>
-                  {(form.locales||[]).map(l => (
-                    <Box key={l.lang} sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
-                      <Chip label={getLangLabel(l.lang)} size="small" sx={{ width: 96, justifyContent: 'flex-start' }} />
-                      <TextField fullWidth size="small" value={l.message} onChange={(e)=>setForm(prev=>({ ...prev, locales: (prev.locales||[]).map(x=> x.lang===l.lang? { ...x, message: e.target.value }: x) }))} multiline minRows={3} />
-                      <IconButton size="small" onClick={()=>removeLocale(l.lang)} sx={{ alignSelf: 'flex-start' }}><CloseIcon fontSize="small" /></IconButton>
-                    </Box>
-                  ))}
-                </Stack>
-              </>
-            )}
+              supportsMultiLanguage={form.supportsMultiLanguage || false}
+              onSupportsMultiLanguageChange={(supports) => setForm(prev => ({ ...prev, supportsMultiLanguage: supports }))}
+              supportsMultiLanguageLabel={t('messageTemplates.supportsMultiLanguage')}
+              supportsMultiLanguageHelperText={t('messageTemplates.supportsMultiLanguageHelp')}
+
+              locales={(form.locales || []).map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
+              onLocalesChange={(locales) => {
+                setForm(prev => ({ ...prev, locales: locales.map(l => ({ lang: l.lang, message: l.message })) }));
+                // 번역 결과가 있으면 자동으로 다국어 지원 활성화
+                const hasNonEmptyLocales = locales.some(l => l.message && l.message.trim() !== '');
+                if (hasNonEmptyLocales && !form.supportsMultiLanguage) {
+                  setForm(prev => ({ ...prev, supportsMultiLanguage: true }));
+                }
+              }}
+              languageSpecificMessagesLabel={t('messageTemplates.languageSpecificMessages')}
+
+              enableTranslation={true}
+              translateButtonLabel={t('common.autoTranslate')}
+              translateTooltip={t('maintenance.translateTooltip')}
+            />
 
             {/* 태그 선택 */}
             <TextField
@@ -790,6 +840,13 @@ const MessageTemplatesPage: React.FC = () => {
               }}
               SelectProps={{
                 multiple: true,
+                MenuProps: {
+                  PaperProps: {
+                    style: {
+                      zIndex: 99999
+                    }
+                  }
+                },
                 renderValue: (selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                     {(selected as number[]).map((id) => {
@@ -820,9 +877,26 @@ const MessageTemplatesPage: React.FC = () => {
               ))}
             </TextField>
           </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)} disabled={saving} startIcon={<CancelIcon />}>{t('common.cancel')}</Button>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setDialogOpen(false)}
+            disabled={saving}
+            startIcon={<CancelIcon />}
+            variant="outlined"
+          >
+            {t('common.cancel')}
+          </Button>
           <Button
             variant="contained"
             onClick={handleSave}
@@ -831,40 +905,158 @@ const MessageTemplatesPage: React.FC = () => {
           >
             {saving ? t('common.saving') : t('common.save')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* 개별 삭제 확인 다이얼로그 */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
-        <DialogContent>
-          <Typography>
-            {t('admin.messageTemplates.confirmDelete', { name: deletingTemplate?.name })}
+      {/* 개별 삭제 확인 Drawer */}
+      <Drawer
+        anchor="right"
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 400 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('common.confirmDelete')}
           </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
-          <Button onClick={confirmDelete} color="error" variant="contained">
+          <IconButton
+            onClick={() => setDeleteDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, p: 2 }}>
+          <Typography>
+            {t('messageTemplates.confirmDelete', { name: deletingTemplate?.name })}
+          </Typography>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setDeleteDialogOpen(false)}
+            variant="outlined"
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={confirmDelete}
+            color="error"
+            variant="contained"
+            startIcon={<DeleteIcon />}
+          >
             {t('common.delete')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* 일괄 삭제 확인 다이얼로그 */}
-      <Dialog open={bulkDeleteDialogOpen} onClose={() => setBulkDeleteDialogOpen(false)}>
-        <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
-        <DialogContent>
-          <Typography>
-            {t('admin.messageTemplates.confirmBulkDelete', { count: selectedIds.length })}
+      {/* 일괄 삭제 확인 Drawer */}
+      <Drawer
+        anchor="right"
+        open={bulkDeleteDialogOpen}
+        onClose={() => setBulkDeleteDialogOpen(false)}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 400 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('common.confirmDelete')}
           </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setBulkDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
-          <Button onClick={confirmBulkDelete} color="error" variant="contained">
+          <IconButton
+            onClick={() => setBulkDeleteDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, p: 2 }}>
+          <Typography>
+            {t('messageTemplates.confirmBulkDelete', { count: selectedIds.length })}
+          </Typography>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setBulkDeleteDialogOpen(false)}
+            variant="outlined"
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={confirmBulkDelete}
+            color="error"
+            variant="contained"
+            startIcon={<DeleteIcon />}
+          >
             {t('common.delete')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
       {/* 태그 관리 다이얼로그 */}
       <Dialog open={tagDialogOpen} onClose={() => setTagDialogOpen(false)} maxWidth="md" fullWidth>
@@ -885,6 +1077,13 @@ const MessageTemplatesPage: React.FC = () => {
               }}
               SelectProps={{
                 multiple: true,
+                MenuProps: {
+                  PaperProps: {
+                    style: {
+                      zIndex: 99999
+                    }
+                  }
+                },
                 renderValue: (selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                     {(selected as number[]).map((id) => {

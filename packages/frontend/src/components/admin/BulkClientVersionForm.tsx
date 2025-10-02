@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Drawer,
   Button,
   TextField,
   FormControl,
@@ -28,14 +25,7 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from '@mui/material';
-import { Cancel as CancelIcon, Save as SaveIcon, ExpandMore as ExpandMoreIcon, Build as BuildIcon } from '@mui/icons-material';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
-import 'dayjs/locale/ko';
-import 'dayjs/locale/en';
-import 'dayjs/locale/zh-cn';
+import { Cancel as CancelIcon, Save as SaveIcon, ExpandMore as ExpandMoreIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -53,6 +43,8 @@ import FormDialogHeader from '../common/FormDialogHeader';
 import { tagService } from '../../services/tagService';
 import { PlatformDefaultsService } from '../../services/platformDefaultsService';
 import { AVAILABLE_PLATFORMS } from '../../constants/platforms';
+import MaintenanceSettingsInput from '../common/MaintenanceSettingsInput';
+import { MessageTemplate, messageTemplateService } from '../../services/messageTemplateService';
 
 // 클라이언트 상태 라벨 매핑
 const ClientStatusLabels = {
@@ -157,6 +149,11 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   const [maintenanceLocales, setMaintenanceLocales] = useState<ClientVersionMaintenanceLocale[]>([]);
   const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
 
+  // 메시지 소스 선택
+  const [inputMode, setInputMode] = useState<'direct' | 'template'>('direct');
+  const [templates, setTemplates] = useState<MessageTemplate[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | ''>('');
+
   // 기본값 설정
   const defaultValues: BulkCreateFormData = {
     clientVersion: '',
@@ -198,7 +195,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     }
   }, [open, reset]);
 
-  // 태그 목록 로드
+  // 태그 목록 및 메시지 템플릿 로드
   useEffect(() => {
     if (open) {
       const loadTags = async () => {
@@ -209,7 +206,18 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
           console.error('Failed to load tags:', error);
         }
       };
+
+      const loadTemplates = async () => {
+        try {
+          const result = await messageTemplateService.list({ type: 'maintenance', isEnabled: true });
+          setTemplates(result.templates);
+        } catch (error) {
+          console.error('Failed to load message templates:', error);
+        }
+      };
+
       loadTags();
+      loadTemplates();
     }
   }, [open]);
 
@@ -242,6 +250,11 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     setValue('supportsMultiLanguage', enabled);
     if (enabled) {
       // 활성화 시, 기존 값을 보존하면서 누락된 언어만 추가
+      const availableLanguages = [
+        { code: 'ko' as const, label: t('clientVersions.maintenance.korean') },
+        { code: 'en' as const, label: t('clientVersions.maintenance.english') },
+        { code: 'zh' as const, label: t('clientVersions.maintenance.chinese') },
+      ];
       const merged = availableLanguages.map((lang) => {
         const existing = maintenanceLocales.find(l => l.lang === lang.code);
         return { lang: lang.code, message: existing?.message || '' } as any;
@@ -251,32 +264,6 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     } else {
       // 비활성화 시, 입력값은 유지하고 UI만 숨김 (state/form 값은 건드리지 않음)
       // no-op
-    }
-  };
-
-  // 사용 가능한 언어 목록
-  const availableLanguages = [
-    { code: 'ko' as const, label: t('clientVersions.maintenance.korean') },
-    { code: 'en' as const, label: t('clientVersions.maintenance.english') },
-    { code: 'zh' as const, label: t('clientVersions.maintenance.chinese') },
-  ];
-
-  const usedLanguages = new Set(maintenanceLocales.map(l => l.lang));
-  const availableToAdd = availableLanguages.filter(l => !usedLanguages.has(l.code));
-
-  // 날짜 로케일 설정
-  const getDateLocale = () => {
-    const currentLang = t('language') || 'ko';
-    switch (currentLang) {
-      case 'en':
-        dayjs.locale('en');
-        return 'en';
-      case 'zh':
-        dayjs.locale('zh-cn');
-        return 'zh-cn';
-      default:
-        dayjs.locale('ko');
-        return 'ko';
     }
   };
 
@@ -336,6 +323,21 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
     try {
       setLoading(true);
 
+      // 템플릿 모드일 때 메시지 처리
+      let finalMaintenanceMessage = data.maintenanceMessage;
+      let finalMaintenanceLocales = maintenanceLocales.filter(l => l.message.trim() !== '');
+
+      if (data.clientStatus === ClientStatus.MAINTENANCE && inputMode === 'template' && selectedTemplateId) {
+        const selectedTemplate = templates.find(t => t.id === selectedTemplateId);
+        if (selectedTemplate) {
+          finalMaintenanceMessage = selectedTemplate.defaultMessage || '';
+          finalMaintenanceLocales = (selectedTemplate.locales || []).map(l => ({
+            lang: l.lang as 'ko' | 'en' | 'zh',
+            message: l.message || ''
+          })).filter(l => l.message.trim() !== '');
+        }
+      }
+
       // 빈 문자열을 undefined로 변환하고 태그 데이터 포함
       const cleanedData = {
         ...data,
@@ -344,9 +346,9 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
         customPayload: data.customPayload || undefined,
         maintenanceStartDate: data.maintenanceStartDate || undefined,
         maintenanceEndDate: data.maintenanceEndDate || undefined,
-        maintenanceMessage: data.maintenanceMessage || undefined,
+        maintenanceMessage: finalMaintenanceMessage || undefined,
         supportsMultiLanguage: data.supportsMultiLanguage || false,
-        maintenanceLocales: maintenanceLocales.filter(l => l.message.trim() !== ''),
+        maintenanceLocales: finalMaintenanceLocales,
         platforms: data.platforms.map(platform => ({
           ...platform,
           gameServerAddressForWhiteList: platform.gameServerAddressForWhiteList || undefined,
@@ -389,24 +391,63 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   };
 
   return (
-    <Dialog
+    <Drawer
+      anchor="right"
       open={open}
       onClose={handleClose}
-      maxWidth="md"
-      fullWidth
-      PaperProps={{
-        sx: { minHeight: '80vh' }
+      sx={{
+        zIndex: 1300,
+        '& .MuiDrawer-paper': {
+          width: { xs: '100%', sm: 700 },
+          maxWidth: '100vw',
+          display: 'flex',
+          flexDirection: 'column'
+        }
+      }}
+      ModalProps={{
+        keepMounted: false
       }}
     >
-      <FormDialogHeader
-        title={t('clientVersions.bulkAdd')}
-        description={t('clientVersions.form.bulkDescription')}
-      />
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%'
+        }}
+      >
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Box>
+            <Typography variant="h6" component="h2">
+              {t('clientVersions.bulkAdd')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {t('clientVersions.form.bulkDescription')}
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={handleClose}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogContent dividers>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Stack spacing={3} sx={{ mt: 1 }}>
-            {/* 기본 정보 섹션 */}
             <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
               <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                 📋 {t('clientVersions.form.basicInfo')}
@@ -416,7 +457,6 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
               </Typography>
 
               <Stack spacing={2}>
-                {/* 버전 필드 */}
                 <Controller
                   name="clientVersion"
                   control={control}
@@ -425,6 +465,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                       {...field}
                       value={field.value || ''}
                       fullWidth
+                      autoFocus
                       label={
                         <Box component="span">
                           {t('clientVersions.version')} <Typography component="span" color="error">*</Typography>
@@ -443,7 +484,6 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                   )}
                 />
 
-                {/* 플랫폼 선택 (멀티셀렉트) */}
                 <FormControl fullWidth error={!!errors.platforms}>
                   <InputLabel id="bulk-platform-label">
                     {t('clientVersions.selectPlatforms')} <Typography component="span" color="error">*</Typography>
@@ -454,6 +494,16 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                     value={selectedPlatforms}
                     onChange={handlePlatformChange}
                     input={<OutlinedInput label={`${t('clientVersions.selectPlatforms')} *`} />}
+                    MenuProps={{
+                      anchorOrigin: {
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                      },
+                      transformOrigin: {
+                        vertical: 'top',
+                        horizontal: 'left',
+                      }
+                    }}
                     renderValue={(selected) => (
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                         {selected.map((value) => (
@@ -475,7 +525,6 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                   )}
                 </FormControl>
 
-                {/* 상태 */}
                 <Controller
                   name="clientStatus"
                   control={control}
@@ -489,6 +538,16 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                         {...field}
                         value={field.value || ClientStatus.OFFLINE}
                         label={`${t('clientVersions.statusLabel')} *`}
+                        MenuProps={{
+                          anchorOrigin: {
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                          },
+                          transformOrigin: {
+                            vertical: 'top',
+                            horizontal: 'left',
+                          }
+                        }}
                       >
                         {Object.values(ClientStatus).map((status) => (
                           <MenuItem key={status} value={status}>
@@ -504,128 +563,40 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                 />
 
 	                {isMaintenanceMode && (
-	                  <Box sx={{ mt: 2, p: 2, border: '1px solid', borderColor: 'warning.light', borderRadius: 1, bgcolor: 'background.default' }}>
-
-	                    <Typography variant="subtitle1" gutterBottom sx={{ color: 'warning.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-	                      <BuildIcon fontSize="small" sx={{ mr: 0.5 }} /> {t('clientVersions.maintenance.title')}
-	                    </Typography>
-	                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-	                      {t('clientVersions.maintenance.description')}
-	                    </Typography>
-
-	                    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
-	                      <Stack spacing={2}>
-	                        {/* 810ac80  2dc c791 c77c */}
-	                        <Controller
-	                          name="maintenanceStartDate"
-	                          control={control}
-	                          render={({ field }) => (
-	                            <DateTimePicker
-	                              label={t('clientVersions.maintenance.startDate')}
-	                              value={field.value ? dayjs(field.value) : null}
-	                              onChange={(date) => field.onChange(date ? date.toISOString() : '')}
-	                              slotProps={{
-	                                textField: {
-	                                  fullWidth: true,
-	                                  helperText: t('clientVersions.maintenance.startDateHelp'),
-	                                  error: !!errors.maintenanceStartDate,
-	                                },
-	                              }}
-	                            />
-	                          )}
-	                        />
-
-	                        {/* 810ac80  885 b8cc c77c */}
-	                        <Controller
-	                          name="maintenanceEndDate"
-	                          control={control}
-	                          render={({ field }) => (
-	                            <DateTimePicker
-	                              label={t('clientVersions.maintenance.endDate')}
-	                              value={field.value ? dayjs(field.value) : null}
-	                              onChange={(date) => field.onChange(date ? date.toISOString() : '')}
-	                              slotProps={{
-	                                textField: {
-	                                  fullWidth: true,
-	                                  helperText: t('clientVersions.maintenance.endDateHelp'),
-	                                  error: !!errors.maintenanceEndDate,
-	                                },
-	                              }}
-	                            />
-	                          )}
-	                        />
-
-	                        {/*
-cc00 b110 810ac80  911 c2dc c9c0 */}
-	                        <Controller
-	                          name="maintenanceMessage"
-	                          control={control}
-	                          render={({ field }) => (
-	                            <TextField
-	                              {...field}
-	                              fullWidth
-	                              multiline
-	                              rows={3}
-	                              label={t('clientVersions.maintenance.defaultMessage')}
-	                              helperText={t('clientVersions.maintenance.defaultMessageHelp')}
-	                              error={!!errors.maintenanceMessage}
-	                              required={watch('clientStatus') === 'maintenance'}
-	                            />
-	                          )}
-	                        />
-
-	                        {/* 5b8 c5b4 bcc4 911 c2dc c9c0 0ac c6a9 5ec bd80 */}
-	                        <FormControlLabel
-	                          control={
-	                            <Switch
-	                              checked={supportsMultiLanguage}
-	                              onChange={(e) => handleSupportsMultiLanguageChange(e.target.checked)}
-	                            />
-	                          }
-	                          label={t('clientVersions.maintenance.supportsMultiLanguage')}
-	                        />
-	                        <Typography variant="caption" color="text.secondary">
-	                          {t('clientVersions.maintenance.supportsMultiLanguageHelp')}
-	                        </Typography>
-
-	                        {/* 5b8 c5b4 bcc4 911 c2dc c9c0 */}
-	                        {supportsMultiLanguage && (
-	                          <Box>
-	                            <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
-	                              {t('clientVersions.maintenance.languageSpecificMessages')}
-	                            </Typography>
-
-	                            {/* a50 b113 5b8 c5b4 bcc4 911 c2dc c9c0 785 b825 */}
-	                            {availableLanguages.map((lang) => {
-	                              const locale = maintenanceLocales.find(l => l.lang === lang.code);
-	                              return (
-	                                <Box key={lang.code} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-	                                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
-	                                    {lang.label}
-	                                  </Typography>
-	                                  <TextField
-	                                    fullWidth
-	                                    multiline
-	                                    rows={3}
-	                                    value={locale?.message || ''}
-	                                    onChange={(e) => updateMaintenanceLocale(lang.code, e.target.value)}
-	                                    placeholder={t(`maintenanceMessage.${lang.code}Help`)}
-	                                  />
-	                                </Box>
-	                              );
-	                            })}
-	                          </Box>
-	                        )}
-	                      </Stack>
-	                    </LocalizationProvider>
-	                  </Box>
+	                  <MaintenanceSettingsInput
+	                    startDate={watch('maintenanceStartDate') || ''}
+	                    endDate={watch('maintenanceEndDate') || ''}
+	                    onStartDateChange={(date) => setValue('maintenanceStartDate', date)}
+	                    onEndDateChange={(date) => setValue('maintenanceEndDate', date)}
+	                    inputMode={inputMode}
+	                    onInputModeChange={setInputMode}
+	                    maintenanceMessage={watch('maintenanceMessage') || ''}
+	                    onMaintenanceMessageChange={(message) => setValue('maintenanceMessage', message)}
+	                    supportsMultiLanguage={supportsMultiLanguage}
+	                    onSupportsMultiLanguageChange={handleSupportsMultiLanguageChange}
+	                    maintenanceLocales={maintenanceLocales.map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
+	                    onMaintenanceLocalesChange={(locales) => {
+	                      setMaintenanceLocales(locales);
+	                      setValue('maintenanceLocales', locales);
+	                      // 번역 결과가 있으면 자동으로 언어별 메시지 사용 활성화
+	                      const hasNonEmptyLocales = locales.some(l => l.message && l.message.trim() !== '');
+	                      if (hasNonEmptyLocales && !supportsMultiLanguage) {
+	                        setSupportsMultiLanguage(true);
+	                        setValue('supportsMultiLanguage', true);
+	                      }
+	                    }}
+	                    templates={templates}
+	                    selectedTemplateId={selectedTemplateId}
+	                    onSelectedTemplateIdChange={setSelectedTemplateId}
+	                    messageError={!!errors.maintenanceMessage}
+	                    messageRequired={true}
+	                  />
 	                )}
 
               </Stack>
             </Paper>
 
 
-            {/* 태그 선택 섹션: 추가 설정 위로 이동 */}
             <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
               <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
                 🏷️ {t('common.tags')}
@@ -644,6 +615,14 @@ cc00 b110 810ac80  911 c2dc c9c0 */}
                 onChange={(_, value) => {
                   setSelectedTags(value);
                   setValue('tags', value);
+                }}
+                slotProps={{
+                  popper: {
+                    style: {
+                      zIndex: 99999
+                    },
+                    placement: 'bottom-start'
+                  }
                 }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => {
@@ -677,7 +656,6 @@ cc00 b110 810ac80  911 c2dc c9c0 */}
               />
             </Paper>
 
-            {/* 추가 설정 섹션 */}
             <Accordion defaultExpanded={false} disableGutters sx={{ border: '1px solid', borderColor: 'divider', bgcolor: 'background.default' }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="subtitle1" sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -690,7 +668,6 @@ cc00 b110 810ac80  911 c2dc c9c0 */}
                 </Typography>
 
               <Stack spacing={2}>
-                {/* 게스트 모드 허용 */}
                 <Controller
                   name="guestModeAllowed"
                   control={control}
@@ -707,7 +684,6 @@ cc00 b110 810ac80  911 c2dc c9c0 */}
                   )}
                 />
 
-                {/* 외부 클릭 링크 */}
                 <Controller
                   name="externalClickLink"
                   control={control}
@@ -729,7 +705,6 @@ cc00 b110 810ac80  911 c2dc c9c0 */}
                   )}
                 />
 
-                {/* 메모 */}
                 <Controller
                   name="memo"
                   control={control}
@@ -750,7 +725,6 @@ cc00 b110 810ac80  911 c2dc c9c0 */}
             </AccordionDetails>
             </Accordion>
 
-            {/* 플랫폼별 서버 주소 설정 */}
             {selectedPlatforms.length > 0 && (
               <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
                 <Typography variant="h6" gutterBottom sx={{ color: 'primary.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -867,9 +841,17 @@ cc00 b110 810ac80  911 c2dc c9c0 */}
             )}
 
           </Stack>
-        </DialogContent>
+        </Box>
 
-        <DialogActions>
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 1,
+          justifyContent: 'flex-end'
+        }}>
           <Button onClick={handleClose} disabled={loading} startIcon={<CancelIcon />}>
             {t('common.cancel')}
           </Button>
@@ -881,9 +863,9 @@ cc00 b110 810ac80  911 c2dc c9c0 */}
           >
             {loading ? t('clientVersions.creating') : t('clientVersions.bulkCreate')}
           </Button>
-        </DialogActions>
+        </Box>
       </form>
-    </Dialog>
+    </Drawer>
   );
 };
 

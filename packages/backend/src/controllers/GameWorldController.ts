@@ -30,6 +30,7 @@ const createGameWorldSchema = Joi.object({
       message: Joi.string().required(),
     })
   ).optional().default([]),
+  customPayload: Joi.object().unknown(true).optional().default({}),
   tagIds: Joi.array().items(Joi.number().integer().min(1)).optional()
 });
 
@@ -55,6 +56,7 @@ const updateGameWorldSchema = Joi.object({
       message: Joi.string().required(),
     })
   ).optional().default([]),
+  customPayload: Joi.object().unknown(true).optional(),
   tagIds: Joi.array().items(Joi.number().integer().min(1)).optional()
 });
 

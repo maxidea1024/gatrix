@@ -1,47 +1,32 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/UserController';
-import { authenticate, requireAdmin } from '../middleware/auth';
+import { authenticate } from '../middleware/auth';
+import { generalLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
 
-// All routes require authentication
+// 모든 라우트에 인증 미들웨어 적용
 router.use(authenticate as any);
 
-// Self-service routes (available to all authenticated users)
-router.get('/me', UserController.getCurrentUser);
-router.put('/me', UserController.updateCurrentUser);
-router.put('/me/language', UserController.updateLanguage);
+// 사용자 검색 (채팅 시스템용)
+router.get(
+  '/search',
+  generalLimiter as any, // Rate limiting
+  UserController.searchUsers
+);
 
-// Admin-only routes
-router.use(requireAdmin as any);
+// 현재 사용자 정보 조회
+router.get(
+  '/me',
+  generalLimiter as any, // Rate limiting
+  UserController.getCurrentUser
+);
 
-// User management routes
-router.get('/', UserController.getAllUsers);
-router.post('/', UserController.createUser);
-router.get('/stats', UserController.getUserStats);
-router.get('/pending', UserController.getPendingUsers);
-router.get('/:id', UserController.getUserById);
-router.put('/:id', UserController.updateUser);
-router.delete('/:id', UserController.deleteUser);
-
-// User status management
-router.post('/:id/approve', UserController.approveUser);
-router.post('/:id/reject', UserController.rejectUser);
-router.post('/:id/suspend', UserController.suspendUser);
-router.post('/:id/unsuspend', UserController.unsuspendUser);
-
-// Role management
-router.post('/:id/promote', UserController.promoteToAdmin);
-router.post('/:id/demote', UserController.demoteFromAdmin);
-
-// Tag management
-router.get('/:id/tags', UserController.getUserTags);
-router.put('/:id/tags', UserController.setUserTags);
-router.post('/:id/tags', UserController.addUserTag);
-router.delete('/:id/tags/:tagId', UserController.removeUserTag);
-
-// Email verification management
-router.post('/:id/verify-email', UserController.verifyUserEmail);
-router.post('/:id/resend-verification', UserController.resendVerificationEmail);
+// 현재 사용자 정보 업데이트
+router.put(
+  '/me',
+  generalLimiter as any, // Rate limiting
+  UserController.updateCurrentUser
+);
 
 export default router;

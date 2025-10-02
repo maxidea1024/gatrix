@@ -36,6 +36,7 @@ import {
   Autocomplete,
   Tooltip,
   Checkbox,
+  Drawer,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -48,6 +49,7 @@ import {
   Security as SecurityIcon,
   Person as PersonIcon,
   Cancel as CancelIcon,
+  Close as CloseIcon,
   Email as EmailIcon,
   VerifiedUser as VerifiedUserIcon,
   Send as SendIcon,
@@ -60,6 +62,7 @@ import {
   PersonRemove as PersonRemoveIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -71,7 +74,13 @@ import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import { useAuth } from '@/hooks/useAuth';
 import SimplePagination from '../../components/common/SimplePagination';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
+import { invitationService } from '../../services/invitationService';
+import { Invitation, CreateInvitationRequest } from '../../types/invitation';
+import InvitationForm from '../../components/admin/InvitationForm';
+import InvitationStatusCard from '../../components/admin/InvitationStatusCard';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
+import { useDebounce } from '../../hooks/useDebounce';
+// SSE는 MainLayout에서 전역으로 처리하므로 여기서는 제거
 
 interface UsersResponse {
   users: User[];
@@ -114,6 +123,9 @@ const UsersManagementPage: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState('');
   const [tagFilter, setTagFilter] = useState<Tag[]>([]);
 
+  // 디바운싱된 검색어
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
   // 일괄 선택 관련 상태
   const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
   const [bulkActionDialogOpen, setBulkActionDialogOpen] = useState(false);
@@ -131,6 +143,10 @@ const UsersManagementPage: React.FC = () => {
     message: '',
     action: () => {},
   });
+
+  // 초대 관련 상태
+  const [invitationDialogOpen, setInvitationDialogOpen] = useState(false);
+  const [currentInvitation, setCurrentInvitation] = useState<Invitation | null>(null);
 
   const [addUserDialog, setAddUserDialog] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
@@ -179,6 +195,23 @@ const UsersManagementPage: React.FC = () => {
   // 이메일 인증 관련 상태
   const [emailVerificationLoading, setEmailVerificationLoading] = useState(false);
 
+  // 현재 초대 정보 로드
+  const loadCurrentInvitation = async () => {
+    try {
+      const invitation = await invitationService.getCurrentInvitation();
+      console.log('Loaded current invitation:', invitation);
+      setCurrentInvitation(invitation);
+    } catch (error: any) {
+      // 초대가 없는 경우 404 에러는 정상적인 상황
+      if (error.status !== 404) {
+        console.error('Failed to load current invitation:', error);
+      } else {
+        console.log('No active invitation found (404)');
+        setCurrentInvitation(null);
+      }
+    }
+  };
+
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -187,7 +220,7 @@ const UsersManagementPage: React.FC = () => {
         limit: rowsPerPage.toString(),
       });
 
-      if (searchTerm) params.append('search', searchTerm);
+      if (debouncedSearchTerm) params.append('search', debouncedSearchTerm);
       if (statusFilter) params.append('status', statusFilter);
       if (roleFilter) params.append('role', roleFilter);
 
@@ -208,7 +241,7 @@ const UsersManagementPage: React.FC = () => {
       setUsers(response.data.users);
       setTotal(response.data.total);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('admin.users.fetchError'), { variant: 'error' });
+      enqueueSnackbar(error.message || t('users.fetchError'), { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -216,7 +249,24 @@ const UsersManagementPage: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [page, rowsPerPage, searchTerm, statusFilter, roleFilter, tagFilter]);
+  }, [page, rowsPerPage, debouncedSearchTerm, statusFilter, roleFilter, tagFilter]);
+
+  // 초대링크 이벤트 처리 (MainLayout에서 전달받음)
+  useEffect(() => {
+    const handleInvitationChange = (event: CustomEvent) => {
+      const sseEvent = event.detail;
+      if (sseEvent.type === 'invitation_created' || sseEvent.type === 'invitation_deleted') {
+        // 초대링크 상태가 변경되면 현재 초대 정보를 다시 로드
+        loadCurrentInvitation();
+      }
+    };
+
+    window.addEventListener('invitation-change', handleInvitationChange as EventListener);
+
+    return () => {
+      window.removeEventListener('invitation-change', handleInvitationChange as EventListener);
+    };
+  }, []);
 
   // Load available tags
   useEffect(() => {
@@ -229,6 +279,7 @@ const UsersManagementPage: React.FC = () => {
       }
     };
     loadTags();
+    loadCurrentInvitation(); // 초대 기능 활성화
   }, []);
 
   // 체크박스 핸들러
@@ -252,8 +303,28 @@ const UsersManagementPage: React.FC = () => {
 
   // 일괄 처리 핸들러
   const handleBulkAction = (actionType: 'status' | 'role' | 'tags' | 'emailVerified' | 'delete') => {
+    // 오픈 시 값 초기화 (이전에 선택한 값 유지 방지)
     setBulkActionType(actionType);
+    setBulkActionValue('');
+    setBulkActionTags([]);
     setBulkActionDialogOpen(true);
+  };
+
+  // 일괄 작업 저장 버튼 활성화 조건 확인
+  const isBulkActionValid = () => {
+    switch (bulkActionType) {
+      case 'status':
+      case 'role':
+      case 'emailVerified':
+        return bulkActionValue !== '';
+      case 'tags':
+        // 태그는 빈 배열도 허용 (태그 제거 목적)
+        return true;
+      case 'delete':
+        return true;
+      default:
+        return false;
+    }
   };
 
   const executeBulkAction = async () => {
@@ -268,32 +339,32 @@ const UsersManagementPage: React.FC = () => {
             userIds,
             status: bulkActionValue
           });
-          enqueueSnackbar(t('admin.users.bulkStatusUpdated'), { variant: 'success' });
+          enqueueSnackbar(t('users.bulkStatusUpdated'), { variant: 'success' });
           break;
         case 'role':
           await apiService.post('/admin/users/bulk/role', {
             userIds,
             role: bulkActionValue
           });
-          enqueueSnackbar(t('admin.users.bulkRoleUpdated'), { variant: 'success' });
+          enqueueSnackbar(t('users.bulkRoleUpdated'), { variant: 'success' });
           break;
         case 'emailVerified':
           await apiService.post('/admin/users/bulk/email-verified', {
             userIds,
             emailVerified: bulkActionValue === 'true'
           });
-          enqueueSnackbar(t('admin.users.bulkEmailVerifiedUpdated'), { variant: 'success' });
+          enqueueSnackbar(t('users.bulkEmailVerifiedUpdated'), { variant: 'success' });
           break;
         case 'tags':
           await apiService.post('/admin/users/bulk/tags', {
             userIds,
             tagIds: bulkActionTags.map(tag => tag.id)
           });
-          enqueueSnackbar(t('admin.users.bulkTagsUpdated'), { variant: 'success' });
+          enqueueSnackbar(t('users.bulkTagsUpdated'), { variant: 'success' });
           break;
         case 'delete':
           await apiService.post('/admin/users/bulk/delete', { userIds });
-          enqueueSnackbar(t('admin.users.bulkDeleted'), { variant: 'success' });
+          enqueueSnackbar(t('users.bulkDeleted'), { variant: 'success' });
           break;
       }
 
@@ -303,7 +374,7 @@ const UsersManagementPage: React.FC = () => {
       setBulkActionValue('');
       setBulkActionTags([]);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('admin.users.bulkActionFailed'), { variant: 'error' });
+      enqueueSnackbar(error.message || t('users.bulkActionFailed'), { variant: 'error' });
     }
   };
 
@@ -447,10 +518,10 @@ const UsersManagementPage: React.FC = () => {
     };
 
     if (!editUserData.name.trim()) {
-      errors.name = t('admin.users.form.nameRequired');
+      errors.name = t('users.form.nameRequired');
     }
     if (!editUserData.email.trim()) {
-      errors.email = t('admin.users.form.emailRequired');
+      errors.email = t('users.form.emailRequired');
     }
 
     setEditUserErrors(errors);
@@ -481,12 +552,12 @@ const UsersManagementPage: React.FC = () => {
         await apiService.put(`/admin/users/${editUserDialog.user.id}`, updateData);
       }
 
-      enqueueSnackbar(t('admin.users.userUpdated'), { variant: 'success' });
+      enqueueSnackbar(t('users.userUpdated'), { variant: 'success' });
       fetchUsers();
       setEditUserDialog({ open: false, user: null });
     } catch (error: any) {
       // API 오류 응답에서 구체적인 메시지 추출
-      const errorMessage = error.error?.message || error.message || t('admin.users.updateError');
+      const errorMessage = error.error?.message || error.message || t('users.updateError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
@@ -494,7 +565,7 @@ const UsersManagementPage: React.FC = () => {
   const handleDeleteUser = (user: User) => {
     // Prevent deleting own account
     if (isCurrentUser(user)) {
-      enqueueSnackbar(t('admin.users.cannotModifyOwnAccount'), { variant: 'error' });
+      enqueueSnackbar(t('users.cannotModifyOwnAccount'), { variant: 'error' });
       return;
     }
 
@@ -525,7 +596,7 @@ const UsersManagementPage: React.FC = () => {
     try {
       setEmailVerificationLoading(true);
       await UserService.verifyUserEmail(userId);
-      enqueueSnackbar(t('admin.users.emailVerified'), { variant: 'success' });
+      enqueueSnackbar(t('users.emailVerified'), { variant: 'success' });
       fetchUsers();
       // 편집 폼이 열려있다면 데이터 업데이트
       if (editUserDialog.open && editUserDialog.user?.id === userId) {
@@ -535,7 +606,7 @@ const UsersManagementPage: React.FC = () => {
         }));
       }
     } catch (error: any) {
-      const errorMessage = error.message || t('admin.users.emailVerificationError');
+      const errorMessage = error.message || t('users.emailVerificationError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setEmailVerificationLoading(false);
@@ -547,9 +618,9 @@ const UsersManagementPage: React.FC = () => {
     try {
       setEmailVerificationLoading(true);
       await UserService.resendVerificationEmail(userId);
-      enqueueSnackbar(t('admin.users.verificationEmailSent'), { variant: 'success' });
+      enqueueSnackbar(t('users.verificationEmailSent'), { variant: 'success' });
     } catch (error: any) {
-      const errorMessage = error.message || t('admin.users.verificationEmailError');
+      const errorMessage = error.message || t('users.verificationEmailError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setEmailVerificationLoading(false);
@@ -604,13 +675,13 @@ const UsersManagementPage: React.FC = () => {
     };
 
     if (!newUserData.name.trim()) {
-      errors.name = t('admin.users.form.nameRequired');
+      errors.name = t('users.form.nameRequired');
     }
     if (!newUserData.email.trim()) {
-      errors.email = t('admin.users.form.emailRequired');
+      errors.email = t('users.form.emailRequired');
     }
     if (!newUserData.password.trim()) {
-      errors.password = t('admin.users.form.passwordRequired');
+      errors.password = t('users.form.passwordRequired');
     }
 
     setNewUserErrors(errors);
@@ -637,6 +708,36 @@ const UsersManagementPage: React.FC = () => {
       const errorMessage = error.error?.message || error.message || t('users.createError');
       enqueueSnackbar(errorMessage, { variant: 'error' });
     }
+  };
+
+  // 초대 관련 핸들러
+  const handleCreateInvitation = async (data: CreateInvitationRequest) => {
+    try {
+      const response = await invitationService.createInvitation(data);
+      setInvitationDialogOpen(false); // 초대 폼 닫기
+      await loadCurrentInvitation(); // 현재 초대 정보 새로고침
+      // 성공 토스트는 SSE 이벤트에서 처리 (중복 방지)
+    } catch (error: any) {
+      console.error('Failed to create invitation:', error);
+      enqueueSnackbar(error.message || '초대 링크 생성에 실패했습니다.', { variant: 'error' });
+    }
+  };
+
+  const handleDeleteInvitation = async () => {
+    if (!currentInvitation) return;
+
+    try {
+      await invitationService.deleteInvitation(currentInvitation.id);
+      setCurrentInvitation(null);
+      // 성공 토스트는 SSE 이벤트에서 처리 (중복 방지)
+    } catch (error: any) {
+      console.error('Failed to delete invitation:', error);
+      enqueueSnackbar(error.message || '초대 링크 삭제에 실패했습니다.', { variant: 'error' });
+    }
+  };
+
+  const handleUpdateInvitation = () => {
+    setInvitationDialogOpen(true);
   };
 
   const getStatusColor = (status: string) => {
@@ -666,134 +767,164 @@ const UsersManagementPage: React.FC = () => {
       {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-          {t('admin.users.title')}
+          {t('users.title')}
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          {t('admin.users.subtitle')}
+          {t('users.subtitle')}
         </Typography>
       </Box>
 
       {/* Filters */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={3}>
-              <TextField
-                fullWidth
-                placeholder={t('admin.users.searchPlaceholder')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <FormControl fullWidth>
-                <InputLabel shrink={true}>{t('admin.users.statusFilter')}</InputLabel>
-                <Select
-                  value={statusFilter}
-                  label={t('admin.users.statusFilter')}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  displayEmpty
-                  sx={{
-                    minWidth: 120,
-                    '& .MuiSelect-select': {
-                      overflow: 'visible',
-                      textOverflow: 'clip',
-                      whiteSpace: 'nowrap',
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {/* 필터 그룹 */}
+            <Grid container spacing={2} alignItems="center" sx={{ flex: 1 }}>
+              <Grid size={{ xs: 12, md: 3 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  placeholder={t('users.searchPlaceholder')}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 2 }}>
+                <FormControl fullWidth size="small">
+                  <InputLabel shrink={true}>{t('users.statusFilter')}</InputLabel>
+                  <Select
+                    value={statusFilter}
+                    label={t('users.statusFilter')}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    displayEmpty
+                    size="small"
+
+                    sx={{
+                      minWidth: 120,
+                      '& .MuiSelect-select': {
+                        overflow: 'visible',
+                        textOverflow: 'clip',
+                        whiteSpace: 'nowrap',
+                      }
+                    }}
+                  >
+                    <MenuItem value="">{t('common.allStatuses')}</MenuItem>
+                    <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
+                    <MenuItem value="pending">{t('users.statuses.pending')}</MenuItem>
+                    <MenuItem value="suspended">{t('users.statuses.suspended')}</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, md: 2 }}>
+                <FormControl fullWidth size="small">
+                  <InputLabel shrink={true}>{t('users.roleFilter')}</InputLabel>
+                  <Select
+                    value={roleFilter}
+                    label={t('users.roleFilter')}
+                    onChange={(e) => setRoleFilter(e.target.value)}
+                    displayEmpty
+                    size="small"
+
+                    sx={{
+                      minWidth: 120,
+                      '& .MuiSelect-select': {
+                        overflow: 'visible',
+                        textOverflow: 'clip',
+                        whiteSpace: 'nowrap',
+                      }
+                    }}
+                  >
+                    <MenuItem value="">{t('common.allRoles')}</MenuItem>
+                    <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
+                    <MenuItem value="user">{t('users.roles.user')}</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, md: 5 }}>
+                <Autocomplete
+                  multiple
+                  sx={{ minWidth: 350 }}
+                  options={availableTags}
+                  getOptionLabel={(option) => option.name}
+                  filterSelectedOptions
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                  value={tagFilter}
+                  onChange={(_, value) => setTagFilter(value)}
+                  slotProps={{
+                    popper: {
+                      style: {
+                        zIndex: 9999
+                      }
                     }
                   }}
-                >
-                  <MenuItem value="">{t('common.allStatuses')}</MenuItem>
-                  <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
-                  <MenuItem value="pending">{t('users.statuses.pending')}</MenuItem>
-                  <MenuItem value="suspended">{t('users.statuses.suspended')}</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <FormControl fullWidth>
-                <InputLabel shrink={true}>{t('admin.users.roleFilter')}</InputLabel>
-                <Select
-                  value={roleFilter}
-                  label={t('admin.users.roleFilter')}
-                  onChange={(e) => setRoleFilter(e.target.value)}
-                  displayEmpty
-                  sx={{
-                    minWidth: 120,
-                    '& .MuiSelect-select': {
-                      overflow: 'visible',
-                      textOverflow: 'clip',
-                      whiteSpace: 'nowrap',
-                    }
-                  }}
-                >
-                  <MenuItem value="">{t('common.allRoles')}</MenuItem>
-                  <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
-                  <MenuItem value="user">{t('users.roles.user')}</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={5}>
-              <Autocomplete
-                multiple
-                sx={{ minWidth: 350 }}
-                options={availableTags}
-                getOptionLabel={(option) => option.name}
-                filterSelectedOptions
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                value={tagFilter}
-                onChange={(_, value) => setTagFilter(value)}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...chipProps } = getTagProps({ index });
+                  renderTags={(value, getTagProps) =>
+                    value.map((option, index) => {
+                      const { key, ...chipProps } = getTagProps({ index });
+                      return (
+                        <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                          <Chip
+                            variant="outlined"
+                            label={option.name}
+                            size="small"
+                            sx={{ bgcolor: option.color, color: '#fff' }}
+                            {...chipProps}
+                          />
+                        </Tooltip>
+                      );
+                    })
+                  }
+                  renderInput={(params) => (
+                    <TextField {...params} label={t('users.tagFilter')} size="small" />
+                  )}
+                  renderOption={(props, option) => {
+                    const { key, ...otherProps } = props;
                     return (
-                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                      <Box component="li" key={key} {...otherProps}>
                         <Chip
-                          variant="outlined"
                           label={option.name}
                           size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
-                          {...chipProps}
+                          sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
                         />
-                      </Tooltip>
+                        {option.description || t('common.noDescription')}
+                      </Box>
                     );
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label={t('admin.users.tagFilter')} />
-                )}
-                renderOption={(props, option) => {
-                  const { key, ...otherProps } = props;
-                  return (
-                    <Box component="li" key={key} {...otherProps}>
-                      <Chip
-                        label={option.name}
-                        size="small"
-                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
-                      />
-                      {option.description || t('common.noDescription')}
-                    </Box>
-                  );
-                }}
-              />
+                  }}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={2}>
+
+            {/* 버튼 그룹 */}
+            <Box sx={{ display: 'flex', gap: 1, ml: 2 }}>
               <Button
-                fullWidth
                 variant="contained"
                 startIcon={<PersonAddIcon />}
                 onClick={handleAddUser}
               >
-                {t('admin.users.addUser')}
+                {t('users.addUser')}
               </Button>
-            </Grid>
-          </Grid>
+              <Box sx={{
+                width: '1px',
+                bgcolor: 'divider',
+                mx: 0.5,
+                alignSelf: 'stretch'
+              }} />
+              <Button
+                variant="outlined"
+                startIcon={<SendIcon />}
+                onClick={() => setInvitationDialogOpen(true)}
+                disabled={!!currentInvitation}
+              >
+                {t('invitations.createInvitation')}
+              </Button>
+            </Box>
+          </Box>
         </CardContent>
       </Card>
 
@@ -803,7 +934,7 @@ const UsersManagementPage: React.FC = () => {
           <CardContent sx={{ py: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, justifyContent: 'space-between' }}>
               <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                {selectedUsers.size} {t('admin.users.selectedUsers')}
+                {selectedUsers.size} {t('users.selectedUsers')}
               </Typography>
               <Box sx={{ display: 'flex', gap: 1 }}>
                 <Button
@@ -813,7 +944,7 @@ const UsersManagementPage: React.FC = () => {
                   onClick={() => handleBulkAction('status')}
                   startIcon={<PersonIcon />}
                 >
-                  {t('admin.users.bulkUpdateStatus')}
+                  {t('users.bulkUpdateStatus')}
                 </Button>
                 <Button
                   size="small"
@@ -822,7 +953,7 @@ const UsersManagementPage: React.FC = () => {
                   onClick={() => handleBulkAction('role')}
                   startIcon={<AdminIcon />}
                 >
-                  {t('admin.users.bulkUpdateRole')}
+                  {t('users.bulkUpdateRole')}
                 </Button>
                 <Button
                   size="small"
@@ -831,7 +962,7 @@ const UsersManagementPage: React.FC = () => {
                   onClick={() => handleBulkAction('emailVerified')}
                   startIcon={<CheckCircleIcon />}
                 >
-                  {t('admin.users.bulkVerifyEmail')}
+                  {t('users.bulkVerifyEmail')}
                 </Button>
                 <Button
                   size="small"
@@ -840,7 +971,7 @@ const UsersManagementPage: React.FC = () => {
                   onClick={() => handleBulkAction('tags')}
                   startIcon={<TagIcon />}
                 >
-                  {t('admin.users.bulkUpdateTags')}
+                  {t('users.bulkUpdateTags')}
                 </Button>
                 <Button
                   size="small"
@@ -849,7 +980,7 @@ const UsersManagementPage: React.FC = () => {
                   onClick={() => handleBulkAction('delete')}
                   startIcon={<DeleteIcon />}
                 >
-                  {t('admin.users.bulkDelete')}
+                  {t('users.bulkDelete')}
                 </Button>
               </Box>
             </Box>
@@ -857,10 +988,18 @@ const UsersManagementPage: React.FC = () => {
         </Card>
       )}
 
+      {/* Current Invitation Status */}
+      {currentInvitation && (
+        <InvitationStatusCard
+          invitation={currentInvitation}
+          onUpdate={handleUpdateInvitation}
+          onDelete={handleDeleteInvitation}
+        />
+      )}
+
       {/* Users Table */}
       <Card>
         <CardContent sx={{ p: 0 }}>
-          {loading && <LinearProgress />}
           <TableContainer>
             <Table>
               <TableHead>
@@ -937,14 +1076,14 @@ const UsersManagementPage: React.FC = () => {
                     <TableCell align="center">
                       {user.emailVerified ? (
                         <Chip
-                          label={t('admin.users.verified')}
+                          label={t('users.verified')}
                           color="success"
                           size="small"
                           variant="outlined"
                         />
                       ) : (
                         <Chip
-                          label={t('admin.users.unverified')}
+                          label={t('users.unverified')}
                           color="warning"
                           size="small"
                           variant="outlined"
@@ -1025,17 +1164,20 @@ const UsersManagementPage: React.FC = () => {
             </Table>
           </TableContainer>
 
-          <SimplePagination
-            count={total}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={(_, newPage) => setPage(newPage)}
-            onRowsPerPageChange={(e) => {
-              setRowsPerPage(parseInt(e.target.value, 10));
-              setPage(0);
-            }}
-            rowsPerPageOptions={[5, 10, 25, 50, 100]}
-          />
+          {/* 페이지네이션 - 데이터가 있을 때만 표시 */}
+          {total > 0 && (
+            <SimplePagination
+              count={total}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={(_, newPage) => setPage(newPage)}
+              onRowsPerPageChange={(e) => {
+                setRowsPerPage(parseInt(e.target.value, 10));
+                setPage(0);
+              }}
+              rowsPerPageOptions={[5, 10, 25, 50, 100]}
+            />
+          )}
         </CardContent>
       </Card>
 
@@ -1113,13 +1255,13 @@ const UsersManagementPage: React.FC = () => {
               <ListItemIcon>
                 <VerifiedUserIcon />
               </ListItemIcon>
-              <ListItemText>{t('admin.users.verifyEmail')}</ListItemText>
+              <ListItemText>{t('users.verifyEmail')}</ListItemText>
             </MenuItem>
             <MenuItem onClick={() => handleMenuAction('resendVerification')}>
               <ListItemIcon>
                 <SendIcon />
               </ListItemIcon>
-              <ListItemText>{t('admin.users.resendVerification')}</ListItemText>
+              <ListItemText>{t('users.resendVerification')}</ListItemText>
             </MenuItem>
           </>
         )}
@@ -1136,19 +1278,56 @@ const UsersManagementPage: React.FC = () => {
         </MenuItem>
       </Menu>
 
-      {/* Add User Dialog */}
-      <Dialog
+      {/* Add User Drawer */}
+      <Drawer
+        anchor="right"
         open={addUserDialog}
         onClose={handleCloseAddUserDialog}
-        maxWidth="sm"
-        fullWidth
-        key={addUserDialog ? 'add-user-dialog-open' : 'add-user-dialog-closed'}
+        PaperProps={{
+          sx: {
+            width: { xs: '100%', sm: 600 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+        ModalProps={{
+          keepMounted: false
+        }}
       >
-        <FormDialogHeader
-          title={t('admin.users.addUserDialogTitle')}
-          description={t('admin.users.addUserDialogDescription')}
-        />
-        <DialogContent>
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Box>
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              {t('users.addUserDialogTitle')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              {t('users.addUserDialogDescription')}
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={handleCloseAddUserDialog}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Box
             component="form"
             autoComplete="off"
@@ -1164,7 +1343,8 @@ const UsersManagementPage: React.FC = () => {
                 placeholder=""
                 required
                 error={!!newUserErrors.name}
-                helperText={newUserErrors.name || t('admin.users.form.nameHelp')}
+                helperText={newUserErrors.name || t('users.form.nameHelp')}
+                autoFocus
               />
             </Box>
             <Box>
@@ -1178,7 +1358,7 @@ const UsersManagementPage: React.FC = () => {
                 placeholder=""
                 required
                 error={!!newUserErrors.email}
-                helperText={newUserErrors.email || t('admin.users.form.emailHelp')}
+                helperText={newUserErrors.email || t('users.form.emailHelp')}
               />
             </Box>
             <Box>
@@ -1192,7 +1372,7 @@ const UsersManagementPage: React.FC = () => {
                 placeholder=""
                 required
                 error={!!newUserErrors.password}
-                helperText={newUserErrors.password || t('admin.users.form.passwordHelp')}
+                helperText={newUserErrors.password || t('users.form.passwordHelp')}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -1200,7 +1380,7 @@ const UsersManagementPage: React.FC = () => {
                         onClick={() => setShowPassword(!showPassword)}
                         edge="end"
                         size="small"
-                        aria-label={showPassword ? t('admin.users.hidePassword') : t('admin.users.showPassword')}
+                        aria-label={showPassword ? t('users.hidePassword') : t('users.showPassword')}
                       >
                         {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                       </IconButton>
@@ -1215,6 +1395,7 @@ const UsersManagementPage: React.FC = () => {
                 value={newUserData.role}
                 label={t('users.role')}
                 onChange={(e) => setNewUserData({ ...newUserData, role: e.target.value as 'admin' | 'user' })}
+
               >
                 <MenuItem value="user">{t('users.roles.user')}</MenuItem>
                 <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
@@ -1232,6 +1413,13 @@ const UsersManagementPage: React.FC = () => {
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={newUserTags}
                 onChange={(_, value) => setNewUserTags(value)}
+                slotProps={{
+                  popper: {
+                    style: {
+                      zIndex: 9999
+                    }
+                  }
+                }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });
@@ -1271,49 +1459,155 @@ const UsersManagementPage: React.FC = () => {
               />
             </Box>
           </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseAddUserDialog} startIcon={<CancelIcon />}>
-            {t('common.cancel')}
-          </Button>
-          <Button onClick={handleCreateUser} variant="contained" startIcon={<AddIcon />}>
-            {t('admin.users.addUser')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
 
-      {/* Confirmation Dialog */}
-      <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog({ ...confirmDialog, open: false })}>
-        <DialogTitle>{confirmDialog.title}</DialogTitle>
-        <DialogContent>
-          <Typography>{confirmDialog.message}</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmDialog({ ...confirmDialog, open: false })}>
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 1,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={handleCloseAddUserDialog}
+            startIcon={<CancelIcon />}
+            variant="outlined"
+          >
             {t('common.cancel')}
           </Button>
-          <Button onClick={confirmDialog.action} color="error" variant="contained">
+          <Button
+            onClick={handleCreateUser}
+            variant="contained"
+            startIcon={<AddIcon />}
+          >
+            {t('users.addUser')}
+          </Button>
+        </Box>
+      </Drawer>
+
+      {/* Confirmation Drawer */}
+      <Drawer
+        anchor="right"
+        open={confirmDialog.open}
+        onClose={() => setConfirmDialog({ ...confirmDialog, open: false })}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 400 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {confirmDialog.title}
+          </Typography>
+          <IconButton
+            onClick={() => setConfirmDialog({ ...confirmDialog, open: false })}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, p: 2 }}>
+          <Typography>{confirmDialog.message}</Typography>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setConfirmDialog({ ...confirmDialog, open: false })}
+            variant="outlined"
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={confirmDialog.action}
+            color="error"
+            variant="contained"
+          >
             {t('common.confirm')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog
+      {/* Delete Confirmation Drawer */}
+      <Drawer
+        anchor="right"
         open={deleteConfirmDialog.open}
         onClose={() => setDeleteConfirmDialog({ open: false, user: null, inputValue: '' })}
-        maxWidth="sm"
-        fullWidth
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 500 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
       >
-        <DialogTitle>
-          {t('admin.users.deleteUser')}
-        </DialogTitle>
-        <DialogContent>
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('users.deleteUser')}
+          </Typography>
+          <IconButton
+            onClick={() => setDeleteConfirmDialog({ open: false, user: null, inputValue: '' })}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Alert severity="warning" sx={{ mb: 2 }}>
-            {t('admin.users.deleteConfirmation')}
+            {t('users.deleteConfirmation')}
           </Alert>
           <Typography variant="body2" sx={{ mb: 2 }}>
-            {t('admin.users.deleteConfirmationInput')}
+            {t('users.deleteConfirmationInput')}
             <strong> {deleteConfirmDialog.user?.email}</strong>
           </Typography>
           <TextField
@@ -1323,14 +1617,25 @@ const UsersManagementPage: React.FC = () => {
             onChange={(e) => setDeleteConfirmDialog(prev => ({ ...prev, inputValue: e.target.value }))}
             placeholder={deleteConfirmDialog.user?.email}
             error={deleteConfirmDialog.inputValue !== '' && deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email}
-            helperText={deleteConfirmDialog.inputValue !== '' && deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email ? t('admin.users.emailDoesNotMatch') : ''}
+            helperText={deleteConfirmDialog.inputValue !== '' && deleteConfirmDialog.inputValue !== deleteConfirmDialog.user?.email ? t('users.emailDoesNotMatch') : ''}
           />
-        </DialogContent>
-        <DialogActions>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
           <Button
             onClick={() => setDeleteConfirmDialog({ open: false, user: null, inputValue: '' })}
             color="inherit"
             startIcon={<CancelIcon />}
+            variant="outlined"
           >
             {t('common.cancel')}
           </Button>
@@ -1343,16 +1648,59 @@ const UsersManagementPage: React.FC = () => {
           >
             {t('common.delete')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* Edit User Dialog */}
-      <Dialog open={editUserDialog.open} onClose={() => setEditUserDialog({ open: false, user: null })} maxWidth="sm" fullWidth>
-        <FormDialogHeader
-          title={t('admin.users.editUserDialogTitle')}
-          description={t('admin.users.editUserDialogDescription')}
-        />
-        <DialogContent>
+      {/* Edit User Drawer */}
+      <Drawer
+        anchor="right"
+        open={editUserDialog.open}
+        onClose={() => setEditUserDialog({ open: false, user: null })}
+        PaperProps={{
+          sx: {
+            width: { xs: '100%', sm: 600 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+        ModalProps={{
+          keepMounted: false
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Box>
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              {t('users.editUserDialogTitle')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              {t('users.editUserDialogDescription')}
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={() => setEditUserDialog({ open: false, user: null })}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             <Box>
               <TextField
@@ -1361,7 +1709,8 @@ const UsersManagementPage: React.FC = () => {
                 onChange={(e) => setEditUserData({ ...editUserData, name: e.target.value })}
                 fullWidth
                 error={!!editUserErrors.name}
-                helperText={editUserErrors.name || t('admin.users.form.nameHelp')}
+                helperText={editUserErrors.name || t('users.form.nameHelp')}
+                autoFocus
               />
             </Box>
             <Box>
@@ -1372,7 +1721,7 @@ const UsersManagementPage: React.FC = () => {
                 fullWidth
                 disabled={editUserDialog.user && isCurrentUser(editUserDialog.user)}
                 error={!!editUserErrors.email}
-                helperText={editUserErrors.email || t('admin.users.form.emailHelp')}
+                helperText={editUserErrors.email || t('users.form.emailHelp')}
               />
             </Box>
 
@@ -1382,12 +1731,12 @@ const UsersManagementPage: React.FC = () => {
                 <EmailIcon color={editUserDialog.user.emailVerified ? 'success' : 'warning'} />
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="body2" fontWeight="medium">
-                    {t('admin.users.emailVerification')}
+                    {t('users.emailVerification')}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     {editUserDialog.user.emailVerified
-                      ? t('admin.users.emailVerified')
-                      : t('admin.users.emailNotVerified')
+                      ? t('users.emailVerified')
+                      : t('users.emailNotVerified')
                     }
                   </Typography>
                 </Box>
@@ -1400,7 +1749,7 @@ const UsersManagementPage: React.FC = () => {
                       disabled={emailVerificationLoading}
                       startIcon={emailVerificationLoading ? <CircularProgress size={16} /> : <VerifiedUserIcon />}
                     >
-                      {t('admin.users.verifyEmail')}
+                      {t('users.verifyEmail')}
                     </Button>
                     <Button
                       size="small"
@@ -1409,7 +1758,7 @@ const UsersManagementPage: React.FC = () => {
                       disabled={emailVerificationLoading}
                       startIcon={emailVerificationLoading ? <CircularProgress size={16} /> : <SendIcon />}
                     >
-                      {t('admin.users.resendVerification')}
+                      {t('users.resendVerification')}
                     </Button>
                   </Box>
                 )}
@@ -1424,6 +1773,7 @@ const UsersManagementPage: React.FC = () => {
                     value={editUserData.role}
                     onChange={(e) => setEditUserData({ ...editUserData, role: e.target.value as 'admin' | 'user' })}
                     label={t('users.role')}
+
                   >
                     <MenuItem value="user">{t('users.roles.user')}</MenuItem>
                     <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
@@ -1436,6 +1786,7 @@ const UsersManagementPage: React.FC = () => {
                     value={editUserData.status}
                     onChange={(e) => setEditUserData({ ...editUserData, status: e.target.value as any })}
                     label={t('users.status')}
+
                   >
                     <MenuItem value="pending">{t('users.statuses.pending')}</MenuItem>
                     <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
@@ -1456,6 +1807,13 @@ const UsersManagementPage: React.FC = () => {
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={editUserTags}
                 onChange={(_, value) => setEditUserTags(value)}
+                slotProps={{
+                  popper: {
+                    style: {
+                      zIndex: 9999
+                    }
+                  }
+                }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });
@@ -1496,13 +1854,27 @@ const UsersManagementPage: React.FC = () => {
             </Box>
             {editUserDialog.user && isCurrentUser(editUserDialog.user) && (
               <Alert severity="info">
-                {t('admin.users.canOnlyModifyOwnName')}
+                {t('users.canOnlyModifyOwnName')}
               </Alert>
             )}
           </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditUserDialog({ open: false, user: null })} startIcon={<CancelIcon />}>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 1,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setEditUserDialog({ open: false, user: null })}
+            startIcon={<CancelIcon />}
+            variant="outlined"
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -1512,15 +1884,59 @@ const UsersManagementPage: React.FC = () => {
           >
             {t('common.save')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* Bulk Action Dialog */}
-      <Dialog open={bulkActionDialogOpen} onClose={() => setBulkActionDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          {t(`admin.users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}`)} ({selectedUsers.size} {t('admin.users.selectedUsers')})
-        </DialogTitle>
-        <DialogContent>
+      {/* Bulk Action Drawer */}
+      <Drawer
+        anchor="right"
+        open={bulkActionDialogOpen}
+        onClose={() => setBulkActionDialogOpen(false)}
+        sx={{
+          zIndex: (theme) => theme.zIndex.drawer + 3, // AppBar(theme.zIndex.drawer+2)보다 높게
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 500 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column',
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            mb: 1
+          }}>
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              {t(`users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}`)} ({selectedUsers.size} {t('users.selectedUsers')})
+            </Typography>
+            <IconButton
+              onClick={() => setBulkActionDialogOpen(false)}
+              size="small"
+              sx={{
+                '&:hover': {
+                  backgroundColor: 'action.hover'
+                }
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+          <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
+            {t(`users.bulk${bulkActionType.charAt(0).toUpperCase() + bulkActionType.slice(1)}Subtitle`)}
+          </Typography>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           {bulkActionType === 'status' && (
             <FormControl fullWidth sx={{ mt: 2 }}>
               <InputLabel>{t('users.status')}</InputLabel>
@@ -1556,8 +1972,8 @@ const UsersManagementPage: React.FC = () => {
                 label={t('users.emailVerified')}
                 onChange={(e) => setBulkActionValue(e.target.value)}
               >
-                <MenuItem value="true">{t('admin.users.verified')}</MenuItem>
-                <MenuItem value="false">{t('admin.users.unverified')}</MenuItem>
+                <MenuItem value="true">{t('users.verified')}</MenuItem>
+                <MenuItem value="false">{t('users.unverified')}</MenuItem>
               </Select>
             </FormControl>
           )}
@@ -1571,6 +1987,13 @@ const UsersManagementPage: React.FC = () => {
                 isOptionEqualToValue={(option, value) => option.id === value.id}
                 value={bulkActionTags}
                 onChange={(_, value) => setBulkActionTags(value)}
+                slotProps={{
+                  popper: {
+                    style: {
+                      zIndex: 1500 // Drawer보다 높은 zIndex
+                    }
+                  }
+                }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });
@@ -1588,7 +2011,11 @@ const UsersManagementPage: React.FC = () => {
                   })
                 }
                 renderInput={(params) => (
-                  <TextField {...params} label={t('users.tags')} />
+                  <TextField
+                    {...params}
+                    label={t('users.tags')}
+                    helperText={t('users.bulkTagsHelperText')}
+                  />
                 )}
                 renderOption={(props, option) => {
                   const { key, ...otherProps } = props;
@@ -1606,14 +2033,133 @@ const UsersManagementPage: React.FC = () => {
               />
             </Box>
           )}
-          {bulkActionType === 'delete' && (
-            <Typography sx={{ mt: 2 }}>
-              {t('admin.users.bulkDeleteConfirm', { count: selectedUsers.size })}
-            </Typography>
+
+          {/* 공통 대상 미리보기 (삭제 외 액션에도 표시) */}
+          {bulkActionType !== 'delete' && selectedUsers.size > 0 && (
+            <Box sx={{ mt: 3 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'medium' }}>
+                {t('users.targetList')}:
+              </Typography>
+              <Box sx={{
+                maxHeight: 300,
+                overflow: 'auto',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: 1,
+                bgcolor: 'background.paper'
+              }}>
+                {users
+                  .filter(user => selectedUsers.has(user.id))
+                  .map(user => (
+                    <Box
+                      key={user.id}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        p: 2,
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                        '&:last-child': { borderBottom: 0 }
+                      }}
+                    >
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                          {user.name}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {user.email}
+                        </Typography>
+                      </Box>
+                      <Chip
+                        label={t(`users.statuses.${user.status}`)}
+                        size="small"
+                        variant="outlined"
+                        sx={{ mr: 1 }}
+                      />
+                      <Chip
+                        label={t(`users.roles.${user.role}`)}
+                        size="small"
+                        color={user.role === 'admin' ? 'error' : 'default'}
+                        variant="outlined"
+                      />
+                    </Box>
+                  ))
+                }
+              </Box>
+            </Box>
           )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setBulkActionDialogOpen(false)} startIcon={<CancelIcon />}>
+
+          {bulkActionType === 'delete' && (
+            <Box sx={{ mt: 2 }}>
+              <Typography sx={{ mb: 2, fontWeight: 'medium' }}>
+                {t('users.bulkDeleteConfirm', { count: selectedUsers.size })}
+              </Typography>
+
+              {/* 삭제 대상 사용자 목록 */}
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'medium' }}>
+                {t('users.deleteTargetUsers')}:
+              </Typography>
+              <Box sx={{
+                maxHeight: 300,
+                overflow: 'auto',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: 1,
+                bgcolor: 'background.paper'
+              }}>
+                {users
+                  .filter(user => selectedUsers.has(user.id))
+                  .map(user => (
+                    <Box
+                      key={user.id}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        p: 2,
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                        '&:last-child': { borderBottom: 0 }
+                      }}
+                    >
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                          {user.name}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {user.email}
+                        </Typography>
+                      </Box>
+                      <Chip
+                        label={t(`users.roles.${user.role}`)}
+                        size="small"
+                        color={user.role === 'admin' ? 'error' : 'default'}
+                        variant="outlined"
+                      />
+                    </Box>
+                  ))
+                }
+              </Box>
+            </Box>
+          )}
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 1,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setBulkActionDialogOpen(false)}
+            startIcon={<CancelIcon />}
+            variant="outlined"
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -1621,11 +2167,98 @@ const UsersManagementPage: React.FC = () => {
             variant="contained"
             color={bulkActionType === 'delete' ? 'error' : 'primary'}
             startIcon={bulkActionType === 'delete' ? <DeleteIcon /> : <SaveIcon />}
+            disabled={!isBulkActionValid()}
           >
             {t('common.save')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
+
+      {/* Invitation Form Drawer */}
+      <Drawer
+        anchor="right"
+        open={invitationDialogOpen}
+        onClose={() => setInvitationDialogOpen(false)}
+        sx={{
+          zIndex: 1300,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 400 },
+            maxWidth: '100vw',
+            height: '100vh', // 전체 화면 높이 사용
+            top: 0, // 상단에 붙임
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('invitations.drawerTitle')}
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <IconButton
+              onClick={loadCurrentInvitation}
+              size="small"
+              sx={{
+                '&:hover': {
+                  backgroundColor: 'action.hover'
+                }
+              }}
+              title={t('common.refresh')}
+            >
+              <RefreshIcon />
+            </IconButton>
+            <IconButton
+              onClick={() => setInvitationDialogOpen(false)}
+              size="small"
+              sx={{
+                '&:hover': {
+                  backgroundColor: 'action.hover'
+                }
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </Box>
+
+        {/* Content - 스크롤 가능 */}
+        <Box sx={{
+          flex: 1,
+          overflow: 'auto',
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#f1f1f1',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: '#c1c1c1',
+            borderRadius: '4px',
+            '&:hover': {
+              background: '#a8a8a8',
+            },
+          },
+        }}>
+          <InvitationForm
+            onSubmit={handleCreateInvitation}
+            onCancel={() => setInvitationDialogOpen(false)}
+            isDrawer={true}
+          />
+        </Box>
+      </Drawer>
+
+
     </Box>
   );
 };

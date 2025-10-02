@@ -16,6 +16,7 @@ interface AuthContextType {
   clearError: () => void;
   isAdmin: () => boolean;
   canAccess: (requiredRoles?: string[]) => boolean;
+  getToken: () => string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -136,6 +137,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return requiredRoles.includes(user.role);
   };
 
+  const getToken = (): string | null => {
+    return AuthService.getStoredToken();
+  };
+
   useEffect(() => {
     // Initialize auth state from localStorage only
     const initializeAuth = () => {
@@ -204,6 +209,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     clearError,
     isAdmin,
     canAccess,
+    getToken,
   };
 
   return (

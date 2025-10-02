@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import redisClient from '../config/redis';
 import logger from '../config/logger';
+import { HEADERS, HEADER_VALUES } from '../constants/headers';
 import crypto from 'crypto';
 
 interface CacheOptions {
@@ -120,8 +121,8 @@ export function responseCache(options: CacheOptions = {}) {
         }
         
         // Add cache hit header
-        res.set('X-Cache', 'HIT');
-        res.set('X-Cache-Key', cacheKey);
+        res.set(HEADERS.X_CACHE, HEADER_VALUES.CACHE_HIT);
+        res.set(HEADERS.X_CACHE_KEY, cacheKey);
         
         logger.debug('Cache hit', { cacheKey, method: req.method, url: req.originalUrl });
         
@@ -129,8 +130,8 @@ export function responseCache(options: CacheOptions = {}) {
       }
       
       // Cache miss - continue to route handler
-      res.set('X-Cache', 'MISS');
-      res.set('X-Cache-Key', cacheKey);
+      res.set(HEADERS.X_CACHE, HEADER_VALUES.CACHE_MISS);
+      res.set(HEADERS.X_CACHE_KEY, cacheKey);
       
       // Override res.json to cache the response
       const originalJson = res.json;
@@ -139,8 +140,8 @@ export function responseCache(options: CacheOptions = {}) {
         const responseData = {
           statusCode: res.statusCode,
           headers: {
-            'Content-Type': res.get('Content-Type'),
-            'Cache-Control': res.get('Cache-Control'),
+            [HEADERS.CONTENT_TYPE]: res.get(HEADERS.CONTENT_TYPE),
+            [HEADERS.CACHE_CONTROL]: res.get(HEADERS.CACHE_CONTROL),
           },
           body,
           timestamp: new Date().toISOString(),

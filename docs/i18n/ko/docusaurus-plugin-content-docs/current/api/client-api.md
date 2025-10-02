@@ -23,6 +23,42 @@ GET /api/v1/client/client-version
 
 게임 클라이언트에서 사용할 버전 정보를 조회합니다.
 
+### 4. Client SDK API (인증 필요)
+
+Client SDK를 위한 API 엔드포인트들입니다. API 토큰 인증이 필요합니다.
+
+#### 4.1. SDK 테스트
+
+```
+GET /api/v1/client/test
+```
+
+SDK 인증을 테스트합니다.
+
+#### 4.2. SDK 템플릿 조회
+
+```
+GET /api/v1/client/templates
+```
+
+Client SDK용 원격 설정 템플릿을 조회합니다.
+
+#### 4.3. 설정 평가
+
+```
+POST /api/v1/client/evaluate
+```
+
+사용자 컨텍스트를 기반으로 설정을 평가합니다.
+
+#### 4.4. 메트릭 제출
+
+```
+POST /api/v1/client/metrics
+```
+
+SDK 사용 메트릭을 제출합니다.
+
 #### 쿼리 매개변수
 
 | 매개변수 | 타입 | 설명 |

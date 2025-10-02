@@ -7,6 +7,7 @@ import {
   Button,
   CircularProgress,
   Alert,
+  useTheme,
 } from '@mui/material';
 import {
   Logout as LogoutIcon,
@@ -21,6 +22,7 @@ const LogoutPage: React.FC = () => {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
+  const theme = useTheme();
   
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [logoutComplete, setLogoutComplete] = useState(false);
@@ -87,12 +89,12 @@ const LogoutPage: React.FC = () => {
           <CheckCircleIcon
             sx={{
               fontSize: 64,
-              color: '#4caf50',
+              color: 'success.main',
               mb: 3
             }}
           />
           <Box sx={{ mt: 2 }}>
-            <CircularProgress size={24} sx={{ color: 'white' }} />
+            <CircularProgress size={24} sx={{ color: 'primary.main' }} />
           </Box>
         </Box>
       </AuthLayout>
@@ -109,7 +111,7 @@ const LogoutPage: React.FC = () => {
         <LogoutIcon
           sx={{
             fontSize: 64,
-            color: '#ff9800',
+            color: 'warning.main',
             mb: 3
           }}
         />
@@ -120,11 +122,13 @@ const LogoutPage: React.FC = () => {
           severity="error"
           sx={{
             mb: 3,
-            backgroundColor: 'rgba(244, 67, 54, 0.1)',
-            color: '#ff6b6b',
-            border: '1px solid rgba(244, 67, 54, 0.2)',
+            backgroundColor: theme.palette.mode === 'dark'
+              ? 'rgba(244, 67, 54, 0.1)'
+              : 'rgba(244, 67, 54, 0.05)',
+            color: 'error.main',
+            border: `1px solid ${theme.palette.error.main}20`,
             '& .MuiAlert-icon': {
-              color: '#ff6b6b'
+              color: 'error.main'
             }
           }}
           action={
@@ -133,7 +137,7 @@ const LogoutPage: React.FC = () => {
               size="small"
               onClick={handleRetry}
               disabled={isLoggingOut}
-              sx={{ color: '#ff6b6b' }}
+              sx={{ color: 'error.main' }}
             >
               {t('common.retry')}
             </Button>
@@ -149,17 +153,21 @@ const LogoutPage: React.FC = () => {
           size="large"
           onClick={handleLogout}
           disabled={isLoggingOut}
-          startIcon={isLoggingOut ? <CircularProgress size={20} /> : <LogoutIcon />}
+          startIcon={isLoggingOut ? <CircularProgress size={20} sx={{ color: 'inherit' }} /> : <LogoutIcon />}
           fullWidth
           sx={{
             height: 48,
-            background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
+            background: theme.palette.mode === 'dark'
+              ? 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)'
+              : 'linear-gradient(45deg, #1976d2 30%, #1565c0 90%)',
             '&:hover': {
-              background: 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)',
+              background: theme.palette.mode === 'dark'
+                ? 'linear-gradient(45deg, #5a6fd8 30%, #6a4190 90%)'
+                : 'linear-gradient(45deg, #1565c0 30%, #0d47a1 90%)',
             },
             '&:disabled': {
-              background: 'rgba(255, 255, 255, 0.1)',
-              color: 'rgba(255, 255, 255, 0.3)',
+              background: theme.palette.action.disabledBackground,
+              color: theme.palette.action.disabled,
             },
             borderRadius: 2,
             textTransform: 'none',
@@ -178,20 +186,22 @@ const LogoutPage: React.FC = () => {
           fullWidth
           sx={{
             height: 48,
-            borderColor: '#667eea',
-            color: '#667eea',
+            borderColor: 'primary.main',
+            color: 'primary.main',
             textTransform: 'none',
             fontSize: '1rem',
             fontWeight: 600,
             borderRadius: 2,
             '&:hover': {
-              borderColor: '#5a6fd8',
-              backgroundColor: 'rgba(102, 126, 234, 0.1)',
-              color: '#5a6fd8',
+              borderColor: 'primary.dark',
+              backgroundColor: theme.palette.mode === 'dark'
+                ? 'rgba(144, 202, 249, 0.08)'
+                : 'rgba(25, 118, 210, 0.04)',
+              color: 'primary.dark',
             },
             '&:disabled': {
-              borderColor: 'rgba(255, 255, 255, 0.2)',
-              color: 'rgba(255, 255, 255, 0.3)',
+              borderColor: theme.palette.action.disabled,
+              color: theme.palette.action.disabled,
             },
           }}
         >
@@ -200,7 +210,7 @@ const LogoutPage: React.FC = () => {
       </Box>
 
       <Box sx={{ mt: 3, textAlign: 'center' }}>
-        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
           {t('auth.logout.note')}
         </Typography>
       </Box>

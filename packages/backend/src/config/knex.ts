@@ -1,18 +1,21 @@
 import knex from 'knex';
+import { Model } from 'objection';
 import dotenv from 'dotenv';
+import { config } from './index';
 
 dotenv.config();
 
 const knexConfig = {
   client: 'mysql2',
   connection: {
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '3306'),
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'gatrix',
+    host: config.database.host,
+    port: config.database.port,
+    user: config.database.user,
+    password: config.database.password,
+    database: config.database.name,
     charset: 'utf8mb4',
   },
+  debug: config.database.debug, // .env의 DB_DEBUG 설정으로 제어
   pool: {
     min: 2,
     max: 10,
@@ -34,6 +37,9 @@ const knexConfig = {
 
 // Knex 인스턴스 생성
 const db = knex(knexConfig);
+
+// Objection.js 초기화
+Model.knex(db);
 
 export default db;
 export { knexConfig };

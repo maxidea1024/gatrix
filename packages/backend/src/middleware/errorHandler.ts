@@ -35,15 +35,36 @@ export const errorHandler = (
 ): void => {
   let { statusCode = 500, message } = error;
 
-  // Log error
-  logger.error('Error occurred:', {
-    error: message,
-    stack: error.stack,
-    url: req.url,
-    method: req.method,
-    ip: req.ip,
-    userAgent: req.get('User-Agent'),
-  });
+  // Check if this is a client abort error (common and expected)
+  const isClientAbort = error.message?.includes('request aborted') ||
+                       error.message?.includes('aborted') ||
+                       (error as any)?.code === 'ECONNABORTED' ||
+                       (error as any)?.code === 'ECONNRESET' ||
+                       (error as any)?.code === 'EPIPE' ||
+                       (error as any)?.type === 'request.aborted' ||
+                       error.name === 'BadRequestError';
+
+  if (isClientAbort) {
+    // Log client aborts at debug level only
+    logger.debug('Client aborted request:', {
+      method: req.method,
+      url: req.url,
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+      code: (error as any)?.code,
+      type: (error as any)?.type
+    });
+  } else {
+    // Log actual errors at error level
+    logger.error('Error occurred:', {
+      error: message,
+      stack: error.stack,
+      url: req.url,
+      method: req.method,
+      ip: req.ip,
+      userAgent: req.get('User-Agent'),
+    });
+  }
 
   // Handle specific error types
   if (error.name === 'ValidationError') {
@@ -61,6 +82,11 @@ export const errorHandler = (
   } else if (error.name === 'CastError') {
     statusCode = 400;
     message = 'Invalid ID format';
+  }
+
+  // For client aborts, don't send response (connection is already closed)
+  if (isClientAbort) {
+    return;
   }
 
   // Don't leak error details in production

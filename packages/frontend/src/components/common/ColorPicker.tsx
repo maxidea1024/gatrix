@@ -151,7 +151,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
             </Typography>
             <Grid container spacing={0.5}>
               {PRESET_COLORS.map((color) => (
-                <Grid item key={color}>
+                <Grid key={color}>
                   <Tooltip title={color}>
                     <IconButton
                       onClick={() => handleColorSelect(color)}

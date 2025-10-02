@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Drawer,
   Button,
   TextField,
   FormControl,
@@ -32,6 +29,7 @@ import {
   FileCopy as CopyIcon,
   ExpandMore as ExpandMoreIcon,
   Build as BuildIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -59,6 +57,9 @@ import { tagService } from '../../services/tagService';
 import { PlatformDefaultsService } from '../../services/platformDefaultsService';
 import { AVAILABLE_PLATFORMS } from '../../constants/platforms';
 import JsonEditor from '../common/JsonEditor';
+import MaintenanceSettingsInput from '../common/MaintenanceSettingsInput';
+import { MessageTemplate, messageTemplateService } from '../../services/messageTemplateService';
+import { MessageLocale } from '../common/MultiLanguageMessageInput';
 
 interface ClientVersionFormProps {
   open: boolean;
@@ -157,6 +158,11 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   // 점검 관련 상태
   const [maintenanceLocales, setMaintenanceLocales] = useState<ClientVersionMaintenanceLocale[]>([]);
   const [supportsMultiLanguage, setSupportsMultiLanguage] = useState(false);
+
+  // 메시지 소스 선택
+  const [inputMode, setInputMode] = useState<'direct' | 'template'>('direct');
+  const [templates, setTemplates] = useState<MessageTemplate[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | ''>('');
 
   // 기본값 설정
   const defaultValues: ClientVersionFormData = {
@@ -262,6 +268,8 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         setSelectedTags([]);
         setMaintenanceLocales([]);
         setSupportsMultiLanguage(false);
+        setInputMode('direct');
+        setSelectedTemplateId('');
 
         // 초기 플랫폼(예: 'pc')에 대한 기본값을 즉시 적용 (필드가 비어있는 경우에만)
         (async () => {
@@ -306,6 +314,22 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         }
       };
       loadTags();
+    }
+  }, [open]);
+
+  // 메시지 템플릿 로드
+  useEffect(() => {
+    if (open) {
+      const loadTemplates = async () => {
+        try {
+          const response = await messageTemplateService.list({ isEnabled: true });
+          setTemplates(response.templates || []);
+        } catch (error) {
+          console.error('Failed to load message templates:', error);
+          setTemplates([]);
+        }
+      };
+      loadTemplates();
     }
   }, [open]);
 
@@ -371,7 +395,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 
   // 날짜 로케일 설정
   const getDateLocale = () => {
-    const currentLang = t('language') || 'ko';
+    const currentLang = t('language');
     switch (currentLang) {
       case 'en':
         dayjs.locale('en');
@@ -451,6 +475,21 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       setLoading(true);
       console.log('Starting form submission...');
 
+      // 템플릿 모드일 때 메시지 처리
+      let finalMaintenanceMessage = data.maintenanceMessage;
+      let finalMaintenanceLocales = maintenanceLocales.filter(l => l.message.trim() !== '');
+
+      if (data.clientStatus === ClientStatus.MAINTENANCE && inputMode === 'template' && selectedTemplateId) {
+        const selectedTemplate = templates.find(t => t.id === selectedTemplateId);
+        if (selectedTemplate) {
+          finalMaintenanceMessage = selectedTemplate.defaultMessage || '';
+          finalMaintenanceLocales = (selectedTemplate.locales || []).map(l => ({
+            lang: l.lang as 'ko' | 'en' | 'zh',
+            message: l.message || ''
+          })).filter(l => l.message.trim() !== '');
+        }
+      }
+
       // 빈 문자열을 undefined로 변환하고 tags, maintenanceLocales 필드 제거 (별도 처리)
       const { tags, maintenanceLocales: formMaintenanceLocales, ...dataWithoutTags } = data;
       const cleanedData = {
@@ -462,9 +501,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
         customPayload: data.customPayload || undefined,
         maintenanceStartDate: data.maintenanceStartDate || undefined,
         maintenanceEndDate: data.maintenanceEndDate || undefined,
-        maintenanceMessage: data.maintenanceMessage || undefined,
+        maintenanceMessage: finalMaintenanceMessage || undefined,
         supportsMultiLanguage: data.supportsMultiLanguage || false,
-        maintenanceLocales: maintenanceLocales.filter(l => l.message.trim() !== ''),
+        maintenanceLocales: finalMaintenanceLocales,
       };
 
       console.log('Cleaned data to send:', cleanedData);
@@ -523,7 +562,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
       onClose();
     } catch (error: any) {
       console.error('Error saving client version:', error);
-      enqueueSnackbar(error.message || t('clientVersions.saveError', { defaultValue: 'Failed to save client version' }), { variant: 'error' });
+      enqueueSnackbar(error.message || t('clientVersions.saveError'), { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -536,34 +575,76 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
   };
 
   return (
-    <Dialog
+    <Drawer
+      anchor="right"
       open={open}
       onClose={handleClose}
-      maxWidth="md"
-      fullWidth
-      PaperProps={{
-        sx: { minHeight: '80vh' }
+      sx={{
+        zIndex: 1300,
+        '& .MuiDrawer-paper': {
+          width: { xs: '100%', sm: 700 },
+          maxWidth: '100vw',
+          display: 'flex',
+          flexDirection: 'column'
+        }
+      }}
+      ModalProps={{
+        keepMounted: false
       }}
     >
-      <FormDialogHeader
-        title={isCopyMode
-          ? t('clientVersions.form.copyTitle')
-          : isEdit
-            ? t('clientVersions.form.editTitle')
-            : t('clientVersions.form.title')
-        }
-        description={isCopyMode
-          ? t('clientVersions.form.copyDescription')
-          : isEdit
-            ? t('clientVersions.form.editDescription')
-            : t('clientVersions.form.createDescription')
-        }
-      />
+      <form
+        onSubmit={handleSubmit(onSubmit as SubmitHandler<ClientVersionFormData>, (errors) => {
+          console.log('Form validation failed:', errors);
+        })}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%'
+        }}
+      >
+        {/* Header - Fixed */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Box>
+            <Typography variant="h6" component="h2">
+              {isCopyMode
+                ? t('clientVersions.form.copyTitle')
+                : isEdit
+                  ? t('clientVersions.form.editTitle')
+                  : t('clientVersions.form.title')
+              }
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {isCopyMode
+                ? t('clientVersions.form.copyDescription')
+                : isEdit
+                  ? t('clientVersions.form.editDescription')
+                  : t('clientVersions.form.createDescription')
+              }
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={handleClose}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
 
-      <form onSubmit={handleSubmit(onSubmit as SubmitHandler<ClientVersionFormData>, (errors) => {
-        console.log('Form validation failed:', errors);
-      })}>
-        <DialogContent dividers>
+        {/* Content - Scrollable */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           {duplicateError && (
             <Alert severity="error" sx={{ mb: 2 }}>
               {duplicateError}
@@ -621,6 +702,16 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                         labelId="cvf-platform-label"
                         {...field}
                         label={`${t('clientVersions.platform')} *`}
+                        MenuProps={{
+                          anchorOrigin: {
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                          },
+                          transformOrigin: {
+                            vertical: 'top',
+                            horizontal: 'left',
+                          }
+                        }}
                         onChange={async (e) => {
                           field.onChange(e);
 
@@ -670,6 +761,16 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                         labelId="cvf-status-label"
                         {...field}
                         label={`${t('clientVersions.statusLabel')} *`}
+                        MenuProps={{
+                          anchorOrigin: {
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                          },
+                          transformOrigin: {
+                            vertical: 'top',
+                            horizontal: 'left',
+                          }
+                        }}
                       >
                         {Object.values(ClientStatus).map((status) => (
                           <MenuItem key={status} value={status}>
@@ -685,120 +786,34 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                 />
 
 	                {isMaintenanceMode && (
-	                  <Box sx={{ mt: 2, p: 2, border: '1px solid', borderColor: 'warning.light', borderRadius: 1, bgcolor: 'background.default' }}>
-
-	                    <Typography variant="subtitle1" gutterBottom sx={{ color: 'warning.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-	                      <BuildIcon fontSize="small" sx={{ mr: 0.5 }} /> {t('clientVersions.maintenance.title')}
-	                    </Typography>
-	                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-	                      {t('clientVersions.maintenance.description')}
-	                    </Typography>
-
-	                    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
-	                      <Stack spacing={2}>
-	                        {/* 점검 시작일 */}
-	                        <Controller
-	                          name="maintenanceStartDate"
-	                          control={control}
-	                          render={({ field }) => (
-	                            <DateTimePicker
-	                              label={t('clientVersions.maintenance.startDate')}
-	                              value={field.value ? dayjs(field.value) : null}
-	                              onChange={(date) => field.onChange(date ? date.toISOString() : '')}
-	                              slotProps={{
-	                                textField: {
-	                                  fullWidth: true,
-	                                  helperText: t('clientVersions.maintenance.startDateHelp'),
-	                                  error: !!errors.maintenanceStartDate,
-	                                },
-	                              }}
-	                            />
-	                          )}
-	                        />
-
-	                        {/* 점검 종료일 */}
-	                        <Controller
-	                          name="maintenanceEndDate"
-	                          control={control}
-	                          render={({ field }) => (
-	                            <DateTimePicker
-	                              label={t('clientVersions.maintenance.endDate')}
-	                              value={field.value ? dayjs(field.value) : null}
-	                              onChange={(date) => field.onChange(date ? date.toISOString() : '')}
-	                              slotProps={{
-	                                textField: {
-	                                  fullWidth: true,
-	                                  helperText: t('clientVersions.maintenance.endDateHelp'),
-	                                  error: !!errors.maintenanceEndDate,
-	                                },
-	                              }}
-	                            />
-	                          )}
-	                        />
-
-	                        {/* 기본 점검 메시지 */}
-	                        <Controller
-	                          name="maintenanceMessage"
-	                          control={control}
-	                          render={({ field }) => (
-	                            <TextField
-	                              {...field}
-	                              fullWidth
-	                              multiline
-	                              rows={3}
-	                              label={t('clientVersions.maintenance.defaultMessage')}
-	                              helperText={t('clientVersions.maintenance.defaultMessageHelp')}
-	                              error={!!errors.maintenanceMessage}
-	                              required={watch('clientStatus') === 'maintenance'}
-	                            />
-	                          )}
-	                        />
-
-	                        {/* 언어별 메시지 사용 여부 */}
-	                        <FormControlLabel
-	                          control={
-	                            <Switch
-	                              checked={supportsMultiLanguage}
-	                              onChange={(e) => handleSupportsMultiLanguageChange(e.target.checked)}
-	                            />
-	                          }
-	                          label={t('clientVersions.maintenance.supportsMultiLanguage')}
-	                        />
-	                        <Typography variant="caption" color="text.secondary">
-	                          {t('clientVersions.maintenance.supportsMultiLanguageHelp')}
-	                        </Typography>
-
-	                        {/* 언어별 메시지 */}
-	                        {supportsMultiLanguage && (
-	                          <Box>
-	                            <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
-	                              {t('clientVersions.maintenance.languageSpecificMessages')}
-	                            </Typography>
-
-	                            {/* 모든 언어별 메시지 입력 */}
-	                            {availableLanguages.map((lang) => {
-	                              const locale = maintenanceLocales.find(l => l.lang === lang.code);
-	                              return (
-	                                <Box key={lang.code} sx={{ mb: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-	                                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
-	                                    {lang.label}
-	                                  </Typography>
-	                                  <TextField
-	                                    fullWidth
-	                                    multiline
-	                                    rows={3}
-	                                    value={locale?.message || ''}
-	                                    onChange={(e) => updateMaintenanceLocale(lang.code, e.target.value)}
-	                                    placeholder={t(`maintenanceMessage.${lang.code}Help`)}
-	                                  />
-	                                </Box>
-	                              );
-	                            })}
-	                          </Box>
-	                        )}
-	                      </Stack>
-	                    </LocalizationProvider>
-	                  </Box>
+	                  <MaintenanceSettingsInput
+	                    startDate={watch('maintenanceStartDate') || ''}
+	                    endDate={watch('maintenanceEndDate') || ''}
+	                    onStartDateChange={(date) => setValue('maintenanceStartDate', date)}
+	                    onEndDateChange={(date) => setValue('maintenanceEndDate', date)}
+	                    inputMode={inputMode}
+	                    onInputModeChange={setInputMode}
+	                    maintenanceMessage={watch('maintenanceMessage') || ''}
+	                    onMaintenanceMessageChange={(message) => setValue('maintenanceMessage', message)}
+	                    supportsMultiLanguage={supportsMultiLanguage}
+	                    onSupportsMultiLanguageChange={handleSupportsMultiLanguageChange}
+	                    maintenanceLocales={maintenanceLocales.map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
+	                    onMaintenanceLocalesChange={(locales) => {
+	                      setMaintenanceLocales(locales);
+	                      setValue('maintenanceLocales', locales);
+	                      // 번역 결과가 있으면 자동으로 언어별 메시지 사용 활성화
+	                      const hasNonEmptyLocales = locales.some(l => l.message && l.message.trim() !== '');
+	                      if (hasNonEmptyLocales && !supportsMultiLanguage) {
+	                        setSupportsMultiLanguage(true);
+	                        setValue('supportsMultiLanguage', true);
+	                      }
+	                    }}
+	                    templates={templates}
+	                    selectedTemplateId={selectedTemplateId}
+	                    onSelectedTemplateIdChange={setSelectedTemplateId}
+	                    messageError={!!errors.maintenanceMessage}
+	                    messageRequired={true}
+	                  />
 	                )}
 
               </Stack>
@@ -929,6 +944,11 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                 onChange={(_, value) => {
                   setSelectedTags(value);
                   setValue('tags', value);
+                }}
+                slotProps={{
+                  popper: {
+                    placement: 'bottom-start'
+                  }
                 }}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => {
@@ -1061,9 +1081,18 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
             </AccordionDetails>
             </Accordion>
           </Stack>
-        </DialogContent>
+        </Box>
 
-        <DialogActions>
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 1,
+          justifyContent: 'flex-end'
+        }}>
           <Button onClick={handleClose} disabled={isSubmitting || loading} startIcon={<CancelIcon />}>
             {t('common.cancel')}
           </Button>
@@ -1090,9 +1119,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                 : t('clientVersions.form.createTitle')
             }
           </Button>
-        </DialogActions>
+        </Box>
       </form>
-    </Dialog>
+    </Drawer>
   );
 };
 

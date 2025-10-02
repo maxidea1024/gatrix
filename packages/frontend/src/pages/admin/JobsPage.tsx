@@ -28,12 +28,14 @@ import {
   Tabs,
   Tab,
   LinearProgress,
-  Autocomplete
+  Autocomplete,
+  Drawer
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
+  Close as CloseIcon,
   PlayArrow as ExecuteIcon,
   History as HistoryIcon,
   Search as SearchIcon
@@ -276,6 +278,7 @@ const JobsPage: React.FC = () => {
             <Grid size={{ xs: 12, md: 3 }}>
               <TextField
                 fullWidth
+                size="small"
                 label={t('common.search')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -290,13 +293,21 @@ const JobsPage: React.FC = () => {
               />
             </Grid>
             <Grid size={{ xs: 12, md: 2 }}>
-              <FormControl fullWidth>
+              <FormControl fullWidth size="small">
                 <InputLabel shrink={true}>{t('jobs.jobType')}</InputLabel>
                 <Select
                   value={selectedJobType}
                   onChange={(e) => setSelectedJobType(e.target.value as number | '')}
                   label={t('jobs.jobType')}
                   displayEmpty
+                  size="small"
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        zIndex: 9999
+                      }
+                    }
+                  }}
                   sx={{
                     minWidth: 120,
                     '& .MuiSelect-select': {
@@ -316,13 +327,21 @@ const JobsPage: React.FC = () => {
               </FormControl>
             </Grid>
             <Grid size={{ xs: 12, md: 2 }}>
-              <FormControl fullWidth>
+              <FormControl fullWidth size="small">
                 <InputLabel shrink={true}>{t('common.usable')}</InputLabel>
                 <Select
                   value={enabledFilter}
                   onChange={(e) => setEnabledFilter(e.target.value as boolean | '')}
                   label={t('common.usable')}
                   displayEmpty
+                  size="small"
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        zIndex: 9999
+                      }
+                    }
+                  }}
                   sx={{
                     minWidth: 120,
                     '& .MuiSelect-select': {
@@ -349,6 +368,13 @@ const JobsPage: React.FC = () => {
                 filterSelectedOptions
                 value={tagFilter}
                 onChange={(_, value) => handleTagFilterChange(value)}
+                slotProps={{
+                  popper: {
+                    style: {
+                      zIndex: 9999
+                    }
+                  }
+                }}
                 renderValue={(value, getTagProps) =>
                   value.map((option, index) => {
                     const { key, ...chipProps } = getTagProps({ index });
@@ -366,7 +392,7 @@ const JobsPage: React.FC = () => {
                   })
                 }
                 renderInput={(params) => (
-                  <TextField {...params} label={t('common.tags')} />
+                  <TextField {...params} label={t('common.tags')} size="small" />
                 )}
                 renderOption={(props, option) => {
                   const { key, ...otherProps } = props;
@@ -396,7 +422,6 @@ const JobsPage: React.FC = () => {
           overflow: 'auto'
         }}
       >
-        {loading && <LinearProgress />}
         <Table sx={{ tableLayout: 'fixed', minWidth: 1100 }}>
           <TableHead>
             <TableRow>
@@ -583,55 +608,202 @@ const JobsPage: React.FC = () => {
         />
       </TableContainer>
 
-      {/* Job Form Dialog */}
-      <Dialog open={formDialogOpen} onClose={() => setFormDialogOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>
-          {editingJob ? t('jobs.editJob') : t('jobs.addJob')}
-        </DialogTitle>
-        <DialogContent>
+      {/* Job Form Drawer */}
+      <Drawer
+        anchor="right"
+        open={formDialogOpen}
+        onClose={() => setFormDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            width: { xs: '100%', sm: 700 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+        ModalProps={{
+          keepMounted: false
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {editingJob ? t('jobs.editJob') : t('jobs.addJob')}
+          </Typography>
+          <IconButton
+            onClick={() => setFormDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto' }}>
           <JobForm
             job={editingJob}
             jobTypes={jobTypes}
             onSubmit={handleFormSubmit}
             onCancel={() => setFormDialogOpen(false)}
+            isDrawer={true}
           />
-        </DialogContent>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* Job History Dialog */}
-      <Dialog open={historyDialogOpen} onClose={() => setHistoryDialogOpen(false)} maxWidth="lg" fullWidth>
-        <DialogTitle>
-          {t('jobs.executionHistory')} - {selectedJobForHistory?.name}
-        </DialogTitle>
-        <DialogContent>
+      {/* Job History Drawer */}
+      <Drawer
+        anchor="right"
+        open={historyDialogOpen}
+        onClose={() => setHistoryDialogOpen(false)}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 800 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('jobs.executionHistory')} - {selectedJobForHistory?.name}
+          </Typography>
+          <IconButton
+            onClick={() => setHistoryDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           {selectedJobForHistory && (
             <JobExecutionHistory jobId={selectedJobForHistory.id} />
           )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setHistoryDialogOpen(false)}>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setHistoryDialogOpen(false)}
+            variant="outlined"
+          >
             {t('common.close')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
-        <DialogContent>
+      {/* Delete Confirmation Drawer */}
+      <Drawer
+        anchor="right"
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        sx={{
+          zIndex: 1301,
+          '& .MuiDrawer-paper': {
+            width: { xs: '100%', sm: 400 },
+            maxWidth: '100vw',
+            display: 'flex',
+            flexDirection: 'column'
+          }
+        }}
+      >
+        {/* Header */}
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+            {t('common.confirmDelete')}
+          </Typography>
+          <IconButton
+            onClick={() => setDeleteDialogOpen(false)}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ flex: 1, p: 2 }}>
           <Typography>
             {t('jobs.confirmDeleteMessage', { name: jobToDelete?.name })}
           </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>
+        </Box>
+
+        {/* Footer */}
+        <Box sx={{
+          p: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'flex-end'
+        }}>
+          <Button
+            onClick={() => setDeleteDialogOpen(false)}
+            variant="outlined"
+          >
             {t('common.cancel')}
           </Button>
-          <Button onClick={confirmDelete} color="error" variant="contained">
+          <Button
+            onClick={confirmDelete}
+            color="error"
+            variant="contained"
+            startIcon={<DeleteIcon />}
+          >
             {t('common.delete')}
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </Drawer>
     </Box>
   );
 };

@@ -11,7 +11,7 @@ export const gameWorldService = {
   // Get list of game worlds
   async getGameWorlds(params?: GameWorldListParams): Promise<GameWorldListResult> {
     try {
-      const response = await api.get('/game-worlds', { params });
+      const response = await api.get('/admin/game-worlds', { params });
 
       // 응답 구조 확인 - 두 가지 경우 모두 처리
       let data: any;
@@ -38,61 +38,61 @@ export const gameWorldService = {
 
   // Get game world by ID
   async getGameWorldById(id: number): Promise<GameWorld> {
-    const response = await api.get(`/game-worlds/id/${id}`);
+    const response = await api.get(`/admin/game-worlds/id/${id}`);
     return response.data?.data?.world || response.data?.world;
   },
 
   // Get game world by world ID
   async getGameWorldByWorldId(worldId: string): Promise<GameWorld> {
-    const response = await api.get(`/game-worlds/world/${worldId}`);
+    const response = await api.get(`/admin/game-worlds/world/${worldId}`);
     return response.data?.data?.world || response.data?.world;
   },
 
   // Create new game world
   async createGameWorld(data: CreateGameWorldData): Promise<GameWorld> {
-    const response = await api.post('/game-worlds', data);
+    const response = await api.post('/admin/game-worlds', data);
     return response.data?.data?.world || response.data?.world;
   },
 
   // Update game world
   async updateGameWorld(id: number, data: UpdateGameWorldData): Promise<GameWorld> {
-    const response = await api.put(`/game-worlds/${id}`, data);
+    const response = await api.put(`/admin/game-worlds/${id}`, data);
     return response.data?.data?.world || response.data?.world;
   },
 
   // Delete game world
   async deleteGameWorld(id: number): Promise<void> {
-    await api.delete(`/game-worlds/${id}`);
+    await api.delete(`/admin/game-worlds/${id}`);
   },
 
   // Toggle visibility
   async toggleVisibility(id: number): Promise<GameWorld> {
-    const response = await api.patch(`/game-worlds/${id}/toggle-visibility`);
+    const response = await api.patch(`/admin/game-worlds/${id}/toggle-visibility`);
     return response.data?.data?.world || response.data?.world;
   },
 
   // Toggle maintenance status
   async toggleMaintenance(id: number): Promise<GameWorld> {
-    const response = await api.patch(`/game-worlds/${id}/toggle-maintenance`);
+    const response = await api.patch(`/admin/game-worlds/${id}/toggle-maintenance`);
     return response.data?.data?.world || response.data?.world;
   },
 
   // Update display orders
   async updateDisplayOrders(orderUpdates: { id: number; displayOrder: number }[]): Promise<void> {
     console.log('Sending updateDisplayOrders request:', { orderUpdates });
-    const response = await api.patch('/game-worlds/update-orders', { orderUpdates });
+    const response = await api.patch('/admin/game-worlds/update-orders', { orderUpdates });
     console.log('updateDisplayOrders response:', response.data);
   },
 
   // Move world up
   async moveUp(id: number): Promise<boolean> {
-    const response = await api.patch(`/game-worlds/${id}/move-up`);
+    const response = await api.patch(`/admin/game-worlds/${id}/move-up`);
     return response.data?.data?.moved ?? response.data?.moved ?? false;
   },
 
   // Move world down
   async moveDown(id: number): Promise<boolean> {
-    const response = await api.patch(`/game-worlds/${id}/move-down`);
+    const response = await api.patch(`/admin/game-worlds/${id}/move-down`);
     return response.data?.data?.moved ?? response.data?.moved ?? false;
   }
 };

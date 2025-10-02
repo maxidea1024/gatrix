@@ -3,8 +3,15 @@ import { config } from './config';
 import logger from './config/logger';
 import database from './config/database';
 import redisClient from './config/redis';
-import { pubSubService } from './services/PubSubService';
+import { pubSubService, SSENotificationBusMessage } from './services/PubSubService';
 import { queueService } from './services/QueueService';
+import apiTokenUsageService from './services/ApiTokenUsageService';
+import { checkDatabaseTimezone, setDatabaseTimezoneToUTC } from './utils/dbTimezoneCheck';
+import { appInstance } from './utils/AppInstance';
+import { Server } from 'socket.io';
+import { createServer } from 'http';
+import { io as ioClient } from 'socket.io-client';
+import SSENotificationService from './services/sseNotificationService';
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error: Error) => {
@@ -23,6 +30,13 @@ const gracefulShutdown = async (signal: string) => {
   logger.info(`Received ${signal}. Starting graceful shutdown...`);
 
   try {
+    // Close ApiTokenUsageService
+    try {
+      await apiTokenUsageService.shutdown();
+    } catch (error) {
+      logger.warn('Error shutting down ApiTokenUsageService:', error);
+    }
+
     // Close Queue service
     try {
       await queueService.shutdown();
@@ -69,12 +83,50 @@ const startServer = async () => {
     }
     logger.info('Database connection established successfully');
 
+    // Check and configure database timezone
+    try {
+      await setDatabaseTimezoneToUTC();
+      logger.info('Database timezone configured for UTC');
+    } catch (error) {
+      logger.warn('Failed to configure database timezone, continuing:', error);
+    }
+
     // Connect to Redis (optional)
     try {
       await redisClient.connect();
       logger.info('Redis connection established successfully');
     } catch (error) {
       logger.warn('Redis connection failed, continuing without Redis:', error);
+    }
+
+    // Initialize PubSub service
+    try {
+      await pubSubService.initialize();
+      logger.info('PubSub service initialized successfully');
+    } catch (error) {
+      logger.warn('PubSub service initialization failed, continuing without PubSub:', error);
+    }
+
+    // Bridge PubSub SSE messages to local SSE service fan-out
+    try {
+      pubSubService.on('sse-notification', (msg: SSENotificationBusMessage) => {
+        try {
+          const sse = SSENotificationService.getInstance();
+          sse.sendNotification({
+            type: msg.type,
+            data: msg.data,
+            timestamp: new Date(msg.timestamp || Date.now()),
+            targetUsers: msg.targetUsers,
+            targetChannels: msg.targetChannels,
+            excludeUsers: msg.excludeUsers,
+          });
+        } catch (err) {
+          logger.error('Failed to fan-out SSE from PubSub message:', err);
+        }
+      });
+      logger.info('SSE PubSub bridge is set up');
+    } catch (error) {
+      logger.warn('Failed to set up SSE PubSub bridge:', error);
     }
 
     // Initialize Queue service
@@ -85,11 +137,22 @@ const startServer = async () => {
       logger.warn('Queue service initialization failed, continuing without queues:', error);
     }
 
-    // Start HTTP server
-    const server = app.listen(config.port, () => {
-      logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`);
+    // Initialize ApiTokenUsageService (QueueService 초기화 후에 실행)
+    try {
+      await apiTokenUsageService.initialize();
+      logger.info('ApiTokenUsageService initialized successfully');
+    } catch (error) {
+      logger.warn('ApiTokenUsageService initialization failed, continuing without token usage tracking:', error);
+    }
+
+    // Start HTTP server (WebSocket은 채팅서버에서 직접 처리)
+    const server = createServer(app);
+
+    server.listen(config.port, () => {
+      logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`, appInstance.getLogInfo());
       logger.info(`Health check available at http://localhost:${config.port}/health`);
       logger.info(`API available at http://localhost:${config.port}/api/v1`);
+      logger.info(`Chat API proxy available at http://localhost:${config.port}/api/v1/chat`);
       logger.info(`Queue service ready: ${queueService.isReady()}`);
       logger.info(`PubSub service ready: ${pubSubService.isReady()}`);
     });
