@@ -2290,7 +2290,10 @@
     "stats": {
       "totalEvents": "Total Events",
       "uniqueUsers": "Unique Users",
-      "eventTypes": "Event Types"
+      "eventTypes": "Event Types",
+      "events": "Events",
+      "users": "Users",
+      "types": "Types"
     }
   }
 }

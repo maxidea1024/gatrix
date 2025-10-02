@@ -56,8 +56,27 @@ const updateGameWorldSchema = Joi.object({
       message: Joi.string().required(),
     })
   ).optional().default([]),
-  customPayload: Joi.object().unknown(true).optional(),
+  customPayload: Joi.object().unknown(true).optional().allow(null),
   tagIds: Joi.array().items(Joi.number().integer().min(1)).optional()
+});
+
+// Update maintenance status schema
+const updateMaintenanceSchema = Joi.object({
+  isMaintenance: Joi.boolean().required(),
+  maintenanceStartDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
+  maintenanceEndDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
+  maintenanceMessage: Joi.when('isMaintenance', {
+    is: true,
+    then: Joi.string().min(1).required(),
+    otherwise: Joi.string().optional().allow('').empty('').default(null)
+  }),
+  supportsMultiLanguage: Joi.boolean().optional().default(false),
+  maintenanceLocales: Joi.array().items(
+    Joi.object({
+      lang: Joi.string().valid('ko', 'en', 'zh').required(),
+      message: Joi.string().required(),
+    })
+  ).optional().default([]),
 });
 
 // const listGameWorldsSchema = Joi.object({
@@ -258,6 +277,35 @@ export class GameWorldController {
       success: true,
       data: { world },
       message: 'Game world maintenance status toggled successfully',
+    });
+  });
+
+  static updateMaintenance = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const id = parseInt(req.params.id);
+
+    if (isNaN(id)) {
+      throw new CustomError('Invalid game world ID', 400);
+    }
+
+    // Validate request body
+    const { error, value } = updateMaintenanceSchema.validate(req.body);
+    if (error) {
+      throw new CustomError(error.details[0].message, 400);
+    }
+
+    // Add updatedBy from authenticated user session
+    const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
+    const updateData = {
+      ...value,
+      updatedBy: authenticatedUserId
+    };
+
+    const world = await GameWorldService.updateGameWorld(id, updateData);
+
+    res.json({
+      success: true,
+      data: { world },
+      message: 'Game world maintenance status updated successfully',
     });
   });
 

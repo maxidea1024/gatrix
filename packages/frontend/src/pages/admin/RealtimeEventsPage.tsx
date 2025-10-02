@@ -90,7 +90,13 @@ const RealtimeEventsPage: React.FC = () => {
   const [events, setEvents] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [topEvents, setTopEvents] = useState<EventStats[]>([]);
-  const [autoRefresh, setAutoRefresh] = useState(true);
+
+  // Load autoRefresh setting from localStorage (default: true)
+  const [autoRefresh, setAutoRefresh] = useState(() => {
+    const saved = localStorage.getItem('realtimeEvents.autoRefresh');
+    return saved !== null ? saved === 'true' : true;
+  });
+
   const [refreshProgress, setRefreshProgress] = useState(0);
   const eventStreamRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -271,17 +277,23 @@ const RealtimeEventsPage: React.FC = () => {
         setEventTypes(types.size);
       }
     } catch (error: any) {
-      console.error('Failed to load events:', error);
-      enqueueSnackbar(error.message || t('common.error'), { variant: 'error' });
+      console.error('[RealtimeEvents] Failed to load events:', error);
+      // Don't show error toast for background auto-refresh failures
+      // Only log to console for debugging
     } finally {
       setLoading(false);
     }
-  }, [t, enqueueSnackbar, eventTypeFilter, userFilter, searchQuery]);
+  }, [eventTypeFilter, userFilter, searchQuery]);
 
   // Initial load
   useEffect(() => {
     loadEvents();
   }, [loadEvents]);
+
+  // Save autoRefresh setting to localStorage
+  useEffect(() => {
+    localStorage.setItem('realtimeEvents.autoRefresh', String(autoRefresh));
+  }, [autoRefresh]);
 
   // Auto refresh every 5 seconds with progress
   useEffect(() => {
@@ -1058,7 +1070,7 @@ const RealtimeEventsPage: React.FC = () => {
                       {events.length}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                      Events
+                      {t('realtimeEvents.stats.events')}
                     </Typography>
                   </Paper>
                 </Grid>
@@ -1077,7 +1089,7 @@ const RealtimeEventsPage: React.FC = () => {
                       {uniqueUsers}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                      Users
+                      {t('realtimeEvents.stats.users')}
                     </Typography>
                   </Paper>
                 </Grid>
@@ -1096,7 +1108,7 @@ const RealtimeEventsPage: React.FC = () => {
                       {eventTypes}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                      Types
+                      {t('realtimeEvents.stats.types')}
                     </Typography>
                   </Paper>
                 </Grid>

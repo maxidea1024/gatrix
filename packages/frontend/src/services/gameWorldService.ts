@@ -91,6 +91,25 @@ export const gameWorldService = {
     return response.data?.data?.world || response.data?.world;
   },
 
+  // Update maintenance status with details
+  async updateMaintenance(id: number, data: {
+    isMaintenance: boolean;
+    maintenanceStartDate?: string;
+    maintenanceEndDate?: string;
+    maintenanceMessage?: string;
+    supportsMultiLanguage?: boolean;
+    maintenanceLocales?: Array<{ lang: 'ko' | 'en' | 'zh'; message: string }>;
+  }): Promise<GameWorld> {
+    // Ensure boolean fields are actually boolean
+    const sanitizedData = {
+      ...data,
+      isMaintenance: Boolean(data.isMaintenance),
+      ...(data.supportsMultiLanguage !== undefined && { supportsMultiLanguage: Boolean(data.supportsMultiLanguage) }),
+    };
+    const response = await api.patch(`/admin/game-worlds/${id}/maintenance`, sanitizedData);
+    return response.data?.data?.world || response.data?.world;
+  },
+
   // Update display orders
   async updateDisplayOrders(orderUpdates: { id: number; displayOrder: number }[]): Promise<void> {
     console.log('Sending updateDisplayOrders request:', { orderUpdates });

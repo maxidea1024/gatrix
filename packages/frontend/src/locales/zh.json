@@ -2287,7 +2287,10 @@
     "stats": {
       "totalEvents": "总事件数",
       "uniqueUsers": "唯一用户",
-      "eventTypes": "事件类型"
+      "eventTypes": "事件类型",
+      "events": "事件",
+      "users": "用户",
+      "types": "类型"
     }
   }
 }

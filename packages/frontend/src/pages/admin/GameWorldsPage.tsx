@@ -875,26 +875,25 @@ const GameWorldsPage: React.FC = () => {
 
     try {
       if (maintenanceToggleDialog.isActivating) {
-        // 점검 활성화: 점검 설정 데이터와 함께 업데이트
-        const updateData: any = {
-          worldId: maintenanceToggleDialog.world.worldId,
-          name: maintenanceToggleDialog.world.name,
-          description: maintenanceToggleDialog.world.description,
-          isVisible: maintenanceToggleDialog.world.isVisible,
+        // 점검 활성화: 점검 전용 API 사용
+        const updateData = {
           isMaintenance: true,
           maintenanceStartDate: maintenanceToggleDialog.maintenanceData.maintenanceStartDate || undefined,
           maintenanceEndDate: maintenanceToggleDialog.maintenanceData.maintenanceEndDate || undefined,
           maintenanceMessage: maintenanceToggleDialog.maintenanceData.maintenanceMessage || undefined,
           supportsMultiLanguage: toggleSupportsMultiLanguage,
           maintenanceLocales: toggleMaintenanceLocales.filter(l => l.message.trim() !== ''),
-          customPayload: maintenanceToggleDialog.world.customPayload,
-          tagIds: (maintenanceToggleDialog.world.tags || []).map(t => t.id),
         };
-        await gameWorldService.updateGameWorld(maintenanceToggleDialog.world.id, updateData);
+        await gameWorldService.updateMaintenance(maintenanceToggleDialog.world.id, updateData);
         enqueueSnackbar(t('gameWorlds.maintenanceStarted'), { variant: 'success' });
       } else {
-        // 점검 해제
-        await gameWorldService.toggleMaintenance(maintenanceToggleDialog.world.id);
+        // 점검 해제: 점검 전용 API 사용
+        const updateData = {
+          isMaintenance: false,
+          maintenanceMessage: '',
+          maintenanceLocales: [],
+        };
+        await gameWorldService.updateMaintenance(maintenanceToggleDialog.world.id, updateData);
         enqueueSnackbar(t('gameWorlds.maintenanceEnded'), { variant: 'success' });
       }
       loadGameWorlds();

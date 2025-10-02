@@ -20,6 +20,7 @@ router.put('/:id', auditGameWorldUpdate as any, GameWorldController.updateGameWo
 router.delete('/:id', auditGameWorldDelete as any, GameWorldController.deleteGameWorld);
 router.patch('/:id/toggle-visibility', auditGameWorldToggleVisibility as any, GameWorldController.toggleVisibility);
 router.patch('/:id/toggle-maintenance', auditGameWorldToggleMaintenance as any, GameWorldController.toggleMaintenance);
+router.patch('/:id/maintenance', auditGameWorldUpdate as any, GameWorldController.updateMaintenance);
 router.patch('/update-orders', auditGameWorldUpdateOrders as any, GameWorldController.updateDisplayOrders);
 router.patch('/:id/move-up', auditGameWorldMoveUp as any, GameWorldController.moveUp);
 router.patch('/:id/move-down', auditGameWorldMoveDown as any, GameWorldController.moveDown);

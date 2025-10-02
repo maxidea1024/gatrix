@@ -2287,7 +2287,10 @@
     "stats": {
       "totalEvents": "전체 이벤트",
       "uniqueUsers": "고유 사용자",
-      "eventTypes": "이벤트 유형"
+      "eventTypes": "이벤트 유형",
+      "events": "이벤트",
+      "users": "사용자",
+      "types": "유형"
     }
   }
 }
