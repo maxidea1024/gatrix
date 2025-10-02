@@ -1109,20 +1109,32 @@ const SystemConsolePage: React.FC = () => {
 
       <Box sx={(th) => ({
         flex: 1,
-        bgcolor: th.palette.background.paper,
-        color: th.palette.text.primary,
+        bgcolor: th.palette.mode === 'dark' ? th.palette.background.paper : '#1e293b',
+        color: th.palette.mode === 'dark' ? th.palette.text.primary : '#e2e8f0',
         borderRadius: 1,
         p: 1,
         minHeight: 0,
         fontFamily: 'D2Coding, "NanumGothicCoding", "Source Han Mono", "Noto Sans Mono CJK KR", Menlo, Monaco, "Courier New", monospace',
         '& .xterm-viewport::-webkit-scrollbar': { width: '8px' },
         '& .xterm-viewport::-webkit-scrollbar-track': {
-          background: th.palette.mode === 'dark' ? alpha(th.palette.common.black, 0.35) : 'transparent'
+          background: th.palette.mode === 'dark' ? alpha(th.palette.common.black, 0.35) : 'rgba(0, 0, 0, 0.2)'
         },
-        '& .xterm-viewport::-webkit-scrollbar-thumb': { background: alpha(th.palette.text.primary, 0.2), borderRadius: '4px' },
-        '& .xterm-viewport::-webkit-scrollbar-thumb:hover': { background: alpha(th.palette.text.primary, 0.3) },
-        '& .xterm-viewport::-webkit-scrollbar-thumb:active': { background: alpha(th.palette.text.primary, 0.4) },
-        '& .xterm-viewport': { scrollbarWidth: 'thin', scrollbarColor: `${alpha(th.palette.text.primary, 0.3)} ${th.palette.mode === 'dark' ? alpha(th.palette.common.black, 0.35) : 'transparent'}` },
+        '& .xterm-viewport::-webkit-scrollbar-thumb': {
+          background: th.palette.mode === 'dark' ? alpha(th.palette.text.primary, 0.2) : 'rgba(226, 232, 240, 0.3)',
+          borderRadius: '4px'
+        },
+        '& .xterm-viewport::-webkit-scrollbar-thumb:hover': {
+          background: th.palette.mode === 'dark' ? alpha(th.palette.text.primary, 0.3) : 'rgba(226, 232, 240, 0.4)'
+        },
+        '& .xterm-viewport::-webkit-scrollbar-thumb:active': {
+          background: th.palette.mode === 'dark' ? alpha(th.palette.text.primary, 0.4) : 'rgba(226, 232, 240, 0.5)'
+        },
+        '& .xterm-viewport': {
+          scrollbarWidth: 'thin',
+          scrollbarColor: th.palette.mode === 'dark'
+            ? `${alpha(th.palette.text.primary, 0.3)} ${alpha(th.palette.common.black, 0.35)}`
+            : 'rgba(226, 232, 240, 0.3) rgba(0, 0, 0, 0.2)'
+        },
       })}>
         <div ref={containerRef as any} onContextMenu={handleContextMenu} style={{ width: '100%', height: '100%' }} />
       </Box>

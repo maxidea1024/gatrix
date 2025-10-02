@@ -97,6 +97,7 @@ const TimezoneSelector: React.FC = () => {
           color: 'rgba(255, 255, 255, 0.9)',
           borderColor: 'rgba(255, 255, 255, 0.3)',
           backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          borderRadius: 2,
           '& .MuiChip-icon': {
             fontSize: '0.875rem',
             color: 'rgba(255, 255, 255, 0.7)'

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Drawer,
@@ -45,8 +45,6 @@ import {
   AccountCircle,
   Logout as LogoutIcon,
   Person as PersonIcon,
-  ChevronLeft as ChevronLeftIcon,
-  ChevronRight as ChevronRightIcon,
   Brightness4 as DarkModeIcon,
   Brightness7 as LightModeIcon,
   Language as LanguageIcon,
@@ -62,6 +60,7 @@ import {
   BugReport as BugReportIcon,
   Timeline as TimelineIcon,
   Terminal as TerminalIcon,
+  MenuOpen as MenuOpenIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -95,12 +94,27 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
-  const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({
-    admin: true,
+  // Load expanded sections from localStorage
+  const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>(() => {
+    try {
+      const stored = localStorage.getItem('sidebarExpandedSections');
+      return stored ? JSON.parse(stored) : { admin: true, settings: true };
+    } catch {
+      return { admin: true, settings: true };
+    }
   });
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(280);
-  const [isResizing, setIsResizing] = useState(false);
+
+  // Load sidebar state from localStorage
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try {
+      const stored = localStorage.getItem('sidebarCollapsed');
+      return stored === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const sidebarWidth = 280; // Fixed width
   const [avatarImageError, setAvatarImageError] = useState(false);
 
   const location = useLocation();
@@ -112,16 +126,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Maintenance banner state
   const [maintenanceStatus, setMaintenanceStatus] = useState<{ active: boolean; detail: MaintenanceDetail | null }>({ active: false, detail: null });
   const prevMaintenanceRef = useRef<{ active: boolean; updatedAt?: string | null } | null>(null);
-
-  // 점검 배너 높이 계산 (전체 높이의 70%로 축소)
-  const bannerHeight = useMemo(() => {
-    if (!maintenanceStatus.active) return 0;
-
-    const baseHeight = 40;
-    const hasTimeInfo = maintenanceStatus.detail?.startsAt || maintenanceStatus.detail?.endsAt;
-    const raw = hasTimeInfo ? baseHeight + 22 : baseHeight;
-    return Math.round(raw * 0.7);
-  }, [maintenanceStatus.active, maintenanceStatus.detail?.startsAt, maintenanceStatus.detail?.endsAt]);
   // If SSE already updated the status, avoid overwriting with initial fetch result
   const maintenanceUpdatedBySSE = useRef(false);
 
@@ -186,56 +190,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   };
 
   const handleSidebarToggle = () => {
-    setSidebarCollapsed(!sidebarCollapsed);
+    const newCollapsed = !sidebarCollapsed;
+    setSidebarCollapsed(newCollapsed);
+    try {
+      localStorage.setItem('sidebarCollapsed', String(newCollapsed));
+    } catch (error) {
+      console.warn('Failed to save sidebar collapsed state:', error);
+    }
   };
 
   const handleMaintenanceBannerClick = () => {
     navigate('/admin/maintenance');
   };
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsResizing(true);
-  };
-
-  const handleMouseMove = React.useCallback((e: MouseEvent) => {
-    if (!isResizing) return;
-
-    const newWidth = e.clientX;
-    if (newWidth >= 200 && newWidth <= 400) {
-      setSidebarWidth(newWidth);
-      if (newWidth < 240) {
-        setSidebarCollapsed(true);
-      } else {
-        setSidebarCollapsed(false);
-      }
-    }
-  }, [isResizing]);
-
-  const handleMouseUp = React.useCallback(() => {
-    setIsResizing(false);
-  }, []);
-
-  React.useEffect(() => {
-    if (isResizing) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-    } else {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    };
-  }, [isResizing, handleMouseMove, handleMouseUp]);
 
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setUserMenuAnchor(event.currentTarget);
@@ -251,10 +217,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   };
 
   const toggleSection = (section: string) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }));
+    setExpandedSections(prev => {
+      const newSections = {
+        ...prev,
+        [section]: !prev[section]
+      };
+      try {
+        localStorage.setItem('sidebarExpandedSections', JSON.stringify(newSections));
+      } catch (error) {
+        console.warn('Failed to save expanded sections:', error);
+      }
+      return newSections;
+    });
   };
 
   const isActivePath = (path: string) => {
@@ -430,12 +404,86 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   const drawerContent = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* 사이드바에서는 로고 제거 - AppBar에만 표시 */}
+      {/* 로고 및 토글 버튼 영역 - AppBar와 동일한 높이 */}
+      <Box
+        sx={{
+          height: 64,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          px: 2,
+          borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+        }}
+      >
+        {!sidebarCollapsed && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              cursor: 'pointer',
+              '&:hover': {
+                opacity: 0.8,
+              },
+            }}
+            onClick={() => navigate('/dashboard')}
+          >
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                backgroundColor: '#5b6ad0',
+                borderRadius: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
+                G
+              </Typography>
+            </Box>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: '#ffffff' }}>
+              Gatrix
+            </Typography>
+          </Box>
+        )}
 
+        {sidebarCollapsed && (
+          <Box
+            sx={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              '&:hover': {
+                opacity: 0.8,
+              },
+            }}
+            onClick={() => navigate('/dashboard')}
+          >
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                backgroundColor: '#5b6ad0',
+                borderRadius: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
+                G
+              </Typography>
+            </Box>
+          </Box>
+        )}
 
+      </Box>
 
       {/* 메뉴 영역 */}
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
         <List sx={{ px: 1, flexGrow: 1 }}>
         {/* 기본 메뉴 */}
         {!sidebarCollapsed && (
@@ -552,110 +600,315 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </>
         )}
         </List>
-
-        {/* 토글 버튼 영역 */}
-        <Box sx={{ mt: 'auto' }}>
-          <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.12)', my: 1 }} />
-          <ListItemButton
-            onClick={handleSidebarToggle}
-            sx={{
-              color: '#94a3b8',
-              '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' },
-              justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
-              px: sidebarCollapsed ? 1 : 2,
-            }}
-          >
-            <ListItemIcon sx={{
-              color: 'inherit',
-              minWidth: sidebarCollapsed ? 'auto' : 40,
-              justifyContent: 'center'
-            }}>
-              {sidebarCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-            </ListItemIcon>
-            {!sidebarCollapsed && (
-              <ListItemText
-                primary={sidebarCollapsed ? t('common.expand') : t('common.collapse')}
-                primaryTypographyProps={{ fontSize: '0.875rem' }}
-              />
-            )}
-          </ListItemButton>
-        </Box>
       </Box>
     </Box>
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      {/* 상단 바 */}
-      <AppBar
-        position="fixed"
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      {/* 사이드바 - 전체 높이 차지 */}
+      <Box
+        component="nav"
         sx={{
-          width: '100%',
-          zIndex: (theme) => theme.zIndex.appBar,
-          backgroundColor: '#1e293b',
-          color: '#ffffff',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
-          borderBottom: 'none',
+          width: { xs: 0, md: sidebarCollapsed ? 64 : sidebarWidth },
+          flexShrink: 0,
+          zIndex: (theme) => theme.zIndex.drawer,
         }}
       >
-        <Toolbar sx={{
-          justifyContent: 'space-between',
-          pl: {
-            xs: 2,
-            md: 2
-          },
-          transition: 'padding-left 0.3s ease',
-        }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            {isMobile && (
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                edge="start"
-                onClick={handleDrawerToggle}
-                sx={{ mr: 2 }}
+        {/* 모바일 드로어 */}
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true,
+          }}
+          sx={{
+            display: { xs: 'block', md: 'none' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: 280,
+              backgroundColor: '#0f172a',
+              color: '#ffffff',
+              borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+            },
+          }}
+        >
+          {drawerContent}
+        </Drawer>
+
+        {/* 데스크톱 드로어 - 전체 높이 */}
+        <Drawer
+          variant="permanent"
+          sx={{
+            display: { xs: 'none', md: 'block' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: sidebarCollapsed ? 64 : sidebarWidth,
+              backgroundColor: '#0f172a',
+              color: '#ffffff',
+              borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+              position: 'fixed',
+              height: '100vh',
+              top: 0,
+              left: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+            },
+          }}
+          open
+        >
+          {drawerContent}
+        </Drawer>
+      </Box>
+
+      {/* 오른쪽 영역: AppBar + 메인 컨텐츠 */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, overflow: 'hidden' }}>
+        {/* 상단 바 - 사이드바 옆에 위치 */}
+        <AppBar
+          position="static"
+          sx={{
+            backgroundColor: '#1e293b',
+            color: '#ffffff',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+            borderBottom: 'none',
+            zIndex: (theme) => theme.zIndex.appBar,
+          }}
+        >
+          <Toolbar sx={{
+            justifyContent: 'space-between',
+            minHeight: 64,
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              {isMobile ? (
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  edge="start"
+                  onClick={handleDrawerToggle}
+                  sx={{ mr: 1 }}
+                >
+                  <MenuIcon />
+                </IconButton>
+              ) : (
+                <IconButton
+                  color="inherit"
+                  aria-label="toggle sidebar"
+                  edge="start"
+                  onClick={handleSidebarToggle}
+                  sx={{ mr: 1 }}
+                >
+                  <MenuOpenIcon />
+                </IconButton>
+              )}
+            </Box>
+
+            {/* 점검 배너 - AppBar 내부 */}
+            {maintenanceStatus.active && (
+              <Tooltip
+                title={
+                  <Box sx={{ p: 1.5, minWidth: 300 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1.5, color: '#ff6b6b' }}>
+                      🔧 {t('maintenance.tooltipTitle')}
+                    </Typography>
+
+                    {/* 상태 */}
+                    <Typography variant="body2" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+                      <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipStatus')}:</strong>
+                      <Box component="span" sx={{
+                        ml: 1,
+                        px: 1,
+                        py: 0.25,
+                        borderRadius: 1,
+                        backgroundColor: maintenanceStatus.active ? '#ff6b6b' : '#ffa726',
+                        color: 'white',
+                        fontSize: '0.75rem',
+                        fontWeight: 'bold'
+                      }}>
+                        {maintenanceStatus.active ? t('maintenance.statusActive') : t('maintenance.statusScheduled')}
+                      </Box>
+                    </Typography>
+
+                    {/* 유형 */}
+                    {maintenanceStatus.detail?.type && (
+                      <Typography variant="body2" sx={{ mb: 1 }}>
+                        <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipType')}:</strong> {(() => {
+                          switch (maintenanceStatus.detail.type) {
+                            case 'scheduled':
+                              return t('maintenance.scheduledLabel');
+                            case 'emergency':
+                              return t('maintenance.emergencyLabel');
+                            case 'regular':
+                              return t('maintenance.regularLabel');
+                            default:
+                              return t('maintenance.immediateStartLabel');
+                          }
+                        })()}
+                      </Typography>
+                    )}
+
+                    {/* 시작 시간 */}
+                    {maintenanceStatus.detail?.startsAt && (
+                      <Typography variant="body2" sx={{ mb: 1 }}>
+                        <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipStartTime')}:</strong> {formatDateTimeDetailed(maintenanceStatus.detail.startsAt)}
+                      </Typography>
+                    )}
+
+                    {/* 종료 시간 */}
+                    {maintenanceStatus.detail?.endsAt && (
+                      <Typography variant="body2" sx={{ mb: 1 }}>
+                        <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipEndTime')}:</strong> {formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}
+                      </Typography>
+                    )}
+
+                    {/* 소요 시간 */}
+                    {maintenanceStatus.detail?.startsAt && maintenanceStatus.detail?.endsAt && (
+                      <Typography variant="body2" sx={{ mb: 1 }}>
+                        <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipDuration')}:</strong> {
+                          (() => {
+                            const start = new Date(maintenanceStatus.detail.startsAt);
+                            const end = new Date(maintenanceStatus.detail.endsAt);
+                            const diffMs = end.getTime() - start.getTime();
+                            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                            const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+                            if (diffHours > 0) {
+                              return `${diffHours}${t('maintenance.hoursUnit')} ${diffMinutes}${t('maintenance.minutesUnit')}`;
+                            } else {
+                              return `${diffMinutes}${t('maintenance.minutesUnit')}`;
+                            }
+                          })()
+                        }
+                      </Typography>
+                    )}
+
+                    {/* 메시지 */}
+                    {maintenanceStatus.detail?.message && (
+                      <Typography variant="body2" sx={{ mb: 1.5 }}>
+                        <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipMessage')}:</strong>
+                        <Box component="div" sx={{
+                          mt: 0.5,
+                          p: 1,
+                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                          borderRadius: 1,
+                          fontStyle: 'italic',
+                          maxWidth: '250px',
+                          wordBreak: 'break-word'
+                        }}>
+                          {maintenanceStatus.detail.message}
+                        </Box>
+                      </Typography>
+                    )}
+
+                    <Typography variant="caption" sx={{
+                      fontStyle: 'italic',
+                      opacity: 0.8,
+                      display: 'flex',
+                      alignItems: 'center',
+                      mt: 1,
+                      pt: 1,
+                      borderTop: '1px solid rgba(255, 255, 255, 0.2)'
+                    }}>
+                      💡 {t('maintenance.clickToManageTooltip')}
+                    </Typography>
+                  </Box>
+                }
+                arrow
+                placement="bottom"
+                enterDelay={500}
+                leaveDelay={200}
               >
-                <MenuIcon />
-              </IconButton>
+                <Box
+                  onClick={handleMaintenanceBannerClick}
+                  sx={{
+                    flexGrow: 1,
+                    mx: 2,
+                    px: 2,
+                    py: 0.75,
+                    borderRadius: 3,
+                    backgroundColor: 'rgba(244, 67, 54, 0.15)',
+                    border: '1px solid rgba(244, 67, 54, 0.3)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    '&:hover': {
+                      backgroundColor: 'rgba(244, 67, 54, 0.25)',
+                      borderColor: 'rgba(244, 67, 54, 0.5)',
+                    },
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Typography variant="body2" sx={{
+                      fontWeight: 700,
+                      fontSize: '0.8rem',
+                      color: '#ff6b6b',
+                    }}>
+                      🔧 {t('common.maintenance.bannerActive')}
+                    </Typography>
+                    {maintenanceStatus.detail?.type && (
+                      <Typography variant="body2" sx={{
+                        fontSize: '0.7rem',
+                        backgroundColor: 'rgba(244, 67, 54, 0.2)',
+                        color: '#ff6b6b',
+                        px: 1,
+                        py: 0.25,
+                        borderRadius: 1,
+                        fontWeight: 600
+                      }}>
+                        {t(`maintenance.types.${maintenanceStatus.detail.type}`)}
+                      </Typography>
+                    )}
+                    {(maintenanceStatus.detail?.startsAt || maintenanceStatus.detail?.endsAt) && (
+                      <Typography variant="body2" sx={{
+                        fontSize: '0.75rem',
+                        color: 'text.secondary',
+                      }}>
+                        📅 {(() => {
+                          const start = maintenanceStatus.detail?.startsAt;
+                          const end = maintenanceStatus.detail?.endsAt;
+                          if (start && end) {
+                            return `${formatDateTimeDetailed(start)} ~ ${formatDateTimeDetailed(end)}`;
+                          } else if (start) {
+                            return `${formatDateTimeDetailed(start)} ${t('maintenance.start')}`;
+                          } else if (end) {
+                            return `${formatDateTimeDetailed(end)} ${t('maintenance.stop')}`;
+                          }
+                          return t('maintenance.immediateStartLabel');
+                        })()}
+                      </Typography>
+                    )}
+                    {maintenanceStatus.detail?.message && (
+                      <Typography variant="body2" sx={{
+                        fontSize: '0.75rem',
+                        color: 'text.secondary',
+                        fontStyle: 'italic',
+                        maxWidth: '300px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}>
+                        💬 {maintenanceStatus.detail.message}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
+              </Tooltip>
             )}
 
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: 'rgba(255,255,255,0.05)',
-                },
-                borderRadius: 1,
-                px: 1,
-                py: 0.5,
-                transition: 'background-color 0.2s ease'
-              }}
-              onClick={() => navigate('/dashboard')}
-            >
+            {/* 점검 배너 우측 구분선 */}
+            {maintenanceStatus.active && (
               <Box
                 sx={{
-                  width: 32,
-                  height: 32,
-                  backgroundColor: '#5b6ad0',
-                  borderRadius: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mr: 1
+                  width: '1px',
+                  height: '24px',
+                  bgcolor: 'rgba(255, 255, 255, 0.2)',
+                  mx: 1
                 }}
-              >
-                <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
-                  G
-                </Typography>
-              </Box>
-              <Typography variant="h6" sx={{ fontWeight: 600, color: '#ffffff' }}>
-                Gatrix
-              </Typography>
-            </Box>
-          </Box>
+              />
+            )}
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <TimezoneSelector />
@@ -737,384 +990,22 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           </Box>
         </Toolbar>
       </AppBar>
-      {/* Maintenance banner (full-width under AppBar) */}
-      {maintenanceStatus.active && (
-        <Tooltip
-          title={
-            <Box sx={{ p: 1.5, minWidth: 300 }}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1.5, color: '#ff6b6b' }}>
-                🔧 {t('maintenance.tooltipTitle')}
-              </Typography>
 
-              {/* 상태 */}
-              <Typography variant="body2" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
-                <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipStatus')}:</strong>
-                <Box component="span" sx={{
-                  ml: 1,
-                  px: 1,
-                  py: 0.25,
-                  borderRadius: 1,
-                  backgroundColor: maintenanceStatus.active ? '#ff6b6b' : '#ffa726',
-                  color: 'white',
-                  fontSize: '0.75rem',
-                  fontWeight: 'bold'
-                }}>
-                  {maintenanceStatus.active ? t('maintenance.statusActive') : t('maintenance.statusScheduled')}
-                </Box>
-              </Typography>
-
-              {/* 유형 */}
-              {maintenanceStatus.detail?.type && (
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipType')}:</strong> {(() => {
-                    switch (maintenanceStatus.detail.type) {
-                      case 'scheduled':
-                        return t('maintenance.scheduledLabel');
-                      case 'emergency':
-                        return t('maintenance.emergencyLabel');
-                      case 'regular':
-                        return t('maintenance.regularLabel');
-                      default:
-                        return t('maintenance.immediateStartLabel');
-                    }
-                  })()}
-                </Typography>
-              )}
-
-              {/* 시작 시간 */}
-              {maintenanceStatus.detail?.startsAt && (
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipStartTime')}:</strong> {formatDateTimeDetailed(maintenanceStatus.detail.startsAt)}
-                </Typography>
-              )}
-
-              {/* 종료 시간 */}
-              {maintenanceStatus.detail?.endsAt && (
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipEndTime')}:</strong> {formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}
-                </Typography>
-              )}
-
-              {/* 소요 시간 */}
-              {maintenanceStatus.detail?.startsAt && maintenanceStatus.detail?.endsAt && (
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipDuration')}:</strong> {
-                    (() => {
-                      const start = new Date(maintenanceStatus.detail.startsAt);
-                      const end = new Date(maintenanceStatus.detail.endsAt);
-                      const diffMs = end.getTime() - start.getTime();
-                      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-                      const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-
-                      if (diffHours > 0) {
-                        return `${diffHours}${t('maintenance.hoursUnit')} ${diffMinutes}${t('maintenance.minutesUnit')}`;
-                      } else {
-                        return `${diffMinutes}${t('maintenance.minutesUnit')}`;
-                      }
-                    })()
-                  }
-                </Typography>
-              )}
-
-              {/* 메시지 */}
-              {maintenanceStatus.detail?.message && (
-                <Typography variant="body2" sx={{ mb: 1.5 }}>
-                  <strong style={{ minWidth: '60px' }}>{t('maintenance.tooltipMessage')}:</strong>
-                  <Box component="div" sx={{
-                    mt: 0.5,
-                    p: 1,
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: 1,
-                    fontStyle: 'italic',
-                    maxWidth: '250px',
-                    wordBreak: 'break-word'
-                  }}>
-                    {maintenanceStatus.detail.message}
-                  </Box>
-                </Typography>
-              )}
-
-              <Typography variant="caption" sx={{
-                fontStyle: 'italic',
-                opacity: 0.8,
-                display: 'flex',
-                alignItems: 'center',
-                mt: 1,
-                pt: 1,
-                borderTop: '1px solid rgba(255, 255, 255, 0.2)'
-              }}>
-                💡 {t('maintenance.clickToManageTooltip')}
-              </Typography>
-            </Box>
-          }
-          arrow
-          placement="bottom"
-          enterDelay={500}
-          leaveDelay={200}
-        >
-          <Box
-            onClick={handleMaintenanceBannerClick}
-            sx={{
-          position: 'fixed',
-          top: '64px',
-          left: 0,
-          right: 0,
-          minHeight: `${bannerHeight}px`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          px: 2,
-          py: 1,
-          color: '#fff',
-          fontWeight: 600,
-          backgroundColor: (theme) => theme.palette.mode === 'dark'
-            ? 'rgba(244, 67, 54, 0.9)'
-            : 'rgba(244, 67, 54, 0.85)',
-          backdropFilter: 'blur(8px)',
-          borderBottom: '1px solid',
-          borderBottomColor: (theme) => theme.palette.mode === 'dark'
-            ? 'rgba(244, 67, 54, 0.3)'
-            : 'rgba(244, 67, 54, 0.2)',
-          boxShadow: (theme) => theme.palette.mode === 'dark'
-            ? '0 2px 8px rgba(211,47,47,0.3)'
-            : '0 2px 8px rgba(255,77,79,0.2)',
-          zIndex: (theme) => theme.zIndex.appBar,
-          overflow: 'hidden',
-          cursor: 'pointer',
-          transition: 'all 0.3s ease',
-          '&:hover': {
-            backgroundColor: (theme) => theme.palette.mode === 'dark'
-              ? 'rgba(244, 67, 54, 0.95)'
-              : 'rgba(244, 67, 54, 0.9)',
-          },
-
-
-        }}>
-
-
-          {/* 한 줄로 정리된 점검 정보 */}
-          <Box sx={{
+        {/* 메인 컨텐츠 */}
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: 3,
+            backgroundColor: 'background.default',
+            overflow: 'auto',
             display: 'flex',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 2,
-            fontSize: '0.875rem',
-            position: 'relative',
-            zIndex: 3
-          }}>
-            {/* 점검 상태 */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="body2" sx={{
-                fontWeight: 700,
-                fontSize: '0.875rem',
-                textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
-              }}>
-                🔧 {t('common.maintenance.bannerActive')}
-              </Typography>
-              {maintenanceStatus.detail?.type && (
-                <Typography variant="body2" sx={{
-                  fontSize: '0.75rem',
-                  backgroundColor: 'rgba(255,255,255,0.25)',
-                  px: 1,
-                  py: 0.25,
-                  textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
-                  borderRadius: 0.5,
-                  fontWeight: 600
-                }}>
-                  {t(`maintenance.types.${maintenanceStatus.detail.type}`)}
-                </Typography>
-              )}
-            </Box>
-
-            {/* 점검 기간 */}
-            {(maintenanceStatus.detail?.startsAt || maintenanceStatus.detail?.endsAt) && (
-              <Typography variant="body2" sx={{
-                fontSize: '0.8rem',
-                opacity: 0.95,
-                textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
-              }}>
-                📅 {(() => {
-                  const start = maintenanceStatus.detail?.startsAt;
-                  const end = maintenanceStatus.detail?.endsAt;
-                  if (start && end) {
-                    return `${formatDateTimeDetailed(start)} ~ ${formatDateTimeDetailed(end)}`;
-                  } else if (start) {
-                    return `${formatDateTimeDetailed(start)} ${t('maintenance.start')}`;
-                  } else if (end) {
-                    return `${formatDateTimeDetailed(end)} ${t('maintenance.stop')}`;
-                  }
-                  return t('maintenance.immediateStartLabel');
-                })()}
-              </Typography>
-            )}
-
-            {/* 점검 메시지 */}
-            {maintenanceStatus.detail?.message && (
-              <Typography variant="body2" sx={{
-                fontSize: '0.8rem',
-                opacity: 0.9,
-                fontStyle: 'italic',
-                maxWidth: '400px',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                position: 'relative',
-                zIndex: 3,
-                textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
-              }}>
-                💬 {maintenanceStatus.detail.message}
-              </Typography>
-            )}
-          </Box>
+            flexDirection: 'column',
+          }}
+        >
+          {children}
         </Box>
-        </Tooltip>
-      )}
-
-      {/* 사이드바 */}
-      <Box
-        component="nav"
-        sx={{
-          width: { md: sidebarCollapsed ? 64 : sidebarWidth },
-          flexShrink: { md: 0 },
-          transition: 'width 0.3s ease',
-          position: 'fixed',
-          top: `${64 + bannerHeight}px`, // AppBar + dynamic banner height
-          height: `calc(100vh - ${64 + bannerHeight}px)`,
-          zIndex: (theme) => theme.zIndex.appBar - 1,
-        }}
-      >
-        {/* 모바일 드로어 */}
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: 280,
-              backgroundColor: '#1e293b',
-              color: '#ffffff',
-              borderRight: 'none',
-              zIndex: (theme) => theme.zIndex.appBar - 1,
-            },
-          }}
-        >
-          {drawerContent}
-        </Drawer>
-
-        {/* 데스크톱 드로어 */}
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: 'none', md: 'block' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: sidebarCollapsed ? 64 : sidebarWidth,
-              backgroundColor: '#1e293b',
-              color: '#ffffff',
-              borderRight: 'none',
-              transition: 'width 220ms ease-out',
-              position: 'relative',
-              height: '100vh',
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden',
-              willChange: 'width',
-              backfaceVisibility: 'hidden',
-              transform: 'translateZ(0)',
-              zIndex: (theme) => theme.zIndex.appBar - 1,
-            },
-          }}
-          open
-        >
-          {drawerContent}
-
-          {/* 리사이즈 핸들 */}
-          {!sidebarCollapsed && (
-            <Box
-              onMouseDown={handleMouseDown}
-              sx={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-                width: 4,
-                height: '100%',
-                cursor: 'col-resize',
-                backgroundColor: 'transparent',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                },
-                zIndex: 1000,
-              }}
-            />
-          )}
-        </Drawer>
       </Box>
-
-      {/* 메인 컨텐츠 */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          pl: {
-            xs: 3,
-            md: `${(sidebarCollapsed ? 64 : sidebarWidth) + 24}px`
-          },
-          mt: `${64 + bannerHeight}px`, // AppBar + dynamic banner height
-          minHeight: `calc(100vh - ${64 + bannerHeight}px)`,
-          height: 'auto',
-          backgroundColor: 'background.default',
-          width: '100%',
-          maxWidth: '100%',
-          transition: 'padding-left 0.3s ease',
-          overflowX: 'hidden',
-          overflow: 'visible', // 스크롤 제거
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-
-      {/* 접힘 상태 전용: 화면 고정(FAB 스타일) 확장 버튼 */}
-      {sidebarCollapsed && (
-        <Tooltip title={t('common.expand')} placement="right" arrow>
-          <IconButton
-            onClick={handleSidebarToggle}
-            sx={{
-              position: 'fixed',
-              top: '50%',
-              left: 60, // 접힘 너비(64) 근처에 노출
-              transform: 'translateY(-50%)',
-              width: 40,
-              height: 40,
-              borderRadius: '50%',
-              bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.04)',
-              color: (theme) => theme.palette.mode === 'dark' ? '#e2e8f0' : '#334155',
-              border: '1px solid',
-              borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.15)',
-              boxShadow: 6,
-              zIndex: (theme) => theme.zIndex.drawer + 6,
-              '&:hover': {
-                bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.08)'
-              }
-            }}
-          >
-            <ChevronRightIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-
-        {/* Maintenance banner */}
-
-
-
-        {children}
-      </Box>
-
     </Box>
   );
 };
