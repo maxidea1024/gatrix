@@ -2255,7 +2255,7 @@
   },
   "realtimeEvents": {
     "title": "실시간 이벤트",
-    "subtitle": "이벤트 스트림 시각화로 시스템 이벤트를 실시간으로 모니터링",
+    "subtitle": "이벤트 스트림 시각화로 시스템 이벤트를 실시간으로 모니터링합니다",
     "timeline": "타임라인",
     "eventStream": "이벤트 스트림",
     "topEvents": "주요 이벤트",

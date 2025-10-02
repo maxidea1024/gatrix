@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { consoleService } from '../services/ConsoleService';
 import { pubSubService } from '../services/PubSubService';
+import { AuditLogModel } from '../models/AuditLog';
+import logger from '../config/logger';
 
 export class SystemConsoleController {
   static async listCommands(req: Request, res: Response) {
@@ -15,6 +17,27 @@ export class SystemConsoleController {
     const argv: string[] = Array.isArray(args) ? args.map(String) : [];
     const ctx = { user: (req as any)?.user };
     const result = await consoleService.execute(command, argv, ctx);
+
+    // Create audit log if command requires auditing
+    if (consoleService.shouldAudit(command)) {
+      try {
+        await AuditLogModel.create({
+          userId: (req as any)?.user?.id || (req as any)?.userId,
+          action: `console_${command}`,
+          resourceType: 'console',
+          resourceId: undefined, // Console commands don't have numeric entity IDs
+          newValues: {
+            command,
+            args: argv,
+          },
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent'),
+        });
+      } catch (error) {
+        // Don't fail the request if audit logging fails
+        logger.error('Failed to create console audit log:', error);
+      }
+    }
 
     // Also broadcast via SSE (to the requesting user only)
     try {

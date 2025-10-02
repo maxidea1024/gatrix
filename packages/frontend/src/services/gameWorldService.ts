@@ -50,13 +50,27 @@ export const gameWorldService = {
 
   // Create new game world
   async createGameWorld(data: CreateGameWorldData): Promise<GameWorld> {
-    const response = await api.post('/admin/game-worlds', data);
+    // Ensure boolean fields are actually boolean, not numbers
+    const sanitizedData = {
+      ...data,
+      ...(data.isVisible !== undefined && { isVisible: Boolean(data.isVisible) }),
+      ...(data.isMaintenance !== undefined && { isMaintenance: Boolean(data.isMaintenance) }),
+      ...(data.supportsMultiLanguage !== undefined && { supportsMultiLanguage: Boolean(data.supportsMultiLanguage) }),
+    };
+    const response = await api.post('/admin/game-worlds', sanitizedData);
     return response.data?.data?.world || response.data?.world;
   },
 
   // Update game world
   async updateGameWorld(id: number, data: UpdateGameWorldData): Promise<GameWorld> {
-    const response = await api.put(`/admin/game-worlds/${id}`, data);
+    // Ensure boolean fields are actually boolean, not numbers
+    const sanitizedData = {
+      ...data,
+      ...(data.isVisible !== undefined && { isVisible: Boolean(data.isVisible) }),
+      ...(data.isMaintenance !== undefined && { isMaintenance: Boolean(data.isMaintenance) }),
+      ...(data.supportsMultiLanguage !== undefined && { supportsMultiLanguage: Boolean(data.supportsMultiLanguage) }),
+    };
+    const response = await api.put(`/admin/game-worlds/${id}`, sanitizedData);
     return response.data?.data?.world || response.data?.world;
   },
 

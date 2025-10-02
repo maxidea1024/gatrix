@@ -33,6 +33,13 @@ import {
   Tabs,
   CircularProgress,
 } from '@mui/material';
+import Timeline from '@mui/lab/Timeline';
+import TimelineItem from '@mui/lab/TimelineItem';
+import TimelineSeparator from '@mui/lab/TimelineSeparator';
+import TimelineConnector from '@mui/lab/TimelineConnector';
+import TimelineContent from '@mui/lab/TimelineContent';
+import TimelineDot from '@mui/lab/TimelineDot';
+import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
 import {
   Refresh as RefreshIcon,
   Timeline as TimelineIcon,
@@ -69,6 +76,7 @@ interface EventStats {
 
 interface TimelineGroup {
   timestamp: string;
+  timeLabel: string; // e.g., "10:08 PM"
   events: AuditLog[];
   count: number;
 }
@@ -87,6 +95,8 @@ const RealtimeEventsPage: React.FC = () => {
   const eventStreamRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [newEventIds, setNewEventIds] = useState<Set<number>>(new Set());
+  const previousEventIdsRef = useRef<Set<number>>(new Set());
 
   // Filter states
   const [showFilters, setShowFilters] = useState(false);
@@ -107,6 +117,8 @@ const RealtimeEventsPage: React.FC = () => {
 
   // Timeline groups (grouped by minute)
   const [timelineGroups, setTimelineGroups] = useState<TimelineGroup[]>([]);
+  const [changedGroupKeys, setChangedGroupKeys] = useState<Set<string>>(new Set());
+  const previousGroupCountsRef = useRef<Map<string, number>>(new Map());
 
   // Set dayjs locale
   useEffect(() => {
@@ -173,26 +185,68 @@ const RealtimeEventsPage: React.FC = () => {
           );
         }
 
+        // Detect new events
+        const currentEventIds = new Set(filteredEvents.map(e => e.id));
+        const newIds = new Set<number>();
+
+        currentEventIds.forEach(id => {
+          if (!previousEventIdsRef.current.has(id)) {
+            newIds.add(id);
+          }
+        });
+
+        if (newIds.size > 0) {
+          setNewEventIds(newIds);
+          // Remove flash effect after 2 seconds
+          setTimeout(() => {
+            setNewEventIds(new Set());
+          }, 2000);
+        }
+
+        previousEventIdsRef.current = currentEventIds;
         setEvents(filteredEvents);
 
         // Group events by minute for timeline view
-        const groups: Record<string, AuditLog[]> = {};
+        const groups: Record<string, { events: AuditLog[], timeLabel: string }> = {};
         filteredEvents.forEach((log) => {
           const minuteKey = dayjs(log.createdAt).format('HH:mm');
+          const timeLabel = dayjs(log.createdAt).format('h:mm A'); // e.g., "10:08 PM"
           if (!groups[minuteKey]) {
-            groups[minuteKey] = [];
+            groups[minuteKey] = { events: [], timeLabel };
           }
-          groups[minuteKey].push(log);
+          groups[minuteKey].events.push(log);
         });
 
         const timelineData: TimelineGroup[] = Object.entries(groups)
-          .map(([timestamp, events]) => ({
+          .map(([timestamp, { events, timeLabel }]) => ({
             timestamp,
+            timeLabel,
             events,
             count: events.length,
           }))
           .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
 
+        // Detect changed group counts for rumble effect
+        const changedKeys = new Set<string>();
+        const newGroupCounts = new Map<string, number>();
+
+        timelineData.forEach(group => {
+          newGroupCounts.set(group.timestamp, group.count);
+          const prevCount = previousGroupCountsRef.current.get(group.timestamp);
+          if (prevCount !== undefined && prevCount !== group.count) {
+            changedKeys.add(group.timestamp);
+          }
+        });
+
+        if (changedKeys.size > 0) {
+          setChangedGroupKeys(changedKeys);
+          // Remove rumble effect after 600ms
+          setTimeout(() => {
+            setChangedGroupKeys(new Set());
+          }, 600);
+        }
+
+        previousGroupCountsRef.current = newGroupCounts;
         setTimelineGroups(timelineData);
 
         // Calculate top events
@@ -238,17 +292,19 @@ const RealtimeEventsPage: React.FC = () => {
       // Update progress every 50ms (5000ms / 100 = 50ms per 1%)
       progressIntervalRef.current = setInterval(() => {
         setRefreshProgress((prev) => {
-          if (prev >= 100) {
-            // Reset to 0 when reaching 100%
+          const next = prev + 1;
+          if (next > 100) {
+            // Reset to 0 when exceeding 100%
             return 0;
           }
-          return prev + 1;
+          return next;
         });
       }, 50);
 
       // Refresh data every 5 seconds
       intervalRef.current = setInterval(() => {
         loadEvents();
+        setRefreshProgress(0); // Reset progress when loading
       }, 5000);
     } else {
       setRefreshProgress(0);
@@ -497,7 +553,7 @@ const RealtimeEventsPage: React.FC = () => {
         <Paper
           elevation={1}
           sx={{
-            flex: '0 0 280px',
+            flex: '0 0 360px',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
@@ -524,7 +580,6 @@ const RealtimeEventsPage: React.FC = () => {
           <Box sx={{
             flex: 1,
             overflowY: 'auto',
-            p: 2,
             // Chat-style scrollbar
             '&::-webkit-scrollbar': {
               width: '8px',
@@ -562,62 +617,193 @@ const RealtimeEventsPage: React.FC = () => {
                 </Typography>
               </Box>
             ) : (
-              <Stack spacing={1}>
-                {timelineGroups.map((group) => (
-                  <Box
-                    key={group.timestamp}
-                    sx={{
-                      p: 1.5,
-                      borderRadius: 1,
-                      bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)',
-                      border: 1,
-                      borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'divider',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                      '&:hover': {
-                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)',
-                        borderColor: 'primary.main',
-                      },
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        {group.timestamp}
-                      </Typography>
-                      <Chip
-                        label={group.count}
-                        size="small"
+              <Timeline
+                sx={{
+                  p: 2,
+                  m: 0,
+                  '& .MuiTimelineItem-root': {
+                    '&:before': {
+                      content: 'none',
+                    },
+                    minHeight: 80,
+                  },
+                  '& .MuiTimelineContent-root': {
+                    py: 0,
+                    px: 2,
+                  },
+                  '& .MuiTimelineDot-root': {
+                    margin: 0,
+                  },
+                  '& .MuiTimelineConnector-root': {
+                    bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)',
+                    width: '2px',
+                  },
+                }}
+              >
+                {timelineGroups.map((group, index) => {
+                  const isChanged = changedGroupKeys.has(group.timestamp);
+
+                  return (
+                  <TimelineItem key={group.timestamp}>
+                    <TimelineSeparator>
+                      <TimelineDot
                         sx={{
-                          height: 20,
-                          fontSize: '0.7rem',
-                          bgcolor: 'primary.main',
-                          color: 'primary.contrastText',
+                          bgcolor: 'transparent',
+                          boxShadow: 'none',
+                          p: 0,
+                          m: 0,
+                          position: 'relative',
                         }}
-                      />
-                    </Box>
-                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                      {Array.from(new Set(group.events.map(e => e.action))).slice(0, 3).map((action) => (
-                        <Chip
-                          key={action}
-                          label={action}
-                          size="small"
-                          variant="outlined"
+                      >
+                        {/* Outer glow ring */}
+                        <Box
                           sx={{
-                            height: 18,
-                            fontSize: '0.65rem',
-                            '& .MuiChip-label': { px: 0.5 },
+                            position: 'absolute',
+                            width: 56,
+                            height: 56,
+                            borderRadius: '50%',
+                            bgcolor: alpha(theme.palette.primary.main, 0.1),
+                            animation: 'pulse 2s ease-in-out infinite',
+                            '@keyframes pulse': {
+                              '0%, 100%': {
+                                transform: 'scale(1)',
+                                opacity: 0.5,
+                              },
+                              '50%': {
+                                transform: 'scale(1.1)',
+                                opacity: 0.3,
+                              },
+                            },
                           }}
                         />
-                      ))}
-                      {Array.from(new Set(group.events.map(e => e.action))).length > 3 && (
-                        <Typography variant="caption" color="text.secondary">
-                          +{Array.from(new Set(group.events.map(e => e.action))).length - 3}
-                        </Typography>
+                        {/* Main circle */}
+                        <Box
+                          sx={{
+                            position: 'relative',
+                            width: 48,
+                            height: 48,
+                            borderRadius: '50%',
+                            bgcolor: 'primary.main',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '0.875rem',
+                            fontWeight: 700,
+                            color: 'primary.contrastText',
+                            boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.4)}`,
+                            border: 4,
+                            borderColor: 'background.paper',
+                            transition: 'all 0.3s ease',
+                            animation: isChanged ? 'rumble 0.6s ease-out' : 'none',
+                            '@keyframes rumble': {
+                              '0%, 100%': {
+                                transform: 'translate(0, 0) scale(1)',
+                              },
+                              '10%': {
+                                transform: 'translate(-2px, -1px) scale(1.05)',
+                              },
+                              '20%': {
+                                transform: 'translate(2px, 1px) scale(1.05)',
+                              },
+                              '30%': {
+                                transform: 'translate(-2px, 1px) scale(1.05)',
+                              },
+                              '40%': {
+                                transform: 'translate(2px, -1px) scale(1.05)',
+                              },
+                              '50%': {
+                                transform: 'translate(-1px, -1px) scale(1.03)',
+                              },
+                              '60%': {
+                                transform: 'translate(1px, 1px) scale(1.03)',
+                              },
+                              '70%': {
+                                transform: 'translate(-1px, 1px) scale(1.02)',
+                              },
+                              '80%': {
+                                transform: 'translate(1px, -1px) scale(1.02)',
+                              },
+                              '90%': {
+                                transform: 'translate(-1px, 0) scale(1.01)',
+                              },
+                            },
+                            '&:hover': {
+                              transform: 'scale(1.1)',
+                              boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.5)}`,
+                            },
+                          }}
+                        >
+                          {group.count}
+                        </Box>
+                      </TimelineDot>
+                      {index < timelineGroups.length - 1 && (
+                        <TimelineConnector sx={{ minHeight: 50 }} />
                       )}
-                    </Box>
-                  </Box>
-                ))}
-              </Stack>
+                    </TimelineSeparator>
+                    <TimelineContent sx={{ pt: 1.5 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: 'block',
+                          mb: 1.5,
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          color: 'text.primary',
+                          letterSpacing: '0.5px',
+                        }}
+                      >
+                        {group.timeLabel}
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
+                        {Array.from(new Set(group.events.map(e => e.action))).slice(0, 3).map((action, idx) => (
+                          <Chip
+                            key={action}
+                            label={action}
+                            size="small"
+                            sx={{
+                              height: 26,
+                              fontSize: '0.7rem',
+                              fontWeight: 500,
+                              bgcolor: theme.palette.mode === 'dark'
+                                ? alpha(theme.palette.primary.main, 0.15)
+                                : alpha(theme.palette.primary.main, 0.08),
+                              color: theme.palette.mode === 'dark' ? 'primary.light' : 'primary.dark',
+                              border: 1,
+                              borderColor: theme.palette.mode === 'dark'
+                                ? alpha(theme.palette.primary.main, 0.3)
+                                : alpha(theme.palette.primary.main, 0.2),
+                              '& .MuiChip-label': { px: 1.5 },
+                              transition: 'all 0.2s ease',
+                              '&:hover': {
+                                bgcolor: theme.palette.mode === 'dark'
+                                  ? alpha(theme.palette.primary.main, 0.25)
+                                  : alpha(theme.palette.primary.main, 0.15),
+                                transform: 'translateY(-2px)',
+                                boxShadow: 1,
+                              },
+                            }}
+                          />
+                        ))}
+                        {Array.from(new Set(group.events.map(e => e.action))).length > 3 && (
+                          <Chip
+                            label={`+${Array.from(new Set(group.events.map(e => e.action))).length - 3}`}
+                            size="small"
+                            sx={{
+                              height: 26,
+                              fontSize: '0.7rem',
+                              fontWeight: 600,
+                              bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
+                              color: 'text.secondary',
+                              '& .MuiChip-label': { px: 1 },
+                            }}
+                          />
+                        )}
+                      </Box>
+                    </TimelineContent>
+                  </TimelineItem>
+                  );
+                })}
+              </Timeline>
             )}
           </Box>
         </Paper>
@@ -694,86 +880,106 @@ const RealtimeEventsPage: React.FC = () => {
                 </Typography>
               </Box>
             ) : (
-              <Stack spacing={1.5}>
+              <Stack spacing={0}>
                 {events.map((event, index) => {
                   const timeDiff = index < events.length - 1 ? getTimeDiff(event.createdAt, events[index + 1].createdAt) : '';
+                  const isNew = newEventIds.has(event.id);
 
                   return (
-                    <Box
-                      key={event.id}
-                      sx={{
-                        display: 'flex',
-                        gap: 2,
-                        p: 1.5,
-                        borderRadius: 1,
-                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.01)',
-                        border: 1,
-                        borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        '&:hover': {
-                          bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-                          borderColor: getEventColor(event.action),
-                        },
-                      }}
-                      onClick={() => handleEventClick(event)}
-                    >
-                      {/* Time */}
-                      <Box sx={{ flex: '0 0 60px', textAlign: 'right' }}>
-                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                          {dayjs(event.createdAt).format('HH:mm:ss')}
-                        </Typography>
-                        {timeDiff && (
-                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.65rem' }}>
-                            +{timeDiff}
+                    <React.Fragment key={event.id}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          gap: 1.5,
+                          py: 1.5,
+                          px: 2,
+                          cursor: 'pointer',
+                          transition: 'all 0.15s',
+                          borderLeft: '3px solid transparent',
+                          alignItems: 'center',
+                          bgcolor: isNew
+                            ? (theme.palette.mode === 'dark'
+                              ? alpha(theme.palette.primary.main, 0.15)
+                              : alpha(theme.palette.primary.main, 0.08))
+                            : 'transparent',
+                          animation: isNew ? 'flashEffect 2s ease-out' : 'none',
+                          '@keyframes flashEffect': {
+                            '0%': {
+                              bgcolor: theme.palette.mode === 'dark'
+                                ? alpha(theme.palette.primary.main, 0.25)
+                                : alpha(theme.palette.primary.main, 0.15),
+                            },
+                            '100%': {
+                              bgcolor: 'transparent',
+                            },
+                          },
+                          '&:hover': {
+                            bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)',
+                            borderLeftColor: getEventColor(event.action),
+                          },
+                        }}
+                        onClick={() => handleEventClick(event)}
+                      >
+                        {/* Time */}
+                        <Box sx={{ flex: '0 0 80px', display: 'flex', alignItems: 'center' }}>
+                          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500, fontSize: '0.7rem' }}>
+                            {dayjs(event.createdAt).format('h:mm:ss A')}
                           </Typography>
+                        </Box>
+
+                        {/* Icon */}
+                        <Box sx={{ flex: '0 0 auto' }}>
+                          <Avatar
+                            sx={{
+                              width: 28,
+                              height: 28,
+                              fontSize: '0.75rem',
+                              bgcolor: getEventColor(event.action),
+                              color: '#fff',
+                              fontWeight: 700,
+                            }}
+                          >
+                            {getEventIcon(event.action)}
+                          </Avatar>
+                        </Box>
+
+                        {/* Content */}
+                        <Box sx={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center' }}>
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.25 }} noWrap>
+                              {event.action}
+                            </Typography>
+                            {event.user && (
+                              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.7rem' }} noWrap>
+                                {event.user.name || event.user.email}
+                              </Typography>
+                            )}
+                          </Box>
+                        </Box>
+
+                        {/* Time diff indicator */}
+                        {timeDiff && (
+                          <Box sx={{ flex: '0 0 auto' }}>
+                            <Chip
+                              label={timeDiff}
+                              size="small"
+                              sx={{
+                                height: 18,
+                                fontSize: '0.65rem',
+                                bgcolor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+                                color: 'text.secondary',
+                                '& .MuiChip-label': { px: 0.75 },
+                              }}
+                            />
+                          </Box>
                         )}
                       </Box>
 
-                      {/* Icon */}
-                      <Box sx={{ flex: '0 0 auto' }}>
-                        <Avatar
-                          sx={{
-                            width: 32,
-                            height: 32,
-                            fontSize: '0.875rem',
-                            bgcolor: alpha(getEventColor(event.action), 0.1),
-                            color: getEventColor(event.action),
-                            border: 2,
-                            borderColor: getEventColor(event.action),
-                          }}
-                        >
-                          {getEventIcon(event.action)}
-                        </Avatar>
-                      </Box>
-
-                      {/* Content */}
-                      <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
-                            {event.action}
-                          </Typography>
-                          {event.entityType && (
-                            <Chip
-                              label={event.entityType}
-                              size="small"
-                              variant="outlined"
-                              sx={{ height: 18, fontSize: '0.65rem' }}
-                            />
-                          )}
-                        </Box>
-                        <Typography variant="caption" color="text.secondary" noWrap>
-                          {event.user?.email || 'System'}
-                        </Typography>
-                      </Box>
-
-                      {/* IP Address */}
-                      <Box sx={{ flex: '0 0 120px', textAlign: 'right' }}>
-                        <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
-                          {event.ipAddress || 'N/A'}
-                        </Typography>
-                      </Box>
-                    </Box>
+                      {/* Divider between events */}
+                      {index < events.length - 1 && (
+                        <Divider sx={{ opacity: 0.3 }} />
+                      )}
+                    </React.Fragment>
                   );
                 })}
               </Stack>
@@ -785,7 +991,7 @@ const RealtimeEventsPage: React.FC = () => {
         <Paper
           elevation={1}
           sx={{
-            flex: '0 0 320px',
+            flex: '0 0 360px',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',

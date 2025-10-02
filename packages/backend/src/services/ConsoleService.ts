@@ -16,13 +16,14 @@ interface BuiltCommandDef {
   name: string;
   description?: string;
   options?: CommandOption[];
+  audit?: boolean; // Whether to create audit log for this command
   action: (args: string[], ctx?: ConsoleContext, opts?: Record<string, any>) => Promise<ConsoleExecutionResult>;
 }
 
 class CommandBuilder {
   private def: BuiltCommandDef;
   constructor(name: string, private onBuild: (def: BuiltCommandDef) => void) {
-    this.def = { name, action: async () => ({ output: '' }) } as BuiltCommandDef;
+    this.def = { name, action: async () => ({ output: '' }), audit: false } as BuiltCommandDef;
   }
   description(desc: string) { this.def.description = desc; return this; }
   option(flag: string, description: string) {
@@ -30,6 +31,7 @@ class CommandBuilder {
     this.def.options.push({ flag, description });
     return this;
   }
+  audit(enabled: boolean = true) { this.def.audit = enabled; return this; }
   action(fn: BuiltCommandDef['action']) { this.def.action = fn; return this; }
   register() { this.onBuild(this.def); return this; }
 }
@@ -38,6 +40,7 @@ class ConsoleService {
   private legacyHandlers: Map<string, ConsoleCommandHandler> = new Map();
   private descriptions: Map<string, string> = new Map();
   private builtCommands: Map<string, BuiltCommandDef> = new Map();
+  private legacyAuditFlags: Map<string, boolean> = new Map(); // Track audit flags for legacy commands
 
   public command(name: string) {
     return new CommandBuilder(name, (def) => {
@@ -46,9 +49,10 @@ class ConsoleService {
     });
   }
 
-  public register(name: string, handler: ConsoleCommandHandler, description?: string) {
+  public register(name: string, handler: ConsoleCommandHandler, description?: string, audit: boolean = false) {
     this.legacyHandlers.set(name, handler);
     if (description) this.descriptions.set(name, description);
+    this.legacyAuditFlags.set(name, audit);
   }
 
   constructor() {
@@ -70,6 +74,7 @@ class ConsoleService {
     // Builder-style (commander-like) registrations
     this.command('whoami')
       .description('Display current user information')
+      .audit(true)
       .register()
       .action(async (_args, ctx) => {
         const u = ctx?.user;
@@ -92,6 +97,7 @@ class ConsoleService {
       .option('--magenta', 'Magenta color')
       .option('--cyan', 'Cyan color')
       .option('--white', 'White color')
+      .audit(false) // echo is not audited
       .register()
       .action(async (args, ctx, opts) => this.echoCommand(args, ctx, opts));
 
@@ -99,18 +105,21 @@ class ConsoleService {
       .description('Base64 encode/decode')
       .option('--encode', 'Encode text to base64')
       .option('--decode', 'Decode base64 to text')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.base64Command(args, ctx, opts));
 
     this.command('jwt-secret')
       .description('Generate a secure JWT secret key')
       .option('--length', 'Length in bytes (default: 64)')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.jwtSecretCommand(args, ctx, opts));
 
     this.command('hash')
       .description('Hash text using bcrypt')
       .option('--rounds', 'Salt rounds (default: 12)')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.hashCommand(args, ctx, opts));
 
@@ -118,6 +127,7 @@ class ConsoleService {
       .description('Encrypt text using specified algorithm')
       .option('--key', 'Encryption key (hex). If not provided, generates a new key')
       .option('--algo', 'Algorithm: aes256-gcm (default), aes256-cbc, chacha20-poly1305')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.encryptCommand(args, ctx, opts));
 
@@ -125,6 +135,7 @@ class ConsoleService {
       .description('Decrypt text using specified algorithm')
       .option('--key', 'Encryption key (hex, required)')
       .option('--algo', 'Algorithm: aes256-gcm (default), aes256-cbc, chacha20-poly1305')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.decryptCommand(args, ctx, opts));
 
@@ -134,6 +145,7 @@ class ConsoleService {
       .option('--type', 'Token type: client or server (required)')
       .option('--description', 'Token description (optional)')
       .option('--expires', 'Expiration date in days (optional)')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.apiKeyCommand(args, ctx, opts));
 
@@ -141,6 +153,7 @@ class ConsoleService {
       .description('Delete API access token')
       .option('--id', 'Token ID (required)')
       .option('--name', 'Token name (alternative to ID)')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.apiTokenDeleteCommand(args, ctx, opts));
 
@@ -150,6 +163,7 @@ class ConsoleService {
       .option('--hex', 'Output as hex (default)')
       .option('--base64', 'Output as base64')
       .option('--alphanumeric', 'Output as alphanumeric')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.randomCommand(args, ctx, opts));
 
@@ -157,6 +171,7 @@ class ConsoleService {
       .description('Generate login-friendly user ID (starts with a letter, contains digits)')
       .option('--length', 'Total length (default: 12)')
       .option('--count', 'How many to generate (default: 1)')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.genLoginIdCommand(args, ctx, opts));
 
@@ -164,23 +179,27 @@ class ConsoleService {
       .description('Generate login-friendly password (starts with a letter; includes digits and symbols)')
       .option('--length', 'Total length (default: 14)')
       .option('--count', 'How many to generate (default: 1)')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.genLoginPasswordCommand(args, ctx, opts));
 
 
     this.command('db-stats')
       .description('Show database statistics')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.dbStatsCommand(args, ctx, opts));
 
     this.command('cache-clear')
       .description('Clear Redis cache')
       .option('--pattern', 'Cache key pattern (default: all)')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.cacheClearCommand(args, ctx, opts));
 
     this.command('cache-stats')
       .description('Show Redis cache statistics')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.cacheStatsCommand(args, ctx, opts));
 
@@ -188,11 +207,13 @@ class ConsoleService {
       .description('List API tokens')
       .option('--type', 'Filter by type (client|server)')
       .option('--limit', 'Limit results (default: 10)')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.tokenListCommand(args, ctx, opts));
 
     this.command('user-info')
       .description('Get user information by ID or email')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.userInfoCommand(args, ctx, opts));
 
@@ -200,22 +221,26 @@ class ConsoleService {
       .description('Convert timestamp or get current timestamp')
       .option('--ms', 'Output in milliseconds')
       .option('--iso', 'Output in ISO format')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.timestampCommand(args, ctx, opts));
 
     this.command('unixtimestamp')
       .description('Get current Unix timestamp')
       .option('--ms', 'Output in milliseconds (default: seconds)')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.unixtimestampCommand(args, ctx, opts));
 
     this.command('md5')
       .description('Generate MD5 hash')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.md5Command(args, ctx, opts));
 
     this.command('sha256')
       .description('Generate SHA256 hash')
+      .audit(true)
       .register()
       .action(async (args, ctx, opts) => this.sha256Command(args, ctx, opts));
 
@@ -230,6 +255,15 @@ class ConsoleService {
       ...Array.from(this.builtCommands.keys()),
       ...Array.from(this.descriptions.keys()),
     ])).sort();
+  }
+
+  public shouldAudit(command: string): boolean {
+    const built = this.builtCommands.get(command);
+    if (built) {
+      return built.audit === true;
+    }
+    // Check legacy commands
+    return this.legacyAuditFlags.get(command) === true;
   }
 
   private showCommandHelp(command: string, built: BuiltCommandDef): ConsoleExecutionResult {
