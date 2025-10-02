@@ -67,13 +67,16 @@ export class MessageTemplateModel {
           });
         }
 
-        // 태그 필터 처리
+        // 태그 필터 처리 (AND 조건: 모든 태그를 가진 템플릿만 반환)
         if (filters?.tags && filters.tags.length > 0) {
-          query.whereIn('mt.id', function(this: any) {
-            this.select('ta.entityId')
-              .from('g_tag_assignments as ta')
-              .where('ta.entityType', 'message_template')
-              .whereIn('ta.tagId', filters.tags);
+          filters.tags.forEach(tagId => {
+            query.whereExists(function(this: any) {
+              this.select('*')
+                .from('g_tag_assignments as ta')
+                .whereRaw('ta.entityId = mt.id')
+                .where('ta.entityType', 'message_template')
+                .where('ta.tagId', tagId);
+            });
           });
         }
 
