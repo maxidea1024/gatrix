@@ -1,0 +1,10 @@
+node_modules
+dist
+logs
+*.log
+.env
+.env.local
+coverage
+.nyc_output
+data/GeoLite2-City.mmdb
+

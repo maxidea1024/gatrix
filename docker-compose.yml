@@ -91,6 +91,104 @@ services:
       interval: 30s
       start_period: 30s
 
+  # ClickHouse
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.12.2.29-alpine
+    container_name: gatrix-clickhouse
+    restart: unless-stopped
+    ports:
+      - "${CLICKHOUSE_PORT:-8123}:8123"
+      - "9000:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    networks:
+      - gatrix-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Event Lens Server
+  event-lens:
+    build:
+      context: .
+      dockerfile: packages/event-lens/Dockerfile
+    container_name: gatrix-event-lens
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3002
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PORT: 8123
+      CLICKHOUSE_DATABASE: event_lens
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: ${DB_NAME:-gatrix}
+      MYSQL_USER: ${DB_USER:-gatrix_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
+      LOG_LEVEL: ${EVENT_LENS_LOG_LEVEL:-info}
+    ports:
+      - "${EVENT_LENS_PORT:-3002}:3002"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+    networks:
+      - gatrix-network
+    volumes:
+      - event_lens_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3002/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      timeout: 10s
+      retries: 5
+      interval: 30s
+      start_period: 30s
+
+  # Event Lens Worker
+  event-lens-worker:
+    build:
+      context: .
+      dockerfile: packages/event-lens/Dockerfile
+    container_name: gatrix-event-lens-worker
+    restart: unless-stopped
+    command: ["node", "dist/worker.js"]
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      CLICKHOUSE_HOST: clickhouse
+      CLICKHOUSE_PORT: 8123
+      CLICKHOUSE_DATABASE: event_lens
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: ${DB_NAME:-gatrix}
+      MYSQL_USER: ${DB_USER:-gatrix_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-gatrix_password}
+      LOG_LEVEL: ${EVENT_LENS_LOG_LEVEL:-info}
+      WORKER_BATCH_SIZE: ${WORKER_BATCH_SIZE:-1000}
+      WORKER_BATCH_TIMEOUT: ${WORKER_BATCH_TIMEOUT:-5000}
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-10}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+    networks:
+      - gatrix-network
+    volumes:
+      - event_lens_logs:/app/logs
+
   # Frontend (Nginx)
   frontend:
     build:
@@ -124,7 +222,11 @@ volumes:
     driver: local
   redis_data:
     driver: local
+  clickhouse_data:
+    driver: local
   backend_logs:
+    driver: local
+  event_lens_logs:
     driver: local
 
 networks:

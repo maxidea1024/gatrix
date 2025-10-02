@@ -72,6 +72,10 @@ app.use(compression({
 import chatRoutes from './routes/chat';
 app.use('/api/v1/chat', chatRoutes);
 
+// Analytics proxy routes - MUST be before body parsing
+import analyticsRoutes from './routes/analytics';
+app.use('/api/v1/analytics', analyticsRoutes);
+
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
