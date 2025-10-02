@@ -128,7 +128,7 @@ class ConsoleService {
       .register()
       .action(async (args, ctx, opts) => this.decryptCommand(args, ctx, opts));
 
-    this.command('api-key')
+    this.command('api-token')
       .description('Generate API access token')
       .option('--name', 'Token name (required)')
       .option('--type', 'Token type: client or server (required)')
@@ -344,10 +344,11 @@ class ConsoleService {
       'Date & Time': ['date', 'time', 'timezone', 'uptime', 'timestamp', 'unixtimestamp'],
       'ID Generation': ['uuid', 'ulid'],
       'Security & Crypto': ['jwt-secret', 'hash', 'encrypt', 'decrypt', 'random', 'md5', 'sha256'],
-      'API Management': ['api-key', 'token-list'],
+      'API Management': ['api-token', 'token-list'],
       'Database': ['db-stats'],
       'Cache': ['cache-clear', 'cache-stats'],
       'User Management': ['user-info'],
+      'Service Discovery': ['sd', 'sd-list', 'sd-register', 'sd-deregister', 'sd-health', 'sd-discover', 'sd-watch', 'sd-stats'],
       'System Info': ['sysinfo', 'env', 'health'],
       'Utilities': ['base64']
     };
@@ -391,19 +392,21 @@ class ConsoleService {
       white: '\u001b[37m',
     };
     let color = '';
-    const rest: string[] = [];
+    let text = args.join(' ');
 
-    // Determine color from opts first (builder path), fallback to args flags (legacy path)
+    // Determine color from opts (parseOptions may have consumed the next arg as value)
     const colorFlag = (['red','green','yellow','blue','magenta','cyan','white'] as const)
-      .find((name) => opts?.[name] === true || args.includes(`--${name}`));
-    if (colorFlag) color = colorMap[colorFlag];
+      .find((name) => opts?.[name] !== undefined && opts?.[name] !== false);
 
-    for (const a of args) {
-      if (a.startsWith('--') && a.slice(2) in colorMap) continue; // skip color flags in args
-      rest.push(a);
+    if (colorFlag) {
+      color = colorMap[colorFlag];
+
+      // If parseOptions consumed the text as the color flag's value, get it back
+      if (opts && typeof opts[colorFlag] === 'string') {
+        text = opts[colorFlag] + (text ? ' ' + text : '');
+      }
     }
 
-    const text = rest.join(' ');
     const output = color ? `${color}${text}\u001b[0m` : text;
     return { output };
   };
@@ -800,7 +803,7 @@ class ConsoleService {
     }
   };
 
-  // Command: api-key - Generate API access token
+  // Command: api-token - Generate API access token
   private apiKeyCommand = async (args: string[], ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
     const tokenName = opts?.name;
     const tokenType = opts?.type;
@@ -1141,6 +1144,200 @@ class ConsoleService {
     } else {
       return { output: String(Math.floor(now / 1000)) };
     }
+  };
+
+  // ============================================================================
+  // Service Discovery Commands (Placeholder implementations)
+  // ============================================================================
+
+  // Command: sd - Service Discovery main command
+  private sdCommand = async (args: string[], _ctx?: ConsoleContext, _opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
+    const subcommand = args[0];
+
+    if (!subcommand) {
+      const lines = [
+        '\u001b[1mService Discovery\u001b[0m',
+        '',
+        'Available subcommands:',
+        '  \u001b[36msd-list\u001b[0m          List all registered services',
+        '  \u001b[36msd-register\u001b[0m      Register a new service',
+        '  \u001b[36msd-deregister\u001b[0m    Deregister a service',
+        '  \u001b[36msd-health\u001b[0m        Check service health status',
+        '  \u001b[36msd-discover\u001b[0m      Discover services by name or tag',
+        '  \u001b[36msd-watch\u001b[0m         Watch for service changes',
+        '  \u001b[36msd-stats\u001b[0m         Show service discovery statistics',
+        '',
+        'Use "sd-<command> --help" for more information about a command.',
+        '',
+        '\u001b[33mNote:\u001b[0m Service Discovery feature is not yet implemented.'
+      ];
+      return { output: lines.join('\n') };
+    }
+
+    return { output: '\u001b[33mService Discovery feature is not yet implemented.\u001b[0m' };
+  };
+
+  // Command: sd-list - List all registered services
+  private sdListCommand = async (_args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
+    const lines = [
+      '\u001b[1mRegistered Services\u001b[0m',
+      '',
+      '\u001b[33mService Discovery feature is not yet implemented.\u001b[0m',
+      '',
+      'This command will list all registered services with the following information:',
+      '  • Service ID',
+      '  • Service Name',
+      '  • Host:Port',
+      '  • Status (healthy/unhealthy)',
+      '  • Tags',
+      '  • Last Health Check',
+      ''
+    ];
+
+    if (opts?.filter) {
+      lines.push(`Filter: ${opts.filter}`);
+    }
+    if (opts?.status) {
+      lines.push(`Status Filter: ${opts.status}`);
+    }
+
+    return { output: lines.join('\n') };
+  };
+
+  // Command: sd-register - Register a new service
+  private sdRegisterCommand = async (_args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
+    const lines = [
+      '\u001b[1mRegister Service\u001b[0m',
+      '',
+      '\u001b[33mService Discovery feature is not yet implemented.\u001b[0m',
+      ''
+    ];
+
+    if (opts?.name && opts?.host && opts?.port) {
+      lines.push('Would register service with:');
+      lines.push(`  Name: ${opts.name}`);
+      lines.push(`  Host: ${opts.host}`);
+      lines.push(`  Port: ${opts.port}`);
+      if (opts?.tags) lines.push(`  Tags: ${opts.tags}`);
+      if (opts?.meta) lines.push(`  Metadata: ${opts.meta}`);
+    } else {
+      lines.push('\u001b[31mError:\u001b[0m --name, --host, and --port are required');
+      lines.push('');
+      lines.push('Example:');
+      lines.push('  sd-register --name "api-server" --host "localhost" --port "3000" --tags "api,backend"');
+    }
+
+    return { output: lines.join('\n') };
+  };
+
+  // Command: sd-deregister - Deregister a service
+  private sdDeregisterCommand = async (_args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
+    const lines = [
+      '\u001b[1mDeregister Service\u001b[0m',
+      '',
+      '\u001b[33mService Discovery feature is not yet implemented.\u001b[0m',
+      ''
+    ];
+
+    if (opts?.id) {
+      lines.push(`Would deregister service with ID: ${opts.id}`);
+    } else {
+      lines.push('\u001b[31mError:\u001b[0m --id is required');
+      lines.push('');
+      lines.push('Example:');
+      lines.push('  sd-deregister --id "service-123"');
+    }
+
+    return { output: lines.join('\n') };
+  };
+
+  // Command: sd-health - Check service health status
+  private sdHealthCommand = async (_args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
+    const lines = [
+      '\u001b[1mService Health Check\u001b[0m',
+      '',
+      '\u001b[33mService Discovery feature is not yet implemented.\u001b[0m',
+      ''
+    ];
+
+    if (opts?.id || opts?.name) {
+      lines.push('Would check health for:');
+      if (opts?.id) lines.push(`  Service ID: ${opts.id}`);
+      if (opts?.name) lines.push(`  Service Name: ${opts.name}`);
+    } else {
+      lines.push('This command will show health status for all services or a specific service.');
+      lines.push('');
+      lines.push('Example:');
+      lines.push('  sd-health --id "service-123"');
+      lines.push('  sd-health --name "api-server"');
+    }
+
+    return { output: lines.join('\n') };
+  };
+
+  // Command: sd-discover - Discover services by name or tag
+  private sdDiscoverCommand = async (_args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
+    const lines = [
+      '\u001b[1mDiscover Services\u001b[0m',
+      '',
+      '\u001b[33mService Discovery feature is not yet implemented.\u001b[0m',
+      ''
+    ];
+
+    if (opts?.name || opts?.tag) {
+      lines.push('Would discover services matching:');
+      if (opts?.name) lines.push(`  Name: ${opts.name}`);
+      if (opts?.tag) lines.push(`  Tag: ${opts.tag}`);
+    } else {
+      lines.push('This command will discover services by name or tag.');
+      lines.push('');
+      lines.push('Example:');
+      lines.push('  sd-discover --name "api-server"');
+      lines.push('  sd-discover --tag "backend"');
+    }
+
+    return { output: lines.join('\n') };
+  };
+
+  // Command: sd-watch - Watch for service changes
+  private sdWatchCommand = async (_args: string[], _ctx?: ConsoleContext, opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
+    const lines = [
+      '\u001b[1mWatch Service Changes\u001b[0m',
+      '',
+      '\u001b[33mService Discovery feature is not yet implemented.\u001b[0m',
+      ''
+    ];
+
+    if (opts?.name) {
+      lines.push(`Would watch for changes to service: ${opts.name}`);
+    } else {
+      lines.push('This command will watch for service registration/deregistration events.');
+      lines.push('');
+      lines.push('Example:');
+      lines.push('  sd-watch --name "api-server"');
+      lines.push('  sd-watch (watch all services)');
+    }
+
+    return { output: lines.join('\n') };
+  };
+
+  // Command: sd-stats - Show service discovery statistics
+  private sdStatsCommand = async (_args: string[], _ctx?: ConsoleContext, _opts?: Record<string, any>): Promise<ConsoleExecutionResult> => {
+    const lines = [
+      '\u001b[1mService Discovery Statistics\u001b[0m',
+      '',
+      '\u001b[33mService Discovery feature is not yet implemented.\u001b[0m',
+      '',
+      'This command will show:',
+      '  • Total registered services',
+      '  • Healthy services count',
+      '  • Unhealthy services count',
+      '  • Services by tag',
+      '  • Recent registration/deregistration events',
+      '  • Health check statistics'
+    ];
+
+    return { output: lines.join('\n') };
   };
 }
 

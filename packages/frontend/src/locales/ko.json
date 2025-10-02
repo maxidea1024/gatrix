@@ -8,7 +8,7 @@
   },
   "console": {
     "title": "시스템 콘솔",
-    "subtitle": "서버 명령 실행 및 출력 확인합니다",
+    "subtitle": "서버 명령 실행 및 출력을 확인합니다",
     "placeholder": "명령어를 입력하고 Enter를 누르세요",
     "hint": "예시",
     "run": "실행",

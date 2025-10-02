@@ -80,6 +80,15 @@ const SystemConsolePage: React.FC = () => {
   // IME composition state for Korean/Chinese/Japanese input
   const isComposingRef = useRef<boolean>(false);
   const compositionTextRef = useRef<string>('');
+  // Selection state for Shift+Arrow keys
+  const selectionStartRef = useRef<number | null>(null);
+  const selectionEndRef = useRef<number | null>(null);
+  // Fullscreen state
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  // Paste handling flag to prevent duplicate paste
+  const isPastingRef = useRef<boolean>(false);
+  // Fullscreen toggle flag to prevent double-trigger
+  const isTogglingFullscreenRef = useRef<boolean>(false);
 
   // Load commands from cache, then refresh from server using ETag
   useEffect(() => {
@@ -136,7 +145,33 @@ const SystemConsolePage: React.FC = () => {
     term.write('\u001b[2K\r');
     writePrompt(term);
     const buf = inputBufRef.current;
-    term.write(buf);
+
+    // If there's a selection, highlight it
+    if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
+      const start = Math.min(selectionStartRef.current, selectionEndRef.current);
+      const end = Math.max(selectionStartRef.current, selectionEndRef.current);
+
+      // Write text before selection
+      if (start > 0) {
+        term.write(buf.slice(0, start));
+      }
+
+      // Write selected text with inverted colors
+      if (end > start) {
+        term.write('\u001b[7m'); // Reverse video
+        term.write(buf.slice(start, end));
+        term.write('\u001b[27m'); // Normal video
+      }
+
+      // Write text after selection
+      if (end < buf.length) {
+        term.write(buf.slice(end));
+      }
+    } else {
+      // No selection, just write the buffer
+      term.write(buf);
+    }
+
     const moves = buf.length - cursorRef.current;
     if (moves > 0) term.write(`\u001b[${moves}D`);
   };
@@ -180,6 +215,19 @@ const SystemConsolePage: React.FC = () => {
 
   useEffect(() => { historyRef.current = history; }, [history]);
   useEffect(() => { historyIndexRef.current = historyIndex; }, [historyIndex]);
+
+  // Handle body overflow when entering/exiting fullscreen
+  useEffect(() => {
+    if (isFullscreen) {
+      // Prevent body scroll in fullscreen
+      document.body.style.overflow = 'hidden';
+
+      return () => {
+        // Restore body scroll
+        document.body.style.overflow = '';
+      };
+    }
+  }, [isFullscreen]);
 
   const getPromptAnsi = useCallback(() => {
     const username = (user?.name || user?.email || 'user').split('@')[0];
@@ -289,37 +337,140 @@ const SystemConsolePage: React.FC = () => {
       const ctrlOrMeta = isMac ? e.metaKey : e.ctrlKey;
       const key = e.key?.toLowerCase?.() || '';
 
+      // Ctrl+Enter: Toggle fullscreen
+      if (ctrlOrMeta && key === 'enter') {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Prevent double-trigger
+        if (isTogglingFullscreenRef.current) {
+          return false;
+        }
+
+        isTogglingFullscreenRef.current = true;
+        setIsFullscreen(prev => !prev);
+
+        setTimeout(() => {
+          if (termRef.current && fitRef.current) {
+            try { fitRef.current.fit(); } catch {}
+          }
+          // Reset flag after transition
+          setTimeout(() => {
+            isTogglingFullscreenRef.current = false;
+          }, 200);
+        }, 100);
+
+        return false;
+      }
+
       // Allow Shift+Arrow keys for selection (don't intercept)
       if (e.shiftKey && (key === 'arrowleft' || key === 'arrowright' || key === 'arrowup' || key === 'arrowdown')) {
         return true; // Let xterm handle selection
       }
 
+      // Shift+Home: Select from cursor to start
+      if (e.shiftKey && key === 'home') {
+        e.preventDefault();
+        e.stopPropagation();
+        if (selectionStartRef.current === null) {
+          selectionStartRef.current = cursorRef.current;
+        }
+        cursorRef.current = 0;
+        selectionEndRef.current = 0;
+        redrawLine(term);
+        return false;
+      }
+
+      // Shift+End: Select from cursor to end
+      if (e.shiftKey && key === 'end') {
+        e.preventDefault();
+        e.stopPropagation();
+        if (selectionStartRef.current === null) {
+          selectionStartRef.current = cursorRef.current;
+        }
+        cursorRef.current = inputBufRef.current.length;
+        selectionEndRef.current = inputBufRef.current.length;
+        redrawLine(term);
+        return false;
+      }
+
       // Copy
       if (ctrlOrMeta && key === 'c') {
+        // First check xterm selection (mouse selection)
         const sel = term.getSelection();
         if (sel) {
           navigator.clipboard?.writeText(sel).catch(() => {});
           return false; // prevent ^C input
         }
-        // Treat as interrupt: new line + prompt
+
+        // Then check keyboard selection (Shift+Arrow)
+        if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
+          const start = Math.min(selectionStartRef.current, selectionEndRef.current);
+          const end = Math.max(selectionStartRef.current, selectionEndRef.current);
+          const selectedText = inputBufRef.current.slice(start, end);
+          if (selectedText) {
+            navigator.clipboard?.writeText(selectedText).catch(() => {});
+            selectionStartRef.current = null;
+            selectionEndRef.current = null;
+            return false;
+          }
+        }
+
+        // No selection: treat as interrupt
         term.write('\r\n');
         inputBufRef.current = '';
         cursorRef.current = 0;
+        selectionStartRef.current = null;
+        selectionEndRef.current = null;
         writePrompt(term);
         return false;
       }
       // Paste
       if (ctrlOrMeta && key === 'v') {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Prevent duplicate paste
+        if (isPastingRef.current) {
+          return false;
+        }
+
+        isPastingRef.current = true;
         navigator.clipboard?.readText?.().then((text) => {
-          if (!text) return;
+          if (!text) {
+            isPastingRef.current = false;
+            return;
+          }
           saveUndo();
-          const before = inputBufRef.current.slice(0, cursorRef.current);
-          const after = inputBufRef.current.slice(cursorRef.current);
-          inputBufRef.current = before + text + after;
-          cursorRef.current += text.length;
-          if (after) { term.write(text + after); term.write(`\u001b[${after.length}D`); }
-          else { term.write(text); }
-        }).catch(() => {});
+
+          // If there's a selection, replace it
+          if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
+            const start = Math.min(selectionStartRef.current, selectionEndRef.current);
+            const end = Math.max(selectionStartRef.current, selectionEndRef.current);
+            const before = inputBufRef.current.slice(0, start);
+            const after = inputBufRef.current.slice(end);
+            inputBufRef.current = before + text + after;
+            cursorRef.current = start + text.length;
+            selectionStartRef.current = null;
+            selectionEndRef.current = null;
+            redrawLine(term);
+          } else {
+            // Normal paste
+            const before = inputBufRef.current.slice(0, cursorRef.current);
+            const after = inputBufRef.current.slice(cursorRef.current);
+            inputBufRef.current = before + text + after;
+            cursorRef.current += text.length;
+            if (after) { term.write(text + after); term.write(`\u001b[${after.length}D`); }
+            else { term.write(text); }
+          }
+
+          // Reset flag after a short delay
+          setTimeout(() => {
+            isPastingRef.current = false;
+          }, 100);
+        }).catch(() => {
+          isPastingRef.current = false;
+        });
         return false;
       }
       // Cut (limit: behaves like copy; terminals generally don't cut past output)
@@ -376,6 +527,55 @@ const SystemConsolePage: React.FC = () => {
       // Skip processing during IME composition
       if (isComposingRef.current) {
         return;
+      }
+
+      // Handle Shift+Arrow key sequences for text selection
+      // Format: ESC[1;2X where X is C(right), D(left), H(home), F(end)
+      if (data === '\u001b[1;2C') { // Shift+Right
+        if (selectionStartRef.current === null) {
+          selectionStartRef.current = cursorRef.current;
+        }
+        if (cursorRef.current < inputBufRef.current.length) {
+          cursorRef.current += 1;
+          selectionEndRef.current = cursorRef.current;
+          redrawLine(term); // Redraw to show selection
+        }
+        return;
+      }
+      if (data === '\u001b[1;2D') { // Shift+Left
+        if (selectionStartRef.current === null) {
+          selectionStartRef.current = cursorRef.current;
+        }
+        if (cursorRef.current > 0) {
+          cursorRef.current -= 1;
+          selectionEndRef.current = cursorRef.current;
+          redrawLine(term); // Redraw to show selection
+        }
+        return;
+      }
+      if (data === '\u001b[1;2H') { // Shift+Home
+        if (selectionStartRef.current === null) {
+          selectionStartRef.current = cursorRef.current;
+        }
+        cursorRef.current = 0;
+        selectionEndRef.current = 0;
+        redrawLine(term);
+        return;
+      }
+      if (data === '\u001b[1;2F') { // Shift+End
+        if (selectionStartRef.current === null) {
+          selectionStartRef.current = cursorRef.current;
+        }
+        cursorRef.current = inputBufRef.current.length;
+        selectionEndRef.current = inputBufRef.current.length;
+        redrawLine(term);
+        return;
+      }
+
+      // Any other key press clears selection
+      if (selectionStartRef.current !== null) {
+        selectionStartRef.current = null;
+        selectionEndRef.current = null;
       }
 
       // Enter
@@ -481,6 +681,22 @@ const SystemConsolePage: React.FC = () => {
 
       // Backspace
       if (data === '\u007f') {
+        // If there's a selection, delete it
+        if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
+          saveUndo();
+          const start = Math.min(selectionStartRef.current, selectionEndRef.current);
+          const end = Math.max(selectionStartRef.current, selectionEndRef.current);
+          const before = inputBufRef.current.slice(0, start);
+          const after = inputBufRef.current.slice(end);
+          inputBufRef.current = before + after;
+          cursorRef.current = start;
+          selectionStartRef.current = null;
+          selectionEndRef.current = null;
+          redrawLine(term);
+          return;
+        }
+
+        // Normal backspace
         if (cursorRef.current > 0) {
           saveUndo();
           const i = cursorRef.current;
@@ -589,6 +805,22 @@ const SystemConsolePage: React.FC = () => {
       }
       // Delete key (ESC [3~)
       if (data === '\u001b[3~') {
+        // If there's a selection, delete it
+        if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
+          saveUndo();
+          const start = Math.min(selectionStartRef.current, selectionEndRef.current);
+          const end = Math.max(selectionStartRef.current, selectionEndRef.current);
+          const before = inputBufRef.current.slice(0, start);
+          const after = inputBufRef.current.slice(end);
+          inputBufRef.current = before + after;
+          cursorRef.current = start;
+          selectionStartRef.current = null;
+          selectionEndRef.current = null;
+          redrawLine(term);
+          return;
+        }
+
+        // Normal delete
         const i = cursorRef.current;
         if (i < inputBufRef.current.length) {
           saveUndo();
@@ -611,6 +843,22 @@ const SystemConsolePage: React.FC = () => {
       const printable = data.replace(/[\x00-\x1F\x7F]/g, '');
       if (printable) {
         saveUndo();
+
+        // If there's a selection, replace it with the new text
+        if (selectionStartRef.current !== null && selectionEndRef.current !== null) {
+          const start = Math.min(selectionStartRef.current, selectionEndRef.current);
+          const end = Math.max(selectionStartRef.current, selectionEndRef.current);
+          const before = inputBufRef.current.slice(0, start);
+          const after = inputBufRef.current.slice(end);
+          inputBufRef.current = before + printable + after;
+          cursorRef.current = start + printable.length;
+          selectionStartRef.current = null;
+          selectionEndRef.current = null;
+          redrawLine(term);
+          return;
+        }
+
+        // Normal insert
         const before = inputBufRef.current.slice(0, cursorRef.current);
         const after = inputBufRef.current.slice(cursorRef.current);
         inputBufRef.current = before + printable + after;
@@ -842,13 +1090,99 @@ const SystemConsolePage: React.FC = () => {
   // });
 
   return (
-    <Box sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }} onKeyDown={(e) => {
-      // [ ignore default browser find etc.
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') e.preventDefault();
-    }}>
-      <Typography variant="h6" sx={{ mb: 0.5 }}>{t('console.title')}</Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{t('console.subtitle')}</Typography>
-      <Box sx={(th) => ({ flex: 1, bgcolor: th.palette.background.paper, color: th.palette.text.primary, borderRadius: 1, p: 1, minHeight: 0,
+    <Box
+      sx={{
+        p: isFullscreen ? 0 : 2,
+        height: isFullscreen ? '100vh' : '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        ...(isFullscreen && {
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 9999,
+          bgcolor: 'background.default',
+          width: '100vw'
+        })
+      }}
+      onKeyDown={(e) => {
+        // [ ignore default browser find etc.
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') e.preventDefault();
+      }}
+    >
+      {!isFullscreen && (
+        <>
+          <Typography variant="h6" sx={{ mb: 0.5 }}>{t('console.title')}</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{t('console.subtitle')}</Typography>
+        </>
+      )}
+
+      {/* Fullscreen exit button - appears on hover at top */}
+      {isFullscreen && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 10000,
+            opacity: 0,
+            transition: 'opacity 0.3s ease',
+            '&:hover': {
+              opacity: 1
+            },
+            // Trigger area - invisible but detects hover
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '200px',
+              height: '50px',
+              zIndex: -1
+            }
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLElement).style.opacity = '1';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLElement).style.opacity = '0';
+          }}
+        >
+          <Box
+            onClick={() => setIsFullscreen(false)}
+            sx={{
+              mt: 1,
+              px: 2,
+              py: 1,
+              bgcolor: 'primary.main',
+              color: 'primary.contrastText',
+              borderRadius: '0 0 8px 8px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              boxShadow: 3,
+              '&:hover': {
+                bgcolor: 'primary.dark'
+              }
+            }}
+          >
+            <Typography variant="body2">Exit Fullscreen (Ctrl+Enter)</Typography>
+          </Box>
+        </Box>
+      )}
+
+      <Box sx={(th) => ({
+        flex: 1,
+        bgcolor: th.palette.background.paper,
+        color: th.palette.text.primary,
+        borderRadius: isFullscreen ? 0 : 1,
+        p: 1,
+        minHeight: 0,
         fontFamily: 'D2Coding, "NanumGothicCoding", "Source Han Mono", "Noto Sans Mono CJK KR", Menlo, Monaco, "Courier New", monospace',
         '& .xterm-viewport::-webkit-scrollbar': { width: '8px' },
         '& .xterm-viewport::-webkit-scrollbar-track': {
@@ -871,11 +1205,13 @@ const SystemConsolePage: React.FC = () => {
         <MenuItem onClick={handleCopy} disabled={!canCopy}>{t('common.copy')}</MenuItem>
         <MenuItem onClick={handlePaste} disabled={!canPaste}>{t('common.paste')}</MenuItem>
       </Menu>
-      <Box sx={{ mt: 1 }}>
-        <Typography variant="caption" color="text.secondary">
-          {t('console.hint')}: echo --green "Hello World" | help | date | time | timezone | uptime
-        </Typography>
-      </Box>
+      {!isFullscreen && (
+        <Box sx={{ mt: 1 }}>
+          <Typography variant="caption" color="text.secondary">
+            {t('console.hint')}: echo --green "Hello World" | help | date | time | timezone | uptime | Ctrl+Enter: Toggle Fullscreen
+          </Typography>
+        </Box>
+      )}
     </Box>
   );
 };
