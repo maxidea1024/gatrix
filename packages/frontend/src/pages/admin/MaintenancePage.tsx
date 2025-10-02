@@ -271,7 +271,7 @@ const MaintenancePage: React.FC = () => {
 
     const result = await maintenanceService.setStatus(payload);
 
-    if (!result.isUnderMaintenance) {
+    if (!result.data?.isUnderMaintenance) {
       // 점검이 업데이트되지 않은 경우 경고
       enqueueSnackbar(t('maintenance.updateFailedWarning'), { variant: 'warning' });
       return;

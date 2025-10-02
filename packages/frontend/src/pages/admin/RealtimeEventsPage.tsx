@@ -52,11 +52,13 @@ import { AuditLogService } from '../../services/auditLogService';
 import { AuditLog } from '../../types';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ko';
 import 'dayjs/locale/zh-cn';
 import { useI18n } from '../../contexts/I18nContext';
 
+dayjs.extend(utc);
 dayjs.extend(relativeTime);
 
 interface EventStats {
@@ -80,8 +82,10 @@ const RealtimeEventsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [topEvents, setTopEvents] = useState<EventStats[]>([]);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [refreshProgress, setRefreshProgress] = useState(0);
   const eventStreamRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Filter states
   const [showFilters, setShowFilters] = useState(false);
@@ -122,10 +126,21 @@ const RealtimeEventsPage: React.FC = () => {
   const loadEvents = useCallback(async () => {
     try {
       // Get events from last 30 minutes
-      const thirtyMinutesAgo = dayjs().subtract(30, 'minute').toISOString();
+      // Use server time instead of client time to avoid timezone issues
+      const now = new Date();
+      const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000);
+
+      console.log('[RealtimeEvents] Loading events:', {
+        start_date: thirtyMinutesAgo.toISOString(),
+        end_date: now.toISOString(),
+        eventTypeFilter,
+        userFilter,
+        clientTime: now.toString()
+      });
 
       const filters: any = {
-        start_date: thirtyMinutesAgo,
+        start_date: thirtyMinutesAgo.toISOString(),
+        end_date: now.toISOString(),
       };
 
       if (eventTypeFilter) {
@@ -137,6 +152,11 @@ const RealtimeEventsPage: React.FC = () => {
       }
 
       const result = await AuditLogService.getAuditLogs(1, 100, filters);
+
+      console.log('[RealtimeEvents] Loaded events:', {
+        count: result?.logs?.length || 0,
+        total: result?.total || 0
+      });
 
       if (result && Array.isArray(result.logs)) {
         let filteredEvents = result.logs;
@@ -208,17 +228,35 @@ const RealtimeEventsPage: React.FC = () => {
     loadEvents();
   }, [loadEvents]);
 
-  // Auto refresh every 5 seconds
+  // Auto refresh every 5 seconds with progress
   useEffect(() => {
     if (autoRefresh) {
+      // Reset progress
+      setRefreshProgress(0);
+
+      // Update progress every 50ms (5000ms / 100 = 50ms per 1%)
+      progressIntervalRef.current = setInterval(() => {
+        setRefreshProgress((prev) => {
+          if (prev >= 100) return 0;
+          return prev + 1;
+        });
+      }, 50);
+
+      // Refresh data every 5 seconds
       intervalRef.current = setInterval(() => {
         loadEvents();
+        setRefreshProgress(0);
       }, 5000);
+    } else {
+      setRefreshProgress(0);
     }
 
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+      }
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
       }
     };
   }, [autoRefresh, loadEvents]);
@@ -264,20 +302,22 @@ const RealtimeEventsPage: React.FC = () => {
 
   return (
     <Box sx={{
-      height: '100vh',
+      height: '100%',
       display: 'flex',
       flexDirection: 'column',
       bgcolor: 'background.default',
+      overflow: 'hidden',
+      p: 3,
     }}>
       {/* Header */}
       <Paper
         elevation={0}
         sx={{
-          p: 2,
-          borderRadius: 0,
-          borderBottom: 1,
-          borderColor: 'divider',
+          p: 3,
+          mb: 2,
+          borderRadius: 1,
           bgcolor: 'background.paper',
+          flexShrink: 0,
         }}
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -294,34 +334,59 @@ const RealtimeEventsPage: React.FC = () => {
           </Box>
 
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            {/* Auto-refresh indicator */}
+            {/* Auto-refresh indicator with progress */}
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                px: 2,
-                py: 0.5,
+                position: 'relative',
+                overflow: 'hidden',
                 borderRadius: 2,
-                bgcolor: autoRefresh ? alpha(theme.palette.success.main, 0.1) : alpha(theme.palette.grey[500], 0.1),
-                border: 1,
-                borderColor: autoRefresh ? 'success.main' : 'divider',
               }}
             >
-              <DotIcon
+              <Box
                 sx={{
-                  fontSize: 12,
-                  color: autoRefresh ? 'success.main' : 'grey.500',
-                  animation: autoRefresh ? 'pulse 2s infinite' : 'none',
-                  '@keyframes pulse': {
-                    '0%, 100%': { opacity: 1 },
-                    '50%': { opacity: 0.3 },
-                  },
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  px: 2,
+                  py: 0.5,
+                  bgcolor: autoRefresh ? alpha(theme.palette.success.main, 0.1) : alpha(theme.palette.grey[500], 0.1),
+                  border: 1,
+                  borderColor: autoRefresh ? 'success.main' : 'divider',
+                  position: 'relative',
+                  zIndex: 1,
                 }}
-              />
-              <Typography variant="caption" sx={{ fontWeight: 600 }}>
-                {autoRefresh ? 'LIVE' : 'PAUSED'}
-              </Typography>
+              >
+                <DotIcon
+                  sx={{
+                    fontSize: 12,
+                    color: autoRefresh ? 'success.main' : 'grey.500',
+                    animation: autoRefresh ? 'pulse 2s infinite' : 'none',
+                    '@keyframes pulse': {
+                      '0%, 100%': { opacity: 1 },
+                      '50%': { opacity: 0.3 },
+                    },
+                  }}
+                />
+                <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                  {autoRefresh ? 'LIVE' : 'PAUSED'}
+                </Typography>
+              </Box>
+
+              {/* Progress bar */}
+              {autoRefresh && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    height: '2px',
+                    width: `${refreshProgress}%`,
+                    bgcolor: 'success.main',
+                    transition: 'width 0.05s linear',
+                    opacity: 0.6,
+                  }}
+                />
+              )}
             </Box>
 
             <Tooltip title={autoRefresh ? t('common.pause') : t('common.play')}>
@@ -415,7 +480,13 @@ const RealtimeEventsPage: React.FC = () => {
       </Paper>
 
       {/* Main Content */}
-      <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex', p: 2, gap: 2, bgcolor: 'background.default' }}>
+      <Box sx={{
+        flex: 1,
+        overflow: 'hidden',
+        display: 'flex',
+        gap: 2,
+        minHeight: 0,
+      }}>
         {/* Left: Timeline View */}
         <Paper
           elevation={1}
@@ -427,7 +498,15 @@ const RealtimeEventsPage: React.FC = () => {
             bgcolor: 'background.paper',
           }}
         >
-          <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+          <Box sx={{
+            p: 2,
+            borderBottom: 1,
+            borderColor: 'divider',
+            height: '72px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+          }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.75rem' }}>
               Timeline
             </Typography>
@@ -436,7 +515,32 @@ const RealtimeEventsPage: React.FC = () => {
             </Typography>
           </Box>
 
-          <Box sx={{ flex: 1, overflowY: 'auto', p: 2 }}>
+          <Box sx={{
+            flex: 1,
+            overflowY: 'auto',
+            p: 2,
+            // Chat-style scrollbar
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'transparent',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+            },
+            '&::-webkit-scrollbar-thumb:active': {
+              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+            },
+            scrollbarWidth: 'thin',
+            scrollbarColor: theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, 0.2) transparent'
+              : 'rgba(0, 0, 0, 0.2) transparent',
+          }}>
             {loading ? (
               <Box sx={{ textAlign: 'center', py: 4 }}>
                 <Typography variant="caption" color="text.secondary">{t('common.loading')}</Typography>
@@ -523,8 +627,16 @@ const RealtimeEventsPage: React.FC = () => {
             bgcolor: 'background.paper',
           }}
         >
-          <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.75rem' }}>
+          <Box sx={{
+            p: 2,
+            borderBottom: 1,
+            borderColor: 'divider',
+            height: '72px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+          }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.75rem', mb: '20px' }}>
               {t('realtimeEvents.eventStream')}
             </Typography>
           </Box>
@@ -535,6 +647,27 @@ const RealtimeEventsPage: React.FC = () => {
               flex: 1,
               overflowY: 'auto',
               p: 2,
+              // Chat-style scrollbar
+              '&::-webkit-scrollbar': {
+                width: '8px',
+              },
+              '&::-webkit-scrollbar-track': {
+                background: 'transparent',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+                borderRadius: '4px',
+              },
+              '&::-webkit-scrollbar-thumb:hover': {
+                background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+              },
+              '&::-webkit-scrollbar-thumb:active': {
+                background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+              },
+              scrollbarWidth: 'thin',
+              scrollbarColor: theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.2) transparent'
+                : 'rgba(0, 0, 0, 0.2) transparent',
             }}
           >
             {loading ? (
@@ -653,7 +786,15 @@ const RealtimeEventsPage: React.FC = () => {
             bgcolor: 'background.paper',
           }}
         >
-          <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+          <Box sx={{
+            p: 2,
+            borderBottom: 1,
+            borderColor: 'divider',
+            height: '72px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+          }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.75rem' }}>
               {t('realtimeEvents.topEvents')}
             </Typography>
@@ -662,7 +803,31 @@ const RealtimeEventsPage: React.FC = () => {
             </Typography>
           </Box>
 
-          <Box sx={{ flex: 1, overflowY: 'auto' }}>
+          <Box sx={{
+            flex: 1,
+            overflowY: 'auto',
+            // Chat-style scrollbar
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'transparent',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+            },
+            '&::-webkit-scrollbar-thumb:active': {
+              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+            },
+            scrollbarWidth: 'thin',
+            scrollbarColor: theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, 0.2) transparent'
+              : 'rgba(0, 0, 0, 0.2) transparent',
+          }}>
             {/* Stats Cards */}
             <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
               <Grid container spacing={1}>

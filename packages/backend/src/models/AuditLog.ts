@@ -147,11 +147,20 @@ export class AuditLogModel {
         .limit(safeLimit)
         .offset(safeOffset);
 
+      // Log the actual SQL query for debugging
+      logger.info('[AuditLog] Query filters:', filters);
+      logger.info('[AuditLog] SQL Query:', logsQuery.toSQL().toNative());
+
       // Execute queries in parallel
       const [countResult, logs] = await Promise.all([
         countQuery,
         logsQuery
       ]);
+
+      logger.info('[AuditLog] Query results:', {
+        count: countResult?.total || 0,
+        logsReturned: logs?.length || 0
+      });
 
       const total = countResult?.total || 0;
 

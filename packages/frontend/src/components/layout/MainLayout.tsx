@@ -883,7 +883,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     {maintenanceStatus.detail?.message && (
                       <Typography variant="body2" sx={{
                         fontSize: '0.75rem',
-                        color: 'text.secondary',
+                        color: '#fbbf24',
                         fontStyle: 'italic',
                         maxWidth: '300px',
                         overflow: 'hidden',

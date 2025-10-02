@@ -6,13 +6,11 @@ import {
   TextField,
   Chip,
   Tooltip,
-  IconButton,
   Popover,
   Stack,
   Divider
 } from '@mui/material';
 import {
-  Schedule as ScheduleIcon,
   Settings as SettingsIcon,
   Public as PublicIcon
 } from '@mui/icons-material';
@@ -28,7 +26,7 @@ import { timeService, ServerTimeData } from '../../services/timeService';
 
 const TimezoneSelector: React.FC = () => {
   const { t } = useTranslation();
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [timezone, setTimezone] = useState<string>(getStoredTimezone());
   const [serverTime, setServerTime] = useState<Date>(new Date());
   const [serverTimeData, setServerTimeData] = useState<ServerTimeData | null>(null);
@@ -61,7 +59,7 @@ const TimezoneSelector: React.FC = () => {
     };
   }, []);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -85,52 +83,38 @@ const TimezoneSelector: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      {/* 서버 시간 표시 */}
-      <Chip
-        icon={<PublicIcon />}
-        label={formatDateTimeDetailed(serverTime)}
-        size="small"
-        variant="outlined"
-        sx={{
-          fontFamily: 'monospace',
-          fontSize: '0.75rem',
-          color: 'rgba(255, 255, 255, 0.9)',
-          borderColor: 'rgba(255, 255, 255, 0.3)',
-          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-          borderRadius: 2,
-          '& .MuiChip-icon': {
-            fontSize: '0.875rem',
-            color: 'rgba(255, 255, 255, 0.7)'
-          },
-          '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            borderColor: 'rgba(255, 255, 255, 0.5)',
-            '& .MuiChip-label': {
-              color: 'rgba(255, 255, 255, 1)'
-            },
-            '& .MuiChip-icon': {
-              color: 'rgba(255, 255, 255, 0.9)'
-            }
-          }
-        }}
-      />
-
-      {/* Timezone 설정 버튼 */}
+      {/* 서버 시간 표시 (클릭 가능) */}
       <Tooltip title={t('common.timezone')}>
-        <IconButton
+        <Chip
+          icon={<PublicIcon />}
+          label={formatDateTimeDetailed(serverTime)}
           size="small"
+          variant="outlined"
           onClick={handleClick}
           sx={{
-            color: 'rgba(255, 255, 255, 0.7)',
-            backgroundColor: 'transparent',
+            fontFamily: 'monospace',
+            fontSize: '0.75rem',
+            color: 'rgba(255, 255, 255, 0.9)',
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            borderRadius: 2,
+            cursor: 'pointer',
+            '& .MuiChip-icon': {
+              fontSize: '0.875rem',
+              color: 'rgba(255, 255, 255, 0.7)'
+            },
             '&:hover': {
-              color: 'rgba(255, 255, 255, 1)',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)'
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              borderColor: 'rgba(255, 255, 255, 0.5)',
+              '& .MuiChip-label': {
+                color: 'rgba(255, 255, 255, 1)'
+              },
+              '& .MuiChip-icon': {
+                color: 'rgba(255, 255, 255, 0.9)'
+              }
             }
           }}
-        >
-          <ScheduleIcon fontSize="small" />
-        </IconButton>
+        />
       </Tooltip>
 
       {/* Timezone 설정 팝오버 */}
@@ -146,11 +130,17 @@ const TimezoneSelector: React.FC = () => {
           vertical: 'top',
           horizontal: 'right',
         }}
+        slotProps={{
+          backdrop: {
+            invisible: true
+          }
+        }}
         PaperProps={{
           sx: {
             bgcolor: 'background.paper',
             border: '1px solid',
-            borderColor: 'divider'
+            borderColor: 'divider',
+            boxShadow: 3
           }
         }}
       >

@@ -324,10 +324,9 @@ export class AdminController {
       const ipAddress = req.query.ipAddress as string || req.query.ip_address as string; // backward compatibility
       const action = req.query.action as string;
       const resourceType = req.query.resourceType as string || req.query.resource_type as string; // backward compatibility
-      const startDate = req.query.startDate ? new Date(req.query.startDate as string) :
-        req.query.start_date ? new Date(req.query.start_date as string) : undefined; // backward compatibility
-      const endDate = req.query.endDate ? new Date(req.query.endDate as string) :
-        req.query.end_date ? new Date(req.query.end_date as string) : undefined; // backward compatibility
+      // Keep as ISO string, don't convert to Date object
+      const startDate = (req.query.startDate as string) || (req.query.start_date as string);
+      const endDate = (req.query.endDate as string) || (req.query.end_date as string);
 
       const filters: any = {};
       if (userId) filters.userId = userId;
@@ -337,6 +336,8 @@ export class AdminController {
       if (resourceType) filters.resourceType = resourceType;
       if (startDate) filters.startDate = startDate;
       if (endDate) filters.endDate = endDate;
+
+      logger.info('[AdminController] Audit log query filters:', filters);
 
       logger.debug('Calling AuditLogModel.findAll with:', {
         page,
