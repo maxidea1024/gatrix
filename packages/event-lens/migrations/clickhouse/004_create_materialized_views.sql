@@ -1,52 +1,52 @@
--- Daily Metrics Materialized View
-CREATE TABLE IF NOT EXISTS event_lens.daily_metrics (
-  projectId String,
-  date Date,
-  uniqueVisitors AggregateFunction(uniq, String),
-  totalSessions AggregateFunction(uniq, String),
-  totalEvents AggregateFunction(count),
-  totalScreenViews AggregateFunction(countIf, String),
-  avgDuration AggregateFunction(avg, UInt32)
-)
+-- ============================================================================
+-- Materialized Views (OpenPanel 스타일)
+-- ============================================================================
+
+-- DAU (Daily Active Users) Materialized View
+CREATE MATERIALIZED VIEW IF NOT EXISTS event_lens.dau_mv
 ENGINE = AggregatingMergeTree()
-PARTITION BY toYYYYMM(date)
-ORDER BY (projectId, date)
-SETTINGS index_granularity = 8192;
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS event_lens.daily_metrics_mv
-TO event_lens.daily_metrics
+PARTITION BY toYYYYMMDD(date)
+ORDER BY (project_id, date)
+TTL date + INTERVAL 365 DAY
 AS SELECT
-  projectId,
-  toDate(createdAt) as date,
-  uniqState(deviceId) as uniqueVisitors,
-  uniqState(sessionId) as totalSessions,
-  countState() as totalEvents,
-  countIfState(name, name = 'screen_view') as totalScreenViews,
-  avgState(duration) as avgDuration
+  toDate(created_at) as date,
+  uniqState(profile_id) as profile_id,
+  project_id
 FROM event_lens.events
-GROUP BY projectId, date;
+GROUP BY date, project_id;
 
--- Hourly Metrics Materialized View
-CREATE TABLE IF NOT EXISTS event_lens.hourly_metrics (
-  projectId String,
-  hour DateTime,
-  uniqueVisitors AggregateFunction(uniq, String),
-  totalSessions AggregateFunction(uniq, String),
-  totalEvents AggregateFunction(count)
-)
+-- Distinct Event Names Materialized View
+CREATE MATERIALIZED VIEW IF NOT EXISTS event_lens.distinct_event_names_mv
 ENGINE = AggregatingMergeTree()
-PARTITION BY toYYYYMM(hour)
-ORDER BY (projectId, hour)
-SETTINGS index_granularity = 8192;
-
-CREATE MATERIALIZED VIEW IF NOT EXISTS event_lens.hourly_metrics_mv
-TO event_lens.hourly_metrics
+ORDER BY (project_id, name, created_at)
 AS SELECT
-  projectId,
-  toStartOfHour(createdAt) as hour,
-  uniqState(deviceId) as uniqueVisitors,
-  uniqState(sessionId) as totalSessions,
-  countState() as totalEvents
+  project_id,
+  name,
+  max(created_at) AS created_at,
+  count() AS event_count
 FROM event_lens.events
-GROUP BY projectId, hour;
+GROUP BY project_id, name;
+
+-- Event Property Values Materialized View
+CREATE MATERIALIZED VIEW IF NOT EXISTS event_lens.event_property_values_mv
+ENGINE = AggregatingMergeTree()
+ORDER BY (project_id, name, property_key, property_value)
+AS SELECT
+  project_id,
+  name,
+  key_value.1 as property_key,
+  key_value.2 as property_value,
+  created_at
+FROM (
+  SELECT
+    project_id,
+    name,
+    arrayJoin(mapItems(properties)) as key_value,
+    max(created_at) as created_at
+  FROM event_lens.events
+  GROUP BY project_id, name, key_value
+)
+WHERE property_value != ''
+  AND property_key != ''
+GROUP BY project_id, name, property_key, property_value, created_at;
 
