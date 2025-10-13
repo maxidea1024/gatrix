@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
+import apiService from '../services/api';
 
 export interface SSEEvent {
   type: string;
@@ -83,8 +84,8 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
     setConnectionStatus('connecting');
 
     try {
-      // Get token from localStorage (올바른 키 사용)
-      const token = localStorage.getItem('accessToken');
+      // Get token from apiService (uses the latest token with auto-refresh)
+      const token = apiService.getAccessToken();
 
       // Build absolute URL to bypass dev proxy for SSE (more reliable)
       const defaultBackendBase = 'http://localhost:5001';

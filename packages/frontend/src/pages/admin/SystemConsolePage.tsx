@@ -4,6 +4,7 @@ import { Terminal as TerminalIcon } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useSSENotifications } from '@/hooks/useSSENotifications';
+import apiService from '../../services/api';
 
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
@@ -89,6 +90,7 @@ const SystemConsolePage: React.FC = () => {
 
   // Load commands from cache, then refresh from server using ETag
   useEffect(() => {
+    // Load from cache first
     try {
       const cached = localStorage.getItem('console:commands:v1');
       if (cached) {
@@ -99,7 +101,10 @@ const SystemConsolePage: React.FC = () => {
       }
     } catch {}
 
-    const token = localStorage.getItem('accessToken');
+    // Don't fetch from server if auth is still loading
+    if (!user) return;
+
+    const token = apiService.getAccessToken();
     const etag = localStorage.getItem('console:commands:etag') || '';
 
     fetch('/api/v1/admin/console/commands', {
@@ -124,7 +129,7 @@ const SystemConsolePage: React.FC = () => {
         } catch {}
       }
     }).catch(() => {});
-  }, []);
+  }, [user]);
 
   const historyIndexRef = useRef<number>(-1);
 
@@ -569,7 +574,7 @@ const SystemConsolePage: React.FC = () => {
 
           // execute backend
           const { command, args } = splitCommand(actualLine);
-          const token = localStorage.getItem('accessToken');
+          const token = apiService.getAccessToken();
 
           // Track if we received SSE output
           let sseReceived = false;
@@ -993,7 +998,7 @@ const SystemConsolePage: React.FC = () => {
 
     const { command, args } = splitCommand(line);
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = apiService.getAccessToken();
       const resp = await fetch('/api/v1/admin/console/execute', {
         method: 'POST',
         headers: {

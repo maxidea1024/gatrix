@@ -26,6 +26,10 @@
     "title": "客户端崩溃",
     "subtitle": "监控和管理客户端崩溃报告",
     "searchPlaceholder": "按用户昵称或用户ID搜索...",
+    "platform": "平台",
+    "branch": "分支",
+    "state": "状态",
+    "version": "版本",
     "filters": {
       "title": "筛选器",
       "dateRange": "日期范围",
@@ -1462,6 +1466,30 @@
     "createdBy": "创建者",
     "cron": "定时任务",
     "day": "日",
+    "dateRange": {
+      "presets": {
+        "today": "今天",
+        "yesterday": "昨天",
+        "last7d": "7天",
+        "last30d": "30天",
+        "last3m": "3个月",
+        "last6m": "6个月",
+        "last12m": "12个月",
+        "ytd": "今年",
+        "custom": "自定义"
+      },
+      "modes": {
+        "fixed": "固定",
+        "since": "自从",
+        "last": "最近"
+      },
+      "customRange": "自定义日期范围",
+      "from": "开始",
+      "to": "结束",
+      "sinceDescription": "选择开始日期。结束日期为今天。",
+      "lastDescription": "从下面的选项中选择时间段。"
+    },
+    "apply": "应用",
     "delete": "删除",
     "description": "描述",
     "edit": "编辑",
@@ -1471,7 +1499,11 @@
     "error": "错误",
     "expand": "展开",
     "export": "导出",
-    "filter": "筛选",
+    "filter": {
+      "addFilter": "添加筛选",
+      "removeFilter": "删除筛选",
+      "clearAll": "清除所有筛选"
+    },
     "filters": "筛选器",
     "goBack": "返回",
     "goToDashboard": "前往仪表板",

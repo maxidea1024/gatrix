@@ -205,12 +205,34 @@ export class AuthService {
     return user?.status === 'active';
   }
 
+  // Check if token is expired
+  static isTokenExpired(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const exp = payload.exp * 1000; // Convert to milliseconds
+      const now = Date.now();
+      // Add 60 second buffer to refresh before actual expiry
+      return now >= (exp - 60000);
+    } catch (error) {
+      console.error('Failed to decode token:', error);
+      return true; // Treat invalid tokens as expired
+    }
+  }
+
   // Initialize auth state from localStorage
-  static initializeAuth(): void {
+  static initializeAuth(): boolean {
     const token = this.getStoredToken();
     if (token) {
+      // Check if token is expired
+      if (this.isTokenExpired(token)) {
+        console.warn('⚠️ Stored token is expired, clearing auth data');
+        this.clearAuthData();
+        return false;
+      }
       apiService.setAccessToken(token);
+      return true;
     }
+    return false;
   }
 
   // OAuth helpers
@@ -296,3 +318,5 @@ export class AuthService {
     throw new Error(response.error?.message || 'Failed to reset password');
   }
 }
+
+export const authService = AuthService;

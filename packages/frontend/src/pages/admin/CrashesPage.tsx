@@ -44,7 +44,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { useSearchParams } from 'react-router-dom';
 import dayjs, { Dayjs } from 'dayjs';
 
 // Types and Services
@@ -64,10 +64,13 @@ import {
 } from '@/types/crash';
 import crashService from '@/services/crashService';
 import SimplePagination from '../../components/common/SimplePagination';
+import DateRangePicker, { DateRangePreset } from '../../components/common/DateRangePicker';
+import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 
 const CrashesPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // State
   const [crashes, setCrashes] = useState<ClientCrash[]>([]);
@@ -79,11 +82,12 @@ const CrashesPage: React.FC = () => {
   // Filters
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<CrashFilters>({});
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
   // Date filters
   const [dateFrom, setDateFrom] = useState<Dayjs | null>(null);
   const [dateTo, setDateTo] = useState<Dayjs | null>(null);
-  const [dateRangePreset, setDateRangePreset] = useState<'last15m' | 'last1h' | 'last24h' | 'last7d' | 'last30d' | 'custom'>('last24h');
+  const [dateRangePreset, setDateRangePreset] = useState<DateRangePreset>('last7d');
 
   // Sort
   const [sortBy, setSortBy] = useState<'lastCrash' | 'count' | 'createdAt'>('lastCrash');
@@ -93,6 +97,47 @@ const CrashesPage: React.FC = () => {
   // Menu state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedCrash, setSelectedCrash] = useState<ClientCrash | null>(null);
+
+  // Define available filters
+  const availableFilterDefinitions: FilterDefinition[] = [
+    {
+      key: 'platform',
+      label: t('crashes.platform'),
+      type: 'select',
+      options: [
+        { value: Platform.WINDOWS, label: getPlatformName(Platform.WINDOWS) },
+        { value: Platform.MAC, label: getPlatformName(Platform.MAC) },
+        { value: Platform.LINUX, label: getPlatformName(Platform.LINUX) },
+      ],
+    },
+    {
+      key: 'branch',
+      label: t('crashes.branch'),
+      type: 'select',
+      options: [
+        { value: Branch.PRODUCTION, label: getBranchName(Branch.PRODUCTION) },
+        { value: Branch.STAGING, label: getBranchName(Branch.STAGING) },
+        { value: Branch.DEVELOPMENT, label: getBranchName(Branch.DEVELOPMENT) },
+        { value: Branch.EDITOR, label: getBranchName(Branch.EDITOR) },
+      ],
+    },
+    {
+      key: 'state',
+      label: t('crashes.state'),
+      type: 'select',
+      options: [
+        { value: CrashState.OPEN, label: getStateName(CrashState.OPEN) },
+        { value: CrashState.CLOSED, label: getStateName(CrashState.CLOSED) },
+        { value: CrashState.DELETED, label: getStateName(CrashState.DELETED) },
+      ],
+    },
+    {
+      key: 'version',
+      label: t('crashes.version'),
+      type: 'text',
+      placeholder: 'e.g., 1.2.3.4',
+    },
+  ];
 
   // Load crashes
   const loadCrashes = async () => {
@@ -121,36 +166,113 @@ const CrashesPage: React.FC = () => {
     }
   };
 
+  // Initialize from URL parameters on mount
+  useEffect(() => {
+    const fromParam = searchParams.get('from');
+    const toParam = searchParams.get('to');
+    const presetParam = searchParams.get('preset') as DateRangePreset;
+    const searchParam = searchParams.get('search');
+    const platformParam = searchParams.get('platform');
+    const branchParam = searchParams.get('branch');
+    const stateParam = searchParams.get('state');
+    const versionParam = searchParams.get('version');
+
+    // Initialize date range
+    if (fromParam && toParam) {
+      setDateFrom(dayjs(fromParam));
+      setDateTo(dayjs(toParam));
+      if (presetParam) {
+        setDateRangePreset(presetParam);
+      }
+    } else {
+      // Default to last 7 days
+      const now = dayjs();
+      setDateFrom(now.subtract(7, 'day'));
+      setDateTo(now);
+      setDateRangePreset('last7d');
+    }
+
+    // Initialize search
+    if (searchParam) {
+      setSearchTerm(searchParam);
+    }
+
+    // Initialize filters
+    const newFilters: CrashFilters = {};
+    const newActiveFilters: ActiveFilter[] = [];
+
+    if (platformParam) {
+      newFilters.platform = Number(platformParam) as Platform;
+      newActiveFilters.push({
+        key: 'platform',
+        value: newFilters.platform,
+        label: t('crashes.platform'),
+      });
+    }
+
+    if (branchParam) {
+      newFilters.branch = Number(branchParam) as Branch;
+      newActiveFilters.push({
+        key: 'branch',
+        value: newFilters.branch,
+        label: t('crashes.branch'),
+      });
+    }
+
+    if (stateParam) {
+      newFilters.state = Number(stateParam) as CrashState;
+      newActiveFilters.push({
+        key: 'state',
+        value: newFilters.state,
+        label: t('crashes.state'),
+      });
+    }
+
+    if (versionParam) {
+      setVersionInput(versionParam);
+      const parts = versionParam.split('.').map(p => p.trim()).filter(Boolean);
+      const nums = parts.map(p => {
+        const n = Number(p);
+        return Number.isFinite(n) ? n : undefined;
+      });
+      newFilters.majorVer = nums[0];
+      newFilters.minorVer = nums[1];
+      newFilters.buildNum = nums[2];
+      newFilters.patchNum = nums[3];
+      newActiveFilters.push({
+        key: 'version',
+        value: versionParam,
+        label: t('crashes.version'),
+      });
+    }
+
+    setFilters(newFilters);
+    setActiveFilters(newActiveFilters);
+  }, []); // Run only on mount
+
+  // Sync state to URL parameters
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (dateFrom) params.set('from', dateFrom.format('YYYY-MM-DD'));
+    if (dateTo) params.set('to', dateTo.format('YYYY-MM-DD'));
+    if (dateRangePreset) params.set('preset', dateRangePreset);
+    if (searchTerm) params.set('search', searchTerm);
+    if (filters.platform !== undefined) params.set('platform', String(filters.platform));
+    if (filters.branch !== undefined) params.set('branch', String(filters.branch));
+    if (filters.state !== undefined) params.set('state', String(filters.state));
+    if (versionInput) params.set('version', versionInput);
+
+    setSearchParams(params, { replace: true });
+  }, [dateFrom, dateTo, dateRangePreset, searchTerm, filters, versionInput]);
+
   // Effects
   useEffect(() => {
-    loadCrashes();
-  }, [page, rowsPerPage, searchTerm, filters, dateFrom, dateTo, sortBy, sortOrder]);
-
-  // Update date range by preset
-  useEffect(() => {
-    if (dateRangePreset === 'custom') return;
-    const now = dayjs();
-    let from = now;
-    switch (dateRangePreset) {
-      case 'last15m':
-        from = now.subtract(15, 'minute');
-        break;
-      case 'last1h':
-        from = now.subtract(1, 'hour');
-        break;
-      case 'last24h':
-        from = now.subtract(24, 'hour');
-        break;
-      case 'last7d':
-        from = now.subtract(7, 'day');
-        break;
-      case 'last30d':
-        from = now.subtract(30, 'day');
-        break;
+    // Only load if date range is initialized
+    if (dateFrom && dateTo) {
+      loadCrashes();
     }
-    setDateFrom(from);
-    setDateTo(now);
-  }, [dateRangePreset]);
+  }, [page, rowsPerPage, searchTerm, filters, dateFrom, dateTo, sortBy, sortOrder]);
 
   // Handlers
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -192,13 +314,62 @@ const CrashesPage: React.FC = () => {
     setPage(0);
   };
 
+  const handleDateRangeChange = (from: Dayjs | null, to: Dayjs | null, preset: DateRangePreset) => {
+    setDateFrom(from);
+    setDateTo(to);
+    setDateRangePreset(preset);
+    setPage(0);
+  };
+
   const handleClearFilters = () => {
     setFilters({});
-    setDateFrom(null);
-    setDateTo(null);
+    setActiveFilters([]);
+    const now = dayjs();
+    setDateFrom(now.subtract(7, 'day'));
+    setDateTo(now);
     setSearchTerm('');
     setVersionInput('');
+    setDateRangePreset('last7d');
     setPage(0);
+  };
+
+  // Dynamic filter handlers
+  const handleFilterAdd = (filter: ActiveFilter) => {
+    setActiveFilters(prev => [...prev, filter]);
+  };
+
+  const handleFilterRemove = (filterKey: string) => {
+    setActiveFilters(prev => prev.filter(f => f.key !== filterKey));
+
+    // Clear the corresponding filter value
+    if (filterKey === 'version') {
+      setVersionInput('');
+      setFilters(prev => ({
+        ...prev,
+        majorVer: undefined,
+        minorVer: undefined,
+        buildNum: undefined,
+        patchNum: undefined,
+      }));
+    } else {
+      setFilters(prev => ({
+        ...prev,
+        [filterKey]: undefined,
+      }));
+    }
+    setPage(0);
+  };
+
+  const handleDynamicFilterChange = (filterKey: string, value: any) => {
+    setActiveFilters(prev =>
+      prev.map(f => (f.key === filterKey ? { ...f, value } : f))
+    );
+
+    if (filterKey === 'version') {
+      updateVersionFilters(value);
+    } else {
+      handleFilterChange(filterKey as keyof CrashFilters, value);
+    }
   };
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>, crash: ClientCrash) => {
@@ -249,180 +420,78 @@ const CrashesPage: React.FC = () => {
       </Box>
 
 
-      {/* Search and Filters */}
+      {/* Search and Filters - Single Row */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', overflow: 'visible' }}>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+            {/* Date Range Picker */}
+            <DateRangePicker
+              dateFrom={dateFrom}
+              dateTo={dateTo}
+              onChange={handleDateRangeChange}
+              preset={dateRangePreset}
+              availablePresets={['today', 'yesterday', 'last7d', 'last30d', 'custom']}
+              size="small"
+              showTime={true}
+            />
 
-            {/* 사용자 닉네임 검색 (왼쪽 첫 번째, 넓게) */}
+            {/* Search */}
             <TextField
               placeholder={t('crashes.searchPlaceholder')}
               value={searchTerm}
               onChange={handleSearchChange}
-              sx={{ minWidth: 340, width: 420, flexShrink: 0 }}
+              sx={{
+                minWidth: 200,
+                flexGrow: 1,
+                maxWidth: 320,
+                '& .MuiOutlinedInput-root': {
+                  height: '40px',
+                  borderRadius: '20px',
+                  bgcolor: 'background.paper',
+                  transition: 'all 0.2s ease-in-out',
+                  '& fieldset': {
+                    borderColor: 'divider',
+                  },
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                    '& fieldset': {
+                      borderColor: 'primary.light',
+                    }
+                  },
+                  '&.Mui-focused': {
+                    bgcolor: 'background.paper',
+                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                    '& fieldset': {
+                      borderColor: 'primary.main',
+                      borderWidth: '1px',
+                    }
+                  }
+                },
+                '& .MuiInputBase-input': {
+                  fontSize: '0.875rem',
+                }
+              }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon />
+                    <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                   </InputAdornment>
                 ),
               }}
               size="small"
             />
 
-            {/* Date Range Preset */}
-            <FormControl size="small" sx={{ minWidth: 160, flexShrink: 0 }}>
-              <InputLabel id="crash-date-range-label" shrink>{t('crashes.filters.dateRange')}</InputLabel>
-              <Select
-                labelId="crash-date-range-label"
-                id="crash-date-range"
-                value={dateRangePreset}
-                label={t('crashes.filters.dateRange')}
-                onChange={(e) => setDateRangePreset(e.target.value as any)}
-                size="small"
-              >
-                <MenuItem value="last15m">{t('crashes.filters.presets.last15m')}</MenuItem>
-                <MenuItem value="last1h">{t('crashes.filters.presets.last1h')}</MenuItem>
-                <MenuItem value="last24h">{t('crashes.filters.presets.last24h')}</MenuItem>
-                <MenuItem value="last7d">{t('crashes.filters.presets.last7d')}</MenuItem>
-                <MenuItem value="last30d">{t('crashes.filters.presets.last30d')}</MenuItem>
-                <MenuItem value="custom">{t('crashes.filters.presets.custom')}</MenuItem>
-              </Select>
-            </FormControl>
-
-            {/* Custom Date Range (inline) */}
-            {dateRangePreset === 'custom' && (
-              <>
-                <DateTimePicker
-                  label={t('crashes.filters.dateFrom')}
-                  value={dateFrom}
-                  onChange={setDateFrom}
-                  slotProps={{ textField: { size: 'small', sx: { minWidth: 220, flexShrink: 0 }, inputProps: { 'aria-label': 'date-from' } } }}
-                />
-                <DateTimePicker
-                  label={t('crashes.filters.dateTo')}
-                  value={dateTo}
-                  onChange={setDateTo}
-                  slotProps={{ textField: { size: 'small', sx: { minWidth: 220, flexShrink: 0 }, inputProps: { 'aria-label': 'date-to' } } }}
-                />
-                {/* Force wrap after end date so following filters go to next line */}
-                <Box sx={{ flexBasis: '100%' }} />
-              </>
-            )}
-
-            {/* State Filter */}
-            <FormControl size="small" sx={{ minWidth: 180, flexShrink: 0 }}>
-              <InputLabel id="crash-state-label" shrink>{t('crashes.filters.state')}</InputLabel>
-              <Select
-                labelId="crash-state-label"
-                id="crash-state-select"
-                value={filters.state ?? ''}
-                onChange={(e) => handleFilterChange('state', e.target.value)}
-                label={t('crashes.filters.state')}
-                displayEmpty
-                size="small"
-              >
-                <MenuItem value="">{t('crashes.filters.allStates')}</MenuItem>
-                <MenuItem value={CrashState.OPEN}>{t('crashes.states.open')}</MenuItem>
-                <MenuItem value={CrashState.CLOSED}>{t('crashes.states.closed')}</MenuItem>
-                <MenuItem value={CrashState.DELETED}>{t('crashes.states.deleted')}</MenuItem>
-              </Select>
-            </FormControl>
-
-            {/* Device Type Filter */}
-            <FormControl size="small" sx={{ minWidth: 180, flexShrink: 0 }}>
-              <InputLabel id="crash-device-label" shrink>{t('crashes.filters.deviceType')}</InputLabel>
-              <Select
-                labelId="crash-device-label"
-                id="crash-device-select"
-                value={filters.deviceType ?? ''}
-                onChange={(e) => handleFilterChange('deviceType', e.target.value)}
-                label={t('crashes.filters.deviceType')}
-                displayEmpty
-                size="small"
-              >
-                <MenuItem value="">{t('crashes.filters.allDeviceTypes')}</MenuItem>
-                <MenuItem value={Platform.ANDROID}>{t('crashes.platforms.android')}</MenuItem>
-                <MenuItem value={Platform.IOS}>{t('crashes.platforms.ios')}</MenuItem>
-                <MenuItem value={Platform.WINDOWS}>{t('crashes.platforms.windows')}</MenuItem>
-                <MenuItem value={Platform.MAC}>{t('crashes.platforms.mac')}</MenuItem>
-                <MenuItem value={Platform.LINUX}>{t('crashes.platforms.linux')}</MenuItem>
-                <MenuItem value={Platform.WEB}>{t('crashes.platforms.web')}</MenuItem>
-              </Select>
-            </FormControl>
-
-            {/* Version Filter */}
-            <TextField
-              label={t('crashes.filters.version')}
-              value={versionInput}
-              onChange={(e) => updateVersionFilters(e.target.value)}
-              size="small"
-              sx={{ minWidth: 160, flexShrink: 0 }}
-              inputProps={{ inputMode: 'numeric', 'aria-label': 'version-input' }}
-            />
-
-            {/* Branch Filter */}
-            <FormControl size="small" sx={{ minWidth: 160, flexShrink: 0 }}>
-              <InputLabel id="crash-branch-label" shrink>{t('crashes.filters.branch')}</InputLabel>
-              <Select
-                labelId="crash-branch-label"
-                id="crash-branch-select"
-                value={filters.branch ?? ''}
-                onChange={(e) => handleFilterChange('branch', e.target.value ? Number(e.target.value) : undefined)}
-                label={t('crashes.filters.branch')}
-                displayEmpty
-                size="small"
-              >
-                <MenuItem value="">{t('crashes.filters.allBranches')}</MenuItem>
-                <MenuItem value={1}>{t('crashes.branches.production')}</MenuItem>
-                <MenuItem value={2}>{t('crashes.branches.staging')}</MenuItem>
-                <MenuItem value={3}>{t('crashes.branches.development')}</MenuItem>
-                <MenuItem value={9}>{t('crashes.branches.editor')}</MenuItem>
-              </Select>
-            </FormControl>
-
-            {/* Sort Options */}
-            <FormControl size="small" sx={{ minWidth: 160, flexShrink: 0 }}>
-              <InputLabel id="crash-sortby-label" shrink>{t('crashes.sort.sortBy')}</InputLabel>
-              <Select
-                labelId="crash-sortby-label"
-                id="crash-sortby-select"
-                value={sortBy}
-                label={t('crashes.sort.sortBy')}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                size="small"
-              >
-                <MenuItem value="createdAt">{t('crashes.sort.by.firstCrash')}</MenuItem>
-                <MenuItem value="lastCrash">{t('crashes.sort.by.lastCrash')}</MenuItem>
-                <MenuItem value="count">{t('crashes.sort.by.count')}</MenuItem>
-                <MenuItem value="firstVersion">{t('crashes.sort.by.firstVersion')}</MenuItem>
-                <MenuItem value="lastVersion">{t('crashes.sort.by.lastVersion')}</MenuItem>
-                <MenuItem value="branch">{t('crashes.sort.by.branch')}</MenuItem>
-              </Select>
-            </FormControl>
-
-            <FormControl size="small" sx={{ minWidth: 140, flexShrink: 0 }}>
-              <InputLabel id="crash-sortorder-label" shrink>{t('crashes.sort.sortOrder')}</InputLabel>
-              <Select
-                labelId="crash-sortorder-label"
-                id="crash-sortorder-select"
-                value={sortOrder}
-                label={t('crashes.sort.sortOrder')}
-                onChange={(e) => setSortOrder(e.target.value as any)}
-                renderValue={(value) => (value === 'DESC' ? t('common.desc') : t('common.asc'))}
-                size="small"
-              >
-                <MenuItem value="DESC">{t('common.desc')}</MenuItem>
-                <MenuItem value="ASC">{t('common.asc')}</MenuItem>
-              </Select>
-            </FormControl>
-
-            {/* Clear */}
-            <Button variant="outlined" onClick={handleClearFilters} size="small" sx={{ flexShrink: 0 }}>
-              {t('crashes.filters.clear')}
-            </Button>
+            {/* Dynamic Filter Bar */}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleDynamicFilterChange}
+              />
+            </Box>
           </Box>
-
         </CardContent>
       </Card>
 

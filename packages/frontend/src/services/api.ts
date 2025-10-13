@@ -137,6 +137,10 @@ class ApiService {
     // }
   }
 
+  getAccessToken(): string | null {
+    return this.accessToken;
+  }
+
   clearTokens() {
     this.accessToken = null;
   }

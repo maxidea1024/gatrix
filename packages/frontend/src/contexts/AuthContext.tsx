@@ -156,29 +156,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.log('🔍 AuthContext: Stored user exists:', !!storedUser);
 
         if (storedToken && storedUser) {
-          // Initialize API service with stored token
-          AuthService.initializeAuth();
-          // Use stored user data without API call to prevent infinite loop
-          setUser(storedUser);
-          console.log('✅ AuthContext: User authenticated from storage');
+          // Initialize API service with stored token (checks expiry)
+          const isValid = AuthService.initializeAuth();
+          if (isValid) {
+            // Use stored user data without API call to prevent infinite loop
+            setUser(storedUser);
+            console.log('✅ AuthContext: User authenticated from storage');
+          } else {
+            // Token was expired and cleared
+            setUser(null);
+            console.log('❌ AuthContext: Stored token expired, user logged out');
+          }
         } else if (storedToken && !storedUser) {
           // Token exists but no user data - fetch profile (OAuth callback scenario)
           console.log('🔄 AuthContext: Token exists but no user data, fetching profile...');
-          AuthService.initializeAuth();
-          AuthService.getProfile()
-            .then((user) => {
-              setUser(user);
-              console.log('✅ AuthContext: User profile fetched successfully');
-            })
-            .catch((error) => {
-              console.error('❌ AuthContext: Failed to fetch user profile:', error);
-              AuthService.clearAuthData();
-              setUser(null);
-            })
-            .finally(() => {
-              setIsLoading(false);
-            });
-          return; // Don't set isLoading to false yet
+          const isValid = AuthService.initializeAuth();
+          if (isValid) {
+            AuthService.getProfile()
+              .then((user) => {
+                setUser(user);
+                console.log('✅ AuthContext: User profile fetched successfully');
+              })
+              .catch((error) => {
+                console.error('❌ AuthContext: Failed to fetch user profile:', error);
+                AuthService.clearAuthData();
+                setUser(null);
+              })
+              .finally(() => {
+                setIsLoading(false);
+              });
+            return; // Don't set isLoading to false yet
+          } else {
+            // Token was expired
+            setUser(null);
+            console.log('❌ AuthContext: Stored token expired, user logged out');
+          }
         } else {
           // No stored auth data
           setUser(null);

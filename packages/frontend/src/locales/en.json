@@ -26,6 +26,10 @@
       "title": "Client Crashes",
       "subtitle": "Monitor, analyze, and manage client application crashes with detailed error tracking and statistics",
       "searchPlaceholder": "Search crashes...",
+      "platform": "Platform",
+      "branch": "Branch",
+      "state": "State",
+      "version": "Version",
       "filters": {
         "title": "Filters",
         "dateRange": "Date Range",
@@ -1465,6 +1469,30 @@
     "createdBy": "Created By",
     "cron": "Cron",
     "day": "Day",
+    "dateRange": {
+      "presets": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "last7d": "7D",
+        "last30d": "30D",
+        "last3m": "3M",
+        "last6m": "6M",
+        "last12m": "12M",
+        "ytd": "YTD",
+        "custom": "Custom"
+      },
+      "modes": {
+        "fixed": "Fixed",
+        "since": "Since",
+        "last": "Last"
+      },
+      "customRange": "Custom Date Range",
+      "from": "From",
+      "to": "To",
+      "sinceDescription": "Select a start date. End date will be today.",
+      "lastDescription": "Select a time period from the options below."
+    },
+    "apply": "Apply",
     "delete": "Delete",
     "description": "description",
     "edit": "Edit",
@@ -1474,7 +1502,11 @@
     "error": "Error",
     "expand": "Expand",
     "export": "Export",
-    "filter": "Filter",
+    "filter": {
+      "addFilter": "Add filter",
+      "removeFilter": "Remove filter",
+      "clearAll": "Clear all filters"
+    },
     "filters": "Filters",
     "goBack": "Go Back",
     "goToDashboard": "Go to Dashboard",
