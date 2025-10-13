@@ -17,24 +17,16 @@ class InvitationService {
 
   // Admin: get current invitation for the admin (if any)
   async getCurrentInvitation(): Promise<Invitation | null> {
-    try {
-      const response = await apiService.get(`${this.ADMIN_BASE_URL}/current`);
-      console.log('getCurrentInvitation response:', response);
+    const response = await apiService.get(`${this.ADMIN_BASE_URL}/current`);
 
-      // apiService는 이미 response.data를 반환하므로
-      // response는 백엔드에서 보낸 { success: true, data: {...} } 구조
-      if (response?.success && response?.data) {
-        return response.data;
-      }
-
-      return null;
-    } catch (error: any) {
-      console.error('getCurrentInvitation error:', error);
-      if (error.status === 404) {
-        return null;
-      }
-      throw error;
+    // Backend now returns 200 with data: null when no invitation exists
+    // apiService는 이미 response.data를 반환하므로
+    // response는 백엔드에서 보낸 { success: true, data: {...} | null } 구조
+    if (response?.success && response?.data) {
+      return response.data;
     }
+
+    return null;
   }
 
   // Admin: delete an invitation

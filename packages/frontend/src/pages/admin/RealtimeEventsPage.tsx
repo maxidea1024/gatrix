@@ -65,6 +65,8 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ko';
 import 'dayjs/locale/zh-cn';
 import { useI18n } from '../../contexts/I18nContext';
+import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
+import { InputAdornment } from '@mui/material';
 
 dayjs.extend(utc);
 dayjs.extend(relativeTime);
@@ -105,10 +107,15 @@ const RealtimeEventsPage: React.FC = () => {
   const previousEventIdsRef = useRef<Set<number>>(new Set());
 
   // Filter states
-  const [showFilters, setShowFilters] = useState(false);
-  const [eventTypeFilter, setEventTypeFilter] = useState<string>('');
-  const [userFilter, setUserFilter] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // 동적 필터 상태
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+
+  // 동적 필터에서 값 추출
+  const eventTypeFilter = activeFilters.find(f => f.key === 'action')?.value as string || '';
+  const resourceTypeFilter = activeFilters.find(f => f.key === 'resource_type')?.value as string || '';
+  const userFilter = activeFilters.find(f => f.key === 'user')?.value as string || '';
 
   // Detail modal
   const [selectedEvent, setSelectedEvent] = useState<AuditLog | null>(null);
@@ -164,6 +171,10 @@ const RealtimeEventsPage: React.FC = () => {
 
       if (eventTypeFilter) {
         filters.action = eventTypeFilter;
+      }
+
+      if (resourceTypeFilter) {
+        filters.resource_type = resourceTypeFilter;
       }
 
       if (userFilter) {
@@ -283,7 +294,7 @@ const RealtimeEventsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [eventTypeFilter, userFilter, searchQuery]);
+  }, [eventTypeFilter, resourceTypeFilter, userFilter, searchQuery]);
 
   // Initial load
   useEffect(() => {
@@ -357,18 +368,55 @@ const RealtimeEventsPage: React.FC = () => {
 
   // Get all unique event types for filter
   const allEventTypes = Array.from(new Set(events.map(e => e.action))).sort();
+  const allResourceTypes = Array.from(new Set(events.map(e => e.entityType).filter(Boolean))).sort();
+
+  // 동적 필터 정의
+  const availableFilterDefinitions: FilterDefinition[] = [
+    {
+      key: 'action',
+      label: t('realtimeEvents.filters.eventType'),
+      type: 'select',
+      options: allEventTypes.map(action => ({
+        value: action,
+        label: t(`auditLogs.actions.${action}`, action),
+      })),
+    },
+    {
+      key: 'resource_type',
+      label: t('auditLogs.resourceType'),
+      type: 'select',
+      options: allResourceTypes.map(type => ({
+        value: type,
+        label: t(`auditLogs.resources.${type}`, type),
+      })),
+    },
+    {
+      key: 'user',
+      label: t('realtimeEvents.filters.user'),
+      type: 'text',
+      placeholder: t('realtimeEvents.filters.userPlaceholder'),
+    },
+  ];
+
+  // 동적 필터 핸들러
+  const handleFilterAdd = (filter: ActiveFilter) => {
+    setActiveFilters([...activeFilters, filter]);
+  };
+
+  const handleFilterRemove = (filterKey: string) => {
+    setActiveFilters(activeFilters.filter(f => f.key !== filterKey));
+  };
+
+  const handleDynamicFilterChange = (filterKey: string, value: any) => {
+    setActiveFilters(activeFilters.map(f =>
+      f.key === filterKey ? { ...f, value } : f
+    ));
+  };
 
   // Handle event click
   const handleEventClick = (event: AuditLog) => {
     setSelectedEvent(event);
     setDetailModalOpen(true);
-  };
-
-  // Clear filters
-  const handleClearFilters = () => {
-    setEventTypeFilter('');
-    setUserFilter('');
-    setSearchQuery('');
   };
 
   return (
@@ -473,17 +521,7 @@ const RealtimeEventsPage: React.FC = () => {
               </IconButton>
             </Tooltip>
 
-            <Tooltip title={t('realtimeEvents.filters.title')}>
-              <IconButton
-                onClick={() => setShowFilters(!showFilters)}
-                color={showFilters ? 'primary' : 'default'}
-                size="small"
-              >
-                <Badge badgeContent={[eventTypeFilter, userFilter, searchQuery].filter(Boolean).length} color="primary">
-                  <FilterListIcon />
-                </Badge>
-              </IconButton>
-            </Tooltip>
+
 
             <Tooltip title={t('common.refresh')}>
               <IconButton onClick={loadEvents} size="small">
@@ -494,63 +532,64 @@ const RealtimeEventsPage: React.FC = () => {
         </Box>
 
         {/* Filters */}
-        <Collapse in={showFilters}>
-          <Box sx={{ mt: 2 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={3}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  label={t('realtimeEvents.filters.user')}
-                  placeholder={t('realtimeEvents.filters.userPlaceholder')}
-                  value={userFilter}
-                  onChange={(e) => setUserFilter(e.target.value)}
-                  InputProps={{
-                    startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <FormControl fullWidth size="small">
-                  <InputLabel>{t('realtimeEvents.filters.eventType')}</InputLabel>
-                  <Select
-                    value={eventTypeFilter}
-                    label={t('realtimeEvents.filters.eventType')}
-                    onChange={(e) => setEventTypeFilter(e.target.value)}
-                  >
-                    <MenuItem value="">{t('realtimeEvents.filters.allEventTypes')}</MenuItem>
-                    {allEventTypes.map((type) => (
-                      <MenuItem key={type} value={type}>{type}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  label={t('common.search')}
-                  placeholder={t('common.search')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  InputProps={{
-                    startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={2}>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  onClick={handleClearFilters}
-                  sx={{ height: '40px' }}
-                >
-                  {t('realtimeEvents.filters.clear')}
-                </Button>
-              </Grid>
-            </Grid>
+        <Box sx={{ mt: 2, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+          {/* Search */}
+          <TextField
+            placeholder={t('common.search')}
+            size="small"
+            sx={{
+              minWidth: 200,
+              flexGrow: 1,
+              maxWidth: 320,
+              '& .MuiOutlinedInput-root': {
+                height: '40px',
+                borderRadius: '20px',
+                bgcolor: 'background.paper',
+                transition: 'all 0.2s ease-in-out',
+                '& fieldset': {
+                  borderColor: 'divider',
+                },
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                  '& fieldset': {
+                    borderColor: 'primary.light',
+                  }
+                },
+                '&.Mui-focused': {
+                  bgcolor: 'background.paper',
+                  boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                  '& fieldset': {
+                    borderColor: 'primary.main',
+                    borderWidth: '1px',
+                  }
+                }
+              },
+              '& .MuiInputBase-input': {
+                fontSize: '0.875rem',
+              }
+            }}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          {/* Dynamic Filter Bar */}
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+            <DynamicFilterBar
+              availableFilters={availableFilterDefinitions}
+              activeFilters={activeFilters}
+              onFilterAdd={handleFilterAdd}
+              onFilterRemove={handleFilterRemove}
+              onFilterChange={handleDynamicFilterChange}
+            />
           </Box>
-        </Collapse>
+        </Box>
       </Paper>
 
       {/* Main Content */}

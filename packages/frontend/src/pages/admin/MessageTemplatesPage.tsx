@@ -59,6 +59,7 @@ import SimplePagination from '@/components/common/SimplePagination';
 import FormDialogHeader from '@/components/common/FormDialogHeader';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
 import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/MultiLanguageMessageInput';
+import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
 
 
 
@@ -91,16 +92,30 @@ const MessageTemplatesPage: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   // 필터
-  const [filters, setFilters] = useState<{
-    type?: MessageTemplateType;
-    isEnabled?: boolean;
-    q?: string;
-    tags?: string[];
-  }>({});
+  const [searchQuery, setSearchQuery] = useState('');
 
   // 디바운싱된 검색어 (500ms 지연)
-  const debouncedSearchQuery = useDebounce(filters.q || '', 500);
-  const [tagFilter, setTagFilter] = useState<Tag[]>([]);
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
+  // 동적 필터 상태
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+
+  // 동적 필터에서 값 추출 (useMemo로 참조 안정화)
+  const typeFilter = useMemo(() =>
+    activeFilters.find(f => f.key === 'type')?.value as MessageTemplateType | undefined,
+    [activeFilters]
+  );
+  const isEnabledFilter = useMemo(() =>
+    activeFilters.find(f => f.key === 'isEnabled')?.value as boolean | undefined,
+    [activeFilters]
+  );
+  const tagIds = useMemo(() =>
+    activeFilters.find(f => f.key === 'tags')?.value as number[] || [],
+    [activeFilters]
+  );
+
+  // tagIds를 문자열로 변환하여 의존성 배열에 사용
+  const tagIdsString = useMemo(() => tagIds.join(','), [tagIds]);
 
   // 선택 관련
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -128,12 +143,15 @@ const MessageTemplatesPage: React.FC = () => {
     setLoading(true);
     try {
       const offset = page * rowsPerPage;
-      const params = {
-        ...filters,
-        q: debouncedSearchQuery || undefined, // 디바운싱된 검색어 사용
+      const params: any = {
+        q: debouncedSearchQuery || undefined,
         limit: rowsPerPage,
         offset
       };
+
+      if (typeFilter) params.type = typeFilter;
+      if (isEnabledFilter !== undefined) params.isEnabled = isEnabledFilter;
+      if (tagIds.length > 0) params.tags = tagIds.map(id => id.toString());
 
       const result = await messageTemplateService.list(params);
 
@@ -146,7 +164,7 @@ const MessageTemplatesPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, filters.type, filters.isEnabled, filters.tags, debouncedSearchQuery, enqueueSnackbar, t]);
+  }, [page, rowsPerPage, typeFilter, isEnabledFilter, tagIdsString, debouncedSearchQuery, enqueueSnackbar, t]);
 
   // 태그 로딩
   const loadTags = useCallback(async () => {
@@ -163,21 +181,57 @@ const MessageTemplatesPage: React.FC = () => {
     loadTags();
   }, [load, loadTags]);
 
-  // 필터 핸들러
-  const handleFilterChange = useCallback((newFilters: typeof filters) => {
-    setFilters(newFilters);
-    setPage(0);
-  }, []);
+  // 동적 필터 정의
+  const availableFilterDefinitions: FilterDefinition[] = [
+    {
+      key: 'type',
+      label: t('messageTemplates.type'),
+      type: 'select',
+      options: [
+        { value: 'maintenance', label: t('messageTemplates.types.maintenance') },
+        { value: 'notification', label: t('messageTemplates.types.notification') },
+        { value: 'email', label: t('messageTemplates.types.email') },
+      ],
+    },
+    {
+      key: 'isEnabled',
+      label: t('common.status'),
+      type: 'select',
+      options: [
+        { value: true, label: t('common.enabled') },
+        { value: false, label: t('common.disabled') },
+      ],
+    },
+    {
+      key: 'tags',
+      label: t('common.tags'),
+      type: 'tags',
+      options: allTags.map(tag => ({
+        value: tag.id,
+        label: tag.name,
+        color: tag.color,
+        description: tag.description,
+      })),
+    },
+  ];
 
-  // 태그 필터 변경 핸들러
-  const handleTagFilterChange = useCallback((tags: Tag[]) => {
-    setTagFilter(tags);
-    const tagIds = tags.map(tag => tag.id.toString());
-    handleFilterChange({
-      ...filters,
-      tags: tagIds.length > 0 ? tagIds : undefined
-    });
-  }, [filters, handleFilterChange]);
+  // 동적 필터 핸들러
+  const handleFilterAdd = (filter: ActiveFilter) => {
+    setActiveFilters([...activeFilters, filter]);
+    setPage(0);
+  };
+
+  const handleFilterRemove = (filterKey: string) => {
+    setActiveFilters(activeFilters.filter(f => f.key !== filterKey));
+    setPage(0);
+  };
+
+  const handleDynamicFilterChange = (filterKey: string, value: any) => {
+    setActiveFilters(activeFilters.map(f =>
+      f.key === filterKey ? { ...f, value } : f
+    ));
+    setPage(0);
+  };
 
   // 페이지 변경 핸들러
   const handlePageChange = useCallback((_: unknown, newPage: number) => {
@@ -433,129 +487,65 @@ const MessageTemplatesPage: React.FC = () => {
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
               {/* 검색 컨트롤을 맨 앞으로 이동하고 개선 */}
               <TextField
                 placeholder={t('messageTemplates.searchPlaceholderDetailed')}
                 size="small"
-                sx={{ minWidth: 500 }}
-                value={filters.q || ''}
-                onChange={(e) => handleFilterChange({ ...filters, q: e.target.value || undefined })}
+                sx={{
+                  minWidth: 200,
+                  flexGrow: 1,
+                  maxWidth: 320,
+                  '& .MuiOutlinedInput-root': {
+                    height: '40px',
+                    borderRadius: '20px',
+                    bgcolor: 'background.paper',
+                    transition: 'all 0.2s ease-in-out',
+                    '& fieldset': {
+                      borderColor: 'divider',
+                    },
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      '& fieldset': {
+                        borderColor: 'primary.light',
+                      }
+                    },
+                    '&.Mui-focused': {
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                      '& fieldset': {
+                        borderColor: 'primary.main',
+                        borderWidth: '1px',
+                      }
+                    }
+                  },
+                  '& .MuiInputBase-input': {
+                    fontSize: '0.875rem',
+                  }
+                }}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 slotProps={{
                   input: {
                     startAdornment: (
                       <InputAdornment position="start">
-                        <SearchIcon />
+                        <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                       </InputAdornment>
                     ),
                   },
                 }}
               />
 
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel shrink={true}>{t('messageTemplates.type')}</InputLabel>
-                <Select
-                  value={filters.type || ''}
-                  label={t('messageTemplates.type')}
-                  onChange={(e) => handleFilterChange({ ...filters, type: e.target.value as MessageTemplateType || undefined })}
-                  displayEmpty
-                  size="small"
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        zIndex: 9999
-                      }
-                    }
-                  }}
-                >
-                  <MenuItem value="">
-                    <em>{t('common.all')}</em>
-                  </MenuItem>
-                  <MenuItem value="maintenance">{t('messageTemplates.types.maintenance')}</MenuItem>
-                  <MenuItem value="general">{t('messageTemplates.types.general')}</MenuItem>
-                  <MenuItem value="notification">{t('messageTemplates.types.notification')}</MenuItem>
-                </Select>
-              </FormControl>
-
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel shrink={true}>{t('messageTemplates.availability')}</InputLabel>
-                <Select
-                  value={filters.isEnabled?.toString() || ''}
-                  label={t('messageTemplates.availability')}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    handleFilterChange({
-                      ...filters,
-                      isEnabled: value === '' ? undefined : value === 'true'
-                    });
-                  }}
-                  displayEmpty
-                  size="small"
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        zIndex: 9999
-                      }
-                    }
-                  }}
-                >
-                  <MenuItem value="">
-                    <em>{t('common.all')}</em>
-                  </MenuItem>
-                  <MenuItem value="true">{t('common.available')}</MenuItem>
-                  <MenuItem value="false">{t('common.unavailable')}</MenuItem>
-                </Select>
-              </FormControl>
-
-              {/* 태그 필터 */}
-              <Autocomplete
-                multiple
-                sx={{ minWidth: 400 }}
-                options={allTags}
-                getOptionLabel={(option) => option.name}
-                filterSelectedOptions
-                value={tagFilter}
-                onChange={(_, value) => handleTagFilterChange(value)}
-                slotProps={{
-                  popper: {
-                    style: {
-                      zIndex: 9999
-                    }
-                  }
-                }}
-                renderValue={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...chipProps } = getTagProps({ index });
-                    return (
-                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
-                        <Chip
-                          variant="outlined"
-                          label={option.name}
-                          size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
-                          {...chipProps}
-                        />
-                      </Tooltip>
-                    );
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label={t('common.tags')} size="small" />
-                )}
-                renderOption={(props, option) => {
-                  const { key, ...otherProps } = props;
-                  return (
-                    <Box component="li" key={key} {...otherProps}>
-                      <Chip
-                        label={option.name}
-                        size="small"
-                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
-                      />
-                      {option.description || t('common.noDescription')}
-                    </Box>
-                  );
-                }}
-              />
+              {/* Dynamic Filter Bar */}
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+                <DynamicFilterBar
+                  availableFilters={availableFilterDefinitions}
+                  activeFilters={activeFilters}
+                  onFilterAdd={handleFilterAdd}
+                  onFilterRemove={handleFilterRemove}
+                  onFilterChange={handleDynamicFilterChange}
+                />
+              </Box>
             </Box>
           </Box>
         </CardContent>

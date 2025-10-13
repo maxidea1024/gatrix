@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -24,7 +24,6 @@ import {
   InputLabel,
   Select,
   Alert,
-  Grid,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -81,6 +80,7 @@ import InvitationForm from '../../components/admin/InvitationForm';
 import InvitationStatusCard from '../../components/admin/InvitationStatusCard';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import { useDebounce } from '../../hooks/useDebounce';
+import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 // SSE는 MainLayout에서 전역으로 처리하므로 여기서는 제거
 
 interface UsersResponse {
@@ -120,12 +120,29 @@ const UsersManagementPage: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [total, setTotal] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [roleFilter, setRoleFilter] = useState('');
-  const [tagFilter, setTagFilter] = useState<Tag[]>([]);
+
+  // 동적 필터 상태
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
   // 디바운싱된 검색어
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  // 동적 필터에서 값 추출 (useMemo로 참조 안정화)
+  const statusFilter = useMemo(() =>
+    activeFilters.find(f => f.key === 'status')?.value as string || '',
+    [activeFilters]
+  );
+  const roleFilter = useMemo(() =>
+    activeFilters.find(f => f.key === 'role')?.value as string || '',
+    [activeFilters]
+  );
+  const tagIds = useMemo(() =>
+    activeFilters.find(f => f.key === 'tags')?.value as number[] || [],
+    [activeFilters]
+  );
+
+  // tagIds를 문자열로 변환하여 의존성 배열에 사용
+  const tagIdsString = useMemo(() => tagIds.join(','), [tagIds]);
 
   // 일괄 선택 관련 상태
   const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
@@ -200,16 +217,11 @@ const UsersManagementPage: React.FC = () => {
   const loadCurrentInvitation = async () => {
     try {
       const invitation = await invitationService.getCurrentInvitation();
-      console.log('Loaded current invitation:', invitation);
       setCurrentInvitation(invitation);
     } catch (error: any) {
-      // 초대가 없는 경우 404 에러는 정상적인 상황
-      if (error.status !== 404) {
-        console.error('Failed to load current invitation:', error);
-      } else {
-        console.log('No active invitation found (404)');
-        setCurrentInvitation(null);
-      }
+      console.error('Failed to load current invitation:', error);
+      // Error loading invitation - set to null
+      setCurrentInvitation(null);
     }
   };
 
@@ -226,8 +238,8 @@ const UsersManagementPage: React.FC = () => {
       if (roleFilter) params.append('role', roleFilter);
 
       // 태그 필터 처리
-      if (tagFilter.length > 0) {
-        tagFilter.forEach(tag => params.append('tags', tag.id.toString()));
+      if (tagIds.length > 0) {
+        tagIds.forEach(tagId => params.append('tags', tagId.toString()));
       }
 
       const response = await apiService.get<UsersResponse>(`/admin/users?${params}`);
@@ -250,7 +262,7 @@ const UsersManagementPage: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [page, rowsPerPage, debouncedSearchTerm, statusFilter, roleFilter, tagFilter]);
+  }, [page, rowsPerPage, debouncedSearchTerm, statusFilter, roleFilter, tagIdsString]);
 
   // 초대링크 이벤트 처리 (MainLayout에서 전달받음)
   useEffect(() => {
@@ -282,6 +294,61 @@ const UsersManagementPage: React.FC = () => {
     loadTags();
     loadCurrentInvitation(); // 초대 기능 활성화
   }, []);
+
+  // 동적 필터 정의
+  const availableFilterDefinitions: FilterDefinition[] = [
+    {
+      key: 'status',
+      label: t('users.statusFilter'),
+      type: 'select',
+      options: [
+        { value: 'active', label: t('users.statuses.active') },
+        { value: 'pending', label: t('users.statuses.pending') },
+        { value: 'suspended', label: t('users.statuses.suspended') },
+      ],
+    },
+    {
+      key: 'role',
+      label: t('users.roleFilter'),
+      type: 'select',
+      options: [
+        { value: 'admin', label: t('users.roles.admin') },
+        { value: 'user', label: t('users.roles.user') },
+      ],
+    },
+    {
+      key: 'tags',
+      label: t('common.tags'),
+      type: 'tags',
+      options: availableTags.map(tag => ({
+        value: tag.id,
+        label: tag.name,
+        color: tag.color,
+        description: tag.description,
+      })),
+    },
+  ];
+
+  // 동적 필터 핸들러
+  const handleFilterAdd = (filter: ActiveFilter) => {
+    setActiveFilters([...activeFilters, filter]);
+  };
+
+  const handleFilterRemove = (filterKey: string) => {
+    setActiveFilters(activeFilters.filter(f => f.key !== filterKey));
+  };
+
+  const handleDynamicFilterChange = (filterKey: string, value: any) => {
+    setActiveFilters(activeFilters.map(f =>
+      f.key === filterKey ? { ...f, value } : f
+    ));
+  };
+
+  const handleOperatorChange = (filterKey: string, operator: 'OR' | 'AND') => {
+    setActiveFilters(activeFilters.map(f =>
+      f.key === filterKey ? { ...f, operator } : f
+    ));
+  };
 
   // 체크박스 핸들러
   const handleSelectUser = (userId: number) => {
@@ -783,131 +850,69 @@ const UsersManagementPage: React.FC = () => {
       {/* Filters */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            {/* 필터 그룹 */}
-            <Grid container spacing={2} alignItems="center" sx={{ flex: 1 }}>
-              <Grid size={{ xs: 12, md: 3 }}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  placeholder={t('users.searchPlaceholder')}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 2 }}>
-                <FormControl fullWidth size="small">
-                  <InputLabel shrink={true}>{t('users.statusFilter')}</InputLabel>
-                  <Select
-                    value={statusFilter}
-                    label={t('users.statusFilter')}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    displayEmpty
-                    size="small"
-
-                    sx={{
-                      minWidth: 120,
-                      '& .MuiSelect-select': {
-                        overflow: 'visible',
-                        textOverflow: 'clip',
-                        whiteSpace: 'nowrap',
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
+              {/* Search */}
+              <TextField
+                placeholder={t('users.searchPlaceholder')}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                sx={{
+                  minWidth: 200,
+                  flexGrow: 1,
+                  maxWidth: 320,
+                  '& .MuiOutlinedInput-root': {
+                    height: '40px',
+                    borderRadius: '20px',
+                    bgcolor: 'background.paper',
+                    transition: 'all 0.2s ease-in-out',
+                    '& fieldset': {
+                      borderColor: 'divider',
+                    },
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      '& fieldset': {
+                        borderColor: 'primary.light',
                       }
-                    }}
-                  >
-                    <MenuItem value="">{t('common.allStatuses')}</MenuItem>
-                    <MenuItem value="active">{t('users.statuses.active')}</MenuItem>
-                    <MenuItem value="pending">{t('users.statuses.pending')}</MenuItem>
-                    <MenuItem value="suspended">{t('users.statuses.suspended')}</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 12, md: 2 }}>
-                <FormControl fullWidth size="small">
-                  <InputLabel shrink={true}>{t('users.roleFilter')}</InputLabel>
-                  <Select
-                    value={roleFilter}
-                    label={t('users.roleFilter')}
-                    onChange={(e) => setRoleFilter(e.target.value)}
-                    displayEmpty
-                    size="small"
-
-                    sx={{
-                      minWidth: 120,
-                      '& .MuiSelect-select': {
-                        overflow: 'visible',
-                        textOverflow: 'clip',
-                        whiteSpace: 'nowrap',
-                      }
-                    }}
-                  >
-                    <MenuItem value="">{t('common.allRoles')}</MenuItem>
-                    <MenuItem value="admin">{t('users.roles.admin')}</MenuItem>
-                    <MenuItem value="user">{t('users.roles.user')}</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 12, md: 5 }}>
-                <Autocomplete
-                  multiple
-                  sx={{ minWidth: 350 }}
-                  options={availableTags}
-                  getOptionLabel={(option) => option.name}
-                  filterSelectedOptions
-                  isOptionEqualToValue={(option, value) => option.id === value.id}
-                  value={tagFilter}
-                  onChange={(_, value) => setTagFilter(value)}
-                  slotProps={{
-                    popper: {
-                      style: {
-                        zIndex: 9999
+                    },
+                    '&.Mui-focused': {
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                      '& fieldset': {
+                        borderColor: 'primary.main',
+                        borderWidth: '1px',
                       }
                     }
-                  }}
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, index) => {
-                      const { key, ...chipProps } = getTagProps({ index });
-                      return (
-                        <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
-                          <Chip
-                            variant="outlined"
-                            label={option.name}
-                            size="small"
-                            sx={{ bgcolor: option.color, color: '#fff' }}
-                            {...chipProps}
-                          />
-                        </Tooltip>
-                      );
-                    })
+                  },
+                  '& .MuiInputBase-input': {
+                    fontSize: '0.875rem',
                   }
-                  renderInput={(params) => (
-                    <TextField {...params} label={t('users.tagFilter')} size="small" />
-                  )}
-                  renderOption={(props, option) => {
-                    const { key, ...otherProps } = props;
-                    return (
-                      <Box component="li" key={key} {...otherProps}>
-                        <Chip
-                          label={option.name}
-                          size="small"
-                          sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
-                        />
-                        {option.description || t('common.noDescription')}
-                      </Box>
-                    );
-                  }}
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                    </InputAdornment>
+                  ),
+                }}
+                size="small"
+              />
+
+              {/* Dynamic Filter Bar */}
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+                <DynamicFilterBar
+                  availableFilters={availableFilterDefinitions}
+                  activeFilters={activeFilters}
+                  onFilterAdd={handleFilterAdd}
+                  onFilterRemove={handleFilterRemove}
+                  onFilterChange={handleDynamicFilterChange}
+                  onOperatorChange={handleOperatorChange}
                 />
-              </Grid>
-            </Grid>
+              </Box>
+            </Box>
 
             {/* 버튼 그룹 */}
-            <Box sx={{ display: 'flex', gap: 1, ml: 2 }}>
+            <Box sx={{ display: 'flex', gap: 1 }}>
               <Button
                 variant="contained"
                 startIcon={<PersonAddIcon />}

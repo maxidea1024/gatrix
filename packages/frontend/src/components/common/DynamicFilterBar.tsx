@@ -12,6 +12,9 @@ import {
   Stack,
   IconButton,
   Paper,
+  Checkbox,
+  ListItemText,
+  Tooltip,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -24,9 +27,10 @@ import { useTranslation } from 'react-i18next';
 export interface FilterDefinition {
   key: string;
   label: string;
-  type: 'text' | 'select' | 'multiselect' | 'number';
-  options?: { value: any; label: string }[];
+  type: 'text' | 'select' | 'multiselect' | 'number' | 'tags';
+  options?: { value: any; label: string; color?: string; description?: string }[];
   placeholder?: string;
+  operator?: 'OR' | 'AND'; // For multiselect and tags - default is OR
 }
 
 
@@ -34,6 +38,7 @@ export interface ActiveFilter {
   key: string;
   value: any;
   label: string;
+  operator?: 'OR' | 'AND'; // For multiselect and tags
 }
 
 interface DynamicFilterBarProps {
@@ -42,6 +47,7 @@ interface DynamicFilterBarProps {
   onFilterAdd: (filter: ActiveFilter) => void;
   onFilterRemove: (filterKey: string) => void;
   onFilterChange: (filterKey: string, value: any) => void;
+  onOperatorChange?: (filterKey: string, operator: 'OR' | 'AND') => void;
 }
 
 const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
@@ -50,6 +56,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
   onFilterAdd,
   onFilterRemove,
   onFilterChange,
+  onOperatorChange,
 }) => {
   const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -65,11 +72,13 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
   };
 
   const handleAddFilter = (filterDef: FilterDefinition) => {
-    const defaultValue = filterDef.type === 'multiselect' ? [] : undefined;
+    const defaultValue = (filterDef.type === 'multiselect' || filterDef.type === 'tags') ? [] : undefined;
+    const defaultOperator = filterDef.operator || 'OR';
     onFilterAdd({
       key: filterDef.key,
       value: defaultValue,
       label: filterDef.label,
+      operator: (filterDef.type === 'multiselect' || filterDef.type === 'tags') ? defaultOperator : undefined,
     });
     setEditingFilter(filterDef.key);
     setSelectOpen(true);
@@ -97,6 +106,17 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
     return availableFilters.find(f => f.key === key);
   };
 
+  const handleToggleOperator = (filterKey: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent chip click
+    const filter = activeFilters.find(f => f.key === filterKey);
+    if (!filter) return;
+
+    const newOperator = filter.operator === 'OR' ? 'AND' : 'OR';
+    if (onOperatorChange) {
+      onOperatorChange(filterKey, newOperator);
+    }
+  };
+
   const renderFilterValue = (filter: ActiveFilter) => {
     const filterDef = getFilterDefinition(filter.key);
     if (!filterDef) return null;
@@ -104,20 +124,203 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
     const isEditing = editingFilter === filter.key;
 
     if (!isEditing) {
-      // Display mode - show as chip
-      let displayValue = filter.value;
-
+      // Display mode - show as chip or tag chips
       // Don't show filter if value is empty/undefined
       if (filter.value === undefined || filter.value === null || filter.value === '') {
         return null;
       }
 
+      // Tags type - show selected tags as chips wrapped in a container chip
+      if (filterDef.type === 'tags' && Array.isArray(filter.value) && filterDef.options) {
+        if (filter.value.length === 0) return null;
+
+        const selectedOptions = filterDef.options.filter(opt =>
+          filter.value.includes(opt.value)
+        );
+
+        const operator = filter.operator || filterDef.operator || 'OR';
+        const showOperator = selectedOptions.length > 1;
+
+        return (
+          <Chip
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap', py: 0.25 }}>
+                <Box sx={{
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  color: 'primary.main',
+                }}>
+                  {filter.label}:
+                </Box>
+                {showOperator && onOperatorChange && (
+                  <Chip
+                    label={operator}
+                    size="small"
+                    onClick={(e) => handleToggleOperator(filter.key, e)}
+                    sx={{
+                      height: '18px',
+                      bgcolor: operator === 'OR' ? 'success.main' : 'warning.main',
+                      color: '#fff',
+                      fontWeight: 700,
+                      fontSize: '0.65rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      '&:hover': {
+                        opacity: 0.8,
+                        transform: 'scale(1.05)',
+                      },
+                      '& .MuiChip-label': {
+                        px: 0.5,
+                      }
+                    }}
+                  />
+                )}
+                {selectedOptions.map((option) => (
+                  <Tooltip key={option.value} title={option.description || ''} arrow>
+                    <Chip
+                      label={option.label}
+                      size="small"
+                      sx={{
+                        height: '20px',
+                        bgcolor: option.color || 'primary.main',
+                        color: '#fff',
+                        fontWeight: 500,
+                        fontSize: '0.7rem',
+                        '& .MuiChip-label': {
+                          px: 0.75,
+                        }
+                      }}
+                    />
+                  </Tooltip>
+                ))}
+              </Box>
+            }
+            onClick={() => setEditingFilter(filter.key)}
+            onDelete={() => handleRemoveFilter(filter.key)}
+            sx={{
+              height: 'auto',
+              minHeight: '32px',
+              bgcolor: 'rgba(25, 118, 210, 0.08)',
+              border: '1.5px solid',
+              borderColor: 'primary.main',
+              fontWeight: 500,
+              transition: 'all 0.2s',
+              cursor: 'pointer',
+              '&:hover': {
+                borderColor: 'primary.dark',
+                boxShadow: '0 2px 8px rgba(25, 118, 210, 0.25)',
+                transform: 'translateY(-1px)',
+              },
+              '& .MuiChip-label': {
+                display: 'block',
+                whiteSpace: 'normal',
+                py: 0.5,
+                color: 'primary.main',
+              },
+              '& .MuiChip-deleteIcon': {
+                color: 'primary.main',
+                '&:hover': {
+                  color: 'error.main',
+                  bgcolor: 'rgba(211, 47, 47, 0.1)',
+                }
+              }
+            }}
+          />
+        );
+      }
+
+      // Multiselect type - show selected items as chips
+      if (filterDef.type === 'multiselect' && Array.isArray(filter.value) && filterDef.options) {
+        if (filter.value.length === 0) return null;
+
+        const selectedOptions = filterDef.options.filter(opt =>
+          filter.value.includes(opt.value)
+        );
+
+        const operator = filter.operator || filterDef.operator || 'OR';
+        const showOperator = selectedOptions.length > 1;
+
+        return (
+          <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
+            <Box sx={{
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              color: 'text.secondary',
+              px: 1,
+            }}>
+              {filter.label}:
+            </Box>
+            {showOperator && onOperatorChange && (
+              <Chip
+                label={operator}
+                size="small"
+                onClick={(e) => handleToggleOperator(filter.key, e)}
+                sx={{
+                  height: '18px',
+                  bgcolor: operator === 'OR' ? 'success.main' : 'warning.main',
+                  color: '#fff',
+                  fontWeight: 700,
+                  fontSize: '0.65rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  '&:hover': {
+                    opacity: 0.8,
+                    transform: 'scale(1.05)',
+                  },
+                  '& .MuiChip-label': {
+                    px: 0.5,
+                  }
+                }}
+              />
+            )}
+            {selectedOptions.map((option) => (
+              <Chip
+                key={option.value}
+                label={option.label}
+                size="small"
+                onClick={() => setEditingFilter(filter.key)}
+                sx={{
+                  height: '24px',
+                  bgcolor: 'rgba(25, 118, 210, 0.08)',
+                  color: 'primary.main',
+                  border: '1.5px solid',
+                  borderColor: 'primary.main',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  '&:hover': {
+                    borderColor: 'primary.dark',
+                    boxShadow: '0 2px 6px rgba(25, 118, 210, 0.2)',
+                    transform: 'translateY(-1px)',
+                  }
+                }}
+              />
+            ))}
+            <IconButton
+              size="small"
+              onClick={() => handleRemoveFilter(filter.key)}
+              sx={{
+                width: 20,
+                height: 20,
+                color: 'text.secondary',
+                '&:hover': {
+                  color: 'error.main',
+                  bgcolor: 'error.lighter',
+                }
+              }}
+            >
+              <CloseIcon sx={{ fontSize: 14 }} />
+            </IconButton>
+          </Box>
+        );
+      }
+
+      // Single select or text - show as single chip
+      let displayValue = filter.value;
       if (filterDef.type === 'select' && filterDef.options) {
         const option = filterDef.options.find(opt => opt.value == filter.value); // Use == for type coercion
         displayValue = option ? option.label : filter.value;
-      } else if (filterDef.type === 'multiselect' && Array.isArray(filter.value)) {
-        if (filter.value.length === 0) return null;
-        displayValue = `${filter.value.length} selected`;
       }
 
       return (
@@ -128,15 +331,17 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
           onDelete={() => handleRemoveFilter(filter.key)}
           sx={{
             height: '32px',
-            bgcolor: 'primary.lighter',
+            bgcolor: 'rgba(25, 118, 210, 0.08)',
             color: 'primary.main',
-            border: '1px solid',
-            borderColor: 'primary.light',
-            fontWeight: 500,
+            border: '1.5px solid',
+            borderColor: 'primary.main',
+            fontWeight: 600,
             transition: 'all 0.2s',
+            cursor: 'pointer',
             '&:hover': {
-              bgcolor: 'primary.light',
-              boxShadow: 1,
+              borderColor: 'primary.dark',
+              boxShadow: '0 2px 8px rgba(25, 118, 210, 0.25)',
+              transform: 'translateY(-1px)',
             },
             '& .MuiChip-icon': {
               color: 'primary.main',
@@ -144,7 +349,8 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
             '& .MuiChip-deleteIcon': {
               color: 'primary.main',
               '&:hover': {
-                color: 'primary.dark',
+                color: 'error.main',
+                bgcolor: 'rgba(211, 47, 47, 0.1)',
               }
             }
           }}
@@ -348,10 +554,124 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                   py: 0.5,
                 }
               }}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 300,
+                  }
+                }
+              }}
             >
               {filterDef.options.map((option, idx) => (
                 <MenuItem key={`${filter.key}-ms-${idx}-${option.value}`} value={option.value}>
-                  {option.label}
+                  <Checkbox
+                    checked={Array.isArray(filter.value) && filter.value.indexOf(option.value) > -1}
+                    size="small"
+                  />
+                  <ListItemText primary={option.label} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+
+        {filterDef.type === 'tags' && filterDef.options && (
+          <FormControl
+            size="small"
+            sx={{
+              minWidth: 200,
+            }}
+          >
+            <Select
+              multiple
+              value={filter.value || []}
+              open={selectOpen && editingFilter === filter.key}
+              onOpen={() => setSelectOpen(true)}
+              onClose={() => {
+                setSelectOpen(false);
+                // Check if any values were selected before closing
+                setTimeout(() => {
+                  const currentFilter = activeFilters.find(f => f.key === filter.key);
+                  if (!currentFilter || !Array.isArray(currentFilter.value) || currentFilter.value.length === 0) {
+                    handleRemoveFilter(filter.key);
+                  } else {
+                    setEditingFilter(null);
+                  }
+                }, 100);
+              }}
+              onChange={(e) => {
+                onFilterChange(filter.key, e.target.value);
+              }}
+              autoFocus
+              renderValue={(selected) => {
+                if (!Array.isArray(selected) || selected.length === 0) return '0 selected';
+                const selectedOptions = filterDef.options!.filter(opt => selected.includes(opt.value));
+                return (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {selectedOptions.map((option) => (
+                      <Chip
+                        key={option.value}
+                        label={option.label}
+                        size="small"
+                        sx={{
+                          height: '20px',
+                          bgcolor: option.color || 'primary.main',
+                          color: '#fff',
+                          fontSize: '0.7rem',
+                          '& .MuiChip-label': {
+                            px: 1,
+                          }
+                        }}
+                      />
+                    ))}
+                  </Box>
+                );
+              }}
+              sx={{
+                minHeight: '28px',
+                fontSize: '0.8125rem',
+                bgcolor: 'background.paper',
+                borderRadius: '8px',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(0, 0, 0, 0.12)',
+                },
+                '& .MuiSelect-select': {
+                  py: 0.5,
+                }
+              }}
+              MenuProps={{
+                PaperProps: {
+                  style: {
+                    maxHeight: 300,
+                  }
+                }
+              }}
+            >
+              {filterDef.options.map((option, idx) => (
+                <MenuItem key={`${filter.key}-tag-${idx}-${option.value}`} value={option.value}>
+                  <Checkbox
+                    checked={Array.isArray(filter.value) && filter.value.indexOf(option.value) > -1}
+                    size="small"
+                  />
+                  <Tooltip title={option.description || ''} arrow placement="right">
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
+                      <Chip
+                        label={option.label}
+                        size="small"
+                        sx={{
+                          height: '22px',
+                          bgcolor: option.color || 'primary.main',
+                          color: '#fff',
+                          fontSize: '0.75rem',
+                        }}
+                      />
+                      {option.description && (
+                        <Box component="span" sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
+                          {option.description}
+                        </Box>
+                      )}
+                    </Box>
+                  </Tooltip>
                 </MenuItem>
               ))}
             </Select>

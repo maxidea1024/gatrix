@@ -29,7 +29,8 @@ import {
   Tab,
   LinearProgress,
   Autocomplete,
-  Drawer
+  Drawer,
+  InputAdornment
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -285,15 +286,43 @@ const JobsPage: React.FC = () => {
               <TextField
                 fullWidth
                 size="small"
-                label={t('common.search')}
+                placeholder={t('common.search')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    height: '40px',
+                    borderRadius: '20px',
+                    bgcolor: 'background.paper',
+                    transition: 'all 0.2s ease-in-out',
+                    '& fieldset': {
+                      borderColor: 'divider',
+                    },
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      '& fieldset': {
+                        borderColor: 'primary.light',
+                      }
+                    },
+                    '&.Mui-focused': {
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                      '& fieldset': {
+                        borderColor: 'primary.main',
+                        borderWidth: '1px',
+                      }
+                    }
+                  },
+                  '& .MuiInputBase-input': {
+                    fontSize: '0.875rem',
+                  }
+                }}
                 InputProps={{
-                  endAdornment: (
-                    <IconButton onClick={handleSearch}>
-                      <SearchIcon />
-                    </IconButton>
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                    </InputAdornment>
                   )
                 }}
               />

@@ -120,10 +120,11 @@ export class AdminInvitationController {
         .orderBy('createdAt', 'desc')
         .first(); // 가장 최근의 활성 초대 하나만 가져오기
 
+      // Return 200 with null data if no active invitation exists (not an error)
       if (!activeInvitation) {
-        return res.status(404).json({
-          success: false,
-          error: 'No active invitation'
+        return res.json({
+          success: true,
+          data: null
         });
       }
 

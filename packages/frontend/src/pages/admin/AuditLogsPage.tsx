@@ -44,6 +44,10 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { useI18n } from '../../contexts/I18nContext';
 import { koKR, zhCN, enUS } from '@mui/x-date-pickers/locales';
 import dayjs, { Dayjs } from 'dayjs';
+import DateRangePicker, { DateRangePreset } from '../../components/common/DateRangePicker';
+import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
+import { InputAdornment } from '@mui/material';
+import { Search as SearchIcon } from '@mui/icons-material';
 
 
 
@@ -86,15 +90,21 @@ const AuditLogsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
 
+  // Date range state
+  const [dateFrom, setDateFrom] = useState<Dayjs | null>(
+    pageState.filters?.start_date ? dayjs(pageState.filters.start_date) : dayjs().subtract(7, 'day')
+  );
+  const [dateTo, setDateTo] = useState<Dayjs | null>(
+    pageState.filters?.end_date ? dayjs(pageState.filters.end_date) : dayjs()
+  );
+  const [dateRangePreset, setDateRangePreset] = useState<DateRangePreset>('last7d');
+
   // Filters - localStorage에서 복원
-  const [startDate, setStartDate] = useState<Dayjs | null>(
-    pageState.filters?.start_date ? dayjs(pageState.filters.start_date) : null
-  );
-  const [endDate, setEndDate] = useState<Dayjs | null>(
-    pageState.filters?.end_date ? dayjs(pageState.filters.end_date) : null
-  );
   const [userFilter, setUserFilter] = useState<string>(pageState.filters?.user || '');
   const [ipFilter, setIpFilter] = useState<string>(pageState.filters?.ip || '');
+
+  // 동적 필터 상태
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
   // 디바운싱된 검색어들 (500ms 지연)
   const debouncedUserFilter = useDebounce(userFilter, 500);
@@ -106,11 +116,11 @@ const AuditLogsPage: React.FC = () => {
       setLoading(true);
 
       const dateFilters: AuditLogFilters = { ...pageState.filters };
-      if (startDate) {
-        dateFilters.start_date = startDate.toISOString();
+      if (dateFrom) {
+        dateFilters.start_date = dateFrom.toISOString();
       }
-      if (endDate) {
-        dateFilters.end_date = endDate.toISOString();
+      if (dateTo) {
+        dateFilters.end_date = dateTo.toISOString();
       }
       if (debouncedUserFilter) {
         (dateFilters as any).user = debouncedUserFilter.trim();
@@ -140,7 +150,7 @@ const AuditLogsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [pageState, startDate, endDate, debouncedUserFilter, debouncedIpFilter, enqueueSnackbar, t]);
+  }, [pageState, dateFrom, dateTo, debouncedUserFilter, debouncedIpFilter, enqueueSnackbar, t]);
 
   useEffect(() => {
     loadAuditLogs();
@@ -219,119 +229,124 @@ const AuditLogsPage: React.FC = () => {
         {/* Filters */}
         <Card sx={{ mb: 3 }}>
           <CardContent>
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-                <FormControl size="small" sx={{ minWidth: 120 }}>
-                  <InputLabel shrink={true}>{t('auditLogs.action')}</InputLabel>
-                  <Select
-                    value={pageState.filters?.action || ''}
-                    label={t('auditLogs.action')}
-                    onChange={(e) => handleFilterChange('action', e.target.value)}
-                    displayEmpty
-                    size="small"
-                  >
-                    <MenuItem value="">{t('auditLogs.allActions')}</MenuItem>
-                    {AuditLogService.getAvailableActions().map((action) => (
-                      <MenuItem key={action} value={action}>
-                        {t(`auditLogs.actions.${action}`)}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+              {/* Date Range Picker */}
+              <DateRangePicker
+                dateFrom={dateFrom}
+                dateTo={dateTo}
+                onChange={(from, to, preset) => {
+                  setDateFrom(from);
+                  setDateTo(to);
+                  setDateRangePreset(preset);
+                }}
+                preset={dateRangePreset}
+                size="small"
+              />
 
-                <FormControl size="small" sx={{ minWidth: 120 }}>
-                  <InputLabel shrink={true}>{t('auditLogs.resourceType')}</InputLabel>
-                  <Select
-                    value={pageState.filters?.resource_type || ''}
-                    label={t('auditLogs.resourceType')}
-                    onChange={(e) => handleFilterChange('resource_type', e.target.value)}
-                    displayEmpty
-                    size="small"
-                  >
-                    <MenuItem value="">{t('auditLogs.allTypes')}</MenuItem>
-                    {AuditLogService.getAvailableResourceTypes().map((type) => (
-                      <MenuItem key={type} value={type}>
-                        {t(`auditLogs.resources.${type}`)}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                <TextField
-                  label={t('auditLogs.user')}
-                  placeholder={t('auditLogs.searchUserPlaceholder')}
-                  size="small"
-                  sx={{ minWidth: 120 }}
-                  value={userFilter}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setUserFilter(value);
-                    handleFilterChange('user', value);
-                  }}
-                />
-
-                <TextField
-                  label={t('auditLogs.ipAddress')}
-                  size="small"
-                  sx={{ minWidth: 120 }}
-                  value={ipFilter}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setIpFilter(value);
-                    handleFilterChange('ip_address', value);
-                  }}
-                />
-
-                <DateTimePicker
-                  key={`start-date-${language}`}
-                  label={t('auditLogs.startDate')}
-                  value={startDate}
-                  onChange={(date) => {
-                    setStartDate(date);
-                    handleFilterChange('start_date', date ? date.toISOString() : undefined);
-                  }}
-                  slotProps={{
-                    textField: {
-                      size: 'small',
-                      sx: { minWidth: 160 }
+              {/* Search */}
+              <TextField
+                placeholder={t('auditLogs.searchUserPlaceholder')}
+                size="small"
+                sx={{
+                  minWidth: 200,
+                  flexGrow: 1,
+                  maxWidth: 320,
+                  '& .MuiOutlinedInput-root': {
+                    height: '40px',
+                    borderRadius: '20px',
+                    bgcolor: 'background.paper',
+                    transition: 'all 0.2s ease-in-out',
+                    '& fieldset': {
+                      borderColor: 'divider',
                     },
-                    actionBar: {
-                      actions: ['cancel', 'accept']
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      '& fieldset': {
+                        borderColor: 'primary.light',
+                      }
                     },
-                    popper: {
-                      style: {
-                        zIndex: 9999
+                    '&.Mui-focused': {
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                      '& fieldset': {
+                        borderColor: 'primary.main',
+                        borderWidth: '1px',
                       }
                     }
-                  }}
-                  localeText={getDatePickerLocale()}
-                />
+                  },
+                  '& .MuiInputBase-input': {
+                    fontSize: '0.875rem',
+                  }
+                }}
+                value={userFilter}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setUserFilter(value);
+                  handleFilterChange('user', value);
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
 
-                <DateTimePicker
-                  key={`end-date-${language}`}
-                  label={t('auditLogs.endDate')}
-                  value={endDate}
-                  onChange={(date) => {
-                    setEndDate(date);
-                    handleFilterChange('end_date', date ? date.toISOString() : undefined);
-                  }}
-                  slotProps={{
-                    textField: {
-                      size: 'small',
-                      sx: { minWidth: 160 }
-                    },
-                    actionBar: {
-                      actions: ['cancel', 'accept']
-                    },
-                    popper: {
-                      style: {
-                        zIndex: 9999
-                      }
-                    }
-                  }}
-                  localeText={getDatePickerLocale()}
-                />
-              </Box>
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel shrink={true}>{t('auditLogs.action')}</InputLabel>
+                <Select
+                  value={pageState.filters?.action || ''}
+                  label={t('auditLogs.action')}
+                  onChange={(e) => handleFilterChange('action', e.target.value)}
+                  displayEmpty
+                  size="small"
+                  sx={{ height: '40px' }}
+                >
+                  <MenuItem value="">{t('auditLogs.allActions')}</MenuItem>
+                  {AuditLogService.getAvailableActions().map((action) => (
+                    <MenuItem key={action} value={action}>
+                      {t(`auditLogs.actions.${action}`)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel shrink={true}>{t('auditLogs.resourceType')}</InputLabel>
+                <Select
+                  value={pageState.filters?.resource_type || ''}
+                  label={t('auditLogs.resourceType')}
+                  onChange={(e) => handleFilterChange('resource_type', e.target.value)}
+                  displayEmpty
+                  size="small"
+                  sx={{ height: '40px' }}
+                >
+                  <MenuItem value="">{t('auditLogs.allTypes')}</MenuItem>
+                  {AuditLogService.getAvailableResourceTypes().map((type) => (
+                    <MenuItem key={type} value={type}>
+                      {t(`auditLogs.resources.${type}`)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <TextField
+                placeholder={t('auditLogs.ipAddress')}
+                size="small"
+                sx={{
+                  minWidth: 120,
+                  '& .MuiOutlinedInput-root': {
+                    height: '40px',
+                  }
+                }}
+                value={ipFilter}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setIpFilter(value);
+                  handleFilterChange('ip_address', value);
+                }}
+              />
             </Box>
           </CardContent>
         </Card>

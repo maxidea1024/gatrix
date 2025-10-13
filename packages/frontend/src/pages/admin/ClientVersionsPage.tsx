@@ -60,7 +60,9 @@ import {
   Settings as SettingsIcon,
   Build as BuildIcon,
   Widgets as WidgetsIcon,
+  Search as SearchIcon,
 } from '@mui/icons-material';
+import { InputAdornment } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -86,6 +88,7 @@ import PlatformDefaultsDialog from '../../components/admin/PlatformDefaultsDialo
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
+import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 
 // HSV를 RGB로 변환하는 함수
 const hsvToRgb = (h: number, s: number, v: number): [number, number, number] => {
@@ -866,23 +869,69 @@ const ClientVersionsPage: React.FC = () => {
       {/* 필터 */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel shrink={true}>{t('clientVersions.version')}</InputLabel>
-                <Select
-                  value={pageState.filters?.version || ''}
-                  label={t('clientVersions.version')}
-                  onChange={(e) => handleFilterChange({ ...pageState.filters, version: e.target.value || undefined })}
-                  displayEmpty
-                  size="small"
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        zIndex: 9999
-                      }
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+            {/* Search */}
+            <TextField
+              placeholder={t('common.search')}
+              value={pageState.filters?.search || ''}
+              onChange={(e) => handleFilterChange({ ...pageState.filters, search: e.target.value || undefined })}
+              sx={{
+                minWidth: 200,
+                flexGrow: 1,
+                maxWidth: 320,
+                '& .MuiOutlinedInput-root': {
+                  height: '40px',
+                  borderRadius: '20px',
+                  bgcolor: 'background.paper',
+                  transition: 'all 0.2s ease-in-out',
+                  '& fieldset': {
+                    borderColor: 'divider',
+                  },
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                    '& fieldset': {
+                      borderColor: 'primary.light',
                     }
-                  }}
+                  },
+                  '&.Mui-focused': {
+                    bgcolor: 'background.paper',
+                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                    '& fieldset': {
+                      borderColor: 'primary.main',
+                      borderWidth: '1px',
+                    }
+                  }
+                },
+                '& .MuiInputBase-input': {
+                  fontSize: '0.875rem',
+                }
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                  </InputAdornment>
+                ),
+              }}
+              size="small"
+            />
+
+            <FormControl size="small" sx={{ minWidth: 120 }}>
+              <InputLabel shrink={true}>{t('clientVersions.version')}</InputLabel>
+              <Select
+                value={pageState.filters?.version || ''}
+                label={t('clientVersions.version')}
+                onChange={(e) => handleFilterChange({ ...pageState.filters, version: e.target.value || undefined })}
+                displayEmpty
+                size="small"
+                sx={{ height: '40px' }}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      zIndex: 9999
+                    }
+                  }
+                }}
                 >
                   <MenuItem value="">
                     <em>{t('common.all')}</em>
@@ -903,6 +952,7 @@ const ClientVersionsPage: React.FC = () => {
                   onChange={(e) => handleFilterChange({ ...pageState.filters, platform: e.target.value || undefined })}
                   displayEmpty
                   size="small"
+                  sx={{ height: '40px' }}
                   MenuProps={{
                     PaperProps: {
                       style: {
@@ -930,6 +980,7 @@ const ClientVersionsPage: React.FC = () => {
                   onChange={(e) => handleFilterChange({ ...pageState.filters, clientStatus: e.target.value as ClientStatus || undefined })}
                   displayEmpty
                   size="small"
+                  sx={{ height: '40px' }}
                   MenuProps={{
                     PaperProps: {
                       style: {
@@ -965,6 +1016,7 @@ const ClientVersionsPage: React.FC = () => {
                   }}
                   displayEmpty
                   size="small"
+                  sx={{ height: '40px' }}
                   MenuProps={{
                     PaperProps: {
                       style: {
@@ -981,56 +1033,55 @@ const ClientVersionsPage: React.FC = () => {
                 </Select>
               </FormControl>
 
-              {/* 태그 필터 */}
-              <Autocomplete
-                multiple
-                sx={{ minWidth: 400, flexShrink: 0 }}
-                options={allTags}
-                getOptionLabel={(option) => option.name}
-                filterSelectedOptions
-                value={tagFilter}
-                onChange={(_, value) => handleTagFilterChange(value)}
-                slotProps={{
-                  popper: {
-                    style: {
-                      zIndex: 9999
-                    }
+            {/* 태그 필터 */}
+            <Autocomplete
+              multiple
+              sx={{ minWidth: 400, flexShrink: 0 }}
+              options={allTags}
+              getOptionLabel={(option) => option.name}
+              filterSelectedOptions
+              value={tagFilter}
+              onChange={(_, value) => handleTagFilterChange(value)}
+              slotProps={{
+                popper: {
+                  style: {
+                    zIndex: 9999
                   }
-                }}
-                renderValue={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...chipProps } = getTagProps({ index });
-                    return (
-                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
-                        <Chip
-                          variant="outlined"
-                          label={option.name}
-                          size="small"
-                          sx={{ bgcolor: option.color, color: '#fff', cursor: 'help' }}
-                          {...chipProps}
-                        />
-                      </Tooltip>
-                    );
-                  })
                 }
-                renderInput={(params) => (
-                  <TextField {...params} label={t('common.tags')} size="small" />
-                )}
-                renderOption={(props, option) => {
-                  const { key, ...otherProps } = props;
+              }}
+              renderValue={(value, getTagProps) =>
+                value.map((option, index) => {
+                  const { key, ...chipProps } = getTagProps({ index });
                   return (
-                    <Box component="li" key={key} {...otherProps}>
+                    <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
                       <Chip
+                        variant="outlined"
                         label={option.name}
                         size="small"
-                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                        sx={{ bgcolor: option.color, color: '#fff', cursor: 'help' }}
+                        {...chipProps}
                       />
-                      {option.description || t('common.noDescription')}
-                    </Box>
+                    </Tooltip>
                   );
-                }}
-              />
-            </Box>
+                })
+              }
+              renderInput={(params) => (
+                <TextField {...params} label={t('common.tags')} size="small" />
+              )}
+              renderOption={(props, option) => {
+                const { key, ...otherProps } = props;
+                return (
+                  <Box component="li" key={key} {...otherProps}>
+                    <Chip
+                      label={option.name}
+                      size="small"
+                      sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                    />
+                    {option.description || t('common.noDescription')}
+                  </Box>
+                );
+              }}
+            />
           </Box>
         </CardContent>
       </Card>
