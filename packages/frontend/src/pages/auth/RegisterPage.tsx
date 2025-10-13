@@ -95,6 +95,7 @@ const RegisterPage: React.FC = () => {
     reset,
     clearErrors,
     watch,
+    setValue,
   } = useForm<RegisterData & { confirmPassword: string }>({
     resolver,
     mode: 'onChange', // 실시간 검증을 위해 onChange로 변경
