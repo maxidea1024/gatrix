@@ -138,6 +138,11 @@ const MessageTemplatesPage: React.FC = () => {
     [activeFilters]
   );
 
+  const tagOperator = useMemo(() => {
+    const filter = activeFilters.find(f => f.key === 'tags');
+    return filter?.operator;
+  }, [activeFilters]);
+
   // 필터를 문자열로 변환하여 의존성 배열에 사용
   const createdByFilterString = useMemo(() =>
     Array.isArray(createdByFilter) ? createdByFilter.join(',') : (createdByFilter || ''),
@@ -189,7 +194,10 @@ const MessageTemplatesPage: React.FC = () => {
         params.isEnabled = isEnabledFilter;
         if (isEnabledOperator) params.isEnabled_operator = isEnabledOperator;
       }
-      if (tagIds.length > 0) params.tags = tagIds.map(id => id.toString());
+      if (tagIds.length > 0) {
+        params.tags = tagIds.map(id => id.toString());
+        if (tagOperator) params.tags_operator = tagOperator;
+      }
 
       const result = await messageTemplateService.list(params);
 
@@ -203,7 +211,7 @@ const MessageTemplatesPage: React.FC = () => {
       setLoading(false);
       setIsInitialLoad(false);
     }
-  }, [page, rowsPerPage, createdByFilterString, createdByOperator, isEnabledFilterString, isEnabledOperator, tagIdsString, debouncedSearchQuery, enqueueSnackbar, t]);
+  }, [page, rowsPerPage, createdByFilterString, createdByOperator, isEnabledFilterString, isEnabledOperator, tagIdsString, tagOperator, debouncedSearchQuery, enqueueSnackbar, t]);
 
   // 태그 로딩
   const loadTags = useCallback(async () => {
@@ -239,7 +247,7 @@ const MessageTemplatesPage: React.FC = () => {
   }, [load, loadTags, loadUsers]);
 
   // 동적 필터 정의
-  const availableFilterDefinitions: FilterDefinition[] = [
+  const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
     {
       key: 'createdBy',
       label: t('common.createdBy'),
@@ -275,7 +283,7 @@ const MessageTemplatesPage: React.FC = () => {
         description: tag.description,
       })),
     },
-  ];
+  ], [t, allUsers, allTags]);
 
   // 동적 필터 핸들러
   const handleFilterAdd = (filter: ActiveFilter) => {

@@ -313,7 +313,7 @@ const UsersManagementPage: React.FC = () => {
   }, []);
 
   // 동적 필터 정의
-  const availableFilterDefinitions: FilterDefinition[] = [
+  const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
     {
       key: 'status',
       label: t('users.statusFilter'),
@@ -350,7 +350,7 @@ const UsersManagementPage: React.FC = () => {
         description: tag.description,
       })),
     },
-  ];
+  ], [t, availableTags]);
 
   // 페이지 로드 시 pageState.filters에서 activeFilters 복원
   useEffect(() => {

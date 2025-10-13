@@ -39,6 +39,7 @@ export class MessageTemplateController {
       if (tags) {
         tagIds = Array.isArray(tags) ? tags : [tags];
       }
+      const tagsOperator = req.query.tags_operator as 'any_of' | 'include_all' | undefined;
 
       // MessageTemplateModel 사용
       const result = await MessageTemplateModel.findAllWithPagination({
@@ -48,6 +49,7 @@ export class MessageTemplateController {
         isEnabled_operator: isEnabledOperator,
         search: q,
         tags: tagIds,
+        tags_operator: tagsOperator,
         limit: Number(limit) || 50,
         offset: Number(offset) || 0
       });

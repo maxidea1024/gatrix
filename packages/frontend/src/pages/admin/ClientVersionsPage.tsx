@@ -312,7 +312,7 @@ const ClientVersionsPage: React.FC = () => {
   }, [updateFilters]);
 
   // 동적 필터 정의
-  const availableFilterDefinitions: FilterDefinition[] = [
+  const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
     {
       key: 'version',
       label: t('clientVersions.version'),
@@ -370,7 +370,7 @@ const ClientVersionsPage: React.FC = () => {
         description: tag.description || '',
       })),
     },
-  ];
+  ], [t, versions, allTags]);
 
   // 동적 필터 추가 핸들러
   const handleFilterAdd = useCallback((filter: ActiveFilter) => {

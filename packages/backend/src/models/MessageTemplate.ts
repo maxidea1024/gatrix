@@ -8,6 +8,7 @@ export interface MessageTemplateFilters {
   isEnabled_operator?: 'any_of' | 'include_all';
   search?: string;
   tags?: string[];
+  tags_operator?: 'any_of' | 'include_all';
   limit?: number;
   offset?: number;
 }
@@ -87,17 +88,31 @@ export class MessageTemplateModel {
           });
         }
 
-        // 태그 필터 처리 (AND 조건: 모든 태그를 가진 템플릿만 반환)
+        // 태그 필터 처리
         if (filters?.tags && filters.tags.length > 0) {
-          filters.tags.forEach(tagId => {
+          const operator = filters.tags_operator || 'include_all';
+
+          if (operator === 'any_of') {
+            // OR 조건: 선택한 태그 중 하나라도 가진 템플릿 반환
             query.whereExists(function(this: any) {
               this.select('*')
                 .from('g_tag_assignments as ta')
                 .whereRaw('ta.entityId = mt.id')
                 .where('ta.entityType', 'message_template')
-                .where('ta.tagId', tagId);
+                .whereIn('ta.tagId', filters.tags!);
             });
-          });
+          } else {
+            // AND 조건: 선택한 모든 태그를 가진 템플릿만 반환
+            filters.tags.forEach(tagId => {
+              query.whereExists(function(this: any) {
+                this.select('*')
+                  .from('g_tag_assignments as ta')
+                  .whereRaw('ta.entityId = mt.id')
+                  .where('ta.entityType', 'message_template')
+                  .where('ta.tagId', tagId);
+              });
+            });
+          }
         }
 
         return query;

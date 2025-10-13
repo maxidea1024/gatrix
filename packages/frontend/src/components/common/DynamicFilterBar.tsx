@@ -151,29 +151,17 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
     }
   }, [editingFilter, activeFilters]);
 
-  // Handle click outside to cancel editing
+  // Handle ESC key to cancel editing
   React.useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (!editingFilter) return;
 
-      const target = event.target as Node;
+      if (event.key === 'Escape') {
+        console.log('[DynamicFilterBar] ESC pressed, canceling edit');
 
-      // Check if click is on MUI Menu/Popover (Select dropdown)
-      const isMenuClick = (target as Element).closest('.MuiPopover-root, .MuiMenu-root, .MuiPaper-root');
-      if (isMenuClick) {
-        return; // Don't close if clicking on dropdown menu
-      }
-
-      // Check if Select is currently open - don't handle outside click if Select is managing its own close
-      if (selectOpen) {
-        return; // Let Select's onClose handle it
-      }
-
-      // Check if click is outside the edit container
-      if (editContainerRef.current && !editContainerRef.current.contains(target)) {
-        // Don't remove filter if it was just added (give user time to type)
-        if (justAddedFilterRef.current === editingFilter) {
-          return;
+        // Close select if open
+        if (selectOpen) {
+          setSelectOpen(false);
         }
 
         // Check if filter has a value
@@ -191,7 +179,87 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
           }
         }
 
+        // Exit edit mode
+        setEditingFilter(null);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [editingFilter, activeFilters, selectOpen]);
+
+  // Handle click outside to cancel editing
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!editingFilter) return;
+
+      const target = event.target as Node;
+
+      // Check if click is on MUI Menu/Popover (Select dropdown only)
+      // Only check for Popover and Menu, NOT Paper (Paper is used everywhere)
+      const isMenuClick = (target as Element).closest('.MuiPopover-root, .MuiMenu-root');
+      if (isMenuClick) {
+        return; // Don't close if clicking on dropdown menu
+      }
+
+      // Check if click is outside the edit container
+      if (editContainerRef.current && !editContainerRef.current.contains(target)) {
+        console.log('[DynamicFilterBar] Click outside edit container, editingFilter:', editingFilter);
+
+        // Don't remove filter if it was just added (give user time to type)
+        if (justAddedFilterRef.current === editingFilter) {
+          return;
+        }
+
+        // If Select is open, close it and exit edit mode
+        if (selectOpen) {
+          console.log('[DynamicFilterBar] Select is open, closing it and exiting edit mode');
+          setSelectOpen(false);
+
+          // Check if filter has a value before exiting
+          const filter = activeFilters.find(f => f.key === editingFilter);
+          if (filter) {
+            const filterDef = getFilterDefinition(editingFilter);
+            const isEmpty =
+              (filterDef?.type === 'multiselect' || filterDef?.type === 'tags')
+                ? (!Array.isArray(filter.value) || filter.value.length === 0)
+                : (!filter.value || filter.value === '');
+
+            if (isEmpty) {
+              // Remove filter if empty
+              handleRemoveFilter(editingFilter);
+            }
+          }
+
+          // Exit edit mode immediately
+          setEditingFilter(null);
+          return;
+        }
+
+        // Check if filter has a value
+        const filter = activeFilters.find(f => f.key === editingFilter);
+        console.log('[DynamicFilterBar] Current filter value:', filter);
+
+        if (filter) {
+          const filterDef = getFilterDefinition(editingFilter);
+          const isEmpty =
+            (filterDef?.type === 'multiselect' || filterDef?.type === 'tags')
+              ? (!Array.isArray(filter.value) || filter.value.length === 0)
+              : (!filter.value || filter.value === '');
+
+          console.log('[DynamicFilterBar] Filter isEmpty:', isEmpty);
+
+          if (isEmpty) {
+            // Remove filter if empty
+            console.log('[DynamicFilterBar] Removing empty filter');
+            handleRemoveFilter(editingFilter);
+          }
+        }
+
         // Cancel editing
+        console.log('[DynamicFilterBar] Exiting edit mode');
         setEditingFilter(null);
         setSelectOpen(false);
       }
@@ -505,7 +573,6 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
           borderColor: 'primary.main',
           borderRadius: '16px',
           bgcolor: 'rgba(25, 118, 210, 0.08)',
-          transition: 'all 0.15s ease-in-out',
         }}
       >
         <Box sx={{
@@ -604,6 +671,13 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
               onOpen={() => setSelectOpen(true)}
               onClose={() => {
                 setSelectOpen(false);
+                // Always exit editing mode when Select closes
+                const currentFilter = activeFilters.find(f => f.key === filter.key);
+                if (!currentFilter || !currentFilter.value || currentFilter.value === '') {
+                  // Remove filter if no value selected
+                  handleRemoveFilter(filter.key);
+                }
+                setEditingFilter(null);
               }}
               onChange={(e) => {
                 const newValue = e.target.value === '' ? undefined : e.target.value;
@@ -611,16 +685,11 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 // Close immediately after selection
                 if (newValue !== undefined && newValue !== '') {
                   setSelectOpen(false);
-                  // Wait for state update before closing edit mode
-                  setTimeout(() => {
-                    setEditingFilter(null);
-                  }, 50);
+                  setEditingFilter(null);
                 } else {
                   // If cleared, remove filter
                   setSelectOpen(false);
-                  setTimeout(() => {
-                    handleRemoveFilter(filter.key);
-                  }, 50);
+                  handleRemoveFilter(filter.key);
                 }
               }}
               autoFocus
@@ -665,19 +734,17 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 setSelectOpen(false);
                 setSearchText('');
 
-                // Use requestAnimationFrame to ensure state is updated
-                requestAnimationFrame(() => {
-                  const currentFilter = activeFilters.find(f => f.key === filter.key);
-                  const hasValue = currentFilter && Array.isArray(currentFilter.value) && currentFilter.value.length > 0;
+                // Immediately exit editing mode when Select closes
+                const currentFilter = activeFilters.find(f => f.key === filter.key);
+                const hasValue = currentFilter && Array.isArray(currentFilter.value) && currentFilter.value.length > 0;
 
-                  if (!hasValue) {
-                    // Remove filter if no values selected
-                    handleRemoveFilter(filter.key);
-                  }
+                if (!hasValue) {
+                  // Remove filter if no values selected
+                  handleRemoveFilter(filter.key);
+                }
 
-                  // Always exit editing mode when Select closes
-                  setEditingFilter(null);
-                });
+                // Always exit editing mode when Select closes
+                setEditingFilter(null);
               }}
               onChange={(e) => {
                 onFilterChange(filter.key, e.target.value);
@@ -788,19 +855,17 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 setSelectOpen(false);
                 setSearchText('');
 
-                // Use requestAnimationFrame to ensure state is updated
-                requestAnimationFrame(() => {
-                  const currentFilter = activeFilters.find(f => f.key === filter.key);
-                  const hasValue = currentFilter && Array.isArray(currentFilter.value) && currentFilter.value.length > 0;
+                // Immediately exit editing mode when Select closes
+                const currentFilter = activeFilters.find(f => f.key === filter.key);
+                const hasValue = currentFilter && Array.isArray(currentFilter.value) && currentFilter.value.length > 0;
 
-                  if (!hasValue) {
-                    // Remove filter if no values selected
-                    handleRemoveFilter(filter.key);
-                  }
+                if (!hasValue) {
+                  // Remove filter if no values selected
+                  handleRemoveFilter(filter.key);
+                }
 
-                  // Always exit editing mode when Select closes
-                  setEditingFilter(null);
-                });
+                // Always exit editing mode when Select closes
+                setEditingFilter(null);
               }}
               onChange={(e) => {
                 onFilterChange(filter.key, e.target.value);
