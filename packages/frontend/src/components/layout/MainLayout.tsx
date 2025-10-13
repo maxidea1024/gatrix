@@ -408,11 +408,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       <Box
         sx={{
           height: 64,
+          flexShrink: 0,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           px: 2,
-          borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
         }}
       >
         {!sidebarCollapsed && (
@@ -482,8 +482,33 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
       </Box>
 
-      {/* 메뉴 영역 */}
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
+      {/* 메뉴 영역 - 스크롤 가능 */}
+      <Box sx={{
+        flexGrow: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'auto',
+        minHeight: 0,
+        // Dark theme scrollbar (sidebar is always dark)
+        '&::-webkit-scrollbar': {
+          width: '8px',
+        },
+        '&::-webkit-scrollbar-track': {
+          background: 'transparent',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: 'rgba(255, 255, 255, 0.2)',
+          borderRadius: '4px',
+        },
+        '&::-webkit-scrollbar-thumb:hover': {
+          background: 'rgba(255, 255, 255, 0.3)',
+        },
+        '&::-webkit-scrollbar-thumb:active': {
+          background: 'rgba(255, 255, 255, 0.4)',
+        },
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgba(255, 255, 255, 0.2) transparent',
+      }}>
         <List sx={{ px: 1, flexGrow: 1 }}>
         {/* 기본 메뉴 */}
         {!sidebarCollapsed && (
