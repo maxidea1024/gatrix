@@ -931,7 +931,7 @@ const UsersManagementPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Box sx={{ mb: 4 }}>
+      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <PeopleIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Box>
@@ -943,95 +943,87 @@ const UsersManagementPage: React.FC = () => {
             </Typography>
           </Box>
         </Box>
+
+        {/* 버튼 그룹 */}
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button
+            variant="contained"
+            startIcon={<PersonAddIcon />}
+            onClick={handleAddUser}
+          >
+            {t('users.addUser')}
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<SendIcon />}
+            onClick={() => setInvitationDialogOpen(true)}
+            disabled={!!currentInvitation}
+          >
+            {t('invitations.createInvitation')}
+          </Button>
+        </Box>
       </Box>
 
       {/* Filters */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
-              {/* Search */}
-              <TextField
-                placeholder={t('users.searchPlaceholder')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                sx={{
-                  minWidth: 200,
-                  flexGrow: 1,
-                  maxWidth: 320,
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                    borderRadius: '20px',
-                    bgcolor: 'background.paper',
-                    transition: 'all 0.2s ease-in-out',
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+            {/* Search */}
+            <TextField
+              placeholder={t('users.searchPlaceholder')}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              sx={{
+                minWidth: 200,
+                flexGrow: 1,
+                maxWidth: 320,
+                '& .MuiOutlinedInput-root': {
+                  height: '40px',
+                  borderRadius: '20px',
+                  bgcolor: 'background.paper',
+                  transition: 'all 0.2s ease-in-out',
+                  '& fieldset': {
+                    borderColor: 'divider',
+                  },
+                  '&:hover': {
+                    bgcolor: 'action.hover',
                     '& fieldset': {
-                      borderColor: 'divider',
-                    },
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                      '& fieldset': {
-                        borderColor: 'primary.light',
-                      }
-                    },
-                    '&.Mui-focused': {
-                      bgcolor: 'background.paper',
-                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                      '& fieldset': {
-                        borderColor: 'primary.main',
-                        borderWidth: '1px',
-                      }
+                      borderColor: 'primary.light',
                     }
                   },
-                  '& .MuiInputBase-input': {
-                    fontSize: '0.875rem',
+                  '&.Mui-focused': {
+                    bgcolor: 'background.paper',
+                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                    '& fieldset': {
+                      borderColor: 'primary.main',
+                      borderWidth: '1px',
+                    }
                   }
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                    </InputAdornment>
-                  ),
-                }}
-                size="small"
+                },
+                '& .MuiInputBase-input': {
+                  fontSize: '0.875rem',
+                }
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                  </InputAdornment>
+                ),
+              }}
+              size="small"
+            />
+
+            {/* Dynamic Filter Bar */}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleDynamicFilterChange}
+                onOperatorChange={handleOperatorChange}
               />
-
-              {/* Dynamic Filter Bar */}
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
-                <DynamicFilterBar
-                  availableFilters={availableFilterDefinitions}
-                  activeFilters={activeFilters}
-                  onFilterAdd={handleFilterAdd}
-                  onFilterRemove={handleFilterRemove}
-                  onFilterChange={handleDynamicFilterChange}
-                  onOperatorChange={handleOperatorChange}
-                />
-              </Box>
-            </Box>
-
-            {/* 버튼 그룹 */}
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button
-                variant="contained"
-                startIcon={<PersonAddIcon />}
-                onClick={handleAddUser}
-              >
-                {t('users.addUser')}
-              </Button>
-              <Box sx={{
-                width: '1px',
-                bgcolor: 'divider',
-                mx: 0.5,
-                alignSelf: 'stretch'
-              }} />
-              <Button
-                variant="outlined"
-                startIcon={<SendIcon />}
-                onClick={() => setInvitationDialogOpen(true)}
-                disabled={!!currentInvitation}
-              >
-                {t('invitations.createInvitation')}
-              </Button>
             </Box>
           </Box>
         </CardContent>
