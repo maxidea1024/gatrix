@@ -35,9 +35,13 @@ export const messageTemplateService = {
       return { templates: d, total: d.length };
     }
 
+    // 서버 응답 구조: { success: true, data: { items: ..., total: ... } }
+    // data.data가 있으면 중첩된 구조
+    const actualData = d?.data || d;
+
     return {
-      templates: d?.templates ?? d?.items ?? [],
-      total: d?.total ?? 0
+      templates: actualData?.templates ?? actualData?.items ?? [],
+      total: actualData?.total ?? 0
     };
   },
   async get(id: number): Promise<MessageTemplate> {

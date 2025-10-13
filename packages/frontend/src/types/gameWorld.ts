@@ -16,6 +16,7 @@ export interface GameWorld {
   maintenanceStartDate?: string;
   maintenanceEndDate?: string;
   maintenanceMessage?: string;
+  maintenanceMessageTemplateId?: number | null;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
   customPayload?: Record<string, any> | null;

@@ -65,10 +65,15 @@ const updateMaintenanceSchema = Joi.object({
   isMaintenance: Joi.boolean().required(),
   maintenanceStartDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
   maintenanceEndDate: Joi.string().isoDate().optional().allow('').empty('').default(null),
-  maintenanceMessage: Joi.when('isMaintenance', {
-    is: true,
-    then: Joi.string().min(1).required(),
-    otherwise: Joi.string().optional().allow('').empty('').default(null)
+  maintenanceMessageTemplateId: Joi.number().integer().optional().allow(null),
+  maintenanceMessage: Joi.when('maintenanceMessageTemplateId', {
+    is: Joi.exist().not(null),
+    then: Joi.string().optional().allow('').empty('').default(null),
+    otherwise: Joi.when('isMaintenance', {
+      is: true,
+      then: Joi.string().min(1).required(),
+      otherwise: Joi.string().optional().allow('').empty('').default(null)
+    })
   }),
   supportsMultiLanguage: Joi.boolean().optional().default(false),
   maintenanceLocales: Joi.array().items(

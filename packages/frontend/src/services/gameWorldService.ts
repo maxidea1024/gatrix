@@ -97,6 +97,7 @@ export const gameWorldService = {
     maintenanceStartDate?: string;
     maintenanceEndDate?: string;
     maintenanceMessage?: string;
+    maintenanceMessageTemplateId?: number | null;
     supportsMultiLanguage?: boolean;
     maintenanceLocales?: Array<{ lang: 'ko' | 'en' | 'zh'; message: string }>;
   }): Promise<GameWorld> {

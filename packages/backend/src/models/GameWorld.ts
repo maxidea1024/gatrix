@@ -25,6 +25,7 @@ export interface GameWorld {
   maintenanceStartDate?: Date;
   maintenanceEndDate?: Date;
   maintenanceMessage?: string;
+  maintenanceMessageTemplateId?: number | null;
   supportsMultiLanguage?: boolean;
   customPayload?: Record<string, any> | null;
   createdBy: number;
@@ -48,6 +49,7 @@ export interface CreateGameWorldData {
   maintenanceStartDate?: Date;
   maintenanceEndDate?: Date;
   maintenanceMessage?: string;
+  maintenanceMessageTemplateId?: number | null;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
   customPayload?: Record<string, any> | null;
@@ -65,6 +67,7 @@ export interface UpdateGameWorldData {
   maintenanceStartDate?: Date;
   maintenanceEndDate?: Date;
   maintenanceMessage?: string;
+  maintenanceMessageTemplateId?: number | null;
   supportsMultiLanguage?: boolean;
   maintenanceLocales?: GameWorldMaintenanceLocale[];
   customPayload?: Record<string, any> | null;
