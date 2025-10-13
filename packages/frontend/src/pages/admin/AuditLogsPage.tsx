@@ -101,14 +101,43 @@ const AuditLogsPage: React.FC = () => {
 
   // Filters - localStorage에서 복원
   const [userFilter, setUserFilter] = useState<string>(pageState.filters?.user || '');
-  const [ipFilter, setIpFilter] = useState<string>(pageState.filters?.ip || '');
 
   // 동적 필터 상태
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
-  // 디바운싱된 검색어들 (500ms 지연)
+  // 디바운싱된 검색어 (500ms 지연)
   const debouncedUserFilter = useDebounce(userFilter, 500);
-  const debouncedIpFilter = useDebounce(ipFilter, 500);
+
+  // Available filter definitions
+  const availableFilters: FilterDefinition[] = [
+    {
+      key: 'action',
+      label: t('auditLogs.action'),
+      type: 'multiselect',
+      operator: 'any_of',
+      allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
+      options: AuditLogService.getAvailableActions().map(action => ({
+        value: action,
+        label: t(`auditLogs.actions.${action}`),
+      })),
+    },
+    {
+      key: 'resource_type',
+      label: t('auditLogs.resourceType'),
+      type: 'multiselect',
+      operator: 'any_of',
+      allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
+      options: AuditLogService.getAvailableResourceTypes().map(type => ({
+        value: type,
+        label: t(`auditLogs.resources.${type}`),
+      })),
+    },
+    {
+      key: 'ip_address',
+      label: t('auditLogs.ipAddress'),
+      type: 'text',
+    },
+  ];
 
   // Load audit logs
   const loadAuditLogs = useCallback(async () => {
@@ -125,9 +154,23 @@ const AuditLogsPage: React.FC = () => {
       if (debouncedUserFilter) {
         (dateFilters as any).user = debouncedUserFilter.trim();
       }
-      if (debouncedIpFilter) {
-        (dateFilters as any).ip_address = debouncedIpFilter;
-      }
+
+      // Add dynamic filters
+      activeFilters.forEach(filter => {
+        if (filter.value !== undefined && filter.value !== null && filter.value !== '') {
+          // For multiselect filters, send as array with operator
+          if (Array.isArray(filter.value) && filter.value.length > 0) {
+            (dateFilters as any)[filter.key] = filter.value;
+            // Add operator for multiselect filters
+            if (filter.operator) {
+              (dateFilters as any)[`${filter.key}_operator`] = filter.operator;
+            }
+          } else if (!Array.isArray(filter.value)) {
+            // For text filters
+            (dateFilters as any)[filter.key] = filter.value;
+          }
+        }
+      });
 
       const result = await AuditLogService.getAuditLogs(
         pageState.page,
@@ -150,7 +193,7 @@ const AuditLogsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [pageState, dateFrom, dateTo, debouncedUserFilter, debouncedIpFilter, enqueueSnackbar, t]);
+  }, [pageState, dateFrom, dateTo, debouncedUserFilter, activeFilters, enqueueSnackbar, t]);
 
   useEffect(() => {
     loadAuditLogs();
@@ -176,6 +219,27 @@ const AuditLogsPage: React.FC = () => {
 
   const handleRefresh = () => {
     loadAuditLogs();
+  };
+
+  // Dynamic filter handlers
+  const handleFilterAdd = (filter: ActiveFilter) => {
+    setActiveFilters(prev => [...prev, filter]);
+  };
+
+  const handleFilterRemove = (filterKey: string) => {
+    setActiveFilters(prev => prev.filter(f => f.key !== filterKey));
+  };
+
+  const handleDynamicFilterChange = (filterKey: string, value: any) => {
+    setActiveFilters(prev =>
+      prev.map(f => (f.key === filterKey ? { ...f, value } : f))
+    );
+  };
+
+  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
+    setActiveFilters(prev =>
+      prev.map(f => (f.key === filterKey ? { ...f, operator } : f))
+    );
   };
 
   const formatDate = (dateString: string) => {
@@ -240,6 +304,7 @@ const AuditLogsPage: React.FC = () => {
                   setDateRangePreset(preset);
                 }}
                 preset={dateRangePreset}
+                availablePresets={['today', 'yesterday', 'last7d', 'last30d', 'last3m', 'last6m', 'last12m', 'custom']}
                 size="small"
               />
 
@@ -293,59 +358,14 @@ const AuditLogsPage: React.FC = () => {
                 }}
               />
 
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel shrink={true}>{t('auditLogs.action')}</InputLabel>
-                <Select
-                  value={pageState.filters?.action || ''}
-                  label={t('auditLogs.action')}
-                  onChange={(e) => handleFilterChange('action', e.target.value)}
-                  displayEmpty
-                  size="small"
-                  sx={{ height: '40px' }}
-                >
-                  <MenuItem value="">{t('auditLogs.allActions')}</MenuItem>
-                  {AuditLogService.getAvailableActions().map((action) => (
-                    <MenuItem key={action} value={action}>
-                      {t(`auditLogs.actions.${action}`)}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel shrink={true}>{t('auditLogs.resourceType')}</InputLabel>
-                <Select
-                  value={pageState.filters?.resource_type || ''}
-                  label={t('auditLogs.resourceType')}
-                  onChange={(e) => handleFilterChange('resource_type', e.target.value)}
-                  displayEmpty
-                  size="small"
-                  sx={{ height: '40px' }}
-                >
-                  <MenuItem value="">{t('auditLogs.allTypes')}</MenuItem>
-                  {AuditLogService.getAvailableResourceTypes().map((type) => (
-                    <MenuItem key={type} value={type}>
-                      {t(`auditLogs.resources.${type}`)}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <TextField
-                placeholder={t('auditLogs.ipAddress')}
-                size="small"
-                sx={{
-                  minWidth: 120,
-                  '& .MuiOutlinedInput-root': {
-                    height: '40px',
-                  }
-                }}
-                value={ipFilter}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setIpFilter(value);
-                  handleFilterChange('ip_address', value);
-                }}
+              {/* Dynamic Filters */}
+              <DynamicFilterBar
+                availableFilters={availableFilters}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleDynamicFilterChange}
+                onOperatorChange={handleOperatorChange}
               />
             </Box>
           </CardContent>

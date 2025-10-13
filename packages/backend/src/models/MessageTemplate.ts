@@ -2,8 +2,10 @@ import db from '../config/knex';
 import logger from '../config/logger';
 
 export interface MessageTemplateFilters {
-  type?: string;
-  isEnabled?: boolean;
+  createdBy?: number | number[];
+  createdBy_operator?: 'any_of' | 'include_all';
+  isEnabled?: boolean | boolean[];
+  isEnabled_operator?: 'any_of' | 'include_all';
   search?: string;
   tags?: string[];
   limit?: number;
@@ -48,17 +50,35 @@ export class MessageTemplateModel {
 
       // 필터 적용 함수
       const applyFilters = (query: any) => {
-        if (filters?.type) {
-          query.where('mt.type', filters.type);
+        // Handle createdBy filter (single or multiple)
+        if (filters?.createdBy !== undefined) {
+          if (Array.isArray(filters.createdBy)) {
+            query.whereIn('mt.createdBy', filters.createdBy);
+          } else {
+            query.where('mt.createdBy', filters.createdBy);
+          }
         }
 
-        // isEnabled 필터 처리
-        // 컨트롤러에서 undefined가 false로 변환되는 문제 때문에
-        // false인 경우도 필터를 적용하지 않음 (모든 레코드 조회)
-        if (filters?.isEnabled === true) {
-          query.where('mt.isEnabled', true);
+        // Handle isEnabled filter (single or multiple)
+        if (filters?.isEnabled !== undefined) {
+          if (Array.isArray(filters.isEnabled)) {
+            // For array of booleans, use OR condition
+            const enabledArray = filters.isEnabled as boolean[];
+            query.where(function(this: any) {
+              enabledArray.forEach((enabled: boolean, index: number) => {
+                if (index === 0) {
+                  this.where('mt.isEnabled', enabled);
+                } else {
+                  this.orWhere('mt.isEnabled', enabled);
+                }
+              });
+            });
+          } else if (filters.isEnabled === true) {
+            query.where('mt.isEnabled', true);
+          } else if (filters.isEnabled === false) {
+            query.where('mt.isEnabled', false);
+          }
         }
-        // false나 undefined인 경우 필터 적용하지 않음
 
         if (filters?.search) {
           query.where(function(this: any) {

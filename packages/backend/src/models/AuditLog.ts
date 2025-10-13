@@ -68,8 +68,10 @@ export class AuditLogModel {
       userId?: number;
       user?: string; // search by email or name
       ipAddress?: string;
-      action?: string;
-      resourceType?: string;
+      action?: string | string[];
+      action_operator?: 'any_of' | 'include_all';
+      resourceType?: string | string[];
+      resource_type_operator?: 'any_of' | 'include_all';
       startDate?: Date;
       endDate?: Date;
     } = {}
@@ -102,12 +104,38 @@ export class AuditLogModel {
           query.where('al.ipAddress', 'like', `%${filters.ipAddress}%`);
         }
 
+        // Handle action filter (single or multiple)
         if (filters.action) {
-          query.where('al.action', filters.action);
+          if (Array.isArray(filters.action)) {
+            const operator = filters.action_operator || 'any_of';
+            if (operator === 'include_all') {
+              // Include all: must match all actions (using AND)
+              // This is tricky for a single field - we'll use whereIn for now
+              // as "include all" doesn't make much sense for a single action field
+              query.whereIn('al.action', filters.action);
+            } else {
+              // Any of: match any action (using OR)
+              query.whereIn('al.action', filters.action);
+            }
+          } else {
+            query.where('al.action', filters.action);
+          }
         }
 
+        // Handle resourceType filter (single or multiple)
         if (filters.resourceType) {
-          query.where('al.entityType', filters.resourceType);
+          if (Array.isArray(filters.resourceType)) {
+            const operator = filters.resource_type_operator || 'any_of';
+            if (operator === 'include_all') {
+              // Include all: must match all resource types
+              query.whereIn('al.entityType', filters.resourceType);
+            } else {
+              // Any of: match any resource type
+              query.whereIn('al.entityType', filters.resourceType);
+            }
+          } else {
+            query.where('al.entityType', filters.resourceType);
+          }
         }
 
         if (filters.user) {

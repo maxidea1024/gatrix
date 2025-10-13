@@ -18,19 +18,32 @@ const EmptyTableRow: React.FC<EmptyTableRowProps> = ({
   const { t } = useTranslation();
   return (
     <TableRow>
-      <TableCell colSpan={colSpan} align="center" sx={{ py: 8, minHeight: 150 }}>
-        {loading ? (
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+      <TableCell
+        colSpan={colSpan}
+        align="center"
+        sx={{
+          py: 8,
+          height: 200,
+          minHeight: 200,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+          }}
+        >
+          {loading ? (
+            <CircularProgress size={32} />
+          ) : (
             <Typography variant="body1" color="text.secondary">
-              {loadingMessage || t('common.loading')}
+              {message}
             </Typography>
-            <CircularProgress size={24} />
-          </Box>
-        ) : (
-          <Typography variant="body1" color="text.secondary">
-            {message}
-          </Typography>
-        )}
+          )}
+        </Box>
       </TableCell>
     </TableRow>
   );

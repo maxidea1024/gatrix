@@ -101,8 +101,11 @@
       "viewDetails": "상세 보기",
       "reopen": "다시 열기",
       "close": "닫기",
-      "delete": "삭제"
-    }
+      "delete": "삭제",
+      "markDeleted": "삭제됨으로 표시"
+    },
+    "noResults": "검색 결과가 없습니다",
+    "loadError": "크래시 목록을 불러오는 중 오류가 발생했습니다"
   },
   "maintenanceTemplates": {
     "title": "점검 템플릿 관리",
@@ -1502,9 +1505,12 @@
     "filter": {
       "addFilter": "필터 추가",
       "removeFilter": "필터 제거",
-      "clearAll": "모든 필터 지우기"
+      "clearAll": "모든 필터 지우기",
+      "operatorLocked": "이 필터는 'any of' 조건만 지원합니다"
     },
-    "filters": "필터",
+    "filters": {
+      "title": "필터"
+    },
     "goBack": "뒤로 가기",
     "goToDashboard": "대시보드로 이동",
     "goToLogin": "로그인으로 이동",

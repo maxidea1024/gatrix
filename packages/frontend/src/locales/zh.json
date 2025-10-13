@@ -1502,9 +1502,12 @@
     "filter": {
       "addFilter": "添加筛选",
       "removeFilter": "删除筛选",
-      "clearAll": "清除所有筛选"
+      "clearAll": "清除所有筛选",
+      "operatorLocked": "此筛选器仅支持'任意'条件"
     },
-    "filters": "筛选器",
+    "filters": {
+      "title": "筛选器"
+    },
     "goBack": "返回",
     "goToDashboard": "前往仪表板",
     "goToLogin": "前往登录",

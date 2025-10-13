@@ -113,8 +113,10 @@ const RealtimeEventsPage: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
   // 동적 필터에서 값 추출
-  const eventTypeFilter = activeFilters.find(f => f.key === 'action')?.value as string || '';
-  const resourceTypeFilter = activeFilters.find(f => f.key === 'resource_type')?.value as string || '';
+  const eventTypeFilter = activeFilters.find(f => f.key === 'action')?.value as string | string[] || '';
+  const eventTypeOperator = activeFilters.find(f => f.key === 'action')?.operator;
+  const resourceTypeFilter = activeFilters.find(f => f.key === 'resource_type')?.value as string | string[] || '';
+  const resourceTypeOperator = activeFilters.find(f => f.key === 'resource_type')?.operator;
   const userFilter = activeFilters.find(f => f.key === 'user')?.value as string || '';
 
   // Detail modal
@@ -171,10 +173,12 @@ const RealtimeEventsPage: React.FC = () => {
 
       if (eventTypeFilter) {
         filters.action = eventTypeFilter;
+        if (eventTypeOperator) filters.action_operator = eventTypeOperator;
       }
 
       if (resourceTypeFilter) {
         filters.resource_type = resourceTypeFilter;
+        if (resourceTypeOperator) filters.resource_type_operator = resourceTypeOperator;
       }
 
       if (userFilter) {
@@ -294,7 +298,7 @@ const RealtimeEventsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [eventTypeFilter, resourceTypeFilter, userFilter, searchQuery]);
+  }, [eventTypeFilter, eventTypeOperator, resourceTypeFilter, resourceTypeOperator, userFilter, searchQuery]);
 
   // Initial load
   useEffect(() => {
@@ -375,7 +379,9 @@ const RealtimeEventsPage: React.FC = () => {
     {
       key: 'action',
       label: t('realtimeEvents.filters.eventType'),
-      type: 'select',
+      type: 'multiselect',
+      operator: 'any_of',
+      allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
       options: allEventTypes.map(action => ({
         value: action,
         label: t(`auditLogs.actions.${action}`, action),
@@ -384,7 +390,9 @@ const RealtimeEventsPage: React.FC = () => {
     {
       key: 'resource_type',
       label: t('auditLogs.resourceType'),
-      type: 'select',
+      type: 'multiselect',
+      operator: 'any_of',
+      allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
       options: allResourceTypes.map(type => ({
         value: type,
         label: t(`auditLogs.resources.${type}`, type),
@@ -410,6 +418,12 @@ const RealtimeEventsPage: React.FC = () => {
   const handleDynamicFilterChange = (filterKey: string, value: any) => {
     setActiveFilters(activeFilters.map(f =>
       f.key === filterKey ? { ...f, value } : f
+    ));
+  };
+
+  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
+    setActiveFilters(activeFilters.map(f =>
+      f.key === filterKey ? { ...f, operator } : f
     ));
   };
 
@@ -587,6 +601,7 @@ const RealtimeEventsPage: React.FC = () => {
               onFilterAdd={handleFilterAdd}
               onFilterRemove={handleFilterRemove}
               onFilterChange={handleDynamicFilterChange}
+              onOperatorChange={handleOperatorChange}
             />
           </Box>
         </Box>

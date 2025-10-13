@@ -101,8 +101,11 @@
         "viewDetails": "View Details",
         "reopen": "Reopen",
         "close": "Close",
-        "delete": "Delete"
-      }
+        "delete": "Delete",
+        "markDeleted": "Mark as Deleted"
+      },
+      "noResults": "No crashes found",
+      "loadError": "Failed to load crashes"
     },
     "maintenanceTemplates": {
       "title": "Message Templates",
@@ -1505,9 +1508,12 @@
     "filter": {
       "addFilter": "Add filter",
       "removeFilter": "Remove filter",
-      "clearAll": "Clear all filters"
+      "clearAll": "Clear all filters",
+      "operatorLocked": "This filter only supports 'any of' condition"
     },
-    "filters": "Filters",
+    "filters": {
+      "title": "Filters"
+    },
     "goBack": "Go Back",
     "goToDashboard": "Go to Dashboard",
     "goToLogin": "Go to Login",

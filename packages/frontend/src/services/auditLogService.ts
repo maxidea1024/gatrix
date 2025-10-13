@@ -43,7 +43,17 @@ export class AuditLogService {
     // Add filters to params
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        params.append(key, value.toString());
+        // Handle array values (for multiselect filters)
+        if (Array.isArray(value)) {
+          value.forEach(v => {
+            // Only append valid values
+            if (v !== undefined && v !== null && v !== '') {
+              params.append(key, v.toString());
+            }
+          });
+        } else {
+          params.append(key, value.toString());
+        }
       }
     });
 

@@ -4,7 +4,35 @@ import { MessageTemplateModel, MessageTemplate } from '../models/MessageTemplate
 export class MessageTemplateController {
   static async list(req: Request, res: Response, next: NextFunction) {
     try {
-      const { type, isEnabled, q, limit, offset, tags } = req.query as any;
+      const { q, limit, offset, tags } = req.query as any;
+
+      // Handle createdBy as single value or array
+      const createdBy = req.query.createdBy;
+      let createdByValue: number | number[] | undefined;
+      if (createdBy !== undefined) {
+        if (Array.isArray(createdBy)) {
+          createdByValue = createdBy.map(v => Number(v));
+        } else {
+          createdByValue = Number(createdBy);
+        }
+      }
+      const createdByOperator = req.query.createdBy_operator as 'any_of' | 'include_all' | undefined;
+
+      // Handle isEnabled as single value or array
+      const isEnabled = req.query.isEnabled;
+      let isEnabledValue: boolean | boolean[] | undefined;
+      if (isEnabled !== undefined) {
+        if (Array.isArray(isEnabled)) {
+          isEnabledValue = isEnabled.map(v => {
+            const str = String(v);
+            return str === '1' || str === 'true';
+          });
+        } else {
+          const str = String(isEnabled);
+          isEnabledValue = str === '1' || str === 'true';
+        }
+      }
+      const isEnabledOperator = req.query.isEnabled_operator as 'any_of' | 'include_all' | undefined;
 
       // tags 파라미터 처리 (배열로 변환)
       let tagIds: string[] | undefined;
@@ -14,8 +42,10 @@ export class MessageTemplateController {
 
       // MessageTemplateModel 사용
       const result = await MessageTemplateModel.findAllWithPagination({
-        type,
-        isEnabled: isEnabled === undefined ? undefined : (isEnabled === '1' || isEnabled === 'true'),
+        createdBy: createdByValue,
+        createdBy_operator: createdByOperator,
+        isEnabled: isEnabledValue,
+        isEnabled_operator: isEnabledOperator,
         search: q,
         tags: tagIds,
         limit: Number(limit) || 50,

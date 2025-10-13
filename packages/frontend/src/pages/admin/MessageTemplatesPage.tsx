@@ -99,22 +99,43 @@ const MessageTemplatesPage: React.FC = () => {
 
   // 동적 필터 상태
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+  const [allUsers, setAllUsers] = useState<{ id: number; name: string; email: string }[]>([]);
 
   // 동적 필터에서 값 추출 (useMemo로 참조 안정화)
-  const typeFilter = useMemo(() =>
-    activeFilters.find(f => f.key === 'type')?.value as MessageTemplateType | undefined,
-    [activeFilters]
-  );
-  const isEnabledFilter = useMemo(() =>
-    activeFilters.find(f => f.key === 'isEnabled')?.value as boolean | undefined,
-    [activeFilters]
-  );
+  const createdByFilter = useMemo(() => {
+    const filter = activeFilters.find(f => f.key === 'createdBy');
+    return filter?.value as number | number[] | undefined;
+  }, [activeFilters]);
+
+  const createdByOperator = useMemo(() => {
+    const filter = activeFilters.find(f => f.key === 'createdBy');
+    return filter?.operator;
+  }, [activeFilters]);
+
+  const isEnabledFilter = useMemo(() => {
+    const filter = activeFilters.find(f => f.key === 'isEnabled');
+    return filter?.value as boolean | boolean[] | undefined;
+  }, [activeFilters]);
+
+  const isEnabledOperator = useMemo(() => {
+    const filter = activeFilters.find(f => f.key === 'isEnabled');
+    return filter?.operator;
+  }, [activeFilters]);
+
   const tagIds = useMemo(() =>
     activeFilters.find(f => f.key === 'tags')?.value as number[] || [],
     [activeFilters]
   );
 
-  // tagIds를 문자열로 변환하여 의존성 배열에 사용
+  // 필터를 문자열로 변환하여 의존성 배열에 사용
+  const createdByFilterString = useMemo(() =>
+    Array.isArray(createdByFilter) ? createdByFilter.join(',') : (createdByFilter || ''),
+    [createdByFilter]
+  );
+  const isEnabledFilterString = useMemo(() =>
+    Array.isArray(isEnabledFilter) ? isEnabledFilter.join(',') : (isEnabledFilter !== undefined ? String(isEnabledFilter) : ''),
+    [isEnabledFilter]
+  );
   const tagIdsString = useMemo(() => tagIds.join(','), [tagIds]);
 
   // 선택 관련
@@ -149,8 +170,14 @@ const MessageTemplatesPage: React.FC = () => {
         offset
       };
 
-      if (typeFilter) params.type = typeFilter;
-      if (isEnabledFilter !== undefined) params.isEnabled = isEnabledFilter;
+      if (createdByFilter) {
+        params.createdBy = createdByFilter;
+        if (createdByOperator) params.createdBy_operator = createdByOperator;
+      }
+      if (isEnabledFilter !== undefined) {
+        params.isEnabled = isEnabledFilter;
+        if (isEnabledOperator) params.isEnabled_operator = isEnabledOperator;
+      }
       if (tagIds.length > 0) params.tags = tagIds.map(id => id.toString());
 
       const result = await messageTemplateService.list(params);
@@ -164,7 +191,7 @@ const MessageTemplatesPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, typeFilter, isEnabledFilter, tagIdsString, debouncedSearchQuery, enqueueSnackbar, t]);
+  }, [page, rowsPerPage, createdByFilterString, createdByOperator, isEnabledFilterString, isEnabledOperator, tagIdsString, debouncedSearchQuery, enqueueSnackbar, t]);
 
   // 태그 로딩
   const loadTags = useCallback(async () => {
@@ -176,27 +203,48 @@ const MessageTemplatesPage: React.FC = () => {
     }
   }, []);
 
+  // 사용자 로딩
+  const loadUsers = useCallback(async () => {
+    try {
+      const response = await fetch('/api/v1/admin/users?limit=1000');
+      const data = await response.json();
+      if (data.success && data.data.users) {
+        setAllUsers(data.data.users.map((u: any) => ({
+          id: u.id,
+          name: u.name,
+          email: u.email
+        })));
+      }
+    } catch (error) {
+      console.error('Failed to load users:', error);
+    }
+  }, []);
+
   useEffect(() => {
     load();
     loadTags();
-  }, [load, loadTags]);
+    loadUsers();
+  }, [load, loadTags, loadUsers]);
 
   // 동적 필터 정의
   const availableFilterDefinitions: FilterDefinition[] = [
     {
-      key: 'type',
-      label: t('messageTemplates.type'),
-      type: 'select',
-      options: [
-        { value: 'maintenance', label: t('messageTemplates.types.maintenance') },
-        { value: 'notification', label: t('messageTemplates.types.notification') },
-        { value: 'email', label: t('messageTemplates.types.email') },
-      ],
+      key: 'createdBy',
+      label: t('common.createdBy'),
+      type: 'multiselect',
+      operator: 'any_of',
+      allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
+      options: allUsers.map(user => ({
+        value: user.id,
+        label: `${user.name} (${user.email})`,
+      })),
     },
     {
       key: 'isEnabled',
       label: t('common.status'),
-      type: 'select',
+      type: 'multiselect',
+      operator: 'any_of', // Status can be any of the selected values
+      allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
       options: [
         { value: true, label: t('common.enabled') },
         { value: false, label: t('common.disabled') },
@@ -206,6 +254,8 @@ const MessageTemplatesPage: React.FC = () => {
       key: 'tags',
       label: t('common.tags'),
       type: 'tags',
+      operator: 'include_all', // Tags are filtered with AND logic in backend
+      allowOperatorToggle: true, // Tags support both 'any_of' and 'include_all'
       options: allTags.map(tag => ({
         value: tag.id,
         label: tag.name,
@@ -231,6 +281,12 @@ const MessageTemplatesPage: React.FC = () => {
       f.key === filterKey ? { ...f, value } : f
     ));
     setPage(0);
+  };
+
+  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
+    setActiveFilters(activeFilters.map(f =>
+      f.key === filterKey ? { ...f, operator } : f
+    ));
   };
 
   // 페이지 변경 핸들러
@@ -544,6 +600,7 @@ const MessageTemplatesPage: React.FC = () => {
                   onFilterAdd={handleFilterAdd}
                   onFilterRemove={handleFilterRemove}
                   onFilterChange={handleDynamicFilterChange}
+                  onOperatorChange={handleOperatorChange}
                 />
               </Box>
             </Box>

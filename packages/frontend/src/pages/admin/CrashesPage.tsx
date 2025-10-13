@@ -66,6 +66,7 @@ import crashService from '@/services/crashService';
 import SimplePagination from '../../components/common/SimplePagination';
 import DateRangePicker, { DateRangePreset } from '../../components/common/DateRangePicker';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
+import EmptyTableRow from '../../components/common/EmptyTableRow';
 
 const CrashesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -81,6 +82,7 @@ const CrashesPage: React.FC = () => {
 
   // Filters
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [filters, setFilters] = useState<CrashFilters>({});
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
@@ -93,6 +95,7 @@ const CrashesPage: React.FC = () => {
   const [sortBy, setSortBy] = useState<'lastCrash' | 'count' | 'createdAt'>('lastCrash');
   const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
   const [versionInput, setVersionInput] = useState('');
+  const [debouncedVersionInput, setDebouncedVersionInput] = useState('');
 
   // Menu state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -103,7 +106,7 @@ const CrashesPage: React.FC = () => {
     {
       key: 'platform',
       label: t('crashes.platform'),
-      type: 'select',
+      type: 'multiselect',
       options: [
         { value: Platform.WINDOWS, label: getPlatformName(Platform.WINDOWS) },
         { value: Platform.MAC, label: getPlatformName(Platform.MAC) },
@@ -113,7 +116,7 @@ const CrashesPage: React.FC = () => {
     {
       key: 'branch',
       label: t('crashes.branch'),
-      type: 'select',
+      type: 'multiselect',
       options: [
         { value: Branch.PRODUCTION, label: getBranchName(Branch.PRODUCTION) },
         { value: Branch.STAGING, label: getBranchName(Branch.STAGING) },
@@ -124,7 +127,7 @@ const CrashesPage: React.FC = () => {
     {
       key: 'state',
       label: t('crashes.state'),
-      type: 'select',
+      type: 'multiselect',
       options: [
         { value: CrashState.OPEN, label: getStateName(CrashState.OPEN) },
         { value: CrashState.CLOSED, label: getStateName(CrashState.CLOSED) },
@@ -142,17 +145,33 @@ const CrashesPage: React.FC = () => {
   // Load crashes
   const loadCrashes = async () => {
     try {
-      setLoading(true);
+      // Only show loading indicator if there's no data yet
+      if (crashes.length === 0) {
+        setLoading(true);
+      }
+
+      // Clean filters to remove any invalid values (NaN, empty arrays, etc.)
+      const cleanedFilters: any = {};
+      Object.entries(filters).forEach(([key, value]) => {
+        // Skip undefined, null, empty string, NaN, and empty arrays
+        if (value !== undefined &&
+            value !== null &&
+            value !== '' &&
+            !Number.isNaN(value) &&
+            !(Array.isArray(value) && value.length === 0)) {
+          cleanedFilters[key] = value;
+        }
+      });
 
       const params: GetCrashesRequest & { sortBy?: string; sortOrder?: 'ASC' | 'DESC' } = {
         page: page + 1, // Backend uses 1-based pagination
         limit: rowsPerPage,
-        search: searchTerm || undefined,
+        search: debouncedSearchTerm || undefined,
         dateFrom: dateFrom?.toISOString(),
         dateTo: dateTo?.toISOString(),
         sortBy,
         sortOrder,
-        ...filters,
+        ...cleanedFilters,
       };
 
       const response = await crashService.getCrashes(params);
@@ -202,30 +221,42 @@ const CrashesPage: React.FC = () => {
     const newActiveFilters: ActiveFilter[] = [];
 
     if (platformParam) {
-      newFilters.platform = Number(platformParam) as Platform;
-      newActiveFilters.push({
-        key: 'platform',
-        value: newFilters.platform,
-        label: t('crashes.platform'),
-      });
+      const platformValue = Number(platformParam);
+      // Only add if it's a valid number (not NaN)
+      if (Number.isFinite(platformValue)) {
+        newFilters.platform = platformValue as Platform;
+        newActiveFilters.push({
+          key: 'platform',
+          value: newFilters.platform,
+          label: t('crashes.platform'),
+        });
+      }
     }
 
     if (branchParam) {
-      newFilters.branch = Number(branchParam) as Branch;
-      newActiveFilters.push({
-        key: 'branch',
-        value: newFilters.branch,
-        label: t('crashes.branch'),
-      });
+      const branchValue = Number(branchParam);
+      // Only add if it's a valid number (not NaN)
+      if (Number.isFinite(branchValue)) {
+        newFilters.branch = branchValue as Branch;
+        newActiveFilters.push({
+          key: 'branch',
+          value: newFilters.branch,
+          label: t('crashes.branch'),
+        });
+      }
     }
 
     if (stateParam) {
-      newFilters.state = Number(stateParam) as CrashState;
-      newActiveFilters.push({
-        key: 'state',
-        value: newFilters.state,
-        label: t('crashes.state'),
-      });
+      const stateValue = Number(stateParam);
+      // Only add if it's a valid number (not NaN)
+      if (Number.isFinite(stateValue)) {
+        newFilters.state = stateValue as CrashState;
+        newActiveFilters.push({
+          key: 'state',
+          value: newFilters.state,
+          label: t('crashes.state'),
+        });
+      }
     }
 
     if (versionParam) {
@@ -266,13 +297,63 @@ const CrashesPage: React.FC = () => {
     setSearchParams(params, { replace: true });
   }, [dateFrom, dateTo, dateRangePreset, searchTerm, filters, versionInput]);
 
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500); // 500ms delay
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [searchTerm]);
+
+  // Debounce version input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedVersionInput(versionInput);
+    }, 500); // 500ms delay
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [versionInput]);
+
+  // Update version filters when debounced version input changes
+  useEffect(() => {
+    if (debouncedVersionInput === '') {
+      // Clear version filters
+      setFilters(prev => ({
+        ...prev,
+        majorVer: undefined,
+        minorVer: undefined,
+        buildNum: undefined,
+        patchNum: undefined,
+      }));
+    } else {
+      // Parse and set version filters
+      const parts = debouncedVersionInput.split('.').map(p => p.trim()).filter(Boolean);
+      const nums = parts.map(p => {
+        const n = Number(p);
+        return Number.isFinite(n) ? n : undefined;
+      });
+      setFilters(prev => ({
+        ...prev,
+        majorVer: nums[0],
+        minorVer: nums[1],
+        buildNum: nums[2],
+        patchNum: nums[3],
+      }));
+    }
+  }, [debouncedVersionInput]);
+
   // Effects
   useEffect(() => {
     // Only load if date range is initialized
     if (dateFrom && dateTo) {
       loadCrashes();
     }
-  }, [page, rowsPerPage, searchTerm, filters, dateFrom, dateTo, sortBy, sortOrder]);
+  }, [page, rowsPerPage, debouncedSearchTerm, filters, dateFrom, dateTo, sortBy, sortOrder]);
 
   // Handlers
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -290,28 +371,26 @@ const CrashesPage: React.FC = () => {
   };
 
   const handleFilterChange = (key: keyof CrashFilters, value: any) => {
+    // Handle array values (multiselect filters)
+    let processedValue = value;
+    if (Array.isArray(value)) {
+      // If empty array, set to undefined
+      processedValue = value.length > 0 ? value : undefined;
+    } else {
+      // For non-array values, set to undefined if falsy
+      processedValue = value || undefined;
+    }
+
     setFilters(prev => ({
       ...prev,
-      [key]: value || undefined,
+      [key]: processedValue,
     }));
     setPage(0);
   };
 
   const updateVersionFilters = (text: string) => {
+    // Only update the input value, debouncing will handle the filter update
     setVersionInput(text);
-    const parts = text.split('.').map(p => p.trim()).filter(Boolean);
-    const nums = parts.map(p => {
-      const n = Number(p);
-      return Number.isFinite(n) ? n : undefined;
-    });
-    setFilters(prev => ({
-      ...prev,
-      majorVer: nums[0],
-      minorVer: nums[1],
-      buildNum: nums[2],
-      patchNum: nums[3],
-    }));
-    setPage(0);
   };
 
   const handleDateRangeChange = (from: Dayjs | null, to: Dayjs | null, preset: DateRangePreset) => {
@@ -370,6 +449,12 @@ const CrashesPage: React.FC = () => {
     } else {
       handleFilterChange(filterKey as keyof CrashFilters, value);
     }
+  };
+
+  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
+    setActiveFilters(prev =>
+      prev.map(f => (f.key === filterKey ? { ...f, operator } : f))
+    );
   };
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>, crash: ClientCrash) => {
@@ -489,6 +574,7 @@ const CrashesPage: React.FC = () => {
                 onFilterAdd={handleFilterAdd}
                 onFilterRemove={handleFilterRemove}
                 onFilterChange={handleDynamicFilterChange}
+                onOperatorChange={handleOperatorChange}
               />
             </Box>
           </Box>
@@ -499,8 +585,6 @@ const CrashesPage: React.FC = () => {
       {/* Crashes Table */}
       <Card>
         <CardContent sx={{ p: 0 }}>
-          {loading && <LinearProgress />}
-
           <TableContainer>
             <Table>
               <TableHead>
@@ -519,14 +603,13 @@ const CrashesPage: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {crashes.length === 0 && !loading ? (
-                  <TableRow>
-                    <TableCell colSpan={11} align="center" sx={{ py: 4 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        {t('crashes.noResults')}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
+                {crashes.length === 0 ? (
+                  <EmptyTableRow
+                    colSpan={11}
+                    loading={loading}
+                    message={t('crashes.noResults')}
+                    loadingMessage={t('common.loadingData')}
+                  />
                 ) : (
                   crashes.map((crash) => (
                     <TableRow key={crash.id} hover>

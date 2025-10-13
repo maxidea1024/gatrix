@@ -129,11 +129,19 @@ const UsersManagementPage: React.FC = () => {
 
   // 동적 필터에서 값 추출 (useMemo로 참조 안정화)
   const statusFilter = useMemo(() =>
-    activeFilters.find(f => f.key === 'status')?.value as string || '',
+    activeFilters.find(f => f.key === 'status')?.value as string[] || [],
+    [activeFilters]
+  );
+  const statusOperator = useMemo(() =>
+    activeFilters.find(f => f.key === 'status')?.operator,
     [activeFilters]
   );
   const roleFilter = useMemo(() =>
-    activeFilters.find(f => f.key === 'role')?.value as string || '',
+    activeFilters.find(f => f.key === 'role')?.value as string[] || [],
+    [activeFilters]
+  );
+  const roleOperator = useMemo(() =>
+    activeFilters.find(f => f.key === 'role')?.operator,
     [activeFilters]
   );
   const tagIds = useMemo(() =>
@@ -141,7 +149,9 @@ const UsersManagementPage: React.FC = () => {
     [activeFilters]
   );
 
-  // tagIds를 문자열로 변환하여 의존성 배열에 사용
+  // 배열을 문자열로 변환하여 의존성 배열에 사용
+  const statusFilterString = useMemo(() => statusFilter.join(','), [statusFilter]);
+  const roleFilterString = useMemo(() => roleFilter.join(','), [roleFilter]);
   const tagIdsString = useMemo(() => tagIds.join(','), [tagIds]);
 
   // 일괄 선택 관련 상태
@@ -231,11 +241,22 @@ const UsersManagementPage: React.FC = () => {
       const params = new URLSearchParams({
         page: (page + 1).toString(),
         limit: rowsPerPage.toString(),
+        _t: Date.now().toString(), // Cache busting
       });
 
       if (debouncedSearchTerm) params.append('search', debouncedSearchTerm);
-      if (statusFilter) params.append('status', statusFilter);
-      if (roleFilter) params.append('role', roleFilter);
+
+      // Status 필터 처리 (배열)
+      if (statusFilter.length > 0) {
+        statusFilter.forEach(status => params.append('status', status));
+        if (statusOperator) params.append('status_operator', statusOperator);
+      }
+
+      // Role 필터 처리 (배열)
+      if (roleFilter.length > 0) {
+        roleFilter.forEach(role => params.append('role', role));
+        if (roleOperator) params.append('role_operator', roleOperator);
+      }
 
       // 태그 필터 처리
       if (tagIds.length > 0) {
@@ -262,7 +283,7 @@ const UsersManagementPage: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [page, rowsPerPage, debouncedSearchTerm, statusFilter, roleFilter, tagIdsString]);
+  }, [page, rowsPerPage, debouncedSearchTerm, statusFilterString, statusOperator, roleFilterString, roleOperator, tagIdsString]);
 
   // 초대링크 이벤트 처리 (MainLayout에서 전달받음)
   useEffect(() => {
@@ -300,7 +321,9 @@ const UsersManagementPage: React.FC = () => {
     {
       key: 'status',
       label: t('users.statusFilter'),
-      type: 'select',
+      type: 'multiselect',
+      operator: 'any_of', // Status can be any of the selected values
+      allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
       options: [
         { value: 'active', label: t('users.statuses.active') },
         { value: 'pending', label: t('users.statuses.pending') },
@@ -310,7 +333,9 @@ const UsersManagementPage: React.FC = () => {
     {
       key: 'role',
       label: t('users.roleFilter'),
-      type: 'select',
+      type: 'multiselect',
+      operator: 'any_of', // Role can be any of the selected values
+      allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
       options: [
         { value: 'admin', label: t('users.roles.admin') },
         { value: 'user', label: t('users.roles.user') },
@@ -320,6 +345,8 @@ const UsersManagementPage: React.FC = () => {
       key: 'tags',
       label: t('common.tags'),
       type: 'tags',
+      operator: 'include_all', // Tags are filtered with AND logic in backend
+      allowOperatorToggle: true, // Tags support both 'any_of' and 'include_all'
       options: availableTags.map(tag => ({
         value: tag.id,
         label: tag.name,
@@ -344,7 +371,7 @@ const UsersManagementPage: React.FC = () => {
     ));
   };
 
-  const handleOperatorChange = (filterKey: string, operator: 'OR' | 'AND') => {
+  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
     setActiveFilters(activeFilters.map(f =>
       f.key === filterKey ? { ...f, operator } : f
     ));

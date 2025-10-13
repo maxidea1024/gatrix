@@ -65,19 +65,42 @@ export class AdminController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
-      const role = req.query.role as string;
-      const status = req.query.status as string;
+
+      // Handle role as single value or array
+      const role = req.query.role;
+      let roleValue: string | string[] | undefined;
+      if (role) {
+        roleValue = Array.isArray(role) ? role.map(r => String(r)) : String(role);
+      }
+      const roleOperator = req.query.role_operator as 'any_of' | 'include_all' | undefined;
+
+      // Handle status as single value or array
+      const status = req.query.status;
+      let statusValue: string | string[] | undefined;
+      if (status) {
+        statusValue = Array.isArray(status) ? status.map(s => String(s)) : String(status);
+      }
+      const statusOperator = req.query.status_operator as 'any_of' | 'include_all' | undefined;
+
       const search = req.query.search as string;
       const tags = req.query.tags;
 
       const filters: any = {};
-      if (role) filters.role = role;
-      if (status) filters.status = status;
+      if (roleValue) {
+        filters.role = roleValue;
+        if (roleOperator) filters.role_operator = roleOperator;
+      }
+      if (statusValue) {
+        filters.status = statusValue;
+        if (statusOperator) filters.status_operator = statusOperator;
+      }
       if (search) filters.search = search;
       if (tags) {
         // tags can be a single string or array of strings
         filters.tags = Array.isArray(tags) ? tags : [tags];
       }
+
+      console.log('[AdminController] User filters:', JSON.stringify(filters, null, 2));
 
       const result = await UserService.getAllUsers(filters, { page, limit });
 
@@ -322,8 +345,17 @@ export class AdminController {
       const userId = req.query.userId ? parseInt(req.query.userId as string) :
         req.query.user_id ? parseInt(req.query.user_id as string) : undefined; // backward compatibility
       const ipAddress = req.query.ipAddress as string || req.query.ip_address as string; // backward compatibility
-      const action = req.query.action as string;
-      const resourceType = req.query.resourceType as string || req.query.resource_type as string; // backward compatibility
+
+      // Handle action as single value or array
+      const action = req.query.action;
+      const actionValue = Array.isArray(action) ? action : (action ? [action as string] : undefined);
+      const actionOperator = req.query.action_operator as 'any_of' | 'include_all' | undefined;
+
+      // Handle resourceType as single value or array
+      const resourceType = req.query.resourceType || req.query.resource_type; // backward compatibility
+      const resourceTypeValue = Array.isArray(resourceType) ? resourceType : (resourceType ? [resourceType as string] : undefined);
+      const resourceTypeOperator = req.query.resource_type_operator as 'any_of' | 'include_all' | undefined;
+
       // Keep as ISO string, don't convert to Date object
       const startDate = (req.query.startDate as string) || (req.query.start_date as string);
       const endDate = (req.query.endDate as string) || (req.query.end_date as string);
@@ -332,8 +364,14 @@ export class AdminController {
       if (userId) filters.userId = userId;
       if (req.query.user) filters.user = String(req.query.user);
       if (ipAddress) filters.ipAddress = ipAddress;
-      if (action) filters.action = action;
-      if (resourceType) filters.resourceType = resourceType;
+      if (actionValue && actionValue.length > 0) {
+        filters.action = actionValue;
+        if (actionOperator) filters.action_operator = actionOperator;
+      }
+      if (resourceTypeValue && resourceTypeValue.length > 0) {
+        filters.resourceType = resourceTypeValue;
+        if (resourceTypeOperator) filters.resource_type_operator = resourceTypeOperator;
+      }
       if (startDate) filters.startDate = startDate;
       if (endDate) filters.endDate = endDate;
 

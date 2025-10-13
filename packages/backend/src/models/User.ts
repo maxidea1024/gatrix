@@ -182,7 +182,14 @@ export class UserModel {
   static async findAll(
     page: number = 1,
     limit: number = 10,
-    filters: { role?: string; status?: string; search?: string; tags?: string[] } = {}
+    filters: {
+      role?: string | string[];
+      role_operator?: 'any_of' | 'include_all';
+      status?: string | string[];
+      status_operator?: 'any_of' | 'include_all';
+      search?: string;
+      tags?: string[]
+    } = {}
   ): Promise<{ users: UserWithoutPassword[]; total: number; page: number; limit: number }> {
     try {
       // Ensure page and limit are integers
@@ -195,12 +202,26 @@ export class UserModel {
 
       // Apply filters function
       const applyFilters = (query: any) => {
+        // Handle role filter (single or multiple)
         if (filters.role) {
-          query.where('g_users.role', filters.role);
+          if (Array.isArray(filters.role)) {
+            logger.info(`[UserModel] Applying role filter (array): ${filters.role.join(', ')}`);
+            query.whereIn('g_users.role', filters.role);
+          } else {
+            logger.info(`[UserModel] Applying role filter (single): ${filters.role}`);
+            query.where('g_users.role', filters.role);
+          }
         }
 
+        // Handle status filter (single or multiple)
         if (filters.status) {
-          query.where('g_users.status', filters.status);
+          if (Array.isArray(filters.status)) {
+            logger.info(`[UserModel] Applying status filter (array): ${filters.status.join(', ')}`);
+            query.whereIn('g_users.status', filters.status);
+          } else {
+            logger.info(`[UserModel] Applying status filter (single): ${filters.status}`);
+            query.where('g_users.status', filters.status);
+          }
         }
 
         if (filters.search) {
