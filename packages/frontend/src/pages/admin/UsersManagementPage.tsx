@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -80,6 +80,7 @@ import InvitationForm from '../../components/admin/InvitationForm';
 import InvitationStatusCard from '../../components/admin/InvitationStatusCard';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import { useDebounce } from '../../hooks/useDebounce';
+import { usePageState } from '../../hooks/usePageState';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 // SSE는 MainLayout에서 전역으로 처리하므로 여기서는 제거
 
@@ -114,15 +115,29 @@ const UsersManagementPage: React.FC = () => {
     }
   };
 
+  // 페이지 상태 관리 (URL params 연동)
+  const {
+    pageState,
+    updatePage,
+    updateLimit,
+    updateFilters,
+  } = usePageState({
+    defaultState: {
+      page: 1,
+      limit: 10,
+      filters: {},
+    },
+    storageKey: 'usersPage',
+  });
+
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [total, setTotal] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
 
   // 동적 필터 상태
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+  const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   // 디바운싱된 검색어
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -243,8 +258,8 @@ const UsersManagementPage: React.FC = () => {
     try {
       setLoading(true);
       const params = new URLSearchParams({
-        page: (page + 1).toString(),
-        limit: rowsPerPage.toString(),
+        page: pageState.page.toString(),
+        limit: pageState.limit.toString(),
         _t: Date.now().toString(), // Cache busting
       });
 
@@ -288,7 +303,7 @@ const UsersManagementPage: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [page, rowsPerPage, debouncedSearchTerm, statusFilterString, statusOperator, roleFilterString, roleOperator, tagIdsString, tagOperator]);
+  }, [pageState.page, pageState.limit, debouncedSearchTerm, statusFilterString, statusOperator, roleFilterString, roleOperator, tagIdsString, tagOperator]);
 
   // 초대링크 이벤트 처리 (MainLayout에서 전달받음)
   useEffect(() => {
@@ -360,6 +375,81 @@ const UsersManagementPage: React.FC = () => {
       })),
     },
   ];
+
+  // 페이지 로드 시 pageState.filters에서 activeFilters 복원
+  useEffect(() => {
+    if (filtersInitialized) return;
+
+    if (!pageState.filters || Object.keys(pageState.filters).length === 0) {
+      setFiltersInitialized(true);
+      return;
+    }
+
+    const restoredFilters: ActiveFilter[] = [];
+    const filters = pageState.filters;
+
+    // status 필터 복원
+    if (filters.status) {
+      restoredFilters.push({
+        key: 'status',
+        value: Array.isArray(filters.status) ? filters.status : [filters.status],
+        label: t('users.statusFilter'),
+        operator: filters.status_operator || 'any_of',
+      });
+    }
+
+    // role 필터 복원
+    if (filters.role) {
+      restoredFilters.push({
+        key: 'role',
+        value: Array.isArray(filters.role) ? filters.role : [filters.role],
+        label: t('users.roleFilter'),
+        operator: filters.role_operator || 'any_of',
+      });
+    }
+
+    // tags 필터 복원
+    if (filters.tags) {
+      restoredFilters.push({
+        key: 'tags',
+        value: Array.isArray(filters.tags) ? filters.tags.map(Number) : [Number(filters.tags)],
+        label: t('common.tags'),
+        operator: filters.tags_operator || 'include_all',
+      });
+    }
+
+    if (restoredFilters.length > 0) {
+      setActiveFilters(restoredFilters);
+    }
+    setFiltersInitialized(true);
+  }, [filtersInitialized, pageState.filters, t]);
+
+  // activeFilters 변경 시 pageState.filters 업데이트
+  useEffect(() => {
+    if (!filtersInitialized) return;
+
+    const filters: Record<string, any> = {};
+
+    activeFilters.forEach(filter => {
+      if (filter.key === 'status') {
+        filters.status = filter.value;
+        filters.status_operator = filter.operator;
+      } else if (filter.key === 'role') {
+        filters.role = filter.value;
+        filters.role_operator = filter.operator;
+      } else if (filter.key === 'tags') {
+        filters.tags = filter.value;
+        filters.tags_operator = filter.operator;
+      }
+    });
+
+    const currentFiltersString = JSON.stringify(pageState.filters || {});
+    const newFiltersString = JSON.stringify(filters);
+
+    if (currentFiltersString !== newFiltersString) {
+      updateFilters(filters);
+    }
+  }, [activeFilters, filtersInitialized, pageState.filters, updateFilters]);
 
   // 동적 필터 핸들러
   const handleFilterAdd = (filter: ActiveFilter) => {
@@ -1211,12 +1301,11 @@ const UsersManagementPage: React.FC = () => {
           {total > 0 && (
             <SimplePagination
               count={total}
-              page={page}
-              rowsPerPage={rowsPerPage}
-              onPageChange={(_, newPage) => setPage(newPage)}
+              page={pageState.page - 1}
+              rowsPerPage={pageState.limit}
+              onPageChange={(_, newPage) => updatePage(newPage + 1)}
               onRowsPerPageChange={(e) => {
-                setRowsPerPage(parseInt(e.target.value, 10));
-                setPage(0);
+                updateLimit(parseInt(e.target.value, 10));
               }}
               rowsPerPageOptions={[5, 10, 25, 50, 100]}
             />

@@ -217,7 +217,7 @@ const ClientVersionsPage: React.FC = () => {
 
   // 상태 관리
   const [clientVersions, setClientVersions] = useState<ClientVersion[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   
   // 선택 관리
@@ -265,6 +265,7 @@ const ClientVersionsPage: React.FC = () => {
 
   // 동적 필터 상태
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+  const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   // 내보내기 메뉴 상태
   const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
@@ -467,8 +468,78 @@ const ClientVersionsPage: React.FC = () => {
     updateFilters(newFilters);
   }, [activeFilters, updateFilters]);
 
+  // 페이지 로드 시 pageState.filters에서 activeFilters 복원
+  useEffect(() => {
+    if (filtersInitialized) return;
+
+    if (!pageState.filters || Object.keys(pageState.filters).length === 0) {
+      setFiltersInitialized(true);
+      return;
+    }
+
+    const restoredFilters: ActiveFilter[] = [];
+    const filters = pageState.filters;
+
+    // version 필터 복원
+    if (filters.version) {
+      restoredFilters.push({
+        key: 'version',
+        value: Array.isArray(filters.version) ? filters.version : [filters.version],
+        label: t('clientVersions.version'),
+        operator: 'any_of',
+      });
+    }
+
+    // platform 필터 복원
+    if (filters.platform) {
+      restoredFilters.push({
+        key: 'platform',
+        value: Array.isArray(filters.platform) ? filters.platform : [filters.platform],
+        label: t('clientVersions.platform'),
+        operator: 'any_of',
+      });
+    }
+
+    // clientStatus 필터 복원
+    if (filters.clientStatus) {
+      restoredFilters.push({
+        key: 'clientStatus',
+        value: Array.isArray(filters.clientStatus) ? filters.clientStatus : [filters.clientStatus],
+        label: t('clientVersions.statusLabel'),
+        operator: 'any_of',
+      });
+    }
+
+    // guestModeAllowed 필터 복원
+    if (filters.guestModeAllowed !== undefined) {
+      restoredFilters.push({
+        key: 'guestModeAllowed',
+        value: Array.isArray(filters.guestModeAllowed) ? filters.guestModeAllowed : [filters.guestModeAllowed],
+        label: t('clientVersions.guestMode'),
+        operator: 'any_of',
+      });
+    }
+
+    // tags 필터 복원
+    if (filters.tags && filters.tags.length > 0) {
+      restoredFilters.push({
+        key: 'tags',
+        value: Array.isArray(filters.tags) ? filters.tags : [filters.tags],
+        label: t('common.tags'),
+        operator: filters.tagsOperator || 'any_of',
+      });
+    }
+
+    if (restoredFilters.length > 0) {
+      setActiveFilters(restoredFilters);
+    }
+    setFiltersInitialized(true);
+  }, [filtersInitialized, pageState.filters, t]);
+
   // activeFilters가 변경될 때마다 pageState.filters 업데이트
   useEffect(() => {
+    if (!filtersInitialized) return; // 초기화 전에는 실행하지 않음
+
     const newFilters: ClientVersionFilters = {
       search: pageState.filters?.search, // 검색어는 유지
     };
@@ -488,7 +559,7 @@ const ClientVersionsPage: React.FC = () => {
     if (currentFiltersStr !== newFiltersStr) {
       updateFilters(newFilters);
     }
-  }, [activeFilters]); // pageState.filters와 updateFilters를 의존성에서 제거
+  }, [activeFilters, filtersInitialized]); // pageState.filters와 updateFilters를 의존성에서 제거
 
   // 정렬은 고정 (버전 내림차순, 플랫폼 내림차순)
   // 정렬 변경 기능 비활성화

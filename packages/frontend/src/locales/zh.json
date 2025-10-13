@@ -1653,6 +1653,7 @@
     "activeSessions": "Active Sessions",
     "activeUsers": "Active Users",
     "adminWelcome": "Manage your admin panel and monitor system activities.",
+    "welcomeBack": "欢迎回来",
     "administration": "Administration",
     "administrationDesc": "Manage users, view audit logs, and configure system settings.",
     "administrators": "Administrators",

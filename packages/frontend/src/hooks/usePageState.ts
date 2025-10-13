@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 export interface PageState {
   page: number;
@@ -14,40 +15,81 @@ export interface UsePageStateOptions {
 }
 
 export const usePageState = ({ defaultState, storageKey }: UsePageStateOptions) => {
-  const [pageState, setPageState] = useState<PageState>(defaultState);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // localStorage에서 상태 로드
-  useEffect(() => {
+  // URL params에서 초기 상태를 즉시 읽어서 설정 (렌더링 전에 실행)
+  const [pageState, setPageState] = useState<PageState>(() => {
     try {
-      const savedState = localStorage.getItem(storageKey);
-      if (savedState) {
-        const parsedState = JSON.parse(savedState);
-        // 기본값과 병합하여 누락된 필드 보완
-        setPageState({
-          ...defaultState,
-          ...parsedState,
-          // 페이지는 항상 1로 초기화 (새로고침 시 첫 페이지부터 시작)
-          page: 1,
-        });
-      }
-    } catch (error) {
-      console.warn(`Failed to load page state from localStorage for key: ${storageKey}`, error);
-      // 오류 발생 시 기본값 사용
-      setPageState(defaultState);
-    }
-  }, [storageKey]); // defaultState 제거
+      const page = parseInt(searchParams.get('page') || '1');
+      const limit = parseInt(searchParams.get('limit') || String(defaultState.limit));
+      const sortBy = searchParams.get('sortBy') || defaultState.sortBy;
+      const sortOrder = (searchParams.get('sortOrder') as 'ASC' | 'DESC') || defaultState.sortOrder;
 
-  // localStorage에 상태 저장
+      // filters는 나머지 모든 params
+      const filters: Record<string, any> = {};
+      searchParams.forEach((value, key) => {
+        if (!['page', 'limit', 'sortBy', 'sortOrder'].includes(key)) {
+          // 배열 처리: 같은 키가 여러 개 있으면 배열로
+          const existing = filters[key];
+          if (existing) {
+            filters[key] = Array.isArray(existing) ? [...existing, value] : [existing, value];
+          } else {
+            filters[key] = value;
+          }
+        }
+      });
+
+      return {
+        page,
+        limit,
+        sortBy,
+        sortOrder,
+        filters: Object.keys(filters).length > 0 ? filters : defaultState.filters,
+      };
+    } catch (error) {
+      console.warn(`Failed to load page state from URL params`, error);
+      return defaultState;
+    }
+  });
+
+  // URL params에 상태 저장
   const savePageState = useCallback((newState: Partial<PageState>) => {
     const updatedState = { ...pageState, ...newState };
     setPageState(updatedState);
-    
+
     try {
-      localStorage.setItem(storageKey, JSON.stringify(updatedState));
+      // URL params 생성
+      const params = new URLSearchParams();
+
+      // page, limit, sortBy, sortOrder 추가
+      params.set('page', String(updatedState.page));
+      params.set('limit', String(updatedState.limit));
+      if (updatedState.sortBy) params.set('sortBy', updatedState.sortBy);
+      if (updatedState.sortOrder) params.set('sortOrder', updatedState.sortOrder);
+
+      // filters 추가
+      if (updatedState.filters) {
+        Object.entries(updatedState.filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            if (Array.isArray(value)) {
+              // 배열은 같은 키로 여러 번 추가
+              value.forEach(v => {
+                if (v !== undefined && v !== null && v !== '') {
+                  params.append(key, String(v));
+                }
+              });
+            } else {
+              params.set(key, String(value));
+            }
+          }
+        });
+      }
+
+      setSearchParams(params, { replace: true });
     } catch (error) {
-      console.warn(`Failed to save page state to localStorage for key: ${storageKey}`, error);
+      console.warn(`Failed to save page state to URL params`, error);
     }
-  }, [pageState, storageKey]);
+  }, [pageState, setSearchParams]);
 
   // 개별 상태 업데이트 함수들
   const updatePage = useCallback((page: number) => {
@@ -68,12 +110,8 @@ export const usePageState = ({ defaultState, storageKey }: UsePageStateOptions) 
 
   const resetState = useCallback(() => {
     setPageState(defaultState);
-    try {
-      localStorage.removeItem(storageKey);
-    } catch (error) {
-      console.warn(`Failed to remove page state from localStorage for key: ${storageKey}`, error);
-    }
-  }, [defaultState, storageKey]);
+    setSearchParams({}, { replace: true });
+  }, [defaultState, setSearchParams]);
 
   return {
     pageState,

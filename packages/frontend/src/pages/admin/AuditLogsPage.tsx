@@ -104,6 +104,7 @@ const AuditLogsPage: React.FC = () => {
 
   // 동적 필터 상태
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+  const [filtersInitialized, setFiltersInitialized] = useState(false);
 
   // 디바운싱된 검색어 (500ms 지연)
   const debouncedUserFilter = useDebounce(userFilter, 500);
@@ -220,6 +221,54 @@ const AuditLogsPage: React.FC = () => {
   const handleRefresh = () => {
     loadAuditLogs();
   };
+
+  // 페이지 로드 시 pageState.filters에서 activeFilters 복원
+  useEffect(() => {
+    if (filtersInitialized) return;
+
+    if (!pageState.filters || Object.keys(pageState.filters).length === 0) {
+      setFiltersInitialized(true);
+      return;
+    }
+
+    const restoredFilters: ActiveFilter[] = [];
+    const filters = pageState.filters;
+
+    // action 필터 복원
+    if (filters.action) {
+      restoredFilters.push({
+        key: 'action',
+        value: Array.isArray(filters.action) ? filters.action : [filters.action],
+        label: t('auditLogs.action'),
+        operator: 'any_of',
+      });
+    }
+
+    // resource_type 필터 복원
+    if (filters.resource_type) {
+      restoredFilters.push({
+        key: 'resource_type',
+        value: Array.isArray(filters.resource_type) ? filters.resource_type : [filters.resource_type],
+        label: t('auditLogs.resourceType'),
+        operator: 'any_of',
+      });
+    }
+
+    // ip_address 필터 복원
+    if (filters.ip_address) {
+      restoredFilters.push({
+        key: 'ip_address',
+        value: filters.ip_address,
+        label: t('auditLogs.ipAddress'),
+        operator: 'any_of',
+      });
+    }
+
+    if (restoredFilters.length > 0) {
+      setActiveFilters(restoredFilters);
+    }
+    setFiltersInitialized(true);
+  }, [filtersInitialized, pageState.filters, t]);
 
   // Dynamic filter handlers
   const handleFilterAdd = (filter: ActiveFilter) => {

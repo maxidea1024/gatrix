@@ -68,7 +68,7 @@ const MessageTemplatesPage: React.FC = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [items, setItems] = useState<MessageTemplate[]>([]);
   const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   // Copy helper with type/label for proper i18n interpolation
   // includeValue=false -> use short toast without the copied value
   const copyWithToast = async (value: string, typeLabel?: string, includeValue: boolean = true) => {
@@ -97,8 +97,16 @@ const MessageTemplatesPage: React.FC = () => {
   // 디바운싱된 검색어 (500ms 지연)
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-  // 동적 필터 상태
-  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+  // 동적 필터 상태 (localStorage에서 복원)
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(() => {
+    try {
+      const saved = localStorage.getItem('messageTemplatesPage.activeFilters');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [filtersInitialized, setFiltersInitialized] = useState(false);
   const [allUsers, setAllUsers] = useState<{ id: number; name: string; email: string }[]>([]);
 
   // 동적 필터에서 값 추출 (useMemo로 참조 안정화)
