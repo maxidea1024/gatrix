@@ -36,6 +36,7 @@ import {
   Tooltip,
   Checkbox,
   Drawer,
+  Skeleton,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -82,6 +83,7 @@ import EmptyTableRow from '../../components/common/EmptyTableRow';
 import { useDebounce } from '../../hooks/useDebounce';
 import { usePageState } from '../../hooks/usePageState';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
+import { usePaginatedApi, useTags } from '../../hooks/useSWR';
 // SSE는 MainLayout에서 전역으로 처리하므로 여기서는 제거
 
 interface UsersResponse {
@@ -130,9 +132,6 @@ const UsersManagementPage: React.FC = () => {
     storageKey: 'usersPage',
   });
 
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [total, setTotal] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
 
   // 동적 필터 상태
@@ -141,6 +140,32 @@ const UsersManagementPage: React.FC = () => {
 
   // 디바운싱된 검색어
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  // SWR로 데이터 로딩
+  const { data: usersData, error: usersError, isLoading: isLoadingUsers, mutate: mutateUsers } = usePaginatedApi<UsersResponse>(
+    '/admin/users',
+    pageState.page,
+    pageState.limit,
+    {
+      ...pageState.filters,
+      search: debouncedSearchTerm || undefined,
+    }
+  );
+
+  const { data: allTags, isLoading: isLoadingTags } = useTags();
+
+  // Derived state from SWR
+  const users = useMemo(() => usersData?.users || [], [usersData]);
+  const total = useMemo(() => usersData?.total || 0, [usersData]);
+  const loading = isLoadingUsers || isLoadingTags;
+
+  // 초기 로딩 상태 추적
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  useEffect(() => {
+    if (!loading && isInitialLoad) {
+      setIsInitialLoad(false);
+    }
+  }, [loading, isInitialLoad]);
 
   // 동적 필터에서 값 추출 (useMemo로 참조 안정화)
   const statusFilter = useMemo(() =>
@@ -254,56 +279,7 @@ const UsersManagementPage: React.FC = () => {
     }
   };
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const params = new URLSearchParams({
-        page: pageState.page.toString(),
-        limit: pageState.limit.toString(),
-        _t: Date.now().toString(), // Cache busting
-      });
-
-      if (debouncedSearchTerm) params.append('search', debouncedSearchTerm);
-
-      // Status 필터 처리 (배열)
-      if (statusFilter.length > 0) {
-        statusFilter.forEach(status => params.append('status', status));
-        if (statusOperator) params.append('status_operator', statusOperator);
-      }
-
-      // Role 필터 처리 (배열)
-      if (roleFilter.length > 0) {
-        roleFilter.forEach(role => params.append('role', role));
-        if (roleOperator) params.append('role_operator', roleOperator);
-      }
-
-      // 태그 필터 처리
-      if (tagIds.length > 0) {
-        tagIds.forEach(tagId => params.append('tags', tagId.toString()));
-        if (tagOperator) params.append('tags_operator', tagOperator);
-      }
-
-      const response = await apiService.get<UsersResponse>(`/admin/users?${params}`);
-
-      console.log('Loaded users data:', {
-        count: response.data.users.length,
-        firstUser: response.data.users[0],
-        hasCreatedAt: response.data.users.length > 0 && response.data.users[0].createdAt !== undefined,
-        hasLastLoginAt: response.data.users.length > 0 && response.data.users[0].lastLoginAt !== undefined
-      });
-
-      setUsers(response.data.users);
-      setTotal(response.data.total);
-    } catch (error: any) {
-      enqueueSnackbar(error.message || t('users.fetchError'), { variant: 'error' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, [pageState.page, pageState.limit, debouncedSearchTerm, statusFilterString, statusOperator, roleFilterString, roleOperator, tagIdsString, tagOperator]);
+  // SWR이 자동으로 데이터를 로드하므로 fetchUsers 함수 제거
 
   // 초대링크 이벤트 처리 (MainLayout에서 전달받음)
   useEffect(() => {
@@ -558,7 +534,7 @@ const UsersManagementPage: React.FC = () => {
           break;
       }
 
-      fetchUsers();
+      mutateUsers(); // SWR cache 갱신
       setSelectedUsers(new Set());
       setBulkActionDialogOpen(false);
       setBulkActionValue('');
@@ -577,7 +553,7 @@ const UsersManagementPage: React.FC = () => {
         try {
           await apiService.post(`/admin/users/${user.id}/suspend`);
           enqueueSnackbar(t('common.userSuspended'), { variant: 'success' });
-          fetchUsers();
+          mutateUsers(); // SWR cache 갱신
         } catch (error: any) {
           enqueueSnackbar(error.message || t('common.userSuspendFailed'), { variant: 'error' });
         }
@@ -595,7 +571,7 @@ const UsersManagementPage: React.FC = () => {
         try {
           await apiService.post(`/admin/users/${user.id}/activate`);
           enqueueSnackbar(t('common.userActivated'), { variant: 'success' });
-          fetchUsers();
+          mutateUsers(); // SWR cache 갱신
         } catch (error: any) {
           enqueueSnackbar(error.message || t('common.userActivateFailed'), { variant: 'error' });
         }
@@ -613,7 +589,7 @@ const UsersManagementPage: React.FC = () => {
         try {
           await apiService.post(`/admin/users/${user.id}/promote`);
           enqueueSnackbar(t('common.userPromoted'), { variant: 'success' });
-          fetchUsers();
+          mutateUsers(); // SWR cache 갱신
         } catch (error: any) {
           enqueueSnackbar(error.message || t('common.userPromoteFailed'), { variant: 'error' });
         }
@@ -631,7 +607,7 @@ const UsersManagementPage: React.FC = () => {
         try {
           await apiService.post(`/admin/users/${user.id}/demote`);
           enqueueSnackbar(t('common.userDemoted'), { variant: 'success' });
-          fetchUsers();
+          mutateUsers(); // SWR cache 갱신
         } catch (error: any) {
           enqueueSnackbar(error.message || t('common.userDemoteFailed'), { variant: 'error' });
         }
@@ -743,7 +719,7 @@ const UsersManagementPage: React.FC = () => {
       }
 
       enqueueSnackbar(t('users.userUpdated'), { variant: 'success' });
-      fetchUsers();
+      mutateUsers(); // SWR cache 갱신
       setEditUserDialog({ open: false, user: null });
     } catch (error: any) {
       // API 오류 응답에서 구체적인 메시지 추출
@@ -771,7 +747,7 @@ const UsersManagementPage: React.FC = () => {
       try {
         await apiService.delete(`/admin/users/${deleteConfirmDialog.user.id}`);
         enqueueSnackbar(t('users.userDeleted'), { variant: 'success' });
-        fetchUsers();
+        mutateUsers(); // SWR cache 갱신
         setDeleteConfirmDialog({ open: false, user: null, inputValue: '' });
       } catch (error: any) {
         // API 오류 응답에서 구체적인 메시지 추출
@@ -787,7 +763,7 @@ const UsersManagementPage: React.FC = () => {
       setEmailVerificationLoading(true);
       await UserService.verifyUserEmail(userId);
       enqueueSnackbar(t('users.emailVerified'), { variant: 'success' });
-      fetchUsers();
+      mutateUsers(); // SWR cache 갱신
       // 편집 폼이 열려있다면 데이터 업데이트
       if (editUserDialog.open && editUserDialog.user?.id === userId) {
         setEditUserDialog(prev => ({
@@ -891,7 +867,7 @@ const UsersManagementPage: React.FC = () => {
       };
       await apiService.post('/admin/users', userData);
       enqueueSnackbar(t('users.userCreated'), { variant: 'success' });
-      fetchUsers();
+      mutateUsers(); // SWR cache 갱신
       handleCloseAddUserDialog();
     } catch (error: any) {
       // API 오류 응답에서 구체적인 메시지 추출
@@ -1131,9 +1107,15 @@ const UsersManagementPage: React.FC = () => {
       )}
 
       {/* Users Table */}
-      <Card>
+      <Card sx={{ position: 'relative' }}>
         <CardContent sx={{ p: 0 }}>
-          <TableContainer>
+          <TableContainer
+            sx={{
+              opacity: !isInitialLoad && loading ? 0.5 : 1,
+              transition: 'opacity 0.15s ease-in-out',
+              pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
+            }}
+          >
             <Table>
               <TableHead>
                 <TableRow>
@@ -1157,10 +1139,55 @@ const UsersManagementPage: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {users.length === 0 ? (
+                {isInitialLoad && loading ? (
+                  // 스켈레톤 로딩 (초기 로딩 시에만)
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <TableRow key={`skeleton-${index}`}>
+                      <TableCell padding="checkbox">
+                        <Skeleton variant="rectangular" width={24} height={24} />
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Skeleton variant="circular" width={40} height={40} />
+                          <Box>
+                            <Skeleton variant="text" width={120} />
+                            <Skeleton variant="text" width={180} sx={{ fontSize: '0.75rem' }} />
+                          </Box>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" width={100} />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="rounded" width={80} height={24} />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="rounded" width={70} height={24} />
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                          <Skeleton variant="rounded" width={60} height={24} />
+                          <Skeleton variant="rounded" width={60} height={24} />
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" width="70%" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" width="70%" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" width="60%" />
+                      </TableCell>
+                      <TableCell align="center">
+                        <Skeleton variant="circular" width={32} height={32} sx={{ mx: 'auto' }} />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : users.length === 0 ? (
                   <EmptyTableRow
                     colSpan={11}
-                    loading={loading}
+                    loading={false}
                     message={t('users.noUsersFound')}
                     loadingMessage={t('common.loadingUsers')}
                   />

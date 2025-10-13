@@ -28,6 +28,7 @@ import {
   CircularProgress,
   FormControl,
   InputLabel,
+  Skeleton,
   Tooltip,
   Checkbox,
   Alert,
@@ -69,6 +70,8 @@ const MessageTemplatesPage: React.FC = () => {
   const [items, setItems] = useState<MessageTemplate[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const loadStartTimeRef = useRef<number>(0);
   // Copy helper with type/label for proper i18n interpolation
   // includeValue=false -> use short toast without the copied value
   const copyWithToast = async (value: string, typeLabel?: string, includeValue: boolean = true) => {
@@ -198,6 +201,7 @@ const MessageTemplatesPage: React.FC = () => {
       setTotal(0);
     } finally {
       setLoading(false);
+      setIsInitialLoad(false);
     }
   }, [page, rowsPerPage, createdByFilterString, createdByOperator, isEnabledFilterString, isEnabledOperator, tagIdsString, debouncedSearchQuery, enqueueSnackbar, t]);
 
@@ -656,31 +660,74 @@ const MessageTemplatesPage: React.FC = () => {
         </Card>
       )}
 
-      <Card>
+      <Card sx={{ position: 'relative' }}>
         <CardContent sx={{ p: 0 }}>
-          <TableContainer>
-            <Table>
+          <TableContainer
+            sx={{
+              opacity: !isInitialLoad && loading ? 0.5 : 1,
+              transition: 'opacity 0.15s ease-in-out',
+              pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
+            }}
+          >
+            <Table sx={{ tableLayout: 'fixed', minWidth: 1400 }}>
               <TableHead>
                 <TableRow>
-                  <TableCell padding="checkbox">
+                  <TableCell padding="checkbox" sx={{ width: 50 }}>
                     <Checkbox
                       checked={selectAll}
                       indeterminate={selectedIds.length > 0 && selectedIds.length < items.filter(item => item.id).length}
                       onChange={(e) => handleSelectAll(e.target.checked)}
                     />
                   </TableCell>
-                  <TableCell>{t('common.name')}</TableCell>
-                  <TableCell>{t('messageTemplates.defaultMessage')}</TableCell>
-                  <TableCell>{t('messageTemplates.availability')}</TableCell>
-                  <TableCell>{t('common.updatedAt')}</TableCell>
-                  <TableCell>{t('common.languages')}</TableCell>
-                  <TableCell>{t('common.creator')}</TableCell>
-                  <TableCell>{t('common.tags')}</TableCell>
-                  <TableCell align="right">{t('common.actions')}</TableCell>
+                  <TableCell sx={{ width: 200, minWidth: 200 }}>{t('common.name')}</TableCell>
+                  <TableCell sx={{ width: 300, minWidth: 300 }}>{t('messageTemplates.defaultMessage')}</TableCell>
+                  <TableCell sx={{ width: 120, minWidth: 120 }}>{t('messageTemplates.availability')}</TableCell>
+                  <TableCell sx={{ width: 180, minWidth: 180 }}>{t('common.updatedAt')}</TableCell>
+                  <TableCell sx={{ width: 150, minWidth: 150 }}>{t('common.languages')}</TableCell>
+                  <TableCell sx={{ width: 120, minWidth: 120 }}>{t('common.creator')}</TableCell>
+                  <TableCell sx={{ width: 200, minWidth: 200 }}>{t('common.tags')}</TableCell>
+                  <TableCell align="right" sx={{ width: 100, minWidth: 100 }}>{t('common.actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {items.length === 0 ? (
+                {isInitialLoad && loading ? (
+                  // 스켈레톤 로딩 (초기 로딩 시에만)
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <TableRow key={`skeleton-${index}`}>
+                      <TableCell padding="checkbox">
+                        <Skeleton variant="rectangular" width={24} height={24} />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" width="80%" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" width="90%" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="rounded" width={80} height={24} />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" width="70%" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" width="60%" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" width="50%" />
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                          <Skeleton variant="rounded" width={60} height={24} />
+                          <Skeleton variant="rounded" width={60} height={24} />
+                        </Box>
+                      </TableCell>
+                      <TableCell align="right">
+                        <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
+                        <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block' }} />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : items.length === 0 ? (
                   <EmptyTableRow
                     colSpan={9}
                     loading={loading}

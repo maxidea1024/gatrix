@@ -25,6 +25,8 @@ import {
   Alert,
   LinearProgress,
   Pagination,
+  Skeleton,
+  CircularProgress,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -89,6 +91,7 @@ const AuditLogsPage: React.FC = () => {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Date range state
   const [dateFrom, setDateFrom] = useState<Dayjs | null>(
@@ -193,6 +196,7 @@ const AuditLogsPage: React.FC = () => {
       setTotal(0);
     } finally {
       setLoading(false);
+      setIsInitialLoad(false);
     }
   }, [pageState, dateFrom, dateTo, debouncedUserFilter, activeFilters, enqueueSnackbar, t]);
 
@@ -422,8 +426,14 @@ const AuditLogsPage: React.FC = () => {
 
         {/* Audit Logs Table */}
 
-        <Card>
-          <TableContainer>
+        <Card sx={{ position: 'relative' }}>
+          <TableContainer
+            sx={{
+              opacity: !isInitialLoad && loading ? 0.5 : 1,
+              transition: 'opacity 0.15s ease-in-out',
+              pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
+            }}
+          >
             <Table>
               <TableHead>
                 <TableRow>
@@ -437,10 +447,40 @@ const AuditLogsPage: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {auditLogs.length === 0 ? (
+                {isInitialLoad && loading ? (
+                  // 스켈레톤 로딩 (초기 로딩 시에만)
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <TableRow key={`skeleton-${index}`}>
+                      <TableCell>
+                        <Skeleton variant="text" width={60} />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="rounded" width={100} height={24} />
+                      </TableCell>
+                      <TableCell>
+                        <Box>
+                          <Skeleton variant="text" width={120} />
+                          <Skeleton variant="text" width={80} sx={{ fontSize: '0.75rem' }} />
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" width={100} />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" width="80%" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="text" width="70%" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton variant="circular" width={32} height={32} />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : auditLogs.length === 0 ? (
                   <EmptyTableRow
                     colSpan={7}
-                    loading={loading}
+                    loading={false}
                     message={t('auditLogs.noLogsFound')}
                     loadingMessage={t('common.loadingAuditLogs')}
                   />

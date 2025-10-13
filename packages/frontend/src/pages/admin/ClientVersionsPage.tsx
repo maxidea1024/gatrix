@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { devLogger, prodLogger } from '../../utils/logger';
 import { usePageState } from '../../hooks/usePageState';
+import { useClientVersions, useAvailableVersions, useTags, mutateClientVersions } from '../../hooks/useSWR';
 import * as XLSX from 'xlsx';
 import {
   Box,
@@ -40,6 +41,8 @@ import {
   Switch,
   FormControlLabel,
   Stack,
+  Skeleton,
+  CircularProgress,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -215,11 +218,32 @@ const ClientVersionsPage: React.FC = () => {
     storageKey: 'clientVersionsPage',
   });
 
-  // 상태 관리
-  const [clientVersions, setClientVersions] = useState<ClientVersion[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [total, setTotal] = useState(0);
-  
+  // SWR로 데이터 로딩
+  const { data: clientVersionsData, error: clientVersionsError, isLoading: isLoadingVersions, mutate: mutateVersions } = useClientVersions(
+    pageState.page,
+    pageState.limit,
+    pageState.sortBy,
+    pageState.sortOrder as 'ASC' | 'DESC',
+    pageState.filters
+  );
+
+  const { data: availableVersions, isLoading: isLoadingAvailableVersions } = useAvailableVersions();
+  const { data: allTags, isLoading: isLoadingTags } = useTags();
+
+  // Derived state from SWR
+  const clientVersions = useMemo(() => clientVersionsData?.clientVersions || [], [clientVersionsData]);
+  const total = useMemo(() => clientVersionsData?.total || 0, [clientVersionsData]);
+  const versions = useMemo(() => availableVersions || [], [availableVersions]);
+  const loading = isLoadingVersions || isLoadingAvailableVersions || isLoadingTags;
+
+  // 초기 로딩 상태 추적
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  useEffect(() => {
+    if (!loading && isInitialLoad) {
+      setIsInitialLoad(false);
+    }
+  }, [loading, isInitialLoad]);
+
   // 선택 관리
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -257,11 +281,9 @@ const ClientVersionsPage: React.FC = () => {
   const [platforms] = useState<string[]>(['pc', 'pc-wegame', 'ios', 'android', 'harmonyos']);
 
   // 태그 관련 상태
-  const [allTags, setAllTags] = useState<Tag[]>([]);
   const [tagDialogOpen, setTagDialogOpen] = useState(false);
   const [selectedClientVersionForTags, setSelectedClientVersionForTags] = useState<ClientVersion | null>(null);
   const [clientVersionTags, setClientVersionTags] = useState<Tag[]>([]);
-  const [versions, setVersions] = useState<string[]>([]);
 
   // 동적 필터 상태
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -271,91 +293,14 @@ const ClientVersionsPage: React.FC = () => {
   const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
   const [selectedExportMenuAnchor, setSelectedExportMenuAnchor] = useState<null | HTMLElement>(null);
 
-  // 사용 가능한 버전 목록 로드
-  const loadAvailableVersions = useCallback(async () => {
-    try {
-      const versions = await ClientVersionService.getAvailableVersions();
-      setVersions(versions);
-    } catch (error) {
-      prodLogger.error('Error loading available versions:', error);
-    }
-  }, []);
-
-  // 클라이언트 버전 목록 로드
-  const loadClientVersions = useCallback(async (customFilters?: ClientVersionFilters) => {
-    try {
-      setLoading(true);
-      const filtersToUse = customFilters || pageState.filters || {};
-
-      const result = await ClientVersionService.getClientVersions(
-        pageState.page,
-        pageState.limit,
-        filtersToUse,
-        pageState.sortBy || 'clientVersion',
-        pageState.sortOrder || 'DESC'
-      );
-
-      if (result && result.clientVersions) {
-        setClientVersions(result.clientVersions);
-        setTotal(result.total || 0);
-      } else {
-        setClientVersions([]);
-        setTotal(0);
-      }
-    } catch (error: any) {
-      enqueueSnackbar(error.message || t('clientVersions.loadFailed'), { variant: 'error' });
-      setClientVersions([]);
-      setTotal(0);
-    } finally {
-      setLoading(false);
-    }
-  }, [pageState.page, pageState.limit, pageState.sortBy, pageState.sortOrder, JSON.stringify(pageState.filters), enqueueSnackbar, t]);
-
-  // 메타데이터 로드
-  const loadMetadata = useCallback(async () => {
-    try {
-      const metadata = await ClientVersionService.getMetadata();
-      if (metadata) {
-        // platforms are hardcoded; metadata currently unused
-      }
-    } catch (error) {
-      console.error('Error loading metadata:', error);
-      // API 호출 실패 시 기본값 유지
-    }
-  }, []);
-
-  // 태그 로드
-  const loadTags = useCallback(async () => {
-    try {
-      const tags = await tagService.list();
-      setAllTags(tags);
-    } catch (error) {
-      console.error('Error loading tags:', error);
-    }
-  }, []);
-
-  // 초기 로드 (메타데이터와 태그만)
+  // 메시지 템플릿 로드 (SWR로 변경 예정이지만 일단 유지)
   useEffect(() => {
-    loadMetadata();
-    loadTags();
-
-    // 메시지 템플릿 로드
     messageTemplateService.list({ isEnabled: true }).then(response => {
       setMessageTemplates(response.templates || []);
     }).catch(() => {
       setMessageTemplates([]);
     });
-  }, [loadMetadata, loadTags]);
-
-  // 버전 목록 별도 로드
-  useEffect(() => {
-    loadAvailableVersions();
-  }, [loadAvailableVersions]);
-
-  // pageState 변경 시 데이터 다시 로드 (클라이언트 버전 포함)
-  useEffect(() => {
-    loadClientVersions();
-  }, [loadClientVersions]);
+  }, []);
 
 
 
@@ -374,7 +319,7 @@ const ClientVersionsPage: React.FC = () => {
       type: 'multiselect',
       operator: 'any_of',
       allowOperatorToggle: false,
-      options: versions.map(version => ({
+      options: (versions || []).map(version => ({
         value: version,
         label: version,
       })),
@@ -418,7 +363,7 @@ const ClientVersionsPage: React.FC = () => {
       type: 'tags',
       operator: 'any_of',
       allowOperatorToggle: true,
-      options: allTags.map(tag => ({
+      options: (allTags || []).map(tag => ({
         value: tag.id.toString(),
         label: tag.name,
         color: tag.color,
@@ -605,13 +550,13 @@ const ClientVersionsPage: React.FC = () => {
       enqueueSnackbar(t('clientVersions.deleteSuccess'), { variant: 'success' });
       setDeleteDialogOpen(false);
       setSelectedClientVersion(null);
-      loadClientVersions();
-      loadAvailableVersions(); // 버전 목록도 갱신
+      mutateVersions(); // SWR cache 갱신
+      mutateClientVersions(); // 모든 client versions 캐시 갱신
     } catch (error: any) {
       console.error('Error deleting client version:', error);
       enqueueSnackbar(error.message || t('clientVersions.deleteError'), { variant: 'error' });
     }
-  }, [selectedClientVersion, t, enqueueSnackbar, loadClientVersions, loadAvailableVersions]);
+  }, [selectedClientVersion, t, enqueueSnackbar, mutateVersions]);
 
   // 일괄 상태 변경 핸들러
   const handleBulkStatusUpdate = useCallback(async () => {
@@ -666,13 +611,13 @@ const ClientVersionsPage: React.FC = () => {
       setMaintenanceLocales([]);
       setInputMode('direct');
       setSelectedTemplateId('');
-      loadClientVersions();
-      loadAvailableVersions(); // 버전 목록도 갱신
+      mutateVersions(); // SWR cache 갱신
+      mutateClientVersions(); // 모든 client versions 캐시 갱신
     } catch (error: any) {
       console.error('Error updating status:', error);
       enqueueSnackbar(error.message || t('clientVersions.statusUpdateError'), { variant: 'error' });
     }
-  }, [selectedIds, bulkStatus, inputMode, maintenanceStartDate, maintenanceEndDate, maintenanceMessage, supportsMultiLanguage, maintenanceLocales, selectedTemplateId, enqueueSnackbar, loadClientVersions, loadAvailableVersions, t]);
+  }, [selectedIds, bulkStatus, inputMode, maintenanceStartDate, maintenanceEndDate, maintenanceMessage, supportsMultiLanguage, maintenanceLocales, selectedTemplateId, enqueueSnackbar, mutateVersions, t]);
 
 
 
@@ -686,13 +631,13 @@ const ClientVersionsPage: React.FC = () => {
       setSelectedIds([]);
       setSelectAll(false);
       setBulkDeleteDialogOpen(false);
-      await loadClientVersions();
-      loadAvailableVersions(); // 버전 목록도 갱신
+      mutateVersions(); // SWR cache 갱신
+      mutateClientVersions(); // 모든 client versions 캐시 갱신
     } catch (error: any) {
       console.error('Failed to delete client versions:', error);
       enqueueSnackbar(error.message || t('clientVersions.bulkDeleteError'), { variant: 'error' });
     }
-  }, [selectedIds, t, enqueueSnackbar, loadClientVersions, loadAvailableVersions]);
+  }, [selectedIds, t, enqueueSnackbar, mutateVersions]);
 
 
 
@@ -956,13 +901,13 @@ const ClientVersionsPage: React.FC = () => {
       setTagDialogOpen(false);
       enqueueSnackbar(t('common.success'), { variant: 'success' });
       // 필요시 목록 새로고침
-      loadClientVersions();
-      loadAvailableVersions(); // 버전 목록도 갱신
+      mutateVersions(); // SWR cache 갱신
+      mutateClientVersions(); // 모든 client versions 캐시 갱신
     } catch (error) {
       console.error('Error saving client version tags:', error);
       enqueueSnackbar(t('common.error'), { variant: 'error' });
     }
-  }, [selectedClientVersionForTags, t, enqueueSnackbar, loadClientVersions, loadAvailableVersions]);
+  }, [selectedClientVersionForTags, t, enqueueSnackbar, mutateVersions]);
 
   return (
     <Box sx={{ p: 3 }}>
@@ -1196,8 +1141,14 @@ const ClientVersionsPage: React.FC = () => {
       )}
 
       {/* 테이블 */}
-      <Card>
-        <TableContainer>
+      <Card sx={{ position: 'relative' }}>
+        <TableContainer
+          sx={{
+            opacity: !isInitialLoad && loading ? 0.5 : 1,
+            transition: 'opacity 0.15s ease-in-out',
+            pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
+          }}
+        >
           <Table>
             <TableHead>
               <TableRow>
@@ -1230,10 +1181,53 @@ const ClientVersionsPage: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {clientVersions.length === 0 ? (
+              {isInitialLoad && loading ? (
+                // 스켈레톤 로딩 (초기 로딩 시에만)
+                Array.from({ length: 5 }).map((_, index) => (
+                  <TableRow key={`skeleton-${index}`}>
+                    <TableCell padding="checkbox">
+                      <Skeleton variant="rectangular" width={24} height={24} />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton variant="rounded" width={80} height={24} />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton variant="rounded" width={60} height={24} />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton variant="rounded" width={80} height={24} />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton variant="text" width="80%" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton variant="text" width="70%" />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Skeleton variant="rounded" width={60} height={24} sx={{ mx: 'auto' }} />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton variant="text" width="70%" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton variant="text" width="60%" />
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', gap: 0.5 }}>
+                        <Skeleton variant="rounded" width={60} height={24} />
+                        <Skeleton variant="rounded" width={60} height={24} />
+                      </Box>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
+                      <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block' }} />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : clientVersions.length === 0 ? (
                 <EmptyTableRow
                   colSpan={12}
-                  loading={loading}
+                  loading={false}
                   message={t('clientVersions.noVersionsFound')}
                   loadingMessage={t('common.loadingClientVersions')}
                 />
@@ -1753,8 +1747,8 @@ const ClientVersionsPage: React.FC = () => {
           setIsCopyMode(false);
         }}
         onSuccess={() => {
-          loadClientVersions();
-          loadAvailableVersions(); // 버전 목록도 갱신
+          mutateVersions(); // SWR cache 갱신
+          mutateClientVersions(); // 모든 client versions 캐시 갱신
           setFormDialogOpen(false);
           setEditingClientVersion(null);
           setIsCopyMode(false);
@@ -1770,8 +1764,8 @@ const ClientVersionsPage: React.FC = () => {
           setBulkFormDialogOpen(false);
         }}
         onSuccess={() => {
-          loadClientVersions();
-          loadAvailableVersions(); // 버전 목록도 갱신
+          mutateVersions(); // SWR cache 갱신
+          mutateClientVersions(); // 모든 client versions 캐시 갱신
           setBulkFormDialogOpen(false);
         }}
       />
@@ -1924,7 +1918,7 @@ const ClientVersionsPage: React.FC = () => {
         <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Autocomplete
             multiple
-            options={allTags}
+            options={allTags || []}
             getOptionLabel={(option) => option.name}
             filterSelectedOptions
             isOptionEqualToValue={(option, value) => option.id === value.id}

@@ -37,17 +37,26 @@ export function usePaginatedApi<T = any>(
   const params = new URLSearchParams();
   params.append('page', page.toString());
   params.append('limit', limit.toString());
-  
+
   if (filters) {
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        params.append(key, value.toString());
+        if (Array.isArray(value)) {
+          // Handle array values (e.g., multiple filters)
+          value.forEach(v => {
+            if (v !== undefined && v !== null && v !== '') {
+              params.append(key, v.toString());
+            }
+          });
+        } else {
+          params.append(key, value.toString());
+        }
       }
     });
   }
 
   const url = baseUrl ? `${baseUrl}?${params.toString()}` : null;
-  
+
   return useApi<T>(url, config);
 }
 
@@ -89,16 +98,35 @@ export function usePendingUsers(config?: SWRConfiguration) {
 export function useAuditLogs(
   page: number = 1,
   limit: number = 10,
-  filters?: {
-    user_id?: number;
-    action?: string;
-    resource_type?: string;
-    start_date?: string;
-    end_date?: string;
-  },
+  sortBy?: string,
+  sortOrder?: 'ASC' | 'DESC',
+  filters?: Record<string, any>,
   config?: SWRConfiguration
 ) {
-  return usePaginatedApi('/admin/audit-logs', page, limit, filters, config);
+  const params = new URLSearchParams();
+  params.append('page', page.toString());
+  params.append('limit', limit.toString());
+  if (sortBy) params.append('sortBy', sortBy);
+  if (sortOrder) params.append('sortOrder', sortOrder);
+
+  if (filters) {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        if (Array.isArray(value)) {
+          value.forEach(v => {
+            if (v !== undefined && v !== null && v !== '') {
+              params.append(key, v.toString());
+            }
+          });
+        } else {
+          params.append(key, value.toString());
+        }
+      }
+    });
+  }
+
+  const url = `/admin/audit-logs?${params.toString()}`;
+  return useApi<{ logs: any[]; total: number; page: number; limit: number }>(url, config);
 }
 
 // Mutation hooks for common operations
@@ -176,4 +204,107 @@ export function useConditionalApi<T = any>(
   config?: SWRConfiguration
 ) {
   return useApi<T>(condition ? url : null, config);
+}
+
+// Hook for tags
+export function useTags(config?: SWRConfiguration) {
+  const { data, ...rest } = useApi<{ tags: any[] }>('/admin/tags', config);
+  return {
+    data: data?.tags,
+    ...rest,
+  };
+}
+
+// Hook for client versions
+export function useClientVersions(
+  page: number = 1,
+  limit: number = 10,
+  sortBy?: string,
+  sortOrder?: 'ASC' | 'DESC',
+  filters?: Record<string, any>,
+  config?: SWRConfiguration
+) {
+  const params = new URLSearchParams();
+  params.append('page', page.toString());
+  params.append('limit', limit.toString());
+  if (sortBy) params.append('sortBy', sortBy);
+  if (sortOrder) params.append('sortOrder', sortOrder);
+
+  if (filters) {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        if (Array.isArray(value)) {
+          value.forEach(v => {
+            if (v !== undefined && v !== null && v !== '') {
+              params.append(key, v.toString());
+            }
+          });
+        } else {
+          params.append(key, value.toString());
+        }
+      }
+    });
+  }
+
+  const url = `/admin/client-versions?${params.toString()}`;
+  return useApi<{ clientVersions: any[]; total: number; page: number; limit: number }>(url, config);
+}
+
+// Hook for available client versions
+export function useAvailableVersions(config?: SWRConfiguration) {
+  return useApi<string[]>('/admin/client-versions/meta/versions', config);
+}
+
+// Hook for available platforms
+export function useAvailablePlatforms(config?: SWRConfiguration) {
+  return useApi<string[]>('/admin/client-versions/meta/platforms', config);
+}
+
+// Hook for message templates
+export function useMessageTemplates(
+  page: number = 1,
+  limit: number = 10,
+  filters?: Record<string, any>,
+  config?: SWRConfiguration
+) {
+  const params = new URLSearchParams();
+  params.append('page', page.toString());
+  params.append('limit', limit.toString());
+
+  if (filters) {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        if (Array.isArray(value)) {
+          value.forEach(v => {
+            if (v !== undefined && v !== null && v !== '') {
+              params.append(key, v.toString());
+            }
+          });
+        } else {
+          params.append(key, value.toString());
+        }
+      }
+    });
+  }
+
+  const url = `/admin/message-templates?${params.toString()}`;
+  return useApi<{ templates: any[]; total: number; page: number; limit: number }>(url, config);
+}
+
+// Hook for all users (for filter options)
+export function useAllUsers(config?: SWRConfiguration) {
+  return useApi<any[]>('/admin/users/all', config);
+}
+
+// Mutation helper
+export function mutateClientVersions() {
+  return mutate((key) => typeof key === 'string' && key.startsWith('/admin/client-versions'));
+}
+
+export function mutateMessageTemplates() {
+  return mutate((key) => typeof key === 'string' && key.startsWith('/admin/message-templates'));
+}
+
+export function mutateTags() {
+  return mutate('/admin/tags');
 }
