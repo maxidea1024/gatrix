@@ -93,6 +93,8 @@ import translationService from '../../services/translationService';
 import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/MultiLanguageMessageInput';
 import JsonEditor from '@/components/common/JsonEditor';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
+import MaintenanceSettingsInput from '../../components/common/MaintenanceSettingsInput';
+import { messageTemplateService, MessageTemplate } from '@/services/messageTemplateService';
 
 // Sortable Row Component
 interface SortableRowProps {
@@ -408,6 +410,12 @@ const GameWorldsPage: React.FC = () => {
   });
   const [toggleMaintenanceLocales, setToggleMaintenanceLocales] = useState<GameWorldMaintenanceLocale[]>([]);
   const [toggleSupportsMultiLanguage, setToggleSupportsMultiLanguage] = useState(false);
+
+  // 메시지 템플릿 관련 state
+  const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>([]);
+  const [toggleInputMode, setToggleInputMode] = useState<'direct' | 'template'>('direct');
+  const [toggleSelectedTemplateId, setToggleSelectedTemplateId] = useState<number | ''>('');
+
   const worldIdRef = useRef<HTMLInputElement>(null);
 
   // Custom payload JSON editor state
