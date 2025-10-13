@@ -164,6 +164,11 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
         return; // Don't close if clicking on dropdown menu
       }
 
+      // Check if Select is currently open - don't handle outside click if Select is managing its own close
+      if (selectOpen) {
+        return; // Let Select's onClose handle it
+      }
+
       // Check if click is outside the edit container
       if (editContainerRef.current && !editContainerRef.current.contains(target)) {
         // Don't remove filter if it was just added (give user time to type)
@@ -196,7 +201,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [editingFilter, activeFilters]);
+  }, [editingFilter, activeFilters, selectOpen]);
 
   const renderFilterValue = (filter: ActiveFilter) => {
     const filterDef = getFilterDefinition(filter.key);
@@ -656,18 +661,23 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 setSelectOpen(true);
                 setSearchText('');
               }}
-              onClose={() => {
+              onClose={(event, reason) => {
                 setSelectOpen(false);
                 setSearchText('');
-                // Check if any values were selected before closing
-                setTimeout(() => {
+
+                // Use requestAnimationFrame to ensure state is updated
+                requestAnimationFrame(() => {
                   const currentFilter = activeFilters.find(f => f.key === filter.key);
-                  if (!currentFilter || !Array.isArray(currentFilter.value) || currentFilter.value.length === 0) {
+                  const hasValue = currentFilter && Array.isArray(currentFilter.value) && currentFilter.value.length > 0;
+
+                  if (!hasValue) {
+                    // Remove filter if no values selected
                     handleRemoveFilter(filter.key);
-                  } else {
-                    setEditingFilter(null);
                   }
-                }, 100);
+
+                  // Always exit editing mode when Select closes
+                  setEditingFilter(null);
+                });
               }}
               onChange={(e) => {
                 onFilterChange(filter.key, e.target.value);
@@ -718,7 +728,10 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
               }}
             >
               {/* Search box at the top */}
-              <Box sx={{ px: 2, py: 1, position: 'sticky', top: 0, bgcolor: 'background.paper', zIndex: 1 }}>
+              <Box
+                sx={{ px: 2, py: 1, position: 'sticky', top: 0, bgcolor: 'background.paper', zIndex: 1 }}
+                onMouseDown={(e) => e.stopPropagation()}
+              >
                 <TextField
                   size="small"
                   placeholder={t('common.search')}
@@ -728,6 +741,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                     setSearchText(e.target.value);
                   }}
                   onKeyDown={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
                   fullWidth
                   sx={{
                     '& .MuiInputBase-root': {
@@ -770,18 +784,23 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                 setSelectOpen(true);
                 setSearchText('');
               }}
-              onClose={() => {
+              onClose={(event, reason) => {
                 setSelectOpen(false);
                 setSearchText('');
-                // Check if any values were selected before closing
-                setTimeout(() => {
+
+                // Use requestAnimationFrame to ensure state is updated
+                requestAnimationFrame(() => {
                   const currentFilter = activeFilters.find(f => f.key === filter.key);
-                  if (!currentFilter || !Array.isArray(currentFilter.value) || currentFilter.value.length === 0) {
+                  const hasValue = currentFilter && Array.isArray(currentFilter.value) && currentFilter.value.length > 0;
+
+                  if (!hasValue) {
+                    // Remove filter if no values selected
                     handleRemoveFilter(filter.key);
-                  } else {
-                    setEditingFilter(null);
                   }
-                }, 100);
+
+                  // Always exit editing mode when Select closes
+                  setEditingFilter(null);
+                });
               }}
               onChange={(e) => {
                 onFilterChange(filter.key, e.target.value);
@@ -832,7 +851,10 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
               }}
             >
               {/* Search box at the top */}
-              <Box sx={{ px: 2, py: 1, position: 'sticky', top: 0, bgcolor: 'background.paper', zIndex: 1 }}>
+              <Box
+                sx={{ px: 2, py: 1, position: 'sticky', top: 0, bgcolor: 'background.paper', zIndex: 1 }}
+                onMouseDown={(e) => e.stopPropagation()}
+              >
                 <TextField
                   size="small"
                   placeholder={t('common.search')}
@@ -842,6 +864,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
                     setSearchText(e.target.value);
                   }}
                   onKeyDown={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
                   fullWidth
                   sx={{
                     '& .MuiInputBase-root': {

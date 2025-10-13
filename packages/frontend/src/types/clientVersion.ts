@@ -115,12 +115,12 @@ export interface BulkCreateFormData {
 
 // 클라이언트 버전 필터
 export interface ClientVersionFilters {
-  version?: string;
-  platform?: string;
-  clientStatus?: ClientStatus;
+  version?: string | string[];
+  platform?: string | string[];
+  clientStatus?: ClientStatus | ClientStatus[];
   gameServerAddress?: string;
   patchAddress?: string;
-  guestModeAllowed?: boolean;
+  guestModeAllowed?: boolean | boolean[];
   externalClickLink?: string;
   memo?: string;
   customPayload?: string;
@@ -135,6 +135,7 @@ export interface ClientVersionFilters {
   tagIds?: string;
   // Legacy support: array of tag IDs
   tags?: string[];
+  tagsOperator?: 'any_of' | 'include_all';
 }
 
 // 클라이언트 버전 정렬 옵션

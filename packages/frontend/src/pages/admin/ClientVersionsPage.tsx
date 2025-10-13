@@ -261,8 +261,10 @@ const ClientVersionsPage: React.FC = () => {
   const [tagDialogOpen, setTagDialogOpen] = useState(false);
   const [selectedClientVersionForTags, setSelectedClientVersionForTags] = useState<ClientVersion | null>(null);
   const [clientVersionTags, setClientVersionTags] = useState<Tag[]>([]);
-  const [tagFilter, setTagFilter] = useState<Tag[]>([]);
   const [versions, setVersions] = useState<string[]>([]);
+
+  // 동적 필터 상태
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
   // 내보내기 메뉴 상태
   const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
@@ -363,17 +365,130 @@ const ClientVersionsPage: React.FC = () => {
     updateFilters(newFilters);
   }, [updateFilters]);
 
-  // 태그 필터 변경 핸들러 (백엔드가 "tags"를 배열로 기대하므로 배열로 전달)
-  const handleTagFilterChange = useCallback((tags: Tag[]) => {
-    setTagFilter(tags);
-    const tagIds = tags.map(tag => tag.id.toString());
-    handleFilterChange({
-      ...pageState.filters,
-      tags: tagIds.length > 0 ? tagIds : undefined,
-      // 더 이상 사용하지 않음
-      tagIds: undefined as any,
+  // 동적 필터 정의
+  const availableFilterDefinitions: FilterDefinition[] = [
+    {
+      key: 'version',
+      label: t('clientVersions.version'),
+      type: 'multiselect',
+      operator: 'any_of',
+      allowOperatorToggle: false,
+      options: versions.map(version => ({
+        value: version,
+        label: version,
+      })),
+    },
+    {
+      key: 'platform',
+      label: t('clientVersions.platform'),
+      type: 'multiselect',
+      operator: 'any_of',
+      allowOperatorToggle: false,
+      options: platforms.map(platform => ({
+        value: platform,
+        label: platform,
+      })),
+    },
+    {
+      key: 'clientStatus',
+      label: t('clientVersions.statusLabel'),
+      type: 'multiselect',
+      operator: 'any_of',
+      allowOperatorToggle: false,
+      options: Object.values(ClientStatus).map(status => ({
+        value: status,
+        label: t(ClientStatusLabels[status]),
+      })),
+    },
+    {
+      key: 'guestModeAllowed',
+      label: t('clientVersions.guestMode'),
+      type: 'multiselect',
+      operator: 'any_of',
+      allowOperatorToggle: false,
+      options: [
+        { value: true, label: t('common.yes') },
+        { value: false, label: t('common.no') },
+      ],
+    },
+    {
+      key: 'tags',
+      label: t('common.tags'),
+      type: 'tags',
+      operator: 'any_of',
+      allowOperatorToggle: true,
+      options: allTags.map(tag => ({
+        value: tag.id.toString(),
+        label: tag.name,
+        color: tag.color,
+        description: tag.description || '',
+      })),
+    },
+  ];
+
+  // 동적 필터 추가 핸들러
+  const handleFilterAdd = useCallback((filter: ActiveFilter) => {
+    setActiveFilters(prev => [...prev, filter]);
+  }, []);
+
+  // 동적 필터 제거 핸들러
+  const handleFilterRemove = useCallback((filterKey: string) => {
+    setActiveFilters(prev => prev.filter(f => f.key !== filterKey));
+  }, []);
+
+  // 동적 필터 변경 핸들러
+  const handleDynamicFilterChange = useCallback((filterKey: string, value: any) => {
+    setActiveFilters(prev =>
+      prev.map(f => (f.key === filterKey ? { ...f, value } : f))
+    );
+  }, []);
+
+  // 동적 필터 연산자 변경 핸들러
+  const handleOperatorChange = useCallback((filterKey: string, operator: 'any_of' | 'include_all') => {
+    setActiveFilters(prev =>
+      prev.map(f => (f.key === filterKey ? { ...f, operator } : f))
+    );
+  }, []);
+
+  // 검색어 변경 핸들러
+  const handleSearchChange = useCallback((search: string) => {
+    const newFilters: ClientVersionFilters = { search: search || undefined };
+
+    // activeFilters를 newFilters에 반영
+    activeFilters.forEach(filter => {
+      if (filter.key === 'tags') {
+        newFilters.tags = Array.isArray(filter.value) ? filter.value : [];
+        newFilters.tagsOperator = filter.operator || 'any_of';
+      } else {
+        (newFilters as any)[filter.key] = filter.value;
+      }
     });
-  }, [pageState.filters, handleFilterChange]);
+
+    updateFilters(newFilters);
+  }, [activeFilters, updateFilters]);
+
+  // activeFilters가 변경될 때마다 pageState.filters 업데이트
+  useEffect(() => {
+    const newFilters: ClientVersionFilters = {
+      search: pageState.filters?.search, // 검색어는 유지
+    };
+
+    activeFilters.forEach(filter => {
+      if (filter.key === 'tags') {
+        newFilters.tags = Array.isArray(filter.value) ? filter.value : [];
+        newFilters.tagsOperator = filter.operator || 'any_of';
+      } else {
+        (newFilters as any)[filter.key] = filter.value;
+      }
+    });
+
+    // 필터가 실제로 변경되었을 때만 업데이트
+    const currentFiltersStr = JSON.stringify(pageState.filters);
+    const newFiltersStr = JSON.stringify(newFilters);
+    if (currentFiltersStr !== newFiltersStr) {
+      updateFilters(newFilters);
+    }
+  }, [activeFilters]); // pageState.filters와 updateFilters를 의존성에서 제거
 
   // 정렬은 고정 (버전 내림차순, 플랫폼 내림차순)
   // 정렬 변경 기능 비활성화
@@ -874,7 +989,7 @@ const ClientVersionsPage: React.FC = () => {
             <TextField
               placeholder={t('common.search')}
               value={pageState.filters?.search || ''}
-              onChange={(e) => handleFilterChange({ ...pageState.filters, search: e.target.value || undefined })}
+              onChange={(e) => handleSearchChange(e.target.value)}
               sx={{
                 minWidth: 200,
                 flexGrow: 1,
@@ -916,172 +1031,17 @@ const ClientVersionsPage: React.FC = () => {
               size="small"
             />
 
-            <FormControl size="small" sx={{ minWidth: 120 }}>
-              <InputLabel shrink={true}>{t('clientVersions.version')}</InputLabel>
-              <Select
-                value={pageState.filters?.version || ''}
-                label={t('clientVersions.version')}
-                onChange={(e) => handleFilterChange({ ...pageState.filters, version: e.target.value || undefined })}
-                displayEmpty
-                size="small"
-                sx={{ height: '40px' }}
-                MenuProps={{
-                  PaperProps: {
-                    style: {
-                      zIndex: 9999
-                    }
-                  }
-                }}
-                >
-                  <MenuItem value="">
-                    <em>{t('common.all')}</em>
-                  </MenuItem>
-                  {versions.map((version) => (
-                    <MenuItem key={version} value={version}>
-                      {version}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel shrink={true}>{t('clientVersions.platform')}</InputLabel>
-                <Select
-                  value={pageState.filters?.platform || ''}
-                  label={t('clientVersions.platform')}
-                  onChange={(e) => handleFilterChange({ ...pageState.filters, platform: e.target.value || undefined })}
-                  displayEmpty
-                  size="small"
-                  sx={{ height: '40px' }}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        zIndex: 9999
-                      }
-                    }
-                  }}
-                >
-                  <MenuItem value="">
-                    <em>{t('common.all')}</em>
-                  </MenuItem>
-                  {platforms.map((platform) => (
-                    <MenuItem key={platform} value={platform}>
-                      {platform}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel shrink={true}>{t('clientVersions.statusLabel')}</InputLabel>
-                <Select
-                  value={pageState.filters?.clientStatus || ''}
-                  label={t('clientVersions.statusLabel')}
-                  onChange={(e) => handleFilterChange({ ...pageState.filters, clientStatus: e.target.value as ClientStatus || undefined })}
-                  displayEmpty
-                  size="small"
-                  sx={{ height: '40px' }}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        zIndex: 9999
-                      }
-                    }
-                  }}
-                >
-                  <MenuItem value="">
-                    <em>{t('common.all')}</em>
-                  </MenuItem>
-                  {Object.values(ClientStatus).map((status) => (
-                    <MenuItem key={status} value={status}>
-                      {t(ClientStatusLabels[status])}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel shrink={true}>{t('clientVersions.guestMode')}</InputLabel>
-                <Select
-                  value={pageState.filters?.guestModeAllowed?.toString() || ''}
-                  label={t('clientVersions.guestMode')}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    const guestModeValue = value === '' ? undefined : value === 'true';
-                    console.log('Guest mode filter changed:', { value, guestModeValue });
-                    handleFilterChange({
-                      ...pageState.filters,
-                      guestModeAllowed: guestModeValue
-                    });
-                  }}
-                  displayEmpty
-                  size="small"
-                  sx={{ height: '40px' }}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        zIndex: 9999
-                      }
-                    }
-                  }}
-                >
-                  <MenuItem value="">
-                    <em>{t('common.all')}</em>
-                  </MenuItem>
-                  <MenuItem value="true">{t('common.yes')}</MenuItem>
-                  <MenuItem value="false">{t('common.no')}</MenuItem>
-                </Select>
-              </FormControl>
-
-            {/* 태그 필터 */}
-            <Autocomplete
-              multiple
-              sx={{ minWidth: 400, flexShrink: 0 }}
-              options={allTags}
-              getOptionLabel={(option) => option.name}
-              filterSelectedOptions
-              value={tagFilter}
-              onChange={(_, value) => handleTagFilterChange(value)}
-              slotProps={{
-                popper: {
-                  style: {
-                    zIndex: 9999
-                  }
-                }
-              }}
-              renderValue={(value, getTagProps) =>
-                value.map((option, index) => {
-                  const { key, ...chipProps } = getTagProps({ index });
-                  return (
-                    <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
-                      <Chip
-                        variant="outlined"
-                        label={option.name}
-                        size="small"
-                        sx={{ bgcolor: option.color, color: '#fff', cursor: 'help' }}
-                        {...chipProps}
-                      />
-                    </Tooltip>
-                  );
-                })
-              }
-              renderInput={(params) => (
-                <TextField {...params} label={t('common.tags')} size="small" />
-              )}
-              renderOption={(props, option) => {
-                const { key, ...otherProps } = props;
-                return (
-                  <Box component="li" key={key} {...otherProps}>
-                    <Chip
-                      label={option.name}
-                      size="small"
-                      sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
-                    />
-                    {option.description || t('common.noDescription')}
-                  </Box>
-                );
-              }}
-            />
+            {/* Dynamic Filter Bar */}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleDynamicFilterChange}
+                onOperatorChange={handleOperatorChange}
+              />
+            </Box>
           </Box>
         </CardContent>
       </Card>

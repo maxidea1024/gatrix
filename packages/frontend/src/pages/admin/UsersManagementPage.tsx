@@ -148,6 +148,10 @@ const UsersManagementPage: React.FC = () => {
     activeFilters.find(f => f.key === 'tags')?.value as number[] || [],
     [activeFilters]
   );
+  const tagOperator = useMemo(() =>
+    activeFilters.find(f => f.key === 'tags')?.operator,
+    [activeFilters]
+  );
 
   // 배열을 문자열로 변환하여 의존성 배열에 사용
   const statusFilterString = useMemo(() => statusFilter.join(','), [statusFilter]);
@@ -261,6 +265,7 @@ const UsersManagementPage: React.FC = () => {
       // 태그 필터 처리
       if (tagIds.length > 0) {
         tagIds.forEach(tagId => params.append('tags', tagId.toString()));
+        if (tagOperator) params.append('tags_operator', tagOperator);
       }
 
       const response = await apiService.get<UsersResponse>(`/admin/users?${params}`);
@@ -283,7 +288,7 @@ const UsersManagementPage: React.FC = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [page, rowsPerPage, debouncedSearchTerm, statusFilterString, statusOperator, roleFilterString, roleOperator, tagIdsString]);
+  }, [page, rowsPerPage, debouncedSearchTerm, statusFilterString, statusOperator, roleFilterString, roleOperator, tagIdsString, tagOperator]);
 
   // 초대링크 이벤트 처리 (MainLayout에서 전달받음)
   useEffect(() => {

@@ -80,16 +80,30 @@ const getClientVersionsQuerySchema = Joi.object({
   limit: Joi.number().integer().min(1).max(100).default(10),
   sortBy: Joi.string().valid('id', 'channel', 'subChannel', 'clientVersion', 'clientStatus', 'createdAt', 'updatedAt').default('createdAt'),
   sortOrder: Joi.string().valid('ASC', 'DESC').default('DESC'),
-  version: Joi.string().optional(),
-  platform: Joi.string().optional(),
-  clientStatus: Joi.string().valid(...Object.values(ClientStatus)).optional(),
+  version: Joi.alternatives().try(
+    Joi.string(),
+    Joi.array().items(Joi.string())
+  ).optional(),
+  platform: Joi.alternatives().try(
+    Joi.string(),
+    Joi.array().items(Joi.string())
+  ).optional(),
+  clientStatus: Joi.alternatives().try(
+    Joi.string().valid(...Object.values(ClientStatus)),
+    Joi.array().items(Joi.string().valid(...Object.values(ClientStatus)))
+  ).optional(),
   gameServerAddress: Joi.string().optional(),
   patchAddress: Joi.string().optional(),
-  guestModeAllowed: Joi.string().valid('true', 'false').optional().custom((value, helpers) => {
-    if (value === 'true') return true;
-    if (value === 'false') return false;
-    return helpers.error('any.invalid');
-  }),
+  guestModeAllowed: Joi.alternatives().try(
+    Joi.string().valid('true', 'false').custom((value, helpers) => {
+      if (value === 'true') return true;
+      if (value === 'false') return false;
+      return helpers.error('any.invalid');
+    }),
+    Joi.array().items(Joi.string().valid('true', 'false')).custom((value, helpers) => {
+      return value.map((v: string) => v === 'true');
+    })
+  ).optional(),
   externalClickLink: Joi.string().optional(),
   memo: Joi.string().optional(),
   customPayload: Joi.string().optional(),
@@ -101,6 +115,7 @@ const getClientVersionsQuerySchema = Joi.object({
   updatedAtTo: Joi.date().iso().optional(),
   search: Joi.string().optional(),
   tags: Joi.array().items(Joi.string()).optional(),
+  tagsOperator: Joi.string().valid('any_of', 'include_all').optional().default('any_of'),
   _t: Joi.string().optional(), // 캐시 방지용 타임스탬프
 });
 
@@ -227,19 +242,19 @@ export class ClientVersionController {
     Object.keys(filterParams).forEach(key => {
       const value = filterParams[key];
       // guestModeAllowed는 boolean이므로 false도 유효한 값
-      if (value !== undefined && (value !== '' || key === 'guestModeAllowed' || key === 'tags')) {
+      if (value !== undefined && (value !== '' || key === 'guestModeAllowed' || key === 'tags' || key === 'tagsOperator')) {
         let processedValue: any = value;
 
-        // guestModeAllowed는 문자열을 boolean으로 변환
-        if (key === 'guestModeAllowed') {
-          processedValue = value === 'true';
-        }
+        // guestModeAllowed는 이미 Joi에서 boolean 또는 boolean[]로 변환됨
+        // 다른 필드는 그대로 사용
 
         // 타입 안전하게 할당
         if (key === 'guestModeAllowed') {
           (filters as any).guestModeAllowed = processedValue;
         } else if (key === 'tags') {
           (filters as any).tags = processedValue;
+        } else if (key === 'tagsOperator') {
+          (filters as any).tagsOperator = processedValue;
         } else {
           filters[key as keyof ClientVersionFilters] = processedValue;
         }

@@ -107,6 +107,8 @@ const CrashesPage: React.FC = () => {
       key: 'platform',
       label: t('crashes.platform'),
       type: 'multiselect',
+      operator: 'any_of',
+      allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
       options: [
         { value: Platform.WINDOWS, label: getPlatformName(Platform.WINDOWS) },
         { value: Platform.MAC, label: getPlatformName(Platform.MAC) },
@@ -117,6 +119,8 @@ const CrashesPage: React.FC = () => {
       key: 'branch',
       label: t('crashes.branch'),
       type: 'multiselect',
+      operator: 'any_of',
+      allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
       options: [
         { value: Branch.PRODUCTION, label: getBranchName(Branch.PRODUCTION) },
         { value: Branch.STAGING, label: getBranchName(Branch.STAGING) },
@@ -128,6 +132,8 @@ const CrashesPage: React.FC = () => {
       key: 'state',
       label: t('crashes.state'),
       type: 'multiselect',
+      operator: 'any_of',
+      allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
       options: [
         { value: CrashState.OPEN, label: getStateName(CrashState.OPEN) },
         { value: CrashState.CLOSED, label: getStateName(CrashState.CLOSED) },

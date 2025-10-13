@@ -2,15 +2,16 @@ import db from '../config/knex';
 import logger from '../config/logger';
 
 export interface ClientVersionFilters {
-  clientVersion?: string;
-  platform?: string;
-  clientStatus?: string;
-  guestModeAllowed?: boolean;
+  clientVersion?: string | string[];
+  platform?: string | string[];
+  clientStatus?: string | string[];
+  guestModeAllowed?: boolean | boolean[];
   limit?: number;
   offset?: number;
   sortBy?: string;
   sortOrder?: 'ASC' | 'DESC';
   tags?: string[];
+  tagsOperator?: 'any_of' | 'include_all'; // For tags filtering logic
 }
 
 export interface ClientVersionListResult {
@@ -100,35 +101,71 @@ export class ClientVersionModel {
 
       // 필터 적용 함수
       const applyFilters = (query: any) => {
+        // clientVersion filter - support both single value and array (any_of)
         if (filters?.clientVersion) {
-          query.where('cv.clientVersion', filters.clientVersion);
+          if (Array.isArray(filters.clientVersion)) {
+            query.whereIn('cv.clientVersion', filters.clientVersion);
+          } else {
+            query.where('cv.clientVersion', filters.clientVersion);
+          }
         }
 
+        // platform filter - support both single value and array (any_of)
         if (filters?.platform) {
-          query.where('cv.platform', filters.platform);
+          if (Array.isArray(filters.platform)) {
+            query.whereIn('cv.platform', filters.platform);
+          } else {
+            query.where('cv.platform', filters.platform);
+          }
         }
 
+        // clientStatus filter - support both single value and array (any_of)
         if (filters?.clientStatus) {
-          query.where('cv.clientStatus', filters.clientStatus);
+          if (Array.isArray(filters.clientStatus)) {
+            query.whereIn('cv.clientStatus', filters.clientStatus);
+          } else {
+            query.where('cv.clientStatus', filters.clientStatus);
+          }
         }
 
+        // guestModeAllowed filter - support both single value and array (any_of)
         if (filters?.guestModeAllowed !== undefined) {
-          // TINYINT 타입이므로 boolean을 숫자로 변환 (true -> 1, false -> 0)
-          const guestModeValue = filters.guestModeAllowed ? 1 : 0;
-          query.where('cv.guestModeAllowed', guestModeValue);
+          if (Array.isArray(filters.guestModeAllowed)) {
+            // Convert boolean array to number array (true -> 1, false -> 0)
+            const guestModeValues = filters.guestModeAllowed.map(val => val ? 1 : 0);
+            query.whereIn('cv.guestModeAllowed', guestModeValues);
+          } else {
+            // TINYINT 타입이므로 boolean을 숫자로 변환 (true -> 1, false -> 0)
+            const guestModeValue = filters.guestModeAllowed ? 1 : 0;
+            query.where('cv.guestModeAllowed', guestModeValue);
+          }
         }
 
-        // 태그 필터링 (AND 조건)
+        // 태그 필터링 - support both any_of and include_all
         if (filters?.tags && filters.tags.length > 0) {
-          filters.tags.forEach(tagId => {
+          const tagsOperator = filters.tagsOperator || 'any_of';
+
+          if (tagsOperator === 'include_all') {
+            // AND 조건: 모든 태그를 포함해야 함
+            filters.tags.forEach(tagId => {
+              query.whereExists((subquery: any) => {
+                subquery.select('*')
+                  .from('g_tag_assignments as ta')
+                  .whereRaw('ta.entityId = cv.id')
+                  .where('ta.entityType', 'client_version')
+                  .where('ta.tagId', tagId);
+              });
+            });
+          } else {
+            // OR 조건: 태그 중 하나라도 포함하면 됨
             query.whereExists((subquery: any) => {
               subquery.select('*')
                 .from('g_tag_assignments as ta')
                 .whereRaw('ta.entityId = cv.id')
                 .where('ta.entityType', 'client_version')
-                .where('ta.tagId', tagId);
+                .whereIn('ta.tagId', filters.tags);
             });
-          });
+          }
         }
 
         return query;

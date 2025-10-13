@@ -3,12 +3,12 @@ import { pubSubService } from './PubSubService';
 import logger from '../config/logger';
 
 export interface ClientVersionFilters {
-  version?: string;
-  platform?: string;
-  clientStatus?: ClientStatus;
+  version?: string | string[];
+  platform?: string | string[];
+  clientStatus?: ClientStatus | ClientStatus[];
   gameServerAddress?: string;
   patchAddress?: string;
-  guestModeAllowed?: boolean;
+  guestModeAllowed?: boolean | boolean[];
   externalClickLink?: string;
   memo?: string;
   customPayload?: string;
@@ -20,6 +20,7 @@ export interface ClientVersionFilters {
   updatedAtTo?: Date;
   search?: string;
   tags?: string[];
+  tagsOperator?: 'any_of' | 'include_all';
 }
 
 export interface ClientVersionPagination {
@@ -217,6 +218,7 @@ export class ClientVersionService {
       clientStatus: filters.clientStatus,
       guestModeAllowed: filters.guestModeAllowed,
       tags: (filters as any).tags,
+      tagsOperator: (filters as any).tagsOperator,
       limit,
       offset,
       sortBy,

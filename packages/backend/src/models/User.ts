@@ -188,7 +188,8 @@ export class UserModel {
       status?: string | string[];
       status_operator?: 'any_of' | 'include_all';
       search?: string;
-      tags?: string[]
+      tags?: string[];
+      tags_operator?: 'any_of' | 'include_all';
     } = {}
   ): Promise<{ users: UserWithoutPassword[]; total: number; page: number; limit: number }> {
     try {
@@ -232,16 +233,29 @@ export class UserModel {
         }
 
         if (filters.tags && filters.tags.length > 0) {
-          // AND 조건: 모든 태그를 가진 사용자만 반환
-          filters.tags.forEach((tagId: string) => {
+          const tagsOperator = filters.tags_operator || 'include_all'; // Default to include_all (AND)
+
+          if (tagsOperator === 'include_all') {
+            // AND 조건: 모든 태그를 가진 사용자만 반환
+            filters.tags.forEach((tagId: string) => {
+              query.whereExists(function(this: any) {
+                this.select('*')
+                    .from('g_tag_assignments')
+                    .whereRaw('g_tag_assignments.entityId = g_users.id')
+                    .where('g_tag_assignments.entityType', 'user')
+                    .where('g_tag_assignments.tagId', tagId);
+              });
+            });
+          } else {
+            // OR 조건: 태그 중 하나라도 가진 사용자 반환
             query.whereExists(function(this: any) {
               this.select('*')
                   .from('g_tag_assignments')
                   .whereRaw('g_tag_assignments.entityId = g_users.id')
                   .where('g_tag_assignments.entityType', 'user')
-                  .where('g_tag_assignments.tagId', tagId);
+                  .whereIn('g_tag_assignments.tagId', filters.tags!);
             });
-          });
+          }
         }
 
         return query;

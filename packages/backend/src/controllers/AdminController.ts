@@ -84,6 +84,7 @@ export class AdminController {
 
       const search = req.query.search as string;
       const tags = req.query.tags;
+      const tagsOperator = req.query.tags_operator as 'any_of' | 'include_all' | undefined;
 
       const filters: any = {};
       if (roleValue) {
@@ -98,6 +99,7 @@ export class AdminController {
       if (tags) {
         // tags can be a single string or array of strings
         filters.tags = Array.isArray(tags) ? tags : [tags];
+        if (tagsOperator) filters.tags_operator = tagsOperator;
       }
 
       console.log('[AdminController] User filters:', JSON.stringify(filters, null, 2));
