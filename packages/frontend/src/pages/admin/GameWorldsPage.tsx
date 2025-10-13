@@ -92,6 +92,7 @@ import EmptyTableRow from '../../components/common/EmptyTableRow';
 import translationService from '../../services/translationService';
 import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/MultiLanguageMessageInput';
 import JsonEditor from '@/components/common/JsonEditor';
+import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 
 // Sortable Row Component
 interface SortableRowProps {
@@ -351,10 +352,12 @@ const GameWorldsPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
-  const [tagsFilter, setTagsFilter] = useState<Tag[]>([]);
 
   // 디바운싱된 검색어 (500ms 지연)
   const debouncedSearch = useDebounce(search, 500);
+
+  // 동적 필터 상태
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingWorld, setEditingWorld] = useState<GameWorld | null>(null);
@@ -516,6 +519,43 @@ const GameWorldsPage: React.FC = () => {
     }
   };
 
+  // 동적 필터 정의
+  const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
+    {
+      key: 'tags',
+      label: t('common.tags'),
+      type: 'tags',
+      operator: 'include_all',
+      allowOperatorToggle: true,
+      options: allRegistryTags.map(tag => ({
+        value: tag.id,
+        label: tag.name,
+        color: tag.color,
+      })),
+    },
+  ], [t, allRegistryTags]);
+
+  // 동적 필터 핸들러
+  const handleFilterAdd = (filter: ActiveFilter) => {
+    setActiveFilters(prev => [...prev, filter]);
+  };
+
+  const handleFilterRemove = (key: string) => {
+    setActiveFilters(prev => prev.filter(f => f.key !== key));
+  };
+
+  const handleDynamicFilterChange = (key: string, value: any) => {
+    setActiveFilters(prev =>
+      prev.map(f => (f.key === key ? { ...f, value } : f))
+    );
+  };
+
+  const handleOperatorChange = (key: string, operator: 'any_of' | 'include_all') => {
+    setActiveFilters(prev =>
+      prev.map(f => (f.key === key ? { ...f, operator } : f))
+    );
+  };
+
 
 
   useEffect(() => {
@@ -528,7 +568,8 @@ const GameWorldsPage: React.FC = () => {
     };
 
     // allRegistryTags가 로드된 후에만 게임월드를 로드
-    if (allRegistryTags.length > 0 || tagsFilter.length === 0) {
+    const tagFilter = activeFilters.find(f => f.key === 'tags');
+    if (allRegistryTags.length > 0 || !tagFilter || (Array.isArray(tagFilter.value) && tagFilter.value.length === 0)) {
       loadData();
     }
 
@@ -537,7 +578,7 @@ const GameWorldsPage: React.FC = () => {
     };
 
 
-  }, [debouncedSearch, tagsFilter.map(t => t.id).join(','), allRegistryTags.length]);
+  }, [debouncedSearch, activeFilters, allRegistryTags.length]);
 
 
   // Scroll moved row into view when worlds reload and highlight is set
@@ -572,13 +613,18 @@ const GameWorldsPage: React.FC = () => {
     try {
       setLoading(true);
 
-      // 태그 ID 추출
-      const tagIds = tagsFilter.length > 0 ? tagsFilter.map(tag => tag.id) : [];
+      // 태그 필터에서 태그 ID 추출
+      const tagFilter = activeFilters.find(f => f.key === 'tags');
+      const tagIds = tagFilter && Array.isArray(tagFilter.value) && tagFilter.value.length > 0
+        ? tagFilter.value
+        : [];
+      const tagOperator = tagFilter?.operator;
 
       const result = await gameWorldService.getGameWorlds({
         // 서버 컨트롤러는 tagIds(쉼표구분)를 기대함
         search: debouncedSearch || undefined,
         tagIds: tagIds.length ? tagIds.join(',') : undefined,
+        tags_operator: tagOperator,
       });
 
       setWorlds(result.worlds);
@@ -1046,63 +1092,63 @@ const GameWorldsPage: React.FC = () => {
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', flexGrow: 1 }}>
               <TextField
                 placeholder={t('gameWorlds.searchPlaceholder')}
                 value={search}
                 onChange={handleSearchChange}
-                size="small"
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
+                sx={{
+                  minWidth: 200,
+                  flexGrow: 1,
+                  maxWidth: 320,
+                  '& .MuiOutlinedInput-root': {
+                    height: '40px',
+                    borderRadius: '20px',
+                    bgcolor: 'background.paper',
+                    transition: 'all 0.2s ease-in-out',
+                    '& fieldset': {
+                      borderColor: 'divider',
+                    },
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      '& fieldset': {
+                        borderColor: 'primary.light',
+                      }
+                    },
+                    '&.Mui-focused': {
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                      '& fieldset': {
+                        borderColor: 'primary.main',
+                        borderWidth: '1px',
+                      }
+                    }
                   },
+                  '& .MuiInputBase-input': {
+                    fontSize: '0.875rem',
+                  }
                 }}
-                sx={{ minWidth: 500 }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                    </InputAdornment>
+                  ),
+                }}
+                size="small"
               />
-              <Autocomplete
-                multiple
-                sx={{ minWidth: 400, flexShrink: 0 }}
-                options={existingTags}
-                getOptionLabel={(option) => option.name}
-                filterSelectedOptions
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                value={tagsFilter}
-                onChange={(_, value) => setTagsFilter(value)}
-                slotProps={autocompleteSlotProps as any}
-                renderValue={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...chipProps } = getTagProps({ index });
-                    return (
-                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
-                        <Chip
-                          variant="outlined"
-                          label={option.name}
-                          size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
-                          {...chipProps}
-                        />
-                      </Tooltip>
-                    );
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label={t('gameWorlds.tags')} size="small" />
-                )}
-                renderOption={(props, option) => (
-                  <Box component="li" {...props}>
-                    <Chip
-                      label={option.name}
-                      size="small"
-                      sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
-                    />
-                    {option.description || t('common.noDescription')}
-                  </Box>
-                )}
-              />
+
+              {/* Dynamic Filter Bar */}
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+                <DynamicFilterBar
+                  availableFilters={availableFilterDefinitions}
+                  activeFilters={activeFilters}
+                  onFilterAdd={handleFilterAdd}
+                  onFilterRemove={handleFilterRemove}
+                  onFilterChange={handleDynamicFilterChange}
+                  onOperatorChange={handleOperatorChange}
+                />
+              </Box>
             </Box>
           </Box>
         </CardContent>

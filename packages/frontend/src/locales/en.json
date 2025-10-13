@@ -1154,7 +1154,27 @@
       "job_set_tags": "Job Set Tags",
       "whitelist_bulk_create": "Whitelist Bulk Create",
       "whitelist_bulk_delete": "Whitelist Bulk Delete",
-      "whitelist_toggle_status": "Whitelist Toggle Status"
+      "whitelist_toggle_status": "Whitelist Toggle Status",
+      "console_whoami": "Console: Show Current User Info",
+      "console_base64": "Console: Base64 Encode/Decode",
+      "console_jwt-secret": "Console: Generate JWT Secret",
+      "console_bcrypt": "Console: Generate Bcrypt Hash",
+      "console_encrypt": "Console: Encrypt Text",
+      "console_decrypt": "Console: Decrypt Text",
+      "console_api-token-create": "Console: Create API Token",
+      "console_api-token-revoke": "Console: Revoke API Token",
+      "console_random-bytes": "Console: Generate Random Bytes",
+      "console_random-id": "Console: Generate Random ID",
+      "console_random-code": "Console: Generate Random Code",
+      "console_db-stats": "Console: Show Database Stats",
+      "console_cache-clear": "Console: Clear Cache",
+      "console_cache-stats": "Console: Show Cache Stats",
+      "console_api-token-list": "Console: List API Tokens",
+      "console_user-info": "Console: Show User Info",
+      "console_timestamp": "Console: Convert Timestamp",
+      "console_unixtimestamp": "Console: Get Unix Timestamp",
+      "console_md5": "Console: Generate MD5 Hash",
+      "console_sha256": "Console: Generate SHA256 Hash"
     },
     "resources": {
       "user": "User",
@@ -1165,7 +1185,8 @@
       "scheduler": "Scheduler",
       "tag": "Tag",
       "message_template": "Message Template",
-      "job": "Job"
+      "job": "Job",
+      "console": "System Console"
     }
   },
   "auth": {

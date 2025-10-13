@@ -108,15 +108,27 @@ export class GameWorldController {
       })
     );
 
-    // Filter by tagIds if provided (world must include all tagIds)
+    // Filter by tagIds if provided
     const tagIdsParam = (req.query as any).tagIds as string | undefined;
+    const tagsOperator = (req.query as any).tags_operator as 'any_of' | 'include_all' | undefined;
     if (tagIdsParam) {
       const requiredIds = tagIdsParam.split(',').map((s) => Number(s)).filter((n) => !isNaN(n));
       if (requiredIds.length > 0) {
-        withTags = withTags.filter((w: any) => {
-          const ids = (w.tags || []).map((t: any) => Number(t.id));
-          return requiredIds.every((rid) => ids.includes(rid));
-        });
+        const operator = tagsOperator || 'include_all';
+
+        if (operator === 'any_of') {
+          // OR 조건: 선택한 태그 중 하나라도 가진 게임월드 반환
+          withTags = withTags.filter((w: any) => {
+            const ids = (w.tags || []).map((t: any) => Number(t.id));
+            return requiredIds.some((rid) => ids.includes(rid));
+          });
+        } else {
+          // AND 조건: 선택한 모든 태그를 가진 게임월드만 반환
+          withTags = withTags.filter((w: any) => {
+            const ids = (w.tags || []).map((t: any) => Number(t.id));
+            return requiredIds.every((rid) => ids.includes(rid));
+          });
+        }
       }
     }
 

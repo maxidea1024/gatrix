@@ -61,6 +61,7 @@ import FormDialogHeader from '@/components/common/FormDialogHeader';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
 import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/MultiLanguageMessageInput';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
+import { api } from '@/services/api';
 
 
 
@@ -226,10 +227,9 @@ const MessageTemplatesPage: React.FC = () => {
   // 사용자 로딩
   const loadUsers = useCallback(async () => {
     try {
-      const response = await fetch('/api/v1/admin/users?limit=1000');
-      const data = await response.json();
-      if (data.success && data.data.users) {
-        setAllUsers(data.data.users.map((u: any) => ({
+      const response = await api.get('/admin/users?limit=1000');
+      if (response.data.success && response.data.data.users) {
+        setAllUsers(response.data.data.users.map((u: any) => ({
           id: u.id,
           name: u.name,
           email: u.email

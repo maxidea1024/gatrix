@@ -1148,7 +1148,27 @@
       "job_set_tags": "作业设置标签",
       "whitelist_bulk_create": "白名单批量创建",
       "whitelist_bulk_delete": "白名单批量删除",
-      "whitelist_toggle_status": "白名单状态切换"
+      "whitelist_toggle_status": "白名单状态切换",
+      "console_whoami": "控制台：显示当前用户信息",
+      "console_base64": "控制台：Base64编码/解码",
+      "console_jwt-secret": "控制台：生成JWT密钥",
+      "console_bcrypt": "控制台：生成Bcrypt哈希",
+      "console_encrypt": "控制台：加密文本",
+      "console_decrypt": "控制台：解密文本",
+      "console_api-token-create": "控制台：创建API令牌",
+      "console_api-token-revoke": "控制台：撤销API令牌",
+      "console_random-bytes": "控制台：生成随机字节",
+      "console_random-id": "控制台：生成随机ID",
+      "console_random-code": "控制台：生成随机代码",
+      "console_db-stats": "控制台：显示数据库统计",
+      "console_cache-clear": "控制台：清除缓存",
+      "console_cache-stats": "控制台：显示缓存统计",
+      "console_api-token-list": "控制台：列出API令牌",
+      "console_user-info": "控制台：显示用户信息",
+      "console_timestamp": "控制台：转换时间戳",
+      "console_unixtimestamp": "控制台：获取Unix时间戳",
+      "console_md5": "控制台：生成MD5哈希",
+      "console_sha256": "控制台：生成SHA256哈希"
     },
     "resources": {
       "user": "用户",
@@ -1159,7 +1179,8 @@
       "scheduler": "调度器",
       "tag": "标签",
       "message_template": "消息模板",
-      "job": "作业"
+      "job": "作业",
+      "console": "系统控制台"
     }
   },
   "auth": {

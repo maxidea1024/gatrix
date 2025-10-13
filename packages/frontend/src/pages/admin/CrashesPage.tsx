@@ -86,10 +86,29 @@ const CrashesPage: React.FC = () => {
   const [filters, setFilters] = useState<CrashFilters>({});
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
-  // Date filters
-  const [dateFrom, setDateFrom] = useState<Dayjs | null>(null);
-  const [dateTo, setDateTo] = useState<Dayjs | null>(null);
-  const [dateRangePreset, setDateRangePreset] = useState<DateRangePreset>('last7d');
+  // Date filters - Initialize from URL params synchronously
+  const [dateFrom, setDateFrom] = useState<Dayjs | null>(() => {
+    const fromParam = searchParams.get('from');
+    if (fromParam) {
+      return dayjs(fromParam);
+    }
+    // Default to 7 days ago
+    return dayjs().subtract(7, 'day');
+  });
+
+  const [dateTo, setDateTo] = useState<Dayjs | null>(() => {
+    const toParam = searchParams.get('to');
+    if (toParam) {
+      return dayjs(toParam);
+    }
+    // Default to now
+    return dayjs();
+  });
+
+  const [dateRangePreset, setDateRangePreset] = useState<DateRangePreset>(() => {
+    const presetParam = searchParams.get('preset') as DateRangePreset;
+    return presetParam || 'last7d';
+  });
 
   // Sort
   const [sortBy, setSortBy] = useState<'lastCrash' | 'count' | 'createdAt'>('lastCrash');
@@ -193,29 +212,11 @@ const CrashesPage: React.FC = () => {
 
   // Initialize from URL parameters on mount
   useEffect(() => {
-    const fromParam = searchParams.get('from');
-    const toParam = searchParams.get('to');
-    const presetParam = searchParams.get('preset') as DateRangePreset;
     const searchParam = searchParams.get('search');
     const platformParam = searchParams.get('platform');
     const branchParam = searchParams.get('branch');
     const stateParam = searchParams.get('state');
     const versionParam = searchParams.get('version');
-
-    // Initialize date range
-    if (fromParam && toParam) {
-      setDateFrom(dayjs(fromParam));
-      setDateTo(dayjs(toParam));
-      if (presetParam) {
-        setDateRangePreset(presetParam);
-      }
-    } else {
-      // Default to last 7 days
-      const now = dayjs();
-      setDateFrom(now.subtract(7, 'day'));
-      setDateTo(now);
-      setDateRangePreset('last7d');
-    }
 
     // Initialize search
     if (searchParam) {

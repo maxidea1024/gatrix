@@ -1151,7 +1151,27 @@
       "job_set_tags": "Job 태그 설정",
       "whitelist_bulk_create": "화이트리스트 일괄 생성",
       "whitelist_bulk_delete": "화이트리스트 일괄 삭제",
-      "whitelist_toggle_status": "화이트리스트 상태 변경"
+      "whitelist_toggle_status": "화이트리스트 상태 변경",
+      "console_whoami": "콘솔: 현재 사용자 정보 조회",
+      "console_base64": "콘솔: Base64 인코딩/디코딩",
+      "console_jwt-secret": "콘솔: JWT 시크릿 키 생성",
+      "console_bcrypt": "콘솔: Bcrypt 해시 생성",
+      "console_encrypt": "콘솔: 텍스트 암호화",
+      "console_decrypt": "콘솔: 텍스트 복호화",
+      "console_api-token-create": "콘솔: API 토큰 생성",
+      "console_api-token-revoke": "콘솔: API 토큰 폐기",
+      "console_random-bytes": "콘솔: 랜덤 바이트 생성",
+      "console_random-id": "콘솔: 랜덤 ID 생성",
+      "console_random-code": "콘솔: 랜덤 코드 생성",
+      "console_db-stats": "콘솔: 데이터베이스 통계 조회",
+      "console_cache-clear": "콘솔: 캐시 삭제",
+      "console_cache-stats": "콘솔: 캐시 통계 조회",
+      "console_api-token-list": "콘솔: API 토큰 목록 조회",
+      "console_user-info": "콘솔: 사용자 정보 조회",
+      "console_timestamp": "콘솔: 타임스탬프 변환",
+      "console_unixtimestamp": "콘솔: Unix 타임스탬프 조회",
+      "console_md5": "콘솔: MD5 해시 생성",
+      "console_sha256": "콘솔: SHA256 해시 생성"
     },
     "resources": {
       "user": "사용자",
@@ -1162,7 +1182,8 @@
       "scheduler": "스케줄",
       "tag": "태그",
       "message_template": "메시지 템플릿",
-      "job": "Job"
+      "job": "Job",
+      "console": "시스템 콘솔"
     }
   },
   "auth": {
