@@ -15,13 +15,9 @@ export interface Tag {
   updatedByEmail?: string | null;
 }
 
-export interface TagListParams {
-  sort?: 'nameAsc' | 'nameDesc' | 'createdAtDesc' | 'createdAtAsc' | 'updatedAtDesc' | 'updatedAtAsc';
-}
-
 export const tagService = {
-  async list(params?: TagListParams): Promise<Tag[]> {
-    const res = await apiService.get<{ tags: Tag[] }>('/admin/tags', { params });
+  async list(): Promise<Tag[]> {
+    const res = await apiService.get<{ tags: Tag[] }>('/admin/tags');
     return res.data?.tags || [];
   },
 

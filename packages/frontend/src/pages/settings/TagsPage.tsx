@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Typography, Card, CardContent, Button, TextField, IconButton, Stack, Chip, Tooltip, Divider, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableHead, TableRow, TableCell, TableBody, TableContainer, LinearProgress, TableSortLabel } from '@mui/material';
+import { Box, Typography, Card, CardContent, Button, TextField, IconButton, Stack, Chip, Tooltip, Divider, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableHead, TableRow, TableCell, TableBody, TableContainer, LinearProgress } from '@mui/material';
 import { Delete as DeleteIcon, Edit as EditIcon, Save as SaveIcon, Close as CloseIcon, Autorenew as RandomIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { tagService, Tag, TagListParams } from '@/services/tagService';
+import { tagService, Tag } from '@/services/tagService';
 import { useSnackbar } from 'notistack';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
@@ -17,7 +17,6 @@ const TagsPage: React.FC = () => {
   // Data/state
   const [tags, setTags] = useState<Tag[]>([]);
   const [query, setQuery] = useState('');
-  const [sort, setSort] = useState<TagListParams['sort']>('nameAsc');
 
   // Delete confirm dialog
   const [deleteTarget, setDeleteTarget] = useState<Tag | null>(null);
@@ -37,10 +36,10 @@ const TagsPage: React.FC = () => {
   const [editDescription, setEditDescription] = useState('');
 
   // Load
-  const loadTags = async (params?: TagListParams) => {
+  const loadTags = async () => {
     try {
       setLoading(true);
-      const items = await tagService.list(params);
+      const items = await tagService.list();
       setTags(items);
     } catch {
       enqueueSnackbar(t('errors.loadError'), { variant: 'error' });
@@ -48,7 +47,7 @@ const TagsPage: React.FC = () => {
       setLoading(false);
     }
   };
-  useEffect(() => { loadTags({ sort }); }, [sort]);
+  useEffect(() => { loadTags(); }, []);
 
   // Derived
   const filtered = useMemo(() => {
@@ -188,18 +187,6 @@ const TagsPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* List header (align with other list pages: filters on left, sort on right) */}
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1, flexWrap: 'wrap' }}>
-        <TextField select size="small" label={t('common.sort')} value={sort} onChange={(e)=>setSort(e.target.value as any)} sx={{ width: 240, ml: 'auto' }}>
-          <MenuItem value="nameAsc">Name A-Z</MenuItem>
-          <MenuItem value="nameDesc">Name Z-A</MenuItem>
-          <MenuItem value="createdAtDesc">Created (new → old)</MenuItem>
-          <MenuItem value="createdAtAsc">Created (old → new)</MenuItem>
-          <MenuItem value="updatedAtDesc">Updated (new → old)</MenuItem>
-          <MenuItem value="updatedAtAsc">Updated (old → new)</MenuItem>
-        </TextField>
-      </Box>
-
       {/* Table list */}
       <Card>
         <CardContent sx={{ p: 0 }}>
@@ -211,16 +198,8 @@ const TagsPage: React.FC = () => {
                   <TableCell>{t('tags.name')}</TableCell>
                   <TableCell>{t('tags.description')}</TableCell>
                   <TableCell sx={{ width: 100 }}>{t('common.color')}</TableCell>
-                  <TableCell>
-                    <TableSortLabel active={!!sort?.startsWith('createdAt')} direction={sort?.endsWith('Asc') ? 'asc' : 'desc'} onClick={() => setSort(sort?.startsWith('createdAt') && sort.endsWith('Desc') ? 'createdAtAsc' : 'createdAtDesc')}>
-                      {t('common.createdAt')}
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell>
-                    <TableSortLabel active={!!sort?.startsWith('updatedAt')} direction={sort?.endsWith('Asc') ? 'asc' : 'desc'} onClick={() => setSort(sort?.startsWith('updatedAt') && sort.endsWith('Desc') ? 'updatedAtAsc' : 'updatedAtDesc')}>
-                      {t('common.updatedAt')}
-                    </TableSortLabel>
-                  </TableCell>
+                  <TableCell>{t('common.createdAt')}</TableCell>
+                  <TableCell>{t('common.updatedAt')}</TableCell>
                   <TableCell>{t('common.createdBy')}</TableCell>
                   <TableCell align="right">{t('common.actions')}</TableCell>
                 </TableRow>

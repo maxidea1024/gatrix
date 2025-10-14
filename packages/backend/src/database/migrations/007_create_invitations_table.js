@@ -3,17 +3,8 @@
  * This table stores invitations sent to users to join the platform
  */
 
-const mysql = require('mysql2/promise');
-require('dotenv').config();
-
-exports.up = async function() {
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'motif_dev',
-    password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
-  });
+exports.up = async function(connection) {
+  // Connection is provided by the migration system
 
   console.log('Creating g_invitations table...');
 
@@ -48,24 +39,13 @@ exports.up = async function() {
   `);
 
   console.log('✓ g_invitations table created successfully');
-
-  await connection.end();
 };
 
-exports.down = async function() {
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'motif_dev',
-    password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
-  });
-
+exports.down = async function(connection) {
+  // Connection is provided by the migration system
   console.log('Dropping g_invitations table...');
 
   await connection.execute(`DROP TABLE IF EXISTS g_invitations`);
 
   console.log('✓ g_invitations table dropped successfully');
-
-  await connection.end();
 };

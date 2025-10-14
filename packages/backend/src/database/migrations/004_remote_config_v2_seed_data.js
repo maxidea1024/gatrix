@@ -3,17 +3,9 @@
  * Inserts default environments and segments
  */
 
-const mysql = require('mysql2/promise');
-require('dotenv').config();
 
-exports.up = async function() {
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'motif_dev',
-    password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
-  });
+exports.up = async function(connection) {
+  // Connection is provided by the migration system
 
   console.log('Inserting Remote Config V2 seed data...');
 
@@ -123,26 +115,16 @@ exports.up = async function() {
       (?, 'server_config', 'Server Configuration', 'Server-side configuration settings', 'server', 'published', 1, ?, ?, 1, NOW())
     `, [devEnv.id, clientTemplateData, clientMetadata, devEnv.id, serverTemplateData, serverMetadata]);
   }
-
-  await connection.end();
   console.log('Remote Config V2 seed data inserted successfully');
 };
 
-exports.down = async function() {
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'motif_dev',
-    password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
-  });
+exports.down = async function(connection) {
+  // Connection is provided by the migration system
 
   console.log('Removing Remote Config V2 seed data...');
 
   await connection.execute('DELETE FROM g_remote_config_v2_templates');
   await connection.execute('DELETE FROM g_remote_config_v2_segments');
   await connection.execute('DELETE FROM g_remote_config_v2_environments');
-
-  await connection.end();
   console.log('Remote Config V2 seed data removed successfully');
 };

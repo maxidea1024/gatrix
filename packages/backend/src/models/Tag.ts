@@ -41,7 +41,7 @@ export default class TagModel {
         'u.name as updatedByName',
         'u.email as updatedByEmail'
       ])
-      .orderBy('t.name', 'asc');
+      .orderBy('t.createdAt', 'desc'); // Sort by most recent first
   }
 
   static async findById(id: number): Promise<TagAttributes | null> {

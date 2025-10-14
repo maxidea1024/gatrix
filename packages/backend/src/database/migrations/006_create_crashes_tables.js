@@ -3,17 +3,9 @@
  * Creates crashes and crash_instances tables for client crash tracking
  */
 
-const mysql = require('mysql2/promise');
-require('dotenv').config();
 
-exports.up = async function() {
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'motif_dev',
-    password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
-  });
+exports.up = async function(connection) {
+  // Connection is provided by the migration system
 
   console.log('Creating crashes tables...');
 
@@ -97,19 +89,11 @@ exports.up = async function() {
   `);
 
   console.log('✓ Created crash_instances table');
-
-  await connection.end();
   console.log('Crashes tables created successfully');
 };
 
-exports.down = async function() {
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'motif_dev',
-    password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
-  });
+exports.down = async function(connection) {
+  // Connection is provided by the migration system
 
   console.log('Rolling back crashes tables...');
 
@@ -119,7 +103,5 @@ exports.down = async function() {
 
   await connection.execute('DROP TABLE IF EXISTS crashes');
   console.log('✓ Dropped crashes table');
-
-  await connection.end();
   console.log('Crashes tables rollback completed');
 };

@@ -3,17 +3,9 @@
  * Creates all tables for the new template-based remote config system
  */
 
-const mysql = require('mysql2/promise');
-require('dotenv').config();
 
-exports.up = async function() {
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'motif_dev',
-    password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
-  });
+exports.up = async function(connection) {
+  // Connection is provided by the migration system
 
   console.log('Creating Remote Config V2 system tables...');
 
@@ -198,19 +190,11 @@ exports.up = async function() {
       CONSTRAINT fk_v2_session_user FOREIGN KEY (userId) REFERENCES g_users(id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
-
-  await connection.end();
   console.log('Remote Config V2 system tables created successfully');
 };
 
-exports.down = async function() {
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'motif_dev',
-    password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
-  });
+exports.down = async function(connection) {
+  // Connection is provided by the migration system
 
   console.log('Dropping Remote Config V2 system tables...');
 
@@ -222,7 +206,5 @@ exports.down = async function() {
   await connection.execute('DROP TABLE IF EXISTS g_remote_config_v2_template_versions');
   await connection.execute('DROP TABLE IF EXISTS g_remote_config_v2_templates');
   await connection.execute('DROP TABLE IF EXISTS g_remote_config_v2_environments');
-
-  await connection.end();
   console.log('Remote Config V2 system tables dropped successfully');
 };

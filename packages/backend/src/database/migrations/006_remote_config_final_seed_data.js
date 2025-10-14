@@ -1,16 +1,7 @@
-const mysql = require('mysql2/promise');
 
-exports.up = async function() {
+exports.up = async function(connection) {
+  // Connection is provided by the migration system
   console.log('Starting Remote Config Final System seed data...');
-  
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'motif_dev',
-    password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
-  });
-
   console.log('Inserting seed data...');
 
   // 1. Insert default environments
@@ -111,28 +102,17 @@ exports.up = async function() {
   `);
 
   // API tokens are managed by the existing g_api_access_tokens table
-
-  await connection.end();
   console.log('Remote Config Final System seed data completed successfully!');
 };
 
-exports.down = async function() {
+exports.down = async function(connection) {
+  // Connection is provided by the migration system
   console.log('Rolling back Remote Config Final System seed data...');
-  
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'motif_dev',
-    password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
-  });
 
   // Delete in reverse order due to foreign key constraints
   await connection.execute(`DELETE FROM g_remote_config_template_versions WHERE templateId IN (SELECT id FROM g_remote_config_templates WHERE templateName IN ('mobile_app_config', 'api_feature_flags'))`);
   await connection.execute(`DELETE FROM g_remote_config_templates WHERE templateName IN ('mobile_app_config', 'api_feature_flags')`);
   await connection.execute(`DELETE FROM g_remote_config_segments WHERE segmentName IN ('beta_users', 'premium_users', 'mobile_users')`);
   await connection.execute(`DELETE FROM g_remote_config_environments WHERE environmentName IN ('development', 'staging', 'production')`);
-
-  await connection.end();
   console.log('Remote Config Final System seed data rollback completed!');
 };

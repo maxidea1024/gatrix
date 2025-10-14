@@ -4,17 +4,9 @@
  * Updated: 2025-09-12 - Consolidated all migrations into one
  */
 
-const mysql = require('mysql2/promise');
-require('dotenv').config();
 
-exports.up = async function() {
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'motif_dev',
-    password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
-  });
+exports.up = async function(connection) {
+  // Connection is provided by the migration system
 
   console.log('Creating initial database schema...');
 
@@ -604,18 +596,10 @@ exports.up = async function() {
 
   console.log('✓ Default data inserted');
   console.log('🎉 Initial schema creation completed successfully!');
-
-  await connection.end();
 };
 
-exports.down = async function() {
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'gatrix'
-  });
+exports.down = async function(connection) {
+  // Connection is provided by the migration system
 
   console.log('Rolling back initial schema...');
 
@@ -651,5 +635,4 @@ exports.down = async function() {
   }
 
   console.log('✓ Initial schema rollback completed');
-  await connection.end();
 };

@@ -1089,7 +1089,7 @@ const SystemConsolePage: React.FC = () => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        p: 2,
+        p: 3,
         flex: 1,
         minHeight: 0,
         overflow: 'hidden'
@@ -1099,7 +1099,7 @@ const SystemConsolePage: React.FC = () => {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') e.preventDefault();
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
         <TerminalIcon sx={{ fontSize: 32, color: 'primary.main' }} />
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700 }}>

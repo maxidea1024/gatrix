@@ -1,4 +1,3 @@
-const mysql = require('mysql2/promise');
 
 exports.up = async function() {
   console.log('Running migration: Add maintenance fields to game worlds and client versions...');
@@ -112,7 +111,6 @@ exports.up = async function() {
     console.error('❌ Migration failed:', error);
     throw error;
   } finally {
-    await connection.end();
   }
 };
 
@@ -161,6 +159,5 @@ exports.down = async function() {
     console.error('❌ Migration rollback failed:', error);
     throw error;
   } finally {
-    await connection.end();
   }
 };

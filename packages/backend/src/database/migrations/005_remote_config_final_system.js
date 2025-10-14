@@ -1,4 +1,3 @@
-const mysql = require('mysql2/promise');
 
 exports.up = async function() {
   console.log('Starting Remote Config Final System migration...');
@@ -221,8 +220,6 @@ exports.up = async function() {
       CONSTRAINT fk_rc_session_user FOREIGN KEY (userId) REFERENCES g_users(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   `);
-
-  await connection.end();
   console.log('Remote Config Final System migration completed successfully!');
 };
 
@@ -251,7 +248,5 @@ exports.down = async function() {
     await connection.execute(`DROP TABLE IF EXISTS ${table}`);
     console.log(`Dropped table: ${table}`);
   }
-
-  await connection.end();
   console.log('Remote Config Final System rollback completed!');
 };
