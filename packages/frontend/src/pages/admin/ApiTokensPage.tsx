@@ -565,7 +565,7 @@ const ApiTokensPage: React.FC = () => {
             <TableBody>
               {!tokens || tokens.length === 0 ? (
                 <EmptyTableRow
-                  colSpan={9}
+                  colSpan={10}
                   loading={loading}
                   message={t('apiTokens.noTokens')}
                   loadingMessage={t('common.loadingData')}

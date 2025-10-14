@@ -450,12 +450,15 @@ const GameWorldsPage: React.FC = () => {
   });
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      // Require 8px of movement before drag starts (prevents accidental drags)
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
-
-
   );
 
   // Load registry tags for form use
