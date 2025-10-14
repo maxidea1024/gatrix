@@ -1,70 +1,93 @@
-import app from './app';
 import { config } from './config';
-import logger from './config/logger';
-import database from './config/database';
-import redisClient from './config/redis';
-import { pubSubService, SSENotificationBusMessage } from './services/PubSubService';
-import { queueService } from './services/QueueService';
-import apiTokenUsageService from './services/ApiTokenUsageService';
-import { checkDatabaseTimezone, setDatabaseTimezoneToUTC } from './utils/dbTimezoneCheck';
-import { appInstance } from './utils/AppInstance';
-import { Server } from 'socket.io';
 import { createServer } from 'http';
-import { io as ioClient } from 'socket.io-client';
-import SSENotificationService from './services/sseNotificationService';
+import type { SSENotificationBusMessage } from './services/PubSubService';
+
+// Lazy imports to avoid initialization at import time
+let app: any;
+let logger: any;
+let database: any;
+let redisClient: any;
+let pubSubService: any;
+let queueService: any;
+let apiTokenUsageService: any;
+let setDatabaseTimezoneToUTC: any;
+let appInstance: any;
+let SSENotificationService: any;
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error: Error) => {
-  logger.error('Uncaught Exception:', error);
+  console.error('Uncaught Exception:', error);
   process.exit(1);
 });
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (reason: any, promise: Promise<any>) => {
-  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
   process.exit(1);
 });
 
 // Graceful shutdown
 const gracefulShutdown = async (signal: string) => {
-  logger.info(`Received ${signal}. Starting graceful shutdown...`);
+  if (logger) {
+    logger.info(`Received ${signal}. Starting graceful shutdown...`);
+  } else {
+    console.log(`Received ${signal}. Starting graceful shutdown...`);
+  }
 
   try {
     // Close ApiTokenUsageService
-    try {
-      await apiTokenUsageService.shutdown();
-    } catch (error) {
-      logger.warn('Error shutting down ApiTokenUsageService:', error);
+    if (apiTokenUsageService) {
+      try {
+        await apiTokenUsageService.shutdown();
+      } catch (error) {
+        if (logger) logger.warn('Error shutting down ApiTokenUsageService:', error);
+      }
     }
 
     // Close Queue service
-    try {
-      await queueService.shutdown();
-    } catch (error) {
-      logger.warn('Error shutting down Queue service:', error);
+    if (queueService) {
+      try {
+        await queueService.shutdown();
+      } catch (error) {
+        if (logger) logger.warn('Error shutting down Queue service:', error);
+      }
     }
 
     // Close PubSub service
-    try {
-      await pubSubService.shutdown();
-    } catch (error) {
-      logger.warn('Error shutting down PubSub service:', error);
+    if (pubSubService) {
+      try {
+        await pubSubService.shutdown();
+      } catch (error) {
+        if (logger) logger.warn('Error shutting down PubSub service:', error);
+      }
     }
 
     // Close database connections
-    await database.close();
-
-    // Close Redis connection
-    try {
-      await redisClient.disconnect();
-    } catch (error) {
-      logger.warn('Error disconnecting Redis:', error);
+    if (database) {
+      await database.close();
     }
 
-    logger.info('Graceful shutdown completed');
+    // Close Redis connection
+    if (redisClient) {
+      try {
+        await redisClient.disconnect();
+      } catch (error) {
+        if (logger) logger.warn('Error disconnecting Redis:', error);
+      }
+    }
+
+    if (logger) {
+      logger.info('Graceful shutdown completed');
+    } else {
+      console.log('Graceful shutdown completed');
+    }
     process.exit(0);
   } catch (error) {
-    logger.error('Error during graceful shutdown:', error);
+    if (logger) {
+      logger.error('Error during graceful shutdown:', error);
+    } else {
+      console.error('Error during graceful shutdown:', error);
+    }
     process.exit(1);
   }
 };
@@ -76,6 +99,30 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 // Start server
 const startServer = async () => {
   try {
+    // Initialize modules at runtime to avoid import-time initialization issues
+    logger = (await import('./config/logger')).default;
+    database = (await import('./config/database')).default;
+    redisClient = (await import('./config/redis')).default;
+
+    const pubSubModule = await import('./services/PubSubService');
+    pubSubService = pubSubModule.pubSubService;
+
+    const queueModule = await import('./services/QueueService');
+    queueService = queueModule.queueService;
+
+    apiTokenUsageService = (await import('./services/ApiTokenUsageService')).default;
+    app = (await import('./app')).default;
+
+    const dbTimezoneModule = await import('./utils/dbTimezoneCheck');
+    setDatabaseTimezoneToUTC = dbTimezoneModule.setDatabaseTimezoneToUTC;
+
+    const appInstanceModule = await import('./utils/AppInstance');
+    appInstance = appInstanceModule.appInstance;
+
+    SSENotificationService = (await import('./services/sseNotificationService')).default;
+
+    logger.info('Starting Gatrix Backend Server...');
+
     // Test database connection
     const dbConnected = await database.testConnection();
     if (!dbConnected) {
@@ -137,7 +184,7 @@ const startServer = async () => {
       logger.warn('Queue service initialization failed, continuing without queues:', error);
     }
 
-    // Initialize ApiTokenUsageService (QueueService 초기화 후에 실행)
+    // Initialize ApiTokenUsageService (QueueService 珥덇린???꾩뿉 ?ㅽ뻾)
     try {
       await apiTokenUsageService.initialize();
       logger.info('ApiTokenUsageService initialized successfully');
@@ -145,7 +192,7 @@ const startServer = async () => {
       logger.warn('ApiTokenUsageService initialization failed, continuing without token usage tracking:', error);
     }
 
-    // Start HTTP server (WebSocket은 채팅서버에서 직접 처리)
+    // Start HTTP server (WebSocket? 梨꾪똿?쒕쾭?먯꽌 吏곸젒 泥섎━)
     const server = createServer(app);
 
     server.listen(config.port, () => {
@@ -180,13 +227,17 @@ const startServer = async () => {
     });
 
   } catch (error) {
-    logger.error('Failed to start server:', error);
+    if (logger) {
+      logger.error('Failed to start server:', error);
+    } else {
+      console.error('Failed to start server:', error);
+    }
     process.exit(1);
   }
 };
 
 // Start the server
 startServer().catch((error) => {
-  logger.error('Failed to start server:', error);
+  console.error('Failed to start server:', error);
   process.exit(1);
 });

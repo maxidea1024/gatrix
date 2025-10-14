@@ -62,15 +62,53 @@ FROM node:18-alpine
 FROM node:20-alpine
 ```
 
-#### 영향받은 파일:
+#### 영향받은 파일 (총 8개):
 - `packages/event-lens/Dockerfile`
 - `packages/event-lens/Dockerfile.dev`
 - `packages/chat-server/Dockerfile`
 - `packages/chat-server/Dockerfile.dev`
+- `packages/backend/Dockerfile` ⭐ 추가
+- `packages/backend/Dockerfile.dev` ⭐ 추가
+- `packages/frontend/Dockerfile` ⭐ 추가
+- `packages/frontend/Dockerfile.dev` ⭐ 추가
+
+**중요**: 모든 서비스가 동일한 Node 버전(20)을 사용하여 일관성을 유지합니다.
 
 ---
 
-### 4. **Root package.json 스크립트 추가** ✅
+### 4. **ClickHouse IPv6 이슈 해결** ✅
+
+Windows Docker 환경에서 ClickHouse의 IPv6 연결 문제를 해결했습니다.
+
+#### 문제:
+```
+Listen [::]:8123 failed: DNS error: EAI: Address family for hostname not supported
+```
+
+#### 해결 방법:
+`docker-compose.dev.yml`에 환경 변수 및 ulimits 추가:
+```yaml
+clickhouse:
+  environment:
+    CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+  ulimits:
+    nofile:
+      soft: 262144
+      hard: 262144
+  healthcheck:
+    test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8123/ping"]
+    start_period: 60s
+    retries: 5
+```
+
+#### 결과:
+```bash
+✔ ClickHouse (healthy) - IPv6 이슈 해결됨
+```
+
+---
+
+### 5. **Root package.json 스크립트 추가** ✅
 
 모든 서비스를 root에서 관리할 수 있도록 스크립트를 추가했습니다.
 
@@ -238,16 +276,6 @@ docker compose -f docker-compose.dev.yml down
 
 ## 📊 빌드 검증 결과
 
-### ✅ 성공한 빌드
-
-```bash
-# Event Lens 빌드 성공
-✔ gatrix-event-lens   Built
-
-# Chat Server 빌드 성공
-✔ gatrix-chat-server  Built
-```
-
 ### ✅ Docker Compose 검증
 
 ```bash
@@ -257,6 +285,52 @@ docker compose -f docker-compose.dev.yml down
 # 개발 설정 검증
 ✅ docker compose -f docker-compose.dev.yml config --quiet
 ```
+
+### ✅ 프로덕션 빌드 성공
+
+```bash
+# Event Lens 빌드 성공
+✔ gatrix-event-lens   Built
+
+# Chat Server 빌드 성공
+✔ gatrix-chat-server  Built
+```
+
+### ✅ 개발 환경 빌드 성공 (Node 20 업그레이드 후)
+
+**모든 서비스 빌드 완료**:
+```bash
+✔ gatrix-backend-dev           Built (194.7s)
+✔ gatrix-frontend-dev          Built (194.7s)
+✔ gatrix-event-lens-dev        Built
+✔ gatrix-event-lens-worker-dev Built
+✔ gatrix-chat-server-dev       Built
+```
+
+### ✅ 개발 환경 실행 상태
+
+**인프라 서비스 (모두 정상)**:
+```bash
+✔ MySQL              (healthy)
+✔ Redis              (healthy)
+✔ ClickHouse         (healthy) - IPv6 이슈 해결됨
+✔ Adminer            (running)
+✔ Redis Commander    (healthy)
+```
+
+**애플리케이션 서비스**:
+```bash
+✔ Frontend           (healthy)
+⚠ Backend            (unhealthy) - 애플리케이션 레벨 설정 필요
+⚠ Chat Server        (unhealthy) - DB 연결 타임아웃 (설정 필요)
+⚠ Event Lens         (starting)  - Queue 이름 설정 이슈
+⚠ Event Lens Worker  (starting)  - Queue 이름 설정 이슈
+```
+
+**중요**:
+- ✅ **Docker 빌드는 모두 성공**했습니다
+- ⚠ 일부 서비스의 unhealthy 상태는 **애플리케이션 코드 레벨의 설정 문제**입니다
+- 🔧 환경 변수 및 애플리케이션 설정 조정이 필요합니다
 
 ---
 

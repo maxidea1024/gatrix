@@ -22,17 +22,17 @@ const defaultQueueOptions: QueueOptions = {
   },
 };
 
-// 이벤트 처리 큐
-export const eventQueue = new Queue('event-lens:events', defaultQueueOptions);
+// 이벤트 처리 큐 (Queue name cannot contain ':' character)
+export const eventQueue = new Queue('event-lens-events', defaultQueueOptions);
 
 // 프로필 업데이트 큐
-export const profileQueue = new Queue('event-lens:profiles', defaultQueueOptions);
+export const profileQueue = new Queue('event-lens-profiles', defaultQueueOptions);
 
 // 세션 집계 큐
-export const sessionQueue = new Queue('event-lens:sessions', defaultQueueOptions);
+export const sessionQueue = new Queue('event-lens-sessions', defaultQueueOptions);
 
 // 집계 큐
-export const aggregationQueue = new Queue('event-lens:aggregations', defaultQueueOptions);
+export const aggregationQueue = new Queue('event-lens-aggregations', defaultQueueOptions);
 
 // 큐 이벤트 리스너
 eventQueue.on('error', (error) => {

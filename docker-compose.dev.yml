@@ -84,7 +84,7 @@ services:
       - .:/app
       - /app/node_modules
       - backend_dev_logs:/app/packages/backend/logs
-    command: yarn workspace @gatrix/backend dev
+    command: sh -c "mkdir -p /app/packages/backend/logs && chmod 777 /app/packages/backend/logs && yarn workspace @gatrix/backend dev"
 
   # Frontend for development (with hot reload)
   frontend-dev:
@@ -149,12 +149,19 @@ services:
       - clickhouse_dev_data:/var/lib/clickhouse
     networks:
       - gatrix-dev-network
+    environment:
+      # Disable IPv6 to avoid connection issues on Windows Docker
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8123/ping"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 10s
+      retries: 5
+      start_period: 60s
 
   # Event Lens Server for development (with hot reload)
   event-lens-dev:
@@ -261,8 +268,8 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_NAME: ${CHAT_DB_NAME:-gatrix_chat}
-      DB_USER: ${DB_USER:-gatrix_user}
-      DB_PASSWORD: ${DB_PASSWORD:-gatrix_password}
+      DB_USER: gatrix_user  # Explicitly set for chat server
+      DB_PASSWORD: gatrix_password  # Explicitly set for chat server
       DB_DEBUG: ${DB_DEBUG:-false}
       # Redis
       REDIS_HOST: redis

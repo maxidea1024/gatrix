@@ -28,7 +28,7 @@ class DatabaseManager {
           password: config.database.password,
           database: config.database.name,
           charset: 'utf8mb4',
-          timezone: '+00:00', // MySQL2에서 올바른 UTC 타임존 형식
+          timezone: '+00:00', // MySQL2?먯꽌 ?щ컮瑜?UTC ??꾩〈 ?뺤떇
         },
         pool: {
           min: 2,
@@ -48,7 +48,7 @@ class DatabaseManager {
         seeds: {
           directory: './seeds',
         },
-        debug: config.database.debug, // .env의 DB_DEBUG 설정으로 제어
+        debug: config.database.debug, // .env??DB_DEBUG ?ㅼ젙?쇰줈 ?쒖뼱
         asyncStackTraces: config.isDevelopment,
       };
 
@@ -78,7 +78,7 @@ class DatabaseManager {
 
       // Use a timeout for the test query
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Connection test timeout')), 5000);
+        setTimeout(() => reject(new Error('Connection test timeout')), 10000); // Increased to 10s
       });
 
       const testPromise = this.knexInstance.raw('SELECT 1');
@@ -87,7 +87,7 @@ class DatabaseManager {
       return true;
     } catch (error) {
       logger.error('Database connection test failed:', error);
-      throw error; // 실패 시 예외를 던져서 서버 시작을 중단
+      throw error; // Throw exception to stop server startup on failure
     }
   }
 

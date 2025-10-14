@@ -21,11 +21,11 @@ RUN yarn install --frozen-lockfile
 # Copy source code
 COPY packages/backend ./packages/backend
 
-# Create logs directory
-RUN mkdir -p logs && chown node:node logs
+# Create logs directory in backend package
+RUN mkdir -p packages/backend/logs
 
-# Switch to non-root user
-USER node
+# Note: Running as root in development for volume mount permissions
+# In production, use non-root user
 
 # Expose ports
 EXPOSE 5000 9229
@@ -36,3 +36,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 # Default command (can be overridden)
 CMD ["npm", "run", "dev"]
+

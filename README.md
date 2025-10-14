@@ -206,9 +206,11 @@ gatrix/
 
 ### Prerequisites
 
-- Node.js 18+
-- MySQL 8.0+
-- Redis 6.0+
+- **Node.js 20+** (Required for latest dependencies)
+- **MySQL 8.0+**
+- **Redis 7.0+**
+- **ClickHouse 24+** (for Event Lens analytics)
+- **Yarn 1.22+** (Package manager)
 
 ### Installation
 
@@ -220,7 +222,7 @@ gatrix/
 3. Update the `.env` file with your configuration
 4. Install dependencies:
    ```bash
-   npm install
+   yarn install
    ```
 
 ### Database Setup
@@ -228,38 +230,56 @@ gatrix/
 1. Create a MySQL database
 2. Run migrations:
    ```bash
-   npm run migrate
+   yarn migrate
    ```
 3. Seed initial data:
    ```bash
-   npm run seed
+   yarn seed
    ```
 
 ### Development
 
-Start all services in development mode:
+#### Using Docker (Recommended)
+
+Start all services with Docker Compose:
 ```bash
-npm run dev
+# Development environment with hot reload
+yarn docker:dev
+
+# View logs
+yarn docker:dev:logs
+
+# Stop services
+yarn docker:dev:down
+```
+
+#### Local Development
+
+Start all services locally:
+```bash
+yarn dev
 ```
 
 Or start them separately:
 ```bash
-npm run dev:backend
-npm run dev:frontend
-npm run dev:chat
+yarn dev:backend
+yarn dev:frontend
+yarn dev:chat-server
+yarn dev:event-lens
+yarn dev:event-lens:worker
 ```
 
 ### Building for Production
 
 ```bash
-npm run build
+yarn build
 ```
 
 ### Queue Monitoring
 
 Access the Bull Board queue monitoring interface at:
 ```
-http://localhost:5001/admin/queues
+http://localhost:5000/admin/queues
 ```
 
 This provides real-time monitoring of:
@@ -267,6 +287,17 @@ This provides real-time monitoring of:
 - Active, waiting, completed, and failed jobs
 - Job execution history and logs
 - Queue performance metrics
+
+### Development Tools (Docker Dev Environment)
+
+When running with `yarn docker:dev`, additional tools are available:
+
+- **Adminer** (Database Management): http://localhost:8080
+- **Redis Commander** (Redis Management): http://localhost:8081
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:5000
+- **Chat Server**: http://localhost:3001
+- **Event Lens**: http://localhost:3002
 
 ## Key Features
 
@@ -397,51 +428,67 @@ The system creates a default admin account on first run:
 
 ### Development Scripts
 ```bash
-# Start both frontend and backend in development mode
-npm run dev
+# Start all services in development mode
+yarn dev
 
 # Start individual services
-npm run dev:backend
-npm run dev:frontend
+yarn dev:backend
+yarn dev:frontend
+yarn dev:chat-server
+yarn dev:event-lens
+yarn dev:event-lens:worker
 
 # Build for production
-npm run build
+yarn build
+
+# Build individual services
+yarn build:backend
+yarn build:frontend
+yarn build:chat-server
+yarn build:event-lens
 
 # Run tests
-npm run test
-npm run test:backend
-npm run test:frontend
-npm run test:e2e
+yarn test
+yarn test:backend
+yarn test:frontend
+yarn test:e2e
+
+# Linting
+yarn lint
+yarn lint:fix
+
+# Type checking
+yarn typecheck
 ```
 
 ### Database Management
 ```bash
 # Run database migrations
-npm run migrate
-npm run migrate:up
-npm run migrate:status
-npm run migrate:rollback
+yarn migrate
+yarn migrate:up
+yarn migrate:status
+yarn migrate:rollback
 
 # Database seeding
-npm run seed
-npm run seed:run
-npm run seed:clear
-npm run seed:reset
+yarn seed
+yarn seed:run
+yarn seed:clear
+yarn seed:reset
 
 # Complete setup (install + migrate + seed)
-npm run setup
+yarn setup
 
 # Reset database (clear + rollback + migrate + seed)
-npm run reset
+yarn reset
 
 # Reset database completely
-npm run db:reset
+yarn db:reset
 ```
 
 ### Translation Management
 ```bash
 # Check translation completeness
-npm run check-translations
+yarn check-translations
 
 # Various translation utility scripts
 node scripts/add-missing-keys.js
@@ -454,92 +501,124 @@ node scripts/rebuild-locales.js
 ### Docker Operations
 ```bash
 # Production Docker setup
-npm run docker:up
-npm run docker:down
-npm run docker:logs
-npm run docker:build
+yarn docker:up
+yarn docker:down
+yarn docker:logs
+yarn docker:build
 
-# Development Docker setup
-npm run docker:dev
-npm run docker:dev:down
-npm run docker:dev:logs
-npm run docker:dev:build
+# Development Docker setup (Recommended)
+yarn docker:dev
+yarn docker:dev:down
+yarn docker:dev:logs
+yarn docker:dev:build
 ```
 
 ### Deployment
 ```bash
 # Deploy to different environments
-npm run deploy              # Production
-npm run deploy:dev          # Development
-npm run deploy:staging      # Staging
+yarn deploy              # Production
+yarn deploy:dev          # Development
+yarn deploy:staging      # Staging
 ```
 
 ### Code Quality
 ```bash
 # Linting
-npm run lint
-npm run lint:fix
+yarn lint
+yarn lint:fix
 
 # Type checking
-npm run typecheck
+yarn typecheck
 
 # Clean build artifacts
-npm run clean
+yarn clean
 ```
 
 ## Docker Support
 
-The project includes comprehensive Docker support with separate configurations for development and production:
+The project includes comprehensive Docker support with separate configurations for development and production, using **Yarn Workspaces** for monorepo management.
 
-### Development Environment
+### Development Environment (Recommended)
+
 ```bash
 # Start development environment with hot reload
-npm run docker:dev
+yarn docker:dev
 
-# View logs
-npm run docker:dev:logs
+# View logs for all services
+yarn docker:dev:logs
+
+# View logs for specific service
+docker compose -f docker-compose.dev.yml logs -f backend-dev
+docker compose -f docker-compose.dev.yml logs -f event-lens-dev
 
 # Stop development environment
-npm run docker:dev:down
+yarn docker:dev:down
+
+# Rebuild specific service
+docker compose -f docker-compose.dev.yml build --no-cache backend-dev
 ```
 
 ### Production Environment
+
 ```bash
 # Start production environment
-npm run docker:up
+yarn docker:up
 
 # View logs
-npm run docker:logs
+yarn docker:logs
 
 # Stop production environment
-npm run docker:down
+yarn docker:down
+
+# Rebuild all services
+yarn docker:build
 ```
 
+### Docker Services
+
 The Docker setup includes:
-- MySQL database with persistent storage
-- Redis for caching and job queues
-- ClickHouse for analytics data storage
-- Backend API server
-- Frontend web server
-- Event Lens server and worker for analytics
-- Chat Server for real-time messaging
-- Nginx reverse proxy (production)
-- Volume mounts for development
+
+**Infrastructure Services:**
+- **MySQL 8.0**: Database with persistent storage
+- **Redis 7**: Caching, sessions, and job queues
+- **ClickHouse 24**: Analytics data storage (Event Lens)
+
+**Application Services:**
+- **Backend**: Express.js API server (Node 20)
+- **Frontend**: React web application (Node 20)
+- **Event Lens**: Analytics server and worker (Node 20)
+- **Chat Server**: Real-time messaging with Socket.IO (Node 20)
+
+**Development Tools (dev environment only):**
+- **Adminer**: Database management UI
+- **Redis Commander**: Redis management UI
+
+**Production Only:**
+- **Nginx**: Reverse proxy and load balancer
+
+### Key Features
+
+- ✅ **Hot Reload**: Development environment supports live code updates
+- ✅ **Persistent Storage**: Data volumes for MySQL, Redis, and ClickHouse
+- ✅ **Health Checks**: All services include health monitoring
+- ✅ **Yarn Workspaces**: Unified dependency management
+- ✅ **Node 20**: All services use Node.js 20 for latest features
 
 ### Service Ports
 
-| Service | Port | Description |
-|---------|------|-------------|
-| MySQL | 3306 | Database |
-| Redis | 6379 | Cache & Queue |
-| Backend | 5000 | API Server |
-| Frontend | 3000 (dev) / 80 (prod) | Web UI |
-| Chat Server | 3001 | WebSocket Server |
-| Event Lens | 3002 | Analytics API |
-| ClickHouse | 8123, 9000 | Analytics DB |
-| Adminer | 8080 | DB Management (dev) |
-| Redis Commander | 8081 | Redis Management (dev) |
-| Metrics | 9090 | Prometheus Metrics |
+| Service | Port | Description | Environment |
+|---------|------|-------------|-------------|
+| MySQL | 3306 | Database | Both |
+| Redis | 6379 | Cache & Queue | Both |
+| Backend | 5000 | API Server | Both |
+| Frontend | 3000 (dev) / 80 (prod) | Web UI | Both |
+| Chat Server | 3001 | WebSocket Server | Both |
+| Event Lens | 3002 | Analytics API | Both |
+| ClickHouse | 8123, 9000 | Analytics DB | Both |
+| Adminer | 8080 | DB Management | Dev only |
+| Redis Commander | 8081 | Redis Management | Dev only |
+| Metrics (Chat) | 9090 | Prometheus Metrics | Both |
+| Debug (Backend) | 9229 | Node.js Debugger | Dev only |
 
 ## Documentation
 
@@ -547,7 +626,7 @@ The Docker setup includes:
 
 Once the backend is running, you can access the Swagger API documentation at:
 ```
-http://localhost:5001/api-docs
+http://localhost:5000/api-docs
 ```
 
 The API includes endpoints for:
@@ -560,6 +639,7 @@ The API includes endpoints for:
 - Maintenance mode control
 - Tag management
 - Audit logging
+- Real-time chat integration
 
 ### Comprehensive Documentation
 
