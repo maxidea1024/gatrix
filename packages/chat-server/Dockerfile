@@ -1,41 +1,52 @@
-# Build stage
-FROM node:18-alpine AS builder
+# Base stage
+FROM node:20-alpine AS base
+RUN apk add --no-cache libc6-compat dumb-init
+WORKDIR /app
 
+# Dependencies stage
+FROM base AS deps
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
-COPY tsconfig.json ./
+COPY package.json yarn.lock* ./
+COPY packages/chat-server/package.json ./packages/chat-server/
 
 # Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+RUN yarn install --frozen-lockfile --production=false
 
-# Copy source code
-COPY src ./src
-
-# Build the application
-RUN npm run build
-
-# Production stage
-FROM node:18-alpine AS production
-
+# Builder stage
+FROM base AS builder
 WORKDIR /app
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# Copy dependencies
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy all source files
+COPY . .
+
+# Build chat-server
+RUN yarn workspace @gatrix/chat-server build
+
+# Production stage
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S chatserver -u 1001
 
 # Copy package files
-COPY package*.json ./
+COPY package.json yarn.lock* ./
+COPY packages/chat-server/package.json ./packages/chat-server/
 
-# Install only production dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install production dependencies only
+RUN yarn install --frozen-lockfile --production=true && \
+    yarn cache clean
 
 # Copy built application
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/packages/chat-server/dist ./packages/chat-server/dist
 
 # Create uploads directory
 RUN mkdir -p uploads && chown -R chatserver:nodejs uploads
@@ -48,8 +59,8 @@ EXPOSE 3001
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node dist/health-check.js
+  CMD node packages/chat-server/dist/health-check.js
 
 # Start the application
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "dist/index.js"]
+CMD ["node", "packages/chat-server/dist/index.js"]

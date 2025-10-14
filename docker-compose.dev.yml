@@ -81,10 +81,10 @@ services:
     networks:
       - gatrix-dev-network
     volumes:
-      - ./packages/backend:/app
+      - .:/app
       - /app/node_modules
-      - backend_dev_logs:/app/logs
-    command: npm run dev
+      - backend_dev_logs:/app/packages/backend/logs
+    command: yarn workspace @gatrix/backend dev
 
   # Frontend for development (with hot reload)
   frontend-dev:
@@ -105,9 +105,9 @@ services:
     networks:
       - gatrix-dev-network
     volumes:
-      - ./packages/frontend:/app
+      - .:/app
       - /app/node_modules
-    command: npm run dev
+    command: yarn workspace @gatrix/frontend dev
 
   # Adminer for database management
   adminer:
@@ -197,10 +197,10 @@ services:
     networks:
       - gatrix-dev-network
     volumes:
-      - ./packages/event-lens:/app
+      - .:/app
       - /app/node_modules
-      - event_lens_dev_logs:/app/logs
-    command: npm run dev
+      - event_lens_dev_logs:/app/packages/event-lens/logs
+    command: yarn workspace @gatrix/event-lens dev
 
   # Event Lens Worker for development (with hot reload)
   event-lens-worker-dev:
@@ -240,10 +240,10 @@ services:
     networks:
       - gatrix-dev-network
     volumes:
-      - ./packages/event-lens:/app
+      - .:/app
       - /app/node_modules
-      - event_lens_dev_logs:/app/logs
-    command: npm run dev:worker
+      - event_lens_dev_logs:/app/packages/event-lens/logs
+    command: yarn workspace @gatrix/event-lens dev:worker
 
   # Chat Server for development (with hot reload)
   chat-server-dev:
@@ -304,11 +304,11 @@ services:
     networks:
       - gatrix-dev-network
     volumes:
-      - ./packages/chat-server:/app
+      - .:/app
       - /app/node_modules
-      - chat_server_dev_uploads:/app/uploads
-      - chat_server_dev_logs:/app/logs
-    command: npm run dev
+      - chat_server_dev_uploads:/app/packages/chat-server/uploads
+      - chat_server_dev_logs:/app/packages/chat-server/logs
+    command: yarn workspace @gatrix/chat-server dev
 
 volumes:
   mysql_dev_data:
