@@ -68,12 +68,17 @@ cp .env.example .env
 
 ### Step 3: Docker Compose로 인프라 실행
 
+> **Note**: Docker Compose v2+ 사용 시 `docker compose` 명령어를 사용하세요 (하이픈 없음).
+
 ```bash
 # 루트 디렉토리로 이동
 cd ../..
 
-# ClickHouse 및 Event Lens 서비스 시작
-docker-compose up -d clickhouse event-lens event-lens-worker
+# ClickHouse 및 Event Lens 서비스 시작 (프로덕션)
+docker compose up -d clickhouse event-lens event-lens-worker
+
+# 또는 개발 환경
+docker compose -f docker-compose.dev.yml up -d clickhouse event-lens-dev event-lens-worker-dev
 ```
 
 ### Step 4: 데이터베이스 마이그레이션
@@ -253,20 +258,20 @@ ORDER BY date;
 
 ```bash
 # ClickHouse 상태 확인
-docker-compose ps clickhouse
+docker compose ps clickhouse
 
 # ClickHouse 로그 확인
-docker-compose logs clickhouse
+docker compose logs clickhouse
 
 # ClickHouse 재시작
-docker-compose restart clickhouse
+docker compose restart clickhouse
 ```
 
 ### 2. Worker가 이벤트를 처리하지 않음
 
 ```bash
 # Worker 로그 확인
-docker-compose logs event-lens-worker
+docker compose logs event-lens-worker
 
 # Redis 큐 확인
 docker exec -it gatrix-redis redis-cli

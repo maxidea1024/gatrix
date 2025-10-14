@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # MySQL Database
   mysql:
@@ -189,6 +187,73 @@ services:
     volumes:
       - event_lens_logs:/app/logs
 
+  # Chat Server
+  chat-server:
+    build:
+      context: .
+      dockerfile: packages/chat-server/Dockerfile
+    container_name: gatrix-chat-server
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3001
+      HOST: 0.0.0.0
+      # Database
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${CHAT_DB_NAME:-gatrix_chat}
+      DB_USER: ${DB_USER:-gatrix_user}
+      DB_PASSWORD: ${DB_PASSWORD:-gatrix_password}
+      DB_DEBUG: false
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_DB: 1
+      # JWT (must match backend)
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-jwt-key-change-this-in-production}
+      JWT_EXPIRES_IN: 24h
+      # CORS
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      # Clustering
+      CLUSTER_ENABLED: ${CHAT_CLUSTER_ENABLED:-true}
+      CLUSTER_WORKERS: ${CHAT_CLUSTER_WORKERS:-0}
+      STICKY_SESSION: ${CHAT_STICKY_SESSION:-true}
+      # Performance
+      BROADCAST_BATCH_SIZE: ${CHAT_BROADCAST_BATCH_SIZE:-1000}
+      USE_MESSAGE_PACK: ${CHAT_USE_MESSAGE_PACK:-true}
+      BROADCAST_COMPRESSION: ${CHAT_BROADCAST_COMPRESSION:-true}
+      WS_MAX_CONNECTIONS: ${CHAT_WS_MAX_CONNECTIONS:-10000}
+      # Monitoring
+      MONITORING_ENABLED: ${CHAT_MONITORING_ENABLED:-true}
+      METRICS_PORT: 9090
+      # Gatrix Integration
+      GATRIX_API_URL: ${GATRIX_API_URL:-http://backend:5000}
+      GATRIX_API_SECRET: ${GATRIX_API_SECRET:-shared-secret-between-servers}
+      # Logging
+      LOG_LEVEL: ${CHAT_LOG_LEVEL:-info}
+    ports:
+      - "${CHAT_PORT:-3001}:3001"
+      - "${CHAT_METRICS_PORT:-9090}:9090"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    networks:
+      - gatrix-network
+    volumes:
+      - chat_server_uploads:/app/uploads
+      - chat_server_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      timeout: 10s
+      retries: 5
+      interval: 30s
+      start_period: 30s
+
   # Frontend (Nginx)
   frontend:
     build:
@@ -227,6 +292,10 @@ volumes:
   backend_logs:
     driver: local
   event_lens_logs:
+    driver: local
+  chat_server_uploads:
+    driver: local
+  chat_server_logs:
     driver: local
 
 networks:

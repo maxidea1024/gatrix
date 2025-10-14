@@ -91,12 +91,17 @@ npm install
 
 ### 2. 개발 환경 실행
 
+> **Note**: Docker Compose v2+ 사용 시 `docker compose` 명령어를 사용하세요 (하이픈 없음).
+
 ```bash
-# 개발 서버 시작
+# 개발 서버 시작 (로컬)
 npm run dev
 
-# 또는 Docker Compose로 전체 스택 실행
-docker-compose up -d
+# 또는 Docker Compose로 전체 스택 실행 (프로덕션)
+docker compose up -d
+
+# 개발 환경 (hot reload)
+docker compose -f docker-compose.dev.yml up -d chat-server-dev
 ```
 
 ### 3. 프로덕션 배포
@@ -249,10 +254,16 @@ docker run -d \
 
 ```bash
 # 전체 스택 배포
-docker-compose up -d
+docker compose up -d
 
 # 스케일링
-docker-compose up -d --scale chat-server=5
+docker compose up -d --scale chat-server=5
+
+# 로그 확인
+docker compose logs -f chat-server
+
+# 서비스 재시작
+docker compose restart chat-server
 ```
 
 ### 프로덕션 배포

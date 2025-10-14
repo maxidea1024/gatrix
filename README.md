@@ -518,10 +518,28 @@ npm run docker:down
 The Docker setup includes:
 - MySQL database with persistent storage
 - Redis for caching and job queues
+- ClickHouse for analytics data storage
 - Backend API server
 - Frontend web server
+- Event Lens server and worker for analytics
+- Chat Server for real-time messaging
 - Nginx reverse proxy (production)
 - Volume mounts for development
+
+### Service Ports
+
+| Service | Port | Description |
+|---------|------|-------------|
+| MySQL | 3306 | Database |
+| Redis | 6379 | Cache & Queue |
+| Backend | 5000 | API Server |
+| Frontend | 3000 (dev) / 80 (prod) | Web UI |
+| Chat Server | 3001 | WebSocket Server |
+| Event Lens | 3002 | Analytics API |
+| ClickHouse | 8123, 9000 | Analytics DB |
+| Adminer | 8080 | DB Management (dev) |
+| Redis Commander | 8081 | Redis Management (dev) |
+| Metrics | 9090 | Prometheus Metrics |
 
 ## Documentation
 
