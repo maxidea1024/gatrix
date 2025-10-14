@@ -14,9 +14,78 @@ export interface MigrationFile {
 
 export class Migration {
   private migrationsPath: string;
+  private lockName: string = 'gatrix_migration_lock';
+  private lockTimeout: number = 300; // 5 minutes in seconds
 
   constructor() {
     this.migrationsPath = path.join(__dirname, 'migrations');
+  }
+
+  /**
+   * Acquire a distributed lock using MySQL GET_LOCK()
+   * This prevents multiple servers from running migrations simultaneously
+   */
+  private async acquireLock(connection: mysql.PoolConnection): Promise<boolean> {
+    try {
+      const [rows] = await connection.query(
+        'SELECT GET_LOCK(?, ?) as lockResult',
+        [this.lockName, this.lockTimeout]
+      ) as any;
+
+      const lockResult = rows[0]?.lockResult;
+
+      if (lockResult === 1) {
+        logger.info('Migration lock acquired successfully', {
+          lockName: this.lockName,
+          timeout: this.lockTimeout
+        });
+        return true;
+      } else if (lockResult === 0) {
+        logger.warn('Failed to acquire migration lock - another process is running migrations', {
+          lockName: this.lockName,
+          timeout: this.lockTimeout
+        });
+        return false;
+      } else {
+        logger.error('Error acquiring migration lock - NULL returned', {
+          lockName: this.lockName
+        });
+        return false;
+      }
+    } catch (error) {
+      logger.error('Exception while acquiring migration lock:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Release the distributed lock using MySQL RELEASE_LOCK()
+   */
+  private async releaseLock(connection: mysql.PoolConnection): Promise<void> {
+    try {
+      const [rows] = await connection.query(
+        'SELECT RELEASE_LOCK(?) as releaseResult',
+        [this.lockName]
+      ) as any;
+
+      const releaseResult = rows[0]?.releaseResult;
+
+      if (releaseResult === 1) {
+        logger.info('Migration lock released successfully', {
+          lockName: this.lockName
+        });
+      } else if (releaseResult === 0) {
+        logger.warn('Lock was not established by this thread', {
+          lockName: this.lockName
+        });
+      } else {
+        logger.warn('Lock does not exist', {
+          lockName: this.lockName
+        });
+      }
+    } catch (error) {
+      logger.error('Exception while releasing migration lock:', error);
+    }
   }
 
   async createMigrationsTable(): Promise<void> {
@@ -77,31 +146,51 @@ export class Migration {
   }
 
   async runMigrations(): Promise<void> {
-    try {
-      await this.createMigrationsTable();
-      
-      const executedMigrations = await this.getExecutedMigrations();
-      const migrationFiles = await this.getMigrationFiles();
-      
-      const pendingMigrations = migrationFiles.filter(
-        migration => !executedMigrations.includes(migration.id)
-      );
+    const lockConnection = await database.getPool().getConnection();
 
-      if (pendingMigrations.length === 0) {
-        logger.info('No pending migrations');
+    try {
+      // Acquire distributed lock to prevent concurrent migrations
+      const lockAcquired = await this.acquireLock(lockConnection);
+
+      if (!lockAcquired) {
+        logger.info('Skipping migrations - another process is already running them');
         return;
       }
 
-      logger.info(`Running ${pendingMigrations.length} pending migrations`);
+      try {
+        await this.createMigrationsTable();
 
-      for (const migration of pendingMigrations) {
-        await this.runMigration(migration);
+        const executedMigrations = await this.getExecutedMigrations();
+        const migrationFiles = await this.getMigrationFiles();
+
+        const pendingMigrations = migrationFiles.filter(
+          migration => !executedMigrations.includes(migration.id)
+        );
+
+        if (pendingMigrations.length === 0) {
+          logger.info('No pending migrations');
+          return;
+        }
+
+        logger.info(`Found ${pendingMigrations.length} pending migrations:`, {
+          migrations: pendingMigrations.map(m => m.id)
+        });
+        logger.info(`Running ${pendingMigrations.length} pending migrations`);
+
+        for (const migration of pendingMigrations) {
+          await this.runMigration(migration);
+        }
+
+        logger.info('All migrations completed successfully');
+      } finally {
+        // Always release the lock, even if migrations fail
+        await this.releaseLock(lockConnection);
       }
-
-      logger.info('All migrations completed successfully');
     } catch (error) {
       logger.error('Error running migrations:', error);
       throw error;
+    } finally {
+      lockConnection.release();
     }
   }
 

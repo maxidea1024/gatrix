@@ -60,6 +60,11 @@ services:
       DB_USER: ${DB_USER:-gatrix_user}
       DB_PASSWORD: ${DB_PASSWORD:-gatrix_password}
       REDIS_HOST: redis
+      # OAuth Configuration
+      GITHUB_CLIENT_ID: Ov23liINHymsWsuhfbW4
+      GITHUB_CLIENT_SECRET: 81c9780248941071a4642033b1ae174bd5a14982
+      GOOGLE_CLIENT_ID: your-google-client-id
+      GOOGLE_CLIENT_SECRET: your-google-client-secret
       REDIS_PORT: 6379
       JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret}
@@ -95,6 +100,8 @@ services:
     container_name: gatrix-frontend-dev
     restart: unless-stopped
     environment:
+      DOCKER_ENV: "true"  # Indicate running in Docker environment (for Node.js scripts)
+      VITE_DOCKER_ENV: "true"  # Indicate running in Docker environment (for Vite config)
       VITE_API_URL: ${VITE_API_URL:-http://localhost:5000/api/v1}
       VITE_APP_NAME: ${VITE_APP_NAME:-Gatrix}
       VITE_DEFAULT_LANGUAGE: ${VITE_DEFAULT_LANGUAGE:-ko}

@@ -4,10 +4,12 @@
   "description": "Gatrix Event Lens - Analytics and Event Tracking Service",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "nodemon src/index.ts",
+    "dev": "yarn migrate:safe && nodemon src/index.ts",
+    "dev:no-migrate": "nodemon src/index.ts",
     "dev:worker": "nodemon src/worker.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "yarn migrate:safe && node dist/index.js",
+    "start:no-migrate": "node dist/index.js",
     "start:worker": "node dist/worker.js",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -16,6 +18,7 @@
     "typecheck": "tsc --noEmit",
     "migrate:clickhouse": "node scripts/migrate-clickhouse.js",
     "migrate:mysql": "node scripts/migrate-mysql.js",
+    "migrate:safe": "(node scripts/migrate-clickhouse.js && node scripts/migrate-mysql.js) || echo 'Migration failed but continuing...'",
     "clean": "rm -rf dist"
   },
   "keywords": [
