@@ -16,16 +16,10 @@ import {
   Divider,
   Badge,
   alpha,
-  TextField,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
   Stack,
   Collapse,
   useTheme,
@@ -47,7 +41,6 @@ import {
   Event as EventIcon,
   FilterList as FilterListIcon,
   Close as CloseIcon,
-  Search as SearchIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   FiberManualRecord as DotIcon,
@@ -58,18 +51,74 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { AuditLogService } from '../../services/auditLogService';
 import { AuditLog } from '../../types';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/ko';
 import 'dayjs/locale/zh-cn';
 import { useI18n } from '../../contexts/I18nContext';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
-import { InputAdornment } from '@mui/material';
+import { getStoredTimezone, formatDateTimeDetailed } from '../../utils/dateFormat';
 
 dayjs.extend(utc);
+dayjs.extend(timezone);
 dayjs.extend(relativeTime);
+
+// Customize relativeTime thresholds and strings
+dayjs.updateLocale('ko', {
+  relativeTime: {
+    future: '%s 후',
+    past: '%s 전',
+    s: '방금',
+    m: '1분',
+    mm: '%d분',
+    h: '1시간',
+    hh: '%d시간',
+    d: '1일',
+    dd: '%d일',
+    M: '1개월',
+    MM: '%d개월',
+    y: '1년',
+    yy: '%d년',
+  },
+});
+
+dayjs.updateLocale('en', {
+  relativeTime: {
+    future: 'in %s',
+    past: '%s ago',
+    s: 'just now',
+    m: '1 min',
+    mm: '%d mins',
+    h: '1 hour',
+    hh: '%d hours',
+    d: '1 day',
+    dd: '%d days',
+    M: '1 month',
+    MM: '%d months',
+    y: '1 year',
+    yy: '%d years',
+  },
+});
+
+dayjs.updateLocale('zh-cn', {
+  relativeTime: {
+    future: '%s后',
+    past: '%s前',
+    s: '刚刚',
+    m: '1分钟',
+    mm: '%d分钟',
+    h: '1小时',
+    hh: '%d小时',
+    d: '1天',
+    dd: '%d天',
+    M: '1个月',
+    MM: '%d个月',
+    y: '1年',
+    yy: '%d年',
+  },
+});
 
 interface EventStats {
   action: string;
@@ -106,8 +155,9 @@ const RealtimeEventsPage: React.FC = () => {
   const [newEventIds, setNewEventIds] = useState<Set<number>>(new Set());
   const previousEventIdsRef = useRef<Set<number>>(new Set());
 
-  // Filter states
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  // Track the latest event timestamp for incremental updates
+  const latestEventTimestampRef = useRef<Date | null>(null);
+  const isInitialLoadRef = useRef<boolean>(true);
 
   // 동적 필터 상태
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -119,9 +169,8 @@ const RealtimeEventsPage: React.FC = () => {
   const resourceTypeOperator = activeFilters.find(f => f.key === 'resource_type')?.operator;
   const userFilter = activeFilters.find(f => f.key === 'user')?.value as string || '';
 
-  // Detail modal
+  // Detail panel
   const [selectedEvent, setSelectedEvent] = useState<AuditLog | null>(null);
-  const [detailModalOpen, setDetailModalOpen] = useState(false);
 
   // Stats
   const [uniqueUsers, setUniqueUsers] = useState(0);
@@ -134,6 +183,12 @@ const RealtimeEventsPage: React.FC = () => {
   const [timelineGroups, setTimelineGroups] = useState<TimelineGroup[]>([]);
   const [changedGroupKeys, setChangedGroupKeys] = useState<Set<string>>(new Set());
   const previousGroupCountsRef = useRef<Map<string, number>>(new Map());
+
+  // New events notification
+  const [hasUnseenEvents, setHasUnseenEvents] = useState(false);
+  const [unseenEventCount, setUnseenEventCount] = useState(0);
+  const [isScrolledDown, setIsScrolledDown] = useState(false);
+  const timelineContainerRef = useRef<HTMLDivElement>(null);
 
   // Set dayjs locale
   useEffect(() => {
@@ -153,21 +208,31 @@ const RealtimeEventsPage: React.FC = () => {
   // Load events
   const loadEvents = useCallback(async () => {
     try {
-      // Get events from last 30 minutes
-      // Use server time instead of client time to avoid timezone issues
       const now = new Date();
-      const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000);
+      let startDate: Date;
+
+      // For initial load or when filters change, get last 30 minutes
+      // For incremental updates, get only new events since last fetch
+      if (isInitialLoadRef.current || !latestEventTimestampRef.current) {
+        startDate = new Date(now.getTime() - 30 * 60 * 1000); // Last 30 minutes
+        console.log('[RealtimeEvents] Initial load - fetching last 30 minutes');
+      } else {
+        // Add 1ms to avoid getting the same event again
+        startDate = new Date(latestEventTimestampRef.current.getTime() + 1);
+        console.log('[RealtimeEvents] Incremental update - fetching since:', startDate.toISOString());
+      }
 
       console.log('[RealtimeEvents] Loading events:', {
-        start_date: thirtyMinutesAgo.toISOString(),
+        start_date: startDate.toISOString(),
         end_date: now.toISOString(),
         eventTypeFilter,
         userFilter,
+        isInitialLoad: isInitialLoadRef.current,
         clientTime: now.toString()
       });
 
       const filters: any = {
-        start_date: thirtyMinutesAgo.toISOString(),
+        start_date: startDate.toISOString(),
         end_date: now.toISOString(),
       };
 
@@ -189,107 +254,86 @@ const RealtimeEventsPage: React.FC = () => {
 
       console.log('[RealtimeEvents] Loaded events:', {
         count: result?.logs?.length || 0,
-        total: result?.total || 0
+        total: result?.total || 0,
+        isIncremental: !isInitialLoadRef.current
       });
 
       if (result && Array.isArray(result.logs)) {
-        let filteredEvents = result.logs;
+        let newEvents = result.logs;
 
-        // Apply search filter
-        if (searchQuery) {
-          const query = searchQuery.toLowerCase();
-          filteredEvents = filteredEvents.filter(log =>
-            log.action.toLowerCase().includes(query) ||
-            log.user?.email?.toLowerCase().includes(query) ||
-            log.user?.name?.toLowerCase().includes(query) ||
-            log.entityType?.toLowerCase().includes(query)
-          );
+        // Update latest timestamp
+        if (newEvents.length > 0) {
+          const latestEvent = newEvents.reduce((latest, event) => {
+            const eventDate = new Date(event.createdAt);
+            return !latest || eventDate > latest ? eventDate : latest;
+          }, latestEventTimestampRef.current);
+
+          latestEventTimestampRef.current = latestEvent;
         }
 
-        // Detect new events
-        const currentEventIds = new Set(filteredEvents.map(e => e.id));
-        const newIds = new Set<number>();
+        // Use functional update to get the current state
+        setEvents(prevEvents => {
+          let allEvents: AuditLog[];
 
-        currentEventIds.forEach(id => {
-          if (!previousEventIdsRef.current.has(id)) {
-            newIds.add(id);
+          if (isInitialLoadRef.current) {
+            // Initial load: replace all events
+            allEvents = newEvents;
+            isInitialLoadRef.current = false;
+          } else {
+            // Incremental update: merge new events with existing ones
+            // Remove duplicates and keep only events from last 30 minutes
+            const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+            const existingEventsMap = new Map(prevEvents.map(e => [e.id, e]));
+
+            console.log('[RealtimeEvents] Merging events:', {
+              existingCount: prevEvents.length,
+              newCount: newEvents.length
+            });
+
+            // Add new events to the map
+            newEvents.forEach(event => {
+              existingEventsMap.set(event.id, event);
+            });
+
+            // Convert back to array and filter by time window
+            allEvents = Array.from(existingEventsMap.values())
+              .filter(event => new Date(event.createdAt) >= thirtyMinutesAgo)
+              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+            console.log('[RealtimeEvents] After merge:', {
+              totalCount: allEvents.length,
+              removedOld: existingEventsMap.size - allEvents.length
+            });
           }
-        });
 
-        if (newIds.size > 0) {
-          setNewEventIds(newIds);
-          // Remove flash effect after 2 seconds
-          setTimeout(() => {
-            setNewEventIds(new Set());
-          }, 2000);
-        }
+          // Detect new events for flash effect
+          const currentEventIds = new Set(allEvents.map(e => e.id));
+          const newIds = new Set<number>();
 
-        previousEventIdsRef.current = currentEventIds;
-        setEvents(filteredEvents);
+          currentEventIds.forEach(id => {
+            if (!previousEventIdsRef.current.has(id)) {
+              newIds.add(id);
+            }
+          });
 
-        // Group events by minute for timeline view
-        const groups: Record<string, { events: AuditLog[], timeLabel: string }> = {};
-        filteredEvents.forEach((log) => {
-          const minuteKey = dayjs(log.createdAt).format('HH:mm');
-          const timeLabel = dayjs(log.createdAt).format('h:mm A'); // e.g., "10:08 PM"
-          if (!groups[minuteKey]) {
-            groups[minuteKey] = { events: [], timeLabel };
+          if (newIds.size > 0) {
+            setNewEventIds(newIds);
+            // Remove flash effect after 2 seconds
+            setTimeout(() => {
+              setNewEventIds(new Set());
+            }, 2000);
+
+            // Check if user is scrolled down
+            if (isScrolledDown) {
+              setHasUnseenEvents(true);
+              setUnseenEventCount(prev => prev + newIds.size);
+            }
           }
-          groups[minuteKey].events.push(log);
+
+          previousEventIdsRef.current = currentEventIds;
+
+          return allEvents;
         });
-
-        const timelineData: TimelineGroup[] = Object.entries(groups)
-          .map(([timestamp, { events, timeLabel }]) => ({
-            timestamp,
-            timeLabel,
-            events,
-            count: events.length,
-          }))
-          .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-
-        // Detect changed group counts for rumble effect
-        const changedKeys = new Set<string>();
-        const newGroupCounts = new Map<string, number>();
-
-        timelineData.forEach(group => {
-          newGroupCounts.set(group.timestamp, group.count);
-          const prevCount = previousGroupCountsRef.current.get(group.timestamp);
-          if (prevCount !== undefined && prevCount !== group.count) {
-            changedKeys.add(group.timestamp);
-          }
-        });
-
-        if (changedKeys.size > 0) {
-          setChangedGroupKeys(changedKeys);
-          // Remove rumble effect after 600ms
-          setTimeout(() => {
-            setChangedGroupKeys(new Set());
-          }, 600);
-        }
-
-        previousGroupCountsRef.current = newGroupCounts;
-        setTimelineGroups(timelineData);
-
-        // Calculate top events
-        const eventCounts: Record<string, number> = {};
-        filteredEvents.forEach((log) => {
-          eventCounts[log.action] = (eventCounts[log.action] || 0) + 1;
-        });
-
-        const stats = Object.entries(eventCounts)
-          .map(([action, count]) => ({ action, count }))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 5);
-
-        setTopEvents(stats);
-
-        // Calculate unique users
-        const users = new Set(filteredEvents.map(log => log.userId).filter(Boolean));
-        setUniqueUsers(users.size);
-
-        // Calculate event types
-        const types = new Set(filteredEvents.map(log => log.action));
-        setEventTypes(types.size);
       }
     } catch (error: any) {
       console.error('[RealtimeEvents] Failed to load events:', error);
@@ -298,12 +342,126 @@ const RealtimeEventsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [eventTypeFilter, eventTypeOperator, resourceTypeFilter, resourceTypeOperator, userFilter, searchQuery]);
+  }, [eventTypeFilter, eventTypeOperator, resourceTypeFilter, resourceTypeOperator, userFilter]);
+
+  // Update timeline groups and stats when events change
+  useEffect(() => {
+    const userTimezone = getStoredTimezone();
+
+    // Group events by minute for timeline view
+    const groups: Record<string, { events: AuditLog[], timeLabel: string }> = {};
+    events.forEach((log) => {
+      const localTime = dayjs.utc(log.createdAt).tz(userTimezone);
+      const minuteKey = localTime.format('HH:mm');
+      const timeLabel = localTime.format('h:mm A'); // e.g., "10:08 PM"
+      if (!groups[minuteKey]) {
+        groups[minuteKey] = { events: [], timeLabel };
+      }
+      groups[minuteKey].events.push(log);
+    });
+
+    const timelineData: TimelineGroup[] = Object.entries(groups)
+      .map(([timestamp, { events, timeLabel }]) => ({
+        timestamp,
+        timeLabel,
+        events,
+        count: events.length,
+      }))
+      .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+
+    // Detect changed group counts for rumble effect
+    const changedKeys = new Set<string>();
+    const newGroupCounts = new Map<string, number>();
+
+    timelineData.forEach(group => {
+      newGroupCounts.set(group.timestamp, group.count);
+      const prevCount = previousGroupCountsRef.current.get(group.timestamp);
+      if (prevCount !== undefined && prevCount !== group.count) {
+        changedKeys.add(group.timestamp);
+      }
+    });
+
+    if (changedKeys.size > 0) {
+      setChangedGroupKeys(changedKeys);
+      // Remove rumble effect after 600ms
+      setTimeout(() => {
+        setChangedGroupKeys(new Set());
+      }, 600);
+    }
+
+    previousGroupCountsRef.current = newGroupCounts;
+    setTimelineGroups(timelineData);
+
+    // Calculate top events
+    const eventCounts: Record<string, number> = {};
+    events.forEach((log) => {
+      eventCounts[log.action] = (eventCounts[log.action] || 0) + 1;
+    });
+
+    const stats = Object.entries(eventCounts)
+      .map(([action, count]) => ({ action, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    setTopEvents(stats);
+
+    // Calculate unique users
+    const users = new Set(events.map(log => log.userId).filter(Boolean));
+    setUniqueUsers(users.size);
+
+    // Calculate event types
+    const types = new Set(events.map(log => log.action));
+    setEventTypes(types.size);
+  }, [events]);
+
+  // Reset to initial load when filters change
+  useEffect(() => {
+    isInitialLoadRef.current = true;
+    latestEventTimestampRef.current = null;
+    previousEventIdsRef.current = new Set();
+  }, [eventTypeFilter, resourceTypeFilter, userFilter]);
 
   // Initial load
   useEffect(() => {
     loadEvents();
   }, [loadEvents]);
+
+  // Scroll detection
+  useEffect(() => {
+    const container = timelineContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const scrollTop = container.scrollTop;
+      const scrollThreshold = 100; // Consider scrolled down if more than 100px from top
+
+      const wasScrolledDown = isScrolledDown;
+      const nowScrolledDown = scrollTop > scrollThreshold;
+
+      setIsScrolledDown(nowScrolledDown);
+
+      // If user scrolled back to top, clear unseen events
+      if (wasScrolledDown && !nowScrolledDown) {
+        setHasUnseenEvents(false);
+        setUnseenEventCount(0);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [isScrolledDown]);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    if (timelineContainerRef.current) {
+      timelineContainerRef.current.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+      setHasUnseenEvents(false);
+      setUnseenEventCount(0);
+    }
+  };
 
   // Save autoRefresh setting to localStorage
   useEffect(() => {
@@ -320,8 +478,8 @@ const RealtimeEventsPage: React.FC = () => {
       progressIntervalRef.current = setInterval(() => {
         setRefreshProgress((prev) => {
           const next = prev + 1;
-          if (next > 100) {
-            // Reset to 0 when exceeding 100%
+          // When reaching 100%, immediately reset to 0 to restart the cycle
+          if (next >= 100) {
             return 0;
           }
           return next;
@@ -330,8 +488,14 @@ const RealtimeEventsPage: React.FC = () => {
 
       // Refresh data every 5 seconds
       intervalRef.current = setInterval(() => {
-        loadEvents();
-        setRefreshProgress(0); // Reset progress when loading
+        // Fill to 100% before refreshing for visual feedback
+        setRefreshProgress(100);
+
+        // Wait a brief moment to show the filled circle, then load and reset
+        setTimeout(() => {
+          loadEvents();
+          setRefreshProgress(0);
+        }, 100);
       }, 5000);
     } else {
       setRefreshProgress(0);
@@ -406,6 +570,14 @@ const RealtimeEventsPage: React.FC = () => {
     },
   ];
 
+  // Manual refresh handler - reset to initial load
+  const handleManualRefresh = () => {
+    isInitialLoadRef.current = true;
+    latestEventTimestampRef.current = null;
+    previousEventIdsRef.current = new Set();
+    loadEvents();
+  };
+
   // 동적 필터 핸들러
   const handleFilterAdd = (filter: ActiveFilter) => {
     setActiveFilters([...activeFilters, filter]);
@@ -430,7 +602,6 @@ const RealtimeEventsPage: React.FC = () => {
   // Handle event click
   const handleEventClick = (event: AuditLog) => {
     setSelectedEvent(event);
-    setDetailModalOpen(true);
   };
 
   return (
@@ -506,6 +677,8 @@ const RealtimeEventsPage: React.FC = () => {
                         color: 'success.main',
                         '& .MuiCircularProgress-circle': {
                           strokeLinecap: 'round',
+                          // Disable transition to prevent reverse animation when resetting to 0
+                          transition: 'none',
                         },
                       }}
                     />
@@ -538,7 +711,7 @@ const RealtimeEventsPage: React.FC = () => {
 
 
             <Tooltip title={t('common.refresh')}>
-              <IconButton onClick={loadEvents} size="small">
+              <IconButton onClick={handleManualRefresh} size="small">
                 <RefreshIcon />
               </IconButton>
             </Tooltip>
@@ -546,64 +719,16 @@ const RealtimeEventsPage: React.FC = () => {
         </Box>
 
         {/* Filters */}
-        <Box sx={{ mt: 2, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-          {/* Search */}
-          <TextField
-            placeholder={t('common.search')}
-            size="small"
-            sx={{
-              minWidth: 200,
-              flexGrow: 1,
-              maxWidth: 320,
-              '& .MuiOutlinedInput-root': {
-                height: '40px',
-                borderRadius: '20px',
-                bgcolor: 'background.paper',
-                transition: 'all 0.2s ease-in-out',
-                '& fieldset': {
-                  borderColor: 'divider',
-                },
-                '&:hover': {
-                  bgcolor: 'action.hover',
-                  '& fieldset': {
-                    borderColor: 'primary.light',
-                  }
-                },
-                '&.Mui-focused': {
-                  bgcolor: 'background.paper',
-                  boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
-                  '& fieldset': {
-                    borderColor: 'primary.main',
-                    borderWidth: '1px',
-                  }
-                }
-              },
-              '& .MuiInputBase-input': {
-                fontSize: '0.875rem',
-              }
-            }}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
-                </InputAdornment>
-              ),
-            }}
-          />
-
+        <Box sx={{ mt: 2 }}>
           {/* Dynamic Filter Bar */}
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
-            <DynamicFilterBar
-              availableFilters={availableFilterDefinitions}
-              activeFilters={activeFilters}
-              onFilterAdd={handleFilterAdd}
-              onFilterRemove={handleFilterRemove}
-              onFilterChange={handleDynamicFilterChange}
-              onOperatorChange={handleOperatorChange}
-            />
-          </Box>
+          <DynamicFilterBar
+            availableFilters={availableFilterDefinitions}
+            activeFilters={activeFilters}
+            onFilterAdd={handleFilterAdd}
+            onFilterRemove={handleFilterRemove}
+            onFilterChange={handleDynamicFilterChange}
+            onOperatorChange={handleOperatorChange}
+          />
         </Box>
       </Paper>
 
@@ -624,8 +749,56 @@ const RealtimeEventsPage: React.FC = () => {
             flexDirection: 'column',
             overflow: 'hidden',
             bgcolor: 'background.paper',
+            position: 'relative',
           }}
         >
+          {/* New Events Notification Badge */}
+          {hasUnseenEvents && (
+            <Box
+              onClick={scrollToTop}
+              sx={{
+                position: 'absolute',
+                top: 80,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                zIndex: 10,
+                bgcolor: 'primary.main',
+                color: 'primary.contrastText',
+                px: 2,
+                py: 1,
+                borderRadius: 3,
+                boxShadow: 3,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                animation: 'slideDown 0.3s ease-out',
+                '@keyframes slideDown': {
+                  from: { opacity: 0, transform: 'translateX(-50%) translateY(-10px)' },
+                  to: { opacity: 1, transform: 'translateX(-50%) translateY(0)' }
+                },
+                '&:hover': {
+                  bgcolor: 'primary.dark',
+                  boxShadow: 4,
+                },
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <DotIcon sx={{ fontSize: 12, animation: 'blink 1s ease-in-out infinite' }} />
+              <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                {unseenEventCount} {t('realtimeEvents.newEvents')}
+              </Typography>
+              <style>
+                {`
+                  @keyframes blink {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.3; }
+                  }
+                `}
+              </style>
+            </Box>
+          )}
+
           <Box sx={{
             p: 2,
             borderBottom: 1,
@@ -643,9 +816,11 @@ const RealtimeEventsPage: React.FC = () => {
             </Typography>
           </Box>
 
-          <Box sx={{
-            flex: 1,
-            overflowY: 'auto',
+          <Box
+            ref={timelineContainerRef}
+            sx={{
+              flex: 1,
+              overflowY: 'auto',
             // Chat-style scrollbar
             '&::-webkit-scrollbar': {
               width: '8px',
@@ -989,7 +1164,7 @@ const RealtimeEventsPage: React.FC = () => {
                         {/* Time */}
                         <Box sx={{ flex: '0 0 80px', display: 'flex', alignItems: 'center' }}>
                           <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500, fontSize: '0.7rem' }}>
-                            {dayjs(event.createdAt).format('h:mm:ss A')}
+                            {dayjs.utc(event.createdAt).tz(getStoredTimezone()).format('h:mm:ss A')}
                           </Typography>
                         </Box>
 
@@ -1053,12 +1228,12 @@ const RealtimeEventsPage: React.FC = () => {
           </Box>
         </Paper>
 
-        {/* Right: Stats & Top Events */}
+        {/* Right: Stats & Top Events OR Event Detail */}
         <Paper
           elevation={1}
           sx={{
             flex: '0 0 360px',
-            display: 'flex',
+            display: selectedEvent ? 'none' : 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
             bgcolor: 'background.paper',
@@ -1207,36 +1382,96 @@ const RealtimeEventsPage: React.FC = () => {
             </Box>
           </Box>
         </Paper>
-      </Box>
 
-      {/* Event Detail Modal */}
-      <Dialog
-        open={detailModalOpen}
-        onClose={() => setDetailModalOpen(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Avatar
+        {/* Right: Event Detail Panel */}
+        <Paper
+          elevation={1}
+          sx={{
+            flex: '0 0 360px',
+            display: selectedEvent ? 'flex' : 'none',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            bgcolor: 'background.paper',
+            position: 'relative',
+            animation: selectedEvent ? 'slideInRight 0.3s ease-out' : 'none',
+            '@keyframes slideInRight': {
+              from: {
+                opacity: 0,
+                transform: 'translateX(20px)',
+              },
+              to: {
+                opacity: 1,
+                transform: 'translateX(0)',
+              },
+            },
+          }}
+        >
+          {/* Header */}
+          <Box sx={{
+            p: 2,
+            borderBottom: 1,
+            borderColor: 'divider',
+            height: '72px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Avatar
+                sx={{
+                  width: 32,
+                  height: 32,
+                  bgcolor: selectedEvent ? getEventColor(selectedEvent.action) : 'grey',
+                }}
+              >
+                {selectedEvent ? getEventIcon(selectedEvent.action) : '?'}
+              </Avatar>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.75rem' }}>
+                {t('realtimeEvents.eventDetails')}
+              </Typography>
+            </Box>
+            <IconButton
+              size="small"
+              onClick={() => setSelectedEvent(null)}
               sx={{
-                width: 32,
-                height: 32,
-                bgcolor: selectedEvent ? getEventColor(selectedEvent.action) : 'grey',
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                }
               }}
             >
-              {selectedEvent ? getEventIcon(selectedEvent.action) : '?'}
-            </Avatar>
-            <Typography variant="h6">{t('realtimeEvents.eventDetails')}</Typography>
+              <CloseIcon fontSize="small" />
+            </IconButton>
           </Box>
-          <IconButton onClick={() => setDetailModalOpen(false)}>
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
 
-        <DialogContent dividers>
-          {selectedEvent && (
-            <Stack spacing={2}>
+          {/* Content */}
+          <Box sx={{
+            flex: 1,
+            overflowY: 'auto',
+            p: 2,
+            // Chat-style scrollbar
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'transparent',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+            },
+            '&::-webkit-scrollbar-thumb:active': {
+              background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+            },
+            scrollbarWidth: 'thin',
+            scrollbarColor: theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, 0.2) transparent'
+              : 'rgba(0, 0, 0, 0.2) transparent',
+          }}>
+            {selectedEvent && (
+              <Stack spacing={2}>
               <Box>
                 <Typography variant="caption" color="text.secondary">
                   {t('realtimeEvents.eventType')}
@@ -1266,7 +1501,7 @@ const RealtimeEventsPage: React.FC = () => {
                   {formatDateTimeDetailed(selectedEvent.createdAt)}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  ({dayjs(selectedEvent.createdAt).fromNow()})
+                  ({dayjs.utc(selectedEvent.createdAt).tz(getStoredTimezone()).fromNow()})
                 </Typography>
               </Box>
 
@@ -1354,16 +1589,11 @@ const RealtimeEventsPage: React.FC = () => {
                   </Box>
                 </>
               )}
-            </Stack>
-          )}
-        </DialogContent>
-
-        <DialogActions>
-          <Button onClick={() => setDetailModalOpen(false)}>
-            {t('common.close')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+              </Stack>
+            )}
+          </Box>
+        </Paper>
+      </Box>
     </Box>
   );
 };

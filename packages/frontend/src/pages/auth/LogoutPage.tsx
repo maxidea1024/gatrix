@@ -30,20 +30,32 @@ const LogoutPage: React.FC = () => {
 
   const handleLogout = async () => {
     try {
+      console.log('[LogoutPage] Starting logout...');
+      console.log('[LogoutPage] Before logout - localStorage:', {
+        hasToken: !!localStorage.getItem('accessToken'),
+        hasUser: !!localStorage.getItem('user')
+      });
+
       setIsLoggingOut(true);
       setLogoutError(null);
-      
+
       await logout();
+
+      console.log('[LogoutPage] After logout - localStorage:', {
+        hasToken: !!localStorage.getItem('accessToken'),
+        hasUser: !!localStorage.getItem('user')
+      });
 
       setLogoutComplete(true);
 
       // 2초 후 로그인 페이지로 이동
       setTimeout(() => {
+        console.log('[LogoutPage] Navigating to login page...');
         navigate('/login', { replace: true });
       }, 2000);
-      
+
     } catch (error: any) {
-      console.error('Logout failed:', error);
+      console.error('[LogoutPage] Logout failed:', error);
       setLogoutError(error.message || t('auth.logout.failed'));
       enqueueSnackbar(t('auth.logout.failed'), { variant: 'error' });
     } finally {
@@ -73,27 +85,62 @@ const LogoutPage: React.FC = () => {
 
   if (logoutComplete) {
     return (
-      <AuthLayout
-        title={t('auth.logout.completed')}
-        subtitle=""
-        showLeftPanel={false}
-      >
-        <Box sx={{
-          textAlign: 'center',
-          py: 6,
+      <Box
+        sx={{
+          minHeight: '100vh',
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <CheckCircleIcon
+          justifyContent: 'center',
+          bgcolor: 'background.default',
+        }}
+      >
+        <Box
+          sx={{
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+            animation: 'fadeIn 0.4s ease-out',
+            '@keyframes fadeIn': {
+              from: { opacity: 0, transform: 'translateY(10px)' },
+              to: { opacity: 1, transform: 'translateY(0)' }
+            }
+          }}
+        >
+          <Box
             sx={{
-              fontSize: 80,
-              color: 'success.main',
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              bgcolor: 'success.main',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              animation: 'scaleIn 0.3s ease-out',
+              '@keyframes scaleIn': {
+                from: { transform: 'scale(0)' },
+                to: { transform: 'scale(1)' }
+              }
             }}
-          />
+          >
+            <CheckCircleIcon sx={{ fontSize: 32, color: 'white' }} />
+          </Box>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 500,
+              color: 'text.primary',
+              letterSpacing: '-0.01em'
+            }}
+          >
+            {t('auth.logout.completed')}
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            {t('auth.logout.redirecting')}
+          </Typography>
         </Box>
-      </AuthLayout>
+      </Box>
     );
   }
 

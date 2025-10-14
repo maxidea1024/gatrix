@@ -95,7 +95,7 @@ const getErrorMessage = (error: any, t: any): string => {
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoading, error, clearError } = useAuth();
+  const { login, isLoading, error, clearError, isAuthenticated, user } = useAuth();
   const { t } = useTranslation();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -105,6 +105,23 @@ const LoginPage: React.FC = () => {
   const [pendingRememberMe, setPendingRememberMe] = useState(false);
 
   const from = (location.state as any)?.from?.pathname || '/dashboard';
+
+  // Check if already authenticated and redirect
+  useEffect(() => {
+    console.log('[LoginPage] Auth state check:', {
+      isAuthenticated,
+      isLoading,
+      hasUser: !!user,
+      userStatus: user?.status,
+      hasToken: !!localStorage.getItem('accessToken'),
+      hasStoredUser: !!localStorage.getItem('user')
+    });
+
+    if (!isLoading && isAuthenticated && user?.status === 'active') {
+      console.log('[LoginPage] User already authenticated, redirecting to:', from);
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, isLoading, user, from, navigate]);
 
   // Check for OAuth error in URL params
   useEffect(() => {
@@ -192,10 +209,23 @@ const LoginPage: React.FC = () => {
   }, [clearErrors, trigger, t]);
 
   const onSubmit = async (data: LoginCredentials & { rememberMe: boolean }) => {
+    console.log('[LoginPage] onSubmit called with data:', {
+      email: data.email,
+      hasPassword: !!data.password,
+      passwordLength: data.password?.length || 0
+    });
+
+    // Validate data before proceeding
+    if (!data.email || !data.password) {
+      console.error('[LoginPage] Missing email or password');
+      return;
+    }
+
     try {
       setLoginError(null);
       clearError();
 
+      console.log('[LoginPage] Starting login...');
       // 최소 2초 대기
       const startTime = Date.now();
 
@@ -216,8 +246,10 @@ const LoginPage: React.FC = () => {
         await loginPromise;
       }
 
+      console.log('[LoginPage] Login successful, navigating to:', from);
       navigate(from, { replace: true });
     } catch (err: any) {
+      console.error('[LoginPage] Login error:', err);
       // Check if the error is about user not found
       if (err.status === 404 ||
           err.message === 'USER_NOT_FOUND' ||
@@ -521,7 +553,7 @@ const LoginPage: React.FC = () => {
           fullWidth
           variant="contained"
           size="large"
-          disabled={isSubmitting || isLoading || !!errors.email || !!errors.password || !emailValue || !passwordValue}
+          disabled={isSubmitting || isLoading || !emailValue || !passwordValue || !!errors.email || !!errors.password}
           startIcon={isSubmitting || isLoading ? <CircularProgress size={20} /> : <LoginIcon />}
           sx={{
             mt: 1,

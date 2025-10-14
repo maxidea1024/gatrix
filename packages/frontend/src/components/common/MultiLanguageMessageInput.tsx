@@ -182,16 +182,18 @@ const MultiLanguageMessageInput = forwardRef<MultiLanguageMessageInputRef, Multi
           {/* 번역 버튼 */}
           {enableTranslation && (
             <Tooltip title={translateTooltip}>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={isTranslating ? <CircularProgress size={16} /> : <TranslateIcon />}
-                onClick={handleTranslate}
-                disabled={isTranslating || !defaultMessage?.trim()}
-                sx={{ minWidth: 'auto' }}
-              >
-                {translateButtonLabel}
-              </Button>
+              <span>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={isTranslating ? <CircularProgress size={16} /> : <TranslateIcon />}
+                  onClick={handleTranslate}
+                  disabled={isTranslating || !defaultMessage?.trim()}
+                  sx={{ minWidth: 'auto' }}
+                >
+                  {translateButtonLabel}
+                </Button>
+              </span>
             </Tooltip>
           )}
         </Box>

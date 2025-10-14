@@ -403,7 +403,24 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   };
 
   const drawerContent = (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        cursor: sidebarCollapsed ? 'pointer' : 'default',
+        transition: 'background-color 0.2s ease',
+        '&:hover': sidebarCollapsed ? {
+          backgroundColor: 'rgba(255, 255, 255, 0.08)',
+        } : {},
+      }}
+      onClick={(e) => {
+        // Only expand if sidebar is collapsed and click is on background (not on menu items)
+        if (sidebarCollapsed && e.target === e.currentTarget) {
+          handleSidebarToggle();
+        }
+      }}
+    >
       {/* 로고 및 토글 버튼 영역 - AppBar와 동일한 높이 */}
       <Box
         sx={{
@@ -483,33 +500,49 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       </Box>
 
       {/* 메뉴 영역 - 스크롤 가능 */}
-      <Box sx={{
-        flexGrow: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'auto',
-        minHeight: 0,
-        // Dark theme scrollbar (sidebar is always dark)
-        '&::-webkit-scrollbar': {
-          width: '8px',
-        },
-        '&::-webkit-scrollbar-track': {
-          background: 'transparent',
-        },
-        '&::-webkit-scrollbar-thumb': {
-          background: 'rgba(255, 255, 255, 0.2)',
-          borderRadius: '4px',
-        },
-        '&::-webkit-scrollbar-thumb:hover': {
-          background: 'rgba(255, 255, 255, 0.3)',
-        },
-        '&::-webkit-scrollbar-thumb:active': {
-          background: 'rgba(255, 255, 255, 0.4)',
-        },
-        scrollbarWidth: 'thin',
-        scrollbarColor: 'rgba(255, 255, 255, 0.2) transparent',
-      }}>
-        <List sx={{ px: 1, flexGrow: 1 }}>
+      <Box
+        sx={{
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'auto',
+          minHeight: 0,
+          // Dark theme scrollbar (sidebar is always dark)
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'transparent',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: 'rgba(255, 255, 255, 0.2)',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            background: 'rgba(255, 255, 255, 0.3)',
+          },
+          '&::-webkit-scrollbar-thumb:active': {
+            background: 'rgba(255, 255, 255, 0.4)',
+          },
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'rgba(255, 255, 255, 0.2) transparent',
+        }}
+        onClick={(e) => {
+          // Expand sidebar when clicking on empty space in menu area
+          if (sidebarCollapsed && e.target === e.currentTarget) {
+            handleSidebarToggle();
+          }
+        }}
+      >
+        <List
+          sx={{ px: 1, flexGrow: 1 }}
+          onClick={(e) => {
+            // Expand sidebar when clicking on empty space in list
+            if (sidebarCollapsed && e.target === e.currentTarget) {
+              handleSidebarToggle();
+            }
+          }}
+        >
         {/* 기본 메뉴 */}
         {!sidebarCollapsed && (
           <Typography
