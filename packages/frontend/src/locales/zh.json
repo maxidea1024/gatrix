@@ -1666,7 +1666,8 @@
     "suspended": "已暂停",
     "maintenance": {
       "bannerActive": "服务当前处于维护中"
-    }
+    },
+    "connectionLostRefresh": "连接已断开。请刷新页面。"
   },
   "createdAt": "createdAt",
   "dashboard": {
@@ -1941,6 +1942,7 @@
       "ipAddressPlaceholder": "如：192.168.1.1 或 192.168.1.0/24",
       "purpose": "用途",
       "purposePlaceholder": "如：办公网络、VPN服务器等",
+      "purposeHelp": "请记录添加到白名单的原因或目的。这有助于管理和跟踪。",
       "startDate": "开始日期（可选）",
       "startDateHelp": "留空表示无限制开始",
       "endDate": "结束日期（可选）",

@@ -1672,7 +1672,8 @@
     "suspended": "Suspended",
     "maintenance": {
       "bannerActive": "The service is currently under maintenance"
-    }
+    },
+    "connectionLostRefresh": "Connection lost. Please refresh the page."
   },
   "createdAt": "createdAt",
   "dashboard": {
@@ -1947,6 +1948,7 @@
       "ipAddressPlaceholder": "e.g., 192.168.1.1 or 192.168.1.0/24",
       "purpose": "Purpose",
       "purposePlaceholder": "e.g., Office network, VPN server, etc.",
+      "purposeHelp": "Please record the reason or purpose for adding to the whitelist. This helps with management and tracking.",
       "startDate": "Start Date (Optional)",
       "startDateHelp": "Leave empty for unlimited start",
       "endDate": "End Date (Optional)",

@@ -75,12 +75,12 @@ const LogoutPage: React.FC = () => {
     return (
       <AuthLayout
         title={t('auth.logout.completed')}
-        subtitle={t('auth.logout.redirecting')}
+        subtitle=""
         showLeftPanel={false}
       >
         <Box sx={{
           textAlign: 'center',
-          py: 4,
+          py: 6,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -88,14 +88,10 @@ const LogoutPage: React.FC = () => {
         }}>
           <CheckCircleIcon
             sx={{
-              fontSize: 64,
+              fontSize: 80,
               color: 'success.main',
-              mb: 3
             }}
           />
-          <Box sx={{ mt: 2 }}>
-            <CircularProgress size={24} sx={{ color: 'primary.main' }} />
-          </Box>
         </Box>
       </AuthLayout>
     );

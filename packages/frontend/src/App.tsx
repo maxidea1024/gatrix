@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { CssBaseline } from '@mui/material';
+import { CssBaseline, Box } from '@mui/material';
 import { SnackbarProvider } from 'notistack';
 
 // MUI Date Pickers
@@ -160,23 +160,81 @@ const LocalizedDatePickers: React.FC<{ children: React.ReactNode }> = ({ childre
   );
 };
 
+// Auth Initializer - Shows loading screen while checking authentication
+const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <Box
+        sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'background.default',
+          overflow: 'hidden',
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'flex-end',
+            gap: '16px',
+            height: '60px',
+          }}
+        >
+          {[0, 1, 2].map((index) => (
+            <Box
+              key={index}
+              sx={{
+                width: '20px',
+                height: '20px',
+                borderRadius: '50%',
+                backgroundColor: 'primary.main',
+                animation: 'dotFlashing 1.4s infinite linear',
+                animationDelay: `${index * 0.2}s`,
+                '@keyframes dotFlashing': {
+                  '0%, 80%, 100%': {
+                    opacity: 0.3,
+                  },
+                  '40%': {
+                    opacity: 1,
+                  },
+                },
+              }}
+            />
+          ))}
+        </Box>
+      </Box>
+    );
+  }
+
+  return <>{children}</>;
+};
+
 // App Content with LocalizedDatePickers inside I18nProvider
 const AppContent: React.FC = () => {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <LocalizedDatePickers>
-          <CssBaseline />
-          <SnackbarProvider
-            maxSnack={3}
-            autoHideDuration={3000}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'center',
-            }}
-          >
-            <Router>
-              <Routes>
+        <AuthInitializer>
+          <LocalizedDatePickers>
+            <CssBaseline />
+            <SnackbarProvider
+              maxSnack={3}
+              autoHideDuration={3000}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'center',
+              }}
+            >
+              <Router>
+                <Routes>
                 {/* Public Routes */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/logout" element={<LogoutPage />} />
@@ -273,6 +331,7 @@ const AppContent: React.FC = () => {
             </Router>
           </SnackbarProvider>
         </LocalizedDatePickers>
+        </AuthInitializer>
       </AuthProvider>
     </ThemeProvider>
   );

@@ -88,13 +88,9 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
       const token = apiService.getAccessToken();
 
       // Build absolute URL to bypass dev proxy for SSE (more reliable)
-      const defaultBackendBase = 'http://localhost:5001';
+      const defaultBackendBase = 'http://localhost:5000';
       const apiBase = (import.meta as any).env?.VITE_API_URL || `${defaultBackendBase}/api/v1`;
       let backendBase = apiBase.replace(/\/api\/v1\/?$/, '');
-      // Dev safeguard: if env still points to :5000, override to :5001
-      if (((import.meta as any).env?.DEV === true) && backendBase.includes('localhost:5000')) {
-        backendBase = defaultBackendBase;
-      }
       const url = token
         ? `${backendBase}/api/v1/admin/notifications/sse?token=${encodeURIComponent(token)}`
         : `${backendBase}/api/v1/admin/notifications/sse`;
@@ -153,7 +149,7 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
           // 최대 재연결 시도에 도달했을 때 한 번만 에러 토스트 표시
           console.error('Max reconnection attempts reached');
           maxReconnectReachedRef.current = true;
-          enqueueSnackbar(t('connectionLostRefresh'), { variant: 'error' });
+          enqueueSnackbar(t('common.connectionLostRefresh'), { variant: 'error' });
         }
       };
 

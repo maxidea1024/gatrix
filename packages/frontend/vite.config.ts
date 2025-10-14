@@ -44,6 +44,14 @@ export default defineConfig({
   server: {
     host: '0.0.0.0', // Allow external connections (required for Docker)
     port: 3000,
+    watch: {
+      usePolling: true, // Required for Docker on Windows/WSL
+      interval: 100,
+    },
+    hmr: {
+      host: 'localhost', // HMR host for browser connection
+      port: 3000,
+    },
     proxy: {
       '/api': {
         target: backendUrl,

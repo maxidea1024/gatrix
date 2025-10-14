@@ -143,7 +143,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     // Initialize auth state from localStorage only
-    const initializeAuth = () => {
+    const initializeAuth = async () => {
+      const startTime = Date.now();
+      const MIN_LOADING_TIME = 1500; // Minimum 1.5 seconds for better UX
+
       try {
         console.log('🔄 AuthContext: Starting initialization...');
         setIsLoading(true);
@@ -172,20 +175,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           console.log('🔄 AuthContext: Token exists but no user data, fetching profile...');
           const isValid = AuthService.initializeAuth();
           if (isValid) {
-            AuthService.getProfile()
-              .then((user) => {
-                setUser(user);
-                console.log('✅ AuthContext: User profile fetched successfully');
-              })
-              .catch((error) => {
-                console.error('❌ AuthContext: Failed to fetch user profile:', error);
-                AuthService.clearAuthData();
-                setUser(null);
-              })
-              .finally(() => {
-                setIsLoading(false);
-              });
-            return; // Don't set isLoading to false yet
+            try {
+              const user = await AuthService.getProfile();
+              setUser(user);
+              console.log('✅ AuthContext: User profile fetched successfully');
+            } catch (error) {
+              console.error('❌ AuthContext: Failed to fetch user profile:', error);
+              AuthService.clearAuthData();
+              setUser(null);
+            }
           } else {
             // Token was expired
             setUser(null);
@@ -201,8 +199,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         AuthService.clearAuthData();
         setUser(null);
       } finally {
-        setIsLoading(false);
-        console.log('✅ AuthContext: Initialization complete, isLoading = false');
+        // Ensure minimum loading time for better UX
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, MIN_LOADING_TIME - elapsedTime);
+
+        if (remainingTime > 0) {
+          console.log(`⏱️ AuthContext: Waiting ${remainingTime}ms for minimum loading time...`);
+          setTimeout(() => {
+            setIsLoading(false);
+            console.log('✅ AuthContext: Initialization complete, isLoading = false');
+          }, remainingTime);
+        } else {
+          setIsLoading(false);
+          console.log('✅ AuthContext: Initialization complete, isLoading = false');
+        }
       }
     };
 
