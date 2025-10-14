@@ -310,38 +310,41 @@ const RealtimeEventsPage: React.FC = () => {
             });
           }
 
-          // Detect new events for flash effect
+          // Detect new events for flash effect (only after initial load)
           const currentEventIds = new Set(allEvents.map(e => e.id));
           const newIds = new Set<number>();
 
-          currentEventIds.forEach(id => {
-            if (!previousEventIdsRef.current.has(id)) {
-              newIds.add(id);
-            }
-          });
-
-          if (newIds.size > 0) {
-            setNewEventIds(newIds);
-            // Remove flash effect after 2 seconds
-            setTimeout(() => {
-              setNewEventIds(new Set());
-            }, 2000);
-
-            // Check which new events haven't been seen yet
-            const unseenNewEvents = Array.from(newIds).filter(id => !seenEventIds.has(id));
-
-            console.log('🔔 New events detected:', {
-              newEventCount: newIds.size,
-              unseenCount: unseenNewEvents.length,
-              seenEventIds: Array.from(seenEventIds),
+          // Only detect new events if this is not the initial load
+          if (!isInitialLoadRef.current) {
+            currentEventIds.forEach(id => {
+              if (!previousEventIdsRef.current.has(id)) {
+                newIds.add(id);
+              }
             });
 
-            if (unseenNewEvents.length > 0) {
-              console.log('✅ Setting hasUnseenEvents to true');
-              setHasUnseenEvents(true);
-              setUnseenEventCount(prev => prev + unseenNewEvents.length);
-            } else {
-              console.log('❌ All new events already seen');
+            if (newIds.size > 0) {
+              setNewEventIds(newIds);
+              // Remove flash effect after 2 seconds
+              setTimeout(() => {
+                setNewEventIds(new Set());
+              }, 2000);
+
+              // Check which new events haven't been seen yet
+              const unseenNewEvents = Array.from(newIds).filter(id => !seenEventIds.has(id));
+
+              console.log('🔔 New events detected:', {
+                newEventCount: newIds.size,
+                unseenCount: unseenNewEvents.length,
+                seenEventIds: Array.from(seenEventIds),
+              });
+
+              if (unseenNewEvents.length > 0) {
+                console.log('✅ Setting hasUnseenEvents to true');
+                setHasUnseenEvents(true);
+                setUnseenEventCount(prev => prev + unseenNewEvents.length);
+              } else {
+                console.log('❌ All new events already seen');
+              }
             }
           }
 
@@ -441,70 +444,53 @@ const RealtimeEventsPage: React.FC = () => {
     loadEvents();
   }, [loadEvents]);
 
-  // Scroll detection
+  // Intersection Observer to track when first event is visible
   useEffect(() => {
-    console.log('🔍 Scroll detection useEffect triggered');
-    console.log('🔍 timelineContainerRef:', timelineContainerRef);
-    console.log('🔍 timelineContainerRef.current:', timelineContainerRef.current);
-
-    const container = timelineContainerRef.current;
-    if (!container) {
-      console.log('⚠️ Timeline container ref not found');
+    const firstEvent = firstEventRef.current;
+    if (!firstEvent) {
+      console.log('⚠️ First event ref not found');
       return;
     }
 
-    console.log('✅ Timeline container found:', container);
-    console.log('✅ Container scrollTop:', container.scrollTop);
-    console.log('✅ Container scrollHeight:', container.scrollHeight);
-    console.log('✅ Container clientHeight:', container.clientHeight);
+    console.log('✅ Setting up Intersection Observer for first event');
 
-    const handleScroll = () => {
-      const scrollTop = container.scrollTop;
-      const scrollThreshold = 100; // Consider scrolled down if more than 100px from top
-
-      const wasScrolledDown = isScrolledDown;
-      const nowScrolledDown = scrollTop > scrollThreshold;
-
-      console.log('📜 Scroll event:', {
-        scrollTop,
-        scrollThreshold,
-        wasScrolledDown,
-        nowScrolledDown,
-      });
-
-      setIsScrolledDown(nowScrolledDown);
-
-      // If user scrolled back to top, clear unseen events
-      if (wasScrolledDown && !nowScrolledDown) {
-        console.log('🔝 Scrolled back to top, clearing unseen events');
-        setHasUnseenEvents(false);
-        setUnseenEventCount(0);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            console.log('👁️ First event is visible - marking events as seen');
+            // Mark all current events as seen
+            const currentEventIds = new Set(events.map(e => e.id));
+            setSeenEventIds(currentEventIds);
+            setHasUnseenEvents(false);
+            setUnseenEventCount(0);
+          }
+        });
+      },
+      {
+        root: eventStreamRef.current,
+        threshold: 0.1, // Trigger when 10% of the element is visible
       }
-    };
+    );
 
-    // Check initial scroll position
-    const initialScrollTop = container.scrollTop;
-    console.log('📍 Initial scroll position:', initialScrollTop);
-    if (initialScrollTop > 100) {
-      console.log('📍 Setting isScrolledDown to true (initial position > 100)');
-      setIsScrolledDown(true);
-    }
+    observer.observe(firstEvent);
 
-    console.log('📍 Adding scroll event listener');
-    container.addEventListener('scroll', handleScroll);
     return () => {
-      console.log('🧹 Removing scroll listener');
-      container.removeEventListener('scroll', handleScroll);
+      console.log('🧹 Cleaning up Intersection Observer');
+      observer.disconnect();
     };
-  }, []);
+  }, [events]);
 
   // Scroll to top function
   const scrollToTop = () => {
-    if (timelineContainerRef.current) {
-      timelineContainerRef.current.scrollTo({
+    if (eventStreamRef.current) {
+      eventStreamRef.current.scrollTo({
         top: 0,
         behavior: 'smooth'
       });
+      // Mark all events as seen
+      const currentEventIds = new Set(events.map(e => e.id));
+      setSeenEventIds(currentEventIds);
       setHasUnseenEvents(false);
       setUnseenEventCount(0);
     }
@@ -799,53 +785,6 @@ const RealtimeEventsPage: React.FC = () => {
             position: 'relative',
           }}
         >
-          {/* New Events Notification Badge */}
-          {hasUnseenEvents && (
-            <Box
-              onClick={scrollToTop}
-              sx={{
-                position: 'absolute',
-                top: 80,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                zIndex: 10,
-                bgcolor: 'primary.main',
-                color: 'primary.contrastText',
-                px: 2,
-                py: 1,
-                borderRadius: 3,
-                boxShadow: 3,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                animation: 'slideDown 0.3s ease-out',
-                '@keyframes slideDown': {
-                  from: { opacity: 0, transform: 'translateX(-50%) translateY(-10px)' },
-                  to: { opacity: 1, transform: 'translateX(-50%) translateY(0)' }
-                },
-                '&:hover': {
-                  bgcolor: 'primary.dark',
-                  boxShadow: 4,
-                },
-                transition: 'all 0.2s ease',
-              }}
-            >
-              <DotIcon sx={{ fontSize: 12, animation: 'blink 1s ease-in-out infinite' }} />
-              <Typography variant="caption" sx={{ fontWeight: 600 }}>
-                {unseenEventCount} {t('realtimeEvents.newEvents')}
-              </Typography>
-              <style>
-                {`
-                  @keyframes blink {
-                    0%, 100% { opacity: 1; }
-                    50% { opacity: 0.3; }
-                  }
-                `}
-              </style>
-            </Box>
-          )}
-
           <Box sx={{
             p: 2,
             borderBottom: 1,
@@ -1105,8 +1044,56 @@ const RealtimeEventsPage: React.FC = () => {
             flexDirection: 'column',
             overflow: 'hidden',
             bgcolor: 'background.paper',
+            position: 'relative',
           }}
         >
+          {/* New Events Notification Badge */}
+          {hasUnseenEvents && (
+            <Box
+              onClick={scrollToTop}
+              sx={{
+                position: 'absolute',
+                top: 16,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                zIndex: 10,
+                bgcolor: 'primary.main',
+                color: 'primary.contrastText',
+                px: 2,
+                py: 1,
+                borderRadius: 3,
+                boxShadow: 3,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                animation: 'slideDown 0.3s ease-out',
+                '@keyframes slideDown': {
+                  from: { opacity: 0, transform: 'translateX(-50%) translateY(-10px)' },
+                  to: { opacity: 1, transform: 'translateX(-50%) translateY(0)' }
+                },
+                '&:hover': {
+                  bgcolor: 'primary.dark',
+                  boxShadow: 4,
+                },
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <DotIcon sx={{ fontSize: 12, animation: 'blink 1s ease-in-out infinite' }} />
+              <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                {unseenEventCount} {t('realtimeEvents.newEvents')}
+              </Typography>
+              <style>
+                {`
+                  @keyframes blink {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.3; }
+                  }
+                `}
+              </style>
+            </Box>
+          )}
+
           <Box sx={{
             p: 2,
             borderBottom: 1,
@@ -1176,6 +1163,7 @@ const RealtimeEventsPage: React.FC = () => {
                   return (
                     <React.Fragment key={event.id}>
                       <Box
+                        ref={index === 0 ? firstEventRef : null}
                         sx={{
                           display: 'flex',
                           gap: 1.5,
