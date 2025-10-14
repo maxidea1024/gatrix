@@ -2366,6 +2366,20 @@
       "users": "사용자",
       "types": "유형"
     },
-    "newEvents": "개의 새 이벤트"
+    "newEvents": "개의 새 이벤트",
+    "customizeEventIcon": "이벤트 아이콘 커스터마이징",
+    "selectIcon": "아이콘 선택",
+    "icon": "아이콘",
+    "iconHelperText": "1-2자의 텍스트 또는 이모지",
+    "color": "색상",
+    "preview": "미리보기",
+    "iconCategories": {
+      "actions": "작업",
+      "visibility": "표시/보안",
+      "status": "상태",
+      "user": "사용자",
+      "system": "시스템",
+      "network": "네트워크"
+    }
   }
 }

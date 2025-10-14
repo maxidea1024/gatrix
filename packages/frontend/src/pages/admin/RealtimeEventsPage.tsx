@@ -26,6 +26,12 @@ import {
   Tab,
   Tabs,
   CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
 } from '@mui/material';
 import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer-continued';
 import Timeline from '@mui/lab/Timeline';
@@ -47,6 +53,42 @@ import {
   FiberManualRecord as DotIcon,
   PlayArrow as PlayIcon,
   Pause as PauseIcon,
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
+  Lock as LockIcon,
+  LockOpen as LockOpenIcon,
+  Check as CheckIcon,
+  Clear as ClearIcon,
+  Login as LoginIcon,
+  Logout as LogoutIcon,
+  Settings as SettingsIcon,
+  Build as BuildIcon,
+  Security as SecurityIcon,
+  Warning as WarningIcon,
+  Error as ErrorIcon,
+  Info as InfoIcon,
+  Star as StarIcon,
+  Flag as FlagIcon,
+  Send as SendIcon,
+  Mail as MailIcon,
+  Notifications as NotificationsIcon,
+  AccountCircle as AccountCircleIcon,
+  Group as GroupIcon,
+  Public as PublicIcon,
+  Language as LanguageIcon,
+  Update as UpdateIcon,
+  Sync as SyncIcon,
+  CloudUpload as CloudUploadIcon,
+  CloudDownload as CloudDownloadIcon,
+  Save as SaveIcon,
+  Cancel as CancelIcon,
+  Done as DoneIcon,
+  Block as BlockIcon,
+  CheckCircle as CheckCircleIcon,
+  RadioButtonUnchecked as RadioButtonUncheckedIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -190,9 +232,20 @@ const RealtimeEventsPage: React.FC = () => {
   // New events notification - track which events have been seen
   const [hasUnseenEvents, setHasUnseenEvents] = useState(false);
   const [unseenEventCount, setUnseenEventCount] = useState(0);
-  const [seenEventIds, setSeenEventIds] = useState<Set<number>>(new Set());
+  const [seenEventIds, setSeenEventIds] = useState<Set<number>>(() => {
+    const saved = localStorage.getItem('realtimeEvents_seenEventIds');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
   const timelineContainerRef = useRef<HTMLDivElement>(null);
   const firstEventRef = useRef<HTMLDivElement>(null);
+
+  // Custom event icon/color settings
+  const [customEventSettings, setCustomEventSettings] = useState<Record<string, { iconName: string; color: string }>>(() => {
+    const saved = localStorage.getItem('realtimeEvents_customSettings');
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [iconDialogOpen, setIconDialogOpen] = useState(false);
+  const [selectedActionForCustomization, setSelectedActionForCustomization] = useState<string | null>(null);
 
   // Set dayjs locale
   useEffect(() => {
@@ -346,9 +399,18 @@ const RealtimeEventsPage: React.FC = () => {
                 console.log('❌ All new events already seen');
               }
             }
+          } else {
+            // Initial load - set previousEventIds to prevent flash on first load
+            console.log('[RealtimeEvents] Initial load - setting previousEventIds');
           }
 
           previousEventIdsRef.current = currentEventIds;
+
+          // Mark initial load as complete
+          if (isInitialLoadRef.current) {
+            isInitialLoadRef.current = false;
+            console.log('[RealtimeEvents] Initial load complete');
+          }
 
           return allEvents;
         });
@@ -443,6 +505,11 @@ const RealtimeEventsPage: React.FC = () => {
   useEffect(() => {
     loadEvents();
   }, [loadEvents]);
+
+  // Save seenEventIds to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('realtimeEvents_seenEventIds', JSON.stringify(Array.from(seenEventIds)));
+  }, [seenEventIds]);
 
   // Intersection Observer to track when first event is visible
   useEffect(() => {
@@ -544,8 +611,11 @@ const RealtimeEventsPage: React.FC = () => {
     };
   }, [autoRefresh, loadEvents]);
 
-  // Get event color
+  // Get event color (with custom override)
   const getEventColor = (action: string): string => {
+    if (customEventSettings[action]?.color) {
+      return customEventSettings[action].color;
+    }
     if (action.includes('create')) return '#4CAF50';
     if (action.includes('update')) return '#2196F3';
     if (action.includes('delete')) return '#F44336';
@@ -553,10 +623,47 @@ const RealtimeEventsPage: React.FC = () => {
     return '#757575';
   };
 
-  // Get event icon
-  const getEventIcon = (action: string): string => {
+  // Get event icon (with custom override)
+  const getEventIcon = (action: string): React.ReactNode => {
+    if (customEventSettings[action]?.iconName) {
+      const IconComponent = iconMap[customEventSettings[action].iconName];
+      return IconComponent ? <IconComponent sx={{ fontSize: '1.1rem' }} /> : action.charAt(0).toUpperCase();
+    }
     const firstLetter = action.charAt(0).toUpperCase();
     return firstLetter;
+  };
+
+  // Handle icon customization
+  const handleIconClick = (action: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    setSelectedActionForCustomization(action);
+    setIconDialogOpen(true);
+  };
+
+  // Save custom icon/color settings
+  const saveCustomSettings = (iconName: string, color: string) => {
+    if (!selectedActionForCustomization) return;
+
+    const newSettings = {
+      ...customEventSettings,
+      [selectedActionForCustomization]: { iconName, color },
+    };
+    setCustomEventSettings(newSettings);
+    localStorage.setItem('realtimeEvents_customSettings', JSON.stringify(newSettings));
+    setIconDialogOpen(false);
+    setSelectedActionForCustomization(null);
+  };
+
+  // Reset custom settings for an action
+  const resetCustomSettings = () => {
+    if (!selectedActionForCustomization) return;
+
+    const newSettings = { ...customEventSettings };
+    delete newSettings[selectedActionForCustomization];
+    setCustomEventSettings(newSettings);
+    localStorage.setItem('realtimeEvents_customSettings', JSON.stringify(newSettings));
+    setIconDialogOpen(false);
+    setSelectedActionForCustomization(null);
   };
 
   // Calculate time difference
@@ -1206,6 +1313,7 @@ const RealtimeEventsPage: React.FC = () => {
                         {/* Icon */}
                         <Box sx={{ flex: '0 0 auto' }}>
                           <Avatar
+                            onClick={(e) => handleIconClick(event.action, e)}
                             sx={{
                               width: 28,
                               height: 28,
@@ -1213,6 +1321,12 @@ const RealtimeEventsPage: React.FC = () => {
                               bgcolor: getEventColor(event.action),
                               color: '#fff',
                               fontWeight: 700,
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              '&:hover': {
+                                transform: 'scale(1.1)',
+                                boxShadow: 2,
+                              },
                             }}
                           >
                             {getEventIcon(event.action)}
@@ -1694,7 +1808,211 @@ const RealtimeEventsPage: React.FC = () => {
           </Box>
         </Paper>
       </Box>
+
+      {/* Icon Customization Dialog */}
+      <IconCustomizationDialog
+        open={iconDialogOpen}
+        action={selectedActionForCustomization}
+        currentIconName={selectedActionForCustomization ? (customEventSettings[selectedActionForCustomization]?.iconName || '') : ''}
+        currentColor={selectedActionForCustomization ? getEventColor(selectedActionForCustomization) : '#757575'}
+        onSave={saveCustomSettings}
+        onReset={resetCustomSettings}
+        onClose={() => {
+          setIconDialogOpen(false);
+          setSelectedActionForCustomization(null);
+        }}
+      />
     </Box>
+  );
+};
+
+// Icon map for Material Icons
+const iconMap: Record<string, React.ComponentType<any>> = {
+  Add: AddIcon,
+  Edit: EditIcon,
+  Delete: DeleteIcon,
+  Visibility: VisibilityIcon,
+  VisibilityOff: VisibilityOffIcon,
+  Lock: LockIcon,
+  LockOpen: LockOpenIcon,
+  Check: CheckIcon,
+  Clear: ClearIcon,
+  Login: LoginIcon,
+  Logout: LogoutIcon,
+  Settings: SettingsIcon,
+  Build: BuildIcon,
+  Security: SecurityIcon,
+  Warning: WarningIcon,
+  Error: ErrorIcon,
+  Info: InfoIcon,
+  Star: StarIcon,
+  Flag: FlagIcon,
+  Send: SendIcon,
+  Mail: MailIcon,
+  Notifications: NotificationsIcon,
+  AccountCircle: AccountCircleIcon,
+  Group: GroupIcon,
+  Public: PublicIcon,
+  Language: LanguageIcon,
+  Update: UpdateIcon,
+  Sync: SyncIcon,
+  CloudUpload: CloudUploadIcon,
+  CloudDownload: CloudDownloadIcon,
+  Save: SaveIcon,
+  Cancel: CancelIcon,
+  Done: DoneIcon,
+  Block: BlockIcon,
+  CheckCircle: CheckCircleIcon,
+  RadioButtonUnchecked: RadioButtonUncheckedIcon,
+  Person: PersonIcon,
+  Event: EventIcon,
+  Refresh: RefreshIcon,
+};
+
+// Icon Customization Dialog Component
+interface IconCustomizationDialogProps {
+  open: boolean;
+  action: string | null;
+  currentIconName: string;
+  currentColor: string;
+  onSave: (iconName: string, color: string) => void;
+  onReset: () => void;
+  onClose: () => void;
+}
+
+const IconCustomizationDialog: React.FC<IconCustomizationDialogProps> = ({
+  open,
+  action,
+  currentIconName,
+  currentColor,
+  onSave,
+  onReset,
+  onClose,
+}) => {
+  const { t } = useTranslation();
+  const [selectedIconName, setSelectedIconName] = useState(currentIconName);
+  const [color, setColor] = useState(currentColor);
+
+  useEffect(() => {
+    setSelectedIconName(currentIconName);
+    setColor(currentColor);
+  }, [currentIconName, currentColor]);
+
+  const handleSave = () => {
+    onSave(selectedIconName, color);
+  };
+
+  const predefinedColors = [
+    '#4CAF50', // Green
+    '#2196F3', // Blue
+    '#F44336', // Red
+    '#FF9800', // Orange
+    '#9C27B0', // Purple
+    '#00BCD4', // Cyan
+    '#FFEB3B', // Yellow
+    '#795548', // Brown
+    '#607D8B', // Blue Grey
+    '#757575', // Grey
+  ];
+
+  // All available icons (flattened)
+  const availableIcons = ['Add', 'Edit', 'Delete', 'Save', 'Cancel', 'Done', 'Clear', 'Send', 'Refresh', 'Update', 'Sync',
+    'Visibility', 'VisibilityOff', 'Lock', 'LockOpen', 'Block',
+    'Check', 'CheckCircle', 'Error', 'Warning', 'Info', 'Star', 'Flag',
+    'Login', 'Logout', 'Person', 'AccountCircle', 'Group',
+    'Settings', 'Build', 'Security', 'Notifications', 'Event',
+    'CloudUpload', 'CloudDownload', 'Public', 'Language', 'Mail'];
+
+  const SelectedIconComponent = selectedIconName && iconMap[selectedIconName] ? iconMap[selectedIconName] : null;
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>
+        {t('realtimeEvents.customizeEventIcon')}
+        {action && (
+          <Typography variant="caption" display="block" color="text.secondary">
+            {action}
+          </Typography>
+        )}
+      </DialogTitle>
+      <DialogContent>
+        <Stack spacing={3} sx={{ mt: 1 }}>
+          {/* Icon Selection */}
+          <Box>
+            <Typography variant="subtitle2" gutterBottom>
+              {t('realtimeEvents.selectIcon')}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', maxHeight: 300, overflowY: 'auto', p: 1 }}>
+              {availableIcons.map((iconName) => {
+                const IconComponent = iconMap[iconName];
+                return (
+                  <Tooltip key={iconName} title={iconName}>
+                    <Avatar
+                      onClick={() => setSelectedIconName(iconName)}
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        bgcolor: selectedIconName === iconName ? color : 'grey.300',
+                        color: selectedIconName === iconName ? '#fff' : 'grey.700',
+                        cursor: 'pointer',
+                        border: selectedIconName === iconName ? '3px solid' : '1px solid',
+                        borderColor: selectedIconName === iconName ? color : 'grey.400',
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          transform: 'scale(1.1)',
+                          boxShadow: 2,
+                        },
+                      }}
+                    >
+                      <IconComponent sx={{ fontSize: 20 }} />
+                    </Avatar>
+                  </Tooltip>
+                );
+              })}
+            </Box>
+          </Box>
+
+          {/* Color Selection */}
+          <Box>
+            <Typography variant="subtitle2" gutterBottom>
+              {t('realtimeEvents.color')}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              {predefinedColors.map((presetColor) => (
+                <Box
+                  key={presetColor}
+                  onClick={() => setColor(presetColor)}
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    bgcolor: presetColor,
+                    borderRadius: 1,
+                    cursor: 'pointer',
+                    border: color === presetColor ? '3px solid #000' : '1px solid #ccc',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                      transform: 'scale(1.1)',
+                      boxShadow: 2,
+                    },
+                  }}
+                />
+              ))}
+            </Box>
+          </Box>
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onReset} color="warning">
+          {t('common.reset')}
+        </Button>
+        <Button onClick={onClose}>
+          {t('common.cancel')}
+        </Button>
+        <Button onClick={handleSave} variant="contained" disabled={!selectedIconName}>
+          {t('common.save')}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

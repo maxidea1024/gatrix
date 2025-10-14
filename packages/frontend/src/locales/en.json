@@ -2351,6 +2351,20 @@
     "oldValues": "Old Values",
     "newValues": "New Values",
     "changes": "Changes",
+    "customizeEventIcon": "Customize Event Icon",
+    "selectIcon": "Select Icon",
+    "icon": "Icon",
+    "iconHelperText": "1-2 characters or emoji",
+    "color": "Color",
+    "preview": "Preview",
+    "iconCategories": {
+      "actions": "Actions",
+      "visibility": "Visibility/Security",
+      "status": "Status",
+      "user": "User",
+      "system": "System",
+      "network": "Network"
+    },
     "userAgent": "User Agent",
     "filters": {
       "title": "Filters",

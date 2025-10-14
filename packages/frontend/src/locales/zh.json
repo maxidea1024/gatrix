@@ -2345,6 +2345,11 @@
     "oldValues": "旧值",
     "newValues": "新值",
     "changes": "变更",
+    "customizeEventIcon": "自定义事件图标",
+    "icon": "图标",
+    "iconHelperText": "1-2个字符或表情符号",
+    "color": "颜色",
+    "preview": "预览",
     "userAgent": "用户代理",
     "filters": {
       "title": "筛选",
