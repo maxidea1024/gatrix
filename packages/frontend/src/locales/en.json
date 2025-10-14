@@ -1174,7 +1174,13 @@
       "console_timestamp": "Console: Convert Timestamp",
       "console_unixtimestamp": "Console: Get Unix Timestamp",
       "console_md5": "Console: Generate MD5 Hash",
-      "console_sha256": "Console: Generate SHA256 Hash"
+      "console_sha256": "Console: Generate SHA256 Hash",
+      "api_token_create": "API Token Created",
+      "api_token_update": "API Token Updated",
+      "api_token_regenerate": "API Token Regenerated",
+      "api_token_delete": "API Token Deleted",
+      "invitation_create": "User Invitation Created",
+      "invitation_delete": "User Invitation Deleted"
     },
     "resources": {
       "user": "User",
@@ -1186,7 +1192,9 @@
       "tag": "Tag",
       "message_template": "Message Template",
       "job": "Job",
-      "console": "System Console"
+      "console": "System Console",
+      "api_token": "API Token",
+      "invitation": "User Invitation"
     }
   },
   "auth": {
@@ -2342,6 +2350,7 @@
     "resource": "Resource",
     "oldValues": "Old Values",
     "newValues": "New Values",
+    "changes": "Changes",
     "userAgent": "User Agent",
     "filters": {
       "title": "Filters",

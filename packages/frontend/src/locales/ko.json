@@ -1171,7 +1171,13 @@
       "console_timestamp": "콘솔: 타임스탬프 변환",
       "console_unixtimestamp": "콘솔: Unix 타임스탬프 조회",
       "console_md5": "콘솔: MD5 해시 생성",
-      "console_sha256": "콘솔: SHA256 해시 생성"
+      "console_sha256": "콘솔: SHA256 해시 생성",
+      "api_token_create": "API 토큰 생성",
+      "api_token_update": "API 토큰 수정",
+      "api_token_regenerate": "API 토큰 재생성",
+      "api_token_delete": "API 토큰 삭제",
+      "invitation_create": "사용자 초대 생성",
+      "invitation_delete": "사용자 초대 삭제"
     },
     "resources": {
       "user": "사용자",
@@ -1183,7 +1189,9 @@
       "tag": "태그",
       "message_template": "메시지 템플릿",
       "job": "Job",
-      "console": "시스템 콘솔"
+      "console": "시스템 콘솔",
+      "api_token": "API 토큰",
+      "invitation": "사용자 초대"
     }
   },
   "auth": {
@@ -2339,6 +2347,7 @@
     "resource": "리소스",
     "oldValues": "이전 값",
     "newValues": "새 값",
+    "changes": "변경 사항",
     "userAgent": "사용자 에이전트",
     "filters": {
       "title": "필터",

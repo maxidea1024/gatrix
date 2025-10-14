@@ -892,28 +892,18 @@ const GameWorldsPage: React.FC = () => {
     }
   };
 
-  const handleToggleVisibility = (worldId: number) => {
+  const handleToggleVisibility = async (worldId: number) => {
     const world = worlds.find(w => w.id === worldId);
     if (!world) return;
 
-    setConfirmDialog({
-      open: true,
-      title: world.isVisible ? t('gameWorlds.hideGameWorld') : t('gameWorlds.showGameWorld'),
-      message: world.isVisible
-        ? t('gameWorlds.confirmHide', { name: world.name })
-        : t('gameWorlds.confirmShow', { name: world.name }),
-      onConfirm: async () => {
-        try {
-          await gameWorldService.toggleVisibility(world.id);
-          enqueueSnackbar(t('gameWorlds.visibilityToggled'), { variant: 'success' });
-          loadGameWorlds();
-        } catch (error) {
-          console.error('Failed to toggle visibility:', error);
-          enqueueSnackbar(t('gameWorlds.errors.toggleVisibilityFailed'), { variant: 'error' });
-        }
-        setConfirmDialog(prev => ({ ...prev, open: false }));
-      }
-    });
+    try {
+      await gameWorldService.toggleVisibility(world.id);
+      enqueueSnackbar(t('gameWorlds.visibilityToggled'), { variant: 'success' });
+      loadGameWorlds();
+    } catch (error) {
+      console.error('Failed to toggle visibility:', error);
+      enqueueSnackbar(t('gameWorlds.errors.toggleVisibilityFailed'), { variant: 'error' });
+    }
   };
 
   const handleToggleMaintenance = (worldId: number) => {

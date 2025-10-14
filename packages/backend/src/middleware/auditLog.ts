@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import { AuditLogModel } from '../models/AuditLog';
 import { AuthenticatedRequest } from './auth';
 import { createLogger } from '../config/logger';
+import { enhancedAuditLog, fetchGameWorldById, fetchUserById } from '../utils/enhancedAuditLog';
 
 const logger = createLogger('AuditLog');
 
@@ -97,94 +98,320 @@ export const auditUserRegister = auditLog({
   }),
 });
 
-export const auditUserUpdate = auditLog({
+export const auditUserUpdate = enhancedAuditLog({
   action: 'user_update',
   resourceType: 'user',
   getResourceId: (req) => req.params?.id,
-  getNewValues: (req) => req.body,
+  fetchOldValues: async (req) => {
+    const id = req.params?.id;
+    if (!id) return null;
+    return await fetchUserById(id);
+  },
+  getNewValues: (req, _res, oldValues) => {
+    const changes: any = {};
+    const body = req.body;
+
+    // Track only changed fields
+    if (body.name !== undefined && body.name !== oldValues?.name) changes.name = body.name;
+    if (body.email !== undefined && body.email !== oldValues?.email) changes.email = body.email;
+    if (body.role !== undefined && body.role !== oldValues?.role) changes.role = body.role;
+    if (body.status !== undefined && body.status !== oldValues?.status) changes.status = body.status;
+    if (body.tags !== undefined) changes.tags = body.tags;
+
+    return changes;
+  },
+  getContext: (req, oldValues, newValues) => ({
+    operation: 'update_user',
+    userName: oldValues?.name,
+    userEmail: oldValues?.email,
+    changedFields: Object.keys(newValues || {}),
+  }),
 });
 
-export const auditUserDelete = auditLog({
+export const auditUserDelete = enhancedAuditLog({
   action: 'user_delete',
   resourceType: 'user',
   getResourceId: (req) => req.params?.id,
+  fetchOldValues: async (req) => {
+    const id = req.params?.id;
+    if (!id) return null;
+    return await fetchUserById(id);
+  },
+  getNewValues: (_req, _res, oldValues) => ({
+    deletedUser: {
+      id: oldValues?.id,
+      email: oldValues?.email,
+      name: oldValues?.name,
+      role: oldValues?.role,
+      status: oldValues?.status,
+    },
+  }),
+  getContext: (_req, oldValues) => ({
+    operation: 'delete_user',
+    userName: oldValues?.name,
+    userEmail: oldValues?.email,
+    userRole: oldValues?.role,
+  }),
 });
 
-export const auditUserApprove = auditLog({
+export const auditUserApprove = enhancedAuditLog({
   action: 'user_approve',
   resourceType: 'user',
   getResourceId: (req) => req.params?.id,
-  getNewValues: () => ({ status: 'active' }),
+  fetchOldValues: async (req) => {
+    const id = req.params?.id;
+    if (!id) return null;
+    return await fetchUserById(id);
+  },
+  getNewValues: (_req, _res, oldValues) => ({
+    status: 'active',
+    previousStatus: oldValues?.status,
+  }),
+  getContext: (_req, oldValues) => ({
+    operation: 'approve_user',
+    userName: oldValues?.name,
+    userEmail: oldValues?.email,
+    statusChange: `${oldValues?.status} → active`,
+  }),
 });
 
-export const auditUserReject = auditLog({
+export const auditUserReject = enhancedAuditLog({
   action: 'user_reject',
   resourceType: 'user',
   getResourceId: (req) => req.params?.id,
-  getNewValues: () => ({ status: 'deleted' }),
+  fetchOldValues: async (req) => {
+    const id = req.params?.id;
+    if (!id) return null;
+    return await fetchUserById(id);
+  },
+  getNewValues: (_req, _res, oldValues) => ({
+    status: 'deleted',
+    previousStatus: oldValues?.status,
+  }),
+  getContext: (_req, oldValues) => ({
+    operation: 'reject_user',
+    userName: oldValues?.name,
+    userEmail: oldValues?.email,
+    statusChange: `${oldValues?.status} → deleted`,
+  }),
 });
 
-export const auditUserSuspend = auditLog({
+export const auditUserSuspend = enhancedAuditLog({
   action: 'user_suspend',
   resourceType: 'user',
   getResourceId: (req) => req.params?.id,
-  getNewValues: () => ({ status: 'suspended' }),
+  fetchOldValues: async (req) => {
+    const id = req.params?.id;
+    if (!id) return null;
+    return await fetchUserById(id);
+  },
+  getNewValues: (_req, _res, oldValues) => ({
+    status: 'suspended',
+    previousStatus: oldValues?.status,
+  }),
+  getContext: (_req, oldValues) => ({
+    operation: 'suspend_user',
+    userName: oldValues?.name,
+    userEmail: oldValues?.email,
+    statusChange: `${oldValues?.status} → suspended`,
+  }),
 });
 
-export const auditUserUnsuspend = auditLog({
+export const auditUserUnsuspend = enhancedAuditLog({
   action: 'user_unsuspend',
   resourceType: 'user',
   getResourceId: (req) => req.params?.id,
-  getNewValues: () => ({ status: 'active' }),
+  fetchOldValues: async (req) => {
+    const id = req.params?.id;
+    if (!id) return null;
+    return await fetchUserById(id);
+  },
+  getNewValues: (_req, _res, oldValues) => ({
+    status: 'active',
+    previousStatus: oldValues?.status,
+  }),
+  getContext: (_req, oldValues) => ({
+    operation: 'unsuspend_user',
+    userName: oldValues?.name,
+    userEmail: oldValues?.email,
+    statusChange: `${oldValues?.status} → active`,
+  }),
 });
 
-export const auditUserPromote = auditLog({
+export const auditUserPromote = enhancedAuditLog({
   action: 'user_promote',
   resourceType: 'user',
   getResourceId: (req) => req.params?.id,
-  getNewValues: () => ({ role: 'admin' }),
+  fetchOldValues: async (req) => {
+    const id = req.params?.id;
+    if (!id) return null;
+    return await fetchUserById(id);
+  },
+  getNewValues: (_req, _res, oldValues) => ({
+    role: 'admin',
+    previousRole: oldValues?.role,
+  }),
+  getContext: (_req, oldValues) => ({
+    operation: 'promote_user',
+    userName: oldValues?.name,
+    userEmail: oldValues?.email,
+    roleChange: `${oldValues?.role} → admin`,
+  }),
 });
 
-export const auditUserDemote = auditLog({
+export const auditUserDemote = enhancedAuditLog({
   action: 'user_demote',
   resourceType: 'user',
   getResourceId: (req) => req.params?.id,
-  getNewValues: () => ({ role: 'user' }),
+  fetchOldValues: async (req) => {
+    const id = req.params?.id;
+    if (!id) return null;
+    return await fetchUserById(id);
+  },
+  getNewValues: (_req, _res, oldValues) => ({
+    role: 'user',
+    previousRole: oldValues?.role,
+  }),
+  getContext: (_req, oldValues) => ({
+    operation: 'demote_user',
+    userName: oldValues?.name,
+    userEmail: oldValues?.email,
+    roleChange: `${oldValues?.role} → user`,
+  }),
 });
 
 // Game world actions
-export const auditGameWorldCreate = auditLog({
+export const auditGameWorldCreate = enhancedAuditLog({
   action: 'game_world_create',
   resourceType: 'game_world',
-  // Don't set getResourceId for create operations since ID doesn't exist yet
-  getNewValues: (req) => req.body,
+  getResourceIdFromResponse: (responseBody) => responseBody?.data?.id || responseBody?.id,
+  getNewValues: (req) => ({
+    worldId: req.body?.worldId,
+    name: req.body?.name,
+    isVisible: req.body?.isVisible ?? true,
+    isMaintenance: req.body?.isMaintenance ?? false,
+    displayOrder: req.body?.displayOrder,
+    description: req.body?.description,
+  }),
+  getContext: (req) => ({
+    operation: 'create_game_world',
+    worldId: req.body?.worldId,
+    worldName: req.body?.name,
+  }),
 });
 
-export const auditGameWorldUpdate = auditLog({
+export const auditGameWorldUpdate = enhancedAuditLog({
   action: 'game_world_update',
   resourceType: 'game_world',
   getResourceId: (req) => req.params?.id,
-  getNewValues: (req) => req.body,
+  fetchOldValues: async (req) => {
+    const id = parseInt(req.params?.id);
+    if (isNaN(id)) return null;
+    return await fetchGameWorldById(id);
+  },
+  getNewValues: (req, _res, oldValues) => {
+    const changes: any = {};
+    const body = req.body;
+
+    // Track only changed fields
+    if (body.name !== undefined && body.name !== oldValues?.name) changes.name = body.name;
+    if (body.worldId !== undefined && body.worldId !== oldValues?.worldId) changes.worldId = body.worldId;
+    if (body.isVisible !== undefined && body.isVisible !== oldValues?.isVisible) changes.isVisible = body.isVisible;
+    if (body.isMaintenance !== undefined && body.isMaintenance !== oldValues?.isMaintenance) changes.isMaintenance = body.isMaintenance;
+    if (body.displayOrder !== undefined && body.displayOrder !== oldValues?.displayOrder) changes.displayOrder = body.displayOrder;
+    if (body.description !== undefined && body.description !== oldValues?.description) changes.description = body.description;
+    if (body.maintenanceMessage !== undefined && body.maintenanceMessage !== oldValues?.maintenanceMessage) changes.maintenanceMessage = body.maintenanceMessage;
+
+    return changes;
+  },
+  getContext: (req, oldValues, newValues) => ({
+    operation: 'update_game_world',
+    worldId: oldValues?.worldId,
+    worldName: oldValues?.name,
+    changedFields: Object.keys(newValues || {}),
+  }),
 });
 
-export const auditGameWorldDelete = auditLog({
+export const auditGameWorldDelete = enhancedAuditLog({
   action: 'game_world_delete',
   resourceType: 'game_world',
   getResourceId: (req) => req.params?.id,
+  fetchOldValues: async (req) => {
+    const id = parseInt(req.params?.id);
+    if (isNaN(id)) return null;
+    return await fetchGameWorldById(id);
+  },
+  getNewValues: (_req, _res, oldValues) => ({
+    deletedWorld: {
+      id: oldValues?.id,
+      worldId: oldValues?.worldId,
+      name: oldValues?.name,
+      isVisible: oldValues?.isVisible,
+      isMaintenance: oldValues?.isMaintenance,
+    },
+  }),
+  getContext: (_req, oldValues) => ({
+    operation: 'delete_game_world',
+    worldId: oldValues?.worldId,
+    worldName: oldValues?.name,
+  }),
 });
 
-export const auditGameWorldToggleVisibility = auditLog({
+export const auditGameWorldToggleVisibility = enhancedAuditLog({
   action: 'game_world_toggle_visibility',
   resourceType: 'game_world',
   getResourceId: (req) => req.params?.id,
-  getNewValues: (req) => ({ isVisible: req.body?.isVisible }),
+  fetchOldValues: async (req) => {
+    const id = parseInt(req.params?.id);
+    if (isNaN(id)) return null;
+    return await fetchGameWorldById(id);
+  },
+  getNewValues: (req, res, oldValues) => {
+    const newIsVisible = oldValues ? !oldValues.isVisible : req.body?.isVisible;
+    return {
+      worldId: oldValues?.worldId,
+      name: oldValues?.name,
+      isVisible: newIsVisible,
+      changedFrom: oldValues?.isVisible,
+      changedTo: newIsVisible,
+    };
+  },
+  getContext: (req, oldValues, newValues) => ({
+    operation: 'toggle_visibility',
+    worldName: oldValues?.name,
+    worldId: oldValues?.worldId,
+    description: `Changed visibility from ${oldValues?.isVisible} to ${newValues?.changedTo}`,
+  }),
 });
 
-export const auditGameWorldToggleMaintenance = auditLog({
+export const auditGameWorldToggleMaintenance = enhancedAuditLog({
   action: 'game_world_toggle_maintenance',
   resourceType: 'game_world',
   getResourceId: (req) => req.params?.id,
-  getNewValues: (req) => ({ isMaintenance: req.body?.isMaintenance }),
+  fetchOldValues: async (req) => {
+    const id = parseInt(req.params?.id);
+    if (isNaN(id)) return null;
+    return await fetchGameWorldById(id);
+  },
+  getNewValues: (req, res, oldValues) => {
+    const newIsMaintenance = oldValues ? !oldValues.isMaintenance : req.body?.isMaintenance;
+    return {
+      worldId: oldValues?.worldId,
+      name: oldValues?.name,
+      isMaintenance: newIsMaintenance,
+      changedFrom: oldValues?.isMaintenance,
+      changedTo: newIsMaintenance,
+      maintenanceMessage: oldValues?.maintenanceMessage,
+      maintenanceStartDate: oldValues?.maintenanceStartDate,
+      maintenanceEndDate: oldValues?.maintenanceEndDate,
+    };
+  },
+  getContext: (req, oldValues, newValues) => ({
+    operation: 'toggle_maintenance',
+    worldName: oldValues?.name,
+    worldId: oldValues?.worldId,
+    description: `Changed maintenance status from ${oldValues?.isMaintenance} to ${newValues?.changedTo}`,
+  }),
 });
 
 export const auditGameWorldUpdateOrders = auditLog({

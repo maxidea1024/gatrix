@@ -27,6 +27,7 @@ import {
   Tabs,
   CircularProgress,
 } from '@mui/material';
+import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer-continued';
 import Timeline from '@mui/lab/Timeline';
 import TimelineItem from '@mui/lab/TimelineItem';
 import TimelineSeparator from '@mui/lab/TimelineSeparator';
@@ -55,6 +56,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import updateLocale from 'dayjs/plugin/updateLocale';
 import 'dayjs/locale/ko';
 import 'dayjs/locale/zh-cn';
 import { useI18n } from '../../contexts/I18nContext';
@@ -64,6 +66,7 @@ import { getStoredTimezone, formatDateTimeDetailed } from '../../utils/dateForma
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(relativeTime);
+dayjs.extend(updateLocale);
 
 // Customize relativeTime thresholds and strings
 dayjs.updateLocale('ko', {
@@ -184,11 +187,12 @@ const RealtimeEventsPage: React.FC = () => {
   const [changedGroupKeys, setChangedGroupKeys] = useState<Set<string>>(new Set());
   const previousGroupCountsRef = useRef<Map<string, number>>(new Map());
 
-  // New events notification
+  // New events notification - track which events have been seen
   const [hasUnseenEvents, setHasUnseenEvents] = useState(false);
   const [unseenEventCount, setUnseenEventCount] = useState(0);
-  const [isScrolledDown, setIsScrolledDown] = useState(false);
+  const [seenEventIds, setSeenEventIds] = useState<Set<number>>(new Set());
   const timelineContainerRef = useRef<HTMLDivElement>(null);
+  const firstEventRef = useRef<HTMLDivElement>(null);
 
   // Set dayjs locale
   useEffect(() => {
@@ -323,10 +327,21 @@ const RealtimeEventsPage: React.FC = () => {
               setNewEventIds(new Set());
             }, 2000);
 
-            // Check if user is scrolled down
-            if (isScrolledDown) {
+            // Check which new events haven't been seen yet
+            const unseenNewEvents = Array.from(newIds).filter(id => !seenEventIds.has(id));
+
+            console.log('🔔 New events detected:', {
+              newEventCount: newIds.size,
+              unseenCount: unseenNewEvents.length,
+              seenEventIds: Array.from(seenEventIds),
+            });
+
+            if (unseenNewEvents.length > 0) {
+              console.log('✅ Setting hasUnseenEvents to true');
               setHasUnseenEvents(true);
-              setUnseenEventCount(prev => prev + newIds.size);
+              setUnseenEventCount(prev => prev + unseenNewEvents.length);
+            } else {
+              console.log('❌ All new events already seen');
             }
           }
 
@@ -428,8 +443,20 @@ const RealtimeEventsPage: React.FC = () => {
 
   // Scroll detection
   useEffect(() => {
+    console.log('🔍 Scroll detection useEffect triggered');
+    console.log('🔍 timelineContainerRef:', timelineContainerRef);
+    console.log('🔍 timelineContainerRef.current:', timelineContainerRef.current);
+
     const container = timelineContainerRef.current;
-    if (!container) return;
+    if (!container) {
+      console.log('⚠️ Timeline container ref not found');
+      return;
+    }
+
+    console.log('✅ Timeline container found:', container);
+    console.log('✅ Container scrollTop:', container.scrollTop);
+    console.log('✅ Container scrollHeight:', container.scrollHeight);
+    console.log('✅ Container clientHeight:', container.clientHeight);
 
     const handleScroll = () => {
       const scrollTop = container.scrollTop;
@@ -438,18 +465,38 @@ const RealtimeEventsPage: React.FC = () => {
       const wasScrolledDown = isScrolledDown;
       const nowScrolledDown = scrollTop > scrollThreshold;
 
+      console.log('📜 Scroll event:', {
+        scrollTop,
+        scrollThreshold,
+        wasScrolledDown,
+        nowScrolledDown,
+      });
+
       setIsScrolledDown(nowScrolledDown);
 
       // If user scrolled back to top, clear unseen events
       if (wasScrolledDown && !nowScrolledDown) {
+        console.log('🔝 Scrolled back to top, clearing unseen events');
         setHasUnseenEvents(false);
         setUnseenEventCount(0);
       }
     };
 
+    // Check initial scroll position
+    const initialScrollTop = container.scrollTop;
+    console.log('📍 Initial scroll position:', initialScrollTop);
+    if (initialScrollTop > 100) {
+      console.log('📍 Setting isScrolledDown to true (initial position > 100)');
+      setIsScrolledDown(true);
+    }
+
+    console.log('📍 Adding scroll event listener');
     container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, [isScrolledDown]);
+    return () => {
+      console.log('🧹 Removing scroll listener');
+      container.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   // Scroll to top function
   const scrollToTop = () => {
@@ -1544,7 +1591,71 @@ const RealtimeEventsPage: React.FC = () => {
                 </>
               )}
 
-              {selectedEvent.oldValues && (
+              {/* Show diff if both old and new values exist */}
+              {selectedEvent.oldValues && selectedEvent.newValues && (
+                <>
+                  <Divider />
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+                      {t('realtimeEvents.changes')}
+                    </Typography>
+                    <Paper sx={{
+                      mt: 0.5,
+                      bgcolor: 'background.default',
+                      overflow: 'hidden',
+                      '& pre': {
+                        fontSize: '0.75rem !important',
+                        fontFamily: 'monospace',
+                      },
+                      '& .diff-gutter': {
+                        minWidth: '30px',
+                      },
+                      '& .diff-code': {
+                        fontSize: '0.75rem',
+                      },
+                    }}>
+                      <ReactDiffViewer
+                        oldValue={JSON.stringify(selectedEvent.oldValues, null, 2)}
+                        newValue={JSON.stringify(selectedEvent.newValues, null, 2)}
+                        splitView={false}
+                        compareMethod={DiffMethod.WORDS}
+                        useDarkTheme={theme.palette.mode === 'dark'}
+                        hideLineNumbers={false}
+                        showDiffOnly={true}
+                        styles={{
+                          variables: {
+                            dark: {
+                              diffViewerBackground: theme.palette.background.default,
+                              addedBackground: alpha(theme.palette.success.main, 0.2),
+                              addedColor: theme.palette.success.contrastText,
+                              removedBackground: alpha(theme.palette.error.main, 0.2),
+                              removedColor: theme.palette.error.contrastText,
+                              wordAddedBackground: alpha(theme.palette.success.main, 0.4),
+                              wordRemovedBackground: alpha(theme.palette.error.main, 0.4),
+                              gutterBackground: theme.palette.background.paper,
+                              gutterColor: theme.palette.text.secondary,
+                            },
+                            light: {
+                              diffViewerBackground: theme.palette.background.default,
+                              addedBackground: alpha(theme.palette.success.main, 0.1),
+                              addedColor: theme.palette.text.primary,
+                              removedBackground: alpha(theme.palette.error.main, 0.1),
+                              removedColor: theme.palette.text.primary,
+                              wordAddedBackground: alpha(theme.palette.success.main, 0.3),
+                              wordRemovedBackground: alpha(theme.palette.error.main, 0.3),
+                              gutterBackground: theme.palette.background.paper,
+                              gutterColor: theme.palette.text.secondary,
+                            },
+                          },
+                        }}
+                      />
+                    </Paper>
+                  </Box>
+                </>
+              )}
+
+              {/* Show only old values if new values don't exist */}
+              {selectedEvent.oldValues && !selectedEvent.newValues && (
                 <>
                   <Divider />
                   <Box>
@@ -1560,7 +1671,8 @@ const RealtimeEventsPage: React.FC = () => {
                 </>
               )}
 
-              {selectedEvent.newValues && (
+              {/* Show only new values if old values don't exist */}
+              {!selectedEvent.oldValues && selectedEvent.newValues && (
                 <>
                   <Divider />
                   <Box>
