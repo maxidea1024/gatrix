@@ -434,8 +434,8 @@ const ApiTokensPage: React.FC = () => {
     <>
       <Box sx={{ p: 3 }}>
         {/* Header */}
-        <Box sx={{ mb: 4 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+        <Box sx={{ mb: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <VpnKeyIcon sx={{ fontSize: 32, color: 'primary.main' }} />
               <Box>

@@ -912,7 +912,7 @@ const ClientVersionsPage: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* 헤더 */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <WidgetsIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Box>
