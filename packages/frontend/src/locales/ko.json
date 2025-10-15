@@ -81,6 +81,7 @@
       "marketType": "마켓 타입",
       "isEditor": "에디터 모드",
       "ipAddress": "IP 주소",
+      "userAgent": "User Agent",
       "userMessage": "사용자 메시지",
       "createdAt": "발생 시각"
     },

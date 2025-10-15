@@ -80,6 +80,8 @@
         "gameServerId": "Game Server ID",
         "marketType": "Market Type",
         "isEditor": "Editor Mode",
+        "ipAddress": "IP Address",
+        "userAgent": "User Agent",
         "userMessage": "User Message",
         "createdAt": "Created At"
       },

@@ -58,6 +58,7 @@ export interface CrashEvent {
   logFilePath?: string; // Path to log file
 
   crashEventIp?: string; // IP address
+  crashEventUserAgent?: string; // Browser user agent
 
   createdAt: string; // ISO date string
 }

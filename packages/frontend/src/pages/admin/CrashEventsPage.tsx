@@ -418,6 +418,7 @@ const CrashEventsPage: React.FC = () => {
       ['Market Type', event.marketType || '-'],
       ['Is Editor', event.isEditor ? 'Yes' : 'No'],
       ['IP Address', event.crashEventIp || '-'],
+      ['User Agent', event.crashEventUserAgent || '-'],
       ['User Message', event.userMessage || '-'],
     ];
     const tsvData = fields.map(([key, value]) => `${key}\t${value}`).join('\n');
@@ -1142,6 +1143,31 @@ const CrashEventsPage: React.FC = () => {
                                               size="small"
                                               onClick={() => {
                                                 navigator.clipboard.writeText(event.crashEventIp!);
+                                                enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                              }}
+                                            >
+                                              <CopyIcon fontSize="small" />
+                                            </IconButton>
+                                          )}
+                                        </Box>
+                                      </TableCell>
+                                    </TableRow>
+
+                                    {/* User Agent */}
+                                    <TableRow>
+                                      <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover' }}>
+                                        {t('crashes.table.userAgent')}
+                                      </TableCell>
+                                      <TableCell>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem', wordBreak: 'break-all' }}>
+                                            {event.crashEventUserAgent || '-'}
+                                          </Typography>
+                                          {event.crashEventUserAgent && (
+                                            <IconButton
+                                              size="small"
+                                              onClick={() => {
+                                                navigator.clipboard.writeText(event.crashEventUserAgent!);
                                                 enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
                                               }}
                                             >

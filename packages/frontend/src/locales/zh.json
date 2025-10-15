@@ -103,6 +103,8 @@
       "gameServerId": "游戏服务器ID",
       "marketType": "市场类型",
       "isEditor": "编辑器模式",
+      "ipAddress": "IP地址",
+      "userAgent": "User Agent",
       "userMessage": "用户消息",
       "createdAt": "创建时间"
     },

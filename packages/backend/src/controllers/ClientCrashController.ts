@@ -129,7 +129,8 @@ export class ClientCrashController {
         userName: body.userName,
         gameServerId: body.gameServerId,
         userMessage: body.userMessage,
-        crashEventIp: clientIp
+        crashEventIp: clientIp,
+        crashEventUserAgent: userAgent
       });
 
       // Update crash record for existing crashes

@@ -4,6 +4,7 @@ import {
   GetCrashEventsRequest,
   GetCrashEventsResponse,
 } from '@/types/crash';
+import { getStoredTimezone } from '@/utils/dateFormat';
 
 class CrashService {
   /**
@@ -89,7 +90,10 @@ class CrashService {
    */
   async getLogFile(eventId: string): Promise<{ logContent: string; logFilePath: string }> {
     try {
-      const response = await api.get(`/admin/crash-events/${eventId}/log`);
+      const timezone = getStoredTimezone();
+      const response = await api.get(`/admin/crash-events/${eventId}/log`, {
+        params: { timezone }
+      });
       return response.data;
     } catch (error) {
       console.error('Error fetching log file:', error);

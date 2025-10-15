@@ -152,11 +152,45 @@ export class CrashEventController {
   });
 
   /**
+   * Convert ISO8601 UTC timestamps in log lines to local timezone
+   * Converts "[2025-10-15T11:51:05.401Z] " to "[2025-10-15 20:51:05.401] " (for Asia/Seoul timezone)
+   */
+  private static convertLogTimestamps(logContent: string, timezone: string = 'UTC'): string {
+    // Match lines starting with "[ISO8601 timestamp] "
+    const timestampRegex = /^\[(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)\]\s/gm;
+
+    return logContent.replace(timestampRegex, (match, isoTimestamp) => {
+      try {
+        const date = new Date(isoTimestamp);
+
+        // Format to local timezone
+        const localTime = date.toLocaleString('sv-SE', {
+          timeZone: timezone,
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          fractionalSecondDigits: 3,
+          hour12: false
+        }).replace(' ', ' ');
+
+        return `[${localTime}] `;
+      } catch (error) {
+        // If conversion fails, return original
+        return match;
+      }
+    });
+  }
+
+  /**
    * Get log file content for a crash event
    * GET /admin/crash-events/:id/log
    */
   static getLogFile = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
+    const timezone = (req.query.timezone as string) || 'UTC';
 
     const event = await CrashEvent.query().findById(id);
 
@@ -170,7 +204,10 @@ export class CrashEventController {
 
     try {
       const fullPath = path.join(process.cwd(), 'public', event.logFilePath);
-      const logContent = await fs.readFile(fullPath, 'utf8');
+      let logContent = await fs.readFile(fullPath, 'utf8');
+
+      // Convert timestamps to local timezone
+      logContent = this.convertLogTimestamps(logContent, timezone);
 
       res.json({
         success: true,
