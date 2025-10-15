@@ -34,6 +34,7 @@
     "viewDetails": "상세 보기",
     "eventDetails": "크래시 이벤트 상세",
     "eventInfo": "이벤트 정보",
+    "properties": "프로퍼티",
     "stackTrace": "스택 트레이스",
     "stackTraceUrl": "스택 트레이스 URL",
     "logFile": "로그 파일",

@@ -21,13 +21,20 @@ export class CrashEventController {
       limit = 20,
       search,
       platform,
+      platformOperator,
       environment,
+      environmentOperator,
       branch,
+      branchOperator,
       marketType,
+      marketTypeOperator,
       isEditor,
       appVersion,
+      appVersionOperator,
       dateFrom,
       dateTo,
+      sortBy,
+      sortOrder,
     } = req.query;
 
     const pageNum = parseInt(page as string, 10);
@@ -47,24 +54,36 @@ export class CrashEventController {
       });
     }
 
-    // Platform filter
+    // Platform filter - support multiple values
     if (platform) {
-      query = query.where('platform', platform as string);
+      const platforms = (platform as string).split(',').map(p => p.trim());
+      if (platforms.length > 0) {
+        query = query.whereIn('platform', platforms);
+      }
     }
 
-    // Environment filter
+    // Environment filter - support multiple values
     if (environment) {
-      query = query.where('environment', environment as string);
+      const environments = (environment as string).split(',').map(e => e.trim());
+      if (environments.length > 0) {
+        query = query.whereIn('environment', environments);
+      }
     }
 
-    // Branch filter
+    // Branch filter - support multiple values
     if (branch) {
-      query = query.where('branch', branch as string);
+      const branches = (branch as string).split(',').map(b => b.trim());
+      if (branches.length > 0) {
+        query = query.whereIn('branch', branches);
+      }
     }
 
-    // Market type filter
+    // Market type filter - support multiple values
     if (marketType) {
-      query = query.where('marketType', marketType as string);
+      const marketTypes = (marketType as string).split(',').map(m => m.trim());
+      if (marketTypes.length > 0) {
+        query = query.whereIn('marketType', marketTypes);
+      }
     }
 
     // Is editor filter
@@ -73,9 +92,12 @@ export class CrashEventController {
       query = query.where('isEditor', isEditorBool);
     }
 
-    // App version filter
+    // App version filter - support multiple values
     if (appVersion) {
-      query = query.where('appVersion', appVersion as string);
+      const appVersions = (appVersion as string).split(',').map(v => v.trim());
+      if (appVersions.length > 0) {
+        query = query.whereIn('appVersion', appVersions);
+      }
     }
 
     // Date range filter
@@ -89,9 +111,14 @@ export class CrashEventController {
     // Get total count
     const total = await query.resultSize();
 
+    // Apply sorting
+    const validSortColumns = ['createdAt', 'platform', 'environment', 'branch', 'appVersion', 'resVersion', 'accountId', 'characterId', 'gameUserId', 'userName'];
+    const sortColumn = validSortColumns.includes(sortBy as string) ? (sortBy as string) : 'createdAt';
+    const sortDirection = sortOrder === 'ASC' ? 'ASC' : 'DESC';
+
     // Get paginated results
     const events = await query
-      .orderBy('createdAt', 'DESC')
+      .orderBy(sortColumn, sortDirection)
       .limit(limitNum)
       .offset((pageNum - 1) * limitNum);
 

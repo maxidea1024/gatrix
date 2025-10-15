@@ -49,17 +49,7 @@ export const StackTraceViewer: React.FC<StackTraceViewerProps> = ({
   return (
     <Box>
       {/* Toolbar */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-        <Box>
-          <Typography variant="caption" color="text.secondary">
-            {stackFilePath || t('crashes.stackTrace')}
-          </Typography>
-          {firstLine && (
-            <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
-              {firstLine}
-            </Typography>
-          )}
-        </Box>
+      <Box display="flex" justifyContent="flex-end" alignItems="center" mb={1}>
         <Tooltip title={t('crashes.copyAll')}>
           <IconButton size="small" onClick={handleCopyAll}>
             <CopyIcon fontSize="small" />

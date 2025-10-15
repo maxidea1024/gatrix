@@ -34,6 +34,7 @@
       "viewDetails": "View Details",
       "eventDetails": "Crash Event Details",
       "eventInfo": "Event Information",
+      "properties": "Properties",
       "stackTrace": "Stack Trace",
       "stackTraceUrl": "Stack Trace URL",
       "logFile": "Log File",

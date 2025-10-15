@@ -20,12 +20,12 @@ import {
   ToggleButtonGroup,
   ToggleButton,
   Paper,
+  Button,
 } from '@mui/material';
 import {
   Search as SearchIcon,
   BugReport as BugReportIcon,
   Description as LogIcon,
-  Code as CodeIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   Close as CloseIcon,
@@ -124,12 +124,11 @@ const CrashEventsPage: React.FC = () => {
   });
   const [detailViewMode, setDetailViewMode] = useState<'table' | 'json'>('table');
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerType, setDrawerType] = useState<'log' | 'stackTrace' | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CrashEvent | null>(null);
   const [logContent, setLogContent] = useState<string>('');
-  const [stackTrace, setStackTrace] = useState<string>('');
+  const [stackTraceMap, setStackTraceMap] = useState<Record<string, string>>({});
   const [loadingLog, setLoadingLog] = useState(false);
-  const [loadingStackTrace, setLoadingStackTrace] = useState(false);
+  const [loadingStackTraceId, setLoadingStackTraceId] = useState<string | null>(null);
 
   // Dynamic filter definitions
   const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
@@ -377,8 +376,26 @@ const CrashEventsPage: React.FC = () => {
     updateSort(column, newSortOrder);
   }, [pageState.sortBy, pageState.sortOrder, updateSort]);
 
-  const handleToggleRow = (eventId: string) => {
-    setExpandedRowId(expandedRowId === eventId ? null : eventId);
+  const handleToggleRow = async (eventId: string) => {
+    const isExpanding = expandedRowId !== eventId;
+    setExpandedRowId(isExpanding ? eventId : null);
+
+    // Load stack trace when expanding
+    if (isExpanding && !stackTraceMap[eventId]) {
+      setLoadingStackTraceId(eventId);
+      try {
+        const stackData = await crashService.getStackTrace(eventId);
+        setStackTraceMap(prev => ({
+          ...prev,
+          [eventId]: stackData.stackTrace,
+        }));
+      } catch (error) {
+        console.error('Failed to load stack trace:', error);
+        // Don't show error snackbar, just show "not available" in UI
+      } finally {
+        setLoadingStackTraceId(null);
+      }
+    }
   };
 
   const handleCopyTableData = useCallback((event: CrashEvent) => {
@@ -420,7 +437,6 @@ const CrashEventsPage: React.FC = () => {
 
   const handleViewLog = async (event: CrashEvent) => {
     setSelectedEvent(event);
-    setDrawerType('log');
     setDrawerOpen(true);
     setLogContent('');
 
@@ -438,30 +454,10 @@ const CrashEventsPage: React.FC = () => {
     }
   };
 
-  const handleViewStackTrace = async (event: CrashEvent) => {
-    setSelectedEvent(event);
-    setDrawerType('stackTrace');
-    setDrawerOpen(true);
-    setStackTrace('');
-
-    setLoadingStackTrace(true);
-    try {
-      const stackData = await crashService.getStackTrace(event.id);
-      setStackTrace(stackData.stackTrace);
-    } catch (error) {
-      console.error('Failed to load stack trace:', error);
-      enqueueSnackbar(t('crashes.stackTraceNotAvailable'), { variant: 'warning' });
-    } finally {
-      setLoadingStackTrace(false);
-    }
-  };
-
   const handleCloseDrawer = () => {
     setDrawerOpen(false);
-    setDrawerType(null);
     setSelectedEvent(null);
     setLogContent('');
-    setStackTrace('');
   };
 
   return (
@@ -764,6 +760,11 @@ const CrashEventsPage: React.FC = () => {
                             borderBottom: 1,
                             borderColor: 'divider',
                           }}>
+                            {/* Properties Title */}
+                            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                              {t('crashes.properties')}
+                            </Typography>
+
                             {/* Table View */}
                             {detailViewMode === 'table' && (
                               <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
@@ -1206,13 +1207,20 @@ const CrashEventsPage: React.FC = () => {
                               </Tooltip>
                             </Box>
 
+                            {/* Divider */}
+                            <Box sx={{ my: 3, borderTop: 1, borderColor: 'divider' }} />
+
                             {/* Stack Trace Section */}
-                            <Box sx={{ mt: 3 }}>
+                            <Box>
                               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
                                 {t('crashes.stackTrace')}
                               </Typography>
-                              {event.stackTrace ? (
-                                <StackTraceViewer stackTrace={event.stackTrace} />
+                              {loadingStackTraceId === event.id ? (
+                                <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                                  <Typography>{t('crashes.loadingStackTrace')}</Typography>
+                                </Box>
+                              ) : stackTraceMap[event.id] ? (
+                                <StackTraceViewer stackTrace={stackTraceMap[event.id]} />
                               ) : (
                                 <Typography color="text.secondary">
                                   {t('crashes.stackTraceNotAvailable')}
@@ -1253,7 +1261,7 @@ const CrashEventsPage: React.FC = () => {
         />
       </Card>
 
-      {/* Log/Stack Trace Drawer */}
+      {/* Log Drawer */}
       <Drawer
         anchor="right"
         open={drawerOpen}
@@ -1282,7 +1290,7 @@ const CrashEventsPage: React.FC = () => {
           bgcolor: 'background.paper'
         }}>
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {drawerType === 'log' ? t('crashes.viewLog') : t('crashes.viewStackTrace')}
+            {t('crashes.viewLog')}
           </Typography>
           <IconButton
             onClick={handleCloseDrawer}
@@ -1299,34 +1307,16 @@ const CrashEventsPage: React.FC = () => {
 
         {/* Content */}
         <Box sx={{ flex: 1, overflow: 'hidden', p: 2, display: 'flex', flexDirection: 'column' }}>
-          {drawerType === 'log' && (
-            <>
-              {loadingLog ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                  <Typography>{t('crashes.loadingLog')}</Typography>
-                </Box>
-              ) : logContent ? (
-                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                  <LogViewer logContent={logContent} logFilePath={selectedEvent?.logFilePath || ''} />
-                </Box>
-              ) : (
-                <Typography color="text.secondary">{t('crashes.logNotAvailable')}</Typography>
-              )}
-            </>
-          )}
-
-          {drawerType === 'stackTrace' && (
-            <>
-              {loadingStackTrace ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                  <Typography>{t('crashes.loadingStackTrace')}</Typography>
-                </Box>
-              ) : stackTrace ? (
-                <StackTraceViewer stackTrace={stackTrace} />
-              ) : (
-                <Typography color="text.secondary">{t('crashes.stackTraceNotAvailable')}</Typography>
-              )}
-            </>
+          {loadingLog ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+              <Typography>{t('crashes.loadingLog')}</Typography>
+            </Box>
+          ) : logContent ? (
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <LogViewer logContent={logContent} logFilePath={selectedEvent?.logFilePath || ''} />
+            </Box>
+          ) : (
+            <Typography color="text.secondary">{t('crashes.logNotAvailable')}</Typography>
           )}
         </Box>
       </Drawer>

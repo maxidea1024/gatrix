@@ -34,6 +34,7 @@
     "viewDetails": "查看详情",
     "eventDetails": "崩溃事件详情",
     "eventInfo": "事件信息",
+    "properties": "属性",
     "stackTrace": "堆栈跟踪",
     "stackTraceUrl": "堆栈跟踪URL",
     "logFile": "日志文件",
