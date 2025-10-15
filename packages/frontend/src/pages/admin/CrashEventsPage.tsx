@@ -813,7 +813,7 @@ const CrashEventsPage: React.FC = () => {
                                   <TableBody>
                                     {/* ID */}
                                     <TableRow>
-                                      <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover' }}>
+                                      <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
                                         ID
                                       </TableCell>
                                       <TableCell>
@@ -836,7 +836,7 @@ const CrashEventsPage: React.FC = () => {
 
                                     {/* Created At */}
                                     <TableRow>
-                                      <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover' }}>
+                                      <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
                                         {t('crashes.table.createdAt')}
                                       </TableCell>
                                       <TableCell>
@@ -848,7 +848,7 @@ const CrashEventsPage: React.FC = () => {
 
                                     {/* Platform */}
                                     <TableRow>
-                                      <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover' }}>
+                                      <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
                                         {t('crashes.table.platform')}
                                       </TableCell>
                                       <TableCell>
@@ -874,7 +874,7 @@ const CrashEventsPage: React.FC = () => {
 
                                     {/* Environment */}
                                     <TableRow>
-                                      <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover' }}>
+                                      <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
                                         {t('crashes.table.environment')}
                                       </TableCell>
                                       <TableCell>
@@ -900,7 +900,7 @@ const CrashEventsPage: React.FC = () => {
 
                                     {/* Branch */}
                                     <TableRow>
-                                      <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover' }}>
+                                      <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
                                         {t('crashes.table.branch')}
                                       </TableCell>
                                       <TableCell>
@@ -926,7 +926,7 @@ const CrashEventsPage: React.FC = () => {
 
                                     {/* App Version */}
                                     <TableRow>
-                                      <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover' }}>
+                                      <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
                                         {t('crashes.table.appVersion')}
                                       </TableCell>
                                       <TableCell>
@@ -953,7 +953,7 @@ const CrashEventsPage: React.FC = () => {
 
                                     {/* Res Version */}
                                     <TableRow>
-                                      <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover' }}>
+                                      <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
                                         {t('crashes.table.resVersion')}
                                       </TableCell>
                                       <TableCell>
@@ -981,7 +981,7 @@ const CrashEventsPage: React.FC = () => {
                                     {/* Account ID */}
                                     {event.accountId != null && (
                                       <TableRow>
-                                        <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover' }}>
+                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
                                           {t('crashes.table.accountId')}
                                         </TableCell>
                                         <TableCell>
@@ -1004,7 +1004,7 @@ const CrashEventsPage: React.FC = () => {
                                     {/* Character ID */}
                                     {event.characterId != null && (
                                       <TableRow>
-                                        <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover' }}>
+                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
                                           {t('crashes.table.characterId')}
                                         </TableCell>
                                         <TableCell>
@@ -1027,7 +1027,7 @@ const CrashEventsPage: React.FC = () => {
                                     {/* Game User ID */}
                                     {event.gameUserId != null && (
                                       <TableRow>
-                                        <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover' }}>
+                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
                                           {t('crashes.table.gameUserId')}
                                         </TableCell>
                                         <TableCell>
@@ -1050,7 +1050,7 @@ const CrashEventsPage: React.FC = () => {
                                     {/* User Name */}
                                     {!!event.userName && (
                                       <TableRow>
-                                        <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover' }}>
+                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
                                           {t('crashes.table.userName')}
                                         </TableCell>
                                         <TableCell>
@@ -1073,7 +1073,7 @@ const CrashEventsPage: React.FC = () => {
                                     {/* Game Server ID */}
                                     {event.gameServerId != null && (
                                       <TableRow>
-                                        <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover' }}>
+                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
                                           {t('crashes.table.gameServerId')}
                                         </TableCell>
                                         <TableCell>
@@ -1096,7 +1096,7 @@ const CrashEventsPage: React.FC = () => {
                                     {/* Market Type */}
                                     {!!event.marketType && (
                                       <TableRow>
-                                        <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover' }}>
+                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
                                           {t('crashes.table.marketType')}
                                         </TableCell>
                                         <TableCell>
@@ -1119,7 +1119,7 @@ const CrashEventsPage: React.FC = () => {
                                     {/* Is Editor */}
                                     {!!event.isEditor && (
                                       <TableRow>
-                                        <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover' }}>
+                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
                                           {t('crashes.table.isEditor')}
                                         </TableCell>
                                         <TableCell>
@@ -1130,7 +1130,7 @@ const CrashEventsPage: React.FC = () => {
 
                                     {/* IP Address */}
                                     <TableRow>
-                                      <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover' }}>
+                                      <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
                                         {t('crashes.table.ipAddress')}
                                       </TableCell>
                                       <TableCell>
@@ -1155,7 +1155,7 @@ const CrashEventsPage: React.FC = () => {
 
                                     {/* User Agent */}
                                     <TableRow>
-                                      <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover' }}>
+                                      <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
                                         {t('crashes.table.userAgent')}
                                       </TableCell>
                                       <TableCell>
@@ -1181,7 +1181,7 @@ const CrashEventsPage: React.FC = () => {
                                     {/* User Message */}
                                     {!!event.userMessage && (
                                       <TableRow>
-                                        <TableCell sx={{ width: '30%', fontWeight: 600, bgcolor: 'action.hover', verticalAlign: 'top' }}>
+                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', verticalAlign: 'top', whiteSpace: 'nowrap' }}>
                                           {t('crashes.table.userMessage')}
                                         </TableCell>
                                         <TableCell>
