@@ -1090,6 +1090,7 @@
     "date": "Date",
     "details": "Details",
     "detailsCopied": "Details copied to clipboard",
+    "detailsTitle": "Details",
     "endDate": "End Date",
     "id": "ID",
     "ipAddress": "IP Address",
@@ -1104,6 +1105,10 @@
     "system": "System",
     "title": "Audit Logs",
     "user": "User",
+    "userAgent": "User Agent",
+    "changes": "Changes",
+    "newValues": "New Values",
+    "oldValues": "Old Values",
     "actions": {
       "create": "Create",
       "user_login": "User Login",

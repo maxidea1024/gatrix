@@ -27,13 +27,21 @@ import {
   Pagination,
   Skeleton,
   CircularProgress,
+  Collapse,
+  Paper,
+  Divider,
+  alpha,
+  useTheme,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
   Info as InfoIcon,
   ContentCopy as ContentCopyIcon,
   History as HistoryIcon,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
+  KeyboardArrowRight as KeyboardArrowRightIcon,
 } from '@mui/icons-material';
+import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer-continued';
 
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -57,6 +65,7 @@ const AuditLogsPage: React.FC = () => {
   const { t } = useTranslation();
   const { language } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
+  const theme = useTheme();
 
   // 페이지 상태 관리 (localStorage 연동)
   const {
@@ -92,6 +101,9 @@ const AuditLogsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Expanded row state
+  const [expandedRowId, setExpandedRowId] = useState<number | null>(null);
 
   // Date range state
   const [dateFrom, setDateFrom] = useState<Dayjs | null>(
@@ -437,13 +449,13 @@ const AuditLogsPage: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
+                  <TableCell width="50px"></TableCell>
                   <TableCell>{t('auditLogs.id')}</TableCell>
                   <TableCell>{t('auditLogs.action')}</TableCell>
                   <TableCell>{t('auditLogs.resource')}</TableCell>
                   <TableCell>{t('auditLogs.user')}</TableCell>
                   <TableCell>{t('auditLogs.ipAddress')}</TableCell>
                   <TableCell>{t('auditLogs.date')}</TableCell>
-                  <TableCell>{t('auditLogs.details')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -451,6 +463,9 @@ const AuditLogsPage: React.FC = () => {
                   // 스켈레톤 로딩 (초기 로딩 시에만)
                   Array.from({ length: 5 }).map((_, index) => (
                     <TableRow key={`skeleton-${index}`}>
+                      <TableCell>
+                        <Skeleton variant="circular" width={32} height={32} />
+                      </TableCell>
                       <TableCell>
                         <Skeleton variant="text" width={60} />
                       </TableCell>
@@ -472,9 +487,6 @@ const AuditLogsPage: React.FC = () => {
                       <TableCell>
                         <Skeleton variant="text" width="70%" />
                       </TableCell>
-                      <TableCell>
-                        <Skeleton variant="circular" width={32} height={32} />
-                      </TableCell>
                     </TableRow>
                   ))
                 ) : auditLogs.length === 0 ? (
@@ -486,68 +498,193 @@ const AuditLogsPage: React.FC = () => {
                   />
                 ) : (
                   auditLogs.map((log) => (
-                    <TableRow key={log.id}>
-                      <TableCell>{log.id}</TableCell>
-                      <TableCell>
-                        <Chip label={t(`auditLogs.actions.${log.action}`)} color={AuditLogService.getActionColor(log.action)} size="small" />
-                      </TableCell>
-                      <TableCell>
-                        {((log as any).resourceType || (log as any).resource_type || (log as any).entityType) ? (
-                          <Box>
-                            <Typography variant="body2" fontWeight="medium">
-                              {t(`auditLogs.resources.${(log as any).resourceType || (log as any).resource_type || (log as any).entityType}`, (log as any).resourceType || (log as any).resource_type || (log as any).entityType)}
-                            </Typography>
-                            {((log as any).resourceId || (log as any).resource_id || (log as any).entityId) && (
-                              <Typography variant="caption" color="text.secondary">
-                                ID: {(log as any).resourceId || (log as any).resource_id || (log as any).entityId}
+                    <React.Fragment key={log.id}>
+                      <TableRow
+                        hover
+                        sx={{
+                          cursor: 'pointer',
+                          '& > *': { borderBottom: expandedRowId === log.id ? 'none' : undefined }
+                        }}
+                        onClick={() => setExpandedRowId(expandedRowId === log.id ? null : log.id)}
+                      >
+                        <TableCell>
+                          <IconButton size="small">
+                            {expandedRowId === log.id ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
+                          </IconButton>
+                        </TableCell>
+                        <TableCell>{log.id}</TableCell>
+                        <TableCell>
+                          <Chip label={t(`auditLogs.actions.${log.action}`)} color={AuditLogService.getActionColor(log.action)} size="small" />
+                        </TableCell>
+                        <TableCell>
+                          {((log as any).resourceType || (log as any).resource_type || (log as any).entityType) ? (
+                            <Box>
+                              <Typography variant="body2" fontWeight="medium">
+                                {t(`auditLogs.resources.${(log as any).resourceType || (log as any).resource_type || (log as any).entityType}`, (log as any).resourceType || (log as any).resource_type || (log as any).entityType)}
                               </Typography>
-                            )}
-                          </Box>
-                        ) : (
-                          <Typography variant="body2" color="text.secondary">-</Typography>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {log.user_name ? (
-                          <Box>
-                            <Typography variant="body2" fontWeight="medium">
-                              {log.user_name}
+                              {((log as any).resourceId || (log as any).resource_id || (log as any).entityId) && (
+                                <Typography variant="caption" color="text.secondary">
+                                  ID: {(log as any).resourceId || (log as any).resource_id || (log as any).entityId}
+                                </Typography>
+                              )}
+                            </Box>
+                          ) : (
+                            <Typography variant="body2" color="text.secondary">-</Typography>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {log.user_name ? (
+                            <Box>
+                              <Typography variant="body2" fontWeight="medium">
+                                {log.user_name}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                {log.user_email}
+                              </Typography>
+                            </Box>
+                          ) : (
+                            <Typography variant="body2" color="text.secondary">
+                              {t('auditLogs.system')}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {log.user_email}
-                            </Typography>
-                          </Box>
-                        ) : (
-                          <Typography variant="body2" color="text.secondary">
-                            {t('auditLogs.system')}
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2" fontFamily="monospace">
+                            {log.ip_address || '-'}
                           </Typography>
-                        )}
-                      </TableCell>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">
+                            {formatDateTimeDetailed((log as any).createdAt || log.created_at)}
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
 
+                      {/* Expanded Detail Row */}
+                      <TableRow>
+                        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+                          <Collapse in={expandedRowId === log.id} timeout="auto" unmountOnExit>
+                            <Box sx={{ py: 2, px: 3, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }}>
+                              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
+                                {t('auditLogs.detailsTitle')}
+                              </Typography>
 
-                      <TableCell>
-                        <Typography variant="body2" fontFamily="monospace">
-                          {log.ip_address || '-'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2">
-                          {formatDateTimeDetailed((log as any).createdAt || log.created_at)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Tooltip title={formatDetails(log.details)}>
-                          <Box sx={{ display: 'inline-flex', gap: 0.5 }}>
-                            <IconButton size="small">
-                              <InfoIcon />
-                            </IconButton>
-                            <IconButton size="small" onClick={() => handleCopyDetails(log.details)}>
-                              <ContentCopyIcon fontSize="small" />
-                            </IconButton>
-                          </Box>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
+                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                {/* IP Address & User Agent */}
+                                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                                  <Box>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {t('auditLogs.ipAddress')}
+                                    </Typography>
+                                    <Typography variant="body2" fontFamily="monospace">
+                                      {log.ip_address || '-'}
+                                    </Typography>
+                                  </Box>
+                                  {log.user_agent && (
+                                    <Box>
+                                      <Typography variant="caption" color="text.secondary">
+                                        {t('auditLogs.userAgent')}
+                                      </Typography>
+                                      <Typography variant="body2" sx={{ wordBreak: 'break-all', fontSize: '0.75rem' }}>
+                                        {log.user_agent}
+                                      </Typography>
+                                    </Box>
+                                  )}
+                                </Box>
+
+                                <Divider />
+
+                                {/* Changes - Diff Viewer */}
+                                {log.old_values && log.new_values && (
+                                  <Box>
+                                    <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+                                      {t('auditLogs.changes')}
+                                    </Typography>
+                                    <Paper sx={{
+                                      mt: 0.5,
+                                      bgcolor: 'background.default',
+                                      overflow: 'hidden',
+                                      '& pre': {
+                                        fontSize: '0.75rem !important',
+                                        fontFamily: 'monospace',
+                                      },
+                                      '& .diff-gutter': {
+                                        minWidth: '30px',
+                                      },
+                                      '& .diff-code': {
+                                        fontSize: '0.75rem',
+                                      },
+                                    }}>
+                                      <ReactDiffViewer
+                                        oldValue={JSON.stringify(log.old_values, null, 2)}
+                                        newValue={JSON.stringify(log.new_values, null, 2)}
+                                        splitView={false}
+                                        compareMethod={DiffMethod.WORDS}
+                                        useDarkTheme={theme.palette.mode === 'dark'}
+                                        hideLineNumbers={false}
+                                        showDiffOnly={true}
+                                        styles={{
+                                          variables: {
+                                            dark: {
+                                              diffViewerBackground: theme.palette.background.default,
+                                              addedBackground: alpha(theme.palette.success.main, 0.2),
+                                              addedColor: theme.palette.success.contrastText,
+                                              removedBackground: alpha(theme.palette.error.main, 0.2),
+                                              removedColor: theme.palette.error.contrastText,
+                                              wordAddedBackground: alpha(theme.palette.success.main, 0.4),
+                                              wordRemovedBackground: alpha(theme.palette.error.main, 0.4),
+                                              gutterBackground: theme.palette.background.paper,
+                                            },
+                                            light: {
+                                              diffViewerBackground: theme.palette.background.default,
+                                              addedBackground: alpha(theme.palette.success.main, 0.1),
+                                              addedColor: theme.palette.text.primary,
+                                              removedBackground: alpha(theme.palette.error.main, 0.1),
+                                              removedColor: theme.palette.text.primary,
+                                              wordAddedBackground: alpha(theme.palette.success.main, 0.3),
+                                              wordRemovedBackground: alpha(theme.palette.error.main, 0.3),
+                                              gutterBackground: theme.palette.background.paper,
+                                            },
+                                          },
+                                        }}
+                                      />
+                                    </Paper>
+                                  </Box>
+                                )}
+
+                                {/* Show only new values if old values don't exist */}
+                                {!log.old_values && log.new_values && (
+                                  <Box>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {t('auditLogs.newValues')}
+                                    </Typography>
+                                    <Paper sx={{ p: 1.5, mt: 0.5, bgcolor: 'background.default' }}>
+                                      <pre style={{ margin: 0, fontSize: '0.75rem', overflow: 'auto', fontFamily: 'monospace' }}>
+                                        {JSON.stringify(log.new_values, null, 2)}
+                                      </pre>
+                                    </Paper>
+                                  </Box>
+                                )}
+
+                                {/* Show only old values if new values don't exist */}
+                                {log.old_values && !log.new_values && (
+                                  <Box>
+                                    <Typography variant="caption" color="text.secondary">
+                                      {t('auditLogs.oldValues')}
+                                    </Typography>
+                                    <Paper sx={{ p: 1.5, mt: 0.5, bgcolor: 'background.default' }}>
+                                      <pre style={{ margin: 0, fontSize: '0.75rem', overflow: 'auto', fontFamily: 'monospace' }}>
+                                        {JSON.stringify(log.old_values, null, 2)}
+                                      </pre>
+                                    </Paper>
+                                  </Box>
+                                )}
+                              </Box>
+                            </Box>
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
+                    </React.Fragment>
                   ))
                 )}
               </TableBody>

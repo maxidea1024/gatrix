@@ -1087,6 +1087,7 @@
     "date": "날짜",
     "details": "세부사항",
     "detailsCopied": "세부사항이 클립보드에 복사되었습니다",
+    "detailsTitle": "상세 정보",
     "endDate": "종료일",
     "id": "ID",
     "ipAddress": "IP 주소",
@@ -1101,6 +1102,10 @@
     "system": "시스템",
     "title": "감사 로그",
     "user": "사용자",
+    "userAgent": "사용자 에이전트",
+    "changes": "변경 내용",
+    "newValues": "새 값",
+    "oldValues": "이전 값",
     "actions": {
       "create": "생성",
       "user_login": "사용자 로그인",

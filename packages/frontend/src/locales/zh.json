@@ -1084,6 +1084,7 @@
     "date": "日期",
     "details": "详情",
     "detailsCopied": "详情已复制到剪贴板",
+    "detailsTitle": "详细信息",
     "endDate": "结束日期",
     "id": "ID",
     "ipAddress": "IP地址",
@@ -1098,6 +1099,10 @@
     "system": "系统",
     "title": "审计日志",
     "user": "用户",
+    "userAgent": "用户代理",
+    "changes": "变更内容",
+    "newValues": "新值",
+    "oldValues": "旧值",
     "actions": {
       "create": "创建",
       "user_login": "用户登录",
