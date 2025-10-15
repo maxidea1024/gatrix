@@ -47,7 +47,7 @@ export const adminMenuItems: MenuItem[] = [
   { text: 'sidebar.whitelist', icon: <SecurityIcon />, path: '/admin/whitelist', adminOnly: true },
   { text: 'sidebar.auditLogs', icon: <HistoryIcon />, path: '/admin/audit-logs', adminOnly: true },
   { text: 'sidebar.realtimeEvents', icon: <TimelineIcon />, path: '/admin/realtime-events', adminOnly: true },
-  { text: 'sidebar.crashes', icon: <BugReportIcon />, path: '/admin/crashes', adminOnly: true },
+  { text: 'sidebar.crashEvents', icon: <BugReportIcon />, path: '/admin/crash-events', adminOnly: true },
   { text: 'sidebar.remoteConfig', icon: <CloudSyncIcon />, path: '/admin/remote-config', adminOnly: true },
   { text: 'sidebar.apiTokens', icon: <VpnKeyIcon />, path: '/admin/api-tokens', adminOnly: true },
   { text: 'sidebar.console', icon: <TerminalIcon />, path: '/admin/console', adminOnly: true },

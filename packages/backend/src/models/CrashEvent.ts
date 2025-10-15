@@ -29,9 +29,10 @@ export class CrashEvent extends Model {
   
   userMessage?: string; // User message (max 255 chars)
   logFilePath?: string; // Path to log file
-  
+
   crashEventIp?: string; // IP address
-  
+  crashEventUserAgent?: string; // Browser user agent
+
   createdAt!: Date;
 
   static get jsonSchema() {
@@ -56,6 +57,7 @@ export class CrashEvent extends Model {
         userMessage: { type: ['string', 'null'], maxLength: 255 },
         logFilePath: { type: ['string', 'null'], maxLength: 500 },
         crashEventIp: { type: ['string', 'null'], maxLength: 45 },
+        crashEventUserAgent: { type: ['string', 'null'], maxLength: 500 },
         createdAt: { type: 'string', format: 'date-time' }
       }
     };
@@ -101,6 +103,7 @@ export class CrashEvent extends Model {
     userMessage?: string;
     logFilePath?: string;
     crashEventIp?: string;
+    crashEventUserAgent?: string;
   }) {
     // Truncate user message if too long
     if (data.userMessage && data.userMessage.length > CRASH_CONSTANTS.MaxUserMsgLen) {

@@ -48,10 +48,18 @@ export class ClientCrashController {
         }
       }
 
-      // Get client IP address
-      const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0] ||
-                       req.socket.remoteAddress ||
-                       '';
+      // Get client IP address and remove IPv6 prefix if present
+      let clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0] ||
+                     req.socket.remoteAddress ||
+                     '';
+
+      // Remove "::ffff:" prefix from IPv4-mapped IPv6 addresses
+      if (clientIp.startsWith('::ffff:')) {
+        clientIp = clientIp.substring(7);
+      }
+
+      // Get user agent
+      const userAgent = req.headers['user-agent'] || '';
 
       if (isNewCrash) {
         // Extract first line from stack trace (max 200 chars)

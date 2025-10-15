@@ -1888,7 +1888,7 @@
     "settingsPanel": "설정 패널",
     "systemStats": "시스템 통계",
     "settings": "설정",
-    "crashes": "클라이언트 크래쉬",
+    "crashEvents": "크래쉬 이벤트",
     "userManagement": "사용자 관리",
     "clientVersions": "클라이언트 버전",
     "gameWorlds": "게임 월드",

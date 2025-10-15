@@ -72,7 +72,6 @@ import RemoteConfigPage from './pages/admin/RemoteConfigPage';
 import RemoteConfigHistoryPage from './pages/admin/RemoteConfigHistoryPage';
 import RemoteConfigDashboard from './pages/RemoteConfig/RemoteConfigParametersPage';
 import ApiTokensPage from './pages/admin/ApiTokensPage';
-// import CrashesPage from './pages/admin/CrashesPage'; // Will be implemented later for grouped crashes
 import CrashEventsPage from './pages/admin/CrashEventsPage';
 import ChatPage from './pages/chat/ChatPage';
 import SystemConsolePage from './pages/admin/SystemConsolePage';
@@ -316,8 +315,7 @@ const AppContent: React.FC = () => {
                         <Route path="queue-monitor" element={<QueueMonitorPage />} />
                         <Route path="audit-logs" element={<AuditLogsPage />} />
                         <Route path="realtime-events" element={<RealtimeEventsPage />} />
-                        <Route path="crashes" element={<CrashEventsPage />} />
-                        {/* <Route path="crash-events" element={<CrashEventsPage />} /> */}
+                        <Route path="crash-events" element={<CrashEventsPage />} />
                         <Route path="remote-config" element={<RemoteConfigDashboard />} />
                         <Route path="remote-config-old" element={<RemoteConfigPage />} />
                         <Route path="remote-config/history" element={<RemoteConfigHistoryPage />} />

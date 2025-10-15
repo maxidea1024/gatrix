@@ -1890,7 +1890,7 @@
     "settingsPanel": "SETTINGS PANEL",
     "systemStats": "System Statistics",
     "settings": "Settings",
-    "crashes": "Client Crashes",
+    "crashEvents": "Crash Events",
     "userManagement": "User Management",
     "clientVersions": "Client Versions",
     "gameWorlds": "Game Worlds",
