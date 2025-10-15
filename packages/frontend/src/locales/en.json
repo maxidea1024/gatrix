@@ -2065,6 +2065,7 @@
     "leaveChannel": "Leave Channel",
     "channelCreated": "Channel created successfully",
     "createChannelFailed": "Failed to create channel",
+    "loadChannelsFailed": "Failed to load channels",
     "noMessages": "No messages yet",
     "startConversation": "Start the conversation by sending a message!",
     "typeMessage": "Type a message...",

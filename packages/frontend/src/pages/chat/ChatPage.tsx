@@ -16,8 +16,6 @@ import {
   FormControlLabel,
   Radio,
   Chip,
-  Alert,
-  Snackbar,
   Drawer,
   List,
   ListItem,
@@ -208,6 +206,20 @@ const ChatPageContent: React.FC = () => {
   useEffect(() => {
     // Channels are loaded in ChatContext when WebSocket connects
   }, []);
+
+  // Handle errors with enqueueSnackbar
+  useEffect(() => {
+    if (state.error) {
+      // Translate error message if it's a known error
+      let errorMessage = state.error;
+      if (state.error === 'Failed to load channels') {
+        errorMessage = t('chat.loadChannelsFailed');
+      }
+
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+      actions.clearError();
+    }
+  }, [state.error, t, enqueueSnackbar, actions]);
 
   // 페이지 재진입 시 현재 채널 메시지를 강제 새로고침하여 스레드 메타데이터 보장
   useEffect(() => {
@@ -814,19 +826,6 @@ const ChatPageContent: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Error Display */}
-      {state.error && (
-        <Snackbar
-          open={Boolean(state.error)}
-          autoHideDuration={6000}
-          onClose={() => actions.clearError()}
-        >
-          <Alert severity="error" onClose={() => actions.clearError()}>
-            {state.error}
-          </Alert>
-        </Snackbar>
-      )}
 
       {/* Member List Drawer */}
       <Drawer

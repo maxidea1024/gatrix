@@ -111,19 +111,8 @@ const MessageTemplatesPage: React.FC = () => {
     }
   });
   const [filtersInitialized, setFiltersInitialized] = useState(false);
-  const [allUsers, setAllUsers] = useState<{ id: number; name: string; email: string }[]>([]);
 
   // 동적 필터에서 값 추출 (useMemo로 참조 안정화)
-  const createdByFilter = useMemo(() => {
-    const filter = activeFilters.find(f => f.key === 'createdBy');
-    return filter?.value as number | number[] | undefined;
-  }, [activeFilters]);
-
-  const createdByOperator = useMemo(() => {
-    const filter = activeFilters.find(f => f.key === 'createdBy');
-    return filter?.operator;
-  }, [activeFilters]);
-
   const isEnabledFilter = useMemo(() => {
     const filter = activeFilters.find(f => f.key === 'isEnabled');
     return filter?.value as boolean | boolean[] | undefined;
@@ -187,10 +176,6 @@ const MessageTemplatesPage: React.FC = () => {
         offset
       };
 
-      if (createdByFilter) {
-        params.createdBy = createdByFilter;
-        if (createdByOperator) params.createdBy_operator = createdByOperator;
-      }
       if (isEnabledFilter !== undefined) {
         params.isEnabled = isEnabledFilter;
         if (isEnabledOperator) params.isEnabled_operator = isEnabledOperator;
@@ -224,41 +209,13 @@ const MessageTemplatesPage: React.FC = () => {
     }
   }, []);
 
-  // 사용자 로딩
-  const loadUsers = useCallback(async () => {
-    try {
-      const response = await api.get('/admin/users?limit=1000');
-      if (response.data.success && response.data.data.users) {
-        setAllUsers(response.data.data.users.map((u: any) => ({
-          id: u.id,
-          name: u.name,
-          email: u.email
-        })));
-      }
-    } catch (error) {
-      console.error('Failed to load users:', error);
-    }
-  }, []);
-
   useEffect(() => {
     load();
     loadTags();
-    loadUsers();
-  }, [load, loadTags, loadUsers]);
+  }, [load, loadTags]);
 
   // 동적 필터 정의
   const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
-    {
-      key: 'createdBy',
-      label: t('common.createdBy'),
-      type: 'multiselect',
-      operator: 'any_of',
-      allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
-      options: allUsers.map(user => ({
-        value: user.id,
-        label: `${user.name} (${user.email})`,
-      })),
-    },
     {
       key: 'isEnabled',
       label: t('common.status'),
@@ -283,7 +240,7 @@ const MessageTemplatesPage: React.FC = () => {
         description: tag.description,
       })),
     },
-  ], [t, allUsers, allTags]);
+  ], [t, allTags]);
 
   // 동적 필터 핸들러
   const handleFilterAdd = (filter: ActiveFilter) => {

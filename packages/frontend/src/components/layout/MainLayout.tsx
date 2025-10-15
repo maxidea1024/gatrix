@@ -263,10 +263,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           key={index}
           onClick={() => toggleSection(`menu-${index}`)}
           sx={{
-            color: hasActiveChild ? '#ffffff' : '#cbd5e1',
-            backgroundColor: hasActiveChild ? 'rgba(91, 106, 208, 0.2)' : 'transparent',
+            color: hasActiveChild ? theme.palette.text.primary : theme.palette.text.secondary,
+            backgroundColor: hasActiveChild ? `${theme.palette.primary.main}20` : 'transparent',
             '&:hover': {
-              backgroundColor: 'rgba(255,255,255,0.1)',
+              backgroundColor: theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.1)'
+                : 'rgba(0,0,0,0.08)',
             },
             justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
             px: sidebarCollapsed ? 1 : 2,
@@ -318,10 +320,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   onClick={() => navigate(child.path)}
                   sx={{
                     pl: 4,
-                    color: isActivePath(child.path) ? '#ffffff' : '#cbd5e1',
-                    backgroundColor: isActivePath(child.path) ? 'rgba(91, 106, 208, 0.2)' : 'transparent',
+                    color: isActivePath(child.path) ? theme.palette.text.primary : theme.palette.text.secondary,
+                    backgroundColor: isActivePath(child.path) ? `${theme.palette.primary.main}20` : 'transparent',
                     '&:hover': {
-                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      backgroundColor: theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.1)'
+                        : 'rgba(0,0,0,0.08)',
                     },
                   }}
                 >
@@ -350,10 +354,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         key={index}
         onClick={() => navigate(item.path)}
         sx={{
-          color: (isSettingsItem ? isActiveSettingsPath(item.path) : isActivePath(item.path)) ? '#ffffff' : '#cbd5e1',
-          backgroundColor: (isSettingsItem ? isActiveSettingsPath(item.path) : isActivePath(item.path)) ? 'rgba(91, 106, 208, 0.2)' : 'transparent',
+          color: (isSettingsItem ? isActiveSettingsPath(item.path) : isActivePath(item.path)) ? theme.palette.text.primary : theme.palette.text.secondary,
+          backgroundColor: (isSettingsItem ? isActiveSettingsPath(item.path) : isActivePath(item.path)) ? `${theme.palette.primary.main}20` : 'transparent',
           '&:hover': {
-            backgroundColor: 'rgba(255,255,255,0.1)',
+            backgroundColor: theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.1)'
+              : 'rgba(0,0,0,0.08)',
           },
           justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
           px: sidebarCollapsed ? 1 : 2,
@@ -449,7 +455,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               sx={{
                 width: 32,
                 height: 32,
-                backgroundColor: '#5b6ad0',
+                backgroundColor: theme.palette.primary.main,
                 borderRadius: 1,
                 display: 'flex',
                 alignItems: 'center',
@@ -460,7 +466,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 G
               </Typography>
             </Box>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: '#ffffff' }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: theme.palette.text.primary }}>
               Gatrix
             </Typography>
           </Box>
@@ -483,7 +489,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               sx={{
                 width: 32,
                 height: 32,
-                backgroundColor: '#5b6ad0',
+                backgroundColor: theme.palette.primary.main,
                 borderRadius: 1,
                 display: 'flex',
                 alignItems: 'center',
@@ -564,13 +570,22 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         {/* 관리자 메뉴 */}
         {isAdmin() && (
           <>
-            <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.1)' }} />
+            <Divider sx={{
+              my: 2,
+              borderColor: theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.1)'
+                : 'rgba(0,0,0,0.12)'
+            }} />
             {!sidebarCollapsed && (
               <ListItemButton
                 onClick={() => toggleSection('admin')}
                 sx={{
-                  color: '#94a3b8',
-                  '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' }
+                  color: theme.palette.text.secondary,
+                  '&:hover': {
+                    backgroundColor: theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.1)'
+                      : 'rgba(0,0,0,0.08)'
+                  }
                 }}
               >
                 <ListItemText
@@ -599,13 +614,22 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             )}
 
             {/* Settings Panel */}
-            <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.1)' }} />
+            <Divider sx={{
+              my: 2,
+              borderColor: theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.1)'
+                : 'rgba(0,0,0,0.12)'
+            }} />
             {!sidebarCollapsed && (
               <ListItemButton
                 onClick={() => toggleSection('settings')}
                 sx={{
-                  color: '#94a3b8',
-                  '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' }
+                  color: theme.palette.text.secondary,
+                  '&:hover': {
+                    backgroundColor: theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.1)'
+                      : 'rgba(0,0,0,0.08)'
+                  }
                 }}
               >
                 <ListItemText
@@ -637,10 +661,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     onClick={() => navigate(item.path)}
                     sx={{
                       pl: 4,
-                      color: isActiveSettingsPath(item.path) ? '#ffffff' : '#cbd5e1',
-                      backgroundColor: isActiveSettingsPath(item.path) ? 'rgba(91, 106, 208, 0.2)' : 'transparent',
+                      color: isActiveSettingsPath(item.path) ? theme.palette.text.primary : theme.palette.text.secondary,
+                      backgroundColor: isActiveSettingsPath(item.path) ? `${theme.palette.primary.main}20` : 'transparent',
                       '&:hover': {
-                        backgroundColor: 'rgba(255,255,255,0.1)',
+                        backgroundColor: theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.1)'
+                          : 'rgba(0,0,0,0.08)',
                       },
                     }}
                   >
@@ -686,8 +712,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: 280,
-              backgroundColor: '#0f172a',
-              color: '#ffffff',
+              backgroundColor: theme.palette.background.paper,
+              color: theme.palette.text.primary,
               border: 'none',
               borderRight: 'none',
             },
@@ -704,8 +730,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: sidebarCollapsed ? 64 : sidebarWidth,
-              backgroundColor: '#0f172a',
-              color: '#ffffff',
+              backgroundColor: theme.palette.background.paper,
+              color: theme.palette.text.primary,
               position: 'fixed',
               height: '100vh',
               top: 0,
@@ -729,9 +755,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         <AppBar
           position="static"
           sx={{
-            backgroundColor: '#1e293b',
-            color: '#ffffff',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+            backgroundColor: theme.palette.background.paper,
+            color: theme.palette.text.primary,
+            boxShadow: 'none',
             borderBottom: 'none',
             zIndex: (theme) => theme.zIndex.appBar,
           }}
@@ -978,7 +1004,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               sx={{
                 width: '1px',
                 height: '24px',
-                bgcolor: 'rgba(255, 255, 255, 0.2)',
+                bgcolor: theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.2)'
+                  : 'rgba(0, 0, 0, 0.2)',
                 mx: 1
               }}
             />

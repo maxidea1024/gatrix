@@ -2062,6 +2062,7 @@
     "leaveChannel": "채널 나가기",
     "channelCreated": "채널이 성공적으로 생성되었습니다",
     "createChannelFailed": "채널 생성에 실패했습니다",
+    "loadChannelsFailed": "채널 목록을 불러오는데 실패했습니다",
     "noMessages": "아직 메시지가 없습니다",
     "startConversation": "메시지를 보내서 대화를 시작하세요!",
     "typeMessage": "메시지를 입력하세요...",

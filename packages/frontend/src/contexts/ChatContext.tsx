@@ -1172,7 +1172,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       }
     } catch (error: any) {
-      dispatch({ type: 'SET_ERROR', payload: error.message || 'Failed to load channels' });
+      const errorMessage = error.message || 'Failed to load channels';
+      console.error('❌ Failed to load channels:', errorMessage);
+      dispatch({ type: 'SET_ERROR', payload: errorMessage });
     } finally {
       // 깜빡임 방지를 위해 로딩 지연 제거 - 즉시 완료 처리
       const finishLoading = () => {

@@ -382,6 +382,10 @@ const RealtimeEventsPage: React.FC = () => {
                 setNewEventIds(new Set());
               }, 2000);
 
+              // Check scroll position - if already at top, mark as seen immediately
+              const container = eventStreamRef.current;
+              const isAtTop = container ? container.scrollTop <= 10 : false;
+
               // Check which new events haven't been seen yet
               const unseenNewEvents = Array.from(newIds).filter(id => !seenEventIds.has(id));
 
@@ -389,14 +393,25 @@ const RealtimeEventsPage: React.FC = () => {
                 newEventCount: newIds.size,
                 unseenCount: unseenNewEvents.length,
                 seenEventIds: Array.from(seenEventIds),
+                isAtTop,
               });
 
-              if (unseenNewEvents.length > 0) {
+              if (unseenNewEvents.length > 0 && !isAtTop) {
                 console.log('✅ Setting hasUnseenEvents to true');
                 setHasUnseenEvents(true);
                 setUnseenEventCount(prev => prev + unseenNewEvents.length);
               } else {
-                console.log('❌ All new events already seen');
+                if (isAtTop) {
+                  console.log('❌ Already at top - marking new events as seen');
+                  // Mark new events as seen immediately
+                  setSeenEventIds(prev => {
+                    const newSet = new Set(prev);
+                    unseenNewEvents.forEach(id => newSet.add(id));
+                    return newSet;
+                  });
+                } else {
+                  console.log('❌ All new events already seen');
+                }
               }
             }
           } else {

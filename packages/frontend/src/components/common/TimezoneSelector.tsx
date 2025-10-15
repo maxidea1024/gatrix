@@ -8,7 +8,8 @@ import {
   Tooltip,
   Popover,
   Stack,
-  Divider
+  Divider,
+  useTheme
 } from '@mui/material';
 import {
   Settings as SettingsIcon,
@@ -26,6 +27,7 @@ import { timeService, ServerTimeData } from '../../services/timeService';
 
 const TimezoneSelector: React.FC = () => {
   const { t } = useTranslation();
+  const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [timezone, setTimezone] = useState<string>(getStoredTimezone());
   const [serverTime, setServerTime] = useState<Date>(new Date());
@@ -94,23 +96,31 @@ const TimezoneSelector: React.FC = () => {
           sx={{
             fontFamily: 'monospace',
             fontSize: '0.75rem',
-            color: 'rgba(255, 255, 255, 0.9)',
-            borderColor: 'rgba(255, 255, 255, 0.3)',
-            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            color: theme.palette.text.primary,
+            borderColor: theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, 0.3)'
+              : 'rgba(0, 0, 0, 0.23)',
+            backgroundColor: theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, 0.05)'
+              : 'rgba(0, 0, 0, 0.02)',
             borderRadius: 2,
             cursor: 'pointer',
             '& .MuiChip-icon': {
               fontSize: '0.875rem',
-              color: 'rgba(255, 255, 255, 0.7)'
+              color: theme.palette.text.secondary
             },
             '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              borderColor: 'rgba(255, 255, 255, 0.5)',
+              backgroundColor: theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.1)'
+                : 'rgba(0, 0, 0, 0.05)',
+              borderColor: theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.5)'
+                : 'rgba(0, 0, 0, 0.4)',
               '& .MuiChip-label': {
-                color: 'rgba(255, 255, 255, 1)'
+                color: theme.palette.text.primary
               },
               '& .MuiChip-icon': {
-                color: 'rgba(255, 255, 255, 0.9)'
+                color: theme.palette.text.primary
               }
             }
           }}
