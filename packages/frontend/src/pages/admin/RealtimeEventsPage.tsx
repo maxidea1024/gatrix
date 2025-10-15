@@ -328,6 +328,11 @@ const RealtimeEventsPage: React.FC = () => {
           latestEventTimestampRef.current = latestEvent;
         }
 
+        // Store new event IDs and unseen events to update state after setEvents
+        let newIdsToFlash = new Set<number>();
+        let unseenEventIdsToProcess: number[] = [];
+        let isAtTopPosition = false;
+
         // Use functional update to get the current state
         setEvents(prevEvents => {
           let allEvents: AuditLog[];
@@ -335,7 +340,6 @@ const RealtimeEventsPage: React.FC = () => {
           if (isInitialLoadRef.current) {
             // Initial load: replace all events
             allEvents = newEvents;
-            isInitialLoadRef.current = false;
           } else {
             // Incremental update: merge new events with existing ones
             // Remove duplicates and keep only events from last 30 minutes
@@ -365,54 +369,29 @@ const RealtimeEventsPage: React.FC = () => {
 
           // Detect new events for flash effect (only after initial load)
           const currentEventIds = new Set(allEvents.map(e => e.id));
-          const newIds = new Set<number>();
 
           // Only detect new events if this is not the initial load
           if (!isInitialLoadRef.current) {
             currentEventIds.forEach(id => {
               if (!previousEventIdsRef.current.has(id)) {
-                newIds.add(id);
+                newIdsToFlash.add(id);
               }
             });
 
-            if (newIds.size > 0) {
-              setNewEventIds(newIds);
-              // Remove flash effect after 2 seconds
-              setTimeout(() => {
-                setNewEventIds(new Set());
-              }, 2000);
-
+            if (newIdsToFlash.size > 0) {
               // Check scroll position - if already at top, mark as seen immediately
               const container = eventStreamRef.current;
-              const isAtTop = container ? container.scrollTop <= 10 : false;
+              isAtTopPosition = container ? container.scrollTop <= 10 : false;
 
               // Check which new events haven't been seen yet
-              const unseenNewEvents = Array.from(newIds).filter(id => !seenEventIds.has(id));
+              unseenEventIdsToProcess = Array.from(newIdsToFlash).filter(id => !seenEventIds.has(id));
 
               console.log('🔔 New events detected:', {
-                newEventCount: newIds.size,
-                unseenCount: unseenNewEvents.length,
+                newEventCount: newIdsToFlash.size,
+                unseenCount: unseenEventIdsToProcess.length,
                 seenEventIds: Array.from(seenEventIds),
-                isAtTop,
+                isAtTop: isAtTopPosition,
               });
-
-              if (unseenNewEvents.length > 0 && !isAtTop) {
-                console.log('✅ Setting hasUnseenEvents to true');
-                setHasUnseenEvents(true);
-                setUnseenEventCount(prev => prev + unseenNewEvents.length);
-              } else {
-                if (isAtTop) {
-                  console.log('❌ Already at top - marking new events as seen');
-                  // Mark new events as seen immediately
-                  setSeenEventIds(prev => {
-                    const newSet = new Set(prev);
-                    unseenNewEvents.forEach(id => newSet.add(id));
-                    return newSet;
-                  });
-                } else {
-                  console.log('❌ All new events already seen');
-                }
-              }
             }
           } else {
             // Initial load - set previousEventIds to prevent flash on first load
@@ -429,6 +408,32 @@ const RealtimeEventsPage: React.FC = () => {
 
           return allEvents;
         });
+
+        // Update flash effect state (outside of setEvents to avoid nested state updates)
+        if (newIdsToFlash.size > 0) {
+          setNewEventIds(newIdsToFlash);
+          // Remove flash effect after 2 seconds
+          setTimeout(() => {
+            setNewEventIds(new Set());
+          }, 2000);
+
+          // Update unseen events state
+          if (unseenEventIdsToProcess.length > 0 && !isAtTopPosition) {
+            console.log('✅ Setting hasUnseenEvents to true');
+            setHasUnseenEvents(true);
+            setUnseenEventCount(prev => prev + unseenEventIdsToProcess.length);
+          } else if (isAtTopPosition && unseenEventIdsToProcess.length > 0) {
+            console.log('❌ Already at top - marking new events as seen');
+            // Mark new events as seen immediately
+            setSeenEventIds(prev => {
+              const newSet = new Set(prev);
+              unseenEventIdsToProcess.forEach(id => newSet.add(id));
+              return newSet;
+            });
+          } else if (unseenEventIdsToProcess.length === 0) {
+            console.log('❌ All new events already seen');
+          }
+        }
       }
     } catch (error: any) {
       console.error('[RealtimeEvents] Failed to load events:', error);
@@ -1189,16 +1194,25 @@ const RealtimeEventsPage: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1,
-                animation: 'slideDown 0.3s ease-out',
-                '@keyframes slideDown': {
-                  from: { opacity: 0, transform: 'translateX(-50%) translateY(-10px)' },
-                  to: { opacity: 1, transform: 'translateX(-50%) translateY(0)' }
+                animation: 'slideDownBounce 0.5s ease-out, gentleBounce 2s ease-in-out 0.5s infinite',
+                '@keyframes slideDownBounce': {
+                  '0%': { opacity: 0, transform: 'translateX(-50%) translateY(-20px)' },
+                  '60%': { opacity: 1, transform: 'translateX(-50%) translateY(2px)' },
+                  '80%': { transform: 'translateX(-50%) translateY(-1px)' },
+                  '100%': { opacity: 1, transform: 'translateX(-50%) translateY(0)' }
+                },
+                '@keyframes gentleBounce': {
+                  '0%, 100%': { transform: 'translateX(-50%) translateY(0)' },
+                  '15%': { transform: 'translateX(-50%) translateY(-4px)' },
+                  '30%': { transform: 'translateX(-50%) translateY(0)' },
+                  '45%, 100%': { transform: 'translateX(-50%) translateY(0)' }
                 },
                 '&:hover': {
                   bgcolor: 'primary.dark',
                   boxShadow: 4,
+                  animation: 'none', // Stop animation on hover
                 },
-                transition: 'all 0.2s ease',
+                transition: 'background-color 0.2s ease, box-shadow 0.2s ease',
               }}
             >
               <DotIcon sx={{ fontSize: 12, animation: 'blink 1s ease-in-out infinite' }} />

@@ -417,7 +417,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         cursor: sidebarCollapsed ? 'pointer' : 'default',
         transition: 'background-color 0.2s ease',
         '&:hover': sidebarCollapsed ? {
-          backgroundColor: 'rgba(255, 255, 255, 0.08)',
+          backgroundColor: theme.palette.mode === 'dark'
+            ? 'rgba(255, 255, 255, 0.08)'
+            : 'rgba(0, 0, 0, 0.05)',
         } : {},
       }}
       onClick={(e) => {

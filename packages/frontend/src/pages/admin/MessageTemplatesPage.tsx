@@ -134,10 +134,6 @@ const MessageTemplatesPage: React.FC = () => {
   }, [activeFilters]);
 
   // 필터를 문자열로 변환하여 의존성 배열에 사용
-  const createdByFilterString = useMemo(() =>
-    Array.isArray(createdByFilter) ? createdByFilter.join(',') : (createdByFilter || ''),
-    [createdByFilter]
-  );
   const isEnabledFilterString = useMemo(() =>
     Array.isArray(isEnabledFilter) ? isEnabledFilter.join(',') : (isEnabledFilter !== undefined ? String(isEnabledFilter) : ''),
     [isEnabledFilter]
@@ -197,7 +193,7 @@ const MessageTemplatesPage: React.FC = () => {
       setLoading(false);
       setIsInitialLoad(false);
     }
-  }, [page, rowsPerPage, createdByFilterString, createdByOperator, isEnabledFilterString, isEnabledOperator, tagIdsString, tagOperator, debouncedSearchQuery, enqueueSnackbar, t]);
+  }, [page, rowsPerPage, isEnabledFilterString, isEnabledOperator, tagIdsString, tagOperator, debouncedSearchQuery, enqueueSnackbar, t]);
 
   // 태그 로딩
   const loadTags = useCallback(async () => {
