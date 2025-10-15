@@ -9,6 +9,7 @@ import path from 'path';
 import logger from '../config/logger';
 import { cacheService } from '../services/CacheService';
 import { isGreaterThan } from '../utils/semver';
+import { generateULID } from '../utils/ulid';
 
 export class ClientCrashController {
   /**
@@ -56,8 +57,11 @@ export class ClientCrashController {
         // Extract first line from stack trace (max 200 chars)
         const firstLine = body.stack.split('\n')[0]?.substring(0, CRASH_CONSTANTS.MaxFirstLineLen) || '';
 
-        // Create new crash record
-        crash = await ClientCrash.query().insert({
+        const newCrashId = generateULID();
+
+        // Create new crash record using raw query to use CURRENT_TIMESTAMP
+        await ClientCrash.query().insert({
+          id: newCrashId,
           chash,
           branch: body.branch,
           environment: body.environment,
@@ -66,12 +70,19 @@ export class ClientCrashController {
           isEditor: body.isEditor || false,
           firstLine,
           crashesCount: 1,
-          firstCrashAt: new Date(),
-          lastCrashAt: new Date(),
+          firstCrashAt: ClientCrash.knex().fn.now(),
+          lastCrashAt: ClientCrash.knex().fn.now(),
           crashesState: CrashState.OPEN,
           maxAppVersion: body.appVersion,
           maxResVersion: body.resVersion
         });
+
+        // Fetch the inserted crash
+        crash = await ClientCrash.query().findById(newCrashId);
+
+        if (!crash) {
+          throw new CustomError('Failed to create crash record', 500);
+        }
 
         crashId = crash.id;
 

@@ -107,10 +107,20 @@ export class CrashEvent extends Model {
       data.userMessage = data.userMessage.substring(0, CRASH_CONSTANTS.MaxUserMsgLen);
     }
 
-    return await this.query().insert({
+    const eventId = generateULID();
+
+    await this.query().insert({
+      id: eventId,
       ...data,
       isEditor: data.isEditor || false
     });
+
+    const event = await this.query().findById(eventId);
+    if (!event) {
+      throw new Error('Failed to create crash event');
+    }
+
+    return event;
   }
 
   /**

@@ -35,6 +35,7 @@ import {
   ArrowUpward as ArrowUpwardIcon,
   ArrowDownward as ArrowDownwardIcon,
   Link as LinkIcon,
+  Code as CodeIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -124,6 +125,7 @@ const CrashEventsPage: React.FC = () => {
   });
   const [detailViewMode, setDetailViewMode] = useState<'table' | 'json'>('table');
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerType, setDrawerType] = useState<'stackTrace' | 'log'>('log');
   const [selectedEvent, setSelectedEvent] = useState<CrashEvent | null>(null);
   const [logContent, setLogContent] = useState<string>('');
   const [stackTraceMap, setStackTraceMap] = useState<Record<string, string>>({});
@@ -437,6 +439,7 @@ const CrashEventsPage: React.FC = () => {
 
   const handleViewLog = async (event: CrashEvent) => {
     setSelectedEvent(event);
+    setDrawerType('log');
     setDrawerOpen(true);
     setLogContent('');
 
@@ -660,11 +663,12 @@ const CrashEventsPage: React.FC = () => {
                   </Box>
                 </TableCell>
                 <TableCell>{t('crashes.table.userMessage')}</TableCell>
+                <TableCell align="center">{t('crashes.columns.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {events.length === 0 ? (
-                <EmptyTableRow colSpan={12} message={t('crashes.noEvents')} loading={loading} />
+                <EmptyTableRow colSpan={13} message={t('crashes.noEvents')} loading={loading} />
               ) : (
                 events.map((event, index) => (
                   <React.Fragment key={event.id}>
@@ -747,9 +751,45 @@ const CrashEventsPage: React.FC = () => {
                           </Typography>
                         </Tooltip>
                       </TableCell>
+                      <TableCell align="center">
+                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                          <Tooltip title={t('crashes.viewStackTrace')}>
+                            <IconButton
+                              size="small"
+                              onClick={async () => {
+                                try {
+                                  const stackData = await crashService.getStackTrace(event.id);
+                                  setSelectedEvent(event);
+                                  setStackTraceMap(prev => ({
+                                    ...prev,
+                                    [event.id]: stackData.stackTrace,
+                                  }));
+                                  setDrawerType('stackTrace');
+                                  setDrawerOpen(true);
+                                } catch (error) {
+                                  console.error('Failed to load stack trace:', error);
+                                  enqueueSnackbar(t('crashes.loadError'), { variant: 'error' });
+                                }
+                              }}
+                            >
+                              <CodeIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          {event.logFilePath && (
+                            <Tooltip title={t('crashes.viewLog')}>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleViewLog(event)}
+                              >
+                                <LogIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                        </Box>
+                      </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell colSpan={12} sx={{ p: 0, border: 0 }}>
+                      <TableCell colSpan={13} sx={{ p: 0, border: 0 }}>
                         <Collapse in={expandedRowId === event.id} timeout="auto" unmountOnExit>
                           <Box sx={{
                             py: 2,
@@ -1088,16 +1128,16 @@ const CrashEventsPage: React.FC = () => {
                                     )}
 
                                     {/* IP Address */}
-                                    {!!event.crashEventIp && (
-                                      <TableRow>
-                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover' }}>
-                                          IP Address
-                                        </TableCell>
-                                        <TableCell>
-                                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                                              {event.crashEventIp}
-                                            </Typography>
+                                    <TableRow>
+                                      <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover' }}>
+                                        {t('crashes.table.ipAddress')}
+                                      </TableCell>
+                                      <TableCell>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                                            {event.crashEventIp || '-'}
+                                          </Typography>
+                                          {event.crashEventIp && (
                                             <IconButton
                                               size="small"
                                               onClick={() => {
@@ -1107,10 +1147,10 @@ const CrashEventsPage: React.FC = () => {
                                             >
                                               <CopyIcon fontSize="small" />
                                             </IconButton>
-                                          </Box>
-                                        </TableCell>
-                                      </TableRow>
-                                    )}
+                                          )}
+                                        </Box>
+                                      </TableCell>
+                                    </TableRow>
 
                                     {/* User Message */}
                                     {!!event.userMessage && (
@@ -1261,7 +1301,7 @@ const CrashEventsPage: React.FC = () => {
         />
       </Card>
 
-      {/* Log Drawer */}
+      {/* Drawer for Stack Trace and Log */}
       <Drawer
         anchor="right"
         open={drawerOpen}
@@ -1290,7 +1330,7 @@ const CrashEventsPage: React.FC = () => {
           bgcolor: 'background.paper'
         }}>
           <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t('crashes.viewLog')}
+            {drawerType === 'stackTrace' ? t('crashes.viewStackTrace') : t('crashes.viewLog')}
           </Typography>
           <IconButton
             onClick={handleCloseDrawer}
@@ -1307,16 +1347,28 @@ const CrashEventsPage: React.FC = () => {
 
         {/* Content */}
         <Box sx={{ flex: 1, overflow: 'hidden', p: 2, display: 'flex', flexDirection: 'column' }}>
-          {loadingLog ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-              <Typography>{t('crashes.loadingLog')}</Typography>
-            </Box>
-          ) : logContent ? (
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-              <LogViewer logContent={logContent} logFilePath={selectedEvent?.logFilePath || ''} />
-            </Box>
+          {drawerType === 'stackTrace' ? (
+            // Stack Trace View
+            selectedEvent && stackTraceMap[selectedEvent.id] ? (
+              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                <StackTraceViewer stackTrace={stackTraceMap[selectedEvent.id]} />
+              </Box>
+            ) : (
+              <Typography color="text.secondary">{t('crashes.stackTraceNotAvailable')}</Typography>
+            )
           ) : (
-            <Typography color="text.secondary">{t('crashes.logNotAvailable')}</Typography>
+            // Log View
+            loadingLog ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                <Typography>{t('crashes.loadingLog')}</Typography>
+              </Box>
+            ) : logContent ? (
+              <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                <LogViewer logContent={logContent} logFilePath={selectedEvent?.logFilePath || ''} />
+              </Box>
+            ) : (
+              <Typography color="text.secondary">{t('crashes.logNotAvailable')}</Typography>
+            )
           )}
         </Box>
       </Drawer>

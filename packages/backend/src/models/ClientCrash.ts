@@ -40,7 +40,7 @@ export class ClientCrash extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['id', 'chash', 'branch', 'environment', 'platform', 'firstCrashAt', 'lastCrashAt'],
+      required: ['id', 'chash', 'branch', 'environment', 'platform'],
       properties: {
         id: { type: 'string', maxLength: 26 }, // ULID
         chash: { type: 'string', maxLength: 32 }, // MD5 hash
@@ -54,15 +54,15 @@ export class ClientCrash extends Model {
         crashesCount: { type: 'integer', default: 1 },
         firstCrashEventId: { type: ['string', 'null'], maxLength: 26 },
         lastCrashEventId: { type: ['string', 'null'], maxLength: 26 },
-        firstCrashAt: { type: 'string', format: 'date-time' },
-        lastCrashAt: { type: 'string', format: 'date-time' },
+        firstCrashAt: { type: ['string', 'object'], format: 'date-time' },
+        lastCrashAt: { type: ['string', 'object'], format: 'date-time' },
         crashesState: { type: 'integer', enum: [0, 1, 2, 3, 4], default: 0 },
         assignee: { type: ['string', 'null'], maxLength: 100 },
         jiraTicket: { type: ['string', 'null'], maxLength: 200 },
         maxAppVersion: { type: ['string', 'null'], maxLength: 50 },
         maxResVersion: { type: ['string', 'null'], maxLength: 50 },
-        createdAt: { type: 'string', format: 'date-time' },
-        updatedAt: { type: 'string', format: 'date-time' }
+        createdAt: { type: ['string', 'object'], format: 'date-time' },
+        updatedAt: { type: ['string', 'object'], format: 'date-time' }
       }
     };
   }
@@ -84,12 +84,6 @@ export class ClientCrash extends Model {
     if (!this.id) {
       this.id = generateULID();
     }
-    this.createdAt = new Date();
-    this.updatedAt = new Date();
-  }
-
-  $beforeUpdate() {
-    this.updatedAt = new Date();
   }
 
   /**
@@ -209,8 +203,7 @@ export class ClientCrash extends Model {
       .patch({
         crashesCount: this.crashesCount + 1,
         lastCrashEventId,
-        lastCrashAt: new Date(),
-        updatedAt: new Date()
+        lastCrashAt: ClientCrash.knex().fn.now()
       });
   }
 
@@ -251,7 +244,7 @@ export class ClientCrash extends Model {
    * Update max versions
    */
   async updateMaxVersions(appVersion?: string, resVersion?: string) {
-    const updates: any = { updatedAt: new Date() };
+    const updates: any = {};
 
     if (appVersion && (!this.maxAppVersion || isGreaterThan(appVersion, this.maxAppVersion))) {
       updates.maxAppVersion = appVersion;
@@ -261,7 +254,7 @@ export class ClientCrash extends Model {
       updates.maxResVersion = resVersion;
     }
 
-    if (Object.keys(updates).length > 1) { // More than just updatedAt
+    if (Object.keys(updates).length > 0) {
       return await this.$query().patch(updates);
     }
   }

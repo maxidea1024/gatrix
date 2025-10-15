@@ -77,6 +77,10 @@
       "characterId": "캐릭터 ID",
       "gameUserId": "게임 사용자 ID",
       "userName": "사용자 이름",
+      "gameServerId": "게임 서버 ID",
+      "marketType": "마켓 타입",
+      "isEditor": "에디터 모드",
+      "ipAddress": "IP 주소",
       "userMessage": "사용자 메시지",
       "createdAt": "발생 시각"
     },

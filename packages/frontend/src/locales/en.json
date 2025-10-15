@@ -77,6 +77,9 @@
         "characterId": "Character ID",
         "gameUserId": "Game User ID",
         "userName": "User Name",
+        "gameServerId": "Game Server ID",
+        "marketType": "Market Type",
+        "isEditor": "Editor Mode",
         "userMessage": "User Message",
         "createdAt": "Created At"
       },

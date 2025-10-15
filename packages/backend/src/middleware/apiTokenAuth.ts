@@ -61,8 +61,9 @@ export const authenticateApiToken = async (req: SDKRequest, res: Response, next:
       }
     }
 
-    // Check if token is valid
-    if (!apiToken.isValid()) {
+    // Check if token is valid (handle both model instances and plain objects from cache)
+    const isExpired = apiToken.expiresAt ? new Date() > new Date(apiToken.expiresAt) : false;
+    if (isExpired) {
       return res.status(401).json({
         success: false,
         message: 'API token is inactive or expired'
