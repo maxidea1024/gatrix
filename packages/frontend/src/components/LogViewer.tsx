@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -23,6 +23,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 interface LogViewerProps {
   logContent: string;
@@ -37,62 +38,87 @@ interface LogViewerProps {
 export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, loading = false }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [contextMenu, setContextMenu] = useState<{
+    mouseX: number;
+    mouseY: number;
+    lineNumber: number;
+  } | null>(null);
   const [selectedLine, setSelectedLine] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [goToLine, setGoToLine] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showScrollBottom, setShowScrollBottom] = useState(false);
-  const lineRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
 
-  const lines = logContent.split('\n');
+  const lines = useMemo(() => logContent.split('\n'), [logContent]);
 
   // Find matching lines for search
-  const matchingLines = new Set<number>();
-  if (searchQuery) {
-    lines.forEach((line, index) => {
-      if (line.toLowerCase().includes(searchQuery.toLowerCase())) {
-        matchingLines.add(index + 1);
-      }
-    });
-  }
+  const matchingLines = useMemo(() => {
+    const matches = new Set<number>();
+    if (searchQuery) {
+      lines.forEach((line, index) => {
+        if (line.toLowerCase().includes(searchQuery.toLowerCase())) {
+          matches.add(index + 1);
+        }
+      });
+    }
+    return matches;
+  }, [lines, searchQuery]);
+
+  // Memoize style objects to prevent re-creation on every render
+  const lineNumberBaseStyle = useMemo(() => ({
+    minWidth: '60px',
+    px: 1,
+    py: 0.25,
+    textAlign: 'right' as const,
+    borderRight: '1px solid',
+    borderColor: 'grey.700',
+    cursor: 'pointer',
+    userSelect: 'none' as const,
+    '&:hover': {
+      color: 'grey.300',
+      bgcolor: 'grey.700',
+    },
+  }), []);
+
+  const lineContentStyle = useMemo(() => ({
+    flex: 1,
+    px: 2,
+    py: 0.25,
+    whiteSpace: 'pre' as const,
+    overflowX: 'auto' as const,
+  }), []);
 
   // Scroll to line if hash is present in URL
   useEffect(() => {
     const hash = window.location.hash;
     if (hash.startsWith('#L')) {
       const lineNumber = parseInt(hash.substring(2), 10);
-      if (!isNaN(lineNumber) && lineRefs.current[lineNumber]) {
-        lineRefs.current[lineNumber]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (!isNaN(lineNumber) && virtuosoRef.current) {
+        setTimeout(() => {
+          virtuosoRef.current?.scrollToIndex({
+            index: lineNumber - 1,
+            align: 'center',
+            behavior: 'smooth'
+          });
+        }, 100);
       }
     }
   }, []);
 
-  // Handle scroll to show/hide floating buttons
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = container;
-      setShowScrollTop(scrollTop > 200);
-      setShowScrollBottom(scrollTop < scrollHeight - clientHeight - 200);
-    };
-
-    container.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initial check
-
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, []);
-
   const handleLineClick = (event: React.MouseEvent<HTMLDivElement>, lineNumber: number) => {
+    event.preventDefault();
+    event.stopPropagation();
     setSelectedLine(lineNumber);
-    setAnchorEl(event.currentTarget);
+    setContextMenu({
+      mouseX: event.clientX,
+      mouseY: event.clientY,
+      lineNumber,
+    });
   };
 
   const handleClose = () => {
-    setAnchorEl(null);
+    setContextMenu(null);
     setSelectedLine(null);
   };
 
@@ -144,19 +170,23 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
 
   const handleGoToLine = () => {
     const lineNumber = parseInt(goToLine, 10);
-    if (!isNaN(lineNumber) && lineNumber > 0 && lineNumber <= lines.length) {
-      lineRefs.current[lineNumber]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (!isNaN(lineNumber) && lineNumber > 0 && lineNumber <= lines.length && virtuosoRef.current) {
+      virtuosoRef.current.scrollToIndex({
+        index: lineNumber - 1,
+        align: 'center',
+        behavior: 'smooth'
+      });
       window.location.hash = `#L${lineNumber}`;
       setGoToLine('');
     }
   };
 
   const handleScrollToTop = () => {
-    containerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    virtuosoRef.current?.scrollToIndex({ index: 0, behavior: 'smooth' });
   };
 
   const handleScrollToBottom = () => {
-    containerRef.current?.scrollTo({ top: containerRef.current.scrollHeight, behavior: 'smooth' });
+    virtuosoRef.current?.scrollToIndex({ index: lines.length - 1, behavior: 'smooth' });
   };
 
   const highlightText = (text: string, query: string) => {
@@ -178,6 +208,71 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
     );
   };
 
+  // Memoized row component for better performance
+  const Row = React.memo(({ index }: { index: number }) => {
+    const lineNumber = index + 1;
+    const line = lines[index];
+    const isHighlighted = window.location.hash === `#L${lineNumber}`;
+    const isMatching = matchingLines.has(lineNumber);
+    const isSelected = selectedLine === lineNumber;
+
+    return (
+      <Box
+        display="flex"
+        sx={{
+          bgcolor: isHighlighted ? 'rgba(255, 255, 0, 0.1)' : 'transparent',
+          '&:hover': {
+            bgcolor: 'rgba(255, 255, 255, 0.05)',
+          },
+          '&:hover .line-menu-chip': {
+            opacity: 1,
+          },
+        }}
+      >
+        {/* Line Number Area (clickable) */}
+        <Box
+          onClick={(e) => handleLineClick(e, lineNumber)}
+          sx={{
+            ...lineNumberBaseStyle,
+            color: isMatching ? '#ffeb3b' : 'grey.500',
+            bgcolor: isMatching ? 'rgba(255, 235, 59, 0.1)' : 'grey.800',
+            borderLeft: isMatching ? '3px solid #ffeb3b' : isSelected ? '3px solid #2196f3' : 'none',
+            fontWeight: isMatching ? 'bold' : 'normal',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 0.5,
+          }}
+        >
+          <span>{lineNumber}</span>
+          {/* Menu chip (shows on hover or when selected) */}
+          <Box
+            className="line-menu-chip"
+            sx={{
+              opacity: isSelected ? 1 : 0,
+              transition: 'opacity 0.2s',
+              fontSize: '0.7rem',
+              color: 'grey.400',
+              cursor: 'pointer',
+            }}
+          >
+            •••
+          </Box>
+        </Box>
+
+        {/* Line Content */}
+        <Box sx={lineContentStyle}>
+          {searchQuery ? highlightText(line || ' ', searchQuery) : (line || ' ')}
+        </Box>
+      </Box>
+    );
+  });
+
+  Row.displayName = 'LogViewerRow';
+
+  // Row renderer for react-virtuoso
+  const rowRenderer = (index: number) => <Row index={index} />;
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" p={4}>
@@ -187,9 +282,9 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
   }
 
   return (
-    <Box sx={{ position: 'relative' }}>
+    <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Toolbar */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1} gap={2}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1} gap={2} sx={{ flexShrink: 0 }}>
         <Typography variant="caption" color="text.secondary">
           {logFilePath || t('crashes.logFile')} ({lines.length} {t('crashes.lines')})
           {searchQuery && ` - ${matchingLines.size} matches`}
@@ -248,11 +343,12 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
 
       {/* Log Content */}
       <Paper
-        ref={containerRef}
         variant="outlined"
         sx={{
-          maxHeight: 600,
-          overflow: 'auto',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
           bgcolor: 'grey.900',
           color: 'grey.100',
           fontFamily: 'monospace',
@@ -260,72 +356,38 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
           position: 'relative',
         }}
       >
-        <Box>
-          {lines.map((line, index) => {
-            const lineNumber = index + 1;
-            const isHighlighted = window.location.hash === `#L${lineNumber}`;
-            const isMatching = matchingLines.has(lineNumber);
-
-            return (
-              <Box
-                key={lineNumber}
-                ref={(el) => (lineRefs.current[lineNumber] = el)}
-                display="flex"
-                sx={{
-                  bgcolor: isHighlighted ? 'rgba(255, 255, 0, 0.1)' : 'transparent',
-                  '&:hover': {
-                    bgcolor: 'rgba(255, 255, 255, 0.05)',
-                  },
-                }}
-              >
-                {/* Line Number */}
-                <Box
-                  onClick={(e) => handleLineClick(e, lineNumber)}
-                  sx={{
-                    minWidth: 60,
-                    px: 1,
-                    py: 0.25,
-                    textAlign: 'right',
-                    color: isMatching ? '#ffeb3b' : 'grey.500',
-                    bgcolor: isMatching ? 'rgba(255, 235, 59, 0.1)' : 'grey.800',
-                    borderRight: '1px solid',
-                    borderColor: 'grey.700',
-                    borderLeft: isMatching ? '3px solid #ffeb3b' : 'none',
-                    cursor: 'pointer',
-                    userSelect: 'none',
-                    fontWeight: isMatching ? 'bold' : 'normal',
-                    '&:hover': {
-                      color: 'grey.300',
-                      bgcolor: 'grey.700',
-                    },
-                  }}
-                >
-                  {lineNumber}
-                </Box>
-
-                {/* Line Content */}
-                <Box
-                  sx={{
-                    flex: 1,
-                    px: 2,
-                    py: 0.25,
-                    whiteSpace: 'pre',
-                    overflowX: 'auto',
-                  }}
-                >
-                  {searchQuery ? highlightText(line || ' ', searchQuery) : (line || ' ')}
-                </Box>
-              </Box>
-            );
-          })}
-        </Box>
+        <Virtuoso
+          ref={virtuosoRef}
+          totalCount={lines.length}
+          itemContent={rowRenderer}
+          style={{ height: '100%' }}
+          overscan={{
+            main: 400,
+            reverse: 200,
+          }}
+          increaseViewportBy={{
+            top: 200,
+            bottom: 400,
+          }}
+          rangeChanged={(range) => {
+            if (range) {
+              setShowScrollTop(range.startIndex > 10);
+              setShowScrollBottom(range.endIndex < lines.length - 10);
+            }
+          }}
+        />
       </Paper>
 
       {/* Context Menu */}
       <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
+        open={contextMenu !== null}
         onClose={handleClose}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          contextMenu !== null
+            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            : undefined
+        }
       >
         <MenuItem onClick={handleCopyLine}>
           <CopyIcon fontSize="small" sx={{ mr: 1 }} />

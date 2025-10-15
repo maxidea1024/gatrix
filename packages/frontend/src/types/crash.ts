@@ -90,12 +90,19 @@ export interface GetCrashEventsRequest {
   search?: string;
   dateFrom?: string;
   dateTo?: string;
+  sortBy?: string;
+  sortOrder?: 'ASC' | 'DESC';
   platform?: string;
+  platformOperator?: 'any_of' | 'include_all';
   environment?: string;
+  environmentOperator?: 'any_of' | 'include_all';
   branch?: string;
+  branchOperator?: 'any_of' | 'include_all';
   marketType?: string;
+  marketTypeOperator?: 'any_of' | 'include_all';
   isEditor?: boolean;
   appVersion?: string;
+  appVersionOperator?: 'any_of' | 'include_all';
 }
 
 export interface GetCrashEventsResponse {

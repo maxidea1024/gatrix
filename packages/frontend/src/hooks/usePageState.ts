@@ -85,7 +85,12 @@ export const usePageState = ({ defaultState, storageKey }: UsePageStateOptions) 
         });
       }
 
-      setSearchParams(params, { replace: true });
+      // Only set search params if there are any params, otherwise clear the URL
+      if (params.toString()) {
+        setSearchParams(params, { replace: true });
+      } else {
+        setSearchParams({}, { replace: true });
+      }
     } catch (error) {
       console.warn(`Failed to save page state to URL params`, error);
     }

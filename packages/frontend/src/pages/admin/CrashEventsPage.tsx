@@ -243,6 +243,8 @@ const CrashEventsPage: React.FC = () => {
     const params: GetCrashEventsRequest = {
       page: pageState.page,
       limit: pageState.limit,
+      sortBy: pageState.sortBy,
+      sortOrder: pageState.sortOrder,
     };
 
     // Add search
@@ -269,12 +271,16 @@ const CrashEventsPage: React.FC = () => {
           params.isEditor = value === 'true';
         } else {
           (params as any)[filter.key] = value;
+          // Add operator suffix for multiselect filters
+          if (filter.operator && Array.isArray(filter.value)) {
+            (params as any)[`${filter.key}Operator`] = filter.operator;
+          }
         }
       }
     });
 
     return params;
-  }, [pageState.page, pageState.limit, debouncedSearchTerm, dateFrom, dateTo, activeFilters]);
+  }, [pageState.page, pageState.limit, pageState.sortBy, pageState.sortOrder, debouncedSearchTerm, dateFrom, dateTo, activeFilters]);
 
   // Load events
   const loadEvents = useCallback(async () => {
@@ -348,7 +354,10 @@ const CrashEventsPage: React.FC = () => {
       params.delete('expandedId');
     }
 
-    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    const paramsString = params.toString();
+    const newUrl = paramsString
+      ? `${window.location.pathname}?${paramsString}`
+      : window.location.pathname;
     window.history.replaceState({}, '', newUrl);
   }, [expandedRowId]);
 
@@ -655,12 +664,11 @@ const CrashEventsPage: React.FC = () => {
                   </Box>
                 </TableCell>
                 <TableCell>{t('crashes.table.userMessage')}</TableCell>
-                <TableCell align="center">{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {events.length === 0 ? (
-                <EmptyTableRow colSpan={13} message={t('crashes.noEvents')} loading={loading} />
+                <EmptyTableRow colSpan={12} message={t('crashes.noEvents')} loading={loading} />
               ) : (
                 events.map((event, index) => (
                   <React.Fragment key={event.id}>
@@ -743,29 +751,9 @@ const CrashEventsPage: React.FC = () => {
                           </Typography>
                         </Tooltip>
                       </TableCell>
-                      <TableCell align="center">
-                        <Tooltip title={t('crashes.viewStackTrace')}>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleViewStackTrace(event)}
-                          >
-                            <CodeIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        {event.logFilePath && (
-                          <Tooltip title={t('crashes.viewLog')}>
-                            <IconButton
-                              size="small"
-                              onClick={() => handleViewLog(event)}
-                            >
-                              <LogIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                      </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell colSpan={13} sx={{ p: 0, border: 0 }}>
+                      <TableCell colSpan={12} sx={{ p: 0, border: 0 }}>
                         <Collapse in={expandedRowId === event.id} timeout="auto" unmountOnExit>
                           <Box sx={{
                             py: 2,
@@ -1217,6 +1205,33 @@ const CrashEventsPage: React.FC = () => {
                                 </IconButton>
                               </Tooltip>
                             </Box>
+
+                            {/* Stack Trace Section */}
+                            <Box sx={{ mt: 3 }}>
+                              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                                {t('crashes.stackTrace')}
+                              </Typography>
+                              {event.stackTrace ? (
+                                <StackTraceViewer stackTrace={event.stackTrace} />
+                              ) : (
+                                <Typography color="text.secondary">
+                                  {t('crashes.stackTraceNotAvailable')}
+                                </Typography>
+                              )}
+                            </Box>
+
+                            {/* Log View Button */}
+                            {event.logFilePath && (
+                              <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-start' }}>
+                                <Button
+                                  variant="outlined"
+                                  startIcon={<LogIcon />}
+                                  onClick={() => handleViewLog(event)}
+                                >
+                                  {t('crashes.viewLog')}
+                                </Button>
+                              </Box>
+                            )}
                           </Box>
                         </Collapse>
                       </TableCell>
@@ -1283,7 +1298,7 @@ const CrashEventsPage: React.FC = () => {
         </Box>
 
         {/* Content */}
-        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+        <Box sx={{ flex: 1, overflow: 'hidden', p: 2, display: 'flex', flexDirection: 'column' }}>
           {drawerType === 'log' && (
             <>
               {loadingLog ? (
@@ -1291,7 +1306,9 @@ const CrashEventsPage: React.FC = () => {
                   <Typography>{t('crashes.loadingLog')}</Typography>
                 </Box>
               ) : logContent ? (
-                <LogViewer logContent={logContent} logFilePath={selectedEvent?.logFilePath || ''} />
+                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                  <LogViewer logContent={logContent} logFilePath={selectedEvent?.logFilePath || ''} />
+                </Box>
               ) : (
                 <Typography color="text.secondary">{t('crashes.logNotAvailable')}</Typography>
               )}
