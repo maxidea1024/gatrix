@@ -87,9 +87,7 @@ const getTheme = (mode: 'light' | 'dark'): Theme => {
         styleOverrides: {
           paper: {
             backgroundColor: mode === 'dark' ? '#1e1e1e' : '#ffffff',
-            borderRight: mode === 'dark' 
-              ? '1px solid rgba(255, 255, 255, 0.12)' 
-              : '1px solid rgba(0, 0, 0, 0.12)',
+            borderRight: 'none',
           },
         },
       },

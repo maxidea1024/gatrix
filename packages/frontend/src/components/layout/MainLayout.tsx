@@ -688,7 +688,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               width: 280,
               backgroundColor: '#0f172a',
               color: '#ffffff',
-              borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+              border: 'none',
+              borderRight: 'none',
             },
           }}
         >
@@ -705,7 +706,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               width: sidebarCollapsed ? 64 : sidebarWidth,
               backgroundColor: '#0f172a',
               color: '#ffffff',
-              borderRight: '1px solid rgba(255, 255, 255, 0.08)',
               position: 'fixed',
               height: '100vh',
               top: 0,
@@ -713,6 +713,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
+              border: 'none',
+              borderRight: 'none',
             },
           }}
           open

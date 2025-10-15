@@ -250,12 +250,23 @@ const LoginPage: React.FC = () => {
       navigate(from, { replace: true });
     } catch (err: any) {
       console.error('[LoginPage] Login error:', err);
+
+      // Handle network errors explicitly
+      if (err.message === 'Network Error' || err.code === 'ERR_NETWORK' || !err.status) {
+        const networkError = t('auth.errors.networkError') || '서버에 연결할 수 없습니다. 네트워크 연결을 확인하거나 잠시 후 다시 시도해주세요.';
+        setLoginError(networkError);
+        enqueueSnackbar(networkError, { variant: 'error' });
+        return;
+      }
+
       // Check if the error is about user not found
       if (err.status === 404 ||
           err.message === 'USER_NOT_FOUND' ||
           (err.error?.message === 'USER_NOT_FOUND')) {
         // Show error message for user not found
-        setLoginError(t('auth.errors.userNotFound'));
+        const errorMsg = t('auth.errors.userNotFound');
+        setLoginError(errorMsg);
+        enqueueSnackbar(errorMsg, { variant: 'error' });
       } else if (err.status === 403) {
         // Check specific account status
         if (err.message === 'ACCOUNT_PENDING' || err.error?.message === 'ACCOUNT_PENDING') {
@@ -278,10 +289,12 @@ const LoginPage: React.FC = () => {
         } else {
           const errorMessage = getErrorMessage(err, t);
           setLoginError(errorMessage);
+          enqueueSnackbar(errorMessage, { variant: 'error' });
         }
       } else {
         const errorMessage = getErrorMessage(err, t);
         setLoginError(errorMessage);
+        enqueueSnackbar(errorMessage, { variant: 'error' });
       }
     }
   };
