@@ -2,33 +2,69 @@ import api from './api';
 import {
   ClientCrash,
   CrashDetail,
-  CrashInstance,
+  CrashEvent,
   CrashStats,
   GetCrashesRequest,
   GetCrashesResponse,
+  GetCrashEventsRequest,
+  GetCrashEventsResponse,
   UpdateCrashStateRequest,
+  UpdateCrashAssigneeRequest,
+  UpdateCrashJiraTicketRequest,
   CrashState
 } from '@/types/crash';
 
 class CrashService {
+  /**
+   * Get all crash events with pagination and filters
+   */
+  async getCrashEvents(params: GetCrashEventsRequest = {}): Promise<GetCrashEventsResponse> {
+    try {
+      const response = await api.get('/admin/crash-events', { params });
+
+      // Check if response.data is an array (already unwrapped by api service)
+      if (Array.isArray(response.data)) {
+        // Data is already unwrapped, need to get metadata from response object
+        return {
+          data: response.data,
+          total: (response as any).total || 0,
+          page: (response as any).page || 1,
+          limit: (response as any).limit || 20,
+          totalPages: (response as any).totalPages || 1
+        };
+      }
+
+      // response.data is the full backend response object
+      return {
+        data: response.data.data || [],
+        total: response.data.total || 0,
+        page: response.data.page || 1,
+        limit: response.data.limit || 10,
+        totalPages: response.data.totalPages || 1
+      };
+    } catch (error) {
+      console.error('Error fetching crash events:', error);
+      throw error;
+    }
+  }
+
   /**
    * Get all crashes with pagination and filters
    */
   async getCrashes(params: GetCrashesRequest = {}): Promise<GetCrashesResponse> {
     try {
       const response = await api.get('/admin/crashes', { params });
-      
-      // Backend returns: { success: true, data: { crashes: [...], pagination: {...} } }
+
       const backendData = response.data;
-      
+
       const result = {
-        data: backendData.crashes || [],
-        total: backendData.pagination?.total || 0,
-        page: backendData.pagination?.page || 1,
-        limit: backendData.pagination?.limit || 10,
-        totalPages: backendData.pagination?.totalPages || 1
+        data: backendData.data || backendData.crashes || [],
+        total: backendData.total || 0,
+        page: backendData.page || 1,
+        limit: backendData.limit || 10,
+        totalPages: backendData.totalPages || 1
       };
-      
+
       return result;
     } catch (error) {
       console.error('Error fetching crashes:', error);
@@ -39,10 +75,10 @@ class CrashService {
   /**
    * Get crash by ID with detailed information
    */
-  async getCrashById(id: number): Promise<CrashDetail> {
+  async getCrashById(id: string): Promise<CrashDetail> {
     try {
       const response = await api.get(`/admin/crashes/${id}`);
-      return response.data;
+      return response.data.data || response.data;
     } catch (error) {
       console.error('Error fetching crash details:', error);
       throw error;
@@ -50,104 +86,30 @@ class CrashService {
   }
 
   /**
-   * Get crash instances for a specific crash
+   * Get crash events for a specific crash
    */
-  async getCrashInstances(crashId: number, page = 1, limit = 20): Promise<{
-    instances: CrashInstance[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  }> {
+  async getCrashEventsByCrashId(crashId: string, limit = 100): Promise<CrashEvent[]> {
     try {
-      const response = await api.get(`/admin/crashes/${crashId}/instances`, {
-        params: { page, limit }
+      const response = await api.get(`/admin/crashes/${crashId}/events`, {
+        params: { limit }
       });
-      
-      const backendData = response.data;
-      
-      return {
-        instances: backendData.instances || [],
-        total: backendData.pagination?.total || 0,
-        page: backendData.pagination?.page || 1,
-        limit: backendData.pagination?.limit || 20,
-        totalPages: backendData.pagination?.totalPages || 1
-      };
+
+      return response.data.data || response.data.events || [];
     } catch (error) {
-      console.error('Error fetching crash instances:', error);
+      console.error('Error fetching crash events:', error);
       throw error;
     }
   }
 
   /**
-   * Get crash statistics
+   * Get crash summary statistics
    */
-  async getCrashStats(): Promise<CrashStats> {
+  async getCrashSummary(): Promise<CrashStats> {
     try {
-      const response = await api.get('/admin/crashes/stats');
-      return response.data;
+      const response = await api.get('/admin/crashes/summary');
+      return response.data.data || response.data;
     } catch (error) {
-      console.error('Error fetching crash statistics:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Update crash state (open/closed/deleted)
-   */
-  async updateCrashState(id: number, data: UpdateCrashStateRequest): Promise<ClientCrash> {
-    try {
-      const response = await api.patch(`/admin/crashes/${id}/state`, data);
-      return response.data;
-    } catch (error) {
-      console.error('Error updating crash state:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Mark crash as closed
-   */
-  async closeCrash(id: number): Promise<ClientCrash> {
-    return this.updateCrashState(id, { state: CrashState.CLOSED });
-  }
-
-  /**
-   * Mark crash as open
-   */
-  async openCrash(id: number): Promise<ClientCrash> {
-    return this.updateCrashState(id, { state: CrashState.OPEN });
-  }
-
-  /**
-   * Mark crash as deleted
-   */
-  async deleteCrash(id: number): Promise<ClientCrash> {
-    return this.updateCrashState(id, { state: CrashState.DELETED });
-  }
-
-  /**
-   * Get crash stack trace content
-   */
-  async getCrashStackTrace(id: number): Promise<string> {
-    try {
-      const response = await api.get(`/admin/crashes/${id}/stacktrace`);
-      return response.data.stackTrace || '';
-    } catch (error) {
-      console.error('Error fetching crash stack trace:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get crash log content
-   */
-  async getCrashLog(id: number): Promise<string> {
-    try {
-      const response = await api.get(`/admin/crashes/${id}/log`);
-      return response.data.log || '';
-    } catch (error) {
-      console.error('Error fetching crash log:', error);
+      console.error('Error fetching crash summary:', error);
       throw error;
     }
   }
@@ -155,15 +117,10 @@ class CrashService {
   /**
    * Get crash statistics for a specific crash
    */
-  async getCrashStatistics(id: number): Promise<{
-    versionDistribution: { version: string; count: number }[];
-    platformDistribution: { platform: string; count: number }[];
-    affectedUsers: number;
-    totalInstances: number;
-  }> {
+  async getCrashStats(id: string): Promise<any> {
     try {
-      const response = await api.get(`/admin/crashes/${id}/statistics`);
-      return response.data;
+      const response = await api.get(`/admin/crashes/${id}/stats`);
+      return response.data.data || response.data;
     } catch (error) {
       console.error('Error fetching crash statistics:', error);
       throw error;
@@ -171,10 +128,94 @@ class CrashService {
   }
 
   /**
-   * Search crashes by user nickname or user ID
+   * Update crash state
    */
-  async searchCrashes(query: string, page = 1, limit = 10): Promise<GetCrashesResponse> {
-    return this.getCrashes({
+  async updateCrashState(id: string, data: UpdateCrashStateRequest): Promise<void> {
+    try {
+      await api.patch(`/admin/crashes/${id}/state`, data);
+    } catch (error) {
+      console.error('Error updating crash state:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update crash assignee
+   */
+  async updateCrashAssignee(id: string, data: UpdateCrashAssigneeRequest): Promise<void> {
+    try {
+      await api.patch(`/admin/crashes/${id}/assignee`, data);
+    } catch (error) {
+      console.error('Error updating crash assignee:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update crash Jira ticket
+   */
+  async updateCrashJiraTicket(id: string, data: UpdateCrashJiraTicketRequest): Promise<void> {
+    try {
+      await api.patch(`/admin/crashes/${id}/jira`, data);
+    } catch (error) {
+      console.error('Error updating crash Jira ticket:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Mark crash as closed
+   */
+  async closeCrash(id: string): Promise<void> {
+    return this.updateCrashState(id, { state: CrashState.CLOSED });
+  }
+
+  /**
+   * Mark crash as open
+   */
+  async openCrash(id: string): Promise<void> {
+    return this.updateCrashState(id, { state: CrashState.OPEN });
+  }
+
+  /**
+   * Mark crash as resolved
+   */
+  async resolveCrash(id: string): Promise<void> {
+    return this.updateCrashState(id, { state: CrashState.RESOLVED });
+  }
+
+  /**
+   * Mark crash as deleted
+   */
+  async deleteCrash(id: string): Promise<void> {
+    return this.updateCrashState(id, { state: CrashState.DELETED });
+  }
+
+  /**
+   * Get filter options
+   */
+  async getFilterOptions(): Promise<{
+    branches: string[];
+    platforms: string[];
+    environments: string[];
+    marketTypes: string[];
+    appVersions: string[];
+    states: { value: number; label: string }[];
+  }> {
+    try {
+      const response = await api.get('/admin/crash-events/filter-options');
+      return response.data.data || response.data;
+    } catch (error) {
+      console.error('Error fetching filter options:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Search crash events
+   */
+  async searchCrashEvents(query: string, page = 1, limit = 10): Promise<GetCrashEventsResponse> {
+    return this.getCrashEvents({
       search: query,
       page,
       limit
@@ -182,28 +223,43 @@ class CrashService {
   }
 
   /**
-   * Get crashes by state
+   * Get recent crash events (last 24 hours)
    */
-  async getCrashesByState(state: CrashState, page = 1, limit = 10): Promise<GetCrashesResponse> {
-    return this.getCrashes({
-      state,
+  async getRecentCrashEvents(page = 1, limit = 10): Promise<GetCrashEventsResponse> {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    return this.getCrashEvents({
+      dateFrom: yesterday.toISOString(),
       page,
       limit
     });
   }
 
   /**
-   * Get recent crashes (last 24 hours)
+   * Get log file content for a crash event
    */
-  async getRecentCrashes(page = 1, limit = 10): Promise<GetCrashesResponse> {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    
-    return this.getCrashes({
-      dateFrom: yesterday.toISOString(),
-      page,
-      limit
-    });
+  async getLogFile(eventId: string): Promise<{ logContent: string; logFilePath: string }> {
+    try {
+      const response = await api.get(`/admin/crash-events/${eventId}/log`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching log file:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get stack trace for a crash event
+   */
+  async getStackTrace(eventId: string): Promise<{ stackTrace: string; stackFilePath: string; firstLine?: string }> {
+    try {
+      const response = await api.get(`/admin/crash-events/${eventId}/stack-trace`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching stack trace:', error);
+      throw error;
+    }
   }
 }
 

@@ -1,14 +1,6 @@
 
-exports.up = async function() {
+exports.up = async function(connection) {
   console.log('Starting Remote Config Final System migration...');
-  
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'motif_dev',
-    password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
-  });
 
   console.log('Creating Remote Config system tables...');
 
@@ -223,16 +215,8 @@ exports.up = async function() {
   console.log('Remote Config Final System migration completed successfully!');
 };
 
-exports.down = async function() {
+exports.down = async function(connection) {
   console.log('Rolling back Remote Config Final System migration...');
-  
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'motif_dev',
-    password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
-  });
 
   const tables = [
     'g_remote_config_edit_sessions',

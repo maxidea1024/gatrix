@@ -1,53 +1,66 @@
 import { Model, QueryBuilder } from 'objection';
-import { CrashState, CrashFilters, PaginationOptions } from '../types/crash';
+import { CrashState, CrashFilters } from '../types/crash';
+import { generateULID } from '../utils/ulid';
+import { isGreaterThan } from '../utils/semver';
 
+/**
+ * ClientCrash Model
+ * Represents a crash group (deduplicated by hash + branch)
+ */
 export class ClientCrash extends Model {
   static tableName = 'crashes';
 
-  id!: number;
-  crash_id!: string;
-  user_id?: number;
-  user_nickname?: string;
-  platform!: string;
-  branch!: string;
-  market_type?: string;
-  server_group?: string;
-  device_type?: string;
-  version!: string;
-  crash_type!: string;
-  crash_message?: string;
-  stack_trace_file?: string;
-  logs_file?: string;
-  state!: CrashState;
-  first_occurred_at!: Date;
-  last_occurred_at!: Date;
-  occurrence_count!: number;
+  id!: string; // ULID
+  chash!: string; // MD5 hash of stack trace
+  branch!: string; // Branch name
+  environment!: string; // Environment
+  platform!: string; // Platform
+  marketType?: string; // Market type
+  isEditor!: boolean; // Whether crash occurred in editor
+
+  firstLine?: string; // First line of stack trace
+  stackFilePath?: string; // Path to stack trace file
+
+  crashesCount!: number; // Number of occurrences
+  firstCrashEventId?: string; // ULID of first crash event
+  lastCrashEventId?: string; // ULID of last crash event
+  firstCrashAt!: Date; // First occurrence timestamp
+  lastCrashAt!: Date; // Last occurrence timestamp
+
+  crashesState!: CrashState; // Current state
+  assignee?: string; // Assigned developer/team
+  jiraTicket?: string; // Jira ticket URL
+
+  maxAppVersion?: string; // Maximum app version
+  maxResVersion?: string; // Maximum resource version
+
   createdAt!: Date;
   updatedAt!: Date;
 
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['crash_id', 'platform', 'branch', 'version', 'crash_type', 'first_occurred_at', 'last_occurred_at'],
+      required: ['id', 'chash', 'branch', 'environment', 'platform', 'firstCrashAt', 'lastCrashAt'],
       properties: {
-        id: { type: 'integer' },
-        crash_id: { type: 'string', maxLength: 255 },
-        user_id: { type: 'integer' },
-        user_nickname: { type: 'string', maxLength: 255 },
-        platform: { type: 'string', enum: ['android', 'ios', 'windows', 'macos', 'linux'] },
-        branch: { type: 'string', enum: ['release', 'patch', 'beta', 'alpha', 'dev'] },
-        market_type: { type: 'string' },
-        server_group: { type: 'string', maxLength: 100 },
-        device_type: { type: 'string', maxLength: 255 },
-        version: { type: 'string', maxLength: 100 },
-        crash_type: { type: 'string', maxLength: 100 },
-        crash_message: { type: 'string' },
-        stack_trace_file: { type: 'string', maxLength: 500 },
-        logs_file: { type: 'string', maxLength: 500 },
-        state: { type: 'integer', enum: [0, 1, 2], default: 0 },
-        first_occurred_at: { type: 'string', format: 'date-time' },
-        last_occurred_at: { type: 'string', format: 'date-time' },
-        occurrence_count: { type: 'integer', default: 1 },
+        id: { type: 'string', maxLength: 26 }, // ULID
+        chash: { type: 'string', maxLength: 32 }, // MD5 hash
+        branch: { type: 'string', maxLength: 50 },
+        environment: { type: 'string', maxLength: 50 },
+        platform: { type: 'string', maxLength: 50 },
+        marketType: { type: ['string', 'null'], maxLength: 50 },
+        isEditor: { type: 'boolean', default: false },
+        firstLine: { type: ['string', 'null'], maxLength: 200 },
+        stackFilePath: { type: ['string', 'null'], maxLength: 500 },
+        crashesCount: { type: 'integer', default: 1 },
+        firstCrashEventId: { type: ['string', 'null'], maxLength: 26 },
+        lastCrashEventId: { type: ['string', 'null'], maxLength: 26 },
+        firstCrashAt: { type: 'string', format: 'date-time' },
+        lastCrashAt: { type: 'string', format: 'date-time' },
+        crashesState: { type: 'integer', enum: [0, 1, 2, 3, 4], default: 0 },
+        assignee: { type: ['string', 'null'], maxLength: 100 },
+        jiraTicket: { type: ['string', 'null'], maxLength: 200 },
+        maxAppVersion: { type: ['string', 'null'], maxLength: 50 },
+        maxResVersion: { type: ['string', 'null'], maxLength: 50 },
         createdAt: { type: 'string', format: 'date-time' },
         updatedAt: { type: 'string', format: 'date-time' }
       }
@@ -56,32 +69,37 @@ export class ClientCrash extends Model {
 
   static get relationMappings() {
     return {
-      instances: {
+      events: {
         relation: Model.HasManyRelation,
-        modelClass: 'CrashInstance',
+        modelClass: 'CrashEvent',
         join: {
           from: 'crashes.id',
-          to: 'crash_instances.cid'
+          to: 'crash_events.crashId'
         }
       }
     };
   }
 
-  // 누락된 메서드 추가
-  static async findByHashAndBranch(crashId: string, branch: string): Promise<ClientCrash | undefined> {
-    return await this.query()
-      .where('crash_id', crashId)
-      .where('branch', branch)
-      .first();
-  }
-
   $beforeInsert() {
+    if (!this.id) {
+      this.id = generateULID();
+    }
     this.createdAt = new Date();
     this.updatedAt = new Date();
   }
 
   $beforeUpdate() {
     this.updatedAt = new Date();
+  }
+
+  /**
+   * Find crash by hash and branch
+   */
+  static async findByHashAndBranch(chash: string, branch: string): Promise<ClientCrash | undefined> {
+    return await this.query()
+      .where('chash', chash)
+      .where('branch', branch)
+      .first();
   }
 
   /**
@@ -92,31 +110,22 @@ export class ClientCrash extends Model {
     limit: number = 10,
     filters: CrashFilters = {}
   ) {
-    const query = this.query()
-      .select('crashes.*')
-      .leftJoin('crash_instances', 'crashes.id', 'crash_instances.cid');
+    const query = this.query();
 
     // Apply filters
     this.applyFilters(query, filters);
 
-    // Group by crash id to avoid duplicates from join
-    query.groupBy('crashes.id');
-
     // Count total
-    const countQuery = this.query()
-      .leftJoin('crash_instances', 'crashes.id', 'crash_instances.cid');
+    const countQuery = this.query();
     this.applyFilters(countQuery, filters);
-    const totalResult = await countQuery
-      .groupBy('crashes.id')
-      .count('crashes.id as count');
-    const total = totalResult.length;
+    const total = await countQuery.resultSize();
 
     // Apply pagination
     const offset = (page - 1) * limit;
     query.offset(offset).limit(limit);
 
     // Order by last crash time (most recent first)
-    query.orderBy('crashes.last_occurred_at', 'desc');
+    query.orderBy('lastCrashAt', 'desc');
 
     const crashes = await query;
 
@@ -133,76 +142,74 @@ export class ClientCrash extends Model {
    * Apply filters to query
    */
   private static applyFilters(query: QueryBuilder<ClientCrash>, filters: CrashFilters) {
-    // Search by user nickname or userId
+    // Search in firstLine, assignee, jiraTicket
     if (filters.search) {
       const searchTerm = `%${filters.search}%`;
       query.where(function() {
-        this.where('crashes.user_id', 'like', searchTerm)
-            .orWhere('crashes.user_nickname', 'like', searchTerm);
+        this.where('firstLine', 'like', searchTerm)
+            .orWhere('assignee', 'like', searchTerm)
+            .orWhere('jiraTicket', 'like', searchTerm);
       });
     }
 
     // Date range filter
     if (filters.dateFrom) {
-      query.where('crashes.last_occurred_at', '>=', filters.dateFrom);
+      query.where('firstCrashAt', '>=', filters.dateFrom);
     }
     if (filters.dateTo) {
-      query.where('crashes.last_occurred_at', '<=', filters.dateTo);
+      query.where('lastCrashAt', '<=', filters.dateTo);
     }
 
     // Platform filter
-    if (filters.deviceType !== undefined) {
-      query.where('crashes.platform', filters.deviceType);
+    if (filters.platform) {
+      query.where('platform', filters.platform);
+    }
+
+    // Environment filter
+    if (filters.environment) {
+      query.where('environment', filters.environment);
     }
 
     // Branch filter
-    if (filters.branch !== undefined) {
-      query.where('crashes.branch', filters.branch);
-    }
-
-    // Version filter
-    if (filters.version) {
-      query.where('crashes.version', 'like', `%${filters.version}%`);
-    }
-
-    // Server group filter
-    if (filters.serverGroup) {
-      query.where('crashes.server_group', filters.serverGroup);
+    if (filters.branch) {
+      query.where('branch', filters.branch);
     }
 
     // Market type filter
     if (filters.marketType) {
-      query.where('crashes.market_type', filters.marketType);
+      query.where('marketType', filters.marketType);
     }
 
-    // Device type filter
-    if (filters.deviceType) {
-      query.where('crashes.device_type', 'like', `%${filters.deviceType}%`);
+    // isEditor filter
+    if (filters.isEditor !== undefined) {
+      query.where('isEditor', filters.isEditor);
     }
 
     // State filter
     if (filters.state !== undefined) {
-      query.where('crashes.state', filters.state);
+      query.where('crashesState', filters.state);
+    }
+
+    // Assignee filter
+    if (filters.assignee) {
+      query.where('assignee', filters.assignee);
+    }
+
+    // App version filter
+    if (filters.appVersion) {
+      query.where('maxAppVersion', 'like', `%${filters.appVersion}%`);
     }
   }
 
   /**
-   * Find crash by crash_id
+   * Increment crash count and update last crash event
    */
-  static async findByCrashId(crash_id: string) {
-    return await this.query()
-      .where('crash_id', crash_id)
-      .first();
-  }
-
-  /**
-   * Increment crash count and update last crash time
-   */
-  async incrementCount() {
+  async incrementCount(lastCrashEventId: string) {
     return await this.$query()
       .patch({
-        occurrence_count: this.occurrence_count + 1,
-        last_occurred_at: new Date(),
+        crashesCount: this.crashesCount + 1,
+        lastCrashEventId,
+        lastCrashAt: new Date(),
         updatedAt: new Date()
       });
   }
@@ -213,18 +220,97 @@ export class ClientCrash extends Model {
   async updateState(state: CrashState) {
     return await this.$query()
       .patch({
-        state,
+        crashesState: state,
         updatedAt: new Date()
       });
   }
 
   /**
-   * Get crash with instances
+   * Update assignee
    */
-  static async findByIdWithInstances(id: number) {
+  async updateAssignee(assignee: string) {
+    return await this.$query()
+      .patch({
+        assignee,
+        updatedAt: new Date()
+      });
+  }
+
+  /**
+   * Update Jira ticket
+   */
+  async updateJiraTicket(jiraTicket: string) {
+    return await this.$query()
+      .patch({
+        jiraTicket,
+        updatedAt: new Date()
+      });
+  }
+
+  /**
+   * Update max versions
+   */
+  async updateMaxVersions(appVersion?: string, resVersion?: string) {
+    const updates: any = { updatedAt: new Date() };
+
+    if (appVersion && (!this.maxAppVersion || isGreaterThan(appVersion, this.maxAppVersion))) {
+      updates.maxAppVersion = appVersion;
+    }
+
+    if (resVersion && (!this.maxResVersion || resVersion > this.maxResVersion)) {
+      updates.maxResVersion = resVersion;
+    }
+
+    if (Object.keys(updates).length > 1) { // More than just updatedAt
+      return await this.$query().patch(updates);
+    }
+  }
+
+  /**
+   * Reopen crash (change state to REPEATED)
+   */
+  async reopen() {
+    return await this.$query()
+      .patch({
+        crashesState: CrashState.REPEATED,
+        updatedAt: new Date()
+      });
+  }
+
+  /**
+   * Get crash with events
+   */
+  static async findByIdWithEvents(id: string) {
     return await this.query()
       .findById(id)
-      .withGraphFetched('instances')
-      .orderBy('instances.createdAt', 'desc');
+      .withGraphFetched('events')
+      .modifyGraph('events', (builder) => {
+        builder.orderBy('createdAt', 'desc');
+      });
+  }
+
+  /**
+   * Get crash summary statistics
+   */
+  static async getSummary() {
+    const stats = await this.query()
+      .select(
+        this.raw('COUNT(*) as totalCrashes'),
+        this.raw('SUM(CASE WHEN crashesState = 0 THEN 1 ELSE 0 END) as openCrashes'),
+        this.raw('SUM(CASE WHEN crashesState = 1 THEN 1 ELSE 0 END) as closedCrashes'),
+        this.raw('SUM(CASE WHEN crashesState = 3 THEN 1 ELSE 0 END) as resolvedCrashes'),
+        this.raw('SUM(CASE WHEN crashesState = 4 THEN 1 ELSE 0 END) as repeatedCrashes'),
+        this.raw('SUM(crashesCount) as totalEvents')
+      )
+      .first();
+
+    const recentCrashes = await this.query()
+      .orderBy('lastCrashAt', 'desc')
+      .limit(10);
+
+    return {
+      ...stats,
+      recentCrashes
+    };
   }
 }

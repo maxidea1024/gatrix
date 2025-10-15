@@ -1,10 +1,12 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { asyncHandler, CustomError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import { ClientCrash } from '../models/ClientCrash';
-import { CrashInstance } from '../models/CrashInstance';
-import { CrashFilters, CrashState, Platform, Branch, MarketType, ServerGroup } from '../types/crash';
+import { CrashEvent } from '../models/CrashEvent';
+import { CrashFilters, CrashState } from '../types/crash';
 import logger from '../config/logger';
+import fs from 'fs/promises';
+import path from 'path';
 
 export class CrashController {
   /**
@@ -19,15 +21,14 @@ export class CrashController {
       search: req.query.search as string,
       dateFrom: req.query.dateFrom as string,
       dateTo: req.query.dateTo as string,
-      serverGroup: req.query.serverGroup as ServerGroup,
-      marketType: req.query.marketType as MarketType,
-      deviceType: req.query.deviceType ? parseInt(req.query.deviceType as string) as Platform : undefined,
-      branch: req.query.branch ? parseInt(req.query.branch as string) as Branch : undefined,
-      majorVer: req.query.majorVer ? parseInt(req.query.majorVer as string) : undefined,
-      minorVer: req.query.minorVer ? parseInt(req.query.minorVer as string) : undefined,
-      buildNum: req.query.buildNum ? parseInt(req.query.buildNum as string) : undefined,
-      patchNum: req.query.patchNum ? parseInt(req.query.patchNum as string) : undefined,
-      state: req.query.state !== undefined ? parseInt(req.query.state as string) as CrashState : undefined
+      platform: req.query.platform as string,
+      environment: req.query.environment as string,
+      branch: req.query.branch as string,
+      marketType: req.query.marketType as string,
+      isEditor: req.query.isEditor !== undefined ? req.query.isEditor === 'true' : undefined,
+      state: req.query.state !== undefined ? parseInt(req.query.state as string) as CrashState : undefined,
+      assignee: req.query.assignee as string,
+      appVersion: req.query.appVersion as string
     };
 
     try {
@@ -44,26 +45,40 @@ export class CrashController {
   });
 
   /**
-   * Get crash details with instances
+   * Get crash details with events
    * GET /admin/crashes/:id
    */
   static getCrashDetail = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const crashId = parseInt(req.params.id);
+    const crashId = req.params.id;
 
-    if (isNaN(crashId)) {
+    if (!crashId) {
       throw new CustomError('Invalid crash ID', 400);
     }
 
     try {
-      const crash = await ClientCrash.findByIdWithInstances(crashId);
+      const crash = await ClientCrash.findByIdWithEvents(crashId);
 
       if (!crash) {
         throw new CustomError('Crash not found', 404);
       }
 
+      // Load stack trace if available
+      let stackTrace: string | undefined;
+      if (crash.stackFilePath) {
+        try {
+          const fullPath = path.join(process.cwd(), 'public', crash.stackFilePath);
+          stackTrace = await fs.readFile(fullPath, 'utf8');
+        } catch (error) {
+          logger.warn('Failed to load stack trace file', { crashId, stackFilePath: crash.stackFilePath, error });
+        }
+      }
+
       res.json({
         success: true,
-        data: crash
+        data: {
+          ...crash,
+          stackTrace
+        }
       });
     } catch (error) {
       if (error instanceof CustomError) {
@@ -75,28 +90,27 @@ export class CrashController {
   });
 
   /**
-   * Get crash instances with pagination
-   * GET /admin/crashes/:id/instances
+   * Get crash events with pagination
+   * GET /admin/crashes/:id/events
    */
-  static getCrashInstances = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const crashId = parseInt(req.params.id);
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = Math.min(parseInt(req.query.limit as string) || 10, 100);
+  static getCrashEvents = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const crashId = req.params.id;
+    const limit = Math.min(parseInt(req.query.limit as string) || 100, 500);
 
-    if (isNaN(crashId)) {
+    if (!crashId) {
       throw new CustomError('Invalid crash ID', 400);
     }
 
     try {
-      const result = await CrashInstance.findByCrashId(crashId, page, limit);
+      const events = await CrashEvent.getByCrashId(crashId, limit);
 
       res.json({
         success: true,
-        data: result
+        data: events
       });
     } catch (error) {
-      logger.error('Error fetching crash instances:', error);
-      throw new CustomError('Failed to fetch crash instances', 500);
+      logger.error('Error fetching crash events:', error);
+      throw new CustomError('Failed to fetch crash events', 500);
     }
   });
 
@@ -105,14 +119,14 @@ export class CrashController {
    * PATCH /admin/crashes/:id/state
    */
   static updateCrashState = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const crashId = parseInt(req.params.id);
+    const crashId = req.params.id;
     const { state } = req.body;
 
-    if (isNaN(crashId)) {
+    if (!crashId) {
       throw new CustomError('Invalid crash ID', 400);
     }
 
-    if (state === undefined || ![CrashState.OPEN, CrashState.CLOSED, CrashState.DELETED].includes(state)) {
+    if (state === undefined || ![CrashState.OPEN, CrashState.CLOSED, CrashState.DELETED, CrashState.RESOLVED, CrashState.REPEATED].includes(state)) {
       throw new CustomError('Invalid state value', 400);
     }
 
@@ -124,6 +138,8 @@ export class CrashController {
       }
 
       await crash.updateState(state);
+
+      logger.info('Crash state updated', { crashId, state, userId: (req.user as any)?.id });
 
       res.json({
         success: true,
@@ -139,22 +155,103 @@ export class CrashController {
   });
 
   /**
+   * Update crash assignee
+   * PATCH /admin/crashes/:id/assignee
+   */
+  static updateCrashAssignee = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const crashId = req.params.id;
+    const { assignee } = req.body;
+
+    if (!crashId) {
+      throw new CustomError('Invalid crash ID', 400);
+    }
+
+    if (!assignee || typeof assignee !== 'string') {
+      throw new CustomError('Invalid assignee value', 400);
+    }
+
+    try {
+      const crash = await ClientCrash.query().findById(crashId);
+
+      if (!crash) {
+        throw new CustomError('Crash not found', 404);
+      }
+
+      await crash.updateAssignee(assignee);
+
+      logger.info('Crash assignee updated', { crashId, assignee, userId: (req.user as any)?.id });
+
+      res.json({
+        success: true,
+        message: 'Crash assignee updated successfully'
+      });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      logger.error('Error updating crash assignee:', error);
+      throw new CustomError('Failed to update crash assignee', 500);
+    }
+  });
+
+  /**
+   * Update crash Jira ticket
+   * PATCH /admin/crashes/:id/jira
+   */
+  static updateCrashJiraTicket = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const crashId = req.params.id;
+    const { jiraTicket } = req.body;
+
+    if (!crashId) {
+      throw new CustomError('Invalid crash ID', 400);
+    }
+
+    if (!jiraTicket || typeof jiraTicket !== 'string') {
+      throw new CustomError('Invalid Jira ticket value', 400);
+    }
+
+    try {
+      const crash = await ClientCrash.query().findById(crashId);
+
+      if (!crash) {
+        throw new CustomError('Crash not found', 404);
+      }
+
+      await crash.updateJiraTicket(jiraTicket);
+
+      logger.info('Crash Jira ticket updated', { crashId, jiraTicket, userId: (req.user as any)?.id });
+
+      res.json({
+        success: true,
+        message: 'Crash Jira ticket updated successfully'
+      });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      logger.error('Error updating crash Jira ticket:', error);
+      throw new CustomError('Failed to update crash Jira ticket', 500);
+    }
+  });
+
+  /**
    * Get crash statistics
    * GET /admin/crashes/:id/stats
    */
   static getCrashStats = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const crashId = parseInt(req.params.id);
+    const crashId = req.params.id;
 
-    if (isNaN(crashId)) {
+    if (!crashId) {
       throw new CustomError('Invalid crash ID', 400);
     }
 
     try {
-      const [versionStats, platformStats, userStats, latestInstances] = await Promise.all([
-        CrashInstance.getVersionStats(crashId),
-        CrashInstance.getPlatformStats(crashId),
-        CrashInstance.getUserStats(crashId),
-        CrashInstance.getLatestInstances(crashId, 10)
+      const [versionStats, platformStats, environmentStats, userStats, latestEvents] = await Promise.all([
+        CrashEvent.getVersionStats(crashId),
+        CrashEvent.getPlatformStats(crashId),
+        CrashEvent.getEnvironmentStats(crashId),
+        CrashEvent.getUserStats(crashId),
+        CrashEvent.getLatestEvents(crashId, 10)
       ]);
 
       res.json({
@@ -162,8 +259,9 @@ export class CrashController {
         data: {
           versionStats,
           platformStats,
+          environmentStats,
           userStats,
-          latestInstances
+          latestEvents
         }
       });
     } catch (error) {
@@ -178,29 +276,11 @@ export class CrashController {
    */
   static getCrashSummary = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const [
-        totalCrashes,
-        openCrashes,
-        closedCrashes,
-        recentCrashes
-      ] = await Promise.all([
-        ClientCrash.query().count('id as count').first(),
-        ClientCrash.query().where('state', CrashState.OPEN).count('id as count').first(),
-        ClientCrash.query().where('state', CrashState.CLOSED).count('id as count').first(),
-        ClientCrash.query()
-          .where('last_occurred_at', '>=', new Date(Date.now() - 24 * 60 * 60 * 1000)) // Last 24 hours
-          .count('id as count')
-          .first()
-      ]);
+      const summary = await ClientCrash.getSummary();
 
       res.json({
         success: true,
-        data: {
-          total: (totalCrashes as any)?.count || 0,
-          open: (openCrashes as any)?.count || 0,
-          closed: (closedCrashes as any)?.count || 0,
-          recent: (recentCrashes as any)?.count || 0
-        }
+        data: summary
       });
     } catch (error) {
       logger.error('Error fetching crash summary:', error);
@@ -214,15 +294,13 @@ export class CrashController {
    */
   static getFilterOptions = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     try {
-      // Get available branches, platforms, and versions from existing data
-      const [branches, platforms, versions] = await Promise.all([
+      // Get available branches, platforms, environments from existing data
+      const [branches, platforms, environments, marketTypes, appVersions] = await Promise.all([
         ClientCrash.query().distinct('branch').orderBy('branch'),
-        CrashInstance.query().distinct('platform').orderBy('platform'),
-        CrashInstance.query()
-          .select('majorVer', 'minorVer', 'buildNum', 'patchNum')
-          .groupBy('majorVer', 'minorVer', 'buildNum', 'patchNum')
-          .orderBy(['majorVer', 'minorVer', 'buildNum', 'patchNum'])
-          .limit(50) // Limit to prevent too many options
+        ClientCrash.query().distinct('platform').orderBy('platform'),
+        ClientCrash.query().distinct('environment').orderBy('environment'),
+        ClientCrash.query().distinct('marketType').whereNotNull('marketType').orderBy('marketType'),
+        ClientCrash.query().distinct('maxAppVersion').whereNotNull('maxAppVersion').orderBy('maxAppVersion').limit(50)
       ]);
 
       res.json({
@@ -230,16 +308,15 @@ export class CrashController {
         data: {
           branches: branches.map(b => b.branch),
           platforms: platforms.map(p => p.platform),
-          versions: versions.map(v => ({
-            label: v.version,
-            value: v.version
-          })),
-          serverGroups: Object.values(ServerGroup),
-          marketTypes: Object.values(MarketType),
+          environments: environments.map(e => e.environment),
+          marketTypes: marketTypes.map(m => m.marketType),
+          appVersions: appVersions.map(v => v.maxAppVersion),
           states: [
             { value: CrashState.OPEN, label: 'Open' },
             { value: CrashState.CLOSED, label: 'Closed' },
-            { value: CrashState.DELETED, label: 'Deleted' }
+            { value: CrashState.DELETED, label: 'Deleted' },
+            { value: CrashState.RESOLVED, label: 'Resolved' },
+            { value: CrashState.REPEATED, label: 'Repeated' }
           ]
         }
       });

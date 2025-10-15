@@ -1,13 +1,14 @@
 import { Request, Response } from 'express';
 import { asyncHandler, CustomError } from '../middleware/errorHandler';
 import { ClientCrash } from '../models/ClientCrash';
-import { CrashInstance } from '../models/CrashInstance';
-import { CrashUploadRequest, CrashState, CRASH_CONSTANTS, Branch } from '../types/crash';
+import { CrashEvent } from '../models/CrashEvent';
+import { CrashUploadRequest, CrashState, CRASH_CONSTANTS } from '../types/crash';
 import crypto from 'crypto';
 import fs from 'fs/promises';
 import path from 'path';
 import logger from '../config/logger';
 import { cacheService } from '../services/CacheService';
+import { isGreaterThan } from '../utils/semver';
 
 export class ClientCrashController {
   /**
@@ -18,22 +19,8 @@ export class ClientCrashController {
     const body: CrashUploadRequest = req.body;
 
     // Validate required fields
-    if (!body.pubId || body.userId === undefined || !body.stack || 
-        body.platform === undefined || body.branch === undefined ||
-        body.majorVer === undefined || body.minorVer === undefined ||
-        body.buildNum === undefined || body.patchNum === undefined) {
-      throw new CustomError('Bad request body: Missing required fields', 400);
-    }
-
-    // Validate numeric fields
-    if (isNaN(body.userId) || isNaN(body.majorVer) || isNaN(body.minorVer) ||
-        isNaN(body.buildNum) || isNaN(body.patchNum)) {
-      throw new CustomError('Bad request body: Invalid numeric fields', 400);
-    }
-
-    // Special handling for empty pubId
-    if (body.pubId === '') {
-      body.pubId = '0';
+    if (!body.platform || !body.branch || !body.environment || !body.stack) {
+      throw new CustomError('Bad request body: Missing required fields (platform, branch, environment, stack)', 400);
     }
 
     try {
@@ -42,93 +29,123 @@ export class ClientCrashController {
 
       // Check if crash already exists (Redis cache + branch)
       const cacheKey = `crash:${chash}:${body.branch}`;
-      let crashId = await cacheService.get<number>(cacheKey);
+      let crashId = await cacheService.get<string>(cacheKey);
       let isNewCrash = false;
+      let crash: ClientCrash;
 
       if (!crashId) {
         // Check database for existing crash
-        const existingCrash = await ClientCrash.findByHashAndBranch(chash, String(body.branch));
-        
+        const existingCrash = await ClientCrash.findByHashAndBranch(chash, body.branch);
+
         if (existingCrash) {
           crashId = existingCrash.id;
+          crash = existingCrash;
           // Cache the crash ID for future lookups
-          await cacheService.set(cacheKey, crashId, 3600); // Cache for 1 hour
+          await cacheService.set(cacheKey, crashId, 86400); // Cache for 24 hours
         } else {
           isNewCrash = true;
         }
       }
 
-      let crash: ClientCrash;
+      // Get client IP address
+      const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0] ||
+                       req.socket.remoteAddress ||
+                       '';
 
       if (isNewCrash) {
-        // Create new crash record
+        // Extract first line from stack trace (max 200 chars)
         const firstLine = body.stack.split('\n')[0]?.substring(0, CRASH_CONSTANTS.MaxFirstLineLen) || '';
-        
+
+        // Create new crash record
         crash = await ClientCrash.query().insert({
-          crash_id: chash,
-          platform: String(body.platform) || 'unknown',
-          branch: String(body.branch),
-          version: body.version || `${body.majorVer}.${body.minorVer}.${body.buildNum}.${body.patchNum}`,
-          crash_type: body.crashType || 'Unknown',
-          crash_message: firstLine,
-          state: CrashState.OPEN,
-          first_occurred_at: new Date(),
-          last_occurred_at: new Date(),
-          occurrence_count: 1
+          chash,
+          branch: body.branch,
+          environment: body.environment,
+          platform: body.platform,
+          marketType: body.marketType,
+          isEditor: body.isEditor || false,
+          firstLine,
+          crashesCount: 1,
+          firstCrashAt: new Date(),
+          lastCrashAt: new Date(),
+          crashesState: CrashState.OPEN,
+          maxAppVersion: body.appVersion,
+          maxResVersion: body.resVersion
         });
 
         crashId = crash.id;
-        
+
         // Cache the new crash ID
-        await cacheService.set(cacheKey, crashId, 3600);
+        await cacheService.set(cacheKey, crashId, 86400); // Cache for 24 hours
 
         // Save stack trace to file for new crashes
-        await this.saveStackTraceFile(chash, body.stack);
-      } else {
-        // Update existing crash
-        if (!crashId) {
-          throw new CustomError('Crash ID not found', 404);
-        }
-        const foundCrash = await ClientCrash.query().findById(crashId);
-        if (!foundCrash) {
-          throw new CustomError('Crash not found', 404);
-        }
-        crash = foundCrash;
+        const stackFilePath = await this.saveStackTraceFile(chash, body.stack);
 
-        // Increment count and update last crash time
-        await crash.incrementCount();
+        // Update crash with stack file path
+        await crash.$query().patch({ stackFilePath });
+      } else {
+        // Existing crash - load if not already loaded
+        if (!crash!) {
+          const foundCrash = await ClientCrash.query().findById(crashId!);
+          if (!foundCrash) {
+            throw new CustomError('Crash not found', 404);
+          }
+          crash = foundCrash;
+        }
+      }
+
+      // Create crash event
+      const event = await CrashEvent.create({
+        crashId: crash.id,
+        platform: body.platform,
+        marketType: body.marketType,
+        branch: body.branch,
+        environment: body.environment,
+        isEditor: body.isEditor,
+        appVersion: body.appVersion,
+        resVersion: body.resVersion,
+        accountId: body.accountId,
+        characterId: body.characterId,
+        gameUserId: body.gameUserId,
+        userName: body.userName,
+        gameServerId: body.gameServerId,
+        userMessage: body.userMessage,
+        crashEventIp: clientIp
+      });
+
+      // Update crash record for existing crashes
+      if (!isNewCrash) {
+        // Update first crash event ID if not set
+        if (!crash.firstCrashEventId) {
+          await crash.$query().patch({ firstCrashEventId: event.id });
+        }
+
+        // Increment count and update last crash event
+        await crash.incrementCount(event.id);
+
+        // Update max versions if needed
+        await crash.updateMaxVersions(body.appVersion, body.resVersion);
 
         // Check for reopen logic
         await this.checkReopenLogic(crash, body);
+      } else {
+        // For new crashes, set first crash event ID
+        await crash.$query().patch({
+          firstCrashEventId: event.id,
+          lastCrashEventId: event.id
+        });
       }
-
-      // Create crash instance
-      const instance = await CrashInstance.create({
-        cid: crashId!,
-        user_id: body.userId,
-        user_nickname: `User${body.userId}`, // 임시 닉네임
-        platform: String(body.platform),
-        branch: String(body.branch),
-        market_type: body.marketType,
-        server_group: body.serverGroup,
-        device_type: String(body.platform),
-        version: body.version || `${body.majorVer}.${body.minorVer}.${body.buildNum}.${body.patchNum}`,
-        crash_type: body.crashType || 'Unknown',
-        crash_message: body.userMsg,
-        stack_trace_file: `/crashes/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(new Date().getDate()).padStart(2, '0')}/stack_${crashId}_${Date.now()}.txt`,
-        logs_file: `/crashes/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(new Date().getDate()).padStart(2, '0')}/logs_${crashId}_${Date.now()}.txt`
-      });
 
       // Save log file if provided
       if (body.log) {
-        await this.saveLogFile(instance.id, body.log);
+        const logFilePath = await this.saveLogFile(event.id, body.log);
+        await event.$query().patch({ logFilePath });
       }
 
       logger.info('Crash uploaded successfully', {
-        crashId: crashId,
-        instanceId: instance.id,
+        crashId: crash.id,
+        eventId: event.id,
         isNewCrash,
-        userId: body.userId,
         platform: body.platform,
         branch: body.branch
       });
@@ -136,8 +153,8 @@ export class ClientCrashController {
       res.json({
         success: true,
         data: {
-          crashId: crashId,
-          instanceId: instance.id,
+          crashId: crash.id,
+          eventId: event.id,
           isNewCrash
         }
       });
@@ -153,109 +170,109 @@ export class ClientCrashController {
 
   /**
    * Save stack trace to file
+   * Returns the relative file path
    */
-  private static async saveStackTraceFile(chash: string, stack: string) {
+  private static async saveStackTraceFile(chash: string, stack: string): Promise<string> {
     try {
-      // Create directory structure: public/lcrashes/hash[0:2]/hash[2:4]/
+      // Create directory structure: public/crashes/hash[0:2]/hash[2:4]/
       const hashDir1 = chash.substring(0, 2);
       const hashDir2 = chash.substring(2, 4);
-      const dirPath = path.join(process.cwd(), 'public', 'lcrashes', hashDir1, hashDir2);
-      
+      const dirPath = path.join(process.cwd(), 'public', 'crashes', hashDir1, hashDir2);
+
       // Ensure directory exists
       await fs.mkdir(dirPath, { recursive: true });
-      
+
       // Save stack trace file
       const filePath = path.join(dirPath, chash);
       await fs.writeFile(filePath, stack, 'utf8');
-      
-      logger.debug('Stack trace saved', { chash, filePath });
+
+      const relativePath = `/crashes/${hashDir1}/${hashDir2}/${chash}`;
+      logger.debug('Stack trace saved', { chash, relativePath });
+
+      return relativePath;
     } catch (error) {
       logger.error('Failed to save stack trace file:', error);
       // Don't throw error - file saving failure shouldn't block crash upload
+      return '';
     }
   }
 
   /**
    * Save log file
+   * Returns the relative file path
    */
-  private static async saveLogFile(instanceId: number, log: string) {
+  private static async saveLogFile(eventId: string, log: string): Promise<string> {
     try {
-      // Check log size limit
+      // Check log size limit (1MB)
       if (log.length > CRASH_CONSTANTS.MaxLogTextLen) {
         logger.warn('Log text exceeds maximum length', {
-          instanceId,
+          eventId,
           logLength: log.length,
           maxLength: CRASH_CONSTANTS.MaxLogTextLen
         });
         log = log.substring(0, CRASH_CONSTANTS.MaxLogTextLen);
       }
 
-      // Create directory structure: public/logs/YYYY/MM/DD/
+      // Create directory structure: public/crashes/logs/YYYY/MM/DD/
       const now = new Date();
       const year = now.getFullYear().toString();
       const month = (now.getMonth() + 1).toString().padStart(2, '0');
       const day = now.getDate().toString().padStart(2, '0');
-      const dirPath = path.join(process.cwd(), 'public', 'logs', year, month, day);
-      
+      const dirPath = path.join(process.cwd(), 'public', 'crashes', 'logs', year, month, day);
+
       // Ensure directory exists
       await fs.mkdir(dirPath, { recursive: true });
-      
+
       // Save log file
-      const filePath = path.join(dirPath, `${instanceId}.txt`);
+      const filePath = path.join(dirPath, `${eventId}.txt`);
       await fs.writeFile(filePath, log, 'utf8');
-      
-      logger.debug('Log file saved', { instanceId, filePath });
+
+      const relativePath = `/crashes/logs/${year}/${month}/${day}/${eventId}.txt`;
+      logger.debug('Log file saved', { eventId, relativePath });
+
+      return relativePath;
     } catch (error) {
       logger.error('Failed to save log file:', error);
       // Don't throw error - file saving failure shouldn't block crash upload
+      return '';
     }
   }
 
   /**
-   * Check reopen logic for closed crashes
+   * Check reopen logic for closed/resolved crashes
    */
   private static async checkReopenLogic(crash: ClientCrash, body: CrashUploadRequest) {
-    if (crash.state !== CrashState.CLOSED) {
-      return; // Only check reopen for closed crashes
+    // Only check reopen for CLOSED or RESOLVED crashes
+    if (crash.crashesState !== CrashState.CLOSED && crash.crashesState !== CrashState.RESOLVED) {
+      return;
     }
 
     let shouldReopen = false;
 
-    // Editor branch (branch 9) always reopens
-    if (body.branch === Branch.EDITOR) {
+    // Editor mode always reopens
+    if (body.isEditor) {
       shouldReopen = true;
-    } else {
-      // For other branches, check if current version is higher than max version
-      const maxVersions = await CrashInstance.query()
-        .where('cid', crash.id)
-        .select(
-          CrashInstance.raw('MAX(majorVer) as maxMajorVer'),
-          CrashInstance.raw('MAX(minorVer) as maxMinorVer'),
-          CrashInstance.raw('MAX(buildNum) as maxBuildNum'),
-          CrashInstance.raw('MAX(patchNum) as maxPatchNum')
-        )
-        .first();
-
-      if (maxVersions) {
-        shouldReopen = CrashInstance.isLatestVersion(
-          (maxVersions as any).maxMajorVer || 0,
-          (maxVersions as any).maxMinorVer || 0,
-          (maxVersions as any).maxBuildNum || 0,
-          (maxVersions as any).maxPatchNum || 0,
-          body.majorVer,
-          body.minorVer,
-          body.buildNum,
-          body.patchNum
-        );
+    } else if (body.appVersion && crash.maxAppVersion) {
+      // For other environments, check if current version is higher than max version
+      try {
+        shouldReopen = isGreaterThan(body.appVersion, crash.maxAppVersion);
+      } catch (error) {
+        logger.warn('Failed to compare versions for reopen logic', {
+          crashId: crash.id,
+          currentVersion: body.appVersion,
+          maxVersion: crash.maxAppVersion,
+          error
+        });
       }
     }
 
     if (shouldReopen) {
-      await crash.updateState(CrashState.OPEN);
+      await crash.reopen();
       logger.info('Crash reopened', {
         crashId: crash.id,
         branch: body.branch,
-        version: `${body.majorVer}.${body.minorVer}.${body.buildNum}.${body.patchNum}`
+        currentVersion: body.appVersion,
+        previousMaxVersion: crash.maxAppVersion
       });
     }
   }

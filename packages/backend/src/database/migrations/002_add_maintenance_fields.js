@@ -1,14 +1,6 @@
 
-exports.up = async function() {
+exports.up = async function(connection) {
   console.log('Running migration: Add maintenance fields to game worlds and client versions...');
-  
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'motif_dev',
-    password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
-  });
 
   try {
     // Add maintenance fields to g_game_worlds table
@@ -106,24 +98,15 @@ exports.up = async function() {
     console.log('✓ Created g_client_version_maintenance_locales table');
 
     console.log('✅ Migration completed successfully: Add maintenance fields');
-    
+
   } catch (error) {
     console.error('❌ Migration failed:', error);
     throw error;
-  } finally {
   }
 };
 
-exports.down = async function() {
+exports.down = async function(connection) {
   console.log('Rolling back migration: Add maintenance fields...');
-  
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'motif_dev',
-    password: process.env.DB_PASSWORD || 'dev123$',
-    database: process.env.DB_NAME || 'uwo_gate'
-  });
 
   try {
     // Drop maintenance locale tables
@@ -154,10 +137,9 @@ exports.down = async function() {
     console.log('✓ Removed maintenance fields from g_game_worlds');
 
     console.log('✅ Migration rollback completed successfully');
-    
+
   } catch (error) {
     console.error('❌ Migration rollback failed:', error);
     throw error;
-  } finally {
   }
 };

@@ -25,63 +25,59 @@
   "crashes": {
       "title": "Client Crashes",
       "subtitle": "Monitor, analyze, and manage client application crashes with detailed error tracking and statistics",
-      "searchPlaceholder": "Search crashes...",
-      "platform": "Platform",
-      "branch": "Branch",
-      "state": "State",
-      "version": "Version",
+      "crashEvents": "Crash Events",
+      "search": "Search crashes...",
+      "searchPlaceholder": "Search by account ID, character ID, user ID, or user name...",
+      "loadError": "Failed to load crashes",
+      "noResults": "No crashes found",
+      "noEvents": "No crash events found",
+      "viewDetails": "View Details",
+      "eventDetails": "Crash Event Details",
+      "eventInfo": "Event Information",
+      "stackTrace": "Stack Trace",
+      "stackTraceUrl": "Stack Trace URL",
+      "logFile": "Log File",
+      "logFileUrl": "Log File URL",
+      "viewLog": "View Log",
+      "viewStackTrace": "View Stack Trace",
+      "downloadLog": "Download Log",
+      "copyAll": "Copy All",
+      "copyLine": "Copy Line",
+      "copyLineWithNumber": "Copy Line with Number",
+      "copyLineLink": "Copy Link to Line",
+      "copyCurrentView": "Copy Current View",
+      "linkCopied": "Link copied to clipboard",
+      "logDownloaded": "Log file downloaded",
+      "lines": "lines",
+      "loadingLog": "Loading log file...",
+      "loadingStackTrace": "Loading stack trace...",
+      "logNotAvailable": "Log file not available",
+      "stackTraceNotAvailable": "Stack trace not available",
+      "events": {
+        "title": "Crash Events",
+        "subtitle": "View and analyze individual crash event occurrences"
+      },
       "filters": {
-        "title": "Filters",
-        "dateRange": "Date Range",
-        "dateFrom": "Start Date",
-        "dateTo": "End Date",
-        "state": "State",
-        "deviceType": "Device",
-        "version": "Version",
+        "platform": "Platform",
+        "environment": "Environment",
         "branch": "Branch",
-        "allStates": "All States",
-        "allDeviceTypes": "All Devices",
-        "clear": "Clear",
-        "allBranches": "All Branches",
-        "presets": {
-          "last15m": "Last 15 minutes",
-          "last1h": "Last 1 hour",
-          "last24h": "Last 24 hours",
-          "last7d": "Last 7 days",
-          "last30d": "Last 30 days",
-          "custom": "Custom"
-        }
+        "marketType": "Market Type",
+        "appVersion": "App Version",
+        "isEditor": "Editor Mode"
       },
-      "platforms": {
-        "android": "Android",
-        "ios": "iOS",
-        "windows": "Windows",
-        "mac": "macOS",
-        "linux": "Linux",
-        "web": "Web"
-      },
-      "states": {
-        "open": "Open",
-        "closed": "Closed",
-        "deleted": "Deleted"
-      },
-      "branches": {
-        "production": "Production",
-        "staging": "Staging",
-        "development": "Development",
-        "editor": "Editor"
-      },
-      "sort": {
-        "sortBy": "Sort By",
-        "sortOrder": "Order",
-        "by": {
-          "firstCrash": "First Crash",
-          "lastCrash": "Last Crash",
-          "count": "Count",
-          "firstVersion": "First Version",
-          "lastVersion": "Last Version",
-          "branch": "Branch"
-        }
+      "table": {
+        "id": "ID",
+        "platform": "Platform",
+        "environment": "Environment",
+        "branch": "Branch",
+        "appVersion": "App Version",
+        "resVersion": "Resource Version",
+        "accountId": "Account ID",
+        "characterId": "Character ID",
+        "gameUserId": "Game User ID",
+        "userName": "User Name",
+        "userMessage": "User Message",
+        "createdAt": "Created At"
       },
       "columns": {
         "id": "ID",
@@ -94,18 +90,15 @@
         "lastCrash": "Last Crash",
         "firstVersion": "First Version",
         "lastVersion": "Last Version",
-        "version": "Version",
         "actions": "Actions"
       },
-      "actions": {
-        "viewDetails": "View Details",
-        "reopen": "Reopen",
-        "close": "Close",
-        "delete": "Delete",
-        "markDeleted": "Mark as Deleted"
-      },
-      "noResults": "No crashes found",
-      "loadError": "Failed to load crashes"
+      "states": {
+        "open": "Open",
+        "closed": "Closed",
+        "deleted": "Deleted",
+        "resolved": "Resolved",
+        "repeated": "Repeated"
+      }
     },
     "maintenanceTemplates": {
       "title": "Message Templates",
@@ -1500,6 +1493,7 @@
     "confirm": "Confirm",
     "confirmDelete": "Confirm Delete",
     "copied": "{{type}} \"{{value}}\" copied to clipboard",
+    "copiedToClipboard": "Copied to clipboard",
     "typeToConfirm": "Type \"{{name}}\" to confirm deletion:",
     "copy": "Copy",
     "paste": "Paste",

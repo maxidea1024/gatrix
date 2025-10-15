@@ -1,97 +1,129 @@
-// Client Crash types based on the analysis document
+/**
+ * Client Crash types based on crashes.md specification
+ */
 
+/**
+ * Crash state enum
+ * 0: OPEN - New or active crash
+ * 1: CLOSED - Manually closed by developer
+ * 2: DELETED - Marked as deleted
+ * 3: RESOLVED - Fixed and verified
+ * 4: REPEATED - Resolved but reoccurred in new version
+ */
+export enum CrashState {
+  OPEN = 0,
+  CLOSED = 1,
+  DELETED = 2,
+  RESOLVED = 3,
+  REPEATED = 4
+}
+
+/**
+ * Main crash record (deduplicated by hash + branch)
+ */
 export interface ClientCrash {
-  id: number;
-  branch: number;
-  chash: string;
-  firstLine: string;
-  count: number;
-  state: CrashState;
-  lastCrash: Date;
+  id: string; // ULID
+  chash: string; // MD5 hash of stack trace
+  branch: string; // Branch name (qa_2025, main, etc)
+  environment: string; // Environment (dev, staging, production, qa)
+  platform: string; // Platform (windows, ios, android, mac)
+  marketType?: string; // Market type (googleplay, apple, etc)
+  isEditor: boolean; // Whether crash occurred in editor
+
+  firstLine?: string; // First line of stack trace (max 200 chars)
+  stackFilePath?: string; // Path to stack trace file
+
+  crashesCount: number; // Number of times this crash occurred
+  firstCrashEventId?: string; // ULID of first crash event
+  lastCrashEventId?: string; // ULID of last crash event
+  firstCrashAt: Date; // First occurrence timestamp
+  lastCrashAt: Date; // Last occurrence timestamp
+
+  crashesState: CrashState; // Current state
+  assignee?: string; // Assigned developer/team
+  jiraTicket?: string; // Jira ticket URL
+
+  maxAppVersion?: string; // Maximum app version where crash occurred
+  maxResVersion?: string; // Maximum resource version where crash occurred
+
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface CrashInstance {
-  id: number;
-  cid: number; // crash id
-  pubId: string;
-  userId: number;
-  platform: number;
-  majorVer: number;
-  minorVer: number;
-  buildNum: number;
-  patchNum: number;
-  userMsg?: string;
+/**
+ * Individual crash event record
+ */
+export interface CrashEvent {
+  id: string; // ULID
+  crashId: string; // Reference to crashes.id
+
+  platform: string; // Platform (windows, ios, android, mac)
+  marketType?: string; // Market type (googleplay, apple, etc)
+  branch: string; // Branch name
+  environment: string; // Environment (dev, staging, production, qa)
+  isEditor: boolean; // Whether crash occurred in editor
+
+  appVersion?: string; // App version (semver format)
+  resVersion?: string; // Resource version
+
+  accountId?: string; // Account ID
+  characterId?: string; // Character ID
+  gameUserId?: string; // Game user ID
+  userName?: string; // User name
+  gameServerId?: string; // Game server ID
+
+  userMessage?: string; // User message (max 255 chars)
+  logFilePath?: string; // Path to log file
+
+  crashEventIp?: string; // IP address (IPv4/IPv6)
+
   createdAt: Date;
 }
 
-export enum CrashState {
-  OPEN = 0,
-  CLOSED = 1,
-  DELETED = 2
+/**
+ * Crash upload request body structure (from crashes.md)
+ */
+export interface CrashUploadRequest {
+  platform: string; // Platform (windows, ios, android, mac) - required
+  marketType?: string; // Market type (googleplay, apple, etc) - optional
+  branch: string; // Branch name (qa_2025, main, etc) - required
+  environment: string; // Environment (dev, staging, production, qa) - required
+  isEditor?: boolean; // Whether crash occurred in editor - optional
+
+  appVersion?: string; // App version (semver format) - optional
+  resVersion?: string; // Resource version - optional
+
+  accountId?: string; // Account ID - optional
+  characterId?: string; // Character ID - optional
+  gameUserId?: string; // Game user ID - optional
+  userName?: string; // User name - optional
+  gameServerId?: string; // Game server ID - optional
+
+  userMessage?: string; // User message - optional
+  stack: string; // Stack trace (ErrWithStack) - required
+  log?: string; // Log data - optional
 }
 
-// Platform constants based on analysis
-export enum Platform {
-  UNKNOWN = 0,
-  ANDROID = 1,
-  IOS = 2,
-  WINDOWS = 3,
-  MAC = 4,
-  LINUX = 5,
-  WEB = 6
-}
-
-// Branch constants
-export enum Branch {
-  PRODUCTION = 1,
-  STAGING = 2,
-  DEVELOPMENT = 3,
-  EDITOR = 9 // Special branch with different reopen logic
-}
-
-// Market types for Android (중국대응 목적)
-export enum MarketType {
-  GOOGLE_PLAY = 'google_play',
-  HUAWEI = 'huawei',
-  XIAOMI = 'xiaomi',
-  OPPO = 'oppo',
-  VIVO = 'vivo',
-  BAIDU = 'baidu',
-  TENCENT = 'tencent',
-  SAMSUNG = 'samsung',
-  OTHER = 'other'
-}
-
-// Server groups for regional issue tracking
-export enum ServerGroup {
-  GLOBAL = 'global',
-  KOREA = 'korea',
-  CHINA = 'china',
-  JAPAN = 'japan',
-  SEA = 'sea', // Southeast Asia
-  NA = 'na', // North America
-  EU = 'eu', // Europe
-  OTHER = 'other'
-}
-
+/**
+ * Crash filter options for listing/searching
+ */
 export interface CrashFilters {
-  search?: string; // 유저닉네임 또는 UserId 검색
-  dateFrom?: string;
-  dateTo?: string;
-  serverGroup?: ServerGroup; // 특정 국가 이슈파악목적
-  marketType?: MarketType; // 중국대응 목적. Android 마켓별 이슈파악
-  deviceType?: Platform; // 운영체제 (platform)
-  branch?: Branch; // 브랜치
-  version?: string; // 버전 문자열
-  majorVer?: number;
-  minorVer?: number;
-  buildNum?: number;
-  patchNum?: number;
-  state?: CrashState;
+  search?: string; // Search in firstLine, assignee, jiraTicket
+  dateFrom?: string; // Filter by firstCrashAt >= dateFrom
+  dateTo?: string; // Filter by lastCrashAt <= dateTo
+  platform?: string; // Filter by platform
+  environment?: string; // Filter by environment
+  branch?: string; // Filter by branch
+  marketType?: string; // Filter by marketType
+  isEditor?: boolean; // Filter by isEditor
+  state?: CrashState; // Filter by state
+  assignee?: string; // Filter by assignee
+  appVersion?: string; // Filter by maxAppVersion
 }
 
+/**
+ * Crash list response with pagination
+ */
 export interface CrashListResponse {
   crashes: ClientCrash[];
   total: number;
@@ -100,47 +132,62 @@ export interface CrashListResponse {
   totalPages: number;
 }
 
-// Upload request body structure from analysis
-export interface CrashUploadRequest {
-  pubId: string; // 퍼블리셔 ID
-  userId: number; // 사용자 ID
-  platform: Platform | string; // 플랫폼 정보
-  branch: Branch | string; // 브랜치 정보
-  version?: string; // 버전 문자열
-  crashType?: string; // 크래시 타입
-  majorVer: number; // 메이저 버전
-  minorVer: number; // 마이너 버전
-  buildNum: number; // 빌드 번호
-  patchNum: number; // 패치 번호
-  userMsg?: string; // 사용자 메시지
-  stack: string; // 스택 트레이스 (ErrWithStack)
-  log?: string; // 로그 데이터
-  serverGroup?: ServerGroup; // 서버 그룹 정보
-  marketType?: MarketType; // 마켓 타입 정보
+/**
+ * Detailed crash view with events
+ */
+export interface CrashDetail extends ClientCrash {
+  events: CrashEvent[];
+  stackTrace?: string; // Full stack trace from file
 }
 
-// Constants from analysis
+/**
+ * Crash retention settings
+ */
+export interface CrashRetentionSettings {
+  id: number;
+  crashEventsRetentionDays: number; // Retention period for crash events in days
+  crashesRetentionDays: number; // Retention period for crashes in days
+  stackFilesRetentionDays: number; // Retention period for stack files in days
+  logFilesRetentionDays: number; // Retention period for log files in days
+  updatedAt: Date;
+  updatedBy?: number; // User ID who updated settings
+}
+
+/**
+ * Constants from crashes.md
+ */
 export const CRASH_CONSTANTS = {
   MaxFirstLineLen: 200,
   MaxUserMsgLen: 255,
   MaxLogTextLen: 1048576 // 1MB
 } as const;
 
-// Detailed crash view with instances
-export interface CrashDetail extends ClientCrash {
-  instances: CrashInstance[];
-  stackTrace?: string; // Full stack trace from file
-}
-
-// Pagination options
+/**
+ * Pagination options
+ */
 export interface PaginationOptions {
   page?: number;
   limit?: number;
 }
 
-// Response wrapper
+/**
+ * Response wrapper
+ */
 export interface CrashResponse<T> {
   success: boolean;
   data: T;
   message?: string;
+}
+
+/**
+ * Crash summary statistics
+ */
+export interface CrashSummary {
+  totalCrashes: number;
+  openCrashes: number;
+  closedCrashes: number;
+  resolvedCrashes: number;
+  repeatedCrashes: number;
+  totalEvents: number;
+  recentCrashes: ClientCrash[];
 }

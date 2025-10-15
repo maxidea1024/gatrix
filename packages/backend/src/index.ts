@@ -101,6 +101,10 @@ const startServer = async () => {
   try {
     // Initialize modules at runtime to avoid import-time initialization issues
     logger = (await import('./config/logger')).default;
+
+    // Initialize knex and Objection.js BEFORE database
+    await import('./config/knex');
+
     database = (await import('./config/database')).default;
     redisClient = (await import('./config/redis')).default;
 

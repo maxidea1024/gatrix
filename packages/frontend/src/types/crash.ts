@@ -1,90 +1,109 @@
 // Frontend crash types for client crash tracking
 
+/**
+ * Main crash record (deduplicated by hash + branch)
+ */
 export interface ClientCrash {
-  id: number;
-  branch: number;
-  chash: string;
-  firstLine: string;
-  count: number;
-  state: CrashState;
-  lastCrash: string; // ISO date string
+  id: string; // ULID
+  chash: string; // MD5 hash
+  branch: string; // Branch name
+  environment: string; // Environment
+  platform: string; // Platform
+  marketType?: string; // Market type
+  isEditor: boolean; // Whether crash occurred in editor
+
+  firstLine?: string; // First line of stack trace
+  stackFilePath?: string; // Path to stack trace file
+
+  crashesCount: number; // Number of occurrences
+  firstCrashEventId?: string; // ULID of first crash event
+  lastCrashEventId?: string; // ULID of last crash event
+  firstCrashAt: string; // ISO date string
+  lastCrashAt: string; // ISO date string
+
+  crashesState: CrashState; // Current state
+  assignee?: string; // Assigned developer/team
+  jiraTicket?: string; // Jira ticket URL
+
+  maxAppVersion?: string; // Maximum app version
+  maxResVersion?: string; // Maximum resource version
+
   createdAt: string; // ISO date string
   updatedAt: string; // ISO date string
 }
 
-export interface CrashInstance {
-  id: number;
-  cid: number; // crash id
-  pubId: string;
-  userId: number;
-  platform: number;
-  majorVer: number;
-  minorVer: number;
-  buildNum: number;
-  patchNum: number;
-  userMsg?: string;
+/**
+ * Individual crash event record
+ */
+export interface CrashEvent {
+  id: string; // ULID
+  crashId: string; // Reference to crashes.id
+
+  platform: string; // Platform
+  marketType?: string; // Market type
+  branch: string; // Branch name
+  environment: string; // Environment
+  isEditor: boolean; // Whether crash occurred in editor
+
+  appVersion?: string; // App version (semver format)
+  resVersion?: string; // Resource version
+
+  accountId?: string; // Account ID
+  characterId?: string; // Character ID
+  gameUserId?: string; // Game user ID
+  userName?: string; // User name
+  gameServerId?: string; // Game server ID
+
+  userMessage?: string; // User message
+  logFilePath?: string; // Path to log file
+
+  crashEventIp?: string; // IP address
+
   createdAt: string; // ISO date string
 }
 
 export enum CrashState {
   OPEN = 0,
   CLOSED = 1,
-  DELETED = 2
-}
-
-export enum Platform {
-  UNKNOWN = 0,
-  ANDROID = 1,
-  IOS = 2,
-  WINDOWS = 3,
-  MAC = 4,
-  LINUX = 5,
-  WEB = 6
-}
-
-export enum Branch {
-  PRODUCTION = 1,
-  STAGING = 2,
-  DEVELOPMENT = 3,
-  EDITOR = 9
-}
-
-export enum MarketType {
-  GOOGLE_PLAY = 'google_play',
-  HUAWEI = 'huawei',
-  XIAOMI = 'xiaomi',
-  OPPO = 'oppo',
-  VIVO = 'vivo',
-  BAIDU = 'baidu',
-  TENCENT = 'tencent',
-  SAMSUNG = 'samsung',
-  OTHER = 'other'
-}
-
-export enum ServerGroup {
-  GLOBAL = 'global',
-  KOREA = 'korea',
-  CHINA = 'china',
-  JAPAN = 'japan',
-  SEA = 'sea',
-  NA = 'na',
-  EU = 'eu',
-  OTHER = 'other'
+  DELETED = 2,
+  RESOLVED = 3,
+  REPEATED = 4
 }
 
 export interface CrashFilters {
   search?: string;
   dateFrom?: string;
   dateTo?: string;
-  serverGroup?: ServerGroup;
-  marketType?: MarketType;
-  deviceType?: Platform;
-  branch?: Branch;
-  majorVer?: number;
-  minorVer?: number;
-  buildNum?: number;
-  patchNum?: number;
+  platform?: string;
+  environment?: string;
+  branch?: string;
+  marketType?: string;
+  isEditor?: boolean;
   state?: CrashState;
+  assignee?: string;
+  appVersion?: string;
+}
+
+export interface GetCrashEventsRequest {
+  page?: number;
+  limit?: number;
+  search?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  platform?: string;
+  environment?: string;
+  branch?: string;
+  marketType?: string;
+  isEditor?: boolean;
+  appVersion?: string;
+}
+
+export interface GetCrashEventsResponse {
+  data: CrashEvent[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 export interface GetCrashesRequest extends CrashFilters {
@@ -101,46 +120,43 @@ export interface GetCrashesResponse {
 }
 
 export interface CrashDetail extends ClientCrash {
-  instances: CrashInstance[];
+  events: CrashEvent[];
   stackTrace?: string;
 }
 
 export interface CrashStats {
-  total: number;
-  open: number;
-  closed: number;
-  recent: number; // last 24 hours
-  versionDistribution: { version: string; count: number }[];
-  platformDistribution: { platform: string; count: number }[];
-  affectedUsers: number;
-  latestInstances: CrashInstance[];
+  totalCrashes: number;
+  openCrashes: number;
+  closedCrashes: number;
+  resolvedCrashes: number;
+  repeatedCrashes: number;
+  totalEvents: number;
+  recentCrashes: ClientCrash[];
 }
 
 export interface UpdateCrashStateRequest {
   state: CrashState;
 }
 
-// Helper functions for display
-export const getPlatformName = (platform: Platform): string => {
-  switch (platform) {
-    case Platform.ANDROID: return 'Android';
-    case Platform.IOS: return 'iOS';
-    case Platform.WINDOWS: return 'Windows';
-    case Platform.MAC: return 'Mac';
-    case Platform.LINUX: return 'Linux';
-    case Platform.WEB: return 'Web';
-    default: return 'Unknown';
-  }
-};
+export interface UpdateCrashAssigneeRequest {
+  assignee: string;
+}
 
-export const getBranchName = (branch: Branch): string => {
-  switch (branch) {
-    case Branch.PRODUCTION: return 'Production';
-    case Branch.STAGING: return 'Staging';
-    case Branch.DEVELOPMENT: return 'Development';
-    case Branch.EDITOR: return 'Editor';
-    default: return 'Unknown';
-  }
+export interface UpdateCrashJiraTicketRequest {
+  jiraTicket: string;
+}
+
+// Helper functions for display
+export const getPlatformName = (platform: string): string => {
+  const platformMap: Record<string, string> = {
+    'windows': 'Windows',
+    'ios': 'iOS',
+    'android': 'Android',
+    'mac': 'Mac',
+    'linux': 'Linux',
+    'web': 'Web'
+  };
+  return platformMap[platform.toLowerCase()] || platform;
 };
 
 export const getStateName = (state: CrashState): string => {
@@ -148,13 +164,18 @@ export const getStateName = (state: CrashState): string => {
     case CrashState.OPEN: return 'Open';
     case CrashState.CLOSED: return 'Closed';
     case CrashState.DELETED: return 'Deleted';
+    case CrashState.RESOLVED: return 'Resolved';
+    case CrashState.REPEATED: return 'Repeated';
     default: return 'Unknown';
   }
 };
 
-export const getVersionString = (crash: ClientCrash | CrashInstance): string => {
-  if ('majorVer' in crash) {
-    return `${crash.majorVer}.${crash.minorVer}.${crash.buildNum}.${crash.patchNum}`;
-  }
-  return 'Unknown';
+export const getEnvironmentName = (environment: string): string => {
+  const envMap: Record<string, string> = {
+    'dev': 'Development',
+    'staging': 'Staging',
+    'production': 'Production',
+    'qa': 'QA'
+  };
+  return envMap[environment.toLowerCase()] || environment;
 };

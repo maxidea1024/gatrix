@@ -112,15 +112,14 @@ router.get('/',
   query('search').optional().isString().trim(),
   query('dateFrom').optional().isISO8601(),
   query('dateTo').optional().isISO8601(),
-  query('serverGroup').optional().isString(),
+  query('platform').optional().isString(),
+  query('environment').optional().isString(),
+  query('branch').optional().isString(),
   query('marketType').optional().isString(),
-  query('deviceType').optional().isInt({ min: 0, max: 6 }),
-  query('branch').optional().isInt(),
-  query('majorVer').optional().isInt(),
-  query('minorVer').optional().isInt(),
-  query('buildNum').optional().isInt(),
-  query('patchNum').optional().isInt(),
-  query('state').optional().isInt({ min: 0, max: 2 }),
+  query('isEditor').optional().isBoolean(),
+  query('state').optional().isInt({ min: 0, max: 4 }),
+  query('assignee').optional().isString(),
+  query('appVersion').optional().isString(),
   validateRequest,
   CrashController.getCrashes
 );
@@ -175,7 +174,7 @@ router.get('/filter-options', CrashController.getFilterOptions);
  *         description: Crash not found
  */
 router.get('/:id',
-  param('id').isInt({ min: 1 }),
+  param('id').isString(),
   validateRequest,
   CrashController.getCrashDetail
 );
@@ -214,12 +213,11 @@ router.get('/:id',
  *       404:
  *         description: Crash not found
  */
-router.get('/:id/instances',
-  param('id').isInt({ min: 1 }),
-  query('page').optional().isInt({ min: 1 }),
-  query('limit').optional().isInt({ min: 1, max: 100 }),
+router.get('/:id/events',
+  param('id').isString(),
+  query('limit').optional().isInt({ min: 1, max: 500 }),
   validateRequest,
-  CrashController.getCrashInstances
+  CrashController.getCrashEvents
 );
 
 /**
@@ -244,7 +242,7 @@ router.get('/:id/instances',
  *         description: Crash not found
  */
 router.get('/:id/stats',
-  param('id').isInt({ min: 1 }),
+  param('id').isString(),
   validateRequest,
   CrashController.getCrashStats
 );
@@ -262,8 +260,8 @@ router.get('/:id/stats',
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *         description: Crash ID
+ *           type: string
+ *         description: Crash ID (ULID)
  *     requestBody:
  *       required: true
  *       content:
@@ -275,8 +273,8 @@ router.get('/:id/stats',
  *             properties:
  *               state:
  *                 type: integer
- *                 enum: [0, 1, 2]
- *                 description: New crash state (0=Open, 1=Closed, 2=Deleted)
+ *                 enum: [0, 1, 2, 3, 4]
+ *                 description: New crash state (0=Open, 1=Closed, 2=Deleted, 3=Resolved, 4=Repeated)
  *     responses:
  *       200:
  *         description: Crash state updated
@@ -286,9 +284,91 @@ router.get('/:id/stats',
  *         description: Crash not found
  */
 router.patch('/:id/state',
-  param('id').isInt({ min: 1 }),
+  param('id').isString(),
   validateRequest,
   CrashController.updateCrashState
+);
+
+/**
+ * @swagger
+ * /admin/crashes/{id}/assignee:
+ *   patch:
+ *     summary: Update crash assignee
+ *     tags: [Crashes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Crash ID (ULID)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - assignee
+ *             properties:
+ *               assignee:
+ *                 type: string
+ *                 description: Assignee name
+ *     responses:
+ *       200:
+ *         description: Crash assignee updated
+ *       400:
+ *         description: Invalid request
+ *       404:
+ *         description: Crash not found
+ */
+router.patch('/:id/assignee',
+  param('id').isString(),
+  validateRequest,
+  CrashController.updateCrashAssignee
+);
+
+/**
+ * @swagger
+ * /admin/crashes/{id}/jira:
+ *   patch:
+ *     summary: Update crash Jira ticket
+ *     tags: [Crashes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Crash ID (ULID)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - jiraTicket
+ *             properties:
+ *               jiraTicket:
+ *                 type: string
+ *                 description: Jira ticket URL
+ *     responses:
+ *       200:
+ *         description: Crash Jira ticket updated
+ *       400:
+ *         description: Invalid request
+ *       404:
+ *         description: Crash not found
+ */
+router.patch('/:id/jira',
+  param('id').isString(),
+  validateRequest,
+  CrashController.updateCrashJiraTicket
 );
 
 export default router;

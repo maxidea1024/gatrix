@@ -5,10 +5,10 @@
   "license": "MIT",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "yarn migrate:safe && nodemon",
+    "dev": "yarn migrate:up && nodemon",
     "dev:no-migrate": "nodemon",
     "build": "tsc",
-    "start": "yarn migrate:safe && node dist/index.js",
+    "start": "yarn migrate:up && node dist/index.js",
     "start:no-migrate": "node dist/index.js",
     "test": "jest",
     "test:watch": "jest --watch",

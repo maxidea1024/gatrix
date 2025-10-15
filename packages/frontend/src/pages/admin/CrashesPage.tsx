@@ -53,14 +53,9 @@ import {
   CrashFilters,
   GetCrashesRequest,
   CrashState,
-  Platform,
-  Branch,
-  MarketType,
-  ServerGroup,
   getPlatformName,
-  getBranchName,
   getStateName,
-  getVersionString,
+  getEnvironmentName,
 } from '@/types/crash';
 import crashService from '@/services/crashService';
 import SimplePagination from '../../components/common/SimplePagination';
@@ -129,9 +124,11 @@ const CrashesPage: React.FC = () => {
       operator: 'any_of',
       allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
       options: [
-        { value: Platform.WINDOWS, label: getPlatformName(Platform.WINDOWS) },
-        { value: Platform.MAC, label: getPlatformName(Platform.MAC) },
-        { value: Platform.LINUX, label: getPlatformName(Platform.LINUX) },
+        { value: 'windows', label: getPlatformName('windows') },
+        { value: 'mac', label: getPlatformName('mac') },
+        { value: 'linux', label: getPlatformName('linux') },
+        { value: 'android', label: getPlatformName('android') },
+        { value: 'ios', label: getPlatformName('ios') },
       ],
     },
     {
@@ -141,10 +138,10 @@ const CrashesPage: React.FC = () => {
       operator: 'any_of',
       allowOperatorToggle: false, // Single-value field, only 'any_of' makes sense
       options: [
-        { value: Branch.PRODUCTION, label: getBranchName(Branch.PRODUCTION) },
-        { value: Branch.STAGING, label: getBranchName(Branch.STAGING) },
-        { value: Branch.DEVELOPMENT, label: getBranchName(Branch.DEVELOPMENT) },
-        { value: Branch.EDITOR, label: getBranchName(Branch.EDITOR) },
+        { value: 'production', label: 'Production' },
+        { value: 'staging', label: 'Staging' },
+        { value: 'development', label: 'Development' },
+        { value: 'editor', label: 'Editor' },
       ],
     },
     {
@@ -656,12 +653,12 @@ const CrashesPage: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {getPlatformName(crash.platform as Platform)}
+                          {getPlatformName(crash.platform)}
                         </Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {getBranchName(crash.branch as Branch)}
+                          {crash.branch}
                         </Typography>
                       </TableCell>
                       {/* First Crash */}

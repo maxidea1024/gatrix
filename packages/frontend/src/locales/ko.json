@@ -25,63 +25,59 @@
   "crashes": {
     "title": "클라이언트 크래시",
     "subtitle": "상세한 오류 추적 및 통계를 통해 클라이언트 애플리케이션 크래시를 모니터링, 분석 및 관리합니다",
-    "searchPlaceholder": "크래시 검색...",
-    "platform": "플랫폼",
-    "branch": "브랜치",
-    "state": "상태",
-    "version": "버전",
+    "crashEvents": "크래시 이벤트",
+    "search": "크래시 검색...",
+    "searchPlaceholder": "계정 ID, 캐릭터 ID, 게임 사용자 ID, 사용자 이름으로 검색...",
+    "loadError": "크래시를 불러오는데 실패했습니다",
+    "noResults": "크래시를 찾을 수 없습니다",
+    "noEvents": "크래시 이벤트를 찾을 수 없습니다",
+    "viewDetails": "상세 보기",
+    "eventDetails": "크래시 이벤트 상세",
+    "eventInfo": "이벤트 정보",
+    "stackTrace": "스택 트레이스",
+    "stackTraceUrl": "스택 트레이스 URL",
+    "logFile": "로그 파일",
+    "logFileUrl": "로그 파일 URL",
+    "viewLog": "로그 보기",
+    "viewStackTrace": "스택 트레이스 보기",
+    "downloadLog": "로그 다운로드",
+    "copyAll": "전체 복사",
+    "copyLine": "줄 복사",
+    "copyLineWithNumber": "줄 번호와 함께 복사",
+    "copyLineLink": "줄 링크 복사",
+    "copyCurrentView": "현재 보기 복사",
+    "linkCopied": "링크가 클립보드에 복사되었습니다",
+    "logDownloaded": "로그 파일이 다운로드되었습니다",
+    "lines": "줄",
+    "loadingLog": "로그 파일 로딩 중...",
+    "loadingStackTrace": "스택 트레이스 로딩 중...",
+    "logNotAvailable": "로그 파일을 사용할 수 없습니다",
+    "stackTraceNotAvailable": "스택 트레이스를 사용할 수 없습니다",
+    "events": {
+      "title": "크래시 이벤트",
+      "subtitle": "개별 크래시 이벤트 발생 내역을 확인하고 분석합니다"
+    },
     "filters": {
-      "title": "필터",
-      "dateRange": "날짜 범위",
-      "dateFrom": "시작 날짜",
-      "dateTo": "종료 날짜",
-      "state": "상태",
-      "deviceType": "기기",
-      "version": "버전",
+      "platform": "플랫폼",
+      "environment": "환경",
       "branch": "브랜치",
-      "allStates": "모든 상태",
-      "allDeviceTypes": "모든 기기",
-      "clear": "초기화",
-      "allBranches": "모든 브랜치",
-      "presets": {
-        "last15m": "최근 15분",
-        "last1h": "최근 1시간",
-        "last24h": "최근 24시간",
-        "last7d": "최근 7일",
-        "last30d": "최근 30일",
-        "custom": "사용자 지정"
-      }
+      "marketType": "마켓 타입",
+      "appVersion": "앱 버전",
+      "isEditor": "에디터 모드"
     },
-    "platforms": {
-      "android": "Android",
-      "ios": "iOS",
-      "windows": "Windows",
-      "mac": "macOS",
-      "linux": "Linux",
-      "web": "Web"
-    },
-    "states": {
-      "open": "열림",
-      "closed": "닫힘",
-      "deleted": "삭제됨"
-    },
-    "branches": {
-      "production": "프로덕션",
-      "staging": "스테이징",
-      "development": "개발",
-      "editor": "에디터"
-    },
-    "sort": {
-      "sortBy": "정렬 기준",
-      "sortOrder": "정렬 순서",
-      "by": {
-        "firstCrash": "첫 크래시",
-        "lastCrash": "마지막 크래시",
-        "count": "발생 횟수",
-        "firstVersion": "첫 버전",
-        "lastVersion": "마지막 버전",
-        "branch": "브랜치"
-      }
+    "table": {
+      "id": "ID",
+      "platform": "플랫폼",
+      "environment": "환경",
+      "branch": "브랜치",
+      "appVersion": "앱 버전",
+      "resVersion": "리소스 버전",
+      "accountId": "계정 ID",
+      "characterId": "캐릭터 ID",
+      "gameUserId": "게임 사용자 ID",
+      "userName": "사용자 이름",
+      "userMessage": "사용자 메시지",
+      "createdAt": "발생 시각"
     },
     "columns": {
       "id": "ID",
@@ -94,18 +90,15 @@
       "lastCrash": "마지막 크래시",
       "firstVersion": "첫 버전",
       "lastVersion": "마지막 버전",
-      "version": "버전",
       "actions": "작업"
     },
-    "actions": {
-      "viewDetails": "상세 보기",
-      "reopen": "다시 열기",
-      "close": "닫기",
-      "delete": "삭제",
-      "markDeleted": "삭제됨으로 표시"
-    },
-    "noResults": "검색 결과가 없습니다",
-    "loadError": "크래시 목록을 불러오는 중 오류가 발생했습니다"
+    "states": {
+      "open": "열림",
+      "closed": "닫힘",
+      "deleted": "삭제됨",
+      "resolved": "해결됨",
+      "repeated": "재발생"
+    }
   },
   "maintenanceTemplates": {
     "title": "점검 템플릿 관리",
@@ -1497,6 +1490,7 @@
     "confirm": "확인",
     "confirmDelete": "삭제 확인",
     "copied": "{{type}} \"{{value}}\"이(가) 클립보드에 복사되었습니다",
+    "copiedToClipboard": "클립보드에 복사되었습니다",
     "typeToConfirm": "삭제를 확인하려면 \"{{name}}\"을(를) 입력하세요:",
     "copy": "복사",
     "paste": "붙여넣기",
