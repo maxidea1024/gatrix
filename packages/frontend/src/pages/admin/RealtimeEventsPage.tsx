@@ -332,6 +332,7 @@ const RealtimeEventsPage: React.FC = () => {
         let newIdsToFlash = new Set<number>();
         let unseenEventIdsToProcess: number[] = [];
         let isAtTopPosition = false;
+        let currentEventIds: Set<number> = new Set();
 
         // Use functional update to get the current state
         setEvents(prevEvents => {
@@ -348,7 +349,8 @@ const RealtimeEventsPage: React.FC = () => {
 
             console.log('[RealtimeEvents] Merging events:', {
               existingCount: prevEvents.length,
-              newCount: newEvents.length
+              newCount: newEvents.length,
+              previousEventIdsCount: previousEventIdsRef.current.size
             });
 
             // Add new events to the map
@@ -368,7 +370,7 @@ const RealtimeEventsPage: React.FC = () => {
           }
 
           // Detect new events for flash effect (only after initial load)
-          const currentEventIds = new Set(allEvents.map(e => e.id));
+          currentEventIds = new Set(allEvents.map(e => e.id));
 
           // Only detect new events if this is not the initial load
           if (!isInitialLoadRef.current) {
@@ -389,6 +391,8 @@ const RealtimeEventsPage: React.FC = () => {
               console.log('🔔 New events detected:', {
                 newEventCount: newIdsToFlash.size,
                 unseenCount: unseenEventIdsToProcess.length,
+                previousEventIds: Array.from(previousEventIdsRef.current),
+                currentEventIds: Array.from(currentEventIds),
                 seenEventIds: Array.from(seenEventIds),
                 isAtTop: isAtTopPosition,
               });
@@ -398,8 +402,6 @@ const RealtimeEventsPage: React.FC = () => {
             console.log('[RealtimeEvents] Initial load - setting previousEventIds');
           }
 
-          previousEventIdsRef.current = currentEventIds;
-
           // Mark initial load as complete
           if (isInitialLoadRef.current) {
             isInitialLoadRef.current = false;
@@ -408,6 +410,10 @@ const RealtimeEventsPage: React.FC = () => {
 
           return allEvents;
         });
+
+        // Update previousEventIdsRef AFTER setEvents completes (outside the functional update)
+        // This prevents race conditions when loadEvents is called rapidly
+        previousEventIdsRef.current = currentEventIds;
 
         // Update flash effect state (outside of setEvents to avoid nested state updates)
         if (newIdsToFlash.size > 0) {

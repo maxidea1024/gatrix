@@ -522,11 +522,28 @@ const AuditLogsPage: React.FC = () => {
                               <Typography variant="body2" fontWeight="medium">
                                 {t(`auditLogs.resources.${(log as any).resourceType || (log as any).resource_type || (log as any).entityType}`, (log as any).resourceType || (log as any).resource_type || (log as any).entityType)}
                               </Typography>
-                              {((log as any).resourceId || (log as any).resource_id || (log as any).entityId) && (
-                                <Typography variant="caption" color="text.secondary">
-                                  ID: {(log as any).resourceId || (log as any).resource_id || (log as any).entityId}
-                                </Typography>
-                              )}
+                              {/* Show resource name from oldValues or newValues if available */}
+                              {(() => {
+                                const oldVals = (log as any).oldValues || (log as any).old_values;
+                                const newVals = (log as any).newValues || (log as any).new_values;
+                                const resourceName = oldVals?.name || newVals?.name || oldVals?.worldId || newVals?.worldId;
+                                const resourceId = (log as any).resourceId || (log as any).resource_id || (log as any).entityId;
+
+                                return (
+                                  <>
+                                    {resourceName && (
+                                      <Typography variant="body2" color="text.primary" sx={{ fontWeight: 500 }}>
+                                        {resourceName}
+                                      </Typography>
+                                    )}
+                                    {resourceId && (
+                                      <Typography variant="caption" color="text.secondary">
+                                        ID: {resourceId}
+                                      </Typography>
+                                    )}
+                                  </>
+                                );
+                              })()}
                             </Box>
                           ) : (
                             <Typography variant="body2" color="text.secondary">-</Typography>
@@ -564,121 +581,273 @@ const AuditLogsPage: React.FC = () => {
                       <TableRow>
                         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
                           <Collapse in={expandedRowId === log.id} timeout="auto" unmountOnExit>
-                            <Box sx={{ py: 2, px: 3, bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }}>
-                              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-                                {t('auditLogs.detailsTitle')}
-                              </Typography>
+                            <Box sx={{
+                              py: 3,
+                              px: 4,
+                              bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+                              borderTop: 1,
+                              borderBottom: 1,
+                              borderColor: 'divider',
+                            }}>
+                              {/* Header with Action Badge */}
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3, pl: 3 }}>
+                                <Chip
+                                  label={t(`auditLogs.actions.${log.action}`)}
+                                  color={AuditLogService.getActionColor(log.action)}
+                                  sx={{ fontWeight: 600, fontSize: '0.875rem' }}
+                                />
+                                {((log as any).resourceType || (log as any).resource_type || (log as any).entityType) && (
+                                  <Chip
+                                    label={t(`auditLogs.resources.${(log as any).resourceType || (log as any).resource_type || (log as any).entityType}`, (log as any).resourceType || (log as any).resource_type || (log as any).entityType)}
+                                    variant="outlined"
+                                    size="small"
+                                  />
+                                )}
+                              </Box>
 
-                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                {/* IP Address & User Agent */}
-                                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-                                  <Box>
-                                    <Typography variant="caption" color="text.secondary">
-                                      {t('auditLogs.ipAddress')}
-                                    </Typography>
-                                    <Typography variant="body2" fontFamily="monospace">
-                                      {log.ip_address || '-'}
-                                    </Typography>
-                                  </Box>
-                                  {log.user_agent && (
-                                    <Box>
-                                      <Typography variant="caption" color="text.secondary">
-                                        {t('auditLogs.userAgent')}
-                                      </Typography>
-                                      <Typography variant="body2" sx={{ wordBreak: 'break-all', fontSize: '0.75rem' }}>
-                                        {log.user_agent}
-                                      </Typography>
-                                    </Box>
-                                  )}
+                              {/* Detail Fields in OpenSearch Discovery Style */}
+                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pl: 3 }}>
+                                {/* Timestamp */}
+                                <Box>
+                                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                    {t('auditLogs.date')}
+                                  </Typography>
+                                  <Typography variant="body1" sx={{ mt: 0.5, fontFamily: 'monospace' }}>
+                                    {formatDateTimeDetailed((log as any).createdAt || log.created_at)}
+                                  </Typography>
                                 </Box>
 
                                 <Divider />
 
+                                {/* User Information */}
+                                <Box>
+                                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                    {t('auditLogs.user')}
+                                  </Typography>
+                                  <Box sx={{ mt: 0.5 }}>
+                                    {log.user_name ? (
+                                      <>
+                                        <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                                          {log.user_name}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary" sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                                          {log.user_email}
+                                        </Typography>
+                                      </>
+                                    ) : (
+                                      <Typography variant="body1" color="text.secondary">
+                                        {t('auditLogs.system')}
+                                      </Typography>
+                                    )}
+                                  </Box>
+                                </Box>
+
+                                <Divider />
+
+                                {/* Resource Information */}
+                                {((log as any).resourceId || (log as any).resource_id || (log as any).entityId) && (
+                                  <>
+                                    <Box>
+                                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                        {t('auditLogs.resource')}
+                                      </Typography>
+                                      <Box sx={{ mt: 0.5 }}>
+                                        {(() => {
+                                          const oldVals = (log as any).oldValues || (log as any).old_values;
+                                          const newVals = (log as any).newValues || (log as any).new_values;
+                                          const resourceName = oldVals?.name || newVals?.name || oldVals?.worldId || newVals?.worldId;
+                                          const resourceType = (log as any).resourceType || (log as any).resource_type || (log as any).entityType;
+                                          const resourceId = (log as any).resourceId || (log as any).resource_id || (log as any).entityId;
+
+                                          return (
+                                            <>
+                                              {resourceName && (
+                                                <Typography variant="body1" sx={{ fontWeight: 600, mb: 0.5 }}>
+                                                  {resourceName}
+                                                </Typography>
+                                              )}
+                                              <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
+                                                {resourceType} #{resourceId}
+                                              </Typography>
+                                            </>
+                                          );
+                                        })()}
+                                      </Box>
+                                    </Box>
+                                    <Divider />
+                                  </>
+                                )}
+
+                                {/* IP Address */}
+                                <Box>
+                                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                    {t('auditLogs.ipAddress')}
+                                  </Typography>
+                                  <Typography variant="body1" sx={{ mt: 0.5, fontFamily: 'monospace' }}>
+                                    {log.ip_address || log.ipAddress || '-'}
+                                  </Typography>
+                                </Box>
+
+                                {/* User Agent */}
+                                {(log.user_agent || log.userAgent) && (
+                                  <>
+                                    <Divider />
+                                    <Box>
+                                      <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                        {t('auditLogs.userAgent')}
+                                      </Typography>
+                                      <Typography variant="body2" sx={{ mt: 0.5, wordBreak: 'break-all', fontFamily: 'monospace', fontSize: '0.75rem', color: 'text.secondary' }}>
+                                        {log.user_agent || log.userAgent}
+                                      </Typography>
+                                    </Box>
+                                  </>
+                                )}
+
                                 {/* Changes - Diff Viewer */}
-                                {log.old_values && log.new_values && (
-                                  <Box>
-                                    <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
-                                      {t('auditLogs.changes')}
-                                    </Typography>
-                                    <Paper sx={{
-                                      mt: 0.5,
-                                      bgcolor: 'background.default',
-                                      overflow: 'hidden',
-                                      '& pre': {
-                                        fontSize: '0.75rem !important',
-                                        fontFamily: 'monospace',
-                                      },
-                                      '& .diff-gutter': {
-                                        minWidth: '30px',
-                                      },
-                                      '& .diff-code': {
-                                        fontSize: '0.75rem',
-                                      },
-                                    }}>
-                                      <ReactDiffViewer
-                                        oldValue={JSON.stringify(log.old_values, null, 2)}
-                                        newValue={JSON.stringify(log.new_values, null, 2)}
-                                        splitView={false}
-                                        compareMethod={DiffMethod.WORDS}
-                                        useDarkTheme={theme.palette.mode === 'dark'}
-                                        hideLineNumbers={false}
-                                        showDiffOnly={true}
-                                        styles={{
-                                          variables: {
-                                            dark: {
-                                              diffViewerBackground: theme.palette.background.default,
-                                              addedBackground: alpha(theme.palette.success.main, 0.2),
-                                              addedColor: theme.palette.success.contrastText,
-                                              removedBackground: alpha(theme.palette.error.main, 0.2),
-                                              removedColor: theme.palette.error.contrastText,
-                                              wordAddedBackground: alpha(theme.palette.success.main, 0.4),
-                                              wordRemovedBackground: alpha(theme.palette.error.main, 0.4),
-                                              gutterBackground: theme.palette.background.paper,
-                                            },
-                                            light: {
-                                              diffViewerBackground: theme.palette.background.default,
-                                              addedBackground: alpha(theme.palette.success.main, 0.1),
-                                              addedColor: theme.palette.text.primary,
-                                              removedBackground: alpha(theme.palette.error.main, 0.1),
-                                              removedColor: theme.palette.text.primary,
-                                              wordAddedBackground: alpha(theme.palette.success.main, 0.3),
-                                              wordRemovedBackground: alpha(theme.palette.error.main, 0.3),
-                                              gutterBackground: theme.palette.background.paper,
-                                            },
+                                {(() => {
+                                  const oldVals = (log as any).oldValues || (log as any).old_values;
+                                  const newVals = (log as any).newValues || (log as any).new_values;
+                                  return oldVals && newVals && (
+                                  <>
+                                    <Divider />
+                                    <Box>
+                                      <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: 'block', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                        {t('auditLogs.changes')}
+                                      </Typography>
+                                      <Paper
+                                        elevation={0}
+                                        sx={{
+                                          bgcolor: 'background.default',
+                                          overflow: 'hidden',
+                                          border: 1,
+                                          borderColor: 'divider',
+                                          borderRadius: 1,
+                                          '& pre': {
+                                            fontSize: '0.75rem !important',
+                                            fontFamily: 'monospace',
+                                          },
+                                          '& .diff-gutter': {
+                                            minWidth: '40px',
+                                          },
+                                          '& .diff-code': {
+                                            fontSize: '0.75rem',
                                           },
                                         }}
-                                      />
-                                    </Paper>
-                                  </Box>
-                                )}
+                                      >
+                                        <ReactDiffViewer
+                                          oldValue={JSON.stringify(oldVals, null, 2)}
+                                          newValue={JSON.stringify(newVals, null, 2)}
+                                          splitView={false}
+                                          compareMethod={DiffMethod.WORDS}
+                                          useDarkTheme={theme.palette.mode === 'dark'}
+                                          hideLineNumbers={false}
+                                          showDiffOnly={true}
+                                          styles={{
+                                            variables: {
+                                              dark: {
+                                                diffViewerBackground: theme.palette.background.default,
+                                                addedBackground: alpha(theme.palette.success.main, 0.2),
+                                                addedColor: theme.palette.success.contrastText,
+                                                removedBackground: alpha(theme.palette.error.main, 0.2),
+                                                removedColor: theme.palette.error.contrastText,
+                                                wordAddedBackground: alpha(theme.palette.success.main, 0.4),
+                                                wordRemovedBackground: alpha(theme.palette.error.main, 0.4),
+                                                gutterBackground: theme.palette.background.paper,
+                                                gutterColor: theme.palette.text.secondary,
+                                              },
+                                              light: {
+                                                diffViewerBackground: theme.palette.background.default,
+                                                addedBackground: alpha(theme.palette.success.main, 0.1),
+                                                addedColor: theme.palette.text.primary,
+                                                removedBackground: alpha(theme.palette.error.main, 0.1),
+                                                removedColor: theme.palette.text.primary,
+                                                wordAddedBackground: alpha(theme.palette.success.main, 0.3),
+                                                wordRemovedBackground: alpha(theme.palette.error.main, 0.3),
+                                                gutterBackground: theme.palette.background.paper,
+                                                gutterColor: theme.palette.text.secondary,
+                                              },
+                                            },
+                                          }}
+                                        />
+                                      </Paper>
+                                    </Box>
+                                  </>
+                                  );
+                                })()}
 
                                 {/* Show only new values if old values don't exist */}
-                                {!log.old_values && log.new_values && (
-                                  <Box>
-                                    <Typography variant="caption" color="text.secondary">
-                                      {t('auditLogs.newValues')}
-                                    </Typography>
-                                    <Paper sx={{ p: 1.5, mt: 0.5, bgcolor: 'background.default' }}>
-                                      <pre style={{ margin: 0, fontSize: '0.75rem', overflow: 'auto', fontFamily: 'monospace' }}>
-                                        {JSON.stringify(log.new_values, null, 2)}
-                                      </pre>
-                                    </Paper>
-                                  </Box>
-                                )}
+                                {(() => {
+                                  const oldVals = (log as any).oldValues || (log as any).old_values;
+                                  const newVals = (log as any).newValues || (log as any).new_values;
+                                  return !oldVals && newVals && (
+                                  <>
+                                    <Divider />
+                                    <Box>
+                                      <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: 'block', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                        {t('auditLogs.newValues')}
+                                      </Typography>
+                                      <Paper
+                                        elevation={0}
+                                        sx={{
+                                          p: 2,
+                                          bgcolor: 'background.default',
+                                          border: 1,
+                                          borderColor: 'divider',
+                                          borderRadius: 1,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        }}
+                                      >
+                                        <pre style={{
+                                          margin: 0,
+                                          fontSize: '0.75rem',
+                                          fontFamily: 'monospace',
+                                          color: theme.palette.text.primary,
+                                        }}>
+                                          {JSON.stringify(newVals, null, 2)}
+                                        </pre>
+                                      </Paper>
+                                    </Box>
+                                  </>
+                                  );
+                                })()}
 
                                 {/* Show only old values if new values don't exist */}
-                                {log.old_values && !log.new_values && (
-                                  <Box>
-                                    <Typography variant="caption" color="text.secondary">
-                                      {t('auditLogs.oldValues')}
-                                    </Typography>
-                                    <Paper sx={{ p: 1.5, mt: 0.5, bgcolor: 'background.default' }}>
-                                      <pre style={{ margin: 0, fontSize: '0.75rem', overflow: 'auto', fontFamily: 'monospace' }}>
-                                        {JSON.stringify(log.old_values, null, 2)}
-                                      </pre>
-                                    </Paper>
-                                  </Box>
-                                )}
+                                {(() => {
+                                  const oldVals = (log as any).oldValues || (log as any).old_values;
+                                  const newVals = (log as any).newValues || (log as any).new_values;
+                                  return oldVals && !newVals && (
+                                  <>
+                                    <Divider />
+                                    <Box>
+                                      <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: 'block', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                        {t('auditLogs.oldValues')}
+                                      </Typography>
+                                      <Paper
+                                        elevation={0}
+                                        sx={{
+                                          p: 2,
+                                          bgcolor: 'background.default',
+                                          border: 1,
+                                          borderColor: 'divider',
+                                          borderRadius: 1,
+                                          overflow: 'auto',
+                                          maxHeight: 400,
+                                        }}
+                                      >
+                                        <pre style={{
+                                          margin: 0,
+                                          fontSize: '0.75rem',
+                                          fontFamily: 'monospace',
+                                          color: theme.palette.text.primary,
+                                        }}>
+                                          {JSON.stringify(oldVals, null, 2)}
+                                        </pre>
+                                      </Paper>
+                                    </Box>
+                                  </>
+                                  );
+                                })()}
                               </Box>
                             </Box>
                           </Collapse>
