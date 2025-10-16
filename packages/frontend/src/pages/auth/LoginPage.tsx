@@ -105,7 +105,17 @@ const LoginPage: React.FC = () => {
   const [showRememberMeWarning, setShowRememberMeWarning] = useState(false);
   const [pendingRememberMe, setPendingRememberMe] = useState(false);
 
-  const from = (location.state as any)?.from?.pathname || '/dashboard';
+  // Get the full URL to redirect to after login (including query params and hash)
+  const from = useMemo(() => {
+    const fromLocation = (location.state as any)?.from;
+    if (fromLocation) {
+      const pathname = fromLocation.pathname || '/dashboard';
+      const search = fromLocation.search || '';
+      const hash = fromLocation.hash || '';
+      return `${pathname}${search}${hash}`;
+    }
+    return '/dashboard';
+  }, [location.state]);
 
   // Check if already authenticated and redirect
   useEffect(() => {

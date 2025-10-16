@@ -35,7 +35,7 @@ export const StackTraceViewer: React.FC<StackTraceViewerProps> = ({
 
   const handleCopyAll = () => {
     navigator.clipboard.writeText(stackTrace);
-    enqueueSnackbar(t('common.copied'), { variant: 'success' });
+    enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
   };
 
   if (loading) {
@@ -65,7 +65,7 @@ export const StackTraceViewer: React.FC<StackTraceViewerProps> = ({
           overflow: 'auto',
           bgcolor: 'grey.900',
           color: 'grey.100',
-          fontFamily: 'monospace',
+          fontFamily: 'D2Coding, monospace',
           fontSize: '0.75rem',
           p: 2,
           whiteSpace: 'pre-wrap',

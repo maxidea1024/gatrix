@@ -1,5 +1,6 @@
 import { apiService } from './api';
 import { LoginCredentials, RegisterData, AuthResponse, User } from '@/types';
+import { devLogger } from '@/utils/logger';
 
 export class AuthService {
   static async login(credentials: LoginCredentials & { rememberMe?: boolean }): Promise<AuthResponse> {
@@ -73,7 +74,7 @@ export class AuthService {
       await apiService.post('/auth/logout');
     } catch (error) {
       // Continue with logout even if API call fails
-      console.warn('Logout API call failed:', error);
+      devLogger.warn('Logout API call failed:', error);
     } finally {
       // Clear local storage and tokens
       this.clearAuthData();
@@ -156,7 +157,7 @@ export class AuthService {
       const userStr = localStorage.getItem('user');
       return userStr ? JSON.parse(userStr) : null;
     } catch (error) {
-      console.error('Failed to parse stored user:', error);
+      devLogger.error('Failed to parse stored user:', error);
       return null;
     }
   }
@@ -214,7 +215,7 @@ export class AuthService {
       // Add 60 second buffer to refresh before actual expiry
       return now >= (exp - 60000);
     } catch (error) {
-      console.error('Failed to decode token:', error);
+      devLogger.error('Failed to decode token:', error);
       return true; // Treat invalid tokens as expired
     }
   }
@@ -225,7 +226,7 @@ export class AuthService {
     if (token) {
       // Check if token is expired
       if (this.isTokenExpired(token)) {
-        console.warn('⚠️ Stored token is expired, clearing auth data');
+        devLogger.warn('⚠️ Stored token is expired, clearing auth data');
         this.clearAuthData();
         return false;
       }
@@ -275,7 +276,7 @@ export class AuthService {
         window.location.href = '/login';
       }
     }).catch((error) => {
-      console.error('Failed to get profile after OAuth:', error);
+      devLogger.error('Failed to get profile after OAuth:', error);
       window.location.href = '/login';
     });
   }

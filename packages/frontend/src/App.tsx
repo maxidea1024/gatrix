@@ -183,7 +183,7 @@ const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) 
         <Box
           sx={{
             display: 'flex',
-            alignItems: 'flex-end',
+            alignItems: 'center',
             gap: '16px',
             height: '60px',
           }}
@@ -196,13 +196,15 @@ const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) 
                 height: '20px',
                 borderRadius: '50%',
                 backgroundColor: 'primary.main',
-                animation: 'dotFlashing 1.4s infinite linear',
-                animationDelay: `${index * 0.2}s`,
-                '@keyframes dotFlashing': {
-                  '0%, 80%, 100%': {
-                    opacity: 0.3,
+                animation: 'dotWave 1.4s infinite ease-in-out',
+                animationDelay: `${index * 0.15}s`,
+                '@keyframes dotWave': {
+                  '0%, 60%, 100%': {
+                    transform: 'translateY(0) scale(1)',
+                    opacity: 0.4,
                   },
-                  '40%': {
+                  '30%': {
+                    transform: 'translateY(-20px) scale(1.2)',
                     opacity: 1,
                   },
                 },

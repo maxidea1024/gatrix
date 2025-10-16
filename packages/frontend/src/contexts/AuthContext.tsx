@@ -50,7 +50,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       await AuthService.logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      devLogger.error('Logout error:', error);
     } finally {
       setUser(null);
     }
@@ -87,13 +87,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         if (payload.exp && payload.exp < currentTime) {
           // Token is expired
-          console.log('Token expired, clearing auth data');
+          devLogger.info('Token expired, clearing auth data');
           AuthService.clearAuthData();
           setUser(null);
           return;
         }
       } catch (tokenError) {
-        console.error('Invalid token format:', tokenError);
+        devLogger.error('Invalid token format:', tokenError);
         AuthService.clearAuthData();
         setUser(null);
         return;
@@ -103,7 +103,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const user = await AuthService.getProfile();
       setUser(user);
     } catch (error) {
-      console.error('Auth refresh error:', error);
+      devLogger.error('Auth refresh error:', error);
       // Clear auth data on error to prevent infinite loops
       AuthService.clearAuthData();
       setUser(null);
@@ -147,15 +147,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const MIN_LOADING_TIME = 1500; // Minimum 1.5 seconds for better UX
 
       try {
-        console.log('🔄 AuthContext: Starting initialization...');
+        devLogger.info('🔄 AuthContext: Starting initialization...');
         setIsLoading(true);
 
         // Check if we have stored auth data
         const storedToken = AuthService.getStoredToken();
         const storedUser = AuthService.getStoredUser();
 
-        console.log('🔍 AuthContext: Stored token exists:', !!storedToken);
-        console.log('🔍 AuthContext: Stored user exists:', !!storedUser);
+        devLogger.debug('🔍 AuthContext: Stored token exists:', !!storedToken);
+        devLogger.debug('🔍 AuthContext: Stored user exists:', !!storedUser);
 
         if (storedToken && storedUser) {
           // Initialize API service with stored token (checks expiry)
@@ -163,38 +163,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           if (isValid) {
             // Use stored user data without API call to prevent infinite loop
             setUser(storedUser);
-            console.log('✅ AuthContext: User authenticated from storage');
+            devLogger.info('✅ AuthContext: User authenticated from storage');
           } else {
             // Token was expired and cleared
             setUser(null);
-            console.log('❌ AuthContext: Stored token expired, user logged out');
+            devLogger.info('❌ AuthContext: Stored token expired, user logged out');
           }
         } else if (storedToken && !storedUser) {
           // Token exists but no user data - fetch profile (OAuth callback scenario)
-          console.log('🔄 AuthContext: Token exists but no user data, fetching profile...');
+          devLogger.info('🔄 AuthContext: Token exists but no user data, fetching profile...');
           const isValid = AuthService.initializeAuth();
           if (isValid) {
             try {
               const user = await AuthService.getProfile();
               setUser(user);
-              console.log('✅ AuthContext: User profile fetched successfully');
+              devLogger.info('✅ AuthContext: User profile fetched successfully');
             } catch (error) {
-              console.error('❌ AuthContext: Failed to fetch user profile:', error);
+              devLogger.error('❌ AuthContext: Failed to fetch user profile:', error);
               AuthService.clearAuthData();
               setUser(null);
             }
           } else {
             // Token was expired
             setUser(null);
-            console.log('❌ AuthContext: Stored token expired, user logged out');
+            devLogger.info('❌ AuthContext: Stored token expired, user logged out');
           }
         } else {
           // No stored auth data
           setUser(null);
-          console.log('❌ AuthContext: No stored auth data, user not authenticated');
+          devLogger.info('❌ AuthContext: No stored auth data, user not authenticated');
         }
       } catch (error) {
-        console.error('❌ AuthContext: Auth initialization error:', error);
+        devLogger.error('❌ AuthContext: Auth initialization error:', error);
         AuthService.clearAuthData();
         setUser(null);
       } finally {
@@ -203,14 +203,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const remainingTime = Math.max(0, MIN_LOADING_TIME - elapsedTime);
 
         if (remainingTime > 0) {
-          console.log(`⏱️ AuthContext: Waiting ${remainingTime}ms for minimum loading time...`);
+          devLogger.debug(`⏱️ AuthContext: Waiting ${remainingTime}ms for minimum loading time...`);
           setTimeout(() => {
             setIsLoading(false);
-            console.log('✅ AuthContext: Initialization complete, isLoading = false');
+            devLogger.info('✅ AuthContext: Initialization complete, isLoading = false');
           }, remainingTime);
         } else {
           setIsLoading(false);
-          console.log('✅ AuthContext: Initialization complete, isLoading = false');
+          devLogger.info('✅ AuthContext: Initialization complete, isLoading = false');
         }
       }
     };

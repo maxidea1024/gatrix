@@ -29,13 +29,15 @@ interface LogViewerProps {
   logContent: string;
   logFilePath?: string;
   loading?: boolean;
+  eventId?: string; // Event ID for generating shareable links
+  initialScrollLine?: number; // Initial line number to scroll to
 }
 
 /**
  * LogViewer Component
  * Displays log file content with line numbers, search, and navigation functionality
  */
-export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, loading = false }) => {
+export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, loading = false, eventId, initialScrollLine }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [contextMenu, setContextMenu] = useState<{
@@ -75,6 +77,7 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
     borderColor: 'grey.700',
     cursor: 'pointer',
     userSelect: 'none' as const,
+    fontFamily: 'D2Coding, monospace',
     '&:hover': {
       color: 'grey.300',
       bgcolor: 'grey.700',
@@ -87,24 +90,34 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
     py: 0.25,
     whiteSpace: 'pre' as const,
     overflowX: 'auto' as const,
+    fontFamily: 'D2Coding, monospace',
   }), []);
 
-  // Scroll to line if hash is present in URL
+  // Scroll to line if hash is present in URL or initialScrollLine is provided
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.startsWith('#L')) {
-      const lineNumber = parseInt(hash.substring(2), 10);
-      if (!isNaN(lineNumber) && virtuosoRef.current) {
-        setTimeout(() => {
-          virtuosoRef.current?.scrollToIndex({
-            index: lineNumber - 1,
-            align: 'center',
-            behavior: 'smooth'
-          });
-        }, 100);
+    let lineNumber: number | null = null;
+
+    // Check initialScrollLine prop first (for auto-opened drawer)
+    if (initialScrollLine) {
+      lineNumber = initialScrollLine;
+    } else {
+      // Otherwise check URL hash
+      const hash = window.location.hash;
+      if (hash.startsWith('#L')) {
+        lineNumber = parseInt(hash.substring(2), 10);
       }
     }
-  }, []);
+
+    if (lineNumber && !isNaN(lineNumber) && virtuosoRef.current && lines.length > 0) {
+      setTimeout(() => {
+        virtuosoRef.current?.scrollToIndex({
+          index: lineNumber! - 1,
+          align: 'center',
+          behavior: 'smooth'
+        });
+      }, 300); // Increased delay to ensure drawer is fully opened
+    }
+  }, [initialScrollLine, lines.length]);
 
   const handleLineClick = (event: React.MouseEvent<HTMLDivElement>, lineNumber: number) => {
     event.preventDefault();
@@ -142,8 +155,12 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
   };
 
   const handleCopyLink = () => {
-    if (selectedLine !== null) {
-      const url = `${window.location.origin}${window.location.pathname}${window.location.search}#L${selectedLine}`;
+    if (selectedLine !== null && eventId) {
+      // Build URL with eventId and action parameters for auto-opening log drawer
+      const params = new URLSearchParams(window.location.search);
+      params.set('eventId', eventId);
+      params.set('action', 'viewLog');
+      const url = `${window.location.origin}${window.location.pathname}?${params.toString()}#L${selectedLine}`;
       navigator.clipboard.writeText(url);
       enqueueSnackbar(t('crashes.linkCopied'), { variant: 'success' });
       handleClose();

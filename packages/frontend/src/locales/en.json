@@ -40,7 +40,9 @@
       "logFile": "Log File",
       "logFileUrl": "Log File URL",
       "viewLog": "View Log",
+      "viewLogSubtitle": "View the log file content for this crash event",
       "viewStackTrace": "View Stack Trace",
+      "viewStackTraceSubtitle": "View the stack trace at the time of the crash",
       "downloadLog": "Download Log",
       "copyAll": "Copy All",
       "copyLine": "Copy Line",
@@ -1487,6 +1489,8 @@
     "clickToManage": "Click to manage",
     "close": "Close",
     "collapse": "Collapse",
+    "enterFullscreen": "Enter Fullscreen",
+    "exitFullscreen": "Exit Fullscreen",
     "color": "Color",
     "colorPicker": {
       "apply": "Apply",

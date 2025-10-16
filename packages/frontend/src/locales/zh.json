@@ -40,7 +40,9 @@
     "logFile": "日志文件",
     "logFileUrl": "日志文件URL",
     "viewLog": "查看日志",
+    "viewLogSubtitle": "查看此崩溃事件的日志文件内容",
     "viewStackTrace": "查看堆栈跟踪",
+    "viewStackTraceSubtitle": "查看崩溃时的堆栈跟踪",
     "downloadLog": "下载日志",
     "copyAll": "复制全部",
     "copyLine": "复制行",
@@ -1539,6 +1541,8 @@
     "clickToManage": "点击管理",
     "close": "关闭",
     "collapse": "折叠",
+    "enterFullscreen": "全屏",
+    "exitFullscreen": "退出全屏",
     "color": "颜色",
     "colorPicker": {
       "apply": "应用",

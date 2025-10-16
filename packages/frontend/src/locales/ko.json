@@ -40,7 +40,9 @@
     "logFile": "로그 파일",
     "logFileUrl": "로그 파일 URL",
     "viewLog": "로그 보기",
+    "viewLogSubtitle": "크래시 이벤트 로그 파일 내용을 확인합니다",
     "viewStackTrace": "스택 트레이스 보기",
+    "viewStackTraceSubtitle": "크래시 발생 시점의 스택 트레이스를 확인합니다",
     "downloadLog": "로그 다운로드",
     "copyAll": "전체 복사",
     "copyLine": "줄 복사",
@@ -1484,6 +1486,8 @@
     "clickToManage": "클릭하여 관리",
     "close": "닫기",
     "collapse": "접기",
+    "enterFullscreen": "전체화면",
+    "exitFullscreen": "전체화면 종료",
     "color": "색상",
     "colorPicker": {
       "apply": "적용",

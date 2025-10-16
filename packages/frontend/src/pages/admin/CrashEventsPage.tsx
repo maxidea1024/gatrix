@@ -35,7 +35,9 @@ import {
   ArrowUpward as ArrowUpwardIcon,
   ArrowDownward as ArrowDownwardIcon,
   Link as LinkIcon,
-  Code as CodeIcon,
+  HourglassEmpty as HourglassIcon,
+  Fullscreen as FullscreenIcon,
+  FullscreenExit as FullscreenExitIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -131,6 +133,19 @@ const CrashEventsPage: React.FC = () => {
   const [stackTraceMap, setStackTraceMap] = useState<Record<string, string>>({});
   const [loadingLog, setLoadingLog] = useState(false);
   const [loadingStackTraceId, setLoadingStackTraceId] = useState<string | null>(null);
+
+  // Drawer fullscreen state (persisted in localStorage, separate for stackTrace and log)
+  const [isStackTraceFullscreen, setIsStackTraceFullscreen] = useState<boolean>(() => {
+    const saved = localStorage.getItem('crashEventsStackTraceFullscreen');
+    return saved === 'true';
+  });
+  const [isLogFullscreen, setIsLogFullscreen] = useState<boolean>(() => {
+    const saved = localStorage.getItem('crashEventsLogFullscreen');
+    return saved === 'true';
+  });
+
+  // Initial scroll line for log viewer (from URL hash)
+  const [initialLogScrollLine, setInitialLogScrollLine] = useState<number | undefined>(undefined);
 
   // Dynamic filter definitions
   const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
@@ -362,6 +377,57 @@ const CrashEventsPage: React.FC = () => {
     window.history.replaceState({}, '', newUrl);
   }, [expandedRowId]);
 
+  // Auto-open log drawer from URL parameters (for shareable log line links)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const eventId = params.get('eventId');
+    const action = params.get('action');
+
+    if (eventId && action === 'viewLog' && events.length > 0) {
+      const event = events.find(e => e.id === eventId);
+      if (event && event.logFilePath) {
+        // Extract line number from hash
+        const hash = window.location.hash;
+        let lineNumber: number | undefined = undefined;
+        if (hash.startsWith('#L')) {
+          const parsed = parseInt(hash.substring(2), 10);
+          if (!isNaN(parsed)) {
+            lineNumber = parsed;
+          }
+        }
+
+        // Open log drawer
+        setSelectedEvent(event);
+        setDrawerType('log');
+        setDrawerOpen(true);
+        setLogContent('');
+        setLoadingLog(true);
+        setInitialLogScrollLine(lineNumber);
+
+        // Load log content
+        crashService.getLogFile(event.id)
+          .then(logData => {
+            setLogContent(logData.logContent);
+          })
+          .catch(error => {
+            console.error('Failed to load log file:', error);
+            enqueueSnackbar(t('crashes.logNotAvailable'), { variant: 'warning' });
+          })
+          .finally(() => {
+            setLoadingLog(false);
+          });
+
+        // Clean up URL parameters after opening
+        params.delete('eventId');
+        params.delete('action');
+        const newUrl = params.toString()
+          ? `${window.location.pathname}?${params.toString()}${window.location.hash}`
+          : `${window.location.pathname}${window.location.hash}`;
+        window.history.replaceState({}, '', newUrl);
+      }
+    }
+  }, [events, enqueueSnackbar, t]);
+
 
 
   const handlePageChange = useCallback((_: unknown, newPage: number) => {
@@ -462,6 +528,18 @@ const CrashEventsPage: React.FC = () => {
     setDrawerOpen(false);
     setSelectedEvent(null);
     setLogContent('');
+  };
+
+  const handleToggleDrawerFullscreen = () => {
+    if (drawerType === 'stackTrace') {
+      const newValue = !isStackTraceFullscreen;
+      setIsStackTraceFullscreen(newValue);
+      localStorage.setItem('crashEventsStackTraceFullscreen', String(newValue));
+    } else {
+      const newValue = !isLogFullscreen;
+      setIsLogFullscreen(newValue);
+      localStorage.setItem('crashEventsLogFullscreen', String(newValue));
+    }
   };
 
   return (
@@ -773,7 +851,7 @@ const CrashEventsPage: React.FC = () => {
                                 }
                               }}
                             >
-                              <CodeIcon fontSize="small" />
+                              <BugReportIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
                           {event.logFilePath && (
@@ -1272,40 +1350,6 @@ const CrashEventsPage: React.FC = () => {
                                 </IconButton>
                               </Tooltip>
                             </Box>
-
-                            {/* Divider */}
-                            <Box sx={{ my: 3, borderTop: 1, borderColor: 'divider' }} />
-
-                            {/* Stack Trace Section */}
-                            <Box>
-                              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                                {t('crashes.stackTrace')}
-                              </Typography>
-                              {loadingStackTraceId === event.id ? (
-                                <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                                  <Typography>{t('crashes.loadingStackTrace')}</Typography>
-                                </Box>
-                              ) : stackTraceMap[event.id] ? (
-                                <StackTraceViewer stackTrace={stackTraceMap[event.id]} />
-                              ) : (
-                                <Typography color="text.secondary">
-                                  {t('crashes.stackTraceNotAvailable')}
-                                </Typography>
-                              )}
-                            </Box>
-
-                            {/* Log View Button */}
-                            {event.logFilePath && (
-                              <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-start' }}>
-                                <Button
-                                  variant="outlined"
-                                  startIcon={<LogIcon />}
-                                  onClick={() => handleViewLog(event)}
-                                >
-                                  {t('crashes.viewLog')}
-                                </Button>
-                              </Box>
-                            )}
                           </Box>
                         </Collapse>
                       </TableCell>
@@ -1335,7 +1379,9 @@ const CrashEventsPage: React.FC = () => {
         sx={{
           zIndex: (theme) => theme.zIndex.drawer + 3,
           '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 700, md: 900 },
+            width: (drawerType === 'stackTrace' ? isStackTraceFullscreen : isLogFullscreen)
+              ? '100vw'
+              : { xs: '100%', sm: 600, md: 700 },
             maxWidth: '100vw',
             display: 'flex',
             flexDirection: 'column'
@@ -1355,20 +1401,40 @@ const CrashEventsPage: React.FC = () => {
           borderColor: 'divider',
           bgcolor: 'background.paper'
         }}>
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {drawerType === 'stackTrace' ? t('crashes.viewStackTrace') : t('crashes.viewLog')}
-          </Typography>
-          <IconButton
-            onClick={handleCloseDrawer}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover'
-              }
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
+          <Box>
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
+              {drawerType === 'stackTrace' ? t('crashes.viewStackTrace') : t('crashes.viewLog')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              {drawerType === 'stackTrace' ? t('crashes.viewStackTraceSubtitle') : t('crashes.viewLogSubtitle')}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Tooltip title={(drawerType === 'stackTrace' ? isStackTraceFullscreen : isLogFullscreen) ? t('common.exitFullscreen') : t('common.enterFullscreen')}>
+              <IconButton
+                onClick={handleToggleDrawerFullscreen}
+                size="small"
+                sx={{
+                  '&:hover': {
+                    backgroundColor: 'action.hover'
+                  }
+                }}
+              >
+                {(drawerType === 'stackTrace' ? isStackTraceFullscreen : isLogFullscreen) ? <FullscreenExitIcon /> : <FullscreenIcon />}
+              </IconButton>
+            </Tooltip>
+            <IconButton
+              onClick={handleCloseDrawer}
+              size="small"
+              sx={{
+                '&:hover': {
+                  backgroundColor: 'action.hover'
+                }
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Box>
         </Box>
 
         {/* Content */}
@@ -1385,12 +1451,28 @@ const CrashEventsPage: React.FC = () => {
           ) : (
             // Log View
             loadingLog ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-                <Typography>{t('crashes.loadingLog')}</Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', p: 4 }}>
+                <HourglassIcon
+                  sx={{
+                    fontSize: 48,
+                    color: 'primary.main',
+                    animation: 'hourglassRotate 2s ease-in-out infinite',
+                    '@keyframes hourglassRotate': {
+                      '0%': { transform: 'rotate(0deg)' },
+                      '50%': { transform: 'rotate(180deg)' },
+                      '100%': { transform: 'rotate(360deg)' },
+                    },
+                  }}
+                />
               </Box>
             ) : logContent ? (
               <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                <LogViewer logContent={logContent} logFilePath={selectedEvent?.logFilePath || ''} />
+                <LogViewer
+                  logContent={logContent}
+                  logFilePath={selectedEvent?.logFilePath || ''}
+                  eventId={selectedEvent?.id}
+                  initialScrollLine={initialLogScrollLine}
+                />
               </Box>
             ) : (
               <Typography color="text.secondary">{t('crashes.logNotAvailable')}</Typography>
