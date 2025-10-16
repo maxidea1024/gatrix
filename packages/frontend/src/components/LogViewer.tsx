@@ -46,6 +46,7 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
     lineNumber: number;
   } | null>(null);
   const [selectedLine, setSelectedLine] = useState<number | null>(null);
+  const [highlightedLine, setHighlightedLine] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [goToLine, setGoToLine] = useState('');
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -95,6 +96,9 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
 
   // Scroll to line if hash is present in URL or initialScrollLine is provided
   useEffect(() => {
+    // Only proceed if we have lines loaded
+    if (lines.length === 0) return;
+
     let lineNumber: number | null = null;
 
     // Check initialScrollLine prop first (for auto-opened drawer)
@@ -108,16 +112,48 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
       }
     }
 
-    if (lineNumber && !isNaN(lineNumber) && virtuosoRef.current && lines.length > 0) {
-      setTimeout(() => {
-        virtuosoRef.current?.scrollToIndex({
-          index: lineNumber! - 1,
-          align: 'center',
-          behavior: 'smooth'
-        });
-      }, 300); // Increased delay to ensure drawer is fully opened
+    if (lineNumber && !isNaN(lineNumber) && lineNumber > 0 && lineNumber <= lines.length) {
+      // Set highlighted line
+      setHighlightedLine(lineNumber);
+
+      // Multiple scroll attempts with increasing delays to ensure Virtuoso is ready
+      const timer1 = setTimeout(() => {
+        if (virtuosoRef.current) {
+          virtuosoRef.current.scrollToIndex({
+            index: lineNumber! - 1,
+            align: 'center',
+            behavior: 'auto'
+          });
+        }
+      }, 300);
+
+      const timer2 = setTimeout(() => {
+        if (virtuosoRef.current) {
+          virtuosoRef.current.scrollToIndex({
+            index: lineNumber! - 1,
+            align: 'center',
+            behavior: 'auto'
+          });
+        }
+      }, 800);
+
+      const timer3 = setTimeout(() => {
+        if (virtuosoRef.current) {
+          virtuosoRef.current.scrollToIndex({
+            index: lineNumber! - 1,
+            align: 'center',
+            behavior: 'smooth'
+          });
+        }
+      }, 1500);
+
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+        clearTimeout(timer3);
+      };
     }
-  }, [initialScrollLine, lines.length]);
+  }, [initialScrollLine, lines.length, logContent]);
 
   const handleLineClick = (event: React.MouseEvent<HTMLDivElement>, lineNumber: number) => {
     event.preventDefault();
@@ -229,7 +265,7 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
   const Row = React.memo(({ index }: { index: number }) => {
     const lineNumber = index + 1;
     const line = lines[index];
-    const isHighlighted = window.location.hash === `#L${lineNumber}`;
+    const isHighlighted = highlightedLine === lineNumber;
     const isMatching = matchingLines.has(lineNumber);
     const isSelected = selectedLine === lineNumber;
 
@@ -301,13 +337,18 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
   return (
     <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Toolbar */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1} gap={2} sx={{ flexShrink: 0 }}>
-        <Typography variant="caption" color="text.secondary">
-          {logFilePath || t('crashes.logFile')} ({lines.length} {t('crashes.lines')})
-          {searchQuery && ` - ${matchingLines.size} matches`}
-        </Typography>
+      <Box sx={{ flexShrink: 0, mb: 1 }}>
+        {/* First row: File info */}
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+          <Typography variant="caption" color="text.secondary">
+            {logFilePath || t('crashes.logFile')} ({lines.length} {t('crashes.lines')})
+            {searchQuery && ` - ${matchingLines.size} matches`}
+          </Typography>
+        </Box>
+
+        {/* Second row: Controls */}
         <Box display="flex" gap={1} alignItems="center">
-          {/* Search */}
+          {/* Search - grows to fill available space */}
           <TextField
             size="small"
             placeholder="Search..."
@@ -327,34 +368,94 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
                 </InputAdornment>
               ),
             }}
-            sx={{ width: 200 }}
-          />
-
-          {/* Go to Line */}
-          <TextField
-            size="small"
-            placeholder="Go to line..."
-            value={goToLine}
-            onChange={(e) => setGoToLine(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') {
-                handleGoToLine();
+            sx={{
+              flex: 1,
+              minWidth: 150,
+              '& .MuiOutlinedInput-root': {
+                height: '40px',
+                borderRadius: '20px',
+                bgcolor: 'background.paper',
+                transition: 'all 0.2s ease-in-out',
+                '& fieldset': {
+                  borderColor: 'divider',
+                },
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                  '& fieldset': {
+                    borderColor: 'primary.light',
+                  }
+                },
+                '&.Mui-focused': {
+                  bgcolor: 'background.paper',
+                  boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                  '& fieldset': {
+                    borderColor: 'primary.main',
+                    borderWidth: '1px',
+                  }
+                }
+              },
+              '& .MuiInputBase-input': {
+                fontSize: '0.875rem',
               }
             }}
-            type="number"
-            sx={{ width: 120 }}
           />
 
-          <Tooltip title={t('crashes.copyAll')}>
-            <IconButton size="small" onClick={handleCopyAll}>
-              <CopyIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={t('crashes.downloadLog')}>
-            <IconButton size="small" onClick={handleDownload}>
-              <DownloadIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          {/* Right-aligned controls */}
+          <Box display="flex" gap={1} alignItems="center" sx={{ flexShrink: 0 }}>
+            {/* Go to Line */}
+            <TextField
+              size="small"
+              placeholder="Go to line..."
+              value={goToLine}
+              onChange={(e) => setGoToLine(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleGoToLine();
+                }
+              }}
+              type="number"
+              sx={{
+                width: 120,
+                '& .MuiOutlinedInput-root': {
+                  height: '40px',
+                  borderRadius: '20px',
+                  bgcolor: 'background.paper',
+                  transition: 'all 0.2s ease-in-out',
+                  '& fieldset': {
+                    borderColor: 'divider',
+                  },
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                    '& fieldset': {
+                      borderColor: 'primary.light',
+                    }
+                  },
+                  '&.Mui-focused': {
+                    bgcolor: 'background.paper',
+                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                    '& fieldset': {
+                      borderColor: 'primary.main',
+                      borderWidth: '1px',
+                    }
+                  }
+                },
+                '& .MuiInputBase-input': {
+                  fontSize: '0.875rem',
+                }
+              }}
+            />
+
+            <Tooltip title={t('crashes.copyAll')}>
+              <IconButton size="small" onClick={handleCopyAll}>
+                <CopyIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t('crashes.downloadLog')}>
+              <IconButton size="small" onClick={handleDownload}>
+                <DownloadIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Box>
       </Box>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -145,7 +145,9 @@ const CrashEventsPage: React.FC = () => {
   });
 
   // Initial scroll line for log viewer (from URL hash)
+  // Capture hash at mount time to prevent it from being lost
   const [initialLogScrollLine, setInitialLogScrollLine] = useState<number | undefined>(undefined);
+  const initialHashRef = useRef<string>(window.location.hash);
 
   // Dynamic filter definitions
   const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
@@ -385,9 +387,10 @@ const CrashEventsPage: React.FC = () => {
 
     if (eventId && action === 'viewLog' && events.length > 0) {
       const event = events.find(e => e.id === eventId);
+
       if (event && event.logFilePath) {
-        // Extract line number from hash
-        const hash = window.location.hash;
+        // Extract line number from the hash captured at mount time
+        const hash = initialHashRef.current;
         let lineNumber: number | undefined = undefined;
         if (hash.startsWith('#L')) {
           const parsed = parseInt(hash.substring(2), 10);
@@ -408,6 +411,24 @@ const CrashEventsPage: React.FC = () => {
         crashService.getLogFile(event.id)
           .then(logData => {
             setLogContent(logData.logContent);
+
+            // Clean up URL parameters AFTER loading content
+            // Use setTimeout to ensure state updates are processed first
+            setTimeout(() => {
+              const currentParams = new URLSearchParams(window.location.search);
+              currentParams.delete('eventId');
+              currentParams.delete('action');
+              const newUrl = currentParams.toString()
+                ? `${window.location.pathname}?${currentParams.toString()}${window.location.hash}`
+                : `${window.location.pathname}${window.location.hash}`;
+              window.history.replaceState({}, '', newUrl);
+
+              // Reset initialLogScrollLine after scroll has been applied
+              // This prevents the line number from being applied to other logs
+              setTimeout(() => {
+                setInitialLogScrollLine(undefined);
+              }, 2000); // Wait for scroll animations to complete
+            }, 100);
           })
           .catch(error => {
             console.error('Failed to load log file:', error);
@@ -416,14 +437,6 @@ const CrashEventsPage: React.FC = () => {
           .finally(() => {
             setLoadingLog(false);
           });
-
-        // Clean up URL parameters after opening
-        params.delete('eventId');
-        params.delete('action');
-        const newUrl = params.toString()
-          ? `${window.location.pathname}?${params.toString()}${window.location.hash}`
-          : `${window.location.pathname}${window.location.hash}`;
-        window.history.replaceState({}, '', newUrl);
       }
     }
   }, [events, enqueueSnackbar, t]);
@@ -509,6 +522,7 @@ const CrashEventsPage: React.FC = () => {
     setDrawerType('log');
     setDrawerOpen(true);
     setLogContent('');
+    setInitialLogScrollLine(undefined); // Reset scroll line when manually opening log
 
     if (event.logFilePath) {
       setLoadingLog(true);
@@ -528,6 +542,7 @@ const CrashEventsPage: React.FC = () => {
     setDrawerOpen(false);
     setSelectedEvent(null);
     setLogContent('');
+    setInitialLogScrollLine(undefined); // Reset scroll line when closing drawer
   };
 
   const handleToggleDrawerFullscreen = () => {
@@ -741,8 +756,8 @@ const CrashEventsPage: React.FC = () => {
                     )}
                   </Box>
                 </TableCell>
-                <TableCell>{t('crashes.table.userMessage')}</TableCell>
-                <TableCell align="center">{t('crashes.columns.actions')}</TableCell>
+                <TableCell width="150px">{t('crashes.table.userMessage')}</TableCell>
+                <TableCell align="center" width="100px">{t('crashes.columns.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -820,7 +835,7 @@ const CrashEventsPage: React.FC = () => {
                           <Typography
                             variant="body2"
                             sx={{
-                              maxWidth: 200,
+                              maxWidth: 120,
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
                               whiteSpace: 'nowrap',
