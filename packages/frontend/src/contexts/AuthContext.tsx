@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User } from '@/types';
 import { AuthService } from '@/services/auth';
+import { devLogger } from '@/utils/logger';
 
 interface AuthContextType {
   user: User | null;
@@ -34,15 +35,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (credentials: { email: string; password: string; rememberMe?: boolean }): Promise<void> => {
     try {
-      setIsLoading(true);
+      // Don't set isLoading here - it's for initial auth check only
+      // Individual pages should manage their own loading states
       setError(null);
       const response = await AuthService.login(credentials);
       setUser(response.user);
     } catch (error: any) {
       setError(error.message || 'Login failed');
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -58,15 +58,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (data: any): Promise<void> => {
     try {
-      setIsLoading(true);
+      // Don't set isLoading here - it's for initial auth check only
+      // Individual pages should manage their own loading states
       setError(null);
       const response = await AuthService.register(data);
-      setUser(response.user);
+      setUser(response);
     } catch (error: any) {
       setError(error.message || 'Registration failed');
       throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
 

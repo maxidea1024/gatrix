@@ -39,11 +39,11 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useSnackbar } from 'notistack';
 import { useAuth } from '@/hooks/useAuth';
 import { LoginCredentials } from '@/types';
 import { AuthService } from '@/services/auth';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { devLogger } from '@/utils/logger';
 
 // Validation schema - will be created inside component to access t function
 
@@ -98,7 +98,6 @@ const LoginPage: React.FC = () => {
   const location = useLocation();
   const { login, isLoading, error, clearError, isAuthenticated, user } = useAuth();
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
 
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -110,7 +109,7 @@ const LoginPage: React.FC = () => {
 
   // Check if already authenticated and redirect
   useEffect(() => {
-    console.log('[LoginPage] Auth state check:', {
+    devLogger.debug('[LoginPage] Auth state check:', {
       isAuthenticated,
       isLoading,
       hasUser: !!user,
@@ -120,7 +119,7 @@ const LoginPage: React.FC = () => {
     });
 
     if (!isLoading && isAuthenticated && user?.status === 'active') {
-      console.log('[LoginPage] User already authenticated, redirecting to:', from);
+      devLogger.info('[LoginPage] User already authenticated, redirecting to:', from);
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, isLoading, user, from, navigate]);
@@ -211,7 +210,7 @@ const LoginPage: React.FC = () => {
   }, [clearErrors, trigger, t]);
 
   const onSubmit = async (data: LoginCredentials & { rememberMe: boolean }) => {
-    console.log('[LoginPage] onSubmit called with data:', {
+    devLogger.debug('[LoginPage] onSubmit called with data:', {
       email: data.email,
       hasPassword: !!data.password,
       passwordLength: data.password?.length || 0
@@ -219,7 +218,7 @@ const LoginPage: React.FC = () => {
 
     // Validate data before proceeding
     if (!data.email || !data.password) {
-      console.error('[LoginPage] Missing email or password');
+      devLogger.error('[LoginPage] Missing email or password');
       return;
     }
 
@@ -227,7 +226,7 @@ const LoginPage: React.FC = () => {
       setLoginError(null);
       clearError();
 
-      console.log('[LoginPage] Starting login...');
+      devLogger.debug('[LoginPage] Starting login...');
       // 최소 2초 대기
       const startTime = Date.now();
 
@@ -248,23 +247,15 @@ const LoginPage: React.FC = () => {
         await loginPromise;
       }
 
-      console.log('[LoginPage] Login successful, navigating to:', from);
+      devLogger.info('[LoginPage] Login successful, navigating to:', from);
       navigate(from, { replace: true });
     } catch (err: any) {
-      console.error('[LoginPage] Login error:', err);
-      console.error('[LoginPage] Error details:', {
-        message: err.message,
-        status: err.status,
-        error: err.error,
-        code: err.code,
-        isNetworkError: err.isNetworkError
-      });
+      devLogger.error('[LoginPage] Login error:', err);
 
       // Handle network errors explicitly
       if (err.message === 'Network Error' || err.code === 'ERR_NETWORK' || !err.status) {
         const networkError = t('auth.errors.networkError') || '서버에 연결할 수 없습니다. 네트워크 연결을 확인하거나 잠시 후 다시 시도해주세요.';
         setLoginError(networkError);
-        enqueueSnackbar(networkError, { variant: 'error' });
         return;
       }
 
@@ -275,7 +266,6 @@ const LoginPage: React.FC = () => {
         // Show error message for user not found
         const errorMsg = t('auth.errors.userNotFound');
         setLoginError(errorMsg);
-        enqueueSnackbar(errorMsg, { variant: 'error' });
       } else if (err.status === 403) {
         // Check specific account status
         if (err.message === 'ACCOUNT_PENDING' || err.error?.message === 'ACCOUNT_PENDING') {
@@ -298,12 +288,10 @@ const LoginPage: React.FC = () => {
         } else {
           const errorMessage = getErrorMessage(err, t);
           setLoginError(errorMessage);
-          enqueueSnackbar(errorMessage, { variant: 'error' });
         }
       } else {
         const errorMessage = getErrorMessage(err, t);
         setLoginError(errorMessage);
-        enqueueSnackbar(errorMessage, { variant: 'error' });
       }
     }
   };
@@ -406,23 +394,41 @@ const LoginPage: React.FC = () => {
 
       {/* Login Form */}
       <Box component="form" onSubmit={handleSubmit(onSubmit)} autoComplete="off">
-        {/* Error Alert */}
+        {/* Error Alert - Smooth height transition */}
         {loginError && (
-          <Alert
-            severity="error"
+          <Box
             sx={{
               mb: 3,
-              backgroundColor: 'rgba(244, 67, 54, 0.1)',
-              color: '#ff6b6b',
-              border: '1px solid rgba(244, 67, 54, 0.2)',
-              '& .MuiAlert-icon': {
-                color: '#ff6b6b'
-              }
+              animation: 'slideDown 0.3s ease-in-out',
+              '@keyframes slideDown': {
+                from: {
+                  opacity: 0,
+                  transform: 'translateY(-10px)',
+                  maxHeight: 0,
+                },
+                to: {
+                  opacity: 1,
+                  transform: 'translateY(0)',
+                  maxHeight: '200px',
+                },
+              },
             }}
-            onClose={() => setLoginError(null)}
           >
-            {loginError}
-          </Alert>
+            <Alert
+              severity="error"
+              sx={{
+                backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                color: '#ff6b6b',
+                border: '1px solid rgba(244, 67, 54, 0.2)',
+                '& .MuiAlert-icon': {
+                  color: '#ff6b6b'
+                }
+              }}
+              onClose={() => setLoginError(null)}
+            >
+              {loginError}
+            </Alert>
+          </Box>
         )}
 
         <Controller

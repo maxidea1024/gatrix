@@ -397,35 +397,49 @@ const RegisterPage: React.FC = () => {
           </Alert>
         )}
 
-        {/* Error Alert - 항상 공간 확보로 레이아웃 안정화 */}
-        <Alert
-          severity="error"
-          sx={{
-            mb: 3,
-            backgroundColor: registerError ? 'rgba(244, 67, 54, 0.1)' : 'transparent',
-            color: registerError ? '#ff6b6b' : 'transparent',
-            border: registerError ? '1px solid rgba(244, 67, 54, 0.2)' : '1px solid transparent',
-            opacity: registerError ? 1 : 0,
-            visibility: registerError ? 'visible' : 'hidden',
-            minHeight: '52px', // Alert의 기본 높이 확보
-            transition: 'opacity 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out',
-            animation: isShaking ? 'errorShake 0.5s ease-in-out' : 'none',
-            '@keyframes errorShake': {
-              '0%, 100%': { transform: 'translateX(0)' },
-              '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-4px)' },
-              '20%, 40%, 60%, 80%': { transform: 'translateX(4px)' },
-            },
-            '& .MuiAlert-icon': {
-              color: registerError ? '#ff6b6b' : 'transparent'
-            },
-            '& .MuiAlert-message': {
-              opacity: registerError ? 1 : 0,
-            }
-          }}
-          onClose={registerError ? () => setRegisterError(null) : undefined}
-        >
-          {registerError || 'placeholder'} {/* 항상 내용이 있도록 */}
-        </Alert>
+        {/* Error Alert - Smooth animation */}
+        {registerError && (
+          <Box
+            sx={{
+              mb: 3,
+              animation: isShaking
+                ? 'errorShake 0.5s ease-in-out'
+                : 'slideDown 0.3s ease-in-out',
+              '@keyframes slideDown': {
+                from: {
+                  opacity: 0,
+                  transform: 'translateY(-10px)',
+                  maxHeight: 0,
+                },
+                to: {
+                  opacity: 1,
+                  transform: 'translateY(0)',
+                  maxHeight: '200px',
+                },
+              },
+              '@keyframes errorShake': {
+                '0%, 100%': { transform: 'translateX(0)' },
+                '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-4px)' },
+                '20%, 40%, 60%, 80%': { transform: 'translateX(4px)' },
+              },
+            }}
+          >
+            <Alert
+              severity="error"
+              sx={{
+                backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                color: '#ff6b6b',
+                border: '1px solid rgba(244, 67, 54, 0.2)',
+                '& .MuiAlert-icon': {
+                  color: '#ff6b6b'
+                }
+              }}
+              onClose={() => setRegisterError(null)}
+            >
+              {registerError}
+            </Alert>
+          </Box>
+        )}
 
         {/* Name Field */}
         <Controller
