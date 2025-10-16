@@ -114,9 +114,13 @@ export class ClientCrashController {
         }
       }
 
+      // Extract first line from stack trace (max 200 chars)
+      const eventFirstLine = body.stack.split('\n')[0]?.substring(0, CRASH_CONSTANTS.MaxFirstLineLen) || '';
+
       // Create crash event
       const event = await CrashEvent.create({
         crashId: crash.id,
+        firstLine: eventFirstLine,
         platform: body.platform,
         marketType: body.marketType,
         branch: body.branch,

@@ -56,6 +56,7 @@ export interface ClientCrash {
 export interface CrashEvent {
   id: string; // ULID
   crashId: string; // Reference to crashes.id
+  firstLine?: string; // First line of stack trace (max 200 chars)
 
   platform: string; // Platform (windows, ios, android, mac)
   marketType?: string; // Market type (googleplay, apple, etc)

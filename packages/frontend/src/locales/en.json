@@ -56,6 +56,9 @@
       "loadingStackTrace": "Loading stack trace...",
       "logNotAvailable": "Log file not available",
       "stackTraceNotAvailable": "Stack trace not available",
+      "columnSettings": "Column Settings",
+      "sortable": "Sortable",
+      "notSortable": "Not Sortable",
       "events": {
         "title": "Crash Events",
         "subtitle": "View and analyze individual crash event occurrences"
@@ -70,6 +73,7 @@
       },
       "table": {
         "id": "ID",
+        "firstLine": "First Line",
         "platform": "Platform",
         "environment": "Environment",
         "branch": "Branch",

@@ -11,7 +11,8 @@ export class CrashEvent extends Model {
 
   id!: string; // ULID
   crashId!: string; // Reference to crashes.id
-  
+  firstLine?: string; // First line of stack trace
+
   platform!: string; // Platform
   marketType?: string; // Market type
   branch!: string; // Branch name
@@ -42,6 +43,7 @@ export class CrashEvent extends Model {
       properties: {
         id: { type: 'string', maxLength: 26 }, // ULID
         crashId: { type: 'string', maxLength: 26 }, // ULID
+        firstLine: { type: ['string', 'null'], maxLength: 200 },
         platform: { type: 'string', maxLength: 50 },
         marketType: { type: ['string', 'null'], maxLength: 50 },
         branch: { type: 'string', maxLength: 50 },
@@ -88,6 +90,7 @@ export class CrashEvent extends Model {
    */
   static async create(data: {
     crashId: string;
+    firstLine?: string;
     platform: string;
     marketType?: string;
     branch: string;

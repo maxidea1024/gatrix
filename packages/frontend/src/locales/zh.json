@@ -56,6 +56,9 @@
     "loadingStackTrace": "正在加载堆栈跟踪...",
     "logNotAvailable": "日志文件不可用",
     "stackTraceNotAvailable": "堆栈跟踪不可用",
+    "columnSettings": "列设置",
+    "sortable": "可排序",
+    "notSortable": "不可排序",
     "platform": "平台",
     "branch": "分支",
     "state": "状态",
@@ -93,6 +96,7 @@
     },
     "table": {
       "id": "ID",
+      "firstLine": "第一行",
       "platform": "平台",
       "environment": "环境",
       "branch": "分支",

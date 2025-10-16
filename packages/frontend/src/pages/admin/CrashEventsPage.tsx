@@ -21,7 +21,31 @@ import {
   ToggleButton,
   Paper,
   Button,
+  Popover,
+  List,
+  ListItem,
+  ListItemText,
+  Checkbox,
+  ListItemButton,
+  ClickAwayListener,
 } from '@mui/material';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import {
   Search as SearchIcon,
   BugReport as BugReportIcon,
@@ -36,6 +60,10 @@ import {
   ArrowDownward as ArrowDownwardIcon,
   Link as LinkIcon,
   HourglassEmpty as HourglassIcon,
+  ViewColumn as ViewColumnIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
+  DragIndicator as DragIndicatorIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -57,6 +85,72 @@ import { usePageState } from '../../hooks/usePageState';
 import { useDebounce } from '../../hooks/useDebounce';
 import LogViewer from '../../components/LogViewer';
 import StackTraceViewer from '../../components/StackTraceViewer';
+
+// Column definition interface
+interface ColumnConfig {
+  id: string;
+  labelKey: string;
+  sortable: boolean;
+  visible: boolean;
+  width?: string;
+}
+
+// Sortable list item component for drag and drop
+interface SortableColumnItemProps {
+  column: ColumnConfig;
+  onToggleVisibility: (id: string) => void;
+}
+
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+  const { t } = useTranslation();
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: column.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <ListItem
+      ref={setNodeRef}
+      style={style}
+      disablePadding
+      secondaryAction={
+        <Box {...attributes} {...listeners} sx={{ cursor: 'grab', display: 'flex', alignItems: 'center', '&:active': { cursor: 'grabbing' } }}>
+          <DragIndicatorIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
+        </Box>
+      }
+    >
+      <ListItemButton
+        dense
+        onClick={() => onToggleVisibility(column.id)}
+        sx={{ pr: 6 }}
+      >
+        <Checkbox
+          edge="start"
+          checked={column.visible}
+          tabIndex={-1}
+          disableRipple
+          size="small"
+          icon={<VisibilityOffIcon fontSize="small" />}
+          checkedIcon={<VisibilityIcon fontSize="small" />}
+        />
+        <ListItemText
+          primary={t(column.labelKey)}
+          slotProps={{ primary: { variant: 'body2' } }}
+        />
+      </ListItemButton>
+    </ListItem>
+  );
+};
 
 const CrashEventsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -131,6 +225,62 @@ const CrashEventsPage: React.FC = () => {
   const [stackTraceMap, setStackTraceMap] = useState<Record<string, string>>({});
   const [loadingLog, setLoadingLog] = useState(false);
   const [loadingStackTraceId, setLoadingStackTraceId] = useState<string | null>(null);
+
+  // Default column configuration
+  const defaultColumns: ColumnConfig[] = [
+    { id: 'createdAt', labelKey: 'crashes.table.createdAt', sortable: true, visible: true },
+    { id: 'platform', labelKey: 'crashes.table.platform', sortable: true, visible: true },
+    { id: 'environment', labelKey: 'crashes.table.environment', sortable: true, visible: true },
+    { id: 'branch', labelKey: 'crashes.table.branch', sortable: true, visible: true },
+    { id: 'appVersion', labelKey: 'crashes.table.appVersion', sortable: true, visible: true },
+    { id: 'resVersion', labelKey: 'crashes.table.resVersion', sortable: true, visible: true },
+    { id: 'accountId', labelKey: 'crashes.table.accountId', sortable: true, visible: true },
+    { id: 'characterId', labelKey: 'crashes.table.characterId', sortable: true, visible: true },
+    { id: 'gameUserId', labelKey: 'crashes.table.gameUserId', sortable: true, visible: true },
+    { id: 'userName', labelKey: 'crashes.table.userName', sortable: true, visible: true },
+    { id: 'firstLine', labelKey: 'crashes.table.firstLine', sortable: false, visible: true, width: '200px' },
+    { id: 'userMessage', labelKey: 'crashes.table.userMessage', sortable: false, visible: true, width: '150px' },
+  ];
+
+  // Column configuration state (persisted in localStorage)
+  const [columns, setColumns] = useState<ColumnConfig[]>(() => {
+    const saved = localStorage.getItem('crashEventsColumns');
+    if (saved) {
+      try {
+        const savedColumns = JSON.parse(saved);
+        // Merge saved columns with defaults, preserving saved order
+        const mergedColumns = savedColumns.map((savedCol: ColumnConfig) => {
+          const defaultCol = defaultColumns.find(c => c.id === savedCol.id);
+          return defaultCol ? { ...defaultCol, ...savedCol } : savedCol;
+        });
+
+        // Add any new columns from defaults that aren't in saved
+        const savedIds = new Set(savedColumns.map((c: ColumnConfig) => c.id));
+        const newColumns = defaultColumns.filter(c => !savedIds.has(c.id));
+
+        return [...mergedColumns, ...newColumns];
+      } catch (e) {
+        return defaultColumns;
+      }
+    }
+    return defaultColumns;
+  });
+
+  // Column settings popover state
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      // Require 8px of movement before drag starts (prevents accidental drags)
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Drawer width state (persisted in localStorage)
   const [drawerWidth, setDrawerWidth] = useState<number>(() => {
@@ -491,6 +641,7 @@ const CrashEventsPage: React.FC = () => {
       ['Game Server ID', event.gameServerId || '-'],
       ['Market Type', event.marketType || '-'],
       ['Is Editor', event.isEditor ? 'Yes' : 'No'],
+      ['First Line', (event as any).firstLine || '-'],
       ['IP Address', event.crashEventIp || '-'],
       ['User Agent', event.crashEventUserAgent || '-'],
       ['User Message', event.userMessage || '-'],
@@ -540,6 +691,79 @@ const CrashEventsPage: React.FC = () => {
     setInitialLogScrollLine(undefined); // Reset scroll line when closing drawer
   };
 
+  // Column configuration handlers
+  const handleToggleColumnVisibility = (columnId: string) => {
+    const newColumns = columns.map(col =>
+      col.id === columnId ? { ...col, visible: !col.visible } : col
+    );
+    setColumns(newColumns);
+    localStorage.setItem('crashEventsColumns', JSON.stringify(newColumns));
+  };
+
+  const handleResetColumns = () => {
+    setColumns(defaultColumns);
+    localStorage.setItem('crashEventsColumns', JSON.stringify(defaultColumns));
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = columns.findIndex((col) => col.id === active.id);
+      const newIndex = columns.findIndex((col) => col.id === over.id);
+
+      const newColumns = arrayMove(columns, oldIndex, newIndex);
+      setColumns(newColumns);
+      localStorage.setItem('crashEventsColumns', JSON.stringify(newColumns));
+    }
+  };
+
+  // Render cell content based on column ID
+  const renderCellContent = (event: CrashEvent, columnId: string) => {
+    switch (columnId) {
+      case 'createdAt':
+        return dayjs(event.createdAt).format('YYYY-MM-DD HH:mm:ss');
+      case 'platform':
+        return <Chip label={getPlatformName(event.platform)} size="small" color="primary" variant="outlined" />;
+      case 'environment':
+        return <Chip label={getEnvironmentName(event.environment)} size="small" color="secondary" variant="outlined" />;
+      case 'branch':
+        return <Chip label={event.branch} size="small" color="info" variant="outlined" />;
+      case 'appVersion':
+        return <Chip label={event.appVersion || '-'} size="small" variant="outlined" />;
+      case 'resVersion':
+        return <Chip label={event.resVersion || '-'} size="small" variant="outlined" />;
+      case 'accountId':
+        return event.accountId || '-';
+      case 'characterId':
+        return event.characterId || '-';
+      case 'gameUserId':
+        return event.gameUserId || '-';
+      case 'userName':
+        return event.userName || '-';
+      case 'firstLine':
+        return (event as any).firstLine || '-';
+      case 'userMessage':
+        return (
+          <Tooltip title={event.userMessage || ''} arrow>
+            <Typography
+              variant="body2"
+              sx={{
+                maxWidth: 120,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {event.userMessage || '-'}
+            </Typography>
+          </Tooltip>
+        );
+      default:
+        return '-';
+    }
+  };
+
   // Handle drawer resize
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -552,7 +776,7 @@ const CrashEventsPage: React.FC = () => {
 
       const newWidth = window.innerWidth - e.clientX;
       const minWidth = 400;
-      const maxWidth = window.innerWidth - 200;
+      const maxWidth = window.innerWidth; // Allow full width
 
       if (newWidth >= minWidth && newWidth <= maxWidth) {
         setDrawerWidth(newWidth);
@@ -687,6 +911,24 @@ const CrashEventsPage: React.FC = () => {
                 <LinkIcon />
               </IconButton>
             </Tooltip>
+
+            {/* Column Settings Button */}
+            <Tooltip title={t('crashes.columnSettings')}>
+              <IconButton
+                onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                sx={{
+                  ml: 1,
+                  bgcolor: 'background.paper',
+                  border: 1,
+                  borderColor: 'divider',
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  },
+                }}
+              >
+                <ViewColumnIcon />
+              </IconButton>
+            </Tooltip>
           </Box>
         </CardContent>
       </Card>
@@ -698,93 +940,29 @@ const CrashEventsPage: React.FC = () => {
             <TableHead>
               <TableRow>
                 <TableCell width="40px"></TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }} onClick={() => handleSort('createdAt')}>
-                    {t('crashes.table.createdAt')}
-                    {pageState.sortBy === 'createdAt' && (
-                      pageState.sortOrder === 'DESC' ? <ArrowDownwardIcon fontSize="small" /> : <ArrowUpwardIcon fontSize="small" />
+                {columns.filter(col => col.visible).map((column) => (
+                  <TableCell key={column.id} width={column.width}>
+                    {column.sortable ? (
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }}
+                        onClick={() => handleSort(column.id)}
+                      >
+                        {t(column.labelKey)}
+                        {pageState.sortBy === column.id && (
+                          pageState.sortOrder === 'DESC' ? <ArrowDownwardIcon fontSize="small" /> : <ArrowUpwardIcon fontSize="small" />
+                        )}
+                      </Box>
+                    ) : (
+                      t(column.labelKey)
                     )}
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }} onClick={() => handleSort('platform')}>
-                    {t('crashes.table.platform')}
-                    {pageState.sortBy === 'platform' && (
-                      pageState.sortOrder === 'DESC' ? <ArrowDownwardIcon fontSize="small" /> : <ArrowUpwardIcon fontSize="small" />
-                    )}
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }} onClick={() => handleSort('environment')}>
-                    {t('crashes.table.environment')}
-                    {pageState.sortBy === 'environment' && (
-                      pageState.sortOrder === 'DESC' ? <ArrowDownwardIcon fontSize="small" /> : <ArrowUpwardIcon fontSize="small" />
-                    )}
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }} onClick={() => handleSort('branch')}>
-                    {t('crashes.table.branch')}
-                    {pageState.sortBy === 'branch' && (
-                      pageState.sortOrder === 'DESC' ? <ArrowDownwardIcon fontSize="small" /> : <ArrowUpwardIcon fontSize="small" />
-                    )}
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }} onClick={() => handleSort('appVersion')}>
-                    {t('crashes.table.appVersion')}
-                    {pageState.sortBy === 'appVersion' && (
-                      pageState.sortOrder === 'DESC' ? <ArrowDownwardIcon fontSize="small" /> : <ArrowUpwardIcon fontSize="small" />
-                    )}
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }} onClick={() => handleSort('resVersion')}>
-                    {t('crashes.table.resVersion')}
-                    {pageState.sortBy === 'resVersion' && (
-                      pageState.sortOrder === 'DESC' ? <ArrowDownwardIcon fontSize="small" /> : <ArrowUpwardIcon fontSize="small" />
-                    )}
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }} onClick={() => handleSort('accountId')}>
-                    {t('crashes.table.accountId')}
-                    {pageState.sortBy === 'accountId' && (
-                      pageState.sortOrder === 'DESC' ? <ArrowDownwardIcon fontSize="small" /> : <ArrowUpwardIcon fontSize="small" />
-                    )}
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }} onClick={() => handleSort('characterId')}>
-                    {t('crashes.table.characterId')}
-                    {pageState.sortBy === 'characterId' && (
-                      pageState.sortOrder === 'DESC' ? <ArrowDownwardIcon fontSize="small" /> : <ArrowUpwardIcon fontSize="small" />
-                    )}
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }} onClick={() => handleSort('gameUserId')}>
-                    {t('crashes.table.gameUserId')}
-                    {pageState.sortBy === 'gameUserId' && (
-                      pageState.sortOrder === 'DESC' ? <ArrowDownwardIcon fontSize="small" /> : <ArrowUpwardIcon fontSize="small" />
-                    )}
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }} onClick={() => handleSort('userName')}>
-                    {t('crashes.table.userName')}
-                    {pageState.sortBy === 'userName' && (
-                      pageState.sortOrder === 'DESC' ? <ArrowDownwardIcon fontSize="small" /> : <ArrowUpwardIcon fontSize="small" />
-                    )}
-                  </Box>
-                </TableCell>
-                <TableCell width="150px">{t('crashes.table.userMessage')}</TableCell>
+                  </TableCell>
+                ))}
                 <TableCell align="center" width="100px">{t('crashes.columns.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {events.length === 0 ? (
-                <EmptyTableRow colSpan={13} message={t('crashes.noEvents')} loading={loading} />
+                <EmptyTableRow colSpan={columns.filter(col => col.visible).length + 2} message={t('crashes.noEvents')} loading={loading} />
               ) : (
                 events.map((event, index) => (
                   <React.Fragment key={event.id}>
@@ -807,66 +985,11 @@ const CrashEventsPage: React.FC = () => {
                           {expandedRowId === event.id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                         </IconButton>
                       </TableCell>
-                      <TableCell>
-                        {dayjs(event.createdAt).format('YYYY-MM-DD HH:mm:ss')}
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={getPlatformName(event.platform)}
-                          size="small"
-                          color="primary"
-                          variant="outlined"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={getEnvironmentName(event.environment)}
-                          size="small"
-                          color="secondary"
-                          variant="outlined"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={event.branch}
-                          size="small"
-                          color="info"
-                          variant="outlined"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={event.appVersion || '-'}
-                          size="small"
-                          variant="outlined"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={event.resVersion || '-'}
-                          size="small"
-                          variant="outlined"
-                        />
-                      </TableCell>
-                      <TableCell>{event.accountId || '-'}</TableCell>
-                      <TableCell>{event.characterId || '-'}</TableCell>
-                      <TableCell>{event.gameUserId || '-'}</TableCell>
-                      <TableCell>{event.userName || '-'}</TableCell>
-                      <TableCell>
-                        <Tooltip title={event.userMessage || ''} arrow>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              maxWidth: 120,
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {event.userMessage || '-'}
-                          </Typography>
-                        </Tooltip>
-                      </TableCell>
+                      {columns.filter(col => col.visible).map((column) => (
+                        <TableCell key={column.id}>
+                          {renderCellContent(event, column.id)}
+                        </TableCell>
+                      ))}
                       <TableCell align="center">
                         <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
                           <Tooltip title={t('crashes.viewStackTrace')}>
@@ -905,7 +1028,7 @@ const CrashEventsPage: React.FC = () => {
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell colSpan={13} sx={{ p: 0, border: 0 }}>
+                      <TableCell colSpan={columns.filter(col => col.visible).length + 2} sx={{ p: 0, border: 0 }}>
                         <Collapse in={expandedRowId === event.id} timeout="auto" unmountOnExit>
                           <Box sx={{
                             py: 2,
@@ -1293,6 +1416,31 @@ const CrashEventsPage: React.FC = () => {
                                       </TableCell>
                                     </TableRow>
 
+                                    {/* First Line */}
+                                    {!!(event as any).firstLine && (
+                                      <TableRow>
+                                        <TableCell sx={{ fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
+                                          {t('crashes.table.firstLine')}
+                                        </TableCell>
+                                        <TableCell>
+                                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.85rem', wordBreak: 'break-all' }}>
+                                              {(event as any).firstLine}
+                                            </Typography>
+                                            <IconButton
+                                              size="small"
+                                              onClick={() => {
+                                                navigator.clipboard.writeText((event as any).firstLine!);
+                                                enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                                              }}
+                                            >
+                                              <CopyIcon fontSize="small" />
+                                            </IconButton>
+                                          </Box>
+                                        </TableCell>
+                                      </TableRow>
+                                    )}
+
                                     {/* User Message */}
                                     {!!event.userMessage && (
                                       <TableRow>
@@ -1537,6 +1685,56 @@ const CrashEventsPage: React.FC = () => {
           )}
         </Box>
       </Drawer>
+
+      {/* Column Settings Popover */}
+      <Popover
+        open={Boolean(columnSettingsAnchor)}
+        anchorEl={columnSettingsAnchor}
+        onClose={() => setColumnSettingsAnchor(null)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        hideBackdrop
+        disableScrollLock
+      >
+        <ClickAwayListener onClickAway={() => setColumnSettingsAnchor(null)}>
+          <Box sx={{ p: 2, minWidth: 280, maxWidth: 320 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                {t('crashes.columnSettings')}
+              </Typography>
+              <Button size="small" onClick={handleResetColumns} color="warning">
+                {t('common.reset')}
+              </Button>
+            </Box>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={columns.map(col => col.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <List dense disablePadding>
+                  {columns.map((column) => (
+                    <SortableColumnItem
+                      key={column.id}
+                      column={column}
+                      onToggleVisibility={handleToggleColumnVisibility}
+                    />
+                  ))}
+                </List>
+              </SortableContext>
+            </DndContext>
+          </Box>
+        </ClickAwayListener>
+      </Popover>
     </Box>
   );
 };
