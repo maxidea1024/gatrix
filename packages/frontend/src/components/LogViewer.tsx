@@ -89,8 +89,8 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
     flex: 1,
     px: 2,
     py: 0.25,
-    whiteSpace: 'pre' as const,
-    overflowX: 'auto' as const,
+    whiteSpace: 'pre-wrap' as const,
+    wordBreak: 'break-all' as const,
     fontFamily: 'D2Coding, monospace',
   }), []);
 
@@ -192,7 +192,8 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
 
   const handleCopyLink = () => {
     if (selectedLine !== null && eventId) {
-      // Build URL with eventId and action parameters for auto-opening log drawer
+      // Build absolute URL with eventId and action parameters for auto-opening log drawer
+      // Uses window.location.origin so it automatically adapts to dev/staging/production environments
       const params = new URLSearchParams(window.location.search);
       params.set('eventId', eventId);
       params.set('action', 'viewLog');
@@ -272,19 +273,23 @@ export const LogViewer: React.FC<LogViewerProps> = ({ logContent, logFilePath, l
     return (
       <Box
         display="flex"
+        onContextMenu={(e) => handleLineClick(e, lineNumber)}
         sx={{
           bgcolor: isHighlighted ? 'rgba(255, 255, 0, 0.1)' : 'transparent',
+          outline: '1px dashed transparent',
+          outlineOffset: '-1px',
+          cursor: 'context-menu',
           '&:hover': {
             bgcolor: 'rgba(255, 255, 255, 0.05)',
+            outlineColor: 'grey.600',
           },
           '&:hover .line-menu-chip': {
             opacity: 1,
           },
         }}
       >
-        {/* Line Number Area (clickable) */}
+        {/* Line Number Area */}
         <Box
-          onClick={(e) => handleLineClick(e, lineNumber)}
           sx={{
             ...lineNumberBaseStyle,
             color: isMatching ? '#ffeb3b' : 'grey.500',

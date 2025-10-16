@@ -99,6 +99,7 @@ export const errorHandler = (
     error: {
       message,
       ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
+      ...((error as any).validationErrors && { validationErrors: (error as any).validationErrors }),
     },
   });
 };

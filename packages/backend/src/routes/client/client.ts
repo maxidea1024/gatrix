@@ -14,8 +14,19 @@ const router = Router();
 const validateRequest = (req: any, res: any, next: any) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const errorMessages = errors.array().map((err: any) => err.msg).join(', ');
-    throw new CustomError(`Validation failed: ${errorMessages}`, 400);
+    const errorDetails = errors.array().map((err: any) => ({
+      field: err.path || err.param,
+      message: err.msg,
+      value: err.value
+    }));
+
+    const errorMessage = errorDetails
+      .map((err: any) => `${err.field}: ${err.message}`)
+      .join(', ');
+
+    const error = new CustomError(`Validation failed: ${errorMessage}`, 400);
+    (error as any).validationErrors = errorDetails;
+    throw error;
   }
   next();
 };
@@ -70,17 +81,17 @@ router.post('/crashes/upload',
   body('branch').isString().notEmpty(),
   body('environment').isString().notEmpty(),
   body('stack').isString().notEmpty(),
-  body('marketType').optional().isString(),
-  body('isEditor').optional().isBoolean(),
-  body('appVersion').optional().isString(),
-  body('resVersion').optional().isString(),
-  body('accountId').optional().isString(),
-  body('characterId').optional().isString(),
-  body('gameUserId').optional().isString(),
-  body('userName').optional().isString(),
-  body('gameServerId').optional().isString(),
-  body('userMessage').optional().isString(),
-  body('log').optional().isString(),
+  body('marketType').optional({ nullable: true }).isString(),
+  body('isEditor').optional({ nullable: true }).isBoolean(),
+  body('appVersion').optional({ nullable: true }).isString(),
+  body('resVersion').optional({ nullable: true }).isString(),
+  body('accountId').optional({ nullable: true }).isString(),
+  body('characterId').optional({ nullable: true }).isString(),
+  body('gameUserId').optional({ nullable: true }).isString(),
+  body('userName').optional({ nullable: true }).isString(),
+  body('gameServerId').optional({ nullable: true }).isString(),
+  body('userMessage').optional({ nullable: true }).isString(),
+  body('log').optional({ nullable: true }).isString(),
   validateRequest,
   ClientCrashController.uploadCrash
 );

@@ -86,12 +86,13 @@ export class ClientCrashController {
         });
 
         // Fetch the inserted crash
-        crash = await ClientCrash.query().findById(newCrashId);
+        const insertedCrash = await ClientCrash.query().findById(newCrashId);
 
-        if (!crash) {
+        if (!insertedCrash) {
           throw new CustomError('Failed to create crash record', 500);
         }
 
+        crash = insertedCrash;
         crashId = crash.id;
 
         // Cache the new crash ID

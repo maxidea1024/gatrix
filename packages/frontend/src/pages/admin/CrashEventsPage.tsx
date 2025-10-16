@@ -36,8 +36,6 @@ import {
   ArrowDownward as ArrowDownwardIcon,
   Link as LinkIcon,
   HourglassEmpty as HourglassIcon,
-  Fullscreen as FullscreenIcon,
-  FullscreenExit as FullscreenExitIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -134,15 +132,12 @@ const CrashEventsPage: React.FC = () => {
   const [loadingLog, setLoadingLog] = useState(false);
   const [loadingStackTraceId, setLoadingStackTraceId] = useState<string | null>(null);
 
-  // Drawer fullscreen state (persisted in localStorage, separate for stackTrace and log)
-  const [isStackTraceFullscreen, setIsStackTraceFullscreen] = useState<boolean>(() => {
-    const saved = localStorage.getItem('crashEventsStackTraceFullscreen');
-    return saved === 'true';
+  // Drawer width state (persisted in localStorage)
+  const [drawerWidth, setDrawerWidth] = useState<number>(() => {
+    const saved = localStorage.getItem('crashEventsDrawerWidth');
+    return saved ? parseInt(saved) : 700;
   });
-  const [isLogFullscreen, setIsLogFullscreen] = useState<boolean>(() => {
-    const saved = localStorage.getItem('crashEventsLogFullscreen');
-    return saved === 'true';
-  });
+  const [isResizing, setIsResizing] = useState(false);
 
   // Initial scroll line for log viewer (from URL hash)
   // Capture hash at mount time to prevent it from being lost
@@ -545,17 +540,44 @@ const CrashEventsPage: React.FC = () => {
     setInitialLogScrollLine(undefined); // Reset scroll line when closing drawer
   };
 
-  const handleToggleDrawerFullscreen = () => {
-    if (drawerType === 'stackTrace') {
-      const newValue = !isStackTraceFullscreen;
-      setIsStackTraceFullscreen(newValue);
-      localStorage.setItem('crashEventsStackTraceFullscreen', String(newValue));
-    } else {
-      const newValue = !isLogFullscreen;
-      setIsLogFullscreen(newValue);
-      localStorage.setItem('crashEventsLogFullscreen', String(newValue));
-    }
+  // Handle drawer resize
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
   };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+
+      const newWidth = window.innerWidth - e.clientX;
+      const minWidth = 400;
+      const maxWidth = window.innerWidth - 200;
+
+      if (newWidth >= minWidth && newWidth <= maxWidth) {
+        setDrawerWidth(newWidth);
+        localStorage.setItem('crashEventsDrawerWidth', String(newWidth));
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'ew-resize';
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing]);
 
   return (
     <Box sx={{ p: 3 }}>
@@ -1394,9 +1416,7 @@ const CrashEventsPage: React.FC = () => {
         sx={{
           zIndex: (theme) => theme.zIndex.drawer + 3,
           '& .MuiDrawer-paper': {
-            width: (drawerType === 'stackTrace' ? isStackTraceFullscreen : isLogFullscreen)
-              ? '100vw'
-              : { xs: '100%', sm: 600, md: 700 },
+            width: `${drawerWidth}px`,
             maxWidth: '100vw',
             display: 'flex',
             flexDirection: 'column'
@@ -1406,6 +1426,43 @@ const CrashEventsPage: React.FC = () => {
           keepMounted: false
         }}
       >
+        {/* Resize Grip */}
+        <Box
+          onMouseDown={handleMouseDown}
+          sx={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: '8px',
+            cursor: 'ew-resize',
+            bgcolor: isResizing ? 'primary.main' : 'transparent',
+            transition: 'background-color 0.2s',
+            zIndex: 1000,
+            '&:hover': {
+              bgcolor: 'primary.main',
+              opacity: 0.5,
+            },
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '3px',
+              height: '40px',
+              borderLeft: '1px solid',
+              borderRight: '1px solid',
+              borderColor: isResizing ? 'primary.contrastText' : 'divider',
+              opacity: isResizing ? 1 : 0.3,
+              transition: 'opacity 0.2s',
+            },
+            '&:hover::before': {
+              opacity: 1,
+              borderColor: 'primary.contrastText',
+            }
+          }}
+        />
         {/* Header */}
         <Box sx={{
           display: 'flex',
@@ -1424,32 +1481,17 @@ const CrashEventsPage: React.FC = () => {
               {drawerType === 'stackTrace' ? t('crashes.viewStackTraceSubtitle') : t('crashes.viewLogSubtitle')}
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Tooltip title={(drawerType === 'stackTrace' ? isStackTraceFullscreen : isLogFullscreen) ? t('common.exitFullscreen') : t('common.enterFullscreen')}>
-              <IconButton
-                onClick={handleToggleDrawerFullscreen}
-                size="small"
-                sx={{
-                  '&:hover': {
-                    backgroundColor: 'action.hover'
-                  }
-                }}
-              >
-                {(drawerType === 'stackTrace' ? isStackTraceFullscreen : isLogFullscreen) ? <FullscreenExitIcon /> : <FullscreenIcon />}
-              </IconButton>
-            </Tooltip>
-            <IconButton
-              onClick={handleCloseDrawer}
-              size="small"
-              sx={{
-                '&:hover': {
-                  backgroundColor: 'action.hover'
-                }
-              }}
-            >
-              <CloseIcon />
-            </IconButton>
-          </Box>
+          <IconButton
+            onClick={handleCloseDrawer}
+            size="small"
+            sx={{
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
         </Box>
 
         {/* Content */}

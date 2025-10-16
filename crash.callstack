@@ -1,0 +1,11 @@
+lucharacterdetailbasicwidget.lua:1455: attempt to index local 'cashShopCms' (a nil value)
+stack traceback:
+  [C](-1):<metamethod> __index
+  lucharacterdetailbasicwidget.lua(1455):<method> _RefreshAcquisitionWayVisibility
+  lucharacterdetailbasicwidget.lua(781):<method> onNext
+  rx.lua(2175):<method> onNext
+  lucharacterdetailpopupwidget.lua(944):<upvalue> call
+  deferred.lua(99):<method> _resolve
+  deferred.lua(233):<method> next
+  lucharacterdetailpopupwidget.lua(943):<field> mateClickedCallback
+  lucharacterdetailbottomlistwidget.lua(419):<> ?
