@@ -39,6 +39,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
 import { useAuth } from '@/hooks/useAuth';
 import { LoginCredentials } from '@/types';
 import { AuthService } from '@/services/auth';
@@ -97,6 +98,7 @@ const LoginPage: React.FC = () => {
   const location = useLocation();
   const { login, isLoading, error, clearError, isAuthenticated, user } = useAuth();
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -250,6 +252,13 @@ const LoginPage: React.FC = () => {
       navigate(from, { replace: true });
     } catch (err: any) {
       console.error('[LoginPage] Login error:', err);
+      console.error('[LoginPage] Error details:', {
+        message: err.message,
+        status: err.status,
+        error: err.error,
+        code: err.code,
+        isNetworkError: err.isNetworkError
+      });
 
       // Handle network errors explicitly
       if (err.message === 'Network Error' || err.code === 'ERR_NETWORK' || !err.status) {
