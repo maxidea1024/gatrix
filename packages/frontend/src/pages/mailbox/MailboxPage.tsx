@@ -975,7 +975,7 @@ const MailboxPage: React.FC = () => {
               >
                 <Box
                   sx={{
-                    animation: 'bounce 1.5s ease-in-out infinite',
+                    animation: mails.length > 0 ? 'bounce 1.5s ease-in-out infinite' : 'none',
                     '@keyframes bounce': {
                       '0%, 100%': {
                         transform: 'translateY(0) rotate(0deg)',
@@ -1002,7 +1002,7 @@ const MailboxPage: React.FC = () => {
                   variant="body1"
                   color="text.secondary"
                   sx={{
-                    animation: 'textBounce 1.5s ease-in-out infinite',
+                    animation: mails.length > 0 ? 'textBounce 1.5s ease-in-out infinite' : 'none',
                     '@keyframes textBounce': {
                       '0%, 100%': {
                         opacity: 0.6,
