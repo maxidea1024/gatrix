@@ -62,9 +62,40 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
   const [isSearching, setIsSearching] = useState(false);
   const [invitingUsers, setInvitingUsers] = useState<Set<number>>(new Set());
   const [pendingInvitedUsers, setPendingInvitedUsers] = useState<Set<number>>(new Set());
+  const [channelMemberIds, setChannelMemberIds] = useState<Set<number>>(new Set());
 
   // 검색 입력창 ref
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // 채널 멤버 조회
+  const fetchChannelMembers = async () => {
+    if (!channelId) return;
+
+    try {
+      const response = await fetch(`/api/v1/chat/channels/${channelId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Channel data response:', data); // 디버깅용
+        if (data.success && data.data) {
+          // members 배열에서 userId 추출
+          const memberIds = new Set(
+            (data.data.members || []).map((member: any) => member.userId)
+          );
+          console.log('Channel member IDs:', memberIds); // 디버깅용
+          setChannelMemberIds(memberIds);
+        }
+      } else {
+        console.error('Failed to fetch channel members:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Failed to fetch channel members:', error);
+    }
+  };
 
   // 채널의 pending invitation 조회
   const fetchPendingInvitations = async () => {
@@ -169,9 +200,10 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     };
   }, [searchQuery, debouncedSearch]);
 
-  // 다이얼로그 열릴 때 pending invitation 조회
+  // 다이얼로그 열릴 때 채널 멤버 및 pending invitation 조회
   useEffect(() => {
     if (open && channelId) {
+      fetchChannelMembers();
       fetchPendingInvitations();
     }
   }, [open, channelId]);
@@ -197,6 +229,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
       setSearchResults([]);
       setInvitingUsers(new Set());
       setPendingInvitedUsers(new Set());
+      setChannelMemberIds(new Set());
     }
   }, [open]);
 
@@ -220,11 +253,20 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
     } catch (error: any) {
       console.error('Invite error:', error);
 
-      // 중복 초대 오류 처리
-      if (error.message && error.message.includes('already has a pending invitation')) {
+      // 오류 메시지 처리 (한 번만 표시)
+      const errorMessage = error.message || '';
+
+      if (errorMessage.includes('already a member')) {
+        // 이미 멤버인 경우 - 멤버 목록 새로고침
+        await fetchChannelMembers();
+        enqueueSnackbar(t('chat.alreadyMember'), { variant: 'info' });
+      } else if (errorMessage.includes('already has a pending invitation')) {
+        // 이미 초대된 경우 - pending invitation 목록 새로고침
+        await fetchPendingInvitations();
         enqueueSnackbar(t('chat.alreadyInvited'), { variant: 'warning' });
       } else {
-        enqueueSnackbar(error.message || t('chat.invitationFailed'), { variant: 'error' });
+        // 기타 오류
+        enqueueSnackbar(errorMessage || t('chat.invitationFailed'), { variant: 'error' });
       }
     } finally {
       setInvitingUsers(prev => {
@@ -369,7 +411,21 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
                     {(() => {
                       const isInviting = invitingUsers.has(user.id);
                       const isPendingInvited = pendingInvitedUsers.has(user.id);
+                      const isMember = channelMemberIds.has(user.id);
 
+                      // 이미 멤버인 경우
+                      if (isMember) {
+                        return (
+                          <Chip
+                            label={t('chat.alreadyMember')}
+                            size="small"
+                            color="success"
+                            variant="outlined"
+                          />
+                        );
+                      }
+
+                      // 초대 대기 중인 경우
                       if (isPendingInvited) {
                         return (
                           <Button
@@ -392,6 +448,7 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
                         );
                       }
 
+                      // 초대 가능한 경우
                       return (
                         <Button
                           variant="outlined"
