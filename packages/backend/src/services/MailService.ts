@@ -218,6 +218,20 @@ export class MailService {
   }
 
   /**
+   * Delete all mails (with optional filters)
+   */
+  async deleteAllMails(userId: number, filters: any = {}): Promise<number> {
+    try {
+      const count = await MailModel.deleteAllMails(userId, filters);
+      logger.info(`${count} mails deleted by user ${userId} with filters:`, filters);
+      return count;
+    } catch (error) {
+      logger.error('Failed to delete all mails:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Get mail statistics for a user
    */
   async getMailStats(userId: number) {

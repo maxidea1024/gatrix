@@ -2482,7 +2482,7 @@
     "markAllAsRead": "Mark All as Read",
     "allMarkedAsRead": "All mails marked as read",
     "markAllAsReadConfirmTitle": "Confirm Mark All as Read",
-    "markAllAsReadConfirmMessage": "Are you sure you want to mark all unread mails ({{count}}) as read?",
+    "markAllAsReadConfirmMessage": "Are you sure you want to mark all mails ({{count}}) in the current filter as read?",
     "mailStarred": "Starred",
     "mailUnstarred": "Unstarred",
     "deleteConfirmTitle": "Delete Mail",
@@ -2540,6 +2540,7 @@
       "deleteFailed": "Failed to delete mail",
       "markReadFailed": "Failed to mark as read",
       "starFailed": "Failed to star mail",
+      "emptyFailed": "Failed to empty mailbox",
       "fillAllFields": "Please fill in all fields"
     }
   }

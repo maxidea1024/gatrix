@@ -2479,7 +2479,7 @@
     "markAllAsRead": "전체 읽음 처리",
     "allMarkedAsRead": "모든 메일이 읽음으로 표시되었습니다",
     "markAllAsReadConfirmTitle": "전체 읽음 처리 확인",
-    "markAllAsReadConfirmMessage": "읽지 않은 모든 메일 ({{count}}개)을 읽음으로 표시하시겠습니까?",
+    "markAllAsReadConfirmMessage": "현재 필터의 모든 메일 ({{count}}개)을 읽음으로 표시하시겠습니까?",
     "mailStarred": "중요 표시되었습니다",
     "mailUnstarred": "중요 표시가 해제되었습니다",
     "deleteConfirmTitle": "메일 삭제",
@@ -2537,6 +2537,7 @@
       "deleteFailed": "메일 삭제에 실패했습니다",
       "markReadFailed": "읽음 표시에 실패했습니다",
       "starFailed": "중요 표시에 실패했습니다",
+      "emptyFailed": "메일함 비우기에 실패했습니다",
       "fillAllFields": "모든 필드를 입력해주세요"
     }
   }

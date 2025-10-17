@@ -58,6 +58,8 @@ import {
   ArrowUpward as ArrowUpwardIcon,
   DeleteSweep as DeleteSweepIcon,
   SelectAll as SelectAllIcon,
+  MailOutline as MailOutlineIcon,
+  Drafts as DraftsIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -659,7 +661,7 @@ const MailboxPage: React.FC = () => {
                 <IconButton
                   size="small"
                   onClick={handleMarkAllAsReadClick}
-                  disabled={!stats || stats.unread === 0}
+                  disabled={!stats || stats.unreadCount === 0}
                   color="primary"
                 >
                   <CheckCircleIcon />
@@ -675,9 +677,9 @@ const MailboxPage: React.FC = () => {
                   onClick={handleEmptyMailboxClick}
                   color="error"
                   disabled={!stats || (
-                    filter === 'unread' ? stats.unread === 0 :
-                    filter === 'starred' ? stats.starred === 0 :
-                    stats.total === 0
+                    filter === 'unread' ? stats.unreadCount === 0 :
+                    filter === 'starred' ? stats.starredCount === 0 :
+                    stats.totalCount === 0
                   )}
                 >
                   <DeleteSweepIcon />
@@ -829,33 +831,31 @@ const MailboxPage: React.FC = () => {
                         <ListItem
                           disablePadding
                           secondaryAction={
-                            <IconButton
-                              edge="end"
-                              onClick={(e) => handleStarToggle(mail.id, e)}
-                            >
-                              {mail.isStarred ? (
-                                <StarIcon sx={{ color: 'warning.main' }} />
-                              ) : (
-                                <StarBorderIcon />
-                              )}
-                            </IconButton>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <IconButton
+                                size="small"
+                                onClick={(e) => handleStarToggle(mail.id, e)}
+                              >
+                                {mail.isStarred ? (
+                                  <StarIcon sx={{ color: 'warning.main' }} />
+                                ) : (
+                                  <StarBorderIcon />
+                                )}
+                              </IconButton>
+                            </Box>
                           }
                         >
                           <ListItemButton
                             selected={selectedMail?.id === mail.id}
                             onClick={() => handleMailClick(mail)}
                             sx={{
-                              backgroundColor: mail.isRead ? 'transparent' : 'action.hover',
                               py: 1,
-                              borderLeft: mail.isRead ? 'none' : '3px solid',
-                              borderLeftColor: 'primary.main',
-                              opacity: mail.isRead ? 0.7 : 1,
                               '&:hover': {
-                                opacity: 1,
+                                backgroundColor: 'action.hover',
                               },
                             }}
                           >
-                            <ListItemIcon>
+                            <ListItemIcon sx={{ minWidth: 40 }}>
                               <Checkbox
                                 edge="start"
                                 checked={selectedMailIds.includes(mail.id)}
@@ -864,6 +864,13 @@ const MailboxPage: React.FC = () => {
                                   handleCheckboxToggle(mail.id);
                                 }}
                               />
+                            </ListItemIcon>
+                            <ListItemIcon sx={{ minWidth: 36 }}>
+                              {mail.isRead ? (
+                                <DraftsIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                              ) : (
+                                <MailOutlineIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+                              )}
                             </ListItemIcon>
                             <ListItemText
                               primaryTypographyProps={{ component: 'div' }}
@@ -1133,9 +1140,9 @@ const MailboxPage: React.FC = () => {
           </Alert>
           <Typography>
             {t('mailbox.emptyMailboxConfirmMessage', {
-              count: filter === 'unread' ? (stats?.unread || 0) :
-                     filter === 'starred' ? (stats?.starred || 0) :
-                     (stats?.total || 0)
+              count: filter === 'unread' ? (stats?.unreadCount || 0) :
+                     filter === 'starred' ? (stats?.starredCount || 0) :
+                     (stats?.totalCount || 0)
             })}
           </Typography>
         </DialogContent>
@@ -1160,9 +1167,9 @@ const MailboxPage: React.FC = () => {
         <DialogContent>
           <Typography>
             {t('mailbox.markAllAsReadConfirmMessage', {
-              count: filter === 'unread' ? (stats?.unread || 0) :
-                     filter === 'starred' ? (stats?.starred || 0) :
-                     (stats?.total || 0)
+              count: filter === 'unread' ? (stats?.unreadCount || 0) :
+                     filter === 'starred' ? (stats?.starredCount || 0) :
+                     (stats?.totalCount || 0)
             })}
           </Typography>
         </DialogContent>

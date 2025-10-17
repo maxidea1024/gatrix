@@ -2518,7 +2518,7 @@
     "markAllAsRead": "全部标记为已读",
     "allMarkedAsRead": "所有邮件已标记为已读",
     "markAllAsReadConfirmTitle": "确认全部标记为已读",
-    "markAllAsReadConfirmMessage": "确定要将所有未读邮件（{{count}}封）标记为已读吗？",
+    "markAllAsReadConfirmMessage": "确定要将当前筛选器中的所有邮件（{{count}}封）标记为已读吗？",
     "mailStarred": "已加星标",
     "mailUnstarred": "已取消星标",
     "deleteConfirmTitle": "删除邮件",
@@ -2576,6 +2576,7 @@
       "deleteFailed": "删除邮件失败",
       "markReadFailed": "标记已读失败",
       "starFailed": "加星标失败",
+      "emptyFailed": "清空邮箱失败",
       "fillAllFields": "请填写所有字段"
     }
   }

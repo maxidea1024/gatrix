@@ -430,5 +430,38 @@ router.delete('/', async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * DELETE /api/mails/delete-all
+ * Delete all mails (with optional filters)
+ */
+router.delete('/delete-all', async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const { isRead, isStarred } = req.query;
+
+    const filters: any = {};
+    if (isRead !== undefined) {
+      filters.isRead = isRead === 'false'; // Delete unread mails
+    }
+    if (isStarred !== undefined) {
+      filters.isStarred = isStarred === 'true';
+    }
+
+    const count = await mailService.deleteAllMails(userId, filters);
+
+    res.json({
+      success: true,
+      count,
+      message: `${count} mails deleted successfully`,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete all mails',
+      error: error.message,
+    });
+  }
+});
+
 export default router;
 

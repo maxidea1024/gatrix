@@ -153,9 +153,9 @@ export class MailService {
     const params: any = {};
     if (filter && filter !== 'all') {
       if (filter === 'unread') {
-        params.isRead = false;
+        params.isRead = 'false';
       } else if (filter === 'starred') {
-        params.isStarred = true;
+        params.isStarred = 'true';
       }
     }
     await apiService.delete('/mails/delete-all', { params });

@@ -232,7 +232,7 @@ const AppContent: React.FC = () => {
               maxSnack={3}
               autoHideDuration={3000}
               anchorOrigin={{
-                vertical: 'top',
+                vertical: 'bottom',
                 horizontal: 'center',
               }}
               style={{ zIndex: 99999 }}

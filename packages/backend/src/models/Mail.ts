@@ -275,6 +275,29 @@ export class MailModel extends Model {
     return result;
   }
 
+  // Delete all mails (with optional filters)
+  static async deleteAllMails(userId: number, filters: any = {}): Promise<number> {
+    const now = new Date();
+    const query = this.query()
+      .patch({
+        isDeleted: true,
+        deletedAt: now.toISOString().slice(0, 19).replace('T', ' '),
+      } as any)
+      .where('recipientId', userId)
+      .where('isDeleted', false);
+
+    // Apply optional filters
+    if (filters.isRead !== undefined) {
+      query.where('isRead', filters.isRead);
+    }
+    if (filters.isStarred !== undefined) {
+      query.where('isStarred', filters.isStarred);
+    }
+
+    const result = await query;
+    return result;
+  }
+
   // Send mail (create new mail)
   static async sendMail(mailData: {
     senderId?: number | null;
