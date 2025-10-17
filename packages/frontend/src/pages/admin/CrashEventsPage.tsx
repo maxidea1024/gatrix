@@ -46,6 +46,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
   Search as SearchIcon,
   BugReport as BugReportIcon,
@@ -936,7 +937,7 @@ const CrashEventsPage: React.FC = () => {
       {/* Table */}
       <Card>
         <TableContainer>
-          <Table>
+          <Table sx={{ tableLayout: 'auto' }}>
             <TableHead>
               <TableRow>
                 <TableCell width="40px"></TableCell>
@@ -1716,6 +1717,7 @@ const CrashEventsPage: React.FC = () => {
               sensors={sensors}
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}
+              modifiers={[restrictToVerticalAxis]}
             >
               <SortableContext
                 items={columns.map(col => col.id)}

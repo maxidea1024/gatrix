@@ -548,6 +548,7 @@
     "status": "상태",
     "joinDate": "가입일",
     "lastLogin": "마지막 로그인",
+    "columnSettings": "컬럼 설정",
     "createdBy": "생성자",
     "tags": "태그",
     "tagsHelp": "사용자 분류 및 관리를 위해 태그를 선택하세요.",

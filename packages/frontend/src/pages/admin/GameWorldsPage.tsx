@@ -35,6 +35,13 @@ import {
   AccordionDetails,
   Paper,
   Stack,
+  Popover,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  ClickAwayListener,
+  Checkbox,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -42,6 +49,8 @@ import {
   Delete as DeleteIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
+  ViewColumn as ViewColumnIcon,
+  DragIndicator as DragIndicatorIcon,
   Search as SearchIcon,
   Language as WorldIcon,
   Build as MaintenanceIcon,
@@ -74,6 +83,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -96,12 +106,79 @@ import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../componen
 import MaintenanceSettingsInput from '../../components/common/MaintenanceSettingsInput';
 import { messageTemplateService, MessageTemplate } from '@/services/messageTemplateService';
 
+// Column definition interface
+interface ColumnConfig {
+  id: string;
+  labelKey: string;
+  visible: boolean;
+  width?: string;
+}
+
+// Sortable list item component for drag and drop
+interface SortableColumnItemProps {
+  column: ColumnConfig;
+  onToggleVisibility: (id: string) => void;
+}
+
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+  const { t } = useTranslation();
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: column.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <ListItem
+      ref={setNodeRef}
+      style={style}
+      disablePadding
+      secondaryAction={
+        <Box {...attributes} {...listeners} sx={{ cursor: 'grab', display: 'flex', alignItems: 'center', '&:active': { cursor: 'grabbing' } }}>
+          <DragIndicatorIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
+        </Box>
+      }
+    >
+      <ListItemButton
+        dense
+        onClick={() => onToggleVisibility(column.id)}
+        sx={{ pr: 6 }}
+      >
+        <Checkbox
+          edge="start"
+          checked={column.visible}
+          tabIndex={-1}
+          disableRipple
+          size="small"
+          icon={<VisibilityOffIcon fontSize="small" />}
+          checkedIcon={<VisibilityIcon fontSize="small" />}
+        />
+        <ListItemText
+          primary={t(column.labelKey)}
+          slotProps={{ primary: { variant: 'body2' } }}
+        />
+      </ListItemButton>
+    </ListItem>
+  );
+};
+
 // Sortable Row Component
 interface SortableRowProps {
   world: GameWorld;
   index: number;
   total: number;
   highlight: boolean;
+  columns: ColumnConfig[];
+  renderCellContent: (world: GameWorld, columnId: string) => React.ReactNode;
   onEdit: (world: GameWorld) => void;
   onDelete: (id: number) => void;
   onToggleVisibility: (worldId: number) => void;
@@ -114,6 +191,8 @@ interface SortableRowProps {
 
 const SortableRow: React.FC<SortableRowProps> = ({
   world,
+  columns,
+  renderCellContent,
   onEdit,
   onDelete,
   onToggleVisibility,
@@ -163,124 +242,20 @@ const SortableRow: React.FC<SortableRowProps> = ({
       sx={{ bgcolor: highlight ? 'rgba(25,118,210,0.12)' : undefined, transition: 'background-color 1.2s ease' }}>
 
       <TableCell>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <IconButton
-            size="small"
-            {...attributes}
-            {...listeners}
-            sx={{ cursor: 'grab', '&:active': { cursor: 'grabbing' } }}
-          >
-            <DragIcon />
-          </IconButton>
-          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-            {world.worldId}
-          </Typography>
-          <Tooltip title={t('common.copy')}>
-            <IconButton
-              size="small"
-              onClick={() => onCopy(world.worldId, t('gameWorlds.worldId'))}
-              sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
-            >
-              <CopyIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      </TableCell>
-      <TableCell>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <WorldIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-          <Typography variant="body2">
-            {world.name}
-          </Typography>
-          <Tooltip title={t('common.copy')}>
-            <IconButton
-              size="small"
-              onClick={() => onCopy(world.name, t('gameWorlds.name'))}
-              sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
-            >
-              <CopyIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      </TableCell>
-      <TableCell>
-        <Chip
-          icon={world.isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
-          label={world.isVisible ? (t('gameWorlds.visible')) : (t('gameWorlds.hidden'))}
-          color={world.isVisible ? "success" : "default"}
+        <IconButton
           size="small"
-          onClick={() => onToggleVisibility(world.id)}
-          sx={{
-            cursor: 'pointer',
-            '&:hover': {
-              backgroundColor: world.isVisible ? 'success.dark' : 'grey.600',
-            }
-          }}
-        />
+          {...attributes}
+          {...listeners}
+          sx={{ cursor: 'grab', '&:active': { cursor: 'grabbing' } }}
+        >
+          <DragIcon />
+        </IconButton>
       </TableCell>
-      <TableCell>
-        {world.isMaintenance ? (
-          <Tooltip
-            title={
-              <Box>
-                {world.maintenanceMessage && (
-                  <Typography variant="body2" sx={{ mb: 1 }}>
-                    {world.maintenanceMessage}
-                  </Typography>
-                )}
-                {world.maintenanceStartDate && (
-                  <Typography variant="caption" display="block">
-                    {t('gameWorlds.maintenance.startDate')}: {new Date(world.maintenanceStartDate).toLocaleString()}
-                  </Typography>
-                )}
-                {world.maintenanceEndDate && (
-                  <Typography variant="caption" display="block">
-                    {t('gameWorlds.maintenance.endDate')}: {new Date(world.maintenanceEndDate).toLocaleString()}
-                  </Typography>
-                )}
-              </Box>
-            }
-            arrow
-            placement="top"
-          >
-            <Chip
-              icon={<MaintenanceIcon />}
-              label={t('gameWorlds.maintenanceLabel')}
-              color="warning"
-              size="small"
-              onClick={() => onToggleMaintenance(world.id)}
-              sx={{
-                cursor: 'pointer',
-                '&:hover': {
-                  backgroundColor: 'warning.dark',
-                }
-              }}
-            />
-          </Tooltip>
-        ) : (
-          <Chip
-            icon={<MaintenanceIcon />}
-            label={t('gameWorlds.active')}
-            color="success"
-            size="small"
-            onClick={() => onToggleMaintenance(world.id)}
-            sx={{
-              cursor: 'pointer',
-              '&:hover': {
-                backgroundColor: 'success.dark',
-              }
-            }}
-          />
-        )}
-      </TableCell>
-      <TableCell>
-        <Typography variant="body2" sx={{ maxWidth: 200 }} noWrap>
-          {world.description || '-'}
-        </Typography>
-      </TableCell>
-      <TableCell>
-        {renderTags(world.tags)}
-      </TableCell>
+      {columns.filter(col => col.visible).map((column) => (
+        <TableCell key={column.id} width={column.width}>
+          {renderCellContent(world, column.id)}
+        </TableCell>
+      ))}
       <TableCell>
         {world.createdByName ? (
           <Box>
@@ -296,11 +271,6 @@ const SortableRow: React.FC<SortableRowProps> = ({
             -
           </Typography>
         )}
-      </TableCell>
-      <TableCell>
-        <Typography variant="body2">
-          {formatDateTimeDetailed(world.createdAt)}
-        </Typography>
       </TableCell>
       <TableCell align="center">
         <Tooltip title={t('gameWorlds.moveUp')}>
@@ -422,8 +392,51 @@ const GameWorldsPage: React.FC = () => {
   const [customPayloadText, setCustomPayloadText] = useState<string>('{}');
   const [customPayloadError, setCustomPayloadError] = useState<string>('');
 
+  // Default column configuration
+  const defaultColumns: ColumnConfig[] = [
+    { id: 'worldId', labelKey: 'gameWorlds.worldId', visible: true },
+    { id: 'name', labelKey: 'gameWorlds.name', visible: true },
+    { id: 'description', labelKey: 'gameWorlds.description', visible: true },
+    { id: 'isVisible', labelKey: 'gameWorlds.isVisible', visible: true },
+    { id: 'isMaintenance', labelKey: 'gameWorlds.isMaintenance', visible: true },
+    { id: 'tags', labelKey: 'common.tags', visible: true },
+    { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
+  ];
 
+  // Column configuration state (persisted in localStorage)
+  const [columns, setColumns] = useState<ColumnConfig[]>(() => {
+    const saved = localStorage.getItem('gameWorldsColumns');
+    if (saved) {
+      try {
+        const savedColumns = JSON.parse(saved);
+        const mergedColumns = savedColumns.map((savedCol: ColumnConfig) => {
+          const defaultCol = defaultColumns.find(c => c.id === savedCol.id);
+          return defaultCol ? { ...defaultCol, ...savedCol } : savedCol;
+        });
+        const savedIds = new Set(savedColumns.map((c: ColumnConfig) => c.id));
+        const newColumns = defaultColumns.filter(c => !savedIds.has(c.id));
+        return [...mergedColumns, ...newColumns];
+      } catch (e) {
+        return defaultColumns;
+      }
+    }
+    return defaultColumns;
+  });
 
+  // Column settings popover state
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+
+  // Drag and drop sensors for column settings
+  const columnSensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Highlight & scroll for recently moved row
   const [recentlyMovedId, setRecentlyMovedId] = useState<number | null>(null);
@@ -1090,6 +1103,116 @@ const GameWorldsPage: React.FC = () => {
     setSearch(event.target.value);
   };
 
+  // Column settings handlers
+  const handleToggleColumnVisibility = (columnId: string) => {
+    const newColumns = columns.map(col =>
+      col.id === columnId ? { ...col, visible: !col.visible } : col
+    );
+    setColumns(newColumns);
+    localStorage.setItem('gameWorldsColumns', JSON.stringify(newColumns));
+  };
+
+  const handleResetColumns = () => {
+    setColumns(defaultColumns);
+    localStorage.setItem('gameWorldsColumns', JSON.stringify(defaultColumns));
+  };
+
+  const handleColumnDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = columns.findIndex((col) => col.id === active.id);
+      const newIndex = columns.findIndex((col) => col.id === over.id);
+      const newColumns = arrayMove(columns, oldIndex, newIndex);
+      setColumns(newColumns);
+      localStorage.setItem('gameWorldsColumns', JSON.stringify(newColumns));
+    }
+  };
+
+  // Render cell content based on column ID
+  const renderCellContent = (world: GameWorld, columnId: string) => {
+    switch (columnId) {
+      case 'worldId':
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+              {world.worldId}
+            </Typography>
+            <Tooltip title={t('common.copy')}>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(world.worldId, t('gameWorlds.worldId'))}
+                sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
+              >
+                <CopyIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        );
+      case 'name':
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+              {world.name}
+            </Typography>
+            <Tooltip title={t('common.copy')}>
+              <IconButton
+                size="small"
+                onClick={() => handleCopy(world.name, t('gameWorlds.name'))}
+                sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
+              >
+                <CopyIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        );
+      case 'description':
+        return (
+          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 300 }}>
+            {world.description || '-'}
+          </Typography>
+        );
+      case 'isVisible':
+        return (
+          <Chip
+            label={world.isVisible ? t('common.visible') : t('common.hidden')}
+            size="small"
+            color={world.isVisible ? 'success' : 'default'}
+          />
+        );
+      case 'isMaintenance':
+        return (
+          <Chip
+            label={world.isMaintenance ? t('gameWorlds.maintenance') : t('gameWorlds.normal')}
+            size="small"
+            color={world.isMaintenance ? 'warning' : 'success'}
+            icon={world.isMaintenance ? <MaintenanceIcon /> : undefined}
+          />
+        );
+      case 'tags':
+        return (
+          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 220 }}>
+            {world.tags && world.tags.length > 0 ? (
+              world.tags.slice(0, 6).map((tag, idx) => (
+                <Tooltip key={`${tag.id}-${idx}`} title={tag.description || t('tags.noDescription')} arrow>
+                  <Chip label={tag.name} size="small" sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }} />
+                </Tooltip>
+              ))
+            ) : (
+              <Typography variant="body2" color="text.secondary">-</Typography>
+            )}
+          </Box>
+        );
+      case 'createdAt':
+        return (
+          <Typography variant="body2">
+            {formatDateTimeDetailed(world.createdAt)}
+          </Typography>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <Box key={i18n.language} sx={{ p: 3 }}>
       {/* Header */}
@@ -1178,6 +1301,23 @@ const GameWorldsPage: React.FC = () => {
                   onFilterChange={handleDynamicFilterChange}
                   onOperatorChange={handleOperatorChange}
                 />
+
+                {/* Column Settings Button */}
+                <Tooltip title={t('users.columnSettings')}>
+                  <IconButton
+                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                    sx={{
+                      bgcolor: 'background.paper',
+                      border: 1,
+                      borderColor: 'divider',
+                      '&:hover': {
+                        bgcolor: 'action.hover',
+                      },
+                    }}
+                  >
+                    <ViewColumnIcon />
+                  </IconButton>
+                </Tooltip>
               </Box>
             </Box>
           </Box>
@@ -1191,19 +1331,19 @@ const GameWorldsPage: React.FC = () => {
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
+            modifiers={[restrictToVerticalAxis]}
           >
             <TableContainer>
-              <Table>
+              <Table sx={{ tableLayout: 'auto' }}>
                 <TableHead>
                   <TableRow>
-                    <TableCell>{t('gameWorlds.worldId')}</TableCell>
-                    <TableCell>{t('gameWorlds.name')}</TableCell>
-                    <TableCell>{t('gameWorlds.visible')}</TableCell>
-                    <TableCell>{t('gameWorlds.maintenanceLabel')}</TableCell>
-                    <TableCell>{t('gameWorlds.description')}</TableCell>
-                    <TableCell>{t('gameWorlds.tags')}</TableCell>
+                    <TableCell width="50px"></TableCell>
+                    {columns.filter(col => col.visible).map((column) => (
+                      <TableCell key={column.id} width={column.width}>
+                        {t(column.labelKey)}
+                      </TableCell>
+                    ))}
                     <TableCell>{t('gameWorlds.creator')}</TableCell>
-                    <TableCell>{t('gameWorlds.created')}</TableCell>
                     <TableCell align="center">{t('gameWorlds.actions')}</TableCell>
                   </TableRow>
                 </TableHead>
@@ -1224,6 +1364,8 @@ const GameWorldsPage: React.FC = () => {
                         <SortableRow
                           key={world.id}
                           world={world}
+                          columns={columns}
+                          renderCellContent={renderCellContent}
                           index={idx}
                           total={worlds.length}
                           highlight={recentlyMovedId === world.id}
@@ -1973,6 +2115,57 @@ const GameWorldsPage: React.FC = () => {
           </Button>
         </Box>
       </Drawer>
+
+      {/* Column Settings Popover */}
+      <Popover
+        open={Boolean(columnSettingsAnchor)}
+        anchorEl={columnSettingsAnchor}
+        onClose={() => setColumnSettingsAnchor(null)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        hideBackdrop
+        disableScrollLock
+      >
+        <ClickAwayListener onClickAway={() => setColumnSettingsAnchor(null)}>
+          <Box sx={{ p: 2, minWidth: 280, maxWidth: 320 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                {t('users.columnSettings')}
+              </Typography>
+              <Button size="small" onClick={handleResetColumns} color="warning">
+                {t('common.reset')}
+              </Button>
+            </Box>
+            <DndContext
+              sensors={columnSensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleColumnDragEnd}
+              modifiers={[restrictToVerticalAxis]}
+            >
+              <SortableContext
+                items={columns.map(col => col.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <List dense disablePadding>
+                  {columns.map((column) => (
+                    <SortableColumnItem
+                      key={column.id}
+                      column={column}
+                      onToggleVisibility={handleToggleColumnVisibility}
+                    />
+                  ))}
+                </List>
+              </SortableContext>
+            </DndContext>
+          </Box>
+        </ClickAwayListener>
+      </Popover>
     </Box>
   );
 };

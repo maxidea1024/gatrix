@@ -43,7 +43,31 @@ import {
   Stack,
   Skeleton,
   CircularProgress,
+  Popover,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  ClickAwayListener,
 } from '@mui/material';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
   Add as AddIcon,
 
@@ -64,6 +88,10 @@ import {
   Build as BuildIcon,
   Widgets as WidgetsIcon,
   Search as SearchIcon,
+  ViewColumn as ViewColumnIcon,
+  DragIndicator as DragIndicatorIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
 import { InputAdornment } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -195,6 +223,71 @@ const getVersionColor = (version: string): 'default' | 'primary' | 'secondary' |
   return colors[colorIndex];
 };
 
+// Column definition interface
+interface ColumnConfig {
+  id: string;
+  labelKey: string;
+  visible: boolean;
+  width?: string;
+}
+
+// Sortable list item component for drag and drop
+interface SortableColumnItemProps {
+  column: ColumnConfig;
+  onToggleVisibility: (id: string) => void;
+}
+
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+  const { t } = useTranslation();
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: column.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <ListItem
+      ref={setNodeRef}
+      style={style}
+      disablePadding
+      secondaryAction={
+        <Box {...attributes} {...listeners} sx={{ cursor: 'grab', display: 'flex', alignItems: 'center', '&:active': { cursor: 'grabbing' } }}>
+          <DragIndicatorIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
+        </Box>
+      }
+    >
+      <ListItemButton
+        dense
+        onClick={() => onToggleVisibility(column.id)}
+        sx={{ pr: 6 }}
+      >
+        <Checkbox
+          edge="start"
+          checked={column.visible}
+          tabIndex={-1}
+          disableRipple
+          size="small"
+          icon={<VisibilityOffIcon fontSize="small" />}
+          checkedIcon={<VisibilityIcon fontSize="small" />}
+        />
+        <ListItemText
+          primary={t(column.labelKey)}
+          slotProps={{ primary: { variant: 'body2' } }}
+        />
+      </ListItemButton>
+    </ListItem>
+  );
+};
+
 const ClientVersionsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -292,6 +385,53 @@ const ClientVersionsPage: React.FC = () => {
   // 내보내기 메뉴 상태
   const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
   const [selectedExportMenuAnchor, setSelectedExportMenuAnchor] = useState<null | HTMLElement>(null);
+
+  // Default column configuration
+  const defaultColumns: ColumnConfig[] = [
+    { id: 'platform', labelKey: 'clientVersions.platform', visible: true },
+    { id: 'clientVersion', labelKey: 'clientVersions.clientVersion', visible: true },
+    { id: 'clientStatus', labelKey: 'clientVersions.clientStatus', visible: true },
+    { id: 'gameServerAddress', labelKey: 'clientVersions.gameServerAddress', visible: true },
+    { id: 'patchAddress', labelKey: 'clientVersions.patchAddress', visible: true },
+    { id: 'guestModeAllowed', labelKey: 'clientVersions.guestModeAllowed', visible: true },
+    { id: 'tags', labelKey: 'clientVersions.tags', visible: true },
+    { id: 'createdAt', labelKey: 'clientVersions.createdAt', visible: true },
+  ];
+
+  // Column configuration state (persisted in localStorage)
+  const [columns, setColumns] = useState<ColumnConfig[]>(() => {
+    const saved = localStorage.getItem('clientVersionsColumns');
+    if (saved) {
+      try {
+        const savedColumns = JSON.parse(saved);
+        const mergedColumns = savedColumns.map((savedCol: ColumnConfig) => {
+          const defaultCol = defaultColumns.find(c => c.id === savedCol.id);
+          return defaultCol ? { ...defaultCol, ...savedCol } : savedCol;
+        });
+        const savedIds = new Set(savedColumns.map((c: ColumnConfig) => c.id));
+        const newColumns = defaultColumns.filter(c => !savedIds.has(c.id));
+        return [...mergedColumns, ...newColumns];
+      } catch (e) {
+        return defaultColumns;
+      }
+    }
+    return defaultColumns;
+  });
+
+  // Column settings popover state
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // 메시지 템플릿 로드 (SWR로 변경 예정이지만 일단 유지)
   useEffect(() => {
@@ -909,6 +1049,111 @@ const ClientVersionsPage: React.FC = () => {
     }
   }, [selectedClientVersionForTags, t, enqueueSnackbar, mutateVersions]);
 
+  // Column settings handlers
+  const handleToggleColumnVisibility = useCallback((columnId: string) => {
+    const newColumns = columns.map(col =>
+      col.id === columnId ? { ...col, visible: !col.visible } : col
+    );
+    setColumns(newColumns);
+    localStorage.setItem('clientVersionsColumns', JSON.stringify(newColumns));
+  }, [columns]);
+
+  const handleResetColumns = useCallback(() => {
+    setColumns(defaultColumns);
+    localStorage.setItem('clientVersionsColumns', JSON.stringify(defaultColumns));
+  }, []);
+
+  const handleColumnDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = columns.findIndex((col) => col.id === active.id);
+      const newIndex = columns.findIndex((col) => col.id === over.id);
+      const newColumns = arrayMove(columns, oldIndex, newIndex);
+      setColumns(newColumns);
+      localStorage.setItem('clientVersionsColumns', JSON.stringify(newColumns));
+    }
+  }, [columns]);
+
+  // Render cell content based on column ID
+  const renderCellContent = useCallback((clientVersion: ClientVersion, columnId: string) => {
+    switch (columnId) {
+      case 'platform':
+        return (
+          <Chip
+            label={clientVersion.platform}
+            size="small"
+            color="primary"
+            variant="outlined"
+          />
+        );
+      case 'clientVersion':
+        return (
+          <Chip
+            label={clientVersion.clientVersion}
+            size="small"
+            sx={getVersionColorStyle(clientVersion.clientVersion, theme.palette.mode === 'dark')}
+          />
+        );
+      case 'clientStatus':
+        return (
+          <Chip
+            label={ClientStatusLabels[clientVersion.clientStatus]}
+            size="small"
+            color={ClientStatusColors[clientVersion.clientStatus]}
+          />
+        );
+      case 'gameServerAddress':
+        return (
+          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+            {clientVersion.gameServerAddress}
+          </Typography>
+        );
+      case 'patchAddress':
+        return (
+          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+            {clientVersion.patchAddress}
+          </Typography>
+        );
+      case 'guestModeAllowed':
+        return (
+          <Chip
+            label={clientVersion.guestModeAllowed ? t('common.yes') : t('common.no')}
+            size="small"
+            color={clientVersion.guestModeAllowed ? 'success' : 'default'}
+            variant="outlined"
+          />
+        );
+      case 'tags':
+        return (
+          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+            {clientVersion.tags && clientVersion.tags.length > 0 ? (
+              clientVersion.tags.map((tag) => (
+                <Chip
+                  key={tag.id}
+                  label={tag.name}
+                  size="small"
+                  sx={{
+                    bgcolor: tag.color,
+                    color: theme.palette.getContrastText(tag.color),
+                  }}
+                />
+              ))
+            ) : (
+              <Typography variant="body2" color="text.secondary">-</Typography>
+            )}
+          </Box>
+        );
+      case 'createdAt':
+        return (
+          <Typography variant="body2">
+            {formatDateTimeDetailed(clientVersion.createdAt)}
+          </Typography>
+        );
+      default:
+        return null;
+    }
+  }, [theme, t]);
+
   return (
     <Box sx={{ p: 3 }}>
       {/* 헤더 */}
@@ -1057,6 +1302,23 @@ const ClientVersionsPage: React.FC = () => {
                 onFilterChange={handleDynamicFilterChange}
                 onOperatorChange={handleOperatorChange}
               />
+
+              {/* Column Settings Button */}
+              <Tooltip title={t('users.columnSettings')}>
+                <IconButton
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    bgcolor: 'background.paper',
+                    border: 1,
+                    borderColor: 'divider',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                    },
+                  }}
+                >
+                  <ViewColumnIcon />
+                </IconButton>
+              </Tooltip>
             </Box>
           </Box>
         </CardContent>
@@ -1149,7 +1411,7 @@ const ClientVersionsPage: React.FC = () => {
             pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
           }}
         >
-          <Table>
+          <Table sx={{ tableLayout: 'auto' }}>
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox">
@@ -1159,24 +1421,17 @@ const ClientVersionsPage: React.FC = () => {
                     onChange={(e) => handleSelectAll(e.target.checked)}
                   />
                 </TableCell>
-                {/* 버전 컬럼을 맨 앞으로 이동 */}
-                <TableCell>
-                  {t('clientVersions.version')} ↓
-                </TableCell>
-                <TableCell>
-                  {t('clientVersions.platform')} ↓
-                </TableCell>
-                <TableCell>
-                  {t('clientVersions.statusLabel')}
-                </TableCell>
-                <TableCell>{t('clientVersions.gameServer')}</TableCell>
-                <TableCell>{t('clientVersions.patchAddress')}</TableCell>
-                <TableCell align="center">{t('clientVersions.guestMode')}</TableCell>
-                <TableCell>
-                  {t('common.createdAt')}
-                </TableCell>
+                {columns.filter(col => col.visible).map((column) => (
+                  <TableCell
+                    key={column.id}
+                    align={column.id === 'guestModeAllowed' ? 'center' : 'left'}
+                    width={column.width}
+                  >
+                    {t(column.labelKey)}
+                    {(column.id === 'clientVersion' || column.id === 'platform') && ' ↓'}
+                  </TableCell>
+                ))}
                 <TableCell>{t('common.createdBy')}</TableCell>
-                <TableCell>{t('common.tags')}</TableCell>
                 <TableCell align="center">{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
@@ -1244,111 +1499,15 @@ const ClientVersionsPage: React.FC = () => {
                       onChange={(e) => handleSelectOne(clientVersion.id, e.target.checked)}
                     />
                   </TableCell>
-                  {/* 버전 셀을 앞쪽으로 이동 */}
-                  <TableCell>
-                    <Chip
-                      label={clientVersion.clientVersion}
-                      variant="filled"
-                      size="small"
-                      sx={{
-                        width: '100%',
-                        justifyContent: 'center',
-                        borderRadius: '4px',
-                        fontFamily: 'monospace',
-                        fontWeight: 700,
-                        fontSize: '0.75rem',
-                        ...getVersionColorStyle(clientVersion.clientVersion, theme.palette.mode === 'dark')
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={clientVersion.platform}
-                      color="primary"
-                      variant="outlined"
-                      size="small"
-                      sx={{ width: '100%', justifyContent: 'center', fontWeight: 600, borderRadius: '4px' }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    {clientVersion.clientStatus === ClientStatus.MAINTENANCE ? (
-                      <Tooltip
-                        title={
-                          <Box>
-                            {clientVersion.maintenanceMessage && (
-                              <Typography variant="body2" sx={{ mb: 1 }}>
-                                {clientVersion.maintenanceMessage}
-                              </Typography>
-                            )}
-                            {clientVersion.maintenanceStartDate && (
-                              <Typography variant="caption" display="block">
-                                {t('clientVersions.maintenance.startDate')}: {new Date(clientVersion.maintenanceStartDate).toLocaleString()}
-                              </Typography>
-                            )}
-                            {clientVersion.maintenanceEndDate && (
-                              <Typography variant="caption" display="block">
-                                {t('clientVersions.maintenance.endDate')}: {new Date(clientVersion.maintenanceEndDate).toLocaleString()}
-                              </Typography>
-                            )}
-                          </Box>
-                        }
-                        arrow
-                        placement="top"
-                      >
-                        <Chip
-                          label={t(ClientStatusLabels[clientVersion.clientStatus])}
-                          color={ClientStatusColors[clientVersion.clientStatus]}
-                          size="small"
-                        />
-                      </Tooltip>
-                    ) : (
-                      <Chip
-                        label={t(ClientStatusLabels[clientVersion.clientStatus])}
-                        color={ClientStatusColors[clientVersion.clientStatus]}
-                        size="small"
-                      />
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <Tooltip title={clientVersion.gameServerAddress}>
-                        <Typography variant="body2" noWrap sx={{ maxWidth: 220 }}>
-                          {clientVersion.gameServerAddress}
-                        </Typography>
-                      </Tooltip>
-                      <Tooltip title={t('common.copy')}>
-                        <IconButton size="small" onClick={async () => { await navigator.clipboard.writeText(clientVersion.gameServerAddress); enqueueSnackbar(t('common.copied', { type: t('clientVersions.gameServer'), value: clientVersion.gameServerAddress }), { variant: 'success' }); }}>
-                          <CopyIcon fontSize="inherit" />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      <Tooltip title={clientVersion.patchAddress}>
-                        <Typography variant="body2" noWrap sx={{ maxWidth: 220 }}>
-                          {clientVersion.patchAddress}
-                        </Typography>
-                      </Tooltip>
-                      <Tooltip title={t('common.copy')}>
-                        <IconButton size="small" onClick={async () => { await navigator.clipboard.writeText(clientVersion.patchAddress); enqueueSnackbar(t('common.copied', { type: t('clientVersions.patchAddress'), value: clientVersion.patchAddress }), { variant: 'success' }); }}>
-                          <CopyIcon fontSize="inherit" />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Chip
-                      label={clientVersion.guestModeAllowed ? t('common.yes') : t('common.no')}
-                      color={clientVersion.guestModeAllowed ? 'success' : 'default'}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">
-                      {formatDateTimeDetailed(clientVersion.createdAt)}
-                    </Typography>
-                  </TableCell>
+                  {columns.filter(col => col.visible).map((column) => (
+                    <TableCell
+                      key={column.id}
+                      align={column.id === 'guestModeAllowed' ? 'center' : 'left'}
+                      width={column.width}
+                    >
+                      {renderCellContent(clientVersion, column.id)}
+                    </TableCell>
+                  ))}
                   <TableCell>
                     <Box>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -1357,25 +1516,6 @@ const ClientVersionsPage: React.FC = () => {
                       {clientVersion.createdByEmail && (
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
                           {clientVersion.createdByEmail}
-                        </Typography>
-                      )}
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 200, justifyContent: 'flex-start' }}>
-                      {clientVersion.tags && clientVersion.tags.length > 0 ? (
-                        clientVersion.tags.map((tag) => (
-                          <Tooltip key={tag.id} title={tag.description || tag.name} arrow>
-                            <Chip
-                              label={tag.name}
-                              size="small"
-                              sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }}
-                            />
-                          </Tooltip>
-                        ))
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          -
                         </Typography>
                       )}
                     </Box>
@@ -1993,6 +2133,57 @@ const ClientVersionsPage: React.FC = () => {
           </Button>
         </Box>
       </Drawer>
+
+      {/* Column Settings Popover */}
+      <Popover
+        open={Boolean(columnSettingsAnchor)}
+        anchorEl={columnSettingsAnchor}
+        onClose={() => setColumnSettingsAnchor(null)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        hideBackdrop
+        disableScrollLock
+      >
+        <ClickAwayListener onClickAway={() => setColumnSettingsAnchor(null)}>
+          <Box sx={{ p: 2, minWidth: 280, maxWidth: 320 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                {t('users.columnSettings')}
+              </Typography>
+              <Button size="small" onClick={handleResetColumns} color="warning">
+                {t('common.reset')}
+              </Button>
+            </Box>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleColumnDragEnd}
+              modifiers={[restrictToVerticalAxis]}
+            >
+              <SortableContext
+                items={columns.map(col => col.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <List dense disablePadding>
+                  {columns.map((column) => (
+                    <SortableColumnItem
+                      key={column.id}
+                      column={column}
+                      onToggleVisibility={handleToggleColumnVisibility}
+                    />
+                  ))}
+                </List>
+              </SortableContext>
+            </DndContext>
+          </Box>
+        </ClickAwayListener>
+      </Popover>
     </Box>
   );
 };

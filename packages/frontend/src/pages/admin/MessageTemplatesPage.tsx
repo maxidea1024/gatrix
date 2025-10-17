@@ -34,8 +34,32 @@ import {
   Alert,
   Autocomplete,
   Drawer,
-  InputAdornment
+  InputAdornment,
+  Popover,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  ClickAwayListener,
 } from '@mui/material';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -47,7 +71,11 @@ import {
   LocalOffer as LocalOfferIcon,
   ContentCopy as ContentCopyIcon,
   Search as SearchIcon,
-  TextFields as TextFieldsIcon
+  TextFields as TextFieldsIcon,
+  ViewColumn as ViewColumnIcon,
+  DragIndicator as DragIndicatorIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -63,7 +91,70 @@ import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/Mu
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
 import { api } from '@/services/api';
 
+// Column definition interface
+interface ColumnConfig {
+  id: string;
+  labelKey: string;
+  visible: boolean;
+  width?: string;
+}
 
+// Sortable list item component for drag and drop
+interface SortableColumnItemProps {
+  column: ColumnConfig;
+  onToggleVisibility: (id: string) => void;
+}
+
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+  const { t } = useTranslation();
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: column.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <ListItem
+      ref={setNodeRef}
+      style={style}
+      disablePadding
+      secondaryAction={
+        <Box {...attributes} {...listeners} sx={{ cursor: 'grab', display: 'flex', alignItems: 'center', '&:active': { cursor: 'grabbing' } }}>
+          <DragIndicatorIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
+        </Box>
+      }
+    >
+      <ListItemButton
+        dense
+        onClick={() => onToggleVisibility(column.id)}
+        sx={{ pr: 6 }}
+      >
+        <Checkbox
+          edge="start"
+          checked={column.visible}
+          tabIndex={-1}
+          disableRipple
+          size="small"
+          icon={<VisibilityOffIcon fontSize="small" />}
+          checkedIcon={<VisibilityIcon fontSize="small" />}
+        />
+        <ListItemText
+          primary={t(column.labelKey)}
+          slotProps={{ primary: { variant: 'body2' } }}
+        />
+      </ListItemButton>
+    </ListItem>
+  );
+};
 
 const MessageTemplatesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -157,6 +248,42 @@ const MessageTemplatesPage: React.FC = () => {
   const [templateTags, setTemplateTags] = useState<Tag[]>([]);
 
   const [form, setForm] = useState<MessageTemplate>({ name: '', type: 'maintenance', isEnabled: true, defaultMessage: '', locales: [] });
+
+  // Column configuration
+  const defaultColumns: ColumnConfig[] = [
+    { id: 'name', labelKey: 'messageTemplates.name', visible: true },
+    { id: 'type', labelKey: 'messageTemplates.type', visible: true },
+    { id: 'defaultMessage', labelKey: 'messageTemplates.defaultMessage', visible: true },
+    { id: 'isEnabled', labelKey: 'messageTemplates.isEnabled', visible: true },
+    { id: 'tags', labelKey: 'common.tags', visible: true },
+    { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
+  ];
+
+  const [columns, setColumns] = useState<ColumnConfig[]>(() => {
+    const saved = localStorage.getItem('messageTemplatesColumns');
+    if (saved) {
+      try {
+        const savedColumns = JSON.parse(saved);
+        const mergedColumns = savedColumns.map((savedCol: ColumnConfig) => {
+          const defaultCol = defaultColumns.find(c => c.id === savedCol.id);
+          return defaultCol ? { ...defaultCol, ...savedCol } : savedCol;
+        });
+        const savedIds = new Set(savedColumns.map((c: ColumnConfig) => c.id));
+        const newColumns = defaultColumns.filter(c => !savedIds.has(c.id));
+        return [...mergedColumns, ...newColumns];
+      } catch (e) {
+        return defaultColumns;
+      }
+    }
+    return defaultColumns;
+  });
+
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   // 폼 필드 ref들
   const nameFieldRef = useRef<HTMLInputElement>(null);
@@ -489,6 +616,73 @@ const MessageTemplatesPage: React.FC = () => {
     }
   };
 
+  // Column handlers
+  const handleToggleColumnVisibility = (columnId: string) => {
+    const newColumns = columns.map(col =>
+      col.id === columnId ? { ...col, visible: !col.visible } : col
+    );
+    setColumns(newColumns);
+    localStorage.setItem('messageTemplatesColumns', JSON.stringify(newColumns));
+  };
+
+  const handleResetColumns = () => {
+    setColumns(defaultColumns);
+    localStorage.setItem('messageTemplatesColumns', JSON.stringify(defaultColumns));
+  };
+
+  const handleColumnDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = columns.findIndex((col) => col.id === active.id);
+      const newIndex = columns.findIndex((col) => col.id === over.id);
+      const newColumns = arrayMove(columns, oldIndex, newIndex);
+      setColumns(newColumns);
+      localStorage.setItem('messageTemplatesColumns', JSON.stringify(newColumns));
+    }
+  };
+
+  const renderCellContent = (template: MessageTemplate, columnId: string) => {
+    switch (columnId) {
+      case 'name':
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>{template.name}</Typography>
+            <Tooltip title={t('common.copy')}>
+              <IconButton size="small" onClick={() => copyWithToast(template.name, t('messageTemplates.name'), false)}>
+                <ContentCopyIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        );
+      case 'type':
+        return <Chip label={t(`messageTemplates.types.${template.type}`)} size="small" color="primary" variant="outlined" />;
+      case 'defaultMessage':
+        return (
+          <Typography variant="body2" sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {template.defaultMessage || '-'}
+          </Typography>
+        );
+      case 'isEnabled':
+        return <Chip label={template.isEnabled ? t('common.enabled') : t('common.disabled')} size="small" color={template.isEnabled ? 'success' : 'default'} />;
+      case 'tags':
+        return (
+          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+            {template.tags && template.tags.length > 0 ? (
+              template.tags.map((tag) => (
+                <Chip key={tag.id} label={tag.name} size="small" sx={{ bgcolor: tag.color, color: '#fff' }} />
+              ))
+            ) : (
+              <Typography variant="body2" color="text.secondary">-</Typography>
+            )}
+          </Box>
+        );
+      case 'createdAt':
+        return <Typography variant="body2">{formatDateTimeDetailed(template.createdAt)}</Typography>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
@@ -575,6 +769,21 @@ const MessageTemplatesPage: React.FC = () => {
                   onFilterChange={handleDynamicFilterChange}
                   onOperatorChange={handleOperatorChange}
                 />
+
+                {/* Column Settings Button */}
+                <Tooltip title={t('users.columnSettings')}>
+                  <IconButton
+                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                    sx={{
+                      bgcolor: 'background.paper',
+                      border: 1,
+                      borderColor: 'divider',
+                      '&:hover': { bgcolor: 'action.hover' },
+                    }}
+                  >
+                    <ViewColumnIcon />
+                  </IconButton>
+                </Tooltip>
               </Box>
             </Box>
           </Box>
@@ -630,23 +839,21 @@ const MessageTemplatesPage: React.FC = () => {
               pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
             }}
           >
-            <Table sx={{ tableLayout: 'fixed', minWidth: 1400 }}>
+            <Table sx={{ tableLayout: 'auto' }}>
               <TableHead>
                 <TableRow>
-                  <TableCell padding="checkbox" sx={{ width: 50 }}>
+                  <TableCell padding="checkbox">
                     <Checkbox
                       checked={selectAll}
                       indeterminate={selectedIds.length > 0 && selectedIds.length < items.filter(item => item.id).length}
                       onChange={(e) => handleSelectAll(e.target.checked)}
                     />
                   </TableCell>
-                  <TableCell sx={{ width: 200, minWidth: 200 }}>{t('common.name')}</TableCell>
-                  <TableCell sx={{ width: 300, minWidth: 300 }}>{t('messageTemplates.defaultMessage')}</TableCell>
-                  <TableCell sx={{ width: 120, minWidth: 120 }}>{t('messageTemplates.availability')}</TableCell>
-                  <TableCell sx={{ width: 180, minWidth: 180 }}>{t('common.updatedAt')}</TableCell>
-                  <TableCell sx={{ width: 150, minWidth: 150 }}>{t('common.languages')}</TableCell>
-                  <TableCell sx={{ width: 120, minWidth: 120 }}>{t('common.creator')}</TableCell>
-                  <TableCell sx={{ width: 200, minWidth: 200 }}>{t('common.tags')}</TableCell>
+                  {columns.filter(col => col.visible).map((column) => (
+                    <TableCell key={column.id} width={column.width}>
+                      {t(column.labelKey)}
+                    </TableCell>
+                  ))}
                   <TableCell align="right" sx={{ width: 100, minWidth: 100 }}>{t('common.actions')}</TableCell>
                 </TableRow>
               </TableHead>

@@ -604,6 +604,7 @@
     "joinDate": "加入日期",
     "lastLogin": "最后登录",
     "createdBy": "创建者",
+    "columnSettings": "列设置",
     "tags": "标签",
     "tagsHelp": "选择标签来分类和管理用户。",
     "roleHelp": "选择用户的权限级别。",

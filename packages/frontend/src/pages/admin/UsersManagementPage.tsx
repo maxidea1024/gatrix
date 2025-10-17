@@ -37,7 +37,30 @@ import {
   Checkbox,
   Drawer,
   Skeleton,
+  Popover,
+  List,
+  ListItem,
+  ListItemButton,
+  ClickAwayListener,
 } from '@mui/material';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
   Search as SearchIcon,
   MoreVert as MoreVertIcon,
@@ -64,6 +87,8 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
   Refresh as RefreshIcon,
+  ViewColumn as ViewColumnIcon,
+  DragIndicator as DragIndicatorIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -93,6 +118,71 @@ interface UsersResponse {
   limit: number;
   totalPages: number;
 }
+
+// Column definition interface
+interface ColumnConfig {
+  id: string;
+  labelKey: string;
+  visible: boolean;
+  width?: string;
+}
+
+// Sortable list item component for drag and drop
+interface SortableColumnItemProps {
+  column: ColumnConfig;
+  onToggleVisibility: (id: string) => void;
+}
+
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+  const { t } = useTranslation();
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: column.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <ListItem
+      ref={setNodeRef}
+      style={style}
+      disablePadding
+      secondaryAction={
+        <Box {...attributes} {...listeners} sx={{ cursor: 'grab', display: 'flex', alignItems: 'center', '&:active': { cursor: 'grabbing' } }}>
+          <DragIndicatorIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
+        </Box>
+      }
+    >
+      <ListItemButton
+        dense
+        onClick={() => onToggleVisibility(column.id)}
+        sx={{ pr: 6 }}
+      >
+        <Checkbox
+          edge="start"
+          checked={column.visible}
+          tabIndex={-1}
+          disableRipple
+          size="small"
+          icon={<VisibilityOffIcon fontSize="small" />}
+          checkedIcon={<VisibilityIcon fontSize="small" />}
+        />
+        <ListItemText
+          primary={t(column.labelKey)}
+          slotProps={{ primary: { variant: 'body2' } }}
+        />
+      </ListItemButton>
+    </ListItem>
+  );
+};
 
 const UsersManagementPage: React.FC = () => {
   const { t } = useTranslation();
@@ -266,6 +356,57 @@ const UsersManagementPage: React.FC = () => {
 
   // 이메일 인증 관련 상태
   const [emailVerificationLoading, setEmailVerificationLoading] = useState(false);
+
+  // Default column configuration
+  const defaultColumns: ColumnConfig[] = [
+    { id: 'user', labelKey: 'users.user', visible: true },
+    { id: 'email', labelKey: 'users.email', visible: true },
+    { id: 'emailVerified', labelKey: 'users.emailVerified', visible: true },
+    { id: 'role', labelKey: 'users.role', visible: true },
+    { id: 'status', labelKey: 'users.status', visible: true },
+    { id: 'tags', labelKey: 'users.tags', visible: true },
+    { id: 'joinDate', labelKey: 'users.joinDate', visible: true },
+    { id: 'lastLogin', labelKey: 'users.lastLogin', visible: true },
+  ];
+
+  // Column configuration state (persisted in localStorage)
+  const [columns, setColumns] = useState<ColumnConfig[]>(() => {
+    const saved = localStorage.getItem('usersColumns');
+    if (saved) {
+      try {
+        const savedColumns = JSON.parse(saved);
+        // Merge saved columns with defaults, preserving saved order
+        const mergedColumns = savedColumns.map((savedCol: ColumnConfig) => {
+          const defaultCol = defaultColumns.find(c => c.id === savedCol.id);
+          return defaultCol ? { ...defaultCol, ...savedCol } : savedCol;
+        });
+
+        // Add any new columns from defaults that aren't in saved
+        const savedIds = new Set(savedColumns.map((c: ColumnConfig) => c.id));
+        const newColumns = defaultColumns.filter(c => !savedIds.has(c.id));
+
+        return [...mergedColumns, ...newColumns];
+      } catch (e) {
+        return defaultColumns;
+      }
+    }
+    return defaultColumns;
+  });
+
+  // Column settings popover state
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // 현재 초대 정보 로드
   const loadCurrentInvitation = async () => {
@@ -906,6 +1047,142 @@ const UsersManagementPage: React.FC = () => {
     setInvitationDialogOpen(true);
   };
 
+  // Column configuration handlers
+  const handleToggleColumnVisibility = (columnId: string) => {
+    const newColumns = columns.map(col =>
+      col.id === columnId ? { ...col, visible: !col.visible } : col
+    );
+    setColumns(newColumns);
+    localStorage.setItem('usersColumns', JSON.stringify(newColumns));
+  };
+
+  const handleResetColumns = () => {
+    setColumns(defaultColumns);
+    localStorage.setItem('usersColumns', JSON.stringify(defaultColumns));
+  };
+
+  const handleColumnDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = columns.findIndex((col) => col.id === active.id);
+      const newIndex = columns.findIndex((col) => col.id === over.id);
+
+      const newColumns = arrayMove(columns, oldIndex, newIndex);
+      setColumns(newColumns);
+      localStorage.setItem('usersColumns', JSON.stringify(newColumns));
+    }
+  };
+
+  // Render cell content based on column ID
+  const renderCellContent = (user: User, columnId: string) => {
+    switch (columnId) {
+      case 'user':
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Avatar src={user.avatarUrl}>
+              {user.name?.charAt(0).toUpperCase()}
+            </Avatar>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                {user.name}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => copyToClipboard(user.name, 'name')}
+                sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
+              >
+                <ContentCopyIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          </Box>
+        );
+      case 'email':
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2">
+              {user.email}
+            </Typography>
+            <IconButton
+              size="small"
+              onClick={() => copyToClipboard(user.email, 'email')}
+              sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
+            >
+              <ContentCopyIcon fontSize="small" />
+            </IconButton>
+          </Box>
+        );
+      case 'emailVerified':
+        return user.emailVerified ? (
+          <Chip
+            label={t('users.verified')}
+            color="success"
+            size="small"
+            variant="outlined"
+          />
+        ) : (
+          <Chip
+            label={t('users.unverified')}
+            color="warning"
+            size="small"
+            variant="outlined"
+          />
+        );
+      case 'role':
+        return (
+          <Chip
+            icon={user.role === 'admin' ? <SecurityIcon /> : <PersonIcon />}
+            label={t(`users.roles.${user.role}`)}
+            color={user.role === 'admin' ? 'primary' : 'secondary'}
+            size="small"
+            variant="outlined"
+          />
+        );
+      case 'status':
+        return (
+          <Chip
+            label={t(`users.statuses.${user.status}`)}
+            color={getStatusColor(user.status)}
+            size="small"
+          />
+        );
+      case 'tags':
+        return (
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+            {user.tags && user.tags.length > 0 && (
+              user.tags.map((tag: any) => (
+                <Chip
+                  key={tag.id}
+                  label={tag.name}
+                  size="small"
+                  variant="outlined"
+                  sx={{
+                    bgcolor: tag.color ? `${tag.color}15` : undefined,
+                    borderColor: tag.color || undefined,
+                    color: tag.color || undefined,
+                  }}
+                />
+              ))
+            )}
+          </Box>
+        );
+      case 'joinDate':
+        return (
+          <Typography variant="body2">
+            {formatDateTimeDetailed(user.createdAt)}
+          </Typography>
+        );
+      case 'lastLogin':
+        return (
+          <Typography variant="body2">
+            {user.lastLoginAt ? formatDateTimeDetailed(user.lastLoginAt) : '-'}
+          </Typography>
+        );
+      default:
+        return null;
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'success';
@@ -1024,6 +1301,23 @@ const UsersManagementPage: React.FC = () => {
                 onFilterChange={handleDynamicFilterChange}
                 onOperatorChange={handleOperatorChange}
               />
+
+              {/* Column Settings Button */}
+              <Tooltip title={t('users.columnSettings')}>
+                <IconButton
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    bgcolor: 'background.paper',
+                    border: 1,
+                    borderColor: 'divider',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                    },
+                  }}
+                >
+                  <ViewColumnIcon />
+                </IconButton>
+              </Tooltip>
             </Box>
           </Box>
         </CardContent>
@@ -1108,7 +1402,7 @@ const UsersManagementPage: React.FC = () => {
               pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
             }}
           >
-            <Table>
+            <Table sx={{ tableLayout: 'auto' }}>
               <TableHead>
                 <TableRow>
                   <TableCell padding="checkbox">
@@ -1118,14 +1412,15 @@ const UsersManagementPage: React.FC = () => {
                       onChange={handleSelectAllUsers}
                     />
                   </TableCell>
-                  <TableCell>{t('users.user')}</TableCell>
-                  <TableCell>{t('users.email')}</TableCell>
-                  <TableCell align="center">{t('users.emailVerified')}</TableCell>
-                  <TableCell>{t('users.role')}</TableCell>
-                  <TableCell>{t('users.status')}</TableCell>
-                  <TableCell>{t('users.tags')}</TableCell>
-                  <TableCell>{t('users.joinDate')}</TableCell>
-                  <TableCell>{t('users.lastLogin')}</TableCell>
+                  {columns.filter(col => col.visible).map((column) => (
+                    <TableCell
+                      key={column.id}
+                      align={column.id === 'emailVerified' ? 'center' : 'left'}
+                      width={column.width}
+                    >
+                      {t(column.labelKey)}
+                    </TableCell>
+                  ))}
                   <TableCell>{t('users.createdBy')}</TableCell>
                   <TableCell align="center">{t('common.actions')}</TableCell>
                 </TableRow>
@@ -1192,98 +1487,15 @@ const UsersManagementPage: React.FC = () => {
                         onChange={() => handleSelectUser(user.id)}
                       />
                     </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Avatar src={user.avatarUrl}>
-                          {user.name?.charAt(0).toUpperCase()}
-                        </Avatar>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                            {user.name}
-                          </Typography>
-                          <IconButton
-                            size="small"
-                            onClick={() => copyToClipboard(user.name, 'name')}
-                            sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
-                          >
-                            <ContentCopyIcon fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="body2">
-                          {user.email}
-                        </Typography>
-                        <IconButton
-                          size="small"
-                          onClick={() => copyToClipboard(user.email, 'email')}
-                          sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}
-                        >
-                          <ContentCopyIcon fontSize="small" />
-                        </IconButton>
-                      </Box>
-                    </TableCell>
-                    <TableCell align="center">
-                      {user.emailVerified ? (
-                        <Chip
-                          label={t('users.verified')}
-                          color="success"
-                          size="small"
-                          variant="outlined"
-                        />
-                      ) : (
-                        <Chip
-                          label={t('users.unverified')}
-                          color="warning"
-                          size="small"
-                          variant="outlined"
-                        />
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        icon={user.role === 'admin' ? <SecurityIcon /> : <PersonIcon />}
-                        label={t(`users.roles.${user.role}`)}
-                        color={getRoleColor(user.role)}
-                        size="small"
-                        variant="outlined"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={t(`users.statuses.${user.status}`)}
-                        color={getStatusColor(user.status)}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {user.tags && user.tags.length > 0 && (
-                          user.tags.map((tag: any) => (
-                            <Tooltip key={tag.id} title={tag.description || t('tags.noDescription')} arrow>
-                              <Chip
-                                label={tag.name}
-                                size="small"
-                                sx={{
-                                  backgroundColor: tag.color,
-                                  color: 'white',
-                                  fontSize: '0.75rem',
-                                  cursor: 'help'
-                                }}
-                              />
-                            </Tooltip>
-                          ))
-                        )}
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      {formatDateTimeDetailed(user.createdAt)}
-                    </TableCell>
-                    <TableCell>
-                      {formatDateTimeDetailed(user.lastLoginAt)}
-                    </TableCell>
+                    {columns.filter(col => col.visible).map((column) => (
+                      <TableCell
+                        key={column.id}
+                        align={column.id === 'emailVerified' ? 'center' : 'left'}
+                        width={column.width}
+                      >
+                        {renderCellContent(user, column.id)}
+                      </TableCell>
+                    ))}
                     <TableCell>
                       {user.createdByName ? (
                         <Box>
@@ -2409,6 +2621,56 @@ const UsersManagementPage: React.FC = () => {
         </Box>
       </Drawer>
 
+      {/* Column Settings Popover */}
+      <Popover
+        open={Boolean(columnSettingsAnchor)}
+        anchorEl={columnSettingsAnchor}
+        onClose={() => setColumnSettingsAnchor(null)}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        hideBackdrop
+        disableScrollLock
+      >
+        <ClickAwayListener onClickAway={() => setColumnSettingsAnchor(null)}>
+          <Box sx={{ p: 2, minWidth: 280, maxWidth: 320 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                {t('users.columnSettings')}
+              </Typography>
+              <Button size="small" onClick={handleResetColumns} color="warning">
+                {t('common.reset')}
+              </Button>
+            </Box>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleColumnDragEnd}
+              modifiers={[restrictToVerticalAxis]}
+            >
+              <SortableContext
+                items={columns.map(col => col.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <List dense disablePadding>
+                  {columns.map((column) => (
+                    <SortableColumnItem
+                      key={column.id}
+                      column={column}
+                      onToggleVisibility={handleToggleColumnVisibility}
+                    />
+                  ))}
+                </List>
+              </SortableContext>
+            </DndContext>
+          </Box>
+        </ClickAwayListener>
+      </Popover>
 
     </Box>
   );

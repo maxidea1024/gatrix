@@ -550,6 +550,7 @@
       "joinDate": "Join Date",
       "lastLogin": "Last Login",
       "createdBy": "Created By",
+      "columnSettings": "Column Settings",
       "tags": "Tags",
       "tagsHelp": "Select tags to classify and manage users.",
       "roleHelp": "Select the user's role.",

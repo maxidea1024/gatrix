@@ -497,12 +497,18 @@ const AuditLogsPage: React.FC = () => {
                     loadingMessage={t('common.loadingAuditLogs')}
                   />
                 ) : (
-                  auditLogs.map((log) => (
+                  auditLogs.map((log, index) => (
                     <React.Fragment key={log.id}>
                       <TableRow
                         hover
                         sx={{
                           cursor: 'pointer',
+                          bgcolor: (theme) =>
+                            index % 2 === 0
+                              ? 'transparent'
+                              : theme.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.02)'
+                                : 'rgba(0, 0, 0, 0.02)',
                           '& > *': { borderBottom: expandedRowId === log.id ? 'none' : undefined }
                         }}
                         onClick={() => setExpandedRowId(expandedRowId === log.id ? null : log.id)}

@@ -75,6 +75,53 @@ docker compose -f docker-compose.dev.yml up -d --build backend-dev
 docker compose -f docker-compose.dev.yml down
 ```
 
+### 📦 Package Management in Development
+
+**Important**: Due to volume mount configuration (`- /app/node_modules`), the container's `node_modules` is isolated from the host. When adding packages in development:
+
+#### Adding Packages to Frontend
+
+```bash
+# Add package to container (recommended for dev environment)
+docker-compose -f docker-compose.dev.yml exec -u root frontend-dev yarn add <package-name> -W
+
+# Example:
+docker-compose -f docker-compose.dev.yml exec -u root frontend-dev yarn add @dnd-kit/modifiers -W
+```
+
+**Notes:**
+- `-u root`: Run as root to avoid permission issues
+- `-W`: Install to workspace root (required for monorepo structure)
+- Package is immediately available without container restart
+- Changes are persisted in `package.json` and `yarn.lock`
+
+#### Adding Packages to Backend
+
+```bash
+# Add package to backend container
+docker-compose -f docker-compose.dev.yml exec -u root backend-dev yarn add <package-name> -W
+
+# Example:
+docker-compose -f docker-compose.dev.yml exec -u root backend-dev yarn add lodash -W
+```
+
+#### For Permanent Installation (Survives Container Rebuild)
+
+If you need to rebuild the container later, the packages will persist because `package.json` is updated. However, if you want to ensure packages are in the Docker image:
+
+```bash
+# 1. Add package (already done above)
+# 2. Rebuild image
+docker-compose -f docker-compose.dev.yml build frontend-dev
+# 3. Recreate container
+docker-compose -f docker-compose.dev.yml up -d frontend-dev
+```
+
+**Why this approach?**
+- Container's `node_modules` is excluded from volume mount
+- Installing locally (`yarn add` on host) won't affect the running container
+- Direct installation in container is faster and doesn't require rebuild
+
 ## 📦 Services
 
 ### Core Services
