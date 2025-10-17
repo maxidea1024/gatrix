@@ -310,6 +310,39 @@ router.patch('/read-multiple', async (req: Request, res: Response) => {
 });
 
 /**
+ * PATCH /api/mails/read-all
+ * Mark all unread mails as read (with optional filters)
+ */
+router.patch('/read-all', async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const { isRead, isStarred } = req.query;
+
+    const filters: any = {};
+    if (isRead !== undefined) {
+      filters.isRead = isRead === 'false'; // Only mark unread mails
+    }
+    if (isStarred !== undefined) {
+      filters.isStarred = isStarred === 'true';
+    }
+
+    const count = await mailService.markAllAsRead(userId, filters);
+
+    res.json({
+      success: true,
+      count,
+      message: `${count} mails marked as read`,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to mark all mails as read',
+      error: error.message,
+    });
+  }
+});
+
+/**
  * PATCH /api/mails/:id/star
  * Toggle starred status
  */

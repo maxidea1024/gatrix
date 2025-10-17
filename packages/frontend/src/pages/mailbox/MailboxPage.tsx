@@ -106,6 +106,7 @@ const MailboxPage: React.FC = () => {
   const [mailToDelete, setMailToDelete] = useState<number | null>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
   const [emptyMailboxConfirmOpen, setEmptyMailboxConfirmOpen] = useState(false);
+  const [markAllReadConfirmOpen, setMarkAllReadConfirmOpen] = useState(false);
 
   // New mail notification state
   const [newMailCount, setNewMailCount] = useState(0);
@@ -342,23 +343,21 @@ const MailboxPage: React.FC = () => {
   };
 
   const handleEmptyMailboxConfirm = async () => {
+    setEmptyMailboxConfirmOpen(false);
+
     try {
       // Delete all mails in current filter
-      const mailIds = mails.map(m => m.id);
-      if (mailIds.length === 0) return;
-
-      await mailService.deleteMultiple(mailIds);
-      setMails([]);
+      await mailService.deleteAllMails(filter);
+      // Reload mails and stats
+      await loadMails(true);
+      await loadStats();
       setSelectedMail(null);
       setSelectedMailIds([]);
       setSelectAll(false);
       enqueueSnackbar(t('mailbox.mailboxEmptied'), { variant: 'success' });
-      loadStats();
     } catch (error) {
       console.error('Failed to empty mailbox:', error);
       enqueueSnackbar(t('mailbox.errors.emptyFailed'), { variant: 'error' });
-    } finally {
-      setEmptyMailboxConfirmOpen(false);
     }
   };
 
@@ -416,6 +415,35 @@ const MailboxPage: React.FC = () => {
       console.error('Failed to mark as read:', error);
       enqueueSnackbar(t('mailbox.errors.markReadFailed'), { variant: 'error' });
     }
+  };
+
+  // Handle mark all as read click
+  const handleMarkAllAsReadClick = () => {
+    setMarkAllReadConfirmOpen(true);
+  };
+
+  // Handle mark all as read confirm
+  const handleMarkAllAsReadConfirm = async () => {
+    setMarkAllReadConfirmOpen(false);
+
+    try {
+      // Mark all unread mails in the current filter
+      await mailService.markAllAsRead(filter);
+      // Reload mails and stats
+      await loadMails(true);
+      await loadStats();
+      enqueueSnackbar(t('mailbox.allMarkedAsRead'), { variant: 'success' });
+      // Notify MainLayout to update unread count
+      window.dispatchEvent(new CustomEvent('mail-read'));
+    } catch (error) {
+      console.error('Failed to mark all as read:', error);
+      enqueueSnackbar(t('mailbox.errors.markReadFailed'), { variant: 'error' });
+    }
+  };
+
+  // Handle mark all as read cancel
+  const handleMarkAllAsReadCancel = () => {
+    setMarkAllReadConfirmOpen(false);
   };
 
   // Get date locale
@@ -627,26 +655,34 @@ const MailboxPage: React.FC = () => {
 
             {/* Mark All as Read Button */}
             <Tooltip title={t('mailbox.markAllAsRead')}>
-              <IconButton
-                size="small"
-                onClick={handleBulkMarkAsRead}
-                disabled={selectedMailIds.length === 0}
-                color="primary"
-              >
-                <CheckCircleIcon />
-              </IconButton>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={handleMarkAllAsReadClick}
+                  disabled={!stats || stats.unread === 0}
+                  color="primary"
+                >
+                  <CheckCircleIcon />
+                </IconButton>
+              </span>
             </Tooltip>
 
             {/* Empty Mailbox Button */}
             <Tooltip title={t('mailbox.emptyMailbox')}>
-              <IconButton
-                size="small"
-                onClick={handleEmptyMailboxClick}
-                color="error"
-                disabled={mails.length === 0}
-              >
-                <DeleteSweepIcon />
-              </IconButton>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={handleEmptyMailboxClick}
+                  color="error"
+                  disabled={!stats || (
+                    filter === 'unread' ? stats.unread === 0 :
+                    filter === 'starred' ? stats.starred === 0 :
+                    stats.total === 0
+                  )}
+                >
+                  <DeleteSweepIcon />
+                </IconButton>
+              </span>
             </Tooltip>
 
             {/* Refresh Button */}
@@ -908,9 +944,16 @@ const MailboxPage: React.FC = () => {
                   )}
                 </Box>
                 <Divider sx={{ mb: 2 }} />
-                <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
-                  {selectedMail.content}
-                </Typography>
+                <Box
+                  className="ql-editor"
+                  sx={{
+                    padding: 0,
+                    '& p': { marginBottom: 1 },
+                    '& a': { color: 'primary.main', textDecoration: 'underline' },
+                    '& img': { maxWidth: '100%', height: 'auto' },
+                  }}
+                  dangerouslySetInnerHTML={{ __html: selectedMail.content }}
+                />
               </Box>
             ) : (
               <Box
@@ -1089,7 +1132,11 @@ const MailboxPage: React.FC = () => {
             {t('mailbox.emptyMailboxWarning')}
           </Alert>
           <Typography>
-            {t('mailbox.emptyMailboxConfirmMessage', { count: mails.length })}
+            {t('mailbox.emptyMailboxConfirmMessage', {
+              count: filter === 'unread' ? (stats?.unread || 0) :
+                     filter === 'starred' ? (stats?.starred || 0) :
+                     (stats?.total || 0)
+            })}
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -1098,6 +1145,33 @@ const MailboxPage: React.FC = () => {
           </Button>
           <Button onClick={handleEmptyMailboxConfirm} color="error" variant="contained">
             {t('mailbox.emptyMailbox')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Mark All as Read Confirmation Dialog */}
+      <Dialog
+        open={markAllReadConfirmOpen}
+        onClose={handleMarkAllAsReadCancel}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>{t('mailbox.markAllAsReadConfirmTitle')}</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {t('mailbox.markAllAsReadConfirmMessage', {
+              count: filter === 'unread' ? (stats?.unread || 0) :
+                     filter === 'starred' ? (stats?.starred || 0) :
+                     (stats?.total || 0)
+            })}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleMarkAllAsReadCancel}>
+            {t('common.cancel')}
+          </Button>
+          <Button onClick={handleMarkAllAsReadConfirm} color="primary" variant="contained">
+            {t('mailbox.markAllAsRead')}
           </Button>
         </DialogActions>
       </Dialog>

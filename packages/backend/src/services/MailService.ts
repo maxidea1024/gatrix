@@ -160,6 +160,20 @@ export class MailService {
   }
 
   /**
+   * Mark all unread mails as read (with optional filters)
+   */
+  async markAllAsRead(userId: number, filters: any = {}): Promise<number> {
+    try {
+      const count = await MailModel.markAllAsRead(userId, filters);
+      logger.info(`${count} mails marked as read by user ${userId} with filters:`, filters);
+      return count;
+    } catch (error) {
+      logger.error('Failed to mark all mails as read:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Toggle starred status
    */
   async toggleStarred(mailId: number, userId: number): Promise<boolean> {

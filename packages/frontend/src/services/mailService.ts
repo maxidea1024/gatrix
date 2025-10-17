@@ -110,6 +110,21 @@ export class MailService {
   }
 
   /**
+   * Mark all unread mails as read (with optional filter)
+   */
+  async markAllAsRead(filter?: 'all' | 'unread' | 'starred'): Promise<void> {
+    const params: any = {};
+    if (filter && filter !== 'all') {
+      if (filter === 'unread') {
+        params.isRead = false;
+      } else if (filter === 'starred') {
+        params.isStarred = true;
+      }
+    }
+    await apiService.patch('/mails/read-all', params);
+  }
+
+  /**
    * Toggle starred status
    */
   async toggleStarred(mailId: number): Promise<boolean> {
@@ -129,6 +144,21 @@ export class MailService {
    */
   async deleteMultiple(mailIds: number[]): Promise<void> {
     await apiService.delete('/mails', { data: { mailIds } });
+  }
+
+  /**
+   * Delete all mails (with optional filter)
+   */
+  async deleteAllMails(filter?: 'all' | 'unread' | 'starred'): Promise<void> {
+    const params: any = {};
+    if (filter && filter !== 'all') {
+      if (filter === 'unread') {
+        params.isRead = false;
+      } else if (filter === 'starred') {
+        params.isStarred = true;
+      }
+    }
+    await apiService.delete('/mails/delete-all', { params });
   }
 }
 

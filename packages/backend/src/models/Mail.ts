@@ -208,6 +208,27 @@ export class MailModel extends Model {
     return result;
   }
 
+  // Mark all unread mails as read (with optional filters)
+  static async markAllAsRead(userId: number, filters: any = {}): Promise<number> {
+    const now = new Date();
+    const query = this.query()
+      .patch({
+        isRead: true,
+        readAt: now.toISOString().slice(0, 19).replace('T', ' '),
+      } as any)
+      .where('recipientId', userId)
+      .where('isDeleted', false)
+      .where('isRead', false); // Only mark unread mails
+
+    // Apply optional filters
+    if (filters.isStarred !== undefined) {
+      query.where('isStarred', filters.isStarred);
+    }
+
+    const result = await query;
+    return result;
+  }
+
   // Toggle starred status
   static async toggleStarred(mailId: number, userId: number): Promise<boolean> {
     const mail = await this.query()
