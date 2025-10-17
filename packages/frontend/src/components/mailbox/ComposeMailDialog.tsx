@@ -266,6 +266,7 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
 
       {/* Content */}
       <DialogContent sx={{ pt: 3, pb: 2 }}>
+        <Box sx={{ mb: 2 }} />
         <Stack spacing={3}>
           {/* Recipients - Multiple selection with modern styling */}
           <Paper

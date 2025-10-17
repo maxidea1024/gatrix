@@ -329,9 +329,41 @@ const MailboxPage: React.FC = () => {
   const handleSelectAll = () => {
     if (selectedMailIds.length === mails.length) {
       setSelectedMailIds([]);
+      setSelectAll(false);
     } else {
       setSelectedMailIds(mails.map(m => m.id));
+      setSelectAll(true);
     }
+  };
+
+  // Handle empty mailbox
+  const handleEmptyMailboxClick = () => {
+    setEmptyMailboxConfirmOpen(true);
+  };
+
+  const handleEmptyMailboxConfirm = async () => {
+    try {
+      // Delete all mails in current filter
+      const mailIds = mails.map(m => m.id);
+      if (mailIds.length === 0) return;
+
+      await mailService.deleteMultiple(mailIds);
+      setMails([]);
+      setSelectedMail(null);
+      setSelectedMailIds([]);
+      setSelectAll(false);
+      enqueueSnackbar(t('mailbox.mailboxEmptied'), { variant: 'success' });
+      loadStats();
+    } catch (error) {
+      console.error('Failed to empty mailbox:', error);
+      enqueueSnackbar(t('mailbox.errors.emptyFailed'), { variant: 'error' });
+    } finally {
+      setEmptyMailboxConfirmOpen(false);
+    }
+  };
+
+  const handleEmptyMailboxCancel = () => {
+    setEmptyMailboxConfirmOpen(false);
   };
 
   // Handle bulk delete - show confirmation dialog
@@ -430,7 +462,20 @@ const MailboxPage: React.FC = () => {
   // Listen for real-time mail received events
   useEffect(() => {
     const handleMailReceived = () => {
-      loadMails();
+      // Check if scroll is at top
+      const scrollElement = parentRef.current;
+      if (scrollElement) {
+        const isAtTop = scrollElement.scrollTop < 50;
+
+        if (isAtTop) {
+          // If at top, reload mails
+          loadMails(true);
+        } else {
+          // If not at top, show floating button
+          setNewMailCount(prev => prev + 1);
+          setShowNewMailButton(true);
+        }
+      }
       loadStats();
     };
 
@@ -439,6 +484,19 @@ const MailboxPage: React.FC = () => {
       window.removeEventListener('mail-received', handleMailReceived);
     };
   }, [filter]);
+
+  // Handle scroll to top and load new mails
+  const handleScrollToNewMails = () => {
+    const scrollElement = parentRef.current;
+    if (scrollElement) {
+      scrollElement.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => {
+        loadMails(true);
+        setNewMailCount(0);
+        setShowNewMailButton(false);
+      }, 300);
+    }
+  };
 
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 3 }}>
@@ -519,11 +577,22 @@ const MailboxPage: React.FC = () => {
               py: 1.5,
               display: 'flex',
               gap: 1,
+              alignItems: 'center',
               boxShadow: (theme) => theme.palette.mode === 'dark'
                 ? '0 2px 8px rgba(0,0,0,0.3)'
                 : '0 2px 8px rgba(0,0,0,0.1)',
             }}
           >
+            {/* Select All Checkbox */}
+            <Tooltip title={t('mailbox.selectAll')}>
+              <Checkbox
+                checked={selectAll}
+                indeterminate={selectedMailIds.length > 0 && selectedMailIds.length < mails.length}
+                onChange={handleSelectAll}
+                size="small"
+              />
+            </Tooltip>
+
             <ToggleButtonGroup
               value={filter}
               exclusive
@@ -555,8 +624,34 @@ const MailboxPage: React.FC = () => {
               </ToggleButton>
             </ToggleButtonGroup>
             <Box sx={{ flex: 1 }} />
+
+            {/* Mark All as Read Button */}
+            <Tooltip title={t('mailbox.markAllAsRead')}>
+              <IconButton
+                size="small"
+                onClick={handleBulkMarkAsRead}
+                disabled={selectedMailIds.length === 0}
+                color="primary"
+              >
+                <CheckCircleIcon />
+              </IconButton>
+            </Tooltip>
+
+            {/* Empty Mailbox Button */}
+            <Tooltip title={t('mailbox.emptyMailbox')}>
+              <IconButton
+                size="small"
+                onClick={handleEmptyMailboxClick}
+                color="error"
+                disabled={mails.length === 0}
+              >
+                <DeleteSweepIcon />
+              </IconButton>
+            </Tooltip>
+
+            {/* Refresh Button */}
             <Tooltip title={t('common.refresh')}>
-              <IconButton size="small" onClick={() => { loadMails(); loadStats(); }}>
+              <IconButton size="small" onClick={() => { loadMails(true); loadStats(); }}>
                 <RefreshIcon />
               </IconButton>
             </Tooltip>
@@ -564,7 +659,7 @@ const MailboxPage: React.FC = () => {
         )}
 
         {/* Mail panels container */}
-        <Box sx={{ flex: 1, display: 'flex', gap: 2, minHeight: 0, pt: stats && currentTab === 'received' ? '58px' : 0 }}>
+        <Box sx={{ flex: 1, display: 'flex', gap: 2, minHeight: 0, pt: stats && currentTab === 'received' ? '60px' : 0 }}>
           {/* Mail List */}
           <Paper sx={{
             flex: 1,
@@ -818,13 +913,83 @@ const MailboxPage: React.FC = () => {
                 </Typography>
               </Box>
             ) : (
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                <Typography variant="body2" color="text.secondary">
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '100%',
+                  flexDirection: 'column',
+                  gap: 2,
+                }}
+              >
+                <Box
+                  sx={{
+                    animation: 'bounce 1.5s ease-in-out infinite',
+                    '@keyframes bounce': {
+                      '0%, 100%': {
+                        transform: 'translateY(0) rotate(0deg)',
+                        opacity: 0.7,
+                      },
+                      '25%': {
+                        transform: 'translateY(-15px) rotate(-5deg)',
+                        opacity: 1,
+                      },
+                      '50%': {
+                        transform: 'translateY(0) rotate(0deg)',
+                        opacity: 0.8,
+                      },
+                      '75%': {
+                        transform: 'translateY(-8px) rotate(5deg)',
+                        opacity: 1,
+                      },
+                    },
+                  }}
+                >
+                  <MailIcon sx={{ fontSize: 64, color: 'text.disabled' }} />
+                </Box>
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{
+                    animation: 'textBounce 1.5s ease-in-out infinite',
+                    '@keyframes textBounce': {
+                      '0%, 100%': {
+                        opacity: 0.6,
+                        transform: 'translateY(0)',
+                      },
+                      '50%': {
+                        opacity: 1,
+                        transform: 'translateY(-3px)',
+                      },
+                    },
+                  }}
+                >
                   {mails.length > 0 ? t('mailbox.selectMail') : t('mailbox.noMails')}
                 </Typography>
               </Box>
             )}
           </Paper>
+
+          {/* New Mail Floating Button */}
+          <Zoom in={showNewMailButton}>
+            <Fab
+              color="primary"
+              size="medium"
+              onClick={handleScrollToNewMails}
+              sx={{
+                position: 'absolute',
+                top: 80,
+                left: 180,
+                zIndex: 101,
+                boxShadow: 3,
+              }}
+            >
+              <Badge badgeContent={newMailCount} color="error">
+                <ArrowUpwardIcon />
+              </Badge>
+            </Fab>
+          </Zoom>
         </Box>
       </Box>
 
@@ -907,6 +1072,32 @@ const MailboxPage: React.FC = () => {
           </Button>
           <Button onClick={handleBulkDeleteConfirm} color="error" variant="contained">
             {t('common.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Empty Mailbox Confirmation Dialog */}
+      <Dialog
+        open={emptyMailboxConfirmOpen}
+        onClose={handleEmptyMailboxCancel}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>{t('mailbox.emptyMailboxConfirmTitle')}</DialogTitle>
+        <DialogContent>
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            {t('mailbox.emptyMailboxWarning')}
+          </Alert>
+          <Typography>
+            {t('mailbox.emptyMailboxConfirmMessage', { count: mails.length })}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEmptyMailboxCancel}>
+            {t('common.cancel')}
+          </Button>
+          <Button onClick={handleEmptyMailboxConfirm} color="error" variant="contained">
+            {t('mailbox.emptyMailbox')}
           </Button>
         </DialogActions>
       </Dialog>
