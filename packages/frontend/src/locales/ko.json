@@ -656,7 +656,9 @@
     "confirmShow": "정말로 \"{{name}}\" 게임 월드를 표시하시겠습니까?",
     "confirmStartMaintenance": "정말로 \"{{name}}\" 게임 월드의 점검을 시작하시겠습니까?",
     "confirmEndMaintenance": "정말로 \"{{name}}\" 게임 월드의 점검을 종료하시겠습니까?",
-    "maintenance": {
+    "normal": "정상",
+    "maintenance": "점검중",
+    "maintenanceConfig": {
       "title": "점검 설정",
       "description": "점검 기간과 메시지를 설정하세요.",
       "startDate": "점검 시작일",
@@ -686,10 +688,13 @@
   "messageTemplates": {
     "title": "메시지 템플릿 관리",
     "subtitle": "시스템에서 사용할 메시지 템플릿을 관리합니다",
+    "name": "이름",
+    "type": "유형",
+    "defaultMessage": "기본 메시지",
+    "isEnabled": "사용 여부",
     "onlyDefaultMessage": "기본 메시지 사용",
     "noTemplates": "메시지 템플릿이 없습니다",
     "noTemplatesFound": "등록된 메시지 템플릿이 없습니다.",
-    "type": "유형",
     "availability": "사용 가능",
     "searchPlaceholder": "이름 또는 메시지로 검색...",
     "searchPlaceholderDetailed": "템플릿 이름, 유형 또는 메시지 내용으로 검색...",
@@ -718,7 +723,8 @@
     "types": {
       "maintenance": "점검",
       "general": "일반",
-      "notification": "알림"
+      "notification": "알림",
+      "reminder": "알림"
     },
     "errors": {
       "duplicateName": "같은 이름의 메시지 템플릿이 이미 존재합니다"
@@ -1020,6 +1026,7 @@
     "tokenTypeNotEditable": "토큰 유형은 생성 후 변경할 수 없습니다",
     "tokenValue": "토큰 값",
     "lastUsed": "마지막 사용",
+    "lastUsedAt": "마지막 사용일",
     "usageCount": "사용 횟수",
     "expiresAt": "만료일",
     "status": "상태",
@@ -1354,6 +1361,14 @@
   "clientVersion": "클라이언트 버전",
   "clientVersions": {
     "description": "플랫폼별 클라이언트 버전을 추가·편집하고, 게임 서버·패치 서버 주소와 업데이트 정책을 관리합니다.",
+    "platform": "플랫폼",
+    "clientVersion": "클라이언트 버전",
+    "clientStatus": "클라이언트 상태",
+    "gameServerAddress": "게임 서버 주소",
+    "patchAddress": "패치 주소",
+    "guestModeAllowed": "게스트 모드 허용",
+    "tags": "태그",
+    "createdAt": "생성일시",
     "addNew": "클라이언트 버전 추가",
     "addIndividual": "개별 추가",
     "addBulk": "간편 추가",
@@ -1497,6 +1512,7 @@
     "clickToManage": "클릭하여 관리",
     "close": "닫기",
     "collapse": "접기",
+    "columnSettings": "컬럼 설정",
     "enterFullscreen": "전체화면",
     "exitFullscreen": "전체화면 종료",
     "color": "색상",
@@ -1630,6 +1646,9 @@
     "user": "사용자",
     "valid": "유효함",
     "invalid": "유효하지 않음",
+    "visible": "표시",
+    "hidden": "숨김",
+    "normal": "정상",
     "warning": "경고",
     "week": "주",
     "weekdays": {
@@ -1755,7 +1774,12 @@
     "addJob": "작업 추가",
     "editJob": "Job 편집",
     "noJobsFound": "등록된 작업이 없습니다.",
+    "jobName": "작업 이름",
     "jobType": "Job 타입",
+    "schedule": "스케줄",
+    "lastExecution": "마지막 실행",
+    "nextExecution": "다음 실행",
+    "isEnabled": "활성화",
     "basicInformation": "기본 정보",
     "configuration": "설정",
     "jobDataConfiguration": "Job 데이터 설정",

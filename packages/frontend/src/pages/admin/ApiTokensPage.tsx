@@ -4,6 +4,8 @@ import {
   Typography,
   Button,
   Paper,
+  Card,
+  CardContent,
   Table,
   TableBody,
   TableCell,
@@ -73,12 +75,20 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import 'dayjs/locale/ko';
+import 'dayjs/locale/en';
+import 'dayjs/locale/zh-cn';
 import { ApiAccessToken, TokenType } from '@/types/apiToken';
 import { apiTokenService } from '@/services/apiTokenService';
 import SimplePagination from '@/components/common/SimplePagination';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
+import { useI18n } from '@/hooks/useI18n';
 
 interface CreateTokenData {
   tokenName: string;
@@ -152,9 +162,28 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggl
   );
 };
 
+// Default column configuration
+const defaultColumns: ColumnConfig[] = [
+  { id: 'tokenName', labelKey: 'apiTokens.tokenName', visible: true },
+  { id: 'tokenType', labelKey: 'apiTokens.tokenType', visible: true },
+  { id: 'description', labelKey: 'apiTokens.description', visible: true },
+  { id: 'lastUsedAt', labelKey: 'apiTokens.lastUsedAt', visible: true },
+  { id: 'expiresAt', labelKey: 'apiTokens.expiresAt', visible: true },
+  { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
+];
+
+// Helper function to get date locale
+const getDateLocale = () => {
+  const lang = localStorage.getItem('i18nextLng') || 'ko';
+  if (lang.startsWith('ko')) return 'ko';
+  if (lang.startsWith('zh')) return 'zh-cn';
+  return 'en';
+};
+
 const ApiTokensPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { language } = useI18n();
   const [tokens, setTokens] = useState<ApiAccessToken[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -162,14 +191,47 @@ const ApiTokensPage: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  
+
+  // Column settings state
+  const [columns, setColumns] = useState<ColumnConfig[]>(() => {
+    const saved = localStorage.getItem('apiTokensColumns');
+    if (saved) {
+      try {
+        const savedColumns = JSON.parse(saved);
+        const mergedColumns = savedColumns.map((savedCol: ColumnConfig) => {
+          const defaultCol = defaultColumns.find(c => c.id === savedCol.id);
+          return defaultCol ? { ...defaultCol, ...savedCol } : savedCol;
+        });
+        const savedIds = new Set(savedColumns.map((c: ColumnConfig) => c.id));
+        const newColumns = defaultColumns.filter(c => !savedIds.has(c.id));
+        return [...mergedColumns, ...newColumns];
+      } catch (e) {
+        return defaultColumns;
+      }
+    }
+    return defaultColumns;
+  });
+
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+
+  const columnSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  // Search state
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Dynamic filter state
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
+
   // Dialog states
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [regenerateDialogOpen, setRegenerateDialogOpen] = useState(false);
   const [selectedToken, setSelectedToken] = useState<ApiAccessToken | null>(null);
-  
+
   // Form states
   const [formData, setFormData] = useState<CreateTokenData>({
     tokenName: '',
@@ -177,7 +239,7 @@ const ApiTokensPage: React.FC = () => {
     tokenType: 'client',
     environmentId: 1,
   });
-  
+
   // UI states
   const [newTokenValue, setNewTokenValue] = useState<string>('');
   const [newTokenInfo, setNewTokenInfo] = useState<any>(null);
@@ -201,18 +263,81 @@ const ApiTokensPage: React.FC = () => {
   const regenerateConfirmRef = useRef<HTMLInputElement>(null);
   const regenerateConfirmInputRef = useRef<HTMLInputElement>(null);
 
+  // Column handlers
+  const handleToggleColumnVisibility = (columnId: string) => {
+    const newColumns = columns.map(col =>
+      col.id === columnId ? { ...col, visible: !col.visible } : col
+    );
+    setColumns(newColumns);
+    localStorage.setItem('apiTokensColumns', JSON.stringify(newColumns));
+  };
+
+  const handleResetColumns = () => {
+    setColumns(defaultColumns);
+    localStorage.removeItem('apiTokensColumns');
+  };
+
+  const handleColumnDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = columns.findIndex(col => col.id === active.id);
+      const newIndex = columns.findIndex(col => col.id === over.id);
+      const newColumns = arrayMove(columns, oldIndex, newIndex);
+      setColumns(newColumns);
+      localStorage.setItem('apiTokensColumns', JSON.stringify(newColumns));
+    }
+  };
+
+  // Filter definitions
+  const availableFilters: FilterDefinition[] = [
+    {
+      key: 'tokenType',
+      label: t('apiTokens.tokenType'),
+      type: 'select',
+      options: [
+        { value: 'client', label: t('apiTokens.types.client') },
+        { value: 'server', label: t('apiTokens.types.server') },
+      ],
+    },
+  ];
+
+  // Filter handlers
+  const handleFilterAdd = (filter: ActiveFilter) => {
+    setActiveFilters([...activeFilters, filter]);
+  };
+
+  const handleFilterRemove = (filterKey: string) => {
+    setActiveFilters(activeFilters.filter(f => f.key !== filterKey));
+  };
+
+  const handleFilterChange = (filterKey: string, value: any) => {
+    setActiveFilters(activeFilters.map(f =>
+      f.key === filterKey ? { ...f, value } : f
+    ));
+  };
+
   useEffect(() => {
     loadTokens();
-  }, [page, rowsPerPage, sortBy, sortOrder]);
+  }, [page, rowsPerPage, sortBy, sortOrder, activeFilters]);
 
   const loadTokens = async () => {
     try {
       setLoading(true);
+
+      // Build filter params
+      const filterParams: any = {};
+      activeFilters.forEach(filter => {
+        if (filter.value !== undefined && filter.value !== null && filter.value !== '') {
+          filterParams[filter.id] = filter.value;
+        }
+      });
+
       const response = await apiTokenService.getTokens({
         page: page + 1,
         limit: rowsPerPage,
         sortBy,
         sortOrder,
+        ...filterParams,
       });
       setTokens(response.data || []);
       setTotal(response.total || 0);
@@ -221,6 +346,49 @@ const ApiTokensPage: React.FC = () => {
       enqueueSnackbar(t('apiTokens.loadFailed'), { variant: 'error' });
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Render cell content based on column ID
+  const renderCellContent = (token: ApiAccessToken, columnId: string) => {
+    switch (columnId) {
+      case 'tokenName':
+        return <Typography variant="body2" sx={{ fontWeight: 500 }}>{token.tokenName}</Typography>;
+      case 'tokenType':
+        return (
+          <Tooltip
+            title={t(token.tokenType === 'client' ? 'apiTokens.clientTokenDescription' : 'apiTokens.serverTokenDescription')}
+            arrow
+          >
+            <Chip
+              label={t(`apiTokens.types.${token.tokenType}`)}
+              size="small"
+              color={token.tokenType === 'server' ? 'primary' : 'default'}
+            />
+          </Tooltip>
+        );
+      case 'description':
+        return (
+          <Typography variant="body2" sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {token.description || '-'}
+          </Typography>
+        );
+      case 'lastUsedAt':
+        return (
+          <Typography variant="body2">
+            {token.lastUsedAt ? formatDateTimeDetailed(token.lastUsedAt) : t('apiTokens.neverUsed')}
+          </Typography>
+        );
+      case 'expiresAt':
+        return (
+          <Typography variant="body2">
+            {token.expiresAt ? formatDateTimeDetailed(token.expiresAt) : t('apiTokens.noExpiration')}
+          </Typography>
+        );
+      case 'createdAt':
+        return <Typography variant="body2">{formatDateTimeDetailed(token.createdAt)}</Typography>;
+      default:
+        return null;
     }
   };
 
@@ -574,13 +742,84 @@ const ApiTokensPage: React.FC = () => {
         </Box>
       )}
 
+      {/* Filter and Column Settings */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+            {/* Search */}
+            <TextField
+              placeholder={t('apiTokens.searchPlaceholder')}
+              size="small"
+              sx={{
+                minWidth: 450,
+                flexGrow: 1,
+                maxWidth: 450,
+                '& .MuiOutlinedInput-root': {
+                  height: '40px',
+                  borderRadius: '20px',
+                  bgcolor: 'background.paper',
+                  transition: 'all 0.2s ease-in-out',
+                  '& fieldset': {
+                    borderColor: 'divider',
+                  },
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                    '& fieldset': {
+                      borderColor: 'primary.light',
+                    }
+                  },
+                  '&.Mui-focused': {
+                    bgcolor: 'background.paper',
+                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                    '& fieldset': {
+                      borderColor: 'primary.main',
+                      borderWidth: '1px',
+                    }
+                  }
+                },
+                '& .MuiInputBase-input': {
+                  fontSize: '0.875rem',
+                }
+              }}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            {/* Column Settings Button */}
+            <Tooltip title={t('common.columnSettings')}>
+              <IconButton
+                onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                sx={{
+                  ml: 1,
+                  bgcolor: 'background.paper',
+                  border: 1,
+                  borderColor: 'divider',
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  },
+                }}
+              >
+                <ViewColumnIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </CardContent>
+      </Card>
+
       {/* Tokens Table */}
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer>
-          <Table stickyHeader>
+          <Table stickyHeader sx={{ tableLayout: 'auto' }}>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
+                <TableCell padding="checkbox" sx={{ width: 50 }}>
                   <Checkbox
                     checked={selectAll}
                     indeterminate={selectedTokenIds.length > 0 && selectedTokenIds.length < tokens.length}
@@ -588,77 +827,18 @@ const ApiTokensPage: React.FC = () => {
                     disabled={tokens.length === 0}
                   />
                 </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortBy === 'tokenName'}
-                    direction={sortBy === 'tokenName' ? sortOrder : 'asc'}
-                    onClick={() => handleSort('tokenName')}
-                  >
-                    {t('apiTokens.tokenName')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>{t('apiTokens.description')}</TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortBy === 'tokenType'}
-                    direction={sortBy === 'tokenType' ? sortOrder : 'asc'}
-                    onClick={() => handleSort('tokenType')}
-                  >
-                    {t('apiTokens.tokenType')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortBy === 'lastUsedAt'}
-                    direction={sortBy === 'lastUsedAt' ? sortOrder : 'asc'}
-                    onClick={() => handleSort('lastUsedAt')}
-                  >
-                    {t('apiTokens.lastUsed')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortBy === 'usageCount'}
-                    direction={sortBy === 'usageCount' ? sortOrder : 'asc'}
-                    onClick={() => handleSort('usageCount')}
-                  >
-                    {t('apiTokens.usageCount')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortBy === 'expiresAt'}
-                    direction={sortBy === 'expiresAt' ? sortOrder : 'asc'}
-                    onClick={() => handleSort('expiresAt')}
-                  >
-                    {t('apiTokens.expiresAt')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortBy === 'creatorName'}
-                    direction={sortBy === 'creatorName' ? sortOrder : 'asc'}
-                    onClick={() => handleSort('creatorName')}
-                  >
-                    {t('apiTokens.createdBy')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortBy === 'createdAt'}
-                    direction={sortBy === 'createdAt' ? sortOrder : 'asc'}
-                    onClick={() => handleSort('createdAt')}
-                  >
-                    {t('apiTokens.createdAt')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell align="center">{t('common.actions')}</TableCell>
+                {columns.filter(col => col.visible).map((column) => (
+                  <TableCell key={column.id}>
+                    {t(column.labelKey)}
+                  </TableCell>
+                ))}
+                <TableCell align="center" sx={{ width: 150 }}>{t('common.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {!tokens || tokens.length === 0 ? (
                 <EmptyTableRow
-                  colSpan={10}
+                  colSpan={columns.filter(col => col.visible).length + 2}
                   loading={loading}
                   message={t('apiTokens.noTokens')}
                   loadingMessage={t('common.loadingData')}
@@ -672,69 +852,11 @@ const ApiTokensPage: React.FC = () => {
                         onChange={(e) => handleSelectToken(token.id, e.target.checked)}
                       />
                     </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight={500}>
-                        {token.tokenName}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="text.secondary">
-                        {token.description || '-'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Box>
-                        <Chip
-                          label={t(`apiTokens.${token.tokenType}TokenType`, token.tokenType)}
-                          color={getTokenTypeColor(token.tokenType)}
-                          size="small"
-                          variant="outlined"
-                          sx={{ mb: 0.5 }}
-                        />
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.75rem' }}>
-                          {t(`apiTokens.${token.tokenType}TokenDescription`)}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-
-                    <TableCell>
-                      <Typography variant="body2">
-                        {token.lastUsedAt
-                          ? formatDateTimeDetailed(token.lastUsedAt)
-                          : t('apiTokens.neverUsed')
-                        }
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {(token.usageCount || 0).toLocaleString()}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {token.expiresAt
-                          ? formatDateTimeDetailed(token.expiresAt)
-                          : t('apiTokens.noExpiration')
-                        }
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                          {token.creator?.name || t('common.unknown')}
-                        </Typography>
-                        {token.creator?.email && (
-                          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', fontSize: '0.75rem' }}>
-                            {token.creator.email}
-                          </Typography>
-                        )}
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {formatDateTimeDetailed(token.createdAt)}
-                      </Typography>
-                    </TableCell>
+                    {columns.filter(col => col.visible).map((column) => (
+                      <TableCell key={column.id}>
+                        {renderCellContent(token, column.id)}
+                      </TableCell>
+                    ))}
                     <TableCell align="center">
                       <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
                         <Tooltip title={t('apiTokens.copyToken')}>
@@ -905,16 +1027,20 @@ const ApiTokensPage: React.FC = () => {
               </RadioGroup>
             </FormControl>
 
-            <TextField
-              label={t('apiTokens.expiresAt')}
-              type="datetime-local"
-              value={formData.expiresAt || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, expiresAt: e.target.value }))}
-              fullWidth
-              size="small"
-              InputLabelProps={{ shrink: true }}
-              helperText={t('apiTokens.expiresAtHelp')}
-            />
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
+              <DateTimePicker
+                label={t('apiTokens.expiresAt')}
+                value={formData.expiresAt ? dayjs(formData.expiresAt) : null}
+                onChange={(date) => setFormData(prev => ({ ...prev, expiresAt: date ? date.toISOString() : undefined }))}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    size: 'small',
+                    helperText: t('apiTokens.expiresAtHelp'),
+                  },
+                }}
+              />
+            </LocalizationProvider>
         </Box>
 
         {/* Actions */}
@@ -1025,16 +1151,20 @@ const ApiTokensPage: React.FC = () => {
               helperText={t('apiTokens.tokenTypeNotEditable')}
             />
 
-            <TextField
-              label={t('apiTokens.expiresAt')}
-              type="datetime-local"
-              value={formData.expiresAt || ''}
-              onChange={(e) => setFormData(prev => ({ ...prev, expiresAt: e.target.value }))}
-              fullWidth
-              size="small"
-              InputLabelProps={{ shrink: true }}
-              helperText={t('apiTokens.expiresAtHelp')}
-            />
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
+              <DateTimePicker
+                label={t('apiTokens.expiresAt')}
+                value={formData.expiresAt ? dayjs(formData.expiresAt) : null}
+                onChange={(date) => setFormData(prev => ({ ...prev, expiresAt: date ? date.toISOString() : undefined }))}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    size: 'small',
+                    helperText: t('apiTokens.expiresAtHelp'),
+                  },
+                }}
+              />
+            </LocalizationProvider>
         </Box>
 
         {/* Actions */}
@@ -1618,6 +1748,40 @@ const ApiTokensPage: React.FC = () => {
             </Button>
           </DialogActions>
         </Dialog>
+
+      {/* Column Settings Popover */}
+      <Popover
+        open={Boolean(columnSettingsAnchor)}
+        anchorEl={columnSettingsAnchor}
+        onClose={() => setColumnSettingsAnchor(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Box sx={{ p: 2, minWidth: 250 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="subtitle2">{t('common.columnSettings')}</Typography>
+            <Button size="small" onClick={handleResetColumns}>{t('common.reset')}</Button>
+          </Box>
+          <DndContext
+            sensors={columnSensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleColumnDragEnd}
+            modifiers={[restrictToVerticalAxis]}
+          >
+            <SortableContext items={columns.map(c => c.id)} strategy={verticalListSortingStrategy}>
+              <List dense>
+                {columns.map((column) => (
+                  <SortableColumnItem
+                    key={column.id}
+                    column={column}
+                    onToggleVisibility={handleToggleColumnVisibility}
+                  />
+                ))}
+              </List>
+            </SortableContext>
+          </DndContext>
+        </Box>
+      </Popover>
     </>
   );
 };

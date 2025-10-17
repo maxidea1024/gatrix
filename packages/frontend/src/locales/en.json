@@ -572,7 +572,11 @@
 
     },
     "gameWorlds": {
+      "worldId": "World ID",
+      "name": "Name",
       "description": "Description",
+      "isVisible": "Visible",
+      "isMaintenance": "Maintenance",
       "actions": "Actions",
       "active": "Active",
       "activeWorlds": "Active Worlds",
@@ -654,7 +658,9 @@
       "confirmShow": "Are you sure you want to show the \"{{name}}\" game world?",
       "confirmStartMaintenance": "Are you sure you want to start maintenance for the \"{{name}}\" game world?",
       "confirmEndMaintenance": "Are you sure you want to end maintenance for the \"{{name}}\" game world?",
-      "maintenance": {
+      "normal": "Normal",
+      "maintenance": "Maintenance",
+      "maintenanceConfig": {
         "title": "Maintenance Settings",
         "description": "Configure maintenance period and messages.",
         "startDate": "Maintenance Start Date",
@@ -684,10 +690,13 @@
     "messageTemplates": {
       "title": "Message Templates",
       "subtitle": "Manage message templates used by the system",
+      "name": "Name",
+      "type": "Type",
+      "defaultMessage": "Default Message",
+      "isEnabled": "Enabled",
       "onlyDefaultMessage": "Default message only",
       "noTemplates": "No message templates found",
       "noTemplatesFound": "No message templates found.",
-      "type": "Type",
       "availability": "Availability",
       "searchPlaceholder": "Search by name or message...",
       "searchPlaceholderDetailed": "Search by template name, type, or message content...",
@@ -716,7 +725,8 @@
       "types": {
         "maintenance": "Service Maintenance",
         "general": "General",
-        "notification": "Notification"
+        "notification": "Notification",
+        "reminder": "Reminder"
       },
       "errors": {
         "duplicateName": "A message template with this name already exists"
@@ -1019,6 +1029,7 @@
     "tokenTypeNotEditable": "Token type cannot be changed after creation",
     "tokenValue": "Token Value",
     "lastUsed": "Last Used",
+    "lastUsedAt": "Last Used At",
     "usageCount": "Usage Count",
     "expiresAt": "Expires",
     "status": "Status",
@@ -1353,6 +1364,14 @@
   "clientVersion": "clientVersion",
   "clientVersions": {
     "description": "Add and edit client versions by platform, manage game server and patch server addresses, and control update policies.",
+    "platform": "Platform",
+    "clientVersion": "Client Version",
+    "clientStatus": "Client Status",
+    "gameServerAddress": "Game Server Address",
+    "patchAddress": "Patch Address",
+    "guestModeAllowed": "Guest Mode Allowed",
+    "tags": "Tags",
+    "createdAt": "Created At",
     "addNew": "Add New Version",
     "addIndividual": "Add Individual Version",
     "addBulk": "Quick Add",
@@ -1496,6 +1515,7 @@
     "clickToManage": "Click to manage",
     "close": "Close",
     "collapse": "Collapse",
+    "columnSettings": "Column Settings",
     "enterFullscreen": "Enter Fullscreen",
     "exitFullscreen": "Exit Fullscreen",
     "color": "Color",
@@ -1629,6 +1649,9 @@
     "user": "User",
     "valid": "Valid",
     "invalid": "Invalid",
+    "visible": "Visible",
+    "hidden": "Hidden",
+    "normal": "Normal",
     "warning": "Warning",
     "week": "Week",
     "weekdays": {
@@ -1754,7 +1777,12 @@
     "addJob": "Add Job",
     "editJob": "Edit Job",
     "noJobsFound": "No jobs found.",
+    "jobName": "Job Name",
     "jobType": "Job Type",
+    "schedule": "Schedule",
+    "lastExecution": "Last Execution",
+    "nextExecution": "Next Execution",
+    "isEnabled": "Enabled",
     "basicInformation": "Basic Information",
     "configuration": "Configuration",
     "jobDataConfiguration": "Job Data Configuration",

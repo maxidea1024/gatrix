@@ -1177,6 +1177,8 @@ const GameWorldsPage: React.FC = () => {
             label={world.isVisible ? t('common.visible') : t('common.hidden')}
             size="small"
             color={world.isVisible ? 'success' : 'default'}
+            onClick={() => handleToggleVisibility(world.id)}
+            sx={{ cursor: 'pointer' }}
           />
         );
       case 'isMaintenance':
@@ -1186,6 +1188,8 @@ const GameWorldsPage: React.FC = () => {
             size="small"
             color={world.isMaintenance ? 'warning' : 'success'}
             icon={world.isMaintenance ? <MaintenanceIcon /> : undefined}
+            onClick={() => handleToggleMaintenance(world.id)}
+            sx={{ cursor: 'pointer' }}
           />
         );
       case 'tags':

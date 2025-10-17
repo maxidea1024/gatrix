@@ -30,7 +30,13 @@ import {
   LinearProgress,
   Autocomplete,
   Drawer,
-  InputAdornment
+  InputAdornment,
+  Popover,
+  List,
+  ListItem,
+  ListItemText,
+  Switch,
+  useTheme
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -40,8 +46,28 @@ import {
   PlayArrow as ExecuteIcon,
   History as HistoryIcon,
   Search as SearchIcon,
-  Work as WorkIcon
+  Work as WorkIcon,
+  ViewColumn as ViewColumnIcon,
+  DragIndicator as DragIndicatorIcon
 } from '@mui/icons-material';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { jobService } from '../../services/jobService';
@@ -53,9 +79,111 @@ import JobExecutionHistory from '../../components/jobs/JobExecutionHistory';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 
+// Column configuration interface
+interface ColumnConfig {
+  id: string;
+  labelKey: string;
+  visible: boolean;
+}
+
+// Sortable column item component
+interface SortableColumnItemProps {
+  column: ColumnConfig;
+  onToggleVisibility: (columnId: string) => void;
+}
+
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: column.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    backgroundColor: isDragging ? 'action.hover' : 'transparent',
+    cursor: 'move'
+  };
+
+  const { t } = useTranslation();
+
+  return (
+    <ListItem
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      sx={{
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 1,
+        mb: 0.5,
+        '&:hover': {
+          bgcolor: 'action.hover'
+        }
+      }}
+      secondaryAction={
+        <Switch
+          edge="end"
+          checked={column.visible}
+          onChange={() => onToggleVisibility(column.id)}
+          onClick={(e) => e.stopPropagation()}
+        />
+      }
+    >
+      <DragIndicatorIcon sx={{ mr: 1, color: 'text.secondary' }} />
+      <ListItemText primary={t(column.labelKey)} />
+    </ListItem>
+  );
+};
+
+// Default column configuration
+const defaultColumns: ColumnConfig[] = [
+  { id: 'jobName', labelKey: 'jobs.jobName', visible: true },
+  { id: 'jobType', labelKey: 'jobs.jobType', visible: true },
+  { id: 'schedule', labelKey: 'jobs.schedule', visible: true },
+  { id: 'lastExecution', labelKey: 'jobs.lastExecution', visible: true },
+  { id: 'nextExecution', labelKey: 'jobs.nextExecution', visible: true },
+  { id: 'isEnabled', labelKey: 'jobs.isEnabled', visible: true },
+  { id: 'tags', labelKey: 'common.tags', visible: true },
+];
+
 const JobsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const theme = useTheme();
+
+  // Column settings state
+  const [columns, setColumns] = useState<ColumnConfig[]>(() => {
+    const saved = localStorage.getItem('jobsColumns');
+    if (saved) {
+      try {
+        const savedColumns = JSON.parse(saved);
+        const mergedColumns = savedColumns.map((savedCol: ColumnConfig) => {
+          const defaultCol = defaultColumns.find(c => c.id === savedCol.id);
+          return defaultCol ? { ...defaultCol, ...savedCol } : savedCol;
+        });
+        const savedIds = new Set(savedColumns.map((c: ColumnConfig) => c.id));
+        const newColumns = defaultColumns.filter(c => !savedIds.has(c.id));
+        return [...mergedColumns, ...newColumns];
+      } catch (e) {
+        return defaultColumns;
+      }
+    }
+    return defaultColumns;
+  });
+
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+
+  const columnSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   // State
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -80,6 +208,31 @@ const JobsPage: React.FC = () => {
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [selectedJobForHistory, setSelectedJobForHistory] = useState<Job | null>(null);
   const [jobToDelete, setJobToDelete] = useState<Job | null>(null);
+
+  // Column handlers
+  const handleToggleColumnVisibility = (columnId: string) => {
+    const newColumns = columns.map(col =>
+      col.id === columnId ? { ...col, visible: !col.visible } : col
+    );
+    setColumns(newColumns);
+    localStorage.setItem('jobsColumns', JSON.stringify(newColumns));
+  };
+
+  const handleResetColumns = () => {
+    setColumns(defaultColumns);
+    localStorage.removeItem('jobsColumns');
+  };
+
+  const handleColumnDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = columns.findIndex(col => col.id === active.id);
+      const newIndex = columns.findIndex(col => col.id === over.id);
+      const newColumns = arrayMove(columns, oldIndex, newIndex);
+      setColumns(newColumns);
+      localStorage.setItem('jobsColumns', JSON.stringify(newColumns));
+    }
+  };
 
   const loadData = useCallback(async () => {
     try {
@@ -252,6 +405,61 @@ const JobsPage: React.FC = () => {
     if (!text) return '-';
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
+  };
+
+  // Render cell content based on column ID
+  const renderCellContent = (job: Job, columnId: string) => {
+    switch (columnId) {
+      case 'jobName':
+        return (
+          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+            {truncateText(job.name, 30)}
+          </Typography>
+        );
+      case 'jobType':
+        return (
+          <Chip
+            label={getJobTypeLabel(job.jobTypeId)}
+            size="small"
+            color="primary"
+            variant="outlined"
+          />
+        );
+      case 'schedule':
+        return (
+          <Typography variant="body2">
+            {job.cronExpression || '-'}
+          </Typography>
+        );
+      case 'lastExecution':
+        return (
+          <Typography variant="body2">
+            {job.lastExecutedAt ? formatDateTimeDetailed(job.lastExecutedAt) : '-'}
+          </Typography>
+        );
+      case 'nextExecution':
+        return (
+          <Typography variant="body2">
+            {job.nextExecutionAt ? formatDateTimeDetailed(job.nextExecutionAt) : '-'}
+          </Typography>
+        );
+      case 'isEnabled':
+        return getStatusChip(job);
+      case 'tags':
+        return (
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+            {job.tags && job.tags.length > 0 ? (
+              job.tags.map((tag) => (
+                <Chip key={tag.id} label={tag.name} size="small" />
+              ))
+            ) : (
+              <Typography variant="body2" color="text.secondary">-</Typography>
+            )}
+          </Box>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
@@ -449,6 +657,17 @@ const JobsPage: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Column Settings Button */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+        <Button
+          startIcon={<ViewColumnIcon />}
+          onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+          size="small"
+        >
+          {t('common.columnSettings')}
+        </Button>
+      </Box>
+
       {/* Jobs Table */}
       <TableContainer
         component={Paper}
@@ -457,150 +676,42 @@ const JobsPage: React.FC = () => {
           overflow: 'auto'
         }}
       >
-        <Table sx={{ tableLayout: 'fixed', minWidth: 1100 }}>
+        <Table sx={{ tableLayout: 'auto' }}>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ width: '150px' }}>{t('common.name')}</TableCell>
-              <TableCell sx={{ width: '200px' }}>{t('common.memo')}</TableCell>
-              <TableCell sx={{ width: '120px' }}>{t('jobs.jobType')}</TableCell>
-              <TableCell sx={{ width: '80px' }}>{t('common.usable')}</TableCell>
-              <TableCell sx={{ width: '150px' }}>{t('common.tags')}</TableCell>
-              <TableCell sx={{ width: '120px' }}>{t('common.createdBy')}</TableCell>
-              <TableCell sx={{ width: '140px' }}>{t('common.createdAt')}</TableCell>
-              <TableCell align="right" sx={{ width: '140px' }}>{t('common.actions')}</TableCell>
+              {columns.filter(col => col.visible).map((column) => (
+                <TableCell key={column.id}>
+                  {t(column.labelKey)}
+                </TableCell>
+              ))}
+              <TableCell align="right" sx={{ width: 150 }}>{t('common.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {jobs.length === 0 ? (
               <EmptyTableRow
-                colSpan={8}
+                colSpan={columns.filter(col => col.visible).length + 1}
                 loading={loading}
                 message={t('jobs.noJobsFound')}
                 loadingMessage={t('common.loadingJobs')}
               />
             ) : (
-              jobs.map((job) => (
-                <TableRow key={job.id}>
-                <TableCell>
-                  {job.name && job.name.length > 30 ? (
-                    <Tooltip title={job.name} arrow>
-                      <Typography
-                        variant="body2"
-                        fontWeight="medium"
-                        sx={{
-                          cursor: 'help',
-                          maxWidth: '150px',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap'
-                        }}
-                      >
-                        {truncateText(job.name, 30)}
-                      </Typography>
-                    </Tooltip>
-                  ) : (
-                    <Typography variant="body2" fontWeight="medium">
-                      {job.name}
-                    </Typography>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {job.memo && job.memo.length > 50 ? (
-                    <Tooltip title={job.memo} arrow>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{
-                          cursor: 'help',
-                          maxWidth: '200px',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap'
-                        }}
-                      >
-                        {truncateText(job.memo, 50)}
-                      </Typography>
-                    </Tooltip>
-                  ) : (
-                    <Typography variant="body2" color="text.secondary">
-                      {job.memo || '-'}
-                    </Typography>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    {(() => {
-                      const jobTypeLabel = getJobTypeLabel(job.jobTypeId);
-                      return jobTypeLabel && jobTypeLabel.length > 20 ? (
-                        <Tooltip title={jobTypeLabel} arrow>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              cursor: 'help',
-                              maxWidth: '120px',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap'
-                            }}
-                          >
-                            {truncateText(jobTypeLabel, 20)}
-                          </Typography>
-                        </Tooltip>
-                      ) : (
-                        <Typography variant="body2">
-                          {jobTypeLabel}
-                        </Typography>
-                      );
-                    })()}
-                  </Box>
-                </TableCell>
-                <TableCell>{getStatusChip(job)}</TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {job.tags && job.tags.length > 0 ? (
-                      job.tags.map((tag) => (
-                        <Tooltip key={tag.id} title={tag.description || tag.name}>
-                          <Chip
-                            label={tag.name}
-                            size="small"
-                            style={{
-                              backgroundColor: tag.color,
-                              color: '#fff',
-                              fontSize: '0.75rem'
-                            }}
-                          />
-                        </Tooltip>
-                      ))
-                    ) : (
-                      <Typography variant="body2" color="text.secondary">
-                        -
-                      </Typography>
-                    )}
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  {job.createdByName ? (
-                    <Box>
-                      <Typography variant="body2" fontWeight="medium">
-                        {job.createdByName}
-                      </Typography>
-                      {job.createdByEmail && (
-                        <Typography variant="caption" color="text.secondary">
-                          {job.createdByEmail}
-                        </Typography>
-                      )}
-                    </Box>
-                  ) : (
-                    <Typography variant="body2" color="text.secondary">
-                      -
-                    </Typography>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2">
-                    {formatDateTimeDetailed(job.createdAt)}
-                  </Typography>
-                </TableCell>
+              jobs.map((job, index) => (
+                <TableRow
+                  key={job.id}
+                  sx={{
+                    bgcolor: index % 2 === 0
+                      ? theme.palette.mode === 'dark'
+                        ? 'rgba(255, 255, 255, 0.02)'
+                        : 'rgba(0, 0, 0, 0.02)'
+                      : 'transparent'
+                  }}
+                >
+                  {columns.filter(col => col.visible).map((column) => (
+                    <TableCell key={column.id}>
+                      {renderCellContent(job, column.id)}
+                    </TableCell>
+                  ))}
                 <TableCell align="right">
                   <Tooltip title={t('jobs.execute')}>
                     <IconButton
@@ -839,6 +950,40 @@ const JobsPage: React.FC = () => {
           </Button>
         </Box>
       </Drawer>
+
+      {/* Column Settings Popover */}
+      <Popover
+        open={Boolean(columnSettingsAnchor)}
+        anchorEl={columnSettingsAnchor}
+        onClose={() => setColumnSettingsAnchor(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Box sx={{ p: 2, minWidth: 250 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="subtitle2">{t('common.columnSettings')}</Typography>
+            <Button size="small" onClick={handleResetColumns}>{t('common.reset')}</Button>
+          </Box>
+          <DndContext
+            sensors={columnSensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleColumnDragEnd}
+            modifiers={[restrictToVerticalAxis]}
+          >
+            <SortableContext items={columns.map(c => c.id)} strategy={verticalListSortingStrategy}>
+              <List dense>
+                {columns.map((column) => (
+                  <SortableColumnItem
+                    key={column.id}
+                    column={column}
+                    onToggleVisibility={handleToggleColumnVisibility}
+                  />
+                ))}
+              </List>
+            </SortableContext>
+          </DndContext>
+        </Box>
+      </Popover>
     </Box>
   );
 };
