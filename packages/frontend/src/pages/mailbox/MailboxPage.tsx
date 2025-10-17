@@ -34,6 +34,11 @@ import {
   Stack,
   ToggleButtonGroup,
   ToggleButton,
+  Fab,
+  Badge,
+  Fade,
+  Zoom,
+  keyframes,
 } from '@mui/material';
 import {
   Mail as MailIcon,
@@ -50,6 +55,9 @@ import {
   Circle as CircleIcon,
   PriorityHigh as PriorityHighIcon,
   Translate as TranslateIcon,
+  ArrowUpward as ArrowUpwardIcon,
+  DeleteSweep as DeleteSweepIcon,
+  SelectAll as SelectAllIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -97,6 +105,14 @@ const MailboxPage: React.FC = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [mailToDelete, setMailToDelete] = useState<number | null>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
+  const [emptyMailboxConfirmOpen, setEmptyMailboxConfirmOpen] = useState(false);
+
+  // New mail notification state
+  const [newMailCount, setNewMailCount] = useState(0);
+  const [showNewMailButton, setShowNewMailButton] = useState(false);
+
+  // Select all state
+  const [selectAll, setSelectAll] = useState(false);
 
   // Load initial mails
   const loadMails = async (reset: boolean = false) => {
@@ -140,6 +156,12 @@ const MailboxPage: React.FC = () => {
           setMails(prev => [...prev, ...response.data]);
         }
         setHasNextPage(response.pagination.page < response.pagination.totalPages);
+      }
+
+      // Reset new mail notification when refreshing
+      if (reset) {
+        setNewMailCount(0);
+        setShowNewMailButton(false);
       }
     } catch (error: any) {
       console.error('Failed to load mails:', error);
@@ -200,6 +222,10 @@ const MailboxPage: React.FC = () => {
   useEffect(() => {
     loadMails(true);
     loadStats();
+    // Clear selection when filter or tab changes
+    setSelectedMail(null);
+    setSelectedMailIds([]);
+    setSelectAll(false);
   }, [filter, currentTab]);
 
   // Load next page when currentPage changes

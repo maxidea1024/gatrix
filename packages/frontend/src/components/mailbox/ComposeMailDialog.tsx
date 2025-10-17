@@ -109,18 +109,6 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
     return () => clearTimeout(timer);
   }, [userSearchQuery, onSearchUsers]);
 
-  // Detect links in content
-  useEffect(() => {
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const plainText = content.replace(/<[^>]*>/g, '');
-    const matches = plainText.match(urlRegex);
-    if (matches) {
-      setDetectedLinks(matches.filter((link, index, self) => self.indexOf(link) === index));
-    } else {
-      setDetectedLinks([]);
-    }
-  }, [content]);
-
   // Handle translation
   const handleTranslate = async () => {
     if (!content.trim()) return;
@@ -147,20 +135,6 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
   const handleCancelTranslation = () => {
     setTranslationEnabled(false);
     setTranslatedContent('');
-  };
-
-  // Handle add link
-  const handleAddLink = () => {
-    if (linkInput.trim() && !detectedLinks.includes(linkInput.trim())) {
-      setDetectedLinks([...detectedLinks, linkInput.trim()]);
-      setLinkInput('');
-      setShowLinkInput(false);
-    }
-  };
-
-  // Handle remove link
-  const handleRemoveLink = (link: string) => {
-    setDetectedLinks(detectedLinks.filter((l) => l !== link));
   };
 
   // Handle send
@@ -198,9 +172,6 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
     setTranslationEnabled(false);
     setTranslatedContent('');
     setTranslationLanguage('en');
-    setDetectedLinks([]);
-    setShowLinkInput(false);
-    setLinkInput('');
     onClose();
   };
 
@@ -213,6 +184,20 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
     }
   }, [open]);
 
+  // Priority icon and color
+  const getPriorityIcon = () => {
+    switch (priority) {
+      case 'urgent':
+        return <FlagIcon sx={{ color: 'error.main', fontSize: 18 }} />;
+      case 'high':
+        return <FlagIcon sx={{ color: 'warning.main', fontSize: 18 }} />;
+      case 'low':
+        return <FlagIcon sx={{ color: 'info.main', fontSize: 18 }} />;
+      default:
+        return <FlagIcon sx={{ color: 'text.disabled', fontSize: 18 }} />;
+    }
+  };
+
   return (
     <Dialog
       open={open}
@@ -221,132 +206,272 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 3,
+          borderRadius: 4,
           minHeight: 600,
           maxHeight: '90vh',
+          overflow: 'hidden',
+          background: theme.palette.mode === 'dark'
+            ? `linear-gradient(to bottom, ${alpha(theme.palette.background.paper, 0.95)}, ${theme.palette.background.paper})`
+            : theme.palette.background.paper,
         },
       }}
     >
-      {/* Header */}
+      {/* Header with gradient */}
       <DialogTitle
         sx={{
-          borderBottom: 1,
-          borderColor: 'divider',
-          pb: 2,
+          background: theme.palette.mode === 'dark'
+            ? `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.1)} 0%, ${alpha(theme.palette.primary.main, 0.05)} 100%)`
+            : `linear-gradient(135deg, ${alpha(theme.palette.primary.light, 0.1)} 0%, ${alpha(theme.palette.primary.main, 0.05)} 100%)`,
+          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          pb: 2.5,
+          pt: 2.5,
         }}
       >
         <Box display="flex" alignItems="flex-start" justifyContent="space-between">
           <Box>
-            <Typography variant="h5" fontWeight="600" gutterBottom>
+            <Typography
+              variant="h5"
+              fontWeight="700"
+              gutterBottom
+              sx={{
+                background: theme.palette.mode === 'dark'
+                  ? `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 100%)`
+                  : `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
               {t('mailbox.compose')}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
               {t('mailbox.composeSubtitle')}
             </Typography>
           </Box>
-          <IconButton onClick={handleClose} size="small" sx={{ mt: -0.5 }}>
+          <IconButton
+            onClick={handleClose}
+            size="small"
+            sx={{
+              mt: -0.5,
+              '&:hover': {
+                backgroundColor: alpha(theme.palette.error.main, 0.1),
+                color: 'error.main',
+              },
+            }}
+          >
             <CloseIcon />
           </IconButton>
         </Box>
       </DialogTitle>
 
       {/* Content */}
-      <DialogContent sx={{ pt: 3 }}>
+      <DialogContent sx={{ pt: 3, pb: 2 }}>
         <Stack spacing={3}>
-          {/* Recipients - Multiple selection */}
-          <Autocomplete
-            multiple
-            options={userSearchResults}
-            value={recipients}
-            onChange={(_, newValue) => setRecipients(newValue)}
-            inputValue={userSearchQuery}
-            onInputChange={(_, newInputValue) => setUserSearchQuery(newInputValue)}
-            getOptionLabel={(option) => option.name || option.email || ''}
-            loading={userSearching}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={t('mailbox.recipients')}
-                placeholder={recipients.length === 0 ? t('mailbox.recipientsPlaceholder') : ''}
-                required
-                inputRef={recipientInputRef}
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {userSearching ? <CircularProgress color="inherit" size={20} /> : null}
-                      {params.InputProps.endAdornment}
-                    </>
-                  ),
-                }}
-              />
-            )}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => {
-                const { key, ...tagProps } = getTagProps({ index });
-                return (
-                  <Chip
-                    key={key}
-                    avatar={<Avatar src={option.avatarUrl} sx={{ width: 24, height: 24 }}>{option.name.charAt(0)}</Avatar>}
-                    label={option.name}
-                    {...tagProps}
-                    sx={{ m: 0.5 }}
-                  />
-                );
-              })
-            }
-            renderOption={(props, option) => {
-              const { key, ...otherProps } = props as any;
-              return (
-                <li {...otherProps} key={option.id}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, width: '100%' }}>
-                    <Avatar src={option.avatarUrl} sx={{ width: 32, height: 32 }}>
-                      {option.name.charAt(0).toUpperCase()}
-                    </Avatar>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography variant="body2">{option.name}</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {option.email}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </li>
-              );
+          {/* Recipients - Multiple selection with modern styling */}
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+              backgroundColor: theme.palette.mode === 'dark'
+                ? alpha(theme.palette.background.default, 0.4)
+                : alpha(theme.palette.primary.main, 0.02),
+              transition: 'all 0.2s',
+              '&:hover': {
+                borderColor: alpha(theme.palette.primary.main, 0.3),
+                backgroundColor: theme.palette.mode === 'dark'
+                  ? alpha(theme.palette.background.default, 0.6)
+                  : alpha(theme.palette.primary.main, 0.04),
+              },
             }}
-            noOptionsText={userSearchQuery ? t('chat.noUsersFound') : t('chat.searchUsers')}
-          />
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+              <PersonAddIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+              <Typography variant="subtitle2" fontWeight="600" color="text.primary">
+                {t('mailbox.recipients')}
+              </Typography>
+            </Box>
+            <Autocomplete
+              multiple
+              options={userSearchResults}
+              value={recipients}
+              onChange={(_, newValue) => setRecipients(newValue)}
+              inputValue={userSearchQuery}
+              onInputChange={(_, newInputValue) => setUserSearchQuery(newInputValue)}
+              getOptionLabel={(option) => option.name || option.email || ''}
+              loading={userSearching}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder={recipients.length === 0 ? t('mailbox.recipientsPlaceholder') : ''}
+                  required
+                  inputRef={recipientInputRef}
+                  variant="outlined"
+                  size="small"
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {userSearching ? <CircularProgress color="inherit" size={20} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: theme.palette.background.paper,
+                    },
+                  }}
+                />
+              )}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => {
+                  const { key, ...tagProps } = getTagProps({ index });
+                  return (
+                    <Chip
+                      key={key}
+                      avatar={
+                        <Avatar
+                          src={option.avatarUrl}
+                          sx={{
+                            width: 24,
+                            height: 24,
+                            border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                          }}
+                        >
+                          {option.name.charAt(0)}
+                        </Avatar>
+                      }
+                      label={option.name}
+                      {...tagProps}
+                      sx={{
+                        m: 0.5,
+                        fontWeight: 500,
+                        backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                        '&:hover': {
+                          backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                        },
+                      }}
+                    />
+                  );
+                })
+              }
+              renderOption={(props, option) => {
+                const { key, ...otherProps } = props as any;
+                return (
+                  <li {...otherProps} key={option.id}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, width: '100%', py: 0.5 }}>
+                      <Avatar
+                        src={option.avatarUrl}
+                        sx={{
+                          width: 36,
+                          height: 36,
+                          border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                        }}
+                      >
+                        {option.name.charAt(0).toUpperCase()}
+                      </Avatar>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="body2" fontWeight="600">{option.name}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {option.email}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </li>
+                );
+              }}
+              noOptionsText={userSearchQuery ? t('chat.noUsersFound') : t('chat.searchUsers')}
+            />
+          </Paper>
 
-          {/* Subject */}
-          <TextField
-            label={t('mailbox.subject')}
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            required
-            fullWidth
-            placeholder={t('mailbox.subjectPlaceholder')}
-          />
+          {/* Subject and Priority in one row */}
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+              label={t('mailbox.subject')}
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              required
+              fullWidth
+              placeholder={t('mailbox.subjectPlaceholder')}
+              sx={{
+                flex: 1,
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: theme.palette.mode === 'dark'
+                    ? alpha(theme.palette.background.default, 0.4)
+                    : alpha(theme.palette.primary.main, 0.02),
+                  '&:hover': {
+                    backgroundColor: theme.palette.mode === 'dark'
+                      ? alpha(theme.palette.background.default, 0.6)
+                      : alpha(theme.palette.primary.main, 0.04),
+                  },
+                },
+              }}
+            />
 
-          {/* Priority */}
-          <FormControl fullWidth size="small">
-            <InputLabel>{t('mailbox.priorityLabel')}</InputLabel>
-            <Select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value as any)}
-              label={t('mailbox.priorityLabel')}
+            {/* Priority with icon */}
+            <FormControl
+              sx={{
+                minWidth: 180,
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: theme.palette.mode === 'dark'
+                    ? alpha(theme.palette.background.default, 0.4)
+                    : alpha(theme.palette.primary.main, 0.02),
+                },
+              }}
             >
-              <MenuItem value="low">{t('mailbox.priority.low')}</MenuItem>
-              <MenuItem value="normal">{t('mailbox.priority.normal')}</MenuItem>
-              <MenuItem value="high">{t('mailbox.priority.high')}</MenuItem>
-              <MenuItem value="urgent">{t('mailbox.priority.urgent')}</MenuItem>
-            </Select>
-          </FormControl>
+              <InputLabel>{t('mailbox.priorityLabel')}</InputLabel>
+              <Select
+                value={priority}
+                onChange={(e) => setPriority(e.target.value as any)}
+                label={t('mailbox.priorityLabel')}
+                startAdornment={getPriorityIcon()}
+              >
+                <MenuItem value="low">
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <FlagIcon sx={{ color: 'info.main', fontSize: 18 }} />
+                    {t('mailbox.priority.low')}
+                  </Box>
+                </MenuItem>
+                <MenuItem value="normal">
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <FlagIcon sx={{ color: 'text.disabled', fontSize: 18 }} />
+                    {t('mailbox.priority.normal')}
+                  </Box>
+                </MenuItem>
+                <MenuItem value="high">
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <FlagIcon sx={{ color: 'warning.main', fontSize: 18 }} />
+                    {t('mailbox.priority.high')}
+                  </Box>
+                </MenuItem>
+                <MenuItem value="urgent">
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <FlagIcon sx={{ color: 'error.main', fontSize: 18 }} />
+                    {t('mailbox.priority.urgent')}
+                  </Box>
+                </MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
 
-          <Divider />
+          <Divider sx={{ my: 1 }} />
 
-          {/* Rich Text Content */}
-          <Box>
-            <Typography variant="subtitle2" gutterBottom sx={{ mb: 1 }}>
-              {t('mailbox.content')} <span style={{ color: 'red' }}>*</span>
+          {/* Rich Text Content with modern styling */}
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+              backgroundColor: theme.palette.mode === 'dark'
+                ? alpha(theme.palette.background.default, 0.4)
+                : alpha(theme.palette.primary.main, 0.02),
+            }}
+          >
+            <Typography variant="subtitle2" gutterBottom sx={{ mb: 1.5, fontWeight: 600 }}>
+              {t('mailbox.content')} <span style={{ color: theme.palette.error.main }}>*</span>
             </Typography>
             <RichTextEditor
               value={content}
@@ -354,93 +479,75 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
               placeholder={t('mailbox.contentPlaceholder')}
               minHeight={200}
             />
-          </Box>
+          </Paper>
 
-          {/* Link Previews */}
-          {detectedLinks.length > 0 && (
-            <Box>
-              <Typography variant="subtitle2" gutterBottom>
-                {t('mailbox.attachedLinks')}
+          <Divider sx={{ my: 1 }} />
+
+          {/* Translation Controls with modern styling */}
+          <Paper
+            elevation={0}
+            sx={{
+              p: 2.5,
+              borderRadius: 2,
+              border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+              backgroundColor: theme.palette.mode === 'dark'
+                ? alpha(theme.palette.background.default, 0.4)
+                : alpha(theme.palette.info.main, 0.03),
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+              <TranslateIcon sx={{ color: 'info.main', fontSize: 20 }} />
+              <Typography variant="subtitle2" fontWeight="600">
+                {t('mailbox.translation')}
               </Typography>
-              {detectedLinks.map((link) => (
-                <LinkPreview key={link} url={link} onRemove={() => handleRemoveLink(link)} />
-              ))}
             </Box>
-          )}
-
-          {/* Add Link Button */}
-          {showLinkInput ? (
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <TextField
-                fullWidth
-                size="small"
-                placeholder="https://example.com"
-                value={linkInput}
-                onChange={(e) => setLinkInput(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleAddLink();
-                  }
-                }}
-              />
-              <Button onClick={handleAddLink} variant="contained" size="small">
-                {t('common.add')}
-              </Button>
-              <Button onClick={() => setShowLinkInput(false)} size="small">
-                {t('common.cancel')}
-              </Button>
-            </Box>
-          ) : (
-            <Button
-              startIcon={<LinkIcon />}
-              onClick={() => setShowLinkInput(true)}
-              variant="outlined"
-              size="small"
-              sx={{ alignSelf: 'flex-start' }}
-            >
-              {t('mailbox.addLink')}
-            </Button>
-          )}
-
-          <Divider />
-
-          {/* Translation Controls */}
-          <Box>
-            <Typography variant="subtitle2" gutterBottom sx={{ mb: 1.5 }}>
-              {t('mailbox.translation')}
-            </Typography>
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-              <FormControl sx={{ minWidth: 150 }} size="small">
+              <FormControl
+                sx={{
+                  minWidth: 150,
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: theme.palette.background.paper,
+                  },
+                }}
+                size="small"
+              >
                 <InputLabel>{t('mailbox.translateTo')}</InputLabel>
                 <Select
                   value={translationLanguage}
                   onChange={(e) => setTranslationLanguage(e.target.value as any)}
                   label={t('mailbox.translateTo')}
                 >
-                  <MenuItem value="ko">한국어</MenuItem>
-                  <MenuItem value="en">English</MenuItem>
-                  <MenuItem value="zh">中文</MenuItem>
+                  <MenuItem value="ko">🇰🇷 한국어</MenuItem>
+                  <MenuItem value="en">🇺🇸 English</MenuItem>
+                  <MenuItem value="zh">🇨🇳 中文</MenuItem>
                 </Select>
               </FormControl>
 
               {!translationEnabled ? (
                 <Button
-                  variant="outlined"
-                  startIcon={translating ? <CircularProgress size={16} /> : <TranslateIcon />}
+                  variant="contained"
+                  startIcon={translating ? <CircularProgress size={16} color="inherit" /> : <TranslateIcon />}
                   onClick={handleTranslate}
                   disabled={translating || !content.trim()}
-                  size="small"
+                  sx={{
+                    background: `linear-gradient(135deg, ${theme.palette.info.main} 0%, ${theme.palette.info.dark} 100%)`,
+                    '&:hover': {
+                      background: `linear-gradient(135deg, ${theme.palette.info.dark} 0%, ${theme.palette.info.main} 100%)`,
+                    },
+                  }}
                 >
                   {translating ? t('mailbox.translating') : t('mailbox.autoTranslate')}
                 </Button>
               ) : (
                 <Box sx={{ display: 'flex', gap: 1 }}>
                   <Button
-                    variant="outlined"
-                    startIcon={translating ? <CircularProgress size={16} /> : <TranslateIcon />}
+                    variant="contained"
+                    startIcon={translating ? <CircularProgress size={16} color="inherit" /> : <TranslateIcon />}
                     onClick={handleRetranslate}
                     disabled={translating}
-                    size="small"
+                    sx={{
+                      background: `linear-gradient(135deg, ${theme.palette.info.main} 0%, ${theme.palette.info.dark} 100%)`,
+                    }}
                   >
                     {translating ? t('mailbox.translating') : t('mailbox.retranslate')}
                   </Button>
@@ -448,19 +555,28 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
                     variant="outlined"
                     color="secondary"
                     onClick={handleCancelTranslation}
-                    size="small"
                   >
                     {t('mailbox.cancelTranslation')}
                   </Button>
                 </Box>
               )}
             </Box>
-          </Box>
+          </Paper>
 
           {/* Translated Content */}
           {translationEnabled && (
-            <Box>
-              <Typography variant="subtitle2" gutterBottom sx={{ mb: 1 }}>
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                border: `1px solid ${alpha(theme.palette.success.main, 0.2)}`,
+                backgroundColor: theme.palette.mode === 'dark'
+                  ? alpha(theme.palette.success.dark, 0.1)
+                  : alpha(theme.palette.success.light, 0.1),
+              }}
+            >
+              <Typography variant="subtitle2" gutterBottom sx={{ mb: 1.5, fontWeight: 600, color: 'success.main' }}>
                 {t('mailbox.translatedContent')}
               </Typography>
               <RichTextEditor
@@ -468,22 +584,35 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
                 onChange={setTranslatedContent}
                 minHeight={150}
               />
-            </Box>
+            </Paper>
           )}
         </Stack>
       </DialogContent>
 
-      {/* Actions */}
+      {/* Footer with gradient */}
       <DialogActions
         sx={{
-          borderTop: 1,
-          borderColor: 'divider',
+          borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          background: theme.palette.mode === 'dark'
+            ? alpha(theme.palette.background.default, 0.4)
+            : alpha(theme.palette.primary.main, 0.02),
           px: 3,
-          py: 2,
-          gap: 1,
+          py: 2.5,
+          gap: 1.5,
         }}
       >
-        <Button onClick={handleClose} disabled={sending} size="large">
+        <Button
+          onClick={handleClose}
+          disabled={sending}
+          size="large"
+          sx={{
+            fontWeight: 600,
+            '&:hover': {
+              backgroundColor: alpha(theme.palette.error.main, 0.1),
+              color: 'error.main',
+            },
+          }}
+        >
           {t('common.cancel')}
         </Button>
         <Button
@@ -492,6 +621,22 @@ const ComposeMailDialog: React.FC<ComposeMailDialogProps> = ({
           disabled={sending || recipients.length === 0 || !subject.trim() || !content.trim()}
           startIcon={sending ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
           size="large"
+          sx={{
+            fontWeight: 600,
+            px: 4,
+            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+            boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
+            '&:hover': {
+              background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+              boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.4)}`,
+              transform: 'translateY(-1px)',
+            },
+            '&:disabled': {
+              background: theme.palette.action.disabledBackground,
+              boxShadow: 'none',
+            },
+            transition: 'all 0.2s',
+          }}
         >
           {sending ? t('mailbox.sending') : t('mailbox.send')}
         </Button>
