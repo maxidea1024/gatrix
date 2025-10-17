@@ -442,14 +442,21 @@ const ChatPageContent: React.FC = () => {
   // }
 
   return (
-    <Box sx={{
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden',
-      px: 3,
-      py: 3
-    }}>
+    <Box
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        px: 3,
+        py: 3
+      }}
+      onContextMenu={(e) => {
+        // Disable right-click in chat content area
+        e.preventDefault();
+        return false;
+      }}
+    >
       {/* Header */}
       <Box sx={{ mb: 3, flexShrink: 0 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>

@@ -2204,6 +2204,7 @@
     "invitationDeclineFailed": "초대 거절에 실패했습니다",
     "invitationPending": "초대중",
     "alreadyInvited": "이미 초대된 사용자입니다",
+    "alreadyMember": "이미 멤버입니다",
     "userJoinedChannel": "{{userName}}님이 채널에 참여했습니다",
     "privacy": "개인정보",
     "privacySettings": "프라이버시 설정",

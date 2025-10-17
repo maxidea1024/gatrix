@@ -2252,6 +2252,7 @@
     "invitationDeclineFailed": "Failed to decline invitation",
     "invitationPending": "Invited",
     "alreadyInvited": "User is already invited",
+    "alreadyMember": "Already a member",
     "userJoinedChannel": "{{userName}} joined the channel",
     "privacy": "Privacy",
     "privacySettings": "Privacy Settings",

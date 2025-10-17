@@ -185,15 +185,22 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
             <Box sx={{
               width: 60,
               height: '100%',
-              backgroundColor: '#f5f5f5',
+              backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#f5f5f5',
               display: 'flex',
               flexDirection: 'column',
               py: 1,
               flexShrink: 0,
               overflow: 'auto',
+              borderRight: (theme) => `1px solid ${theme.palette.divider}`,
               '&::-webkit-scrollbar': { width: '6px' },
               '&::-webkit-scrollbar-track': { background: 'transparent' },
-              '&::-webkit-scrollbar-thumb': { background: 'rgba(0,0,0,0.2)', borderRadius: '3px', '&:hover': { background: 'rgba(0,0,0,0.3)' } },
+              '&::-webkit-scrollbar-thumb': {
+                background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
+                borderRadius: '3px',
+                '&:hover': {
+                  background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'
+                }
+              },
             }}>
               {Object.keys(categoryLabels).map((category) => {
                 const isSelected = selectedCategory === category;
@@ -220,18 +227,19 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                       height: 44,
                       mx: 'auto',
                       mb: 0.5,
-                      color: isSelected ? 'primary.main' : 'text.primary',
+                      color: isSelected
+                        ? 'primary.main'
+                        : (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
+                      backgroundColor: isSelected
+                        ? (theme) => theme.palette.mode === 'dark' ? 'rgba(144, 202, 249, 0.16)' : 'rgba(25, 118, 210, 0.08)'
+                        : 'transparent',
                       borderRadius: '8px',
                       '&:hover': {
-                        backgroundColor: 'action.hover',
+                        backgroundColor: isSelected
+                          ? (theme) => theme.palette.mode === 'dark' ? 'rgba(144, 202, 249, 0.24)' : 'rgba(25, 118, 210, 0.12)'
+                          : (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
                       },
                       '& .MuiTouchRipple-root': { display: 'none' },
-                      '& svg': {
-                        color: 'inherit',
-                        fill: 'currentColor',
-                        opacity: '1 !important',
-                        filter: 'none !important',
-                      },
                     }}
                     title={categoryLabels[category as keyof typeof categoryLabels]}
                     disableRipple
@@ -241,15 +249,13 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                 );
               })}
             </Box>
-            {/* 명확한 우측 분리선 */}
-            <Box sx={{ width: '1px', bgcolor: 'divider' }} />
           </>
         )}
 
-        {/* 메인 컨텐츠 영역 (스크롤 제거) */}
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', p: 1, overflow: 'hidden' }}>
-          {/* Search (sticky header wrapper) */}
-          <Box sx={{ position: 'sticky', top: 0, zIndex: 2, backgroundColor: 'background.paper', pb: 1 }}>
+        {/* 메인 컨텐츠 영역 */}
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', p: 2, overflow: 'hidden' }}>
+          {/* Search */}
+          <Box sx={{ mb: 2 }}>
             <TextField
               size="small"
               placeholder={t('chat.searchEmojis')}
@@ -263,26 +269,65 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                 ),
               }}
               fullWidth
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.02)',
+                  '&:hover': {
+                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                  },
+                  '&.Mui-focused': {
+                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                  },
+                },
+              }}
             />
           </Box>
 
           {/* 카테고리 제목 */}
           {!searchQuery && (
-            <Typography variant="subtitle2" sx={{ mb: 1, px: 1, color: 'text.secondary' }}>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                mb: 1.5,
+                px: 0.5,
+                color: 'text.secondary',
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+              }}
+            >
               {categoryLabels[selectedCategory as keyof typeof categoryLabels]}
             </Typography>
           )}
 
           {/* Emoji Grid */}
-          <Box sx={{ flex: 1 }}>
+          <Box sx={{
+            flex: 1,
+            overflow: 'auto',
+            '&::-webkit-scrollbar': { width: '8px' },
+            '&::-webkit-scrollbar-track': { background: 'transparent' },
+            '&::-webkit-scrollbar-thumb': {
+              background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
+              borderRadius: '4px',
+              '&:hover': {
+                background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'
+              }
+            },
+          }}>
             {filteredEmojis.length === 0 ? (
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '200px' }}>
                 <Typography variant="body2" color="text.secondary">
                   {searchQuery ? t('chat.noEmojisFound') : t('chat.noEmojis')}
                 </Typography>
               </Box>
             ) : (
-              <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(8, 36px)', gap: 0.5 }}>
+              <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(8, 1fr)',
+                gap: 0.5,
+                pb: 1,
+              }}>
                 {filteredEmojis.map((emoji, index) => (
                   <IconButton
                     key={`${emoji}-${index}`}
@@ -290,13 +335,17 @@ const EmojiPicker: React.FC<EmojiPickerProps> = ({
                     onClick={() => handleEmojiClick(emoji)}
                     disableRipple
                     sx={{
-                      width: 32,
-                      height: 32,
-                      fontSize: '1.2rem',
+                      width: 40,
+                      height: 40,
+                      fontSize: '1.5rem',
                       color: 'inherit',
                       backgroundColor: 'transparent',
-                      '&:hover': { backgroundColor: 'action.hover', transform: 'scale(1.15)' },
-                      transition: 'transform 0.1s ease-in-out',
+                      borderRadius: '8px',
+                      '&:hover': {
+                        backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
+                        transform: 'scale(1.2)'
+                      },
+                      transition: 'all 0.15s ease-in-out',
                     }}
                   >
                     <span style={{ display: 'block', lineHeight: 1 }}>{emoji}</span>
