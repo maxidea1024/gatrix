@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Box,
   Drawer,
@@ -73,6 +73,7 @@ import { useSSENotifications } from '@/hooks/useSSENotifications';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import moment from 'moment';
 import { baseMenuItems, adminMenuItems as configAdminMenuItems, settingsMenuItems as configSettingsMenuItems } from '@/config/navigation';
+import mailService from '@/services/mailService';
 
 // Sidebar width is now dynamic
 
@@ -122,6 +123,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const { toggleTheme, mode, isDark } = useCustomTheme();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+
+  // Mail notification state
+  const [unreadMailCount, setUnreadMailCount] = useState(0);
 
   // Maintenance banner state
   const [maintenanceStatus, setMaintenanceStatus] = useState<{ active: boolean; detail: MaintenanceDetail | null }>({ active: false, detail: null });
@@ -179,6 +183,34 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       console.warn('SSE connection error in MainLayout:', error);
     }
   });
+
+  // Load unread mail count
+  const loadUnreadMailCount = useCallback(async () => {
+    try {
+      const count = await mailService.getUnreadCount();
+      setUnreadMailCount(count);
+    } catch (error) {
+      console.error('Failed to load unread mail count:', error);
+    }
+  }, []);
+
+  // Initial load of unread mail count
+  useEffect(() => {
+    loadUnreadMailCount();
+    // Refresh every 60 seconds
+    const interval = setInterval(loadUnreadMailCount, 60000);
+
+    // Listen for mail-read event from MailboxPage
+    const handleMailRead = () => {
+      loadUnreadMailCount();
+    };
+    window.addEventListener('mail-read', handleMailRead);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('mail-read', handleMailRead);
+    };
+  }, [loadUnreadMailCount]);
 
   // 사용자가 변경될 때마다 아바타 이미지 에러 상태 초기화
   useEffect(() => {
@@ -1017,11 +1049,16 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               {isDark ? <LightModeIcon /> : <DarkModeIcon />}
             </IconButton>
 
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
+            <Tooltip title={t('mailbox.title')}>
+              <IconButton
+                color="inherit"
+                onClick={() => navigate('/mailbox')}
+              >
+                <Badge badgeContent={unreadMailCount} color="error">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+            </Tooltip>
 
             <IconButton
               onClick={handleUserMenuOpen}

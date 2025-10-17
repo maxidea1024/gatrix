@@ -11,6 +11,7 @@ import {
   VpnKey as VpnKeyIcon,
   Terminal as TerminalIcon,
   Chat as ChatIcon,
+  Mail as MailIcon,
   Widgets as WidgetsIcon,
   Language as LanguageIcon,
   Build as BuildIcon,
@@ -32,6 +33,7 @@ export interface MenuItem {
 export const baseMenuItems: MenuItem[] = [
   { text: 'sidebar.dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'sidebar.chat', icon: <ChatIcon />, path: '/chat' },
+  { text: 'mailbox.title', icon: <MailIcon />, path: '/mailbox' },
 ];
 
 // 관리자 메뉴

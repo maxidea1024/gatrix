@@ -253,6 +253,10 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
         }
         break;
 
+      case 'mail_received':
+        handleMailReceived(event.data);
+        break;
+
       case 'invitation_deleted':
         if (!skipInvitationNotifications) {
           handleInvitationDeleted(event.data);
@@ -310,6 +314,19 @@ export const useSSENotifications = (options: SSEOptions = {}) => {
       ? t('users.invitationDeletedForEmail', { email: invitation.email })
       : t('users.invitationDeleted');
     enqueueSnackbar(message, { variant: 'success' });
+  }, [enqueueSnackbar, t]);
+
+  // Handle mail received notifications
+  const handleMailReceived = useCallback((data: any) => {
+    const { senderName, subject, priority } = data;
+    const priorityIcon = priority === 'urgent' || priority === 'high' ? '🔴 ' : '';
+    enqueueSnackbar(`${priorityIcon}${t('mailbox.newMailFrom', { sender: senderName })}: ${subject}`, {
+      variant: priority === 'urgent' ? 'warning' : 'info',
+      autoHideDuration: 5000,
+    });
+
+    // Trigger custom event for mailbox to refresh
+    window.dispatchEvent(new CustomEvent('mail-received'));
   }, [enqueueSnackbar, t]);
 
   // Subscribe to channels

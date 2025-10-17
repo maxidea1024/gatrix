@@ -317,8 +317,24 @@ export class ChatService {
       }
     }
 
-    console.warn('Unexpected users response structure:', response);
     return [];
+  }
+
+  // Search users (for mail compose, etc.)
+  static async searchUsers(query: string): Promise<User[]> {
+    if (!query || query.length < 2) {
+      return [];
+    }
+
+    try {
+      const response = await apiService.get<{ success: boolean; data: User[] }>(
+        `/users/search?q=${encodeURIComponent(query)}`
+      );
+      return response.data || [];
+    } catch (error) {
+      console.error('Failed to search users:', error);
+      return [];
+    }
   }
 
   // User synchronization

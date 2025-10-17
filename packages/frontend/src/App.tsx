@@ -74,6 +74,7 @@ import RemoteConfigDashboard from './pages/RemoteConfig/RemoteConfigParametersPa
 import ApiTokensPage from './pages/admin/ApiTokensPage';
 import CrashEventsPage from './pages/admin/CrashEventsPage';
 import ChatPage from './pages/chat/ChatPage';
+import MailboxPage from './pages/mailbox/MailboxPage';
 import SystemConsolePage from './pages/admin/SystemConsolePage';
 import RealtimeEventsPage from './pages/admin/RealtimeEventsPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
@@ -269,6 +270,14 @@ const AppContent: React.FC = () => {
                   <ProtectedRoute>
                     <MainLayout>
                       <ChatPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
+
+                <Route path="/mailbox" element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <MailboxPage />
                     </MainLayout>
                   </ProtectedRoute>
                 } />
