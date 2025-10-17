@@ -388,8 +388,8 @@ const ClientVersionsPage: React.FC = () => {
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
-    { id: 'platform', labelKey: 'clientVersions.platform', visible: true },
     { id: 'clientVersion', labelKey: 'clientVersions.clientVersion', visible: true },
+    { id: 'platform', labelKey: 'clientVersions.platform', visible: true },
     { id: 'clientStatus', labelKey: 'clientVersions.clientStatus', visible: true },
     { id: 'gameServerAddress', labelKey: 'clientVersions.gameServerAddress', visible: true },
     { id: 'patchAddress', labelKey: 'clientVersions.patchAddress', visible: true },
@@ -1097,7 +1097,7 @@ const ClientVersionsPage: React.FC = () => {
       case 'clientStatus':
         return (
           <Chip
-            label={ClientStatusLabels[clientVersion.clientStatus]}
+            label={t(ClientStatusLabels[clientVersion.clientStatus])}
             size="small"
             color={ClientStatusColors[clientVersion.clientStatus]}
           />

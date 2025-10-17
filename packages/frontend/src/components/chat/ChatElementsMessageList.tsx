@@ -1074,7 +1074,6 @@ const ChatElementsMessageList: React.FC<ChatElementsMessageListProps> = ({
                 sx={{
                   width: '36px',
                   height: '36px',
-                  borderRadius: '8px',
                   fontSize: '14px',
                   fontWeight: 'bold',
                   backgroundColor: theme.palette.mode === 'dark' ? '#5f6368' : '#e0e0e0',

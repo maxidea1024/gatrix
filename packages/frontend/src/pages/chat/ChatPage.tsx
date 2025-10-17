@@ -442,15 +442,16 @@ const ChatPageContent: React.FC = () => {
   // }
 
   return (
-    <Box sx={{ px: 3, py: 3, pb: 6 }}> {/* 하단 패딩을 6으로 늘림 (좌우와 동일한 24px) */}
-      <Box sx={{
-        height: 'calc(100vh - 160px)', // 하단 여백을 더 확보 (120px → 160px)
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden'
-      }}>
-        {/* Header */}
-        <Box sx={{ mb: 3, flexShrink: 0 }}>
+    <Box sx={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden',
+      px: 3,
+      py: 3
+    }}>
+      {/* Header */}
+      <Box sx={{ mb: 3, flexShrink: 0 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
           <ChatIcon sx={{ fontSize: 32, color: 'primary.main' }} />
           <Typography variant="h4" sx={{ fontWeight: 600, flex: 1 }}>
@@ -925,7 +926,6 @@ const ChatPageContent: React.FC = () => {
         title={t('chat.setStatus')}
         subtitle={t('chat.setStatusSubtitle')}
       />
-      </Box>
     </Box>
   );
 };

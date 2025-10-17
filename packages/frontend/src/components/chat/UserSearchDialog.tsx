@@ -206,15 +206,17 @@ const UserSearchDialog: React.FC<UserSearchDialogProps> = ({
 
     try {
       await onInviteUser(userId);
-      enqueueSnackbar(t('chat.invitationSent'), { variant: 'success' });
 
       // 초대 성공 시 pending invitation 목록에 추가
       setPendingInvitedUsers(prev => new Set(prev).add(userId));
 
-      // 초대 성공 시 창 닫기
+      // 먼저 다이얼로그를 닫고 토스트를 표시 (backdrop에 가려지지 않도록)
+      onClose();
+
+      // 다이얼로그가 닫힌 후 토스트 표시
       setTimeout(() => {
-        onClose();
-      }, 1000); // 1초 후 닫기 (성공 메시지를 볼 시간 제공)
+        enqueueSnackbar(t('chat.invitationSent'), { variant: 'success' });
+      }, 100);
     } catch (error: any) {
       console.error('Invite error:', error);
 

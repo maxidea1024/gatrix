@@ -302,6 +302,10 @@ export class InvitationController {
       const status = action === 'accept' ? 'accepted' : 'declined';
       const updatedInvitation = await ChannelInvitationModel.respond(invitationIdNum, status);
 
+      // Get invitee info (Redis cache → DB fallback)
+      const inviteeData = await getUserInfo(userId);
+      const inviteeName = inviteeData?.name || 'Unknown User';
+
       // If accepted, add user as channel member
       if (action === 'accept') {
         await ChannelModel.addMember(invitation.channelId, userId, 'member');
@@ -313,7 +317,7 @@ export class InvitationController {
         await broadcastService.broadcastToChannel(invitation.channelId, 'user_joined_channel', {
           userId,
           channelId: invitation.channelId,
-          userName: (req as any).user.name || 'Unknown User',
+          userName: inviteeName,
           timestamp: Date.now(),
         });
       }
@@ -326,7 +330,7 @@ export class InvitationController {
         invitationId: invitation.id,
         channelId: invitation.channelId,
         inviteeId: userId,
-        inviteeName: (req as any).user.name || 'Unknown User',
+        inviteeName: inviteeName,
         action,
         timestamp: Date.now(),
       });

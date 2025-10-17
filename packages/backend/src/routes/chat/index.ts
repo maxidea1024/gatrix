@@ -5,6 +5,7 @@ import { authenticate } from '../../middleware/auth';
 import { ChatSyncController } from '../../controllers/ChatSyncController';
 import logger from '../../config/logger';
 import { HEADERS } from '../../constants/headers';
+import { UserModel } from '../../models/User';
 
 const router = express.Router();
 
@@ -22,7 +23,7 @@ router.use(upload.any() as any);
 // 채팅서버 설정
 const CHAT_SERVER_URL = process.env.CHAT_SERVER_URL || 'http://localhost:3001';
 const CHAT_API_BASE = `${CHAT_SERVER_URL}/api/v1`;
-const CHAT_SERVER_API_TOKEN = 'gatrix-api-180c05eb58db26b863481f5d54e657a218b54da5bfb388e9278a7eb733227aec';
+const CHAT_SERVER_API_TOKEN = 'gatrix-api-015893d49d112919b7ec84addab31fdd182c4f2de3c4d880e1db12467c89cf3c';
 const DEFAULT_AVATAR_URL = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
 
 // 모든 채팅 라우트에 인증 필요 (디버깅 로깅 추가)
@@ -207,12 +208,24 @@ router.use('/', async (req, res, next) => {
     let requestData = req.body;
     if (targetPath === '/users/sync-user' && req.user) {
       const user = req.user as any;
+
+      // DB에서 최신 사용자 정보 조회 (avatarUrl 포함)
+      let avatarUrl = user.avatarUrl || DEFAULT_AVATAR_URL;
+      try {
+        const dbUser = await UserModel.findById(user.id);
+        if (dbUser && dbUser.avatarUrl) {
+          avatarUrl = dbUser.avatarUrl;
+        }
+      } catch (error) {
+        console.error('Failed to fetch user avatar from DB:', error);
+      }
+
       requestData = {
         id: user.id,
         username: user.email,
         name: user.name || user.email,
         email: user.email,
-        avatarUrl: user.avatarUrl || DEFAULT_AVATAR_URL
+        avatarUrl: avatarUrl
       };
       console.log('📝 Adding user data for sync:', requestData);
     }

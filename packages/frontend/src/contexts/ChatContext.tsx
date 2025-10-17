@@ -782,8 +782,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log('📨 Invitation response received in ChatContext:', event);
         const { data } = event;
 
-        // 현재 사용자가 초대한 사람인지 확인 (백엔드에서 inviterId에게만 전송하지만 추가 확인)
-        if (user && data.inviteeId !== user.id) {
+        // 백엔드에서 inviterId에게만 전송하므로, 이 이벤트를 받은 사람은 초대한 사람임
+        // 따라서 조건 없이 메시지 표시
+        if (user) {
           if (data.action === 'accept') {
             enqueueSnackbar(
               t('chat.invitationAccepted', { inviteeName: data.inviteeName }),
@@ -840,8 +841,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         dispatch({ type: 'SET_PENDING_INVITATIONS_COUNT', payload: Math.max(0, state.pendingInvitationsCount - 1) });
                         // 채널 목록 새로고침 후 해당 채널로 이동
                         await loadChannels();
-                        if (response.data?.channelId) {
-                          dispatch({ type: 'SET_CURRENT_CHANNEL', payload: response.data.channelId });
+                        if (response.channelId) {
+                          console.log('🎉 Invitation accepted, switching to channel:', response.channelId);
+                          dispatch({ type: 'SET_CURRENT_CHANNEL', payload: response.channelId });
                         }
                       } else {
                         enqueueSnackbar(t('chat.invitationAcceptFailed'), { variant: 'error' });

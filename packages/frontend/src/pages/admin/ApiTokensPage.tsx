@@ -88,7 +88,7 @@ import SimplePagination from '@/components/common/SimplePagination';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
-import { useI18n } from '@/hooks/useI18n';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface CreateTokenData {
   tokenName: string;
@@ -221,6 +221,16 @@ const ApiTokensPage: React.FC = () => {
 
   // Search state
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   // Dynamic filter state
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -689,7 +699,17 @@ const ApiTokensPage: React.FC = () => {
     }
   };
 
+  // Filter tokens based on debounced search term
+  const filteredTokens = React.useMemo(() => {
+    if (!debouncedSearchTerm.trim()) return tokens;
 
+    const lowerSearch = debouncedSearchTerm.toLowerCase();
+    return tokens.filter(token =>
+      token.tokenName.toLowerCase().includes(lowerSearch) ||
+      (token.description && token.description.toLowerCase().includes(lowerSearch)) ||
+      token.tokenType.toLowerCase().includes(lowerSearch)
+    );
+  }, [tokens, debouncedSearchTerm]);
 
   return (
     <>
@@ -822,9 +842,9 @@ const ApiTokensPage: React.FC = () => {
                 <TableCell padding="checkbox" sx={{ width: 50 }}>
                   <Checkbox
                     checked={selectAll}
-                    indeterminate={selectedTokenIds.length > 0 && selectedTokenIds.length < tokens.length}
+                    indeterminate={selectedTokenIds.length > 0 && selectedTokenIds.length < filteredTokens.length}
                     onChange={(e) => handleSelectAll(e.target.checked)}
-                    disabled={tokens.length === 0}
+                    disabled={filteredTokens.length === 0}
                   />
                 </TableCell>
                 {columns.filter(col => col.visible).map((column) => (
@@ -836,15 +856,15 @@ const ApiTokensPage: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {!tokens || tokens.length === 0 ? (
+              {!filteredTokens || filteredTokens.length === 0 ? (
                 <EmptyTableRow
                   colSpan={columns.filter(col => col.visible).length + 2}
                   loading={loading}
-                  message={t('apiTokens.noTokens')}
+                  message={searchTerm ? t('common.noSearchResults') : t('apiTokens.noTokens')}
                   loadingMessage={t('common.loadingData')}
                 />
               ) : (
-                tokens.map((token) => (
+                filteredTokens.map((token) => (
                   <TableRow key={token.id} hover selected={selectedTokenIds.includes(token.id)}>
                     <TableCell padding="checkbox">
                       <Checkbox
@@ -1756,31 +1776,35 @@ const ApiTokensPage: React.FC = () => {
         onClose={() => setColumnSettingsAnchor(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        hideBackdrop
+        disableScrollLock
       >
-        <Box sx={{ p: 2, minWidth: 250 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="subtitle2">{t('common.columnSettings')}</Typography>
-            <Button size="small" onClick={handleResetColumns}>{t('common.reset')}</Button>
+        <ClickAwayListener onClickAway={() => setColumnSettingsAnchor(null)}>
+          <Box sx={{ p: 2, minWidth: 250 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="subtitle2">{t('common.columnSettings')}</Typography>
+              <Button size="small" onClick={handleResetColumns}>{t('common.reset')}</Button>
+            </Box>
+            <DndContext
+              sensors={columnSensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleColumnDragEnd}
+              modifiers={[restrictToVerticalAxis]}
+            >
+              <SortableContext items={columns.map(c => c.id)} strategy={verticalListSortingStrategy}>
+                <List dense>
+                  {columns.map((column) => (
+                    <SortableColumnItem
+                      key={column.id}
+                      column={column}
+                      onToggleVisibility={handleToggleColumnVisibility}
+                    />
+                  ))}
+                </List>
+              </SortableContext>
+            </DndContext>
           </Box>
-          <DndContext
-            sensors={columnSensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleColumnDragEnd}
-            modifiers={[restrictToVerticalAxis]}
-          >
-            <SortableContext items={columns.map(c => c.id)} strategy={verticalListSortingStrategy}>
-              <List dense>
-                {columns.map((column) => (
-                  <SortableColumnItem
-                    key={column.id}
-                    column={column}
-                    onToggleVisibility={handleToggleColumnVisibility}
-                  />
-                ))}
-              </List>
-            </SortableContext>
-          </DndContext>
-        </Box>
+        </ClickAwayListener>
       </Popover>
     </>
   );
