@@ -570,7 +570,11 @@
     }
   },
   "gameWorlds": {
+    "worldId": "월드 ID",
+    "name": "이름",
     "description": "설명",
+    "isVisible": "표시 여부",
+    "isMaintenance": "점검 여부",
     "actions": "작업",
     "active": "활성",
     "activeWorlds": "활성 월드",
@@ -1102,6 +1106,8 @@
     "noLogsFound": "감사 로그를 찾을 수 없습니다",
     "resource": "리소스",
     "resourceType": "리소스 유형",
+    "resourceId": "리소스 ID",
+    "createdAt": "생성일시",
     "searchUserPlaceholder": "사용자 검색",
     "startDate": "시작일",
     "subtitle": "모든 시스템 활동과 사용자 작업, 관리 운영을 상세한 감사 추적으로 추적하고 모니터링합니다",

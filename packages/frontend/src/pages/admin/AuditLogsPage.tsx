@@ -32,7 +32,33 @@ import {
   Divider,
   alpha,
   useTheme,
+  Popover,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  ClickAwayListener,
+  Checkbox,
+  Button,
 } from '@mui/material';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
   Refresh as RefreshIcon,
   Info as InfoIcon,
@@ -40,6 +66,10 @@ import {
   History as HistoryIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
   KeyboardArrowRight as KeyboardArrowRightIcon,
+  ViewColumn as ViewColumnIcon,
+  DragIndicator as DragIndicatorIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
 import ReactDiffViewer, { DiffMethod } from 'react-diff-viewer-continued';
 
@@ -59,7 +89,69 @@ import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../componen
 import { InputAdornment } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 
+// Column definition interface
+interface ColumnConfig {
+  id: string;
+  labelKey: string;
+  visible: boolean;
+}
 
+// Sortable list item component for drag and drop
+interface SortableColumnItemProps {
+  column: ColumnConfig;
+  onToggleVisibility: (id: string) => void;
+}
+
+const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
+  const { t } = useTranslation();
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: column.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <ListItem
+      ref={setNodeRef}
+      style={style}
+      disablePadding
+      secondaryAction={
+        <Box {...attributes} {...listeners} sx={{ cursor: 'grab', display: 'flex', alignItems: 'center', '&:active': { cursor: 'grabbing' } }}>
+          <DragIndicatorIcon sx={{ color: 'text.disabled', fontSize: 20 }} />
+        </Box>
+      }
+    >
+      <ListItemButton
+        dense
+        onClick={() => onToggleVisibility(column.id)}
+        sx={{ pr: 6 }}
+      >
+        <Checkbox
+          edge="start"
+          checked={column.visible}
+          tabIndex={-1}
+          disableRipple
+          size="small"
+          icon={<VisibilityOffIcon fontSize="small" />}
+          checkedIcon={<VisibilityIcon fontSize="small" />}
+        />
+        <ListItemText
+          primary={t(column.labelKey)}
+          slotProps={{ primary: { variant: 'body2' } }}
+        />
+      </ListItemButton>
+    </ListItem>
+  );
+};
 
 const AuditLogsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -123,6 +215,42 @@ const AuditLogsPage: React.FC = () => {
 
   // 디바운싱된 검색어 (500ms 지연)
   const debouncedUserFilter = useDebounce(userFilter, 500);
+
+  // Column configuration
+  const defaultColumns: ColumnConfig[] = [
+    { id: 'createdAt', labelKey: 'auditLogs.createdAt', visible: true },
+    { id: 'user', labelKey: 'auditLogs.user', visible: true },
+    { id: 'action', labelKey: 'auditLogs.action', visible: true },
+    { id: 'resource', labelKey: 'auditLogs.resource', visible: true },
+    { id: 'resourceId', labelKey: 'auditLogs.resourceId', visible: true },
+    { id: 'ipAddress', labelKey: 'auditLogs.ipAddress', visible: true },
+  ];
+
+  const [columns, setColumns] = useState<ColumnConfig[]>(() => {
+    const saved = localStorage.getItem('auditLogsColumns');
+    if (saved) {
+      try {
+        const savedColumns = JSON.parse(saved);
+        const mergedColumns = savedColumns.map((savedCol: ColumnConfig) => {
+          const defaultCol = defaultColumns.find(c => c.id === savedCol.id);
+          return defaultCol ? { ...defaultCol, ...savedCol } : savedCol;
+        });
+        const savedIds = new Set(savedColumns.map((c: ColumnConfig) => c.id));
+        const newColumns = defaultColumns.filter(c => !savedIds.has(c.id));
+        return [...mergedColumns, ...newColumns];
+      } catch (e) {
+        return defaultColumns;
+      }
+    }
+    return defaultColumns;
+  });
+
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
+
+  const columnSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   // Available filter definitions
   const availableFilters: FilterDefinition[] = [
@@ -307,6 +435,81 @@ const AuditLogsPage: React.FC = () => {
     );
   };
 
+  // Column handlers
+  const handleToggleColumnVisibility = (columnId: string) => {
+    const newColumns = columns.map(col =>
+      col.id === columnId ? { ...col, visible: !col.visible } : col
+    );
+    setColumns(newColumns);
+    localStorage.setItem('auditLogsColumns', JSON.stringify(newColumns));
+  };
+
+  const handleResetColumns = () => {
+    setColumns(defaultColumns);
+    localStorage.setItem('auditLogsColumns', JSON.stringify(defaultColumns));
+  };
+
+  const handleColumnDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = columns.findIndex((col) => col.id === active.id);
+      const newIndex = columns.findIndex((col) => col.id === over.id);
+      const newColumns = arrayMove(columns, oldIndex, newIndex);
+      setColumns(newColumns);
+      localStorage.setItem('auditLogsColumns', JSON.stringify(newColumns));
+    }
+  };
+
+  const renderCellContent = (log: AuditLog, columnId: string) => {
+    switch (columnId) {
+      case 'createdAt':
+        return <Typography variant="body2">{formatDateTimeDetailed((log as any).createdAt || log.created_at)}</Typography>;
+      case 'user':
+        return log.user_name ? (
+          <Box>
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>{log.user_name}</Typography>
+            <Typography variant="caption" color="text.secondary">{log.user_email}</Typography>
+          </Box>
+        ) : (
+          <Typography variant="body2" color="text.secondary">{t('auditLogs.system')}</Typography>
+        );
+      case 'action':
+        return <Chip label={t(`auditLogs.actions.${log.action}`)} color={AuditLogService.getActionColor(log.action)} size="small" />;
+      case 'resource':
+        const resourceType = (log as any).resourceType || (log as any).resource_type || (log as any).entityType;
+        return resourceType ? (
+          <Box>
+            <Typography variant="body2" fontWeight="medium">
+              {t(`auditLogs.resources.${resourceType}`, resourceType)}
+            </Typography>
+            {(() => {
+              const oldVals = (log as any).oldValues || (log as any).old_values;
+              const newVals = (log as any).newValues || (log as any).new_values;
+              const resourceName = oldVals?.name || newVals?.name || oldVals?.worldId || newVals?.worldId;
+              return resourceName ? (
+                <Typography variant="body2" color="text.primary" sx={{ fontWeight: 500 }}>
+                  {resourceName}
+                </Typography>
+              ) : null;
+            })()}
+          </Box>
+        ) : (
+          <Typography variant="body2" color="text.secondary">-</Typography>
+        );
+      case 'resourceId':
+        const resourceId = (log as any).resourceId || (log as any).resource_id || (log as any).entityId;
+        return resourceId ? (
+          <Typography variant="caption" color="text.secondary">ID: {resourceId}</Typography>
+        ) : (
+          <Typography variant="body2" color="text.secondary">-</Typography>
+        );
+      case 'ipAddress':
+        return <Typography variant="body2" fontFamily="monospace">{log.ip_address || '-'}</Typography>;
+      default:
+        return null;
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return formatDateTimeDetailed(dateString);
   };
@@ -432,6 +635,21 @@ const AuditLogsPage: React.FC = () => {
                 onFilterChange={handleDynamicFilterChange}
                 onOperatorChange={handleOperatorChange}
               />
+
+              {/* Column Settings Button */}
+              <Tooltip title={t('users.columnSettings')}>
+                <IconButton
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    bgcolor: 'background.paper',
+                    border: 1,
+                    borderColor: 'divider',
+                    '&:hover': { bgcolor: 'action.hover' },
+                  }}
+                >
+                  <ViewColumnIcon />
+                </IconButton>
+              </Tooltip>
             </Box>
           </CardContent>
         </Card>
@@ -446,16 +664,15 @@ const AuditLogsPage: React.FC = () => {
               pointerEvents: !isInitialLoad && loading ? 'none' : 'auto',
             }}
           >
-            <Table>
+            <Table sx={{ tableLayout: 'auto' }}>
               <TableHead>
                 <TableRow>
-                  <TableCell width="50px"></TableCell>
-                  <TableCell>{t('auditLogs.id')}</TableCell>
-                  <TableCell>{t('auditLogs.action')}</TableCell>
-                  <TableCell>{t('auditLogs.resource')}</TableCell>
-                  <TableCell>{t('auditLogs.user')}</TableCell>
-                  <TableCell>{t('auditLogs.ipAddress')}</TableCell>
-                  <TableCell>{t('auditLogs.date')}</TableCell>
+                  <TableCell sx={{ width: 50 }}></TableCell>
+                  {columns.filter(col => col.visible).map((column) => (
+                    <TableCell key={column.id}>
+                      {t(column.labelKey)}
+                    </TableCell>
+                  ))}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -466,32 +683,16 @@ const AuditLogsPage: React.FC = () => {
                       <TableCell>
                         <Skeleton variant="circular" width={32} height={32} />
                       </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width={60} />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="rounded" width={100} height={24} />
-                      </TableCell>
-                      <TableCell>
-                        <Box>
-                          <Skeleton variant="text" width={120} />
-                          <Skeleton variant="text" width={80} sx={{ fontSize: '0.75rem' }} />
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width={100} />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width="80%" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width="70%" />
-                      </TableCell>
+                      {columns.filter(col => col.visible).map((column) => (
+                        <TableCell key={column.id}>
+                          <Skeleton variant="text" width="80%" />
+                        </TableCell>
+                      ))}
                     </TableRow>
                   ))
                 ) : auditLogs.length === 0 ? (
                   <EmptyTableRow
-                    colSpan={7}
+                    colSpan={columns.filter(col => col.visible).length + 1}
                     loading={false}
                     message={t('auditLogs.noLogsFound')}
                     loadingMessage={t('common.loadingAuditLogs')}
@@ -518,74 +719,16 @@ const AuditLogsPage: React.FC = () => {
                             {expandedRowId === log.id ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
                           </IconButton>
                         </TableCell>
-                        <TableCell>{log.id}</TableCell>
-                        <TableCell>
-                          <Chip label={t(`auditLogs.actions.${log.action}`)} color={AuditLogService.getActionColor(log.action)} size="small" />
-                        </TableCell>
-                        <TableCell>
-                          {((log as any).resourceType || (log as any).resource_type || (log as any).entityType) ? (
-                            <Box>
-                              <Typography variant="body2" fontWeight="medium">
-                                {t(`auditLogs.resources.${(log as any).resourceType || (log as any).resource_type || (log as any).entityType}`, (log as any).resourceType || (log as any).resource_type || (log as any).entityType)}
-                              </Typography>
-                              {/* Show resource name from oldValues or newValues if available */}
-                              {(() => {
-                                const oldVals = (log as any).oldValues || (log as any).old_values;
-                                const newVals = (log as any).newValues || (log as any).new_values;
-                                const resourceName = oldVals?.name || newVals?.name || oldVals?.worldId || newVals?.worldId;
-                                const resourceId = (log as any).resourceId || (log as any).resource_id || (log as any).entityId;
-
-                                return (
-                                  <>
-                                    {resourceName && (
-                                      <Typography variant="body2" color="text.primary" sx={{ fontWeight: 500 }}>
-                                        {resourceName}
-                                      </Typography>
-                                    )}
-                                    {resourceId && (
-                                      <Typography variant="caption" color="text.secondary">
-                                        ID: {resourceId}
-                                      </Typography>
-                                    )}
-                                  </>
-                                );
-                              })()}
-                            </Box>
-                          ) : (
-                            <Typography variant="body2" color="text.secondary">-</Typography>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {log.user_name ? (
-                            <Box>
-                              <Typography variant="body2" fontWeight="medium">
-                                {log.user_name}
-                              </Typography>
-                              <Typography variant="caption" color="text.secondary">
-                                {log.user_email}
-                              </Typography>
-                            </Box>
-                          ) : (
-                            <Typography variant="body2" color="text.secondary">
-                              {t('auditLogs.system')}
-                            </Typography>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2" fontFamily="monospace">
-                            {log.ip_address || '-'}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2">
-                            {formatDateTimeDetailed((log as any).createdAt || log.created_at)}
-                          </Typography>
-                        </TableCell>
+                        {columns.filter(col => col.visible).map((column) => (
+                          <TableCell key={column.id}>
+                            {renderCellContent(log, column.id)}
+                          </TableCell>
+                        ))}
                       </TableRow>
 
                       {/* Expanded Detail Row */}
                       <TableRow>
-                        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+                        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={columns.filter(col => col.visible).length + 1}>
                           <Collapse in={expandedRowId === log.id} timeout="auto" unmountOnExit>
                             <Box sx={{
                               py: 3,
@@ -875,6 +1018,51 @@ const AuditLogsPage: React.FC = () => {
             rowsPerPageOptions={[5, 10, 25, 50, 100]}
           />
         </Card>
+
+        {/* Column Settings Popover */}
+        <Popover
+          open={Boolean(columnSettingsAnchor)}
+          anchorEl={columnSettingsAnchor}
+          onClose={() => setColumnSettingsAnchor(null)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+          hideBackdrop
+          disableScrollLock
+        >
+          <ClickAwayListener onClickAway={() => setColumnSettingsAnchor(null)}>
+            <Box sx={{ p: 2, minWidth: 280, maxWidth: 320 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                  {t('users.columnSettings')}
+                </Typography>
+                <Button size="small" onClick={handleResetColumns} color="warning">
+                  {t('common.reset')}
+                </Button>
+              </Box>
+              <DndContext
+                sensors={columnSensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleColumnDragEnd}
+                modifiers={[restrictToVerticalAxis]}
+              >
+                <SortableContext
+                  items={columns.map(col => col.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <List dense disablePadding>
+                    {columns.map((column) => (
+                      <SortableColumnItem
+                        key={column.id}
+                        column={column}
+                        onToggleVisibility={handleToggleColumnVisibility}
+                      />
+                    ))}
+                  </List>
+                </SortableContext>
+              </DndContext>
+            </Box>
+          </ClickAwayListener>
+        </Popover>
       </Box>
     );
 };

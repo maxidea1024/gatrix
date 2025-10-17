@@ -239,8 +239,8 @@ const CrashEventsPage: React.FC = () => {
     { id: 'characterId', labelKey: 'crashes.table.characterId', sortable: true, visible: true },
     { id: 'gameUserId', labelKey: 'crashes.table.gameUserId', sortable: true, visible: true },
     { id: 'userName', labelKey: 'crashes.table.userName', sortable: true, visible: true },
-    { id: 'firstLine', labelKey: 'crashes.table.firstLine', sortable: false, visible: true, width: '200px' },
-    { id: 'userMessage', labelKey: 'crashes.table.userMessage', sortable: false, visible: true, width: '150px' },
+    { id: 'firstLine', labelKey: 'crashes.table.firstLine', sortable: false, visible: true },
+    { id: 'userMessage', labelKey: 'crashes.table.userMessage', sortable: false, visible: true },
   ];
 
   // Column configuration state (persisted in localStorage)
@@ -940,9 +940,9 @@ const CrashEventsPage: React.FC = () => {
           <Table sx={{ tableLayout: 'auto' }}>
             <TableHead>
               <TableRow>
-                <TableCell width="40px"></TableCell>
+                <TableCell sx={{ width: 40 }}></TableCell>
                 {columns.filter(col => col.visible).map((column) => (
-                  <TableCell key={column.id} width={column.width}>
+                  <TableCell key={column.id}>
                     {column.sortable ? (
                       <Box
                         sx={{ display: 'flex', alignItems: 'center', gap: 0.5, cursor: 'pointer' }}
@@ -958,7 +958,7 @@ const CrashEventsPage: React.FC = () => {
                     )}
                   </TableCell>
                 ))}
-                <TableCell align="center" width="100px">{t('crashes.columns.actions')}</TableCell>
+                <TableCell align="center" sx={{ width: 100 }}>{t('crashes.columns.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

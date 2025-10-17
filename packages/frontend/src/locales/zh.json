@@ -1157,6 +1157,8 @@
     "noLogsFound": "未找到审计日志",
     "resource": "资源",
     "resourceType": "资源类型",
+    "resourceId": "资源ID",
+    "createdAt": "创建时间",
     "searchUserPlaceholder": "搜索用户",
     "startDate": "开始日期",
     "subtitle": "跟踪系统活动和变更",

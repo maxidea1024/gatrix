@@ -865,30 +865,11 @@ const MessageTemplatesPage: React.FC = () => {
                       <TableCell padding="checkbox">
                         <Skeleton variant="rectangular" width={24} height={24} />
                       </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width="80%" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width="90%" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="rounded" width={80} height={24} />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width="70%" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width="60%" />
-                      </TableCell>
-                      <TableCell>
-                        <Skeleton variant="text" width="50%" />
-                      </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', gap: 0.5 }}>
-                          <Skeleton variant="rounded" width={60} height={24} />
-                          <Skeleton variant="rounded" width={60} height={24} />
-                        </Box>
-                      </TableCell>
+                      {columns.filter(col => col.visible).map((column) => (
+                        <TableCell key={column.id}>
+                          <Skeleton variant="text" width="80%" />
+                        </TableCell>
+                      ))}
                       <TableCell align="right">
                         <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
                         <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block' }} />
@@ -897,17 +878,13 @@ const MessageTemplatesPage: React.FC = () => {
                   ))
                 ) : items.length === 0 ? (
                   <EmptyTableRow
-                    colSpan={9}
+                    colSpan={columns.filter(col => col.visible).length + 2}
                     loading={loading}
                     message={t('messageTemplates.noTemplatesFound')}
                     loadingMessage={t('common.loadingData')}
                   />
                 ) : (
-                  items.map(row => {
-                  const langs = (row.locales||[]).map(l=>l.lang);
-                  const hasLocales = langs.length > 0;
-                  const langsLabel = hasLocales ? langs.join(', ') : t('messageTemplates.onlyDefaultMessage');
-                  return (
+                  items.map(row => (
                     <TableRow key={row.id} hover>
                       <TableCell padding="checkbox">
                         <Checkbox
@@ -916,72 +893,17 @@ const MessageTemplatesPage: React.FC = () => {
                           disabled={!row.id}
                         />
                       </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <Typography variant="subtitle2">{row.name}</Typography>
-                          <IconButton size="small" onClick={() => copyWithToast(row.name, t('common.name'))} sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}>
-                            <ContentCopyIcon fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      </TableCell>
-                      <TableCell sx={{ maxWidth: 280 }}>
-                        {(row as any).defaultMessage ? (
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <Typography variant="body2" sx={{ whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
-                              {String((row as any).defaultMessage).replace(/\n/g, ' ')}
-                            </Typography>
-                            <IconButton size="small" onClick={() => copyWithToast(String((row as any).defaultMessage), t('messageTemplates.defaultMessage'), false)} sx={{ opacity: 0.7, '&:hover': { opacity: 1 } }}>
-                              <ContentCopyIcon fontSize="small" />
-                            </IconButton>
-                          </Box>
-                        ) : (
-                          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                            {t('messageTemplates.onlyDefaultMessage')}
-                          </Typography>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={(row as any).isEnabled ? t('common.available') : t('common.unavailable')}
-                          color={(row as any).isEnabled ? 'success' : 'default'}
-                          size="small"
-                          variant={(row as any).isEnabled ? 'filled' : 'outlined'}
-                        />
-                      </TableCell>
-                      <TableCell>{formatDateTimeDetailed((row as any).updatedAt) || '-'}</TableCell>
-                      <TableCell>{hasLocales ? langs.map(c=>getLanguageDisplayName(c as any)).join(', ') : t('messageTemplates.onlyDefaultMessage')}</TableCell>
-                      <TableCell>{(row as any).createdByName || '-'}</TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                          {row.tags && row.tags.length > 0 ? (
-                            row.tags.map((tag) => (
-                              <Tooltip key={tag.id} title={(tag as any).description || t('tags.noDescription')} arrow>
-                                <Chip
-                                  label={tag.name}
-                                  size="small"
-                                  sx={{
-                                    bgcolor: tag.color,
-                                    color: '#fff',
-                                    fontSize: '0.75rem',
-                                    cursor: 'help'
-                                  }}
-                                />
-                              </Tooltip>
-                            ))
-                          ) : (
-                            <Typography variant="body2" color="text.secondary">
-                              -
-                            </Typography>
-                          )}
-                        </Box>
-                      </TableCell>
+                      {columns.filter(col => col.visible).map((column) => (
+                        <TableCell key={column.id}>
+                          {renderCellContent(row, column.id)}
+                        </TableCell>
+                      ))}
                       <TableCell align="right">
                         <IconButton size="small" onClick={() => handleEdit(row)}><EditIcon fontSize="small" /></IconButton>
                         <IconButton size="small" color="error" onClick={() => openDeleteDialog(row)}><DeleteIcon fontSize="small" /></IconButton>
                       </TableCell>
                     </TableRow>
-                  );
-                  })
+                  ))
                 )}
               </TableBody>
             </Table>
@@ -1404,6 +1326,51 @@ const MessageTemplatesPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Column Settings Popover */}
+      <Popover
+        open={Boolean(columnSettingsAnchor)}
+        anchorEl={columnSettingsAnchor}
+        onClose={() => setColumnSettingsAnchor(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        hideBackdrop
+        disableScrollLock
+      >
+        <ClickAwayListener onClickAway={() => setColumnSettingsAnchor(null)}>
+          <Box sx={{ p: 2, minWidth: 280, maxWidth: 320 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                {t('users.columnSettings')}
+              </Typography>
+              <Button size="small" onClick={handleResetColumns} color="warning">
+                {t('common.reset')}
+              </Button>
+            </Box>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleColumnDragEnd}
+              modifiers={[restrictToVerticalAxis]}
+            >
+              <SortableContext
+                items={columns.map(col => col.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <List dense disablePadding>
+                  {columns.map((column) => (
+                    <SortableColumnItem
+                      key={column.id}
+                      column={column}
+                      onToggleVisibility={handleToggleColumnVisibility}
+                    />
+                  ))}
+                </List>
+              </SortableContext>
+            </DndContext>
+          </Box>
+        </ClickAwayListener>
+      </Popover>
     </Box>
   );
 };

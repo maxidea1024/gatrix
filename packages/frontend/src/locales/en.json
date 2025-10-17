@@ -1105,6 +1105,8 @@
     "noLogsFound": "No audit logs found",
     "resource": "Resource",
     "resourceType": "Resource Type",
+    "resourceId": "Resource ID",
+    "createdAt": "Created At",
     "searchUserPlaceholder": "searchUserPlaceholder",
     "startDate": "Start Date",
     "subtitle": "Track and monitor all system activities, user actions, and administrative operations with detailed audit trails",
