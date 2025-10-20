@@ -39,6 +39,7 @@ import {
   ExpandLess,
   ExpandMore,
   Notifications as NotificationsIcon,
+  Mail as MailIcon,
   Settings as SettingsIcon,
   ShoppingCart as ShoppingCartIcon,
   Menu as MenuIcon,
@@ -61,6 +62,16 @@ import {
   Timeline as TimelineIcon,
   Terminal as TerminalIcon,
   MenuOpen as MenuOpenIcon,
+  CardGiftcard as CardGiftcardIcon,
+  Campaign as CampaignIcon,
+  ConfirmationNumber as ConfirmationNumberIcon,
+  Poll as PollIcon,
+  SportsEsports as SportsEsportsIcon,
+  Storage as StorageIcon,
+  Event as EventIcon,
+  Whatshot as WhatshotIcon,
+  Celebration as CelebrationIcon,
+  Dns as DnsIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -72,7 +83,7 @@ import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceSer
 import { useSSENotifications } from '@/hooks/useSSENotifications';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import moment from 'moment';
-import { baseMenuItems, adminMenuItems as configAdminMenuItems, settingsMenuItems as configSettingsMenuItems } from '@/config/navigation';
+import { baseMenuItems, adminMenuItems as configAdminMenuItems, gameMenuItems as configGameMenuItems, settingsMenuItems as configSettingsMenuItems } from '@/config/navigation';
 import mailService from '@/services/mailService';
 
 // Sidebar width is now dynamic
@@ -84,6 +95,7 @@ interface MainLayoutProps {
 // 중앙 설정에서 메뉴 가져오기
 const menuItems = baseMenuItems;
 const adminMenuItems = configAdminMenuItems;
+const gameMenuItems = configGameMenuItems;
 const settingsMenuItems = configSettingsMenuItems.map(item => ({
   ...item,
   requireAdmin: item.path !== '/settings', // settings 페이지는 모든 사용자 접근 가능
@@ -99,9 +111,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>(() => {
     try {
       const stored = localStorage.getItem('sidebarExpandedSections');
-      return stored ? JSON.parse(stored) : { admin: true, settings: true };
+      return stored ? JSON.parse(stored) : { admin: true, game: true, settings: true };
     } catch {
-      return { admin: true, settings: true };
+      return { admin: true, game: true, settings: true };
     }
   });
 
@@ -282,6 +294,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
   const renderMenuItem = (item: any, index: number) => {
     const isAdminItem = typeof index === 'string' && index.startsWith('admin-');
+    const isGameItem = typeof index === 'string' && index.startsWith('game-');
+    const isSettingsItemByIndex = typeof index === 'string' && index.startsWith('settings-');
     // 설정 메뉴 항목인지 확인
     const isSettingsItem = settingsMenuItems.some(settingsItem => settingsItem.path === item.path);
 
@@ -295,8 +309,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           key={index}
           onClick={() => toggleSection(`menu-${index}`)}
           sx={{
-            color: hasActiveChild ? theme.palette.text.primary : theme.palette.text.secondary,
-            backgroundColor: hasActiveChild ? `${theme.palette.primary.main}20` : 'transparent',
+            color: theme.palette.text.secondary,
+            backgroundColor: 'transparent',
             '&:hover': {
               backgroundColor: theme.palette.mode === 'dark'
                 ? 'rgba(255,255,255,0.1)'
@@ -304,7 +318,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             },
             justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
             px: sidebarCollapsed ? 1 : 2,
-            pl: isAdminItem ? 4 : (sidebarCollapsed ? 1 : 2),
+            pl: (isAdminItem || isGameItem || isSettingsItemByIndex) ? 2 : (sidebarCollapsed ? 1 : 2),
           }}
         >
           <ListItemIcon sx={{
@@ -395,7 +409,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           },
           justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
           px: sidebarCollapsed ? 1 : 2,
-          pl: isAdminItem ? 4 : (sidebarCollapsed ? 1 : 2),
+          pl: (isAdminItem || isGameItem || isSettingsItemByIndex) ? 2 : (sidebarCollapsed ? 1 : 2),
         }}
       >
         <ListItemIcon sx={{
@@ -647,6 +661,50 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               </Collapse>
             )}
 
+            {/* Game Management Panel */}
+            <Divider sx={{
+              my: 2,
+              borderColor: theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.1)'
+                : 'rgba(0,0,0,0.12)'
+            }} />
+            {!sidebarCollapsed && (
+              <ListItemButton
+                onClick={() => toggleSection('game')}
+                sx={{
+                  color: theme.palette.text.secondary,
+                  '&:hover': {
+                    backgroundColor: theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.1)'
+                      : 'rgba(0,0,0,0.08)'
+                  }
+                }}
+              >
+                <ListItemText
+                  primary={t('sidebar.gamePanel')}
+                  primaryTypographyProps={{
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}
+                />
+                {expandedSections.game ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+            )}
+            {sidebarCollapsed && (
+              <Box sx={{ px: 1, py: 0.5 }}>
+                {gameMenuItems.map((item, index) => renderMenuItem(item, index))}
+              </Box>
+            )}
+            {!sidebarCollapsed && (
+              <Collapse in={expandedSections.game} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  {gameMenuItems.map((item, index) => renderMenuItem(item, `game-${index}`))}
+                </List>
+              </Collapse>
+            )}
+
             {/* Settings Panel */}
             <Divider sx={{
               my: 2,
@@ -687,32 +745,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             )}
             {!sidebarCollapsed && (
               <Collapse in={expandedSections.settings} timeout="auto" unmountOnExit>
-                {settingsMenuItems
-                  .filter(item => !item.requireAdmin || user?.role === 'admin')
-                  .map((item, index) => (
-                  <ListItemButton
-                    key={index}
-                    onClick={() => navigate(item.path)}
-                    sx={{
-                      pl: 4,
-                      color: isActiveSettingsPath(item.path) ? theme.palette.text.primary : theme.palette.text.secondary,
-                      backgroundColor: isActiveSettingsPath(item.path) ? `${theme.palette.primary.main}20` : 'transparent',
-                      '&:hover': {
-                        backgroundColor: theme.palette.mode === 'dark'
-                          ? 'rgba(255,255,255,0.1)'
-                          : 'rgba(0,0,0,0.08)',
-                      },
-                    }}
-                  >
-                    <ListItemIcon sx={{ color: 'inherit', minWidth: 40 }}>
-                      {item.icon}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={t(item.text)}
-                      primaryTypographyProps={{ fontSize: '0.875rem' }}
-                    />
-                  </ListItemButton>
-                ))}
+                <List component="div" disablePadding>
+                  {settingsMenuItems
+                    .filter(item => !item.requireAdmin || user?.role === 'admin')
+                    .map((item, index) => renderMenuItem(item, `settings-${index}`))}
+                </List>
               </Collapse>
             )}
           </>
@@ -1031,6 +1068,38 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             )}
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Tooltip title={t('sidebar.chat')}>
+              <IconButton
+                color="inherit"
+                onClick={() => navigate('/chat')}
+              >
+                <ChatIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title={t('mailbox.title')}>
+              <IconButton
+                color="inherit"
+                onClick={() => navigate('/mailbox')}
+              >
+                <Badge badgeContent={unreadMailCount} color="error">
+                  <MailIcon />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+
+            {/* 구분선 */}
+            <Box
+              sx={{
+                width: '1px',
+                height: '24px',
+                bgcolor: theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.2)'
+                  : 'rgba(0, 0, 0, 0.2)',
+                mx: 1
+              }}
+            />
+
             <TimezoneSelector />
 
             {/* 구분선 */}
@@ -1048,17 +1117,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <IconButton onClick={toggleTheme} color="inherit">
               {isDark ? <LightModeIcon /> : <DarkModeIcon />}
             </IconButton>
-
-            <Tooltip title={t('mailbox.title')}>
-              <IconButton
-                color="inherit"
-                onClick={() => navigate('/mailbox')}
-              >
-                <Badge badgeContent={unreadMailCount} color="error">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
-            </Tooltip>
 
             <IconButton
               onClick={handleUserMenuOpen}

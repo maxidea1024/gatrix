@@ -59,6 +59,12 @@ const SettingsPage: React.FC = () => {
     setPreview(moment(now).tz(timezone).format(dtFormat));
   }, [timezone, dtFormat]);
 
+  // Format timezone with UTC offset
+  const formatTimezone = (tz: string) => {
+    const offset = moment.tz(tz).format('Z');
+    return `${tz} (UTC${offset})`;
+  };
+
   // Load vars
   useEffect(() => {
     (async () => {
@@ -155,8 +161,19 @@ const SettingsPage: React.FC = () => {
                   options={tzOptions}
                   value={timezone}
                   onChange={(_, v) => v && setTimezone(v)}
+                  getOptionLabel={formatTimezone}
                   renderInput={(params) => (
                     <TextField {...params} label="Timezone" placeholder="Search timezone" />
+                  )}
+                  renderOption={(props, option) => (
+                    <li {...props}>
+                      <Box>
+                        <Typography variant="body2">{option}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          UTC{moment.tz(option).format('Z')}
+                        </Typography>
+                      </Box>
+                    </li>
                   )}
                 />
 

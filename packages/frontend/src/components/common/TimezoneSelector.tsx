@@ -9,7 +9,8 @@ import {
   Popover,
   Stack,
   Divider,
-  useTheme
+  useTheme,
+  ClickAwayListener
 } from '@mui/material';
 import {
   Settings as SettingsIcon,
@@ -140,11 +141,8 @@ const TimezoneSelector: React.FC = () => {
           vertical: 'top',
           horizontal: 'right',
         }}
-        slotProps={{
-          backdrop: {
-            invisible: true
-          }
-        }}
+        hideBackdrop
+        disableScrollLock
         PaperProps={{
           sx: {
             bgcolor: 'background.paper',
@@ -154,7 +152,8 @@ const TimezoneSelector: React.FC = () => {
           }
         }}
       >
-        <Box sx={{ p: 2, minWidth: 300 }}>
+        <ClickAwayListener onClickAway={handleClose}>
+          <Box sx={{ p: 2, minWidth: 300 }}>
           <Stack spacing={2}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <SettingsIcon fontSize="small" />
@@ -249,7 +248,8 @@ const TimezoneSelector: React.FC = () => {
               </Typography>
             </Box>
           </Stack>
-        </Box>
+          </Box>
+        </ClickAwayListener>
       </Popover>
     </Box>
   );

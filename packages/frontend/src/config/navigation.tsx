@@ -20,20 +20,29 @@ import {
   Work as JobIcon,
   Monitor as MonitorIcon,
   Label as LabelIcon,
+  CardGiftcard as CardGiftcardIcon,
+  Campaign as CampaignIcon,
+  ConfirmationNumber as ConfirmationNumberIcon,
+  Poll as PollIcon,
+  SportsEsports as SportsEsportsIcon,
+  Storage as StorageIcon,
+  Event as EventIcon,
+  Whatshot as WhatshotIcon,
+  Celebration as CelebrationIcon,
+  Dns as DnsIcon,
 } from '@mui/icons-material';
 
 export interface MenuItem {
   text: string;
   icon: React.ReactElement;
-  path: string;
+  path?: string;
   adminOnly?: boolean;
+  children?: MenuItem[];
 }
 
 // 기본 메뉴 (모든 사용자)
 export const baseMenuItems: MenuItem[] = [
   { text: 'sidebar.dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-  { text: 'sidebar.chat', icon: <ChatIcon />, path: '/chat' },
-  { text: 'mailbox.title', icon: <MailIcon />, path: '/mailbox' },
 ];
 
 // 관리자 메뉴
@@ -53,6 +62,25 @@ export const adminMenuItems: MenuItem[] = [
   { text: 'sidebar.remoteConfig', icon: <CloudSyncIcon />, path: '/admin/remote-config', adminOnly: true },
   { text: 'sidebar.apiTokens', icon: <VpnKeyIcon />, path: '/admin/api-tokens', adminOnly: true },
   { text: 'sidebar.console', icon: <TerminalIcon />, path: '/admin/console', adminOnly: true },
+  { text: 'sidebar.serverList', icon: <DnsIcon />, path: '/admin/server-list', adminOnly: true },
+];
+
+// 게임관리 메뉴
+export const gameMenuItems: MenuItem[] = [
+  { text: 'sidebar.itemRewards', icon: <CardGiftcardIcon />, path: '/game/item-rewards', adminOnly: true },
+  { text: 'sidebar.ingameNotices', icon: <CampaignIcon />, path: '/game/ingame-notices', adminOnly: true },
+  { text: 'sidebar.coupons', icon: <ConfirmationNumberIcon />, path: '/game/coupons', adminOnly: true },
+  { text: 'sidebar.surveys', icon: <PollIcon />, path: '/game/surveys', adminOnly: true },
+  {
+    text: 'sidebar.operationEvents',
+    icon: <EventIcon />,
+    adminOnly: true,
+    children: [
+      { text: 'sidebar.hotTimeButtonEvent', icon: <WhatshotIcon />, path: '/game/hot-time-button-event', adminOnly: true },
+      { text: 'sidebar.liveEvent', icon: <CelebrationIcon />, path: '/game/live-event', adminOnly: true },
+    ]
+  },
+  { text: 'sidebar.planningData', icon: <StorageIcon />, path: '/game/planning-data', adminOnly: true },
 ];
 
 // 설정 메뉴

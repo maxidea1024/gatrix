@@ -38,6 +38,16 @@ import {
   Work,
   Monitor,
   Label,
+  CardGiftcard,
+  Campaign,
+  ConfirmationNumber,
+  Poll,
+  SportsEsports,
+  Storage,
+  Event,
+  Whatshot,
+  Celebration,
+  Dns,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -77,6 +87,16 @@ const iconMap: Record<string, React.ReactElement> = {
   Work: <Work />,
   Monitor: <Monitor />,
   Label: <Label />,
+  CardGiftcard: <CardGiftcard />,
+  Campaign: <Campaign />,
+  ConfirmationNumber: <ConfirmationNumber />,
+  Poll: <Poll />,
+  SportsEsports: <SportsEsports />,
+  Storage: <Storage />,
+  Event: <Event />,
+  Whatshot: <Whatshot />,
+  Celebration: <Celebration />,
+  Dns: <Dns />,
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {

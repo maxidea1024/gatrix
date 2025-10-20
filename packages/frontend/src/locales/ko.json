@@ -1718,7 +1718,8 @@
     "maintenance": {
       "bannerActive": "현재 서비스 점검이 진행 중입니다"
     },
-    "connectionLostRefresh": "연결이 끊어졌습니다. 페이지를 새로고침해주세요."
+    "connectionLostRefresh": "연결이 끊어졌습니다. 페이지를 새로고침해주세요.",
+    "comingSoon": "준비 중입니다"
   },
   "createdAt": "생성일",
   "dashboard": {
@@ -1921,6 +1922,7 @@
   },
   "sidebar": {
     "adminPanel": "관리자 패널",
+    "gamePanel": "게임 관리",
     "chat": "채팅",
     "dashboard": "대시보드",
     "logout": "로그아웃",
@@ -1945,7 +1947,16 @@
     "jobs": "작업 관리",
     "queueMonitor": "큐 모니터",
     "console": "시스템 콘솔",
-    "realtimeEvents": "실시간 이벤트"
+    "realtimeEvents": "실시간 이벤트",
+    "itemRewards": "지급 아이템 관리",
+    "ingameNotices": "인게임 팝업공지",
+    "coupons": "쿠폰",
+    "surveys": "설문지",
+    "operationEvents": "운영이벤트 관리",
+    "hotTimeButtonEvent": "핫타임버튼 이벤트",
+    "liveEvent": "라이브이벤트",
+    "planningData": "기획데이터",
+    "serverList": "서버목록"
   },
   "signUpPrompt": {
     "backToLogin": "로그인으로 돌아가기",
@@ -2540,5 +2551,37 @@
       "emptyFailed": "메일함 비우기에 실패했습니다",
       "fillAllFields": "모든 필드를 입력해주세요"
     }
+  },
+  "itemRewards": {
+    "title": "지급 아이템 관리",
+    "subtitle": "게임 내에서 지급 가능한 아이템들을 관리합니다"
+  },
+  "ingameNotices": {
+    "title": "인게임 팝업공지",
+    "subtitle": "게임 내 팝업 공지와 알림을 관리합니다"
+  },
+  "coupons": {
+    "title": "쿠폰",
+    "subtitle": "게임 쿠폰을 생성하고 관리합니다"
+  },
+  "surveys": {
+    "title": "설문지",
+    "subtitle": "게임 내 설문조사를 생성하고 관리합니다"
+  },
+  "hotTimeButtonEvent": {
+    "title": "핫타임버튼 이벤트",
+    "subtitle": "핫타임 버튼 이벤트를 설정합니다"
+  },
+  "liveEvent": {
+    "title": "라이브이벤트",
+    "subtitle": "라이브 이벤트를 설정합니다"
+  },
+  "planningData": {
+    "title": "기획데이터",
+    "subtitle": "게임 기획 데이터를 관리합니다"
+  },
+  "serverList": {
+    "title": "서버목록",
+    "subtitle": "서버 디스커버리를 통해 서버 목록과 상태를 조회하고 제어합니다"
   }
 }

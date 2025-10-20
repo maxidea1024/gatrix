@@ -77,7 +77,17 @@ import ChatPage from './pages/chat/ChatPage';
 import MailboxPage from './pages/mailbox/MailboxPage';
 import SystemConsolePage from './pages/admin/SystemConsolePage';
 import RealtimeEventsPage from './pages/admin/RealtimeEventsPage';
+import ServerListPage from './pages/admin/ServerListPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
+
+// Pages - Game
+import ItemRewardsPage from './pages/game/ItemRewardsPage';
+import IngameNoticesPage from './pages/game/IngameNoticesPage';
+import CouponsPage from './pages/game/CouponsPage';
+import SurveysPage from './pages/game/SurveysPage';
+import HotTimeButtonEventPage from './pages/game/HotTimeButtonEventPage';
+import LiveEventPage from './pages/game/LiveEventPage';
+import PlanningDataPage from './pages/game/PlanningDataPage';
 
 // Conditional Landing Page Component
 const ConditionalLandingPage: React.FC = () => {
@@ -332,6 +342,24 @@ const AppContent: React.FC = () => {
                         <Route path="remote-config/history" element={<RemoteConfigHistoryPage />} />
                         <Route path="api-tokens" element={<ApiTokensPage />} />
                         <Route path="console" element={<SystemConsolePage />} />
+                        <Route path="server-list" element={<ServerListPage />} />
+                      </Routes>
+                    </MainLayout>
+                  </ProtectedRoute>
+                } />
+
+                {/* Game Routes */}
+                <Route path="/game/*" element={
+                  <ProtectedRoute requiredRoles={['admin']}>
+                    <MainLayout>
+                      <Routes>
+                        <Route path="item-rewards" element={<ItemRewardsPage />} />
+                        <Route path="ingame-notices" element={<IngameNoticesPage />} />
+                        <Route path="coupons" element={<CouponsPage />} />
+                        <Route path="surveys" element={<SurveysPage />} />
+                        <Route path="hot-time-button-event" element={<HotTimeButtonEventPage />} />
+                        <Route path="live-event" element={<LiveEventPage />} />
+                        <Route path="planning-data" element={<PlanningDataPage />} />
                       </Routes>
                     </MainLayout>
                   </ProtectedRoute>

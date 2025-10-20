@@ -1721,7 +1721,8 @@
     "maintenance": {
       "bannerActive": "The service is currently under maintenance"
     },
-    "connectionLostRefresh": "Connection lost. Please refresh the page."
+    "connectionLostRefresh": "Connection lost. Please refresh the page.",
+    "comingSoon": "Coming soon"
   },
   "createdAt": "createdAt",
   "dashboard": {
@@ -1924,6 +1925,7 @@
   },
   "sidebar": {
     "adminPanel": "ADMIN PANEL",
+    "gamePanel": "GAME MANAGEMENT",
     "chat": "Chat",
     "dashboard": "Dashboard",
     "logout": "Logout",
@@ -1948,7 +1950,16 @@
     "jobs": "Job Management",
     "queueMonitor": "Queue Monitor",
     "console": "System Console",
-    "realtimeEvents": "Realtime Events"
+    "realtimeEvents": "Realtime Events",
+    "itemRewards": "Item Rewards",
+    "ingameNotices": "In-game Notices",
+    "coupons": "Coupons",
+    "surveys": "Surveys",
+    "operationEvents": "Operation Events",
+    "hotTimeButtonEvent": "Hot Time Button Event",
+    "liveEvent": "Live Event",
+    "planningData": "Planning Data",
+    "serverList": "Server List"
   },
   "signUpPrompt": {
     "backToLogin": "Back to Login",
@@ -2543,5 +2554,37 @@
       "emptyFailed": "Failed to empty mailbox",
       "fillAllFields": "Please fill in all fields"
     }
+  },
+  "itemRewards": {
+    "title": "Item Rewards Management",
+    "subtitle": "Manage items that can be rewarded in-game"
+  },
+  "ingameNotices": {
+    "title": "In-game Notices",
+    "subtitle": "Manage in-game popup notices and announcements"
+  },
+  "coupons": {
+    "title": "Coupons",
+    "subtitle": "Create and manage game coupons"
+  },
+  "surveys": {
+    "title": "Surveys",
+    "subtitle": "Create and manage in-game surveys"
+  },
+  "hotTimeButtonEvent": {
+    "title": "Hot Time Button Event",
+    "subtitle": "Configure hot time button events"
+  },
+  "liveEvent": {
+    "title": "Live Event",
+    "subtitle": "Configure live events"
+  },
+  "planningData": {
+    "title": "Planning Data",
+    "subtitle": "Manage game planning data"
+  },
+  "serverList": {
+    "title": "Server List",
+    "subtitle": "View server list and status through server discovery and control servers with commands"
   }
 }

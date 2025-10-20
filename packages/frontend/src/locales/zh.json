@@ -1766,7 +1766,8 @@
     "maintenance": {
       "bannerActive": "服务当前处于维护中"
     },
-    "connectionLostRefresh": "连接已断开。请刷新页面。"
+    "connectionLostRefresh": "连接已断开。请刷新页面。",
+    "comingSoon": "即将推出"
   },
   "createdAt": "createdAt",
   "dashboard": {
@@ -1969,6 +1970,7 @@
   },
   "sidebar": {
     "adminPanel": "管理员面板",
+    "gamePanel": "游戏管理",
     "chat": "聊天",
     "dashboard": "仪表板",
     "logout": "退出登录",
@@ -1993,7 +1995,16 @@
     "jobs": "作业管理",
     "queueMonitor": "队列监控",
     "console": "系统控制台",
-    "realtimeEvents": "实时事件"
+    "realtimeEvents": "实时事件",
+    "itemRewards": "道具奖励",
+    "ingameNotices": "游戏内公告",
+    "coupons": "优惠券",
+    "surveys": "问卷调查",
+    "operationEvents": "运营活动管理",
+    "hotTimeButtonEvent": "热时按钮活动",
+    "liveEvent": "直播活动",
+    "planningData": "策划数据",
+    "serverList": "服务器列表"
   },
   "signUpPrompt": {
     "backToLogin": "返回登录",
@@ -2579,5 +2590,37 @@
       "emptyFailed": "清空邮箱失败",
       "fillAllFields": "请填写所有字段"
     }
+  },
+  "itemRewards": {
+    "title": "道具奖励管理",
+    "subtitle": "管理游戏内可奖励的道具"
+  },
+  "ingameNotices": {
+    "title": "游戏内公告",
+    "subtitle": "管理游戏内的弹窗公告和通知"
+  },
+  "coupons": {
+    "title": "优惠券",
+    "subtitle": "创建和管理游戏优惠券"
+  },
+  "surveys": {
+    "title": "问卷调查",
+    "subtitle": "创建和管理游戏内的问卷调查"
+  },
+  "hotTimeButtonEvent": {
+    "title": "热时按钮活动",
+    "subtitle": "配置热时按钮活动"
+  },
+  "liveEvent": {
+    "title": "直播活动",
+    "subtitle": "配置直播活动"
+  },
+  "planningData": {
+    "title": "策划数据",
+    "subtitle": "管理游戏策划数据"
+  },
+  "serverList": {
+    "title": "服务器列表",
+    "subtitle": "通过服务器发现查看服务器列表和状态，并使用命令控制服务器"
   }
 }
