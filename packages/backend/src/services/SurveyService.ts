@@ -101,14 +101,20 @@ export class SurveyService {
 
     // Get surveys
     const [rows] = await pool.execute<RowDataPacket[]>(
-      `SELECT * FROM g_surveys ${whereClause} ORDER BY createdAt DESC LIMIT ? OFFSET ?`,
-      [...queryParams, limit, offset]
+      `SELECT * FROM g_surveys ${whereClause} ORDER BY createdAt DESC LIMIT ${limit} OFFSET ${offset}`,
+      queryParams
     );
 
     const surveys = rows.map(row => ({
       ...row,
-      triggerConditions: JSON.parse(row.triggerConditions),
-      participationRewards: row.participationRewards ? JSON.parse(row.participationRewards) : null,
+      triggerConditions: typeof row.triggerConditions === 'string'
+        ? JSON.parse(row.triggerConditions)
+        : row.triggerConditions,
+      participationRewards: row.participationRewards
+        ? (typeof row.participationRewards === 'string'
+          ? JSON.parse(row.participationRewards)
+          : row.participationRewards)
+        : null,
     })) as Survey[];
 
     return { surveys, total, page, limit };
@@ -130,8 +136,14 @@ export class SurveyService {
 
     const survey = {
       ...rows[0],
-      triggerConditions: JSON.parse(rows[0].triggerConditions),
-      participationRewards: rows[0].participationRewards ? JSON.parse(rows[0].participationRewards) : null,
+      triggerConditions: typeof rows[0].triggerConditions === 'string'
+        ? JSON.parse(rows[0].triggerConditions)
+        : rows[0].triggerConditions,
+      participationRewards: rows[0].participationRewards
+        ? (typeof rows[0].participationRewards === 'string'
+          ? JSON.parse(rows[0].participationRewards)
+          : rows[0].participationRewards)
+        : null,
     } as Survey;
 
     return survey;
@@ -153,8 +165,14 @@ export class SurveyService {
 
     const survey = {
       ...rows[0],
-      triggerConditions: JSON.parse(rows[0].triggerConditions),
-      participationRewards: rows[0].participationRewards ? JSON.parse(rows[0].participationRewards) : null,
+      triggerConditions: typeof rows[0].triggerConditions === 'string'
+        ? JSON.parse(rows[0].triggerConditions)
+        : rows[0].triggerConditions,
+      participationRewards: rows[0].participationRewards
+        ? (typeof rows[0].participationRewards === 'string'
+          ? JSON.parse(rows[0].participationRewards)
+          : rows[0].participationRewards)
+        : null,
     } as Survey;
 
     return survey;

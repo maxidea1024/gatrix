@@ -17,6 +17,7 @@ import {
   Select,
   FormControl,
   InputLabel,
+  Paper,
 } from '@mui/material';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -153,7 +154,18 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       onSuccess();
       onClose();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('surveys.saveFailed'), { variant: 'error' });
+      // Map backend error messages to localized messages
+      let errorMessage = t('surveys.saveFailed');
+
+      if (error.message) {
+        if (error.message.includes('Platform survey ID already exists')) {
+          errorMessage = t('surveys.platformSurveyIdExists');
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setSubmitting(false);
     }
@@ -174,8 +186,20 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       <DialogContent dividers>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           {/* Section 1: Survey Participation */}
-          <Box>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+          <Paper
+            variant="outlined"
+            sx={{
+              p: 2.5,
+              borderRadius: 1,
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              sx={{
+                mb: 2,
+                fontWeight: 600,
+              }}
+            >
               {t('surveys.section.participation')}
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -267,13 +291,23 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                 ))}
               </Box>
             </Box>
-          </Box>
-
-          <Divider />
+          </Paper>
 
           {/* Section 2: Rewards */}
-          <Box>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'primary.main' }}>
+          <Paper
+            variant="outlined"
+            sx={{
+              p: 2.5,
+              borderRadius: 1,
+            }}
+          >
+            <Typography
+              variant="subtitle1"
+              sx={{
+                mb: 2,
+                fontWeight: 600,
+              }}
+            >
               {t('surveys.section.rewards')}
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -335,7 +369,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                 ))}
               </Box>
             </Box>
-          </Box>
+          </Paper>
         </Box>
       </DialogContent>
       <DialogActions>

@@ -26,6 +26,7 @@ import invitationRoutes from './invitations';
 import crashEventRoutes from './crashEvents';
 import consoleRoutes from './console';
 import surveyRoutes from './surveys';
+import serviceNoticeRoutes from './serviceNotices';
 
 const router = express.Router();
 
@@ -61,5 +62,6 @@ router.use('/invitations', invitationRoutes);
 router.use('/crash-events', crashEventRoutes);
 router.use('/console', consoleRoutes);
 router.use('/surveys', surveyRoutes);
+router.use('/service-notices', serviceNoticeRoutes);
 
 export default router;

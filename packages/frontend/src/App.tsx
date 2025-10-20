@@ -82,6 +82,7 @@ import ServerListPage from './pages/admin/ServerListPage';
 
 // Pages - Game
 import ItemRewardsPage from './pages/game/ItemRewardsPage';
+import ServiceNoticesPage from './pages/game/ServiceNoticesPage';
 import IngameNoticesPage from './pages/game/IngameNoticesPage';
 import CouponsPage from './pages/game/CouponsPage';
 import SurveysPage from './pages/game/SurveysPage';
@@ -245,7 +246,10 @@ const AppContent: React.FC = () => {
                 vertical: 'bottom',
                 horizontal: 'center',
               }}
-              style={{ zIndex: 99999 }}
+              classes={{
+                containerRoot: 'snackbar-container-root',
+              }}
+              style={{ zIndex: 9999 }}
             >
               <Router>
                 <Routes>
@@ -354,6 +358,7 @@ const AppContent: React.FC = () => {
                     <MainLayout>
                       <Routes>
                         <Route path="item-rewards" element={<ItemRewardsPage />} />
+                        <Route path="service-notices" element={<ServiceNoticesPage />} />
                         <Route path="ingame-notices" element={<IngameNoticesPage />} />
                         <Route path="coupons" element={<CouponsPage />} />
                         <Route path="surveys" element={<SurveysPage />} />

@@ -67,10 +67,20 @@ const SurveysPage: React.FC = () => {
         limit: rowsPerPage,
         search: debouncedSearchTerm || undefined,
       });
-      setSurveys(result.surveys);
-      setTotal(result.total);
+
+      if (result && result.surveys) {
+        setSurveys(result.surveys);
+        setTotal(result.total || 0);
+      } else {
+        console.error('Invalid survey response:', result);
+        setSurveys([]);
+        setTotal(0);
+      }
     } catch (error: any) {
+      console.error('Failed to load surveys:', error);
       enqueueSnackbar(error.message || t('surveys.loadFailed'), { variant: 'error' });
+      setSurveys([]);
+      setTotal(0);
     } finally {
       setLoading(false);
     }

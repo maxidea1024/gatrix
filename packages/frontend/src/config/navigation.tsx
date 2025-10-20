@@ -21,6 +21,7 @@ import {
   Monitor as MonitorIcon,
   Label as LabelIcon,
   CardGiftcard as CardGiftcardIcon,
+  Announcement as AnnouncementIcon,
   Campaign as CampaignIcon,
   ConfirmationNumber as ConfirmationNumberIcon,
   Poll as PollIcon,
@@ -68,6 +69,7 @@ export const adminMenuItems: MenuItem[] = [
 // 게임관리 메뉴
 export const gameMenuItems: MenuItem[] = [
   { text: 'sidebar.itemRewards', icon: <CardGiftcardIcon />, path: '/game/item-rewards', adminOnly: true },
+  { text: 'sidebar.serviceNotices', icon: <AnnouncementIcon />, path: '/game/service-notices', adminOnly: true },
   { text: 'sidebar.ingameNotices', icon: <CampaignIcon />, path: '/game/ingame-notices', adminOnly: true },
   { text: 'sidebar.coupons', icon: <ConfirmationNumberIcon />, path: '/game/coupons', adminOnly: true },
   { text: 'sidebar.surveys', icon: <PollIcon />, path: '/game/surveys', adminOnly: true },

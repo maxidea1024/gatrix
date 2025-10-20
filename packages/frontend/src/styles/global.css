@@ -1,0 +1,17 @@
+/* Global styles for the application */
+
+/* Ensure snackbar notifications appear above all modals and backdrops */
+.snackbar-container-root {
+  z-index: 9999 !important;
+}
+
+/* Notistack container override */
+.notistack-SnackbarContainer {
+  z-index: 9999 !important;
+}
+
+/* Individual snackbar items */
+.notistack-MuiContent {
+  z-index: 9999 !important;
+}
+
