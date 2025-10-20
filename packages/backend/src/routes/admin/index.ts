@@ -25,6 +25,7 @@ import maintenanceRoutes from './maintenance';
 import invitationRoutes from './invitations';
 import crashEventRoutes from './crashEvents';
 import consoleRoutes from './console';
+import surveyRoutes from './surveys';
 
 const router = express.Router();
 
@@ -59,5 +60,6 @@ router.use('/maintenance', maintenanceRoutes);
 router.use('/invitations', invitationRoutes);
 router.use('/crash-events', crashEventRoutes);
 router.use('/console', consoleRoutes);
+router.use('/surveys', surveyRoutes);
 
 export default router;
