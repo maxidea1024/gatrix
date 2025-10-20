@@ -1,8 +1,9 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import { Box, Paper } from '@mui/material';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useTheme } from '@mui/material/styles';
+import { useTranslation } from 'react-i18next';
 
 interface RichTextEditorProps {
   value: string;
@@ -20,6 +21,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   minHeight = 200,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const quillRef = useRef<ReactQuill>(null);
 
   // Quill modules configuration
@@ -55,6 +57,47 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     'background',
     'link',
   ];
+
+  // Add tooltips to toolbar buttons
+  useEffect(() => {
+    if (!quillRef.current || readOnly) return;
+
+    const toolbar = quillRef.current.getEditor().getModule('toolbar');
+    if (!toolbar || !toolbar.container) return;
+
+    const container = toolbar.container as HTMLElement;
+
+    // Tooltip mapping
+    const tooltips: { [key: string]: string } = {
+      '.ql-bold': t('richTextEditor.bold'),
+      '.ql-italic': t('richTextEditor.italic'),
+      '.ql-underline': t('richTextEditor.underline'),
+      '.ql-strike': t('richTextEditor.strike'),
+      '.ql-header[value="1"]': t('richTextEditor.header1'),
+      '.ql-header[value="2"]': t('richTextEditor.header2'),
+      '.ql-header[value="3"]': t('richTextEditor.header3'),
+      '.ql-list[value="ordered"]': t('richTextEditor.orderedList'),
+      '.ql-list[value="bullet"]': t('richTextEditor.bulletList'),
+      '.ql-color': t('richTextEditor.textColor'),
+      '.ql-background': t('richTextEditor.backgroundColor'),
+      '.ql-link': t('richTextEditor.link'),
+      '.ql-clean': t('richTextEditor.clean'),
+    };
+
+    // Apply tooltips
+    Object.entries(tooltips).forEach(([selector, tooltip]) => {
+      const button = container.querySelector(selector);
+      if (button) {
+        button.setAttribute('title', tooltip);
+      }
+    });
+
+    // Also handle header dropdown
+    const headerPicker = container.querySelector('.ql-header .ql-picker-label');
+    if (headerPicker) {
+      headerPicker.setAttribute('title', t('richTextEditor.header'));
+    }
+  }, [t, readOnly]);
 
   return (
     <Paper

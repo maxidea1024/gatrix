@@ -2598,6 +2598,22 @@
     "title": "道具奖励管理",
     "subtitle": "管理游戏内可奖励的道具"
   },
+  "richTextEditor": {
+    "bold": "粗体",
+    "italic": "斜体",
+    "underline": "下划线",
+    "strike": "删除线",
+    "header": "标题",
+    "header1": "标题 1",
+    "header2": "标题 2",
+    "header3": "标题 3",
+    "orderedList": "有序列表",
+    "bulletList": "无序列表",
+    "textColor": "文字颜色",
+    "backgroundColor": "背景颜色",
+    "link": "链接",
+    "clean": "清除格式"
+  },
   "serviceNotices": {
     "title": "服务公告",
     "subtitle": "创建和管理服务公告",

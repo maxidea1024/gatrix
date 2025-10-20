@@ -2562,6 +2562,22 @@
     "title": "Item Rewards Management",
     "subtitle": "Manage items that can be rewarded in-game"
   },
+  "richTextEditor": {
+    "bold": "Bold",
+    "italic": "Italic",
+    "underline": "Underline",
+    "strike": "Strikethrough",
+    "header": "Heading",
+    "header1": "Heading 1",
+    "header2": "Heading 2",
+    "header3": "Heading 3",
+    "orderedList": "Ordered List",
+    "bulletList": "Bullet List",
+    "textColor": "Text Color",
+    "backgroundColor": "Background Color",
+    "link": "Link",
+    "clean": "Clear Formatting"
+  },
   "serviceNotices": {
     "title": "Service Notices",
     "subtitle": "Create and manage service announcements",
