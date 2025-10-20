@@ -1,5 +1,6 @@
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import database from '../config/database';
+import { convertDateFieldsFromMySQL, convertToMySQLDateTime } from '../utils/dateUtils';
 
 export interface ServiceNotice {
   id: number;
@@ -89,20 +90,24 @@ class ServiceNoticeService {
         queryParams
       );
 
-      const notices = rows.map(row => ({
-        id: row.id,
-        isActive: Boolean(row.isActive),
-        category: row.category,
-        platforms: typeof row.platforms === 'string' ? JSON.parse(row.platforms) : row.platforms,
-        startDate: row.startDate,
-        endDate: row.endDate,
-        tabTitle: row.tabTitle,
-        title: row.title,
-        content: row.content,
-        description: row.description,
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt,
-      }));
+      const notices = rows.map(row => {
+        const notice = {
+          id: row.id,
+          isActive: Boolean(row.isActive),
+          category: row.category,
+          platforms: typeof row.platforms === 'string' ? JSON.parse(row.platforms) : row.platforms,
+          startDate: row.startDate,
+          endDate: row.endDate,
+          tabTitle: row.tabTitle,
+          title: row.title,
+          content: row.content,
+          description: row.description,
+          createdAt: row.createdAt,
+          updatedAt: row.updatedAt,
+        };
+        // Convert MySQL DATETIME to ISO 8601
+        return convertDateFieldsFromMySQL(notice, ['startDate', 'endDate', 'createdAt', 'updatedAt']);
+      });
 
       return { notices, total };
     } catch (error) {
@@ -126,7 +131,7 @@ class ServiceNoticeService {
       }
 
       const row = rows[0];
-      return {
+      const notice = {
         id: row.id,
         isActive: Boolean(row.isActive),
         category: row.category,
@@ -140,6 +145,8 @@ class ServiceNoticeService {
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
       };
+      // Convert MySQL DATETIME to ISO 8601
+      return convertDateFieldsFromMySQL(notice, ['startDate', 'endDate', 'createdAt', 'updatedAt']);
     } catch (error) {
       throw error;
     }
@@ -151,6 +158,15 @@ class ServiceNoticeService {
   async createServiceNotice(data: CreateServiceNoticeData): Promise<ServiceNotice> {
     try {
       const pool = database.getPool();
+
+      // Debug logging
+      console.log('Creating service notice with data:', {
+        startDate: data.startDate,
+        endDate: data.endDate,
+        convertedStartDate: convertToMySQLDateTime(data.startDate),
+        convertedEndDate: convertToMySQLDateTime(data.endDate),
+      });
+
       const [result] = await pool.execute<ResultSetHeader>(
         `INSERT INTO g_service_notices
         (isActive, category, platforms, startDate, endDate, tabTitle, title, content, description)
@@ -159,8 +175,8 @@ class ServiceNoticeService {
           data.isActive,
           data.category,
           JSON.stringify(data.platforms),
-          data.startDate,
-          data.endDate,
+          convertToMySQLDateTime(data.startDate),
+          convertToMySQLDateTime(data.endDate),
           data.tabTitle || null,
           data.title,
           data.content,
@@ -205,12 +221,12 @@ class ServiceNoticeService {
 
       if (data.startDate) {
         updates.push('startDate = ?');
-        values.push(data.startDate);
+        values.push(convertToMySQLDateTime(data.startDate));
       }
 
       if (data.endDate) {
         updates.push('endDate = ?');
-        values.push(data.endDate);
+        values.push(convertToMySQLDateTime(data.endDate));
       }
 
       if (data.tabTitle !== undefined) {

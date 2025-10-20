@@ -2559,6 +2559,22 @@
     "title": "지급 아이템 관리",
     "subtitle": "게임 내에서 지급 가능한 아이템들을 관리합니다"
   },
+  "richTextEditor": {
+    "bold": "굵게",
+    "italic": "기울임",
+    "underline": "밑줄",
+    "strike": "취소선",
+    "header": "제목",
+    "header1": "제목 1",
+    "header2": "제목 2",
+    "header3": "제목 3",
+    "orderedList": "순서 있는 목록",
+    "bulletList": "순서 없는 목록",
+    "textColor": "글자 색",
+    "backgroundColor": "배경 색",
+    "link": "링크",
+    "clean": "서식 지우기"
+  },
   "serviceNotices": {
     "title": "서비스 공지",
     "subtitle": "서비스 공지사항을 작성하고 관리합니다",
@@ -2586,7 +2602,7 @@
     "period": "적용 기간",
     "tabTitle": "탭 제목",
     "tabTitleHelp": "목록에서 표시될 짧은 제목 (선택사항)",
-    "title": "제목",
+    "noticeTitle": "제목",
     "content": "내용",
     "contentPlaceholder": "공지 내용을 입력하세요 (Rich Text 지원)",
     "description": "설명",

@@ -66,6 +66,9 @@ class ServiceNoticeController {
     try {
       const data = req.body;
 
+      // Debug logging
+      console.log('Received service notice data:', JSON.stringify(data, null, 2));
+
       // Validation
       if (!data.category) {
         return res.status(400).json({

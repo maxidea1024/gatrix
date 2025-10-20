@@ -60,7 +60,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     <Paper
       variant="outlined"
       sx={{
-        overflow: 'hidden',
+        overflow: 'visible', // Changed from 'hidden' to allow tooltip to show
         borderRadius: 2,
         borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
         '&:hover': {
@@ -91,6 +91,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           fontSize: '14px',
           fontFamily: theme.typography.fontFamily,
           minHeight: `${minHeight}px`,
+          overflow: 'visible', // Allow tooltip to overflow
         },
         '& .ql-editor': {
           minHeight: `${minHeight}px`,
@@ -130,6 +131,41 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           '& .ql-fill': {
             fill: theme.palette.primary.main,
           },
+        },
+        // Link tooltip positioning
+        '& .ql-tooltip': {
+          position: 'absolute',
+          zIndex: 9999,
+          backgroundColor: theme.palette.background.paper,
+          border: `1px solid ${theme.palette.divider}`,
+          boxShadow: theme.shadows[4],
+          color: theme.palette.text.primary,
+          padding: '8px 12px',
+          borderRadius: '4px',
+          left: '0 !important', // Override default positioning
+          transform: 'translateY(10px)', // Position below the selection
+          '& input[type="text"]': {
+            backgroundColor: theme.palette.background.default,
+            color: theme.palette.text.primary,
+            border: `1px solid ${theme.palette.divider}`,
+            padding: '6px 8px',
+            borderRadius: '4px',
+            '&:focus': {
+              outline: 'none',
+              borderColor: theme.palette.primary.main,
+            },
+          },
+          '& a.ql-action::after': {
+            content: '"Edit"',
+            color: theme.palette.primary.main,
+          },
+          '& a.ql-remove::before': {
+            content: '"Remove"',
+            color: theme.palette.error.main,
+          },
+        },
+        '& .ql-tooltip.ql-editing': {
+          left: '0 !important',
         },
       }}
     >

@@ -147,16 +147,38 @@ const ServiceNoticesPage: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuNotice, setMenuNotice] = useState<ServiceNotice | null>(null);
 
-  // Column settings
-  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
-  const [columns, setColumns] = useState<ColumnConfig[]>([
+  // Default column configuration
+  const defaultColumns: ColumnConfig[] = [
     { id: 'status', labelKey: 'serviceNotices.status', visible: true },
     { id: 'category', labelKey: 'serviceNotices.category', visible: true },
-    { id: 'title', labelKey: 'serviceNotices.title', visible: true },
+    { id: 'title', labelKey: 'serviceNotices.noticeTitle', visible: true },
     { id: 'platforms', labelKey: 'serviceNotices.platforms', visible: true },
     { id: 'period', labelKey: 'serviceNotices.period', visible: true },
     { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
-  ]);
+  ];
+
+  // Column settings
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
+  const [columns, setColumns] = useState<ColumnConfig[]>(() => {
+    const saved = localStorage.getItem('serviceNoticesColumns');
+    if (saved) {
+      try {
+        const savedColumns = JSON.parse(saved);
+        // Merge saved columns with defaults, preserving saved order
+        const mergedColumns = savedColumns.map((savedCol: ColumnConfig) => {
+          const defaultCol = defaultColumns.find(c => c.id === savedCol.id);
+          return defaultCol ? { ...defaultCol, ...savedCol } : savedCol;
+        });
+        // Add any new columns that weren't in saved state
+        const savedIds = new Set(savedColumns.map((c: ColumnConfig) => c.id));
+        const newColumns = defaultColumns.filter(c => !savedIds.has(c.id));
+        return [...mergedColumns, ...newColumns];
+      } catch (e) {
+        return defaultColumns;
+      }
+    }
+    return defaultColumns;
+  });
 
   // Debounced search
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -276,9 +298,11 @@ const ServiceNoticesPage: React.FC = () => {
 
   // Column handlers
   const handleToggleColumnVisibility = (id: string) => {
-    setColumns(columns.map(col =>
+    const newColumns = columns.map(col =>
       col.id === id ? { ...col, visible: !col.visible } : col
-    ));
+    );
+    setColumns(newColumns);
+    localStorage.setItem('serviceNoticesColumns', JSON.stringify(newColumns));
   };
 
   const handleColumnDragEnd = (event: DragEndEvent) => {
@@ -287,20 +311,16 @@ const ServiceNoticesPage: React.FC = () => {
       setColumns((items) => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);
-        return arrayMove(items, oldIndex, newIndex);
+        const newColumns = arrayMove(items, oldIndex, newIndex);
+        localStorage.setItem('serviceNoticesColumns', JSON.stringify(newColumns));
+        return newColumns;
       });
     }
   };
 
   const handleResetColumns = () => {
-    setColumns([
-      { id: 'status', labelKey: 'serviceNotices.status', visible: true },
-      { id: 'category', labelKey: 'serviceNotices.category', visible: true },
-      { id: 'title', labelKey: 'serviceNotices.title', visible: true },
-      { id: 'platforms', labelKey: 'serviceNotices.platforms', visible: true },
-      { id: 'period', labelKey: 'serviceNotices.period', visible: true },
-      { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
-    ]);
+    setColumns(defaultColumns);
+    localStorage.setItem('serviceNoticesColumns', JSON.stringify(defaultColumns));
   };
 
   // Search handler

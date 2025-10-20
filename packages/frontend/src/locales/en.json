@@ -2589,7 +2589,7 @@
     "period": "Period",
     "tabTitle": "Tab Title",
     "tabTitleHelp": "Short title for list views (optional)",
-    "title": "Title",
+    "noticeTitle": "Title",
     "content": "Content",
     "contentPlaceholder": "Enter notice content (Rich Text supported)",
     "description": "Description",

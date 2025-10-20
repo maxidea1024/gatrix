@@ -432,7 +432,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
 
           {/* Title */}
           <TextField
-            label={t('serviceNotices.title')}
+            label={t('serviceNotices.noticeTitle')}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             fullWidth

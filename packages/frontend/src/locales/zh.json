@@ -2625,7 +2625,7 @@
     "period": "期间",
     "tabTitle": "标签标题",
     "tabTitleHelp": "列表视图中显示的简短标题（可选）",
-    "title": "标题",
+    "noticeTitle": "标题",
     "content": "内容",
     "contentPlaceholder": "输入公告内容（支持富文本）",
     "description": "描述",

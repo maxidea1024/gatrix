@@ -51,7 +51,7 @@ class ServiceNoticeService {
     filters: ServiceNoticeFilters = {}
   ): Promise<ServiceNoticesResponse> {
     const params: any = { page, limit };
-    
+
     if (filters.isActive !== undefined) {
       params.isActive = filters.isActive;
     }
@@ -66,7 +66,7 @@ class ServiceNoticeService {
     }
 
     const response = await api.get('/admin/service-notices', { params });
-    return response.data.data;
+    return response.data;
   }
 
   /**
@@ -74,7 +74,7 @@ class ServiceNoticeService {
    */
   async getServiceNoticeById(id: number): Promise<ServiceNotice> {
     const response = await api.get(`/admin/service-notices/${id}`);
-    return response.data.data.notice;
+    return response.data.notice;
   }
 
   /**
@@ -82,7 +82,7 @@ class ServiceNoticeService {
    */
   async createServiceNotice(data: CreateServiceNoticeData): Promise<ServiceNotice> {
     const response = await api.post('/admin/service-notices', data);
-    return response.data.data.notice;
+    return response.data.notice;
   }
 
   /**
@@ -90,7 +90,7 @@ class ServiceNoticeService {
    */
   async updateServiceNotice(id: number, data: UpdateServiceNoticeData): Promise<ServiceNotice> {
     const response = await api.put(`/admin/service-notices/${id}`, data);
-    return response.data.data.notice;
+    return response.data.notice;
   }
 
   /**
@@ -112,7 +112,7 @@ class ServiceNoticeService {
    */
   async toggleActive(id: number): Promise<ServiceNotice> {
     const response = await api.patch(`/admin/service-notices/${id}/toggle-active`);
-    return response.data.data.notice;
+    return response.data.notice;
   }
 }
 

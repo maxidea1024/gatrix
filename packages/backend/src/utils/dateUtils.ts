@@ -101,27 +101,37 @@ export const COMMON_DATE_FIELDS = {
 
 /**
  * MySQL에서 반환된 DATETIME을 ISO 8601 형식으로 변환 (프론트엔드용)
- * 
- * @param mysqlDateTime - MySQL DATETIME 형식 문자열
+ *
+ * @param mysqlDateTime - MySQL DATETIME 형식 문자열 또는 Date 객체
  * @returns ISO 8601 형식 문자열 또는 null
- * 
+ *
  * @example
  * convertFromMySQLDateTime("2025-09-15 15:00:00") // "2025-09-15T15:00:00.000Z"
+ * convertFromMySQLDateTime(new Date()) // "2025-09-15T15:00:00.000Z"
  * convertFromMySQLDateTime(null) // null
  */
-export function convertFromMySQLDateTime(mysqlDateTime: string | null | undefined): string | null {
+export function convertFromMySQLDateTime(mysqlDateTime: string | Date | null | undefined): string | null {
   if (!mysqlDateTime) return null;
-  
+
   try {
+    // If already a Date object, convert directly
+    if (mysqlDateTime instanceof Date) {
+      if (isNaN(mysqlDateTime.getTime())) {
+        console.warn(`Invalid Date object: ${mysqlDateTime}`);
+        return null;
+      }
+      return mysqlDateTime.toISOString();
+    }
+
     // MySQL DATETIME은 UTC로 저장되어 있으므로 'Z'를 추가하여 UTC임을 명시
     const isoString = mysqlDateTime.replace(' ', 'T') + '.000Z';
     const date = new Date(isoString);
-    
+
     if (isNaN(date.getTime())) {
       console.warn(`Invalid MySQL datetime value: ${mysqlDateTime}`);
       return null;
     }
-    
+
     return date.toISOString();
   } catch (error) {
     console.error(`Error converting MySQL datetime: ${mysqlDateTime}`, error);
