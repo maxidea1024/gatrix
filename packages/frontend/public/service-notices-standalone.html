@@ -142,11 +142,29 @@
             font-size: 24px;
             font-weight: bold;
             color: #3D3228;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
         }
-        
+
         .content-meta {
-            font-size: 12px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .category-chip {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #6B5D52;
+            color: #E8DDD0;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 12px;
+            border: 1px solid #4A3D32;
+        }
+
+        .content-date {
+            font-size: 11px;
             color: #6B5D52;
         }
         
@@ -217,6 +235,47 @@
         .content-body iframe {
             max-width: 100%;
             border: none;
+        }
+
+        /* Quill editor font families */
+        .content-body .ql-font-serif {
+            font-family: Georgia, Times New Roman, serif;
+        }
+
+        .content-body .ql-font-monospace {
+            font-family: Monaco, Courier New, monospace;
+        }
+
+        /* Quill editor font sizes */
+        .content-body .ql-size-small {
+            font-size: 0.75em;
+        }
+
+        .content-body .ql-size-large {
+            font-size: 1.5em;
+        }
+
+        .content-body .ql-size-huge {
+            font-size: 2.5em;
+        }
+
+        /* Quill editor text alignment */
+        .content-body .ql-align-center {
+            text-align: center;
+        }
+
+        .content-body .ql-align-right {
+            text-align: right;
+        }
+
+        .content-body .ql-align-justify {
+            text-align: justify;
+        }
+
+        /* Emoji support */
+        .content-body .emoji {
+            display: inline-block;
+            vertical-align: middle;
         }
         
         .loading {
@@ -328,6 +387,19 @@
             return '<svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>';
         }
 
+        // Get category name (localized)
+        function getCategoryName(category) {
+            var names = {
+                'maintenance': '점검',
+                'event': '이벤트',
+                'notice': '공지',
+                'promotion': '프로모션',
+                'update': '업데이트',
+                'other': '기타'
+            };
+            return names[category] || '공지';
+        }
+
         // Format date
         function formatDate(dateStr) {
             var d = new Date(dateStr);
@@ -407,7 +479,10 @@
             var html = '';
             html += '<div class="content-header">';
             html += '<div class="content-title">' + notice.title + '</div>';
-            html += '<div class="content-meta">' + formatDate(notice.startDate) + ' ~ ' + formatDate(notice.endDate) + '</div>';
+            html += '<div class="content-meta">';
+            html += '<span class="category-chip">' + getCategoryName(notice.category) + '</span>';
+            html += '<span class="content-date">' + formatDate(notice.startDate) + ' ~ ' + formatDate(notice.endDate) + '</span>';
+            html += '</div>';
             html += '</div>';
             html += '<div class="content-body">' + notice.content + '</div>';
 
@@ -454,9 +529,10 @@
 
                             notices = activeNotices;
 
-                            // Select first notice
+                            // Select first notice and mark as read
                             if (notices.length > 0) {
                                 selectedNoticeId = notices[0].id;
+                                markAsRead(selectedNoticeId);
                             }
 
                             renderSidebar();

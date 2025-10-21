@@ -1,9 +1,11 @@
-import React, { useMemo, useRef, useEffect } from 'react';
-import { Box, Paper } from '@mui/material';
+import React, { useMemo, useRef, useEffect, useState } from 'react';
+import { Box, Paper, IconButton, Popover } from '@mui/material';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
+import EmojiPicker, { EmojiClickData, Theme as EmojiTheme, Categories } from 'emoji-picker-react';
+import { EmojiEmotions as EmojiIcon } from '@mui/icons-material';
 
 interface RichTextEditorProps {
   value: string;
@@ -23,6 +25,29 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const theme = useTheme();
   const { t } = useTranslation();
   const quillRef = useRef<ReactQuill>(null);
+  const [emojiAnchorEl, setEmojiAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+  // Handle emoji picker
+  const handleEmojiClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setEmojiAnchorEl(event.currentTarget);
+  };
+
+  const handleEmojiClose = () => {
+    setEmojiAnchorEl(null);
+  };
+
+  const handleEmojiSelect = (emojiData: EmojiClickData) => {
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const range = editor.getSelection();
+      const position = range ? range.index : editor.getLength();
+      editor.insertText(position, emojiData.emoji);
+      editor.setSelection(position + emojiData.emoji.length, 0);
+    }
+    handleEmojiClose();
+  };
+
+  const emojiOpen = Boolean(emojiAnchorEl);
 
   // Quill modules configuration
   const modules = useMemo(
@@ -31,9 +56,11 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         ? false
         : [
             [{ header: [1, 2, 3, false] }],
+            [{ size: ['small', false, 'large', 'huge'] }], // Font size selector
             ['bold', 'italic', 'underline', 'strike'],
-            [{ list: 'ordered' }, { list: 'bullet' }],
             [{ color: [] }, { background: [] }],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            [{ align: [] }], // Text alignment
             ['link'],
             ['clean'],
           ],
@@ -47,6 +74,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   // Quill formats
   const formats = [
     'header',
+    'size',
     'bold',
     'italic',
     'underline',
@@ -55,6 +83,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
     'bullet',
     'color',
     'background',
+    'align',
     'link',
   ];
 
@@ -76,10 +105,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
       '.ql-header[value="1"]': t('richTextEditor.header1'),
       '.ql-header[value="2"]': t('richTextEditor.header2'),
       '.ql-header[value="3"]': t('richTextEditor.header3'),
+      '.ql-size': t('richTextEditor.size', 'Size'),
       '.ql-list[value="ordered"]': t('richTextEditor.orderedList'),
       '.ql-list[value="bullet"]': t('richTextEditor.bulletList'),
       '.ql-color': t('richTextEditor.textColor'),
       '.ql-background': t('richTextEditor.backgroundColor'),
+      '.ql-align': t('richTextEditor.align', 'Align'),
       '.ql-link': t('richTextEditor.link'),
       '.ql-clean': t('richTextEditor.clean'),
     };
@@ -100,32 +131,36 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   }, [t, readOnly]);
 
   return (
-    <Paper
-      variant="outlined"
-      sx={{
-        overflow: 'visible', // Changed from 'hidden' to allow tooltip to show
-        borderRadius: 2,
-        borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
-        '&:hover': {
-          borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
-        },
-        '&:focus-within': {
-          borderColor: 'primary.main',
-          borderWidth: 2,
-        },
-        '& .quill': {
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-        },
-        '& .ql-toolbar': {
-          borderTop: 'none',
-          borderLeft: 'none',
-          borderRight: 'none',
-          borderBottom: `1px solid ${theme.palette.divider}`,
-          backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.01)',
-          padding: '8px',
-        },
+    <Box sx={{ position: 'relative' }}>
+      <Paper
+        variant="outlined"
+        sx={{
+          overflow: 'visible', // Changed from 'hidden' to allow tooltip to show
+          borderRadius: 2,
+          borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
+          '&:hover': {
+            borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+          },
+          '&:focus-within': {
+            borderColor: 'primary.main',
+            borderWidth: 2,
+          },
+          '& .quill': {
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+          },
+          '& .ql-toolbar': {
+            borderTop: 'none',
+            borderLeft: 'none',
+            borderRight: 'none',
+            borderBottom: `1px solid ${theme.palette.divider}`,
+            backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.01)',
+            padding: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+          },
         '& .ql-container': {
           borderTop: 'none',
           borderLeft: 'none',
@@ -212,17 +247,110 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         },
       }}
     >
-      <ReactQuill
-        ref={quillRef}
-        theme="snow"
-        value={value}
-        onChange={onChange}
-        modules={modules}
-        formats={formats}
-        placeholder={placeholder}
-        readOnly={readOnly}
-      />
-    </Paper>
+        <ReactQuill
+          ref={quillRef}
+          theme="snow"
+          value={value}
+          onChange={onChange}
+          modules={modules}
+          formats={formats}
+          placeholder={placeholder}
+          readOnly={readOnly}
+        />
+      </Paper>
+
+      {/* Emoji Button - Positioned at the end of toolbar */}
+      {!readOnly && (
+        <IconButton
+          onClick={handleEmojiClick}
+          size="small"
+          sx={{
+            position: 'absolute',
+            top: '8px',
+            right: '8px',
+            zIndex: 1,
+            color: theme.palette.text.primary,
+            '&:hover': {
+              backgroundColor: theme.palette.action.hover,
+            },
+          }}
+          title={t('richTextEditor.emoji', 'Emoji')}
+        >
+          <EmojiIcon fontSize="small" />
+        </IconButton>
+      )}
+
+      {/* Emoji Picker Popover */}
+      <Popover
+        open={emojiOpen}
+        anchorEl={emojiAnchorEl}
+        onClose={handleEmojiClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        slotProps={{
+          backdrop: {
+            sx: {
+              backgroundColor: 'transparent',
+            },
+          },
+        }}
+      >
+        <EmojiPicker
+          onEmojiClick={handleEmojiSelect}
+          theme={theme.palette.mode === 'dark' ? EmojiTheme.DARK : EmojiTheme.LIGHT}
+          width={350}
+          height={400}
+          searchPlaceholder={t('richTextEditor.emojiSearch', 'Search emoji...')}
+          previewConfig={{
+            showPreview: false,
+          }}
+          categories={[
+            {
+              category: Categories.SUGGESTED,
+              name: t('richTextEditor.emojiFrequentlyUsed', 'Frequently Used'),
+            },
+            {
+              category: Categories.SMILEYS_PEOPLE,
+              name: t('richTextEditor.emojiSmileysAndPeople', 'Smileys & People'),
+            },
+            {
+              category: Categories.ANIMALS_NATURE,
+              name: t('richTextEditor.emojiAnimalsAndNature', 'Animals & Nature'),
+            },
+            {
+              category: Categories.FOOD_DRINK,
+              name: t('richTextEditor.emojiFoodAndDrink', 'Food & Drink'),
+            },
+            {
+              category: Categories.TRAVEL_PLACES,
+              name: t('richTextEditor.emojiTravelAndPlaces', 'Travel & Places'),
+            },
+            {
+              category: Categories.ACTIVITIES,
+              name: t('richTextEditor.emojiActivities', 'Activities'),
+            },
+            {
+              category: Categories.OBJECTS,
+              name: t('richTextEditor.emojiObjects', 'Objects'),
+            },
+            {
+              category: Categories.SYMBOLS,
+              name: t('richTextEditor.emojiSymbols', 'Symbols'),
+            },
+            {
+              category: Categories.FLAGS,
+              name: t('richTextEditor.emojiFlags', 'Flags'),
+            },
+          ]}
+        />
+      </Popover>
+    </Box>
   );
 };
 

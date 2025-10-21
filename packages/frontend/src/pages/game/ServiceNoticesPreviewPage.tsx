@@ -569,6 +569,38 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                     maxWidth: '100%',
                     border: 'none',
                   },
+                  // Quill editor font families
+                  '& .ql-font-serif': {
+                    fontFamily: 'Georgia, Times New Roman, serif',
+                  },
+                  '& .ql-font-monospace': {
+                    fontFamily: 'Monaco, Courier New, monospace',
+                  },
+                  // Quill editor font sizes
+                  '& .ql-size-small': {
+                    fontSize: '0.75em',
+                  },
+                  '& .ql-size-large': {
+                    fontSize: '1.5em',
+                  },
+                  '& .ql-size-huge': {
+                    fontSize: '2.5em',
+                  },
+                  // Quill editor text alignment
+                  '& .ql-align-center': {
+                    textAlign: 'center',
+                  },
+                  '& .ql-align-right': {
+                    textAlign: 'right',
+                  },
+                  '& .ql-align-justify': {
+                    textAlign: 'justify',
+                  },
+                  // Emoji support
+                  '& .emoji': {
+                    display: 'inline-block',
+                    verticalAlign: 'middle',
+                  },
                 }}
                 dangerouslySetInnerHTML={{ __html: selectedNotice.content }}
               />
