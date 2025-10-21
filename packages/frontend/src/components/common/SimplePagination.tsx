@@ -7,6 +7,7 @@ import {
   MenuItem,
   Typography,
   Divider,
+  SelectChangeEvent,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
@@ -15,7 +16,7 @@ interface SimplePaginationProps {
   page: number;
   rowsPerPage: number;
   onPageChange: (event: unknown, newPage: number) => void;
-  onRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onRowsPerPageChange: (event: SelectChangeEvent<number> | any) => void;
   rowsPerPageOptions?: number[];
   showRowsPerPage?: boolean;
 }
@@ -39,8 +40,9 @@ const SimplePagination: React.FC<SimplePaginationProps> = ({
     onPageChange(event, pageNumber); // Convert 1-based to 0-based
   };
 
-  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onRowsPerPageChange(event);
+  const handleRowsPerPageChange = (event: SelectChangeEvent<number>) => {
+    // Always pass the event to the handler
+    onRowsPerPageChange(event as any);
   };
 
   return (

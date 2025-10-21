@@ -2590,7 +2590,9 @@
     "searchPlaceholder": "Search by title or content",
     "noNotices": "No notices found",
     "isActive": "Active Status",
+    "isActiveHelp": "Set the active status of the notice",
     "category": "Category",
+    "categoryHelp": "Select the type of notice",
     "categories": {
       "maintenance": "Maintenance",
       "event": "Event",
@@ -2599,14 +2601,19 @@
       "other": "Other"
     },
     "platforms": "Target Platforms",
+    "platformsHelp": "Select platforms where the notice will be displayed (multiple selection allowed)",
     "platform": "Platform",
     "startDate": "Start Date",
+    "startDateHelp": "Set the date and time when the notice starts displaying",
     "endDate": "End Date",
+    "endDateHelp": "Set the date and time when the notice stops displaying",
     "period": "Period",
     "tabTitle": "Tab Title",
     "tabTitleHelp": "Short title for list views (optional)",
     "noticeTitle": "Title",
+    "noticeTitleHelp": "Enter the title of the notice",
     "content": "Content",
+    "contentHelp": "Write the detailed content of the notice (Rich Text editing supported)",
     "contentPlaceholder": "Enter notice content (Rich Text supported)",
     "description": "Description",
     "descriptionHelp": "Administrative description (optional)",
@@ -2632,7 +2639,17 @@
     "previewLabel": "Preview",
     "noTitle": "(No Title)",
     "noContent": "(No Content)",
-    "noNoticesFound": "No notices found"
+    "noNoticesFound": "No notices found",
+    "unread": "Unread",
+    "noticeList": "Notice List",
+    "previewPage": {
+      "title": "Service Notices",
+      "subtitle": "This preview shows how notices will appear in the in-game webview. Actual display may vary slightly.",
+      "readStatus": "Read",
+      "unreadStatus": "Unread",
+      "noActiveNotices": "No active notices available",
+      "selectNotice": "Select a notice"
+    }
   },
   "ingameNotices": {
     "title": "In-game Notices",

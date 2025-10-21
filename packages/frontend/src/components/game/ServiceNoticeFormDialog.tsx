@@ -350,34 +350,54 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       </AppBar>
 
       {/* Content */}
-      <Box sx={{ p: 3, flexGrow: 1, overflow: 'auto' }}>
+      <Box
+        sx={{
+          p: 3,
+          flexGrow: 1,
+          overflow: 'auto',
+          // Chat message list scrollbar style
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'transparent',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: (theme) =>
+              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            background: (theme) =>
+              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+          },
+          '&::-webkit-scrollbar-thumb:active': {
+            background: (theme) =>
+              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+          },
+          scrollbarWidth: 'thin',
+          scrollbarColor: (theme) =>
+            theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, 0.2) transparent'
+              : 'rgba(0, 0, 0, 0.2) transparent',
+        }}
+      >
         <Stack spacing={3}>
           {/* Active Status */}
-          <FormControlLabel
-            control={
-              <Switch
-                checked={isActive}
-                onChange={(e) => setIsActive(e.target.checked)}
-              />
-            }
-            label={t('serviceNotices.isActive')}
-          />
-
-          {/* Category */}
-          <FormControl fullWidth required>
-            <InputLabel>{t('serviceNotices.category')}</InputLabel>
-            <Select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              label={t('serviceNotices.category')}
-            >
-              {CATEGORIES.map((cat) => (
-                <MenuItem key={cat} value={cat}>
-                  {t(`serviceNotices.categories.${cat}`)}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Box>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isActive}
+                  onChange={(e) => setIsActive(e.target.checked)}
+                />
+              }
+              label={t('serviceNotices.isActive')}
+            />
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', ml: 4, mt: 0.5 }}>
+              {t('serviceNotices.isActiveHelp')}
+            </Typography>
+          </Box>
 
           {/* Platforms */}
           <FormControl fullWidth required>
@@ -401,43 +421,75 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
                 </MenuItem>
               ))}
             </Select>
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
+              {t('serviceNotices.platformsHelp')}
+            </Typography>
           </FormControl>
 
           {/* Date Range */}
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <DateTimePicker
-              label={t('serviceNotices.startDate')}
-              value={startDate}
-              onChange={(date) => setStartDate(date)}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  required: true,
-                },
-              }}
-            />
-            <DateTimePicker
-              label={t('serviceNotices.endDate')}
-              value={endDate}
-              onChange={(date) => setEndDate(date)}
-              minDateTime={startDate || undefined}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  required: true,
-                },
-              }}
-            />
+          <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <DateTimePicker
+                label={t('serviceNotices.startDate')}
+                value={startDate}
+                onChange={(date) => setStartDate(date)}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    required: true,
+                  },
+                }}
+              />
+              <DateTimePicker
+                label={t('serviceNotices.endDate')}
+                value={endDate}
+                onChange={(date) => setEndDate(date)}
+                minDateTime={startDate || undefined}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    required: true,
+                  },
+                }}
+              />
+            </Box>
+            <Typography variant="caption" color="text.secondary" sx={{ ml: 1.75 }}>
+              {t('serviceNotices.startDateHelp')} / {t('serviceNotices.endDateHelp')}
+            </Typography>
           </Box>
 
-          {/* Title */}
-          <TextField
-            label={t('serviceNotices.noticeTitle')}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            fullWidth
-            required
-          />
+          {/* Category and Title in one row */}
+          <Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              {/* Category */}
+              <FormControl required sx={{ minWidth: 200 }}>
+                <InputLabel>{t('serviceNotices.category')}</InputLabel>
+                <Select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  label={t('serviceNotices.category')}
+                >
+                  {CATEGORIES.map((cat) => (
+                    <MenuItem key={cat} value={cat}>
+                      {t(`serviceNotices.categories.${cat}`)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {/* Title */}
+              <TextField
+                label={t('serviceNotices.noticeTitle')}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                fullWidth
+                required
+              />
+            </Box>
+            <Typography variant="caption" color="text.secondary" sx={{ ml: 1.75 }}>
+              {t('serviceNotices.categoryHelp')} / {t('serviceNotices.noticeTitleHelp')}
+            </Typography>
+          </Box>
 
           {/* Tab Title (Optional) - Below Title */}
           <TextField
@@ -449,17 +501,22 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
           />
 
           {/* Content (Rich Text) */}
-          <Paper variant="outlined" sx={{ p: 2 }}>
-            <Typography variant="subtitle2" gutterBottom sx={{ mb: 1.5, fontWeight: 600 }}>
-              {t('serviceNotices.content')} <span style={{ color: 'error.main' }}>*</span>
+          <Box>
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Typography variant="subtitle2" gutterBottom sx={{ mb: 1.5, fontWeight: 600 }}>
+                {t('serviceNotices.content')} <span style={{ color: 'error.main' }}>*</span>
+              </Typography>
+              <RichTextEditor
+                value={content}
+                onChange={setContent}
+                placeholder={t('serviceNotices.contentPlaceholder')}
+                minHeight={200}
+              />
+            </Paper>
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, ml: 1.75 }}>
+              {t('serviceNotices.contentHelp')}
             </Typography>
-            <RichTextEditor
-              value={content}
-              onChange={setContent}
-              placeholder={t('serviceNotices.contentPlaceholder')}
-              minHeight={200}
-            />
-          </Paper>
+          </Box>
 
           {/* Description (Optional) */}
           <TextField
@@ -514,6 +571,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
           p: 2,
           borderTop: 1,
           borderColor: 'divider',
+          bgcolor: 'background.paper',
           display: 'flex',
           gap: 1,
           justifyContent: 'flex-end',

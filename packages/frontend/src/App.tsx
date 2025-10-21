@@ -83,6 +83,7 @@ import ServerListPage from './pages/admin/ServerListPage';
 // Pages - Game
 import ItemRewardsPage from './pages/game/ItemRewardsPage';
 import ServiceNoticesPage from './pages/game/ServiceNoticesPage';
+import ServiceNoticesPreviewPage from './pages/game/ServiceNoticesPreviewPage';
 import IngameNoticesPage from './pages/game/IngameNoticesPage';
 import CouponsPage from './pages/game/CouponsPage';
 import SurveysPage from './pages/game/SurveysPage';
@@ -266,6 +267,9 @@ const AppContent: React.FC = () => {
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+                {/* Service Notices Preview - Public Route */}
+                <Route path="/service-notices-preview" element={<ServiceNoticesPreviewPage />} />
 
                 {/* Landing Page - only for first-time visitors */}
                 <Route path="/" element={<ConditionalLandingPage />} />

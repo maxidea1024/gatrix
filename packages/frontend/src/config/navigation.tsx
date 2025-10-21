@@ -68,7 +68,6 @@ export const adminMenuItems: MenuItem[] = [
 
 // 게임관리 메뉴
 export const gameMenuItems: MenuItem[] = [
-  { text: 'sidebar.itemRewards', icon: <CardGiftcardIcon />, path: '/game/item-rewards', adminOnly: true },
   { text: 'sidebar.serviceNotices', icon: <AnnouncementIcon />, path: '/game/service-notices', adminOnly: true },
   { text: 'sidebar.ingameNotices', icon: <CampaignIcon />, path: '/game/ingame-notices', adminOnly: true },
   { text: 'sidebar.coupons', icon: <ConfirmationNumberIcon />, path: '/game/coupons', adminOnly: true },
@@ -82,6 +81,7 @@ export const gameMenuItems: MenuItem[] = [
       { text: 'sidebar.liveEvent', icon: <CelebrationIcon />, path: '/game/live-event', adminOnly: true },
     ]
   },
+  { text: 'sidebar.itemRewards', icon: <CardGiftcardIcon />, path: '/game/item-rewards', adminOnly: true },
   { text: 'sidebar.planningData', icon: <StorageIcon />, path: '/game/planning-data', adminOnly: true },
 ];
 

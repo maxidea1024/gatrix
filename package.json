@@ -58,6 +58,8 @@
     "deploy:dev": "chmod +x scripts/deploy.sh && scripts/deploy.sh -e development",
     "deploy:staging": "chmod +x scripts/deploy.sh && scripts/deploy.sh -e staging",
     "check:tables": "node scripts/check-tables.js",
+    "add:service-notice": "node scripts/add-service-notice-via-api.js",
+    "add:100-notices": "node scripts/add-100-service-notices.js",
     "docs:start": "cd docs && npm start",
     "docs:build": "cd docs && npm run build",
     "docs:serve": "cd docs && npm run serve",

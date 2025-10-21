@@ -26,8 +26,6 @@ import {
   ClickAwayListener,
   List,
   ListItem,
-  Menu,
-  MenuItem,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -38,7 +36,8 @@ import {
   Visibility as VisibilityIcon,
   ViewColumn as ViewColumnIcon,
   DragIndicator as DragIndicatorIcon,
-  MoreVert as MoreVertIcon,
+  Close as CloseIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import {
   DndContext,
@@ -138,20 +137,40 @@ const ServiceNoticesPage: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
+  // Extract filter values with useMemo for stable references
+  const isActiveFilter = useMemo(() => {
+    const filter = activeFilters.find(f => f.key === 'isActive');
+    return filter?.value as string | undefined;
+  }, [activeFilters]);
+
+  const categoryFilter = useMemo(() => {
+    const filter = activeFilters.find(f => f.key === 'category');
+    return filter?.value as string | undefined;
+  }, [activeFilters]);
+
+  const platformFilter = useMemo(() => {
+    const filter = activeFilters.find(f => f.key === 'platform');
+    return filter?.value as string | undefined;
+  }, [activeFilters]);
+
+  // Convert filters to strings for dependency array
+  const isActiveFilterString = useMemo(() => isActiveFilter || '', [isActiveFilter]);
+  const categoryFilterString = useMemo(() => categoryFilter || '', [categoryFilter]);
+  const platformFilterString = useMemo(() => platformFilter || '', [platformFilter]);
+
   // Dialog states
   const [formDrawerOpen, setFormDrawerOpen] = useState(false);
   const [editingNotice, setEditingNotice] = useState<ServiceNotice | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingNotice, setDeletingNotice] = useState<ServiceNotice | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [menuNotice, setMenuNotice] = useState<ServiceNotice | null>(null);
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
 
-  // Default column configuration
+  // Default column configuration - title moved to first position
   const defaultColumns: ColumnConfig[] = [
+    { id: 'title', labelKey: 'serviceNotices.noticeTitle', visible: true },
     { id: 'status', labelKey: 'serviceNotices.status', visible: true },
     { id: 'category', labelKey: 'serviceNotices.category', visible: true },
-    { id: 'title', labelKey: 'serviceNotices.noticeTitle', visible: true },
     { id: 'platforms', labelKey: 'serviceNotices.platforms', visible: true },
     { id: 'period', labelKey: 'serviceNotices.period', visible: true },
     { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
@@ -240,15 +259,15 @@ const ServiceNoticesPage: React.FC = () => {
       };
 
       // Apply active filters
-      activeFilters.forEach(filter => {
-        if (filter.key === 'isActive' && Array.isArray(filter.value) && filter.value.length > 0) {
-          filters.isActive = filter.value[0] === 'true';
-        } else if (filter.key === 'category' && Array.isArray(filter.value) && filter.value.length > 0) {
-          filters.category = filter.value[0];
-        } else if (filter.key === 'platform' && Array.isArray(filter.value) && filter.value.length > 0) {
-          filters.platform = filter.value[0];
-        }
-      });
+      if (isActiveFilter !== undefined && isActiveFilter !== '') {
+        filters.isActive = isActiveFilter === 'true';
+      }
+      if (categoryFilter !== undefined && categoryFilter !== '') {
+        filters.category = categoryFilter;
+      }
+      if (platformFilter !== undefined && platformFilter !== '') {
+        filters.platform = platformFilter;
+      }
 
       const result = await serviceNoticeService.getServiceNotices(page + 1, rowsPerPage, filters);
       
@@ -273,26 +292,28 @@ const ServiceNoticesPage: React.FC = () => {
 
   useEffect(() => {
     loadNotices();
-  }, [page, rowsPerPage, debouncedSearchTerm, activeFilters]);
+  }, [page, rowsPerPage, debouncedSearchTerm, isActiveFilterString, categoryFilterString, platformFilterString]);
 
   // Filter handlers
   const handleFilterAdd = (filter: ActiveFilter) => {
     setActiveFilters([...activeFilters, filter]);
   };
 
-  const handleFilterRemove = (index: number) => {
-    setActiveFilters(activeFilters.filter((_, i) => i !== index));
+  const handleFilterRemove = (filterKey: string) => {
+    setActiveFilters(activeFilters.filter(f => f.key !== filterKey));
   };
 
-  const handleDynamicFilterChange = (index: number, value: any) => {
-    const newFilters = [...activeFilters];
-    newFilters[index] = { ...newFilters[index], value };
+  const handleDynamicFilterChange = (filterKey: string, value: any) => {
+    const newFilters = activeFilters.map(f =>
+      f.key === filterKey ? { ...f, value } : f
+    );
     setActiveFilters(newFilters);
   };
 
-  const handleOperatorChange = (index: number, operator: string) => {
-    const newFilters = [...activeFilters];
-    newFilters[index] = { ...newFilters[index], operator };
+  const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
+    const newFilters = activeFilters.map(f =>
+      f.key === filterKey ? { ...f, operator } : f
+    );
     setActiveFilters(newFilters);
   };
 
@@ -403,31 +424,6 @@ const ServiceNoticesPage: React.FC = () => {
     }
   };
 
-  // Menu handlers
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, notice: ServiceNotice) => {
-    setAnchorEl(event.currentTarget);
-    setMenuNotice(notice);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setMenuNotice(null);
-  };
-
-  const handleMenuEdit = () => {
-    if (menuNotice) {
-      handleEdit(menuNotice);
-    }
-    handleMenuClose();
-  };
-
-  const handleMenuDelete = () => {
-    if (menuNotice) {
-      handleDelete(menuNotice);
-    }
-    handleMenuClose();
-  };
-
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
@@ -445,7 +441,7 @@ const ServiceNoticesPage: React.FC = () => {
           <Button
             variant="outlined"
             startIcon={<VisibilityIcon />}
-            onClick={() => window.open('/service-notices-preview', '_blank')}
+            onClick={() => setPreviewDialogOpen(true)}
           >
             {t('serviceNotices.preview')}
           </Button>
@@ -633,7 +629,17 @@ const ServiceNoticesPage: React.FC = () => {
                           return (
                             <TableCell key={column.id}>
                               <Box>
-                                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                <Typography
+                                  variant="body2"
+                                  sx={{
+                                    fontWeight: 500,
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                      textDecoration: 'underline',
+                                    }
+                                  }}
+                                  onClick={() => handleEdit(notice)}
+                                >
                                   {notice.tabTitle || notice.title}
                                 </Typography>
                                 {notice.tabTitle && (
@@ -680,12 +686,26 @@ const ServiceNoticesPage: React.FC = () => {
                         return null;
                       })}
                       <TableCell align="center">
-                        <IconButton
-                          size="small"
-                          onClick={(e) => handleMenuOpen(e, notice)}
-                        >
-                          <MoreVertIcon />
-                        </IconButton>
+                        <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                          <Tooltip title={t('common.edit')}>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleEdit(notice)}
+                              color="primary"
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title={t('common.delete')}>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleDelete(notice)}
+                              color="error"
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
                       </TableCell>
                     </TableRow>
                   ))
@@ -699,10 +719,10 @@ const ServiceNoticesPage: React.FC = () => {
             <SimplePagination
               page={page}
               rowsPerPage={rowsPerPage}
-              totalCount={total}
-              onPageChange={(newPage) => setPage(newPage)}
-              onRowsPerPageChange={(newRowsPerPage) => {
-                setRowsPerPage(newRowsPerPage);
+              count={total}
+              onPageChange={(event, newPage) => setPage(newPage)}
+              onRowsPerPageChange={(event) => {
+                setRowsPerPage(Number(event.target.value));
                 setPage(0);
               }}
             />
@@ -750,21 +770,7 @@ const ServiceNoticesPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Action Menu */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-      >
-        <MenuItem onClick={handleMenuEdit}>
-          <EditIcon fontSize="small" sx={{ mr: 1 }} />
-          {t('common.edit')}
-        </MenuItem>
-        <MenuItem onClick={handleMenuDelete}>
-          <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
-          {t('common.delete')}
-        </MenuItem>
-      </Menu>
+
 
       {/* Column Settings Popover */}
       <Popover
@@ -814,6 +820,75 @@ const ServiceNoticesPage: React.FC = () => {
           </Box>
         </ClickAwayListener>
       </Popover>
+
+      {/* Preview Dialog */}
+      <Dialog
+        open={previewDialogOpen}
+        onClose={() => setPreviewDialogOpen(false)}
+        maxWidth={false}
+        PaperProps={{
+          sx: {
+            width: 1536,
+            height: 928,
+            maxWidth: '95vw',
+            maxHeight: '95vh',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={(theme) => ({
+            display: 'flex',
+            flexDirection: 'column',
+            pb: 1,
+            bgcolor: theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100',
+            borderBottom: 1,
+            borderColor: 'divider',
+          })}
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+            <Typography variant="h6">{t('serviceNotices.preview')}</Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <IconButton
+                color="primary"
+                onClick={() => {
+                  const iframe = document.querySelector('iframe[src="/service-notices-preview"]') as HTMLIFrameElement;
+                  if (iframe) {
+                    iframe.src = iframe.src;
+                  }
+                }}
+                aria-label="refresh"
+                size="small"
+              >
+                <RefreshIcon />
+              </IconButton>
+              <IconButton
+                edge="end"
+                color="inherit"
+                onClick={() => setPreviewDialogOpen(false)}
+                aria-label="close"
+                size="small"
+              >
+                <CloseIcon />
+              </IconButton>
+            </Box>
+          </Box>
+          <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+            {t('serviceNotices.previewPage.subtitle')}
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ p: 0, overflow: 'hidden', display: 'flex' }}>
+          <Box
+            component="iframe"
+            src="/service-notices-preview"
+            sx={{
+              width: '100%',
+              height: '100%',
+              border: 'none',
+              display: 'block',
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

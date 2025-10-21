@@ -2626,7 +2626,9 @@
     "searchPlaceholder": "按标题或内容搜索",
     "noNotices": "没有找到公告",
     "isActive": "启用状态",
+    "isActiveHelp": "设置公告的启用状态",
     "category": "类别",
+    "categoryHelp": "选择公告的类型",
     "categories": {
       "maintenance": "维护",
       "event": "活动",
@@ -2635,14 +2637,19 @@
       "other": "其他"
     },
     "platforms": "目标平台",
+    "platformsHelp": "选择公告将显示的平台（可多选）",
     "platform": "平台",
     "startDate": "开始日期",
+    "startDateHelp": "设置公告开始显示的日期和时间",
     "endDate": "结束日期",
+    "endDateHelp": "设置公告停止显示的日期和时间",
     "period": "期间",
     "tabTitle": "标签标题",
     "tabTitleHelp": "列表视图中显示的简短标题（可选）",
     "noticeTitle": "标题",
+    "noticeTitleHelp": "输入公告的标题",
     "content": "内容",
+    "contentHelp": "编写公告的详细内容（支持富文本编辑）",
     "contentPlaceholder": "输入公告内容（支持富文本）",
     "description": "描述",
     "descriptionHelp": "管理用描述（可选）",
@@ -2668,7 +2675,15 @@
     "previewLabel": "预览",
     "noTitle": "(无标题)",
     "noContent": "(无内容)",
-    "noNoticesFound": "未找到公告"
+    "noNoticesFound": "未找到公告",
+    "previewPage": {
+      "title": "服务公告",
+      "subtitle": "此预览显示游戏内网页视图中的公告内容。实际显示可能略有不同。",
+      "readStatus": "已读",
+      "unreadStatus": "未读",
+      "noActiveNotices": "当前没有活动公告",
+      "selectNotice": "选择公告"
+    }
   },
   "ingameNotices": {
     "title": "游戏内公告",
