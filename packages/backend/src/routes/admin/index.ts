@@ -27,6 +27,7 @@ import crashEventRoutes from './crashEvents';
 import consoleRoutes from './console';
 import surveyRoutes from './surveys';
 import serviceNoticeRoutes from './serviceNotices';
+import ingamePopupNoticeRoutes from './ingamePopupNotices';
 
 const router = express.Router();
 
@@ -63,5 +64,6 @@ router.use('/crash-events', crashEventRoutes);
 router.use('/console', consoleRoutes);
 router.use('/surveys', surveyRoutes);
 router.use('/service-notices', serviceNoticeRoutes);
+router.use('/ingame-popup-notices', ingamePopupNoticeRoutes);
 
 export default router;

@@ -7,10 +7,10 @@ export interface ServiceNotice {
   platforms: string[];
   startDate: string;
   endDate: string;
-  tabTitle?: string;
+  tabTitle?: string | null;
   title: string;
   content: string;
-  description?: string;
+  description?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -21,10 +21,10 @@ export interface CreateServiceNoticeData {
   platforms: string[];
   startDate: string;
   endDate: string;
-  tabTitle?: string;
+  tabTitle?: string | null;
   title: string;
   content: string;
-  description?: string;
+  description?: string | null;
 }
 
 export interface UpdateServiceNoticeData extends Partial<CreateServiceNoticeData> {}

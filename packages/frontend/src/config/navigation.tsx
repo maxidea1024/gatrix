@@ -31,6 +31,7 @@ import {
   Whatshot as WhatshotIcon,
   Celebration as CelebrationIcon,
   Dns as DnsIcon,
+  Notifications as NotificationsIcon,
 } from '@mui/icons-material';
 
 export interface MenuItem {
@@ -69,7 +70,7 @@ export const adminMenuItems: MenuItem[] = [
 // 게임관리 메뉴
 export const gameMenuItems: MenuItem[] = [
   { text: 'sidebar.serviceNotices', icon: <AnnouncementIcon />, path: '/game/service-notices', adminOnly: true },
-  { text: 'sidebar.ingameNotices', icon: <CampaignIcon />, path: '/game/ingame-notices', adminOnly: true },
+  { text: 'sidebar.ingamePopupNotices', icon: <NotificationsIcon />, path: '/game/ingame-popup-notices', adminOnly: true },
   { text: 'sidebar.coupons', icon: <ConfirmationNumberIcon />, path: '/game/coupons', adminOnly: true },
   { text: 'sidebar.surveys', icon: <PollIcon />, path: '/game/surveys', adminOnly: true },
   {

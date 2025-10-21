@@ -289,16 +289,19 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
     setSubmitting(true);
 
     try {
+      const trimmedTabTitle = tabTitle.trim();
+      const trimmedDescription = description.trim();
+
       const data: CreateServiceNoticeData | UpdateServiceNoticeData = {
         isActive,
         category: category as any,
         platforms,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
-        tabTitle: tabTitle.trim() || undefined,
+        tabTitle: trimmedTabTitle ? trimmedTabTitle : null,
         title: title.trim(),
         content: content.trim(),
-        description: description.trim() || undefined,
+        description: trimmedDescription ? trimmedDescription : null,
       };
 
       if (notice) {

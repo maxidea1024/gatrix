@@ -140,20 +140,50 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const insertLink = () => {
     handleContextMenuClose();
+
+    // Get selected text if any
     if (quillRef.current) {
       const editor = quillRef.current.getEditor();
-      const url = prompt(t('richTextEditor.enterUrl', 'Enter URL:'));
-      if (url) {
-        const selection = savedSelectionRef.current;
-        if (selection && selection.length > 0) {
-          editor.formatText(selection.index, selection.length, 'link', url);
-        } else {
-          const position = selection ? selection.index : editor.getLength();
-          editor.insertText(position, url, 'link', url);
-        }
-        editor.focus();
+      const selection = savedSelectionRef.current;
+
+      if (selection && selection.length > 0) {
+        const selectedText = editor.getText(selection.index, selection.length);
+        setLinkText(selectedText);
+      } else {
+        setLinkText('');
       }
     }
+
+    setLinkUrl('');
+    setLinkDialogOpen(true);
+  };
+
+  const handleLinkDialogClose = () => {
+    setLinkDialogOpen(false);
+    setLinkUrl('');
+    setLinkText('');
+  };
+
+  const handleLinkInsert = () => {
+    if (quillRef.current && linkUrl) {
+      const editor = quillRef.current.getEditor();
+      const selection = savedSelectionRef.current;
+
+      if (selection && selection.length > 0) {
+        // Apply link to selected text
+        editor.formatText(selection.index, selection.length, 'link', linkUrl);
+      } else {
+        // Insert new link with text
+        const position = selection ? selection.index : editor.getLength();
+        const textToInsert = linkText || linkUrl;
+        editor.insertText(position, textToInsert, 'link', linkUrl);
+        editor.setSelection(position + textToInsert.length, 0);
+      }
+
+      editor.focus();
+    }
+
+    handleLinkDialogClose();
   };
 
   const formatBold = () => {
@@ -562,6 +592,56 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <ListItemText>{t('richTextEditor.clearFormatting', 'Clear Formatting')}</ListItemText>
         </MenuItem>
       </Menu>
+
+      {/* Link Insert Dialog */}
+      <Dialog
+        open={linkDialogOpen}
+        onClose={handleLinkDialogClose}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>{t('richTextEditor.insertLink', 'Insert Link')}</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
+            <TextField
+              autoFocus
+              label={t('richTextEditor.linkUrl', 'URL')}
+              placeholder="https://example.com"
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
+              fullWidth
+              required
+              helperText={t('richTextEditor.linkUrlHelp', 'Enter the web address (URL)')}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && linkUrl) {
+                  handleLinkInsert();
+                }
+              }}
+            />
+            <TextField
+              label={t('richTextEditor.linkText', 'Display Text (Optional)')}
+              placeholder={t('richTextEditor.linkTextPlaceholder', 'Text to display')}
+              value={linkText}
+              onChange={(e) => setLinkText(e.target.value)}
+              fullWidth
+              helperText={t('richTextEditor.linkTextHelp', 'Leave empty to use URL as text')}
+              disabled={savedSelectionRef.current && savedSelectionRef.current.length > 0}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleLinkDialogClose}>
+            {t('common.cancel', 'Cancel')}
+          </Button>
+          <Button
+            onClick={handleLinkInsert}
+            variant="contained"
+            disabled={!linkUrl}
+          >
+            {t('common.insert', 'Insert')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

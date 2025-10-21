@@ -84,7 +84,7 @@ import ServerListPage from './pages/admin/ServerListPage';
 import ItemRewardsPage from './pages/game/ItemRewardsPage';
 import ServiceNoticesPage from './pages/game/ServiceNoticesPage';
 import ServiceNoticesPreviewPage from './pages/game/ServiceNoticesPreviewPage';
-import IngameNoticesPage from './pages/game/IngameNoticesPage';
+import IngamePopupNoticesPage from './pages/game/IngamePopupNoticesPage';
 import CouponsPage from './pages/game/CouponsPage';
 import SurveysPage from './pages/game/SurveysPage';
 import HotTimeButtonEventPage from './pages/game/HotTimeButtonEventPage';
@@ -390,7 +390,7 @@ const AppContent: React.FC = () => {
                       <Routes>
                         <Route path="item-rewards" element={<ItemRewardsPage />} />
                         <Route path="service-notices" element={<ServiceNoticesPage />} />
-                        <Route path="ingame-notices" element={<IngameNoticesPage />} />
+                        <Route path="ingame-popup-notices" element={<IngamePopupNoticesPage />} />
                         <Route path="coupons" element={<CouponsPage />} />
                         <Route path="surveys" element={<SurveysPage />} />
                         <Route path="hot-time-button-event" element={<HotTimeButtonEventPage />} />
