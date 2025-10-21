@@ -98,7 +98,7 @@ class IngamePopupNoticeService {
     }
 
     const response = await api.get('/admin/ingame-popup-notices', { params });
-    return response.data;
+    return response;
   }
 
   /**
@@ -106,7 +106,7 @@ class IngamePopupNoticeService {
    */
   async getIngamePopupNoticeById(id: number): Promise<IngamePopupNotice> {
     const response = await api.get(`/admin/ingame-popup-notices/${id}`);
-    return response.data.notice;
+    return response.notice;
   }
 
   /**
@@ -114,7 +114,7 @@ class IngamePopupNoticeService {
    */
   async createIngamePopupNotice(data: CreateIngamePopupNoticeData): Promise<IngamePopupNotice> {
     const response = await api.post('/admin/ingame-popup-notices', data);
-    return response.data.notice;
+    return response.notice;
   }
 
   /**
@@ -122,7 +122,7 @@ class IngamePopupNoticeService {
    */
   async updateIngamePopupNotice(id: number, data: UpdateIngamePopupNoticeData): Promise<IngamePopupNotice> {
     const response = await api.put(`/admin/ingame-popup-notices/${id}`, data);
-    return response.data.notice;
+    return response.notice;
   }
 
   /**
@@ -144,7 +144,7 @@ class IngamePopupNoticeService {
    */
   async toggleActive(id: number): Promise<IngamePopupNotice> {
     const response = await api.patch(`/admin/ingame-popup-notices/${id}/toggle-active`);
-    return response.data.notice;
+    return response.notice;
   }
 }
 

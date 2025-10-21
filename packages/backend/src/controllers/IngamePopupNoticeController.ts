@@ -72,15 +72,16 @@ class IngamePopupNoticeController {
       }
 
       if (req.query.platform) {
-        filters.platform = req.query.platform as string;
+        const platformParam = req.query.platform as string;
+        filters.platform = platformParam.includes(',') ? platformParam.split(',') : platformParam;
+      }
+
+      if (req.query.platformOperator) {
+        filters.platformOperator = req.query.platformOperator as 'any_of' | 'include_all';
       }
 
       if (req.query.clientVersion) {
         filters.clientVersion = req.query.clientVersion as string;
-      }
-
-      if (req.query.gameVersion) {
-        filters.gameVersion = req.query.gameVersion as string;
       }
 
       if (req.query.accountId) {

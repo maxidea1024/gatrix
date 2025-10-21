@@ -263,9 +263,12 @@ const IngamePopupNoticesPage: React.FC = () => {
   const loadNotices = async () => {
     setLoading(true);
     try {
-      const filters: IngamePopupNoticeFilters = {
-        search: debouncedSearchTerm || undefined,
-      };
+      const filters: IngamePopupNoticeFilters = {};
+
+      // Apply search filter
+      if (debouncedSearchTerm) {
+        filters.search = debouncedSearchTerm;
+      }
 
       // Apply active filters
       if (isActiveFilter !== undefined && isActiveFilter !== '') {
@@ -686,7 +689,11 @@ const IngamePopupNoticesPage: React.FC = () => {
                                   <Chip label={`${t('ingamePopupNotices.targetWorlds')}: ${notice.targetWorlds.length}`} size="small" />
                                 )}
                                 {notice.targetPlatforms && notice.targetPlatforms.length > 0 && (
-                                  <Chip label={`${t('ingamePopupNotices.targetPlatforms')}: ${notice.targetPlatforms.length}`} size="small" />
+                                  <>
+                                    {notice.targetPlatforms.map((platform) => (
+                                      <Chip key={platform} label={platform} size="small" />
+                                    ))}
+                                  </>
                                 )}
                                 {notice.showOnce && (
                                   <Chip label={t('ingamePopupNotices.showOnce')} size="small" color="info" />

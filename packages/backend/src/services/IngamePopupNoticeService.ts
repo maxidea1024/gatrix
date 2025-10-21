@@ -97,8 +97,20 @@ class IngamePopupNoticeService {
       }
 
       if (filters.platform) {
-        whereClauses.push('(targetPlatforms IS NULL OR JSON_CONTAINS(targetPlatforms, ?))');
-        queryParams.push(JSON.stringify(filters.platform));
+        const platforms = Array.isArray(filters.platform) ? filters.platform : [filters.platform];
+        const operator = filters.platformOperator || 'any_of';
+
+        if (operator === 'include_all') {
+          // All specified platforms must be included
+          const platformChecks = platforms.map(() => 'JSON_CONTAINS(targetPlatforms, ?)').join(' AND ');
+          whereClauses.push(`(targetPlatforms IS NULL OR (${platformChecks}))`);
+          platforms.forEach(platform => queryParams.push(JSON.stringify(platform)));
+        } else {
+          // Any of the specified platforms (default)
+          const platformChecks = platforms.map(() => 'JSON_CONTAINS(targetPlatforms, ?)').join(' OR ');
+          whereClauses.push(`(targetPlatforms IS NULL OR (${platformChecks}))`);
+          platforms.forEach(platform => queryParams.push(JSON.stringify(platform)));
+        }
       }
 
       if (filters.clientVersion) {
@@ -128,8 +140,8 @@ class IngamePopupNoticeService {
 
       // Get paginated results
       const [rows] = await pool.execute<RowDataPacket[]>(
-        `SELECT * FROM g_ingame_popup_notices ${whereClause} ORDER BY displayPriority ASC, createdAt DESC LIMIT ? OFFSET ?`,
-        [...queryParams, limit, offset]
+        `SELECT * FROM g_ingame_popup_notices ${whereClause} ORDER BY displayPriority ASC, createdAt DESC LIMIT ${limit} OFFSET ${offset}`,
+        queryParams
       );
 
       const notices = rows.map(row => this.formatNotice(row));
@@ -364,11 +376,11 @@ class IngamePopupNoticeService {
       id: row.id,
       isActive: Boolean(row.isActive),
       content: row.content,
-      targetWorlds: row.targetWorlds ? JSON.parse(row.targetWorlds) : null,
-      targetMarkets: row.targetMarkets ? JSON.parse(row.targetMarkets) : null,
-      targetPlatforms: row.targetPlatforms ? JSON.parse(row.targetPlatforms) : null,
-      targetClientVersions: row.targetClientVersions ? JSON.parse(row.targetClientVersions) : null,
-      targetAccountIds: row.targetAccountIds ? JSON.parse(row.targetAccountIds) : null,
+      targetWorlds: typeof row.targetWorlds === 'string' ? JSON.parse(row.targetWorlds) : row.targetWorlds,
+      targetMarkets: typeof row.targetMarkets === 'string' ? JSON.parse(row.targetMarkets) : row.targetMarkets,
+      targetPlatforms: typeof row.targetPlatforms === 'string' ? JSON.parse(row.targetPlatforms) : row.targetPlatforms,
+      targetClientVersions: typeof row.targetClientVersions === 'string' ? JSON.parse(row.targetClientVersions) : row.targetClientVersions,
+      targetAccountIds: typeof row.targetAccountIds === 'string' ? JSON.parse(row.targetAccountIds) : row.targetAccountIds,
       displayPriority: row.displayPriority,
       showOnce: Boolean(row.showOnce),
       startDate: convertFromMySQLDateTime(row.startDate)!,

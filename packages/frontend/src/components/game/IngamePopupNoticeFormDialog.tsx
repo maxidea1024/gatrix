@@ -180,8 +180,10 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
       }
 
       onSuccess();
+      onClose();
     } catch (error: any) {
-      enqueueSnackbar(t('ingamePopupNotices.saveFailed'), { variant: 'error' });
+      console.error('Failed to save ingame popup notice:', error);
+      enqueueSnackbar(error?.error?.message || t('ingamePopupNotices.saveFailed'), { variant: 'error' });
     } finally {
       setSubmitting(false);
     }
