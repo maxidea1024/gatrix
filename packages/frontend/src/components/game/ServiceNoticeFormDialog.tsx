@@ -268,10 +268,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       return;
     }
 
-    if (platforms.length === 0) {
-      enqueueSnackbar(t('serviceNotices.platformsRequired'), { variant: 'error' });
-      return;
-    }
+    // Note: platforms is optional - empty array means "all platforms"
 
     if (!startDate || !endDate) {
       enqueueSnackbar(t('serviceNotices.datesRequired'), { variant: 'error' });
@@ -405,7 +402,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
           </Box>
 
           {/* Platforms */}
-          <FormControl fullWidth required>
+          <FormControl fullWidth>
             <InputLabel>{t('serviceNotices.platforms')}</InputLabel>
             <Select
               multiple
@@ -414,9 +411,13 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
               input={<OutlinedInput label={t('serviceNotices.platforms')} />}
               renderValue={(selected) => (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {selected.map((value) => (
-                    <Chip key={value} label={value} size="small" />
-                  ))}
+                  {selected.length === 0 ? (
+                    <Chip label={t('common.all')} size="small" variant="outlined" />
+                  ) : (
+                    selected.map((value) => (
+                      <Chip key={value} label={value} size="small" />
+                    ))
+                  )}
                 </Box>
               )}
             >

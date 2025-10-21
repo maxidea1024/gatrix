@@ -85,14 +85,14 @@ class IngamePopupNoticeService {
         }
       }
 
-      // Target filters - check if JSON array contains the value
+      // Target filters - check if JSON array contains the value OR is empty/null (all targets)
       if (filters.world) {
-        whereClauses.push('(targetWorlds IS NULL OR JSON_CONTAINS(targetWorlds, ?))');
+        whereClauses.push('(targetWorlds IS NULL OR JSON_LENGTH(targetWorlds) = 0 OR JSON_CONTAINS(targetWorlds, ?))');
         queryParams.push(JSON.stringify(filters.world));
       }
 
       if (filters.market) {
-        whereClauses.push('(targetMarkets IS NULL OR JSON_CONTAINS(targetMarkets, ?))');
+        whereClauses.push('(targetMarkets IS NULL OR JSON_LENGTH(targetMarkets) = 0 OR JSON_CONTAINS(targetMarkets, ?))');
         queryParams.push(JSON.stringify(filters.market));
       }
 
@@ -101,25 +101,25 @@ class IngamePopupNoticeService {
         const operator = filters.platformOperator || 'any_of';
 
         if (operator === 'include_all') {
-          // All specified platforms must be included
+          // All specified platforms must be included OR be empty/null (all platforms)
           const platformChecks = platforms.map(() => 'JSON_CONTAINS(targetPlatforms, ?)').join(' AND ');
-          whereClauses.push(`(targetPlatforms IS NULL OR (${platformChecks}))`);
+          whereClauses.push(`(targetPlatforms IS NULL OR JSON_LENGTH(targetPlatforms) = 0 OR (${platformChecks}))`);
           platforms.forEach(platform => queryParams.push(JSON.stringify(platform)));
         } else {
-          // Any of the specified platforms (default)
+          // Any of the specified platforms (default) OR be empty/null (all platforms)
           const platformChecks = platforms.map(() => 'JSON_CONTAINS(targetPlatforms, ?)').join(' OR ');
-          whereClauses.push(`(targetPlatforms IS NULL OR (${platformChecks}))`);
+          whereClauses.push(`(targetPlatforms IS NULL OR JSON_LENGTH(targetPlatforms) = 0 OR (${platformChecks}))`);
           platforms.forEach(platform => queryParams.push(JSON.stringify(platform)));
         }
       }
 
       if (filters.clientVersion) {
-        whereClauses.push('(targetClientVersions IS NULL OR JSON_CONTAINS(targetClientVersions, ?))');
+        whereClauses.push('(targetClientVersions IS NULL OR JSON_LENGTH(targetClientVersions) = 0 OR JSON_CONTAINS(targetClientVersions, ?))');
         queryParams.push(JSON.stringify(filters.clientVersion));
       }
 
       if (filters.accountId) {
-        whereClauses.push('(targetAccountIds IS NULL OR JSON_CONTAINS(targetAccountIds, ?))');
+        whereClauses.push('(targetAccountIds IS NULL OR JSON_LENGTH(targetAccountIds) = 0 OR JSON_CONTAINS(targetAccountIds, ?))');
         queryParams.push(JSON.stringify(filters.accountId));
       }
 

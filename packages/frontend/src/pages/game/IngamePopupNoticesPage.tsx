@@ -685,16 +685,33 @@ const IngamePopupNoticesPage: React.FC = () => {
                           return (
                             <TableCell key={column.id}>
                               <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                {notice.targetWorlds && notice.targetWorlds.length > 0 && (
-                                  <Chip label={`${t('ingamePopupNotices.targetWorlds')}: ${notice.targetWorlds.length}`} size="small" />
-                                )}
-                                {notice.targetPlatforms && notice.targetPlatforms.length > 0 && (
+                                {/* Platforms */}
+                                {notice.targetPlatforms && notice.targetPlatforms.length > 0 ? (
                                   <>
                                     {notice.targetPlatforms.map((platform) => (
                                       <Chip key={platform} label={platform} size="small" />
                                     ))}
                                   </>
+                                ) : (
+                                  <Chip label={t('common.all')} size="small" variant="outlined" />
                                 )}
+                                {/* Worlds */}
+                                {notice.targetWorlds && notice.targetWorlds.length > 0 && (
+                                  <Chip label={`${t('ingamePopupNotices.targetWorlds')}: ${notice.targetWorlds.length}`} size="small" />
+                                )}
+                                {/* Markets */}
+                                {notice.targetMarkets && notice.targetMarkets.length > 0 && (
+                                  <Chip label={`${t('ingamePopupNotices.targetMarkets')}: ${notice.targetMarkets.length}`} size="small" />
+                                )}
+                                {/* Client Versions */}
+                                {notice.targetClientVersions && notice.targetClientVersions.length > 0 && (
+                                  <Chip label={`${t('ingamePopupNotices.targetClientVersions')}: ${notice.targetClientVersions.length}`} size="small" />
+                                )}
+                                {/* Account IDs */}
+                                {notice.targetAccountIds && notice.targetAccountIds.length > 0 && (
+                                  <Chip label={`${t('ingamePopupNotices.targetAccountIds')}: ${notice.targetAccountIds.length}`} size="small" />
+                                )}
+                                {/* Show Once */}
                                 {notice.showOnce && (
                                   <Chip label={t('ingamePopupNotices.showOnce')} size="small" color="info" />
                                 )}

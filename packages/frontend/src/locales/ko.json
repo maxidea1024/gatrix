@@ -2633,7 +2633,7 @@
       "other": "기타"
     },
     "platforms": "적용 플랫폼",
-    "platformsHelp": "공지가 표시될 플랫폼을 선택합니다 (복수 선택 가능)",
+    "platformsHelp": "공지가 표시될 플랫폼을 선택합니다. 선택하지 않으면 모든 플랫폼에 표시됩니다.",
     "platform": "플랫폼",
     "startDate": "시작일시",
     "startDateHelp": "공지가 표시되기 시작하는 일시를 설정합니다",

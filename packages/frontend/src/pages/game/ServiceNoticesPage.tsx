@@ -742,9 +742,13 @@ const ServiceNoticesPage: React.FC = () => {
                           return (
                             <TableCell key={column.id}>
                               <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                {notice.platforms.map((platform) => (
-                                  <Chip key={platform} label={platform} size="small" />
-                                ))}
+                                {notice.platforms.length === 0 ? (
+                                  <Chip label={t('common.all')} size="small" variant="outlined" />
+                                ) : (
+                                  notice.platforms.map((platform) => (
+                                    <Chip key={platform} label={platform} size="small" />
+                                  ))
+                                )}
                               </Box>
                             </TableCell>
                           );

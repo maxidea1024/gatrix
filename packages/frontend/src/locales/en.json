@@ -2636,7 +2636,7 @@
       "other": "Other"
     },
     "platforms": "Target Platforms",
-    "platformsHelp": "Select platforms where the notice will be displayed (multiple selection allowed)",
+    "platformsHelp": "Select platforms where the notice will be displayed. If none selected, it will be displayed on all platforms.",
     "platform": "Platform",
     "startDate": "Start Date",
     "startDateHelp": "Set the date and time when the notice starts displaying",

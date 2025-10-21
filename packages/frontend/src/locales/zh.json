@@ -2672,7 +2672,7 @@
       "other": "其他"
     },
     "platforms": "目标平台",
-    "platformsHelp": "选择公告将显示的平台（可多选）",
+    "platformsHelp": "选择公告将显示的平台。如果不选择，将在所有平台上显示。",
     "platform": "平台",
     "startDate": "开始日期",
     "startDateHelp": "设置公告开始显示的日期和时间",

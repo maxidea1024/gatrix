@@ -80,15 +80,15 @@ class ServiceNoticeService {
         const operator = filters.platformOperator || 'any_of';
 
         if (operator === 'include_all') {
-          // AND condition: notice must include ALL selected platforms
+          // AND condition: notice must include ALL selected platforms OR be empty (all platforms)
           platforms.forEach(platform => {
-            whereClauses.push('JSON_CONTAINS(platforms, ?)');
+            whereClauses.push('(JSON_LENGTH(platforms) = 0 OR JSON_CONTAINS(platforms, ?))');
             queryParams.push(JSON.stringify(platform));
           });
         } else {
-          // OR condition: notice must include ANY of the selected platforms
+          // OR condition: notice must include ANY of the selected platforms OR be empty (all platforms)
           const platformConditions = platforms.map(() => 'JSON_CONTAINS(platforms, ?)').join(' OR ');
-          whereClauses.push(`(${platformConditions})`);
+          whereClauses.push(`(JSON_LENGTH(platforms) = 0 OR (${platformConditions}))`);
           platforms.forEach(platform => {
             queryParams.push(JSON.stringify(platform));
           });
