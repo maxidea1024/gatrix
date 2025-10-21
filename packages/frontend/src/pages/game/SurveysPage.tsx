@@ -17,9 +17,6 @@ import {
   InputAdornment,
   Tooltip,
   Checkbox,
-  Popover,
-  ClickAwayListener,
-  List,
   Skeleton,
 } from '@mui/material';
 import {
@@ -30,100 +27,20 @@ import {
   Search as SearchIcon,
   Settings as SettingsIcon,
   ViewColumn as ViewColumnIcon,
-  DragIndicator as DragIndicatorIcon,
   Close as CloseIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import surveyService, { Survey } from '../../services/surveyService';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
+import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import SurveyFormDialog from '../../components/game/SurveyFormDialog';
 import SurveyConfigDialog from '../../components/game/SurveyConfigDialog';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
-
-// Column definition interface
-interface ColumnConfig {
-  id: string;
-  labelKey: string;
-  visible: boolean;
-  width?: string;
-}
-
-// Sortable column item component
-interface SortableColumnItemProps {
-  column: ColumnConfig;
-  onToggleVisibility: (id: string) => void;
-}
-
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
-  const { t } = useTranslation();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: column.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  return (
-    <Box
-      ref={setNodeRef}
-      style={style}
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 1,
-        py: 0.5,
-        px: 1,
-        borderRadius: 1,
-        '&:hover': {
-          bgcolor: 'action.hover',
-        },
-      }}
-    >
-      <Box {...attributes} {...listeners} sx={{ display: 'flex', cursor: 'grab', '&:active': { cursor: 'grabbing' } }}>
-        <DragIndicatorIcon fontSize="small" sx={{ color: 'text.secondary' }} />
-      </Box>
-      <Checkbox
-        checked={column.visible}
-        onChange={() => onToggleVisibility(column.id)}
-        size="small"
-      />
-      <Typography variant="body2" sx={{ flex: 1 }}>
-        {t(column.labelKey)}
-      </Typography>
-    </Box>
-  );
-};
 
 const SurveysPage: React.FC = () => {
   const { t } = useTranslation();
@@ -156,14 +73,6 @@ const SurveysPage: React.FC = () => {
     { id: 'createdAt', labelKey: 'surveys.createdAt', visible: true },
     { id: 'actions', labelKey: 'common.actions', visible: true },
   ]);
-
-  // DnD sensors for column reordering
-  const columnSensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
 
   // Extract filter values from activeFilters
   const isActiveFilter = useMemo(() => {
@@ -249,34 +158,24 @@ const SurveysPage: React.FC = () => {
     ));
   };
 
-  // Column handlers
-  const handleToggleColumnVisibility = (columnId: string) => {
-    setColumns(columns.map(col =>
-      col.id === columnId ? { ...col, visible: !col.visible } : col
-    ));
-  };
+  // Default columns for reset
+  const defaultColumns: ColumnConfig[] = [
+    { id: 'checkbox', labelKey: '', visible: true },
+    { id: 'platformSurveyId', labelKey: 'surveys.platformSurveyId', visible: true },
+    { id: 'surveyTitle', labelKey: 'surveys.surveyTitle', visible: true },
+    { id: 'triggerConditions', labelKey: 'surveys.triggerConditions', visible: true },
+    { id: 'status', labelKey: 'surveys.status', visible: true },
+    { id: 'createdAt', labelKey: 'surveys.createdAt', visible: true },
+    { id: 'actions', labelKey: 'common.actions', visible: true },
+  ];
 
-  const handleColumnDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      setColumns((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
+  // Column handlers
+  const handleColumnsChange = (newColumns: ColumnConfig[]) => {
+    setColumns(newColumns);
   };
 
   const handleResetColumns = () => {
-    setColumns([
-      { id: 'checkbox', labelKey: '', visible: true },
-      { id: 'platformSurveyId', labelKey: 'surveys.platformSurveyId', visible: true },
-      { id: 'surveyTitle', labelKey: 'surveys.surveyTitle', visible: true },
-      { id: 'triggerConditions', labelKey: 'surveys.triggerConditions', visible: true },
-      { id: 'status', labelKey: 'surveys.status', visible: true },
-      { id: 'createdAt', labelKey: 'surveys.createdAt', visible: true },
-      { id: 'actions', labelKey: 'common.actions', visible: true },
-    ]);
+    setColumns(defaultColumns);
   };
 
   // Selection handlers
@@ -635,54 +534,14 @@ const SurveysPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Column Settings Popover */}
-      <Popover
-        open={Boolean(columnSettingsAnchor)}
+      {/* Column Settings Dialog */}
+      <ColumnSettingsDialog
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-        hideBackdrop
-        disableScrollLock
-      >
-        <ClickAwayListener onClickAway={() => setColumnSettingsAnchor(null)}>
-          <Box sx={{ p: 2, minWidth: 250 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-              <Typography variant="subtitle2">{t('users.columnSettings')}</Typography>
-              <Button size="small" onClick={handleResetColumns}>
-                {t('common.reset')}
-              </Button>
-            </Box>
-            <DndContext
-              sensors={columnSensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleColumnDragEnd}
-              modifiers={[restrictToVerticalAxis]}
-            >
-              <SortableContext
-                items={columns.map(c => c.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <List dense>
-                  {columns.map((column) => (
-                    <SortableColumnItem
-                      key={column.id}
-                      column={column}
-                      onToggleVisibility={handleToggleColumnVisibility}
-                    />
-                  ))}
-                </List>
-              </SortableContext>
-            </DndContext>
-          </Box>
-        </ClickAwayListener>
-      </Popover>
+        columns={columns}
+        onColumnsChange={handleColumnsChange}
+        onReset={handleResetColumns}
+      />
 
       {/* Form Drawer */}
       <SurveyFormDialog

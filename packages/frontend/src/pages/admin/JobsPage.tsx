@@ -31,11 +31,6 @@ import {
   Autocomplete,
   Drawer,
   InputAdornment,
-  Popover,
-  List,
-  ListItem,
-  ListItemText,
-  Switch,
   useTheme
 } from '@mui/material';
 import {
@@ -48,26 +43,7 @@ import {
   Search as SearchIcon,
   Work as WorkIcon,
   ViewColumn as ViewColumnIcon,
-  DragIndicator as DragIndicatorIcon
 } from '@mui/icons-material';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent
-} from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { jobService } from '../../services/jobService';
@@ -78,69 +54,7 @@ import JobForm from '../../components/jobs/JobForm';
 import JobExecutionHistory from '../../components/jobs/JobExecutionHistory';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
-
-// Column configuration interface
-interface ColumnConfig {
-  id: string;
-  labelKey: string;
-  visible: boolean;
-}
-
-// Sortable column item component
-interface SortableColumnItemProps {
-  column: ColumnConfig;
-  onToggleVisibility: (columnId: string) => void;
-}
-
-const SortableColumnItem: React.FC<SortableColumnItemProps> = ({ column, onToggleVisibility }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging
-  } = useSortable({ id: column.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-    backgroundColor: isDragging ? 'action.hover' : 'transparent',
-    cursor: 'move'
-  };
-
-  const { t } = useTranslation();
-
-  return (
-    <ListItem
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      sx={{
-        border: '1px solid',
-        borderColor: 'divider',
-        borderRadius: 1,
-        mb: 0.5,
-        '&:hover': {
-          bgcolor: 'action.hover'
-        }
-      }}
-      secondaryAction={
-        <Switch
-          edge="end"
-          checked={column.visible}
-          onChange={() => onToggleVisibility(column.id)}
-          onClick={(e) => e.stopPropagation()}
-        />
-      }
-    >
-      <DragIndicatorIcon sx={{ mr: 1, color: 'text.secondary' }} />
-      <ListItemText primary={t(column.labelKey)} />
-    </ListItem>
-  );
-};
+import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 
 // Default column configuration
 const defaultColumns: ColumnConfig[] = [
@@ -180,11 +94,6 @@ const JobsPage: React.FC = () => {
 
   const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLButtonElement | null>(null);
 
-  const columnSensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-  );
-
   // State
   const [jobs, setJobs] = useState<Job[]>([]);
   const [jobTypes, setJobTypes] = useState<JobType[]>([]);
@@ -210,10 +119,7 @@ const JobsPage: React.FC = () => {
   const [jobToDelete, setJobToDelete] = useState<Job | null>(null);
 
   // Column handlers
-  const handleToggleColumnVisibility = (columnId: string) => {
-    const newColumns = columns.map(col =>
-      col.id === columnId ? { ...col, visible: !col.visible } : col
-    );
+  const handleColumnsChange = (newColumns: ColumnConfig[]) => {
     setColumns(newColumns);
     localStorage.setItem('jobsColumns', JSON.stringify(newColumns));
   };
@@ -221,17 +127,6 @@ const JobsPage: React.FC = () => {
   const handleResetColumns = () => {
     setColumns(defaultColumns);
     localStorage.removeItem('jobsColumns');
-  };
-
-  const handleColumnDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      const oldIndex = columns.findIndex(col => col.id === active.id);
-      const newIndex = columns.findIndex(col => col.id === over.id);
-      const newColumns = arrayMove(columns, oldIndex, newIndex);
-      setColumns(newColumns);
-      localStorage.setItem('jobsColumns', JSON.stringify(newColumns));
-    }
   };
 
   const loadData = useCallback(async () => {
@@ -951,39 +846,14 @@ const JobsPage: React.FC = () => {
         </Box>
       </Drawer>
 
-      {/* Column Settings Popover */}
-      <Popover
-        open={Boolean(columnSettingsAnchor)}
+      {/* Column Settings Dialog */}
+      <ColumnSettingsDialog
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Box sx={{ p: 2, minWidth: 250 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="subtitle2">{t('common.columnSettings')}</Typography>
-            <Button size="small" onClick={handleResetColumns}>{t('common.reset')}</Button>
-          </Box>
-          <DndContext
-            sensors={columnSensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleColumnDragEnd}
-            modifiers={[restrictToVerticalAxis]}
-          >
-            <SortableContext items={columns.map(c => c.id)} strategy={verticalListSortingStrategy}>
-              <List dense>
-                {columns.map((column) => (
-                  <SortableColumnItem
-                    key={column.id}
-                    column={column}
-                    onToggleVisibility={handleToggleColumnVisibility}
-                  />
-                ))}
-              </List>
-            </SortableContext>
-          </DndContext>
-        </Box>
-      </Popover>
+        columns={columns}
+        onColumnsChange={handleColumnsChange}
+        onReset={handleResetColumns}
+      />
     </Box>
   );
 };
