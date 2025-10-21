@@ -2632,7 +2632,11 @@
     "emojiActivities": "活动",
     "emojiObjects": "物品",
     "emojiSymbols": "符号",
-    "emojiFlags": "旗帜"
+    "emojiFlags": "旗帜",
+    "insertEmoji": "插入表情符号",
+    "insertLink": "插入链接",
+    "clearFormatting": "清除格式",
+    "enterUrl": "输入URL:"
   },
   "serviceNotices": {
     "title": "服务公告",

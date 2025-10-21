@@ -1,11 +1,33 @@
 import React, { useMemo, useRef, useEffect, useState } from 'react';
-import { Box, Paper, IconButton, Popover } from '@mui/material';
+import {
+  Box,
+  Paper,
+  IconButton,
+  Popover,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+} from '@mui/material';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import EmojiPicker, { EmojiClickData, Theme as EmojiTheme, Categories } from 'emoji-picker-react';
-import { EmojiEmotions as EmojiIcon } from '@mui/icons-material';
+import {
+  EmojiEmotions as EmojiIcon,
+  FormatBold as BoldIcon,
+  FormatItalic as ItalicIcon,
+  FormatUnderlined as UnderlineIcon,
+  Link as LinkIcon,
+  FormatClear as ClearIcon,
+} from '@mui/icons-material';
 
 interface RichTextEditorProps {
   value: string;
@@ -26,9 +48,43 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const { t } = useTranslation();
   const quillRef = useRef<ReactQuill>(null);
   const [emojiAnchorEl, setEmojiAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ mouseX: number; mouseY: number } | null>(null);
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+  const [linkText, setLinkText] = useState('');
+  const savedSelectionRef = useRef<{ index: number; length: number } | null>(null);
+
+  // Save cursor position continuously
+  useEffect(() => {
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+
+      const handleSelectionChange = () => {
+        const selection = editor.getSelection();
+        if (selection) {
+          savedSelectionRef.current = selection;
+        }
+      };
+
+      // Listen to selection changes
+      editor.on('selection-change', handleSelectionChange);
+
+      return () => {
+        editor.off('selection-change', handleSelectionChange);
+      };
+    }
+  }, []);
 
   // Handle emoji picker
   const handleEmojiClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    // Save current selection before opening picker
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const selection = editor.getSelection();
+      if (selection) {
+        savedSelectionRef.current = selection;
+      }
+    }
     setEmojiAnchorEl(event.currentTarget);
   };
 
@@ -39,15 +95,117 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const handleEmojiSelect = (emojiData: EmojiClickData) => {
     if (quillRef.current) {
       const editor = quillRef.current.getEditor();
-      const range = editor.getSelection();
-      const position = range ? range.index : editor.getLength();
+
+      // Restore focus first
+      editor.focus();
+
+      // Use saved selection
+      const selection = savedSelectionRef.current;
+      const position = selection ? selection.index : editor.getLength();
+
+      // Insert emoji at the saved position
       editor.insertText(position, emojiData.emoji);
+
+      // Move cursor after the emoji
       editor.setSelection(position + emojiData.emoji.length, 0);
     }
     handleEmojiClose();
   };
 
   const emojiOpen = Boolean(emojiAnchorEl);
+
+  // Handle context menu
+  const handleContextMenu = (event: React.MouseEvent) => {
+    if (readOnly) return;
+    event.preventDefault();
+    setContextMenu(
+      contextMenu === null
+        ? { mouseX: event.clientX - 2, mouseY: event.clientY - 4 }
+        : null
+    );
+  };
+
+  const handleContextMenuClose = () => {
+    setContextMenu(null);
+  };
+
+  const insertEmoji = () => {
+    handleContextMenuClose();
+    // Trigger emoji picker
+    const emojiButton = document.querySelector('[aria-label="Insert emoji"]') as HTMLButtonElement;
+    if (emojiButton) {
+      emojiButton.click();
+    }
+  };
+
+  const insertLink = () => {
+    handleContextMenuClose();
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const url = prompt(t('richTextEditor.enterUrl', 'Enter URL:'));
+      if (url) {
+        const selection = savedSelectionRef.current;
+        if (selection && selection.length > 0) {
+          editor.formatText(selection.index, selection.length, 'link', url);
+        } else {
+          const position = selection ? selection.index : editor.getLength();
+          editor.insertText(position, url, 'link', url);
+        }
+        editor.focus();
+      }
+    }
+  };
+
+  const formatBold = () => {
+    handleContextMenuClose();
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const selection = savedSelectionRef.current;
+      if (selection && selection.length > 0) {
+        const format = editor.getFormat(selection.index, selection.length);
+        editor.formatText(selection.index, selection.length, 'bold', !format.bold);
+        editor.focus();
+      }
+    }
+  };
+
+  const formatItalic = () => {
+    handleContextMenuClose();
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const selection = savedSelectionRef.current;
+      if (selection && selection.length > 0) {
+        const format = editor.getFormat(selection.index, selection.length);
+        editor.formatText(selection.index, selection.length, 'italic', !format.italic);
+        editor.focus();
+      }
+    }
+  };
+
+  const formatUnderline = () => {
+    handleContextMenuClose();
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const selection = savedSelectionRef.current;
+      if (selection && selection.length > 0) {
+        const format = editor.getFormat(selection.index, selection.length);
+        editor.formatText(selection.index, selection.length, 'underline', !format.underline);
+        editor.focus();
+      }
+    }
+  };
+
+  const clearFormatting = () => {
+    handleContextMenuClose();
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      const selection = savedSelectionRef.current;
+      if (selection && selection.length > 0) {
+        editor.removeFormat(selection.index, selection.length);
+        editor.focus();
+      }
+    }
+  };
 
   // Quill modules configuration
   const modules = useMemo(
@@ -247,29 +405,34 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
         },
       }}
     >
-        <ReactQuill
-          ref={quillRef}
-          theme="snow"
-          value={value}
-          onChange={onChange}
-          modules={modules}
-          formats={formats}
-          placeholder={placeholder}
-          readOnly={readOnly}
-        />
+        <Box onContextMenu={handleContextMenu}>
+          <ReactQuill
+            ref={quillRef}
+            theme="snow"
+            value={value}
+            onChange={onChange}
+            modules={modules}
+            formats={formats}
+            placeholder={placeholder}
+            readOnly={readOnly}
+          />
+        </Box>
       </Paper>
 
-      {/* Emoji Button - Positioned at the end of toolbar */}
+      {/* Emoji Button - Fixed position, doesn't scroll */}
       {!readOnly && (
         <IconButton
           onClick={handleEmojiClick}
           size="small"
+          aria-label="Insert emoji"
           sx={{
             position: 'absolute',
             top: '8px',
             right: '8px',
-            zIndex: 1,
+            zIndex: 10,
+            backgroundColor: theme.palette.background.paper,
             color: theme.palette.text.primary,
+            boxShadow: 1,
             '&:hover': {
               backgroundColor: theme.palette.action.hover,
             },
@@ -350,6 +513,55 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
           ]}
         />
       </Popover>
+
+      {/* Context Menu */}
+      <Menu
+        open={contextMenu !== null}
+        onClose={handleContextMenuClose}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          contextMenu !== null
+            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            : undefined
+        }
+      >
+        <MenuItem onClick={insertEmoji}>
+          <ListItemIcon>
+            <EmojiIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('richTextEditor.insertEmoji', 'Insert Emoji')}</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={insertLink}>
+          <ListItemIcon>
+            <LinkIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('richTextEditor.insertLink', 'Insert Link')}</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={formatBold}>
+          <ListItemIcon>
+            <BoldIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('richTextEditor.bold', 'Bold')}</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={formatItalic}>
+          <ListItemIcon>
+            <ItalicIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('richTextEditor.italic', 'Italic')}</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={formatUnderline}>
+          <ListItemIcon>
+            <UnderlineIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('richTextEditor.underline', 'Underline')}</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={clearFormatting}>
+          <ListItemIcon>
+            <ClearIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('richTextEditor.clearFormatting', 'Clear Formatting')}</ListItemText>
+        </MenuItem>
+      </Menu>
     </Box>
   );
 };

@@ -2593,7 +2593,11 @@
     "emojiActivities": "활동",
     "emojiObjects": "사물",
     "emojiSymbols": "기호",
-    "emojiFlags": "국기"
+    "emojiFlags": "국기",
+    "insertEmoji": "이모지 삽입",
+    "insertLink": "링크 삽입",
+    "clearFormatting": "서식 지우기",
+    "enterUrl": "URL을 입력하세요:"
   },
   "serviceNotices": {
     "title": "서비스 공지",
