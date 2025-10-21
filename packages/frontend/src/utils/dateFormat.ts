@@ -50,8 +50,10 @@ function toMoment(date: string | Date): moment.Moment | null {
 
   if (!dateObj || isNaN(dateObj.getTime())) return null;
 
-  // parseDateString에서 이미 timezone 변환이 완료되었으므로 그대로 사용
-  return moment(dateObj);
+  const timezone = getStoredTimezone();
+
+  // Convert UTC Date to moment with timezone
+  return moment.utc(dateObj).tz(timezone);
 }
 
 /**
@@ -224,34 +226,24 @@ export const isYesterday = (date: string | Date | null | undefined): boolean => 
   }
 };
 
-// 기존 파서 유지: ISO 또는 'YYYY-MM-DD HH:mm:ss' 지원
-// UTC 시간을 timezone에 맞춰 변환
+// Parse date string and treat as UTC (no timezone conversion)
+// This ensures that times are displayed consistently across all timezones
+// e.g., "12:00 UTC" is displayed as "12:00" regardless of user's timezone
 function parseDateString(input: string): Date | null {
   if (!input) return null;
 
-  const timezone = getStoredTimezone();
-
-  // ISO 형식 (T가 포함된 경우) - UTC를 timezone으로 변환
+  // ISO 형식 (T가 포함된 경우) - UTC 시간 그대로 사용
   if (/[Tt]/.test(input)) {
     const utcDate = new Date(input);
     if (isNaN(utcDate.getTime())) return null;
-
-    // timezone 변환 후 offset을 적용한 새로운 Date 생성
-    const converted = moment.utc(utcDate).tz(timezone);
-    const offsetMinutes = converted.utcOffset();
-    return new Date(utcDate.getTime() + (offsetMinutes * 60 * 1000));
+    return utcDate;
   }
 
-  // 'YYYY-MM-DD HH:mm:ss' 형식 - 데이터베이스에서 오는 UTC 시간으로 처리
+  // 'YYYY-MM-DD HH:mm:ss' 형식 - UTC 시간으로 처리
   const m = input.match(/^(\d{4})-(\d{2})-(\d{2})[\s](\d{2}):(\d{2}):(\d{2})$/);
   if (m) {
     const [, y, mo, d, h, mi, s] = m;
-    const utcDate = new Date(Date.UTC(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(s)));
-
-    // timezone 변환 후 offset을 적용한 새로운 Date 생성
-    const converted = moment.utc(utcDate).tz(timezone);
-    const offsetMinutes = converted.utcOffset();
-    return new Date(utcDate.getTime() + (offsetMinutes * 60 * 1000));
+    return new Date(Date.UTC(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(s)));
   }
 
   const fallback = new Date(input);

@@ -95,6 +95,7 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
       setTargetAccountIds(notice.targetAccountIds || []);
       setDisplayPriority(notice.displayPriority);
       setShowOnce(notice.showOnce);
+      // Parse UTC time and convert to local timezone for display
       setStartDate(dayjs(notice.startDate));
       setEndDate(dayjs(notice.endDate));
       setUseTemplate(notice.useTemplate);
@@ -164,6 +165,7 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
         targetAccountIds: targetAccountIds.length > 0 ? targetAccountIds : null,
         displayPriority,
         showOnce,
+        // Convert local time to UTC (12:00 KST -> 03:00 UTC)
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
         useTemplate,
