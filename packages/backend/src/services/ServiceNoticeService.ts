@@ -34,7 +34,8 @@ export interface UpdateServiceNoticeData extends Partial<CreateServiceNoticeData
 export interface ServiceNoticeFilters {
   isActive?: boolean;
   category?: string;
-  platform?: string;
+  platform?: string | string[];
+  platformOperator?: 'any_of' | 'include_all';
   search?: string;
 }
 
@@ -65,8 +66,23 @@ class ServiceNoticeService {
       }
 
       if (filters.platform) {
-        whereClauses.push('JSON_CONTAINS(platforms, ?)');
-        queryParams.push(JSON.stringify(filters.platform));
+        const platforms = Array.isArray(filters.platform) ? filters.platform : [filters.platform];
+        const operator = filters.platformOperator || 'any_of';
+
+        if (operator === 'include_all') {
+          // AND condition: notice must include ALL selected platforms
+          platforms.forEach(platform => {
+            whereClauses.push('JSON_CONTAINS(platforms, ?)');
+            queryParams.push(JSON.stringify(platform));
+          });
+        } else {
+          // OR condition: notice must include ANY of the selected platforms
+          const platformConditions = platforms.map(() => 'JSON_CONTAINS(platforms, ?)').join(' OR ');
+          whereClauses.push(`(${platformConditions})`);
+          platforms.forEach(platform => {
+            queryParams.push(JSON.stringify(platform));
+          });
+        }
       }
 
       if (filters.search) {

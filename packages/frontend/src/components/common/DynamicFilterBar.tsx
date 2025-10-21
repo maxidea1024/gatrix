@@ -671,12 +671,6 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
               onOpen={() => setSelectOpen(true)}
               onClose={() => {
                 setSelectOpen(false);
-                // Always exit editing mode when Select closes
-                const currentFilter = activeFilters.find(f => f.key === filter.key);
-                if (!currentFilter || !currentFilter.value || currentFilter.value === '') {
-                  // Remove filter if no value selected
-                  handleRemoveFilter(filter.key);
-                }
                 setEditingFilter(null);
               }}
               onChange={(e) => {

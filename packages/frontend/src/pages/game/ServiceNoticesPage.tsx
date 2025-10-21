@@ -26,6 +26,7 @@ import {
   ClickAwayListener,
   List,
   ListItem,
+  Skeleton,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -132,7 +133,8 @@ const ServiceNoticesPage: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -145,18 +147,29 @@ const ServiceNoticesPage: React.FC = () => {
 
   const categoryFilter = useMemo(() => {
     const filter = activeFilters.find(f => f.key === 'category');
-    return filter?.value as string | undefined;
+    return filter?.value as string[] | undefined;
   }, [activeFilters]);
 
   const platformFilter = useMemo(() => {
     const filter = activeFilters.find(f => f.key === 'platform');
-    return filter?.value as string | undefined;
+    return filter?.value as string[] | undefined;
+  }, [activeFilters]);
+
+  const platformOperator = useMemo(() => {
+    const filter = activeFilters.find(f => f.key === 'platform');
+    return filter?.operator;
   }, [activeFilters]);
 
   // Convert filters to strings for dependency array
   const isActiveFilterString = useMemo(() => isActiveFilter || '', [isActiveFilter]);
-  const categoryFilterString = useMemo(() => categoryFilter || '', [categoryFilter]);
-  const platformFilterString = useMemo(() => platformFilter || '', [platformFilter]);
+  const categoryFilterString = useMemo(() =>
+    Array.isArray(categoryFilter) ? categoryFilter.join(',') : '',
+    [categoryFilter]
+  );
+  const platformFilterString = useMemo(() =>
+    Array.isArray(platformFilter) ? platformFilter.join(',') : '',
+    [platformFilter]
+  );
 
   // Dialog states
   const [formDrawerOpen, setFormDrawerOpen] = useState(false);
@@ -224,7 +237,9 @@ const ServiceNoticesPage: React.FC = () => {
     {
       key: 'category',
       label: t('serviceNotices.category'),
-      type: 'select',
+      type: 'multiselect',
+      operator: 'any_of',
+      allowOperatorToggle: false,
       options: [
         { value: 'maintenance', label: t('serviceNotices.categories.maintenance') },
         { value: 'event', label: t('serviceNotices.categories.event') },
@@ -236,7 +251,9 @@ const ServiceNoticesPage: React.FC = () => {
     {
       key: 'platform',
       label: t('serviceNotices.platform'),
-      type: 'select',
+      type: 'multiselect',
+      operator: 'any_of',
+      allowOperatorToggle: true,
       options: [
         { value: 'pc', label: 'PC' },
         { value: 'pc-wegame', label: 'PC-WeGame' },
@@ -262,11 +279,12 @@ const ServiceNoticesPage: React.FC = () => {
       if (isActiveFilter !== undefined && isActiveFilter !== '') {
         filters.isActive = isActiveFilter === 'true';
       }
-      if (categoryFilter !== undefined && categoryFilter !== '') {
-        filters.category = categoryFilter;
+      if (Array.isArray(categoryFilter) && categoryFilter.length > 0) {
+        filters.category = categoryFilter[0];
       }
-      if (platformFilter !== undefined && platformFilter !== '') {
+      if (Array.isArray(platformFilter) && platformFilter.length > 0) {
         filters.platform = platformFilter;
+        filters.platformOperator = platformOperator;
       }
 
       const result = await serviceNoticeService.getServiceNotices(page + 1, rowsPerPage, filters);
@@ -287,6 +305,7 @@ const ServiceNoticesPage: React.FC = () => {
       setTotal(0);
     } finally {
       setLoading(false);
+      setIsInitialLoad(false);
     }
   };
 
@@ -297,10 +316,12 @@ const ServiceNoticesPage: React.FC = () => {
   // Filter handlers
   const handleFilterAdd = (filter: ActiveFilter) => {
     setActiveFilters([...activeFilters, filter]);
+    setPage(0);
   };
 
   const handleFilterRemove = (filterKey: string) => {
     setActiveFilters(activeFilters.filter(f => f.key !== filterKey));
+    setPage(0);
   };
 
   const handleDynamicFilterChange = (filterKey: string, value: any) => {
@@ -308,6 +329,7 @@ const ServiceNoticesPage: React.FC = () => {
       f.key === filterKey ? { ...f, value } : f
     );
     setActiveFilters(newFilters);
+    setPage(0);
   };
 
   const handleOperatorChange = (filterKey: string, operator: 'any_of' | 'include_all') => {
@@ -577,19 +599,30 @@ const ServiceNoticesPage: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {loading ? (
-                  <EmptyTableRow
-                    colSpan={visibleColumns.length + 2}
-                    loading={true}
-                    message=""
-                    loadingMessage={t('common.loadingData')}
-                  />
+                {isInitialLoad && loading ? (
+                  // Skeleton loading (only on initial load)
+                  Array.from({ length: 5 }).map((_, index) => (
+                    <TableRow key={`skeleton-${index}`}>
+                      <TableCell padding="checkbox">
+                        <Skeleton variant="rectangular" width={24} height={24} />
+                      </TableCell>
+                      {visibleColumns.map((column) => (
+                        <TableCell key={column.id}>
+                          <Skeleton variant="text" width="80%" />
+                        </TableCell>
+                      ))}
+                      <TableCell align="center">
+                        <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
+                        <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block', mr: 0.5 }} />
+                        <Skeleton variant="circular" width={32} height={32} sx={{ display: 'inline-block' }} />
+                      </TableCell>
+                    </TableRow>
+                  ))
                 ) : notices.length === 0 ? (
                   <EmptyTableRow
                     colSpan={visibleColumns.length + 2}
-                    loading={false}
+                    loading={loading}
                     message={t('serviceNotices.noNoticesFound')}
-                    loadingMessage=""
                   />
                 ) : (
                   notices.map((notice) => (

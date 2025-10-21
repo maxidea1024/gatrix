@@ -32,7 +32,8 @@ export interface UpdateServiceNoticeData extends Partial<CreateServiceNoticeData
 export interface ServiceNoticeFilters {
   isActive?: boolean;
   category?: string;
-  platform?: string;
+  platform?: string | string[];
+  platformOperator?: 'any_of' | 'include_all';
   search?: string;
 }
 
@@ -59,7 +60,13 @@ class ServiceNoticeService {
       params.category = filters.category;
     }
     if (filters.platform) {
-      params.platform = filters.platform;
+      // Send as comma-separated string if array
+      params.platform = Array.isArray(filters.platform)
+        ? filters.platform.join(',')
+        : filters.platform;
+    }
+    if (filters.platformOperator) {
+      params.platformOperator = filters.platformOperator;
     }
     if (filters.search) {
       params.search = filters.search;

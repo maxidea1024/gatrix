@@ -9,10 +9,20 @@ class ServiceNoticeController {
     try {
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
+
+      // Parse platform - can be string or array
+      let platform: string | string[] | undefined;
+      if (req.query.platform) {
+        platform = Array.isArray(req.query.platform)
+          ? req.query.platform as string[]
+          : (req.query.platform as string).split(',').filter(p => p.trim());
+      }
+
       const filters = {
         isActive: req.query.isActive !== undefined ? req.query.isActive === 'true' : undefined,
         category: req.query.category as string,
-        platform: req.query.platform as string,
+        platform,
+        platformOperator: req.query.platformOperator as 'any_of' | 'include_all' | undefined,
         search: req.query.search as string,
       };
 
