@@ -31,6 +31,7 @@ export interface UpdateServiceNoticeData extends Partial<CreateServiceNoticeData
 
 export interface ServiceNoticeFilters {
   isActive?: boolean;
+  currentlyVisible?: boolean;
   category?: string;
   platform?: string | string[];
   platformOperator?: 'any_of' | 'include_all';
@@ -55,6 +56,9 @@ class ServiceNoticeService {
 
     if (filters.isActive !== undefined) {
       params.isActive = filters.isActive;
+    }
+    if (filters.currentlyVisible !== undefined) {
+      params.currentlyVisible = filters.currentlyVisible;
     }
     if (filters.category) {
       params.category = filters.category;

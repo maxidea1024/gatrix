@@ -449,3 +449,119 @@ export const auditProfileUpdate = auditLog({
   getResourceId: (req: AuthenticatedRequest) => req.user?.userId?.toString(),
   getNewValues: (req: AuthenticatedRequest) => req.body,
 });
+
+// Service Notice actions
+export const auditServiceNoticeCreate = auditLog({
+  action: 'service_notice_create',
+  resourceType: 'service_notice',
+  getResourceIdFromResponse: (responseBody) => responseBody?.data?.notice?.id || responseBody?.notice?.id,
+  getNewValues: (req) => ({
+    title: req.body?.title,
+    category: req.body?.category,
+    platforms: req.body?.platforms,
+    isActive: req.body?.isActive,
+    startDate: req.body?.startDate,
+    endDate: req.body?.endDate,
+  }),
+});
+
+export const auditServiceNoticeUpdate = enhancedAuditLog({
+  action: 'service_notice_update',
+  resourceType: 'service_notice',
+  getResourceId: (req) => req.params?.id,
+  fetchOldValues: async (req) => {
+    const id = req.params?.id;
+    if (!id) return null;
+    try {
+      const ServiceNoticeService = require('../services/ServiceNoticeService').default;
+      const notice = await ServiceNoticeService.getServiceNoticeById(parseInt(id));
+      return {
+        title: notice.title,
+        category: notice.category,
+        platforms: notice.platforms,
+        isActive: notice.isActive,
+        startDate: notice.startDate,
+        endDate: notice.endDate,
+      };
+    } catch (error) {
+      return null;
+    }
+  },
+  getNewValues: (req) => ({
+    title: req.body?.title,
+    category: req.body?.category,
+    platforms: req.body?.platforms,
+    isActive: req.body?.isActive,
+    startDate: req.body?.startDate,
+    endDate: req.body?.endDate,
+  }),
+  getContext: (req, oldValues) => ({
+    operation: 'update_service_notice',
+    noticeTitle: oldValues?.title || req.body?.title,
+  }),
+});
+
+export const auditServiceNoticeDelete = enhancedAuditLog({
+  action: 'service_notice_delete',
+  resourceType: 'service_notice',
+  getResourceId: (req) => req.params?.id,
+  fetchOldValues: async (req) => {
+    const id = req.params?.id;
+    if (!id) return null;
+    try {
+      const ServiceNoticeService = require('../services/ServiceNoticeService').default;
+      const notice = await ServiceNoticeService.getServiceNoticeById(parseInt(id));
+      return {
+        title: notice.title,
+        category: notice.category,
+        platforms: notice.platforms,
+        isActive: notice.isActive,
+        startDate: notice.startDate,
+        endDate: notice.endDate,
+      };
+    } catch (error) {
+      return null;
+    }
+  },
+  getContext: (req, oldValues) => ({
+    operation: 'delete_service_notice',
+    noticeTitle: oldValues?.title,
+  }),
+});
+
+export const auditServiceNoticeBulkDelete = auditLog({
+  action: 'service_notice_bulk_delete',
+  resourceType: 'service_notice',
+  getNewValues: (req) => ({
+    ids: req.body?.ids,
+    count: req.body?.ids?.length || 0,
+  }),
+});
+
+export const auditServiceNoticeToggleActive = enhancedAuditLog({
+  action: 'service_notice_toggle_active',
+  resourceType: 'service_notice',
+  getResourceId: (req) => req.params?.id,
+  fetchOldValues: async (req) => {
+    const id = req.params?.id;
+    if (!id) return null;
+    try {
+      const ServiceNoticeService = require('../services/ServiceNoticeService').default;
+      const notice = await ServiceNoticeService.getServiceNoticeById(parseInt(id));
+      return {
+        title: notice.title,
+        isActive: notice.isActive,
+      };
+    } catch (error) {
+      return null;
+    }
+  },
+  getNewValues: (_req, _res, oldValues) => ({
+    isActive: !oldValues?.isActive,
+  }),
+  getContext: (_req, oldValues) => ({
+    operation: 'toggle_service_notice_status',
+    noticeTitle: oldValues?.title,
+    statusChange: `${oldValues?.isActive ? 'active' : 'inactive'} → ${!oldValues?.isActive ? 'active' : 'inactive'}`,
+  }),
+});

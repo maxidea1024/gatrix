@@ -21,6 +21,7 @@ import {
   Close as CloseIcon,
   FilterList as FilterListIcon,
   Tune as TuneIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
@@ -49,6 +50,11 @@ interface DynamicFilterBarProps {
   onFilterRemove: (filterKey: string) => void;
   onFilterChange: (filterKey: string, value: any) => void;
   onOperatorChange?: (filterKey: string, operator: 'any_of' | 'include_all') => void;
+  onRefresh?: () => void; // Optional refresh callback
+  refreshDisabled?: boolean; // Optional refresh button disabled state
+  leftActions?: React.ReactNode; // Optional left-aligned actions (before filters)
+  afterFilterAddActions?: React.ReactNode; // Optional actions after filter add button
+  noWrap?: boolean; // Optional: prevent wrapping to single line (default: false, allows wrapping)
 }
 
 const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
@@ -58,6 +64,11 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
   onFilterRemove,
   onFilterChange,
   onOperatorChange,
+  onRefresh,
+  refreshDisabled,
+  leftActions,
+  afterFilterAddActions,
+  noWrap = false,
 }) => {
   const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -997,70 +1008,117 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
   );
 
   return (
-    <>
-      {activeFilters.map(filter => (
-        <React.Fragment key={`filter-wrapper-${filter.key}`}>
-          {renderFilterValue(filter)}
-        </React.Fragment>
-      ))}
-
-      {availableToAdd.length > 0 && (
-        <>
-          <Button
-            startIcon={<TuneIcon sx={{ fontSize: 18 }} />}
-            onClick={handleOpenMenu}
-            variant="text"
-            size="small"
-            sx={{
-              height: '32px',
-              minWidth: 'auto',
-              px: 1.5,
-              py: 0.5,
-              textTransform: 'none',
-              color: 'text.secondary',
-              fontSize: '0.875rem',
-              fontWeight: 500,
-              border: 'none',
-              '&:hover': {
-                bgcolor: 'action.hover',
-                color: 'primary.main',
-              }
-            }}
-          >
-            {t('common.filters.title')}
-          </Button>
-
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleCloseMenu}
-            PaperProps={{
-              sx: {
-                mt: 0.5,
-                minWidth: 180,
-                boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-              }
-            }}
-          >
-            {availableToAdd.map(filterDef => (
-              <MenuItem
-                key={`add-filter-${filterDef.key}`}
-                onClick={() => handleAddFilter(filterDef)}
-                sx={{
-                  fontSize: '0.875rem',
-                  py: 1,
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                  }
-                }}
-              >
-                {filterDef.label}
-              </MenuItem>
-            ))}
-          </Menu>
-        </>
+    <Box sx={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 1,
+      width: noWrap ? '100%' : 'auto',
+      flexWrap: noWrap ? 'nowrap' : 'wrap',
+    }}>
+      {/* Left Actions - Before filters */}
+      {leftActions && (
+        <Box sx={{ flexShrink: 0 }}>
+          {leftActions}
+        </Box>
       )}
-    </>
+
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1,
+        flex: noWrap ? 1 : 'auto',
+        minWidth: noWrap ? 0 : 'auto',
+        overflow: noWrap ? 'auto' : 'visible',
+        flexWrap: noWrap ? 'nowrap' : 'wrap',
+      }}>
+        {activeFilters.map(filter => (
+          <React.Fragment key={`filter-wrapper-${filter.key}`}>
+            {renderFilterValue(filter)}
+          </React.Fragment>
+        ))}
+
+        {availableToAdd.length > 0 && (
+          <>
+            <Button
+              startIcon={<TuneIcon sx={{ fontSize: 18 }} />}
+              onClick={handleOpenMenu}
+              variant="text"
+              size="small"
+              sx={{
+                height: '32px',
+                minWidth: 'auto',
+                px: 1.5,
+                py: 0.5,
+                textTransform: 'none',
+                color: 'text.secondary',
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                border: 'none',
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                  color: 'primary.main',
+                }
+              }}
+            >
+              {t('common.filters.title')}
+            </Button>
+
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleCloseMenu}
+              PaperProps={{
+                sx: {
+                  mt: 0.5,
+                  minWidth: 180,
+                  boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                }
+              }}
+            >
+              {availableToAdd.map(filterDef => (
+                <MenuItem
+                  key={`add-filter-${filterDef.key}`}
+                  onClick={() => handleAddFilter(filterDef)}
+                  sx={{
+                    fontSize: '0.875rem',
+                    py: 1,
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                    }
+                  }}
+                >
+                  {filterDef.label}
+                </MenuItem>
+              ))}
+            </Menu>
+          </>
+        )}
+
+        {/* Actions after filter add button */}
+        {afterFilterAddActions && (
+          <Box sx={{ flexShrink: 0 }}>
+            {afterFilterAddActions}
+          </Box>
+        )}
+      </Box>
+
+      {/* Refresh Button - Right aligned */}
+      {onRefresh && (
+        <Box sx={{ flexShrink: 0 }}>
+          <Tooltip title={refreshDisabled ? '' : t('common.refresh')}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={onRefresh}
+                disabled={refreshDisabled}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </Box>
+      )}
+    </Box>
   );
 };
 

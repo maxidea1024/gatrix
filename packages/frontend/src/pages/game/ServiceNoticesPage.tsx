@@ -145,6 +145,11 @@ const ServiceNoticesPage: React.FC = () => {
     return filter?.value as string | undefined;
   }, [activeFilters]);
 
+  const currentlyVisibleFilter = useMemo(() => {
+    const filter = activeFilters.find(f => f.key === 'currentlyVisible');
+    return filter?.value as string | undefined;
+  }, [activeFilters]);
+
   const categoryFilter = useMemo(() => {
     const filter = activeFilters.find(f => f.key === 'category');
     return filter?.value as string[] | undefined;
@@ -162,6 +167,7 @@ const ServiceNoticesPage: React.FC = () => {
 
   // Convert filters to strings for dependency array
   const isActiveFilterString = useMemo(() => isActiveFilter || '', [isActiveFilter]);
+  const currentlyVisibleFilterString = useMemo(() => currentlyVisibleFilter || '', [currentlyVisibleFilter]);
   const categoryFilterString = useMemo(() =>
     Array.isArray(categoryFilter) ? categoryFilter.join(',') : '',
     [categoryFilter]
@@ -182,6 +188,7 @@ const ServiceNoticesPage: React.FC = () => {
   // Default column configuration - title moved to first position
   const defaultColumns: ColumnConfig[] = [
     { id: 'title', labelKey: 'serviceNotices.noticeTitle', visible: true },
+    { id: 'currentlyVisible', labelKey: 'serviceNotices.currentlyVisible', visible: true },
     { id: 'status', labelKey: 'serviceNotices.status', visible: true },
     { id: 'category', labelKey: 'serviceNotices.category', visible: true },
     { id: 'platforms', labelKey: 'serviceNotices.platforms', visible: true },
@@ -235,6 +242,15 @@ const ServiceNoticesPage: React.FC = () => {
       ],
     },
     {
+      key: 'currentlyVisible',
+      label: t('serviceNotices.currentlyVisible'),
+      type: 'select',
+      options: [
+        { value: 'true', label: t('serviceNotices.visible') },
+        { value: 'false', label: t('serviceNotices.notVisible') },
+      ],
+    },
+    {
       key: 'category',
       label: t('serviceNotices.category'),
       type: 'multiselect',
@@ -279,6 +295,9 @@ const ServiceNoticesPage: React.FC = () => {
       if (isActiveFilter !== undefined && isActiveFilter !== '') {
         filters.isActive = isActiveFilter === 'true';
       }
+      if (currentlyVisibleFilter !== undefined && currentlyVisibleFilter !== '') {
+        filters.currentlyVisible = currentlyVisibleFilter === 'true';
+      }
       if (Array.isArray(categoryFilter) && categoryFilter.length > 0) {
         filters.category = categoryFilter[0];
       }
@@ -311,7 +330,7 @@ const ServiceNoticesPage: React.FC = () => {
 
   useEffect(() => {
     loadNotices();
-  }, [page, rowsPerPage, debouncedSearchTerm, isActiveFilterString, categoryFilterString, platformFilterString]);
+  }, [page, rowsPerPage, debouncedSearchTerm, isActiveFilterString, currentlyVisibleFilterString, categoryFilterString, platformFilterString]);
 
   // Filter handlers
   const handleFilterAdd = (filter: ActiveFilter) => {
@@ -480,16 +499,16 @@ const ServiceNoticesPage: React.FC = () => {
       {/* Search and Filters Card */}
       <Card sx={{ mb: 2 }}>
         <CardContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', justifyContent: 'space-between' }}>
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', flexGrow: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'nowrap', flexGrow: 1, minWidth: 0 }}>
               <TextField
                 placeholder={t('serviceNotices.searchPlaceholder')}
                 value={searchTerm}
                 onChange={handleSearchChange}
                 sx={{
-                  minWidth: 200,
+                  minWidth: 300,
                   flexGrow: 1,
-                  maxWidth: 320,
+                  maxWidth: 500,
                   '& .MuiOutlinedInput-root': {
                     height: '40px',
                     borderRadius: '20px',
@@ -527,34 +546,35 @@ const ServiceNoticesPage: React.FC = () => {
                 size="small"
               />
 
-              {/* Dynamic Filter Bar */}
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
-                <DynamicFilterBar
-                  availableFilters={availableFilterDefinitions}
-                  activeFilters={activeFilters}
-                  onFilterAdd={handleFilterAdd}
-                  onFilterRemove={handleFilterRemove}
-                  onFilterChange={handleDynamicFilterChange}
-                  onOperatorChange={handleOperatorChange}
-                />
-
-                {/* Column Settings Button */}
-                <Tooltip title={t('users.columnSettings')}>
-                  <IconButton
-                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                    sx={{
-                      bgcolor: 'background.paper',
-                      border: 1,
-                      borderColor: 'divider',
-                      '&:hover': {
-                        bgcolor: 'action.hover',
-                      },
-                    }}
-                  >
-                    <ViewColumnIcon />
-                  </IconButton>
-                </Tooltip>
-              </Box>
+              {/* Dynamic Filter Bar with Column Settings and Refresh Button */}
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleDynamicFilterChange}
+                onOperatorChange={handleOperatorChange}
+                onRefresh={loadNotices}
+                refreshDisabled={loading}
+                noWrap={true}
+                afterFilterAddActions={
+                  <Tooltip title={t('users.columnSettings')}>
+                    <IconButton
+                      onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                      sx={{
+                        bgcolor: 'background.paper',
+                        border: 1,
+                        borderColor: 'divider',
+                        '&:hover': {
+                          bgcolor: 'action.hover',
+                        },
+                      }}
+                    >
+                      <ViewColumnIcon />
+                    </IconButton>
+                  </Tooltip>
+                }
+              />
             </Box>
           </Box>
         </CardContent>
@@ -644,6 +664,40 @@ const ServiceNoticesPage: React.FC = () => {
                                 onClick={() => handleToggleActive(notice)}
                                 sx={{ cursor: 'pointer' }}
                               />
+                            </TableCell>
+                          );
+                        }
+                        if (column.id === 'currentlyVisible') {
+                          // Check if notice is currently visible (isActive + within date range)
+                          const now = new Date();
+                          const startDate = new Date(notice.startDate);
+                          const endDate = new Date(notice.endDate);
+                          const isCurrentlyVisible = notice.isActive && now >= startDate && now <= endDate;
+
+                          // Create tooltip message
+                          const tooltipMessage = isCurrentlyVisible
+                            ? t('serviceNotices.currentlyVisibleTooltip', {
+                                time: formatDateTime(now),
+                                start: formatDateTime(startDate),
+                                end: formatDateTime(endDate)
+                              })
+                            : t('serviceNotices.notVisibleTooltip', {
+                                time: formatDateTime(now),
+                                start: formatDateTime(startDate),
+                                end: formatDateTime(endDate),
+                                isActive: notice.isActive
+                              });
+
+                          return (
+                            <TableCell key={column.id}>
+                              <Tooltip title={tooltipMessage} arrow>
+                                <Chip
+                                  label={isCurrentlyVisible ? t('serviceNotices.visible') : t('serviceNotices.notVisible')}
+                                  color={isCurrentlyVisible ? 'primary' : 'default'}
+                                  size="small"
+                                  variant={isCurrentlyVisible ? 'filled' : 'outlined'}
+                                />
+                              </Tooltip>
                             </TableCell>
                           );
                         }

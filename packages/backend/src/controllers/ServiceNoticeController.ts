@@ -20,6 +20,7 @@ class ServiceNoticeController {
 
       const filters = {
         isActive: req.query.isActive !== undefined ? req.query.isActive === 'true' : undefined,
+        currentlyVisible: req.query.currentlyVisible !== undefined ? req.query.currentlyVisible === 'true' : undefined,
         category: req.query.category as string,
         platform,
         platformOperator: req.query.platformOperator as 'any_of' | 'include_all' | undefined,

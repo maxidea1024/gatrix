@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React App Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-section {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+        .test-section.error {
+            border-left-color: #f44336;
+        }
+        h1 {
+            color: #333;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.ok {
+            background: #4CAF50;
+            color: white;
+        }
+        .status.fail {
+            background: #f44336;
+            color: white;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>React App 로딩 테스트</h1>
+    <div id="results"></div>
+    
+    <h2>실제 React 앱 미리보기</h2>
+    <p>아래 iframe에서 React 앱이 보이나요?</p>
+    <iframe id="preview" src="/service-notices-preview"></iframe>
+
+    <script>
+        var results = document.getElementById('results');
+        
+        function addResult(title, status, message, isError) {
+            var section = document.createElement('div');
+            section.className = 'test-section' + (isError ? ' error' : '');
+            
+            var statusSpan = document.createElement('span');
+            statusSpan.className = 'status ' + (status ? 'ok' : 'fail');
+            statusSpan.textContent = status ? 'OK' : 'FAIL';
+            
+            var heading = document.createElement('h2');
+            heading.textContent = title;
+            heading.appendChild(statusSpan);
+            
+            var content = document.createElement('pre');
+            content.textContent = message;
+            
+            section.appendChild(heading);
+            section.appendChild(content);
+            results.appendChild(section);
+        }
+
+        // Test 1: Check if root element exists in main app
+        setTimeout(function() {
+            var iframe = document.getElementById('preview');
+            
+            iframe.onload = function() {
+                try {
+                    var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    var root = iframeDoc.getElementById('root');
+                    
+                    if (root) {
+                        var hasContent = root.innerHTML.length > 0;
+                        var bgColor = window.getComputedStyle(root).backgroundColor;
+                        
+                        addResult('1. React Root Element', 
+                            hasContent, 
+                            'Root element exists: ' + (root ? 'Yes' : 'No') + '\n' +
+                            'Has content: ' + (hasContent ? 'Yes (' + root.innerHTML.length + ' chars)' : 'No') + '\n' +
+                            'Background color: ' + bgColor + '\n' +
+                            'First 200 chars:\n' + root.innerHTML.substring(0, 200),
+                            !hasContent);
+                    } else {
+                        addResult('1. React Root Element', false, 'Root element not found!', true);
+                    }
+                    
+                    // Check body background
+                    var bodyBg = window.getComputedStyle(iframeDoc.body).backgroundColor;
+                    addResult('2. Body Background', true, 'Body background: ' + bodyBg);
+                    
+                    // Check for React
+                    var hasReact = typeof iframe.contentWindow.React !== 'undefined';
+                    addResult('3. React Library', hasReact, 
+                        'React loaded: ' + (hasReact ? 'Yes' : 'No'));
+                    
+                    // Check console errors
+                    var originalConsoleError = iframe.contentWindow.console.error;
+                    var errors = [];
+                    iframe.contentWindow.console.error = function() {
+                        errors.push(Array.prototype.slice.call(arguments).join(' '));
+                        originalConsoleError.apply(console, arguments);
+                    };
+                    
+                    setTimeout(function() {
+                        if (errors.length > 0) {
+                            addResult('4. Console Errors', false, 
+                                'Errors found:\n' + errors.join('\n'), true);
+                        } else {
+                            addResult('4. Console Errors', true, 'No errors detected');
+                        }
+                    }, 2000);
+                    
+                } catch (e) {
+                    addResult('Error', false, 
+                        'Cannot access iframe content (CORS?):\n' + e.message, true);
+                }
+            };
+            
+            iframe.onerror = function() {
+                addResult('iframe Load', false, 'Failed to load iframe', true);
+            };
+        }, 100);
+
+        // Test 2: Direct API call
+        setTimeout(function() {
+            var apiUrl = window.location.protocol + '//' + window.location.host + '/api/service-notices?page=1&limit=1&isActive=true';
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', apiUrl, true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    try {
+                        var data = JSON.parse(xhr.responseText);
+                        addResult('5. API Response', true, 
+                            'Status: ' + xhr.status + '\n' +
+                            'Notices count: ' + (data.notices ? data.notices.length : 0) + '\n' +
+                            'Response preview:\n' + JSON.stringify(data, null, 2).substring(0, 300));
+                    } catch (e) {
+                        addResult('5. API Response', false, 
+                            'JSON parse error: ' + e.message, true);
+                    }
+                } else {
+                    addResult('5. API Response', false, 
+                        'HTTP ' + xhr.status + ': ' + xhr.statusText, true);
+                }
+            };
+            xhr.onerror = function() {
+                addResult('5. API Response', false, 'Network error', true);
+            };
+            xhr.send();
+        }, 500);
+
+        // Test 3: Check main app HTML
+        setTimeout(function() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/service-notices-preview', true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var html = xhr.responseText;
+                    var hasRoot = html.indexOf('id="root"') !== -1;
+                    var hasScript = html.indexOf('<script') !== -1;
+                    
+                    addResult('6. HTML Structure', hasRoot && hasScript,
+                        'Has root div: ' + (hasRoot ? 'Yes' : 'No') + '\n' +
+                        'Has script tags: ' + (hasScript ? 'Yes' : 'No') + '\n' +
+                        'HTML length: ' + html.length + ' chars\n' +
+                        'First 500 chars:\n' + html.substring(0, 500),
+                        !hasRoot || !hasScript);
+                } else {
+                    addResult('6. HTML Structure', false,
+                        'Failed to load HTML: ' + xhr.status, true);
+                }
+            };
+            xhr.send();
+        }, 1000);
+    </script>
+</body>
+</html>
+

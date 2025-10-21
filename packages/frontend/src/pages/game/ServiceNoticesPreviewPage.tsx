@@ -102,6 +102,16 @@ const ServiceNoticesPreviewPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Debug: Log to console for UE4 debugging
+  useEffect(() => {
+    console.log('[ServiceNoticesPreview] Component mounted');
+    console.log('[ServiceNoticesPreview] User Agent:', navigator.userAgent);
+    console.log('[ServiceNoticesPreview] Window size:', window.innerWidth, 'x', window.innerHeight);
+    return () => {
+      console.log('[ServiceNoticesPreview] Component unmounted');
+    };
+  }, []);
+
   // Prevent body scroll
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -125,12 +135,15 @@ const ServiceNoticesPreviewPage: React.FC = () => {
   useEffect(() => {
     const loadNotices = async () => {
       try {
+        console.log('[ServiceNoticesPreview] Starting to load notices...');
         setLoading(true);
         setError(null);
-        
+
         // Get all active notices
+        console.log('[ServiceNoticesPreview] Calling API...');
         const result = await serviceNoticeService.getServiceNotices(1, 100, { isActive: true });
-        
+        console.log('[ServiceNoticesPreview] API response:', result);
+
         if (result && result.notices) {
           // Filter notices that are currently active (within date range)
           const now = new Date();
@@ -139,12 +152,14 @@ const ServiceNoticesPreviewPage: React.FC = () => {
             const endDate = new Date(notice.endDate);
             return now >= startDate && now <= endDate;
           });
-          
+
+          console.log('[ServiceNoticesPreview] Active notices count:', activeNotices.length);
           setNotices(activeNotices);
 
           // Select first notice by default and mark as read
           if (activeNotices.length > 0 && !selectedNotice) {
             const firstNotice = activeNotices[0];
+            console.log('[ServiceNoticesPreview] Selecting first notice:', firstNotice.id);
             setSelectedNotice(firstNotice);
 
             // Mark first notice as read automatically
@@ -155,11 +170,19 @@ const ServiceNoticesPreviewPage: React.FC = () => {
               saveReadNotices(newReadNotices);
             }
           }
+        } else {
+          console.warn('[ServiceNoticesPreview] No result or notices from API');
         }
       } catch (err: any) {
-        console.error('Failed to load notices:', err);
+        console.error('[ServiceNoticesPreview] Failed to load notices:', err);
+        console.error('[ServiceNoticesPreview] Error details:', {
+          message: err.message,
+          stack: err.stack,
+          name: err.name
+        });
         setError(err.message || t('serviceNotices.loadFailed'));
       } finally {
+        console.log('[ServiceNoticesPreview] Loading complete');
         setLoading(false);
       }
     };
@@ -352,7 +375,7 @@ const ServiceNoticesPreviewPage: React.FC = () => {
               >
                 <Box sx={{ width: '100%' }}>
                   {/* Title with unread indicator and category icon */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     {/* Category Icon */}
                     <Box
                       sx={{
@@ -391,18 +414,6 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                       />
                     )}
                   </Box>
-
-                  {/* Date and time info */}
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: selectedNotice?.id === notice.id ? GAME_COLORS.textSelected : 'rgba(232, 221, 208, 0.7)',
-                      display: 'block',
-                      textAlign: 'right',
-                    }}
-                  >
-                    {formatDateTime(notice.startDate)} ~ {formatDateTime(notice.endDate)}
-                  </Typography>
                 </Box>
               </ListItemButton>
             </ListItem>

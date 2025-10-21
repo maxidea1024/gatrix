@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { CssBaseline, Box } from '@mui/material';
+import { CssBaseline, Box, GlobalStyles } from '@mui/material';
 import { SnackbarProvider } from 'notistack';
 
 // MUI Date Pickers
@@ -16,10 +16,10 @@ import { zhCN } from '@mui/x-date-pickers/locales';
 import { enUS } from '@mui/x-date-pickers/locales';
 
 // Styles
+import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import './styles/fullcalendar.css';
 import './styles/chat.css';
-import './styles/scrollbar.css';
-import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
+import './styles/scrollbar.css'; // Must be last to override all other scrollbar styles
 
 // Contexts
 import { AuthProvider } from './contexts/AuthContext';
@@ -240,6 +240,33 @@ const AppContent: React.FC = () => {
         <AuthInitializer>
           <LocalizedDatePickers>
             <CssBaseline />
+            {/* Global scrollbar styles */}
+            <GlobalStyles
+              styles={(theme) => ({
+                // Firefox - thin scrollbar for all elements
+                'html, body, *, div, main, section, article, aside, nav': {
+                  scrollbarWidth: 'thin',
+                },
+                // WebKit/Blink (Chrome, Edge, Safari)
+                'html::-webkit-scrollbar, body::-webkit-scrollbar, *::-webkit-scrollbar, div::-webkit-scrollbar': {
+                  width: '8px',
+                  height: '8px',
+                },
+                'html::-webkit-scrollbar-track, body::-webkit-scrollbar-track, *::-webkit-scrollbar-track, div::-webkit-scrollbar-track': {
+                  background: 'transparent',
+                },
+                'html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, *::-webkit-scrollbar-thumb, div::-webkit-scrollbar-thumb': {
+                  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+                  borderRadius: '4px',
+                },
+                'html::-webkit-scrollbar-thumb:hover, body::-webkit-scrollbar-thumb:hover, *::-webkit-scrollbar-thumb:hover, div::-webkit-scrollbar-thumb:hover': {
+                  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+                },
+                'html::-webkit-scrollbar-thumb:active, body::-webkit-scrollbar-thumb:active, *::-webkit-scrollbar-thumb:active, div::-webkit-scrollbar-thumb:active': {
+                  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)',
+                },
+              })}
+            />
             <SnackbarProvider
               maxSnack={3}
               autoHideDuration={3000}

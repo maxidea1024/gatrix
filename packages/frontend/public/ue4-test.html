@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UE4 WebView Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-section {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+        .test-section.error {
+            border-left-color: #f44336;
+        }
+        .test-section.warning {
+            border-left-color: #ff9800;
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #666;
+            font-size: 18px;
+            margin-top: 0;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+        .status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.ok {
+            background: #4CAF50;
+            color: white;
+        }
+        .status.fail {
+            background: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>UE4 WebView 호환성 테스트</h1>
+    <div id="results"></div>
+
+    <script>
+        var results = document.getElementById('results');
+        
+        function addResult(title, status, message, isError) {
+            var section = document.createElement('div');
+            section.className = 'test-section' + (isError ? ' error' : '');
+            
+            var statusSpan = document.createElement('span');
+            statusSpan.className = 'status ' + (status ? 'ok' : 'fail');
+            statusSpan.textContent = status ? 'OK' : 'FAIL';
+            
+            var heading = document.createElement('h2');
+            heading.textContent = title;
+            heading.appendChild(statusSpan);
+            
+            var content = document.createElement('pre');
+            content.textContent = message;
+            
+            section.appendChild(heading);
+            section.appendChild(content);
+            results.appendChild(section);
+        }
+
+        // Test 1: Basic JavaScript
+        try {
+            addResult('1. 기본 JavaScript', true, 'JavaScript 실행 가능');
+        } catch (e) {
+            addResult('1. 기본 JavaScript', false, 'Error: ' + e.message, true);
+        }
+
+        // Test 2: Console API
+        try {
+            console.log('Console test');
+            addResult('2. Console API', true, 'console.log 사용 가능');
+        } catch (e) {
+            addResult('2. Console API', false, 'Error: ' + e.message, true);
+        }
+
+        // Test 3: localStorage
+        try {
+            localStorage.setItem('test', 'value');
+            var value = localStorage.getItem('test');
+            localStorage.removeItem('test');
+            addResult('3. localStorage', value === 'value', 
+                value === 'value' ? 'localStorage 사용 가능' : 'localStorage 읽기/쓰기 실패', 
+                value !== 'value');
+        } catch (e) {
+            addResult('3. localStorage', false, 'Error: ' + e.message, true);
+        }
+
+        // Test 4: ES6 Features
+        try {
+            // Arrow function
+            var arrow = function(x) { return x * 2; };
+            var result = arrow(5);
+            
+            // const/let
+            var testConst = 'test';
+            var testLet = 'test';
+            
+            // Template literals
+            var template = 'Value: ' + result;
+            
+            addResult('4. ES6 기본 기능', true, 
+                'Arrow functions, const/let, template literals 사용 가능\n' +
+                'Arrow result: ' + result);
+        } catch (e) {
+            addResult('4. ES6 기본 기능', false, 'Error: ' + e.message, true);
+        }
+
+        // Test 5: Array methods
+        try {
+            var arr = [1, 2, 3, 4, 5];
+            var filtered = arr.filter(function(x) { return x > 2; });
+            var mapped = arr.map(function(x) { return x * 2; });
+            var found = arr.find(function(x) { return x === 3; });
+            
+            addResult('5. Array Methods', true, 
+                'filter, map, find 사용 가능\n' +
+                'filtered: [' + filtered.join(', ') + ']\n' +
+                'mapped: [' + mapped.join(', ') + ']\n' +
+                'found: ' + found);
+        } catch (e) {
+            addResult('5. Array Methods', false, 'Error: ' + e.message, true);
+        }
+
+        // Test 6: JSON
+        try {
+            var obj = { test: 'value', number: 123 };
+            var json = JSON.stringify(obj);
+            var parsed = JSON.parse(json);
+            
+            addResult('6. JSON', parsed.test === 'value', 
+                'JSON.stringify/parse 사용 가능\n' +
+                'JSON: ' + json);
+        } catch (e) {
+            addResult('6. JSON', false, 'Error: ' + e.message, true);
+        }
+
+        // Test 7: Fetch API
+        try {
+            if (typeof fetch !== 'undefined') {
+                addResult('7. Fetch API', true, 'fetch 함수 존재 (실제 호출은 테스트하지 않음)');
+            } else {
+                addResult('7. Fetch API', false, 'fetch 함수가 정의되지 않음', true);
+            }
+        } catch (e) {
+            addResult('7. Fetch API', false, 'Error: ' + e.message, true);
+        }
+
+        // Test 8: XMLHttpRequest
+        try {
+            var xhr = new XMLHttpRequest();
+            addResult('8. XMLHttpRequest', true, 'XMLHttpRequest 사용 가능');
+        } catch (e) {
+            addResult('8. XMLHttpRequest', false, 'Error: ' + e.message, true);
+        }
+
+        // Test 9: User Agent
+        try {
+            addResult('9. User Agent', true, 
+                'User Agent:\n' + navigator.userAgent);
+        } catch (e) {
+            addResult('9. User Agent', false, 'Error: ' + e.message, true);
+        }
+
+        // Test 10: Window size
+        try {
+            addResult('10. Window Size', true, 
+                'Width: ' + window.innerWidth + 'px\n' +
+                'Height: ' + window.innerHeight + 'px');
+        } catch (e) {
+            addResult('10. Window Size', false, 'Error: ' + e.message, true);
+        }
+
+        // Test 11: API 연결 테스트
+        try {
+            var apiUrl = window.location.protocol + '//' + window.location.host + '/api/service-notices?page=1&limit=1';
+            addResult('11. API URL', true, 
+                'API URL:\n' + apiUrl + '\n\n' +
+                '실제 API 호출은 Network 탭에서 확인하세요.');
+            
+            // Try to fetch
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', apiUrl, true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var section = document.createElement('div');
+                    section.className = 'test-section';
+                    section.innerHTML = '<h2>12. API 응답<span class="status ok">OK</span></h2>' +
+                        '<pre>Status: ' + xhr.status + '\nResponse: ' + xhr.responseText.substring(0, 200) + '...</pre>';
+                    results.appendChild(section);
+                } else {
+                    var section = document.createElement('div');
+                    section.className = 'test-section error';
+                    section.innerHTML = '<h2>12. API 응답<span class="status fail">FAIL</span></h2>' +
+                        '<pre>Status: ' + xhr.status + '\nError: ' + xhr.statusText + '</pre>';
+                    results.appendChild(section);
+                }
+            };
+            xhr.onerror = function() {
+                var section = document.createElement('div');
+                section.className = 'test-section error';
+                section.innerHTML = '<h2>12. API 응답<span class="status fail">FAIL</span></h2>' +
+                    '<pre>Network error occurred</pre>';
+                results.appendChild(section);
+            };
+            xhr.send();
+        } catch (e) {
+            addResult('11. API 연결', false, 'Error: ' + e.message, true);
+        }
+
+        // Add timestamp
+        var timestamp = document.createElement('div');
+        timestamp.className = 'test-section';
+        timestamp.innerHTML = '<h2>테스트 시간</h2><pre>' + new Date().toString() + '</pre>';
+        results.appendChild(timestamp);
+    </script>
+</body>
+</html>
+

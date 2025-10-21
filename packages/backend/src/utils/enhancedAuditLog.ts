@@ -77,17 +77,17 @@ export const enhancedAuditLog = (options: EnhancedAuditLogOptions) => {
         }
 
         // Get new values with context
-        const newValues = options.getNewValues 
-          ? options.getNewValues(req, res, oldValues) 
+        const newValues = options.getNewValues
+          ? options.getNewValues(req, res, oldValues)
           : req.body;
 
         // Get additional context
-        const context = options.getContext 
+        const context = options.getContext
           ? options.getContext(req, oldValues, newValues)
           : undefined;
 
         // Merge context into newValues if provided
-        const finalNewValues = context 
+        const finalNewValues = context
           ? { ...newValues, _context: context }
           : newValues;
 

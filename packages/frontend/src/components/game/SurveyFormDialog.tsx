@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Drawer,
+  AppBar,
+  Toolbar,
   Button,
   TextField,
   Box,
@@ -12,14 +11,14 @@ import {
   Chip,
   FormControlLabel,
   Switch,
-  Divider,
   MenuItem,
   Select,
   FormControl,
   InputLabel,
   Paper,
+  Stack,
 } from '@mui/material';
-import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { Add as AddIcon, Delete as DeleteIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import surveyService, { Survey, TriggerCondition, ParticipationReward } from '../../services/surveyService';
@@ -172,37 +171,92 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>
-        <Box>
-          <Typography variant="h6">
-            {survey ? t('surveys.editSurvey') : t('surveys.createSurvey')}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {t('surveys.formSubtitle')}
-          </Typography>
-        </Box>
-      </DialogTitle>
-      <DialogContent dividers>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Drawer
+      anchor="right"
+      open={open}
+      onClose={onClose}
+      PaperProps={{
+        sx: { width: { xs: '100%', sm: 600, md: 800 } }
+      }}
+    >
+      {/* Header */}
+      <AppBar position="static" color="default" elevation={0} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Toolbar>
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography variant="h6">
+              {survey ? t('surveys.editSurvey') : t('surveys.createSurvey')}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {t('surveys.formSubtitle')}
+            </Typography>
+          </Box>
+          <IconButton edge="end" onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+
+      {/* Content */}
+      <Box
+        sx={{
+          flex: 1,
+          overflow: 'auto',
+          p: 3,
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'transparent',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.2)'
+                : 'rgba(0, 0, 0, 0.2)',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            background: (theme) =>
+              theme.palette.mode === 'dark'
+                ? 'rgba(255, 255, 255, 0.3)'
+                : 'rgba(0, 0, 0, 0.3)',
+          },
+          scrollbarWidth: 'thin',
+          scrollbarColor: (theme) =>
+            theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, 0.2) transparent'
+              : 'rgba(0, 0, 0, 0.2) transparent',
+        }}
+      >
+        <Stack spacing={3}>
           {/* Section 1: Survey Participation */}
-          <Paper
-            variant="outlined"
-            sx={{
-              p: 2.5,
-              borderRadius: 1,
-            }}
-          >
+          <Box>
             <Typography
               variant="subtitle1"
               sx={{
                 mb: 2,
                 fontWeight: 600,
+                color: 'primary.main',
               }}
             >
               {t('surveys.section.participation')}
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Stack spacing={2}>
+              <Box>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={isActive}
+                      onChange={(e) => setIsActive(e.target.checked)}
+                    />
+                  }
+                  label={t('surveys.isActive')}
+                />
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', ml: 4, mt: 0.5 }}>
+                  {t('surveys.isActiveHelp')}
+                </Typography>
+              </Box>
+
               <TextField
                 label={t('surveys.platformSurveyId')}
                 value={platformSurveyId}
@@ -227,16 +281,6 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                 multiline
                 rows={3}
                 fullWidth
-              />
-
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={isActive}
-                    onChange={(e) => setIsActive(e.target.checked)}
-                  />
-                }
-                label={t('surveys.isActive')}
               />
 
               {/* Trigger Conditions */}
@@ -290,32 +334,27 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                   </Box>
                 ))}
               </Box>
-            </Box>
-          </Paper>
+            </Stack>
+          </Box>
 
           {/* Section 2: Rewards */}
-          <Paper
-            variant="outlined"
-            sx={{
-              p: 2.5,
-              borderRadius: 1,
-            }}
-          >
+          <Box>
             <Typography
               variant="subtitle1"
               sx={{
                 mb: 2,
                 fontWeight: 600,
+                color: 'primary.main',
               }}
             >
               {t('surveys.section.rewards')}
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Stack spacing={2}>
 
               {/* Reward Mail */}
               <Box>
                 <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('surveys.rewardMail')}</Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Stack spacing={2}>
                   <TextField
                     label={t('surveys.rewardMailTitle')}
                     value={rewardMailTitle}
@@ -330,7 +369,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                     rows={3}
                     fullWidth
                   />
-                </Box>
+                </Stack>
               </Box>
 
               {/* Participation Rewards */}
@@ -368,19 +407,35 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                   </Box>
                 ))}
               </Box>
-            </Box>
-          </Paper>
-        </Box>
-      </DialogContent>
-      <DialogActions>
+            </Stack>
+          </Box>
+        </Stack>
+      </Box>
+
+      {/* Footer */}
+      <Box
+        sx={{
+          p: 2,
+          borderTop: 1,
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          display: 'flex',
+          gap: 1,
+          justifyContent: 'flex-end',
+        }}
+      >
         <Button onClick={onClose} disabled={submitting}>
           {t('common.cancel')}
         </Button>
-        <Button onClick={handleSubmit} variant="contained" disabled={submitting}>
-          {submitting ? t('common.saving') : t('common.save')}
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          disabled={submitting}
+        >
+          {survey ? t('common.update') : t('common.create')}
         </Button>
-      </DialogActions>
-    </Dialog>
+      </Box>
+    </Drawer>
   );
 };
 

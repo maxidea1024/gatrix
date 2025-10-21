@@ -33,6 +33,7 @@ export interface UpdateServiceNoticeData extends Partial<CreateServiceNoticeData
 
 export interface ServiceNoticeFilters {
   isActive?: boolean;
+  currentlyVisible?: boolean;
   category?: string;
   platform?: string | string[];
   platformOperator?: 'any_of' | 'include_all';
@@ -58,6 +59,15 @@ class ServiceNoticeService {
       if (filters.isActive !== undefined) {
         whereClauses.push('isActive = ?');
         queryParams.push(filters.isActive);
+      }
+
+      if (filters.currentlyVisible !== undefined) {
+        // Filter by currently visible (isActive + within date range)
+        if (filters.currentlyVisible) {
+          whereClauses.push('isActive = 1 AND startDate <= NOW() AND endDate >= NOW()');
+        } else {
+          whereClauses.push('(isActive = 0 OR startDate > NOW() OR endDate < NOW())');
+        }
       }
 
       if (filters.category) {
