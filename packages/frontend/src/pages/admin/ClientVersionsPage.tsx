@@ -116,7 +116,7 @@ import { ClientVersionService } from '../../services/clientVersionService';
 import ClientVersionForm from '../../components/admin/ClientVersionForm';
 import BulkClientVersionForm from '../../components/admin/BulkClientVersionForm';
 import PlatformDefaultsDialog from '../../components/admin/PlatformDefaultsDialog';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { formatDateTimeDetailed, parseUTCForPicker } from '../../utils/dateFormat';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
@@ -1753,7 +1753,7 @@ const ClientVersionsPage: React.FC = () => {
                   {/* 점검 시작일 */}
                   <DateTimePicker
                     label={t('clientVersions.maintenance.startDate')}
-                    value={maintenanceStartDate ? dayjs(maintenanceStartDate) : null}
+                    value={parseUTCForPicker(maintenanceStartDate)}
                     onChange={(date) => setMaintenanceStartDate(date ? date.toISOString() : '')}
                     slotProps={{
                       textField: {
@@ -1766,7 +1766,7 @@ const ClientVersionsPage: React.FC = () => {
                   {/* 점검 종료일 */}
                   <DateTimePicker
                     label={t('clientVersions.maintenance.endDate')}
-                    value={maintenanceEndDate ? dayjs(maintenanceEndDate) : null}
+                    value={parseUTCForPicker(maintenanceEndDate)}
                     onChange={(date) => setMaintenanceEndDate(date ? date.toISOString() : '')}
                     slotProps={{
                       textField: {

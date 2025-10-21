@@ -96,7 +96,7 @@ import 'dayjs/locale/zh-cn';
 import { gameWorldService } from '../../services/gameWorldService';
 import { tagService, Tag } from '@/services/tagService';
 import { GameWorld, CreateGameWorldData, GameWorldMaintenanceLocale } from '../../types/gameWorld';
-import { formatDateTimeDetailed } from '../../utils/dateFormat';
+import { formatDateTimeDetailed, parseUTCForPicker } from '../../utils/dateFormat';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import translationService from '../../services/translationService';
@@ -1607,7 +1607,7 @@ const GameWorldsPage: React.FC = () => {
                     {/* 점검 시작일 */}
                     <DateTimePicker
                       label={t('gameWorlds.maintenance.startDate')}
-                      value={formData.maintenanceStartDate ? dayjs(formData.maintenanceStartDate) : null}
+                      value={parseUTCForPicker(formData.maintenanceStartDate)}
                       onChange={(date) => setFormData({ ...formData, maintenanceStartDate: date ? date.toISOString() : '' })}
                       slotProps={{
                         textField: {
@@ -1621,7 +1621,7 @@ const GameWorldsPage: React.FC = () => {
                     {/* 점검 종료일 */}
                     <DateTimePicker
                       label={t('gameWorlds.maintenance.endDate')}
-                      value={formData.maintenanceEndDate ? dayjs(formData.maintenanceEndDate) : null}
+                      value={parseUTCForPicker(formData.maintenanceEndDate)}
                       onChange={(date) => setFormData({ ...formData, maintenanceEndDate: date ? date.toISOString() : '' })}
                       slotProps={{
                         textField: {

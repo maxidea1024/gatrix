@@ -32,6 +32,7 @@ import {
 import ingamePopupNoticeService from '../../services/ingamePopupNoticeService';
 import { messageTemplateService, MessageTemplate } from '../../services/messageTemplateService';
 import MultiLanguageMessageInput from '../common/MultiLanguageMessageInput';
+import { parseUTCForPicker } from '../../utils/dateFormat';
 
 interface IngamePopupNoticeFormDialogProps {
   open: boolean;
@@ -95,9 +96,9 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
       setTargetAccountIds(notice.targetAccountIds || []);
       setDisplayPriority(notice.displayPriority);
       setShowOnce(notice.showOnce);
-      // Parse UTC time and convert to local timezone for display
-      setStartDate(dayjs(notice.startDate));
-      setEndDate(dayjs(notice.endDate));
+      // Parse UTC time and convert to user's timezone for display
+      setStartDate(parseUTCForPicker(notice.startDate));
+      setEndDate(parseUTCForPicker(notice.endDate));
       setUseTemplate(notice.useTemplate);
       setMessageTemplateId(notice.messageTemplateId);
       setDescription(notice.description || '');

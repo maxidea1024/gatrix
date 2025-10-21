@@ -28,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { ServiceNotice, CreateServiceNoticeData, UpdateServiceNoticeData } from '../../services/serviceNoticeService';
 import RichTextEditor from '../mailbox/RichTextEditor';
+import { parseUTCForPicker } from '../../utils/dateFormat';
 
 interface ServiceNoticeFormDialogProps {
   open: boolean;
@@ -234,8 +235,9 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
       setIsActive(notice.isActive);
       setCategory(notice.category);
       setPlatforms(notice.platforms);
-      setStartDate(dayjs(notice.startDate));
-      setEndDate(dayjs(notice.endDate));
+      // Parse UTC time and convert to user's timezone for display
+      setStartDate(parseUTCForPicker(notice.startDate));
+      setEndDate(parseUTCForPicker(notice.endDate));
       setTabTitle(notice.tabTitle || '');
       setTitle(notice.title);
       setContent(notice.content);

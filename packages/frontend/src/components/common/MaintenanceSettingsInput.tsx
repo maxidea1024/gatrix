@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import BuildIcon from '@mui/icons-material/Build';
 import MultiLanguageMessageInput, { MessageLocale } from './MultiLanguageMessageInput';
 import { MessageTemplate } from '@/services/messageTemplateService';
-import { getDateLocale } from '@/utils/dateFormat';
+import { getDateLocale, parseUTCForPicker } from '@/utils/dateFormat';
 
 export interface MaintenanceSettingsInputProps {
   // 점검 시작/종료 날짜
@@ -89,7 +89,7 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
           {/* 점검 시작일 */}
           <DateTimePicker
             label={t('clientVersions.maintenance.startDate')}
-            value={startDate ? dayjs(startDate) : null}
+            value={parseUTCForPicker(startDate)}
             onChange={(date) => onStartDateChange(date ? date.toISOString() : '')}
             slotProps={{
               textField: {
@@ -102,7 +102,7 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
           {/* 점검 종료일 */}
           <DateTimePicker
             label={t('clientVersions.maintenance.endDate')}
-            value={endDate ? dayjs(endDate) : null}
+            value={parseUTCForPicker(endDate)}
             onChange={(date) => onEndDateChange(date ? date.toISOString() : '')}
             slotProps={{
               textField: {

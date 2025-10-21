@@ -1,11 +1,16 @@
 /**
  * 날짜/시간 포맷 유틸 - 사용자 설정(timezone, datetimeFormat)에 따라 출력
  */
-import moment from 'moment-timezone';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 import 'dayjs/locale/ko';
 import 'dayjs/locale/en';
 import 'dayjs/locale/zh-cn';
+
+// Enable plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const DEFAULT_TZ = 'Asia/Seoul';
 const DEFAULT_FORMAT = 'YYYY-MM-DD HH:mm:ss';
@@ -36,24 +41,20 @@ export const setStoredDateTimeFormat = (fmt: string) => {
   try { localStorage.setItem('settings.datetimeFormat', fmt); } catch {}
 };
 
-// 내부: 다양한 문자열을 Date로 파싱 후 moment로 변환
-function toMoment(date: string | Date): moment.Moment | null {
-  let dateObj: Date | null;
-
-  if (typeof date === 'string') {
-    dateObj = parseDateString(date);
-  } else if (date instanceof Date) {
-    dateObj = date;
-  } else {
-    return null;
-  }
-
-  if (!dateObj || isNaN(dateObj.getTime())) return null;
+// 내부: 다양한 문자열을 dayjs로 변환 (UTC -> 사용자 timezone)
+function toDayjs(date: string | Date): Dayjs | null {
+  if (!date) return null;
 
   const timezone = getStoredTimezone();
 
-  // Convert UTC Date to moment with timezone
-  return moment.utc(dateObj).tz(timezone);
+  try {
+    // Parse as UTC and convert to user's timezone
+    const parsed = dayjs.utc(date);
+    if (!parsed.isValid()) return null;
+    return parsed.tz(timezone);
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -62,8 +63,8 @@ function toMoment(date: string | Date): moment.Moment | null {
 export const formatDate = (date: string | Date | null | undefined): string => {
   if (!date) return '-';
   try {
-    const m = toMoment(date);
-    return m ? m.format('YYYY-MM-DD') : '-';
+    const d = toDayjs(date);
+    return d ? d.format('YYYY-MM-DD') : '-';
   } catch { return '-'; }
 };
 
@@ -73,8 +74,8 @@ export const formatDate = (date: string | Date | null | undefined): string => {
 export const formatDateTime = (date: string | Date | null | undefined): string => {
   if (!date) return '-';
   try {
-    const m = toMoment(date);
-    return m ? m.format(getStoredDateTimeFormat()) : '-';
+    const d = toDayjs(date);
+    return d ? d.format(getStoredDateTimeFormat()) : '-';
   } catch { return '-'; }
 };
 
@@ -92,8 +93,8 @@ export const formatDateTimeDetailed = (date: string | Date | null | undefined): 
 export const formatDateTimeUI = (date: string | Date | null | undefined): string => {
   if (!date) return '-';
   try {
-    const m = toMoment(date);
-    return m ? m.format(UI_DISPLAY_FORMAT) : '-';
+    const d = toDayjs(date);
+    return d ? d.format(UI_DISPLAY_FORMAT) : '-';
   } catch { return '-'; }
 };
 
@@ -102,8 +103,8 @@ export const formatDateTimeUI = (date: string | Date | null | undefined): string
  */
 export const formatWith = (date: string | Date | null | undefined, format: string): string => {
   if (!date) return '-';
-  const m = toMoment(date);
-  return m ? m.format(format) : '-';
+  const d = toDayjs(date);
+  return d ? d.format(format) : '-';
 };
 
 /**
@@ -157,11 +158,11 @@ export const formatRelativeTime = (date: string | Date | null | undefined): stri
   if (!date) return '-';
 
   try {
-    const m = toMoment(date);
-    if (!m) return '-';
+    const d = toDayjs(date);
+    if (!d) return '-';
 
-    const now = moment().tz(getStoredTimezone());
-    const diffMs = now.diff(m);
+    const now = dayjs().tz(getStoredTimezone());
+    const diffMs = now.diff(d);
 
     if (diffMs < 60000) { // Less than 1 minute
       return 'Just now';
@@ -194,8 +195,8 @@ export const formatRelativeTime = (date: string | Date | null | undefined): stri
 export const formatTime = (date: string | Date | null | undefined): string => {
   if (!date) return '-';
   try {
-    const m = toMoment(date);
-    return m ? m.format('HH:mm:ss') : '-';
+    const d = toDayjs(date);
+    return d ? d.format('HH:mm:ss') : '-';
   } catch { return '-'; }
 };
 
@@ -205,10 +206,10 @@ export const formatTime = (date: string | Date | null | undefined): string => {
 export const isToday = (date: string | Date | null | undefined): boolean => {
   if (!date) return false;
   try {
-    const m = toMoment(date);
-    if (!m) return false;
-    const today = moment().tz(getStoredTimezone());
-    return m.format('YYYY-MM-DD') === today.format('YYYY-MM-DD');
+    const d = toDayjs(date);
+    if (!d) return false;
+    const today = dayjs().tz(getStoredTimezone());
+    return d.format('YYYY-MM-DD') === today.format('YYYY-MM-DD');
   } catch {
     return false;
   }
@@ -217,38 +218,14 @@ export const isToday = (date: string | Date | null | undefined): boolean => {
 export const isYesterday = (date: string | Date | null | undefined): boolean => {
   if (!date) return false;
   try {
-    const m = toMoment(date);
-    if (!m) return false;
-    const yesterday = moment().tz(getStoredTimezone()).subtract(1, 'day');
-    return m.format('YYYY-MM-DD') === yesterday.format('YYYY-MM-DD');
+    const d = toDayjs(date);
+    if (!d) return false;
+    const yesterday = dayjs().tz(getStoredTimezone()).subtract(1, 'day');
+    return d.format('YYYY-MM-DD') === yesterday.format('YYYY-MM-DD');
   } catch {
     return false;
   }
 };
-
-// Parse date string and treat as UTC (no timezone conversion)
-// This ensures that times are displayed consistently across all timezones
-// e.g., "12:00 UTC" is displayed as "12:00" regardless of user's timezone
-function parseDateString(input: string): Date | null {
-  if (!input) return null;
-
-  // ISO 형식 (T가 포함된 경우) - UTC 시간 그대로 사용
-  if (/[Tt]/.test(input)) {
-    const utcDate = new Date(input);
-    if (isNaN(utcDate.getTime())) return null;
-    return utcDate;
-  }
-
-  // 'YYYY-MM-DD HH:mm:ss' 형식 - UTC 시간으로 처리
-  const m = input.match(/^(\d{4})-(\d{2})-(\d{2})[\s](\d{2}):(\d{2}):(\d{2})$/);
-  if (m) {
-    const [, y, mo, d, h, mi, s] = m;
-    return new Date(Date.UTC(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(s)));
-  }
-
-  const fallback = new Date(input);
-  return isNaN(fallback.getTime()) ? null : fallback;
-}
 
 /**
  * Get dayjs locale based on current language
@@ -268,5 +245,32 @@ export const getDateLocale = (currentLang?: string): string => {
     default:
       dayjs.locale('ko');
       return 'ko';
+  }
+};
+
+/**
+ * Parse UTC date string to Dayjs object in user's timezone
+ * Use this for DateTimePicker value prop
+ *
+ * @param utcDateString - UTC date string (ISO 8601 format)
+ * @returns Dayjs object in user's timezone, or null if invalid
+ *
+ * @example
+ * // Database has: "2025-10-20T03:00:00.000Z" (UTC)
+ * // User timezone: Asia/Seoul (UTC+9)
+ * // Returns: Dayjs object representing "2025-10-20 12:00:00" in Seoul timezone
+ * const date = parseUTCForPicker("2025-10-20T03:00:00.000Z");
+ * <DateTimePicker value={date} />
+ */
+export const parseUTCForPicker = (utcDateString: string | null | undefined): Dayjs | null => {
+  if (!utcDateString) return null;
+
+  try {
+    const timezone = getStoredTimezone();
+    // Parse as UTC and convert to user's timezone
+    const parsed = dayjs.utc(utcDateString).tz(timezone);
+    return parsed.isValid() ? parsed : null;
+  } catch {
+    return null;
   }
 };
