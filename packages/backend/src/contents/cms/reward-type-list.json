@@ -1,0 +1,317 @@
+[
+  {
+    "value": 1,
+    "name": "POINT",
+    "nameKey": "REWARD_TYPE_POINT",
+    "hasTable": true,
+    "tableFile": "Point.json",
+    "itemCount": 23,
+    "descriptionKey": null
+  },
+  {
+    "value": 2,
+    "name": "ITEM",
+    "nameKey": "REWARD_TYPE_ITEM",
+    "hasTable": true,
+    "tableFile": "Item.json",
+    "itemCount": 2827,
+    "descriptionKey": null
+  },
+  {
+    "value": 3,
+    "name": "DEPART_SUPPLY",
+    "nameKey": "REWARD_TYPE_DEPART_SUPPLY",
+    "hasTable": true,
+    "tableFile": "DepartSupply.json",
+    "itemCount": 4,
+    "descriptionKey": null
+  },
+  {
+    "value": 4,
+    "name": "TRADE_GOODS",
+    "nameKey": "REWARD_TYPE_TRADE_GOODS",
+    "hasTable": true,
+    "tableFile": "TradeGoods.json",
+    "itemCount": 698,
+    "descriptionKey": null
+  },
+  {
+    "value": 5,
+    "name": "MATE_EQUIP",
+    "nameKey": "REWARD_TYPE_MATE_EQUIP",
+    "hasTable": true,
+    "tableFile": "CEquip.json",
+    "itemCount": 3966,
+    "descriptionKey": null
+  },
+  {
+    "value": 6,
+    "name": "SHIP",
+    "nameKey": "REWARD_TYPE_SHIP",
+    "hasTable": true,
+    "tableFile": "Ship.json",
+    "itemCount": 699,
+    "descriptionKey": null
+  },
+  {
+    "value": 7,
+    "name": "MATE",
+    "nameKey": "REWARD_TYPE_MATE",
+    "hasTable": true,
+    "tableFile": "Mate.json",
+    "itemCount": 1407,
+    "descriptionKey": null
+  },
+  {
+    "value": 8,
+    "name": "SHIP_BLUEPRINT",
+    "nameKey": "REWARD_TYPE_SHIP_BLUEPRINT",
+    "hasTable": true,
+    "tableFile": "ShipBlueprint.json",
+    "itemCount": 442,
+    "descriptionKey": null
+  },
+  {
+    "value": 9,
+    "name": "SHIP_SLOT_ITEM",
+    "nameKey": "REWARD_TYPE_SHIP_SLOT_ITEM",
+    "hasTable": true,
+    "tableFile": "ShipSlot.json",
+    "itemCount": 7617,
+    "descriptionKey": null
+  },
+  {
+    "value": 10,
+    "name": "QUEST_ITEM",
+    "nameKey": "REWARD_TYPE_QUEST_ITEM",
+    "hasTable": true,
+    "tableFile": "Item.json",
+    "itemCount": 2827,
+    "descriptionKey": null
+  },
+  {
+    "value": 11,
+    "name": "BATTLE_EXP",
+    "nameKey": "REWARD_TYPE_BATTLE_EXP",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_BATTLE_EXP"
+  },
+  {
+    "value": 12,
+    "name": "TRADE_EXP",
+    "nameKey": "REWARD_TYPE_TRADE_EXP",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_TRADE_EXP"
+  },
+  {
+    "value": 13,
+    "name": "ADVENTURE_EXP",
+    "nameKey": "REWARD_TYPE_ADVENTURE_EXP",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_ADVENTURE_EXP"
+  },
+  {
+    "value": 14,
+    "name": "BATTLE_FAME",
+    "nameKey": "REWARD_TYPE_BATTLE_FAME",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_BATTLE_FAME"
+  },
+  {
+    "value": 15,
+    "name": "TRADE_FAME",
+    "nameKey": "REWARD_TYPE_TRADE_FAME",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_TRADE_FAME"
+  },
+  {
+    "value": 16,
+    "name": "ADVENTURE_FAME",
+    "nameKey": "REWARD_TYPE_ADVENTURE_FAME",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_ADVENTURE_FAME"
+  },
+  {
+    "value": 17,
+    "name": "SAILOR",
+    "nameKey": "REWARD_TYPE_SAILOR",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_SAILOR"
+  },
+  {
+    "value": 18,
+    "name": "MATE_INTIMACY_OR_LOYALTY",
+    "nameKey": "REWARD_TYPE_MATE_INTIMACY_OR_LOYALTY",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_MATE_INTIMACY_OR_LOYALTY"
+  },
+  {
+    "value": 19,
+    "name": "ENERGY",
+    "nameKey": "REWARD_TYPE_ENERGY",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_ENERGY"
+  },
+  {
+    "value": 22,
+    "name": "TAX_FREE_PERMIT",
+    "nameKey": "REWARD_TYPE_TAX_FREE_PERMIT",
+    "hasTable": true,
+    "tableFile": "TaxFreePermit.json",
+    "itemCount": 18,
+    "descriptionKey": null
+  },
+  {
+    "value": 25,
+    "name": "SHIELD_NON_PURCHASE_COUNT",
+    "nameKey": "REWARD_TYPE_SHIELD_NON_PURCHASE_COUNT",
+    "hasTable": true,
+    "tableFile": "Shield.json",
+    "itemCount": 4,
+    "descriptionKey": null
+  },
+  {
+    "value": 26,
+    "name": "SHIELD_PURCHASE_COUNT",
+    "nameKey": "REWARD_TYPE_SHIELD_PURCHASE_COUNT",
+    "hasTable": true,
+    "tableFile": "Shield.json",
+    "itemCount": 4,
+    "descriptionKey": null
+  },
+  {
+    "value": 27,
+    "name": "ARENA_TICKET",
+    "nameKey": "REWARD_TYPE_ARENA_TICKET",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_ARENA_TICKET"
+  },
+  {
+    "value": 28,
+    "name": "WESTERN_SHIP_BUILD_EXP",
+    "nameKey": "REWARD_TYPE_WESTERN_SHIP_BUILD_EXP",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_WESTERN_SHIP_BUILD_EXP"
+  },
+  {
+    "value": 29,
+    "name": "ORIENTAL_SHIP_BUILD_EXP",
+    "nameKey": "REWARD_TYPE_ORIENTAL_SHIP_BUILD_EXP",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_ORIENTAL_SHIP_BUILD_EXP"
+  },
+  {
+    "value": 31,
+    "name": "CHOICE_BOX",
+    "nameKey": "REWARD_TYPE_CHOICE_BOX",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_CHOICE_BOX"
+  },
+  {
+    "value": 32,
+    "name": "SHIP_CAMOUFLAGE",
+    "nameKey": "REWARD_TYPE_SHIP_CAMOUFLAGE",
+    "hasTable": true,
+    "tableFile": "ShipCamouflage.json",
+    "itemCount": 31,
+    "descriptionKey": null
+  },
+  {
+    "value": 33,
+    "name": "USER_TITLE",
+    "nameKey": "REWARD_TYPE_USER_TITLE",
+    "hasTable": true,
+    "tableFile": "UserTitle.json",
+    "itemCount": 125,
+    "descriptionKey": null
+  },
+  {
+    "value": 34,
+    "name": "FREE_SWEEP_TICKET",
+    "nameKey": "REWARD_TYPE_FREE_SWEEP_TICKET",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_FREE_SWEEP_TICKET"
+  },
+  {
+    "value": 35,
+    "name": "BUY_SWEEP_TICKET",
+    "nameKey": "REWARD_TYPE_BUY_SWEEP_TICKET",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_BUY_SWEEP_TICKET"
+  },
+  {
+    "value": 36,
+    "name": "PET",
+    "nameKey": "REWARD_TYPE_PET",
+    "hasTable": true,
+    "tableFile": "Pet.json",
+    "itemCount": 20,
+    "descriptionKey": null
+  },
+  {
+    "value": 37,
+    "name": "SMUGGLE_GOODS",
+    "nameKey": "REWARD_TYPE_SMUGGLE_GOODS",
+    "hasTable": true,
+    "tableFile": "SmuggleGoods.json",
+    "itemCount": 48,
+    "descriptionKey": null
+  },
+  {
+    "value": 38,
+    "name": "REWERD_SEASON_ITEMS",
+    "nameKey": "REWARD_TYPE_REWERD_SEASON_ITEMS",
+    "hasTable": true,
+    "tableFile": "RewardSeasonItems.json",
+    "itemCount": 810,
+    "descriptionKey": null
+  },
+  {
+    "value": 100,
+    "name": "CAPTURED_SHIP",
+    "nameKey": "REWARD_TYPE_CAPTURED_SHIP",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_CAPTURED_SHIP"
+  },
+  {
+    "value": 101,
+    "name": "SOUND_PACK",
+    "nameKey": "REWARD_TYPE_SOUND_PACK",
+    "hasTable": false,
+    "tableFile": null,
+    "itemCount": 0,
+    "descriptionKey": "REWARD_TYPE_DESC_SOUND_PACK"
+  }
+]

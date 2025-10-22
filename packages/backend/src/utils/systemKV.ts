@@ -29,6 +29,12 @@ const SYSTEM_KV_DEFINITIONS: SystemKVDefinition[] = [
     valueType: 'array',
     description: '[elementType:string] Market types for the system',
   },
+  {
+    key: 'kv:clientVersionPassiveData',
+    value: JSON.stringify({}),
+    valueType: 'object',
+    description: 'Passive data sent with client version info queries from client SDK',
+  },
   // Add more system KV definitions here as needed
   // Example:
   // {
