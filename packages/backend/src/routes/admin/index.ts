@@ -28,6 +28,7 @@ import consoleRoutes from './console';
 import surveyRoutes from './surveys';
 import serviceNoticeRoutes from './serviceNotices';
 import ingamePopupNoticeRoutes from './ingamePopupNotices';
+import planningDataRoutes from './planningData';
 
 const router = express.Router();
 
@@ -65,5 +66,6 @@ router.use('/console', consoleRoutes);
 router.use('/surveys', surveyRoutes);
 router.use('/service-notices', serviceNoticeRoutes);
 router.use('/ingame-popup-notices', ingamePopupNoticeRoutes);
+router.use('/planning-data', planningDataRoutes);
 
 export default router;

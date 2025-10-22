@@ -30,6 +30,7 @@ import ResizableDrawer from '../common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import surveyService, { Survey, TriggerCondition, ParticipationReward } from '../../services/surveyService';
+import RewardItemSelector, { RewardSelection } from './RewardItemSelector';
 
 interface SurveyFormDialogProps {
   open: boolean;
@@ -172,9 +173,13 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
     setParticipationRewards(participationRewards.filter((_, i) => i !== index));
   };
 
-  const handleRewardChange = (index: number, field: keyof ParticipationReward, value: any) => {
+  const handleRewardChange = (index: number, selection: RewardSelection) => {
     const updated = [...participationRewards];
-    updated[index] = { ...updated[index], [field]: value };
+    updated[index] = {
+      rewardType: selection.rewardType,
+      itemId: selection.itemId,
+      quantity: selection.quantity,
+    };
     setParticipationRewards(updated);
   };
 
@@ -620,39 +625,19 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                   {t('surveys.participationRewardsHelp')}
                 </Typography>
                 {participationRewards.map((reward, index) => (
-                  <Box key={index} sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                    <TextField
-                      label={t('surveys.rewardType')}
-                      value={reward.rewardType}
-                      onChange={(e) => handleRewardChange(index, 'rewardType', e.target.value)}
-                      sx={{ flex: 1 }}
-                      size="small"
-                    />
-                    <TextField
-                      label={t('surveys.itemId')}
-                      value={reward.itemId}
-                      onChange={(e) => handleRewardChange(index, 'itemId', e.target.value)}
-                      sx={{ flex: 1 }}
-                      size="small"
-                    />
-                    <TextField
-                      label={t('surveys.quantity')}
-                      type="number"
-                      value={reward.quantity}
-                      onChange={(e) => handleRewardChange(index, 'quantity', parseInt(e.target.value) || 1)}
-                      sx={{
-                        width: 100,
-                        '& input[type=number]': {
-                          MozAppearance: 'textfield',
-                        },
-                        '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
-                          WebkitAppearance: 'none',
-                          margin: 0,
-                        },
-                      }}
-                      size="small"
-                    />
-                    <IconButton onClick={() => handleRemoveReward(index)} size="small">
+                  <Box key={index} sx={{ display: 'flex', gap: 1, mb: 1, alignItems: 'flex-start' }}>
+                    <Box sx={{ flex: 1 }}>
+                      <RewardItemSelector
+                        value={{
+                          rewardType: reward.rewardType,
+                          itemId: reward.itemId,
+                          quantity: reward.quantity,
+                        }}
+                        onChange={(selection) => handleRewardChange(index, selection)}
+                        minQuantity={1}
+                      />
+                    </Box>
+                    <IconButton onClick={() => handleRemoveReward(index)} size="small" sx={{ mt: 0.5 }}>
                       <DeleteIcon />
                     </IconButton>
                   </Box>
