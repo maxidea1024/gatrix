@@ -22,6 +22,7 @@ interface KeyValueFormDrawerProps {
   onClose: () => void;
   onSuccess: () => void;
   item?: VarItem | null;
+  isDuplicate?: boolean;
 }
 
 interface FormData {
@@ -37,10 +38,12 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
   onClose,
   onSuccess,
   item,
+  isDuplicate = false,
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const [submitting, setSubmitting] = useState(false);
+  const [previousArrayElementType, setPreviousArrayElementType] = useState<VarValueType | undefined>(undefined);
 
   const [formData, setFormData] = useState<FormData>({
     varKey: '',
@@ -74,6 +77,7 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
         description: item.description?.replace(/\[elementType:\w+\]\s*/, '') || '',
         arrayElementType,
       });
+      setPreviousArrayElementType(arrayElementType);
     } else {
       // Reset form
       setFormData({
@@ -83,6 +87,7 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
         description: '',
         arrayElementType: undefined,
       });
+      setPreviousArrayElementType(undefined);
     }
     setFormErrors({});
   }, [item, open]);
@@ -147,12 +152,17 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
         description,
       };
 
-      if (item) {
+      // Check if item has id to determine edit mode (duplicated items won't have id)
+      if (item?.id) {
         await varsService.updateKV(item.varKey.replace('kv:', ''), data as UpdateVarData);
         enqueueSnackbar(t('settings.kv.updateSuccess'), { variant: 'success' });
       } else {
         await varsService.createKV(data as CreateVarData);
-        enqueueSnackbar(t('settings.kv.createSuccess'), { variant: 'success' });
+        // Show different message for duplicate vs create
+        const successMessage = isDuplicate
+          ? t('settings.kv.duplicateSuccess')
+          : t('settings.kv.createSuccess');
+        enqueueSnackbar(successMessage, { variant: 'success' });
       }
 
       onSuccess();
@@ -187,11 +197,23 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
           <TextField
             fullWidth
             label={`${t('settings.kv.value')} *`}
-            type="number"
+            type="text"
+            inputMode="numeric"
             value={formData.varValue}
-            onChange={(e) => setFormData({ ...formData, varValue: e.target.value })}
+            onChange={(e) => {
+              const val = e.target.value;
+              // Allow empty, negative sign, decimal point, and valid numbers
+              if (val === '' || val === '-' || val === '.' || val === '-.' || !isNaN(Number(val))) {
+                setFormData({ ...formData, varValue: val });
+              }
+            }}
             error={!!formErrors.varValue}
             helperText={formErrors.varValue || t('settings.kv.numberHelp')}
+            sx={{
+              '& input[type=text]::-webkit-outer-spin-button, & input[type=text]::-webkit-inner-spin-button': {
+                display: 'none',
+              },
+            }}
           />
         );
       case 'boolean':
@@ -278,8 +300,8 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
     <ResizableDrawer
       open={open}
       onClose={onClose}
-      title={item ? t('settings.kv.edit') : t('settings.kv.create')}
-      subtitle={item ? t('settings.kv.editSubtitle') : t('settings.kv.createSubtitle')}
+      title={item?.id ? t('settings.kv.edit') : t('settings.kv.create')}
+      subtitle={item?.id ? t('settings.kv.editSubtitle') : t('settings.kv.createSubtitle')}
       storageKey="kvFormDrawerWidth"
       defaultWidth={700}
       minWidth={500}
@@ -321,7 +343,7 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
               formErrors.varKey ||
               (isSystemDefined ? t('settings.kv.systemDefinedKeyHelp') : t('settings.kv.keyHelp'))
             }
-            autoFocus={!item}
+            autoFocus={!item?.id}
           />
 
           {/* Type */}
@@ -361,7 +383,40 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
               select
               label={`${t('settings.kv.arrayElementType')} *`}
               value={formData.arrayElementType || 'string'}
-              onChange={(e) => setFormData({ ...formData, arrayElementType: e.target.value as VarValueType })}
+              onChange={(e) => {
+                const newElementType = e.target.value as VarValueType;
+
+                // Warn if changing element type and array has values
+                if (previousArrayElementType && previousArrayElementType !== newElementType && formData.varValue) {
+                  try {
+                    const currentArray = JSON.parse(formData.varValue);
+                    if (Array.isArray(currentArray) && currentArray.length > 0) {
+                      enqueueSnackbar(t('settings.kv.arrayElementTypeChangeWarning'), { variant: 'warning' });
+
+                      // Reset array values to default values for the new type
+                      const defaultValue = newElementType === 'number' ? 0
+                        : newElementType === 'boolean' ? false
+                        : newElementType === 'color' ? '#000000'
+                        : newElementType === 'object' ? {}
+                        : '';
+
+                      const newArray = new Array(currentArray.length).fill(defaultValue);
+                      setFormData({
+                        ...formData,
+                        arrayElementType: newElementType,
+                        varValue: JSON.stringify(newArray)
+                      });
+                      setPreviousArrayElementType(newElementType);
+                      return;
+                    }
+                  } catch (e) {
+                    // Ignore parse errors
+                  }
+                }
+
+                setFormData({ ...formData, arrayElementType: newElementType });
+                setPreviousArrayElementType(newElementType);
+              }}
               helperText={t('settings.kv.arrayElementTypeHelp')}
             >
               <MenuItem value="string">String</MenuItem>
@@ -408,7 +463,7 @@ const KeyValueFormDrawer: React.FC<KeyValueFormDrawerProps> = ({
           variant="contained"
           disabled={submitting}
         >
-          {item ? t('common.update') : t('common.create')}
+          {item?.id ? t('common.update') : t('common.create')}
         </Button>
       </Box>
     </ResizableDrawer>

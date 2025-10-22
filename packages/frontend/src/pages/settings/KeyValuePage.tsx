@@ -40,6 +40,7 @@ const KeyValuePage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<VarItem | null>(null);
+  const [isDuplicateMode, setIsDuplicateMode] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; item: VarItem | null }>({
     open: false,
     item: null,
@@ -65,12 +66,14 @@ const KeyValuePage: React.FC = () => {
   // Handle create
   const handleCreate = () => {
     setEditingItem(null);
+    setIsDuplicateMode(false);
     setDrawerOpen(true);
   };
 
   // Handle edit
   const handleEdit = (item: VarItem) => {
     setEditingItem(item);
+    setIsDuplicateMode(false);
     setDrawerOpen(true);
   };
 
@@ -80,21 +83,25 @@ const KeyValuePage: React.FC = () => {
     const baseKey = item.varKey.replace('kv:', '');
     const newKey = `${baseKey}_copy`;
 
-    // Create a new item with copied data
-    const duplicatedItem: VarItem = {
+    // Create a new item with copied data (without id to trigger create mode)
+    const duplicatedItem: Partial<VarItem> = {
       ...item,
       varKey: `kv:${newKey}`,
       isSystemDefined: false, // Duplicated items are never system-defined
     };
 
-    setEditingItem(duplicatedItem);
+    // Remove id to ensure it's treated as a new item
+    delete duplicatedItem.id;
+
+    setEditingItem(duplicatedItem as VarItem);
+    setIsDuplicateMode(true);
     setDrawerOpen(true);
   };
 
   // Handle copy key name
   const handleCopyKeyName = (keyName: string) => {
     navigator.clipboard.writeText(keyName);
-    enqueueSnackbar(t('common.copied'), { variant: 'success' });
+    enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
   };
 
   // Get chip color based on type
@@ -134,9 +141,10 @@ const KeyValuePage: React.FC = () => {
   const handleDeleteConfirm = async () => {
     if (!deleteConfirm.item) return;
 
+    const keyName = deleteConfirm.item.varKey.replace('kv:', '');
     try {
-      await varsService.deleteKV(deleteConfirm.item.varKey.replace('kv:', ''));
-      enqueueSnackbar(t('settings.kv.deleteSuccess'), { variant: 'success' });
+      await varsService.deleteKV(keyName);
+      enqueueSnackbar(t('settings.kv.deleteSuccess', { key: keyName }), { variant: 'success' });
       setDeleteConfirm({ open: false, item: null });
       loadItems();
     } catch (error: any) {
@@ -225,8 +233,8 @@ const KeyValuePage: React.FC = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>{t('settings.kv.key')}</TableCell>
-                  <TableCell>{t('settings.kv.value')}</TableCell>
                   <TableCell>{t('settings.kv.type')}</TableCell>
+                  <TableCell>{t('settings.kv.value')}</TableCell>
                   <TableCell>{t('settings.kv.description')}</TableCell>
                   <TableCell>{t('common.updatedAt')}</TableCell>
                   <TableCell align="center">{t('common.actions')}</TableCell>
@@ -259,7 +267,6 @@ const KeyValuePage: React.FC = () => {
                           )}
                         </Box>
                       </TableCell>
-                      <TableCell>{renderValueDisplay(item)}</TableCell>
                       <TableCell>
                         <Chip
                           label={formatTypeDisplay(item)}
@@ -268,6 +275,7 @@ const KeyValuePage: React.FC = () => {
                           variant="outlined"
                         />
                       </TableCell>
+                      <TableCell>{renderValueDisplay(item)}</TableCell>
                       <TableCell>
                         <Typography variant="body2" color="text.secondary">
                           {item.description?.replace(/\[elementType:\w+\]\s*/, '') || '-'}
@@ -316,6 +324,7 @@ const KeyValuePage: React.FC = () => {
         onClose={() => setDrawerOpen(false)}
         onSuccess={loadItems}
         item={editingItem}
+        isDuplicate={isDuplicateMode}
       />
 
       {/* Delete Confirmation Dialog */}
