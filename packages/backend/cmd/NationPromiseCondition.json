@@ -1,0 +1,163 @@
+{
+  ":NationPromiseCondition": {
+    ":type": {
+      "id": "key",
+      "conditionType": "number",
+      "conditionTargetType": "number",
+      "operator": "number",
+      "descFormat": [
+        {
+          "Type": "number",
+          "TypeName": "string"
+        },
+        {
+          "Type": "number",
+          "TypeName": "string"
+        }
+      ]
+    },
+    ":required": {
+      "conditionType": 1,
+      "conditionTargetType": 1,
+      "operator": 1,
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    ":requiredInObject": {
+      "descFormat": [
+        {
+          "Type": 1
+        },
+        {
+          "Type": 1
+        }
+      ]
+    },
+    ":min": {
+      "operator": 1,
+      "descFormat": [
+        {
+          "Type": 1
+        },
+        {
+          "Type": 1
+        }
+      ]
+    },
+    ":max": {
+      "operator": 5,
+      "descFormat": [
+        {
+          "Type": 5
+        },
+        {
+          "Type": 5
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "NationPromiseCondition": {
+    "10160001": {
+      "id": 10160001,
+      "conditionType": 1,
+      "conditionTargetType": 2,
+      "operator": 2,
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Region"
+        },
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "10160002": {
+      "id": 10160002,
+      "conditionType": 1,
+      "conditionTargetType": 0,
+      "operator": 2,
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        },
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "10160003": {
+      "id": 10160003,
+      "conditionType": 0,
+      "conditionTargetType": 0,
+      "operator": 1,
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        },
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "10160004": {
+      "id": 10160004,
+      "conditionType": 0,
+      "conditionTargetType": 2,
+      "operator": 2,
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Region"
+        },
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "10160005": {
+      "id": 10160005,
+      "conditionType": 0,
+      "conditionTargetType": 2,
+      "operator": 1,
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Region"
+        },
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "10160006": {
+      "id": 10160006,
+      "conditionType": 0,
+      "conditionTargetType": 1,
+      "operator": 4,
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "10160007": {
+      "id": 10160007,
+      "conditionType": 1,
+      "conditionTargetType": 1,
+      "operator": 2,
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    }
+  }
+}

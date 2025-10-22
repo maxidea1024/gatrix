@@ -1,0 +1,824 @@
+{
+  ":BattleChallenge": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "illust": "string",
+      "localBitflag": "bit",
+      "contentsTerms": [
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        },
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        },
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        }
+      ],
+      "stage": [
+        {
+          "OceanNpcId": "number",
+          "IsAttack": "bool",
+          "FirstRewardId": "number",
+          "RepeatRewardId": "number",
+          "Energy": "number",
+          "BattleMissionGroupId": "number"
+        },
+        {
+          "OceanNpcId": "number",
+          "IsAttack": "bool",
+          "FirstRewardId": "number",
+          "RepeatRewardId": "number",
+          "Energy": "number",
+          "BattleMissionGroupId": "number"
+        },
+        {
+          "OceanNpcId": "number",
+          "IsAttack": "bool",
+          "FirstRewardId": "number",
+          "RepeatRewardId": "number",
+          "Energy": "number",
+          "BattleMissionGroupId": "number"
+        },
+        {
+          "OceanNpcId": "number",
+          "IsAttack": "bool",
+          "FirstRewardId": "number",
+          "RepeatRewardId": "number",
+          "Energy": "number",
+          "BattleMissionGroupId": "number"
+        },
+        {
+          "OceanNpcId": "number",
+          "IsAttack": "bool",
+          "FirstRewardId": "number",
+          "RepeatRewardId": "number",
+          "Energy": "number",
+          "BattleMissionGroupId": "number"
+        },
+        {
+          "OceanNpcId": "number",
+          "IsAttack": "bool",
+          "FirstRewardId": "number",
+          "RepeatRewardId": "number",
+          "Energy": "number",
+          "BattleMissionGroupId": "number"
+        },
+        {
+          "OceanNpcId": "number",
+          "IsAttack": "bool",
+          "FirstRewardId": "number",
+          "RepeatRewardId": "number",
+          "Energy": "number",
+          "BattleMissionGroupId": "number"
+        },
+        {
+          "OceanNpcId": "number",
+          "IsAttack": "bool",
+          "FirstRewardId": "number",
+          "RepeatRewardId": "number",
+          "Energy": "number",
+          "BattleMissionGroupId": "number"
+        },
+        {
+          "OceanNpcId": "number",
+          "IsAttack": "bool",
+          "FirstRewardId": "number",
+          "RepeatRewardId": "number",
+          "Energy": "number",
+          "BattleMissionGroupId": "number"
+        }
+      ]
+    },
+    ":required": {
+      "name": 1,
+      "illust": 1,
+      "localBitflag": 1
+    },
+    ":requiredInObject": {
+      "contentsTerms": [
+        {
+          "Id": 1,
+          "Count": 1
+        },
+        {
+          "Id": 1,
+          "Count": 1
+        },
+        {
+          "Id": 1,
+          "Count": 1
+        }
+      ],
+      "stage": [
+        {
+          "OceanNpcId": 1,
+          "IsAttack": 1,
+          "FirstRewardId": 1,
+          "RepeatRewardId": 1,
+          "Energy": 1
+        },
+        {
+          "OceanNpcId": 1,
+          "IsAttack": 1,
+          "FirstRewardId": 1,
+          "RepeatRewardId": 1,
+          "Energy": 1
+        },
+        {
+          "OceanNpcId": 1,
+          "IsAttack": 1,
+          "FirstRewardId": 1,
+          "RepeatRewardId": 1,
+          "Energy": 1
+        },
+        {
+          "OceanNpcId": 1,
+          "IsAttack": 1,
+          "FirstRewardId": 1,
+          "RepeatRewardId": 1,
+          "Energy": 1
+        },
+        {
+          "OceanNpcId": 1,
+          "IsAttack": 1,
+          "FirstRewardId": 1,
+          "RepeatRewardId": 1,
+          "Energy": 1
+        },
+        {
+          "OceanNpcId": 1,
+          "IsAttack": 1,
+          "FirstRewardId": 1,
+          "RepeatRewardId": 1,
+          "Energy": 1
+        },
+        {
+          "OceanNpcId": 1,
+          "IsAttack": 1,
+          "FirstRewardId": 1,
+          "RepeatRewardId": 1,
+          "Energy": 1
+        },
+        {
+          "OceanNpcId": 1,
+          "IsAttack": 1,
+          "FirstRewardId": 1,
+          "RepeatRewardId": 1,
+          "Energy": 1
+        },
+        {
+          "OceanNpcId": 1,
+          "IsAttack": 1,
+          "FirstRewardId": 1,
+          "RepeatRewardId": 1,
+          "Energy": 1
+        }
+      ]
+    },
+    ":min": {
+      "contentsTerms": [
+        {
+          "Id": 81000000
+        },
+        {
+          "Id": 81000000
+        },
+        {
+          "Id": 81000000
+        }
+      ],
+      "stage": [
+        {
+          "OceanNpcId": 15000000,
+          "FirstRewardId": 94000000,
+          "RepeatRewardId": 90000000,
+          "BattleMissionGroupId": 69100000
+        },
+        {
+          "OceanNpcId": 15000000,
+          "FirstRewardId": 94000000,
+          "RepeatRewardId": 90000000,
+          "BattleMissionGroupId": 69100000
+        },
+        {
+          "OceanNpcId": 15000000,
+          "FirstRewardId": 94000000,
+          "RepeatRewardId": 90000000,
+          "BattleMissionGroupId": 69100000
+        },
+        {
+          "OceanNpcId": 15000000,
+          "FirstRewardId": 94000000,
+          "RepeatRewardId": 90000000,
+          "BattleMissionGroupId": 69100000
+        },
+        {
+          "OceanNpcId": 15000000,
+          "FirstRewardId": 94000000,
+          "RepeatRewardId": 90000000,
+          "BattleMissionGroupId": 69100000
+        },
+        {
+          "OceanNpcId": 15000000,
+          "FirstRewardId": 94000000,
+          "RepeatRewardId": 90000000,
+          "BattleMissionGroupId": 69100000
+        },
+        {
+          "OceanNpcId": 15000000,
+          "FirstRewardId": 94000000,
+          "RepeatRewardId": 90000000,
+          "BattleMissionGroupId": 69100000
+        },
+        {
+          "OceanNpcId": 15000000,
+          "FirstRewardId": 94000000,
+          "RepeatRewardId": 90000000,
+          "BattleMissionGroupId": 69100000
+        },
+        {
+          "OceanNpcId": 15000000,
+          "FirstRewardId": 94000000,
+          "RepeatRewardId": 90000000,
+          "BattleMissionGroupId": 69100000
+        }
+      ]
+    },
+    ":max": {
+      "contentsTerms": [
+        {
+          "Id": 81999999
+        },
+        {
+          "Id": 81999999
+        },
+        {
+          "Id": 81999999
+        }
+      ],
+      "stage": [
+        {
+          "OceanNpcId": 15099999,
+          "FirstRewardId": 95999999,
+          "RepeatRewardId": 90999999,
+          "BattleMissionGroupId": 69199999
+        },
+        {
+          "OceanNpcId": 15099999,
+          "FirstRewardId": 95999999,
+          "RepeatRewardId": 90999999,
+          "BattleMissionGroupId": 69199999
+        },
+        {
+          "OceanNpcId": 15099999,
+          "FirstRewardId": 95999999,
+          "RepeatRewardId": 90999999,
+          "BattleMissionGroupId": 69199999
+        },
+        {
+          "OceanNpcId": 15099999,
+          "FirstRewardId": 95999999,
+          "RepeatRewardId": 90999999,
+          "BattleMissionGroupId": 69199999
+        },
+        {
+          "OceanNpcId": 15099999,
+          "FirstRewardId": 95999999,
+          "RepeatRewardId": 90999999,
+          "BattleMissionGroupId": 69199999
+        },
+        {
+          "OceanNpcId": 15099999,
+          "FirstRewardId": 95999999,
+          "RepeatRewardId": 90999999,
+          "BattleMissionGroupId": 69199999
+        },
+        {
+          "OceanNpcId": 15099999,
+          "FirstRewardId": 95999999,
+          "RepeatRewardId": 90999999,
+          "BattleMissionGroupId": 69199999
+        },
+        {
+          "OceanNpcId": 15099999,
+          "FirstRewardId": 95999999,
+          "RepeatRewardId": 90999999,
+          "BattleMissionGroupId": 69199999
+        },
+        {
+          "OceanNpcId": 15099999,
+          "FirstRewardId": 95999999,
+          "RepeatRewardId": 90999999,
+          "BattleMissionGroupId": 69199999
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "contentsTerms": [
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        },
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        },
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        }
+      ],
+      "stage": [
+        {
+          "OceanNpcId": [
+            "OceanNpc"
+          ],
+          "FirstRewardId": [
+            "RewardFixed"
+          ],
+          "RepeatRewardId": [
+            "Reward"
+          ],
+          "BattleMissionGroupId": [
+            "BattleMissionGroup"
+          ]
+        },
+        {
+          "OceanNpcId": [
+            "OceanNpc"
+          ],
+          "FirstRewardId": [
+            "RewardFixed"
+          ],
+          "RepeatRewardId": [
+            "Reward"
+          ],
+          "BattleMissionGroupId": [
+            "BattleMissionGroup"
+          ]
+        },
+        {
+          "OceanNpcId": [
+            "OceanNpc"
+          ],
+          "FirstRewardId": [
+            "RewardFixed"
+          ],
+          "RepeatRewardId": [
+            "Reward"
+          ],
+          "BattleMissionGroupId": [
+            "BattleMissionGroup"
+          ]
+        },
+        {
+          "OceanNpcId": [
+            "OceanNpc"
+          ],
+          "FirstRewardId": [
+            "RewardFixed"
+          ],
+          "RepeatRewardId": [
+            "Reward"
+          ],
+          "BattleMissionGroupId": [
+            "BattleMissionGroup"
+          ]
+        },
+        {
+          "OceanNpcId": [
+            "OceanNpc"
+          ],
+          "FirstRewardId": [
+            "RewardFixed"
+          ],
+          "RepeatRewardId": [
+            "Reward"
+          ],
+          "BattleMissionGroupId": [
+            "BattleMissionGroup"
+          ]
+        },
+        {
+          "OceanNpcId": [
+            "OceanNpc"
+          ],
+          "FirstRewardId": [
+            "RewardFixed"
+          ],
+          "RepeatRewardId": [
+            "Reward"
+          ],
+          "BattleMissionGroupId": [
+            "BattleMissionGroup"
+          ]
+        },
+        {
+          "OceanNpcId": [
+            "OceanNpc"
+          ],
+          "FirstRewardId": [
+            "RewardFixed"
+          ],
+          "RepeatRewardId": [
+            "Reward"
+          ],
+          "BattleMissionGroupId": [
+            "BattleMissionGroup"
+          ]
+        },
+        {
+          "OceanNpcId": [
+            "OceanNpc"
+          ],
+          "FirstRewardId": [
+            "RewardFixed"
+          ],
+          "RepeatRewardId": [
+            "Reward"
+          ],
+          "BattleMissionGroupId": [
+            "BattleMissionGroup"
+          ]
+        },
+        {
+          "OceanNpcId": [
+            "OceanNpc"
+          ],
+          "FirstRewardId": [
+            "RewardFixed"
+          ],
+          "RepeatRewardId": [
+            "Reward"
+          ],
+          "BattleMissionGroupId": [
+            "BattleMissionGroup"
+          ]
+        }
+      ]
+    }
+  },
+  "BattleChallenge": {
+    "79000001": {
+      "id": 79000001,
+      "name": "기초 전투 학습",
+      "illust": "Illustration_Loading_Battle_02_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 1
+        }
+      ],
+      "stage": [
+        {
+          "OceanNpcId": 15080035,
+          "IsAttack": true,
+          "FirstRewardId": 95905054,
+          "RepeatRewardId": 90064657,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150011
+        },
+        {
+          "OceanNpcId": 15080036,
+          "IsAttack": true,
+          "FirstRewardId": 95905058,
+          "RepeatRewardId": 90064658,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150012
+        },
+        {
+          "OceanNpcId": 15080037,
+          "IsAttack": true,
+          "FirstRewardId": 95905062,
+          "RepeatRewardId": 90064659,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150013
+        }
+      ]
+    },
+    "79000002": {
+      "id": 79000002,
+      "name": "심화 전투 학습",
+      "illust": "Illustration_Loading_Battle_03_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 10
+        }
+      ],
+      "stage": [
+        {
+          "OceanNpcId": 15080038,
+          "IsAttack": true,
+          "FirstRewardId": 95905066,
+          "RepeatRewardId": 90064660,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150014
+        },
+        {
+          "OceanNpcId": 15080039,
+          "IsAttack": true,
+          "FirstRewardId": 95905070,
+          "RepeatRewardId": 90064661,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150015
+        },
+        {
+          "OceanNpcId": 15080040,
+          "IsAttack": true,
+          "FirstRewardId": 95905074,
+          "RepeatRewardId": 90064662,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150016
+        }
+      ]
+    },
+    "79000003": {
+      "id": 79000003,
+      "name": "알제 수금함대 토벌(백병)",
+      "illust": "Illustration_Story_056_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000039,
+          "Target": 82570018,
+          "Count": 2
+        }
+      ],
+      "stage": [
+        {
+          "OceanNpcId": 15080127,
+          "IsAttack": true,
+          "FirstRewardId": 95905078,
+          "RepeatRewardId": 90064663,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150017
+        },
+        {
+          "OceanNpcId": 15080128,
+          "IsAttack": true,
+          "FirstRewardId": 95905082,
+          "RepeatRewardId": 90064664,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150018
+        },
+        {
+          "OceanNpcId": 15080129,
+          "IsAttack": true,
+          "FirstRewardId": 95905086,
+          "RepeatRewardId": 90064665,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150019
+        }
+      ]
+    },
+    "79000004": {
+      "id": 79000004,
+      "name": "알제 수금함대 토벌(포격)",
+      "illust": "Illustration_Story_056_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000039,
+          "Target": 82570018,
+          "Count": 2
+        }
+      ],
+      "stage": [
+        {
+          "OceanNpcId": 15080130,
+          "IsAttack": true,
+          "FirstRewardId": 95905090,
+          "RepeatRewardId": 90064666,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150020
+        },
+        {
+          "OceanNpcId": 15080131,
+          "IsAttack": true,
+          "FirstRewardId": 95905094,
+          "RepeatRewardId": 90064667,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150021
+        },
+        {
+          "OceanNpcId": 15080132,
+          "IsAttack": true,
+          "FirstRewardId": 95905098,
+          "RepeatRewardId": 90064668,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150022
+        }
+      ]
+    },
+    "79000005": {
+      "id": 79000005,
+      "name": "알제 수금함대 토벌(충파)",
+      "illust": "Illustration_Story_056_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000039,
+          "Target": 82570018,
+          "Count": 2
+        }
+      ],
+      "stage": [
+        {
+          "OceanNpcId": 15080133,
+          "IsAttack": true,
+          "FirstRewardId": 95905102,
+          "RepeatRewardId": 90064669,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150023
+        },
+        {
+          "OceanNpcId": 15080134,
+          "IsAttack": true,
+          "FirstRewardId": 95905106,
+          "RepeatRewardId": 90064670,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150024
+        },
+        {
+          "OceanNpcId": 15080135,
+          "IsAttack": true,
+          "FirstRewardId": 95905110,
+          "RepeatRewardId": 90064671,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150025
+        }
+      ]
+    },
+    "79000006": {
+      "id": 79000006,
+      "name": "후퇴를 모르는 자",
+      "illust": "Illustration_Loading_Port_11_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000039,
+          "Target": 82570028,
+          "Count": 2
+        }
+      ],
+      "stage": [
+        {
+          "OceanNpcId": 15080140,
+          "IsAttack": true,
+          "FirstRewardId": 95905114,
+          "RepeatRewardId": 90064672,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150026
+        },
+        {
+          "OceanNpcId": 15080141,
+          "IsAttack": true,
+          "FirstRewardId": 95905118,
+          "RepeatRewardId": 90064673,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150027
+        },
+        {
+          "OceanNpcId": 15080142,
+          "IsAttack": true,
+          "FirstRewardId": 95905122,
+          "RepeatRewardId": 90064674,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150028
+        }
+      ]
+    },
+    "79000007": {
+      "id": 79000007,
+      "name": "영겁의 불꽃",
+      "illust": "Illustration_Disaster_16100005_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000039,
+          "Target": 82570032,
+          "Count": 4
+        }
+      ],
+      "stage": [
+        {
+          "OceanNpcId": 15080339,
+          "IsAttack": true,
+          "FirstRewardId": 95905138,
+          "RepeatRewardId": 90064678,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150045
+        },
+        {
+          "OceanNpcId": 15080340,
+          "IsAttack": true,
+          "FirstRewardId": 95905142,
+          "RepeatRewardId": 90064679,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150046
+        },
+        {
+          "OceanNpcId": 15080341,
+          "IsAttack": true,
+          "FirstRewardId": 95905146,
+          "RepeatRewardId": 90064680,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150047
+        }
+      ]
+    },
+    "79010001": {
+      "id": 79010001,
+      "name": "요새 전함의 최후",
+      "illust": "Illustration_Loading_Battle_03_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000039,
+          "Target": 82000008,
+          "Count": 106
+        }
+      ],
+      "stage": [
+        {
+          "OceanNpcId": 15080250,
+          "IsAttack": true,
+          "FirstRewardId": 95905126,
+          "RepeatRewardId": 90064675,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150042
+        },
+        {
+          "OceanNpcId": 15080251,
+          "IsAttack": true,
+          "FirstRewardId": 95905130,
+          "RepeatRewardId": 90064676,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150043
+        },
+        {
+          "OceanNpcId": 15080253,
+          "IsAttack": true,
+          "FirstRewardId": 95905134,
+          "RepeatRewardId": 90064677,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150044
+        }
+      ]
+    },
+    "79010002": {
+      "id": 79010002,
+      "name": "아홉 개의 원혼",
+      "illust": "Illustration_Story_068_Sprite",
+      "localBitflag": 219,
+      "contentsTerms": [
+        {
+          "Id": 81000039,
+          "Target": 82000017,
+          "Count": 97
+        }
+      ],
+      "stage": [
+        {
+          "OceanNpcId": 15080346,
+          "IsAttack": true,
+          "FirstRewardId": 95905150,
+          "RepeatRewardId": 90064681,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150048
+        },
+        {
+          "OceanNpcId": 15080347,
+          "IsAttack": true,
+          "FirstRewardId": 95905154,
+          "RepeatRewardId": 90064682,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150049
+        },
+        {
+          "OceanNpcId": 15080349,
+          "IsAttack": true,
+          "FirstRewardId": 95905158,
+          "RepeatRewardId": 90064683,
+          "Energy": 10,
+          "BattleMissionGroupId": 69150050
+        }
+      ]
+    }
+  }
+}

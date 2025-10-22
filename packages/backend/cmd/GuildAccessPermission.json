@@ -1,0 +1,51 @@
+{
+  ":GuildAccessPermission": {
+    ":type": {
+      "id": "key",
+      "modifyGuildNotice": "bool",
+      "manageMember": "bool",
+      "manageGuildBuff": "bool",
+      "manageGuildRaid": "bool"
+    },
+    ":required": {
+      "modifyGuildNotice": 1,
+      "manageMember": 1,
+      "manageGuildBuff": 1,
+      "manageGuildRaid": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "GuildAccessPermission": {
+    "1": {
+      "id": 1,
+      "modifyGuildNotice": true,
+      "manageMember": true,
+      "manageGuildBuff": true,
+      "manageGuildRaid": true
+    },
+    "2": {
+      "id": 2,
+      "modifyGuildNotice": true,
+      "manageMember": true,
+      "manageGuildBuff": false,
+      "manageGuildRaid": true
+    },
+    "3": {
+      "id": 3,
+      "modifyGuildNotice": false,
+      "manageMember": false,
+      "manageGuildBuff": false,
+      "manageGuildRaid": false
+    },
+    "4": {
+      "id": 4,
+      "modifyGuildNotice": false,
+      "manageMember": false,
+      "manageGuildBuff": false,
+      "manageGuildRaid": false
+    }
+  }
+}

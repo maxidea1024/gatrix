@@ -1,0 +1,117 @@
+{
+  ":AdvSpcEffFuncGroup": {
+    ":type": {
+      "id": "key",
+      "advSpcEffFunc": [
+        "number",
+        "number"
+      ]
+    },
+    ":required": {},
+    ":min": {
+      "advSpcEffFunc": [
+        77490000,
+        77490000
+      ]
+    },
+    ":max": {
+      "advSpcEffFunc": [
+        77499999,
+        77499999
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "advSpcEffFunc": [
+        [
+          "AdvSpcEffFunc"
+        ],
+        [
+          "AdvSpcEffFunc"
+        ]
+      ]
+    }
+  },
+  "AdvSpcEffFuncGroup": {
+    "77480000": {
+      "id": 77480000,
+      "advSpcEffFunc": [
+        77490001,
+        77490002
+      ]
+    },
+    "77480001": {
+      "id": 77480001,
+      "advSpcEffFunc": [
+        77490002,
+        77490002
+      ]
+    },
+    "77480002": {
+      "id": 77480002,
+      "advSpcEffFunc": [
+        77490003
+      ]
+    },
+    "77480003": {
+      "id": 77480003,
+      "advSpcEffFunc": [
+        77490004
+      ]
+    },
+    "77480004": {
+      "id": 77480004,
+      "advSpcEffFunc": [
+        77490005
+      ]
+    },
+    "77480005": {
+      "id": 77480005,
+      "advSpcEffFunc": [
+        77490006
+      ]
+    },
+    "77480006": {
+      "id": 77480006,
+      "advSpcEffFunc": [
+        77490022
+      ]
+    },
+    "77480007": {
+      "id": 77480007,
+      "advSpcEffFunc": [
+        77490023
+      ]
+    },
+    "77480008": {
+      "id": 77480008,
+      "advSpcEffFunc": [
+        77490024
+      ]
+    },
+    "77480009": {
+      "id": 77480009,
+      "advSpcEffFunc": [
+        77490025
+      ]
+    },
+    "77480010": {
+      "id": 77480010,
+      "advSpcEffFunc": [
+        77490008
+      ]
+    },
+    "77481001": {
+      "id": 77481001,
+      "advSpcEffFunc": [
+        77491000
+      ]
+    },
+    "77481002": {
+      "id": 77481002,
+      "advSpcEffFunc": [
+        77491001
+      ]
+    }
+  }
+}

@@ -1,0 +1,297 @@
+{
+  ":NeedShipSpecialStat": {
+    ":type": {
+      "id": "key",
+      "specialStat": [
+        {
+          "Type": "number",
+          "NeedLv": "number",
+          "StatId": "number"
+        },
+        {
+          "Type": "number",
+          "NeedLv": "number",
+          "StatId": "number"
+        },
+        {
+          "Type": "number",
+          "NeedLv": "number",
+          "StatId": "number"
+        },
+        {
+          "Type": "number",
+          "NeedLv": "number",
+          "StatId": "number"
+        }
+      ]
+    },
+    ":required": {},
+    ":min": {
+      "specialStat": [
+        {
+          "Type": 1,
+          "NeedLv": 1
+        },
+        {
+          "Type": 1,
+          "NeedLv": 1
+        },
+        {
+          "Type": 1,
+          "NeedLv": 1
+        },
+        {
+          "Type": 1,
+          "NeedLv": 1
+        }
+      ]
+    },
+    ":max": {
+      "specialStat": [
+        {
+          "Type": 4,
+          "NeedLv": 20
+        },
+        {
+          "Type": 4,
+          "NeedLv": 20
+        },
+        {
+          "Type": 4,
+          "NeedLv": 20
+        },
+        {
+          "Type": 4,
+          "NeedLv": 20
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "specialStat": [
+        {
+          "StatId": [
+            "SpecialStat"
+          ]
+        },
+        {
+          "StatId": [
+            "SpecialStat"
+          ]
+        },
+        {
+          "StatId": [
+            "SpecialStat"
+          ]
+        },
+        {
+          "StatId": [
+            "SpecialStat"
+          ]
+        }
+      ]
+    }
+  },
+  "NeedShipSpecialStat": {
+    "50000": {
+      "id": 50000,
+      "specialStat": [
+        {
+          "Type": 1,
+          "NeedLv": 10,
+          "StatId": 21600009
+        },
+        {
+          "Type": 4,
+          "NeedLv": 10,
+          "StatId": 21600309
+        },
+        {
+          "Type": 2,
+          "NeedLv": 10,
+          "StatId": 21600109
+        },
+        {
+          "Type": 3,
+          "NeedLv": 10,
+          "StatId": 21600209
+        }
+      ]
+    },
+    "50001": {
+      "id": 50001,
+      "specialStat": [
+        {
+          "Type": 1,
+          "NeedLv": 9,
+          "StatId": 21600008
+        },
+        {
+          "Type": 4,
+          "NeedLv": 9,
+          "StatId": 21600308
+        },
+        {
+          "Type": 2,
+          "NeedLv": 9,
+          "StatId": 21600108
+        },
+        {
+          "Type": 3,
+          "NeedLv": 9,
+          "StatId": 21600208
+        }
+      ]
+    },
+    "50002": {
+      "id": 50002,
+      "specialStat": [
+        {
+          "Type": 1,
+          "NeedLv": 8,
+          "StatId": 21600007
+        },
+        {
+          "Type": 4,
+          "NeedLv": 8,
+          "StatId": 21600307
+        },
+        {
+          "Type": 2,
+          "NeedLv": 8,
+          "StatId": 21600107
+        },
+        {
+          "Type": 3,
+          "NeedLv": 8,
+          "StatId": 21600207
+        }
+      ]
+    },
+    "50003": {
+      "id": 50003,
+      "specialStat": [
+        {
+          "Type": 1,
+          "NeedLv": 4,
+          "StatId": 21600003
+        },
+        {
+          "Type": 4,
+          "NeedLv": 4,
+          "StatId": 21600303
+        },
+        {
+          "Type": 2,
+          "NeedLv": 4,
+          "StatId": 21600103
+        },
+        {
+          "Type": 3,
+          "NeedLv": 4,
+          "StatId": 21600203
+        }
+      ]
+    },
+    "50004": {
+      "id": 50004,
+      "specialStat": [
+        {
+          "Type": 1,
+          "NeedLv": 5,
+          "StatId": 21600004
+        },
+        {
+          "Type": 4,
+          "NeedLv": 5,
+          "StatId": 21600304
+        },
+        {
+          "Type": 2,
+          "NeedLv": 5,
+          "StatId": 21600104
+        },
+        {
+          "Type": 3,
+          "NeedLv": 5,
+          "StatId": 21600204
+        }
+      ]
+    },
+    "50005": {
+      "id": 50005,
+      "specialStat": [
+        {
+          "Type": 1,
+          "NeedLv": 8,
+          "StatId": 21600007
+        },
+        {
+          "Type": 4,
+          "NeedLv": 8,
+          "StatId": 21600307
+        },
+        {
+          "Type": 2,
+          "NeedLv": 8,
+          "StatId": 21600107
+        },
+        {
+          "Type": 3,
+          "NeedLv": 8,
+          "StatId": 21600207
+        }
+      ]
+    },
+    "50006": {
+      "id": 50006,
+      "specialStat": [
+        {
+          "Type": 1,
+          "NeedLv": 13,
+          "StatId": 21600012
+        },
+        {
+          "Type": 4,
+          "NeedLv": 13,
+          "StatId": 21600312
+        },
+        {
+          "Type": 2,
+          "NeedLv": 13,
+          "StatId": 21600112
+        },
+        {
+          "Type": 3,
+          "NeedLv": 13,
+          "StatId": 21600212
+        }
+      ]
+    },
+    "50007": {
+      "id": 50007,
+      "specialStat": [
+        {
+          "Type": 1,
+          "NeedLv": 12,
+          "StatId": 21600011
+        },
+        {
+          "Type": 4,
+          "NeedLv": 12,
+          "StatId": 21600311
+        },
+        {
+          "Type": 2,
+          "NeedLv": 12,
+          "StatId": 21600111
+        },
+        {
+          "Type": 3,
+          "NeedLv": 12,
+          "StatId": 21600211
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,315 @@
+{
+  ":diceRank": {
+    ":type": {
+      "id": "key",
+      "rank": "number",
+      "name": "string",
+      "type": "number",
+      "rankType": "number",
+      "targetNum": "number",
+      "targetValue": "number"
+    },
+    ":required": {
+      "rank": 1,
+      "name": 1,
+      "type": 1,
+      "rankType": 1,
+      "targetNum": 1,
+      "targetValue": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "diceRank": {
+    "101": {
+      "id": 101,
+      "rank": 1,
+      "name": "파이브 다이스",
+      "type": 1,
+      "rankType": 1,
+      "targetNum": 1,
+      "targetValue": 5
+    },
+    "102": {
+      "id": 102,
+      "rank": 2,
+      "name": "파이브 다이스",
+      "type": 1,
+      "rankType": 1,
+      "targetNum": 6,
+      "targetValue": 5
+    },
+    "103": {
+      "id": 103,
+      "rank": 3,
+      "name": "파이브 다이스",
+      "type": 1,
+      "rankType": 1,
+      "targetNum": 5,
+      "targetValue": 5
+    },
+    "104": {
+      "id": 104,
+      "rank": 4,
+      "name": "파이브 다이스",
+      "type": 1,
+      "rankType": 1,
+      "targetNum": 4,
+      "targetValue": 5
+    },
+    "105": {
+      "id": 105,
+      "rank": 5,
+      "name": "파이브 다이스",
+      "type": 1,
+      "rankType": 1,
+      "targetNum": 3,
+      "targetValue": 5
+    },
+    "106": {
+      "id": 106,
+      "rank": 6,
+      "name": "파이브 다이스",
+      "type": 1,
+      "rankType": 1,
+      "targetNum": 2,
+      "targetValue": 5
+    },
+    "107": {
+      "id": 107,
+      "rank": 7,
+      "name": "포 다이스",
+      "type": 1,
+      "rankType": 2,
+      "targetNum": 1,
+      "targetValue": 4
+    },
+    "108": {
+      "id": 108,
+      "rank": 8,
+      "name": "포 다이스",
+      "type": 1,
+      "rankType": 2,
+      "targetNum": 6,
+      "targetValue": 4
+    },
+    "109": {
+      "id": 109,
+      "rank": 9,
+      "name": "포 다이스",
+      "type": 1,
+      "rankType": 2,
+      "targetNum": 5,
+      "targetValue": 4
+    },
+    "110": {
+      "id": 110,
+      "rank": 10,
+      "name": "포 다이스",
+      "type": 1,
+      "rankType": 2,
+      "targetNum": 4,
+      "targetValue": 4
+    },
+    "111": {
+      "id": 111,
+      "rank": 11,
+      "name": "포 다이스",
+      "type": 1,
+      "rankType": 2,
+      "targetNum": 3,
+      "targetValue": 4
+    },
+    "112": {
+      "id": 112,
+      "rank": 12,
+      "name": "포 다이스",
+      "type": 1,
+      "rankType": 2,
+      "targetNum": 2,
+      "targetValue": 4
+    },
+    "113": {
+      "id": 113,
+      "rank": 13,
+      "name": "풀 하우스",
+      "type": 2,
+      "rankType": 3,
+      "targetNum": 0,
+      "targetValue": 1
+    },
+    "114": {
+      "id": 114,
+      "rank": 14,
+      "name": "쓰리 다이스",
+      "type": 1,
+      "rankType": 4,
+      "targetNum": 1,
+      "targetValue": 3
+    },
+    "115": {
+      "id": 115,
+      "rank": 15,
+      "name": "쓰리 다이스",
+      "type": 1,
+      "rankType": 4,
+      "targetNum": 6,
+      "targetValue": 3
+    },
+    "116": {
+      "id": 116,
+      "rank": 16,
+      "name": "쓰리 다이스",
+      "type": 1,
+      "rankType": 4,
+      "targetNum": 5,
+      "targetValue": 3
+    },
+    "117": {
+      "id": 117,
+      "rank": 17,
+      "name": "쓰리 다이스",
+      "type": 1,
+      "rankType": 4,
+      "targetNum": 4,
+      "targetValue": 3
+    },
+    "118": {
+      "id": 118,
+      "rank": 18,
+      "name": "쓰리 다이스",
+      "type": 1,
+      "rankType": 4,
+      "targetNum": 3,
+      "targetValue": 3
+    },
+    "119": {
+      "id": 119,
+      "rank": 19,
+      "name": "쓰리 다이스",
+      "type": 1,
+      "rankType": 4,
+      "targetNum": 2,
+      "targetValue": 3
+    },
+    "120": {
+      "id": 120,
+      "rank": 20,
+      "name": "투 페어",
+      "type": 3,
+      "rankType": 5,
+      "targetNum": 0,
+      "targetValue": 1
+    },
+    "121": {
+      "id": 121,
+      "rank": 21,
+      "name": "원 페어",
+      "type": 1,
+      "rankType": 6,
+      "targetNum": 1,
+      "targetValue": 2
+    },
+    "122": {
+      "id": 122,
+      "rank": 22,
+      "name": "원 페어",
+      "type": 1,
+      "rankType": 6,
+      "targetNum": 6,
+      "targetValue": 2
+    },
+    "123": {
+      "id": 123,
+      "rank": 23,
+      "name": "원 페어",
+      "type": 1,
+      "rankType": 6,
+      "targetNum": 5,
+      "targetValue": 2
+    },
+    "124": {
+      "id": 124,
+      "rank": 24,
+      "name": "원 페어",
+      "type": 1,
+      "rankType": 6,
+      "targetNum": 4,
+      "targetValue": 2
+    },
+    "125": {
+      "id": 125,
+      "rank": 25,
+      "name": "원 페어",
+      "type": 1,
+      "rankType": 6,
+      "targetNum": 3,
+      "targetValue": 2
+    },
+    "126": {
+      "id": 126,
+      "rank": 26,
+      "name": "원 페어",
+      "type": 1,
+      "rankType": 6,
+      "targetNum": 2,
+      "targetValue": 2
+    },
+    "127": {
+      "id": 127,
+      "rank": 27,
+      "name": "없음",
+      "type": 0,
+      "rankType": 0,
+      "targetNum": 1,
+      "targetValue": 1
+    },
+    "128": {
+      "id": 128,
+      "rank": 28,
+      "name": "없음",
+      "type": 0,
+      "rankType": 0,
+      "targetNum": 6,
+      "targetValue": 1
+    },
+    "129": {
+      "id": 129,
+      "rank": 29,
+      "name": "없음",
+      "type": 0,
+      "rankType": 0,
+      "targetNum": 5,
+      "targetValue": 1
+    },
+    "130": {
+      "id": 130,
+      "rank": 30,
+      "name": "없음",
+      "type": 0,
+      "rankType": 0,
+      "targetNum": 4,
+      "targetValue": 1
+    },
+    "131": {
+      "id": 131,
+      "rank": 31,
+      "name": "없음",
+      "type": 0,
+      "rankType": 0,
+      "targetNum": 3,
+      "targetValue": 1
+    },
+    "132": {
+      "id": 132,
+      "rank": 32,
+      "name": "없음",
+      "type": 0,
+      "rankType": 0,
+      "targetNum": 2,
+      "targetValue": 1
+    }
+  }
+}

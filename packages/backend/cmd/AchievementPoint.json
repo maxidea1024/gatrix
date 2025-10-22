@@ -1,0 +1,527 @@
+{
+  ":AchievementPoint": {
+    ":type": {
+      "id": "key",
+      "needAchievementPoint": "number",
+      "reward": "number"
+    },
+    ":required": {
+      "needAchievementPoint": 1,
+      "reward": 1
+    },
+    ":min": {
+      "reward": 94000000
+    },
+    ":max": {
+      "reward": 95999999
+    },
+    ":enum": {},
+    ":links": {
+      "reward": [
+        "RewardFixed"
+      ]
+    }
+  },
+  "AchievementPoint": {
+    "2000": {
+      "id": 2000,
+      "needAchievementPoint": 10,
+      "reward": 94010001
+    },
+    "2001": {
+      "id": 2001,
+      "needAchievementPoint": 20,
+      "reward": 94010002
+    },
+    "2002": {
+      "id": 2002,
+      "needAchievementPoint": 40,
+      "reward": 94010003
+    },
+    "2003": {
+      "id": 2003,
+      "needAchievementPoint": 80,
+      "reward": 94010004
+    },
+    "2004": {
+      "id": 2004,
+      "needAchievementPoint": 130,
+      "reward": 94010005
+    },
+    "2005": {
+      "id": 2005,
+      "needAchievementPoint": 190,
+      "reward": 94010006
+    },
+    "2006": {
+      "id": 2006,
+      "needAchievementPoint": 270,
+      "reward": 94010007
+    },
+    "2007": {
+      "id": 2007,
+      "needAchievementPoint": 360,
+      "reward": 94010008
+    },
+    "2008": {
+      "id": 2008,
+      "needAchievementPoint": 460,
+      "reward": 94010009
+    },
+    "2009": {
+      "id": 2009,
+      "needAchievementPoint": 590,
+      "reward": 94010010
+    },
+    "2010": {
+      "id": 2010,
+      "needAchievementPoint": 720,
+      "reward": 94010011
+    },
+    "2011": {
+      "id": 2011,
+      "needAchievementPoint": 870,
+      "reward": 94010012
+    },
+    "2012": {
+      "id": 2012,
+      "needAchievementPoint": 1000,
+      "reward": 94010013
+    },
+    "2013": {
+      "id": 2013,
+      "needAchievementPoint": 1200,
+      "reward": 94010014
+    },
+    "2014": {
+      "id": 2014,
+      "needAchievementPoint": 1400,
+      "reward": 94010015
+    },
+    "2015": {
+      "id": 2015,
+      "needAchievementPoint": 1600,
+      "reward": 94010016
+    },
+    "2016": {
+      "id": 2016,
+      "needAchievementPoint": 1900,
+      "reward": 94010017
+    },
+    "2017": {
+      "id": 2017,
+      "needAchievementPoint": 2100,
+      "reward": 94010018
+    },
+    "2018": {
+      "id": 2018,
+      "needAchievementPoint": 2400,
+      "reward": 94010019
+    },
+    "2019": {
+      "id": 2019,
+      "needAchievementPoint": 2700,
+      "reward": 94010020
+    },
+    "2020": {
+      "id": 2020,
+      "needAchievementPoint": 3000,
+      "reward": 94010021
+    },
+    "2021": {
+      "id": 2021,
+      "needAchievementPoint": 3400,
+      "reward": 94010022
+    },
+    "2022": {
+      "id": 2022,
+      "needAchievementPoint": 3800,
+      "reward": 94010023
+    },
+    "2023": {
+      "id": 2023,
+      "needAchievementPoint": 4200,
+      "reward": 94010024
+    },
+    "2024": {
+      "id": 2024,
+      "needAchievementPoint": 4600,
+      "reward": 94010025
+    },
+    "2025": {
+      "id": 2025,
+      "needAchievementPoint": 5100,
+      "reward": 94010026
+    },
+    "2026": {
+      "id": 2026,
+      "needAchievementPoint": 5600,
+      "reward": 94010027
+    },
+    "2027": {
+      "id": 2027,
+      "needAchievementPoint": 6100,
+      "reward": 94010028
+    },
+    "2028": {
+      "id": 2028,
+      "needAchievementPoint": 6600,
+      "reward": 94010029
+    },
+    "2029": {
+      "id": 2029,
+      "needAchievementPoint": 7200,
+      "reward": 94010030
+    },
+    "2030": {
+      "id": 2030,
+      "needAchievementPoint": 7800,
+      "reward": 94010031
+    },
+    "2031": {
+      "id": 2031,
+      "needAchievementPoint": 8400,
+      "reward": 94010032
+    },
+    "2032": {
+      "id": 2032,
+      "needAchievementPoint": 9000,
+      "reward": 94010033
+    },
+    "2033": {
+      "id": 2033,
+      "needAchievementPoint": 9700,
+      "reward": 94010034
+    },
+    "2034": {
+      "id": 2034,
+      "needAchievementPoint": 10400,
+      "reward": 94010035
+    },
+    "2035": {
+      "id": 2035,
+      "needAchievementPoint": 11100,
+      "reward": 94010036
+    },
+    "2036": {
+      "id": 2036,
+      "needAchievementPoint": 11900,
+      "reward": 94010037
+    },
+    "2037": {
+      "id": 2037,
+      "needAchievementPoint": 12700,
+      "reward": 94010038
+    },
+    "2038": {
+      "id": 2038,
+      "needAchievementPoint": 13500,
+      "reward": 94010039
+    },
+    "2039": {
+      "id": 2039,
+      "needAchievementPoint": 14400,
+      "reward": 94010040
+    },
+    "2040": {
+      "id": 2040,
+      "needAchievementPoint": 15300,
+      "reward": 94010041
+    },
+    "2041": {
+      "id": 2041,
+      "needAchievementPoint": 16200,
+      "reward": 94010042
+    },
+    "2042": {
+      "id": 2042,
+      "needAchievementPoint": 17200,
+      "reward": 94010043
+    },
+    "2043": {
+      "id": 2043,
+      "needAchievementPoint": 18200,
+      "reward": 94010044
+    },
+    "2044": {
+      "id": 2044,
+      "needAchievementPoint": 19200,
+      "reward": 94010045
+    },
+    "2045": {
+      "id": 2045,
+      "needAchievementPoint": 20300,
+      "reward": 94010046
+    },
+    "2046": {
+      "id": 2046,
+      "needAchievementPoint": 21400,
+      "reward": 94010047
+    },
+    "2047": {
+      "id": 2047,
+      "needAchievementPoint": 22500,
+      "reward": 94010048
+    },
+    "2048": {
+      "id": 2048,
+      "needAchievementPoint": 23700,
+      "reward": 94010049
+    },
+    "2049": {
+      "id": 2049,
+      "needAchievementPoint": 25000,
+      "reward": 94010050
+    },
+    "2050": {
+      "id": 2050,
+      "needAchievementPoint": 26500,
+      "reward": 94010051
+    },
+    "2051": {
+      "id": 2051,
+      "needAchievementPoint": 28000,
+      "reward": 94010052
+    },
+    "2052": {
+      "id": 2052,
+      "needAchievementPoint": 29500,
+      "reward": 94010053
+    },
+    "2053": {
+      "id": 2053,
+      "needAchievementPoint": 31000,
+      "reward": 94010054
+    },
+    "2054": {
+      "id": 2054,
+      "needAchievementPoint": 32500,
+      "reward": 94010055
+    },
+    "2055": {
+      "id": 2055,
+      "needAchievementPoint": 34000,
+      "reward": 94010056
+    },
+    "2056": {
+      "id": 2056,
+      "needAchievementPoint": 35500,
+      "reward": 94010057
+    },
+    "2057": {
+      "id": 2057,
+      "needAchievementPoint": 37000,
+      "reward": 94010058
+    },
+    "2058": {
+      "id": 2058,
+      "needAchievementPoint": 38500,
+      "reward": 94010059
+    },
+    "2059": {
+      "id": 2059,
+      "needAchievementPoint": 40000,
+      "reward": 94010060
+    },
+    "2060": {
+      "id": 2060,
+      "needAchievementPoint": 41500,
+      "reward": 94010061
+    },
+    "2061": {
+      "id": 2061,
+      "needAchievementPoint": 43000,
+      "reward": 94010062
+    },
+    "2062": {
+      "id": 2062,
+      "needAchievementPoint": 44500,
+      "reward": 94010063
+    },
+    "2063": {
+      "id": 2063,
+      "needAchievementPoint": 46000,
+      "reward": 94010064
+    },
+    "2064": {
+      "id": 2064,
+      "needAchievementPoint": 47500,
+      "reward": 94010065
+    },
+    "2065": {
+      "id": 2065,
+      "needAchievementPoint": 49000,
+      "reward": 94010066
+    },
+    "2066": {
+      "id": 2066,
+      "needAchievementPoint": 50500,
+      "reward": 94010067
+    },
+    "2067": {
+      "id": 2067,
+      "needAchievementPoint": 52000,
+      "reward": 94010068
+    },
+    "2068": {
+      "id": 2068,
+      "needAchievementPoint": 53500,
+      "reward": 94010069
+    },
+    "2069": {
+      "id": 2069,
+      "needAchievementPoint": 55000,
+      "reward": 94010070
+    },
+    "2070": {
+      "id": 2070,
+      "needAchievementPoint": 56500,
+      "reward": 94010071
+    },
+    "2071": {
+      "id": 2071,
+      "needAchievementPoint": 58000,
+      "reward": 94010072
+    },
+    "2072": {
+      "id": 2072,
+      "needAchievementPoint": 59500,
+      "reward": 94010073
+    },
+    "2073": {
+      "id": 2073,
+      "needAchievementPoint": 61000,
+      "reward": 94010074
+    },
+    "2074": {
+      "id": 2074,
+      "needAchievementPoint": 62500,
+      "reward": 94010075
+    },
+    "2075": {
+      "id": 2075,
+      "needAchievementPoint": 64000,
+      "reward": 94010076
+    },
+    "2076": {
+      "id": 2076,
+      "needAchievementPoint": 65500,
+      "reward": 94010077
+    },
+    "2077": {
+      "id": 2077,
+      "needAchievementPoint": 67000,
+      "reward": 94010078
+    },
+    "2078": {
+      "id": 2078,
+      "needAchievementPoint": 68500,
+      "reward": 94010079
+    },
+    "2079": {
+      "id": 2079,
+      "needAchievementPoint": 70000,
+      "reward": 94010080
+    },
+    "2080": {
+      "id": 2080,
+      "needAchievementPoint": 71500,
+      "reward": 94010081
+    },
+    "2081": {
+      "id": 2081,
+      "needAchievementPoint": 73000,
+      "reward": 94010082
+    },
+    "2082": {
+      "id": 2082,
+      "needAchievementPoint": 74500,
+      "reward": 94010083
+    },
+    "2083": {
+      "id": 2083,
+      "needAchievementPoint": 76000,
+      "reward": 94010084
+    },
+    "2084": {
+      "id": 2084,
+      "needAchievementPoint": 77500,
+      "reward": 94010085
+    },
+    "2085": {
+      "id": 2085,
+      "needAchievementPoint": 79000,
+      "reward": 94010086
+    },
+    "2086": {
+      "id": 2086,
+      "needAchievementPoint": 80500,
+      "reward": 94010087
+    },
+    "2087": {
+      "id": 2087,
+      "needAchievementPoint": 82000,
+      "reward": 94010088
+    },
+    "2088": {
+      "id": 2088,
+      "needAchievementPoint": 83500,
+      "reward": 94010089
+    },
+    "2089": {
+      "id": 2089,
+      "needAchievementPoint": 85000,
+      "reward": 94010090
+    },
+    "2090": {
+      "id": 2090,
+      "needAchievementPoint": 86500,
+      "reward": 94010091
+    },
+    "2091": {
+      "id": 2091,
+      "needAchievementPoint": 88000,
+      "reward": 94010092
+    },
+    "2092": {
+      "id": 2092,
+      "needAchievementPoint": 89500,
+      "reward": 94010093
+    },
+    "2093": {
+      "id": 2093,
+      "needAchievementPoint": 91000,
+      "reward": 94010094
+    },
+    "2094": {
+      "id": 2094,
+      "needAchievementPoint": 92500,
+      "reward": 94010095
+    },
+    "2095": {
+      "id": 2095,
+      "needAchievementPoint": 94000,
+      "reward": 94010096
+    },
+    "2096": {
+      "id": 2096,
+      "needAchievementPoint": 95500,
+      "reward": 94010097
+    },
+    "2097": {
+      "id": 2097,
+      "needAchievementPoint": 97000,
+      "reward": 94010098
+    },
+    "2098": {
+      "id": 2098,
+      "needAchievementPoint": 98500,
+      "reward": 94010099
+    },
+    "2099": {
+      "id": 2099,
+      "needAchievementPoint": 100000,
+      "reward": 94010100
+    }
+  }
+}

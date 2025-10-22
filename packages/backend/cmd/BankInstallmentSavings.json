@@ -1,0 +1,413 @@
+{
+  ":BankInstallmentSavings": {
+    ":type": {
+      "id": "key",
+      "contentsTerms": [
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        }
+      ],
+      "minCompanyLv": "number",
+      "maxCompanyLv": "number",
+      "name": "text",
+      "sumGold": "number",
+      "sumRate": "number",
+      "pointId": "number",
+      "pointVal": "number",
+      "icon": "string"
+    },
+    ":required": {
+      "minCompanyLv": 1,
+      "maxCompanyLv": 1,
+      "name": 1,
+      "sumGold": 1,
+      "sumRate": 1,
+      "pointId": 1,
+      "pointVal": 1
+    },
+    ":requiredInObject": {
+      "contentsTerms": [
+        {
+          "Id": 1,
+          "Count": 1
+        }
+      ]
+    },
+    ":min": {
+      "contentsTerms": [
+        {
+          "Id": 81000000
+        }
+      ],
+      "minCompanyLv": 0,
+      "maxCompanyLv": 0,
+      "pointId": 100000
+    },
+    ":max": {
+      "contentsTerms": [
+        {
+          "Id": 81999999
+        }
+      ],
+      "minCompanyLv": 100,
+      "maxCompanyLv": 100,
+      "pointId": 199999
+    },
+    ":enum": {},
+    ":asset": {
+      "icon": 1
+    },
+    ":links": {
+      "contentsTerms": [
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        }
+      ],
+      "pointId": [
+        "Point"
+      ]
+    }
+  },
+  "BankInstallmentSavings": {
+    "40100000": {
+      "id": 40100000,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ],
+      "minCompanyLv": 0,
+      "maxCompanyLv": 9,
+      "name": "일반 적금",
+      "sumGold": 90000,
+      "sumRate": 30,
+      "pointId": 100001,
+      "pointVal": 90000
+    },
+    "40100001": {
+      "id": 40100001,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 2
+        }
+      ],
+      "minCompanyLv": 0,
+      "maxCompanyLv": 9,
+      "name": "고급 적금",
+      "sumGold": 120000,
+      "sumRate": 50,
+      "pointId": 100003,
+      "pointVal": 2
+    },
+    "40100002": {
+      "id": 40100002,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 4
+        }
+      ],
+      "minCompanyLv": 0,
+      "maxCompanyLv": 9,
+      "name": "최고급 적금",
+      "sumGold": 175000,
+      "sumRate": 60,
+      "pointId": 100003,
+      "pointVal": 3
+    },
+    "40100003": {
+      "id": 40100003,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ],
+      "minCompanyLv": 10,
+      "maxCompanyLv": 19,
+      "name": "일반 적금",
+      "sumGold": 180000,
+      "sumRate": 30,
+      "pointId": 100001,
+      "pointVal": 180000
+    },
+    "40100004": {
+      "id": 40100004,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 2
+        }
+      ],
+      "minCompanyLv": 10,
+      "maxCompanyLv": 19,
+      "name": "고급 적금",
+      "sumGold": 240000,
+      "sumRate": 50,
+      "pointId": 100003,
+      "pointVal": 5
+    },
+    "40100005": {
+      "id": 40100005,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 4
+        }
+      ],
+      "minCompanyLv": 10,
+      "maxCompanyLv": 19,
+      "name": "최고급 적금",
+      "sumGold": 360000,
+      "sumRate": 60,
+      "pointId": 100003,
+      "pointVal": 6
+    },
+    "40100006": {
+      "id": 40100006,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ],
+      "minCompanyLv": 20,
+      "maxCompanyLv": 29,
+      "name": "일반 적금",
+      "sumGold": 300000,
+      "sumRate": 30,
+      "pointId": 100001,
+      "pointVal": 300000
+    },
+    "40100007": {
+      "id": 40100007,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 2
+        }
+      ],
+      "minCompanyLv": 20,
+      "maxCompanyLv": 29,
+      "name": "고급 적금",
+      "sumGold": 360000,
+      "sumRate": 50,
+      "pointId": 100003,
+      "pointVal": 6
+    },
+    "40100008": {
+      "id": 40100008,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 4
+        }
+      ],
+      "minCompanyLv": 20,
+      "maxCompanyLv": 29,
+      "name": "최고급 적금",
+      "sumGold": 480000,
+      "sumRate": 60,
+      "pointId": 100003,
+      "pointVal": 8
+    },
+    "40100009": {
+      "id": 40100009,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ],
+      "minCompanyLv": 30,
+      "maxCompanyLv": 39,
+      "name": "일반 적금",
+      "sumGold": 375000,
+      "sumRate": 30,
+      "pointId": 100001,
+      "pointVal": 375000
+    },
+    "40100010": {
+      "id": 40100010,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 2
+        }
+      ],
+      "minCompanyLv": 30,
+      "maxCompanyLv": 39,
+      "name": "고급 적금",
+      "sumGold": 400000,
+      "sumRate": 50,
+      "pointId": 100003,
+      "pointVal": 8
+    },
+    "40100011": {
+      "id": 40100011,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 4
+        }
+      ],
+      "minCompanyLv": 30,
+      "maxCompanyLv": 39,
+      "name": "최고급 적금",
+      "sumGold": 600000,
+      "sumRate": 60,
+      "pointId": 100003,
+      "pointVal": 12
+    },
+    "40100012": {
+      "id": 40100012,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ],
+      "minCompanyLv": 40,
+      "maxCompanyLv": 49,
+      "name": "일반 적금",
+      "sumGold": 1200000,
+      "sumRate": 30,
+      "pointId": 100001,
+      "pointVal": 1200000
+    },
+    "40100013": {
+      "id": 40100013,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 2
+        }
+      ],
+      "minCompanyLv": 40,
+      "maxCompanyLv": 49,
+      "name": "고급 적금",
+      "sumGold": 1250000,
+      "sumRate": 50,
+      "pointId": 100003,
+      "pointVal": 25
+    },
+    "40100014": {
+      "id": 40100014,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 4
+        }
+      ],
+      "minCompanyLv": 40,
+      "maxCompanyLv": 49,
+      "name": "최고급 적금",
+      "sumGold": 1750000,
+      "sumRate": 60,
+      "pointId": 100003,
+      "pointVal": 35
+    },
+    "40100015": {
+      "id": 40100015,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ],
+      "minCompanyLv": 50,
+      "maxCompanyLv": 59,
+      "name": "일반 적금",
+      "sumGold": 1200000,
+      "sumRate": 30,
+      "pointId": 100001,
+      "pointVal": 1200000
+    },
+    "40100016": {
+      "id": 40100016,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 2
+        }
+      ],
+      "minCompanyLv": 50,
+      "maxCompanyLv": 59,
+      "name": "고급 적금",
+      "sumGold": 1500000,
+      "sumRate": 50,
+      "pointId": 100003,
+      "pointVal": 30
+    },
+    "40100017": {
+      "id": 40100017,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 4
+        }
+      ],
+      "minCompanyLv": 50,
+      "maxCompanyLv": 59,
+      "name": "최고급 적금",
+      "sumGold": 2000000,
+      "sumRate": 60,
+      "pointId": 100003,
+      "pointVal": 40
+    },
+    "40100018": {
+      "id": 40100018,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ],
+      "minCompanyLv": 60,
+      "maxCompanyLv": 100,
+      "name": "일반 적금",
+      "sumGold": 3150000,
+      "sumRate": 30,
+      "pointId": 100001,
+      "pointVal": 3150000
+    },
+    "40100019": {
+      "id": 40100019,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 2
+        }
+      ],
+      "minCompanyLv": 60,
+      "maxCompanyLv": 100,
+      "name": "고급 적금",
+      "sumGold": 3600000,
+      "sumRate": 50,
+      "pointId": 100003,
+      "pointVal": 72
+    },
+    "40100020": {
+      "id": 40100020,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 4
+        }
+      ],
+      "minCompanyLv": 60,
+      "maxCompanyLv": 100,
+      "name": "최고급 적금",
+      "sumGold": 4500000,
+      "sumRate": 60,
+      "pointId": 100003,
+      "pointVal": 90
+    }
+  }
+}

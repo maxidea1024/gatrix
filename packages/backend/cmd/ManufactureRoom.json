@@ -1,0 +1,124 @@
+{
+  ":ManufactureRoom": {
+    ":type": {
+      "id": "key",
+      "roomName": "text",
+      "roomBG": "string",
+      "localBitFlag": "bit",
+      "spine": [
+        {
+          "id": "number"
+        },
+        {
+          "id": "number"
+        },
+        {
+          "id": "number"
+        }
+      ],
+      "manufactureType": "number"
+    },
+    ":required": {
+      "roomName": 1,
+      "roomBG": 1,
+      "localBitFlag": 1,
+      "manufactureType": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "ManufactureRoom": {
+    "0": {
+      "id": 0,
+      "roomName": "조리실",
+      "roomBG": "1",
+      "localBitFlag": 27,
+      "spine": [
+        {
+          "id": 1
+        },
+        {
+          "id": 1
+        },
+        {
+          "id": 1
+        }
+      ],
+      "manufactureType": 1
+    },
+    "1": {
+      "id": 1,
+      "roomName": "주조실",
+      "roomBG": "1",
+      "localBitFlag": 27,
+      "spine": [
+        {
+          "id": 1
+        },
+        {
+          "id": 1
+        },
+        {
+          "id": 1
+        }
+      ],
+      "manufactureType": 2
+    },
+    "2": {
+      "id": 2,
+      "roomName": "준비중",
+      "roomBG": "1",
+      "localBitFlag": 0,
+      "spine": [
+        {
+          "id": 1
+        },
+        {
+          "id": 1
+        },
+        {
+          "id": 1
+        }
+      ],
+      "manufactureType": 3
+    },
+    "3": {
+      "id": 3,
+      "roomName": "준비중",
+      "roomBG": "1",
+      "localBitFlag": 0,
+      "spine": [
+        {
+          "id": 1
+        },
+        {
+          "id": 1
+        },
+        {
+          "id": 1
+        }
+      ],
+      "manufactureType": 4
+    },
+    "4": {
+      "id": 4,
+      "roomName": "준비중",
+      "roomBG": "1",
+      "localBitFlag": 0,
+      "spine": [
+        {
+          "id": 1
+        },
+        {
+          "id": 1
+        },
+        {
+          "id": 1
+        }
+      ],
+      "manufactureType": 5
+    }
+  }
+}

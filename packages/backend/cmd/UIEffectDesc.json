@@ -1,0 +1,316 @@
+{
+  ":UIEffectDesc": {
+    ":type": {
+      "id": "key",
+      "icon": "string",
+      "isAsscending": "bool"
+    },
+    ":required": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "UIEffectDesc": {
+    "1": {
+      "id": 1,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "2": {
+      "id": 2,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "3": {
+      "id": 3,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "4": {
+      "id": 4,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "5": {
+      "id": 5,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "6": {
+      "id": 6,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "7": {
+      "id": 7,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "8": {
+      "id": 8,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "9": {
+      "id": 9,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "10": {
+      "id": 10,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "11": {
+      "id": 11,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "12": {
+      "id": 12,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "13": {
+      "id": 13,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "14": {
+      "id": 14,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "15": {
+      "id": 15,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "16": {
+      "id": 16,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "17": {
+      "id": 17,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "18": {
+      "id": 18,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "19": {
+      "id": 19,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "20": {
+      "id": 20,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "21": {
+      "id": 21,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "22": {
+      "id": 22,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "23": {
+      "id": 23,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "24": {
+      "id": 24,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "25": {
+      "id": 25,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "26": {
+      "id": 26,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "27": {
+      "id": 27,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "28": {
+      "id": 28,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "29": {
+      "id": 29,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "30": {
+      "id": 30,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "31": {
+      "id": 31,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "32": {
+      "id": 32,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "33": {
+      "id": 33,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "34": {
+      "id": 34,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "35": {
+      "id": 35,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "603": {
+      "id": 603,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "606": {
+      "id": 606,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "607": {
+      "id": 607,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "608": {
+      "id": 608,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "609": {
+      "id": 609,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "611": {
+      "id": 611,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "614": {
+      "id": 614,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "615": {
+      "id": 615,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "612": {
+      "id": 612,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "613": {
+      "id": 613,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "630": {
+      "id": 630,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "616": {
+      "id": 616,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "617": {
+      "id": 617,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "618": {
+      "id": 618,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "619": {
+      "id": 619,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "620": {
+      "id": 620,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "621": {
+      "id": 621,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "623": {
+      "id": 623,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "622": {
+      "id": 622,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "624": {
+      "id": 624,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "625": {
+      "id": 625,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "629": {
+      "id": 629,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "628": {
+      "id": 628,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "627": {
+      "id": 627,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    },
+    "626": {
+      "id": 626,
+      "icon": "icon_skill_battle_characterEffect_998_Sprite",
+      "isAsscending": true
+    }
+  }
+}

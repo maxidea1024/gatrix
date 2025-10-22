@@ -1,0 +1,473 @@
+{
+  ":WeatherTile": {
+    ":type": {
+      "id": "key",
+      "weathertileclimateId": "number"
+    },
+    ":required": {
+      "weathertileclimateId": 1
+    },
+    ":min": {
+      "weathertileclimateId": 13400000
+    },
+    ":max": {
+      "weathertileclimateId": 13499999
+    },
+    ":enum": {},
+    ":links": {
+      "weathertileclimateId": [
+        "WeatherTileClimate"
+      ]
+    }
+  },
+  "WeatherTile": {
+    "13300000": {
+      "id": 13300000,
+      "weathertileclimateId": 13400001
+    },
+    "13300001": {
+      "id": 13300001,
+      "weathertileclimateId": 13400000
+    },
+    "13300002": {
+      "id": 13300002,
+      "weathertileclimateId": 13400001
+    },
+    "13300003": {
+      "id": 13300003,
+      "weathertileclimateId": 13400000
+    },
+    "13300010": {
+      "id": 13300010,
+      "weathertileclimateId": 13400001
+    },
+    "13300012": {
+      "id": 13300012,
+      "weathertileclimateId": 13400001
+    },
+    "13300013": {
+      "id": 13300013,
+      "weathertileclimateId": 13400000
+    },
+    "13300050": {
+      "id": 13300050,
+      "weathertileclimateId": 13400000
+    },
+    "13300051": {
+      "id": 13300051,
+      "weathertileclimateId": 13400001
+    },
+    "13300053": {
+      "id": 13300053,
+      "weathertileclimateId": 13400000
+    },
+    "13300100": {
+      "id": 13300100,
+      "weathertileclimateId": 13400010
+    },
+    "13300101": {
+      "id": 13300101,
+      "weathertileclimateId": 13400010
+    },
+    "13300102": {
+      "id": 13300102,
+      "weathertileclimateId": 13400010
+    },
+    "13300103": {
+      "id": 13300103,
+      "weathertileclimateId": 13400010
+    },
+    "13300104": {
+      "id": 13300104,
+      "weathertileclimateId": 13400010
+    },
+    "13300105": {
+      "id": 13300105,
+      "weathertileclimateId": 13400010
+    },
+    "13300106": {
+      "id": 13300106,
+      "weathertileclimateId": 13400010
+    },
+    "13300114": {
+      "id": 13300114,
+      "weathertileclimateId": 13400010
+    },
+    "13300150": {
+      "id": 13300150,
+      "weathertileclimateId": 13400010
+    },
+    "13300153": {
+      "id": 13300153,
+      "weathertileclimateId": 13400010
+    },
+    "13300154": {
+      "id": 13300154,
+      "weathertileclimateId": 13400010
+    },
+    "13300200": {
+      "id": 13300200,
+      "weathertileclimateId": 13400020
+    },
+    "13300201": {
+      "id": 13300201,
+      "weathertileclimateId": 13400304
+    },
+    "13300202": {
+      "id": 13300202,
+      "weathertileclimateId": 13400022
+    },
+    "13300203": {
+      "id": 13300203,
+      "weathertileclimateId": 13400022
+    },
+    "13300204": {
+      "id": 13300204,
+      "weathertileclimateId": 13400020
+    },
+    "13300205": {
+      "id": 13300205,
+      "weathertileclimateId": 13400020
+    },
+    "13300206": {
+      "id": 13300206,
+      "weathertileclimateId": 13400022
+    },
+    "13300211": {
+      "id": 13300211,
+      "weathertileclimateId": 13400304
+    },
+    "13300212": {
+      "id": 13300212,
+      "weathertileclimateId": 13400022
+    },
+    "13300214": {
+      "id": 13300214,
+      "weathertileclimateId": 13400020
+    },
+    "13300216": {
+      "id": 13300216,
+      "weathertileclimateId": 13400022
+    },
+    "13300252": {
+      "id": 13300252,
+      "weathertileclimateId": 13400022
+    },
+    "13300253": {
+      "id": 13300253,
+      "weathertileclimateId": 13400022
+    },
+    "13300254": {
+      "id": 13300254,
+      "weathertileclimateId": 13400022
+    },
+    "13300255": {
+      "id": 13300255,
+      "weathertileclimateId": 13400020
+    },
+    "13300300": {
+      "id": 13300300,
+      "weathertileclimateId": 13400100
+    },
+    "13300301": {
+      "id": 13300301,
+      "weathertileclimateId": 13400101
+    },
+    "13300302": {
+      "id": 13300302,
+      "weathertileclimateId": 13400100
+    },
+    "13300303": {
+      "id": 13300303,
+      "weathertileclimateId": 13400100
+    },
+    "13300304": {
+      "id": 13300304,
+      "weathertileclimateId": 13400101
+    },
+    "13300305": {
+      "id": 13300305,
+      "weathertileclimateId": 13400100
+    },
+    "13300306": {
+      "id": 13300306,
+      "weathertileclimateId": 13400101
+    },
+    "13300307": {
+      "id": 13300307,
+      "weathertileclimateId": 13400101
+    },
+    "13300310": {
+      "id": 13300310,
+      "weathertileclimateId": 13400100
+    },
+    "13300315": {
+      "id": 13300315,
+      "weathertileclimateId": 13400100
+    },
+    "13300353": {
+      "id": 13300353,
+      "weathertileclimateId": 13400100
+    },
+    "13300355": {
+      "id": 13300355,
+      "weathertileclimateId": 13400100
+    },
+    "13300356": {
+      "id": 13300356,
+      "weathertileclimateId": 13400100
+    },
+    "13300400": {
+      "id": 13300400,
+      "weathertileclimateId": 13400111
+    },
+    "13300401": {
+      "id": 13300401,
+      "weathertileclimateId": 13400110
+    },
+    "13300402": {
+      "id": 13300402,
+      "weathertileclimateId": 13400110
+    },
+    "13300450": {
+      "id": 13300450,
+      "weathertileclimateId": 13400110
+    },
+    "13300455": {
+      "id": 13300455,
+      "weathertileclimateId": 13400110
+    },
+    "13300500": {
+      "id": 13300500,
+      "weathertileclimateId": 13400415
+    },
+    "13300501": {
+      "id": 13300501,
+      "weathertileclimateId": 13400201
+    },
+    "13300502": {
+      "id": 13300502,
+      "weathertileclimateId": 13400200
+    },
+    "13300503": {
+      "id": 13300503,
+      "weathertileclimateId": 13400415
+    },
+    "13300504": {
+      "id": 13300504,
+      "weathertileclimateId": 13400200
+    },
+    "13300505": {
+      "id": 13300505,
+      "weathertileclimateId": 13400201
+    },
+    "13300512": {
+      "id": 13300512,
+      "weathertileclimateId": 13400200
+    },
+    "13300514": {
+      "id": 13300514,
+      "weathertileclimateId": 13400200
+    },
+    "13300550": {
+      "id": 13300550,
+      "weathertileclimateId": 13400200
+    },
+    "13300552": {
+      "id": 13300552,
+      "weathertileclimateId": 13400201
+    },
+    "13300600": {
+      "id": 13300600,
+      "weathertileclimateId": 13400210
+    },
+    "13300601": {
+      "id": 13300601,
+      "weathertileclimateId": 13400211
+    },
+    "13300602": {
+      "id": 13300602,
+      "weathertileclimateId": 13400211
+    },
+    "13300603": {
+      "id": 13300603,
+      "weathertileclimateId": 13400211
+    },
+    "13300604": {
+      "id": 13300604,
+      "weathertileclimateId": 13400211
+    },
+    "13300605": {
+      "id": 13300605,
+      "weathertileclimateId": 13400210
+    },
+    "13300606": {
+      "id": 13300606,
+      "weathertileclimateId": 13400210
+    },
+    "13300607": {
+      "id": 13300607,
+      "weathertileclimateId": 13400210
+    },
+    "13300608": {
+      "id": 13300608,
+      "weathertileclimateId": 13400211
+    },
+    "13300609": {
+      "id": 13300609,
+      "weathertileclimateId": 13400211
+    },
+    "13300700": {
+      "id": 13300700,
+      "weathertileclimateId": 13400220
+    },
+    "13300750": {
+      "id": 13300750,
+      "weathertileclimateId": 13400414
+    },
+    "13300800": {
+      "id": 13300800,
+      "weathertileclimateId": 13400230
+    },
+    "13300801": {
+      "id": 13300801,
+      "weathertileclimateId": 13400231
+    },
+    "13300802": {
+      "id": 13300802,
+      "weathertileclimateId": 13400230
+    },
+    "13300803": {
+      "id": 13300803,
+      "weathertileclimateId": 13400230
+    },
+    "13300804": {
+      "id": 13300804,
+      "weathertileclimateId": 13400413
+    },
+    "13300805": {
+      "id": 13300805,
+      "weathertileclimateId": 13400231
+    },
+    "13300900": {
+      "id": 13300900,
+      "weathertileclimateId": 13400300
+    },
+    "13300901": {
+      "id": 13300901,
+      "weathertileclimateId": 13400300
+    },
+    "13300902": {
+      "id": 13300902,
+      "weathertileclimateId": 13400300
+    },
+    "13300903": {
+      "id": 13300903,
+      "weathertileclimateId": 13400300
+    },
+    "13300904": {
+      "id": 13300904,
+      "weathertileclimateId": 13400300
+    },
+    "13300905": {
+      "id": 13300905,
+      "weathertileclimateId": 13400300
+    },
+    "13300906": {
+      "id": 13300906,
+      "weathertileclimateId": 13400300
+    },
+    "13300907": {
+      "id": 13300907,
+      "weathertileclimateId": 13400303
+    },
+    "13300911": {
+      "id": 13300911,
+      "weathertileclimateId": 13400302
+    },
+    "13300912": {
+      "id": 13300912,
+      "weathertileclimateId": 13400302
+    },
+    "13300913": {
+      "id": 13300913,
+      "weathertileclimateId": 13400302
+    },
+    "13300914": {
+      "id": 13300914,
+      "weathertileclimateId": 13400302
+    },
+    "13300916": {
+      "id": 13300916,
+      "weathertileclimateId": 13400302
+    },
+    "13300950": {
+      "id": 13300950,
+      "weathertileclimateId": 13400302
+    },
+    "13300957": {
+      "id": 13300957,
+      "weathertileclimateId": 13400300
+    },
+    "13300958": {
+      "id": 13300958,
+      "weathertileclimateId": 13400300
+    },
+    "13301000": {
+      "id": 13301000,
+      "weathertileclimateId": 13400400
+    },
+    "13301001": {
+      "id": 13301001,
+      "weathertileclimateId": 13400400
+    },
+    "13301002": {
+      "id": 13301002,
+      "weathertileclimateId": 13400400
+    },
+    "13301003": {
+      "id": 13301003,
+      "weathertileclimateId": 13400400
+    },
+    "13301004": {
+      "id": 13301004,
+      "weathertileclimateId": 13400400
+    },
+    "13301005": {
+      "id": 13301005,
+      "weathertileclimateId": 13400400
+    },
+    "13301013": {
+      "id": 13301013,
+      "weathertileclimateId": 13400401
+    },
+    "13301014": {
+      "id": 13301014,
+      "weathertileclimateId": 13400401
+    },
+    "13301015": {
+      "id": 13301015,
+      "weathertileclimateId": 13400401
+    },
+    "13301057": {
+      "id": 13301057,
+      "weathertileclimateId": 13400400
+    },
+    "13301100": {
+      "id": 13301100,
+      "weathertileclimateId": 13400410
+    },
+    "13301101": {
+      "id": 13301101,
+      "weathertileclimateId": 13400410
+    },
+    "13301200": {
+      "id": 13301200,
+      "weathertileclimateId": 13400411
+    },
+    "13301201": {
+      "id": 13301201,
+      "weathertileclimateId": 13400412
+    }
+  }
+}

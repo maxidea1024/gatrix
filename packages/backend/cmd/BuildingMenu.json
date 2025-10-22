@@ -1,0 +1,405 @@
+{
+  ":BuildingMenu": {
+    ":type": {
+      "id": "key",
+      "localBitflag": "bit",
+      "buildingType": "number",
+      "isNotYetDev": "bool",
+      "buildingContentsUnlockId": "number"
+    },
+    ":required": {},
+    ":min": {
+      "buildingType": 0,
+      "buildingContentsUnlockId": 38300000
+    },
+    ":max": {
+      "buildingType": 54,
+      "buildingContentsUnlockId": 38399999
+    },
+    ":enum": {},
+    ":links": {
+      "buildingContentsUnlockId": [
+        "BuildingContentsUnlock"
+      ]
+    }
+  },
+  "BuildingMenu": {
+    "38400000": {
+      "id": 38400000,
+      "localBitflag": 219,
+      "buildingType": 2,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300010
+    },
+    "38400001": {
+      "id": 38400001,
+      "localBitflag": 219,
+      "buildingType": 4,
+      "isNotYetDev": false
+    },
+    "38400002": {
+      "id": 38400002,
+      "localBitflag": 3,
+      "buildingType": 4,
+      "isNotYetDev": false
+    },
+    "38400003": {
+      "id": 38400003,
+      "localBitflag": 219,
+      "buildingType": 4,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300009
+    },
+    "38400004": {
+      "id": 38400004,
+      "localBitflag": 219,
+      "buildingType": 4,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300014
+    },
+    "38400005": {
+      "id": 38400005,
+      "localBitflag": 219,
+      "buildingType": 4,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300028
+    },
+    "38400006": {
+      "id": 38400006,
+      "localBitflag": 219,
+      "buildingType": 5,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300015
+    },
+    "38400007": {
+      "id": 38400007,
+      "localBitflag": 219,
+      "buildingType": 5,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300016
+    },
+    "38400008": {
+      "id": 38400008,
+      "localBitflag": 219,
+      "buildingType": 5,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300017
+    },
+    "38400009": {
+      "id": 38400009,
+      "localBitflag": 219,
+      "buildingType": 9,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300001
+    },
+    "38400010": {
+      "id": 38400010,
+      "localBitflag": 219,
+      "buildingType": 9,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300002
+    },
+    "38400011": {
+      "id": 38400011,
+      "localBitflag": 219,
+      "buildingType": 9,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300003
+    },
+    "38400012": {
+      "id": 38400012,
+      "localBitflag": 219,
+      "buildingType": 10,
+      "isNotYetDev": false
+    },
+    "38400013": {
+      "id": 38400013,
+      "localBitflag": 219,
+      "buildingType": 10,
+      "isNotYetDev": false
+    },
+    "38400014": {
+      "id": 38400014,
+      "localBitflag": 219,
+      "buildingType": 11,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300005
+    },
+    "38400015": {
+      "id": 38400015,
+      "localBitflag": 219,
+      "buildingType": 11,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300006
+    },
+    "38400016": {
+      "id": 38400016,
+      "localBitflag": 219,
+      "buildingType": 11,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300038
+    },
+    "38400017": {
+      "id": 38400017,
+      "localBitflag": 219,
+      "buildingType": 11,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300007
+    },
+    "38400018": {
+      "id": 38400018,
+      "localBitflag": 219,
+      "buildingType": 11,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300008
+    },
+    "38400019": {
+      "id": 38400019,
+      "localBitflag": 219,
+      "buildingType": 11,
+      "isNotYetDev": true,
+      "buildingContentsUnlockId": 38300004
+    },
+    "38400020": {
+      "id": 38400020,
+      "localBitflag": 219,
+      "buildingType": 12,
+      "isNotYetDev": false
+    },
+    "38400021": {
+      "id": 38400021,
+      "localBitflag": 219,
+      "buildingType": 12,
+      "isNotYetDev": true,
+      "buildingContentsUnlockId": 38300004
+    },
+    "38400022": {
+      "id": 38400022,
+      "localBitflag": 219,
+      "buildingType": 12,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300007
+    },
+    "38400023": {
+      "id": 38400023,
+      "localBitflag": 219,
+      "buildingType": 12,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300009
+    },
+    "38400025": {
+      "id": 38400025,
+      "localBitflag": 219,
+      "buildingType": 7,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300021
+    },
+    "38400026": {
+      "id": 38400026,
+      "localBitflag": 219,
+      "buildingType": 7,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300022
+    },
+    "38400027": {
+      "id": 38400027,
+      "localBitflag": 219,
+      "buildingType": 3,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300025
+    },
+    "38400028": {
+      "id": 38400028,
+      "localBitflag": 219,
+      "buildingType": 3,
+      "isNotYetDev": true
+    },
+    "38400029": {
+      "id": 38400029,
+      "localBitflag": 219,
+      "buildingType": 13,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300029
+    },
+    "38400030": {
+      "id": 38400030,
+      "localBitflag": 219,
+      "buildingType": 1,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300018
+    },
+    "38400031": {
+      "id": 38400031,
+      "localBitflag": 219,
+      "buildingType": 1,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300020
+    },
+    "38400032": {
+      "id": 38400032,
+      "localBitflag": 219,
+      "buildingType": 1,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300019
+    },
+    "38400033": {
+      "id": 38400033,
+      "localBitflag": 219,
+      "buildingType": 8,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300024
+    },
+    "38400034": {
+      "id": 38400034,
+      "localBitflag": 219,
+      "buildingType": 8,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300030
+    },
+    "38400035": {
+      "id": 38400035,
+      "localBitflag": 219,
+      "buildingType": 8,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300031
+    },
+    "38400036": {
+      "id": 38400036,
+      "localBitflag": 219,
+      "buildingType": 5,
+      "isNotYetDev": false
+    },
+    "38400037": {
+      "id": 38400037,
+      "localBitflag": 219,
+      "buildingType": 13,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300032
+    },
+    "38400038": {
+      "id": 38400038,
+      "localBitflag": 219,
+      "buildingType": 13,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300033
+    },
+    "38400039": {
+      "id": 38400039,
+      "localBitflag": 219,
+      "buildingType": 8,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300023
+    },
+    "38400040": {
+      "id": 38400040,
+      "localBitflag": 219,
+      "buildingType": 2,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300034
+    },
+    "38400041": {
+      "id": 38400041,
+      "localBitflag": 219,
+      "buildingType": 11,
+      "isNotYetDev": true,
+      "buildingContentsUnlockId": 38300035
+    },
+    "38400042": {
+      "id": 38400042,
+      "localBitflag": 219,
+      "buildingType": 11,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300036
+    },
+    "38400043": {
+      "id": 38400043,
+      "localBitflag": 219,
+      "buildingType": 1,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300037
+    },
+    "38400044": {
+      "id": 38400044,
+      "localBitflag": 219,
+      "buildingType": 3,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300039
+    },
+    "38400045": {
+      "id": 38400045,
+      "localBitflag": 219,
+      "buildingType": 30,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300010
+    },
+    "38400046": {
+      "id": 38400046,
+      "localBitflag": 219,
+      "buildingType": 30,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300034
+    },
+    "38400047": {
+      "id": 38400047,
+      "localBitflag": 219,
+      "buildingType": 30,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300010
+    },
+    "38400048": {
+      "id": 38400048,
+      "localBitflag": 0,
+      "buildingType": 13,
+      "isNotYetDev": false
+    },
+    "38400049": {
+      "id": 38400049,
+      "localBitflag": 219,
+      "buildingType": 13,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300016
+    },
+    "38400050": {
+      "id": 38400050,
+      "localBitflag": 219,
+      "buildingType": 2,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300043
+    },
+    "38400051": {
+      "id": 38400051,
+      "localBitflag": 219,
+      "buildingType": 14,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300044
+    },
+    "38400052": {
+      "id": 38400052,
+      "localBitflag": 219,
+      "buildingType": 11,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300045
+    },
+    "38400053": {
+      "id": 38400053,
+      "localBitflag": 219,
+      "buildingType": 5,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300046
+    },
+    "38400054": {
+      "id": 38400054,
+      "localBitflag": 0,
+      "buildingType": 13,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300047
+    },
+    "38400055": {
+      "id": 38400055,
+      "localBitflag": 219,
+      "buildingType": 11,
+      "isNotYetDev": false,
+      "buildingContentsUnlockId": 38300048
+    }
+  }
+}

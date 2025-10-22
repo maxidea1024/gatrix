@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  AppBar,
+  Toolbar,
   Button,
   TextField,
   Box,
+  Typography,
+  IconButton,
 } from '@mui/material';
+import {
+  Close as CloseIcon,
+} from '@mui/icons-material';
+import ResizableDrawer from '../common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import surveyService, { SurveyConfig } from '../../services/surveyService';
@@ -63,10 +67,31 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({ open, onClose }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{t('surveys.config')}</DialogTitle>
-      <DialogContent dividers>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <ResizableDrawer
+      open={open}
+      onClose={onClose}
+      defaultWidth={600}
+      minWidth={400}
+      maxWidth={1200}
+    >
+      {/* Header */}
+      <AppBar position="static" color="default" elevation={0}>
+        <Toolbar>
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography variant="h6">{t('surveys.config')}</Typography>
+            <Typography variant="body2" color="text.secondary">
+              {t('surveys.configSubtitle')}
+            </Typography>
+          </Box>
+          <IconButton edge="end" onClick={onClose} sx={{ ml: 2 }}>
+            <CloseIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+
+      {/* Content */}
+      <Box sx={{ p: 3, flexGrow: 1, overflow: 'auto' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <TextField
             label={t('surveys.baseSurveyUrl')}
             value={config.baseSurveyUrl}
@@ -101,16 +126,27 @@ const SurveyConfigDialog: React.FC<SurveyConfigDialogProps> = ({ open, onClose }
             type="password"
           />
         </Box>
-      </DialogContent>
-      <DialogActions>
+      </Box>
+
+      {/* Footer */}
+      <Box
+        sx={{
+          p: 2,
+          borderTop: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: 1,
+        }}
+      >
         <Button onClick={onClose} disabled={submitting}>
           {t('common.cancel')}
         </Button>
         <Button onClick={handleSubmit} variant="contained" disabled={loading || submitting}>
           {submitting ? t('common.saving') : t('common.save')}
         </Button>
-      </DialogActions>
-    </Dialog>
+      </Box>
+    </ResizableDrawer>
   );
 };
 

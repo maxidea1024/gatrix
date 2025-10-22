@@ -1,0 +1,2917 @@
+{
+  ":BattleActionRange": {
+    ":type": {
+      "id": "key",
+      "name": "string",
+      "battleActionRangePath": [
+        "string",
+        "string",
+        "string",
+        "string"
+      ],
+      "battleActionRangeImage": [
+        "string",
+        "string",
+        "string",
+        "string"
+      ],
+      "image": "string",
+      "specialBattleActionRangePath": [
+        "string",
+        "string",
+        "string",
+        "string"
+      ],
+      "specialBattleActionRangeImage": [
+        "string",
+        "string",
+        "string",
+        "string"
+      ],
+      "specialImage": "string",
+      "ebattleActionRangePath": [
+        "string",
+        "string",
+        "string",
+        "string"
+      ],
+      "obstaclePassType": "number",
+      "directionAngle": "number",
+      "centralAngle": "number",
+      "minDistance": "number",
+      "maxDistance": "number",
+      "isReflected": "bool",
+      "effectiveDistance": "number"
+    },
+    ":required": {
+      "name": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {},
+    ":asset": {}
+  },
+  "BattleActionRange": {
+    "60300000": {
+      "id": 60300000,
+      "name": "박격포_일반",
+      "battleActionRangePath": [
+        "WT_ActionRange_Mortar_Short_2-3_New_Down_1",
+        "WT_ActionRange_Mortar_Short_2-3_New",
+        "WT_ActionRange_Mortar_Short_2-3_New_Up_1",
+        "WT_ActionRange_Mortar_Short_2-3_New_Up_2"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Mortar_Short_2-3_New_Down_1_Sprite",
+        "WT_ActionRange_Mortar_Short_2-3_New_Sprite",
+        "WT_ActionRange_Mortar_Short_2-3_New_Up_1_Sprite",
+        "WT_ActionRange_Mortar_Short_2-3_New_Up_2_Sprite"
+      ],
+      "image": "WT_ActionRange_Mortar_Short_2-3_New_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Special_Mortar_Short_2-3_New_Down_1",
+        "WT_ActionRange_Special_Mortar_Short_2-3_New",
+        "WT_ActionRange_Special_Mortar_Short_2-3_New_Up_1",
+        "WT_ActionRange_Special_Mortar_Short_2-3_New_Up_2"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Special_Mortar_Short_2-3_New_Down_1_Sprite",
+        "WT_ActionRange_Special_Mortar_Short_2-3_New_Sprite",
+        "WT_ActionRange_Special_Mortar_Short_2-3_New_Up_1_Sprite",
+        "WT_ActionRange_Special_Mortar_Short_2-3_New_Up_2_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Special_Mortar_Short_2-3_New_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Mortar_Short_2-3_renew_Down_1",
+        "WT_ActionRange_Elite_Mortar_Short_2-3_renew",
+        "WT_ActionRange_Elite_Mortar_Short_2-3_renew_Up_1",
+        "WT_ActionRange_Elite_Mortar_Short_2-3_renew_Up_2"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 3,
+      "maxDistance": 5,
+      "isReflected": true,
+      "effectiveDistance": 4
+    },
+    "60300001": {
+      "id": 60300001,
+      "name": "박격포_근거리",
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 4,
+      "isReflected": true,
+      "effectiveDistance": 3
+    },
+    "60300002": {
+      "id": 60300002,
+      "name": "박격포_원거리",
+      "battleActionRangePath": [
+        "WT_ActionRange_Mortar_Long_3-4_New_Down_1",
+        "WT_ActionRange_Mortar_Long_3-4_New",
+        "WT_ActionRange_Mortar_Long_3-4_New_Up_1",
+        "WT_ActionRange_Mortar_Long_3-4_New_Up_2"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Mortar_Long_3-4_New_Down_1_Sprite",
+        "WT_ActionRange_Mortar_Long_3-4_New_Sprite",
+        "WT_ActionRange_Mortar_Long_3-4_New_Up_1_Sprite",
+        "WT_ActionRange_Mortar_Long_3-4_New_Up_2_Sprite"
+      ],
+      "image": "WT_ActionRange_Mortar_Long_3-4_New_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Mortar_Long_3-4_New_Down_1",
+        "WT_ActionRange_Mortar_Long_3-4_New",
+        "WT_ActionRange_Mortar_Long_3-4_New_Up_1",
+        "WT_ActionRange_Mortar_Long_3-4_New_Up_2"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Mortar_Long_3-4_New_Down_1_Sprite",
+        "WT_ActionRange_Mortar_Long_3-4_New_Sprite",
+        "WT_ActionRange_Mortar_Long_3-4_New_Up_1_Sprite",
+        "WT_ActionRange_Mortar_Long_3-4_New_Up_2_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Mortar_Long_3-4_New_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Mortar_Long_3-4_renew_Down_1",
+        "WT_ActionRange_Elite_Mortar_Long_3-4_renew",
+        "WT_ActionRange_Elite_Mortar_Long_3-4_renew_Up_1",
+        "WT_ActionRange_Elite_Mortar_Long_3-4_renew_Up_2"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 4,
+      "maxDistance": 6,
+      "isReflected": true,
+      "effectiveDistance": 5
+    },
+    "60300003": {
+      "id": 60300003,
+      "name": "신록의 대포",
+      "battleActionRangePath": [
+        "WT_ActionRange_Howitzer_Short_3-4_New_Down_1",
+        "WT_ActionRange_Howitzer_Short_3-4_New",
+        "WT_ActionRange_Howitzer_Short_3-4_New_Up_1",
+        "WT_ActionRange_Howitzer_Short_3-4_New_Up_2"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Howitzer_Short_3-4_New_Down_1_Sprite",
+        "WT_ActionRange_Howitzer_Short_3-4_New_Sprite",
+        "WT_ActionRange_Howitzer_Short_3-4_New_Up_1_Sprite",
+        "WT_ActionRange_Howitzer_Short_3-4_New_Up_2_Sprite"
+      ],
+      "image": "WT_ActionRange_Howitzer_Short_3-4_New_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Special_Howitzer_Short_3-4_New_Down_1",
+        "WT_ActionRange_Special_Howitzer_Short_3-4_New",
+        "WT_ActionRange_Special_Howitzer_Short_3-4_New_Up_1",
+        "WT_ActionRange_Special_Howitzer_Short_3-4_New_Up_2"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Special_Howitzer_Short_3-4_New_Down_1_Sprite",
+        "WT_ActionRange_Special_Howitzer_Short_3-4_New_Sprite",
+        "WT_ActionRange_Special_Howitzer_Short_3-4_New_Up_1_Sprite",
+        "WT_ActionRange_Special_Howitzer_Short_3-4_New_Up_2_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Special_Howitzer_Short_3-4_New_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Howitzer_Short_3-4_renew_Down_1",
+        "WT_ActionRange_Elite_Howitzer_Short_3-4_renew",
+        "WT_ActionRange_Elite_Howitzer_Short_3-4_renew_Up_1",
+        "WT_ActionRange_Elite_Howitzer_Short_3-4_renew_Up_2"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 3,
+      "maxDistance": 5,
+      "isReflected": true,
+      "effectiveDistance": 4
+    },
+    "60300100": {
+      "id": 60300100,
+      "name": "곡사포_일반",
+      "battleActionRangePath": [
+        "WT_ActionRange_Howitzer_Short_3-4_New_Down_1",
+        "WT_ActionRange_Howitzer_Short_3-4_New",
+        "WT_ActionRange_Howitzer_Short_3-4_New_Up_1",
+        "WT_ActionRange_Howitzer_Short_3-4_New_Up_2"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Howitzer_Short_3-4_New_Down_1_Sprite",
+        "WT_ActionRange_Howitzer_Short_3-4_New_Sprite",
+        "WT_ActionRange_Howitzer_Short_3-4_New_Up_1_Sprite",
+        "WT_ActionRange_Howitzer_Short_3-4_New_Up_2_Sprite"
+      ],
+      "image": "WT_ActionRange_Howitzer_Short_3-4_New_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Special_Howitzer_Short_3-4_New_Down_1",
+        "WT_ActionRange_Special_Howitzer_Short_3-4_New",
+        "WT_ActionRange_Special_Howitzer_Short_3-4_New_Up_1",
+        "WT_ActionRange_Special_Howitzer_Short_3-4_New_Up_2"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Special_Howitzer_Short_3-4_New_Down_1_Sprite",
+        "WT_ActionRange_Special_Howitzer_Short_3-4_New_Sprite",
+        "WT_ActionRange_Special_Howitzer_Short_3-4_New_Up_1_Sprite",
+        "WT_ActionRange_Special_Howitzer_Short_3-4_New_Up_2_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Special_Howitzer_Short_3-4_New_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Howitzer_Short_3-4_renew_Down_1",
+        "WT_ActionRange_Elite_Howitzer_Short_3-4_renew",
+        "WT_ActionRange_Elite_Howitzer_Short_3-4_renew_Up_1",
+        "WT_ActionRange_Elite_Howitzer_Short_3-4_renew_Up_2"
+      ],
+      "obstaclePassType": 1,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 4,
+      "isReflected": true,
+      "effectiveDistance": 3
+    },
+    "60300102": {
+      "id": 60300102,
+      "name": "곡사포_원거리",
+      "battleActionRangePath": [
+        "WT_ActionRange_Howitzer_Long_4-5_New_Down_1",
+        "WT_ActionRange_Howitzer_Long_4-5_New",
+        "WT_ActionRange_Howitzer_Long_4-5_New_Up_1",
+        "WT_ActionRange_Howitzer_Long_4-5_New_Up_2"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Howitzer_Long_4-5_New_Down_1_Sprite",
+        "WT_ActionRange_Howitzer_Long_4-5_New_Sprite",
+        "WT_ActionRange_Howitzer_Long_4-5_New_Up_1_Sprite",
+        "WT_ActionRange_Howitzer_Long_4-5_New_Up_2_Sprite"
+      ],
+      "image": "WT_ActionRange_Howitzer_Long_4-5_New_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Howitzer_Long_4-5_New_Down_1",
+        "WT_ActionRange_Howitzer_Long_4-5_New",
+        "WT_ActionRange_Howitzer_Long_4-5_New_Up_1",
+        "WT_ActionRange_Howitzer_Long_4-5_New_Up_2"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Howitzer_Long_4-5_New_Down_1_Sprite",
+        "WT_ActionRange_Howitzer_Long_4-5_New_Sprite",
+        "WT_ActionRange_Howitzer_Long_4-5_New_Up_1_Sprite",
+        "WT_ActionRange_Howitzer_Long_4-5_New_Up_2_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Howitzer_Long_4-5_New_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Howitzer_Long_4-5_renew_Down_1",
+        "WT_ActionRange_Elite_Howitzer_Long_4-5_renew",
+        "WT_ActionRange_Elite_Howitzer_Long_4-5_renew_Up_1",
+        "WT_ActionRange_Elite_Howitzer_Long_4-5_renew_Up_2"
+      ],
+      "obstaclePassType": 1,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60300200": {
+      "id": 60300200,
+      "name": "평사포_일반",
+      "battleActionRangePath": [
+        "WT_ActionRange_Gun_Short_4-5_New_Down_1",
+        "WT_ActionRange_Gun_Short_4-5_New",
+        "WT_ActionRange_Gun_Short_4-5_New_Up_1",
+        "WT_ActionRange_Gun_Short_4-5_New_Up_2"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Gun_Short_4-5_New_Down_1_Sprite",
+        "WT_ActionRange_Gun_Short_4-5_New_Sprite",
+        "WT_ActionRange_Gun_Short_4-5_New_Up_1_Sprite",
+        "WT_ActionRange_Gun_Short_4-5_New_Up_2_Sprite"
+      ],
+      "image": "WT_ActionRange_Gun_Short_4-5_New_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Special_Gun_Short_4-5_New_Down_1",
+        "WT_ActionRange_Special_Gun_Short_4-5_New",
+        "WT_ActionRange_Special_Gun_Short_4-5_New_Up_1",
+        "WT_ActionRange_Special_Gun_Short_4-5_New_Up_2"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Special_Gun_Short_4-5_New_Down_1_Sprite",
+        "WT_ActionRange_Special_Gun_Short_4-5_New_Sprite",
+        "WT_ActionRange_Special_Gun_Short_4-5_New_Up_1_Sprite",
+        "WT_ActionRange_Special_Gun_Short_4-5_New_Up_2_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Special_Gun_Short_4-5_New_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Gun_Short_4-5_renew_Down_1",
+        "WT_ActionRange_Elite_Gun_Short_4-5_renew",
+        "WT_ActionRange_Elite_Gun_Short_4-5_renew_Up_1",
+        "WT_ActionRange_Elite_Gun_Short_4-5_renew_Up_2"
+      ],
+      "obstaclePassType": 1,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true,
+      "effectiveDistance": 2
+    },
+    "60300202": {
+      "id": 60300202,
+      "name": "평사포_원거리",
+      "battleActionRangePath": [
+        "WT_ActionRange_Gun_Long_5-6_New_Down_1",
+        "WT_ActionRange_Gun_Long_5-6_New",
+        "WT_ActionRange_Gun_Long_5-6_New_Up_1",
+        "WT_ActionRange_Gun_Long_5-6_New_Up_2"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Gun_Long_5-6_New_Down_1_Sprite",
+        "WT_ActionRange_Gun_Long_5-6_New_Sprite",
+        "WT_ActionRange_Gun_Long_5-6_New_Up_1_Sprite",
+        "WT_ActionRange_Gun_Long_5-6_New_Up_2_Sprite"
+      ],
+      "image": "WT_ActionRange_Gun_Long_5-6_New_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Gun_Long_5-6_New_Down_1",
+        "WT_ActionRange_Gun_Long_5-6_New",
+        "WT_ActionRange_Gun_Long_5-6_New_Up_1",
+        "WT_ActionRange_Gun_Long_5-6_New_Up_2"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Gun_Long_5-6_New_Down_1_Sprite",
+        "WT_ActionRange_Gun_Long_5-6_New_Sprite",
+        "WT_ActionRange_Gun_Long_5-6_New_Up_1_Sprite",
+        "WT_ActionRange_Gun_Long_5-6_New_Up_2_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Gun_Long_5-6_New_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Gun_Long_5-6_renew_Down_1",
+        "WT_ActionRange_Elite_Gun_Long_5-6_renew",
+        "WT_ActionRange_Elite_Gun_Long_5-6_renew_Up_1",
+        "WT_ActionRange_Elite_Gun_Long_5-6_renew_Up_2"
+      ],
+      "obstaclePassType": 0,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60300300": {
+      "id": 60300300,
+      "name": "백병_일반",
+      "battleActionRangePath": [
+        "WT_ActionRange_Combat",
+        "WT_ActionRange_Combat",
+        "WT_ActionRange_Combat",
+        "WT_ActionRange_Combat"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Combat_Sprite",
+        "WT_ActionRange_Combat_Sprite",
+        "WT_ActionRange_Combat_Sprite",
+        "WT_ActionRange_Combat_Sprite"
+      ],
+      "image": "WT_ActionRange_Combat_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Combat",
+        "WT_ActionRange_Combat",
+        "WT_ActionRange_Combat",
+        "WT_ActionRange_Combat"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Combat_Sprite",
+        "WT_ActionRange_Combat_Sprite",
+        "WT_ActionRange_Combat_Sprite",
+        "WT_ActionRange_Combat_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Combat_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Combat",
+        "WT_ActionRange_Elite_Combat",
+        "WT_ActionRange_Elite_Combat",
+        "WT_ActionRange_Elite_Combat"
+      ],
+      "obstaclePassType": 0,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 1,
+      "maxDistance": 1,
+      "isReflected": true
+    },
+    "60300301": {
+      "id": 60300301,
+      "name": "백병_원거리",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_LongCombat",
+        "WT_ActionRange_Skill_LongCombat",
+        "WT_ActionRange_Skill_LongCombat",
+        "WT_ActionRange_Skill_LongCombat"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_LongCombat_Sprite",
+        "WT_ActionRange_Skill_LongCombat_Sprite",
+        "WT_ActionRange_Skill_LongCombat_Sprite",
+        "WT_ActionRange_Skill_LongCombat_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_LongCombat_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_LongCombat",
+        "WT_ActionRange_Skill_LongCombat",
+        "WT_ActionRange_Skill_LongCombat",
+        "WT_ActionRange_Skill_LongCombat"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_LongCombat_Sprite",
+        "WT_ActionRange_Skill_LongCombat_Sprite",
+        "WT_ActionRange_Skill_LongCombat_Sprite",
+        "WT_ActionRange_Skill_LongCombat_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_LongCombat_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_LongCombat",
+        "WT_ActionRange_Elite_Skill_LongCombat",
+        "WT_ActionRange_Elite_Skill_LongCombat",
+        "WT_ActionRange_Elite_Skill_LongCombat"
+      ],
+      "obstaclePassType": 0,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 2,
+      "isReflected": true
+    },
+    "60300400": {
+      "id": 60300400,
+      "name": "충각_일반",
+      "battleActionRangePath": [
+        "WT_ActionRange_Conflict_Down_1",
+        "WT_ActionRange_Conflict",
+        "WT_ActionRange_Conflict_Up_1",
+        "WT_ActionRange_Conflict_Up_2"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Conflict_Down_1_Sprite",
+        "WT_ActionRange_Conflict_Sprite",
+        "WT_ActionRange_Conflict_Up_1_Sprite",
+        "WT_ActionRange_Conflict_Up_2_Sprite"
+      ],
+      "image": "WT_ActionRange_Conflict_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Conflict_Down_1",
+        "WT_ActionRange_Conflict",
+        "WT_ActionRange_Conflict_Up_1",
+        "WT_ActionRange_Conflict_Up_2"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Conflict_Down_1_Sprite",
+        "WT_ActionRange_Conflict_Sprite",
+        "WT_ActionRange_Conflict_Up_1_Sprite",
+        "WT_ActionRange_Conflict_Up_2_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Conflict_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Conflict_Down_1",
+        "WT_ActionRange_Elite_Conflict",
+        "WT_ActionRange_Elite_Conflict_Up_1",
+        "WT_ActionRange_Elite_Conflict_Up_2"
+      ],
+      "obstaclePassType": 0,
+      "directionAngle": 0,
+      "centralAngle": 0,
+      "minDistance": 2,
+      "maxDistance": 4,
+      "isReflected": false
+    },
+    "60300401": {
+      "id": 60300401,
+      "name": "충각_1_2",
+      "obstaclePassType": 0,
+      "directionAngle": 0,
+      "centralAngle": 0,
+      "minDistance": 1,
+      "maxDistance": 2,
+      "isReflected": false
+    },
+    "60300402": {
+      "id": 60300402,
+      "name": "충각_1_3",
+      "obstaclePassType": 0,
+      "directionAngle": 0,
+      "centralAngle": 0,
+      "minDistance": 1,
+      "maxDistance": 3,
+      "isReflected": false
+    },
+    "60300403": {
+      "id": 60300403,
+      "name": "충각_광범위",
+      "obstaclePassType": 0,
+      "directionAngle": 0,
+      "centralAngle": 30,
+      "minDistance": 1,
+      "maxDistance": 3,
+      "isReflected": false
+    },
+    "60300500": {
+      "id": 60300500,
+      "name": "내구도 회복_일반",
+      "battleActionRangePath": [
+        "WT_ActionRange_Supporter_Repair_Short_Down_1",
+        "WT_ActionRange_Supporter_Repair_Short",
+        "WT_ActionRange_Supporter_Repair_Short_Up_1",
+        "WT_ActionRange_Supporter_Repair_Short_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Supporter_Repair_Short_Down_1_Sprite",
+        "WT_ActionRange_Supporter_Repair_Short_Sprite",
+        "WT_ActionRange_Supporter_Repair_Short_Up_1_Sprite",
+        "WT_ActionRange_Supporter_Repair_Short_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Supporter_Repair_Short_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Supporter_Repair_Short_Down_1",
+        "WT_ActionRange_Supporter_Repair_Short",
+        "WT_ActionRange_Supporter_Repair_Short_Up_1",
+        "WT_ActionRange_Supporter_Repair_Short_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Supporter_Repair_Short_Down_1_Sprite",
+        "WT_ActionRange_Supporter_Repair_Short_Sprite",
+        "WT_ActionRange_Supporter_Repair_Short_Up_1_Sprite",
+        "WT_ActionRange_Supporter_Repair_Short_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Supporter_Repair_Short_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Supporter_Repair_Short_Down_1",
+        "WT_ActionRange_Elite_Supporter_Repair_Short",
+        "WT_ActionRange_Elite_Supporter_Repair_Short_Up_1",
+        "WT_ActionRange_Elite_Supporter_Repair_Short_Up_1"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 0,
+      "isReflected": true
+    },
+    "60300501": {
+      "id": 60300501,
+      "name": "선원 회복_일반",
+      "battleActionRangePath": [
+        "WT_ActionRange_Supporter_Heal_Short_Down_1",
+        "WT_ActionRange_Supporter_Heal_Short",
+        "WT_ActionRange_Supporter_Heal_Short_Up_1",
+        "WT_ActionRange_Supporter_Heal_Short_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Supporter_Heal_Short_Down_1_Sprite",
+        "WT_ActionRange_Supporter_Heal_Short_Sprite",
+        "WT_ActionRange_Supporter_Heal_Short_Up_1_Sprite",
+        "WT_ActionRange_Supporter_Heal_Short_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Supporter_Heal_Short_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Supporter_Heal_Short_Down_1",
+        "WT_ActionRange_Supporter_Heal_Short",
+        "WT_ActionRange_Supporter_Heal_Short_Up_1",
+        "WT_ActionRange_Supporter_Heal_Short_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Supporter_Heal_Short_Down_1_Sprite",
+        "WT_ActionRange_Supporter_Heal_Short_Sprite",
+        "WT_ActionRange_Supporter_Heal_Short_Up_1_Sprite",
+        "WT_ActionRange_Supporter_Heal_Short_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Supporter_Heal_Short_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Supporter_Heal_Short_Down_1",
+        "WT_ActionRange_Elite_Supporter_Heal_Short",
+        "WT_ActionRange_Elite_Supporter_Heal_Short_Up_1",
+        "WT_ActionRange_Elite_Supporter_Heal_Short_Up_1"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60300502": {
+      "id": 60300502,
+      "name": "내구도 회복_원거리",
+      "battleActionRangePath": [
+        "WT_ActionRange_Supporter_Repair_Long_Down_1",
+        "WT_ActionRange_Supporter_Repair_Long",
+        "WT_ActionRange_Supporter_Repair_Long_Up_1",
+        "WT_ActionRange_Supporter_Repair_Long_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Supporter_Repair_Long_Down_1_Sprite",
+        "WT_ActionRange_Supporter_Repair_Long_Sprite",
+        "WT_ActionRange_Supporter_Repair_Long_Up_1_Sprite",
+        "WT_ActionRange_Supporter_Repair_Long_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Supporter_Repair_Long_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Supporter_Repair_Long_Down_1",
+        "WT_ActionRange_Supporter_Repair_Long",
+        "WT_ActionRange_Supporter_Repair_Long_Up_1",
+        "WT_ActionRange_Supporter_Repair_Long_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Supporter_Repair_Long_Down_1_Sprite",
+        "WT_ActionRange_Supporter_Repair_Long_Sprite",
+        "WT_ActionRange_Supporter_Repair_Long_Up_1_Sprite",
+        "WT_ActionRange_Supporter_Repair_Long_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Supporter_Repair_Long_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Supporter_Repair_Long_Down_1",
+        "WT_ActionRange_Elite_Supporter_Repair_Long",
+        "WT_ActionRange_Elite_Supporter_Repair_Long_Up_1",
+        "WT_ActionRange_Elite_Supporter_Repair_Long_Up_1"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60300503": {
+      "id": 60300503,
+      "name": "선원 회복_원거리",
+      "battleActionRangePath": [
+        "WT_ActionRange_Supporter_Heal_Long_Down_1",
+        "WT_ActionRange_Supporter_Heal_Long",
+        "WT_ActionRange_Supporter_Heal_Long_Up_1",
+        "WT_ActionRange_Supporter_Heal_Long_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Supporter_Heal_Long_Down_1_Sprite",
+        "WT_ActionRange_Supporter_Heal_Long_Sprite",
+        "WT_ActionRange_Supporter_Heal_Long_Up_1_Sprite",
+        "WT_ActionRange_Supporter_Heal_Long_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Supporter_Heal_Long_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Supporter_Heal_Long_Down_1",
+        "WT_ActionRange_Supporter_Heal_Long",
+        "WT_ActionRange_Supporter_Heal_Long_Up_1",
+        "WT_ActionRange_Supporter_Heal_Long_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Supporter_Heal_Long_Down_1_Sprite",
+        "WT_ActionRange_Supporter_Heal_Long_Sprite",
+        "WT_ActionRange_Supporter_Heal_Long_Up_1_Sprite",
+        "WT_ActionRange_Supporter_Heal_Long_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Supporter_Heal_Long_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Supporter_Heal_Long_Down_1",
+        "WT_ActionRange_Elite_Supporter_Heal_Long",
+        "WT_ActionRange_Elite_Supporter_Heal_Long_Up_1",
+        "WT_ActionRange_Elite_Supporter_Heal_Long_Up_1"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60300550": {
+      "id": 60300550,
+      "name": "내구도 회복_자신",
+      "battleActionRangePath": [
+        "WT_ActionRange_Repair_Self",
+        "WT_ActionRange_Repair_Self",
+        "WT_ActionRange_Repair_Self",
+        "WT_ActionRange_Repair_Self"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Repair_Self_Sprite",
+        "WT_ActionRange_Repair_Self_Sprite",
+        "WT_ActionRange_Repair_Self_Sprite",
+        "WT_ActionRange_Repair_Self_Sprite"
+      ],
+      "image": "WT_ActionRange_Repair_Self_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Repair_Self",
+        "WT_ActionRange_Repair_Self",
+        "WT_ActionRange_Repair_Self",
+        "WT_ActionRange_Repair_Self"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Repair_Self_Sprite",
+        "WT_ActionRange_Repair_Self_Sprite",
+        "WT_ActionRange_Repair_Self_Sprite",
+        "WT_ActionRange_Repair_Self_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Repair_Self_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Repair_Self",
+        "WT_ActionRange_Elite_Repair_Self",
+        "WT_ActionRange_Elite_Repair_Self",
+        "WT_ActionRange_Elite_Repair_Self"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60300551": {
+      "id": 60300551,
+      "name": "선원 회복_자신",
+      "battleActionRangePath": [
+        "WT_ActionRange_Heal_Self",
+        "WT_ActionRange_Heal_Self",
+        "WT_ActionRange_Heal_Self",
+        "WT_ActionRange_Heal_Self"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Heal_Self_Sprite",
+        "WT_ActionRange_Heal_Self_Sprite",
+        "WT_ActionRange_Heal_Self_Sprite",
+        "WT_ActionRange_Heal_Self_Sprite"
+      ],
+      "image": "WT_ActionRange_Heal_Self_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Heal_Self",
+        "WT_ActionRange_Heal_Self",
+        "WT_ActionRange_Heal_Self",
+        "WT_ActionRange_Heal_Self"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Heal_Self_Sprite",
+        "WT_ActionRange_Heal_Self_Sprite",
+        "WT_ActionRange_Heal_Self_Sprite",
+        "WT_ActionRange_Heal_Self_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Heal_Self_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Heal_Self",
+        "WT_ActionRange_Elite_Heal_Self",
+        "WT_ActionRange_Elite_Heal_Self",
+        "WT_ActionRange_Elite_Heal_Self"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60300552": {
+      "id": 60300552,
+      "name": "버프_일반",
+      "battleActionRangePath": [
+        "WT_ActionRange_Buff",
+        "WT_ActionRange_Buff",
+        "WT_ActionRange_Buff",
+        "WT_ActionRange_Buff"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Buff_Sprite",
+        "WT_ActionRange_Buff_Sprite",
+        "WT_ActionRange_Buff_Sprite",
+        "WT_ActionRange_Buff_Sprite"
+      ],
+      "image": "WT_ActionRange_Buff_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Buff",
+        "WT_ActionRange_Buff",
+        "WT_ActionRange_Buff",
+        "WT_ActionRange_Buff"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Buff_Sprite",
+        "WT_ActionRange_Buff_Sprite",
+        "WT_ActionRange_Buff_Sprite",
+        "WT_ActionRange_Buff_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Buff_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Buff_Down_1",
+        "WT_ActionRange_Elite_Buff",
+        "WT_ActionRange_Elite_Buff_Up_1",
+        "WT_ActionRange_Elite_Buff_Up_2"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60300553": {
+      "id": 60300553,
+      "name": "디버프_일반",
+      "battleActionRangePath": [
+        "WT_ActionRange_Debuff",
+        "WT_ActionRange_Debuff",
+        "WT_ActionRange_Debuff",
+        "WT_ActionRange_Debuff"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Debuff_Sprite",
+        "WT_ActionRange_Debuff_Sprite",
+        "WT_ActionRange_Debuff_Sprite",
+        "WT_ActionRange_Debuff_Sprite"
+      ],
+      "image": "WT_ActionRange_Debuff_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Debuff",
+        "WT_ActionRange_Debuff",
+        "WT_ActionRange_Debuff",
+        "WT_ActionRange_Debuff"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Debuff_Sprite",
+        "WT_ActionRange_Debuff_Sprite",
+        "WT_ActionRange_Debuff_Sprite",
+        "WT_ActionRange_Debuff_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Debuff_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Debuff_Down_1",
+        "WT_ActionRange_Elite_Debuff",
+        "WT_ActionRange_Elite_Debuff_Up_1",
+        "WT_ActionRange_Elite_Debuff_Up_2"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60301000": {
+      "id": 60301000,
+      "name": "ZOC_depth0",
+      "battleActionRangePath": [
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-1",
+        "WT_ActionRange_Depth_0-1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-1_Sprite",
+        "WT_ActionRange_Depth_0-1_Sprite"
+      ],
+      "image": "WT_ActionRange_Depth_0-0_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-1",
+        "WT_ActionRange_Depth_0-1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-1_Sprite",
+        "WT_ActionRange_Depth_0-1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Depth_0-0_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Depth_0-0",
+        "WT_ActionRange_Elite_Depth_0-0",
+        "WT_ActionRange_Elite_Depth_0-1",
+        "WT_ActionRange_Elite_Depth_0-1"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 0,
+      "isReflected": true
+    },
+    "60301001": {
+      "id": 60301001,
+      "name": "ZOC_depth1",
+      "battleActionRangePath": [
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-1",
+        "WT_ActionRange_Depth_0-2",
+        "WT_ActionRange_Depth_0-2"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-1_Sprite",
+        "WT_ActionRange_Depth_0-2_Sprite",
+        "WT_ActionRange_Depth_0-2_Sprite"
+      ],
+      "image": "WT_ActionRange_Depth_0-1_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-1",
+        "WT_ActionRange_Depth_0-2",
+        "WT_ActionRange_Depth_0-2"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-1_Sprite",
+        "WT_ActionRange_Depth_0-2_Sprite",
+        "WT_ActionRange_Depth_0-2_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Depth_0-1_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Depth_0-0",
+        "WT_ActionRange_Elite_Depth_0-1",
+        "WT_ActionRange_Elite_Depth_0-2",
+        "WT_ActionRange_Elite_Depth_0-2"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 1,
+      "isReflected": true
+    },
+    "60301002": {
+      "id": 60301002,
+      "name": "ZOC_depth2",
+      "battleActionRangePath": [
+        "WT_ActionRange_Depth_0-1",
+        "WT_ActionRange_Depth_0-2",
+        "WT_ActionRange_Depth_0-3",
+        "WT_ActionRange_Depth_0-3"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Depth_0-1_Sprite",
+        "WT_ActionRange_Depth_0-2_Sprite",
+        "WT_ActionRange_Depth_0-3_Sprite",
+        "WT_ActionRange_Depth_0-3_Sprite"
+      ],
+      "image": "WT_ActionRange_Depth_0-2_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Depth_0-1",
+        "WT_ActionRange_Depth_0-2",
+        "WT_ActionRange_Depth_0-3",
+        "WT_ActionRange_Depth_0-3"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Depth_0-1_Sprite",
+        "WT_ActionRange_Depth_0-2_Sprite",
+        "WT_ActionRange_Depth_0-3_Sprite",
+        "WT_ActionRange_Depth_0-3_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Depth_0-2_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Depth_0-1",
+        "WT_ActionRange_Elite_Depth_0-2",
+        "WT_ActionRange_Elite_Depth_0-3",
+        "WT_ActionRange_Elite_Depth_0-3"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 2,
+      "isReflected": true
+    },
+    "60301003": {
+      "id": 60301003,
+      "name": "ZOC_depth3",
+      "battleActionRangePath": [
+        "WT_ActionRange_Depth_0-2",
+        "WT_ActionRange_Depth_0-3",
+        "WT_ActionRange_Depth_0-4",
+        "WT_ActionRange_Depth_0-4"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Depth_0-2_Sprite",
+        "WT_ActionRange_Depth_0-3_Sprite",
+        "WT_ActionRange_Depth_0-4_Sprite",
+        "WT_ActionRange_Depth_0-4_Sprite"
+      ],
+      "image": "WT_ActionRange_Depth_0-3_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Depth_0-2",
+        "WT_ActionRange_Depth_0-3",
+        "WT_ActionRange_Depth_0-4",
+        "WT_ActionRange_Depth_0-4"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Depth_0-2_Sprite",
+        "WT_ActionRange_Depth_0-3_Sprite",
+        "WT_ActionRange_Depth_0-4_Sprite",
+        "WT_ActionRange_Depth_0-4_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Depth_0-3_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Depth_0-2",
+        "WT_ActionRange_Elite_Depth_0-3",
+        "WT_ActionRange_Elite_Depth_0-4",
+        "WT_ActionRange_Elite_Depth_0-4"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60301004": {
+      "id": 60301004,
+      "name": "ZOC_depth4",
+      "battleActionRangePath": [
+        "WT_ActionRange_Depth_0-3",
+        "WT_ActionRange_Depth_0-4",
+        "WT_ActionRange_Depth_0-5",
+        "WT_ActionRange_Depth_0-5"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Depth_0-3_Sprite",
+        "WT_ActionRange_Depth_0-4_Sprite",
+        "WT_ActionRange_Depth_0-5_Sprite",
+        "WT_ActionRange_Depth_0-5_Sprite"
+      ],
+      "image": "WT_ActionRange_Depth_0-4_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Depth_0-3",
+        "WT_ActionRange_Depth_0-4",
+        "WT_ActionRange_Depth_0-5",
+        "WT_ActionRange_Depth_0-5"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Depth_0-3_Sprite",
+        "WT_ActionRange_Depth_0-4_Sprite",
+        "WT_ActionRange_Depth_0-5_Sprite",
+        "WT_ActionRange_Depth_0-5_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Depth_0-4_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Depth_0-3",
+        "WT_ActionRange_Elite_Depth_0-4",
+        "WT_ActionRange_Elite_Depth_0-5",
+        "WT_ActionRange_Elite_Depth_0-5"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 4,
+      "isReflected": true
+    },
+    "60301005": {
+      "id": 60301005,
+      "name": "ZOC_depth5",
+      "battleActionRangePath": [
+        "WT_ActionRange_Depth_0-4",
+        "WT_ActionRange_Depth_0-5",
+        "WT_ActionRange_Depth_0-6",
+        "WT_ActionRange_Depth_0-6"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Depth_0-4_Sprite",
+        "WT_ActionRange_Depth_0-5_Sprite",
+        "WT_ActionRange_Depth_0-6_Sprite",
+        "WT_ActionRange_Depth_0-6_Sprite"
+      ],
+      "image": "WT_ActionRange_Depth_0-5_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Depth_0-4",
+        "WT_ActionRange_Depth_0-5",
+        "WT_ActionRange_Depth_0-6",
+        "WT_ActionRange_Depth_0-6"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Depth_0-4_Sprite",
+        "WT_ActionRange_Depth_0-5_Sprite",
+        "WT_ActionRange_Depth_0-6_Sprite",
+        "WT_ActionRange_Depth_0-6_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Depth_0-5_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Depth_0-4",
+        "WT_ActionRange_Elite_Depth_0-5",
+        "WT_ActionRange_Elite_Depth_0-6",
+        "WT_ActionRange_Elite_Depth_0-6"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 5,
+      "isReflected": true
+    },
+    "60301006": {
+      "id": 60301006,
+      "name": "ZOC_depth6",
+      "battleActionRangePath": [
+        "WT_ActionRange_Depth_0-5",
+        "WT_ActionRange_Depth_0-6",
+        "WT_ActionRange_Depth_0-7",
+        "WT_ActionRange_Depth_0-7"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Depth_0-5_Sprite",
+        "WT_ActionRange_Depth_0-6_Sprite",
+        "WT_ActionRange_Depth_0-7_Sprite",
+        "WT_ActionRange_Depth_0-7_Sprite"
+      ],
+      "image": "WT_ActionRange_Depth_0-6_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Depth_0-5",
+        "WT_ActionRange_Depth_0-6",
+        "WT_ActionRange_Depth_0-7",
+        "WT_ActionRange_Depth_0-7"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Depth_0-5_Sprite",
+        "WT_ActionRange_Depth_0-6_Sprite",
+        "WT_ActionRange_Depth_0-7_Sprite",
+        "WT_ActionRange_Depth_0-7_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Depth_0-6_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Depth_0-5",
+        "WT_ActionRange_Elite_Depth_0-6",
+        "WT_ActionRange_Elite_Depth_0-7",
+        "WT_ActionRange_Elite_Depth_0-7"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 6,
+      "isReflected": true
+    },
+    "60301007": {
+      "id": 60301007,
+      "name": "ZOC_depth7",
+      "battleActionRangePath": [
+        "WT_ActionRange_Depth_0-6",
+        "WT_ActionRange_Depth_0-7",
+        "WT_ActionRange_Depth_0-8",
+        "WT_ActionRange_Depth_0-8"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Depth_0-6_Sprite",
+        "WT_ActionRange_Depth_0-7_Sprite",
+        "WT_ActionRange_Depth_0-8_Sprite",
+        "WT_ActionRange_Depth_0-8_Sprite"
+      ],
+      "image": "WT_ActionRange_Depth_0-7_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Depth_0-6",
+        "WT_ActionRange_Depth_0-7",
+        "WT_ActionRange_Depth_0-8",
+        "WT_ActionRange_Depth_0-8"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Depth_0-6_Sprite",
+        "WT_ActionRange_Depth_0-7_Sprite",
+        "WT_ActionRange_Depth_0-8_Sprite",
+        "WT_ActionRange_Depth_0-8_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Depth_0-7_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Depth_0-6",
+        "WT_ActionRange_Elite_Depth_0-7",
+        "WT_ActionRange_Elite_Depth_0-7",
+        "WT_ActionRange_Elite_Depth_0-7"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 7,
+      "isReflected": true
+    },
+    "60301008": {
+      "id": 60301008,
+      "name": "ZOC_depth8",
+      "battleActionRangePath": [
+        "WT_ActionRange_Depth_0-7",
+        "WT_ActionRange_Depth_0-8",
+        "WT_ActionRange_Depth_0-8",
+        "WT_ActionRange_Depth_0-8"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Depth_0-7_Sprite",
+        "WT_ActionRange_Depth_0-8_Sprite",
+        "WT_ActionRange_Depth_0-8_Sprite",
+        "WT_ActionRange_Depth_0-8_Sprite"
+      ],
+      "image": "WT_ActionRange_Depth_0-8_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Depth_0-7",
+        "WT_ActionRange_Depth_0-8",
+        "WT_ActionRange_Depth_0-8",
+        "WT_ActionRange_Depth_0-8"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Depth_0-7_Sprite",
+        "WT_ActionRange_Depth_0-8_Sprite",
+        "WT_ActionRange_Depth_0-8_Sprite",
+        "WT_ActionRange_Depth_0-8_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Depth_0-8_Sprite",
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 8,
+      "isReflected": true
+    },
+    "60301100": {
+      "id": 60301100,
+      "name": "박격포_테두리 포격",
+      "battleActionRangePath": [
+        "WT_ActionRange_Mortar_Around_2-3_Down_1",
+        "WT_ActionRange_Mortar_Around_2-3",
+        "WT_ActionRange_Mortar_Around_2-3_Up_1",
+        "WT_ActionRange_Mortar_Around_2-3_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Mortar_Around_2-3_Down_1_Sprite",
+        "WT_ActionRange_Mortar_Around_2-3_Sprite",
+        "WT_ActionRange_Mortar_Around_2-3_Up_1_Sprite",
+        "WT_ActionRange_Mortar_Around_2-3_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Mortar_Around_2-3_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Mortar_Around_2-3_Down_1",
+        "WT_ActionRange_Mortar_Around_2-3",
+        "WT_ActionRange_Mortar_Around_2-3_Up_1",
+        "WT_ActionRange_Mortar_Around_2-3_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Mortar_Around_2-3_Down_1_Sprite",
+        "WT_ActionRange_Mortar_Around_2-3_Sprite",
+        "WT_ActionRange_Mortar_Around_2-3_Up_1_Sprite",
+        "WT_ActionRange_Mortar_Around_2-3_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Mortar_Around_2-3_Sprite",
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 3,
+      "maxDistance": 5,
+      "isReflected": true
+    },
+    "60301101": {
+      "id": 60301101,
+      "name": "곡사포_테두리 포격",
+      "battleActionRangePath": [
+        "WT_ActionRange_Howitzer_Around_3-4_Down_1",
+        "WT_ActionRange_Howitzer_Around_3-4",
+        "WT_ActionRange_Howitzer_Around_3-4_Up_1",
+        "WT_ActionRange_Howitzer_Around_3-4_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Howitzer_Around_3-4_Down_1_Sprite",
+        "WT_ActionRange_Howitzer_Around_3-4_Sprite",
+        "WT_ActionRange_Howitzer_Around_3-4_Up_1_Sprite",
+        "WT_ActionRange_Howitzer_Around_3-4_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Howitzer_Around_3-4_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Howitzer_Around_3-4_Down_1",
+        "WT_ActionRange_Howitzer_Around_3-4",
+        "WT_ActionRange_Howitzer_Around_3-4_Up_1",
+        "WT_ActionRange_Howitzer_Around_3-4_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Howitzer_Around_3-4_Down_1_Sprite",
+        "WT_ActionRange_Howitzer_Around_3-4_Sprite",
+        "WT_ActionRange_Howitzer_Around_3-4_Up_1_Sprite",
+        "WT_ActionRange_Howitzer_Around_3-4_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Howitzer_Around_3-4_Sprite",
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 3,
+      "maxDistance": 6,
+      "isReflected": true
+    },
+    "60301102": {
+      "id": 60301102,
+      "name": "평사포_테두리 포격",
+      "battleActionRangePath": [
+        "WT_ActionRange_Gun_Around_4-5_Down_1",
+        "WT_ActionRange_Gun_Around_4-5",
+        "WT_ActionRange_Gun_Around_4-5_Up_1",
+        "WT_ActionRange_Gun_Around_4-5_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Gun_Around_4-5_Down_1_Sprite",
+        "WT_ActionRange_Gun_Around_4-5_Sprite",
+        "WT_ActionRange_Gun_Around_4-5_Up_1_Sprite",
+        "WT_ActionRange_Gun_Around_4-5_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Gun_Around_4-5_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Gun_Around_4-5_Down_1",
+        "WT_ActionRange_Gun_Around_4-5",
+        "WT_ActionRange_Gun_Around_4-5_Up_1",
+        "WT_ActionRange_Gun_Around_4-5_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Gun_Around_4-5_Down_1_Sprite",
+        "WT_ActionRange_Gun_Around_4-5_Sprite",
+        "WT_ActionRange_Gun_Around_4-5_Up_1_Sprite",
+        "WT_ActionRange_Gun_Around_4-5_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Gun_Around_4-5_Sprite",
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 6,
+      "isReflected": true
+    },
+    "60301103": {
+      "id": 60301103,
+      "name": "테두리 포격4",
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 7,
+      "isReflected": true
+    },
+    "60301104": {
+      "id": 60301104,
+      "name": "테두리 포격5",
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 1,
+      "maxDistance": 7,
+      "isReflected": true
+    },
+    "60301105": {
+      "id": 60301105,
+      "name": "테두리 포격6",
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 1,
+      "maxDistance": 8,
+      "isReflected": true
+    },
+    "60302000": {
+      "id": 60302000,
+      "name": "화염탄 포격",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Fireshot_Down_1",
+        "WT_ActionRange_Skill_Fireshot",
+        "WT_ActionRange_Skill_Fireshot_Up_1",
+        "WT_ActionRange_Skill_Fireshot_Up_2"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Fireshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Fireshot_Sprite",
+        "WT_ActionRange_Skill_Fireshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Fireshot_Up_2_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Fireshot_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Fireshot_Down_1",
+        "WT_ActionRange_Skill_Fireshot",
+        "WT_ActionRange_Skill_Fireshot_Up_1",
+        "WT_ActionRange_Skill_Fireshot_Up_2"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Fireshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Fireshot_Sprite",
+        "WT_ActionRange_Skill_Fireshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Fireshot_Up_2_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Fireshot_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Fireshot_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Fireshot_renew",
+        "WT_ActionRange_Elite_Skill_Fireshot_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Fireshot_Up_2_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302001": {
+      "id": 60302001,
+      "name": "철퇴탄 포격",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Flailshot_Down_1",
+        "WT_ActionRange_Skill_Flailshot",
+        "WT_ActionRange_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Skill_Flailshot_Up_2"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Flailshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Flailshot_Sprite",
+        "WT_ActionRange_Skill_Flailshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Flailshot_Up_2_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Flailshot_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Flailshot_Down_1",
+        "WT_ActionRange_Skill_Flailshot",
+        "WT_ActionRange_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Skill_Flailshot_Up_2"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Flailshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Flailshot_Sprite",
+        "WT_ActionRange_Skill_Flailshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Flailshot_Up_2_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Flailshot_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Flailshot_Down_1",
+        "WT_ActionRange_Elite_Skill_Flailshot",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_2_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302002": {
+      "id": 60302002,
+      "name": "먹물탄 포격",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_SquidInkshot_Down_1",
+        "WT_ActionRange_Skill_SquidInkshot",
+        "WT_ActionRange_Skill_SquidInkshot_Up_1",
+        "WT_ActionRange_Skill_SquidInkshot_Up_2"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_SquidInkshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_SquidInkshot_Sprite",
+        "WT_ActionRange_Skill_SquidInkshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_SquidInkshot_Up_2_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_SquidInkshot_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_SquidInkshot_Down_1",
+        "WT_ActionRange_Skill_SquidInkshot",
+        "WT_ActionRange_Skill_SquidInkshot_Up_1",
+        "WT_ActionRange_Skill_SquidInkshot_Up_2"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_SquidInkshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_SquidInkshot_Sprite",
+        "WT_ActionRange_Skill_SquidInkshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_SquidInkshot_Up_2_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_SquidInkshot_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_SquidInkshot_Down_1",
+        "WT_ActionRange_Elite_Skill_SquidInkshot",
+        "WT_ActionRange_Elite_Skill_SquidInkshot_Up_1",
+        "WT_ActionRange_Elite_Skill_SquidInkshot_Up_2_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302003": {
+      "id": 60302003,
+      "name": "사슬탄 포격",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Chainshot_Down_1",
+        "WT_ActionRange_Skill_Chainshot",
+        "WT_ActionRange_Skill_Chainshot_Up_1",
+        "WT_ActionRange_Skill_Chainshot_Up_2"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Chainshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Chainshot_Sprite",
+        "WT_ActionRange_Skill_Chainshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Chainshot_Up_2_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Chainshot_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Chainshot_Down_1",
+        "WT_ActionRange_Skill_Chainshot",
+        "WT_ActionRange_Skill_Chainshot_Up_1",
+        "WT_ActionRange_Skill_Chainshot_Up_2"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Chainshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Chainshot_Sprite",
+        "WT_ActionRange_Skill_Chainshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Chainshot_Up_2_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Chainshot_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Chainshot_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Chainshot_renew",
+        "WT_ActionRange_Elite_Skill_Chainshot_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Chainshot_Up_2_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302004": {
+      "id": 60302004,
+      "name": "석환 포격",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Stoneshot_Down_1",
+        "WT_ActionRange_Skill_Stoneshot",
+        "WT_ActionRange_Skill_Stoneshot_Up_1",
+        "WT_ActionRange_Skill_Stoneshot_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Stoneshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Stoneshot_Sprite",
+        "WT_ActionRange_Skill_Stoneshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Stoneshot_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Stoneshot_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Stoneshot_Down_1",
+        "WT_ActionRange_Skill_Stoneshot",
+        "WT_ActionRange_Skill_Stoneshot_Up_1",
+        "WT_ActionRange_Skill_Stoneshot_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Stoneshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Stoneshot_Sprite",
+        "WT_ActionRange_Skill_Stoneshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Stoneshot_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Stoneshot_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Stoneshot_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Stoneshot_renew",
+        "WT_ActionRange_Elite_Skill_Stoneshot_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Stoneshot_Up_1_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302005": {
+      "id": 60302005,
+      "name": "끈끈이 포격",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Stickyshot_Down_1",
+        "WT_ActionRange_Skill_Stickyshot",
+        "WT_ActionRange_Skill_Stickyshot_Up_1",
+        "WT_ActionRange_Skill_Stickyshot_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Stickyshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Stickyshot_Sprite",
+        "WT_ActionRange_Skill_Stickyshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Stickyshot_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Stickyshot_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Stickyshot_Down_1",
+        "WT_ActionRange_Skill_Stickyshot",
+        "WT_ActionRange_Skill_Stickyshot_Up_1",
+        "WT_ActionRange_Skill_Stickyshot_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Stickyshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Stickyshot_Sprite",
+        "WT_ActionRange_Skill_Stickyshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Stickyshot_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Stickyshot_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Stickyshot_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Stickyshot_renew",
+        "WT_ActionRange_Elite_Skill_Stickyshot_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Stickyshot_Up_1_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302006": {
+      "id": 60302006,
+      "name": "맹톡탄 포격",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Poisonshot_Down_1",
+        "WT_ActionRange_Skill_Poisonshot",
+        "WT_ActionRange_Skill_Poisonshot_Up_1",
+        "WT_ActionRange_Skill_Poisonshot_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Poisonshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Poisonshot_Sprite",
+        "WT_ActionRange_Skill_Poisonshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Poisonshot_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Poisonshot_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Poisonshot_Down_1",
+        "WT_ActionRange_Skill_Poisonshot",
+        "WT_ActionRange_Skill_Poisonshot_Up_1",
+        "WT_ActionRange_Skill_Poisonshot_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Poisonshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Poisonshot_Sprite",
+        "WT_ActionRange_Skill_Poisonshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Poisonshot_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Poisonshot_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Poisonshot_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Poisonshot_renew",
+        "WT_ActionRange_Elite_Skill_Poisonshot_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Poisonshot_Up_1_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302007": {
+      "id": 60302007,
+      "name": "금괴탄 포격",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Goldshot_Down_1",
+        "WT_ActionRange_Skill_Goldshot",
+        "WT_ActionRange_Skill_Goldshot_Up_1",
+        "WT_ActionRange_Skill_Goldshot_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Goldshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Goldshot_Sprite",
+        "WT_ActionRange_Skill_Goldshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Goldshot_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Goldshot_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Goldshot_Down_1",
+        "WT_ActionRange_Skill_Goldshot",
+        "WT_ActionRange_Skill_Goldshot_Up_1",
+        "WT_ActionRange_Skill_Goldshot_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Goldshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Goldshot_Sprite",
+        "WT_ActionRange_Skill_Goldshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Goldshot_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Goldshot_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Goldshot_Down_1",
+        "WT_ActionRange_Elite_Skill_Goldshot_renew",
+        "WT_ActionRange_Elite_Skill_Goldshot_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Goldshot_Up_1_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302008": {
+      "id": 60302008,
+      "name": "연막탄 포격",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Smokeshot_Down_1",
+        "WT_ActionRange_Skill_Smokeshot",
+        "WT_ActionRange_Skill_Smokeshot_Up_1",
+        "WT_ActionRange_Skill_Smokeshot_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Smokeshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Smokeshot_Sprite",
+        "WT_ActionRange_Skill_Smokeshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Smokeshot_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Smokeshot_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Smokeshot_Down_1",
+        "WT_ActionRange_Skill_Smokeshot",
+        "WT_ActionRange_Skill_Smokeshot_Up_1",
+        "WT_ActionRange_Skill_Smokeshot_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Smokeshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Smokeshot_Sprite",
+        "WT_ActionRange_Skill_Smokeshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Smokeshot_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Smokeshot_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Smokeshot_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Smokeshot_renew",
+        "WT_ActionRange_Elite_Skill_Smokeshot_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Smokeshot_Up_1_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302009": {
+      "id": 60302009,
+      "name": "섬광탄 포격",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Flashshot_Down_1",
+        "WT_ActionRange_Skill_Flashshot",
+        "WT_ActionRange_Skill_Flashshot_Up_1",
+        "WT_ActionRange_Skill_Flashshot_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Flashshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Flashshot_Sprite",
+        "WT_ActionRange_Skill_Flashshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Flashshot_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Flashshot_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Flashshot_Down_1",
+        "WT_ActionRange_Skill_Flashshot",
+        "WT_ActionRange_Skill_Flashshot_Up_1",
+        "WT_ActionRange_Skill_Flashshot_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Flashshot_Down_1_Sprite",
+        "WT_ActionRange_Skill_Flashshot_Sprite",
+        "WT_ActionRange_Skill_Flashshot_Up_1_Sprite",
+        "WT_ActionRange_Skill_Flashshot_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Flashshot_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Flashshot_Down_1",
+        "WT_ActionRange_Elite_Skill_Flashshot",
+        "WT_ActionRange_Elite_Skill_Flashshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flashshot_Up_1"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302010": {
+      "id": 60302010,
+      "name": "화염 충파",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Fireconflict_Down_1",
+        "WT_ActionRange_Skill_Fireconflict",
+        "WT_ActionRange_Skill_Fireconflict_Up_1",
+        "WT_ActionRange_Skill_Fireconflict_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Fireconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Fireconflict_Sprite",
+        "WT_ActionRange_Skill_Fireconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Fireconflict_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Fireconflict_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Fireconflict_Down_1",
+        "WT_ActionRange_Skill_Fireconflict",
+        "WT_ActionRange_Skill_Fireconflict_Up_1",
+        "WT_ActionRange_Skill_Fireconflict_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Fireconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Fireconflict_Sprite",
+        "WT_ActionRange_Skill_Fireconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Fireconflict_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Fireconflict_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Fireconflict_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Fireconflict_renew",
+        "WT_ActionRange_Elite_Skill_Fireconflict_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Fireconflict_Up_1_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302011": {
+      "id": 60302011,
+      "name": "침수 충파",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Floodconflict_Down_1",
+        "WT_ActionRange_Skill_Floodconflict",
+        "WT_ActionRange_Skill_Floodconflict_Up_1",
+        "WT_ActionRange_Skill_Floodconflict_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Floodconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Floodconflict_Sprite",
+        "WT_ActionRange_Skill_Floodconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Floodconflict_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Floodconflict_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Floodconflict_Down_1",
+        "WT_ActionRange_Skill_Floodconflict",
+        "WT_ActionRange_Skill_Floodconflict_Up_1",
+        "WT_ActionRange_Skill_Floodconflict_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Floodconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Floodconflict_Sprite",
+        "WT_ActionRange_Skill_Floodconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Floodconflict_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Floodconflict_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Floodconflict_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Floodconflict_renew",
+        "WT_ActionRange_Elite_Skill_Floodconflict_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Floodconflict_Up_1_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302012": {
+      "id": 60302012,
+      "name": "혼란 충파",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Confusionconflict_Down_1",
+        "WT_ActionRange_Skill_Confusionconflict",
+        "WT_ActionRange_Skill_Confusionconflict_Up_1",
+        "WT_ActionRange_Skill_Confusionconflict_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Confusionconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Confusionconflict_Sprite",
+        "WT_ActionRange_Skill_Confusionconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Confusionconflict_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Confusionconflict_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Confusionconflict_Down_1",
+        "WT_ActionRange_Skill_Confusionconflict",
+        "WT_ActionRange_Skill_Confusionconflict_Up_1",
+        "WT_ActionRange_Skill_Confusionconflict_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Confusionconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Confusionconflict_Sprite",
+        "WT_ActionRange_Skill_Confusionconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Confusionconflict_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Confusionconflict_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Confusionconflict_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Confusionconflict_renew",
+        "WT_ActionRange_Elite_Skill_Confusionconflict_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Confusionconflict_Up_1_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302013": {
+      "id": 60302013,
+      "name": "사슬 충파",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Chainconflict_Down_1",
+        "WT_ActionRange_Skill_Chainconflict",
+        "WT_ActionRange_Skill_Chainconflict_Up_1",
+        "WT_ActionRange_Skill_Chainconflict_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Chainconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Chainconflict_Sprite",
+        "WT_ActionRange_Skill_Chainconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Chainconflict_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Chainconflict_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Chainconflict_Down_1",
+        "WT_ActionRange_Skill_Chainconflict",
+        "WT_ActionRange_Skill_Chainconflict_Up_1",
+        "WT_ActionRange_Skill_Chainconflict_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Chainconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Chainconflict_Sprite",
+        "WT_ActionRange_Skill_Chainconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Chainconflict_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Chainconflict_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Chainconflict_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Chainconflict_renew",
+        "WT_ActionRange_Elite_Skill_Chainconflict_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Chainconflict_Up_1_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302014": {
+      "id": 60302014,
+      "name": "돛 손상 충파",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Damagesailconflict_Down_1",
+        "WT_ActionRange_Skill_Damagesailconflict",
+        "WT_ActionRange_Skill_Damagesailconflict_Up_1",
+        "WT_ActionRange_Skill_Damagesailconflict_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Damagesailconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Damagesailconflict_Sprite",
+        "WT_ActionRange_Skill_Damagesailconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Damagesailconflict_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Damagesailconflict_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Damagesailconflict_Down_1",
+        "WT_ActionRange_Skill_Damagesailconflict",
+        "WT_ActionRange_Skill_Damagesailconflict_Up_1",
+        "WT_ActionRange_Skill_Damagesailconflict_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Damagesailconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Damagesailconflict_Sprite",
+        "WT_ActionRange_Skill_Damagesailconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Damagesailconflict_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Damagesailconflict_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Damagesailconflict_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Damagesailconflict_renew",
+        "WT_ActionRange_Elite_Skill_Damagesailconflict_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Damagesailconflict_Up_1_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302015": {
+      "id": 60302015,
+      "name": "키 손상 충파",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Damagewheelconflict_Down_1",
+        "WT_ActionRange_Skill_Damagewheelconflict",
+        "WT_ActionRange_Skill_Damagewheelconflict_Up_1",
+        "WT_ActionRange_Skill_Damagewheelconflict_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Damagewheelconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Damagewheelconflict_Sprite",
+        "WT_ActionRange_Skill_Damagewheelconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Damagewheelconflict_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Damagewheelconflict_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Damagewheelconflict_Down_1",
+        "WT_ActionRange_Skill_Damagewheelconflict",
+        "WT_ActionRange_Skill_Damagewheelconflict_Up_1",
+        "WT_ActionRange_Skill_Damagewheelconflict_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Damagewheelconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Damagewheelconflict_Sprite",
+        "WT_ActionRange_Skill_Damagewheelconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Damagewheelconflict_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Damagewheelconflict_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Damagewheelconflict_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Damagewheelconflict_renew",
+        "WT_ActionRange_Elite_Skill_Damagewheelconflict_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Damagewheelconflict_Up_1_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302016": {
+      "id": 60302016,
+      "name": "중독 충파",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Poisonconflict_Down_1",
+        "WT_ActionRange_Skill_Poisonconflict",
+        "WT_ActionRange_Skill_Poisonconflict_Up_1",
+        "WT_ActionRange_Skill_Poisonconflict_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Poisonconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Poisonconflict_Sprite",
+        "WT_ActionRange_Skill_Poisonconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Poisonconflict_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Poisonconflict_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Poisonconflict_Down_1",
+        "WT_ActionRange_Skill_Poisonconflict",
+        "WT_ActionRange_Skill_Poisonconflict_Up_1",
+        "WT_ActionRange_Skill_Poisonconflict_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Poisonconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Poisonconflict_Sprite",
+        "WT_ActionRange_Skill_Poisonconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Poisonconflict_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Poisonconflict_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Poisonconflict_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Poisonconflict_renew",
+        "WT_ActionRange_Elite_Skill_Poisonconflict_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Poisonconflict_Up_1_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302017": {
+      "id": 60302017,
+      "name": "싸움 충파",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Fightconflict_Down_1",
+        "WT_ActionRange_Skill_Fightconflict",
+        "WT_ActionRange_Skill_Fightconflict_Up_1",
+        "WT_ActionRange_Skill_Fightconflict_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Fightconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Fightconflict_Sprite",
+        "WT_ActionRange_Skill_Fightconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Fightconflict_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Fightconflict_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Fightconflict_Down_1",
+        "WT_ActionRange_Skill_Fightconflict",
+        "WT_ActionRange_Skill_Fightconflict_Up_1",
+        "WT_ActionRange_Skill_Fightconflict_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Fightconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Fightconflict_Sprite",
+        "WT_ActionRange_Skill_Fightconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Fightconflict_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Fightconflict_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Fightconflict_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Fightconflict_renew",
+        "WT_ActionRange_Elite_Skill_Fightconflict_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Fightconflict_Up_1_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302018": {
+      "id": 60302018,
+      "name": "연막 충파",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Smokeconflict_Down_1",
+        "WT_ActionRange_Skill_Smokeconflict",
+        "WT_ActionRange_Skill_Smokeconflict_Up_1",
+        "WT_ActionRange_Skill_Smokeconflict_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Smokeconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Smokeconflict_Sprite",
+        "WT_ActionRange_Skill_Smokeconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Smokeconflict_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Smokeconflict_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Smokeconflict_Down_1",
+        "WT_ActionRange_Skill_Smokeconflict",
+        "WT_ActionRange_Skill_Smokeconflict_Up_1",
+        "WT_ActionRange_Skill_Smokeconflict_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Smokeconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Smokeconflict_Sprite",
+        "WT_ActionRange_Skill_Smokeconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Smokeconflict_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Smokeconflict_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Smokeconflict_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Smokeconflict_renew",
+        "WT_ActionRange_Elite_Skill_Smokeconflict_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Smokeconflict_Up_1_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302019": {
+      "id": 60302019,
+      "name": "실명 충파",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Blindconflict_Down_1",
+        "WT_ActionRange_Skill_Blindconflict",
+        "WT_ActionRange_Skill_Blindconflict_Up_1",
+        "WT_ActionRange_Skill_Blindconflict_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Blindconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Blindconflict_Sprite",
+        "WT_ActionRange_Skill_Blindconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Blindconflict_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Blindconflict_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Blindconflict_Down_1",
+        "WT_ActionRange_Skill_Blindconflict",
+        "WT_ActionRange_Skill_Blindconflict_Up_1",
+        "WT_ActionRange_Skill_Blindconflict_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Blindconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Blindconflict_Sprite",
+        "WT_ActionRange_Skill_Blindconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Blindconflict_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Blindconflict_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Blindconflict_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Blindconflict_renew",
+        "WT_ActionRange_Elite_Skill_Blindconflict_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Blindconflict_Up_1_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302020": {
+      "id": 60302020,
+      "name": "관통 충파",
+      "battleActionRangePath": [
+        "WT_ActionRange_Skill_Penetrateconflict_Down_1",
+        "WT_ActionRange_Skill_Penetrateconflict",
+        "WT_ActionRange_Skill_Penetrateconflict_Up_1",
+        "WT_ActionRange_Skill_Penetrateconflict_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Skill_Penetrateconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Penetrateconflict_Sprite",
+        "WT_ActionRange_Skill_Penetrateconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Penetrateconflict_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Skill_Penetrateconflict_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Skill_Penetrateconflict_Down_1",
+        "WT_ActionRange_Skill_Penetrateconflict",
+        "WT_ActionRange_Skill_Penetrateconflict_Up_1",
+        "WT_ActionRange_Skill_Penetrateconflict_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Skill_Penetrateconflict_Down_1_Sprite",
+        "WT_ActionRange_Skill_Penetrateconflict_Sprite",
+        "WT_ActionRange_Skill_Penetrateconflict_Up_1_Sprite",
+        "WT_ActionRange_Skill_Penetrateconflict_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Skill_Penetrateconflict_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Penetrateconflict_Down_1_renew",
+        "WT_ActionRange_Elite_Skill_Penetrateconflict_renew",
+        "WT_ActionRange_Elite_Skill_Penetrateconflict_Up_1_renew",
+        "WT_ActionRange_Elite_Skill_Penetrateconflict_Up_1_renew"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302021": {
+      "id": 60302021,
+      "name": "토벌_에드워드티치_기본",
+      "battleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302022": {
+      "id": 60302022,
+      "name": "토벌_에드워드티치_장거리",
+      "battleActionRangePath": [
+        "WT_ActionRange_Elite_Depth_0-7",
+        "WT_ActionRange_Elite_Depth_0-7",
+        "WT_ActionRange_Elite_Depth_0-7",
+        "WT_ActionRange_Elite_Depth_0-7"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Elite_Depth_0-7_Sprite",
+        "WT_ActionRange_Elite_Depth_0-7_Sprite",
+        "WT_ActionRange_Elite_Depth_0-7_Sprite",
+        "WT_ActionRange_Elite_Depth_0-7_Sprite"
+      ],
+      "image": "WT_ActionRange_Elite_Depth_0-7_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Elite_Depth_0-7",
+        "WT_ActionRange_Elite_Depth_0-7",
+        "WT_ActionRange_Elite_Depth_0-7",
+        "WT_ActionRange_Elite_Depth_0-7"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Elite_Depth_0-7_Sprite",
+        "WT_ActionRange_Elite_Depth_0-7_Sprite",
+        "WT_ActionRange_Elite_Depth_0-7_Sprite",
+        "WT_ActionRange_Elite_Depth_0-7_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Elite_Depth_0-7_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Depth_0-7",
+        "WT_ActionRange_Elite_Depth_0-7",
+        "WT_ActionRange_Elite_Depth_0-7",
+        "WT_ActionRange_Elite_Depth_0-7"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302023": {
+      "id": 60302023,
+      "name": "토벌_에드워드티치_자신",
+      "battleActionRangePath": [
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-0_Sprite"
+      ],
+      "image": "WT_ActionRange_Depth_0-0_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-0_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Depth_0-0_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302024": {
+      "id": 60302024,
+      "name": "토벌_쿠아우테목_투창",
+      "battleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite"
+      ],
+      "image": "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Elite_Skill_Flailshot_Up_1_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1",
+        "WT_ActionRange_Elite_Skill_Flailshot_Up_1"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302025": {
+      "id": 60302025,
+      "name": "토벌_에드워드티치_기본",
+      "battleActionRangePath": [
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-0_Sprite"
+      ],
+      "image": "WT_ActionRange_Depth_0-0_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-0_Sprite",
+        "WT_ActionRange_Depth_0-0_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Depth_0-0_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0",
+        "WT_ActionRange_Depth_0-0"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302026": {
+      "id": 60302026,
+      "name": "토벌_토마스튜_기본",
+      "battleActionRangePath": [
+        "WT_ActionRange_Elite_Conflict",
+        "WT_ActionRange_Elite_Conflict",
+        "WT_ActionRange_Elite_Conflict",
+        "WT_ActionRange_Elite_Conflict"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Elite_Conflict_Sprite",
+        "WT_ActionRange_Elite_Conflict_Sprite",
+        "WT_ActionRange_Elite_Conflict_Sprite",
+        "WT_ActionRange_Elite_Conflict_Sprite"
+      ],
+      "image": "WT_ActionRange_Elite_Conflict_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_Elite_Conflict",
+        "WT_ActionRange_Elite_Conflict",
+        "WT_ActionRange_Elite_Conflict",
+        "WT_ActionRange_Elite_Conflict"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Elite_Conflict_Sprite",
+        "WT_ActionRange_Elite_Conflict_Sprite",
+        "WT_ActionRange_Elite_Conflict_Sprite",
+        "WT_ActionRange_Elite_Conflict_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Elite_Conflict_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_Elite_Conflict",
+        "WT_ActionRange_Elite_Conflict",
+        "WT_ActionRange_Elite_Conflict",
+        "WT_ActionRange_Elite_Conflict"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302027": {
+      "id": 60302027,
+      "name": "토벌_토마스튜_회유",
+      "battleActionRangePath": [
+        "WT_ActionRange_ThomasTew_Bribe",
+        "WT_ActionRange_ThomasTew_Bribe",
+        "WT_ActionRange_ThomasTew_Bribe",
+        "WT_ActionRange_ThomasTew_Bribe"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_ThomasTew_Bribe_Sprite",
+        "WT_ActionRange_ThomasTew_Bribe_Sprite",
+        "WT_ActionRange_ThomasTew_Bribe_Sprite",
+        "WT_ActionRange_ThomasTew_Bribe_Sprite"
+      ],
+      "image": "WT_ActionRange_ThomasTew_Bribe_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_ThomasTew_Bribe",
+        "WT_ActionRange_ThomasTew_Bribe",
+        "WT_ActionRange_ThomasTew_Bribe",
+        "WT_ActionRange_ThomasTew_Bribe"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_ThomasTew_Bribe_Sprite",
+        "WT_ActionRange_ThomasTew_Bribe_Sprite",
+        "WT_ActionRange_ThomasTew_Bribe_Sprite",
+        "WT_ActionRange_ThomasTew_Bribe_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_ThomasTew_Bribe_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_ThomasTew_Bribe",
+        "WT_ActionRange_ThomasTew_Bribe",
+        "WT_ActionRange_ThomasTew_Bribe",
+        "WT_ActionRange_ThomasTew_Bribe"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60302028": {
+      "id": 60302028,
+      "name": "토벌_토마스튜_황금",
+      "battleActionRangePath": [
+        "WT_ActionRange_DoYouWannerMyGold",
+        "WT_ActionRange_DoYouWannerMyGold",
+        "WT_ActionRange_DoYouWannerMyGold",
+        "WT_ActionRange_DoYouWannerMyGold"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_DoYouWannerMyGold_Sprite",
+        "WT_ActionRange_DoYouWannerMyGold_Sprite",
+        "WT_ActionRange_DoYouWannerMyGold_Sprite",
+        "WT_ActionRange_DoYouWannerMyGold_Sprite"
+      ],
+      "image": "WT_ActionRange_DoYouWannerMyGold_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_DoYouWannerMyGold",
+        "WT_ActionRange_DoYouWannerMyGold",
+        "WT_ActionRange_DoYouWannerMyGold",
+        "WT_ActionRange_DoYouWannerMyGold"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_DoYouWannerMyGold_Sprite",
+        "WT_ActionRange_DoYouWannerMyGold_Sprite",
+        "WT_ActionRange_DoYouWannerMyGold_Sprite",
+        "WT_ActionRange_DoYouWannerMyGold_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_DoYouWannerMyGold_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_DoYouWannerMyGold",
+        "WT_ActionRange_DoYouWannerMyGold",
+        "WT_ActionRange_DoYouWannerMyGold",
+        "WT_ActionRange_DoYouWannerMyGold"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 90,
+      "centralAngle": 30,
+      "minDistance": 2,
+      "maxDistance": 3,
+      "isReflected": true
+    },
+    "60303001": {
+      "id": 60303001,
+      "name": "측면 섬멸",
+      "battleActionRangePath": [
+        "WT_ActionRange_SideAttack_0-20",
+        "WT_ActionRange_SideAttack_0-20",
+        "WT_ActionRange_SideAttack_0-20",
+        "WT_ActionRange_SideAttack_0-20"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Depth_0-7_Sprite",
+        "WT_ActionRange_Depth_0-7_Sprite",
+        "WT_ActionRange_Depth_0-7_Sprite",
+        "WT_ActionRange_Depth_0-7_Sprite"
+      ],
+      "image": "WT_ActionRange_Depth_0-7_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_SideAttack_0-20",
+        "WT_ActionRange_SideAttack_0-20",
+        "WT_ActionRange_SideAttack_0-20",
+        "WT_ActionRange_SideAttack_0-20"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_Depth_0-7_Sprite",
+        "WT_ActionRange_Depth_0-7_Sprite",
+        "WT_ActionRange_Depth_0-7_Sprite",
+        "WT_ActionRange_Depth_0-7_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_Depth_0-7_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_SideAttack_0-20",
+        "WT_ActionRange_SideAttack_0-20",
+        "WT_ActionRange_SideAttack_0-20",
+        "WT_ActionRange_SideAttack_0-20"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 8,
+      "isReflected": true
+    },
+    "60303002": {
+      "id": 60303002,
+      "name": "토벌_토마스튜_화공",
+      "battleActionRangePath": [
+        "WT_ActionRange_ThomasTew_FireConfilct",
+        "WT_ActionRange_ThomasTew_FireConfilct",
+        "WT_ActionRange_ThomasTew_FireConfilct",
+        "WT_ActionRange_ThomasTew_FireConfilct"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_ThomasTew_FireConfilct_Sprite",
+        "WT_ActionRange_ThomasTew_FireConfilct_Sprite",
+        "WT_ActionRange_ThomasTew_FireConfilct_Sprite",
+        "WT_ActionRange_ThomasTew_FireConfilct_Sprite"
+      ],
+      "image": "WT_ActionRange_ThomasTew_FireConfilct_Sprite",
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_ThomasTew_FireConfilct",
+        "WT_ActionRange_ThomasTew_FireConfilct",
+        "WT_ActionRange_ThomasTew_FireConfilct",
+        "WT_ActionRange_ThomasTew_FireConfilct"
+      ],
+      "specialBattleActionRangeImage": [
+        "WT_ActionRange_ThomasTew_FireConfilct_Sprite",
+        "WT_ActionRange_ThomasTew_FireConfilct_Sprite",
+        "WT_ActionRange_ThomasTew_FireConfilct_Sprite",
+        "WT_ActionRange_ThomasTew_FireConfilct_Sprite"
+      ],
+      "specialImage": "WT_ActionRange_ThomasTew_FireConfilct_Sprite",
+      "ebattleActionRangePath": [
+        "WT_ActionRange_ThomasTew_FireConfilct",
+        "WT_ActionRange_ThomasTew_FireConfilct",
+        "WT_ActionRange_ThomasTew_FireConfilct",
+        "WT_ActionRange_ThomasTew_FireConfilct"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 8,
+      "isReflected": true
+    },
+    "60303003": {
+      "id": 60303003,
+      "name": "토벌_모비딕_기본",
+      "battleActionRangePath": [
+        "WT_ActionRange_MobyDick_HeadButt",
+        "WT_ActionRange_MobyDick_HeadButt",
+        "WT_ActionRange_MobyDick_HeadButt",
+        "WT_ActionRange_MobyDick_HeadButt"
+      ],
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_MobyDick_HeadButt",
+        "WT_ActionRange_MobyDick_HeadButt",
+        "WT_ActionRange_MobyDick_HeadButt",
+        "WT_ActionRange_MobyDick_HeadButt"
+      ],
+      "ebattleActionRangePath": [
+        "WT_ActionRange_MobyDick_HeadButt",
+        "WT_ActionRange_MobyDick_HeadButt",
+        "WT_ActionRange_MobyDick_HeadButt",
+        "WT_ActionRange_MobyDick_HeadButt"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 8,
+      "isReflected": true
+    },
+    "60303004": {
+      "id": 60303004,
+      "name": "토벌_모비딕_물뿜기",
+      "battleActionRangePath": [
+        "WT_ActionRange_MobyDick_Spout",
+        "WT_ActionRange_MobyDick_Spout",
+        "WT_ActionRange_MobyDick_Spout",
+        "WT_ActionRange_MobyDick_Spout"
+      ],
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_MobyDick_Spout",
+        "WT_ActionRange_MobyDick_Spout",
+        "WT_ActionRange_MobyDick_Spout",
+        "WT_ActionRange_MobyDick_Spout"
+      ],
+      "ebattleActionRangePath": [
+        "WT_ActionRange_MobyDick_Spout",
+        "WT_ActionRange_MobyDick_Spout",
+        "WT_ActionRange_MobyDick_Spout",
+        "WT_ActionRange_MobyDick_Spout"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 8,
+      "isReflected": true
+    },
+    "60303005": {
+      "id": 60303005,
+      "name": "이벤트_마장기_포격지원",
+      "battleActionRangePath": [
+        "WT_ActionRange_RaCoverFire",
+        "WT_ActionRange_RaCoverFire",
+        "WT_ActionRange_RaCoverFire",
+        "WT_ActionRange_RaCoverFire"
+      ],
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_RaCoverFire",
+        "WT_ActionRange_RaCoverFire",
+        "WT_ActionRange_RaCoverFire",
+        "WT_ActionRange_RaCoverFire"
+      ],
+      "ebattleActionRangePath": [
+        "WT_ActionRange_RaCoverFire",
+        "WT_ActionRange_RaCoverFire",
+        "WT_ActionRange_RaCoverFire",
+        "WT_ActionRange_RaCoverFire"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 8,
+      "isReflected": true
+    },
+    "60303006": {
+      "id": 60303006,
+      "name": "이벤트_마장기_강흔들기",
+      "battleActionRangePath": [
+        "WT_ActionRange_RaRiverWave",
+        "WT_ActionRange_RaRiverWave",
+        "WT_ActionRange_RaRiverWave",
+        "WT_ActionRange_RaRiverWave"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Elite_Conflict_Down_1_Sprite",
+        "WT_ActionRange_Elite_Conflict_Down_1_Sprite",
+        "WT_ActionRange_Elite_Conflict_Down_1_Sprite",
+        "WT_ActionRange_Elite_Conflict_Down_1_Sprite"
+      ],
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_RaRiverWave",
+        "WT_ActionRange_RaRiverWave",
+        "WT_ActionRange_RaRiverWave",
+        "WT_ActionRange_RaRiverWave"
+      ],
+      "ebattleActionRangePath": [
+        "WT_ActionRange_RaRiverWave",
+        "WT_ActionRange_RaRiverWave",
+        "WT_ActionRange_RaRiverWave",
+        "WT_ActionRange_RaRiverWave"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 8,
+      "isReflected": true
+    },
+    "60303007": {
+      "id": 60303007,
+      "name": "토벌_가오리_날개치기",
+      "battleActionRangePath": [
+        "WT_ActionRange_StingRay_WIngAttack",
+        "WT_ActionRange_StingRay_WIngAttack",
+        "WT_ActionRange_StingRay_WIngAttack",
+        "WT_ActionRange_StingRay_WIngAttack"
+      ],
+      "battleActionRangeImage": [
+        "WT_ActionRange_Elite_Conflict_Down_1_Sprite",
+        "WT_ActionRange_Elite_Conflict_Down_1_Sprite",
+        "WT_ActionRange_Elite_Conflict_Down_1_Sprite",
+        "WT_ActionRange_Elite_Conflict_Down_1_Sprite"
+      ],
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_StingRay_WIngAttack",
+        "WT_ActionRange_StingRay_WIngAttack",
+        "WT_ActionRange_StingRay_WIngAttack",
+        "WT_ActionRange_StingRay_WIngAttack"
+      ],
+      "ebattleActionRangePath": [
+        "WT_ActionRange_StingRay_WIngAttack",
+        "WT_ActionRange_StingRay_WIngAttack",
+        "WT_ActionRange_StingRay_WIngAttack",
+        "WT_ActionRange_StingRay_WIngAttack"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 8,
+      "isReflected": true
+    },
+    "60303008": {
+      "id": 60303008,
+      "name": "토벌_가오리_맹독숨결",
+      "battleActionRangePath": [
+        "WT_ActionRange_StingRay_PoisonBreath",
+        "WT_ActionRange_StingRay_PoisonBreath",
+        "WT_ActionRange_StingRay_PoisonBreath",
+        "WT_ActionRange_StingRay_PoisonBreath"
+      ],
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_StingRay_PoisonBreath",
+        "WT_ActionRange_StingRay_PoisonBreath",
+        "WT_ActionRange_StingRay_PoisonBreath",
+        "WT_ActionRange_StingRay_PoisonBreath"
+      ],
+      "ebattleActionRangePath": [
+        "WT_ActionRange_StingRay_PoisonBreath",
+        "WT_ActionRange_StingRay_PoisonBreath",
+        "WT_ActionRange_StingRay_PoisonBreath",
+        "WT_ActionRange_StingRay_PoisonBreath"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 8,
+      "isReflected": true
+    },
+    "60303009": {
+      "id": 60303009,
+      "name": "상회토벌_자폭",
+      "battleActionRangePath": [
+        "WT_ActionRange_SelfDestruct",
+        "WT_ActionRange_SelfDestruct",
+        "WT_ActionRange_SelfDestruct",
+        "WT_ActionRange_SelfDestruct"
+      ],
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_SelfDestruct",
+        "WT_ActionRange_SelfDestruct",
+        "WT_ActionRange_SelfDestruct",
+        "WT_ActionRange_SelfDestruct"
+      ],
+      "ebattleActionRangePath": [
+        "WT_ActionRange_SelfDestruct",
+        "WT_ActionRange_SelfDestruct",
+        "WT_ActionRange_SelfDestruct",
+        "WT_ActionRange_SelfDestruct"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 8,
+      "isReflected": true
+    },
+    "60303010": {
+      "id": 60303010,
+      "name": "백병_끌어오기",
+      "battleActionRangePath": [
+        "WT_ActionRange_hook_2",
+        "WT_ActionRange_hook_2",
+        "WT_ActionRange_hook_2",
+        "WT_ActionRange_hook_2"
+      ],
+      "specialBattleActionRangePath": [
+        "WT_ActionRange_hook_2",
+        "WT_ActionRange_hook_2",
+        "WT_ActionRange_hook_2",
+        "WT_ActionRange_hook_2"
+      ],
+      "ebattleActionRangePath": [
+        "WT_ActionRange_hook_2",
+        "WT_ActionRange_hook_2",
+        "WT_ActionRange_hook_2",
+        "WT_ActionRange_hook_2"
+      ],
+      "obstaclePassType": 2,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 8,
+      "isReflected": true
+    },
+    "60310000": {
+      "id": 60310000,
+      "name": "없음",
+      "obstaclePassType": 0,
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 1,
+      "maxDistance": 8,
+      "isReflected": true
+    }
+  }
+}

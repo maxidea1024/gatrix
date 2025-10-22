@@ -1,0 +1,692 @@
+{
+  ":DailySubscription": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "purchaseRewardId": "number",
+      "dailyRewardId": "number",
+      "mainTitle": "text",
+      "mainTileFormatText": "text",
+      "desc": "text",
+      "descFormatText": [
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text",
+        "text"
+      ],
+      "LocalBitflag": "bit",
+      "startDate": "string",
+      "endDate": "string",
+      "durationDays": "number",
+      "mail": "number",
+      "bgIllust": "string",
+      "spineAsset": "string",
+      "contentsTerms": [
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        },
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        }
+      ]
+    },
+    ":required": {
+      "name": 1,
+      "purchaseRewardId": 1,
+      "dailyRewardId": 1,
+      "durationDays": 1,
+      "mail": 1
+    },
+    ":min": {
+      "purchaseRewardId": 94000000,
+      "dailyRewardId": 94000000,
+      "mail": 92000000,
+      "contentsTerms": [
+        {
+          "Id": 81000000
+        },
+        {
+          "Id": 81000000
+        }
+      ]
+    },
+    ":max": {
+      "purchaseRewardId": 95999999,
+      "dailyRewardId": 95999999,
+      "mail": 92999999,
+      "contentsTerms": [
+        {
+          "Id": 81999999
+        },
+        {
+          "Id": 81999999
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "purchaseRewardId": [
+        "RewardFixed"
+      ],
+      "dailyRewardId": [
+        "RewardFixed"
+      ],
+      "mail": [
+        "Mail"
+      ],
+      "contentsTerms": [
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        },
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        }
+      ]
+    }
+  },
+  "DailySubscription": {
+    "10700001": {
+      "id": 10700001,
+      "name": "테스트 구독(레드젬)",
+      "purchaseRewardId": 95080052,
+      "dailyRewardId": 95080053,
+      "mainTitle": "매일{0} 구독",
+      "mainTileFormatText": "[[BigR]]",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "[[BigR]]",
+        "1000",
+        "[[BigR]]",
+        "50"
+      ],
+      "LocalBitflag": 0,
+      "durationDays": 28,
+      "mail": 92100007,
+      "bgIllust": "WT_EventBG01_Sprite",
+      "spineAsset": "CH_NPC_KR_GaEJ0"
+    },
+    "10700002": {
+      "id": 10700002,
+      "name": "테스트 구독(부품)",
+      "purchaseRewardId": 95080054,
+      "dailyRewardId": 95080055,
+      "mainTitle": "매일{0} 구독2",
+      "mainTileFormatText": "오리나무판",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "오리나무판",
+        "5",
+        "오리나무판",
+        "1"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2023/03/13/00:00:00",
+      "durationDays": 21,
+      "mail": 92100007,
+      "bgIllust": "WT_EventBG00_Sprite",
+      "spineAsset": "CH_NPC_ES_Flora0",
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 10
+        }
+      ]
+    },
+    "10700003": {
+      "id": 10700003,
+      "name": "테스트 구독(장비)",
+      "purchaseRewardId": 95080056,
+      "dailyRewardId": 95080057,
+      "mainTitle": "매일{0} 구독3",
+      "mainTileFormatText": "커틀라스",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "커틀라스",
+        "5",
+        "커틀라스",
+        "1"
+      ],
+      "LocalBitflag": 0,
+      "endDate": "2023/03/30/00:00:00",
+      "durationDays": 14,
+      "mail": 92100007,
+      "bgIllust": "WT_EventBG03_Sprite",
+      "spineAsset": "CH_NPC_NE_Klaudia0",
+      "contentsTerms": [
+        {
+          "Id": 81000018,
+          "Target": 21200009,
+          "Count": 1
+        }
+      ]
+    },
+    "10700004": {
+      "id": 10700004,
+      "name": "테스트 구독(아이템)",
+      "purchaseRewardId": 95080058,
+      "dailyRewardId": 95080059,
+      "mainTitle": "매일{0} 구독4",
+      "mainTileFormatText": "특별 투자 증서",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "특별 투자 증서",
+        "3",
+        "특별 투자 증서",
+        "1"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2023/03/13/00:00:00",
+      "endDate": "2023/03/30/00:00:00",
+      "durationDays": 7,
+      "mail": 92100007,
+      "spineAsset": "CH_NPC_AL_Anisa0"
+    },
+    "10700005": {
+      "id": 10700005,
+      "name": "28일 레드젬",
+      "purchaseRewardId": 95070181,
+      "dailyRewardId": 95070182,
+      "mainTitle": "{0}일 레드젬",
+      "mainTileFormatText": "28",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "2,000",
+        "레드젬",
+        "100"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2023/04/12/00:00:00",
+      "endDate": "2024/03/19/00:00:00",
+      "durationDays": 28,
+      "mail": 92100007,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 25
+        }
+      ]
+    },
+    "10700006": {
+      "id": 10700006,
+      "name": "28일 두카트",
+      "purchaseRewardId": 95070183,
+      "dailyRewardId": 95070184,
+      "mainTitle": "{0}일 두카트",
+      "mainTileFormatText": "28",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "두카트",
+        "10,000,000",
+        "두카트",
+        "3,000,000"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2023/04/12/00:00:00",
+      "endDate": "2024/07/31/00:00:00",
+      "durationDays": 28,
+      "mail": 92100007
+    },
+    "10700007": {
+      "id": 10700007,
+      "name": "14일 대형 공용 도면",
+      "purchaseRewardId": 95070185,
+      "dailyRewardId": 95070186,
+      "mainTitle": "{0}일 대형 공용 도면",
+      "mainTileFormatText": "14",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "대형 공용 도면",
+        "10",
+        "대형 공용 도면",
+        "5"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2023/04/26/12:00:00",
+      "endDate": "2024/04/30/00:00:00",
+      "durationDays": 14,
+      "mail": 92100007
+    },
+    "10700008": {
+      "id": 10700008,
+      "name": "14일 대형 용골",
+      "purchaseRewardId": 95070187,
+      "dailyRewardId": 95070188,
+      "mainTitle": "{0}일 대형 용골",
+      "mainTileFormatText": "14",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "대형 용골",
+        "6",
+        "대형 용골",
+        "1"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2023/04/26/12:00:00",
+      "endDate": "2024/03/19/00:00:00",
+      "durationDays": 14,
+      "mail": 92100007
+    },
+    "10700009": {
+      "id": 10700009,
+      "name": "28일 레드젬",
+      "purchaseRewardId": 95090001,
+      "dailyRewardId": 95090002,
+      "mainTitle": "{0}일 레드젬",
+      "mainTileFormatText": "28",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "2,000",
+        "레드젬",
+        "100"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2023/04/26/00:00:00",
+      "endDate": "2028/04/30/00:00:00",
+      "durationDays": 28,
+      "mail": 92100007,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 25
+        }
+      ]
+    },
+    "10700010": {
+      "id": 10700010,
+      "name": "10일 항해사 티켓",
+      "purchaseRewardId": 95090003,
+      "dailyRewardId": 95090004,
+      "mainTitle": "{0}일 항해사 티켓",
+      "mainTileFormatText": "10",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "500",
+        "항해사 티켓",
+        "2"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2023/04/26/00:00:00",
+      "endDate": "2024/11/06/00:00:00",
+      "durationDays": 10,
+      "mail": 92100007
+    },
+    "10700011": {
+      "id": 10700011,
+      "name": "10일 고급 항해사 티켓",
+      "purchaseRewardId": 95090005,
+      "dailyRewardId": 95090006,
+      "mainTitle": "{0}일 고급 항해사 티켓",
+      "mainTileFormatText": "10",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "2,000",
+        "고급 항해사 티켓",
+        "1"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2023/04/26/00:00:00",
+      "endDate": "2024/11/06/00:00:00",
+      "durationDays": 10,
+      "mail": 92100007
+    },
+    "10700012": {
+      "id": 10700012,
+      "name": "10일 고급 아이템 티켓",
+      "purchaseRewardId": 95090007,
+      "dailyRewardId": 95090008,
+      "mainTitle": "{0}일 고급 아이템 티켓",
+      "mainTileFormatText": "10",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "2,000",
+        "고급 아이템 티켓",
+        "1"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2023/04/26/00:00:00",
+      "endDate": "2024/11/06/00:00:00",
+      "durationDays": 10,
+      "mail": 92100007
+    },
+    "10700014": {
+      "id": 10700014,
+      "name": "14일 대형 공용 도면",
+      "purchaseRewardId": 95090213,
+      "dailyRewardId": 95090214,
+      "mainTitle": "{0}일 대형 공용 도면",
+      "mainTileFormatText": "14",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "3,000",
+        "대형 공용 도면",
+        "5"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2023/05/31/12:00:00",
+      "endDate": "2024/05/22/00:00:00",
+      "durationDays": 14,
+      "mail": 92100007
+    },
+    "10700015": {
+      "id": 10700015,
+      "name": "14일 대형 용골",
+      "purchaseRewardId": 95090215,
+      "dailyRewardId": 95090216,
+      "mainTitle": "{0}일 대형 용골",
+      "mainTileFormatText": "14",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "2,000",
+        "대형 용골",
+        "1"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2023/05/31/12:00:00",
+      "durationDays": 14,
+      "mail": 92100007
+    },
+    "10700016": {
+      "id": 10700016,
+      "name": "수에즈 운하 7일 정기권",
+      "purchaseRewardId": 95071425,
+      "dailyRewardId": 95071426,
+      "mainTitle": "수에즈 운하 {0}일 정기권",
+      "mainTileFormatText": "7",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개, {4} {5}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "1,000",
+        "수에즈 운하 이용권",
+        "9",
+        "수에즈 운하 운송 이용권",
+        "9"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2023/12/20/00:00:00",
+      "endDate": "2024/03/19/00:00:00",
+      "durationDays": 7,
+      "mail": 92100007
+    },
+    "10700017": {
+      "id": 10700017,
+      "name": "수에즈 운하 7일 정기권",
+      "purchaseRewardId": 95078472,
+      "dailyRewardId": 95078473,
+      "mainTitle": "수에즈 운하 {0}일 정기권",
+      "mainTileFormatText": "7",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개, {4} {5}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "1,000",
+        "수에즈 운하 이용권",
+        "9",
+        "수에즈 운하 운송 이용권",
+        "9"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2024/01/03/00:00:00",
+      "endDate": "2025/04/09/00:00:00",
+      "durationDays": 7,
+      "mail": 92100007
+    },
+    "10700018": {
+      "id": 10700018,
+      "name": "파나마 운하 7일 정기권",
+      "purchaseRewardId": 95071895,
+      "dailyRewardId": 95071896,
+      "mainTitle": "파나마 운하 {0}일 정기권",
+      "mainTileFormatText": "7",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개, {4} {5}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "1,000",
+        "파나마 운하 이용권",
+        "9",
+        "파나마 운하 운송 이용권",
+        "9"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2024/02/14/00:00:00",
+      "endDate": "2024/03/19/00:00:00",
+      "durationDays": 7,
+      "mail": 92100007
+    },
+    "10700019": {
+      "id": 10700019,
+      "name": "파나마 운하 7일 정기권",
+      "purchaseRewardId": 95079088,
+      "dailyRewardId": 95079089,
+      "mainTitle": "파나마 운하 {0}일 정기권",
+      "mainTileFormatText": "7",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개, {4} {5}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "1,000",
+        "파나마 운하 이용권",
+        "9",
+        "파나마 운하 운송 이용권",
+        "9"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2024/02/28/00:00:00",
+      "endDate": "2025/04/09/00:00:00",
+      "durationDays": 7,
+      "mail": 92100007
+    },
+    "10700020": {
+      "id": 10700020,
+      "name": "초급 7일 두카트",
+      "purchaseRewardId": 95073022,
+      "dailyRewardId": 95073025,
+      "mainTitle": "초급 {0}일 두카트",
+      "mainTileFormatText": "7",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "500",
+        "두카트",
+        "10,000,000"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2024/07/31/00:00:00",
+      "endDate": "2024/03/19/00:00:00",
+      "durationDays": 7,
+      "mail": 92100007,
+      "contentsTerms": [
+        {
+          "Id": 81000038,
+          "Count": 31
+        }
+      ]
+    },
+    "10700021": {
+      "id": 10700021,
+      "name": "7일 두카트",
+      "purchaseRewardId": 95073023,
+      "dailyRewardId": 95073026,
+      "mainTitle": "{0}일 두카트",
+      "mainTileFormatText": "7",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "1,000",
+        "두카트",
+        "30,000,000"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2024/07/31/00:00:00",
+      "endDate": "2024/03/19/00:00:00",
+      "durationDays": 7,
+      "mail": 92100007,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 31
+        },
+        {
+          "Id": 81000038,
+          "Count": 56
+        }
+      ]
+    },
+    "10700022": {
+      "id": 10700022,
+      "name": "고급 7일 두카트",
+      "purchaseRewardId": 95073024,
+      "dailyRewardId": 95073027,
+      "mainTitle": "고급 {0}일 두카트",
+      "mainTileFormatText": "7",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "2,000",
+        "두카트",
+        "100,000,000"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2024/07/31/00:00:00",
+      "endDate": "2024/03/19/00:00:00",
+      "durationDays": 7,
+      "mail": 92100007,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 56
+        }
+      ]
+    },
+    "10700023": {
+      "id": 10700023,
+      "name": "10일 티켓 교환권",
+      "purchaseRewardId": 95080706,
+      "dailyRewardId": 95080707,
+      "mainTitle": "{0}일 티켓 교환권",
+      "mainTileFormatText": "10",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "6,000",
+        "고급 티켓 선택 교환권",
+        "3"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2024/08/21/12:00:00",
+      "endDate": "2024/11/06/00:00:00",
+      "durationDays": 10,
+      "mail": 92100007
+    },
+    "10700024": {
+      "id": 10700024,
+      "name": "7일 종합 건조",
+      "purchaseRewardId": 95073197,
+      "dailyRewardId": 95073198,
+      "mainTitle": "{0}일 종합 건조",
+      "mainTileFormatText": "7",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2}, {3}, {4}, {5}, {6}을 각각 {7}개 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "9,000",
+        "판재 선택 교환권",
+        "돛대 선택 교환권",
+        "포문 선택 교환권",
+        "공용 도면 선택 교환권",
+        "용골 선택 교환권",
+        "1"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2024/09/04/12:00:00",
+      "endDate": "2024/03/19/00:00:00",
+      "durationDays": 7,
+      "mail": 92100007
+    },
+    "10700025": {
+      "id": 10700025,
+      "name": "7일 종합 건조",
+      "purchaseRewardId": 95080708,
+      "dailyRewardId": 95080709,
+      "mainTitle": "{0}일 종합 건조",
+      "mainTileFormatText": "7",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2}, {3}, {4}, {5}, {6}을 각각 {7}개 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "9,000",
+        "판재 선택 교환권",
+        "돛대 선택 교환권",
+        "포문 선택 교환권",
+        "공용 도면 선택 교환권",
+        "용골 선택 교환권",
+        "1"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2024/09/04/12:00:00",
+      "durationDays": 7,
+      "mail": 92100007
+    },
+    "10700026": {
+      "id": 10700026,
+      "name": "고급 7일 레드젬",
+      "purchaseRewardId": 95073812,
+      "dailyRewardId": 95073813,
+      "mainTitle": "고급 {0}일 레드젬",
+      "mainTileFormatText": "7",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "레드젬",
+        "5,000",
+        "레드젬",
+        "1,000"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2024/11/20/00:00:00",
+      "endDate": "2025/04/09/00:00:00",
+      "durationDays": 7,
+      "mail": 92100007,
+      "contentsTerms": [
+        {
+          "Id": 81000001,
+          "Count": 25
+        }
+      ]
+    },
+    "10700013": {
+      "id": 10700013,
+      "name": "테스트 구독(아이템)2",
+      "purchaseRewardId": 95080058,
+      "dailyRewardId": 95080059,
+      "mainTitle": "매일{0} 구독4",
+      "mainTileFormatText": "7",
+      "desc": "구매 시 {0} {1}개, 이후 매일 이벤트 페이지에서 {2} {3}개를 수령할 수 있습니다.",
+      "descFormatText": [
+        "7",
+        "3",
+        "7",
+        "1"
+      ],
+      "LocalBitflag": 0,
+      "startDate": "2023/03/13/00:00:00",
+      "endDate": "2023/03/30/00:00:00",
+      "durationDays": 7,
+      "mail": 92100007,
+      "spineAsset": "CH_NPC_AL_Anisa0"
+    }
+  }
+}

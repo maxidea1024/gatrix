@@ -1,0 +1,534 @@
+{
+  ":InvestEventRanking": {
+    ":type": {
+      "id": "key",
+      "localBitFlag": "bit",
+      "rankingGrade": "number",
+      "rankingType": "number",
+      "rankingRange": "number",
+      "mailId": "number"
+    },
+    ":required": {
+      "rankingGrade": 1,
+      "rankingType": 1
+    },
+    ":min": {
+      "mailId": 1
+    },
+    ":max": {
+      "mailId": 95999999
+    },
+    ":enum": {},
+    ":links": {
+      "mailId": [
+        "Mail"
+      ]
+    }
+  },
+  "InvestEventRanking": {
+    "27180001": {
+      "id": 27180001,
+      "localBitFlag": 1,
+      "rankingGrade": 1,
+      "rankingType": 2,
+      "rankingRange": 1,
+      "mailId": 92001023
+    },
+    "27180002": {
+      "id": 27180002,
+      "localBitFlag": 1,
+      "rankingGrade": 2,
+      "rankingType": 2,
+      "rankingRange": 2,
+      "mailId": 92001024
+    },
+    "27180003": {
+      "id": 27180003,
+      "localBitFlag": 1,
+      "rankingGrade": 3,
+      "rankingType": 2,
+      "rankingRange": 3,
+      "mailId": 92001025
+    },
+    "27180004": {
+      "id": 27180004,
+      "localBitFlag": 1,
+      "rankingGrade": 4,
+      "rankingType": 2,
+      "rankingRange": 4,
+      "mailId": 92001026
+    },
+    "27180005": {
+      "id": 27180005,
+      "localBitFlag": 1,
+      "rankingGrade": 5,
+      "rankingType": 2,
+      "rankingRange": 5,
+      "mailId": 92001027
+    },
+    "27180006": {
+      "id": 27180006,
+      "localBitFlag": 1,
+      "rankingGrade": 6,
+      "rankingType": 2,
+      "rankingRange": 6,
+      "mailId": 92001028
+    },
+    "27180007": {
+      "id": 27180007,
+      "localBitFlag": 1,
+      "rankingGrade": 7,
+      "rankingType": 2,
+      "rankingRange": 7,
+      "mailId": 92001029
+    },
+    "27180008": {
+      "id": 27180008,
+      "localBitFlag": 1,
+      "rankingGrade": 8,
+      "rankingType": 2,
+      "rankingRange": 8,
+      "mailId": 92001030
+    },
+    "27180009": {
+      "id": 27180009,
+      "localBitFlag": 1,
+      "rankingGrade": 9,
+      "rankingType": 2,
+      "rankingRange": 9,
+      "mailId": 92001031
+    },
+    "27180010": {
+      "id": 27180010,
+      "localBitFlag": 1,
+      "rankingGrade": 10,
+      "rankingType": 2,
+      "rankingRange": 10,
+      "mailId": 92001032
+    },
+    "27180011": {
+      "id": 27180011,
+      "localBitFlag": 1,
+      "rankingGrade": 11,
+      "rankingType": 2,
+      "rankingRange": 11,
+      "mailId": 92001033
+    },
+    "27180012": {
+      "id": 27180012,
+      "localBitFlag": 1,
+      "rankingGrade": 12,
+      "rankingType": 2,
+      "rankingRange": 12,
+      "mailId": 92001034
+    },
+    "27180013": {
+      "id": 27180013,
+      "localBitFlag": 1,
+      "rankingGrade": 13,
+      "rankingType": 2,
+      "rankingRange": 13,
+      "mailId": 92001035
+    },
+    "27180014": {
+      "id": 27180014,
+      "localBitFlag": 1,
+      "rankingGrade": 14,
+      "rankingType": 2,
+      "rankingRange": 14,
+      "mailId": 92001036
+    },
+    "27180015": {
+      "id": 27180015,
+      "localBitFlag": 1,
+      "rankingGrade": 15,
+      "rankingType": 2,
+      "rankingRange": 15,
+      "mailId": 92001037
+    },
+    "27180016": {
+      "id": 27180016,
+      "localBitFlag": 1,
+      "rankingGrade": 16,
+      "rankingType": 2,
+      "rankingRange": 16,
+      "mailId": 92001038
+    },
+    "27180017": {
+      "id": 27180017,
+      "localBitFlag": 1,
+      "rankingGrade": 17,
+      "rankingType": 2,
+      "rankingRange": 17,
+      "mailId": 92001039
+    },
+    "27180018": {
+      "id": 27180018,
+      "localBitFlag": 1,
+      "rankingGrade": 18,
+      "rankingType": 2,
+      "rankingRange": 18,
+      "mailId": 92001040
+    },
+    "27180019": {
+      "id": 27180019,
+      "localBitFlag": 1,
+      "rankingGrade": 19,
+      "rankingType": 2,
+      "rankingRange": 19,
+      "mailId": 92001041
+    },
+    "27180020": {
+      "id": 27180020,
+      "localBitFlag": 1,
+      "rankingGrade": 20,
+      "rankingType": 2,
+      "rankingRange": 20,
+      "mailId": 92001042
+    },
+    "27180021": {
+      "id": 27180021,
+      "localBitFlag": 1,
+      "rankingGrade": 21,
+      "rankingType": 1,
+      "rankingRange": 100,
+      "mailId": 92001043
+    },
+    "27180101": {
+      "id": 27180101,
+      "localBitFlag": 4,
+      "rankingGrade": 1,
+      "rankingType": 2,
+      "rankingRange": 1,
+      "mailId": 92001023
+    },
+    "27180102": {
+      "id": 27180102,
+      "localBitFlag": 4,
+      "rankingGrade": 2,
+      "rankingType": 2,
+      "rankingRange": 2,
+      "mailId": 92001024
+    },
+    "27180103": {
+      "id": 27180103,
+      "localBitFlag": 4,
+      "rankingGrade": 3,
+      "rankingType": 2,
+      "rankingRange": 3,
+      "mailId": 92001025
+    },
+    "27180104": {
+      "id": 27180104,
+      "localBitFlag": 4,
+      "rankingGrade": 4,
+      "rankingType": 2,
+      "rankingRange": 4,
+      "mailId": 92001026
+    },
+    "27180105": {
+      "id": 27180105,
+      "localBitFlag": 4,
+      "rankingGrade": 5,
+      "rankingType": 2,
+      "rankingRange": 5,
+      "mailId": 92001027
+    },
+    "27180106": {
+      "id": 27180106,
+      "localBitFlag": 4,
+      "rankingGrade": 6,
+      "rankingType": 2,
+      "rankingRange": 6,
+      "mailId": 92001028
+    },
+    "27180107": {
+      "id": 27180107,
+      "localBitFlag": 4,
+      "rankingGrade": 7,
+      "rankingType": 2,
+      "rankingRange": 7,
+      "mailId": 92001029
+    },
+    "27180108": {
+      "id": 27180108,
+      "localBitFlag": 4,
+      "rankingGrade": 8,
+      "rankingType": 2,
+      "rankingRange": 8,
+      "mailId": 92001030
+    },
+    "27180109": {
+      "id": 27180109,
+      "localBitFlag": 4,
+      "rankingGrade": 9,
+      "rankingType": 2,
+      "rankingRange": 9,
+      "mailId": 92001031
+    },
+    "27180110": {
+      "id": 27180110,
+      "localBitFlag": 4,
+      "rankingGrade": 10,
+      "rankingType": 2,
+      "rankingRange": 10,
+      "mailId": 92001032
+    },
+    "27180111": {
+      "id": 27180111,
+      "localBitFlag": 4,
+      "rankingGrade": 11,
+      "rankingType": 2,
+      "rankingRange": 11,
+      "mailId": 92001033
+    },
+    "27180112": {
+      "id": 27180112,
+      "localBitFlag": 4,
+      "rankingGrade": 12,
+      "rankingType": 2,
+      "rankingRange": 12,
+      "mailId": 92001034
+    },
+    "27180113": {
+      "id": 27180113,
+      "localBitFlag": 4,
+      "rankingGrade": 13,
+      "rankingType": 2,
+      "rankingRange": 13,
+      "mailId": 92001035
+    },
+    "27180114": {
+      "id": 27180114,
+      "localBitFlag": 4,
+      "rankingGrade": 14,
+      "rankingType": 2,
+      "rankingRange": 14,
+      "mailId": 92001036
+    },
+    "27180115": {
+      "id": 27180115,
+      "localBitFlag": 4,
+      "rankingGrade": 15,
+      "rankingType": 2,
+      "rankingRange": 15,
+      "mailId": 92001037
+    },
+    "27180116": {
+      "id": 27180116,
+      "localBitFlag": 4,
+      "rankingGrade": 16,
+      "rankingType": 2,
+      "rankingRange": 16,
+      "mailId": 92001038
+    },
+    "27180117": {
+      "id": 27180117,
+      "localBitFlag": 4,
+      "rankingGrade": 17,
+      "rankingType": 2,
+      "rankingRange": 17,
+      "mailId": 92001039
+    },
+    "27180118": {
+      "id": 27180118,
+      "localBitFlag": 4,
+      "rankingGrade": 18,
+      "rankingType": 2,
+      "rankingRange": 18,
+      "mailId": 92001040
+    },
+    "27180119": {
+      "id": 27180119,
+      "localBitFlag": 4,
+      "rankingGrade": 19,
+      "rankingType": 2,
+      "rankingRange": 19,
+      "mailId": 92001041
+    },
+    "27180120": {
+      "id": 27180120,
+      "localBitFlag": 4,
+      "rankingGrade": 20,
+      "rankingType": 2,
+      "rankingRange": 20,
+      "mailId": 92001042
+    },
+    "27180121": {
+      "id": 27180121,
+      "localBitFlag": 4,
+      "rankingGrade": 21,
+      "rankingType": 1,
+      "rankingRange": 100,
+      "mailId": 92001043
+    },
+    "27180201": {
+      "id": 27180201,
+      "localBitFlag": 18,
+      "rankingGrade": 1,
+      "rankingType": 2,
+      "rankingRange": 1,
+      "mailId": 92001023
+    },
+    "27180202": {
+      "id": 27180202,
+      "localBitFlag": 18,
+      "rankingGrade": 2,
+      "rankingType": 2,
+      "rankingRange": 2,
+      "mailId": 92001024
+    },
+    "27180203": {
+      "id": 27180203,
+      "localBitFlag": 18,
+      "rankingGrade": 3,
+      "rankingType": 2,
+      "rankingRange": 3,
+      "mailId": 92001025
+    },
+    "27180204": {
+      "id": 27180204,
+      "localBitFlag": 18,
+      "rankingGrade": 4,
+      "rankingType": 2,
+      "rankingRange": 4,
+      "mailId": 92001026
+    },
+    "27180205": {
+      "id": 27180205,
+      "localBitFlag": 18,
+      "rankingGrade": 5,
+      "rankingType": 2,
+      "rankingRange": 5,
+      "mailId": 92001027
+    },
+    "27180206": {
+      "id": 27180206,
+      "localBitFlag": 18,
+      "rankingGrade": 6,
+      "rankingType": 2,
+      "rankingRange": 6,
+      "mailId": 92001028
+    },
+    "27180207": {
+      "id": 27180207,
+      "localBitFlag": 18,
+      "rankingGrade": 7,
+      "rankingType": 2,
+      "rankingRange": 7,
+      "mailId": 92001029
+    },
+    "27180208": {
+      "id": 27180208,
+      "localBitFlag": 18,
+      "rankingGrade": 8,
+      "rankingType": 2,
+      "rankingRange": 8,
+      "mailId": 92001030
+    },
+    "27180209": {
+      "id": 27180209,
+      "localBitFlag": 18,
+      "rankingGrade": 9,
+      "rankingType": 2,
+      "rankingRange": 9,
+      "mailId": 92001031
+    },
+    "27180210": {
+      "id": 27180210,
+      "localBitFlag": 18,
+      "rankingGrade": 10,
+      "rankingType": 2,
+      "rankingRange": 10,
+      "mailId": 92001032
+    },
+    "27180211": {
+      "id": 27180211,
+      "localBitFlag": 18,
+      "rankingGrade": 11,
+      "rankingType": 2,
+      "rankingRange": 11,
+      "mailId": 92001033
+    },
+    "27180212": {
+      "id": 27180212,
+      "localBitFlag": 18,
+      "rankingGrade": 12,
+      "rankingType": 2,
+      "rankingRange": 12,
+      "mailId": 92001034
+    },
+    "27180213": {
+      "id": 27180213,
+      "localBitFlag": 18,
+      "rankingGrade": 13,
+      "rankingType": 2,
+      "rankingRange": 13,
+      "mailId": 92001035
+    },
+    "27180214": {
+      "id": 27180214,
+      "localBitFlag": 18,
+      "rankingGrade": 14,
+      "rankingType": 2,
+      "rankingRange": 14,
+      "mailId": 92001036
+    },
+    "27180215": {
+      "id": 27180215,
+      "localBitFlag": 18,
+      "rankingGrade": 15,
+      "rankingType": 2,
+      "rankingRange": 15,
+      "mailId": 92001037
+    },
+    "27180216": {
+      "id": 27180216,
+      "localBitFlag": 18,
+      "rankingGrade": 16,
+      "rankingType": 2,
+      "rankingRange": 16,
+      "mailId": 92001038
+    },
+    "27180217": {
+      "id": 27180217,
+      "localBitFlag": 18,
+      "rankingGrade": 17,
+      "rankingType": 2,
+      "rankingRange": 17,
+      "mailId": 92001039
+    },
+    "27180218": {
+      "id": 27180218,
+      "localBitFlag": 18,
+      "rankingGrade": 18,
+      "rankingType": 2,
+      "rankingRange": 18,
+      "mailId": 92001040
+    },
+    "27180219": {
+      "id": 27180219,
+      "localBitFlag": 18,
+      "rankingGrade": 19,
+      "rankingType": 2,
+      "rankingRange": 19,
+      "mailId": 92001041
+    },
+    "27180220": {
+      "id": 27180220,
+      "localBitFlag": 18,
+      "rankingGrade": 20,
+      "rankingType": 2,
+      "rankingRange": 20,
+      "mailId": 92001042
+    },
+    "27180221": {
+      "id": 27180221,
+      "localBitFlag": 18,
+      "rankingGrade": 21,
+      "rankingType": 1,
+      "rankingRange": 100,
+      "mailId": 92001043
+    }
+  }
+}

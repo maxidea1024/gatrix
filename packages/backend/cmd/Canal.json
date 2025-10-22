@@ -1,0 +1,583 @@
+{
+  ":Canal": {
+    ":type": {
+      "id": "key",
+      "groupId": "number",
+      "name": "text",
+      "type": "number",
+      "contentsTerms": [
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        }
+      ],
+      "goalTownId": "number",
+      "ticketItemId": {
+        "Enter": "number",
+        "Trade": "number"
+      },
+      "costMove": {
+        "PointId": "number",
+        "Value": "number"
+      },
+      "costWithTrade": [
+        {
+          "PointId": "number",
+          "Value": "number"
+        },
+        {
+          "PointId": "number",
+          "Value": "number"
+        },
+        {
+          "PointId": "number",
+          "Value": "number"
+        },
+        {
+          "PointId": "number",
+          "Value": "number"
+        },
+        {
+          "PointId": "number",
+          "Value": "number"
+        },
+        {
+          "PointId": "number",
+          "Value": "number"
+        },
+        {
+          "PointId": "number",
+          "Value": "number"
+        },
+        {
+          "PointId": "number",
+          "Value": "number"
+        },
+        {
+          "PointId": "number",
+          "Value": "number"
+        },
+        {
+          "PointId": "number",
+          "Value": "number"
+        }
+      ],
+      "mapSprite": "string",
+      "position1": {
+        "X": "number",
+        "Y": "number",
+        "IsStart": "bool"
+      },
+      "position2": {
+        "X": "number",
+        "Y": "number",
+        "IsStart": "bool"
+      }
+    },
+    ":required": {
+      "groupId": 1,
+      "name": 1,
+      "type": 1,
+      "goalTownId": 1,
+      "ticketItemId": {
+        "Enter": 1,
+        "Trade": 1
+      },
+      "costMove": {
+        "PointId": 1,
+        "Value": 1
+      },
+      "position1": {
+        "IsStart": 1
+      },
+      "position2": {
+        "IsStart": 1
+      }
+    },
+    ":requiredInObject": {
+      "contentsTerms": [
+        {
+          "Id": 1,
+          "Count": 1
+        }
+      ]
+    },
+    ":min": {
+      "type": 0,
+      "contentsTerms": [
+        {
+          "Id": 81000000
+        }
+      ],
+      "goalTownId": 11000000,
+      "ticketItemId": {
+        "Enter": 23000000,
+        "Trade": 23000000
+      },
+      "costMove": {
+        "PointId": 100000
+      },
+      "costWithTrade": [
+        {
+          "PointId": 100000
+        },
+        {
+          "PointId": 100000
+        },
+        {
+          "PointId": 100000
+        },
+        {
+          "PointId": 100000
+        },
+        {
+          "PointId": 100000
+        },
+        {
+          "PointId": 100000
+        },
+        {
+          "PointId": 100000
+        },
+        {
+          "PointId": 100000
+        },
+        {
+          "PointId": 100000
+        },
+        {
+          "PointId": 100000
+        }
+      ]
+    },
+    ":max": {
+      "type": 2,
+      "contentsTerms": [
+        {
+          "Id": 81999999
+        }
+      ],
+      "goalTownId": 11999999,
+      "ticketItemId": {
+        "Enter": 23999999,
+        "Trade": 23999999
+      },
+      "costMove": {
+        "PointId": 199999
+      },
+      "costWithTrade": [
+        {
+          "PointId": 199999
+        },
+        {
+          "PointId": 199999
+        },
+        {
+          "PointId": 199999
+        },
+        {
+          "PointId": 199999
+        },
+        {
+          "PointId": 199999
+        },
+        {
+          "PointId": 199999
+        },
+        {
+          "PointId": 199999
+        },
+        {
+          "PointId": 199999
+        },
+        {
+          "PointId": 199999
+        },
+        {
+          "PointId": 199999
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "contentsTerms": [
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        }
+      ],
+      "goalTownId": [
+        "Town"
+      ],
+      "ticketItemId": {
+        "Enter": [
+          "Item"
+        ],
+        "Trade": [
+          "Item"
+        ]
+      },
+      "costMove": {
+        "PointId": [
+          "Point"
+        ]
+      },
+      "costWithTrade": [
+        {
+          "PointId": [
+            "Point"
+          ]
+        },
+        {
+          "PointId": [
+            "Point"
+          ]
+        },
+        {
+          "PointId": [
+            "Point"
+          ]
+        },
+        {
+          "PointId": [
+            "Point"
+          ]
+        },
+        {
+          "PointId": [
+            "Point"
+          ]
+        },
+        {
+          "PointId": [
+            "Point"
+          ]
+        },
+        {
+          "PointId": [
+            "Point"
+          ]
+        },
+        {
+          "PointId": [
+            "Point"
+          ]
+        },
+        {
+          "PointId": [
+            "Point"
+          ]
+        },
+        {
+          "PointId": [
+            "Point"
+          ]
+        }
+      ]
+    }
+  },
+  "Canal": {
+    "10900000": {
+      "id": 10900000,
+      "groupId": 100,
+      "name": "수에즈 운하",
+      "type": 1,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Target": 10001029,
+          "Count": 1
+        }
+      ],
+      "goalTownId": 11000211,
+      "ticketItemId": {
+        "Enter": 23810013,
+        "Trade": 23810014
+      },
+      "costMove": {
+        "PointId": 100001,
+        "Value": 1000000
+      },
+      "costWithTrade": [
+        {
+          "PointId": 100001,
+          "Value": 100000
+        },
+        {
+          "PointId": 100003,
+          "Value": 10
+        },
+        {
+          "PointId": 100003,
+          "Value": 11
+        },
+        {
+          "PointId": 100003,
+          "Value": 12
+        },
+        {
+          "PointId": 100003,
+          "Value": 13
+        },
+        {
+          "PointId": 100004,
+          "Value": 10
+        },
+        {
+          "PointId": 100004,
+          "Value": 11
+        },
+        {
+          "PointId": 100004,
+          "Value": 12
+        },
+        {
+          "PointId": 100004,
+          "Value": 13
+        },
+        {
+          "PointId": 100004,
+          "Value": 14
+        }
+      ],
+      "mapSprite": "WT_CanalLocationMap01_Sprite",
+      "position1": {
+        "X": 0,
+        "Y": -60,
+        "IsStart": false
+      },
+      "position2": {
+        "X": 0,
+        "Y": 30,
+        "IsStart": true
+      }
+    },
+    "10900001": {
+      "id": 10900001,
+      "groupId": 100,
+      "name": "수에즈 운하",
+      "type": 1,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Target": 10001029,
+          "Count": 1
+        }
+      ],
+      "goalTownId": 11000099,
+      "ticketItemId": {
+        "Enter": 23810013,
+        "Trade": 23810014
+      },
+      "costMove": {
+        "PointId": 100001,
+        "Value": 1000000
+      },
+      "costWithTrade": [
+        {
+          "PointId": 100001,
+          "Value": 100000
+        },
+        {
+          "PointId": 100003,
+          "Value": 10
+        },
+        {
+          "PointId": 100003,
+          "Value": 11
+        },
+        {
+          "PointId": 100003,
+          "Value": 12
+        },
+        {
+          "PointId": 100003,
+          "Value": 13
+        },
+        {
+          "PointId": 100004,
+          "Value": 10
+        },
+        {
+          "PointId": 100004,
+          "Value": 11
+        },
+        {
+          "PointId": 100004,
+          "Value": 12
+        },
+        {
+          "PointId": 100004,
+          "Value": 13
+        },
+        {
+          "PointId": 100004,
+          "Value": 14
+        }
+      ],
+      "mapSprite": "WT_CanalLocationMap01_Sprite",
+      "position1": {
+        "X": 0,
+        "Y": -60,
+        "IsStart": true
+      },
+      "position2": {
+        "X": 0,
+        "Y": 30,
+        "IsStart": false
+      }
+    },
+    "10900002": {
+      "id": 10900002,
+      "groupId": 101,
+      "name": "파나마 운하",
+      "type": 1,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Target": 10001080,
+          "Count": 1
+        }
+      ],
+      "goalTownId": 11000185,
+      "ticketItemId": {
+        "Enter": 23810013,
+        "Trade": 23810014
+      },
+      "costMove": {
+        "PointId": 100001,
+        "Value": 1000000
+      },
+      "costWithTrade": [
+        {
+          "PointId": 100001,
+          "Value": 100000
+        },
+        {
+          "PointId": 100003,
+          "Value": 10
+        },
+        {
+          "PointId": 100003,
+          "Value": 11
+        },
+        {
+          "PointId": 100003,
+          "Value": 12
+        },
+        {
+          "PointId": 100003,
+          "Value": 13
+        },
+        {
+          "PointId": 100004,
+          "Value": 10
+        },
+        {
+          "PointId": 100004,
+          "Value": 11
+        },
+        {
+          "PointId": 100004,
+          "Value": 12
+        },
+        {
+          "PointId": 100004,
+          "Value": 13
+        },
+        {
+          "PointId": 100004,
+          "Value": 14
+        }
+      ],
+      "mapSprite": "WT_CanalLocationMap02_Sprite",
+      "position1": {
+        "X": 0,
+        "Y": -50,
+        "IsStart": false
+      },
+      "position2": {
+        "X": 0,
+        "Y": 30,
+        "IsStart": true
+      }
+    },
+    "10900003": {
+      "id": 10900003,
+      "groupId": 101,
+      "name": "파나마 운하",
+      "type": 1,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Target": 10001080,
+          "Count": 1
+        }
+      ],
+      "goalTownId": 11000176,
+      "ticketItemId": {
+        "Enter": 23810013,
+        "Trade": 23810014
+      },
+      "costMove": {
+        "PointId": 100001,
+        "Value": 1000000
+      },
+      "costWithTrade": [
+        {
+          "PointId": 100001,
+          "Value": 100000
+        },
+        {
+          "PointId": 100003,
+          "Value": 10
+        },
+        {
+          "PointId": 100003,
+          "Value": 11
+        },
+        {
+          "PointId": 100003,
+          "Value": 12
+        },
+        {
+          "PointId": 100003,
+          "Value": 13
+        },
+        {
+          "PointId": 100004,
+          "Value": 10
+        },
+        {
+          "PointId": 100004,
+          "Value": 11
+        },
+        {
+          "PointId": 100004,
+          "Value": 12
+        },
+        {
+          "PointId": 100004,
+          "Value": 13
+        },
+        {
+          "PointId": 100004,
+          "Value": 14
+        }
+      ],
+      "mapSprite": "WT_CanalLocationMap02_Sprite",
+      "position1": {
+        "X": 0,
+        "Y": -50,
+        "IsStart": true
+      },
+      "position2": {
+        "X": 0,
+        "Y": 30,
+        "IsStart": false
+      }
+    }
+  }
+}

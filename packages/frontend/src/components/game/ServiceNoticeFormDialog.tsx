@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Drawer,
   Button,
   TextField,
   FormControl,
@@ -22,6 +21,7 @@ import {
   Toolbar,
 } from '@mui/material';
 import { Visibility as VisibilityIcon, Close as CloseIcon } from '@mui/icons-material';
+import ResizableDrawer from '../common/ResizableDrawer';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
@@ -326,31 +326,16 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
   };
 
   return (
-    <Drawer
-      anchor="right"
+    <ResizableDrawer
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: { width: { xs: '100%', sm: 600, md: 800 } }
-      }}
+      title={notice ? t('serviceNotices.editNotice') : t('serviceNotices.createNotice')}
+      subtitle={notice ? t('serviceNotices.editNoticeSubtitle') : t('serviceNotices.createNoticeSubtitle')}
+      storageKey="serviceNoticeFormDrawerWidth"
+      defaultWidth={800}
+      minWidth={600}
+      zIndex={1300}
     >
-      {/* Header */}
-      <AppBar position="static" color="default" elevation={0} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Toolbar>
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h6">
-              {notice ? t('serviceNotices.editNotice') : t('serviceNotices.createNotice')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {notice ? t('serviceNotices.editNoticeSubtitle') : t('serviceNotices.createNoticeSubtitle')}
-            </Typography>
-          </Box>
-          <IconButton edge="end" onClick={onClose}>
-            <CloseIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-
       {/* Content */}
       <Box
         sx={{
@@ -594,7 +579,7 @@ const ServiceNoticeFormDialog: React.FC<ServiceNoticeFormDialogProps> = ({
           {notice ? t('common.update') : t('common.create')}
         </Button>
       </Box>
-    </Drawer>
+    </ResizableDrawer>
   );
 };
 

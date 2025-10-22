@@ -1,0 +1,405 @@
+{
+  ":OceanNpcTendency": {
+    ":type": {
+      "id": "key",
+      "strongSelectRate": [
+        "number",
+        "number",
+        "number",
+        "number"
+      ],
+      "normalSelectRate": [
+        "number",
+        "number",
+        "number",
+        "number"
+      ],
+      "weakSelectRate": [
+        "number",
+        "number",
+        "number",
+        "number"
+      ],
+      "minCompanyLv": "number",
+      "maxCompanyLv": "number",
+      "minRoyalTitle": "number",
+      "maxRoyalTitle": "number"
+    },
+    ":required": {
+      "strongSelectRate": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "normalSelectRate": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "weakSelectRate": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    ":requiredInObject": {
+      "strongSelectRate": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "normalSelectRate": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "weakSelectRate": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    ":min": {
+      "minRoyalTitle": 21700000,
+      "maxRoyalTitle": 21700000
+    },
+    ":max": {
+      "minRoyalTitle": 21709999,
+      "maxRoyalTitle": 21709999
+    },
+    ":enum": {},
+    ":links": {
+      "minRoyalTitle": [
+        "RoyalTitle"
+      ],
+      "maxRoyalTitle": [
+        "RoyalTitle"
+      ]
+    }
+  },
+  "OceanNpcTendency": {
+    "15300000": {
+      "id": 15300000,
+      "strongSelectRate": [
+        3500,
+        1500,
+        2000,
+        3000
+      ],
+      "normalSelectRate": [
+        8000,
+        1000,
+        500,
+        500
+      ],
+      "weakSelectRate": [
+        9500,
+        500,
+        0,
+        0
+      ],
+      "minRoyalTitle": 21700003,
+      "maxRoyalTitle": 21700010
+    },
+    "15300001": {
+      "id": 15300001,
+      "strongSelectRate": [
+        4000,
+        1500,
+        2000,
+        2500
+      ],
+      "normalSelectRate": [
+        8000,
+        1000,
+        500,
+        500
+      ],
+      "weakSelectRate": [
+        9500,
+        500,
+        0,
+        0
+      ],
+      "minCompanyLv": 101,
+      "maxCompanyLv": 101,
+      "minRoyalTitle": 21700003,
+      "maxRoyalTitle": 21700010
+    },
+    "15300002": {
+      "id": 15300002,
+      "strongSelectRate": [
+        5000,
+        1500,
+        1500,
+        2000
+      ],
+      "normalSelectRate": [
+        8000,
+        1000,
+        500,
+        500
+      ],
+      "weakSelectRate": [
+        9500,
+        500,
+        0,
+        0
+      ],
+      "minCompanyLv": 101,
+      "maxCompanyLv": 101,
+      "minRoyalTitle": 21700003,
+      "maxRoyalTitle": 21700010
+    },
+    "15300003": {
+      "id": 15300003,
+      "strongSelectRate": [
+        6500,
+        1500,
+        1000,
+        1000
+      ],
+      "normalSelectRate": [
+        8500,
+        500,
+        500,
+        500
+      ],
+      "weakSelectRate": [
+        9500,
+        500,
+        0,
+        0
+      ],
+      "minCompanyLv": 20,
+      "maxCompanyLv": 100,
+      "minRoyalTitle": 21700003,
+      "maxRoyalTitle": 21700010
+    },
+    "15300004": {
+      "id": 15300004,
+      "strongSelectRate": [
+        7000,
+        1000,
+        1000,
+        1000
+      ],
+      "normalSelectRate": [
+        8500,
+        500,
+        500,
+        500
+      ],
+      "weakSelectRate": [
+        10000,
+        0,
+        0,
+        0
+      ],
+      "minCompanyLv": 20,
+      "maxCompanyLv": 100,
+      "minRoyalTitle": 21700003,
+      "maxRoyalTitle": 21700010
+    },
+    "15300008": {
+      "id": 15300008,
+      "strongSelectRate": [
+        10000,
+        0,
+        0,
+        0
+      ],
+      "normalSelectRate": [
+        10000,
+        0,
+        0,
+        0
+      ],
+      "weakSelectRate": [
+        10000,
+        0,
+        0,
+        0
+      ],
+      "minCompanyLv": 101,
+      "maxCompanyLv": 101,
+      "minRoyalTitle": 21700009,
+      "maxRoyalTitle": 21700010
+    },
+    "15300009": {
+      "id": 15300009,
+      "strongSelectRate": [
+        10000,
+        0,
+        0,
+        0
+      ],
+      "normalSelectRate": [
+        10000,
+        0,
+        0,
+        0
+      ],
+      "weakSelectRate": [
+        10000,
+        0,
+        0,
+        0
+      ],
+      "minCompanyLv": 101,
+      "maxCompanyLv": 101,
+      "minRoyalTitle": 21700009,
+      "maxRoyalTitle": 21700010
+    },
+    "15300010": {
+      "id": 15300010,
+      "strongSelectRate": [
+        10000,
+        0,
+        0,
+        0
+      ],
+      "normalSelectRate": [
+        10000,
+        0,
+        0,
+        0
+      ],
+      "weakSelectRate": [
+        10000,
+        0,
+        0,
+        0
+      ],
+      "minCompanyLv": 30,
+      "maxCompanyLv": 100,
+      "minRoyalTitle": 21700009,
+      "maxRoyalTitle": 21700010
+    },
+    "15300011": {
+      "id": 15300011,
+      "strongSelectRate": [
+        10000,
+        0,
+        0,
+        0
+      ],
+      "normalSelectRate": [
+        10000,
+        0,
+        0,
+        0
+      ],
+      "weakSelectRate": [
+        10000,
+        0,
+        0,
+        0
+      ],
+      "minCompanyLv": 30,
+      "maxCompanyLv": 100,
+      "minRoyalTitle": 21700009,
+      "maxRoyalTitle": 21700010
+    },
+    "15300012": {
+      "id": 15300012,
+      "strongSelectRate": [
+        10000,
+        0,
+        0,
+        0
+      ],
+      "normalSelectRate": [
+        10000,
+        0,
+        0,
+        0
+      ],
+      "weakSelectRate": [
+        10000,
+        0,
+        0,
+        0
+      ],
+      "minRoyalTitle": 21700009,
+      "maxRoyalTitle": 21700010
+    },
+    "15300013": {
+      "id": 15300013,
+      "strongSelectRate": [
+        9900,
+        0,
+        0,
+        100
+      ],
+      "normalSelectRate": [
+        9900,
+        0,
+        0,
+        100
+      ],
+      "weakSelectRate": [
+        9900,
+        0,
+        0,
+        100
+      ],
+      "minRoyalTitle": 21700009,
+      "maxRoyalTitle": 21700010
+    },
+    "15300014": {
+      "id": 15300014,
+      "strongSelectRate": [
+        9900,
+        0,
+        0,
+        100
+      ],
+      "normalSelectRate": [
+        9900,
+        0,
+        0,
+        100
+      ],
+      "weakSelectRate": [
+        9900,
+        0,
+        0,
+        100
+      ],
+      "minCompanyLv": 101,
+      "maxCompanyLv": 101
+    },
+    "15300015": {
+      "id": 15300015,
+      "strongSelectRate": [
+        6500,
+        1500,
+        1000,
+        1000
+      ],
+      "normalSelectRate": [
+        8500,
+        500,
+        500,
+        500
+      ],
+      "weakSelectRate": [
+        9500,
+        500,
+        0,
+        0
+      ],
+      "minCompanyLv": 40,
+      "maxCompanyLv": 100,
+      "minRoyalTitle": 21700003,
+      "maxRoyalTitle": 21700010
+    }
+  }
+}

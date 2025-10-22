@@ -1,0 +1,913 @@
+{
+  ":BlindBid": {
+    ":type": {
+      "id": "key",
+      "order": "number",
+      "startDate": "string",
+      "endDate": "string",
+      "rewardItem": [
+        {
+          "Type": "number",
+          "Id": "number",
+          "Val": "number"
+        }
+      ],
+      "minPrice": "number"
+    },
+    ":required": {
+      "order": 1,
+      "startDate": 1,
+      "endDate": 1,
+      "rewardItem": [
+        {
+          "Type": 1,
+          "Id": 1,
+          "Val": 1
+        }
+      ],
+      "minPrice": 1
+    },
+    ":requiredInObject": {
+      "order": 1,
+      "startDate": 1,
+      "endDate": 1,
+      "rewardItem": [
+        {
+          "Type": 1,
+          "Id": 1,
+          "Val": 1
+        }
+      ],
+      "minPrice": 1
+    },
+    ":min": {
+      "rewardItem": [
+        {
+          "Id": 1
+        }
+      ]
+    },
+    ":max": {
+      "rewardItem": [
+        {
+          "Id": 99999999
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "rewardItem": [
+        {
+          "Id": [
+            "Item",
+            "CEquip",
+            "Ship",
+            "ShipSlot"
+          ]
+        }
+      ]
+    }
+  },
+  "BlindBid": {
+    "1": {
+      "id": 1,
+      "order": 1,
+      "startDate": "2024/08/28/20:00:00",
+      "endDate": "2024/09/04/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100285,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "2": {
+      "id": 2,
+      "order": 2,
+      "startDate": "2024/09/04/20:00:00",
+      "endDate": "2024/09/11/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100536,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "3": {
+      "id": 3,
+      "order": 3,
+      "startDate": "2024/09/11/20:00:00",
+      "endDate": "2024/09/18/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100688,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "4": {
+      "id": 4,
+      "order": 4,
+      "startDate": "2024/09/18/20:00:00",
+      "endDate": "2024/09/25/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101236,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "5": {
+      "id": 5,
+      "order": 5,
+      "startDate": "2024/09/30/20:00:00",
+      "endDate": "2024/10/07/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100470,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "6": {
+      "id": 6,
+      "order": 6,
+      "startDate": "2024/10/07/20:00:00",
+      "endDate": "2024/10/14/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101346,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "7": {
+      "id": 7,
+      "order": 7,
+      "startDate": "2024/10/14/20:00:00",
+      "endDate": "2024/10/21/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101613,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "8": {
+      "id": 8,
+      "order": 8,
+      "startDate": "2024/10/21/20:00:00",
+      "endDate": "2024/10/28/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101614,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "9": {
+      "id": 9,
+      "order": 9,
+      "startDate": "2024/10/28/20:00:00",
+      "endDate": "2024/11/04/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100261,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "10": {
+      "id": 10,
+      "order": 10,
+      "startDate": "2024/11/04/20:00:00",
+      "endDate": "2024/11/11/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100532,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "11": {
+      "id": 11,
+      "order": 11,
+      "startDate": "2024/11/11/20:00:00",
+      "endDate": "2024/11/18/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100678,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "12": {
+      "id": 12,
+      "order": 12,
+      "startDate": "2024/11/18/20:00:00",
+      "endDate": "2024/11/25/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101254,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "13": {
+      "id": 13,
+      "order": 13,
+      "startDate": "2024/11/25/20:00:00",
+      "endDate": "2024/12/02/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100456,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "14": {
+      "id": 14,
+      "order": 14,
+      "startDate": "2024/12/02/20:00:00",
+      "endDate": "2024/12/09/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101360,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "15": {
+      "id": 15,
+      "order": 15,
+      "startDate": "2024/12/09/20:00:00",
+      "endDate": "2024/12/16/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101632,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "16": {
+      "id": 16,
+      "order": 16,
+      "startDate": "2024/12/16/20:00:00",
+      "endDate": "2024/12/23/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101362,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "17": {
+      "id": 17,
+      "order": 17,
+      "startDate": "2024/12/23/20:00:00",
+      "endDate": "2024/12/30/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101635,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "18": {
+      "id": 18,
+      "order": 18,
+      "startDate": "2024/12/30/20:00:00",
+      "endDate": "2025/01/06/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101636,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "19": {
+      "id": 19,
+      "order": 19,
+      "startDate": "2025/01/06/20:00:00",
+      "endDate": "2025/01/13/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101637,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "20": {
+      "id": 20,
+      "order": 20,
+      "startDate": "2025/01/13/20:00:00",
+      "endDate": "2025/01/20/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101638,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "21": {
+      "id": 21,
+      "order": 21,
+      "startDate": "2025/01/20/20:00:00",
+      "endDate": "2025/01/27/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100704,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "22": {
+      "id": 22,
+      "order": 22,
+      "startDate": "2025/01/27/20:00:00",
+      "endDate": "2025/02/03/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101659,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "23": {
+      "id": 23,
+      "order": 23,
+      "startDate": "2025/02/03/20:00:00",
+      "endDate": "2025/02/10/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101660,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "24": {
+      "id": 24,
+      "order": 24,
+      "startDate": "2025/02/10/20:00:00",
+      "endDate": "2025/02/17/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101661,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "25": {
+      "id": 25,
+      "order": 25,
+      "startDate": "2025/02/17/20:00:00",
+      "endDate": "2025/02/24/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101671,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "26": {
+      "id": 26,
+      "order": 26,
+      "startDate": "2025/02/24/20:00:00",
+      "endDate": "2025/03/03/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100706,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "27": {
+      "id": 27,
+      "order": 27,
+      "startDate": "2025/03/03/20:00:00",
+      "endDate": "2025/03/10/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101060,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "28": {
+      "id": 28,
+      "order": 28,
+      "startDate": "2025/03/10/20:00:00",
+      "endDate": "2025/03/17/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101264,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "29": {
+      "id": 29,
+      "order": 29,
+      "startDate": "2025/03/17/20:00:00",
+      "endDate": "2025/03/24/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101680,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "30": {
+      "id": 30,
+      "order": 30,
+      "startDate": "2025/03/24/20:00:00",
+      "endDate": "2025/03/31/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101681,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "31": {
+      "id": 31,
+      "order": 31,
+      "startDate": "2025/03/31/20:00:00",
+      "endDate": "2025/04/07/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101682,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "32": {
+      "id": 32,
+      "order": 32,
+      "startDate": "2025/04/07/20:00:00",
+      "endDate": "2025/04/14/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101683,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "33": {
+      "id": 33,
+      "order": 33,
+      "startDate": "2025/04/14/20:00:00",
+      "endDate": "2025/04/21/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101292,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "34": {
+      "id": 34,
+      "order": 34,
+      "startDate": "2025/04/21/20:00:00",
+      "endDate": "2025/04/28/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100323,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "35": {
+      "id": 35,
+      "order": 35,
+      "startDate": "2025/04/28/20:00:00",
+      "endDate": "2025/05/05/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100542,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "36": {
+      "id": 36,
+      "order": 36,
+      "startDate": "2025/05/05/20:00:00",
+      "endDate": "2025/05/12/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101240,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "37": {
+      "id": 37,
+      "order": 37,
+      "startDate": "2025/05/12/20:00:00",
+      "endDate": "2025/05/19/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101296,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "38": {
+      "id": 38,
+      "order": 38,
+      "startDate": "2025/05/19/20:00:00",
+      "endDate": "2025/05/26/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101684,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "39": {
+      "id": 39,
+      "order": 39,
+      "startDate": "2025/05/26/20:00:00",
+      "endDate": "2025/06/02/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100293,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "40": {
+      "id": 40,
+      "order": 40,
+      "startDate": "2025/06/02/20:00:00",
+      "endDate": "2025/06/09/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100698,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "41": {
+      "id": 41,
+      "order": 41,
+      "startDate": "2025/06/09/20:00:00",
+      "endDate": "2025/06/16/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101314,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "42": {
+      "id": 42,
+      "order": 42,
+      "startDate": "2025/06/16/20:00:00",
+      "endDate": "2025/06/23/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101358,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "43": {
+      "id": 43,
+      "order": 43,
+      "startDate": "2025/06/23/20:00:00",
+      "endDate": "2025/06/30/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101688,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "44": {
+      "id": 44,
+      "order": 44,
+      "startDate": "2025/06/30/20:00:00",
+      "endDate": "2025/07/07/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100291,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "45": {
+      "id": 45,
+      "order": 45,
+      "startDate": "2025/07/07/20:00:00",
+      "endDate": "2025/07/14/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100694,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "46": {
+      "id": 46,
+      "order": 46,
+      "startDate": "2025/07/14/20:00:00",
+      "endDate": "2025/07/21/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101282,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "47": {
+      "id": 47,
+      "order": 47,
+      "startDate": "2025/07/21/20:00:00",
+      "endDate": "2025/07/28/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101700,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "48": {
+      "id": 48,
+      "order": 48,
+      "startDate": "2025/07/28/20:00:00",
+      "endDate": "2025/08/04/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101701,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "49": {
+      "id": 49,
+      "order": 49,
+      "startDate": "2025/08/04/20:00:00",
+      "endDate": "2025/08/11/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101366,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "50": {
+      "id": 50,
+      "order": 50,
+      "startDate": "2025/08/11/20:00:00",
+      "endDate": "2025/08/18/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101300,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "51": {
+      "id": 51,
+      "order": 51,
+      "startDate": "2025/08/18/20:00:00",
+      "endDate": "2025/08/25/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100702,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "52": {
+      "id": 52,
+      "order": 52,
+      "startDate": "2025/08/25/20:00:00",
+      "endDate": "2025/09/01/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101704,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "53": {
+      "id": 53,
+      "order": 53,
+      "startDate": "2025/09/15/20:00:00",
+      "endDate": "2025/09/22/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100295,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "54": {
+      "id": 54,
+      "order": 54,
+      "startDate": "2025/09/22/20:00:00",
+      "endDate": "2025/09/29/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101280,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "55": {
+      "id": 55,
+      "order": 55,
+      "startDate": "2025/09/29/20:00:00",
+      "endDate": "2025/10/06/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101288,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "56": {
+      "id": 56,
+      "order": 56,
+      "startDate": "2025/10/06/20:00:00",
+      "endDate": "2025/10/13/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101714,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "57": {
+      "id": 57,
+      "order": 57,
+      "startDate": "2025/10/13/20:00:00",
+      "endDate": "2025/10/20/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100267,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "58": {
+      "id": 58,
+      "order": 58,
+      "startDate": "2025/10/20/20:00:00",
+      "endDate": "2025/10/27/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70100708,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "59": {
+      "id": 59,
+      "order": 59,
+      "startDate": "2025/10/27/20:00:00",
+      "endDate": "2025/11/03/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101284,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    },
+    "60": {
+      "id": 60,
+      "order": 60,
+      "startDate": "2025/11/03/20:00:00",
+      "endDate": "2025/11/10/20:00:00",
+      "rewardItem": [
+        {
+          "Type": 3,
+          "Id": 70101726,
+          "Val": 1
+        }
+      ],
+      "minPrice": 10000
+    }
+  }
+}

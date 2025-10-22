@@ -1,0 +1,303 @@
+{
+  ":TownNpcGroup": {
+    ":type": {
+      "id": "key",
+      "templateId": "number",
+      "npcNationType": "number",
+      "npcJobType": "number",
+      "genderType": "number",
+      "actionRadius": "number",
+      "appearTownTime": "number",
+      "outTownTime": "number",
+      "patrolBuilding": [
+        "number",
+        "number",
+        "number"
+      ]
+    },
+    ":required": {
+      "actionRadius": 1,
+      "appearTownTime": 1,
+      "outTownTime": 1
+    },
+    ":min": {
+      "npcNationType": 1,
+      "npcJobType": 1,
+      "genderType": 0,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 0,
+      "patrolBuilding": [
+        0,
+        0,
+        0
+      ]
+    },
+    ":max": {
+      "npcNationType": 4,
+      "npcJobType": 6,
+      "genderType": 1,
+      "actionRadius": 5,
+      "appearTownTime": 24,
+      "outTownTime": 24,
+      "patrolBuilding": [
+        54,
+        54,
+        54
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "templateId": [
+        "TownNpcTemplate"
+      ]
+    }
+  },
+  "TownNpcGroup": {
+    "52000001": {
+      "id": 52000001,
+      "npcNationType": 1,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000002": {
+      "id": 52000002,
+      "npcNationType": 1,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000003": {
+      "id": 52000003,
+      "npcNationType": 1,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000004": {
+      "id": 52000004,
+      "npcNationType": 1,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000005": {
+      "id": 52000005,
+      "npcNationType": 1,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000006": {
+      "id": 52000006,
+      "npcNationType": 1,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000007": {
+      "id": 52000007,
+      "npcNationType": 1,
+      "npcJobType": 3,
+      "genderType": 0,
+      "actionRadius": 4,
+      "appearTownTime": 8,
+      "outTownTime": 20
+    },
+    "52000008": {
+      "id": 52000008,
+      "npcNationType": 1,
+      "npcJobType": 3,
+      "genderType": 0,
+      "actionRadius": 4,
+      "appearTownTime": 22,
+      "outTownTime": 6
+    },
+    "52000009": {
+      "id": 52000009,
+      "npcNationType": 1,
+      "npcJobType": 3,
+      "genderType": 0,
+      "actionRadius": 4,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "52000010": {
+      "id": 52000010,
+      "npcNationType": 2,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000011": {
+      "id": 52000011,
+      "npcNationType": 2,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000012": {
+      "id": 52000012,
+      "npcNationType": 2,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000013": {
+      "id": 52000013,
+      "npcNationType": 2,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000014": {
+      "id": 52000014,
+      "npcNationType": 2,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000015": {
+      "id": 52000015,
+      "npcNationType": 2,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000016": {
+      "id": 52000016,
+      "npcNationType": 3,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000017": {
+      "id": 52000017,
+      "npcNationType": 3,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000018": {
+      "id": 52000018,
+      "npcNationType": 3,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000019": {
+      "id": 52000019,
+      "npcNationType": 3,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000020": {
+      "id": 52000020,
+      "npcNationType": 3,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000021": {
+      "id": 52000021,
+      "npcNationType": 3,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000022": {
+      "id": 52000022,
+      "npcNationType": 4,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000023": {
+      "id": 52000023,
+      "npcNationType": 4,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000024": {
+      "id": 52000024,
+      "npcNationType": 4,
+      "npcJobType": 1,
+      "actionRadius": 2,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000025": {
+      "id": 52000025,
+      "npcNationType": 4,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000026": {
+      "id": 52000026,
+      "npcNationType": 4,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000027": {
+      "id": 52000027,
+      "npcNationType": 4,
+      "npcJobType": 2,
+      "actionRadius": 4,
+      "appearTownTime": 6,
+      "outTownTime": 21
+    },
+    "52000028": {
+      "id": 52000028,
+      "npcNationType": 1,
+      "npcJobType": 4,
+      "actionRadius": 4,
+      "appearTownTime": 21,
+      "outTownTime": 6
+    },
+    "52000029": {
+      "id": 52000029,
+      "npcNationType": 1,
+      "npcJobType": 5,
+      "genderType": 0,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "52000030": {
+      "id": 52000030,
+      "npcNationType": 1,
+      "npcJobType": 6,
+      "genderType": 0,
+      "actionRadius": 4,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    }
+  }
+}

@@ -1,0 +1,1353 @@
+{
+  ":FleetDispatchAction": {
+    ":type": {
+      "id": "key",
+      "actionDesc": "text",
+      "descFormat": [
+        {
+          "Type": "number",
+          "TypeName": "string",
+          "Text": "text"
+        },
+        {
+          "Type": "number",
+          "TypeName": "string",
+          "Text": "text"
+        }
+      ],
+      "actionGroupType": "number",
+      "actionGroup": [
+        {
+          "Min": "number",
+          "Max": "number"
+        }
+      ],
+      "actionRatio": "number",
+      "actionResultType": "number",
+      "actionResult": "number",
+      "actionResultVal": "number"
+    },
+    ":required": {
+      "actionGroupType": 1,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 1
+        }
+      ],
+      "actionRatio": 1
+    },
+    ":requiredInObject": {},
+    ":min": {
+      "descFormat": [
+        {
+          "Type": 1
+        },
+        {
+          "Type": 1
+        }
+      ],
+      "actionGroupType": 1,
+      "actionResultType": 1,
+      "actionResult": 0
+    },
+    ":max": {
+      "descFormat": [
+        {
+          "Type": 4
+        },
+        {
+          "Type": 4
+        }
+      ],
+      "actionGroupType": 6,
+      "actionResultType": 4,
+      "actionResult": 1
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "FleetDispatchAction": {
+    "28500001": {
+      "id": 28500001,
+      "actionDesc": "{0} 근처로 이동 중",
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "actionGroupType": 1,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 10000
+    },
+    "28500002": {
+      "id": 28500002,
+      "actionDesc": "{0} 근처 도착",
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "actionGroupType": 2,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 10000
+    },
+    "28500003": {
+      "id": 28500003,
+      "actionDesc": "목표 기한 만료로 위임 종료",
+      "actionGroupType": 3,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 10000
+    },
+    "28500004": {
+      "id": 28500004,
+      "actionDesc": "...",
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 1500
+    },
+    "28500005": {
+      "id": 28500005,
+      "actionDesc": "{0}에서 보급 진행",
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "Town"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 1200,
+      "actionResultType": 2,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500006": {
+      "id": 28500006,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "쥐"
+        },
+        {
+          "Type": 4,
+          "Text": "화물 유실"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 220,
+      "actionResultType": 4,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500007": {
+      "id": 28500007,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "오염"
+        },
+        {
+          "Type": 4,
+          "Text": "선원 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 104,
+      "actionResultType": 2,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500008": {
+      "id": 28500008,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "괴혈병"
+        },
+        {
+          "Type": 4,
+          "Text": "선원 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 104,
+      "actionResultType": 2,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500009": {
+      "id": 28500009,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "전염병"
+        },
+        {
+          "Type": 4,
+          "Text": "선원 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 104,
+      "actionResultType": 2,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500010": {
+      "id": 28500010,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "화재"
+        },
+        {
+          "Type": 4,
+          "Text": "화물 유실"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 220,
+      "actionResultType": 4,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500011": {
+      "id": 28500011,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "해초"
+        },
+        {
+          "Type": 4,
+          "Text": "선박 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 150,
+      "actionResultType": 3,
+      "actionResult": 1,
+      "actionResultVal": 6
+    },
+    "28500012": {
+      "id": 28500012,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "암초"
+        },
+        {
+          "Type": 4,
+          "Text": "선박 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 150,
+      "actionResultType": 3,
+      "actionResult": 1,
+      "actionResultVal": 6
+    },
+    "28500013": {
+      "id": 28500013,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "침수"
+        },
+        {
+          "Type": 4,
+          "Text": "선박 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 150,
+      "actionResultType": 3,
+      "actionResult": 1,
+      "actionResultVal": 6
+    },
+    "28500014": {
+      "id": 28500014,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "대화재"
+        },
+        {
+          "Type": 4,
+          "Text": "선박 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 150,
+      "actionResultType": 3,
+      "actionResult": 1,
+      "actionResultVal": 6
+    },
+    "28500015": {
+      "id": 28500015,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "부패"
+        },
+        {
+          "Type": 4,
+          "Text": "선원 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 104,
+      "actionResultType": 2,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500016": {
+      "id": 28500016,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "싸움"
+        },
+        {
+          "Type": 4,
+          "Text": "선원 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 104,
+      "actionResultType": 2,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500017": {
+      "id": 28500017,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "반란"
+        },
+        {
+          "Type": 4,
+          "Text": "선원 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 104,
+      "actionResultType": 2,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500018": {
+      "id": 28500018,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "화물 붕괴"
+        },
+        {
+          "Type": 4,
+          "Text": "화물 유실"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 220,
+      "actionResultType": 4,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500019": {
+      "id": 28500019,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "화물 도난"
+        },
+        {
+          "Type": 4,
+          "Text": "화물 유실"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 220,
+      "actionResultType": 4,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500020": {
+      "id": 28500020,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "욕구불만"
+        },
+        {
+          "Type": 4,
+          "Text": "선원 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 104,
+      "actionResultType": 2,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500021": {
+      "id": 28500021,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "향수병"
+        },
+        {
+          "Type": 4,
+          "Text": "항해사 획득 경험치 감소"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 200,
+      "actionResultType": 1,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500022": {
+      "id": 28500022,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "정서불안"
+        },
+        {
+          "Type": 4,
+          "Text": "항해사 획득 경험치 감소"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 200,
+      "actionResultType": 1,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500023": {
+      "id": 28500023,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "불면증"
+        },
+        {
+          "Type": 4,
+          "Text": "항해사 획득 경험치 감소"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 200,
+      "actionResultType": 1,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500024": {
+      "id": 28500024,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "폭풍"
+        },
+        {
+          "Type": 4,
+          "Text": "화물 유실"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 220,
+      "actionResultType": 4,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500025": {
+      "id": 28500025,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "격랑"
+        },
+        {
+          "Type": 4,
+          "Text": "선박 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 150,
+      "actionResultType": 3,
+      "actionResult": 1,
+      "actionResultVal": 6
+    },
+    "28500026": {
+      "id": 28500026,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "눈보라"
+        },
+        {
+          "Type": 4,
+          "Text": "선박 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 150,
+      "actionResultType": 3,
+      "actionResult": 1,
+      "actionResultVal": 6
+    },
+    "28500027": {
+      "id": 28500027,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "돌풍"
+        },
+        {
+          "Type": 4,
+          "Text": "선박 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 150,
+      "actionResultType": 3,
+      "actionResult": 1,
+      "actionResultVal": 6
+    },
+    "28500028": {
+      "id": 28500028,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "무풍"
+        },
+        {
+          "Type": 4,
+          "Text": "선원 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 104,
+      "actionResultType": 2,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500029": {
+      "id": 28500029,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "자기장 이상"
+        },
+        {
+          "Type": 4,
+          "Text": "선원 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 104,
+      "actionResultType": 2,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500030": {
+      "id": 28500030,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "세이렌"
+        },
+        {
+          "Type": 4,
+          "Text": "항해사 획득 경험치 감소"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 200,
+      "actionResultType": 1,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500031": {
+      "id": 28500031,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "식인상어"
+        },
+        {
+          "Type": 4,
+          "Text": "선원 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 104,
+      "actionResultType": 2,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500032": {
+      "id": 28500032,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "고래 충돌"
+        },
+        {
+          "Type": 4,
+          "Text": "선박 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 150,
+      "actionResultType": 3,
+      "actionResult": 1,
+      "actionResultVal": 6
+    },
+    "28500033": {
+      "id": 28500033,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "저체온증"
+        },
+        {
+          "Type": 4,
+          "Text": "선원 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 104,
+      "actionResultType": 2,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500034": {
+      "id": 28500034,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "동상"
+        },
+        {
+          "Type": 4,
+          "Text": "선원 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 103,
+      "actionResultType": 2,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500035": {
+      "id": 28500035,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "외로움"
+        },
+        {
+          "Type": 4,
+          "Text": "항해사 획득 경험치 감소"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 200,
+      "actionResultType": 1,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500036": {
+      "id": 28500036,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "갈매기"
+        },
+        {
+          "Type": 4,
+          "Text": "선원 피해 보호"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 300,
+      "actionResultType": 2,
+      "actionResult": 0,
+      "actionResultVal": 1
+    },
+    "28500037": {
+      "id": 28500037,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "돌고래"
+        },
+        {
+          "Type": 4,
+          "Text": "선원 피해 보호"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 300,
+      "actionResultType": 2,
+      "actionResult": 0,
+      "actionResultVal": 1
+    },
+    "28500038": {
+      "id": 28500038,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "엘모의 불"
+        },
+        {
+          "Type": 4,
+          "Text": "항해사 획득 경험치 증가"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 300,
+      "actionResultType": 1,
+      "actionResult": 0,
+      "actionResultVal": 1
+    },
+    "28500039": {
+      "id": 28500039,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "햇무리"
+        },
+        {
+          "Type": 4,
+          "Text": "화물 유실 보호"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 175,
+      "actionResultType": 4,
+      "actionResult": 0,
+      "actionResultVal": 1
+    },
+    "28500040": {
+      "id": 28500040,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "달무리"
+        },
+        {
+          "Type": 4,
+          "Text": "화물 유실 보호"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 175,
+      "actionResultType": 4,
+      "actionResult": 0,
+      "actionResultVal": 1
+    },
+    "28500041": {
+      "id": 28500041,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "아네모이"
+        },
+        {
+          "Type": 4,
+          "Text": "선박 피해 보호"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 175,
+      "actionResultType": 3,
+      "actionResult": 0,
+      "actionResultVal": 6
+    },
+    "28500042": {
+      "id": 28500042,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "틈새 빛살"
+        },
+        {
+          "Type": 4,
+          "Text": "항해사 획득 경험치 증가"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 300,
+      "actionResultType": 1,
+      "actionResult": 0,
+      "actionResultVal": 1
+    },
+    "28500043": {
+      "id": 28500043,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "클라바우테르만"
+        },
+        {
+          "Type": 4,
+          "Text": "선박 피해 보호"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 175,
+      "actionResultType": 3,
+      "actionResult": 0,
+      "actionResultVal": 6
+    },
+    "28500044": {
+      "id": 28500044,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "말라리아"
+        },
+        {
+          "Type": 4,
+          "Text": "선원 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 103,
+      "actionResultType": 2,
+      "actionResult": 1,
+      "actionResultVal": 1
+    },
+    "28500045": {
+      "id": 28500045,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "대왕오징어"
+        },
+        {
+          "Type": 4,
+          "Text": "선박 피해 발생"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 150,
+      "actionResultType": 3,
+      "actionResult": 1,
+      "actionResultVal": 6
+    },
+    "28500046": {
+      "id": 28500046,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "날치 떼"
+        },
+        {
+          "Type": 4,
+          "Text": "선원 피해 보호"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 300,
+      "actionResultType": 2,
+      "actionResult": 0,
+      "actionResultVal": 1
+    },
+    "28500047": {
+      "id": 28500047,
+      "actionDesc": "{0} 발생으로 {1}",
+      "descFormat": [
+        {
+          "Type": 4,
+          "Text": "신기루"
+        },
+        {
+          "Type": 4,
+          "Text": "항해사 획득 경험치 증가"
+        }
+      ],
+      "actionGroupType": 4,
+      "actionGroup": [
+        {
+          "Min": 1,
+          "Max": 9999
+        }
+      ],
+      "actionRatio": 300,
+      "actionResultType": 1,
+      "actionResult": 0,
+      "actionResultVal": 1
+    },
+    "28501001": {
+      "id": 28501001,
+      "actionDesc": "{0}|hpp(과,와) 전투하여 승리",
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "OceanNpc"
+        }
+      ],
+      "actionGroupType": 5,
+      "actionGroup": [
+        {
+          "Min": 10,
+          "Max": 19
+        }
+      ],
+      "actionRatio": 10000
+    },
+    "28501002": {
+      "id": 28501002,
+      "actionDesc": "{0}|hpp(과,와) 전투하여 패배",
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "OceanNpc"
+        }
+      ],
+      "actionGroupType": 6,
+      "actionGroup": [
+        {
+          "Min": 10,
+          "Max": 19
+        }
+      ],
+      "actionRatio": 10000
+    },
+    "28502001": {
+      "id": 28502001,
+      "actionDesc": "{0} 탐험에 성공",
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "LandExplore"
+        }
+      ],
+      "actionGroupType": 5,
+      "actionGroup": [
+        {
+          "Min": 30,
+          "Max": 39
+        }
+      ],
+      "actionRatio": 10000
+    },
+    "28502002": {
+      "id": 28502002,
+      "actionDesc": "{0} 탐험에 실패",
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "LandExplore"
+        }
+      ],
+      "actionGroupType": 6,
+      "actionGroup": [
+        {
+          "Min": 30,
+          "Max": 39
+        }
+      ],
+      "actionRatio": 10000
+    },
+    "28503001": {
+      "id": 28503001,
+      "actionDesc": "{0} 교역 성공으로 이익 발생",
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "TradeGoods"
+        }
+      ],
+      "actionGroupType": 5,
+      "actionGroup": [
+        {
+          "Min": 20,
+          "Max": 29
+        }
+      ],
+      "actionRatio": 700
+    },
+    "28503002": {
+      "id": 28503002,
+      "actionDesc": "{0} 유행으로 큰 이익 발생",
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "TradeGoods"
+        }
+      ],
+      "actionGroupType": 5,
+      "actionGroup": [
+        {
+          "Min": 20,
+          "Max": 29
+        }
+      ],
+      "actionRatio": 300,
+      "actionResultType": 4,
+      "actionResult": 0,
+      "actionResultVal": 1
+    },
+    "28503003": {
+      "id": 28503003,
+      "actionDesc": "{0} 교역 실패로 손실 발생",
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "TradeGoods"
+        }
+      ],
+      "actionGroupType": 6,
+      "actionGroup": [
+        {
+          "Min": 20,
+          "Max": 29
+        }
+      ],
+      "actionRatio": 700
+    },
+    "28503004": {
+      "id": 28503004,
+      "actionDesc": "{0} 과잉으로 큰 손실 발생",
+      "descFormat": [
+        {
+          "Type": 2,
+          "TypeName": "TradeGoods"
+        }
+      ],
+      "actionGroupType": 6,
+      "actionGroup": [
+        {
+          "Min": 20,
+          "Max": 29
+        }
+      ],
+      "actionRatio": 300,
+      "actionResultType": 4,
+      "actionResult": 1,
+      "actionResultVal": 1
+    }
+  }
+}

@@ -76,7 +76,7 @@ class SurveyService {
    */
   async getSurveys(params?: GetSurveysParams): Promise<GetSurveysResponse> {
     const response = await api.get('/admin/surveys', { params });
-    return response.data.data;
+    return response.data;
   }
 
   /**
@@ -84,7 +84,7 @@ class SurveyService {
    */
   async getSurveyById(id: string): Promise<Survey> {
     const response = await api.get(`/admin/surveys/${id}`);
-    return response.data.data.survey;
+    return response.data.survey;
   }
 
   /**
@@ -92,7 +92,7 @@ class SurveyService {
    */
   async getSurveyByPlatformId(platformSurveyId: string): Promise<Survey> {
     const response = await api.get(`/admin/surveys/platform/${platformSurveyId}`);
-    return response.data.data.survey;
+    return response.data.survey;
   }
 
   /**
@@ -100,7 +100,7 @@ class SurveyService {
    */
   async createSurvey(input: CreateSurveyInput): Promise<Survey> {
     const response = await api.post('/admin/surveys', input);
-    return response.data.data.survey;
+    return response.data.survey;
   }
 
   /**
@@ -108,7 +108,7 @@ class SurveyService {
    */
   async updateSurvey(id: string, input: UpdateSurveyInput): Promise<Survey> {
     const response = await api.put(`/admin/surveys/${id}`, input);
-    return response.data.data.survey;
+    return response.data.survey;
   }
 
   /**
@@ -123,7 +123,7 @@ class SurveyService {
    */
   async toggleActive(id: string): Promise<Survey> {
     const response = await api.patch(`/admin/surveys/${id}/toggle-active`);
-    return response.data.data.survey;
+    return response.data.survey;
   }
 
   /**
@@ -131,7 +131,7 @@ class SurveyService {
    */
   async getSurveyConfig(): Promise<SurveyConfig> {
     const response = await api.get('/admin/surveys/config');
-    return response.data.data.config;
+    return response.data.config;
   }
 
   /**
@@ -139,7 +139,7 @@ class SurveyService {
    */
   async updateSurveyConfig(input: Partial<SurveyConfig>): Promise<SurveyConfig> {
     const response = await api.put('/admin/surveys/config', input);
-    return response.data.data.config;
+    return response.data.config;
   }
 }
 

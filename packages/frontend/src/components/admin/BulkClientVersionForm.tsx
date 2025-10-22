@@ -1,6 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
 import {
-  Drawer,
   Button,
   TextField,
   FormControl,
@@ -25,7 +24,7 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from '@mui/material';
-import { Cancel as CancelIcon, Save as SaveIcon, ExpandMore as ExpandMoreIcon, Close as CloseIcon } from '@mui/icons-material';
+import { Cancel as CancelIcon, Save as SaveIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -45,6 +44,7 @@ import { PlatformDefaultsService } from '../../services/platformDefaultsService'
 import { AVAILABLE_PLATFORMS } from '../../constants/platforms';
 import MaintenanceSettingsInput from '../common/MaintenanceSettingsInput';
 import { MessageTemplate, messageTemplateService } from '../../services/messageTemplateService';
+import ResizableDrawer from '../common/ResizableDrawer';
 
 // 클라이언트 상태 라벨 매핑
 const ClientStatusLabels = {
@@ -391,22 +391,15 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
   };
 
   return (
-    <Drawer
-      anchor="right"
+    <ResizableDrawer
       open={open}
       onClose={handleClose}
-      sx={{
-        zIndex: 1300,
-        '& .MuiDrawer-paper': {
-          width: { xs: '100%', sm: 700 },
-          maxWidth: '100vw',
-          display: 'flex',
-          flexDirection: 'column'
-        }
-      }}
-      ModalProps={{
-        keepMounted: false
-      }}
+      title={t('clientVersions.bulkAdd')}
+      subtitle={t('clientVersions.form.bulkDescription')}
+      storageKey="bulkClientVersionFormDrawerWidth"
+      defaultWidth={700}
+      minWidth={500}
+      zIndex={1300}
     >
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -416,36 +409,6 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
           height: '100%'
         }}
       >
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          p: 2,
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          bgcolor: 'background.paper'
-        }}>
-          <Box>
-            <Typography variant="h6" component="h2">
-              {t('clientVersions.bulkAdd')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('clientVersions.form.bulkDescription')}
-            </Typography>
-          </Box>
-          <IconButton
-            onClick={handleClose}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover'
-              }
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
         <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Stack spacing={3} sx={{ mt: 1 }}>
             <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
@@ -865,7 +828,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
           </Button>
         </Box>
       </form>
-    </Drawer>
+    </ResizableDrawer>
   );
 };
 

@@ -1083,7 +1083,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           </Button>
         </Box>
       </form>
-    </Drawer>
+    </ResizableDrawer>
   );
 };
 

@@ -1,0 +1,1688 @@
+{
+  ":BattleAoeRange": {
+    ":type": {
+      "id": "key",
+      "name": "string",
+      "battleActionRangePath": [
+        "string",
+        "string",
+        "string",
+        "string"
+      ],
+      "battleActionRangeImage": [
+        "string",
+        "string",
+        "string",
+        "string"
+      ],
+      "image": "string",
+      "directionAngle": "number",
+      "centralAngle": "number",
+      "minDistance": "number",
+      "maxDistance": "number",
+      "isReflected": "bool",
+      "obstaclePassType": "number",
+      "targetDistanceWeight": "number",
+      "maxTarget": "number",
+      "maxHitsPerUnit": "number"
+    },
+    ":required": {
+      "name": 1,
+      "directionAngle": 1,
+      "centralAngle": 1,
+      "minDistance": 1,
+      "maxDistance": 1,
+      "isReflected": 1,
+      "targetDistanceWeight": 1
+    },
+    ":min": {
+      "directionAngle": 0,
+      "centralAngle": 0,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0
+    },
+    ":max": {
+      "directionAngle": 180,
+      "centralAngle": 90,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 1000
+    },
+    ":enum": {},
+    ":links": {},
+    ":asset": {}
+  },
+  "BattleAoeRange": {
+    "60400000": {
+      "id": 60400000,
+      "name": "단일",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-0",
+        "WT_AoeRange_Depth_0-0",
+        "WT_AoeRange_Depth_0-0",
+        "WT_AoeRange_Depth_0-0"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-0_Sprite",
+        "WT_AoeRange_Depth_0-0_Sprite",
+        "WT_AoeRange_Depth_0-0_Sprite",
+        "WT_AoeRange_Depth_0-0_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-0_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 0,
+      "minDistance": 0,
+      "maxDistance": 0,
+      "isReflected": false,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 1,
+      "maxHitsPerUnit": 1
+    },
+    "60400100": {
+      "id": 60400100,
+      "name": "6방향_1",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-1",
+        "WT_AoeRange_Depth_0-1",
+        "WT_AoeRange_Depth_0-1",
+        "WT_AoeRange_Depth_0-1"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-1_Sprite",
+        "WT_AoeRange_Depth_0-1_Sprite",
+        "WT_AoeRange_Depth_0-1_Sprite",
+        "WT_AoeRange_Depth_0-1_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-1_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 1,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 3,
+      "maxHitsPerUnit": 1
+    },
+    "60400200": {
+      "id": 60400200,
+      "name": "직선형_1",
+      "battleActionRangePath": [
+        "WT_AoeRange_Straight_0-1",
+        "WT_AoeRange_Straight_0-1",
+        "WT_AoeRange_Straight_0-1",
+        "WT_AoeRange_Straight_0-1"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Straight_0-1_Sprite",
+        "WT_AoeRange_Straight_0-1_Sprite",
+        "WT_AoeRange_Straight_0-1_Sprite",
+        "WT_AoeRange_Straight_0-1_Sprite"
+      ],
+      "image": "WT_AoeRange_Straight_0-1_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 30,
+      "minDistance": 0,
+      "maxDistance": 1,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 2,
+      "maxHitsPerUnit": 1
+    },
+    "60400400": {
+      "id": 60400400,
+      "name": "일직선1",
+      "battleActionRangePath": [
+        "WT_AoeRange_Straight_0-1",
+        "WT_AoeRange_Straight_0-1",
+        "WT_AoeRange_Straight_0-1",
+        "WT_AoeRange_Straight_0-1"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Straight_0-1_Sprite",
+        "WT_AoeRange_Straight_0-1_Sprite",
+        "WT_AoeRange_Straight_0-1_Sprite",
+        "WT_AoeRange_Straight_0-1_Sprite"
+      ],
+      "image": "WT_AoeRange_Straight_0-1_Sprite",
+      "directionAngle": 90,
+      "centralAngle": 15,
+      "minDistance": 0,
+      "maxDistance": 1,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60400401": {
+      "id": 60400401,
+      "name": "일직선2",
+      "battleActionRangePath": [
+        "WT_AoeRange_Straight_0-1",
+        "WT_AoeRange_Straight_0-2",
+        "WT_AoeRange_Straight_0-2",
+        "WT_AoeRange_Straight_0-2"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Straight_0-1_Sprite",
+        "WT_AoeRange_Straight_0-2_Sprite",
+        "WT_AoeRange_Straight_0-2_Sprite",
+        "WT_AoeRange_Straight_0-2_Sprite"
+      ],
+      "image": "WT_AoeRange_Straight_0-2_Sprite",
+      "directionAngle": 90,
+      "centralAngle": 15,
+      "minDistance": 0,
+      "maxDistance": 2,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60400402": {
+      "id": 60400402,
+      "name": "일직선3",
+      "battleActionRangePath": [
+        "WT_AoeRange_Straight_0-2",
+        "WT_AoeRange_Straight_0-3",
+        "WT_AoeRange_Straight_0-3",
+        "WT_AoeRange_Straight_0-3"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Straight_0-2_Sprite",
+        "WT_AoeRange_Straight_0-3_Sprite",
+        "WT_AoeRange_Straight_0-3_Sprite",
+        "WT_AoeRange_Straight_0-3_Sprite"
+      ],
+      "image": "WT_AoeRange_Straight_0-3_Sprite",
+      "directionAngle": 90,
+      "centralAngle": 15,
+      "minDistance": 0,
+      "maxDistance": 3,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60400403": {
+      "id": 60400403,
+      "name": "일직선4",
+      "battleActionRangePath": [
+        "WT_AoeRange_Straight_0-3",
+        "WT_AoeRange_Straight_0-4",
+        "WT_AoeRange_Straight_0-4",
+        "WT_AoeRange_Straight_0-4"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Straight_0-3_Sprite",
+        "WT_AoeRange_Straight_0-4_Sprite",
+        "WT_AoeRange_Straight_0-4_Sprite",
+        "WT_AoeRange_Straight_0-4_Sprite"
+      ],
+      "image": "WT_AoeRange_Straight_0-4_Sprite",
+      "directionAngle": 90,
+      "centralAngle": 15,
+      "minDistance": 0,
+      "maxDistance": 4,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60400404": {
+      "id": 60400404,
+      "name": "일직선5",
+      "battleActionRangePath": [
+        "WT_AoeRange_Straight_0-4",
+        "WT_AoeRange_Straight_0-5",
+        "WT_AoeRange_Straight_0-5",
+        "WT_AoeRange_Straight_0-5"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Straight_0-4_Sprite",
+        "WT_AoeRange_Straight_0-5_Sprite",
+        "WT_AoeRange_Straight_0-5_Sprite",
+        "WT_AoeRange_Straight_0-5_Sprite"
+      ],
+      "image": "WT_AoeRange_Straight_0-5_Sprite",
+      "directionAngle": 90,
+      "centralAngle": 15,
+      "minDistance": 0,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401000": {
+      "id": 60401000,
+      "name": "ZOC_depth0",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-0",
+        "WT_AoeRange_Depth_0-0",
+        "WT_AoeRange_Depth_0-1",
+        "WT_AoeRange_Depth_0-1"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-0_Sprite",
+        "WT_AoeRange_Depth_0-0_Sprite",
+        "WT_AoeRange_Depth_0-1_Sprite",
+        "WT_AoeRange_Depth_0-1_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-0_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 0,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401001": {
+      "id": 60401001,
+      "name": "ZOC_depth1",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-0",
+        "WT_AoeRange_Depth_0-1",
+        "WT_AoeRange_Depth_0-2",
+        "WT_AoeRange_Depth_0-2"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-0_Sprite",
+        "WT_AoeRange_Depth_0-1_Sprite",
+        "WT_AoeRange_Depth_0-2_Sprite",
+        "WT_AoeRange_Depth_0-2_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-1_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 1,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401002": {
+      "id": 60401002,
+      "name": "ZOC_depth2",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-1",
+        "WT_AoeRange_Depth_0-2",
+        "WT_AoeRange_Depth_0-3",
+        "WT_AoeRange_Depth_0-3"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-1_Sprite",
+        "WT_AoeRange_Depth_0-2_Sprite",
+        "WT_AoeRange_Depth_0-3_Sprite",
+        "WT_AoeRange_Depth_0-3_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-2_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 2,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401003": {
+      "id": 60401003,
+      "name": "ZOC_depth3",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-2",
+        "WT_AoeRange_Depth_0-3",
+        "WT_AoeRange_Depth_0-4",
+        "WT_AoeRange_Depth_0-4"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-2_Sprite",
+        "WT_AoeRange_Depth_0-3_Sprite",
+        "WT_AoeRange_Depth_0-4_Sprite",
+        "WT_AoeRange_Depth_0-4_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-3_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 3,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401004": {
+      "id": 60401004,
+      "name": "ZOC_depth4",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-3",
+        "WT_AoeRange_Depth_0-4",
+        "WT_AoeRange_Depth_0-5",
+        "WT_AoeRange_Depth_0-5"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-3_Sprite",
+        "WT_AoeRange_Depth_0-4_Sprite",
+        "WT_AoeRange_Depth_0-5_Sprite",
+        "WT_AoeRange_Depth_0-5_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-4_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 4,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401005": {
+      "id": 60401005,
+      "name": "ZOC_depth5",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-4",
+        "WT_AoeRange_Depth_0-5",
+        "WT_AoeRange_Depth_0-6",
+        "WT_AoeRange_Depth_0-6"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-4_Sprite",
+        "WT_AoeRange_Depth_0-5_Sprite",
+        "WT_AoeRange_Depth_0-6_Sprite",
+        "WT_AoeRange_Depth_0-6_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-5_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401006": {
+      "id": 60401006,
+      "name": "ZOC_depth6",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-5",
+        "WT_AoeRange_Depth_0-6",
+        "WT_AoeRange_Depth_0-7",
+        "WT_AoeRange_Depth_0-7"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-5_Sprite",
+        "WT_AoeRange_Depth_0-6_Sprite",
+        "WT_AoeRange_Depth_0-7_Sprite",
+        "WT_AoeRange_Depth_0-7_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-6_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401007": {
+      "id": 60401007,
+      "name": "ZOC_depth7",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-6",
+        "WT_AoeRange_Depth_0-7",
+        "WT_AoeRange_Depth_0-8",
+        "WT_AoeRange_Depth_0-8"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-6_Sprite",
+        "WT_AoeRange_Depth_0-7_Sprite",
+        "WT_AoeRange_Depth_0-8_Sprite",
+        "WT_AoeRange_Depth_0-8_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-7_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401008": {
+      "id": 60401008,
+      "name": "ZOC_depth8",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-7",
+        "WT_AoeRange_Depth_0-8",
+        "WT_AoeRange_Depth_0-8",
+        "WT_AoeRange_Depth_0-8"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-7_Sprite",
+        "WT_AoeRange_Depth_0-8_Sprite",
+        "WT_AoeRange_Depth_0-8_Sprite",
+        "WT_AoeRange_Depth_0-8_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-8_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401010": {
+      "id": 60401010,
+      "name": "거리가중치적용0",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-0",
+        "WT_AoeRange_Depth_0-0",
+        "WT_AoeRange_Depth_0-1",
+        "WT_AoeRange_Depth_0-1"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-0_Sprite",
+        "WT_AoeRange_Depth_0-0_Sprite",
+        "WT_AoeRange_Depth_0-1_Sprite",
+        "WT_AoeRange_Depth_0-1_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-0_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 0,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 10,
+      "maxTarget": 1,
+      "maxHitsPerUnit": 1
+    },
+    "60401011": {
+      "id": 60401011,
+      "name": "거리가중치적용1",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-0",
+        "WT_AoeRange_Depth_0-1",
+        "WT_AoeRange_Depth_0-2",
+        "WT_AoeRange_Depth_0-2"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-0_Sprite",
+        "WT_AoeRange_Depth_0-1_Sprite",
+        "WT_AoeRange_Depth_0-2_Sprite",
+        "WT_AoeRange_Depth_0-2_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-1_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 1,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 10,
+      "maxTarget": 1,
+      "maxHitsPerUnit": 1
+    },
+    "60401012": {
+      "id": 60401012,
+      "name": "거리가중치적용2",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-1",
+        "WT_AoeRange_Depth_0-2",
+        "WT_AoeRange_Depth_0-3",
+        "WT_AoeRange_Depth_0-3"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-1_Sprite",
+        "WT_AoeRange_Depth_0-2_Sprite",
+        "WT_AoeRange_Depth_0-3_Sprite",
+        "WT_AoeRange_Depth_0-3_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-2_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 2,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 10,
+      "maxTarget": 2,
+      "maxHitsPerUnit": 1
+    },
+    "60401013": {
+      "id": 60401013,
+      "name": "거리가중치적용3",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-2",
+        "WT_AoeRange_Depth_0-3",
+        "WT_AoeRange_Depth_0-4",
+        "WT_AoeRange_Depth_0-4"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-2_Sprite",
+        "WT_AoeRange_Depth_0-3_Sprite",
+        "WT_AoeRange_Depth_0-4_Sprite",
+        "WT_AoeRange_Depth_0-4_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-3_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 3,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 10,
+      "maxTarget": 2,
+      "maxHitsPerUnit": 1
+    },
+    "60401014": {
+      "id": 60401014,
+      "name": "거리가중치적용4",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-3",
+        "WT_AoeRange_Depth_0-4",
+        "WT_AoeRange_Depth_0-5",
+        "WT_AoeRange_Depth_0-5"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-3_Sprite",
+        "WT_AoeRange_Depth_0-4_Sprite",
+        "WT_AoeRange_Depth_0-5_Sprite",
+        "WT_AoeRange_Depth_0-5_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-4_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 4,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 10,
+      "maxTarget": 3,
+      "maxHitsPerUnit": 1
+    },
+    "60401015": {
+      "id": 60401015,
+      "name": "거리가중치적용5",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-4",
+        "WT_AoeRange_Depth_0-5",
+        "WT_AoeRange_Depth_0-6",
+        "WT_AoeRange_Depth_0-6"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-4_Sprite",
+        "WT_AoeRange_Depth_0-5_Sprite",
+        "WT_AoeRange_Depth_0-6_Sprite",
+        "WT_AoeRange_Depth_0-6_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-5_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 10,
+      "maxTarget": 4,
+      "maxHitsPerUnit": 1
+    },
+    "60401016": {
+      "id": 60401016,
+      "name": "엘리트 전용 : 전방위 0",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-0",
+        "WT_AoeRange_Depth_0-0",
+        "WT_AoeRange_Depth_0-1",
+        "WT_AoeRange_Depth_0-1"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-0_Sprite",
+        "WT_AoeRange_Depth_0-0_Sprite",
+        "WT_AoeRange_Depth_0-1_Sprite",
+        "WT_AoeRange_Depth_0-1_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-0_Sprite",
+      "directionAngle": 90,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 0,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401017": {
+      "id": 60401017,
+      "name": "엘리트 전용 : 전방위 1",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-0",
+        "WT_AoeRange_Depth_0-1",
+        "WT_AoeRange_Depth_0-2",
+        "WT_AoeRange_Depth_0-2"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-0_Sprite",
+        "WT_AoeRange_Depth_0-1_Sprite",
+        "WT_AoeRange_Depth_0-2_Sprite",
+        "WT_AoeRange_Depth_0-2_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-1_Sprite",
+      "directionAngle": 90,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 1,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401018": {
+      "id": 60401018,
+      "name": "엘리트 전용 : 전방위 2",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-1",
+        "WT_AoeRange_Depth_0-2",
+        "WT_AoeRange_Depth_0-3",
+        "WT_AoeRange_Depth_0-3"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-1_Sprite",
+        "WT_AoeRange_Depth_0-2_Sprite",
+        "WT_AoeRange_Depth_0-3_Sprite",
+        "WT_AoeRange_Depth_0-3_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-2_Sprite",
+      "directionAngle": 90,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 2,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401019": {
+      "id": 60401019,
+      "name": "엘리트 전용 : 전방위 3",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-2",
+        "WT_AoeRange_Depth_0-3",
+        "WT_AoeRange_Depth_0-4",
+        "WT_AoeRange_Depth_0-4"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-2_Sprite",
+        "WT_AoeRange_Depth_0-3_Sprite",
+        "WT_AoeRange_Depth_0-4_Sprite",
+        "WT_AoeRange_Depth_0-4_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-3_Sprite",
+      "directionAngle": 90,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 3,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401020": {
+      "id": 60401020,
+      "name": "엘리트 전용 : 전방위 4",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-3",
+        "WT_AoeRange_Depth_0-4",
+        "WT_AoeRange_Depth_0-5",
+        "WT_AoeRange_Depth_0-5"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-3_Sprite",
+        "WT_AoeRange_Depth_0-4_Sprite",
+        "WT_AoeRange_Depth_0-5_Sprite",
+        "WT_AoeRange_Depth_0-5_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-4_Sprite",
+      "directionAngle": 90,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 4,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401021": {
+      "id": 60401021,
+      "name": "엘리트 전용 : 전방위 5",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-4",
+        "WT_AoeRange_Depth_0-5",
+        "WT_AoeRange_Depth_0-6",
+        "WT_AoeRange_Depth_0-6"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-4_Sprite",
+        "WT_AoeRange_Depth_0-5_Sprite",
+        "WT_AoeRange_Depth_0-6_Sprite",
+        "WT_AoeRange_Depth_0-6_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-5_Sprite",
+      "directionAngle": 90,
+      "centralAngle": 90,
+      "minDistance": 0,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401101": {
+      "id": 60401101,
+      "name": "전방위 포격1",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_3-3",
+        "WT_AoeRange_Depth_3-3",
+        "WT_AoeRange_Depth_3-3",
+        "WT_AoeRange_Depth_3-3"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_3-3_Sprite",
+        "WT_AoeRange_Depth_3-3_Sprite",
+        "WT_AoeRange_Depth_3-3_Sprite",
+        "WT_AoeRange_Depth_3-3_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_3-3_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 3,
+      "maxDistance": 3,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401102": {
+      "id": 60401102,
+      "name": "전방위 포격2",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_3-3",
+        "WT_AoeRange_Depth_3-4",
+        "WT_AoeRange_Depth_3-4",
+        "WT_AoeRange_Depth_3-4"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_3-3_Sprite",
+        "WT_AoeRange_Depth_3-4_Sprite",
+        "WT_AoeRange_Depth_3-4_Sprite",
+        "WT_AoeRange_Depth_3-4_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_3-4_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 3,
+      "maxDistance": 4,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401103": {
+      "id": 60401103,
+      "name": "전방위 포격3",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_2-4",
+        "WT_AoeRange_Depth_2-4",
+        "WT_AoeRange_Depth_2-4",
+        "WT_AoeRange_Depth_2-4"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_2-4_Sprite",
+        "WT_AoeRange_Depth_2-4_Sprite",
+        "WT_AoeRange_Depth_2-4_Sprite",
+        "WT_AoeRange_Depth_2-4_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_2-4_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 4,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401104": {
+      "id": 60401104,
+      "name": "전방위 포격4",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_2-4",
+        "WT_AoeRange_Depth_2-5",
+        "WT_AoeRange_Depth_2-5",
+        "WT_AoeRange_Depth_2-5"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_2-4_Sprite",
+        "WT_AoeRange_Depth_2-5_Sprite",
+        "WT_AoeRange_Depth_2-5_Sprite",
+        "WT_AoeRange_Depth_2-5_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_2-5_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60401105": {
+      "id": 60401105,
+      "name": "엘리트 스킬_기뢰 투사",
+      "battleActionRangePath": [
+        "WT_AoeRange_FireThrow",
+        "WT_AoeRange_FireThrow",
+        "WT_AoeRange_FireThrow",
+        "WT_AoeRange_FireThrow"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_2-4_Sprite",
+        "WT_AoeRange_Depth_2-4_Sprite",
+        "WT_AoeRange_FireThrow_Sprite",
+        "WT_AoeRange_FireThrow"
+      ],
+      "image": "WT_AoeRange_Depth_2-5_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60402001": {
+      "id": 60402001,
+      "name": "측면 섬멸",
+      "battleActionRangePath": [
+        "WT_AoeRange_SideAttack_0-20",
+        "WT_AoeRange_SideAttack_0-20",
+        "WT_AoeRange_SideAttack_0-20",
+        "WT_AoeRange_SideAttack_0-20"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_2-4_Sprite",
+        "WT_AoeRange_Depth_2-4_Sprite",
+        "WT_AoeRange_Depth_2-4_Sprite",
+        "WT_AoeRange_Depth_2-4_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_2-5_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490001": {
+      "id": 60490001,
+      "name": "토벌_에드워드티치_화염2",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_2-3",
+        "WT_AoeRange_Depth_2-3",
+        "WT_AoeRange_Depth_2-3",
+        "WT_AoeRange_Depth_2-3"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_2-3_Sprite",
+        "WT_AoeRange_Depth_2-3_Sprite",
+        "WT_AoeRange_Depth_2-3_Sprite",
+        "WT_AoeRange_Depth_2-3_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_2-3_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490002": {
+      "id": 60490002,
+      "name": "토벌_에드워드티치_화염3",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_2-4",
+        "WT_AoeRange_Depth_2-4",
+        "WT_AoeRange_Depth_2-4",
+        "WT_AoeRange_Depth_2-4"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_2-4_Sprite",
+        "WT_AoeRange_Depth_2-4_Sprite",
+        "WT_AoeRange_Depth_2-4_Sprite",
+        "WT_AoeRange_Depth_2-4_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_2-4_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490003": {
+      "id": 60490003,
+      "name": "토벌_에드워드티치_섬멸X",
+      "battleActionRangePath": [
+        "WT_AoeRange_Boss2Tile_Cross_7",
+        "WT_AoeRange_Boss2Tile_Cross_7",
+        "WT_AoeRange_Boss2Tile_Cross_7",
+        "WT_AoeRange_Boss2Tile_Cross_7"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Boss2Tile_Cross_7_Sprite",
+        "WT_AoeRange_Boss2Tile_Cross_7_Sprite",
+        "WT_AoeRange_Boss2Tile_Cross_7_Sprite",
+        "WT_AoeRange_Boss2Tile_Cross_7_Sprite"
+      ],
+      "image": "WT_AoeRange_Boss2Tile_Cross_7_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490004": {
+      "id": 60490004,
+      "name": "토벌_에드워드티치_섬멸",
+      "battleActionRangePath": [
+        "WT_AoeRange_Boss2Tile_Cross2_6",
+        "WT_AoeRange_Boss2Tile_Cross2_6",
+        "WT_AoeRange_Boss2Tile_Cross2_6",
+        "WT_AoeRange_Boss2Tile_Cross2_6"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Boss2Tile_Cross2_6_Sprite",
+        "WT_AoeRange_Boss2Tile_Cross2_6_Sprite",
+        "WT_AoeRange_Boss2Tile_Cross2_6_Sprite",
+        "WT_AoeRange_Boss2Tile_Cross2_6_Sprite"
+      ],
+      "image": "WT_AoeRange_Boss2Tile_Cross2_6_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490005": {
+      "id": 60490005,
+      "name": "토벌_에드워드티치_제왕",
+      "battleActionRangePath": [
+        "WT_AoeRange_Boss2Tile_EdwardTeach_12",
+        "WT_AoeRange_Boss2Tile_EdwardTeach_12",
+        "WT_AoeRange_Boss2Tile_EdwardTeach_12",
+        "WT_AoeRange_Boss2Tile_EdwardTeach_12"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Boss2Tile_EdwardTeach_12_Sprite",
+        "WT_AoeRange_Boss2Tile_EdwardTeach_12_Sprite",
+        "WT_AoeRange_Boss2Tile_EdwardTeach_12_Sprite",
+        "WT_AoeRange_Boss2Tile_EdwardTeach_12_Sprite"
+      ],
+      "image": "WT_AoeRange_Boss2Tile_EdwardTeach_12_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490006": {
+      "id": 60490006,
+      "name": "토벌_쿠아우테목_투창",
+      "battleActionRangePath": [
+        "WT_AoeRange_Multi_Depth_0-1",
+        "WT_AoeRange_Multi_Depth_0-1",
+        "WT_AoeRange_Multi_Depth_0-1",
+        "WT_AoeRange_Multi_Depth_0-1"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Multi_Depth_0-1_Sprite",
+        "WT_AoeRange_Multi_Depth_0-1_Sprite",
+        "WT_AoeRange_Multi_Depth_0-1_Sprite",
+        "WT_AoeRange_Multi_Depth_0-1_Sprite"
+      ],
+      "image": "WT_AoeRange_Multi_Depth_0-1_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490007": {
+      "id": 60490007,
+      "name": "토벌_토마스튜_화공",
+      "battleActionRangePath": [
+        "WT_AoeRange_ThomasTew_FireConfilct",
+        "WT_AoeRange_ThomasTew_FireConfilct",
+        "WT_AoeRange_ThomasTew_FireConfilct",
+        "WT_AoeRange_ThomasTew_FireConfilct"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_ThomasTew_FireConfilct_Sprite",
+        "WT_AoeRange_ThomasTew_FireConfilct_Sprite",
+        "WT_AoeRange_ThomasTew_FireConfilct_Sprite",
+        "WT_AoeRange_ThomasTew_FireConfilct_Sprite"
+      ],
+      "image": "WT_AoeRange_ThomasTew_FireConfilct_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490008": {
+      "id": 60490008,
+      "name": "토벌_토마스튜_황금",
+      "battleActionRangePath": [
+        "WT_AoeRange_DoYouWannerMyGold",
+        "WT_AoeRange_DoYouWannerMyGold",
+        "WT_AoeRange_DoYouWannerMyGold",
+        "WT_AoeRange_DoYouWannerMyGold"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_DoYouWannerMyGold_Sprite",
+        "WT_AoeRange_DoYouWannerMyGold_Sprite",
+        "WT_AoeRange_DoYouWannerMyGold_Sprite",
+        "WT_AoeRange_DoYouWannerMyGold_Sprite"
+      ],
+      "image": "WT_AoeRange_DoYouWannerMyGold_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 2,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490009": {
+      "id": 60490009,
+      "name": "##충파 테스트",
+      "battleActionRangePath": [
+        "WT_AoeRange_Conflict_Test",
+        "WT_AoeRange_Conflict_Test",
+        "WT_AoeRange_Conflict_Test",
+        "WT_AoeRange_Conflict_Test"
+      ],
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 2,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490010": {
+      "id": 60490010,
+      "name": "상회토벌_제왕",
+      "battleActionRangePath": [
+        "WT_AoeRange_Boss2Tile_EdwardTeach_13",
+        "WT_AoeRange_Boss2Tile_EdwardTeach_13",
+        "WT_AoeRange_Boss2Tile_EdwardTeach_13",
+        "WT_AoeRange_Boss2Tile_EdwardTeach_13"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Boss2Tile_EdwardTeach_12_Sprite",
+        "WT_AoeRange_Boss2Tile_EdwardTeach_12_Sprite",
+        "WT_AoeRange_Boss2Tile_EdwardTeach_12_Sprite",
+        "WT_AoeRange_Boss2Tile_EdwardTeach_12_Sprite"
+      ],
+      "image": "WT_AoeRange_Boss2Tile_EdwardTeach_12_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 2,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490011": {
+      "id": 60490011,
+      "name": "토벌_모비딕_박치기",
+      "battleActionRangePath": [
+        "WT_AoeRange_MobyDick_HeadButt",
+        "WT_AoeRange_MobyDick_HeadButt",
+        "WT_AoeRange_MobyDick_HeadButt",
+        "WT_AoeRange_MobyDick_HeadButt"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_HeadButt_Sprite",
+        "WT_AoeRange_HeadButt_Sprite",
+        "WT_AoeRange_HeadButt_Sprite",
+        "WT_AoeRange_HeadButt_Sprite"
+      ],
+      "image": "WT_AoeRange_HeadButt_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490012": {
+      "id": 60490012,
+      "name": "토벌_모비딕_꼬리치기",
+      "battleActionRangePath": [
+        "WT_AoeRange_MobyDick_Tailwhip",
+        "WT_AoeRange_MobyDick_Tailwhip",
+        "WT_AoeRange_MobyDick_Tailwhip",
+        "WT_AoeRange_MobyDick_Tailwhip"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Tailwhip_Sprite",
+        "WT_AoeRange_Tailwhip_Sprite",
+        "WT_AoeRange_Tailwhip_Sprite",
+        "WT_AoeRange_Tailwhip_Sprite"
+      ],
+      "image": "WT_AoeRange_Tailwhip_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490013": {
+      "id": 60490013,
+      "name": "토벌_모비딕_돌진",
+      "battleActionRangePath": [
+        "WT_AoeRange_MobyDick_TakeDown",
+        "WT_AoeRange_MobyDick_TakeDown",
+        "WT_AoeRange_MobyDick_TakeDown",
+        "WT_AoeRange_MobyDick_TakeDown"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_ThomasTew_FireConfilct_Sprite",
+        "WT_AoeRange_ThomasTew_FireConfilct_Sprite",
+        "WT_AoeRange_ThomasTew_FireConfilct_Sprite",
+        "WT_AoeRange_ThomasTew_FireConfilct_Sprite"
+      ],
+      "image": "WT_AoeRange_ThomasTew_FireConfilct_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490014": {
+      "id": 60490014,
+      "name": "토벌_모비딕_난동",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_0-4",
+        "WT_AoeRange_Depth_0-4",
+        "WT_AoeRange_Depth_0-4",
+        "WT_AoeRange_Depth_0-4"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-4_Sprite",
+        "WT_AoeRange_Depth_0-4_Sprite",
+        "WT_AoeRange_Depth_0-4_Sprite",
+        "WT_AoeRange_Depth_0-4_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-4_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490015": {
+      "id": 60490015,
+      "name": "토벌_모비딕_물뿜기",
+      "battleActionRangePath": [
+        "WT_AoeRange_MobyDick_spout",
+        "WT_AoeRange_MobyDick_spout",
+        "WT_AoeRange_MobyDick_spout",
+        "WT_AoeRange_MobyDick_spout"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_2-3_Sprite",
+        "WT_AoeRange_Depth_2-3_Sprite",
+        "WT_AoeRange_Depth_2-3_Sprite",
+        "WT_AoeRange_Depth_2-3_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_2-3_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490016": {
+      "id": 60490016,
+      "name": "이벤트_마장기_관조격",
+      "battleActionRangePath": [
+        "WT_AoeRange_RaCloseAttack",
+        "WT_AoeRange_RaCloseAttack",
+        "WT_AoeRange_RaCloseAttack",
+        "WT_AoeRange_RaCloseAttack"
+      ],
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490017": {
+      "id": 60490017,
+      "name": "이벤트_마장기_지원포격",
+      "battleActionRangePath": [
+        "WT_AoeRange_RaCoverFire",
+        "WT_AoeRange_RaCoverFire",
+        "WT_AoeRange_RaCoverFire",
+        "WT_AoeRange_RaCoverFire"
+      ],
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490018": {
+      "id": 60490018,
+      "name": "이벤트_마장기_강흔들기",
+      "battleActionRangePath": [
+        "WT_AoeRange_RaRiverWave",
+        "WT_AoeRange_RaRiverWave",
+        "WT_AoeRange_RaRiverWave",
+        "WT_AoeRange_RaRiverWave"
+      ],
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490019": {
+      "id": 60490019,
+      "name": "토벌_가오리_날개치기",
+      "battleActionRangePath": [
+        "WT_AoeRange_StingRay_WingAttack",
+        "WT_AoeRange_StingRay_WingAttack",
+        "WT_AoeRange_StingRay_WingAttack",
+        "WT_AoeRange_StingRay_WingAttack"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_StingRay_WingAttack_Sprite",
+        "WT_AoeRange_StingRay_WingAttack_Sprite",
+        "WT_AoeRange_StingRay_WingAttack_Sprite",
+        "WT_AoeRange_StingRay_WingAttack_Sprite"
+      ],
+      "image": "WT_AoeRange_StingRay_WingAttack_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490020": {
+      "id": 60490020,
+      "name": "토벌_가오리_맹독숨결",
+      "battleActionRangePath": [
+        "WT_AoeRange_StingRay_PoisonBreath",
+        "WT_AoeRange_StingRay_PoisonBreath",
+        "WT_AoeRange_StingRay_PoisonBreath",
+        "WT_AoeRange_StingRay_PoisonBreath"
+      ],
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490021": {
+      "id": 60490021,
+      "name": "상회토벌_자폭",
+      "battleActionRangePath": [
+        "WT_AoeRange_SelfDestruct",
+        "WT_AoeRange_SelfDestruct",
+        "WT_AoeRange_SelfDestruct",
+        "WT_AoeRange_SelfDestruct"
+      ],
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490022": {
+      "id": 60490022,
+      "name": "토벌_가오리_독안개1",
+      "battleActionRangePath": [
+        "WT_AoeRange_PosionMist1",
+        "WT_AoeRange_PosionMist1",
+        "WT_AoeRange_PosionMist1",
+        "WT_AoeRange_PosionMist1"
+      ],
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490023": {
+      "id": 60490023,
+      "name": "토벌_가오리_독안개2",
+      "battleActionRangePath": [
+        "WT_AoeRange_PosionMist2",
+        "WT_AoeRange_PosionMist2",
+        "WT_AoeRange_PosionMist2",
+        "WT_AoeRange_PosionMist2"
+      ],
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490024": {
+      "id": 60490024,
+      "name": "토벌_포도탄 포격",
+      "battleActionRangePath": [
+        "WT_AoeRange_GrapeShot",
+        "WT_AoeRange_GrapeShot",
+        "WT_AoeRange_GrapeShot",
+        "WT_AoeRange_GrapeShot"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_GrapeShot_Sprite",
+        "WT_AoeRange_GrapeShot_Sprite",
+        "WT_AoeRange_GrapeShot_Sprite",
+        "WT_AoeRange_GrapeShot_Sprite"
+      ],
+      "image": "WT_AoeRange_GrapeShot_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490025": {
+      "id": 60490025,
+      "name": "토벌_광역 연막",
+      "battleActionRangePath": [
+        "WT_AoeRange_SmokeShell",
+        "WT_AoeRange_SmokeShell",
+        "WT_AoeRange_SmokeShell",
+        "WT_AoeRange_SmokeShell"
+      ],
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490026": {
+      "id": 60490026,
+      "name": "토벌_광역 제압",
+      "battleActionRangePath": [
+        "WT_AoeRange_Wideshot",
+        "WT_AoeRange_Wideshot",
+        "WT_AoeRange_Wideshot",
+        "WT_AoeRange_Wideshot"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Wideshot_Sprite",
+        "WT_AoeRange_Wideshot_Sprite",
+        "WT_AoeRange_Wideshot_Sprite",
+        "WT_AoeRange_Wideshot_Sprite"
+      ],
+      "image": "WT_AoeRange_Wideshot_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490027": {
+      "id": 60490027,
+      "name": "토벌_강화 충파",
+      "battleActionRangePath": [
+        "WT_AoeRange_PowerConflict",
+        "WT_AoeRange_PowerConflict",
+        "WT_AoeRange_PowerConflict",
+        "WT_AoeRange_PowerConflict"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Tailwhip_Sprite",
+        "WT_AoeRange_Tailwhip_Sprite",
+        "WT_AoeRange_Tailwhip_Sprite",
+        "WT_AoeRange_Tailwhip_Sprite"
+      ],
+      "image": "WT_AoeRange_Tailwhip_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490028": {
+      "id": 60490028,
+      "name": "토벌_기뢰 투척 공격",
+      "battleActionRangePath": [
+        "WT_AoeRange_Depth_2-2",
+        "WT_AoeRange_Depth_2-2",
+        "WT_AoeRange_Depth_2-2",
+        "WT_AoeRange_Depth_2-2"
+      ],
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490029": {
+      "id": 60490029,
+      "name": "토벌_기뢰 투척",
+      "battleActionRangePath": [
+        "WT_AoeRange_MineThrow",
+        "WT_AoeRange_MineThrow",
+        "WT_AoeRange_MineThrow",
+        "WT_AoeRange_MineThrow"
+      ],
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490030": {
+      "id": 60490030,
+      "name": "등대_기뢰 뿌리기",
+      "battleActionRangePath": [
+        "WT_AoeRange_LighthouseMineThrow",
+        "WT_AoeRange_LighthouseMineThrow",
+        "WT_AoeRange_LighthouseMineThrow",
+        "WT_AoeRange_LighthouseMineThrow"
+      ],
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    },
+    "60490031": {
+      "id": 60490031,
+      "name": "모든 범위",
+      "battleActionRangePath": [
+        "WT_AoeRange_AllRange",
+        "WT_AoeRange_AllRange",
+        "WT_AoeRange_AllRange",
+        "WT_AoeRange_AllRange"
+      ],
+      "battleActionRangeImage": [
+        "WT_AoeRange_Depth_0-8_Sprite",
+        "WT_AoeRange_Depth_0-8_Sprite",
+        "WT_AoeRange_Depth_0-8_Sprite",
+        "WT_AoeRange_Depth_0-8_Sprite"
+      ],
+      "image": "WT_AoeRange_Depth_0-8_Sprite",
+      "directionAngle": 0,
+      "centralAngle": 90,
+      "minDistance": 2,
+      "maxDistance": 5,
+      "isReflected": true,
+      "obstaclePassType": 0,
+      "targetDistanceWeight": 0,
+      "maxTarget": 99,
+      "maxHitsPerUnit": 1
+    }
+  }
+}

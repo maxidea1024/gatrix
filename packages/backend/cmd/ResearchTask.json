@@ -1,0 +1,8022 @@
+{
+  ":ResearchTask": {
+    ":type": {
+      "id": "key",
+      "overrideDesc": "text",
+      "researchTaskTermsType": "number",
+      "researchTaskTermsId": "number",
+      "researchTaskTargets": [
+        "number",
+        "number"
+      ],
+      "researchTaskCount": "number",
+      "missionTargetType": "number",
+      "autoMovingVal": [
+        "number"
+      ],
+      "descFormat": [
+        {
+          "Type": "number",
+          "TypeName": "string"
+        },
+        {
+          "Type": "number",
+          "TypeName": "string"
+        },
+        {
+          "Type": "number",
+          "TypeName": "string"
+        }
+      ]
+    },
+    ":required": {
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 1,
+      "researchTaskCount": 1,
+      "missionTargetType": 1
+    },
+    ":min": {
+      "researchTaskTermsType": 1,
+      "missionTargetType": 1,
+      "descFormat": [
+        {
+          "Type": 1
+        },
+        {
+          "Type": 1
+        },
+        {
+          "Type": 1
+        }
+      ]
+    },
+    ":max": {
+      "researchTaskTermsType": 2,
+      "missionTargetType": 110,
+      "descFormat": [
+        {
+          "Type": 5
+        },
+        {
+          "Type": 5
+        },
+        {
+          "Type": 5
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "researchTaskTermsId": [
+        "AchievementTerms",
+        "ContentsTerms"
+      ]
+    }
+  },
+  "ResearchTask": {
+    "99800001": {
+      "id": 99800001,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000042,
+      "researchTaskCount": 120000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800002": {
+      "id": 99800002,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000042,
+      "researchTaskCount": 210000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800003": {
+      "id": 99800003,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000042,
+      "researchTaskCount": 380000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800004": {
+      "id": 99800004,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000042,
+      "researchTaskCount": 500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800005": {
+      "id": 99800005,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000042,
+      "researchTaskCount": 700000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800006": {
+      "id": 99800006,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000042,
+      "researchTaskCount": 950000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800007": {
+      "id": 99800007,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000037,
+      "researchTaskCount": 50,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800008": {
+      "id": 99800008,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000037,
+      "researchTaskCount": 200,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800009": {
+      "id": 99800009,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000037,
+      "researchTaskCount": 450,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800010": {
+      "id": 99800010,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000037,
+      "researchTaskCount": 520,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800011": {
+      "id": 99800011,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000037,
+      "researchTaskCount": 800,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800012": {
+      "id": 99800012,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000037,
+      "researchTaskCount": 950,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800013": {
+      "id": 99800013,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000038,
+      "researchTaskCount": 50,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800014": {
+      "id": 99800014,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000038,
+      "researchTaskCount": 200,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800015": {
+      "id": 99800015,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000038,
+      "researchTaskCount": 450,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800016": {
+      "id": 99800016,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000038,
+      "researchTaskCount": 520,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800017": {
+      "id": 99800017,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000038,
+      "researchTaskCount": 800,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800018": {
+      "id": 99800018,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000038,
+      "researchTaskCount": 950,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99800019": {
+      "id": 99800019,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000012,
+      "researchTaskTargets": [
+        11000042
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 1,
+      "autoMovingVal": [
+        11000042
+      ]
+    },
+    "99800020": {
+      "id": 99800020,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000012,
+      "researchTaskTargets": [
+        11000042
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 1,
+      "autoMovingVal": [
+        11000042
+      ]
+    },
+    "99800021": {
+      "id": 99800021,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000012,
+      "researchTaskTargets": [
+        11000108
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 1,
+      "autoMovingVal": [
+        11000108
+      ]
+    },
+    "99800022": {
+      "id": 99800022,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000012,
+      "researchTaskTargets": [
+        11000086
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 1,
+      "autoMovingVal": [
+        11000086
+      ]
+    },
+    "99800023": {
+      "id": 99800023,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000012,
+      "researchTaskTargets": [
+        11000058
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 1,
+      "autoMovingVal": [
+        11000058
+      ]
+    },
+    "99800024": {
+      "id": 99800024,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000012,
+      "researchTaskTargets": [
+        11000154
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 1,
+      "autoMovingVal": [
+        11000154
+      ]
+    },
+    "99800025": {
+      "id": 99800025,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000047,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99800026": {
+      "id": 99800026,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000047,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99800027": {
+      "id": 99800027,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000047,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801001": {
+      "id": 99801001,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000053,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801002": {
+      "id": 99801002,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000048,
+      "researchTaskCount": 2,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        8
+      ]
+    },
+    "99801003": {
+      "id": 99801003,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21402009
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 1
+    },
+    "99801004": {
+      "id": 99801004,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000053,
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801005": {
+      "id": 99801005,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000048,
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        8
+      ]
+    },
+    "99801006": {
+      "id": 99801006,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21402008
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 1
+    },
+    "99801007": {
+      "id": 99801007,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000053,
+      "researchTaskCount": 20,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801008": {
+      "id": 99801008,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000048,
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        8
+      ]
+    },
+    "99801009": {
+      "id": 99801009,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21402009
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 1
+    },
+    "99801010": {
+      "id": 99801010,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000053,
+      "researchTaskCount": 50,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801011": {
+      "id": 99801011,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000048,
+      "researchTaskCount": 10,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        8
+      ]
+    },
+    "99801012": {
+      "id": 99801012,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21402008
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 1
+    },
+    "99801013": {
+      "id": 99801013,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000053,
+      "researchTaskCount": 100,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801014": {
+      "id": 99801014,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000048,
+      "researchTaskCount": 30,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        8
+      ]
+    },
+    "99801015": {
+      "id": 99801015,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21402010
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 1
+    },
+    "99801016": {
+      "id": 99801016,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000078,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801017": {
+      "id": 99801017,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70409320
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801018": {
+      "id": 99801018,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000142,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801019": {
+      "id": 99801019,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000078,
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801020": {
+      "id": 99801020,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70409343
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801021": {
+      "id": 99801021,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000142,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801022": {
+      "id": 99801022,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000078,
+      "researchTaskCount": 20,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801023": {
+      "id": 99801023,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70409181
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801024": {
+      "id": 99801024,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000142,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801025": {
+      "id": 99801025,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000078,
+      "researchTaskCount": 50,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801026": {
+      "id": 99801026,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70409312
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801027": {
+      "id": 99801027,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000142,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801028": {
+      "id": 99801028,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000078,
+      "researchTaskCount": 100,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801029": {
+      "id": 99801029,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70409038
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801030": {
+      "id": 99801030,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000142,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801031": {
+      "id": 99801031,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801032": {
+      "id": 99801032,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000003
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000003
+      ]
+    },
+    "99801033": {
+      "id": 99801033,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801034": {
+      "id": 99801034,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801035": {
+      "id": 99801035,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000004
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000004
+      ]
+    },
+    "99801036": {
+      "id": 99801036,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801037": {
+      "id": 99801037,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801038": {
+      "id": 99801038,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000029
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000029
+      ]
+    },
+    "99801039": {
+      "id": 99801039,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801040": {
+      "id": 99801040,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801041": {
+      "id": 99801041,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000012
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000012
+      ]
+    },
+    "99801042": {
+      "id": 99801042,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801043": {
+      "id": 99801043,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801044": {
+      "id": 99801044,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000008
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000008
+      ]
+    },
+    "99801045": {
+      "id": 99801045,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801046": {
+      "id": 99801046,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801047": {
+      "id": 99801047,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000004
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000004
+      ]
+    },
+    "99801048": {
+      "id": 99801048,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801049": {
+      "id": 99801049,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801050": {
+      "id": 99801050,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000007
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000007
+      ]
+    },
+    "99801051": {
+      "id": 99801051,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801052": {
+      "id": 99801052,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801053": {
+      "id": 99801053,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000005
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000005
+      ]
+    },
+    "99801054": {
+      "id": 99801054,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801055": {
+      "id": 99801055,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801056": {
+      "id": 99801056,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000002
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000002
+      ]
+    },
+    "99801057": {
+      "id": 99801057,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801058": {
+      "id": 99801058,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801059": {
+      "id": 99801059,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000001
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000001
+      ]
+    },
+    "99801060": {
+      "id": 99801060,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801061": {
+      "id": 99801061,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801062": {
+      "id": 99801062,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000013
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000013
+      ]
+    },
+    "99801063": {
+      "id": 99801063,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801064": {
+      "id": 99801064,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801065": {
+      "id": 99801065,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000014
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000014
+      ]
+    },
+    "99801066": {
+      "id": 99801066,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801067": {
+      "id": 99801067,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801068": {
+      "id": 99801068,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000006
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000006
+      ]
+    },
+    "99801069": {
+      "id": 99801069,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801070": {
+      "id": 99801070,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801071": {
+      "id": 99801071,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000011
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000011
+      ]
+    },
+    "99801072": {
+      "id": 99801072,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801073": {
+      "id": 99801073,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801074": {
+      "id": 99801074,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000025
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000025
+      ]
+    },
+    "99801075": {
+      "id": 99801075,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801076": {
+      "id": 99801076,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801077": {
+      "id": 99801077,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000038
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000038
+      ]
+    },
+    "99801078": {
+      "id": 99801078,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801079": {
+      "id": 99801079,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801080": {
+      "id": 99801080,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000033
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000033
+      ]
+    },
+    "99801081": {
+      "id": 99801081,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801082": {
+      "id": 99801082,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801083": {
+      "id": 99801083,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000031
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000031
+      ]
+    },
+    "99801084": {
+      "id": 99801084,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801085": {
+      "id": 99801085,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801086": {
+      "id": 99801086,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000011
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000011
+      ]
+    },
+    "99801087": {
+      "id": 99801087,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801088": {
+      "id": 99801088,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000054,
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801089": {
+      "id": 99801089,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000150,
+      "researchTaskTargets": [
+        23000004
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 15,
+      "autoMovingVal": [
+        23000004
+      ]
+    },
+    "99801090": {
+      "id": 99801090,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000055,
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801091": {
+      "id": 99801091,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000160,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801092": {
+      "id": 99801092,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000162,
+      "researchTaskCount": 5000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801093": {
+      "id": 99801093,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000164,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801094": {
+      "id": 99801094,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000160,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801095": {
+      "id": 99801095,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000162,
+      "researchTaskCount": 10000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801096": {
+      "id": 99801096,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000164,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801097": {
+      "id": 99801097,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000160,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801098": {
+      "id": 99801098,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000162,
+      "researchTaskCount": 15000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801099": {
+      "id": 99801099,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000164,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801100": {
+      "id": 99801100,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000160,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801101": {
+      "id": 99801101,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000162,
+      "researchTaskCount": 20000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801102": {
+      "id": 99801102,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000164,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801103": {
+      "id": 99801103,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000160,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801104": {
+      "id": 99801104,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000162,
+      "researchTaskCount": 25000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801105": {
+      "id": 99801105,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000164,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801106": {
+      "id": 99801106,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000160,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801107": {
+      "id": 99801107,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000162,
+      "researchTaskCount": 10000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801108": {
+      "id": 99801108,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000162,
+      "researchTaskCount": 10000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801109": {
+      "id": 99801109,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000160,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801110": {
+      "id": 99801110,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000162,
+      "researchTaskCount": 20000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801111": {
+      "id": 99801111,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000162,
+      "researchTaskCount": 25000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801112": {
+      "id": 99801112,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000160,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801113": {
+      "id": 99801113,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000162,
+      "researchTaskCount": 30000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801114": {
+      "id": 99801114,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000162,
+      "researchTaskCount": 50000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801115": {
+      "id": 99801115,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000160,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801116": {
+      "id": 99801116,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000162,
+      "researchTaskCount": 40000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801117": {
+      "id": 99801117,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000162,
+      "researchTaskCount": 75000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801118": {
+      "id": 99801118,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000160,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801119": {
+      "id": 99801119,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000162,
+      "researchTaskCount": 50000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801120": {
+      "id": 99801120,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000162,
+      "researchTaskCount": 100000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801121": {
+      "id": 99801121,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000160,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801122": {
+      "id": 99801122,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000161,
+      "researchTaskTargets": [
+        10000
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801123": {
+      "id": 99801123,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000164,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801124": {
+      "id": 99801124,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000160,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801125": {
+      "id": 99801125,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000161,
+      "researchTaskTargets": [
+        15000
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801126": {
+      "id": 99801126,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000164,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801127": {
+      "id": 99801127,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000160,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801128": {
+      "id": 99801128,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000161,
+      "researchTaskTargets": [
+        20000
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801129": {
+      "id": 99801129,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000164,
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801130": {
+      "id": 99801130,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000160,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801131": {
+      "id": 99801131,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000161,
+      "researchTaskTargets": [
+        25000
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801132": {
+      "id": 99801132,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000164,
+      "researchTaskCount": 12,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801133": {
+      "id": 99801133,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000160,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801134": {
+      "id": 99801134,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000161,
+      "researchTaskTargets": [
+        30000
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801135": {
+      "id": 99801135,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000164,
+      "researchTaskCount": 15,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801136": {
+      "id": 99801136,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000104,
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801137": {
+      "id": 99801137,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000103,
+      "researchTaskCount": 10000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801138": {
+      "id": 99801138,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70403130
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801139": {
+      "id": 99801139,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000104,
+      "researchTaskCount": 20,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801140": {
+      "id": 99801140,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000103,
+      "researchTaskCount": 20000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801141": {
+      "id": 99801141,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70403026
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801142": {
+      "id": 99801142,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000104,
+      "researchTaskCount": 50,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801143": {
+      "id": 99801143,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000103,
+      "researchTaskCount": 50000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801144": {
+      "id": 99801144,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70403112
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801145": {
+      "id": 99801145,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000104,
+      "researchTaskCount": 100,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801146": {
+      "id": 99801146,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000103,
+      "researchTaskCount": 100000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801147": {
+      "id": 99801147,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70403145
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801148": {
+      "id": 99801148,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000104,
+      "researchTaskCount": 300,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801149": {
+      "id": 99801149,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000103,
+      "researchTaskCount": 300000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801150": {
+      "id": 99801150,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70403050
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801151": {
+      "id": 99801151,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000104,
+      "researchTaskCount": 20,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801152": {
+      "id": 99801152,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000103,
+      "researchTaskCount": 20000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801153": {
+      "id": 99801153,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70416025
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801154": {
+      "id": 99801154,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000104,
+      "researchTaskCount": 50,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801155": {
+      "id": 99801155,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000103,
+      "researchTaskCount": 50000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801156": {
+      "id": 99801156,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70413362
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801157": {
+      "id": 99801157,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000104,
+      "researchTaskCount": 100,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801158": {
+      "id": 99801158,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000103,
+      "researchTaskCount": 100000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801159": {
+      "id": 99801159,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70402149
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801160": {
+      "id": 99801160,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000104,
+      "researchTaskCount": 300,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801161": {
+      "id": 99801161,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000103,
+      "researchTaskCount": 300000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801162": {
+      "id": 99801162,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70417048
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801163": {
+      "id": 99801163,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000104,
+      "researchTaskCount": 500,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801164": {
+      "id": 99801164,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000103,
+      "researchTaskCount": 500000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801165": {
+      "id": 99801165,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70401036
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801166": {
+      "id": 99801166,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000104,
+      "researchTaskCount": 50,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801167": {
+      "id": 99801167,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000103,
+      "researchTaskCount": 50000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801168": {
+      "id": 99801168,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70406028
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801169": {
+      "id": 99801169,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000104,
+      "researchTaskCount": 100,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801170": {
+      "id": 99801170,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000103,
+      "researchTaskCount": 100000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801171": {
+      "id": 99801171,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70407103
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801172": {
+      "id": 99801172,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000104,
+      "researchTaskCount": 300,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801173": {
+      "id": 99801173,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000103,
+      "researchTaskCount": 300000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801174": {
+      "id": 99801174,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70407067
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801175": {
+      "id": 99801175,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000104,
+      "researchTaskCount": 500,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801176": {
+      "id": 99801176,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000103,
+      "researchTaskCount": 500000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801177": {
+      "id": 99801177,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70406014
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801178": {
+      "id": 99801178,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000104,
+      "researchTaskCount": 1000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801179": {
+      "id": 99801179,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000103,
+      "researchTaskCount": 1000000,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801180": {
+      "id": 99801180,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000052,
+      "researchTaskTargets": [
+        70406002
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801181": {
+      "id": 99801181,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000053,
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801182": {
+      "id": 99801182,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000048,
+      "researchTaskCount": 40,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        8
+      ]
+    },
+    "99801183": {
+      "id": 99801183,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21402011
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99801184": {
+      "id": 99801184,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000053,
+      "researchTaskCount": 20,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801185": {
+      "id": 99801185,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000048,
+      "researchTaskCount": 50,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        8
+      ]
+    },
+    "99801186": {
+      "id": 99801186,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21402012
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99801187": {
+      "id": 99801187,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000053,
+      "researchTaskCount": 50,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801188": {
+      "id": 99801188,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000048,
+      "researchTaskCount": 60,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        8
+      ]
+    },
+    "99801189": {
+      "id": 99801189,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21402011
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 1
+    },
+    "99801190": {
+      "id": 99801190,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000053,
+      "researchTaskCount": 100,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801191": {
+      "id": 99801191,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000048,
+      "researchTaskCount": 70,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        8
+      ]
+    },
+    "99801192": {
+      "id": 99801192,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21402012
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 1
+    },
+    "99801193": {
+      "id": 99801193,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000053,
+      "researchTaskCount": 300,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99801194": {
+      "id": 99801194,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000048,
+      "researchTaskCount": 80,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        8
+      ]
+    },
+    "99801195": {
+      "id": 99801195,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21402013
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 1
+    },
+    "99802001": {
+      "id": 99802001,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        10
+      ],
+      "researchTaskCount": 300000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802002": {
+      "id": 99802002,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        9
+      ],
+      "researchTaskCount": 300000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802003": {
+      "id": 99802003,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000040,
+      "researchTaskCount": 100,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802004": {
+      "id": 99802004,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        8
+      ],
+      "researchTaskCount": 500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802005": {
+      "id": 99802005,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        7
+      ],
+      "researchTaskCount": 500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802006": {
+      "id": 99802006,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000040,
+      "researchTaskCount": 200,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802007": {
+      "id": 99802007,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        6
+      ],
+      "researchTaskCount": 1000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802008": {
+      "id": 99802008,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        19
+      ],
+      "researchTaskCount": 1000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802009": {
+      "id": 99802009,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000040,
+      "researchTaskCount": 300,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802010": {
+      "id": 99802010,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        16
+      ],
+      "researchTaskCount": 3000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802011": {
+      "id": 99802011,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        17
+      ],
+      "researchTaskCount": 3000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802012": {
+      "id": 99802012,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000040,
+      "researchTaskCount": 400,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802013": {
+      "id": 99802013,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        15
+      ],
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802014": {
+      "id": 99802014,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        13
+      ],
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802015": {
+      "id": 99802015,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000040,
+      "researchTaskCount": 500,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802016": {
+      "id": 99802016,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        0
+      ],
+      "researchTaskCount": 300000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802017": {
+      "id": 99802017,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        1
+      ],
+      "researchTaskCount": 300000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802018": {
+      "id": 99802018,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000042,
+      "researchTaskCount": 500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802019": {
+      "id": 99802019,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        4
+      ],
+      "researchTaskCount": 500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802020": {
+      "id": 99802020,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        3
+      ],
+      "researchTaskCount": 500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802021": {
+      "id": 99802021,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000042,
+      "researchTaskCount": 1000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802022": {
+      "id": 99802022,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        2
+      ],
+      "researchTaskCount": 1000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802023": {
+      "id": 99802023,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 1000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802024": {
+      "id": 99802024,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000042,
+      "researchTaskCount": 1500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802025": {
+      "id": 99802025,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        11
+      ],
+      "researchTaskCount": 3000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802026": {
+      "id": 99802026,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        18
+      ],
+      "researchTaskCount": 3000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802027": {
+      "id": 99802027,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000042,
+      "researchTaskCount": 2000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802028": {
+      "id": 99802028,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        14
+      ],
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802029": {
+      "id": 99802029,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        12
+      ],
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802030": {
+      "id": 99802030,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000042,
+      "researchTaskCount": 2500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802031": {
+      "id": 99802031,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000039,
+      "researchTaskTargets": [
+        24000312
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802032": {
+      "id": 99802032,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000039,
+      "researchTaskTargets": [
+        24000496
+      ],
+      "researchTaskCount": 150,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802033": {
+      "id": 99802033,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000041,
+      "researchTaskTargets": [
+        24000297
+      ],
+      "researchTaskCount": 150,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802034": {
+      "id": 99802034,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000039,
+      "researchTaskTargets": [
+        24000300
+      ],
+      "researchTaskCount": 200,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802035": {
+      "id": 99802035,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000041,
+      "researchTaskTargets": [
+        24000315
+      ],
+      "researchTaskCount": 200,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802036": {
+      "id": 99802036,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000039,
+      "researchTaskTargets": [
+        24000283
+      ],
+      "researchTaskCount": 250,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802037": {
+      "id": 99802037,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000041,
+      "researchTaskTargets": [
+        24000284
+      ],
+      "researchTaskCount": 250,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802038": {
+      "id": 99802038,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000041,
+      "researchTaskTargets": [
+        24000316
+      ],
+      "researchTaskCount": 300,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802039": {
+      "id": 99802039,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000041,
+      "researchTaskTargets": [
+        24000293
+      ],
+      "researchTaskCount": 300,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802040": {
+      "id": 99802040,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000041,
+      "researchTaskTargets": [
+        24000306
+      ],
+      "researchTaskCount": 300,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802041": {
+      "id": 99802041,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000039,
+      "researchTaskTargets": [
+        24000387
+      ],
+      "researchTaskCount": 100,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802042": {
+      "id": 99802042,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000039,
+      "researchTaskTargets": [
+        24000265
+      ],
+      "researchTaskCount": 150,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802043": {
+      "id": 99802043,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000041,
+      "researchTaskTargets": [
+        24000455
+      ],
+      "researchTaskCount": 150,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802044": {
+      "id": 99802044,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000039,
+      "researchTaskTargets": [
+        24000383
+      ],
+      "researchTaskCount": 200,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802045": {
+      "id": 99802045,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000041,
+      "researchTaskTargets": [
+        24000267
+      ],
+      "researchTaskCount": 200,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802046": {
+      "id": 99802046,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000039,
+      "researchTaskTargets": [
+        24000500
+      ],
+      "researchTaskCount": 250,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802047": {
+      "id": 99802047,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000041,
+      "researchTaskTargets": [
+        24000262
+      ],
+      "researchTaskCount": 250,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802048": {
+      "id": 99802048,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000041,
+      "researchTaskTargets": [
+        24000481
+      ],
+      "researchTaskCount": 300,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802049": {
+      "id": 99802049,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000041,
+      "researchTaskTargets": [
+        24000264
+      ],
+      "researchTaskCount": 300,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802050": {
+      "id": 99802050,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000041,
+      "researchTaskTargets": [
+        24000263
+      ],
+      "researchTaskCount": 300,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802051": {
+      "id": 99802051,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        10
+      ],
+      "researchTaskCount": 3000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802052": {
+      "id": 99802052,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        9
+      ],
+      "researchTaskCount": 3000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802053": {
+      "id": 99802053,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000040,
+      "researchTaskCount": 100,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802054": {
+      "id": 99802054,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        8
+      ],
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802055": {
+      "id": 99802055,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        7
+      ],
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802056": {
+      "id": 99802056,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000040,
+      "researchTaskCount": 200,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802057": {
+      "id": 99802057,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        6
+      ],
+      "researchTaskCount": 10000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802058": {
+      "id": 99802058,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        19
+      ],
+      "researchTaskCount": 10000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802059": {
+      "id": 99802059,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000040,
+      "researchTaskCount": 300,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802060": {
+      "id": 99802060,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        16
+      ],
+      "researchTaskCount": 30000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802061": {
+      "id": 99802061,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        17
+      ],
+      "researchTaskCount": 30000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802062": {
+      "id": 99802062,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000040,
+      "researchTaskCount": 400,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802063": {
+      "id": 99802063,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        15
+      ],
+      "researchTaskCount": 50000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802064": {
+      "id": 99802064,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        13
+      ],
+      "researchTaskCount": 50000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802065": {
+      "id": 99802065,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000040,
+      "researchTaskCount": 500,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802066": {
+      "id": 99802066,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        0
+      ],
+      "researchTaskCount": 3000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802067": {
+      "id": 99802067,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        1
+      ],
+      "researchTaskCount": 3000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802068": {
+      "id": 99802068,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000042,
+      "researchTaskCount": 500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802069": {
+      "id": 99802069,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        4
+      ],
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802070": {
+      "id": 99802070,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        3
+      ],
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802071": {
+      "id": 99802071,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000042,
+      "researchTaskCount": 1000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802072": {
+      "id": 99802072,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        2
+      ],
+      "researchTaskCount": 10000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802073": {
+      "id": 99802073,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 10000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802074": {
+      "id": 99802074,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000042,
+      "researchTaskCount": 1500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802075": {
+      "id": 99802075,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        11
+      ],
+      "researchTaskCount": 30000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802076": {
+      "id": 99802076,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        18
+      ],
+      "researchTaskCount": 30000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802077": {
+      "id": 99802077,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000042,
+      "researchTaskCount": 2000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802078": {
+      "id": 99802078,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        14
+      ],
+      "researchTaskCount": 50000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802079": {
+      "id": 99802079,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000149,
+      "researchTaskTargets": [
+        12
+      ],
+      "researchTaskCount": 50000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802080": {
+      "id": 99802080,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000042,
+      "researchTaskCount": 2500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802081": {
+      "id": 99802081,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802082": {
+      "id": 99802082,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000534
+      ],
+      "researchTaskCount": 2000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802083": {
+      "id": 99802083,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000535
+      ],
+      "researchTaskCount": 3500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802084": {
+      "id": 99802084,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802085": {
+      "id": 99802085,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000536
+      ],
+      "researchTaskCount": 1500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802086": {
+      "id": 99802086,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000537
+      ],
+      "researchTaskCount": 2000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802087": {
+      "id": 99802087,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802088": {
+      "id": 99802088,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000532
+      ],
+      "researchTaskCount": 3000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802089": {
+      "id": 99802089,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000533
+      ],
+      "researchTaskCount": 3500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802090": {
+      "id": 99802090,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802091": {
+      "id": 99802091,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000575
+      ],
+      "researchTaskCount": 3000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802092": {
+      "id": 99802092,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000576
+      ],
+      "researchTaskCount": 2500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802093": {
+      "id": 99802093,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802094": {
+      "id": 99802094,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000538
+      ],
+      "researchTaskCount": 2500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802095": {
+      "id": 99802095,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000539
+      ],
+      "researchTaskCount": 4000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802096": {
+      "id": 99802096,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802097": {
+      "id": 99802097,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000544
+      ],
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802098": {
+      "id": 99802098,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000535
+      ],
+      "researchTaskCount": 3500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802099": {
+      "id": 99802099,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802100": {
+      "id": 99802100,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000546
+      ],
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802101": {
+      "id": 99802101,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000537
+      ],
+      "researchTaskCount": 2000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802102": {
+      "id": 99802102,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802103": {
+      "id": 99802103,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000510
+      ],
+      "researchTaskCount": 2000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802104": {
+      "id": 99802104,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000533
+      ],
+      "researchTaskCount": 3500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802105": {
+      "id": 99802105,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802106": {
+      "id": 99802106,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000584
+      ],
+      "researchTaskCount": 4000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802107": {
+      "id": 99802107,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000576
+      ],
+      "researchTaskCount": 2500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802108": {
+      "id": 99802108,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802109": {
+      "id": 99802109,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000547
+      ],
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802110": {
+      "id": 99802110,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000539
+      ],
+      "researchTaskCount": 4000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802111": {
+      "id": 99802111,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802112": {
+      "id": 99802112,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000540
+      ],
+      "researchTaskCount": 7000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802113": {
+      "id": 99802113,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000541
+      ],
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802114": {
+      "id": 99802114,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802115": {
+      "id": 99802115,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000577
+      ],
+      "researchTaskCount": 7000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802116": {
+      "id": 99802116,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000586
+      ],
+      "researchTaskCount": 9000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802117": {
+      "id": 99802117,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802118": {
+      "id": 99802118,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000578
+      ],
+      "researchTaskCount": 9000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802119": {
+      "id": 99802119,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000579
+      ],
+      "researchTaskCount": 6000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802120": {
+      "id": 99802120,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802121": {
+      "id": 99802121,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000580
+      ],
+      "researchTaskCount": 9000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802122": {
+      "id": 99802122,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000581
+      ],
+      "researchTaskCount": 7000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802123": {
+      "id": 99802123,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802124": {
+      "id": 99802124,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000610
+      ],
+      "researchTaskCount": 6000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802125": {
+      "id": 99802125,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000611
+      ],
+      "researchTaskCount": 6000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802126": {
+      "id": 99802126,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802127": {
+      "id": 99802127,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000548
+      ],
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802128": {
+      "id": 99802128,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000535
+      ],
+      "researchTaskCount": 3500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802129": {
+      "id": 99802129,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802130": {
+      "id": 99802130,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000589
+      ],
+      "researchTaskCount": 12000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802131": {
+      "id": 99802131,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000537
+      ],
+      "researchTaskCount": 2000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802132": {
+      "id": 99802132,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802133": {
+      "id": 99802133,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000591
+      ],
+      "researchTaskCount": 10000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802134": {
+      "id": 99802134,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000533
+      ],
+      "researchTaskCount": 3500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802135": {
+      "id": 99802135,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802136": {
+      "id": 99802136,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000592
+      ],
+      "researchTaskCount": 7000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802137": {
+      "id": 99802137,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000576
+      ],
+      "researchTaskCount": 2500000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802138": {
+      "id": 99802138,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000154,
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802139": {
+      "id": 99802139,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000620
+      ],
+      "researchTaskCount": 4000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802140": {
+      "id": 99802140,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000098,
+      "researchTaskTargets": [
+        24000539
+      ],
+      "researchTaskCount": 4000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802141": {
+      "id": 99802141,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 1000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802142": {
+      "id": 99802142,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 1000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802143": {
+      "id": 99802143,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802144": {
+      "id": 99802144,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 3000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802145": {
+      "id": 99802145,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 3000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802146": {
+      "id": 99802146,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802147": {
+      "id": 99802147,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 5000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802148": {
+      "id": 99802148,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802149": {
+      "id": 99802149,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802150": {
+      "id": 99802150,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 10000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802151": {
+      "id": 99802151,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 10000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802152": {
+      "id": 99802152,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802153": {
+      "id": 99802153,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 30000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802154": {
+      "id": 99802154,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 30000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802155": {
+      "id": 99802155,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802156": {
+      "id": 99802156,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 3000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802157": {
+      "id": 99802157,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 3000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802158": {
+      "id": 99802158,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802159": {
+      "id": 99802159,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 5000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802160": {
+      "id": 99802160,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802161": {
+      "id": 99802161,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802162": {
+      "id": 99802162,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 10000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802163": {
+      "id": 99802163,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 10000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802164": {
+      "id": 99802164,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802165": {
+      "id": 99802165,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 30000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802166": {
+      "id": 99802166,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 30000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802167": {
+      "id": 99802167,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802168": {
+      "id": 99802168,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 50000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802169": {
+      "id": 99802169,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 50000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802170": {
+      "id": 99802170,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802171": {
+      "id": 99802171,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 1000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802172": {
+      "id": 99802172,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 1000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802173": {
+      "id": 99802173,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802174": {
+      "id": 99802174,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 3000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802175": {
+      "id": 99802175,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 3000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802176": {
+      "id": 99802176,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802177": {
+      "id": 99802177,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 5000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802178": {
+      "id": 99802178,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802179": {
+      "id": 99802179,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802180": {
+      "id": 99802180,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 10000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802181": {
+      "id": 99802181,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 10000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802182": {
+      "id": 99802182,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802183": {
+      "id": 99802183,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 30000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802184": {
+      "id": 99802184,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 30000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802185": {
+      "id": 99802185,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802186": {
+      "id": 99802186,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 3000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802187": {
+      "id": 99802187,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 3000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802188": {
+      "id": 99802188,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802189": {
+      "id": 99802189,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 5000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802190": {
+      "id": 99802190,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802191": {
+      "id": 99802191,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802192": {
+      "id": 99802192,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 10000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802193": {
+      "id": 99802193,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 10000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802194": {
+      "id": 99802194,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802195": {
+      "id": 99802195,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 30000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802196": {
+      "id": 99802196,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 30000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802197": {
+      "id": 99802197,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802198": {
+      "id": 99802198,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 50000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802199": {
+      "id": 99802199,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 50000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802200": {
+      "id": 99802200,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802201": {
+      "id": 99802201,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 5000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802202": {
+      "id": 99802202,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 5000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802203": {
+      "id": 99802203,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802204": {
+      "id": 99802204,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 10000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802205": {
+      "id": 99802205,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 10000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802206": {
+      "id": 99802206,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802207": {
+      "id": 99802207,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 30000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802208": {
+      "id": 99802208,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 30000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802209": {
+      "id": 99802209,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802210": {
+      "id": 99802210,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 50000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802211": {
+      "id": 99802211,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 50000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802212": {
+      "id": 99802212,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802213": {
+      "id": 99802213,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 100000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802214": {
+      "id": 99802214,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 100000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802215": {
+      "id": 99802215,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802216": {
+      "id": 99802216,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 10000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802217": {
+      "id": 99802217,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 10000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802218": {
+      "id": 99802218,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802219": {
+      "id": 99802219,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 30000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802220": {
+      "id": 99802220,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 30000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802221": {
+      "id": 99802221,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802222": {
+      "id": 99802222,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 50000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802223": {
+      "id": 99802223,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 50000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802224": {
+      "id": 99802224,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802225": {
+      "id": 99802225,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 100000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802226": {
+      "id": 99802226,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 100000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802227": {
+      "id": 99802227,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99802228": {
+      "id": 99802228,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000125,
+      "researchTaskCount": 200000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        10
+      ]
+    },
+    "99802229": {
+      "id": 99802229,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000017,
+      "researchTaskCount": 200000000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        2
+      ]
+    },
+    "99802230": {
+      "id": 99802230,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000072,
+      "researchTaskTargets": [
+        3,
+        2
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        3
+      ]
+    },
+    "99803001": {
+      "id": 99803001,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803002": {
+      "id": 99803002,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        1
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803003": {
+      "id": 99803003,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000062,
+      "researchTaskTargets": [
+        1
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803004": {
+      "id": 99803004,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803005": {
+      "id": 99803005,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        1
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803006": {
+      "id": 99803006,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000062,
+      "researchTaskTargets": [
+        1
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803007": {
+      "id": 99803007,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803008": {
+      "id": 99803008,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        1
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803009": {
+      "id": 99803009,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000062,
+      "researchTaskTargets": [
+        1
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803010": {
+      "id": 99803010,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803011": {
+      "id": 99803011,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        1
+      ],
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803012": {
+      "id": 99803012,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000062,
+      "researchTaskTargets": [
+        1
+      ],
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803013": {
+      "id": 99803013,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803014": {
+      "id": 99803014,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        1
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803015": {
+      "id": 99803015,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000062,
+      "researchTaskCount": 15,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803016": {
+      "id": 99803016,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803017": {
+      "id": 99803017,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        4
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803018": {
+      "id": 99803018,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000062,
+      "researchTaskTargets": [
+        4
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803019": {
+      "id": 99803019,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803020": {
+      "id": 99803020,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        4
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803021": {
+      "id": 99803021,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000062,
+      "researchTaskTargets": [
+        4
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803022": {
+      "id": 99803022,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803023": {
+      "id": 99803023,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        4
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803024": {
+      "id": 99803024,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000062,
+      "researchTaskTargets": [
+        4
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803025": {
+      "id": 99803025,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803026": {
+      "id": 99803026,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        4
+      ],
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803027": {
+      "id": 99803027,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000062,
+      "researchTaskTargets": [
+        4
+      ],
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803028": {
+      "id": 99803028,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803029": {
+      "id": 99803029,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        4
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803030": {
+      "id": 99803030,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000062,
+      "researchTaskTargets": [
+        4
+      ],
+      "researchTaskCount": 15,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803031": {
+      "id": 99803031,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803032": {
+      "id": 99803032,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803033": {
+      "id": 99803033,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803034": {
+      "id": 99803034,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803035": {
+      "id": 99803035,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803036": {
+      "id": 99803036,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803037": {
+      "id": 99803037,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803038": {
+      "id": 99803038,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803039": {
+      "id": 99803039,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803040": {
+      "id": 99803040,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803041": {
+      "id": 99803041,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 4,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803042": {
+      "id": 99803042,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803043": {
+      "id": 99803043,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803044": {
+      "id": 99803044,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803045": {
+      "id": 99803045,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803046": {
+      "id": 99803046,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803047": {
+      "id": 99803047,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000002,
+      "researchTaskCount": 1,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99803048": {
+      "id": 99803048,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 12,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803049": {
+      "id": 99803049,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803050": {
+      "id": 99803050,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000002,
+      "researchTaskCount": 2,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99803051": {
+      "id": 99803051,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 15,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803052": {
+      "id": 99803052,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803053": {
+      "id": 99803053,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000002,
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99803054": {
+      "id": 99803054,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 17,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803055": {
+      "id": 99803055,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803056": {
+      "id": 99803056,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000002,
+      "researchTaskCount": 4,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99803057": {
+      "id": 99803057,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 20,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803058": {
+      "id": 99803058,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803059": {
+      "id": 99803059,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000002,
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99803060": {
+      "id": 99803060,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        5
+      ],
+      "researchTaskCount": 25,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803061": {
+      "id": 99803061,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803062": {
+      "id": 99803062,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400001
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 1
+    },
+    "99803063": {
+      "id": 99803063,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 10000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803064": {
+      "id": 99803064,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803065": {
+      "id": 99803065,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400002
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 1
+    },
+    "99803066": {
+      "id": 99803066,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 20000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803067": {
+      "id": 99803067,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803068": {
+      "id": 99803068,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400001
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99803069": {
+      "id": 99803069,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 30000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803070": {
+      "id": 99803070,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803071": {
+      "id": 99803071,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400002
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99803072": {
+      "id": 99803072,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 40000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803073": {
+      "id": 99803073,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803074": {
+      "id": 99803074,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400003
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99803075": {
+      "id": 99803075,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 50000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803076": {
+      "id": 99803076,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803077": {
+      "id": 99803077,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000147,
+      "researchTaskCount": 100000,
+      "missionTargetType": 1
+    },
+    "99803078": {
+      "id": 99803078,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskTargets": [
+        1
+      ],
+      "researchTaskCount": 100000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803079": {
+      "id": 99803079,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803080": {
+      "id": 99803080,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000147,
+      "researchTaskCount": 300000,
+      "missionTargetType": 1
+    },
+    "99803081": {
+      "id": 99803081,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 150000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803082": {
+      "id": 99803082,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803083": {
+      "id": 99803083,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000147,
+      "researchTaskCount": 500000,
+      "missionTargetType": 1
+    },
+    "99803084": {
+      "id": 99803084,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskTargets": [
+        1
+      ],
+      "researchTaskCount": 200000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803085": {
+      "id": 99803085,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803086": {
+      "id": 99803086,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000147,
+      "researchTaskCount": 1000000,
+      "missionTargetType": 1
+    },
+    "99803087": {
+      "id": 99803087,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskTargets": [
+        1
+      ],
+      "researchTaskCount": 250000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803088": {
+      "id": 99803088,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803089": {
+      "id": 99803089,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000147,
+      "researchTaskCount": 3000000,
+      "missionTargetType": 1
+    },
+    "99803090": {
+      "id": 99803090,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 300000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803091": {
+      "id": 99803091,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803092": {
+      "id": 99803092,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400004
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 1
+    },
+    "99803093": {
+      "id": 99803093,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 10000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803094": {
+      "id": 99803094,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803095": {
+      "id": 99803095,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400005
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 1
+    },
+    "99803096": {
+      "id": 99803096,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 20000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803097": {
+      "id": 99803097,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803098": {
+      "id": 99803098,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400004
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99803099": {
+      "id": 99803099,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 30000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803100": {
+      "id": 99803100,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803101": {
+      "id": 99803101,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400005
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99803102": {
+      "id": 99803102,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 40000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803103": {
+      "id": 99803103,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803104": {
+      "id": 99803104,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400006
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99803105": {
+      "id": 99803105,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 50000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803106": {
+      "id": 99803106,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803107": {
+      "id": 99803107,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000093,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803108": {
+      "id": 99803108,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 100000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803109": {
+      "id": 99803109,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803110": {
+      "id": 99803110,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000093,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803111": {
+      "id": 99803111,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 150000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803112": {
+      "id": 99803112,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803113": {
+      "id": 99803113,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000093,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803114": {
+      "id": 99803114,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 200000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803115": {
+      "id": 99803115,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803116": {
+      "id": 99803116,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000093,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803117": {
+      "id": 99803117,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 250000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803118": {
+      "id": 99803118,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803119": {
+      "id": 99803119,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000093,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803120": {
+      "id": 99803120,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 300000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803121": {
+      "id": 99803121,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803122": {
+      "id": 99803122,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        2
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803123": {
+      "id": 99803123,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000062,
+      "researchTaskTargets": [
+        2
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803124": {
+      "id": 99803124,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803125": {
+      "id": 99803125,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        2
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803126": {
+      "id": 99803126,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000062,
+      "researchTaskTargets": [
+        2
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803127": {
+      "id": 99803127,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803128": {
+      "id": 99803128,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        2
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803129": {
+      "id": 99803129,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000062,
+      "researchTaskTargets": [
+        2
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803130": {
+      "id": 99803130,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803131": {
+      "id": 99803131,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        2
+      ],
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803132": {
+      "id": 99803132,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000062,
+      "researchTaskTargets": [
+        2
+      ],
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803133": {
+      "id": 99803133,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803134": {
+      "id": 99803134,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        2
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803135": {
+      "id": 99803135,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000062,
+      "researchTaskTargets": [
+        2
+      ],
+      "researchTaskCount": 15,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803136": {
+      "id": 99803136,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803137": {
+      "id": 99803137,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        6
+      ],
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803138": {
+      "id": 99803138,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000049,
+      "researchTaskCount": 3,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803139": {
+      "id": 99803139,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803140": {
+      "id": 99803140,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        6
+      ],
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803141": {
+      "id": 99803141,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000049,
+      "researchTaskCount": 5,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803142": {
+      "id": 99803142,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803143": {
+      "id": 99803143,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        6
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803144": {
+      "id": 99803144,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000049,
+      "researchTaskCount": 7,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803145": {
+      "id": 99803145,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803146": {
+      "id": 99803146,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        6
+      ],
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803147": {
+      "id": 99803147,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000049,
+      "researchTaskCount": 10,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803148": {
+      "id": 99803148,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803149": {
+      "id": 99803149,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000061,
+      "researchTaskTargets": [
+        6
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803150": {
+      "id": 99803150,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000049,
+      "researchTaskCount": 15,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803151": {
+      "id": 99803151,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803152": {
+      "id": 99803152,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000019,
+      "researchTaskCount": 20,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        4
+      ]
+    },
+    "99803153": {
+      "id": 99803153,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000049,
+      "researchTaskCount": 25,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803154": {
+      "id": 99803154,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803155": {
+      "id": 99803155,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000019,
+      "researchTaskCount": 30,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        4
+      ]
+    },
+    "99803156": {
+      "id": 99803156,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000049,
+      "researchTaskCount": 30,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803157": {
+      "id": 99803157,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803158": {
+      "id": 99803158,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000019,
+      "researchTaskCount": 50,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        4
+      ]
+    },
+    "99803159": {
+      "id": 99803159,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000049,
+      "researchTaskCount": 35,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803160": {
+      "id": 99803160,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803161": {
+      "id": 99803161,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000019,
+      "researchTaskCount": 70,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        4
+      ]
+    },
+    "99803162": {
+      "id": 99803162,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000049,
+      "researchTaskCount": 40,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803163": {
+      "id": 99803163,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803164": {
+      "id": 99803164,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000019,
+      "researchTaskCount": 100,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        4
+      ]
+    },
+    "99803165": {
+      "id": 99803165,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000049,
+      "researchTaskCount": 50,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803166": {
+      "id": 99803166,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803167": {
+      "id": 99803167,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400007
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 1
+    },
+    "99803168": {
+      "id": 99803168,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 10000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803169": {
+      "id": 99803169,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803170": {
+      "id": 99803170,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400008
+      ],
+      "researchTaskCount": 3,
+      "missionTargetType": 1
+    },
+    "99803171": {
+      "id": 99803171,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 20000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803172": {
+      "id": 99803172,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803173": {
+      "id": 99803173,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400007
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99803174": {
+      "id": 99803174,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 30000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803175": {
+      "id": 99803175,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803176": {
+      "id": 99803176,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400008
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99803177": {
+      "id": 99803177,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 40000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803178": {
+      "id": 99803178,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803179": {
+      "id": 99803179,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400009
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99803180": {
+      "id": 99803180,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 50000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803181": {
+      "id": 99803181,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803182": {
+      "id": 99803182,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000063,
+      "researchTaskCount": 1,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803183": {
+      "id": 99803183,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 100000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803184": {
+      "id": 99803184,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803185": {
+      "id": 99803185,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000063,
+      "researchTaskCount": 2,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803186": {
+      "id": 99803186,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 150000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803187": {
+      "id": 99803187,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803188": {
+      "id": 99803188,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000063,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803189": {
+      "id": 99803189,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 200000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803190": {
+      "id": 99803190,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803191": {
+      "id": 99803191,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000063,
+      "researchTaskCount": 4,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803192": {
+      "id": 99803192,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 250000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803193": {
+      "id": 99803193,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803194": {
+      "id": 99803194,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000063,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803195": {
+      "id": 99803195,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 300000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803196": {
+      "id": 99803196,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 6,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803197": {
+      "id": 99803197,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400013
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99803198": {
+      "id": 99803198,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400010
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99803199": {
+      "id": 99803199,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 6,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803200": {
+      "id": 99803200,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400014
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99803201": {
+      "id": 99803201,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400011
+      ],
+      "researchTaskCount": 5,
+      "missionTargetType": 1
+    },
+    "99803202": {
+      "id": 99803202,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 6,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803203": {
+      "id": 99803203,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400013
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 1
+    },
+    "99803204": {
+      "id": 99803204,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400010
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 1
+    },
+    "99803205": {
+      "id": 99803205,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 6,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803206": {
+      "id": 99803206,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400014
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 1
+    },
+    "99803207": {
+      "id": 99803207,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400011
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 1
+    },
+    "99803208": {
+      "id": 99803208,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 6,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803209": {
+      "id": 99803209,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400015
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 1
+    },
+    "99803210": {
+      "id": 99803210,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400012
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 1
+    },
+    "99803211": {
+      "id": 99803211,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803212": {
+      "id": 99803212,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400001
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 1
+    },
+    "99803213": {
+      "id": 99803213,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 10000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803214": {
+      "id": 99803214,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803215": {
+      "id": 99803215,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400002
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 1
+    },
+    "99803216": {
+      "id": 99803216,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 20000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803217": {
+      "id": 99803217,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803218": {
+      "id": 99803218,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400001
+      ],
+      "researchTaskCount": 10,
+      "missionTargetType": 1
+    },
+    "99803219": {
+      "id": 99803219,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 30000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803220": {
+      "id": 99803220,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803221": {
+      "id": 99803221,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400002
+      ],
+      "researchTaskCount": 10,
+      "missionTargetType": 1
+    },
+    "99803222": {
+      "id": 99803222,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 40000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803223": {
+      "id": 99803223,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803224": {
+      "id": 99803224,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400003
+      ],
+      "researchTaskCount": 10,
+      "missionTargetType": 1
+    },
+    "99803225": {
+      "id": 99803225,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000062,
+      "researchTaskTargets": [
+        1
+      ],
+      "researchTaskCount": 20,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803226": {
+      "id": 99803226,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803227": {
+      "id": 99803227,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400004
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 1
+    },
+    "99803228": {
+      "id": 99803228,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 10000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803229": {
+      "id": 99803229,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803230": {
+      "id": 99803230,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400005
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 1
+    },
+    "99803231": {
+      "id": 99803231,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 20000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803232": {
+      "id": 99803232,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803233": {
+      "id": 99803233,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400004
+      ],
+      "researchTaskCount": 10,
+      "missionTargetType": 1
+    },
+    "99803234": {
+      "id": 99803234,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 30000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803235": {
+      "id": 99803235,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803236": {
+      "id": 99803236,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400005
+      ],
+      "researchTaskCount": 10,
+      "missionTargetType": 1
+    },
+    "99803237": {
+      "id": 99803237,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 40000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803238": {
+      "id": 99803238,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803239": {
+      "id": 99803239,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400006
+      ],
+      "researchTaskCount": 10,
+      "missionTargetType": 1
+    },
+    "99803240": {
+      "id": 99803240,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 50000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803241": {
+      "id": 99803241,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803242": {
+      "id": 99803242,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400007
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 1
+    },
+    "99803243": {
+      "id": 99803243,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 10000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803244": {
+      "id": 99803244,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803245": {
+      "id": 99803245,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400008
+      ],
+      "researchTaskCount": 7,
+      "missionTargetType": 1
+    },
+    "99803246": {
+      "id": 99803246,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 20000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803247": {
+      "id": 99803247,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803248": {
+      "id": 99803248,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400007
+      ],
+      "researchTaskCount": 10,
+      "missionTargetType": 1
+    },
+    "99803249": {
+      "id": 99803249,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 30000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803250": {
+      "id": 99803250,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803251": {
+      "id": 99803251,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400008
+      ],
+      "researchTaskCount": 10,
+      "missionTargetType": 1
+    },
+    "99803252": {
+      "id": 99803252,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 40000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803253": {
+      "id": 99803253,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803254": {
+      "id": 99803254,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000047,
+      "researchTaskTargets": [
+        21400009
+      ],
+      "researchTaskCount": 10,
+      "missionTargetType": 1
+    },
+    "99803255": {
+      "id": 99803255,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000052,
+      "researchTaskCount": 50000,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803256": {
+      "id": 99803256,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 8,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803257": {
+      "id": 99803257,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000050,
+      "researchTaskCount": 16,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99803258": {
+      "id": 99803258,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000146,
+      "researchTaskCount": 3,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803259": {
+      "id": 99803259,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 8,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803260": {
+      "id": 99803260,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000050,
+      "researchTaskCount": 17,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99803261": {
+      "id": 99803261,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000146,
+      "researchTaskCount": 5,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803262": {
+      "id": 99803262,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 8,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803263": {
+      "id": 99803263,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000050,
+      "researchTaskCount": 18,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99803264": {
+      "id": 99803264,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000146,
+      "researchTaskCount": 7,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803265": {
+      "id": 99803265,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 8,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803266": {
+      "id": 99803266,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000050,
+      "researchTaskCount": 19,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99803267": {
+      "id": 99803267,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000146,
+      "researchTaskCount": 10,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803268": {
+      "id": 99803268,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000059,
+      "researchTaskCount": 8,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803269": {
+      "id": 99803269,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000050,
+      "researchTaskCount": 20,
+      "missionTargetType": 17,
+      "autoMovingVal": [
+        11
+      ]
+    },
+    "99803270": {
+      "id": 99803270,
+      "researchTaskTermsType": 1,
+      "researchTaskTermsId": 87000146,
+      "researchTaskCount": 12,
+      "missionTargetType": 2,
+      "autoMovingVal": [
+        12
+      ]
+    },
+    "99803271": {
+      "id": 99803271,
+      "researchTaskTermsType": 2,
+      "researchTaskTermsId": 81000001,
+      "researchTaskCount": 1,
+      "missionTargetType": 1
+    }
+  }
+}

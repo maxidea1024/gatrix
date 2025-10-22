@@ -1,0 +1,218 @@
+{
+  ":TownNpcAnimType": {
+    ":type": {
+      "id": "key",
+      "idle": "string",
+      "admiralIdle": [
+        "string",
+        "string"
+      ],
+      "run": "string",
+      "walk": "string",
+      "walkup": "string"
+    },
+    ":required": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "TownNpcAnimType": {
+    "56000001": {
+      "id": 56000001,
+      "idle": "Town_Watchman01_Idle",
+      "run": "Town_Watchman01_Run",
+      "walk": "Town_Watchman01_Walk",
+      "walkup": "Town_Watchman01_Walk_02"
+    },
+    "56000002": {
+      "id": 56000002,
+      "idle": "Town_Watchman02_Idle",
+      "run": "Town_Watchman02_Run",
+      "walk": "Town_Watchman02_Walk",
+      "walkup": "Town_Watchman02_Walk_02"
+    },
+    "56000003": {
+      "id": 56000003,
+      "idle": "Town_Watchman03_Idle",
+      "run": "Town_Watchman03_Run",
+      "walk": "Town_Watchman03_Walk",
+      "walkup": "Town_Watchman03_Walk_02"
+    },
+    "56000004": {
+      "id": 56000004,
+      "admiralIdle": [
+        "Town_Map_Idle_01",
+        "Town_LookAround_Idle_01"
+      ]
+    },
+    "56000005": {
+      "id": 56000005,
+      "admiralIdle": [
+        "Town_FoldArm_Idle_01",
+        "Town_LookAround_Idle_01"
+      ]
+    },
+    "56000006": {
+      "id": 56000006,
+      "admiralIdle": [
+        "Town_Calculation_Idle_01",
+        "Town_Think_Idle_01"
+      ]
+    },
+    "56000007": {
+      "id": 56000007,
+      "admiralIdle": [
+        "Town_FoldArm_Idle_01",
+        "Town_Whisk_Idle_01"
+      ]
+    },
+    "56000008": {
+      "id": 56000008,
+      "admiralIdle": [
+        "Town_Map_Idle_01",
+        "Town_Think_Idle_01"
+      ]
+    },
+    "56000009": {
+      "id": 56000009,
+      "admiralIdle": [
+        "Town_Map_Idle_01",
+        "Town_Stretching_Idle_01"
+      ]
+    },
+    "56000010": {
+      "id": 56000010,
+      "admiralIdle": [
+        "Town_Map_Idle_01",
+        "Town_LookAround_Idle_01"
+      ]
+    },
+    "56000011": {
+      "id": 56000011,
+      "admiralIdle": [
+        "Town_FoldArm_Idle_01",
+        "Town_Think_Idle_01"
+      ]
+    },
+    "56000012": {
+      "id": 56000012,
+      "admiralIdle": [
+        "Town_Calculation_Idle_01",
+        "Town_LookAround_Idle_01"
+      ]
+    },
+    "56000013": {
+      "id": 56000013,
+      "admiralIdle": [
+        "Town_FoldArm_Idle_01",
+        "Town_Whisk_Idle_01"
+      ]
+    },
+    "56000014": {
+      "id": 56000014,
+      "admiralIdle": [
+        "Town_FoldArm_Idle_01",
+        "Town_LookAround_Idle_01"
+      ]
+    },
+    "56000015": {
+      "id": 56000015,
+      "admiralIdle": [
+        "Town_Massage_Idle_01",
+        "Town_Order_Idle_01"
+      ]
+    },
+    "56000016": {
+      "id": 56000016,
+      "admiralIdle": [
+        "Town_Whisk_Idle_01",
+        "Town_LookAround_Idle_01"
+      ]
+    },
+    "56000017": {
+      "id": 56000017,
+      "admiralIdle": [
+        "Town_Whisk_Idle_01",
+        "Town_LookAround_Idle_01"
+      ]
+    },
+    "56000018": {
+      "id": 56000018,
+      "admiralIdle": [
+        "Town_Order_Idle_01",
+        "Town_Clap_Idle_01"
+      ]
+    },
+    "56000019": {
+      "id": 56000019,
+      "admiralIdle": [
+        "Town_FoldArm_Idle_01",
+        "Town_Clap_Idle_01"
+      ]
+    },
+    "56000020": {
+      "id": 56000020,
+      "admiralIdle": [
+        "Town_Whisk_Idle_01",
+        "Town_LookAround_Idle_01"
+      ]
+    },
+    "56000021": {
+      "id": 56000021,
+      "admiralIdle": [
+        "Town_Map_Idle_01",
+        "Town_LookAround_Idle_01"
+      ]
+    },
+    "56000022": {
+      "id": 56000022,
+      "admiralIdle": [
+        "Town_FoldArm_Idle_01",
+        "Town_Think_Idle_01"
+      ]
+    },
+    "56000023": {
+      "id": 56000023,
+      "admiralIdle": [
+        "Town_LookAround_Idle_01",
+        "Town_Think_Idle_01"
+      ]
+    },
+    "56000024": {
+      "id": 56000024,
+      "admiralIdle": [
+        "Town_Map_Idle_01",
+        "Town_LookAround_Idle_01"
+      ]
+    },
+    "56000028": {
+      "id": 56000028,
+      "admiralIdle": [
+        "Town_FoldArm_Idle",
+        "Town_Order_Idle_01"
+      ]
+    },
+    "56000029": {
+      "id": 56000029,
+      "admiralIdle": [
+        "Town_Think_Idle_01",
+        "Town_Hello_Idle_01"
+      ]
+    },
+    "56000030": {
+      "id": 56000030,
+      "admiralIdle": [
+        "Town_Calculation_Idle_01",
+        "Town_Think_Idle_01"
+      ]
+    },
+    "56000031": {
+      "id": 56000031,
+      "admiralIdle": [
+        "Town_FoldArm_Idle",
+        "Town_Order_Idle_01"
+      ]
+    }
+  }
+}

@@ -1,0 +1,1493 @@
+{
+  ":BuildingBuff": {
+    ":type": {
+      "id": "key",
+      "buildingType": "number",
+      "buildingMenuId": [
+        "number",
+        "number"
+      ],
+      "contentsTermsId": "number",
+      "contentsTermsTarget": "number",
+      "contentsTermsCount": "number",
+      "statEffectType": "number",
+      "statEffectId": "number",
+      "statEffectValue": "float"
+    },
+    ":required": {
+      "statEffectId": 1,
+      "statEffectValue": 1
+    },
+    ":min": {
+      "buildingType": 0,
+      "buildingMenuId": [
+        38400000,
+        38400000
+      ],
+      "contentsTermsId": 81000000,
+      "statEffectType": 0,
+      "statEffectId": 1
+    },
+    ":max": {
+      "buildingType": 54,
+      "buildingMenuId": [
+        38419999,
+        38419999
+      ],
+      "contentsTermsId": 81999999,
+      "statEffectType": 1,
+      "statEffectId": 99999999
+    },
+    ":enum": {},
+    ":asset": {},
+    ":links": {
+      "buildingMenuId": [
+        [
+          "BuildingMenu"
+        ],
+        [
+          "BuildingMenu"
+        ]
+      ],
+      "contentsTermsId": [
+        "ContentsTerms"
+      ],
+      "statEffectId": [
+        "StatOperator",
+        "WorldPassiveEffect"
+      ]
+    }
+  },
+  "BuildingBuff": {
+    "38201003": {
+      "id": 38201003,
+      "buildingType": 9,
+      "buildingMenuId": [
+        38400009
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4001,
+      "statEffectValue": 1000
+    },
+    "38200000": {
+      "id": 38200000,
+      "buildingType": 9,
+      "buildingMenuId": [
+        38400009
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4001,
+      "statEffectValue": 975
+    },
+    "38200001": {
+      "id": 38200001,
+      "buildingType": 9,
+      "buildingMenuId": [
+        38400009
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4001,
+      "statEffectValue": 950
+    },
+    "38200002": {
+      "id": 38200002,
+      "buildingType": 9,
+      "buildingMenuId": [
+        38400009
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4001,
+      "statEffectValue": 900
+    },
+    "38200003": {
+      "id": 38200003,
+      "buildingType": 9,
+      "buildingMenuId": [
+        38400009
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4001,
+      "statEffectValue": 850
+    },
+    "38200004": {
+      "id": 38200004,
+      "buildingType": 9,
+      "buildingMenuId": [
+        38400009
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4001,
+      "statEffectValue": 800
+    },
+    "38200005": {
+      "id": 38200005,
+      "buildingType": 12,
+      "buildingMenuId": [
+        38400020
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4002,
+      "statEffectValue": 1000
+    },
+    "38200006": {
+      "id": 38200006,
+      "buildingType": 12,
+      "buildingMenuId": [
+        38400020
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4002,
+      "statEffectValue": 1000
+    },
+    "38200007": {
+      "id": 38200007,
+      "buildingType": 12,
+      "buildingMenuId": [
+        38400020
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4002,
+      "statEffectValue": 950
+    },
+    "38200008": {
+      "id": 38200008,
+      "buildingType": 12,
+      "buildingMenuId": [
+        38400020
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4002,
+      "statEffectValue": 900
+    },
+    "38200009": {
+      "id": 38200009,
+      "buildingType": 12,
+      "buildingMenuId": [
+        38400020
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4002,
+      "statEffectValue": 850
+    },
+    "38200010": {
+      "id": 38200010,
+      "buildingType": 12,
+      "buildingMenuId": [
+        38400020
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4002,
+      "statEffectValue": 800
+    },
+    "38201004": {
+      "id": 38201004,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400014
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4003,
+      "statEffectValue": 1000
+    },
+    "38200011": {
+      "id": 38200011,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400014
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4003,
+      "statEffectValue": 990
+    },
+    "38200012": {
+      "id": 38200012,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400014
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4003,
+      "statEffectValue": 980
+    },
+    "38200013": {
+      "id": 38200013,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400014
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4003,
+      "statEffectValue": 970
+    },
+    "38200014": {
+      "id": 38200014,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400014
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4003,
+      "statEffectValue": 940
+    },
+    "38200015": {
+      "id": 38200015,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400014
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4003,
+      "statEffectValue": 900
+    },
+    "38200016": {
+      "id": 38200016,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400017,
+        38400022
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4004,
+      "statEffectValue": 1000
+    },
+    "38200017": {
+      "id": 38200017,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400017,
+        38400022
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4004,
+      "statEffectValue": 1000
+    },
+    "38200018": {
+      "id": 38200018,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400017,
+        38400022
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4004,
+      "statEffectValue": 990
+    },
+    "38200019": {
+      "id": 38200019,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400017,
+        38400022
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4004,
+      "statEffectValue": 970
+    },
+    "38200020": {
+      "id": 38200020,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400017,
+        38400022
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4004,
+      "statEffectValue": 940
+    },
+    "38200021": {
+      "id": 38200021,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400017,
+        38400022
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4004,
+      "statEffectValue": 900
+    },
+    "38200022": {
+      "id": 38200022,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400016
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4023,
+      "statEffectValue": 1000
+    },
+    "38200023": {
+      "id": 38200023,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400016
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4023,
+      "statEffectValue": 1000
+    },
+    "38200024": {
+      "id": 38200024,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400016
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4023,
+      "statEffectValue": 990
+    },
+    "38200025": {
+      "id": 38200025,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400016
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4023,
+      "statEffectValue": 970
+    },
+    "38200026": {
+      "id": 38200026,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400016
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4023,
+      "statEffectValue": 940
+    },
+    "38200027": {
+      "id": 38200027,
+      "buildingType": 11,
+      "buildingMenuId": [
+        38400016
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4023,
+      "statEffectValue": 900
+    },
+    "38200028": {
+      "id": 38200028,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400003,
+        38400023
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4006,
+      "statEffectValue": 1000
+    },
+    "38200029": {
+      "id": 38200029,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400003,
+        38400023
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4006,
+      "statEffectValue": 1000
+    },
+    "38200030": {
+      "id": 38200030,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400003,
+        38400023
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4006,
+      "statEffectValue": 950
+    },
+    "38200031": {
+      "id": 38200031,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400003,
+        38400023
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4006,
+      "statEffectValue": 900
+    },
+    "38200032": {
+      "id": 38200032,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400003,
+        38400023
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4006,
+      "statEffectValue": 850
+    },
+    "38200033": {
+      "id": 38200033,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400003,
+        38400023
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4006,
+      "statEffectValue": 800
+    },
+    "38200034": {
+      "id": 38200034,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400003,
+        38400023
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4012,
+      "statEffectValue": 50
+    },
+    "38200035": {
+      "id": 38200035,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400003,
+        38400023
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4012,
+      "statEffectValue": 100
+    },
+    "38200036": {
+      "id": 38200036,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4007,
+      "statEffectValue": 1000
+    },
+    "38200037": {
+      "id": 38200037,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4007,
+      "statEffectValue": 1000
+    },
+    "38200038": {
+      "id": 38200038,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4007,
+      "statEffectValue": 990
+    },
+    "38200039": {
+      "id": 38200039,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4007,
+      "statEffectValue": 970
+    },
+    "38200040": {
+      "id": 38200040,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4007,
+      "statEffectValue": 940
+    },
+    "38200041": {
+      "id": 38200041,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4007,
+      "statEffectValue": 900
+    },
+    "38201000": {
+      "id": 38201000,
+      "buildingType": 10,
+      "buildingMenuId": [
+        38400012
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4009,
+      "statEffectValue": 1000
+    },
+    "38200042": {
+      "id": 38200042,
+      "buildingType": 10,
+      "buildingMenuId": [
+        38400012
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4009,
+      "statEffectValue": 1000
+    },
+    "38200043": {
+      "id": 38200043,
+      "buildingType": 10,
+      "buildingMenuId": [
+        38400012
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4009,
+      "statEffectValue": 990
+    },
+    "38200044": {
+      "id": 38200044,
+      "buildingType": 10,
+      "buildingMenuId": [
+        38400012
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4009,
+      "statEffectValue": 980
+    },
+    "38200045": {
+      "id": 38200045,
+      "buildingType": 10,
+      "buildingMenuId": [
+        38400012
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4009,
+      "statEffectValue": 970
+    },
+    "38200046": {
+      "id": 38200046,
+      "buildingType": 10,
+      "buildingMenuId": [
+        38400012
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4009,
+      "statEffectValue": 950
+    },
+    "38201001": {
+      "id": 38201001,
+      "buildingType": 10,
+      "buildingMenuId": [
+        38400013
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4010,
+      "statEffectValue": 1000
+    },
+    "38200047": {
+      "id": 38200047,
+      "buildingType": 10,
+      "buildingMenuId": [
+        38400013
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4010,
+      "statEffectValue": 1000
+    },
+    "38200048": {
+      "id": 38200048,
+      "buildingType": 10,
+      "buildingMenuId": [
+        38400013
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4010,
+      "statEffectValue": 1010
+    },
+    "38200049": {
+      "id": 38200049,
+      "buildingType": 10,
+      "buildingMenuId": [
+        38400013
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4010,
+      "statEffectValue": 1020
+    },
+    "38200050": {
+      "id": 38200050,
+      "buildingType": 10,
+      "buildingMenuId": [
+        38400013
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4010,
+      "statEffectValue": 1030
+    },
+    "38200051": {
+      "id": 38200051,
+      "buildingType": 10,
+      "buildingMenuId": [
+        38400013
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4010,
+      "statEffectValue": 1050
+    },
+    "38201002": {
+      "id": 38201002,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4011,
+      "statEffectValue": 1000
+    },
+    "38200052": {
+      "id": 38200052,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4011,
+      "statEffectValue": 1000
+    },
+    "38200053": {
+      "id": 38200053,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4011,
+      "statEffectValue": 950
+    },
+    "38200054": {
+      "id": 38200054,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4011,
+      "statEffectValue": 950
+    },
+    "38200055": {
+      "id": 38200055,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4011,
+      "statEffectValue": 950
+    },
+    "38200056": {
+      "id": 38200056,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4011,
+      "statEffectValue": 900
+    },
+    "38201005": {
+      "id": 38201005,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4013,
+      "statEffectValue": 0
+    },
+    "38200057": {
+      "id": 38200057,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4013,
+      "statEffectValue": 1
+    },
+    "38200058": {
+      "id": 38200058,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4013,
+      "statEffectValue": 1
+    },
+    "38200059": {
+      "id": 38200059,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4013,
+      "statEffectValue": 2
+    },
+    "38200060": {
+      "id": 38200060,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4013,
+      "statEffectValue": 2
+    },
+    "38200061": {
+      "id": 38200061,
+      "buildingType": 4,
+      "buildingMenuId": [
+        38400001
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4013,
+      "statEffectValue": 3
+    },
+    "38201006": {
+      "id": 38201006,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400006
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4015,
+      "statEffectValue": 1000
+    },
+    "38200062": {
+      "id": 38200062,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400006
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4015,
+      "statEffectValue": 990
+    },
+    "38200063": {
+      "id": 38200063,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400006
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4015,
+      "statEffectValue": 980
+    },
+    "38200064": {
+      "id": 38200064,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400006
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4015,
+      "statEffectValue": 970
+    },
+    "38200065": {
+      "id": 38200065,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400006
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4015,
+      "statEffectValue": 940
+    },
+    "38200066": {
+      "id": 38200066,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400006
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4015,
+      "statEffectValue": 900
+    },
+    "38201007": {
+      "id": 38201007,
+      "buildingType": 7,
+      "buildingMenuId": [
+        38400025
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4014,
+      "statEffectValue": 1000
+    },
+    "38200067": {
+      "id": 38200067,
+      "buildingType": 7,
+      "buildingMenuId": [
+        38400025
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4014,
+      "statEffectValue": 950
+    },
+    "38200068": {
+      "id": 38200068,
+      "buildingType": 7,
+      "buildingMenuId": [
+        38400025
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4014,
+      "statEffectValue": 900
+    },
+    "38200069": {
+      "id": 38200069,
+      "buildingType": 7,
+      "buildingMenuId": [
+        38400025
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4014,
+      "statEffectValue": 850
+    },
+    "38200070": {
+      "id": 38200070,
+      "buildingType": 7,
+      "buildingMenuId": [
+        38400025
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4014,
+      "statEffectValue": 800
+    },
+    "38200071": {
+      "id": 38200071,
+      "buildingType": 7,
+      "buildingMenuId": [
+        38400025
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4014,
+      "statEffectValue": 750
+    },
+    "38201008": {
+      "id": 38201008,
+      "buildingType": 7,
+      "buildingMenuId": [
+        38400026
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4008,
+      "statEffectValue": 1000
+    },
+    "38200072": {
+      "id": 38200072,
+      "buildingType": 7,
+      "buildingMenuId": [
+        38400026
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4008,
+      "statEffectValue": 990
+    },
+    "38200073": {
+      "id": 38200073,
+      "buildingType": 7,
+      "buildingMenuId": [
+        38400026
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4008,
+      "statEffectValue": 970
+    },
+    "38200074": {
+      "id": 38200074,
+      "buildingType": 7,
+      "buildingMenuId": [
+        38400026
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4008,
+      "statEffectValue": 950
+    },
+    "38200075": {
+      "id": 38200075,
+      "buildingType": 7,
+      "buildingMenuId": [
+        38400026
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4008,
+      "statEffectValue": 925
+    },
+    "38200076": {
+      "id": 38200076,
+      "buildingType": 7,
+      "buildingMenuId": [
+        38400026
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4008,
+      "statEffectValue": 900
+    },
+    "38201009": {
+      "id": 38201009,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400007
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4017,
+      "statEffectValue": 1000
+    },
+    "38200080": {
+      "id": 38200080,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400007
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4017,
+      "statEffectValue": 990
+    },
+    "38200081": {
+      "id": 38200081,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400007
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4017,
+      "statEffectValue": 980
+    },
+    "38200082": {
+      "id": 38200082,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400007
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4017,
+      "statEffectValue": 970
+    },
+    "38200083": {
+      "id": 38200083,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400007
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4017,
+      "statEffectValue": 940
+    },
+    "38200084": {
+      "id": 38200084,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400007
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4017,
+      "statEffectValue": 900
+    },
+    "38201010": {
+      "id": 38201010,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400008
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4019,
+      "statEffectValue": 1000
+    },
+    "38200085": {
+      "id": 38200085,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400008
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4019,
+      "statEffectValue": 990
+    },
+    "38200086": {
+      "id": 38200086,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400008
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4019,
+      "statEffectValue": 980
+    },
+    "38200087": {
+      "id": 38200087,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400008
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4019,
+      "statEffectValue": 970
+    },
+    "38200088": {
+      "id": 38200088,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400008
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4019,
+      "statEffectValue": 940
+    },
+    "38200089": {
+      "id": 38200089,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400008
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4019,
+      "statEffectValue": 900
+    },
+    "38201011": {
+      "id": 38201011,
+      "buildingType": 13,
+      "buildingMenuId": [
+        38400029
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4022,
+      "statEffectValue": 1000
+    },
+    "38200090": {
+      "id": 38200090,
+      "buildingType": 13,
+      "buildingMenuId": [
+        38400029
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4022,
+      "statEffectValue": 950
+    },
+    "38200091": {
+      "id": 38200091,
+      "buildingType": 13,
+      "buildingMenuId": [
+        38400029
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4022,
+      "statEffectValue": 900
+    },
+    "38200092": {
+      "id": 38200092,
+      "buildingType": 13,
+      "buildingMenuId": [
+        38400029
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4022,
+      "statEffectValue": 850
+    },
+    "38200093": {
+      "id": 38200093,
+      "buildingType": 13,
+      "buildingMenuId": [
+        38400029
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4022,
+      "statEffectValue": 800
+    },
+    "38200094": {
+      "id": 38200094,
+      "buildingType": 13,
+      "buildingMenuId": [
+        38400029
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4022,
+      "statEffectValue": 750
+    },
+    "38200095": {
+      "id": 38200095,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400036
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4016,
+      "statEffectValue": 1000
+    },
+    "38200096": {
+      "id": 38200096,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400036
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4016,
+      "statEffectValue": 1000
+    },
+    "38200097": {
+      "id": 38200097,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400036
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4016,
+      "statEffectValue": 1000
+    },
+    "38200098": {
+      "id": 38200098,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400036
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4016,
+      "statEffectValue": 1000
+    },
+    "38200099": {
+      "id": 38200099,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400036
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4016,
+      "statEffectValue": 1000
+    },
+    "38200100": {
+      "id": 38200100,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400036
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4016,
+      "statEffectValue": 1000
+    },
+    "38200101": {
+      "id": 38200101,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400036
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 0,
+      "statEffectType": 0,
+      "statEffectId": 4018,
+      "statEffectValue": 1000
+    },
+    "38200102": {
+      "id": 38200102,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400036
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 1,
+      "statEffectType": 0,
+      "statEffectId": 4018,
+      "statEffectValue": 1000
+    },
+    "38200103": {
+      "id": 38200103,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400036
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 2,
+      "statEffectType": 0,
+      "statEffectId": 4018,
+      "statEffectValue": 1000
+    },
+    "38200104": {
+      "id": 38200104,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400036
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 3,
+      "statEffectType": 0,
+      "statEffectId": 4018,
+      "statEffectValue": 1000
+    },
+    "38200105": {
+      "id": 38200105,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400036
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 0,
+      "statEffectId": 4018,
+      "statEffectValue": 1000
+    },
+    "38200106": {
+      "id": 38200106,
+      "buildingType": 5,
+      "buildingMenuId": [
+        38400036
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 0,
+      "statEffectId": 4018,
+      "statEffectValue": 1000
+    },
+    "38200107": {
+      "id": 38200107,
+      "buildingType": 14,
+      "buildingMenuId": [
+        38400051
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 4,
+      "statEffectType": 1,
+      "statEffectId": 75312218,
+      "statEffectValue": -50
+    },
+    "38200108": {
+      "id": 38200108,
+      "buildingType": 14,
+      "buildingMenuId": [
+        38400051
+      ],
+      "contentsTermsId": 81000000,
+      "contentsTermsCount": 5,
+      "statEffectType": 1,
+      "statEffectId": 75312218,
+      "statEffectValue": -100
+    }
+  }
+}

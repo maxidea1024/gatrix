@@ -13,6 +13,7 @@ interface ResizableDrawerProps {
   minWidth?: number;
   maxWidth?: number;
   zIndex?: number;
+  onEntered?: () => void; // Callback when drawer animation completes
 }
 
 /**
@@ -30,6 +31,7 @@ const ResizableDrawer: React.FC<ResizableDrawerProps> = ({
   minWidth = 400,
   maxWidth,
   zIndex = 1300,
+  onEntered,
 }) => {
   // Drawer width state (persisted in localStorage)
   const [drawerWidth, setDrawerWidth] = useState<number>(() => {
@@ -94,6 +96,9 @@ const ResizableDrawer: React.FC<ResizableDrawerProps> = ({
       slotProps={{
         backdrop: { sx: { zIndex: zIndex - 1 } }
       }}
+      SlideProps={{
+        onEntered
+      }}
     >
       {/* Resize Grip */}
       <Box
@@ -103,7 +108,7 @@ const ResizableDrawer: React.FC<ResizableDrawerProps> = ({
           left: 0,
           top: 0,
           bottom: 0,
-          width: '8px',
+          width: '4px',
           cursor: 'ew-resize',
           bgcolor: isResizing ? 'primary.main' : 'transparent',
           transition: 'background-color 0.2s',

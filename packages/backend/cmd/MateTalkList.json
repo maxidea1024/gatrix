@@ -1,0 +1,593 @@
+{
+  ":MateTalkList": {
+    ":type": {
+      "id": "key",
+      "modeType": "number",
+      "talkColumn": "string"
+    },
+    ":required": {
+      "modeType": 1,
+      "talkColumn": 1
+    },
+    ":min": {
+      "modeType": 1
+    },
+    ":max": {
+      "modeType": 6
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "MateTalkList": {
+    "17600000": {
+      "id": 17600000,
+      "modeType": 3,
+      "talkColumn": "recruitDialBasic"
+    },
+    "17600001": {
+      "id": 17600001,
+      "modeType": 1,
+      "talkColumn": "admiralAddress"
+    },
+    "17600002": {
+      "id": 17600002,
+      "modeType": 3,
+      "talkColumn": "recruitDialFail"
+    },
+    "17600004": {
+      "id": 17600004,
+      "modeType": 3,
+      "talkColumn": "insuranceNotice"
+    },
+    "17600007": {
+      "id": 17600007,
+      "modeType": 4,
+      "talkColumn": "battleStartNormalDefense"
+    },
+    "17600008": {
+      "id": 17600008,
+      "modeType": 4,
+      "talkColumn": "battleStartNormalAttack"
+    },
+    "17600015": {
+      "id": 17600015,
+      "modeType": 4,
+      "talkColumn": "battleWin"
+    },
+    "17600017": {
+      "id": 17600017,
+      "modeType": 3,
+      "talkColumn": "recruitDialDrink"
+    },
+    "17600018": {
+      "id": 17600018,
+      "modeType": 3,
+      "talkColumn": "recruitGiftGood"
+    },
+    "17600019": {
+      "id": 17600019,
+      "modeType": 3,
+      "talkColumn": "recruitGiftBad"
+    },
+    "17600021": {
+      "id": 17600021,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice1"
+    },
+    "17600022": {
+      "id": 17600022,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice2"
+    },
+    "17600023": {
+      "id": 17600023,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice3"
+    },
+    "17600024": {
+      "id": 17600024,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice4"
+    },
+    "17600025": {
+      "id": 17600025,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice5"
+    },
+    "17600026": {
+      "id": 17600026,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice6"
+    },
+    "17600027": {
+      "id": 17600027,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice7"
+    },
+    "17600028": {
+      "id": 17600028,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice8"
+    },
+    "17600029": {
+      "id": 17600029,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice9"
+    },
+    "17600030": {
+      "id": 17600030,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice10"
+    },
+    "17600031": {
+      "id": 17600031,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice11"
+    },
+    "17600032": {
+      "id": 17600032,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice12"
+    },
+    "17600033": {
+      "id": 17600033,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice13"
+    },
+    "17600034": {
+      "id": 17600034,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice14"
+    },
+    "17600035": {
+      "id": 17600035,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice15"
+    },
+    "17600036": {
+      "id": 17600036,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice16"
+    },
+    "17600037": {
+      "id": 17600037,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice17"
+    },
+    "17600038": {
+      "id": 17600038,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice18"
+    },
+    "17600039": {
+      "id": 17600039,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice19"
+    },
+    "17600040": {
+      "id": 17600040,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice20"
+    },
+    "17600041": {
+      "id": 17600041,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice21"
+    },
+    "17600042": {
+      "id": 17600042,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice22"
+    },
+    "17600043": {
+      "id": 17600043,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice23"
+    },
+    "17600044": {
+      "id": 17600044,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice24"
+    },
+    "17600045": {
+      "id": 17600045,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice25"
+    },
+    "17600046": {
+      "id": 17600046,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice26"
+    },
+    "17600047": {
+      "id": 17600047,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice27"
+    },
+    "17600048": {
+      "id": 17600048,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice28"
+    },
+    "17600049": {
+      "id": 17600049,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice29"
+    },
+    "17600050": {
+      "id": 17600050,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice30"
+    },
+    "17600051": {
+      "id": 17600051,
+      "modeType": 2,
+      "talkColumn": "oceanDisasterNotice31"
+    },
+    "17600052": {
+      "id": 17600052,
+      "modeType": 3,
+      "talkColumn": "MateTalk"
+    },
+    "17600053": {
+      "id": 17600053,
+      "modeType": 3,
+      "talkColumn": "MateReward"
+    },
+    "17600054": {
+      "id": 17600054,
+      "modeType": 3,
+      "talkColumn": "MateRecovery"
+    },
+    "17600055": {
+      "id": 17600055,
+      "modeType": 1,
+      "talkColumn": "employSpeech"
+    },
+    "17600056": {
+      "id": 17600056,
+      "modeType": 3,
+      "talkColumn": "tradeEventNoticeCommon"
+    },
+    "17600057": {
+      "id": 17600057,
+      "modeType": 3,
+      "talkColumn": "tradeEventNoticeLoadup"
+    },
+    "17600058": {
+      "id": 17600058,
+      "modeType": 3,
+      "talkColumn": "buyBargainingStart"
+    },
+    "17600059": {
+      "id": 17600059,
+      "modeType": 3,
+      "talkColumn": "sellBargainingStart"
+    },
+    "17600060": {
+      "id": 17600060,
+      "modeType": 3,
+      "talkColumn": "BargainingProgress"
+    },
+    "17600061": {
+      "id": 17600061,
+      "modeType": 3,
+      "talkColumn": "BargainingLastProgress"
+    },
+    "17600066": {
+      "id": 17600066,
+      "modeType": 1,
+      "talkColumn": "levelUpDiaMsg"
+    },
+    "17600067": {
+      "id": 17600067,
+      "modeType": 2,
+      "talkColumn": "quickSupply"
+    },
+    "17600071": {
+      "id": 17600071,
+      "modeType": 4,
+      "talkColumn": "cannonCaster"
+    },
+    "17600073": {
+      "id": 17600073,
+      "modeType": 4,
+      "talkColumn": "cannonCriticalCaster"
+    },
+    "17600075": {
+      "id": 17600075,
+      "modeType": 4,
+      "talkColumn": "cannonAvoidTarget"
+    },
+    "17600076": {
+      "id": 17600076,
+      "modeType": 4,
+      "talkColumn": "cannonCriticalTarget"
+    },
+    "17600077": {
+      "id": 17600077,
+      "modeType": 4,
+      "talkColumn": "duelAttackerAttack"
+    },
+    "17600079": {
+      "id": 17600079,
+      "modeType": 4,
+      "talkColumn": "duelTargetDefense"
+    },
+    "17600080": {
+      "id": 17600080,
+      "modeType": 4,
+      "talkColumn": "duelTargetDamage"
+    },
+    "17600081": {
+      "id": 17600081,
+      "modeType": 4,
+      "talkColumn": "duelWin"
+    },
+    "17600085": {
+      "id": 17600085,
+      "modeType": 4,
+      "talkColumn": "repairTarget"
+    },
+    "17600087": {
+      "id": 17600087,
+      "modeType": 4,
+      "talkColumn": "healTarget"
+    },
+    "17600088": {
+      "id": 17600088,
+      "modeType": 4,
+      "talkColumn": "jointAttackNormal"
+    },
+    "17600090": {
+      "id": 17600090,
+      "modeType": 4,
+      "talkColumn": "dead"
+    },
+    "17600091": {
+      "id": 17600091,
+      "modeType": 4,
+      "talkColumn": "unitTriggerPositive"
+    },
+    "17600092": {
+      "id": 17600092,
+      "modeType": 4,
+      "talkColumn": "unitTriggerNegative"
+    },
+    "17600093": {
+      "id": 17600093,
+      "modeType": 4,
+      "talkColumn": "warning"
+    },
+    "17600094": {
+      "id": 17600094,
+      "modeType": 4,
+      "talkColumn": "addBuff"
+    },
+    "17600095": {
+      "id": 17600095,
+      "modeType": 4,
+      "talkColumn": "addDebuff"
+    },
+    "17600096": {
+      "id": 17600096,
+      "modeType": 4,
+      "talkColumn": "clearBuff"
+    },
+    "17600097": {
+      "id": 17600097,
+      "modeType": 4,
+      "talkColumn": "clearDebuff"
+    },
+    "17600103": {
+      "id": 17600103,
+      "modeType": 5,
+      "talkColumn": "LandingComplete"
+    },
+    "17600105": {
+      "id": 17600105,
+      "modeType": 5,
+      "talkColumn": "DiscoverySuccess"
+    },
+    "17600106": {
+      "id": 17600106,
+      "modeType": 5,
+      "talkColumn": "DiscoveryFail"
+    },
+    "17600108": {
+      "id": 17600108,
+      "modeType": 1,
+      "talkColumn": "duelStart"
+    },
+    "17600109": {
+      "id": 17600109,
+      "modeType": 2,
+      "talkColumn": "NewTownDiscovery"
+    },
+    "17600110": {
+      "id": 17600110,
+      "modeType": 1,
+      "talkColumn": "kickEventRunBattle"
+    },
+    "17600111": {
+      "id": 17600111,
+      "modeType": 1,
+      "talkColumn": "promotionDiaMsg"
+    },
+    "17600112": {
+      "id": 17600112,
+      "modeType": 6,
+      "talkColumn": "commonStart"
+    },
+    "17600113": {
+      "id": 17600113,
+      "modeType": 6,
+      "talkColumn": "koikoiStart"
+    },
+    "17600114": {
+      "id": 17600114,
+      "modeType": 6,
+      "talkColumn": "holdumStart"
+    },
+    "17600115": {
+      "id": 17600115,
+      "modeType": 6,
+      "talkColumn": "diceStart"
+    },
+    "17600116": {
+      "id": 17600116,
+      "modeType": 6,
+      "talkColumn": "dartStart"
+    },
+    "17600117": {
+      "id": 17600117,
+      "modeType": 6,
+      "talkColumn": "blackjackStart"
+    },
+    "17600118": {
+      "id": 17600118,
+      "modeType": 6,
+      "talkColumn": "commonWin"
+    },
+    "17600119": {
+      "id": 17600119,
+      "modeType": 6,
+      "talkColumn": "commonLose"
+    },
+    "17600120": {
+      "id": 17600120,
+      "modeType": 6,
+      "talkColumn": "commonDraw"
+    },
+    "17600121": {
+      "id": 17600121,
+      "modeType": 2,
+      "talkColumn": "EncounterATK"
+    },
+    "17600122": {
+      "id": 17600122,
+      "modeType": 2,
+      "talkColumn": "EncounterDEF"
+    },
+    "17600124": {
+      "id": 17600124,
+      "modeType": 2,
+      "talkColumn": "RunAttempt"
+    },
+    "17600125": {
+      "id": 17600125,
+      "modeType": 2,
+      "talkColumn": "SurrenderAttempt"
+    },
+    "17600126": {
+      "id": 17600126,
+      "modeType": 2,
+      "talkColumn": "SurrenderDonation"
+    },
+    "17600127": {
+      "id": 17600127,
+      "modeType": 2,
+      "talkColumn": "NegotiationAttempt"
+    },
+    "17600128": {
+      "id": 17600128,
+      "modeType": 2,
+      "talkColumn": "GoBattle"
+    },
+    "17600129": {
+      "id": 17600129,
+      "modeType": 2,
+      "talkColumn": "RunSuccess"
+    },
+    "17600130": {
+      "id": 17600130,
+      "modeType": 2,
+      "talkColumn": "RunFail"
+    },
+    "17600131": {
+      "id": 17600131,
+      "modeType": 2,
+      "talkColumn": "NotChase"
+    },
+    "17600132": {
+      "id": 17600132,
+      "modeType": 2,
+      "talkColumn": "SurrenderSuccess"
+    },
+    "17600133": {
+      "id": 17600133,
+      "modeType": 2,
+      "talkColumn": "SurrenderDeny"
+    },
+    "17600134": {
+      "id": 17600134,
+      "modeType": 2,
+      "talkColumn": "NegotiationSuccess"
+    },
+    "17600135": {
+      "id": 17600135,
+      "modeType": 2,
+      "talkColumn": "NegotiationDeny"
+    },
+    "17600137": {
+      "id": 17600137,
+      "modeType": 5,
+      "talkColumn": "clueOceanDoodadCave"
+    },
+    "17600138": {
+      "id": 17600138,
+      "modeType": 5,
+      "talkColumn": "clueOceanDoodadLandmark"
+    },
+    "17600139": {
+      "id": 17600139,
+      "modeType": 5,
+      "talkColumn": "clueOceanDoodadBluehole"
+    },
+    "17600140": {
+      "id": 17600140,
+      "modeType": 5,
+      "talkColumn": "clueOceanDoodadGlacial"
+    },
+    "17600141": {
+      "id": 17600141,
+      "modeType": 5,
+      "talkColumn": "clueOceanDoodadMountain"
+    },
+    "17600142": {
+      "id": 17600142,
+      "modeType": 5,
+      "talkColumn": "clueOceanDoodadDelta"
+    },
+    "17600143": {
+      "id": 17600143,
+      "modeType": 5,
+      "talkColumn": "clueOceanDoodadWaterfall"
+    },
+    "17600144": {
+      "id": 17600144,
+      "modeType": 5,
+      "talkColumn": "clueOceanDoodadBeach"
+    },
+    "17600145": {
+      "id": 17600145,
+      "modeType": 5,
+      "talkColumn": "clueOceanDoodadConstellation"
+    },
+    "17600146": {
+      "id": 17600146,
+      "modeType": 5,
+      "talkColumn": "clueOceanDoodadConstellationClueWreck"
+    },
+    "17600147": {
+      "id": 17600147,
+      "modeType": 5,
+      "talkColumn": "clueOceanDoodadConstellationClueLightHouse"
+    },
+    "17600148": {
+      "id": 17600148,
+      "modeType": 1,
+      "talkColumn": "promotionDiaMsg"
+    }
+  }
+}

@@ -1,0 +1,1397 @@
+{
+  ":BattleMapObject": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "blueprint": "string",
+      "icon": "string",
+      "tileId": "number",
+      "activationTiming": "number",
+      "aiScore": "number",
+      "radius": "number",
+      "activeEffects": [
+        {
+          "Id": "number",
+          "Val1": "number",
+          "Val2": "number"
+        },
+        {
+          "Id": "number",
+          "Val1": "number",
+          "Val2": "number"
+        },
+        {
+          "Id": "number",
+          "Val1": "number",
+          "Val2": "number"
+        }
+      ],
+      "passives": [
+        {
+          "Id": "number"
+        },
+        {
+          "Id": "number"
+        }
+      ],
+      "rewards": [
+        {
+          "BattleContentsTermsListId": "number",
+          "RewardFixedId": "number"
+        },
+        {
+          "BattleContentsTermsListId": "number",
+          "RewardFixedId": "number"
+        },
+        {
+          "BattleContentsTermsListId": "number",
+          "RewardFixedId": "number"
+        },
+        {
+          "BattleContentsTermsListId": "number",
+          "RewardFixedId": "number"
+        },
+        {
+          "BattleContentsTermsListId": "number",
+          "RewardFixedId": "number"
+        },
+        {
+          "BattleContentsTermsListId": "number",
+          "RewardFixedId": "number"
+        },
+        {
+          "BattleContentsTermsListId": "number",
+          "RewardFixedId": "number"
+        },
+        {
+          "BattleContentsTermsListId": "number",
+          "RewardFixedId": "number"
+        },
+        {
+          "BattleContentsTermsListId": "number",
+          "RewardFixedId": "number"
+        },
+        {
+          "BattleContentsTermsListId": "number",
+          "RewardFixedId": "number"
+        },
+        {
+          "BattleContentsTermsListId": "number",
+          "RewardFixedId": "number"
+        },
+        {
+          "BattleContentsTermsListId": "number",
+          "RewardFixedId": "number"
+        },
+        {
+          "BattleContentsTermsListId": "number",
+          "RewardFixedId": "number"
+        },
+        {
+          "BattleContentsTermsListId": "number",
+          "RewardFixedId": "number"
+        },
+        {
+          "BattleContentsTermsListId": "number",
+          "RewardFixedId": "number"
+        }
+      ],
+      "isLinked": "bool",
+      "obstacleType": "number",
+      "totalObjectCheck": "bool"
+    },
+    ":required": {
+      "name": 1,
+      "activationTiming": 1,
+      "aiScore": 1,
+      "radius": 1,
+      "isLinked": 1,
+      "obstacleType": 1,
+      "totalObjectCheck": 1
+    },
+    ":requiredInObject": {
+      "passives": [
+        {
+          "Id": 1
+        },
+        {
+          "Id": 1
+        }
+      ],
+      "rewards": [
+        {
+          "BattleContentsTermsListId": 1
+        }
+      ]
+    },
+    ":min": {
+      "tileId": 60000000,
+      "activationTiming": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000000
+        },
+        {
+          "Id": 66000000
+        },
+        {
+          "Id": 66000000
+        }
+      ],
+      "passives": [
+        {
+          "Id": 67000000
+        },
+        {
+          "Id": 67000000
+        }
+      ],
+      "rewards": [
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 94000000
+        },
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 94000000
+        },
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 94000000
+        },
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 94000000
+        },
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 94000000
+        },
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 94000000
+        },
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 94000000
+        },
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 94000000
+        },
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 94000000
+        },
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 94000000
+        },
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 94000000
+        },
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 94000000
+        },
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 94000000
+        },
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 94000000
+        },
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 94000000
+        }
+      ],
+      "obstacleType": 0
+    },
+    ":max": {
+      "tileId": 60099999,
+      "activationTiming": 2,
+      "radius": 2,
+      "activeEffects": [
+        {
+          "Id": 66999999
+        },
+        {
+          "Id": 66999999
+        },
+        {
+          "Id": 66999999
+        }
+      ],
+      "passives": [
+        {
+          "Id": 67499999
+        },
+        {
+          "Id": 67499999
+        }
+      ],
+      "rewards": [
+        {
+          "BattleContentsTermsListId": 69499999,
+          "RewardFixedId": 95999999
+        },
+        {
+          "BattleContentsTermsListId": 69499999,
+          "RewardFixedId": 95999999
+        },
+        {
+          "BattleContentsTermsListId": 69499999,
+          "RewardFixedId": 95999999
+        },
+        {
+          "BattleContentsTermsListId": 69499999,
+          "RewardFixedId": 95999999
+        },
+        {
+          "BattleContentsTermsListId": 69499999,
+          "RewardFixedId": 95999999
+        },
+        {
+          "BattleContentsTermsListId": 69499999,
+          "RewardFixedId": 95999999
+        },
+        {
+          "BattleContentsTermsListId": 69499999,
+          "RewardFixedId": 95999999
+        },
+        {
+          "BattleContentsTermsListId": 69499999,
+          "RewardFixedId": 95999999
+        },
+        {
+          "BattleContentsTermsListId": 69499999,
+          "RewardFixedId": 95999999
+        },
+        {
+          "BattleContentsTermsListId": 69499999,
+          "RewardFixedId": 95999999
+        },
+        {
+          "BattleContentsTermsListId": 69499999,
+          "RewardFixedId": 95999999
+        },
+        {
+          "BattleContentsTermsListId": 69499999,
+          "RewardFixedId": 95999999
+        },
+        {
+          "BattleContentsTermsListId": 69499999,
+          "RewardFixedId": 95999999
+        },
+        {
+          "BattleContentsTermsListId": 69499999,
+          "RewardFixedId": 95999999
+        },
+        {
+          "BattleContentsTermsListId": 69499999,
+          "RewardFixedId": 95999999
+        }
+      ],
+      "obstacleType": 3
+    },
+    ":enum": {},
+    ":links": {
+      "tileId": [
+        "BattleTile"
+      ],
+      "activeEffects": [
+        {
+          "Id": [
+            "BattleActiveEffect"
+          ]
+        },
+        {
+          "Id": [
+            "BattleActiveEffect"
+          ]
+        },
+        {
+          "Id": [
+            "BattleActiveEffect"
+          ]
+        }
+      ],
+      "passives": [
+        {
+          "Id": [
+            "BattlePassive"
+          ]
+        },
+        {
+          "Id": [
+            "BattlePassive"
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "BattleContentsTermsListId": [
+            "BattleContentsTermsList"
+          ],
+          "RewardFixedId": [
+            "RewardFixed"
+          ]
+        },
+        {
+          "BattleContentsTermsListId": [
+            "BattleContentsTermsList"
+          ],
+          "RewardFixedId": [
+            "RewardFixed"
+          ]
+        },
+        {
+          "BattleContentsTermsListId": [
+            "BattleContentsTermsList"
+          ],
+          "RewardFixedId": [
+            "RewardFixed"
+          ]
+        },
+        {
+          "BattleContentsTermsListId": [
+            "BattleContentsTermsList"
+          ],
+          "RewardFixedId": [
+            "RewardFixed"
+          ]
+        },
+        {
+          "BattleContentsTermsListId": [
+            "BattleContentsTermsList"
+          ],
+          "RewardFixedId": [
+            "RewardFixed"
+          ]
+        },
+        {
+          "BattleContentsTermsListId": [
+            "BattleContentsTermsList"
+          ],
+          "RewardFixedId": [
+            "RewardFixed"
+          ]
+        },
+        {
+          "BattleContentsTermsListId": [
+            "BattleContentsTermsList"
+          ],
+          "RewardFixedId": [
+            "RewardFixed"
+          ]
+        },
+        {
+          "BattleContentsTermsListId": [
+            "BattleContentsTermsList"
+          ],
+          "RewardFixedId": [
+            "RewardFixed"
+          ]
+        },
+        {
+          "BattleContentsTermsListId": [
+            "BattleContentsTermsList"
+          ],
+          "RewardFixedId": [
+            "RewardFixed"
+          ]
+        },
+        {
+          "BattleContentsTermsListId": [
+            "BattleContentsTermsList"
+          ],
+          "RewardFixedId": [
+            "RewardFixed"
+          ]
+        },
+        {
+          "BattleContentsTermsListId": [
+            "BattleContentsTermsList"
+          ],
+          "RewardFixedId": [
+            "RewardFixed"
+          ]
+        },
+        {
+          "BattleContentsTermsListId": [
+            "BattleContentsTermsList"
+          ],
+          "RewardFixedId": [
+            "RewardFixed"
+          ]
+        },
+        {
+          "BattleContentsTermsListId": [
+            "BattleContentsTermsList"
+          ],
+          "RewardFixedId": [
+            "RewardFixed"
+          ]
+        },
+        {
+          "BattleContentsTermsListId": [
+            "BattleContentsTermsList"
+          ],
+          "RewardFixedId": [
+            "RewardFixed"
+          ]
+        },
+        {
+          "BattleContentsTermsListId": [
+            "BattleContentsTermsList"
+          ],
+          "RewardFixedId": [
+            "RewardFixed"
+          ]
+        }
+      ]
+    },
+    ":asset": {
+      "blueprint": 1,
+      "icon": 1
+    }
+  },
+  "BattleMapObject": {
+    "60200000": {
+      "id": 60200000,
+      "name": "부유물",
+      "blueprint": "BP_BMO_FloatingObject_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000004,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000007,
+          "Val1": 100
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200001": {
+      "id": 60200001,
+      "name": "부유물",
+      "blueprint": "BP_BMO_FloatingObject_02",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000004,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000011,
+          "Val1": 3,
+          "Val2": 10
+        },
+        {
+          "Id": 66000011,
+          "Val1": 4,
+          "Val2": 10
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200002": {
+      "id": 60200002,
+      "name": "부유물 (통)",
+      "blueprint": "BP_BMO_FloatingBarrel_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000004,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000011,
+          "Val1": 1,
+          "Val2": 10
+        },
+        {
+          "Id": 66000011,
+          "Val1": 2,
+          "Val2": 10
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200003": {
+      "id": 60200003,
+      "name": "부유물 (선원)",
+      "blueprint": "BP_BMO_FloatingMan_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000004,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000009,
+          "Val1": 100
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200004": {
+      "id": 60200004,
+      "name": "빈 병",
+      "blueprint": "BP_BMO_FloatingObject_bottle",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000004,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200005": {
+      "id": 60200005,
+      "name": "난파선",
+      "blueprint": "BP_BMO_Wreck_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000005,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": false,
+      "obstacleType": 1,
+      "totalObjectCheck": false
+    },
+    "60200006": {
+      "id": 60200006,
+      "name": "바위섬",
+      "blueprint": "BP_BMO_Stone_Island_4M_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000006,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": true,
+      "obstacleType": 2,
+      "totalObjectCheck": false
+    },
+    "60200007": {
+      "id": 60200007,
+      "name": "해초",
+      "blueprint": "BP_BMO_Seaweed_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000008,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65551027,
+          "Val2": 1000
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200008": {
+      "id": 60200008,
+      "name": "불",
+      "blueprint": "BP_BMO_Fire_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000010,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000003,
+          "Val1": 100
+        },
+        {
+          "Id": 66000005,
+          "Val1": 100
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200009": {
+      "id": 60200009,
+      "name": "소용돌이",
+      "blueprint": "BP_BMO_Vortex_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000013,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000003,
+          "Val1": 250
+        },
+        {
+          "Id": 66000005,
+          "Val1": 250
+        },
+        {
+          "Id": 66000018,
+          "Val1": 65551026,
+          "Val2": 1000
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200010": {
+      "id": 60200010,
+      "name": "암초",
+      "blueprint": "BP_BMO_SunkenRock_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000015,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": false,
+      "obstacleType": 1,
+      "totalObjectCheck": false
+    },
+    "60200011": {
+      "id": 60200011,
+      "name": "해빙",
+      "blueprint": "BP_BMO_Driftice_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000009,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65551023,
+          "Val2": 1000
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200012": {
+      "id": 60200012,
+      "name": "빙산",
+      "blueprint": "BP_BMO_Iceberg_4M_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000007,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": false,
+      "obstacleType": 2,
+      "totalObjectCheck": false
+    },
+    "60200013": {
+      "id": 60200013,
+      "name": "기뢰",
+      "blueprint": "BP_BMO_Mine_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000022,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000003,
+          "Val1": 150
+        },
+        {
+          "Id": 66000005,
+          "Val1": 150
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200014": {
+      "id": 60200014,
+      "name": "바위섬",
+      "blueprint": "BP_BMO_Stone_Island_2M_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000006,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": true,
+      "obstacleType": 2,
+      "totalObjectCheck": false
+    },
+    "60200015": {
+      "id": 60200015,
+      "name": "바위섬",
+      "blueprint": "BP_BMO_Stone_Island_3M_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000006,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": true,
+      "obstacleType": 2,
+      "totalObjectCheck": false
+    },
+    "60200016": {
+      "id": 60200016,
+      "name": "바위섬",
+      "blueprint": "BP_BMO_Stone_Island_4M_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000006,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": true,
+      "obstacleType": 2,
+      "totalObjectCheck": false
+    },
+    "60200017": {
+      "id": 60200017,
+      "name": "빙산",
+      "blueprint": "BP_BMO_Iceberg_2M_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000007,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": false,
+      "obstacleType": 2,
+      "totalObjectCheck": false
+    },
+    "60200018": {
+      "id": 60200018,
+      "name": "빙산",
+      "blueprint": "BP_BMO_Iceberg_3M_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000007,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": false,
+      "obstacleType": 2,
+      "totalObjectCheck": false
+    },
+    "60200019": {
+      "id": 60200019,
+      "name": "빙산",
+      "blueprint": "BP_BMO_Iceberg_4M_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000007,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": false,
+      "obstacleType": 2,
+      "totalObjectCheck": false
+    },
+    "60200020": {
+      "id": 60200020,
+      "name": "바위섬",
+      "blueprint": "BP_BMO_Stone_Island_2M_07",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000006,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 1,
+      "isLinked": true,
+      "obstacleType": 2,
+      "totalObjectCheck": false
+    },
+    "60200021": {
+      "id": 60200021,
+      "name": "바위섬",
+      "blueprint": "BP_BMO_Stone_Island_3M_07",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000006,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 1,
+      "isLinked": true,
+      "obstacleType": 2,
+      "totalObjectCheck": false
+    },
+    "60200022": {
+      "id": 60200022,
+      "name": "바위섬",
+      "blueprint": "BP_BMO_Stone_Island_4M_07",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000006,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 1,
+      "isLinked": true,
+      "obstacleType": 2,
+      "totalObjectCheck": false
+    },
+    "60200023": {
+      "id": 60200023,
+      "name": "빙산",
+      "blueprint": "BP_BMO_Iceberg_2M_07",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000007,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 1,
+      "isLinked": true,
+      "obstacleType": 2,
+      "totalObjectCheck": false
+    },
+    "60200024": {
+      "id": 60200024,
+      "name": "빙산",
+      "blueprint": "BP_BMO_Iceberg_3M_07",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000007,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 1,
+      "isLinked": true,
+      "obstacleType": 2,
+      "totalObjectCheck": false
+    },
+    "60200025": {
+      "id": 60200025,
+      "name": "빙산",
+      "blueprint": "BP_BMO_Iceberg_4M_07",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000007,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 1,
+      "isLinked": true,
+      "obstacleType": 2,
+      "totalObjectCheck": false
+    },
+    "60200099": {
+      "id": 60200099,
+      "name": "도주로",
+      "blueprint": "BP_BMO_Escape_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000998,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200030": {
+      "id": 60200030,
+      "name": "보물 상자(흔한)",
+      "blueprint": "BP_BMO_TreasureChest_D",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000004,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "rewards": [
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 95997000
+        },
+        {
+          "BattleContentsTermsListId": 69440001,
+          "RewardFixedId": 95997000
+        },
+        {
+          "BattleContentsTermsListId": 69440002,
+          "RewardFixedId": 95997000
+        },
+        {
+          "BattleContentsTermsListId": 69440003,
+          "RewardFixedId": 95997000
+        },
+        {
+          "BattleContentsTermsListId": 69440004,
+          "RewardFixedId": 95997000
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200031": {
+      "id": 60200031,
+      "name": "보물 상자(하급)",
+      "blueprint": "BP_BMO_TreasureChest_C",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000004,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "rewards": [
+        {
+          "BattleContentsTermsListId": 69440000,
+          "RewardFixedId": 95997001
+        },
+        {
+          "BattleContentsTermsListId": 69440001,
+          "RewardFixedId": 95997001
+        },
+        {
+          "BattleContentsTermsListId": 69440002,
+          "RewardFixedId": 95997001
+        },
+        {
+          "BattleContentsTermsListId": 69440003,
+          "RewardFixedId": 95997001
+        },
+        {
+          "BattleContentsTermsListId": 69440004,
+          "RewardFixedId": 95997001
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200032": {
+      "id": 60200032,
+      "name": "보물 상자(중급)",
+      "blueprint": "BP_BMO_TreasureChest_B",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000004,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "rewards": [
+        {
+          "BattleContentsTermsListId": 69440002,
+          "RewardFixedId": 95997002
+        },
+        {
+          "BattleContentsTermsListId": 69440003,
+          "RewardFixedId": 95997002
+        },
+        {
+          "BattleContentsTermsListId": 69440004,
+          "RewardFixedId": 95997002
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200033": {
+      "id": 60200033,
+      "name": "보물 상자(고급)",
+      "blueprint": "BP_BMO_TreasureChest_A",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000004,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "rewards": [
+        {
+          "BattleContentsTermsListId": 69440003,
+          "RewardFixedId": 95997003
+        },
+        {
+          "BattleContentsTermsListId": 69440004,
+          "RewardFixedId": 95997003
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200034": {
+      "id": 60200034,
+      "name": "보물 상자(희귀)",
+      "blueprint": "BP_BMO_TreasureChest_S",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000004,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "rewards": [
+        {
+          "BattleContentsTermsListId": 69440003,
+          "RewardFixedId": 95997004
+        },
+        {
+          "BattleContentsTermsListId": 69440004,
+          "RewardFixedId": 95997004
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200035": {
+      "id": 60200035,
+      "name": "축복의 석상 잔해",
+      "blueprint": "BP_BMO_blessedTotem_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000004,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65990015,
+          "Val2": 1000
+        },
+        {
+          "Id": 66000019,
+          "Val1": 65990014,
+          "Val2": 1000
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200036": {
+      "id": 60200036,
+      "name": "저주의 석상 잔해",
+      "blueprint": "BP_BMO_cursedTotem_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000024,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65990016,
+          "Val2": 1000
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200037": {
+      "id": 60200037,
+      "name": "가라앉은 대포",
+      "blueprint": "BP_BMO_sunkenCannon_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000004,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65990017,
+          "Val2": 1000
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200038": {
+      "id": 60200038,
+      "name": "방패 더미",
+      "blueprint": "BP_BMO_piledShield_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000004,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65990018,
+          "Val2": 1000
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200039": {
+      "id": 60200039,
+      "name": "독안개",
+      "blueprint": "BP_BMO_PoisonFog",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000025,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65990121,
+          "Val2": 1000
+        }
+      ],
+      "isLinked": true,
+      "obstacleType": 1,
+      "totalObjectCheck": false
+    },
+    "60200040": {
+      "id": 60200040,
+      "name": "불(상태이상 부여)",
+      "blueprint": "BP_BMO_Fire_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000022,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000003,
+          "Val1": 100
+        },
+        {
+          "Id": 66000005,
+          "Val1": 100
+        },
+        {
+          "Id": 66000018,
+          "Val1": 65551021,
+          "Val2": 1000
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200041": {
+      "id": 60200041,
+      "name": "안개",
+      "blueprint": "BP_BMO_Smoke",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000026,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65990145,
+          "Val2": 1000
+        }
+      ],
+      "isLinked": true,
+      "obstacleType": 1,
+      "totalObjectCheck": false
+    },
+    "60200042": {
+      "id": 60200042,
+      "name": "기뢰",
+      "blueprint": "BP_BMO_SeaMine_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000022,
+      "activationTiming": 2,
+      "aiScore": -100,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65990155,
+          "Val2": 1000
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": true
+    },
+    "60200043": {
+      "id": 60200043,
+      "name": "바위섬_포격불가",
+      "blueprint": "BP_BMO_Stone_Island_4M_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000006,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": true,
+      "obstacleType": 3,
+      "totalObjectCheck": false
+    },
+    "60200044": {
+      "id": 60200044,
+      "name": "기뢰",
+      "blueprint": "BP_BMO_SeaMine_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000022,
+      "activationTiming": 2,
+      "aiScore": -100,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000003,
+          "Val1": 300,
+          "Val2": 9999
+        },
+        {
+          "Id": 66000005,
+          "Val1": 300,
+          "Val2": 9999
+        },
+        {
+          "Id": 66000018,
+          "Val1": 65551021,
+          "Val2": 1000
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": true
+    },
+    "60200045": {
+      "id": 60200045,
+      "name": "해초_충파맵 전용",
+      "blueprint": "BP_BMO_Seaweed_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000030,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": false,
+      "obstacleType": 3,
+      "totalObjectCheck": false
+    },
+    "60200046": {
+      "id": 60200046,
+      "name": "포격선 이동증가",
+      "blueprint": "BP_BMO_SpeedUp_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000031,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200047": {
+      "id": 60200047,
+      "name": "백병선 이동증가",
+      "blueprint": "BP_BMO_SpeedUp_02",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000032,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200048": {
+      "id": 60200048,
+      "name": "충파선 이동증가",
+      "blueprint": "BP_BMO_SpeedUp_03",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000033,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200049": {
+      "id": 60200049,
+      "name": "떠다니는 대포",
+      "blueprint": "BP_BMO_sunkenCannon_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000034,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "passives": [
+        {
+          "Id": 67490012
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200050": {
+      "id": 60200050,
+      "name": "백병-충파 이동감소 수풀",
+      "blueprint": "BP_BMO_Seaweed_01",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000035,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": false,
+      "obstacleType": 3,
+      "totalObjectCheck": false
+    },
+    "60200051": {
+      "id": 60200051,
+      "name": "안개",
+      "blueprint": "BP_BMO_Smoke",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000036,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "passives": [
+        {
+          "Id": 67490013
+        },
+        {
+          "Id": 67490014
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200052": {
+      "id": 60200052,
+      "name": "보물상자",
+      "blueprint": "BP_BMO_TreasureChest_A",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000004,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "activeEffects": [
+        {
+          "Id": 66000018,
+          "Val1": 65500026,
+          "Val2": 1000
+        }
+      ],
+      "isLinked": false,
+      "obstacleType": 0,
+      "totalObjectCheck": false
+    },
+    "60200053": {
+      "id": 60200053,
+      "name": "포격 및 백병 이동 제한 연막",
+      "blueprint": "BP_BMO_Smoke",
+      "icon": "DummyIcon_Sprite",
+      "tileId": 60000004,
+      "activationTiming": 1,
+      "aiScore": 0,
+      "radius": 0,
+      "isLinked": false,
+      "obstacleType": 3,
+      "totalObjectCheck": false
+    }
+  }
+}

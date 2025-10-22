@@ -1,0 +1,67 @@
+{
+  ":ChannelState": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "isAutoJoin": "bool",
+      "isManualJoin": "bool",
+      "minUserRate": "number",
+      "maxUserRate": "number",
+      "stateColor": "string"
+    },
+    ":required": {
+      "name": 1,
+      "isAutoJoin": 1,
+      "isManualJoin": 1,
+      "stateColor": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "ChannelState": {
+    "1": {
+      "id": 1,
+      "name": "쾌적",
+      "isAutoJoin": true,
+      "isManualJoin": true,
+      "minUserRate": 0,
+      "maxUserRate": 300,
+      "stateColor": "00FF99"
+    },
+    "2": {
+      "id": 2,
+      "name": "원활",
+      "isAutoJoin": true,
+      "isManualJoin": true,
+      "minUserRate": 301,
+      "maxUserRate": 800,
+      "stateColor": "FFFF00"
+    },
+    "3": {
+      "id": 3,
+      "name": "혼잡",
+      "isAutoJoin": false,
+      "isManualJoin": true,
+      "minUserRate": 801,
+      "maxUserRate": 999,
+      "stateColor": "E26B0A"
+    },
+    "4": {
+      "id": 4,
+      "name": "포화",
+      "isAutoJoin": false,
+      "isManualJoin": false,
+      "minUserRate": 1000,
+      "stateColor": "FE0000"
+    },
+    "5": {
+      "id": 5,
+      "name": "점검",
+      "isAutoJoin": false,
+      "isManualJoin": false,
+      "stateColor": "808080"
+    }
+  }
+}

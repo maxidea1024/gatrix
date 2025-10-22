@@ -1,0 +1,1059 @@
+{
+  ":WorldSkill": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "desc": "text",
+      "descFormatTexts": [
+        "text",
+        "text",
+        "text",
+        "text"
+      ],
+      "jobType": "number",
+      "needEnergyValue": "number",
+      "worldSkillTargetMode": "number",
+      "coolTime": "number",
+      "actionType": "number",
+      "specialActionType": "number",
+      "worldbuffId": "number",
+      "randWorldbuffId": [
+        "number",
+        "number",
+        "number"
+      ],
+      "activeEffect": [
+        {
+          "Id": "number",
+          "Val": "number"
+        },
+        {
+          "Id": "number",
+          "Val": "number"
+        }
+      ],
+      "skillIcon": "string",
+      "skillFXScreen": "string",
+      "skillFXShip": "string"
+    },
+    ":required": {
+      "name": 1,
+      "jobType": 1,
+      "needEnergyValue": 1
+    },
+    ":requiredInObject": {
+      "worldSkillTargetMode": 1,
+      "activeEffect": [
+        {
+          "Id": 1
+        },
+        {
+          "Id": 1
+        }
+      ]
+    },
+    ":min": {
+      "worldbuffId": 38000000,
+      "randWorldbuffId": [
+        38000000,
+        38000000,
+        38000000
+      ],
+      "activeEffect": [
+        {
+          "Id": 75100000
+        },
+        {
+          "Id": 75100000
+        }
+      ]
+    },
+    ":max": {
+      "worldbuffId": 38099999,
+      "randWorldbuffId": [
+        38099999,
+        38099999,
+        38099999
+      ],
+      "activeEffect": [
+        {
+          "Id": 75199999
+        },
+        {
+          "Id": 75199999
+        }
+      ]
+    },
+    ":enum": {},
+    ":asset": {},
+    ":links": {
+      "worldbuffId": [
+        "WorldBuff"
+      ],
+      "randWorldbuffId": [
+        [
+          "WorldBuff"
+        ],
+        [
+          "WorldBuff"
+        ],
+        [
+          "WorldBuff"
+        ]
+      ],
+      "activeEffect": [
+        {
+          "Id": [
+            "WorldActiveEffect"
+          ]
+        },
+        {
+          "Id": [
+            "WorldActiveEffect"
+          ]
+        }
+      ]
+    }
+  },
+  "WorldSkill": {
+    "75000000": {
+      "id": 75000000,
+      "name": "돛 조종",
+      "desc": "{0}시간 동안 함대 속도가 {1}노트 증가합니다.",
+      "descFormatTexts": [
+        "1",
+        "2"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 3,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38020546,
+      "skillIcon": "icon_skill_adventureOrder_01_Sprite",
+      "skillFXShip": "SailingOrderOceanProvisionUp"
+    },
+    "75000020": {
+      "id": 75000020,
+      "name": "노 젓기",
+      "desc": "노 달린 선박 1대당 함대 속도가 {0}초 동안 {1}노트 증가합니다.",
+      "descFormatTexts": [
+        "30",
+        "2"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 3,
+      "coolTime": 300,
+      "actionType": 1,
+      "skillIcon": "icon_skill_adventureOrder_02_Sprite"
+    },
+    "75000040": {
+      "id": 75000040,
+      "name": "생존주의",
+      "desc": "함대의 물 보유량이 {0}, 식량 보유량이 {1} 증가합니다.(최대 적재량 초과 불가)",
+      "descFormatTexts": [
+        "50",
+        "50"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 5,
+      "worldSkillTargetMode": 3,
+      "coolTime": 3600,
+      "actionType": 1,
+      "activeEffect": [
+        {
+          "Id": 75111039,
+          "Val": 50
+        },
+        {
+          "Id": 75111040,
+          "Val": 50
+        }
+      ],
+      "skillIcon": "icon_skill_adventureOrder_03_Sprite",
+      "skillFXShip": "SailingOrderOceanProvisionUp"
+    },
+    "75000060": {
+      "id": 75000060,
+      "name": "인양부선",
+      "desc": "침몰한 선박의 내구도와 선원 수가 회복됩니다.",
+      "jobType": 1,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 3,
+      "coolTime": 60,
+      "actionType": 1,
+      "activeEffect": [
+        {
+          "Id": 75111033,
+          "Val": 1
+        }
+      ],
+      "skillIcon": "icon_skill_adventureOrder_04_Sprite"
+    },
+    "75000080": {
+      "id": 75000080,
+      "name": "함대 장악",
+      "desc": "{0}시간 동안 충성도 회복 효과와 충성도 감소 방지 효과가 적용됩니다.",
+      "descFormatTexts": [
+        "1"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 3,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38053000,
+      "activeEffect": [
+        {
+          "Id": 75111026,
+          "Val": 10
+        }
+      ],
+      "skillIcon": "icon_skill_adventureOrder_05_Sprite",
+      "skillFXShip": "SailingOrderFleetDominationSkill"
+    },
+    "75000100": {
+      "id": 75000100,
+      "name": "경계",
+      "desc": "{0}시간 동안 해전 보호 효과가 적용됩니다.",
+      "descFormatTexts": [
+        "1"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 3,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38053002,
+      "skillIcon": "icon_skill_adventureOrder_06_Sprite",
+      "skillFXShip": "SailingOrderOceanAlertBattle"
+    },
+    "75000120": {
+      "id": 75000120,
+      "name": "운용",
+      "desc": "{0}시간 동안 함대의 일일 물 소모량과 일일 식량 소모량이 {1}% 감소합니다.",
+      "descFormatTexts": [
+        "1",
+        "30"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 3,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38053003,
+      "skillIcon": "icon_skill_adventureOrder_07_Sprite",
+      "skillFXShip": "SailingOrderOceanDistribution"
+    },
+    "75000140": {
+      "id": 75000140,
+      "name": "재해 대책",
+      "desc": "모든 선박의 재해를 해소하고, {0}분 동안 재해 면역 효과가 적용됩니다.",
+      "descFormatTexts": [
+        "10"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 3,
+      "coolTime": 3600,
+      "actionType": 1,
+      "worldbuffId": 38053004,
+      "activeEffect": [
+        {
+          "Id": 75111028,
+          "Val": 1
+        }
+      ],
+      "skillIcon": "icon_skill_adventureOrder_08_Sprite",
+      "skillFXShip": "SailingOrderDisasterCountermeasures"
+    },
+    "75000160": {
+      "id": 75000160,
+      "name": "기우제",
+      "desc": "현재 위치한 해역의 날씨가 무작위로 변경됩니다.",
+      "jobType": 1,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 3,
+      "coolTime": 60,
+      "actionType": 1,
+      "activeEffect": [
+        {
+          "Id": 75111034,
+          "Val": 1
+        }
+      ],
+      "skillIcon": "icon_skill_adventureOrder_09_Sprite"
+    },
+    "75000180": {
+      "id": 75000180,
+      "name": "응급처치",
+      "desc": "함대 내 모든 항해사의 부상이 즉시 회복되고, {0}시간 동안 부상 방지 효과가 적용됩니다.",
+      "descFormatTexts": [
+        "1"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 5,
+      "worldSkillTargetMode": 3,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38053001,
+      "activeEffect": [
+        {
+          "Id": 75111038,
+          "Val": 1
+        }
+      ],
+      "skillIcon": "icon_skill_adventureOrder_10_Sprite",
+      "skillFXShip": "SailingOrderOceanEmergencyCare"
+    },
+    "75000200": {
+      "id": 75000200,
+      "name": "연금술",
+      "desc": "함대의 교역품을 소모하여, 새로운 교역품을 획득합니다.",
+      "jobType": 1,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 3,
+      "coolTime": 60,
+      "actionType": 1,
+      "activeEffect": [
+        {
+          "Id": 75111035,
+          "Val": 1
+        }
+      ],
+      "skillIcon": "icon_skill_adventureOrder_11_Sprite"
+    },
+    "75000220": {
+      "id": 75000220,
+      "name": "카모플라쥬",
+      "desc": "기함의 외형을 변경합니다.",
+      "jobType": 1,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 3,
+      "coolTime": 60,
+      "actionType": 1,
+      "activeEffect": [
+        {
+          "Id": 75111036,
+          "Val": 1
+        }
+      ],
+      "skillIcon": "icon_skill_adventureOrder_12_Sprite"
+    },
+    "75000240": {
+      "id": 75000240,
+      "name": "긴급귀환",
+      "desc": "자국의 본거지로 이동합니다.",
+      "jobType": 1,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 3,
+      "coolTime": 60,
+      "actionType": 2,
+      "specialActionType": 2,
+      "skillIcon": "icon_skill_adventureOrder_13_Sprite"
+    },
+    "75000260": {
+      "id": 75000260,
+      "name": "구매의 화술",
+      "desc": "교역품 구매 비용 할인 효과가 적용됩니다.",
+      "jobType": 2,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 1,
+      "coolTime": 60,
+      "actionType": 1,
+      "worldbuffId": 38030000,
+      "skillIcon": "icon_skill_tradeOrder_01_Sprite"
+    },
+    "75000261": {
+      "id": 75000261,
+      "name": "판매의 화술",
+      "desc": "{0}시간 동안 교역품 판매 수익이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "1",
+        "7.7%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030001,
+      "skillIcon": "icon_skill_tradeOrder_02_Sprite",
+      "skillFXShip": "SailingOrderTradeOrderRareSpoils"
+    },
+    "75000262": {
+      "id": 75000262,
+      "name": "눈도장",
+      "desc": "{0}분 동안 교역품 구매 시 구매 수량이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "10",
+        "10"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030002,
+      "skillIcon": "icon_skill_tradeOrder_03_Sprite",
+      "skillFXShip": "SailingOrderTradeOrderRareSpoils"
+    },
+    "75000263": {
+      "id": 75000263,
+      "name": "노련미",
+      "desc": "{0}시간 동안 교역품 판매 시 항해사 교역 경험치 획득량이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "1",
+        "10%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030003,
+      "skillIcon": "icon_skill_tradeOrder_04_Sprite",
+      "skillFXShip": "SailingOrderTradeOrderRareSpoils"
+    },
+    "75000264": {
+      "id": 75000264,
+      "name": "유명세",
+      "desc": "교역품 판매 시 명성 획득량이 증가합니다.",
+      "jobType": 2,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 1,
+      "coolTime": 60,
+      "actionType": 1,
+      "worldbuffId": 38030004,
+      "skillIcon": "icon_skill_tradeOrder_05_Sprite"
+    },
+    "75000265": {
+      "id": 75000265,
+      "name": "협상가",
+      "desc": "{0}분 동안 교역 시 협상 발생 확률이 {1}% 증가합니다.",
+      "descFormatTexts": [
+        "10",
+        "10"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 3600,
+      "actionType": 1,
+      "worldbuffId": 38030005,
+      "skillIcon": "icon_skill_tradeOrder_06_Sprite",
+      "skillFXShip": "SailingOrderTradeOrderRareSpoils"
+    },
+    "75000266": {
+      "id": 75000266,
+      "name": "진귀한 전리품",
+      "desc": "{0}시간 동안 무기류, 조미료, 기호품 판매 수익이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "1",
+        "8.5%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030006,
+      "skillIcon": "icon_skill_tradeOrder_07_Sprite",
+      "skillFXShip": "SailingOrderTradeOrderRareSpoils"
+    },
+    "75000267": {
+      "id": 75000267,
+      "name": "신문물 확보",
+      "desc": "{0}분 동안 무기류, 조미료, 기호품 구매 시 구매 수량이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "10",
+        "20"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030007,
+      "skillIcon": "icon_skill_tradeOrder_08_Sprite",
+      "skillFXShip": "SailingOrderTradeOrderRareSpoils"
+    },
+    "75000268": {
+      "id": 75000268,
+      "name": "부흥을 위한 전략",
+      "desc": "{0}시간 동안 식료품, 미술품, 향신료 판매 수익이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "1",
+        "8.5%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030008,
+      "skillIcon": "icon_skill_tradeOrder_09_Sprite",
+      "skillFXShip": "SailingOrderTradeOrderRenaissance"
+    },
+    "75000269": {
+      "id": 75000269,
+      "name": "내수 활성화",
+      "desc": "{0}분 동안 식료품, 미술품, 향신료 구매 시 구매 수량이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "10",
+        "20"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030009,
+      "skillIcon": "icon_skill_tradeOrder_10_Sprite",
+      "skillFXShip": "SailingOrderTradeOrderRareSpoils"
+    },
+    "75000270": {
+      "id": 75000270,
+      "name": "이마이류 판매술",
+      "desc": "{0}시간 동안 공예품, 가축, 직물 판매 수익이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "1",
+        "8.5%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030010,
+      "skillIcon": "icon_skill_tradeOrder_11_Sprite",
+      "skillFXShip": "TradeOrderImaiDroughtySalesmanship"
+    },
+    "75000271": {
+      "id": 75000271,
+      "name": "이마이류 협상술",
+      "desc": "{0}분 동안 교역 협상 성공 시 할증률을 {1} 증가시킵니다.",
+      "descFormatTexts": [
+        "10",
+        "15%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030011,
+      "skillIcon": "icon_skill_tradeOrder_12_Sprite",
+      "skillFXShip": "SailingOrderTradeOrderRareSpoils"
+    },
+    "75000272": {
+      "id": 75000272,
+      "name": "다테식 판매법",
+      "desc": "{0}시간 동안 총포류, 공업품, 의약품 판매 수익이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "1",
+        "8.5%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030012,
+      "skillIcon": "icon_skill_tradeOrder_13_Sprite",
+      "skillFXShip": "TradeOrderDateSelling"
+    },
+    "75000273": {
+      "id": 75000273,
+      "name": "다테식 구매법",
+      "desc": "{0}시간 동안 직물 구매 수량이 {1}, 직물 구매 할인이 {2} 증가합니다.",
+      "descFormatTexts": [
+        "1",
+        "45%",
+        "6%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030013,
+      "skillIcon": "icon_skill_tradeOrder_14_Sprite",
+      "skillFXShip": "TradeOrderDateBuying"
+    },
+    "75000274": {
+      "id": 75000274,
+      "name": "거상의 진가",
+      "desc": "{0}시간 동안 염료, 잡화, 주류 판매 수익이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "1",
+        "8.5%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030014,
+      "skillIcon": "icon_skill_tradeOrder_15_Sprite",
+      "skillFXShip": "TradeGodmotherJustice"
+    },
+    "75000275": {
+      "id": 75000275,
+      "name": "제주의 달밤",
+      "desc": "{0}시간 동안 주류 구매 수량이 {1}, 주류 구매 할인이 {2} 증가합니다.",
+      "descFormatTexts": [
+        "1",
+        "45%",
+        "6%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030015,
+      "skillIcon": "icon_skill_tradeOrder_16_Sprite",
+      "skillFXShip": "TradeJejuNight"
+    },
+    "75000276": {
+      "id": 75000276,
+      "name": "예의바른 손님",
+      "desc": "{0}시간 동안 물물 교환 가격 협상 시 우호도 소모량이 {1} 감소합니다.",
+      "descFormatTexts": [
+        "1",
+        "30%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 1,
+      "coolTime": 86400,
+      "actionType": 1,
+      "worldbuffId": 38030016,
+      "skillIcon": "icon_skill_tradeOrder_22_Sprite",
+      "skillFXShip": "SailingOrderTradeOrderRareSpoils"
+    },
+    "75000277": {
+      "id": 75000277,
+      "name": "신묘한 협상",
+      "desc": "{0}분 동안 물물 교환 시 교역품 획득량이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "10",
+        "5%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 80,
+      "worldSkillTargetMode": 1,
+      "coolTime": 28800,
+      "actionType": 1,
+      "worldbuffId": 38030017,
+      "skillIcon": "icon_skill_tradeOrder_18_Sprite",
+      "skillFXShip": "TradeOrderMagicalPower"
+    },
+    "75000278": {
+      "id": 75000278,
+      "name": "오스만식 협상기술",
+      "desc": "{0}시간 동안 물물 교환 시 가격 협상 성공률이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "1",
+        "15%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 1,
+      "coolTime": 86400,
+      "actionType": 1,
+      "worldbuffId": 38030018,
+      "skillIcon": "icon_skill_tradeOrder_19_Sprite",
+      "skillFXShip": "TradeOrderOttomanNegotiationSkills"
+    },
+    "75000279": {
+      "id": 75000279,
+      "name": "품격 있는 협상",
+      "desc": "{0}분 동안 물물 교환 시 가격 협상 성공률이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "30",
+        "10%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 1,
+      "coolTime": 86400,
+      "actionType": 1,
+      "worldbuffId": 38030019,
+      "skillIcon": "icon_skill_tradeOrder_20_Sprite",
+      "skillFXShip": "TradeOrderClassyNegotiation"
+    },
+    "75000280": {
+      "id": 75000280,
+      "name": "남만인의 수완",
+      "desc": "{0}분 동안 기호품, 공업품, 섬유 구매 시 구매 수량이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "10",
+        "20"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030020,
+      "skillIcon": "icon_skill_tradeOrder_21_Sprite",
+      "skillFXShip": "SouthernMansResourcefulness"
+    },
+    "75090001": {
+      "id": 75090001,
+      "name": "마이아의 해풍",
+      "desc": "{0}초 동안 함대 속도가 {1}노트 증가합니다.",
+      "descFormatTexts": [
+        "8",
+        "20"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 3,
+      "coolTime": 10,
+      "actionType": 1,
+      "worldbuffId": 38090001,
+      "skillIcon": "icon_skill_adventureOrder_01_Sprite",
+      "skillFXScreen": "Concentrate",
+      "skillFXShip": "SailingOrderBoatSpeed"
+    },
+    "75000281": {
+      "id": 75000281,
+      "name": "풍향 정복",
+      "desc": "{0}시간 동안 함대 속도가 {1}노트 증가합니다.",
+      "descFormatTexts": [
+        "2",
+        "1"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 3,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38053005,
+      "skillIcon": "icon_skill_adventureOrder_14_Sprite",
+      "skillFXShip": "SailingOrderOceanWindControl"
+    },
+    "75000282": {
+      "id": 75000282,
+      "name": "생존전략",
+      "desc": "{0}시간 동안 함대의 일일 물 소모량과 일일 식량 소모량이 {1}% 감소합니다.",
+      "descFormatTexts": [
+        "2",
+        "15"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 3,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38053006,
+      "skillIcon": "icon_skill_adventureOrder_15_Sprite",
+      "skillFXShip": "SailingOrderSurvivalStrategy"
+    },
+    "75000283": {
+      "id": 75000283,
+      "name": "긴급 충원",
+      "desc": "함대를 구성한 모든 선박의 선원 수가 최대치로 충원됩니다.",
+      "jobType": 1,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 3,
+      "coolTime": 14400,
+      "actionType": 1,
+      "activeEffect": [
+        {
+          "Id": 75110110,
+          "Val": 1000
+        }
+      ],
+      "skillIcon": "icon_skill_adventureOrder_16_Sprite",
+      "skillFXShip": "SailingOrderMaxRecruit"
+    },
+    "75000284": {
+      "id": 75000284,
+      "name": "탐험 지휘",
+      "desc": "{0}분 동안 탐험 시의 전투력, 채집력, 관찰력 중 하나가 {1} 증가합니다.",
+      "descFormatTexts": [
+        "5",
+        "15"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 3,
+      "coolTime": 14400,
+      "actionType": 2,
+      "specialActionType": 3,
+      "randWorldbuffId": [
+        38053007,
+        38053008,
+        38053009
+      ],
+      "skillIcon": "icon_skill_adventureOrder_17_Sprite"
+    },
+    "75000285": {
+      "id": 75000285,
+      "name": "마사무네식 절약법",
+      "desc": "{0}분 동안 함대의 일일 물 소모량과 일일 식량 소모량이 {1} 감소합니다.",
+      "descFormatTexts": [
+        "30",
+        "60%"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 3,
+      "coolTime": 7200,
+      "actionType": 1,
+      "worldbuffId": 38053010,
+      "skillIcon": "icon_skill_adventureOrder_18_Sprite",
+      "skillFXShip": "SailingOrderMasamuneConservation"
+    },
+    "75000286": {
+      "id": 75000286,
+      "name": "긴급 조달",
+      "desc": "{0}시간 동안 물과 식량 일일 소모량이 {1} 감소하고, {2}분 마다 물과 식량 보유량이 {3}씩 증가합니다.(물과 식량을 보급받을 수 있는 선박에만 적용)",
+      "descFormatTexts": [
+        "1",
+        "20%",
+        "10",
+        "5"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 3,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38053011,
+      "skillIcon": "icon_skill_adventureOrder_19_Sprite",
+      "skillFXShip": "SailingUrgentProcure"
+    },
+    "75000287": {
+      "id": 75000287,
+      "name": "신비한 의식",
+      "desc": "모든 선박의 재해를 해소하고, 임의의 해상 가호를 1개 발생시킵니다. 이미 적용된 가호가 있을 경우, 해당 가호를 즉시 해제시킨 뒤에 적용합니다.",
+      "jobType": 1,
+      "needEnergyValue": 10,
+      "worldSkillTargetMode": 3,
+      "coolTime": 43200,
+      "actionType": 2,
+      "specialActionType": 4,
+      "activeEffect": [
+        {
+          "Id": 75111028,
+          "Val": 1
+        }
+      ],
+      "skillIcon": "icon_skill_adventureOrder_20_Sprite",
+      "skillFXShip": "SailingMagicalCeremony"
+    },
+    "75000288": {
+      "id": 75000288,
+      "name": "전설의 낚시꾼",
+      "desc": "{0}시간 동안 낚시 기술이 {1} 증가하고, 상급 어종 발견확률이 {2} 증가합니다.",
+      "descFormatTexts": [
+        "1",
+        "15",
+        "15%"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 3,
+      "coolTime": 3600,
+      "actionType": 1,
+      "worldbuffId": 38053012,
+      "skillIcon": "icon_skill_adventureOrder_21_Sprite",
+      "skillFXShip": "SailingLegendaryFisherman"
+    },
+    "75000289": {
+      "id": 75000289,
+      "name": "신바람 항해",
+      "desc": "{0}시간 동안 가속 발판 등장 확률이 {1}, 보물 상자 등장 확률이 {2} 증가합니다.",
+      "descFormatTexts": [
+        "2",
+        "40%",
+        "20%"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 3,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38053013,
+      "skillIcon": "icon_skill_adventureOrder_22_Sprite",
+      "skillFXShip": "OceanOrderWindAhead"
+    },
+    "75000290": {
+      "id": 75000290,
+      "name": "오스만식 낚시기술",
+      "desc": "{0}시간 동안 자동 낚시 치명타 확률이 {1}% 증가합니다.",
+      "descFormatTexts": [
+        "1",
+        "70"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 3,
+      "coolTime": 28800,
+      "actionType": 1,
+      "worldbuffId": 38053014,
+      "skillIcon": "icon_skill_adventureOrder_23_Sprite",
+      "skillFXShip": "OceanOrderOttomanFishingTechniques"
+    },
+    "75000291": {
+      "id": 75000291,
+      "name": "해신의 축복",
+      "desc": "{0}시간 동안 자동 낚시 치명타 확률이 {1}% 증가합니다.",
+      "descFormatTexts": [
+        "2",
+        "40"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 3,
+      "coolTime": 28800,
+      "actionType": 1,
+      "worldbuffId": 38053015,
+      "skillIcon": "icon_skill_adventureOrder_24_Sprite",
+      "skillFXShip": "TradeOrderSeaGodsBlessing"
+    },
+    "75000292": {
+      "id": 75000292,
+      "name": "쾌속 항해",
+      "desc": "{0}시간 동안 함대 속도가 {1}노트 증가하고, 물과 식량 소모량이 {2} 감소합니다.",
+      "descFormatTexts": [
+        "1",
+        "1",
+        "15%"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 3,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38053016,
+      "skillIcon": "icon_skill_adventureOrder_25_Sprite",
+      "skillFXShip": "SailingOrderFastSailing"
+    },
+    "75000293": {
+      "id": 75000293,
+      "name": "인력 동원",
+      "desc": "{0}분 동안 탐험 내 채집력, 관찰력, 전투력이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "10",
+        "7"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 3,
+      "coolTime": 86400,
+      "actionType": 1,
+      "worldbuffId": 38053017,
+      "skillIcon": "icon_skill_adventureOrder_26_Sprite",
+      "skillFXShip": "SailingOrderManpowerMobilization"
+    },
+    "75000294": {
+      "id": 75000294,
+      "name": "전략적인 언변",
+      "desc": "{0}분 동안 교역 협상 성공 시 할증률을 {1} 증가시킵니다.",
+      "descFormatTexts": [
+        "10",
+        "5.5%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030021,
+      "skillIcon": "icon_skill_tradeOrder_23_Sprite",
+      "skillFXShip": "StrategicRhetoric"
+    },
+    "75000295": {
+      "id": 75000295,
+      "name": "대마행보",
+      "desc": "{0}분 동안 교역품 구매 시 구매 수량이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "7",
+        "10%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 20,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030022,
+      "skillIcon": "icon_skill_tradeOrder_24_Sprite",
+      "skillFXShip": "SailingOrderTradeOrderRareSpoils"
+    },
+    "75000296": {
+      "id": 75000296,
+      "name": "고단수",
+      "desc": "{0}분 동안 교역품 판매 수익이 {1} 증가합니다.",
+      "descFormatTexts": [
+        "10",
+        "10%"
+      ],
+      "jobType": 2,
+      "needEnergyValue": 100,
+      "worldSkillTargetMode": 1,
+      "coolTime": 14400,
+      "actionType": 1,
+      "worldbuffId": 38030023,
+      "skillIcon": "icon_skill_tradeOrder_25_Sprite",
+      "skillFXShip": "SailingOrderTradeOrderRareSpoils"
+    },
+    "75080001": {
+      "id": 75080001,
+      "name": "끈기 있는 잠수부",
+      "desc": "{0}시간 동안 인양에 걸리는 시간이 {1}% 감소합니다.",
+      "descFormatTexts": [
+        "1",
+        "10"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 3,
+      "coolTime": 28800,
+      "actionType": 1,
+      "worldbuffId": 38053018,
+      "skillIcon": "icon_skill_adventureOrder_27_Sprite",
+      "skillFXShip": "PersistentDiver"
+    },
+    "75080002": {
+      "id": 75080002,
+      "name": "보물선 인양 전문가",
+      "desc": "{0}시간 동안 심해와 천해에서 인양 보상 기준 점수가 {1} 감소됩니다.",
+      "descFormatTexts": [
+        "1",
+        "10"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 50,
+      "worldSkillTargetMode": 3,
+      "coolTime": 28800,
+      "actionType": 1,
+      "worldbuffId": 38053019,
+      "skillIcon": "icon_skill_adventureOrder_27_Sprite",
+      "skillFXShip": "PersistentDiver"
+    },
+    "75080003": {
+      "id": 75080003,
+      "name": "고대 유물 사냥꾼",
+      "desc": "{0}분 동안 육지탐험 시 고등급 보상 획득률이 {1}% 증가합니다.",
+      "descFormatTexts": [
+        "10",
+        "10"
+      ],
+      "jobType": 1,
+      "needEnergyValue": 80,
+      "worldSkillTargetMode": 3,
+      "coolTime": 86400,
+      "actionType": 1,
+      "worldbuffId": 38053020,
+      "skillIcon": "icon_skill_adventureOrder_29_Sprite",
+      "skillFXShip": "AncientArtifactHunter"
+    }
+  }
+}

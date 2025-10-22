@@ -1,0 +1,23 @@
+{
+  ":SalvageDepth": {
+    ":type": {
+      "id": "key",
+      "depth": "number",
+      "appearObject": {
+        "Id": [
+          "number"
+        ],
+        "Ratio": [
+          "number"
+        ]
+      },
+      "discoveryRate": "number"
+    },
+    ":required": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "SalvageDepth": {}
+}

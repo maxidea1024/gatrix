@@ -43,6 +43,7 @@ import {
   ClickAwayListener,
   Checkbox,
 } from '@mui/material';
+import ResizableDrawer from '../../components/common/ResizableDrawer';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -533,9 +534,9 @@ const GameWorldsPage: React.FC = () => {
 
   // 사용 가능한 언어 목록
   const availableLanguages = useMemo(() => ([
-    { code: 'ko' as const, label: t('gameWorlds.maintenance.korean') },
-    { code: 'en' as const, label: t('gameWorlds.maintenance.english') },
-    { code: 'zh' as const, label: t('gameWorlds.maintenance.chinese') },
+    { code: 'ko' as const, label: t('gameWorlds.maintenanceConfig.korean') },
+    { code: 'en' as const, label: t('gameWorlds.maintenanceConfig.english') },
+    { code: 'zh' as const, label: t('gameWorlds.maintenanceConfig.chinese') },
   ]), [t]);
 
   const usedLanguages = new Set(maintenanceLocales.map(l => l.lang));
@@ -1144,7 +1145,7 @@ const GameWorldsPage: React.FC = () => {
                   textDecoration: 'underline'
                 }
               }}
-              onClick={() => handleEdit(world)}
+              onClick={() => handleEditWorld(world)}
             >
               {world.worldId}
             </Typography>
@@ -1407,60 +1408,16 @@ const GameWorldsPage: React.FC = () => {
       </Card>
 
       {/* Add/Edit Drawer */}
-      <Drawer
-        anchor="right"
+      <ResizableDrawer
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        sx={{
-          zIndex: 1300,
-          '& .MuiDrawer-paper': {
-            width: 700,
-            height: '100vh',
-            display: 'flex',
-            flexDirection: 'column'
-          }
-        }}
-        ModalProps={{
-          keepMounted: false
-        }}
+        title={editingWorld ? t('gameWorlds.editGameWorld') : t('gameWorlds.addGameWorld')}
+        subtitle={editingWorld ? t('gameWorlds.form.editDescription') : t('gameWorlds.form.addDescription')}
+        storageKey="gameWorldFormDrawerWidth"
+        defaultWidth={700}
+        minWidth={500}
+        zIndex={1300}
       >
-        {/* Header */}
-        <Box sx={{
-          p: 3,
-          borderBottom: 1,
-          borderColor: 'divider',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          backgroundColor: 'background.paper',
-          position: 'sticky',
-          top: 0,
-          zIndex: 1
-        }}>
-          <Box>
-            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {editingWorld ? t('gameWorlds.editGameWorld') : t('gameWorlds.addGameWorld')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {editingWorld
-                ? t('gameWorlds.form.editDescription')
-                : t('gameWorlds.form.addDescription')
-              }
-            </Typography>
-          </Box>
-          <IconButton
-            onClick={() => setDialogOpen(false)}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover'
-              }
-            }}
-          >
-            <CancelIcon />
-          </IconButton>
-        </Box>
-
         {/* Content */}
         <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
@@ -1718,7 +1675,7 @@ const GameWorldsPage: React.FC = () => {
             {saving ? t('common.saving') : (editingWorld ? t('gameWorlds.saveWorld') : t('gameWorlds.addGameWorld'))}
           </Button>
         </Box>
-      </Drawer>
+      </ResizableDrawer>
 
       {/* Confirmation Drawer */}
       <Drawer
@@ -1926,9 +1883,9 @@ const GameWorldsPage: React.FC = () => {
                       setToggleSupportsMultiLanguage(enabled);
                       if (enabled) {
                         const availableLanguages = [
-                          { code: 'ko' as const, label: t('gameWorlds.maintenance.korean') },
-                          { code: 'en' as const, label: t('gameWorlds.maintenance.english') },
-                          { code: 'zh' as const, label: t('gameWorlds.maintenance.chinese') },
+                          { code: 'ko' as const, label: t('gameWorlds.maintenanceConfig.korean') },
+                          { code: 'en' as const, label: t('gameWorlds.maintenanceConfig.english') },
+                          { code: 'zh' as const, label: t('gameWorlds.maintenanceConfig.chinese') },
                         ];
                         const merged = availableLanguages.map((lang) => {
                           const existing = toggleMaintenanceLocales.find(l => l.lang === lang.code);

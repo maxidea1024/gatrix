@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Drawer,
   AppBar,
   Toolbar,
   Button,
@@ -17,8 +16,16 @@ import {
   InputLabel,
   Paper,
   Stack,
+  Collapse,
 } from '@mui/material';
-import { Add as AddIcon, Delete as DeleteIcon, Close as CloseIcon } from '@mui/icons-material';
+import {
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  Close as CloseIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
+} from '@mui/icons-material';
+import ResizableDrawer from '../common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import surveyService, { Survey, TriggerCondition, ParticipationReward } from '../../services/surveyService';
@@ -52,6 +59,11 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   const [isActive, setIsActive] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
+  // Collapse states
+  const [triggerConditionsExpanded, setTriggerConditionsExpanded] = useState(true);
+  const [participationMailExpanded, setParticipationMailExpanded] = useState(true);
+  const [rewardsExpanded, setRewardsExpanded] = useState(true);
+
   // Initialize form with survey data
   useEffect(() => {
     if (survey) {
@@ -76,9 +88,34 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
     }
   }, [survey, open]);
 
+  // Get available condition types (exclude already used types)
+  const getAvailableConditionTypes = (currentIndex: number): ('userLevel' | 'joinDays')[] => {
+    const usedTypes = triggerConditions
+      .map((c, idx) => idx !== currentIndex ? c.type : null)
+      .filter(Boolean) as ('userLevel' | 'joinDays')[];
+
+    const allTypes: ('userLevel' | 'joinDays')[] = ['userLevel', 'joinDays'];
+    return allTypes.filter(type => !usedTypes.includes(type));
+  };
+
+  // Check if we can add more conditions
+  const canAddMoreConditions = () => {
+    const usedTypes = new Set(triggerConditions.map(c => c.type));
+    return usedTypes.size < 2; // Only 2 types available: userLevel and joinDays
+  };
+
   // Trigger condition handlers
   const handleAddTriggerCondition = () => {
-    setTriggerConditions([...triggerConditions, { type: 'userLevel', value: 1 }]);
+    if (!canAddMoreConditions()) {
+      enqueueSnackbar(t('surveys.allConditionTypesUsed'), { variant: 'warning' });
+      return;
+    }
+
+    // Find the first available type
+    const usedTypes = new Set(triggerConditions.map(c => c.type));
+    const availableType = usedTypes.has('userLevel') ? 'joinDays' : 'userLevel';
+
+    setTriggerConditions([...triggerConditions, { type: availableType, value: 1 }]);
   };
 
   const handleRemoveTriggerCondition = (index: number) => {
@@ -90,6 +127,15 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   };
 
   const handleTriggerConditionChange = (index: number, field: keyof TriggerCondition, value: any) => {
+    // If changing type, check if the new type is already used
+    if (field === 'type') {
+      const isTypeUsed = triggerConditions.some((c, idx) => idx !== index && c.type === value);
+      if (isTypeUsed) {
+        enqueueSnackbar(t('surveys.conditionTypeAlreadyUsed'), { variant: 'warning' });
+        return;
+      }
+    }
+
     const updated = [...triggerConditions];
     updated[index] = { ...updated[index], [field]: value };
     setTriggerConditions(updated);
@@ -156,11 +202,17 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       // Map backend error messages to localized messages
       let errorMessage = t('surveys.saveFailed');
 
-      if (error.message) {
-        if (error.message.includes('Platform survey ID already exists')) {
+      // Extract error message from various possible error structures
+      const backendMessage = error?.error?.message || error?.message || '';
+
+      if (backendMessage) {
+        if (backendMessage.includes('Platform survey ID already exists') ||
+            backendMessage.includes('already exists')) {
           errorMessage = t('surveys.platformSurveyIdExists');
+        } else if (backendMessage.includes('At least one trigger condition is required')) {
+          errorMessage = t('surveys.triggerConditionRequired');
         } else {
-          errorMessage = error.message;
+          errorMessage = backendMessage;
         }
       }
 
@@ -171,31 +223,16 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   };
 
   return (
-    <Drawer
-      anchor="right"
+    <ResizableDrawer
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: { width: { xs: '100%', sm: 600, md: 800 } }
-      }}
+      title={survey ? t('surveys.editSurvey') : t('surveys.createSurvey')}
+      subtitle={t('surveys.formSubtitle')}
+      storageKey="surveyFormDrawerWidth"
+      defaultWidth={800}
+      minWidth={600}
+      zIndex={1300}
     >
-      {/* Header */}
-      <AppBar position="static" color="default" elevation={0} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Toolbar>
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h6">
-              {survey ? t('surveys.editSurvey') : t('surveys.createSurvey')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('surveys.formSubtitle')}
-            </Typography>
-          </Box>
-          <IconButton edge="end" onClick={onClose}>
-            <CloseIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-
       {/* Content */}
       <Box
         sx={{
@@ -229,69 +266,72 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         }}
       >
         <Stack spacing={3}>
-          {/* Section 1: Survey Participation */}
+          {/* Basic Settings */}
           <Box>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                mb: 2,
-                fontWeight: 600,
-                color: 'primary.main',
-              }}
-            >
-              {t('surveys.section.participation')}
-            </Typography>
-            <Stack spacing={2}>
-              <Box>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={isActive}
-                      onChange={(e) => setIsActive(e.target.checked)}
-                    />
-                  }
-                  label={t('surveys.isActive')}
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isActive}
+                  onChange={(e) => setIsActive(e.target.checked)}
                 />
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', ml: 4, mt: 0.5 }}>
-                  {t('surveys.isActiveHelp')}
+              }
+              label={t('surveys.isActive')}
+            />
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', ml: 4, mt: 0.5 }}>
+              {t('surveys.isActiveHelp')}
+            </Typography>
+          </Box>
+
+          <TextField
+            label={t('surveys.platformSurveyId')}
+            value={platformSurveyId}
+            onChange={(e) => setPlatformSurveyId(e.target.value)}
+            required
+            fullWidth
+            helperText={t('surveys.platformSurveyIdHelp')}
+          />
+
+          {/* Trigger Conditions */}
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                mb: triggerConditionsExpanded ? 1 : 0,
+                cursor: 'pointer',
+              }}
+              onClick={() => setTriggerConditionsExpanded(!triggerConditionsExpanded)}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  {t('surveys.triggerConditions')}
                 </Typography>
+                <IconButton size="small" sx={{ pointerEvents: 'none' }}>
+                  {triggerConditionsExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </IconButton>
               </Box>
-
-              <TextField
-                label={t('surveys.platformSurveyId')}
-                value={platformSurveyId}
-                onChange={(e) => setPlatformSurveyId(e.target.value)}
-                required
-                fullWidth
-                helperText={t('surveys.platformSurveyIdHelp')}
-              />
-
-              <TextField
-                label={t('surveys.surveyTitle')}
-                value={surveyTitle}
-                onChange={(e) => setSurveyTitle(e.target.value)}
-                required
-                fullWidth
-              />
-
-              <TextField
-                label={t('surveys.surveyContent')}
-                value={surveyContent}
-                onChange={(e) => setSurveyContent(e.target.value)}
-                multiline
-                rows={3}
-                fullWidth
-              />
-
-              {/* Trigger Conditions */}
-              <Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                  <Typography variant="subtitle2">{t('surveys.triggerConditions')}</Typography>
-                  <Button size="small" startIcon={<AddIcon />} onClick={handleAddTriggerCondition}>
-                    {t('surveys.addCondition')}
-                  </Button>
-                </Box>
-                {triggerConditions.map((condition, index) => (
+              {triggerConditionsExpanded && (
+                <Button
+                  size="small"
+                  startIcon={<AddIcon />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAddTriggerCondition();
+                  }}
+                  disabled={!canAddMoreConditions()}
+                >
+                  {t('surveys.addCondition')}
+                </Button>
+              )}
+            </Box>
+            <Collapse in={triggerConditionsExpanded}>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                {t('surveys.triggerConditionsHelp')}
+              </Typography>
+              {triggerConditions.map((condition, index) => {
+                const availableTypes = getAvailableConditionTypes(index);
+                return (
                   <Box key={index}>
                     <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
                       <FormControl sx={{ minWidth: 150 }}>
@@ -301,8 +341,18 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                           onChange={(e) => handleTriggerConditionChange(index, 'type', e.target.value)}
                           label={t('surveys.conditionType')}
                         >
-                          <MenuItem value="userLevel">{t('surveys.condition.userLevel')}</MenuItem>
-                          <MenuItem value="joinDays">{t('surveys.condition.joinDays')}</MenuItem>
+                          {/* Always show current type */}
+                          {!availableTypes.includes(condition.type) && (
+                            <MenuItem value={condition.type}>
+                              {t(`surveys.condition.${condition.type}`)}
+                            </MenuItem>
+                          )}
+                          {/* Show available types */}
+                          {availableTypes.map(type => (
+                            <MenuItem key={type} value={type}>
+                              {t(`surveys.condition.${type}`)}
+                            </MenuItem>
+                          ))}
                         </Select>
                       </FormControl>
                       <TextField
@@ -310,7 +360,16 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                         type="number"
                         value={condition.value}
                         onChange={(e) => handleTriggerConditionChange(index, 'value', parseInt(e.target.value) || 0)}
-                        sx={{ flex: 1 }}
+                        sx={{
+                          flex: 1,
+                          '& input[type=number]': {
+                            MozAppearance: 'textfield',
+                          },
+                          '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                            WebkitAppearance: 'none',
+                            margin: 0,
+                          },
+                        }}
                       />
                       <IconButton
                         onClick={() => handleRemoveTriggerCondition(index)}
@@ -332,54 +391,116 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                       </Box>
                     )}
                   </Box>
-                ))}
-              </Box>
-            </Stack>
-          </Box>
+                );
+              })}
+            </Collapse>
+          </Paper>
 
-          {/* Section 2: Rewards */}
-          <Box>
-            <Typography
-              variant="subtitle1"
+          {/* Survey Participation Mail */}
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Box
               sx={{
-                mb: 2,
-                fontWeight: 600,
-                color: 'primary.main',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                mb: participationMailExpanded ? 1 : 0,
+                cursor: 'pointer',
               }}
+              onClick={() => setParticipationMailExpanded(!participationMailExpanded)}
             >
-              {t('surveys.section.rewards')}
-            </Typography>
-            <Stack spacing={2}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                {t('surveys.participationMail')}
+              </Typography>
+              <IconButton size="small" sx={{ pointerEvents: 'none' }}>
+                {participationMailExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </IconButton>
+            </Box>
+            <Collapse in={participationMailExpanded}>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                {t('surveys.participationMailHelp')}
+              </Typography>
+              <Stack spacing={2}>
+                <TextField
+                  label={t('surveys.surveyTitle')}
+                  value={surveyTitle}
+                  onChange={(e) => setSurveyTitle(e.target.value)}
+                  required
+                  fullWidth
+                  helperText={t('surveys.surveyTitleHelp')}
+                />
+                <TextField
+                  label={t('surveys.surveyContent')}
+                  value={surveyContent}
+                  onChange={(e) => setSurveyContent(e.target.value)}
+                  multiline
+                  rows={3}
+                  fullWidth
+                  helperText={t('surveys.surveyContentHelp')}
+                />
+              </Stack>
+            </Collapse>
+          </Paper>
 
+          {/* Rewards */}
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                mb: rewardsExpanded ? 1 : 0,
+                cursor: 'pointer',
+              }}
+              onClick={() => setRewardsExpanded(!rewardsExpanded)}
+            >
+              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                {t('surveys.section.rewards')}
+              </Typography>
+              <IconButton size="small" sx={{ pointerEvents: 'none' }}>
+                {rewardsExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </IconButton>
+            </Box>
+            <Collapse in={rewardsExpanded}>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                {t('surveys.rewardsHelp')}
+              </Typography>
+              <Stack spacing={2}>
               {/* Reward Mail */}
               <Box>
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('surveys.rewardMail')}</Typography>
-                <Stack spacing={2}>
-                  <TextField
-                    label={t('surveys.rewardMailTitle')}
-                    value={rewardMailTitle}
-                    onChange={(e) => setRewardMailTitle(e.target.value)}
-                    fullWidth
-                  />
-                  <TextField
-                    label={t('surveys.rewardMailContent')}
-                    value={rewardMailContent}
-                    onChange={(e) => setRewardMailContent(e.target.value)}
-                    multiline
-                    rows={3}
-                    fullWidth
-                  />
-                </Stack>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('surveys.rewardMailTitle')}</Typography>
+                <TextField
+                  value={rewardMailTitle}
+                  onChange={(e) => setRewardMailTitle(e.target.value)}
+                  fullWidth
+                  size="small"
+                  helperText={t('surveys.rewardMailTitleHelp')}
+                />
+              </Box>
+
+              <Box>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('surveys.rewardMailContent')}</Typography>
+                <TextField
+                  value={rewardMailContent}
+                  onChange={(e) => setRewardMailContent(e.target.value)}
+                  multiline
+                  rows={3}
+                  fullWidth
+                  size="small"
+                  helperText={t('surveys.rewardMailContentHelp')}
+                />
               </Box>
 
               {/* Participation Rewards */}
               <Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
                   <Typography variant="subtitle2">{t('surveys.participationRewards')}</Typography>
                   <Button size="small" startIcon={<AddIcon />} onClick={handleAddReward}>
                     {t('surveys.addReward')}
                   </Button>
                 </Box>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                  {t('surveys.participationRewardsHelp')}
+                </Typography>
                 {participationRewards.map((reward, index) => (
                   <Box key={index} sx={{ display: 'flex', gap: 1, mb: 1 }}>
                     <TextField
@@ -387,28 +508,41 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
                       value={reward.rewardType}
                       onChange={(e) => handleRewardChange(index, 'rewardType', e.target.value)}
                       sx={{ flex: 1 }}
+                      size="small"
                     />
                     <TextField
                       label={t('surveys.itemId')}
                       value={reward.itemId}
                       onChange={(e) => handleRewardChange(index, 'itemId', e.target.value)}
                       sx={{ flex: 1 }}
+                      size="small"
                     />
                     <TextField
                       label={t('surveys.quantity')}
                       type="number"
                       value={reward.quantity}
                       onChange={(e) => handleRewardChange(index, 'quantity', parseInt(e.target.value) || 1)}
-                      sx={{ width: 100 }}
+                      sx={{
+                        width: 100,
+                        '& input[type=number]': {
+                          MozAppearance: 'textfield',
+                        },
+                        '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                          WebkitAppearance: 'none',
+                          margin: 0,
+                        },
+                      }}
+                      size="small"
                     />
-                    <IconButton onClick={() => handleRemoveReward(index)}>
+                    <IconButton onClick={() => handleRemoveReward(index)} size="small">
                       <DeleteIcon />
                     </IconButton>
                   </Box>
                 ))}
               </Box>
-            </Stack>
-          </Box>
+              </Stack>
+            </Collapse>
+          </Paper>
         </Stack>
       </Box>
 
@@ -435,7 +569,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
           {survey ? t('common.update') : t('common.create')}
         </Button>
       </Box>
-    </Drawer>
+    </ResizableDrawer>
   );
 };
 

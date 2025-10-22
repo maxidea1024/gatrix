@@ -1,0 +1,83 @@
+{
+  ":ReturnerBuff": {
+    ":type": {
+      "id": "key",
+      "startDate": "string",
+      "endDate": "string",
+      "minLv": "number",
+      "maxLv": "number",
+      "worldBuffId": [
+        "number",
+        "number",
+        "number",
+        "number"
+      ]
+    },
+    ":required": {
+      "startDate": 1,
+      "endDate": 1,
+      "minLv": 1,
+      "maxLv": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {
+      "worldBuffId": [
+        [
+          "WorldBuff"
+        ],
+        [
+          "WorldBuff"
+        ],
+        [
+          "WorldBuff"
+        ],
+        [
+          "WorldBuff"
+        ]
+      ]
+    }
+  },
+  "ReturnerBuff": {
+    "1": {
+      "id": 1,
+      "startDate": "2023/06/12/00:00:00",
+      "endDate": "2099/06/25/23:59:59",
+      "minLv": 1,
+      "maxLv": 30,
+      "worldBuffId": [
+        38090026,
+        38001202,
+        38001203,
+        38001204
+      ]
+    },
+    "2": {
+      "id": 2,
+      "startDate": "2023/06/12/00:00:00",
+      "endDate": "2099/06/25/23:59:59",
+      "minLv": 31,
+      "maxLv": 60,
+      "worldBuffId": [
+        38090026,
+        38001202,
+        38001203,
+        38001204
+      ]
+    },
+    "3": {
+      "id": 3,
+      "startDate": "2023/06/12/00:00:00",
+      "endDate": "2099/06/25/23:59:59",
+      "minLv": 61,
+      "maxLv": 99,
+      "worldBuffId": [
+        38090026,
+        38001202,
+        38001203,
+        38001204
+      ]
+    }
+  }
+}

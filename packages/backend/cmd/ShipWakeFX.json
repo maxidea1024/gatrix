@@ -1,0 +1,192 @@
+{
+  ":ShipWakeFX": {
+    ":type": {
+      "id": "key",
+      "type": "number",
+      "wakeParticle": "string",
+      "wakeSocket": "string",
+      "idleParticle": "string",
+      "bAutoScale": "bool",
+      "wakeScaleX": "number",
+      "wakeScaleY": "number",
+      "idleScaleX": "number",
+      "idleScaleY": "number"
+    },
+    ":required": {
+      "type": 1,
+      "wakeParticle": 1,
+      "wakeSocket": 1,
+      "bAutoScale": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {},
+    ":asset": {
+      "wakeParticle": 1,
+      "idleParticle": 1
+    }
+  },
+  "ShipWakeFX": {
+    "47600000": {
+      "id": 47600000,
+      "type": 1,
+      "wakeParticle": "P_E_Water_Splash_Player",
+      "wakeSocket": "naval_ram",
+      "idleParticle": "P_E_Water_Splash_ShipIdle",
+      "bAutoScale": true
+    },
+    "47600001": {
+      "id": 47600001,
+      "type": 2,
+      "wakeParticle": "P_E_Water_Splash",
+      "wakeSocket": "naval_ram",
+      "bAutoScale": true
+    },
+    "47600002": {
+      "id": 47600002,
+      "type": 3,
+      "wakeParticle": "P_E_Water_Splash_CutScene",
+      "wakeSocket": "naval_ram",
+      "bAutoScale": true
+    },
+    "47600003": {
+      "id": 47600003,
+      "type": 1,
+      "wakeParticle": "P_E_Water_Splash_Player",
+      "wakeSocket": "naval_ram",
+      "idleParticle": "P_E_Water_Splash_ShipIdle",
+      "bAutoScale": false,
+      "wakeScaleX": 1.6,
+      "wakeScaleY": 1.6,
+      "idleScaleX": 0.6,
+      "idleScaleY": 0.5
+    },
+    "47600004": {
+      "id": 47600004,
+      "type": 2,
+      "wakeParticle": "P_E_Water_Splash",
+      "wakeSocket": "naval_ram",
+      "bAutoScale": false,
+      "wakeScaleX": 1.6,
+      "wakeScaleY": 1.6
+    },
+    "47600005": {
+      "id": 47600005,
+      "type": 3,
+      "wakeParticle": "P_E_Water_Splash_CutScene",
+      "wakeSocket": "naval_ram",
+      "bAutoScale": false,
+      "wakeScaleX": 1.6,
+      "wakeScaleY": 1.6
+    },
+    "47600010": {
+      "id": 47600010,
+      "type": 1,
+      "wakeParticle": "P_E_Water_Splash_Player",
+      "wakeSocket": "naval_ram",
+      "idleParticle": "P_E_Water_Splash_ShipIdle",
+      "bAutoScale": false,
+      "wakeScaleX": 1.6,
+      "wakeScaleY": 1.6,
+      "idleScaleX": 0.6,
+      "idleScaleY": 0.5
+    },
+    "47600011": {
+      "id": 47600011,
+      "type": 1,
+      "wakeParticle": "P_E_Water_Splash_Player",
+      "wakeSocket": "naval_ram",
+      "idleParticle": "P_E_Water_Splash_ShipIdle",
+      "bAutoScale": false,
+      "wakeScaleX": 1.6,
+      "wakeScaleY": 1.6,
+      "idleScaleX": 0.6,
+      "idleScaleY": 0.5
+    },
+    "47600012": {
+      "id": 47600012,
+      "type": 1,
+      "wakeParticle": "P_E_Water_Splash_Player",
+      "wakeSocket": "naval_ram",
+      "idleParticle": "P_E_Water_Splash_ShipIdle",
+      "bAutoScale": false,
+      "wakeScaleX": 1.6,
+      "wakeScaleY": 1.6,
+      "idleScaleX": 0.6,
+      "idleScaleY": 0.5
+    },
+    "47600013": {
+      "id": 47600013,
+      "type": 1,
+      "wakeParticle": "P_E_Water_Splash_Player",
+      "wakeSocket": "naval_ram",
+      "idleParticle": "P_E_Water_Splash_ShipIdle",
+      "bAutoScale": false,
+      "wakeScaleX": 1.6,
+      "wakeScaleY": 1.6,
+      "idleScaleX": 0.6,
+      "idleScaleY": 0.5
+    },
+    "47600014": {
+      "id": 47600014,
+      "type": 1,
+      "wakeParticle": "P_E_Water_Splash_Player_XS",
+      "wakeSocket": "naval_ram",
+      "idleParticle": "P_E_Water_Splash_ShipIdle",
+      "bAutoScale": false,
+      "wakeScaleX": 1.6,
+      "wakeScaleY": 1.6,
+      "idleScaleX": 0.7,
+      "idleScaleY": 0.6
+    },
+    "47600015": {
+      "id": 47600015,
+      "type": 1,
+      "wakeParticle": "P_E_Water_Splash_Player_S",
+      "wakeSocket": "naval_ram",
+      "idleParticle": "P_E_Water_Splash_ShipIdle",
+      "bAutoScale": false,
+      "wakeScaleX": 1.7,
+      "wakeScaleY": 1.7,
+      "idleScaleX": 0.8,
+      "idleScaleY": 0.6
+    },
+    "47600016": {
+      "id": 47600016,
+      "type": 1,
+      "wakeParticle": "P_E_Water_Splash_Player_M",
+      "wakeSocket": "naval_ram",
+      "idleParticle": "P_E_Water_Splash_ShipIdle",
+      "bAutoScale": false,
+      "wakeScaleX": 1.8,
+      "wakeScaleY": 1.8,
+      "idleScaleX": 1,
+      "idleScaleY": 0.85
+    },
+    "47600017": {
+      "id": 47600017,
+      "type": 1,
+      "wakeParticle": "P_E_Water_Splash_Player_L",
+      "wakeSocket": "naval_ram",
+      "idleParticle": "P_E_Water_Splash_ShipIdle",
+      "bAutoScale": false,
+      "wakeScaleX": 1.9,
+      "wakeScaleY": 1.9,
+      "idleScaleX": 1.3,
+      "idleScaleY": 1.1
+    },
+    "47600018": {
+      "id": 47600018,
+      "type": 1,
+      "wakeParticle": "P_E_Water_Splash_Player_XL",
+      "wakeSocket": "naval_ram",
+      "idleParticle": "P_E_Water_Splash_ShipIdle",
+      "bAutoScale": false,
+      "wakeScaleX": 2,
+      "wakeScaleY": 2,
+      "idleScaleX": 1.6,
+      "idleScaleY": 1.3
+    }
+  }
+}

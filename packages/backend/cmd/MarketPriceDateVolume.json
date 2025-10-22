@@ -1,0 +1,137 @@
+{
+  ":MarketPriceDateVolume": {
+    ":type": {
+      "id": "key",
+      "marketPriceVolumeRate": "number"
+    },
+    ":required": {
+      "marketPriceVolumeRate": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "MarketPriceDateVolume": {
+    "1": {
+      "id": 1,
+      "marketPriceVolumeRate": 3000
+    },
+    "2": {
+      "id": 2,
+      "marketPriceVolumeRate": 2900
+    },
+    "3": {
+      "id": 3,
+      "marketPriceVolumeRate": 2800
+    },
+    "4": {
+      "id": 4,
+      "marketPriceVolumeRate": 2700
+    },
+    "5": {
+      "id": 5,
+      "marketPriceVolumeRate": 2600
+    },
+    "6": {
+      "id": 6,
+      "marketPriceVolumeRate": 2500
+    },
+    "7": {
+      "id": 7,
+      "marketPriceVolumeRate": 2400
+    },
+    "8": {
+      "id": 8,
+      "marketPriceVolumeRate": 2300
+    },
+    "9": {
+      "id": 9,
+      "marketPriceVolumeRate": 2200
+    },
+    "10": {
+      "id": 10,
+      "marketPriceVolumeRate": 2100
+    },
+    "11": {
+      "id": 11,
+      "marketPriceVolumeRate": 2000
+    },
+    "12": {
+      "id": 12,
+      "marketPriceVolumeRate": 1900
+    },
+    "13": {
+      "id": 13,
+      "marketPriceVolumeRate": 1800
+    },
+    "14": {
+      "id": 14,
+      "marketPriceVolumeRate": 1700
+    },
+    "15": {
+      "id": 15,
+      "marketPriceVolumeRate": 1600
+    },
+    "16": {
+      "id": 16,
+      "marketPriceVolumeRate": 1500
+    },
+    "17": {
+      "id": 17,
+      "marketPriceVolumeRate": 1400
+    },
+    "18": {
+      "id": 18,
+      "marketPriceVolumeRate": 1300
+    },
+    "19": {
+      "id": 19,
+      "marketPriceVolumeRate": 1200
+    },
+    "20": {
+      "id": 20,
+      "marketPriceVolumeRate": 1100
+    },
+    "21": {
+      "id": 21,
+      "marketPriceVolumeRate": 1000
+    },
+    "22": {
+      "id": 22,
+      "marketPriceVolumeRate": 900
+    },
+    "23": {
+      "id": 23,
+      "marketPriceVolumeRate": 850
+    },
+    "24": {
+      "id": 24,
+      "marketPriceVolumeRate": 800
+    },
+    "25": {
+      "id": 25,
+      "marketPriceVolumeRate": 750
+    },
+    "26": {
+      "id": 26,
+      "marketPriceVolumeRate": 700
+    },
+    "27": {
+      "id": 27,
+      "marketPriceVolumeRate": 650
+    },
+    "28": {
+      "id": 28,
+      "marketPriceVolumeRate": 600
+    },
+    "29": {
+      "id": 29,
+      "marketPriceVolumeRate": 550
+    },
+    "30": {
+      "id": 30,
+      "marketPriceVolumeRate": 500
+    }
+  }
+}

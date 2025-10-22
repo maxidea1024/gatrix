@@ -18,6 +18,7 @@ import {
   Tooltip,
   Checkbox,
   Skeleton,
+  Divider,
 } from '@mui/material';
 import {
   Poll as PollIcon,
@@ -41,6 +42,7 @@ import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import SurveyFormDialog from '../../components/game/SurveyFormDialog';
 import SurveyConfigDialog from '../../components/game/SurveyConfigDialog';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
+import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 
 const SurveysPage: React.FC = () => {
   const { t } = useTranslation();
@@ -60,6 +62,9 @@ const SurveysPage: React.FC = () => {
   const [editingSurvey, setEditingSurvey] = useState<Survey | null>(null);
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
   const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deletingSurvey, setDeletingSurvey] = useState<Survey | null>(null);
+  const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -69,6 +74,7 @@ const SurveysPage: React.FC = () => {
     { id: 'platformSurveyId', labelKey: 'surveys.platformSurveyId', visible: true },
     { id: 'surveyTitle', labelKey: 'surveys.surveyTitle', visible: true },
     { id: 'triggerConditions', labelKey: 'surveys.triggerConditions', visible: true },
+    { id: 'rewards', labelKey: 'surveys.rewards', visible: true },
     { id: 'status', labelKey: 'surveys.status', visible: true },
     { id: 'createdAt', labelKey: 'surveys.createdAt', visible: true },
     { id: 'actions', labelKey: 'common.actions', visible: true },
@@ -80,7 +86,13 @@ const SurveysPage: React.FC = () => {
     return filter?.value;
   }, [activeFilters]);
 
+  const conditionTypeFilter = useMemo(() => {
+    const filter = activeFilters.find(f => f.key === 'conditionType');
+    return filter?.value;
+  }, [activeFilters]);
+
   const isActiveFilterString = useMemo(() => JSON.stringify(isActiveFilter), [isActiveFilter]);
+  const conditionTypeFilterString = useMemo(() => JSON.stringify(conditionTypeFilter), [conditionTypeFilter]);
 
   // Filter definitions
   const availableFilterDefinitions: FilterDefinition[] = [
@@ -91,6 +103,17 @@ const SurveysPage: React.FC = () => {
       options: [
         { value: 'true', label: t('common.active') },
         { value: 'false', label: t('common.inactive') },
+      ],
+    },
+    {
+      key: 'conditionType',
+      label: t('surveys.conditionType'),
+      type: 'multiselect',
+      operator: 'any_of',
+      allowOperatorToggle: false,
+      options: [
+        { value: 'userLevel', label: t('surveys.condition.userLevel') },
+        { value: 'joinDays', label: t('surveys.condition.joinDays') },
       ],
     },
   ];
@@ -108,13 +131,18 @@ const SurveysPage: React.FC = () => {
         filters.isActive = isActiveFilter === 'true';
       }
 
+      if (conditionTypeFilter && Array.isArray(conditionTypeFilter) && conditionTypeFilter.length > 0) {
+        filters.conditionType = conditionTypeFilter;
+      }
+
       const result = await surveyService.getSurveys({
         page: page + 1,
         limit: rowsPerPage,
         ...filters,
       });
 
-      if (result && result.surveys) {
+      // Check if result is valid
+      if (result && typeof result === 'object' && 'surveys' in result && Array.isArray(result.surveys)) {
         setSurveys(result.surveys);
         setTotal(result.total || 0);
       } else {
@@ -124,7 +152,7 @@ const SurveysPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Failed to load surveys:', error);
-      enqueueSnackbar(error.message || t('surveys.loadFailed'), { variant: 'error' });
+      enqueueSnackbar(error.message || error.error?.message || t('surveys.loadFailed'), { variant: 'error' });
       setSurveys([]);
       setTotal(0);
     } finally {
@@ -135,7 +163,7 @@ const SurveysPage: React.FC = () => {
 
   useEffect(() => {
     loadSurveys();
-  }, [page, rowsPerPage, debouncedSearchTerm, isActiveFilterString]);
+  }, [page, rowsPerPage, debouncedSearchTerm, isActiveFilterString, conditionTypeFilterString]);
 
   // Filter handlers
   const handleFilterAdd = (filter: ActiveFilter) => {
@@ -164,6 +192,7 @@ const SurveysPage: React.FC = () => {
     { id: 'platformSurveyId', labelKey: 'surveys.platformSurveyId', visible: true },
     { id: 'surveyTitle', labelKey: 'surveys.surveyTitle', visible: true },
     { id: 'triggerConditions', labelKey: 'surveys.triggerConditions', visible: true },
+    { id: 'rewards', labelKey: 'surveys.rewards', visible: true },
     { id: 'status', labelKey: 'surveys.status', visible: true },
     { id: 'createdAt', labelKey: 'surveys.createdAt', visible: true },
     { id: 'actions', labelKey: 'common.actions', visible: true },
@@ -171,7 +200,17 @@ const SurveysPage: React.FC = () => {
 
   // Column handlers
   const handleColumnsChange = (newColumns: ColumnConfig[]) => {
-    setColumns(newColumns);
+    // Merge with checkbox and actions columns
+    const checkboxCol = columns.find(c => c.id === 'checkbox');
+    const actionsCol = columns.find(c => c.id === 'actions');
+
+    const updatedColumns = [
+      checkboxCol!,
+      ...newColumns,
+      actionsCol!,
+    ];
+
+    setColumns(updatedColumns);
   };
 
   const handleResetColumns = () => {
@@ -204,27 +243,39 @@ const SurveysPage: React.FC = () => {
     setFormDrawerOpen(true);
   };
 
-  const handleDelete = async (survey: Survey) => {
-    if (!window.confirm(t('surveys.confirmDelete'))) {
-      return;
-    }
+  const handleDelete = (survey: Survey) => {
+    setDeletingSurvey(survey);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingSurvey) return;
 
     try {
-      await surveyService.deleteSurvey(survey.id);
+      await surveyService.deleteSurvey(deletingSurvey.id);
       enqueueSnackbar(t('surveys.deleteSuccess'), { variant: 'success' });
       setSelectedIds([]);
       loadSurveys();
     } catch (error: any) {
       enqueueSnackbar(error.message || t('surveys.deleteFailed'), { variant: 'error' });
+    } finally {
+      setDeleteConfirmOpen(false);
+      setDeletingSurvey(null);
     }
   };
 
-  const handleBulkDelete = async () => {
-    if (selectedIds.length === 0) return;
+  const handleDeleteCancel = () => {
+    setDeleteConfirmOpen(false);
+    setDeletingSurvey(null);
+  };
 
-    if (!window.confirm(t('surveys.confirmBulkDelete', { count: selectedIds.length }))) {
-      return;
-    }
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) return;
+    setBulkDeleteConfirmOpen(true);
+  };
+
+  const handleBulkDeleteConfirm = async () => {
+    if (selectedIds.length === 0) return;
 
     try {
       await Promise.all(selectedIds.map(id => surveyService.deleteSurvey(id)));
@@ -233,7 +284,13 @@ const SurveysPage: React.FC = () => {
       loadSurveys();
     } catch (error: any) {
       enqueueSnackbar(error.message || t('surveys.bulkDeleteFailed'), { variant: 'error' });
+    } finally {
+      setBulkDeleteConfirmOpen(false);
     }
+  };
+
+  const handleBulkDeleteCancel = () => {
+    setBulkDeleteConfirmOpen(false);
   };
 
   const handleToggleActive = async (survey: Survey) => {
@@ -266,14 +323,7 @@ const SurveysPage: React.FC = () => {
             {t('surveys.subtitle')}
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="outlined"
-            startIcon={<SettingsIcon />}
-            onClick={handleConfigOpen}
-          >
-            {t('surveys.config')}
-          </Button>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
@@ -281,48 +331,66 @@ const SurveysPage: React.FC = () => {
           >
             {t('surveys.createSurvey')}
           </Button>
+          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+          <Button
+            variant="outlined"
+            startIcon={<SettingsIcon />}
+            onClick={handleConfigOpen}
+          >
+            {t('surveys.config')}
+          </Button>
         </Box>
       </Box>
 
       {/* Filter Panel */}
       <Card sx={{ mb: 2 }}>
         <CardContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {/* Search Bar */}
-            <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'nowrap', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'nowrap', flexGrow: 1, minWidth: 0 }}>
               <TextField
-                fullWidth
                 placeholder={t('surveys.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                sx={{
+                  minWidth: 300,
+                  flexGrow: 1,
+                  maxWidth: 500,
+                  '& .MuiOutlinedInput-root': {
+                    height: '40px',
+                    borderRadius: '20px',
+                    bgcolor: 'background.paper',
+                    transition: 'all 0.2s ease-in-out',
+                    '& fieldset': {
+                      borderColor: 'divider',
+                    },
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      '& fieldset': {
+                        borderColor: 'primary.light',
+                      }
+                    },
+                    '&.Mui-focused': {
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                      '& fieldset': {
+                        borderColor: 'primary.main',
+                        borderWidth: '1px',
+                      }
+                    }
+                  },
+                  '& .MuiInputBase-input': {
+                    fontSize: '0.875rem',
+                  }
+                }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <SearchIcon />
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                     </InputAdornment>
                   ),
                 }}
                 size="small"
               />
-            </Box>
-
-            {/* Bulk Actions and Filters */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {selectedIds.length > 0 && (
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('common.selectedCount', { count: selectedIds.length })}
-                  </Typography>
-                  <Button
-                    size="small"
-                    color="error"
-                    startIcon={<DeleteIcon />}
-                    onClick={handleBulkDelete}
-                  >
-                    {t('common.delete')}
-                  </Button>
-                </Box>
-              )}
 
               {/* Dynamic Filter Bar with Column Settings and Refresh Button */}
               <DynamicFilterBar
@@ -357,6 +425,24 @@ const SurveysPage: React.FC = () => {
           </Box>
         </CardContent>
       </Card>
+
+      {/* Bulk Actions */}
+      {selectedIds.length > 0 && (
+        <Box sx={{ mb: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
+          <Typography variant="body2" color="text.secondary">
+            {t('common.selectedCount', { count: selectedIds.length })}
+          </Typography>
+          <Button
+            variant="outlined"
+            color="error"
+            size="small"
+            startIcon={<DeleteIcon />}
+            onClick={handleBulkDelete}
+          >
+            {t('common.deleteSelected')}
+          </Button>
+        </Box>
+      )}
 
       {/* Table */}
       <Card>
@@ -428,40 +514,102 @@ const SurveysPage: React.FC = () => {
                         if (column.id === 'platformSurveyId') {
                           return (
                             <TableCell key={column.id}>
-                              {survey.platformSurveyId}
+                              <Typography
+                                sx={{
+                                  cursor: 'pointer',
+                                  color: 'primary.main',
+                                  '&:hover': {
+                                    color: 'primary.main',
+                                    textDecoration: 'underline'
+                                  }
+                                }}
+                                onClick={() => handleEdit(survey)}
+                              >
+                                {survey.platformSurveyId}
+                              </Typography>
                             </TableCell>
                           );
                         }
                         if (column.id === 'surveyTitle') {
                           return (
                             <TableCell key={column.id}>
-                              {survey.surveyTitle}
+                              <Typography
+                                sx={{
+                                  cursor: 'pointer',
+                                  color: 'primary.main',
+                                  '&:hover': {
+                                    color: 'primary.main',
+                                    textDecoration: 'underline'
+                                  }
+                                }}
+                                onClick={() => handleEdit(survey)}
+                              >
+                                {survey.surveyTitle}
+                              </Typography>
                             </TableCell>
                           );
                         }
                         if (column.id === 'triggerConditions') {
                           return (
                             <TableCell key={column.id}>
-                              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                                {survey.triggerConditions.map((condition, idx) => (
-                                  <Chip
-                                    key={idx}
-                                    label={`${t(`surveys.condition.${condition.type}`)}: ${condition.value}`}
-                                    size="small"
-                                  />
-                                ))}
+                              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
+                                {survey.triggerConditions.map((condition, idx) => {
+                                  // Format condition label with unit
+                                  let label = '';
+                                  if (condition.type === 'userLevel') {
+                                    label = `${t('surveys.condition.userLevel')}: ${condition.value}${t('surveys.conditionUnit.levelOrMore')}`;
+                                  } else if (condition.type === 'joinDays') {
+                                    label = `${t('surveys.condition.joinDays')}: ${condition.value}${t('surveys.conditionUnit.daysOrMore')}`;
+                                  } else {
+                                    label = `${t(`surveys.condition.${condition.type}`)}: ${condition.value}`;
+                                  }
+
+                                  return (
+                                    <React.Fragment key={idx}>
+                                      <Chip
+                                        label={label}
+                                        size="small"
+                                      />
+                                      {idx < survey.triggerConditions.length - 1 && (
+                                        <Typography
+                                          variant="caption"
+                                          sx={{
+                                            fontWeight: 600,
+                                            color: 'primary.main',
+                                            px: 0.5
+                                          }}
+                                        >
+                                          AND
+                                        </Typography>
+                                      )}
+                                    </React.Fragment>
+                                  );
+                                })}
                               </Box>
+                            </TableCell>
+                          );
+                        }
+                        if (column.id === 'rewards') {
+                          return (
+                            <TableCell key={column.id}>
+                              <Typography variant="body2" color="text.secondary">
+                                {t('surveys.rewardsPlaceholder')}
+                              </Typography>
                             </TableCell>
                           );
                         }
                         if (column.id === 'status') {
                           return (
                             <TableCell key={column.id}>
-                              <Chip
-                                label={survey.isActive ? t('common.active') : t('common.inactive')}
-                                color={survey.isActive ? 'success' : 'default'}
-                                size="small"
-                              />
+                              <Tooltip title={survey.isActive ? t('surveys.deactivate') : t('surveys.activate')}>
+                                <Chip
+                                  label={survey.isActive ? t('common.active') : t('common.inactive')}
+                                  color={survey.isActive ? 'success' : 'default'}
+                                  size="small"
+                                  onClick={() => handleToggleActive(survey)}
+                                  sx={{ cursor: 'pointer' }}
+                                />
+                              </Tooltip>
                             </TableCell>
                           );
                         }
@@ -482,19 +630,6 @@ const SurveysPage: React.FC = () => {
                                     onClick={() => handleEdit(survey)}
                                   >
                                     <EditIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title={survey.isActive ? t('surveys.deactivate') : t('surveys.activate')}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleToggleActive(survey)}
-                                  >
-                                    <Chip
-                                      label={survey.isActive ? t('common.active') : t('common.inactive')}
-                                      color={survey.isActive ? 'success' : 'default'}
-                                      size="small"
-                                      sx={{ cursor: 'pointer' }}
-                                    />
                                   </IconButton>
                                 </Tooltip>
                                 <Tooltip title={t('common.delete')}>
@@ -538,7 +673,7 @@ const SurveysPage: React.FC = () => {
       <ColumnSettingsDialog
         anchorEl={columnSettingsAnchor}
         onClose={() => setColumnSettingsAnchor(null)}
-        columns={columns}
+        columns={columns.filter(col => col.id !== 'checkbox' && col.id !== 'actions')}
         onColumnsChange={handleColumnsChange}
         onReset={handleResetColumns}
       />
@@ -555,6 +690,27 @@ const SurveysPage: React.FC = () => {
       <SurveyConfigDialog
         open={configDialogOpen}
         onClose={() => setConfigDialogOpen(false)}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDeleteDialog
+        open={deleteConfirmOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title={t('surveys.deleteConfirmTitle')}
+        message={t('surveys.deleteConfirmMessage', {
+          platformSurveyId: deletingSurvey?.platformSurveyId || ''
+        })}
+      />
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <ConfirmDeleteDialog
+        open={bulkDeleteConfirmOpen}
+        onClose={handleBulkDeleteCancel}
+        onConfirm={handleBulkDeleteConfirm}
+        title={t('surveys.bulkDeleteConfirmTitle')}
+        message={t('surveys.bulkDeleteConfirmMessage', { count: selectedIds.length })}
+        warning={t('surveys.bulkDeleteWarning')}
       />
     </Box>
   );

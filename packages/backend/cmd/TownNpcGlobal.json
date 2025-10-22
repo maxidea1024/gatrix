@@ -1,0 +1,7020 @@
+{
+  ":TownNpcGlobal": {
+    ":type": {
+      "id": "key",
+      "charId": "number",
+      "location": "string",
+      "localBitFlag": "bit",
+      "liveEvent": "number",
+      "npcInteractionId": [
+        "number",
+        "number"
+      ],
+      "questId": [
+        "number",
+        "number"
+      ],
+      "injectionNodeId": [
+        "number",
+        "number"
+      ],
+      "actionRadius": "number",
+      "moveSpeed": "number",
+      "appearTownTime": "number",
+      "outTownTime": "number",
+      "randomDialogue": "number",
+      "clickDialogue": "number",
+      "npcShopGroup": "number"
+    },
+    ":required": {
+      "charId": 1,
+      "location": 1,
+      "localBitFlag": 1,
+      "actionRadius": 1,
+      "appearTownTime": 1,
+      "outTownTime": 1
+    },
+    ":min": {
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 0
+    },
+    ":max": {
+      "actionRadius": 5,
+      "appearTownTime": 24,
+      "outTownTime": 24
+    },
+    ":enum": {},
+    ":links": {
+      "charId": [
+        "Character"
+      ],
+      "liveEvent": [
+        "LiveEvent"
+      ],
+      "npcInteractionId": [
+        [
+          "NpcInteraction"
+        ],
+        [
+          "NpcInteraction"
+        ]
+      ],
+      "questId": [
+        [
+          "Quest"
+        ],
+        [
+          "Quest"
+        ]
+      ],
+      "injectionNodeId": [
+        [
+          "QuestNode"
+        ],
+        [
+          "QuestNode"
+        ]
+      ],
+      "randomDialogue": [
+        "TownText"
+      ],
+      "clickDialogue": [
+        "TownText"
+      ]
+    }
+  },
+  "TownNpcGlobal": {
+    "51000001": {
+      "id": 51000001,
+      "charId": 21150158,
+      "location": "Spawner_Dog_01",
+      "localBitFlag": 219,
+      "actionRadius": 5,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000002": {
+      "id": 51000002,
+      "charId": 21150158,
+      "location": "Spawner_Dog_02",
+      "localBitFlag": 219,
+      "actionRadius": 5,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000003": {
+      "id": 51000003,
+      "charId": 21150158,
+      "location": "Spawner_Dog_03",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000004": {
+      "id": 51000004,
+      "charId": 21150158,
+      "location": "Spawner_Dog_04",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000005": {
+      "id": 51000005,
+      "charId": 21150158,
+      "location": "Spawner_Dog_05",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000006": {
+      "id": 51000006,
+      "charId": 21150158,
+      "location": "Spawner_Dog_06",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000007": {
+      "id": 51000007,
+      "charId": 21150158,
+      "location": "Spawner_Dog_07",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000008": {
+      "id": 51000008,
+      "charId": 21150158,
+      "location": "Spawner_Dog_08",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000009": {
+      "id": 51000009,
+      "charId": 21150158,
+      "location": "Spawner_Dog_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000010": {
+      "id": 51000010,
+      "charId": 21150158,
+      "location": "Spawner_Dog_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000011": {
+      "id": 51000011,
+      "charId": 21150158,
+      "location": "Spawner_Dog_11",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000012": {
+      "id": 51000012,
+      "charId": 21150158,
+      "location": "Spawner_Dog_12",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000013": {
+      "id": 51000013,
+      "charId": 21150001,
+      "location": "Spawner_Islam_01",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000014": {
+      "id": 51000014,
+      "charId": 21150002,
+      "location": "Spawner_Islam_02",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000015": {
+      "id": 51000015,
+      "charId": 21150003,
+      "location": "Spawner_Islam_03",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000016": {
+      "id": 51000016,
+      "charId": 21150004,
+      "location": "Spawner_Islam_04",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000017": {
+      "id": 51000017,
+      "charId": 21150005,
+      "location": "Spawner_Islam_05",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000018": {
+      "id": 51000018,
+      "charId": 21150006,
+      "location": "Spawner_Islam_06",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000019": {
+      "id": 51000019,
+      "charId": 21150007,
+      "location": "Spawner_Islam_07",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000020": {
+      "id": 51000020,
+      "charId": 21150008,
+      "location": "Spawner_Islam_08",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000021": {
+      "id": 51000021,
+      "charId": 21150009,
+      "location": "Spawner_Islam_09",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000022": {
+      "id": 51000022,
+      "charId": 21150010,
+      "location": "Spawner_Islam_10",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000023": {
+      "id": 51000023,
+      "charId": 21150011,
+      "location": "Spawner_Islam_11",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000024": {
+      "id": 51000024,
+      "charId": 21150012,
+      "location": "Spawner_Islam_12",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000025": {
+      "id": 51000025,
+      "charId": 21150013,
+      "location": "Spawner_Islam_13",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000026": {
+      "id": 51000026,
+      "charId": 21150014,
+      "location": "Spawner_Islam_14",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000027": {
+      "id": 51000027,
+      "charId": 21150015,
+      "location": "Spawner_Islam_15",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000028": {
+      "id": 51000028,
+      "charId": 21150016,
+      "location": "Spawner_Islam_16",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000029": {
+      "id": 51000029,
+      "charId": 21150017,
+      "location": "Spawner_Islam_17",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000030": {
+      "id": 51000030,
+      "charId": 21150018,
+      "location": "Spawner_Islam_18",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000031": {
+      "id": 51000031,
+      "charId": 21150019,
+      "location": "Spawner_Islam_19",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000032": {
+      "id": 51000032,
+      "charId": 21150020,
+      "location": "Spawner_Islam_20",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000033": {
+      "id": 51000033,
+      "charId": 21150021,
+      "location": "Spawner_Islam_21",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000034": {
+      "id": 51000034,
+      "charId": 21150022,
+      "location": "Spawner_Islam_22",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000035": {
+      "id": 51000035,
+      "charId": 21150023,
+      "location": "Spawner_Islam_23",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000036": {
+      "id": 51000036,
+      "charId": 21150024,
+      "location": "Spawner_Islam_24",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000037": {
+      "id": 51000037,
+      "charId": 21150025,
+      "location": "Spawner_Islam_25",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000038": {
+      "id": 51000038,
+      "charId": 21150026,
+      "location": "Spawner_Islam_26",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000039": {
+      "id": 51000039,
+      "charId": 21150027,
+      "location": "Spawner_Islam_27",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000040": {
+      "id": 51000040,
+      "charId": 21150028,
+      "location": "Spawner_Islam_28",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000041": {
+      "id": 51000041,
+      "charId": 21150029,
+      "location": "Spawner_Islam_29",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000042": {
+      "id": 51000042,
+      "charId": 21150030,
+      "location": "Spawner_Islam_30",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000043": {
+      "id": 51000043,
+      "charId": 21150031,
+      "location": "Spawner_Islam_31",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000044": {
+      "id": 51000044,
+      "charId": 21150032,
+      "location": "Spawner_Islam_32",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000045": {
+      "id": 51000045,
+      "charId": 21150033,
+      "location": "Spawner_Islam_33",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000046": {
+      "id": 51000046,
+      "charId": 21150034,
+      "location": "Spawner_Islam_34",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000047": {
+      "id": 51000047,
+      "charId": 21150035,
+      "location": "Spawner_Islam_35",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000048": {
+      "id": 51000048,
+      "charId": 21150036,
+      "location": "Spawner_Islam_36",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000049": {
+      "id": 51000049,
+      "charId": 21150037,
+      "location": "Spawner_Islam_37",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000050": {
+      "id": 51000050,
+      "charId": 21150038,
+      "location": "Spawner_Islam_38",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000051": {
+      "id": 51000051,
+      "charId": 21150039,
+      "location": "Spawner_Islam_39",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000052": {
+      "id": 51000052,
+      "charId": 21150040,
+      "location": "Spawner_Islam_40",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000053": {
+      "id": 51000053,
+      "charId": 21150041,
+      "location": "Spawner_Islam_41",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000054": {
+      "id": 51000054,
+      "charId": 21150042,
+      "location": "Spawner_Islam_42",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000055": {
+      "id": 51000055,
+      "charId": 21150043,
+      "location": "Spawner_Islam_43",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000056": {
+      "id": 51000056,
+      "charId": 21150044,
+      "location": "Spawner_Islam_44",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000057": {
+      "id": 51000057,
+      "charId": 21150045,
+      "location": "Spawner_Islam_45",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000058": {
+      "id": 51000058,
+      "charId": 21150046,
+      "location": "Spawner_Islam_46",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000059": {
+      "id": 51000059,
+      "charId": 21150047,
+      "location": "Spawner_Islam_47",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000060": {
+      "id": 51000060,
+      "charId": 21150048,
+      "location": "Spawner_Islam_48",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000061": {
+      "id": 51000061,
+      "charId": 21150004,
+      "location": "Spawner_Algiers_01",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000062": {
+      "id": 51000062,
+      "charId": 21150037,
+      "location": "Spawner_Algiers_02",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000063": {
+      "id": 51000063,
+      "charId": 21150001,
+      "location": "Spawner_Algiers_03",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000064": {
+      "id": 51000064,
+      "charId": 21150031,
+      "location": "Spawner_Algiers_04",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000065": {
+      "id": 51000065,
+      "charId": 21150010,
+      "location": "Spawner_Algiers_05",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000066": {
+      "id": 51000066,
+      "charId": 21150007,
+      "location": "Spawner_Algiers_06",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000067": {
+      "id": 51000067,
+      "charId": 21150002,
+      "location": "Spawner_Tunis_01",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000068": {
+      "id": 51000068,
+      "charId": 21150011,
+      "location": "Spawner_Tunis_02",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000069": {
+      "id": 51000069,
+      "charId": 21150014,
+      "location": "Spawner_Tunis_03",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000070": {
+      "id": 51000070,
+      "charId": 21150005,
+      "location": "Spawner_Tunis_04",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000071": {
+      "id": 51000071,
+      "charId": 21150047,
+      "location": "Spawner_Tunis_05",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000072": {
+      "id": 51000072,
+      "charId": 21150044,
+      "location": "Spawner_Tunis_06",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000073": {
+      "id": 51000073,
+      "charId": 21150017,
+      "location": "Spawner_Tunis_07",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000074": {
+      "id": 51000074,
+      "charId": 21150049,
+      "location": "Spawner_Medit_01",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000075": {
+      "id": 51000075,
+      "charId": 21150050,
+      "location": "Spawner_Medit_02",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000076": {
+      "id": 51000076,
+      "charId": 21150051,
+      "location": "Spawner_Medit_03",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000077": {
+      "id": 51000077,
+      "charId": 21150052,
+      "location": "Spawner_Medit_04",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000078": {
+      "id": 51000078,
+      "charId": 21150053,
+      "location": "Spawner_Medit_05",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000079": {
+      "id": 51000079,
+      "charId": 21150054,
+      "location": "Spawner_Medit_06",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000080": {
+      "id": 51000080,
+      "charId": 21150055,
+      "location": "Spawner_Medit_07",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000081": {
+      "id": 51000081,
+      "charId": 21150056,
+      "location": "Spawner_Medit_08",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000082": {
+      "id": 51000082,
+      "charId": 21150057,
+      "location": "Spawner_Medit_09",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000083": {
+      "id": 51000083,
+      "charId": 21150058,
+      "location": "Spawner_Medit_10",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000084": {
+      "id": 51000084,
+      "charId": 21150059,
+      "location": "Spawner_Medit_11",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000085": {
+      "id": 51000085,
+      "charId": 21150060,
+      "location": "Spawner_Medit_12",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000086": {
+      "id": 51000086,
+      "charId": 21150061,
+      "location": "Spawner_Medit_13",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000087": {
+      "id": 51000087,
+      "charId": 21150062,
+      "location": "Spawner_Medit_14",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000088": {
+      "id": 51000088,
+      "charId": 21150063,
+      "location": "Spawner_Medit_15",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000089": {
+      "id": 51000089,
+      "charId": 21150064,
+      "location": "Spawner_Medit_16",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000090": {
+      "id": 51000090,
+      "charId": 21150065,
+      "location": "Spawner_Medit_17",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000091": {
+      "id": 51000091,
+      "charId": 21150066,
+      "location": "Spawner_Medit_18",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000092": {
+      "id": 51000092,
+      "charId": 21150067,
+      "location": "Spawner_Medit_19",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000093": {
+      "id": 51000093,
+      "charId": 21150068,
+      "location": "Spawner_Medit_20",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000094": {
+      "id": 51000094,
+      "charId": 21150069,
+      "location": "Spawner_Medit_21",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000095": {
+      "id": 51000095,
+      "charId": 21150070,
+      "location": "Spawner_Medit_22",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000096": {
+      "id": 51000096,
+      "charId": 21150071,
+      "location": "Spawner_Medit_23",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000097": {
+      "id": 51000097,
+      "charId": 21150072,
+      "location": "Spawner_Medit_24",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000098": {
+      "id": 51000098,
+      "charId": 21150073,
+      "location": "Spawner_Medit_25",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000099": {
+      "id": 51000099,
+      "charId": 21150074,
+      "location": "Spawner_Medit_26",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000100": {
+      "id": 51000100,
+      "charId": 21150075,
+      "location": "Spawner_Medit_27",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000101": {
+      "id": 51000101,
+      "charId": 21150076,
+      "location": "Spawner_Medit_28",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000102": {
+      "id": 51000102,
+      "charId": 21150077,
+      "location": "Spawner_Medit_29",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000103": {
+      "id": 51000103,
+      "charId": 21150078,
+      "location": "Spawner_Medit_30",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000104": {
+      "id": 51000104,
+      "charId": 21150079,
+      "location": "Spawner_Medit_31",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000105": {
+      "id": 51000105,
+      "charId": 21150080,
+      "location": "Spawner_Medit_32",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000106": {
+      "id": 51000106,
+      "charId": 21150081,
+      "location": "Spawner_Medit_33",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000107": {
+      "id": 51000107,
+      "charId": 21150082,
+      "location": "Spawner_Medit_34",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000108": {
+      "id": 51000108,
+      "charId": 21150083,
+      "location": "Spawner_Medit_35",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000109": {
+      "id": 51000109,
+      "charId": 21150084,
+      "location": "Spawner_Medit_36",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000110": {
+      "id": 51000110,
+      "charId": 21150085,
+      "location": "Spawner_Medit_37",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000111": {
+      "id": 51000111,
+      "charId": 21150086,
+      "location": "Spawner_Medit_38",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000112": {
+      "id": 51000112,
+      "charId": 21150087,
+      "location": "Spawner_Medit_39",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000113": {
+      "id": 51000113,
+      "charId": 21150088,
+      "location": "Spawner_Medit_40",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000114": {
+      "id": 51000114,
+      "charId": 21150089,
+      "location": "Spawner_Medit_41",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000115": {
+      "id": 51000115,
+      "charId": 21150090,
+      "location": "Spawner_Medit_42",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73100001,
+      "clickDialogue": 73100001
+    },
+    "51000116": {
+      "id": 51000116,
+      "charId": 21150091,
+      "location": "Spawner_Medit_43",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000117": {
+      "id": 51000117,
+      "charId": 21150092,
+      "location": "Spawner_Medit_44",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000118": {
+      "id": 51000118,
+      "charId": 21150093,
+      "location": "Spawner_Medit_45",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000119": {
+      "id": 51000119,
+      "charId": 21150094,
+      "location": "Spawner_Medit_46",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000120": {
+      "id": 51000120,
+      "charId": 21150095,
+      "location": "Spawner_Medit_47",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000121": {
+      "id": 51000121,
+      "charId": 21150096,
+      "location": "Spawner_Medit_48",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000122": {
+      "id": 51000122,
+      "charId": 21150058,
+      "location": "Spawner_Seville_01",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000123": {
+      "id": 51000123,
+      "charId": 21150049,
+      "location": "Spawner_Seville_02",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000124": {
+      "id": 51000124,
+      "charId": 21150067,
+      "location": "Spawner_Seville_03",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000125": {
+      "id": 51000125,
+      "charId": 21150052,
+      "location": "Spawner_Seville_04",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000126": {
+      "id": 51000126,
+      "charId": 21150070,
+      "location": "Spawner_Seville_05",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000127": {
+      "id": 51000127,
+      "charId": 21150053,
+      "location": "Spawner_Xenova_01",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000128": {
+      "id": 51000128,
+      "charId": 21150062,
+      "location": "Spawner_Xenova_02",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000129": {
+      "id": 51000129,
+      "charId": 21150059,
+      "location": "Spawner_Xenova_03",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000130": {
+      "id": 51000130,
+      "charId": 21150092,
+      "location": "Spawner_Xenova_04",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000131": {
+      "id": 51000131,
+      "charId": 21150056,
+      "location": "Spawner_Xenova_05",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000132": {
+      "id": 51000132,
+      "charId": 21150054,
+      "location": "Spawner_Marseille_01",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000133": {
+      "id": 51000133,
+      "charId": 21150093,
+      "location": "Spawner_Marseille_02",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000134": {
+      "id": 51000134,
+      "charId": 21150057,
+      "location": "Spawner_Marseille_03",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000135": {
+      "id": 51000135,
+      "charId": 21150081,
+      "location": "Spawner_Marseille_04",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000136": {
+      "id": 51000136,
+      "charId": 21150069,
+      "location": "Spawner_Marseille_05",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000137": {
+      "id": 51000137,
+      "charId": 21150060,
+      "location": "Spawner_Marseille_06",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000138": {
+      "id": 51000138,
+      "charId": 21150097,
+      "location": "Spawner_Amsterdam_Bank_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000139": {
+      "id": 51000139,
+      "charId": 21150098,
+      "location": "Spawner_Amsterdam_Bank_02",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 10,
+      "outTownTime": 19
+    },
+    "51000140": {
+      "id": 51000140,
+      "charId": 21150099,
+      "location": "Spawner_Amsterdam_Bridge_01",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000141": {
+      "id": 51000141,
+      "charId": 21150100,
+      "location": "Spawner_Amsterdam_Castle_01",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000142": {
+      "id": 51000142,
+      "charId": 21150101,
+      "location": "Spawner_Amsterdam_Castle_02",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000143": {
+      "id": 51000143,
+      "charId": 21150102,
+      "location": "Spawner_Amsterdam_Church_01",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000144": {
+      "id": 51000144,
+      "charId": 21150103,
+      "location": "Spawner_Amsterdam_Embark_01",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000145": {
+      "id": 51000145,
+      "charId": 21150104,
+      "location": "Spawner_Amsterdam_Fleece_01",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000146": {
+      "id": 51000146,
+      "charId": 21150105,
+      "location": "Spawner_Amsterdam_Fleece_02",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000147": {
+      "id": 51000147,
+      "charId": 21150106,
+      "location": "Spawner_Amsterdam_Flower_01",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000148": {
+      "id": 51000148,
+      "charId": 21150107,
+      "location": "Spawner_Amsterdam_Fruit_01",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000149": {
+      "id": 51000149,
+      "charId": 21150108,
+      "location": "Spawner_Amsterdam_Fruit_02",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000150": {
+      "id": 51000150,
+      "charId": 21150109,
+      "location": "Spawner_Amsterdam_Guild_01",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000151": {
+      "id": 51000151,
+      "charId": 21150110,
+      "location": "Spawner_Amsterdam_Magic_01",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000152": {
+      "id": 51000152,
+      "charId": 21150111,
+      "location": "Spawner_Amsterdam_Magic_02",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000153": {
+      "id": 51000153,
+      "charId": 21150112,
+      "location": "Spawner_Amsterdam_Office_01",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000154": {
+      "id": 51000154,
+      "charId": 21150113,
+      "location": "Spawner_Amsterdam_Shipyard_01",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000155": {
+      "id": 51000155,
+      "charId": 21150114,
+      "location": "Spawner_Amsterdam_Special_01",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000156": {
+      "id": 51000156,
+      "charId": 21150115,
+      "location": "Spawner_Amsterdam_Spectacle_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000157": {
+      "id": 51000157,
+      "charId": 21150116,
+      "location": "Spawner_Amsterdam_Square_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000158": {
+      "id": 51000158,
+      "charId": 21150117,
+      "location": "Spawner_Amsterdam_Square_02",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000159": {
+      "id": 51000159,
+      "charId": 21150118,
+      "location": "Spawner_Amsterdam_Square_03",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000160": {
+      "id": 51000160,
+      "charId": 21150119,
+      "location": "Spawner_Amsterdam_Table_01",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000161": {
+      "id": 51000161,
+      "charId": 21150120,
+      "location": "Spawner_Amsterdam_Table_02",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000162": {
+      "id": 51000162,
+      "charId": 21150121,
+      "location": "Spawner_Amsterdam_Table_03",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000163": {
+      "id": 51000163,
+      "charId": 21150122,
+      "location": "Spawner_Amsterdam_Table_04",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000164": {
+      "id": 51000164,
+      "charId": 21150123,
+      "location": "Spawner_Amsterdam_Tool_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000165": {
+      "id": 51000165,
+      "charId": 21150124,
+      "location": "Spawner_Amsterdam_Trade_01",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000166": {
+      "id": 51000166,
+      "charId": 21150125,
+      "location": "Spawner_Amsterdam_Weapone_01",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000167": {
+      "id": 51000167,
+      "charId": 21150126,
+      "location": "Spawner_Amsterdam_Weapone_02",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000168": {
+      "id": 51000168,
+      "charId": 21150127,
+      "location": "Spawner_Amsterdam_Weapone_03",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000169": {
+      "id": 51000169,
+      "charId": 21150049,
+      "location": "Spawner_Dummy_Walker_01",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 10,
+      "outTownTime": 19
+    },
+    "51000170": {
+      "id": 51000170,
+      "charId": 21150050,
+      "location": "Spawner_Dummy_Walker_02",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000171": {
+      "id": 51000171,
+      "charId": 21150051,
+      "location": "Spawner_Dummy_Walker_03",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000172": {
+      "id": 51000172,
+      "charId": 21150052,
+      "location": "Spawner_Dummy_Walker_04",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000173": {
+      "id": 51000173,
+      "charId": 21150053,
+      "location": "Spawner_Dummy_Walker_05",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000174": {
+      "id": 51000174,
+      "charId": 21150054,
+      "location": "Spawner_Dummy_Walker_06",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000175": {
+      "id": 51000175,
+      "charId": 21150055,
+      "location": "Spawner_Dummy_Walker_07",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000176": {
+      "id": 51000176,
+      "charId": 21150056,
+      "location": "Spawner_Dummy_Walker_08",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000177": {
+      "id": 51000177,
+      "charId": 21150057,
+      "location": "Spawner_Dummy_Walker_09",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000178": {
+      "id": 51000178,
+      "charId": 21150058,
+      "location": "Spawner_Dummy_Walker_10",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000179": {
+      "id": 51000179,
+      "charId": 21150059,
+      "location": "Spawner_Dummy_Walker_11",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000180": {
+      "id": 51000180,
+      "charId": 21150060,
+      "location": "Spawner_Dummy_Walker_12",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000181": {
+      "id": 51000181,
+      "charId": 21150061,
+      "location": "Spawner_Dummy_Walker_13",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000182": {
+      "id": 51000182,
+      "charId": 21150062,
+      "location": "Spawner_Dummy_Walker_14",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000183": {
+      "id": 51000183,
+      "charId": 21150063,
+      "location": "Spawner_Dummy_Walker_15",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000184": {
+      "id": 51000184,
+      "charId": 21150064,
+      "location": "Spawner_Dummy_Walker_16",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000185": {
+      "id": 51000185,
+      "charId": 21150065,
+      "location": "Spawner_Dummy_Walker_17",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000186": {
+      "id": 51000186,
+      "charId": 21150066,
+      "location": "Spawner_Dummy_Walker_18",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000187": {
+      "id": 51000187,
+      "charId": 21150067,
+      "location": "Spawner_Dummy_Walker_19",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000188": {
+      "id": 51000188,
+      "charId": 21150068,
+      "location": "Spawner_Dummy_Walker_20",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000189": {
+      "id": 51000189,
+      "charId": 21150069,
+      "location": "Spawner_Dummy_Walker_21",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000190": {
+      "id": 51000190,
+      "charId": 21150070,
+      "location": "Spawner_Dummy_Walker_22",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000191": {
+      "id": 51000191,
+      "charId": 21150071,
+      "location": "Spawner_Dummy_Walker_23",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000192": {
+      "id": 51000192,
+      "charId": 21150072,
+      "location": "Spawner_Dummy_Walker_24",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000193": {
+      "id": 51000193,
+      "charId": 21150073,
+      "location": "Spawner_Dummy_Walker_25",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000194": {
+      "id": 51000194,
+      "charId": 21150074,
+      "location": "Spawner_Dummy_Walker_26",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000195": {
+      "id": 51000195,
+      "charId": 21150075,
+      "location": "Spawner_Dummy_Walker_27",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000196": {
+      "id": 51000196,
+      "charId": 21150076,
+      "location": "Spawner_Dummy_Walker_28",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000197": {
+      "id": 51000197,
+      "charId": 21150077,
+      "location": "Spawner_Dummy_Walker_29",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000198": {
+      "id": 51000198,
+      "charId": 21150078,
+      "location": "Spawner_Dummy_Walker_30",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000199": {
+      "id": 51000199,
+      "charId": 21150159,
+      "location": "Spawner_Africa_01",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000200": {
+      "id": 51000200,
+      "charId": 21150160,
+      "location": "Spawner_Africa_02",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000201": {
+      "id": 51000201,
+      "charId": 21150161,
+      "location": "Spawner_Africa_03",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000202": {
+      "id": 51000202,
+      "charId": 21150162,
+      "location": "Spawner_Africa_04",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000203": {
+      "id": 51000203,
+      "charId": 21150163,
+      "location": "Spawner_Africa_05",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000204": {
+      "id": 51000204,
+      "charId": 21150164,
+      "location": "Spawner_Africa_06",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000205": {
+      "id": 51000205,
+      "charId": 21150165,
+      "location": "Spawner_Africa_07",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000206": {
+      "id": 51000206,
+      "charId": 21150166,
+      "location": "Spawner_Africa_08",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000207": {
+      "id": 51000207,
+      "charId": 21150167,
+      "location": "Spawner_Africa_09",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000208": {
+      "id": 51000208,
+      "charId": 21150168,
+      "location": "Spawner_Africa_10",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000209": {
+      "id": 51000209,
+      "charId": 21150169,
+      "location": "Spawner_Africa_11",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000210": {
+      "id": 51000210,
+      "charId": 21150170,
+      "location": "Spawner_Africa_12",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000211": {
+      "id": 51000211,
+      "charId": 21150171,
+      "location": "Spawner_Africa_13",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000212": {
+      "id": 51000212,
+      "charId": 21150172,
+      "location": "Spawner_Africa_14",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000213": {
+      "id": 51000213,
+      "charId": 21150173,
+      "location": "Spawner_Africa_15",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000214": {
+      "id": 51000214,
+      "charId": 21150174,
+      "location": "Spawner_Africa_16",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000215": {
+      "id": 51000215,
+      "charId": 21150175,
+      "location": "Spawner_Africa_17",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000216": {
+      "id": 51000216,
+      "charId": 21150176,
+      "location": "Spawner_Africa_18",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000217": {
+      "id": 51000217,
+      "charId": 21150177,
+      "location": "Spawner_Africa_19",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000218": {
+      "id": 51000218,
+      "charId": 21150178,
+      "location": "Spawner_Africa_20",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000219": {
+      "id": 51000219,
+      "charId": 21150179,
+      "location": "Spawner_Africa_21",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000220": {
+      "id": 51000220,
+      "charId": 21150180,
+      "location": "Spawner_Africa_22",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000221": {
+      "id": 51000221,
+      "charId": 21150181,
+      "location": "Spawner_Africa_23",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000222": {
+      "id": 51000222,
+      "charId": 21150182,
+      "location": "Spawner_Africa_24",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000223": {
+      "id": 51000223,
+      "charId": 21150183,
+      "location": "Spawner_Africa_25",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000224": {
+      "id": 51000224,
+      "charId": 21150184,
+      "location": "Spawner_Africa_26",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000225": {
+      "id": 51000225,
+      "charId": 21150185,
+      "location": "Spawner_Africa_27",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000226": {
+      "id": 51000226,
+      "charId": 21150186,
+      "location": "Spawner_Africa_28",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000227": {
+      "id": 51000227,
+      "charId": 21150187,
+      "location": "Spawner_Africa_29",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000228": {
+      "id": 51000228,
+      "charId": 21150188,
+      "location": "Spawner_Africa_30",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000229": {
+      "id": 51000229,
+      "charId": 21150189,
+      "location": "Spawner_Africa_31",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000230": {
+      "id": 51000230,
+      "charId": 21150190,
+      "location": "Spawner_Africa_32",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000231": {
+      "id": 51000231,
+      "charId": 21150191,
+      "location": "Spawner_Africa_33",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000232": {
+      "id": 51000232,
+      "charId": 21150192,
+      "location": "Spawner_Africa_34",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000233": {
+      "id": 51000233,
+      "charId": 21150193,
+      "location": "Spawner_Africa_35",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000234": {
+      "id": 51000234,
+      "charId": 21150194,
+      "location": "Spawner_Africa_36",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000235": {
+      "id": 51000235,
+      "charId": 21150195,
+      "location": "Spawner_Africa_37",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000236": {
+      "id": 51000236,
+      "charId": 21150196,
+      "location": "Spawner_Africa_38",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000237": {
+      "id": 51000237,
+      "charId": 21150197,
+      "location": "Spawner_Africa_39",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000238": {
+      "id": 51000238,
+      "charId": 21150198,
+      "location": "Spawner_Africa_40",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000239": {
+      "id": 51000239,
+      "charId": 21150199,
+      "location": "Spawner_Africa_41",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000240": {
+      "id": 51000240,
+      "charId": 21150200,
+      "location": "Spawner_Africa_42",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000241": {
+      "id": 51000241,
+      "charId": 21150201,
+      "location": "Spawner_Africa_43",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000242": {
+      "id": 51000242,
+      "charId": 21150202,
+      "location": "Spawner_Africa_44",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000243": {
+      "id": 51000243,
+      "charId": 21150203,
+      "location": "Spawner_Africa_45",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000244": {
+      "id": 51000244,
+      "charId": 21150204,
+      "location": "Spawner_Africa_46",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000245": {
+      "id": 51000245,
+      "charId": 21150205,
+      "location": "Spawner_Africa_47",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000246": {
+      "id": 51000246,
+      "charId": 21150206,
+      "location": "Spawner_Africa_48",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000247": {
+      "id": 51000247,
+      "charId": 21150207,
+      "location": "Spawner_China_01",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000248": {
+      "id": 51000248,
+      "charId": 21150208,
+      "location": "Spawner_China_02",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000249": {
+      "id": 51000249,
+      "charId": 21150209,
+      "location": "Spawner_China_03",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000250": {
+      "id": 51000250,
+      "charId": 21150210,
+      "location": "Spawner_China_04",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000251": {
+      "id": 51000251,
+      "charId": 21150211,
+      "location": "Spawner_China_05",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000252": {
+      "id": 51000252,
+      "charId": 21150212,
+      "location": "Spawner_China_06",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000253": {
+      "id": 51000253,
+      "charId": 21150213,
+      "location": "Spawner_China_07",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000254": {
+      "id": 51000254,
+      "charId": 21150214,
+      "location": "Spawner_China_08",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000255": {
+      "id": 51000255,
+      "charId": 21150215,
+      "location": "Spawner_China_09",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000256": {
+      "id": 51000256,
+      "charId": 21150216,
+      "location": "Spawner_China_10",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000257": {
+      "id": 51000257,
+      "charId": 21150217,
+      "location": "Spawner_China_11",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000258": {
+      "id": 51000258,
+      "charId": 21150218,
+      "location": "Spawner_China_12",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000259": {
+      "id": 51000259,
+      "charId": 21150219,
+      "location": "Spawner_China_13",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000260": {
+      "id": 51000260,
+      "charId": 21150220,
+      "location": "Spawner_China_14",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000261": {
+      "id": 51000261,
+      "charId": 21150221,
+      "location": "Spawner_China_15",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000262": {
+      "id": 51000262,
+      "charId": 21150222,
+      "location": "Spawner_China_16",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000263": {
+      "id": 51000263,
+      "charId": 21150223,
+      "location": "Spawner_China_17",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000264": {
+      "id": 51000264,
+      "charId": 21150224,
+      "location": "Spawner_China_18",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000265": {
+      "id": 51000265,
+      "charId": 21150225,
+      "location": "Spawner_China_19",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000266": {
+      "id": 51000266,
+      "charId": 21150226,
+      "location": "Spawner_China_20",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000267": {
+      "id": 51000267,
+      "charId": 21150227,
+      "location": "Spawner_China_21",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000268": {
+      "id": 51000268,
+      "charId": 21150228,
+      "location": "Spawner_China_22",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000269": {
+      "id": 51000269,
+      "charId": 21150229,
+      "location": "Spawner_China_23",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000270": {
+      "id": 51000270,
+      "charId": 21150230,
+      "location": "Spawner_China_24",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000271": {
+      "id": 51000271,
+      "charId": 21150231,
+      "location": "Spawner_China_25",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000272": {
+      "id": 51000272,
+      "charId": 21150232,
+      "location": "Spawner_China_26",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000273": {
+      "id": 51000273,
+      "charId": 21150233,
+      "location": "Spawner_China_27",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000274": {
+      "id": 51000274,
+      "charId": 21150234,
+      "location": "Spawner_China_28",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000275": {
+      "id": 51000275,
+      "charId": 21150235,
+      "location": "Spawner_China_29",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000276": {
+      "id": 51000276,
+      "charId": 21150236,
+      "location": "Spawner_China_30",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000277": {
+      "id": 51000277,
+      "charId": 21150237,
+      "location": "Spawner_China_31",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000278": {
+      "id": 51000278,
+      "charId": 21150238,
+      "location": "Spawner_China_32",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000279": {
+      "id": 51000279,
+      "charId": 21150239,
+      "location": "Spawner_China_33",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000280": {
+      "id": 51000280,
+      "charId": 21150240,
+      "location": "Spawner_China_34",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000281": {
+      "id": 51000281,
+      "charId": 21150241,
+      "location": "Spawner_China_35",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000282": {
+      "id": 51000282,
+      "charId": 21150242,
+      "location": "Spawner_China_36",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000283": {
+      "id": 51000283,
+      "charId": 21150243,
+      "location": "Spawner_China_37",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000284": {
+      "id": 51000284,
+      "charId": 21150244,
+      "location": "Spawner_China_38",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000285": {
+      "id": 51000285,
+      "charId": 21150245,
+      "location": "Spawner_China_39",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000286": {
+      "id": 51000286,
+      "charId": 21150246,
+      "location": "Spawner_China_40",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000287": {
+      "id": 51000287,
+      "charId": 21150247,
+      "location": "Spawner_China_41",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000288": {
+      "id": 51000288,
+      "charId": 21150248,
+      "location": "Spawner_China_42",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000289": {
+      "id": 51000289,
+      "charId": 21150249,
+      "location": "Spawner_China_43",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000290": {
+      "id": 51000290,
+      "charId": 21150250,
+      "location": "Spawner_China_44",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000291": {
+      "id": 51000291,
+      "charId": 21150251,
+      "location": "Spawner_China_45",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000292": {
+      "id": 51000292,
+      "charId": 21150252,
+      "location": "Spawner_China_46",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000293": {
+      "id": 51000293,
+      "charId": 21150253,
+      "location": "Spawner_China_47",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000294": {
+      "id": 51000294,
+      "charId": 21150254,
+      "location": "Spawner_China_48",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22
+    },
+    "51000295": {
+      "id": 51000295,
+      "charId": 21150255,
+      "location": "NPC_Lisbon_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121550,
+      "clickDialogue": 73121550
+    },
+    "51000296": {
+      "id": 51000296,
+      "charId": 21150256,
+      "location": "NPC_Lisbon_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121551,
+      "clickDialogue": 73121551
+    },
+    "51000297": {
+      "id": 51000297,
+      "charId": 21150257,
+      "location": "NPC_Lisbon_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121552,
+      "clickDialogue": 73121552
+    },
+    "51000298": {
+      "id": 51000298,
+      "charId": 21150258,
+      "location": "NPC_Lisbon_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121553,
+      "clickDialogue": 73121553
+    },
+    "51000299": {
+      "id": 51000299,
+      "charId": 21150259,
+      "location": "NPC_Lisbon_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121554,
+      "clickDialogue": 73121554
+    },
+    "51000300": {
+      "id": 51000300,
+      "charId": 21150260,
+      "location": "NPC_Lisbon_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121555,
+      "clickDialogue": 73121555
+    },
+    "51000301": {
+      "id": 51000301,
+      "charId": 21150261,
+      "location": "NPC_Lisbon_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121556,
+      "clickDialogue": 73121556
+    },
+    "51000302": {
+      "id": 51000302,
+      "charId": 21150262,
+      "location": "NPC_Lisbon_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121557,
+      "clickDialogue": 73121557
+    },
+    "51000303": {
+      "id": 51000303,
+      "charId": 21150263,
+      "location": "NPC_Lisbon_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121558,
+      "clickDialogue": 73121558
+    },
+    "51000304": {
+      "id": 51000304,
+      "charId": 21150264,
+      "location": "NPC_Lisbon_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121559,
+      "clickDialogue": 73121559
+    },
+    "51000305": {
+      "id": 51000305,
+      "charId": 21150265,
+      "location": "NPC_Lisbon_11",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121560,
+      "clickDialogue": 73121560
+    },
+    "51000306": {
+      "id": 51000306,
+      "charId": 21150266,
+      "location": "NPC_Seville_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121561,
+      "clickDialogue": 73121561
+    },
+    "51000307": {
+      "id": 51000307,
+      "charId": 21150267,
+      "location": "NPC_Seville_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121562,
+      "clickDialogue": 73121562
+    },
+    "51000308": {
+      "id": 51000308,
+      "charId": 21150268,
+      "location": "NPC_Seville_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121563,
+      "clickDialogue": 73121563
+    },
+    "51000309": {
+      "id": 51000309,
+      "charId": 21150269,
+      "location": "NPC_Seville_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121564,
+      "clickDialogue": 73121564
+    },
+    "51000310": {
+      "id": 51000310,
+      "charId": 21150270,
+      "location": "NPC_Seville_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121565,
+      "clickDialogue": 73121565
+    },
+    "51000311": {
+      "id": 51000311,
+      "charId": 21150271,
+      "location": "NPC_Seville_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121566,
+      "clickDialogue": 73121566
+    },
+    "51000312": {
+      "id": 51000312,
+      "charId": 21150272,
+      "location": "NPC_Seville_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121567,
+      "clickDialogue": 73121567
+    },
+    "51000313": {
+      "id": 51000313,
+      "charId": 21150273,
+      "location": "NPC_Seville_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121568,
+      "clickDialogue": 73121568
+    },
+    "51000314": {
+      "id": 51000314,
+      "charId": 21150274,
+      "location": "NPC_Seville_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121569,
+      "clickDialogue": 73121569
+    },
+    "51000315": {
+      "id": 51000315,
+      "charId": 21150275,
+      "location": "NPC_Seville_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121570,
+      "clickDialogue": 73121570
+    },
+    "51000316": {
+      "id": 51000316,
+      "charId": 21150276,
+      "location": "NPC_Venezia_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121571,
+      "clickDialogue": 73121571
+    },
+    "51000317": {
+      "id": 51000317,
+      "charId": 21150277,
+      "location": "NPC_Venezia_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121572,
+      "clickDialogue": 73121572
+    },
+    "51000318": {
+      "id": 51000318,
+      "charId": 21150278,
+      "location": "NPC_Venezia_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121573,
+      "clickDialogue": 73121573
+    },
+    "51000319": {
+      "id": 51000319,
+      "charId": 21150279,
+      "location": "NPC_Venezia_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121574,
+      "clickDialogue": 73121574
+    },
+    "51000320": {
+      "id": 51000320,
+      "charId": 21150280,
+      "location": "NPC_Venezia_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121575,
+      "clickDialogue": 73121575
+    },
+    "51000321": {
+      "id": 51000321,
+      "charId": 21150281,
+      "location": "NPC_Venezia_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121576,
+      "clickDialogue": 73121576
+    },
+    "51000322": {
+      "id": 51000322,
+      "charId": 21150282,
+      "location": "NPC_Venezia_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121577,
+      "clickDialogue": 73121577
+    },
+    "51000323": {
+      "id": 51000323,
+      "charId": 21150283,
+      "location": "NPC_Venezia_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121578,
+      "clickDialogue": 73121578
+    },
+    "51000324": {
+      "id": 51000324,
+      "charId": 21150284,
+      "location": "NPC_Venezia_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121579,
+      "clickDialogue": 73121579
+    },
+    "51000325": {
+      "id": 51000325,
+      "charId": 21150285,
+      "location": "NPC_Venezia_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121580,
+      "clickDialogue": 73121580
+    },
+    "51000326": {
+      "id": 51000326,
+      "charId": 21150286,
+      "location": "NPC_Xenova_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121581,
+      "clickDialogue": 73121581
+    },
+    "51000327": {
+      "id": 51000327,
+      "charId": 21150287,
+      "location": "NPC_Xenova_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121582,
+      "clickDialogue": 73121582
+    },
+    "51000328": {
+      "id": 51000328,
+      "charId": 21150288,
+      "location": "NPC_Xenova_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121583,
+      "clickDialogue": 73121583
+    },
+    "51000329": {
+      "id": 51000329,
+      "charId": 21150289,
+      "location": "NPC_Xenova_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121584,
+      "clickDialogue": 73121584
+    },
+    "51000330": {
+      "id": 51000330,
+      "charId": 21150290,
+      "location": "NPC_Xenova_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121585,
+      "clickDialogue": 73121585
+    },
+    "51000331": {
+      "id": 51000331,
+      "charId": 21150291,
+      "location": "NPC_Xenova_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121586,
+      "clickDialogue": 73121586
+    },
+    "51000332": {
+      "id": 51000332,
+      "charId": 21150292,
+      "location": "NPC_Xenova_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121587,
+      "clickDialogue": 73121587
+    },
+    "51000333": {
+      "id": 51000333,
+      "charId": 21150293,
+      "location": "NPC_Xenova_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121588,
+      "clickDialogue": 73121588
+    },
+    "51000334": {
+      "id": 51000334,
+      "charId": 21150294,
+      "location": "NPC_Xenova_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121589,
+      "clickDialogue": 73121589
+    },
+    "51000335": {
+      "id": 51000335,
+      "charId": 21150295,
+      "location": "NPC_Xenova_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121590,
+      "clickDialogue": 73121590
+    },
+    "51000336": {
+      "id": 51000336,
+      "charId": 21150296,
+      "location": "NPC_PontaDelgada_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121591,
+      "clickDialogue": 73121591
+    },
+    "51000337": {
+      "id": 51000337,
+      "charId": 21150297,
+      "location": "NPC_PontaDelgada_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121592,
+      "clickDialogue": 73121592
+    },
+    "51000338": {
+      "id": 51000338,
+      "charId": 21150298,
+      "location": "NPC_PontaDelgada_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121593,
+      "clickDialogue": 73121593
+    },
+    "51000339": {
+      "id": 51000339,
+      "charId": 21150299,
+      "location": "NPC_PontaDelgada_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121594,
+      "clickDialogue": 73121594
+    },
+    "51000340": {
+      "id": 51000340,
+      "charId": 21150300,
+      "location": "NPC_PontaDelgada_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121595,
+      "clickDialogue": 73121595
+    },
+    "51000341": {
+      "id": 51000341,
+      "charId": 21150301,
+      "location": "NPC_PontaDelgada_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121596,
+      "clickDialogue": 73121596
+    },
+    "51000342": {
+      "id": 51000342,
+      "charId": 21150302,
+      "location": "NPC_PontaDelgada_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121597,
+      "clickDialogue": 73121597
+    },
+    "51000343": {
+      "id": 51000343,
+      "charId": 21150303,
+      "location": "NPC_PontaDelgada_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121598,
+      "clickDialogue": 73121598
+    },
+    "51000344": {
+      "id": 51000344,
+      "charId": 21150304,
+      "location": "NPC_PontaDelgada_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121599,
+      "clickDialogue": 73121599
+    },
+    "51000345": {
+      "id": 51000345,
+      "charId": 21150305,
+      "location": "NPC_PontaDelgada_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121600,
+      "clickDialogue": 73121600
+    },
+    "51000346": {
+      "id": 51000346,
+      "charId": 21150306,
+      "location": "NPC_Candia_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121601,
+      "clickDialogue": 73121601
+    },
+    "51000347": {
+      "id": 51000347,
+      "charId": 21150307,
+      "location": "NPC_Candia_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121602,
+      "clickDialogue": 73121602
+    },
+    "51000348": {
+      "id": 51000348,
+      "charId": 21150308,
+      "location": "NPC_Candia_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121603,
+      "clickDialogue": 73121603
+    },
+    "51000349": {
+      "id": 51000349,
+      "charId": 21150309,
+      "location": "NPC_Candia_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121604,
+      "clickDialogue": 73121604
+    },
+    "51000350": {
+      "id": 51000350,
+      "charId": 21150310,
+      "location": "NPC_Candia_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121605,
+      "clickDialogue": 73121605
+    },
+    "51000351": {
+      "id": 51000351,
+      "charId": 21150311,
+      "location": "NPC_Candia_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121606,
+      "clickDialogue": 73121606
+    },
+    "51000352": {
+      "id": 51000352,
+      "charId": 21150312,
+      "location": "NPC_Candia_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121607,
+      "clickDialogue": 73121607
+    },
+    "51000353": {
+      "id": 51000353,
+      "charId": 21150313,
+      "location": "NPC_Candia_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121608,
+      "clickDialogue": 73121608
+    },
+    "51000354": {
+      "id": 51000354,
+      "charId": 21150314,
+      "location": "NPC_Candia_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121609,
+      "clickDialogue": 73121609
+    },
+    "51000355": {
+      "id": 51000355,
+      "charId": 21150315,
+      "location": "NPC_Candia_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121610,
+      "clickDialogue": 73121610
+    },
+    "51000356": {
+      "id": 51000356,
+      "charId": 21150316,
+      "location": "NPC_Nantes_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121611,
+      "clickDialogue": 73121611
+    },
+    "51000357": {
+      "id": 51000357,
+      "charId": 21150317,
+      "location": "NPC_Nantes_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121612,
+      "clickDialogue": 73121612
+    },
+    "51000358": {
+      "id": 51000358,
+      "charId": 21150318,
+      "location": "NPC_Nantes_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121613,
+      "clickDialogue": 73121613
+    },
+    "51000359": {
+      "id": 51000359,
+      "charId": 21150319,
+      "location": "NPC_Nantes_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121614,
+      "clickDialogue": 73121614
+    },
+    "51000360": {
+      "id": 51000360,
+      "charId": 21150320,
+      "location": "NPC_Nantes_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121615,
+      "clickDialogue": 73121615
+    },
+    "51000361": {
+      "id": 51000361,
+      "charId": 21150321,
+      "location": "NPC_Nantes_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121616,
+      "clickDialogue": 73121616
+    },
+    "51000362": {
+      "id": 51000362,
+      "charId": 21150322,
+      "location": "NPC_Nantes_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121617,
+      "clickDialogue": 73121617
+    },
+    "51000363": {
+      "id": 51000363,
+      "charId": 21150323,
+      "location": "NPC_Nantes_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121618,
+      "clickDialogue": 73121618
+    },
+    "51000364": {
+      "id": 51000364,
+      "charId": 21150324,
+      "location": "NPC_Nantes_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121619,
+      "clickDialogue": 73121619
+    },
+    "51000365": {
+      "id": 51000365,
+      "charId": 21150325,
+      "location": "NPC_Nantes_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121620,
+      "clickDialogue": 73121620
+    },
+    "51000366": {
+      "id": 51000366,
+      "charId": 21150326,
+      "location": "NPC_Sakai_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121621,
+      "clickDialogue": 73121621
+    },
+    "51000367": {
+      "id": 51000367,
+      "charId": 21150327,
+      "location": "NPC_Sakai_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121622,
+      "clickDialogue": 73121622
+    },
+    "51000368": {
+      "id": 51000368,
+      "charId": 21150328,
+      "location": "NPC_Sakai_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121623,
+      "clickDialogue": 73121623
+    },
+    "51000369": {
+      "id": 51000369,
+      "charId": 21150329,
+      "location": "NPC_Sakai_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121624,
+      "clickDialogue": 73121624
+    },
+    "51000370": {
+      "id": 51000370,
+      "charId": 21150330,
+      "location": "NPC_Sakai_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121625,
+      "clickDialogue": 73121625
+    },
+    "51000371": {
+      "id": 51000371,
+      "charId": 21150331,
+      "location": "NPC_Sakai_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121626,
+      "clickDialogue": 73121626
+    },
+    "51000372": {
+      "id": 51000372,
+      "charId": 21150332,
+      "location": "NPC_Sakai_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121627,
+      "clickDialogue": 73121627
+    },
+    "51000373": {
+      "id": 51000373,
+      "charId": 21150333,
+      "location": "NPC_Sakai_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121628,
+      "clickDialogue": 73121628
+    },
+    "51000374": {
+      "id": 51000374,
+      "charId": 21150334,
+      "location": "NPC_Sakai_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121629,
+      "clickDialogue": 73121629
+    },
+    "51000375": {
+      "id": 51000375,
+      "charId": 21150335,
+      "location": "NPC_Sakai_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121630,
+      "clickDialogue": 73121630
+    },
+    "51000376": {
+      "id": 51000376,
+      "charId": 21150336,
+      "location": "NPC_Nagasaki_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121631,
+      "clickDialogue": 73121631
+    },
+    "51000377": {
+      "id": 51000377,
+      "charId": 21150337,
+      "location": "NPC_Nagasaki_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121632,
+      "clickDialogue": 73121632
+    },
+    "51000378": {
+      "id": 51000378,
+      "charId": 21150338,
+      "location": "NPC_Nagasaki_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121633,
+      "clickDialogue": 73121633
+    },
+    "51000379": {
+      "id": 51000379,
+      "charId": 21150339,
+      "location": "NPC_Nagasaki_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121634,
+      "clickDialogue": 73121634
+    },
+    "51000380": {
+      "id": 51000380,
+      "charId": 21150340,
+      "location": "NPC_Nagasaki_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121635,
+      "clickDialogue": 73121635
+    },
+    "51000382": {
+      "id": 51000382,
+      "charId": 21150341,
+      "location": "NPC_Nagasaki_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121637,
+      "clickDialogue": 73121637
+    },
+    "51000383": {
+      "id": 51000383,
+      "charId": 21150342,
+      "location": "NPC_Nagasaki_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121638,
+      "clickDialogue": 73121638
+    },
+    "51000384": {
+      "id": 51000384,
+      "charId": 21150343,
+      "location": "NPC_Nagasaki_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121639,
+      "clickDialogue": 73121639
+    },
+    "51000386": {
+      "id": 51000386,
+      "charId": 21150344,
+      "location": "NPC_Istanbul_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121641,
+      "clickDialogue": 73121641
+    },
+    "51000387": {
+      "id": 51000387,
+      "charId": 21150345,
+      "location": "NPC_Istanbul_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121642,
+      "clickDialogue": 73121642
+    },
+    "51000388": {
+      "id": 51000388,
+      "charId": 21150346,
+      "location": "NPC_Istanbul_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121643,
+      "clickDialogue": 73121643
+    },
+    "51000389": {
+      "id": 51000389,
+      "charId": 21150347,
+      "location": "NPC_Istanbul_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121644,
+      "clickDialogue": 73121644
+    },
+    "51000390": {
+      "id": 51000390,
+      "charId": 21150348,
+      "location": "NPC_Istanbul_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121645,
+      "clickDialogue": 73121645
+    },
+    "51000391": {
+      "id": 51000391,
+      "charId": 21150349,
+      "location": "NPC_Istanbul_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121646,
+      "clickDialogue": 73121646
+    },
+    "51000392": {
+      "id": 51000392,
+      "charId": 21150350,
+      "location": "NPC_Istanbul_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121647,
+      "clickDialogue": 73121647
+    },
+    "51000393": {
+      "id": 51000393,
+      "charId": 21150351,
+      "location": "NPC_Istanbul_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121648,
+      "clickDialogue": 73121648
+    },
+    "51000394": {
+      "id": 51000394,
+      "charId": 21150352,
+      "location": "NPC_Istanbul_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121649,
+      "clickDialogue": 73121649
+    },
+    "51000395": {
+      "id": 51000395,
+      "charId": 21150353,
+      "location": "NPC_Istanbul_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121650,
+      "clickDialogue": 73121650
+    },
+    "51000396": {
+      "id": 51000396,
+      "charId": 21150354,
+      "location": "NPC_Alexandria_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121651,
+      "clickDialogue": 73121651
+    },
+    "51000397": {
+      "id": 51000397,
+      "charId": 21150355,
+      "location": "NPC_Alexandria_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121652,
+      "clickDialogue": 73121652
+    },
+    "51000398": {
+      "id": 51000398,
+      "charId": 21150356,
+      "location": "NPC_Alexandria_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121653,
+      "clickDialogue": 73121653
+    },
+    "51000399": {
+      "id": 51000399,
+      "charId": 21150357,
+      "location": "NPC_Alexandria_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121654,
+      "clickDialogue": 73121654
+    },
+    "51000400": {
+      "id": 51000400,
+      "charId": 21150358,
+      "location": "NPC_Alexandria_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121655,
+      "clickDialogue": 73121655
+    },
+    "51000401": {
+      "id": 51000401,
+      "charId": 21150359,
+      "location": "NPC_Alexandria_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121656,
+      "clickDialogue": 73121656
+    },
+    "51000402": {
+      "id": 51000402,
+      "charId": 21150360,
+      "location": "NPC_Alexandria_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121657,
+      "clickDialogue": 73121657
+    },
+    "51000403": {
+      "id": 51000403,
+      "charId": 21150361,
+      "location": "NPC_Alexandria_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121658,
+      "clickDialogue": 73121658
+    },
+    "51000404": {
+      "id": 51000404,
+      "charId": 21150362,
+      "location": "NPC_Alexandria_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121659,
+      "clickDialogue": 73121659
+    },
+    "51000405": {
+      "id": 51000405,
+      "charId": 21150363,
+      "location": "NPC_Alexandria_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121660,
+      "clickDialogue": 73121660
+    },
+    "51000406": {
+      "id": 51000406,
+      "charId": 21150364,
+      "location": "NPC_Massawa_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121661,
+      "clickDialogue": 73121661
+    },
+    "51000407": {
+      "id": 51000407,
+      "charId": 21150365,
+      "location": "NPC_Massawa_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121662,
+      "clickDialogue": 73121662
+    },
+    "51000408": {
+      "id": 51000408,
+      "charId": 21150366,
+      "location": "NPC_Massawa_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121663,
+      "clickDialogue": 73121663
+    },
+    "51000409": {
+      "id": 51000409,
+      "charId": 21150367,
+      "location": "NPC_Massawa_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121664,
+      "clickDialogue": 73121664
+    },
+    "51000410": {
+      "id": 51000410,
+      "charId": 21150368,
+      "location": "NPC_Massawa_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121665,
+      "clickDialogue": 73121665
+    },
+    "51000411": {
+      "id": 51000411,
+      "charId": 21150369,
+      "location": "NPC_Massawa_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121666,
+      "clickDialogue": 73121666
+    },
+    "51000412": {
+      "id": 51000412,
+      "charId": 21150370,
+      "location": "NPC_Massawa_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121667,
+      "clickDialogue": 73121667
+    },
+    "51000413": {
+      "id": 51000413,
+      "charId": 21150371,
+      "location": "NPC_Massawa_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121668,
+      "clickDialogue": 73121668
+    },
+    "51000414": {
+      "id": 51000414,
+      "charId": 21150372,
+      "location": "NPC_Massawa_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121669,
+      "clickDialogue": 73121669
+    },
+    "51000415": {
+      "id": 51000415,
+      "charId": 21150373,
+      "location": "NPC_Massawa_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121670,
+      "clickDialogue": 73121670
+    },
+    "51000416": {
+      "id": 51000416,
+      "charId": 21150374,
+      "location": "NPC_Basra_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121671,
+      "clickDialogue": 73121671
+    },
+    "51000417": {
+      "id": 51000417,
+      "charId": 21150375,
+      "location": "NPC_Basra_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121672,
+      "clickDialogue": 73121672
+    },
+    "51000418": {
+      "id": 51000418,
+      "charId": 21150376,
+      "location": "NPC_Basra_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121673,
+      "clickDialogue": 73121673
+    },
+    "51000419": {
+      "id": 51000419,
+      "charId": 21150377,
+      "location": "NPC_Basra_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121674,
+      "clickDialogue": 73121674
+    },
+    "51000420": {
+      "id": 51000420,
+      "charId": 21150378,
+      "location": "NPC_Basra_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121675,
+      "clickDialogue": 73121675
+    },
+    "51000421": {
+      "id": 51000421,
+      "charId": 21150379,
+      "location": "NPC_Basra_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121676,
+      "clickDialogue": 73121676
+    },
+    "51000422": {
+      "id": 51000422,
+      "charId": 21150380,
+      "location": "NPC_Basra_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121677,
+      "clickDialogue": 73121677
+    },
+    "51000423": {
+      "id": 51000423,
+      "charId": 21150381,
+      "location": "NPC_Basra_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121678,
+      "clickDialogue": 73121678
+    },
+    "51000424": {
+      "id": 51000424,
+      "charId": 21150382,
+      "location": "NPC_Basra_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121679,
+      "clickDialogue": 73121679
+    },
+    "51000425": {
+      "id": 51000425,
+      "charId": 21150383,
+      "location": "NPC_Basra_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121680,
+      "clickDialogue": 73121680
+    },
+    "51000426": {
+      "id": 51000426,
+      "charId": 21150384,
+      "location": "NPC_Ceuta_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121681,
+      "clickDialogue": 73121681
+    },
+    "51000427": {
+      "id": 51000427,
+      "charId": 21150385,
+      "location": "NPC_Ceuta_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121682,
+      "clickDialogue": 73121682
+    },
+    "51000428": {
+      "id": 51000428,
+      "charId": 21150386,
+      "location": "NPC_Ceuta_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121683,
+      "clickDialogue": 73121683
+    },
+    "51000429": {
+      "id": 51000429,
+      "charId": 21150387,
+      "location": "NPC_Ceuta_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121684,
+      "clickDialogue": 73121684
+    },
+    "51000430": {
+      "id": 51000430,
+      "charId": 21150388,
+      "location": "NPC_Ceuta_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121685,
+      "clickDialogue": 73121685
+    },
+    "51000431": {
+      "id": 51000431,
+      "charId": 21150389,
+      "location": "NPC_Ceuta_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121686,
+      "clickDialogue": 73121686
+    },
+    "51000432": {
+      "id": 51000432,
+      "charId": 21150390,
+      "location": "NPC_Ceuta_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121687,
+      "clickDialogue": 73121687
+    },
+    "51000433": {
+      "id": 51000433,
+      "charId": 21150391,
+      "location": "NPC_Ceuta_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121688,
+      "clickDialogue": 73121688
+    },
+    "51000434": {
+      "id": 51000434,
+      "charId": 21150392,
+      "location": "NPC_Ceuta_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121689,
+      "clickDialogue": 73121689
+    },
+    "51000435": {
+      "id": 51000435,
+      "charId": 21150393,
+      "location": "NPC_Ceuta_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121690,
+      "clickDialogue": 73121690
+    },
+    "51000436": {
+      "id": 51000436,
+      "charId": 21150394,
+      "location": "NPC_Cairo_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121691,
+      "clickDialogue": 73121691
+    },
+    "51000437": {
+      "id": 51000437,
+      "charId": 21150395,
+      "location": "NPC_Cairo_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121692,
+      "clickDialogue": 73121692
+    },
+    "51000438": {
+      "id": 51000438,
+      "charId": 21150396,
+      "location": "NPC_Cairo_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121693,
+      "clickDialogue": 73121693
+    },
+    "51000439": {
+      "id": 51000439,
+      "charId": 21150397,
+      "location": "NPC_Cairo_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121694,
+      "clickDialogue": 73121694
+    },
+    "51000440": {
+      "id": 51000440,
+      "charId": 21150398,
+      "location": "NPC_Cairo_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121695,
+      "clickDialogue": 73121695
+    },
+    "51000441": {
+      "id": 51000441,
+      "charId": 21150399,
+      "location": "NPC_Cairo_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121696,
+      "clickDialogue": 73121696
+    },
+    "51000442": {
+      "id": 51000442,
+      "charId": 21150400,
+      "location": "NPC_Cairo_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121697,
+      "clickDialogue": 73121697
+    },
+    "51000443": {
+      "id": 51000443,
+      "charId": 21150401,
+      "location": "NPC_Cairo_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121698,
+      "clickDialogue": 73121698
+    },
+    "51000444": {
+      "id": 51000444,
+      "charId": 21150402,
+      "location": "NPC_Cairo_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121699,
+      "clickDialogue": 73121699
+    },
+    "51000445": {
+      "id": 51000445,
+      "charId": 21150403,
+      "location": "NPC_Cairo_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121700,
+      "clickDialogue": 73121700
+    },
+    "51000446": {
+      "id": 51000446,
+      "charId": 21150404,
+      "location": "NPC_Suez_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121701,
+      "clickDialogue": 73121701
+    },
+    "51000447": {
+      "id": 51000447,
+      "charId": 21150405,
+      "location": "NPC_Suez_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121702,
+      "clickDialogue": 73121702
+    },
+    "51000448": {
+      "id": 51000448,
+      "charId": 21150406,
+      "location": "NPC_Suez_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121703,
+      "clickDialogue": 73121703
+    },
+    "51000449": {
+      "id": 51000449,
+      "charId": 21150407,
+      "location": "NPC_Suez_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121704,
+      "clickDialogue": 73121704
+    },
+    "51000450": {
+      "id": 51000450,
+      "charId": 21150408,
+      "location": "NPC_Suez_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121705,
+      "clickDialogue": 73121705
+    },
+    "51000451": {
+      "id": 51000451,
+      "charId": 21150409,
+      "location": "NPC_Suez_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121706,
+      "clickDialogue": 73121706
+    },
+    "51000452": {
+      "id": 51000452,
+      "charId": 21150410,
+      "location": "NPC_Suez_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121707,
+      "clickDialogue": 73121707
+    },
+    "51000453": {
+      "id": 51000453,
+      "charId": 21150411,
+      "location": "NPC_Suez_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121708,
+      "clickDialogue": 73121708
+    },
+    "51000454": {
+      "id": 51000454,
+      "charId": 21150412,
+      "location": "NPC_Suez_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121709,
+      "clickDialogue": 73121709
+    },
+    "51000455": {
+      "id": 51000455,
+      "charId": 21150413,
+      "location": "NPC_Suez_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121710,
+      "clickDialogue": 73121710
+    },
+    "51000456": {
+      "id": 51000456,
+      "charId": 21150414,
+      "location": "NPC_Baghdad_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121711,
+      "clickDialogue": 73121711
+    },
+    "51000457": {
+      "id": 51000457,
+      "charId": 21150415,
+      "location": "NPC_Baghdad_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121712,
+      "clickDialogue": 73121712
+    },
+    "51000458": {
+      "id": 51000458,
+      "charId": 21150416,
+      "location": "NPC_Baghdad_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121713,
+      "clickDialogue": 73121713
+    },
+    "51000459": {
+      "id": 51000459,
+      "charId": 21150417,
+      "location": "NPC_Baghdad_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121714,
+      "clickDialogue": 73121714
+    },
+    "51000460": {
+      "id": 51000460,
+      "charId": 21150418,
+      "location": "NPC_Baghdad_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121715,
+      "clickDialogue": 73121715
+    },
+    "51000461": {
+      "id": 51000461,
+      "charId": 21150419,
+      "location": "NPC_Baghdad_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121716,
+      "clickDialogue": 73121716
+    },
+    "51000462": {
+      "id": 51000462,
+      "charId": 21150420,
+      "location": "NPC_Baghdad_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121717,
+      "clickDialogue": 73121717
+    },
+    "51000463": {
+      "id": 51000463,
+      "charId": 21150421,
+      "location": "NPC_Baghdad_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121718,
+      "clickDialogue": 73121718
+    },
+    "51000464": {
+      "id": 51000464,
+      "charId": 21150422,
+      "location": "NPC_Baghdad_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121719,
+      "clickDialogue": 73121719
+    },
+    "51000465": {
+      "id": 51000465,
+      "charId": 21150423,
+      "location": "NPC_Baghdad_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121720,
+      "clickDialogue": 73121720
+    },
+    "51000466": {
+      "id": 51000466,
+      "charId": 21150424,
+      "location": "NPC_London_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121721,
+      "clickDialogue": 73121721
+    },
+    "51000467": {
+      "id": 51000467,
+      "charId": 21150425,
+      "location": "NPC_London_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121722,
+      "clickDialogue": 73121722
+    },
+    "51000468": {
+      "id": 51000468,
+      "charId": 21150426,
+      "location": "NPC_London_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121723,
+      "clickDialogue": 73121723
+    },
+    "51000469": {
+      "id": 51000469,
+      "charId": 21150427,
+      "location": "NPC_London_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121724,
+      "clickDialogue": 73121724
+    },
+    "51000470": {
+      "id": 51000470,
+      "charId": 21150428,
+      "location": "NPC_London_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121725,
+      "clickDialogue": 73121725
+    },
+    "51000471": {
+      "id": 51000471,
+      "charId": 21150429,
+      "location": "NPC_London_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121726,
+      "clickDialogue": 73121726
+    },
+    "51000472": {
+      "id": 51000472,
+      "charId": 21150430,
+      "location": "NPC_London_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121727,
+      "clickDialogue": 73121727
+    },
+    "51000473": {
+      "id": 51000473,
+      "charId": 21150431,
+      "location": "NPC_London_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121728,
+      "clickDialogue": 73121728
+    },
+    "51000474": {
+      "id": 51000474,
+      "charId": 21150432,
+      "location": "NPC_London_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121729,
+      "clickDialogue": 73121729
+    },
+    "51000475": {
+      "id": 51000475,
+      "charId": 21150433,
+      "location": "NPC_London_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121730,
+      "clickDialogue": 73121730
+    },
+    "51000476": {
+      "id": 51000476,
+      "charId": 21150434,
+      "location": "NPC_Cayenne_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121731,
+      "clickDialogue": 73121731
+    },
+    "51000477": {
+      "id": 51000477,
+      "charId": 21150435,
+      "location": "NPC_Cayenne_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121732,
+      "clickDialogue": 73121732
+    },
+    "51000478": {
+      "id": 51000478,
+      "charId": 21150436,
+      "location": "NPC_Cayenne_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121733,
+      "clickDialogue": 73121733
+    },
+    "51000479": {
+      "id": 51000479,
+      "charId": 21150437,
+      "location": "NPC_Cayenne_04",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121734,
+      "clickDialogue": 73121734
+    },
+    "51000480": {
+      "id": 51000480,
+      "charId": 21150438,
+      "location": "NPC_Cayenne_05",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121735,
+      "clickDialogue": 73121735
+    },
+    "51000481": {
+      "id": 51000481,
+      "charId": 21150439,
+      "location": "NPC_Cayenne_06",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121736,
+      "clickDialogue": 73121736
+    },
+    "51000482": {
+      "id": 51000482,
+      "charId": 21150440,
+      "location": "NPC_Cayenne_07",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121737,
+      "clickDialogue": 73121737
+    },
+    "51000483": {
+      "id": 51000483,
+      "charId": 21150441,
+      "location": "NPC_Cayenne_08",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121738,
+      "clickDialogue": 73121738
+    },
+    "51000484": {
+      "id": 51000484,
+      "charId": 21150442,
+      "location": "NPC_Cayenne_09",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121739,
+      "clickDialogue": 73121739
+    },
+    "51000485": {
+      "id": 51000485,
+      "charId": 21150443,
+      "location": "NPC_Cayenne_10",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 6,
+      "outTownTime": 22,
+      "randomDialogue": 73121740,
+      "clickDialogue": 73121740
+    },
+    "51000486": {
+      "id": 51000486,
+      "charId": 21150610,
+      "location": "NPC_Danzig_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121972,
+      "clickDialogue": 73121972
+    },
+    "51000487": {
+      "id": 51000487,
+      "charId": 21150826,
+      "location": "NPC_Barcelona_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122188,
+      "clickDialogue": 73122188
+    },
+    "51000488": {
+      "id": 51000488,
+      "charId": 21150843,
+      "location": "NPC_Valencia_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122205,
+      "clickDialogue": 73122205
+    },
+    "51000489": {
+      "id": 51000489,
+      "charId": 21150860,
+      "location": "NPC_Barrow_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122222,
+      "clickDialogue": 73122222
+    },
+    "51000490": {
+      "id": 51000490,
+      "charId": 21150870,
+      "location": "NPC_Benin_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122232,
+      "clickDialogue": 73122232
+    },
+    "51000491": {
+      "id": 51000491,
+      "charId": 21150879,
+      "location": "NPC_Bergen_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122241,
+      "clickDialogue": 73122241
+    },
+    "51000492": {
+      "id": 51000492,
+      "charId": 21150884,
+      "location": "NPC_Beirut_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122246,
+      "clickDialogue": 73122246
+    },
+    "51000493": {
+      "id": 51000493,
+      "charId": 21150941,
+      "location": "NPC_Visby_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122303,
+      "clickDialogue": 73122303
+    },
+    "51000494": {
+      "id": 51000494,
+      "charId": 21150967,
+      "location": "NPC_Arkhangelsk_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122329,
+      "clickDialogue": 73122329
+    },
+    "51000495": {
+      "id": 51000495,
+      "charId": 21150969,
+      "location": "NPC_Athenae_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122331,
+      "clickDialogue": 73122331
+    },
+    "51000496": {
+      "id": 51000496,
+      "charId": 21150983,
+      "location": "NPC_Amsterdam_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122345,
+      "clickDialogue": 73122345
+    },
+    "51000497": {
+      "id": 51000497,
+      "charId": 21151027,
+      "location": "NPC_Kokkola_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122389,
+      "clickDialogue": 73122389
+    },
+    "51000498": {
+      "id": 51000498,
+      "charId": 21151051,
+      "location": "NPC_Khatanga_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122413,
+      "clickDialogue": 73122413
+    },
+    "51000499": {
+      "id": 51000499,
+      "charId": 21151065,
+      "location": "NPC_Korf_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122427,
+      "clickDialogue": 73122427
+    },
+    "51000500": {
+      "id": 51000500,
+      "charId": 21151084,
+      "location": "NPC_Groningen_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122446,
+      "clickDialogue": 73122446
+    },
+    "51000501": {
+      "id": 51000501,
+      "charId": 21151182,
+      "location": "NPC_Karibib_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122544,
+      "clickDialogue": 73122544
+    },
+    "51000502": {
+      "id": 51000502,
+      "charId": 21151191,
+      "location": "NPC_Casablanca_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122553,
+      "clickDialogue": 73122553
+    },
+    "51000503": {
+      "id": 51000503,
+      "charId": 21151192,
+      "location": "NPC_Casablanca_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122554,
+      "clickDialogue": 73122554
+    },
+    "51000504": {
+      "id": 51000504,
+      "charId": 21151247,
+      "location": "NPC_Hadiboh_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122609,
+      "clickDialogue": 73122609
+    },
+    "51000505": {
+      "id": 51000505,
+      "charId": 21151265,
+      "location": "NPC_Shiraz_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122627,
+      "clickDialogue": 73122627
+    },
+    "51000506": {
+      "id": 51000506,
+      "charId": 21151266,
+      "location": "NPC_Shiraz_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122628,
+      "clickDialogue": 73122628
+    },
+    "51000507": {
+      "id": 51000507,
+      "charId": 21151302,
+      "location": "NPC_Cochin_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122664,
+      "clickDialogue": 73122664
+    },
+    "51000508": {
+      "id": 51000508,
+      "charId": 21151328,
+      "location": "NPC_Pondicherry_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122690,
+      "clickDialogue": 73122690
+    },
+    "51000509": {
+      "id": 51000509,
+      "charId": 21151338,
+      "location": "NPC_Hanoi_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122700,
+      "clickDialogue": 73122700
+    },
+    "51000510": {
+      "id": 51000510,
+      "charId": 21151339,
+      "location": "NPC_Hanoi_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122701,
+      "clickDialogue": 73122701
+    },
+    "51000511": {
+      "id": 51000511,
+      "charId": 21151526,
+      "location": "NPC_SantoDomingo_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122888,
+      "clickDialogue": 73122888
+    },
+    "51000512": {
+      "id": 51000512,
+      "charId": 21151658,
+      "location": "NPC_Velhagoa_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73123020,
+      "clickDialogue": 73123020
+    },
+    "51000513": {
+      "id": 51000513,
+      "charId": 21150326,
+      "location": "NPC_Sacay_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121621,
+      "clickDialogue": 73121621
+    },
+    "51000514": {
+      "id": 51000514,
+      "charId": 21150335,
+      "location": "NPC_Sacay_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121630,
+      "clickDialogue": 73121630
+    },
+    "51000515": {
+      "id": 51000515,
+      "charId": 21150338,
+      "location": "NPC_Nagasaki_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121633,
+      "clickDialogue": 73121633
+    },
+    "51000516": {
+      "id": 51000516,
+      "charId": 21150341,
+      "location": "NPC_Nagasaki_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73121637,
+      "clickDialogue": 73121637
+    },
+    "51000517": {
+      "id": 51000517,
+      "charId": 21150657,
+      "location": "NPC_DukWon_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122019,
+      "clickDialogue": 73122019
+    },
+    "51000518": {
+      "id": 51000518,
+      "charId": 21151354,
+      "location": "NPC_Edo_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122716,
+      "clickDialogue": 73122716
+    },
+    "51000519": {
+      "id": 51000519,
+      "charId": 21151365,
+      "location": "NPC_Youngil_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122727,
+      "clickDialogue": 73122727
+    },
+    "51000520": {
+      "id": 51000520,
+      "charId": 21151408,
+      "location": "NPC_HanYang_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73122770,
+      "clickDialogue": 73122770
+    },
+    "51000521": {
+      "id": 51000521,
+      "charId": 21153000,
+      "location": "NPC_HanYang_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73123035,
+      "clickDialogue": 73123035
+    },
+    "51000522": {
+      "id": 51000522,
+      "charId": 21153001,
+      "location": "NPC_HanYang_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73123036,
+      "clickDialogue": 73123036
+    },
+    "51000523": {
+      "id": 51000523,
+      "charId": 21153090,
+      "location": "Spawner_Horse_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000524": {
+      "id": 51000524,
+      "charId": 21153091,
+      "location": "Spawner_Horse_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000525": {
+      "id": 51000525,
+      "charId": 21153110,
+      "location": "Spawner_Buffalo_01",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000526": {
+      "id": 51000526,
+      "charId": 21153111,
+      "location": "Spawner_Buffalo_02",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000527": {
+      "id": 51000527,
+      "charId": 21153112,
+      "location": "Spawner_Buffalo_03",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000528": {
+      "id": 51000528,
+      "charId": 21153113,
+      "location": "Spawner_Bear_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "moveSpeed": 70,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000529": {
+      "id": 51000529,
+      "charId": 21153114,
+      "location": "Spawner_Bear_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "moveSpeed": 70,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000530": {
+      "id": 51000530,
+      "charId": 21153119,
+      "location": "Spawner_Bison_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "moveSpeed": 90,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000531": {
+      "id": 51000531,
+      "charId": 21153120,
+      "location": "Spawner_Parrot_01",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000532": {
+      "id": 51000532,
+      "charId": 21153144,
+      "location": "Spawner_Elephant_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "moveSpeed": 90,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51000533": {
+      "id": 51000533,
+      "charId": 21154189,
+      "location": "NPC_Iqaluktuuttiaq_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73123044,
+      "clickDialogue": 73123044
+    },
+    "51000534": {
+      "id": 51000534,
+      "charId": 21154190,
+      "location": "NPC_Iqaluktuuttiaq_02",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73123045,
+      "clickDialogue": 73123045
+    },
+    "51000535": {
+      "id": 51000535,
+      "charId": 21154191,
+      "location": "NPC_Iqaluktuuttiaq_03",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73123046,
+      "clickDialogue": 73123046
+    },
+    "51000536": {
+      "id": 51000536,
+      "charId": 21154192,
+      "location": "NPC_PortPirie_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73123047,
+      "clickDialogue": 73123047
+    },
+    "51000537": {
+      "id": 51000537,
+      "charId": 21154193,
+      "location": "NPC_Vardo_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73123048,
+      "clickDialogue": 73123048
+    },
+    "51000538": {
+      "id": 51000538,
+      "charId": 21154194,
+      "location": "NPC_Qaanaaq_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73123049,
+      "clickDialogue": 73123049
+    },
+    "51000539": {
+      "id": 51000539,
+      "charId": 21153159,
+      "location": "Spawner_Reindeer_01",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "moveSpeed": 50,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100001": {
+      "id": 51100001,
+      "charId": 21070001,
+      "location": "EventNPC_2022Thansgiving_01",
+      "localBitFlag": 219,
+      "liveEvent": 99800001,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300000,
+      "clickDialogue": 73300000
+    },
+    "51100002": {
+      "id": 51100002,
+      "charId": 21153102,
+      "location": "EventNPC_2022Thansgiving_02",
+      "localBitFlag": 219,
+      "liveEvent": 99800001,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100003": {
+      "id": 51100003,
+      "charId": 21153102,
+      "location": "EventNPC_2022Thansgiving_02",
+      "localBitFlag": 219,
+      "liveEvent": 99800004,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100004": {
+      "id": 51100004,
+      "charId": 21153159,
+      "location": "Spawner_Reindeer_01",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100005": {
+      "id": 51100005,
+      "charId": 21153160,
+      "location": "Spawner_ChristmasRudolf_01",
+      "localBitFlag": 219,
+      "actionRadius": 1,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300012,
+      "clickDialogue": 73300012
+    },
+    "51100006": {
+      "id": 51100006,
+      "charId": 21153161,
+      "location": "Spawner_ChristmasCat_01",
+      "localBitFlag": 219,
+      "actionRadius": 5,
+      "moveSpeed": 35,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100007": {
+      "id": 51100007,
+      "charId": 21153162,
+      "location": "Spawner_ChristmasPoodle_01",
+      "localBitFlag": 219,
+      "actionRadius": 5,
+      "moveSpeed": 65,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100008": {
+      "id": 51100008,
+      "charId": 21153163,
+      "location": "Spawner_ChristmasPoodle_02",
+      "localBitFlag": 219,
+      "actionRadius": 5,
+      "moveSpeed": 45,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100009": {
+      "id": 51100009,
+      "charId": 21153164,
+      "location": "Spawner_ChristmasDog_01",
+      "localBitFlag": 219,
+      "actionRadius": 5,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100010": {
+      "id": 51100010,
+      "charId": 21153165,
+      "location": "Spawner_ChristmasAlpaca_01",
+      "localBitFlag": 219,
+      "actionRadius": 5,
+      "moveSpeed": 40,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100011": {
+      "id": 51100011,
+      "charId": 21153166,
+      "location": "Spawner_ChristmasRabbit_01",
+      "localBitFlag": 219,
+      "actionRadius": 5,
+      "moveSpeed": 100,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100012": {
+      "id": 51100012,
+      "charId": 21153167,
+      "location": "Spawner_ChristmasSheep_01",
+      "localBitFlag": 219,
+      "actionRadius": 5,
+      "moveSpeed": 40,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100013": {
+      "id": 51100013,
+      "charId": 21153168,
+      "location": "Spawner_ChristmasIsland_01",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300004,
+      "clickDialogue": 73300004
+    },
+    "51100014": {
+      "id": 51100014,
+      "charId": 21153169,
+      "location": "Spawner_ChristmasIsland_02",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73300005,
+      "clickDialogue": 73300005
+    },
+    "51100015": {
+      "id": 51100015,
+      "charId": 21153170,
+      "location": "Spawner_ChristmasIsland_03",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300006,
+      "clickDialogue": 73300006
+    },
+    "51100016": {
+      "id": 51100016,
+      "charId": 21153171,
+      "location": "Spawner_ChristmasIsland_04",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73300007,
+      "clickDialogue": 73300007
+    },
+    "51100017": {
+      "id": 51100017,
+      "charId": 21153172,
+      "location": "Spawner_ChristmasIsland_05",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300007,
+      "clickDialogue": 73300007
+    },
+    "51100018": {
+      "id": 51100018,
+      "charId": 21153173,
+      "location": "Spawner_ChristmasIsland_06",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73300006,
+      "clickDialogue": 73300006
+    },
+    "51100019": {
+      "id": 51100019,
+      "charId": 21153174,
+      "location": "Spawner_ChristmasIsland_07",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300005,
+      "clickDialogue": 73300005
+    },
+    "51100020": {
+      "id": 51100020,
+      "charId": 21153175,
+      "location": "Spawner_ChristmasIsland_08",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73300004,
+      "clickDialogue": 73300004
+    },
+    "51100021": {
+      "id": 51100021,
+      "charId": 21153176,
+      "location": "Spawner_ChristmasIsland_09",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300004,
+      "clickDialogue": 73300004
+    },
+    "51100022": {
+      "id": 51100022,
+      "charId": 21153177,
+      "location": "Spawner_ChristmasIsland_10",
+      "localBitFlag": 219,
+      "actionRadius": 4,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73300005,
+      "clickDialogue": 73300005
+    },
+    "51100023": {
+      "id": 51100023,
+      "charId": 21153178,
+      "location": "Spawner_ChristmasIsland_11",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300006,
+      "clickDialogue": 73300006
+    },
+    "51100024": {
+      "id": 51100024,
+      "charId": 21153179,
+      "location": "Spawner_ChristmasIsland_12",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73300008,
+      "clickDialogue": 73300008
+    },
+    "51100025": {
+      "id": 51100025,
+      "charId": 21153180,
+      "location": "Spawner_ChristmasIsland_13",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300009,
+      "clickDialogue": 73300009
+    },
+    "51100026": {
+      "id": 51100026,
+      "charId": 21153181,
+      "location": "Spawner_ChristmasIsland_14",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73300010,
+      "clickDialogue": 73300010
+    },
+    "51100027": {
+      "id": 51100027,
+      "charId": 21153182,
+      "location": "Spawner_ChristmasIsland_15",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300011,
+      "clickDialogue": 73300011
+    },
+    "51100028": {
+      "id": 51100028,
+      "charId": 21153183,
+      "location": "Spawner_ChristmasIsland_16",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73300011,
+      "clickDialogue": 73300011
+    },
+    "51100029": {
+      "id": 51100029,
+      "charId": 21153184,
+      "location": "Spawner_ChristmasIsland_17",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300010,
+      "clickDialogue": 73300010
+    },
+    "51100030": {
+      "id": 51100030,
+      "charId": 21153185,
+      "location": "Spawner_ChristmasIsland_18",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73300009,
+      "clickDialogue": 73300009
+    },
+    "51100031": {
+      "id": 51100031,
+      "charId": 21153186,
+      "location": "Spawner_ChristmasIsland_19",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300008,
+      "clickDialogue": 73300008
+    },
+    "51100032": {
+      "id": 51100032,
+      "charId": 21153187,
+      "location": "Spawner_ChristmasIsland_20",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73300008,
+      "clickDialogue": 73300008
+    },
+    "51100033": {
+      "id": 51100033,
+      "charId": 21153188,
+      "location": "Spawner_ChristmasIsland_21",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300009,
+      "clickDialogue": 73300009
+    },
+    "51100034": {
+      "id": 51100034,
+      "charId": 21153189,
+      "location": "Spawner_ChristmasIsland_22",
+      "localBitFlag": 219,
+      "actionRadius": 3,
+      "appearTownTime": 7,
+      "outTownTime": 22,
+      "randomDialogue": 73300010,
+      "clickDialogue": 73300010
+    },
+    "51100035": {
+      "id": 51100035,
+      "charId": 21060117,
+      "location": "Spawner_EventAurelie_01",
+      "localBitFlag": 219,
+      "actionRadius": 2,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300013,
+      "clickDialogue": 73300013
+    },
+    "51100036": {
+      "id": 51100036,
+      "charId": 21010214,
+      "location": "Spawner_EventButler_01",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300014,
+      "clickDialogue": 73300014
+    },
+    "51100080": {
+      "id": 51100080,
+      "charId": 21153196,
+      "location": "Spawner_Soda_01",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100081": {
+      "id": 51100081,
+      "charId": 21153196,
+      "location": "Spawner_Soda_02",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100082": {
+      "id": 51100082,
+      "charId": 21153196,
+      "location": "Spawner_Soda_03",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100083": {
+      "id": 51100083,
+      "charId": 21153196,
+      "location": "Spawner_Soda_04",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100084": {
+      "id": 51100084,
+      "charId": 21153196,
+      "location": "Spawner_Soda_05",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100085": {
+      "id": 51100085,
+      "charId": 21153196,
+      "location": "Spawner_Soda_06",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100086": {
+      "id": 51100086,
+      "charId": 21153196,
+      "location": "Spawner_Soda_07",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100087": {
+      "id": 51100087,
+      "charId": 21153196,
+      "location": "Spawner_Soda_08",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100088": {
+      "id": 51100088,
+      "charId": 21153196,
+      "location": "Spawner_Soda_09",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100089": {
+      "id": 51100089,
+      "charId": 21153196,
+      "location": "Spawner_Soda_10",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24
+    },
+    "51100090": {
+      "id": 51100090,
+      "charId": 21155102,
+      "location": "NPC_Interaction_01_Marco",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300029,
+      "clickDialogue": 73300029
+    },
+    "51100091": {
+      "id": 51100091,
+      "charId": 21155103,
+      "location": "NPC_Interaction_01_Sofia",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300030,
+      "clickDialogue": 73300030
+    },
+    "51100092": {
+      "id": 51100092,
+      "charId": 21155104,
+      "location": "NPC_Interaction_01_Maria",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300031,
+      "clickDialogue": 73300031
+    },
+    "51100093": {
+      "id": 51100093,
+      "charId": 21155105,
+      "location": "NPC_Interaction_01_Edward",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300032,
+      "clickDialogue": 73300032
+    },
+    "51100094": {
+      "id": 51100094,
+      "charId": 21155106,
+      "location": "NPC_Interaction_01_Ana",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300033,
+      "clickDialogue": 73300033
+    },
+    "51100095": {
+      "id": 51100095,
+      "charId": 21155102,
+      "location": "NPC_Interaction_02_Marco",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300029,
+      "clickDialogue": 73300029
+    },
+    "51100096": {
+      "id": 51100096,
+      "charId": 21155103,
+      "location": "NPC_Interaction_02_Sofia",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300030,
+      "clickDialogue": 73300030
+    },
+    "51100097": {
+      "id": 51100097,
+      "charId": 21155104,
+      "location": "NPC_Interaction_02_Maria",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300031,
+      "clickDialogue": 73300031
+    },
+    "51100098": {
+      "id": 51100098,
+      "charId": 21155105,
+      "location": "NPC_Interaction_02_Edward",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300032,
+      "clickDialogue": 73300032
+    },
+    "51100099": {
+      "id": 51100099,
+      "charId": 21155106,
+      "location": "NPC_Interaction_02_Ana",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300033,
+      "clickDialogue": 73300033
+    },
+    "51100100": {
+      "id": 51100100,
+      "charId": 21155102,
+      "location": "NPC_Interaction_03_Marco",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300029,
+      "clickDialogue": 73300029
+    },
+    "51100101": {
+      "id": 51100101,
+      "charId": 21155103,
+      "location": "NPC_Interaction_03_Sofia",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300030,
+      "clickDialogue": 73300030
+    },
+    "51100102": {
+      "id": 51100102,
+      "charId": 21155104,
+      "location": "NPC_Interaction_03_Maria",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300031,
+      "clickDialogue": 73300031
+    },
+    "51100103": {
+      "id": 51100103,
+      "charId": 21155105,
+      "location": "NPC_Interaction_03_Edward",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300032,
+      "clickDialogue": 73300032
+    },
+    "51100104": {
+      "id": 51100104,
+      "charId": 21155106,
+      "location": "NPC_Interaction_03_Ana",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300033,
+      "clickDialogue": 73300033
+    },
+    "51100105": {
+      "id": 51100105,
+      "charId": 21155102,
+      "location": "NPC_Interaction_04_Marco",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300029,
+      "clickDialogue": 73300029
+    },
+    "51100106": {
+      "id": 51100106,
+      "charId": 21155103,
+      "location": "NPC_Interaction_04_Sofia",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300030,
+      "clickDialogue": 73300030
+    },
+    "51100107": {
+      "id": 51100107,
+      "charId": 21155104,
+      "location": "NPC_Interaction_04_Maria",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300031,
+      "clickDialogue": 73300031
+    },
+    "51100108": {
+      "id": 51100108,
+      "charId": 21155105,
+      "location": "NPC_Interaction_04_Edward",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300032,
+      "clickDialogue": 73300032
+    },
+    "51100109": {
+      "id": 51100109,
+      "charId": 21155106,
+      "location": "NPC_Interaction_04_Ana",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300033,
+      "clickDialogue": 73300033
+    },
+    "51100110": {
+      "id": 51100110,
+      "charId": 21155102,
+      "location": "NPC_Interaction_05_Marco",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300029,
+      "clickDialogue": 73300029
+    },
+    "51100111": {
+      "id": 51100111,
+      "charId": 21155103,
+      "location": "NPC_Interaction_05_Sofia",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300030,
+      "clickDialogue": 73300030
+    },
+    "51100112": {
+      "id": 51100112,
+      "charId": 21155104,
+      "location": "NPC_Interaction_05_Maria",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300031,
+      "clickDialogue": 73300031
+    },
+    "51100113": {
+      "id": 51100113,
+      "charId": 21155105,
+      "location": "NPC_Interaction_05_Edward",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300032,
+      "clickDialogue": 73300032
+    },
+    "51100114": {
+      "id": 51100114,
+      "charId": 21155106,
+      "location": "NPC_Interaction_05_Ana",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300033,
+      "clickDialogue": 73300033
+    },
+    "51100115": {
+      "id": 51100115,
+      "charId": 21155102,
+      "location": "NPC_Interaction_06_Marco",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300029,
+      "clickDialogue": 73300029
+    },
+    "51100116": {
+      "id": 51100116,
+      "charId": 21155103,
+      "location": "NPC_Interaction_06_Sofia",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300030,
+      "clickDialogue": 73300030
+    },
+    "51100117": {
+      "id": 51100117,
+      "charId": 21155104,
+      "location": "NPC_Interaction_06_Maria",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300031,
+      "clickDialogue": 73300031
+    },
+    "51100118": {
+      "id": 51100118,
+      "charId": 21155105,
+      "location": "NPC_Interaction_06_Edward",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300032,
+      "clickDialogue": 73300032
+    },
+    "51100119": {
+      "id": 51100119,
+      "charId": 21155106,
+      "location": "NPC_Interaction_06_Ana",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300033,
+      "clickDialogue": 73300033
+    },
+    "51100120": {
+      "id": 51100120,
+      "charId": 21155102,
+      "location": "NPC_Interaction_07_Marco",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300029,
+      "clickDialogue": 73300029
+    },
+    "51100121": {
+      "id": 51100121,
+      "charId": 21155103,
+      "location": "NPC_Interaction_07_Sofia",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300030,
+      "clickDialogue": 73300030
+    },
+    "51100122": {
+      "id": 51100122,
+      "charId": 21155104,
+      "location": "NPC_Interaction_07_Maria",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300031,
+      "clickDialogue": 73300031
+    },
+    "51100123": {
+      "id": 51100123,
+      "charId": 21155105,
+      "location": "NPC_Interaction_07_Edward",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300032,
+      "clickDialogue": 73300032
+    },
+    "51100124": {
+      "id": 51100124,
+      "charId": 21155106,
+      "location": "NPC_Interaction_07_Ana",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300033,
+      "clickDialogue": 73300033
+    },
+    "51100125": {
+      "id": 51100125,
+      "charId": 21155102,
+      "location": "NPC_Interaction_08_Marco",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300029,
+      "clickDialogue": 73300029
+    },
+    "51100126": {
+      "id": 51100126,
+      "charId": 21155103,
+      "location": "NPC_Interaction_08_Sofia",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300030,
+      "clickDialogue": 73300030
+    },
+    "51100127": {
+      "id": 51100127,
+      "charId": 21155104,
+      "location": "NPC_Interaction_08_Maria",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300031,
+      "clickDialogue": 73300031
+    },
+    "51100128": {
+      "id": 51100128,
+      "charId": 21155105,
+      "location": "NPC_Interaction_08_Edward",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300032,
+      "clickDialogue": 73300032
+    },
+    "51100129": {
+      "id": 51100129,
+      "charId": 21155106,
+      "location": "NPC_Interaction_08_Ana",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300033,
+      "clickDialogue": 73300033
+    },
+    "51100130": {
+      "id": 51100130,
+      "charId": 21155102,
+      "location": "NPC_Interaction_09_Marco",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300029,
+      "clickDialogue": 73300029
+    },
+    "51100131": {
+      "id": 51100131,
+      "charId": 21155103,
+      "location": "NPC_Interaction_09_Sofia",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300030,
+      "clickDialogue": 73300030
+    },
+    "51100132": {
+      "id": 51100132,
+      "charId": 21155104,
+      "location": "NPC_Interaction_09_Maria",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300031,
+      "clickDialogue": 73300031
+    },
+    "51100133": {
+      "id": 51100133,
+      "charId": 21155105,
+      "location": "NPC_Interaction_09_Edward",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300032,
+      "clickDialogue": 73300032
+    },
+    "51100134": {
+      "id": 51100134,
+      "charId": 21155106,
+      "location": "NPC_Interaction_09_Ana",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300033,
+      "clickDialogue": 73300033
+    },
+    "51100135": {
+      "id": 51100135,
+      "charId": 21155102,
+      "location": "NPC_Interaction_10_Marco",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300029,
+      "clickDialogue": 73300029
+    },
+    "51100136": {
+      "id": 51100136,
+      "charId": 21155103,
+      "location": "NPC_Interaction_10_Sofia",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300030,
+      "clickDialogue": 73300030
+    },
+    "51100137": {
+      "id": 51100137,
+      "charId": 21155104,
+      "location": "NPC_Interaction_10_Maria",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300031,
+      "clickDialogue": 73300031
+    },
+    "51100138": {
+      "id": 51100138,
+      "charId": 21155105,
+      "location": "NPC_Interaction_10_Edward",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300032,
+      "clickDialogue": 73300032
+    },
+    "51100139": {
+      "id": 51100139,
+      "charId": 21155106,
+      "location": "NPC_Interaction_10_Ana",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300033,
+      "clickDialogue": 73300033
+    },
+    "51100140": {
+      "id": 51100140,
+      "charId": 21155102,
+      "location": "NPC_Interaction_11_Marco",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300029,
+      "clickDialogue": 73300029
+    },
+    "51100141": {
+      "id": 51100141,
+      "charId": 21155103,
+      "location": "NPC_Interaction_11_Sofia",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300030,
+      "clickDialogue": 73300030
+    },
+    "51100142": {
+      "id": 51100142,
+      "charId": 21155104,
+      "location": "NPC_Interaction_11_Maria",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300031,
+      "clickDialogue": 73300031
+    },
+    "51100143": {
+      "id": 51100143,
+      "charId": 21155105,
+      "location": "NPC_Interaction_11_Edward",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300032,
+      "clickDialogue": 73300032
+    },
+    "51100144": {
+      "id": 51100144,
+      "charId": 21155106,
+      "location": "NPC_Interaction_11_Ana",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300033,
+      "clickDialogue": 73300033
+    },
+    "51100145": {
+      "id": 51100145,
+      "charId": 21155102,
+      "location": "NPC_Interaction_12_Marco",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300029,
+      "clickDialogue": 73300029
+    },
+    "51100146": {
+      "id": 51100146,
+      "charId": 21155103,
+      "location": "NPC_Interaction_12_Sofia",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300030,
+      "clickDialogue": 73300030
+    },
+    "51100147": {
+      "id": 51100147,
+      "charId": 21155104,
+      "location": "NPC_Interaction_12_Maria",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300031,
+      "clickDialogue": 73300031
+    },
+    "51100148": {
+      "id": 51100148,
+      "charId": 21155105,
+      "location": "NPC_Interaction_12_Edward",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300032,
+      "clickDialogue": 73300032
+    },
+    "51100149": {
+      "id": 51100149,
+      "charId": 21155106,
+      "location": "NPC_Interaction_12_Ana",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300033,
+      "clickDialogue": 73300033
+    },
+    "51100150": {
+      "id": 51100150,
+      "charId": 21155102,
+      "location": "NPC_Interaction_13_Marco",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300029,
+      "clickDialogue": 73300029
+    },
+    "51100151": {
+      "id": 51100151,
+      "charId": 21155103,
+      "location": "NPC_Interaction_13_Sofia",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300030,
+      "clickDialogue": 73300030
+    },
+    "51100152": {
+      "id": 51100152,
+      "charId": 21155104,
+      "location": "NPC_Interaction_13_Maria",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300031,
+      "clickDialogue": 73300031
+    },
+    "51100153": {
+      "id": 51100153,
+      "charId": 21155105,
+      "location": "NPC_Interaction_13_Edward",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300032,
+      "clickDialogue": 73300032
+    },
+    "51100154": {
+      "id": 51100154,
+      "charId": 21155106,
+      "location": "NPC_Interaction_13_Ana",
+      "localBitFlag": 219,
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300033,
+      "clickDialogue": 73300033
+    },
+    "51100155": {
+      "id": 51100155,
+      "charId": 21153191,
+      "location": "NPC_Interaction_Smuggler_Trader_01",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000026
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300034,
+      "clickDialogue": 73300034
+    },
+    "51100156": {
+      "id": 51100156,
+      "charId": 21153192,
+      "location": "NPC_Interaction_Smuggler_Trader_02",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000026
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300034,
+      "clickDialogue": 73300034
+    },
+    "51100157": {
+      "id": 51100157,
+      "charId": 21153193,
+      "location": "NPC_Interaction_Smuggler_Trader_03",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000026
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300034,
+      "clickDialogue": 73300034
+    },
+    "51100158": {
+      "id": 51100158,
+      "charId": 21153194,
+      "location": "NPC_Interaction_Smuggler_Trader_04",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000026
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300034,
+      "clickDialogue": 73300034
+    },
+    "51100159": {
+      "id": 51100159,
+      "charId": 21153197,
+      "location": "NPC_Interaction_Smuggler_Trader_05",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000026
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300034,
+      "clickDialogue": 73300034
+    },
+    "51100160": {
+      "id": 51100160,
+      "charId": 21153198,
+      "location": "NPC_Interaction_Smuggler_Trader_06",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000026
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300034,
+      "clickDialogue": 73300034
+    },
+    "51100161": {
+      "id": 51100161,
+      "charId": 21153199,
+      "location": "NPC_Interaction_Smuggler_Trader_07",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000026
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300034,
+      "clickDialogue": 73300034
+    },
+    "51100162": {
+      "id": 51100162,
+      "charId": 21153200,
+      "location": "NPC_Interaction_Smuggler_Trader_08",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000026
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300034,
+      "clickDialogue": 73300034
+    },
+    "51100163": {
+      "id": 51100163,
+      "charId": 21153201,
+      "location": "NPC_Interaction_Smuggler_Shop_01",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000027
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300035,
+      "clickDialogue": 73300035,
+      "npcShopGroup": 1001001
+    },
+    "51100164": {
+      "id": 51100164,
+      "charId": 21153202,
+      "location": "NPC_Interaction_Smuggler_Shop_02",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000027
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300035,
+      "clickDialogue": 73300035,
+      "npcShopGroup": 1001002
+    },
+    "51100165": {
+      "id": 51100165,
+      "charId": 21153203,
+      "location": "NPC_Interaction_Smuggler_Shop_03",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000027
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300035,
+      "clickDialogue": 73300035,
+      "npcShopGroup": 1001030
+    },
+    "51100166": {
+      "id": 51100166,
+      "charId": 21153204,
+      "location": "NPC_Interaction_Smuggler_Shop_04",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000027
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300035,
+      "clickDialogue": 73300035,
+      "npcShopGroup": 1001077
+    },
+    "51100167": {
+      "id": 51100167,
+      "charId": 21153205,
+      "location": "NPC_Interaction_Smuggler_Shop_05",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000027
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300035,
+      "clickDialogue": 73300035,
+      "npcShopGroup": 1001118
+    },
+    "51100168": {
+      "id": 51100168,
+      "charId": 21153206,
+      "location": "NPC_Interaction_Smuggler_Shop_06",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000027
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300035,
+      "clickDialogue": 73300035,
+      "npcShopGroup": 1001122
+    },
+    "51100169": {
+      "id": 51100169,
+      "charId": 21153207,
+      "location": "NPC_Interaction_Smuggler_Shop_07",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000027
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300035,
+      "clickDialogue": 73300035,
+      "npcShopGroup": 1001130
+    },
+    "51100170": {
+      "id": 51100170,
+      "charId": 21153208,
+      "location": "NPC_Interaction_Smuggler_Shop_08",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000027
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300035,
+      "clickDialogue": 73300035,
+      "npcShopGroup": 1001195
+    },
+    "51100171": {
+      "id": 51100171,
+      "charId": 21153209,
+      "location": "NPC_Interaction_Smuggler_Shop_09",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000028
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300041,
+      "clickDialogue": 73300041,
+      "npcShopGroup": 1003156
+    },
+    "51100172": {
+      "id": 51100172,
+      "charId": 21153210,
+      "location": "NPC_Interaction_Smuggler_Trader_09",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000026
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300034,
+      "clickDialogue": 73300034
+    },
+    "51100173": {
+      "id": 51100173,
+      "charId": 21153211,
+      "location": "NPC_Interaction_Smuggler_Trader_10",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000026
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300034,
+      "clickDialogue": 73300034
+    },
+    "51100174": {
+      "id": 51100174,
+      "charId": 21153212,
+      "location": "NPC_Interaction_Smuggler_Trader_11",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000026
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300034,
+      "clickDialogue": 73300034
+    },
+    "51100175": {
+      "id": 51100175,
+      "charId": 21153213,
+      "location": "NPC_Interaction_Smuggler_Trader_12",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000026
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300034,
+      "clickDialogue": 73300034
+    },
+    "51100176": {
+      "id": 51100176,
+      "charId": 21153214,
+      "location": "NPC_Interaction_Smuggler_Trader_13",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000026
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300034,
+      "clickDialogue": 73300034
+    },
+    "51100177": {
+      "id": 51100177,
+      "charId": 21153215,
+      "location": "NPC_Interaction_Smuggler_Trader_14",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000026
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300034,
+      "clickDialogue": 73300034
+    },
+    "51100178": {
+      "id": 51100178,
+      "charId": 21153216,
+      "location": "NPC_Interaction_Smuggler_Trader_15",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000026
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300034,
+      "clickDialogue": 73300034
+    },
+    "51100179": {
+      "id": 51100179,
+      "charId": 21153217,
+      "location": "NPC_Interaction_Smuggler_Trader_16",
+      "localBitFlag": 27,
+      "npcInteractionId": [
+        49000026
+      ],
+      "actionRadius": 0,
+      "appearTownTime": 0,
+      "outTownTime": 24,
+      "randomDialogue": 73300034,
+      "clickDialogue": 73300034
+    }
+  }
+}

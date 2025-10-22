@@ -33,7 +33,6 @@ import {
   Checkbox,
   Alert,
   Autocomplete,
-  Drawer,
   InputAdornment,
   Popover,
   List,
@@ -42,6 +41,7 @@ import {
   ListItemText,
   ClickAwayListener,
 } from '@mui/material';
+import ResizableDrawer from '../../components/common/ResizableDrawer';
 import {
   DndContext,
   closestCenter,
@@ -935,65 +935,22 @@ const MessageTemplatesPage: React.FC = () => {
         />
       )}
 
-      <Drawer
-        anchor="right"
+      <ResizableDrawer
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
-        sx={{
-          zIndex: 1300,
-          '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 600 },
-            maxWidth: '100vw',
-            display: 'flex',
-            flexDirection: 'column'
-          }
-        }}
-        ModalProps={{
-          keepMounted: false
-        }}
-        SlideProps={{
-          onEntered: () => {
-            // Drawer가 열린 후 이름 필드에 포커스
-            setTimeout(() => {
-              nameFieldRef.current?.focus();
-            }, 100);
-          }
+        title={editing ? t('messageTemplates.editTitle') : t('messageTemplates.addTitle')}
+        subtitle={editing ? t('messageTemplates.editDescription') : t('messageTemplates.addDescription')}
+        storageKey="messageTemplateFormDrawerWidth"
+        defaultWidth={600}
+        minWidth={500}
+        zIndex={1300}
+        onEntered={() => {
+          // Drawer가 열린 후 이름 필드에 포커스
+          setTimeout(() => {
+            nameFieldRef.current?.focus();
+          }, 100);
         }}
       >
-        {/* Header */}
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          p: 2,
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          bgcolor: 'background.paper'
-        }}>
-          <Box>
-            <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-              {editing ? t('messageTemplates.editTitle') : t('messageTemplates.addTitle')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              {editing
-                ? t('messageTemplates.editDescription')
-                : t('messageTemplates.addDescription')
-              }
-            </Typography>
-          </Box>
-          <IconButton
-            onClick={() => setDialogOpen(false)}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover'
-              }
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
         {/* Content */}
         <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           <Stack spacing={2} sx={{ mt: 1 }}>
@@ -1118,49 +1075,19 @@ const MessageTemplatesPage: React.FC = () => {
             {saving ? t('common.saving') : t('common.save')}
           </Button>
         </Box>
-      </Drawer>
+      </ResizableDrawer>
 
       {/* 개별 삭제 확인 Drawer */}
-      <Drawer
-        anchor="right"
+      <ResizableDrawer
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 400 },
-            maxWidth: '100vw',
-            display: 'flex',
-            flexDirection: 'column'
-          }
-        }}
+        title={t('common.confirmDelete')}
+        subtitle=""
+        storageKey="messageTemplateDeleteDrawerWidth"
+        defaultWidth={400}
+        minWidth={350}
+        zIndex={1301}
       >
-        {/* Header */}
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          p: 2,
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          bgcolor: 'background.paper'
-        }}>
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t('common.confirmDelete')}
-          </Typography>
-          <IconButton
-            onClick={() => setDeleteDialogOpen(false)}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover'
-              }
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
         {/* Content */}
         <Box sx={{ flex: 1, p: 2 }}>
           <Typography>
@@ -1193,49 +1120,19 @@ const MessageTemplatesPage: React.FC = () => {
             {t('common.delete')}
           </Button>
         </Box>
-      </Drawer>
+      </ResizableDrawer>
 
       {/* 일괄 삭제 확인 Drawer */}
-      <Drawer
-        anchor="right"
+      <ResizableDrawer
         open={bulkDeleteDialogOpen}
         onClose={() => setBulkDeleteDialogOpen(false)}
-        sx={{
-          zIndex: 1301,
-          '& .MuiDrawer-paper': {
-            width: { xs: '100%', sm: 400 },
-            maxWidth: '100vw',
-            display: 'flex',
-            flexDirection: 'column'
-          }
-        }}
+        title={t('common.confirmDelete')}
+        subtitle=""
+        storageKey="messageTemplateBulkDeleteDrawerWidth"
+        defaultWidth={400}
+        minWidth={350}
+        zIndex={1301}
       >
-        {/* Header */}
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          p: 2,
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          bgcolor: 'background.paper'
-        }}>
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {t('common.confirmDelete')}
-          </Typography>
-          <IconButton
-            onClick={() => setBulkDeleteDialogOpen(false)}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover'
-              }
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
         {/* Content */}
         <Box sx={{ flex: 1, p: 2 }}>
           <Typography>
@@ -1268,7 +1165,7 @@ const MessageTemplatesPage: React.FC = () => {
             {t('common.delete')}
           </Button>
         </Box>
-      </Drawer>
+      </ResizableDrawer>
 
       {/* 태그 관리 다이얼로그 */}
       <Dialog open={tagDialogOpen} onClose={() => setTagDialogOpen(false)} maxWidth="md" fullWidth>

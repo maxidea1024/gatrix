@@ -1,0 +1,1437 @@
+{
+  ":TownTalk": {
+    ":type": {
+      "id": "key",
+      "gender": "number",
+      "personalityType": "number"
+    },
+    ":required": {},
+    ":min": {
+      "gender": 0,
+      "personalityType": 1
+    },
+    ":max": {
+      "gender": 1,
+      "personalityType": 205
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "TownTalk": {
+    "71200001": {
+      "id": 71200001,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71200002": {
+      "id": 71200002,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71200003": {
+      "id": 71200003,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71200004": {
+      "id": 71200004,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71200005": {
+      "id": 71200005,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71200006": {
+      "id": 71200006,
+      "gender": 0,
+      "personalityType": 5
+    },
+    "71200007": {
+      "id": 71200007,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71200008": {
+      "id": 71200008,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71200009": {
+      "id": 71200009,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71200010": {
+      "id": 71200010,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71200011": {
+      "id": 71200011,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71200012": {
+      "id": 71200012,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71200013": {
+      "id": 71200013,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71200014": {
+      "id": 71200014,
+      "gender": 1,
+      "personalityType": 4
+    },
+    "71200015": {
+      "id": 71200015,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71200016": {
+      "id": 71200016,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71200017": {
+      "id": 71200017,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71200018": {
+      "id": 71200018,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71200019": {
+      "id": 71200019,
+      "gender": 1,
+      "personalityType": 5
+    },
+    "71200020": {
+      "id": 71200020,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71200021": {
+      "id": 71200021,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71200022": {
+      "id": 71200022,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71200023": {
+      "id": 71200023,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71200024": {
+      "id": 71200024,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71200025": {
+      "id": 71200025,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71200026": {
+      "id": 71200026,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71200028": {
+      "id": 71200028,
+      "gender": 1,
+      "personalityType": 5
+    },
+    "71200029": {
+      "id": 71200029,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71200030": {
+      "id": 71200030,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71200031": {
+      "id": 71200031,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71200032": {
+      "id": 71200032,
+      "gender": 1,
+      "personalityType": 10
+    },
+    "71200033": {
+      "id": 71200033,
+      "gender": 1,
+      "personalityType": 2
+    },
+    "71200034": {
+      "id": 71200034,
+      "gender": 1,
+      "personalityType": 4
+    },
+    "71200035": {
+      "id": 71200035,
+      "gender": 0,
+      "personalityType": 7
+    },
+    "71201001": {
+      "id": 71201001,
+      "gender": 1,
+      "personalityType": 9
+    },
+    "71201002": {
+      "id": 71201002,
+      "gender": 1,
+      "personalityType": 3
+    },
+    "71201003": {
+      "id": 71201003,
+      "gender": 1,
+      "personalityType": 8
+    },
+    "71201004": {
+      "id": 71201004,
+      "gender": 0,
+      "personalityType": 9
+    },
+    "71201005": {
+      "id": 71201005,
+      "gender": 0,
+      "personalityType": 5
+    },
+    "71201006": {
+      "id": 71201006,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201007": {
+      "id": 71201007,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201008": {
+      "id": 71201008,
+      "gender": 0,
+      "personalityType": 9
+    },
+    "71201009": {
+      "id": 71201009,
+      "gender": 0,
+      "personalityType": 5
+    },
+    "71201010": {
+      "id": 71201010,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71201011": {
+      "id": 71201011,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71201012": {
+      "id": 71201012,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71201013": {
+      "id": 71201013,
+      "gender": 0,
+      "personalityType": 10
+    },
+    "71201014": {
+      "id": 71201014,
+      "gender": 1,
+      "personalityType": 7
+    },
+    "71201015": {
+      "id": 71201015,
+      "gender": 0,
+      "personalityType": 6
+    },
+    "71201016": {
+      "id": 71201016,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201017": {
+      "id": 71201017,
+      "gender": 0,
+      "personalityType": 5
+    },
+    "71201018": {
+      "id": 71201018,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71201019": {
+      "id": 71201019,
+      "gender": 1,
+      "personalityType": 7
+    },
+    "71201020": {
+      "id": 71201020,
+      "gender": 0,
+      "personalityType": 5
+    },
+    "71201021": {
+      "id": 71201021,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71201022": {
+      "id": 71201022,
+      "gender": 0,
+      "personalityType": 9
+    },
+    "71201023": {
+      "id": 71201023,
+      "gender": 0,
+      "personalityType": 5
+    },
+    "71201024": {
+      "id": 71201024,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201025": {
+      "id": 71201025,
+      "gender": 0,
+      "personalityType": 5
+    },
+    "71201026": {
+      "id": 71201026,
+      "gender": 0,
+      "personalityType": 9
+    },
+    "71201027": {
+      "id": 71201027,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71201028": {
+      "id": 71201028,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201029": {
+      "id": 71201029,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71201030": {
+      "id": 71201030,
+      "gender": 1,
+      "personalityType": 10
+    },
+    "71201031": {
+      "id": 71201031,
+      "gender": 1,
+      "personalityType": 3
+    },
+    "71201032": {
+      "id": 71201032,
+      "gender": 1,
+      "personalityType": 3
+    },
+    "71201033": {
+      "id": 71201033,
+      "gender": 1,
+      "personalityType": 2
+    },
+    "71201034": {
+      "id": 71201034,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71201035": {
+      "id": 71201035,
+      "gender": 1,
+      "personalityType": 7
+    },
+    "71201036": {
+      "id": 71201036,
+      "gender": 1,
+      "personalityType": 7
+    },
+    "71201037": {
+      "id": 71201037,
+      "gender": 1,
+      "personalityType": 5
+    },
+    "71201038": {
+      "id": 71201038,
+      "gender": 1,
+      "personalityType": 7
+    },
+    "71201039": {
+      "id": 71201039,
+      "gender": 1,
+      "personalityType": 7
+    },
+    "71201040": {
+      "id": 71201040,
+      "gender": 1,
+      "personalityType": 3
+    },
+    "71201041": {
+      "id": 71201041,
+      "gender": 1,
+      "personalityType": 7
+    },
+    "71201042": {
+      "id": 71201042,
+      "gender": 1,
+      "personalityType": 8
+    },
+    "71201043": {
+      "id": 71201043,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71201044": {
+      "id": 71201044,
+      "gender": 1,
+      "personalityType": 10
+    },
+    "71201045": {
+      "id": 71201045,
+      "gender": 1,
+      "personalityType": 7
+    },
+    "71201046": {
+      "id": 71201046,
+      "gender": 1,
+      "personalityType": 9
+    },
+    "71201047": {
+      "id": 71201047,
+      "gender": 1,
+      "personalityType": 10
+    },
+    "71201048": {
+      "id": 71201048,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201049": {
+      "id": 71201049,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201050": {
+      "id": 71201050,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71201051": {
+      "id": 71201051,
+      "gender": 0,
+      "personalityType": 10
+    },
+    "71201052": {
+      "id": 71201052,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201053": {
+      "id": 71201053,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71201054": {
+      "id": 71201054,
+      "gender": 0,
+      "personalityType": 9
+    },
+    "71201055": {
+      "id": 71201055,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201056": {
+      "id": 71201056,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201057": {
+      "id": 71201057,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201058": {
+      "id": 71201058,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201059": {
+      "id": 71201059,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201060": {
+      "id": 71201060,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71201061": {
+      "id": 71201061,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71201062": {
+      "id": 71201062,
+      "gender": 0,
+      "personalityType": 3
+    },
+    "71201063": {
+      "id": 71201063,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201064": {
+      "id": 71201064,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71201065": {
+      "id": 71201065,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201066": {
+      "id": 71201066,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201067": {
+      "id": 71201067,
+      "gender": 0,
+      "personalityType": 10
+    },
+    "71201068": {
+      "id": 71201068,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71201069": {
+      "id": 71201069,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201070": {
+      "id": 71201070,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71201071": {
+      "id": 71201071,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71201072": {
+      "id": 71201072,
+      "gender": 0,
+      "personalityType": 5
+    },
+    "71201073": {
+      "id": 71201073,
+      "gender": 0,
+      "personalityType": 5
+    },
+    "71201074": {
+      "id": 71201074,
+      "gender": 0,
+      "personalityType": 6
+    },
+    "71201075": {
+      "id": 71201075,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71201076": {
+      "id": 71201076,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201077": {
+      "id": 71201077,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71201078": {
+      "id": 71201078,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201079": {
+      "id": 71201079,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71201080": {
+      "id": 71201080,
+      "gender": 1,
+      "personalityType": 8
+    },
+    "71201081": {
+      "id": 71201081,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201082": {
+      "id": 71201082,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201083": {
+      "id": 71201083,
+      "gender": 0,
+      "personalityType": 9
+    },
+    "71201084": {
+      "id": 71201084,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201085": {
+      "id": 71201085,
+      "gender": 0,
+      "personalityType": 5
+    },
+    "71201086": {
+      "id": 71201086,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201087": {
+      "id": 71201087,
+      "gender": 0,
+      "personalityType": 9
+    },
+    "71201088": {
+      "id": 71201088,
+      "gender": 0,
+      "personalityType": 5
+    },
+    "71201089": {
+      "id": 71201089,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201090": {
+      "id": 71201090,
+      "gender": 1,
+      "personalityType": 9
+    },
+    "71201091": {
+      "id": 71201091,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201092": {
+      "id": 71201092,
+      "gender": 1,
+      "personalityType": 3
+    },
+    "71201093": {
+      "id": 71201093,
+      "gender": 0,
+      "personalityType": 7
+    },
+    "71201094": {
+      "id": 71201094,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201095": {
+      "id": 71201095,
+      "gender": 0,
+      "personalityType": 5
+    },
+    "71201096": {
+      "id": 71201096,
+      "gender": 0,
+      "personalityType": 10
+    },
+    "71201097": {
+      "id": 71201097,
+      "gender": 0,
+      "personalityType": 9
+    },
+    "71201098": {
+      "id": 71201098,
+      "gender": 0,
+      "personalityType": 5
+    },
+    "71201099": {
+      "id": 71201099,
+      "gender": 0,
+      "personalityType": 9
+    },
+    "71201100": {
+      "id": 71201100,
+      "gender": 0,
+      "personalityType": 10
+    },
+    "71201101": {
+      "id": 71201101,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201102": {
+      "id": 71201102,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71201103": {
+      "id": 71201103,
+      "gender": 0,
+      "personalityType": 9
+    },
+    "71201104": {
+      "id": 71201104,
+      "gender": 1,
+      "personalityType": 3
+    },
+    "71201105": {
+      "id": 71201105,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71201106": {
+      "id": 71201106,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201107": {
+      "id": 71201107,
+      "gender": 0,
+      "personalityType": 5
+    },
+    "71201108": {
+      "id": 71201108,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71201109": {
+      "id": 71201109,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71201110": {
+      "id": 71201110,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71201111": {
+      "id": 71201111,
+      "gender": 1,
+      "personalityType": 9
+    },
+    "71201112": {
+      "id": 71201112,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201113": {
+      "id": 71201113,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201114": {
+      "id": 71201114,
+      "gender": 1,
+      "personalityType": 4
+    },
+    "71201115": {
+      "id": 71201115,
+      "gender": 1,
+      "personalityType": 5
+    },
+    "71201116": {
+      "id": 71201116,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71201117": {
+      "id": 71201117,
+      "gender": 0,
+      "personalityType": 9
+    },
+    "71201118": {
+      "id": 71201118,
+      "gender": 0,
+      "personalityType": 3
+    },
+    "71201119": {
+      "id": 71201119,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71201120": {
+      "id": 71201120,
+      "gender": 1,
+      "personalityType": 5
+    },
+    "71201121": {
+      "id": 71201121,
+      "gender": 1,
+      "personalityType": 3
+    },
+    "71201122": {
+      "id": 71201122,
+      "gender": 0,
+      "personalityType": 10
+    },
+    "71201123": {
+      "id": 71201123,
+      "gender": 0,
+      "personalityType": 7
+    },
+    "71201124": {
+      "id": 71201124,
+      "gender": 0,
+      "personalityType": 7
+    },
+    "71201125": {
+      "id": 71201125,
+      "gender": 0,
+      "personalityType": 6
+    },
+    "71201126": {
+      "id": 71201126,
+      "gender": 0,
+      "personalityType": 6
+    },
+    "71201127": {
+      "id": 71201127,
+      "gender": 0,
+      "personalityType": 6
+    },
+    "71201128": {
+      "id": 71201128,
+      "gender": 0,
+      "personalityType": 6
+    },
+    "71201129": {
+      "id": 71201129,
+      "gender": 0,
+      "personalityType": 6
+    },
+    "71201130": {
+      "id": 71201130,
+      "gender": 1,
+      "personalityType": 8
+    },
+    "71201131": {
+      "id": 71201131,
+      "gender": 1,
+      "personalityType": 8
+    },
+    "71201132": {
+      "id": 71201132,
+      "gender": 0,
+      "personalityType": 11
+    },
+    "71201133": {
+      "id": 71201133,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201134": {
+      "id": 71201134,
+      "gender": 0,
+      "personalityType": 5
+    },
+    "71201135": {
+      "id": 71201135,
+      "gender": 1,
+      "personalityType": 9
+    },
+    "71201136": {
+      "id": 71201136,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201137": {
+      "id": 71201137,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201138": {
+      "id": 71201138,
+      "gender": 0,
+      "personalityType": 6
+    },
+    "71201139": {
+      "id": 71201139,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71201140": {
+      "id": 71201140,
+      "gender": 1,
+      "personalityType": 9
+    },
+    "71201141": {
+      "id": 71201141,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71201142": {
+      "id": 71201142,
+      "gender": 1,
+      "personalityType": 9
+    },
+    "71201143": {
+      "id": 71201143,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71201144": {
+      "id": 71201144,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71201145": {
+      "id": 71201145,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71201146": {
+      "id": 71201146,
+      "gender": 1,
+      "personalityType": 3
+    },
+    "71201147": {
+      "id": 71201147,
+      "gender": 1,
+      "personalityType": 3
+    },
+    "71201148": {
+      "id": 71201148,
+      "gender": 1,
+      "personalityType": 5
+    },
+    "71201149": {
+      "id": 71201149,
+      "gender": 1,
+      "personalityType": 8
+    },
+    "71201150": {
+      "id": 71201150,
+      "gender": 1,
+      "personalityType": 9
+    },
+    "71201151": {
+      "id": 71201151,
+      "gender": 1,
+      "personalityType": 10
+    },
+    "71201152": {
+      "id": 71201152,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71201153": {
+      "id": 71201153,
+      "gender": 1,
+      "personalityType": 10
+    },
+    "71201154": {
+      "id": 71201154,
+      "gender": 1,
+      "personalityType": 8
+    },
+    "71201155": {
+      "id": 71201155,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71201156": {
+      "id": 71201156,
+      "gender": 0,
+      "personalityType": 6
+    },
+    "71201157": {
+      "id": 71201157,
+      "gender": 0,
+      "personalityType": 8
+    },
+    "71201158": {
+      "id": 71201158,
+      "gender": 1,
+      "personalityType": 7
+    },
+    "71201159": {
+      "id": 71201159,
+      "gender": 1,
+      "personalityType": 5
+    },
+    "71201160": {
+      "id": 71201160,
+      "gender": 0,
+      "personalityType": 10
+    },
+    "71201161": {
+      "id": 71201161,
+      "gender": 0,
+      "personalityType": 10
+    },
+    "71201162": {
+      "id": 71201162,
+      "gender": 1,
+      "personalityType": 7
+    },
+    "71201163": {
+      "id": 71201163,
+      "gender": 1,
+      "personalityType": 8
+    },
+    "71201164": {
+      "id": 71201164,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71201165": {
+      "id": 71201165,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201166": {
+      "id": 71201166,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201167": {
+      "id": 71201167,
+      "gender": 1,
+      "personalityType": 2
+    },
+    "71201168": {
+      "id": 71201168,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201169": {
+      "id": 71201169,
+      "gender": 1,
+      "personalityType": 4
+    },
+    "71201170": {
+      "id": 71201170,
+      "gender": 1,
+      "personalityType": 10
+    },
+    "71201171": {
+      "id": 71201171,
+      "gender": 1,
+      "personalityType": 2
+    },
+    "71201172": {
+      "id": 71201172,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71201173": {
+      "id": 71201173,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71201174": {
+      "id": 71201174,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71201175": {
+      "id": 71201175,
+      "gender": 1,
+      "personalityType": 9
+    },
+    "71201176": {
+      "id": 71201176,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201177": {
+      "id": 71201177,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71201178": {
+      "id": 71201178,
+      "gender": 1,
+      "personalityType": 5
+    },
+    "71201179": {
+      "id": 71201179,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201180": {
+      "id": 71201180,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71201181": {
+      "id": 71201181,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71201182": {
+      "id": 71201182,
+      "gender": 1,
+      "personalityType": 9
+    },
+    "71201183": {
+      "id": 71201183,
+      "gender": 1,
+      "personalityType": 3
+    },
+    "71201184": {
+      "id": 71201184,
+      "gender": 1,
+      "personalityType": 8
+    },
+    "71201185": {
+      "id": 71201185,
+      "gender": 0,
+      "personalityType": 6
+    },
+    "71201186": {
+      "id": 71201186,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71201187": {
+      "id": 71201187,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71201188": {
+      "id": 71201188,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71201189": {
+      "id": 71201189,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71201190": {
+      "id": 71201190,
+      "gender": 1,
+      "personalityType": 3
+    },
+    "71201191": {
+      "id": 71201191,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71201192": {
+      "id": 71201192,
+      "gender": 1,
+      "personalityType": 2
+    },
+    "71201193": {
+      "id": 71201193,
+      "gender": 0,
+      "personalityType": 9
+    },
+    "71201194": {
+      "id": 71201194,
+      "gender": 1,
+      "personalityType": 8
+    },
+    "71201195": {
+      "id": 71201195,
+      "gender": 1,
+      "personalityType": 4
+    },
+    "71201196": {
+      "id": 71201196,
+      "gender": 1,
+      "personalityType": 5
+    },
+    "71201197": {
+      "id": 71201197,
+      "gender": 1,
+      "personalityType": 4
+    },
+    "71201198": {
+      "id": 71201198,
+      "gender": 1,
+      "personalityType": 7
+    },
+    "71201199": {
+      "id": 71201199,
+      "gender": 1,
+      "personalityType": 10
+    },
+    "71201200": {
+      "id": 71201200,
+      "gender": 1,
+      "personalityType": 9
+    },
+    "71201201": {
+      "id": 71201201,
+      "gender": 1,
+      "personalityType": 2
+    },
+    "71201202": {
+      "id": 71201202,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71201203": {
+      "id": 71201203,
+      "gender": 1,
+      "personalityType": 2
+    },
+    "71201204": {
+      "id": 71201204,
+      "gender": 1,
+      "personalityType": 8
+    },
+    "71210001": {
+      "id": 71210001,
+      "gender": 0,
+      "personalityType": 1
+    },
+    "71210002": {
+      "id": 71210002,
+      "gender": 0,
+      "personalityType": 2
+    },
+    "71210003": {
+      "id": 71210003,
+      "gender": 0,
+      "personalityType": 3
+    },
+    "71210004": {
+      "id": 71210004,
+      "gender": 0,
+      "personalityType": 4
+    },
+    "71210005": {
+      "id": 71210005,
+      "gender": 0,
+      "personalityType": 5
+    },
+    "71210006": {
+      "id": 71210006,
+      "gender": 0,
+      "personalityType": 6
+    },
+    "71210007": {
+      "id": 71210007,
+      "gender": 0,
+      "personalityType": 7
+    },
+    "71210008": {
+      "id": 71210008,
+      "gender": 0,
+      "personalityType": 8
+    },
+    "71210009": {
+      "id": 71210009,
+      "gender": 0,
+      "personalityType": 9
+    },
+    "71210010": {
+      "id": 71210010,
+      "gender": 0,
+      "personalityType": 10
+    },
+    "71210011": {
+      "id": 71210011,
+      "gender": 1,
+      "personalityType": 1
+    },
+    "71210012": {
+      "id": 71210012,
+      "gender": 1,
+      "personalityType": 2
+    },
+    "71210013": {
+      "id": 71210013,
+      "gender": 1,
+      "personalityType": 3
+    },
+    "71210014": {
+      "id": 71210014,
+      "gender": 1,
+      "personalityType": 4
+    },
+    "71210015": {
+      "id": 71210015,
+      "gender": 1,
+      "personalityType": 5
+    },
+    "71210016": {
+      "id": 71210016,
+      "gender": 1,
+      "personalityType": 6
+    },
+    "71210017": {
+      "id": 71210017,
+      "gender": 1,
+      "personalityType": 7
+    },
+    "71210018": {
+      "id": 71210018,
+      "gender": 1,
+      "personalityType": 8
+    },
+    "71210019": {
+      "id": 71210019,
+      "gender": 1,
+      "personalityType": 9
+    },
+    "71210020": {
+      "id": 71210020,
+      "gender": 1,
+      "personalityType": 10
+    },
+    "71210021": {
+      "id": 71210021,
+      "gender": 0,
+      "personalityType": 101
+    },
+    "71210022": {
+      "id": 71210022,
+      "gender": 0,
+      "personalityType": 102
+    },
+    "71210023": {
+      "id": 71210023,
+      "gender": 0,
+      "personalityType": 103
+    },
+    "71210024": {
+      "id": 71210024,
+      "gender": 0,
+      "personalityType": 104
+    },
+    "71210025": {
+      "id": 71210025,
+      "gender": 0,
+      "personalityType": 105
+    },
+    "71210026": {
+      "id": 71210026,
+      "gender": 0,
+      "personalityType": 106
+    },
+    "71210027": {
+      "id": 71210027,
+      "gender": 0,
+      "personalityType": 107
+    },
+    "71210028": {
+      "id": 71210028,
+      "gender": 0,
+      "personalityType": 108
+    },
+    "71210029": {
+      "id": 71210029,
+      "gender": 0,
+      "personalityType": 109
+    },
+    "71210030": {
+      "id": 71210030,
+      "gender": 0,
+      "personalityType": 110
+    },
+    "71210031": {
+      "id": 71210031,
+      "gender": 1,
+      "personalityType": 101
+    },
+    "71210032": {
+      "id": 71210032,
+      "gender": 1,
+      "personalityType": 102
+    },
+    "71210033": {
+      "id": 71210033,
+      "gender": 1,
+      "personalityType": 103
+    },
+    "71210034": {
+      "id": 71210034,
+      "gender": 1,
+      "personalityType": 104
+    },
+    "71210035": {
+      "id": 71210035,
+      "gender": 1,
+      "personalityType": 105
+    },
+    "71210036": {
+      "id": 71210036,
+      "gender": 1,
+      "personalityType": 106
+    },
+    "71210037": {
+      "id": 71210037,
+      "gender": 1,
+      "personalityType": 107
+    },
+    "71210038": {
+      "id": 71210038,
+      "gender": 1,
+      "personalityType": 108
+    },
+    "71210039": {
+      "id": 71210039,
+      "gender": 1,
+      "personalityType": 109
+    },
+    "71210040": {
+      "id": 71210040,
+      "gender": 1,
+      "personalityType": 110
+    },
+    "71210041": {
+      "id": 71210041,
+      "gender": 0,
+      "personalityType": 11
+    },
+    "71210042": {
+      "id": 71210042,
+      "gender": 0,
+      "personalityType": 102
+    },
+    "71210043": {
+      "id": 71210043,
+      "gender": 0,
+      "personalityType": 102
+    },
+    "71210044": {
+      "id": 71210044,
+      "gender": 0,
+      "personalityType": 111
+    },
+    "71210045": {
+      "id": 71210045,
+      "gender": 1,
+      "personalityType": 111
+    }
+  }
+}

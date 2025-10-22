@@ -1611,32 +1611,13 @@ const CrashEventsPage: React.FC = () => {
             left: 0,
             top: 0,
             bottom: 0,
-            width: '8px',
+            width: '4px',
             cursor: 'ew-resize',
             bgcolor: isResizing ? 'primary.main' : 'transparent',
             transition: 'background-color 0.2s',
             zIndex: 1000,
             '&:hover': {
-              bgcolor: 'primary.main',
-              opacity: 0.5,
-            },
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '3px',
-              height: '40px',
-              borderLeft: '1px solid',
-              borderRight: '1px solid',
-              borderColor: isResizing ? 'primary.contrastText' : 'divider',
-              opacity: isResizing ? 1 : 0.3,
-              transition: 'opacity 0.2s',
-            },
-            '&:hover::before': {
-              opacity: 1,
-              borderColor: 'primary.contrastText',
+              bgcolor: 'primary.light',
             }
           }}
         />

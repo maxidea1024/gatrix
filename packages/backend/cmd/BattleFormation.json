@@ -1,0 +1,2301 @@
+{
+  ":BattleFormation": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "isUser": "bool",
+      "path": "string",
+      "desc": "text",
+      "learnPointId": "number",
+      "learnPointVal": "number",
+      "duration": "number",
+      "frontBattleBuffId": [
+        "number",
+        "number",
+        "number"
+      ],
+      "frontSlot": [
+        "number",
+        "number",
+        "number",
+        "number"
+      ],
+      "centerBattleBuffId": [
+        "number",
+        "number",
+        "number"
+      ],
+      "centerSlot": [
+        "number",
+        "number",
+        "number",
+        "number"
+      ],
+      "rearBattleBuffId": [
+        "number",
+        "number",
+        "number"
+      ],
+      "rearSlot": [
+        "number",
+        "number",
+        "number"
+      ],
+      "worldBuffId": [
+        "number"
+      ],
+      "clearQuestId": "number",
+      "needMateId": "number",
+      "purchaseNeedRank": "number",
+      "purchaseDucat": "number",
+      "purchaseGem": "number"
+    },
+    ":required": {
+      "name": 1,
+      "isUser": 1,
+      "path": 1,
+      "learnPointId": 1,
+      "learnPointVal": 1,
+      "purchaseNeedRank": 1
+    },
+    ":requiredInObject": {
+      "frontSlot": [
+        1
+      ],
+      "centerSlot": [
+        1
+      ],
+      "rearSlot": [
+        1
+      ]
+    },
+    ":min": {
+      "learnPointId": 100000,
+      "frontBattleBuffId": [
+        65500000,
+        65500000,
+        65500000
+      ],
+      "frontSlot": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "centerBattleBuffId": [
+        65500000,
+        65500000,
+        65500000
+      ],
+      "centerSlot": [
+        1
+      ],
+      "rearBattleBuffId": [
+        65500000,
+        65500000,
+        65500000
+      ],
+      "rearSlot": [
+        1
+      ],
+      "worldBuffId": [
+        38000000
+      ],
+      "clearQuestId": 82000000,
+      "needMateId": 21200000
+    },
+    ":max": {
+      "learnPointId": 199999,
+      "frontBattleBuffId": [
+        65999999,
+        65999999,
+        65999999
+      ],
+      "frontSlot": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "centerBattleBuffId": [
+        65999999,
+        65999999,
+        65999999
+      ],
+      "centerSlot": [
+        7
+      ],
+      "rearBattleBuffId": [
+        65999999,
+        65999999,
+        65999999
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38099999
+      ],
+      "clearQuestId": 82999999,
+      "needMateId": 21399999
+    },
+    ":enum": {},
+    ":links": {
+      "learnPointId": [
+        "Point"
+      ],
+      "frontBattleBuffId": [
+        [
+          "BattleBuff"
+        ],
+        [
+          "BattleBuff"
+        ],
+        [
+          "BattleBuff"
+        ]
+      ],
+      "centerBattleBuffId": [
+        [
+          "BattleBuff"
+        ],
+        [
+          "BattleBuff"
+        ],
+        [
+          "BattleBuff"
+        ]
+      ],
+      "rearBattleBuffId": [
+        [
+          "BattleBuff"
+        ],
+        [
+          "BattleBuff"
+        ],
+        [
+          "BattleBuff"
+        ]
+      ],
+      "worldBuffId": [
+        [
+          "WorldBuff"
+        ]
+      ],
+      "clearQuestId": [
+        "Quest"
+      ],
+      "needMateId": [
+        "Mate"
+      ]
+    }
+  },
+  "BattleFormation": {
+    "64200000": {
+      "id": 64200000,
+      "name": "기본 진형",
+      "isUser": true,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64200001": {
+      "id": 64200001,
+      "name": "퇴로 차단",
+      "isUser": true,
+      "path": "battleFormation_09",
+      "desc": "적을 포위하여 섬멸하는데 특화된 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800027
+      ],
+      "frontSlot": [
+        6,
+        7
+      ],
+      "centerBattleBuffId": [
+        65800028
+      ],
+      "centerSlot": [
+        4,
+        5
+      ],
+      "rearBattleBuffId": [
+        65800029
+      ],
+      "rearSlot": [
+        1,
+        2,
+        3
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 5,
+      "purchaseGem": 1000
+    },
+    "64200002": {
+      "id": 64200002,
+      "name": "후방 집결",
+      "isUser": true,
+      "path": "battleFormation_10",
+      "desc": "후방에 집결하여 적의 공격을 무력화하는데 특화된 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800030
+      ],
+      "frontSlot": [
+        6,
+        7
+      ],
+      "centerBattleBuffId": [
+        65800031
+      ],
+      "centerSlot": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "rearBattleBuffId": [
+        65800032
+      ],
+      "rearSlot": [
+        1
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64200003": {
+      "id": 64200003,
+      "name": "포위_범위5_1",
+      "isUser": false,
+      "path": "siege_r5_1",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        4,
+        5,
+        6
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249001": {
+      "id": 64249001,
+      "name": "튜토리얼_아군",
+      "isUser": false,
+      "path": "tutorialAlly",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        4,
+        5,
+        6
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249002": {
+      "id": 64249002,
+      "name": "튜토리얼_적1",
+      "isUser": false,
+      "path": "tutorialEnemy1",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        4,
+        5,
+        6
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249003": {
+      "id": 64249003,
+      "name": "튜토리얼_적2",
+      "isUser": false,
+      "path": "tutorialEnemy2",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        4,
+        5,
+        6
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249004": {
+      "id": 64249004,
+      "name": "튜토리얼_적3",
+      "isUser": false,
+      "path": "tutorialEnemy3",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        4,
+        5,
+        6
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249005": {
+      "id": 64249005,
+      "name": "도전_전투 학습1_길막1",
+      "isUser": false,
+      "path": "NewBattleTutorial01_1",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        4,
+        5,
+        6
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249006": {
+      "id": 64249006,
+      "name": "도전_전투 학습1_길막2",
+      "isUser": false,
+      "path": "NewBattleTutorial01_2",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        4,
+        5,
+        6
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249007": {
+      "id": 64249007,
+      "name": "도전_전투 학습4",
+      "isUser": false,
+      "path": "NewBattleTutorial04",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        4,
+        5,
+        6
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249008": {
+      "id": 64249008,
+      "name": "영상촬영1_아군",
+      "isUser": false,
+      "path": "movie1_user",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        4,
+        5,
+        6
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249009": {
+      "id": 64249009,
+      "name": "영상촬영1_적군",
+      "isUser": false,
+      "path": "movie1_enemy",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        4,
+        5,
+        6
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249010": {
+      "id": 64249010,
+      "name": "해적 간부 소탕",
+      "isUser": false,
+      "path": "CadrePirates",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        4,
+        5,
+        6
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249011": {
+      "id": 64249011,
+      "name": "결사 해적1",
+      "isUser": false,
+      "path": "BombPirates1",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        4,
+        5,
+        6
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249012": {
+      "id": 64249012,
+      "name": "결사 해적2",
+      "isUser": false,
+      "path": "BombPirates2",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        4,
+        5,
+        6
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249013": {
+      "id": 64249013,
+      "name": "스킬라_진형",
+      "isUser": false,
+      "path": "Raid_ScyllaFormation",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        4,
+        5,
+        6
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249014": {
+      "id": 64249014,
+      "name": "스킬라_진형1",
+      "isUser": false,
+      "path": "Raid_ScyllaFormation1",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        4,
+        5,
+        6
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249015": {
+      "id": 64249015,
+      "name": "스킬라_진형2",
+      "isUser": false,
+      "path": "Raid_ScyllaFormation2",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800024
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800025
+      ],
+      "centerSlot": [
+        4,
+        5,
+        6
+      ],
+      "rearBattleBuffId": [
+        65800026
+      ],
+      "rearSlot": [
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249500": {
+      "id": 64249500,
+      "name": "고귀한 결속",
+      "isUser": true,
+      "path": "battleFormation_01",
+      "desc": "빠른 기동력으로 적을 제압하는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800000
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800001
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800002
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1
+    },
+    "64249501": {
+      "id": 64249501,
+      "name": "신속한 포격",
+      "isUser": true,
+      "path": "battleFormation_02",
+      "desc": "적이 접근하기 전에 포격 공격을 가하기 좋은 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800003
+      ],
+      "frontSlot": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "centerBattleBuffId": [
+        65800004
+      ],
+      "centerSlot": [
+        6,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800005
+      ],
+      "rearSlot": [
+        1
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249502": {
+      "id": 64249502,
+      "name": "용맹한 진격",
+      "isUser": true,
+      "path": "battleFormation_03",
+      "desc": "적에게 빠르게 접근하여 백병 공격을 가하기 좋은 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800006
+      ],
+      "frontSlot": [
+        2,
+        3,
+        4
+      ],
+      "centerBattleBuffId": [
+        65800007
+      ],
+      "centerSlot": [
+        1
+      ],
+      "rearBattleBuffId": [
+        65800008
+      ],
+      "rearSlot": [
+        5,
+        6,
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249503": {
+      "id": 64249503,
+      "name": "가혹한 돌파",
+      "isUser": true,
+      "path": "battleFormation_04",
+      "desc": "가까이 접근한 적에게 충파 공격을 가하기 좋은 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800009
+      ],
+      "frontSlot": [
+        1,
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800010
+      ],
+      "centerSlot": [
+        4,
+        5
+      ],
+      "rearBattleBuffId": [
+        65800011
+      ],
+      "rearSlot": [
+        6,
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249504": {
+      "id": 64249504,
+      "name": "화력 집중",
+      "isUser": true,
+      "path": "battleFormation_05",
+      "desc": "적에게 치명적인 피해를 주는데 특화된 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800012
+      ],
+      "frontSlot": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "centerBattleBuffId": [
+        65800013
+      ],
+      "centerSlot": [
+        6,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800014
+      ],
+      "rearSlot": [
+        1
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249505": {
+      "id": 64249505,
+      "name": "일제 포격",
+      "isUser": true,
+      "path": "battleFormation_06",
+      "desc": "방어를 포기하는 대신 포격에 특화된 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800015
+      ],
+      "frontSlot": [
+        2,
+        3,
+        4
+      ],
+      "centerBattleBuffId": [
+        65800016
+      ],
+      "centerSlot": [
+        5,
+        6,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800017
+      ],
+      "rearSlot": [
+        1
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249506": {
+      "id": 64249506,
+      "name": "성스러운 보호",
+      "isUser": true,
+      "path": "battleFormation_07",
+      "desc": "방어와 생존에 집중하여 버티기에 특화된 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800018
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800019
+      ],
+      "centerSlot": [
+        1,
+        6,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800020
+      ],
+      "rearSlot": [
+        4,
+        5
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249507": {
+      "id": 64249507,
+      "name": "의지의 반격",
+      "isUser": true,
+      "path": "battleFormation_08",
+      "desc": "적의 공격에 대한 반격에 특화된 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800021
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800022
+      ],
+      "centerSlot": [
+        4,
+        5
+      ],
+      "rearBattleBuffId": [
+        65800023
+      ],
+      "rearSlot": [
+        1,
+        6,
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249508": {
+      "id": 64249508,
+      "name": "21티어 추가 버프 진형",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65551038,
+        65800034
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65551038,
+        65800034
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65551038,
+        65800034
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249509": {
+      "id": 64249509,
+      "name": "15층 보스 진형",
+      "isUser": false,
+      "path": "battleFormation_04",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800036
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800036
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800036
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249510": {
+      "id": 64249510,
+      "name": "20층 보스 진형",
+      "isUser": false,
+      "path": "battleFormation_05",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800034
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800034
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800034
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249511": {
+      "id": 64249511,
+      "name": "25층 보스 진형",
+      "isUser": false,
+      "path": "battleFormation_10",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800035
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800035
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800035
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249512": {
+      "id": 64249512,
+      "name": "30층 보스 진형",
+      "isUser": false,
+      "path": "battleFormation_10",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800037
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800037
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800037
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249513": {
+      "id": 64249513,
+      "name": "99% 피해 감소",
+      "isUser": false,
+      "path": "battleFormation_10",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800038
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800038
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800038
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249514": {
+      "id": 64249514,
+      "name": "테스트용 진형",
+      "isUser": false,
+      "path": "battleFormation_08",
+      "desc": "테스트용 유료 기간제 진형입니다",
+      "learnPointId": 100004,
+      "learnPointVal": 300,
+      "duration": 604800,
+      "frontBattleBuffId": [
+        65800021
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800022
+      ],
+      "centerSlot": [
+        4,
+        5
+      ],
+      "rearBattleBuffId": [
+        65800023
+      ],
+      "rearSlot": [
+        1,
+        6,
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249515": {
+      "id": 64249515,
+      "name": "독립 전투",
+      "isUser": true,
+      "path": "battleFormation_11",
+      "desc": "각개전투에 특화된 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800039
+      ],
+      "frontSlot": [
+        2,
+        3,
+        4
+      ],
+      "centerBattleBuffId": [
+        65800039
+      ],
+      "centerSlot": [
+        5,
+        6,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800039
+      ],
+      "rearSlot": [
+        1
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249516": {
+      "id": 64249516,
+      "name": "맹공 일변도",
+      "isUser": true,
+      "path": "battleFormation_12",
+      "desc": "길게 늘어진 선박별로 연계를 보완한 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800040
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800040
+      ],
+      "centerSlot": [
+        1,
+        6,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800040
+      ],
+      "rearSlot": [
+        4,
+        5
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249517": {
+      "id": 64249517,
+      "name": "강대한 돌격",
+      "isUser": true,
+      "path": "battleFormation_13",
+      "desc": "일제히 적진으로 돌격하기에 특화된 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800041
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800041
+      ],
+      "centerSlot": [
+        4,
+        5
+      ],
+      "rearBattleBuffId": [
+        65800041
+      ],
+      "rearSlot": [
+        1,
+        6,
+        7
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 10,
+      "purchaseGem": 1000
+    },
+    "64249518": {
+      "id": 64249518,
+      "name": "C15층 보스 진형",
+      "isUser": false,
+      "path": "battleFormation_03",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800036
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800036
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800036
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249519": {
+      "id": 64249519,
+      "name": "C20층 보스 진형",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800034
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800034
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800034
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249520": {
+      "id": 64249520,
+      "name": "C25층 보스 진형",
+      "isUser": false,
+      "path": "battleFormation_03",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800035
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800035
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800035
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249521": {
+      "id": 64249521,
+      "name": "22티어 추가 버프",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65551038,
+        65800035,
+        65551048
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65551038,
+        65800035,
+        65551048
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65551038,
+        65800035,
+        65551048
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249522": {
+      "id": 64249522,
+      "name": "받는 피해량 감소 30%, 광역 피해량 감소 60%",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800036,
+        65800042
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800036,
+        65800042
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800036,
+        65800042
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249523": {
+      "id": 64249523,
+      "name": "받는 피해량 감소 30%, 광역 피해량 감소 50%",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800036,
+        65800043
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800036,
+        65800043
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800036,
+        65800043
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249524": {
+      "id": 64249524,
+      "name": "23티어 추가 버프",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65551040,
+        65800033,
+        65551050
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65551040,
+        65800033,
+        65551050
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65551040,
+        65800033,
+        65551050
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249525": {
+      "id": 64249525,
+      "name": "받는 피해량 감소 50%, 광역 피해량 감소 50%",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800035,
+        65800043
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800035,
+        65800043
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800035,
+        65800043
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249526": {
+      "id": 64249526,
+      "name": "받는 피해량 감소 40%, 광역 피해량 감소 40%",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800034,
+        65800044
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800034,
+        65800044
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800034,
+        65800044
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249527": {
+      "id": 64249527,
+      "name": "받는 피해량 감소 30%, 광역 피해량 감소 30%",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800036,
+        65800045
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800036,
+        65800045
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800036,
+        65800045
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249528": {
+      "id": 64249528,
+      "name": "받는 피해량 감소 40%, 광역 피해량 감소 30%",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800034,
+        65800045
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800034,
+        65800045
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800034,
+        65800045
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249529": {
+      "id": 64249529,
+      "name": "받는 피해량 감소 50%, 광역 피해량 감소 40%",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800035,
+        65800044
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800035,
+        65800044
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800035,
+        65800044
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249530": {
+      "id": 64249530,
+      "name": "받는 피해량 감소 60%",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800033
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800033
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800033
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249531": {
+      "id": 64249531,
+      "name": "24티어 추가 버프",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65551040,
+        65800046,
+        65800036
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65551040,
+        65800046,
+        65800036
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65551040,
+        65800046,
+        65800036
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249532": {
+      "id": 64249532,
+      "name": "받는 포격 피해량 85% 감소, 받는 백병 피해량 50% 감소",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800047,
+        65800048
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800047,
+        65800048
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800047,
+        65800048
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249533": {
+      "id": 64249533,
+      "name": "받는 피해량 감소 40%, 광역 피해량 감소 50%",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65800034,
+        65800043
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65800034,
+        65800043
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65800034,
+        65800043
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249534": {
+      "id": 64249534,
+      "name": "추종자 1단계",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65990170
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65990170
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65990170
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249535": {
+      "id": 64249535,
+      "name": "추종자 2단계",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65990172
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65990172
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65990172
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249536": {
+      "id": 64249536,
+      "name": "추종자 3단계",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65990173
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65990173
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65990173
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    },
+    "64249537": {
+      "id": 64249537,
+      "name": "25티어 추가 버프",
+      "isUser": false,
+      "path": "battleFormation_00",
+      "desc": "어느 상황에도 무난하게 적용할 수 있는 진형",
+      "learnPointId": 100003,
+      "learnPointVal": 1000,
+      "frontBattleBuffId": [
+        65551040,
+        65800046,
+        65800035
+      ],
+      "frontSlot": [
+        2,
+        3
+      ],
+      "centerBattleBuffId": [
+        65551040,
+        65800046,
+        65800035
+      ],
+      "centerSlot": [
+        1,
+        4,
+        7
+      ],
+      "rearBattleBuffId": [
+        65551040,
+        65800046,
+        65800035
+      ],
+      "rearSlot": [
+        5,
+        6
+      ],
+      "worldBuffId": [
+        38001000
+      ],
+      "purchaseNeedRank": 1,
+      "purchaseGem": 1000
+    }
+  }
+}

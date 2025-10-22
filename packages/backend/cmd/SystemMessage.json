@@ -1,0 +1,193 @@
+{
+  ":SystemMessage": {
+    ":type": {
+      "id": "key",
+      "desc": "text",
+      "formatTexts": [
+        {
+          "Type": "number",
+          "Val": "string"
+        },
+        {
+          "Type": "number",
+          "Val": "string"
+        },
+        {
+          "Type": "number",
+          "Val": "string"
+        },
+        {
+          "Type": "number",
+          "Val": "string"
+        }
+      ]
+    },
+    ":required": {},
+    ":min": {
+      "formatTexts": [
+        {
+          "Type": 1
+        },
+        {
+          "Type": 1
+        },
+        {
+          "Type": 1
+        },
+        {
+          "Type": 1
+        }
+      ]
+    },
+    ":max": {
+      "formatTexts": [
+        {
+          "Type": 5
+        },
+        {
+          "Type": 5
+        },
+        {
+          "Type": 5
+        },
+        {
+          "Type": 5
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "SystemMessage": {
+    "99220000": {
+      "id": 99220000,
+      "desc": "{0}에서 {1}|hpp(이,가) 발생했습니다.",
+      "formatTexts": [
+        {
+          "Type": 3,
+          "Val": "shipname"
+        },
+        {
+          "Type": 2,
+          "Val": "OceanDisaster"
+        }
+      ]
+    },
+    "99220001": {
+      "id": 99220001,
+      "desc": "{0}에서 {1}|hpp(이,가) 해소되었습니다.",
+      "formatTexts": [
+        {
+          "Type": 3,
+          "Val": "shipname"
+        },
+        {
+          "Type": 2,
+          "Val": "OceanDisaster"
+        }
+      ]
+    },
+    "99220002": {
+      "id": 99220002
+    },
+    "99220003": {
+      "id": 99220003,
+      "desc": "금일 식량 배급으로 {0}을 {1}개, {2}을 {3}개 소모 했습니다.",
+      "formatTexts": [
+        {
+          "Type": 3,
+          "Val": "water"
+        },
+        {
+          "Type": 1
+        },
+        {
+          "Type": 3,
+          "Val": "food"
+        },
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99220004": {
+      "id": 99220004,
+      "desc": "해역이 이동되었습니다."
+    },
+    "99220005": {
+      "id": 99220005,
+      "desc": "{0}|hpp(이,가) 어딘가의 해역을 점유했습니다.",
+      "formatTexts": [
+        {
+          "Type": 2,
+          "Val": "Nation"
+        }
+      ]
+    },
+    "99220006": {
+      "id": 99220006,
+      "desc": "{0} {1}개 소모했습니다.",
+      "formatTexts": [
+        {
+          "Type": 2,
+          "Val": "Point"
+        },
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99220007": {
+      "id": 99220007,
+      "desc": "{0}|hpp(과,와)의 우호도가 {1} 증가했습니다.",
+      "formatTexts": [
+        {
+          "Type": 2,
+          "Val": "Nation"
+        },
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99220008": {
+      "id": 99220008,
+      "desc": "{0}|hpp(과,와)의 우호도가 {1} 감소했습니다.",
+      "formatTexts": [
+        {
+          "Type": 2,
+          "Val": "Nation"
+        },
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99220009": {
+      "id": 99220009,
+      "desc": "{0}의 평판이 {1} 증가했습니다.",
+      "formatTexts": [
+        {
+          "Type": 2,
+          "Val": "Nation"
+        },
+        {
+          "Type": 1
+        }
+      ]
+    },
+    "99220010": {
+      "id": 99220010,
+      "desc": "{0}의 평판이 {1} 감소했습니다.",
+      "formatTexts": [
+        {
+          "Type": 2,
+          "Val": "Nation"
+        },
+        {
+          "Type": 1
+        }
+      ]
+    }
+  }
+}

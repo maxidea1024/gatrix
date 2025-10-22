@@ -1,0 +1,241 @@
+{
+  ":PieceSwap": {
+    ":type": {
+      "id": "key",
+      "swapType": "number",
+      "pieceType": "number",
+      "pieceGrade": "number",
+      "pieceTier": "number",
+      "pieceSwapVal": "number",
+      "exchangableItemId": [
+        "number",
+        "number"
+      ],
+      "rewardId": "number"
+    },
+    ":required": {
+      "swapType": 1,
+      "pieceType": 1,
+      "pieceSwapVal": 1,
+      "rewardId": 1
+    },
+    ":requiredInObject": {},
+    ":min": {
+      "swapType": 0,
+      "pieceType": 0,
+      "pieceGrade": 0
+    },
+    ":max": {
+      "swapType": 8,
+      "pieceType": 5,
+      "pieceGrade": 5,
+      "pieceTier": 99
+    },
+    ":enum": {},
+    ":links": {
+      "exchangableItemId": [
+        [
+          "Item"
+        ],
+        [
+          "Item"
+        ]
+      ],
+      "rewardId": [
+        "Reward"
+      ]
+    }
+  },
+  "PieceSwap": {
+    "17900100": {
+      "id": 17900100,
+      "swapType": 1,
+      "pieceType": 1,
+      "pieceGrade": 2,
+      "pieceSwapVal": 50,
+      "rewardId": 90050161
+    },
+    "17900101": {
+      "id": 17900101,
+      "swapType": 1,
+      "pieceType": 1,
+      "pieceGrade": 3,
+      "pieceSwapVal": 40,
+      "rewardId": 90050162
+    },
+    "17900102": {
+      "id": 17900102,
+      "swapType": 1,
+      "pieceType": 1,
+      "pieceGrade": 4,
+      "pieceSwapVal": 30,
+      "rewardId": 90050163
+    },
+    "17900103": {
+      "id": 17900103,
+      "swapType": 1,
+      "pieceType": 1,
+      "pieceGrade": 5,
+      "pieceSwapVal": 20,
+      "rewardId": 90050164
+    },
+    "17900109": {
+      "id": 17900109,
+      "swapType": 2,
+      "pieceType": 1,
+      "pieceGrade": 2,
+      "pieceSwapVal": 20,
+      "exchangableItemId": [
+        23411001
+      ],
+      "rewardId": 90050169
+    },
+    "17900110": {
+      "id": 17900110,
+      "swapType": 2,
+      "pieceType": 1,
+      "pieceGrade": 3,
+      "pieceSwapVal": 20,
+      "exchangableItemId": [
+        23411002
+      ],
+      "rewardId": 90050170
+    },
+    "17900111": {
+      "id": 17900111,
+      "swapType": 2,
+      "pieceType": 1,
+      "pieceGrade": 4,
+      "pieceSwapVal": 20,
+      "exchangableItemId": [
+        23411003
+      ],
+      "rewardId": 90050171
+    },
+    "17900116": {
+      "id": 17900116,
+      "swapType": 3,
+      "pieceType": 2,
+      "pieceTier": 5,
+      "pieceSwapVal": 30,
+      "rewardId": 90120040
+    },
+    "17900117": {
+      "id": 17900117,
+      "swapType": 3,
+      "pieceType": 2,
+      "pieceTier": 6,
+      "pieceSwapVal": 30,
+      "rewardId": 90120041
+    },
+    "17900118": {
+      "id": 17900118,
+      "swapType": 3,
+      "pieceType": 2,
+      "pieceTier": 7,
+      "pieceSwapVal": 25,
+      "rewardId": 90120042
+    },
+    "17900119": {
+      "id": 17900119,
+      "swapType": 3,
+      "pieceType": 2,
+      "pieceTier": 8,
+      "pieceSwapVal": 25,
+      "rewardId": 90120043
+    },
+    "17900120": {
+      "id": 17900120,
+      "swapType": 3,
+      "pieceType": 2,
+      "pieceTier": 9,
+      "pieceSwapVal": 20,
+      "rewardId": 90120044
+    },
+    "17900121": {
+      "id": 17900121,
+      "swapType": 3,
+      "pieceType": 2,
+      "pieceTier": 10,
+      "pieceSwapVal": 20,
+      "rewardId": 90120045
+    },
+    "17900126": {
+      "id": 17900126,
+      "swapType": 5,
+      "pieceType": 4,
+      "pieceGrade": 1,
+      "pieceSwapVal": 20,
+      "exchangableItemId": [
+        23409999
+      ],
+      "rewardId": 90120307
+    },
+    "17900127": {
+      "id": 17900127,
+      "swapType": 5,
+      "pieceType": 4,
+      "pieceGrade": 2,
+      "pieceSwapVal": 20,
+      "exchangableItemId": [
+        23410000
+      ],
+      "rewardId": 90120308
+    },
+    "17900128": {
+      "id": 17900128,
+      "swapType": 5,
+      "pieceType": 4,
+      "pieceGrade": 3,
+      "pieceSwapVal": 20,
+      "exchangableItemId": [
+        23410001
+      ],
+      "rewardId": 90120309
+    },
+    "17900129": {
+      "id": 17900129,
+      "swapType": 5,
+      "pieceType": 4,
+      "pieceGrade": 4,
+      "pieceSwapVal": 20,
+      "exchangableItemId": [
+        23410002
+      ],
+      "rewardId": 90120310
+    },
+    "17900130": {
+      "id": 17900130,
+      "swapType": 7,
+      "pieceType": 4,
+      "pieceGrade": 2,
+      "pieceSwapVal": 20,
+      "exchangableItemId": [
+        23421101
+      ],
+      "rewardId": 90121572
+    },
+    "17900131": {
+      "id": 17900131,
+      "swapType": 7,
+      "pieceType": 4,
+      "pieceGrade": 3,
+      "pieceSwapVal": 20,
+      "exchangableItemId": [
+        23421093
+      ],
+      "rewardId": 90121573
+    },
+    "17900132": {
+      "id": 17900132,
+      "swapType": 7,
+      "pieceType": 4,
+      "pieceGrade": 4,
+      "pieceSwapVal": 20,
+      "exchangableItemId": [
+        23421094
+      ],
+      "rewardId": 90121574
+    }
+  }
+}

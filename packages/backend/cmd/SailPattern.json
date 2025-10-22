@@ -1,0 +1,1361 @@
+{
+  ":SailPattern": {
+    ":type": {
+      "id": "key",
+      "patternimage": "string",
+      "patternUiIcon": "string",
+      "isExposure": "bool",
+      "applypointId": "number",
+      "applypointval": "number",
+      "unlockpointId": "number",
+      "unlockpointval": "number",
+      "unlockitemId": "number",
+      "unlockitemval": "number",
+      "unlockitemsId": [
+        "number",
+        "number",
+        "number"
+      ],
+      "unlockitemsval": [
+        "number",
+        "number",
+        "number"
+      ],
+      "defaultcolorId": [
+        "number",
+        "number",
+        "number"
+      ]
+    },
+    ":required": {
+      "patternimage": 1,
+      "isExposure": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {
+      "defaultcolorId": [
+        [
+          "SailPatternColor"
+        ],
+        [
+          "SailPatternColor"
+        ],
+        [
+          "SailPatternColor"
+        ]
+      ]
+    },
+    ":asset": {
+      "patternimage": 1,
+      "patternUiIcon": 1
+    }
+  },
+  "SailPattern": {
+    "47200000": {
+      "id": 47200000,
+      "patternimage": "Sail_Pattern_00",
+      "patternUiIcon": "Icon_Sail_Pattern_0_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "defaultcolorId": [
+        47300000
+      ]
+    },
+    "47200001": {
+      "id": 47200001,
+      "patternimage": "Sail_Pattern_1",
+      "patternUiIcon": "Icon_Sail_Pattern_1_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348500,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200002": {
+      "id": 47200002,
+      "patternimage": "Sail_Pattern_2",
+      "patternUiIcon": "Icon_Sail_Pattern_2_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348501,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200003": {
+      "id": 47200003,
+      "patternimage": "Sail_Pattern_3",
+      "patternUiIcon": "Icon_Sail_Pattern_3_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348502,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200005": {
+      "id": 47200005,
+      "patternimage": "Sail_Pattern_5",
+      "patternUiIcon": "Icon_Sail_Pattern_5_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348503,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200006": {
+      "id": 47200006,
+      "patternimage": "Sail_Pattern_6",
+      "patternUiIcon": "Icon_Sail_Pattern_6_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348504,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200007": {
+      "id": 47200007,
+      "patternimage": "Sail_Pattern_7",
+      "patternUiIcon": "Icon_Sail_Pattern_7_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348505,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200008": {
+      "id": 47200008,
+      "patternimage": "Sail_Pattern_8",
+      "patternUiIcon": "Icon_Sail_Pattern_8_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348506,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200009": {
+      "id": 47200009,
+      "patternimage": "Sail_Pattern_9",
+      "patternUiIcon": "Icon_Sail_Pattern_9_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348507,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200011": {
+      "id": 47200011,
+      "patternimage": "Sail_Pattern_11",
+      "patternUiIcon": "Icon_Sail_Pattern_11_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348508,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200012": {
+      "id": 47200012,
+      "patternimage": "Sail_Pattern_12",
+      "patternUiIcon": "Icon_Sail_Pattern_12_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348509,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200013": {
+      "id": 47200013,
+      "patternimage": "Sail_Pattern_13",
+      "patternUiIcon": "Icon_Sail_Pattern_13_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348510,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200015": {
+      "id": 47200015,
+      "patternimage": "Sail_Pattern_15",
+      "patternUiIcon": "Icon_Sail_Pattern_15_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348511,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200016": {
+      "id": 47200016,
+      "patternimage": "Sail_Pattern_16",
+      "patternUiIcon": "Icon_Sail_Pattern_16_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348512,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200017": {
+      "id": 47200017,
+      "patternimage": "Sail_Pattern_17",
+      "patternUiIcon": "Icon_Sail_Pattern_17_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348513,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200018": {
+      "id": 47200018,
+      "patternimage": "Sail_Pattern_18",
+      "patternUiIcon": "Icon_Sail_Pattern_18_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348514,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200019": {
+      "id": 47200019,
+      "patternimage": "Sail_Pattern_19",
+      "patternUiIcon": "Icon_Sail_Pattern_19_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348515,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200020": {
+      "id": 47200020,
+      "patternimage": "Sail_Pattern_20",
+      "patternUiIcon": "Icon_Sail_Pattern_20_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348516,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200021": {
+      "id": 47200021,
+      "patternimage": "Sail_Pattern_21",
+      "patternUiIcon": "Icon_Sail_Pattern_21_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348517,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200022": {
+      "id": 47200022,
+      "patternimage": "Sail_Pattern_22",
+      "patternUiIcon": "Icon_Sail_Pattern_22_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348518,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200023": {
+      "id": 47200023,
+      "patternimage": "Sail_Pattern_23",
+      "patternUiIcon": "Icon_Sail_Pattern_23_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348519,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200024": {
+      "id": 47200024,
+      "patternimage": "Sail_Pattern_24",
+      "patternUiIcon": "Icon_Sail_Pattern_24_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348520,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200025": {
+      "id": 47200025,
+      "patternimage": "Sail_Pattern_25",
+      "patternUiIcon": "Icon_Sail_Pattern_25_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348521,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200026": {
+      "id": 47200026,
+      "patternimage": "Sail_Pattern_26",
+      "patternUiIcon": "Icon_Sail_Pattern_26_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348522,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200027": {
+      "id": 47200027,
+      "patternimage": "Sail_Pattern_27",
+      "patternUiIcon": "Icon_Sail_Pattern_27_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348523,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200028": {
+      "id": 47200028,
+      "patternimage": "Sail_Pattern_28",
+      "patternUiIcon": "Icon_Sail_Pattern_28_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348524,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200029": {
+      "id": 47200029,
+      "patternimage": "Sail_Pattern_29",
+      "patternUiIcon": "Icon_Sail_Pattern_29_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348525,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200030": {
+      "id": 47200030,
+      "patternimage": "Sail_Pattern_30",
+      "patternUiIcon": "Icon_Sail_Pattern_30_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348526,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200032": {
+      "id": 47200032,
+      "patternimage": "Sail_Pattern_32",
+      "patternUiIcon": "Icon_Sail_Pattern_32_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348527,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200033": {
+      "id": 47200033,
+      "patternimage": "Sail_Pattern_33",
+      "patternUiIcon": "Icon_Sail_Pattern_33_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348528,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200034": {
+      "id": 47200034,
+      "patternimage": "Sail_Pattern_34",
+      "patternUiIcon": "Icon_Sail_Pattern_34_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348529,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200036": {
+      "id": 47200036,
+      "patternimage": "Sail_Pattern_36",
+      "patternUiIcon": "Icon_Sail_Pattern_36_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348530,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200037": {
+      "id": 47200037,
+      "patternimage": "Sail_Pattern_37",
+      "patternUiIcon": "Icon_Sail_Pattern_37_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348531,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200038": {
+      "id": 47200038,
+      "patternimage": "Sail_Pattern_38",
+      "patternUiIcon": "Icon_Sail_Pattern_38_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348532,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200039": {
+      "id": 47200039,
+      "patternimage": "Sail_Pattern_39",
+      "patternUiIcon": "Icon_Sail_Pattern_39_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348533,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200040": {
+      "id": 47200040,
+      "patternimage": "Sail_Pattern_40",
+      "patternUiIcon": "Icon_Sail_Pattern_40_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348534,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200041": {
+      "id": 47200041,
+      "patternimage": "Sail_Pattern_41",
+      "patternUiIcon": "Icon_Sail_Pattern_41_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348535,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200042": {
+      "id": 47200042,
+      "patternimage": "Sail_Pattern_42",
+      "patternUiIcon": "Icon_Sail_Pattern_42_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348536,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200043": {
+      "id": 47200043,
+      "patternimage": "Sail_Pattern_43",
+      "patternUiIcon": "Icon_Sail_Pattern_43_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348537,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200044": {
+      "id": 47200044,
+      "patternimage": "Sail_Pattern_44",
+      "patternUiIcon": "Icon_Sail_Pattern_44_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348538,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200045": {
+      "id": 47200045,
+      "patternimage": "Sail_Pattern_45",
+      "patternUiIcon": "Icon_Sail_Pattern_45_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348539,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200046": {
+      "id": 47200046,
+      "patternimage": "Sail_Pattern_46",
+      "patternUiIcon": "Icon_Sail_Pattern_46_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348540,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200047": {
+      "id": 47200047,
+      "patternimage": "Sail_Pattern_47",
+      "patternUiIcon": "Icon_Sail_Pattern_47_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348541,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200048": {
+      "id": 47200048,
+      "patternimage": "Sail_Pattern_48",
+      "patternUiIcon": "Icon_Sail_Pattern_48_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348542,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200049": {
+      "id": 47200049,
+      "patternimage": "Sail_Pattern_49",
+      "patternUiIcon": "Icon_Sail_Pattern_49_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348543,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200050": {
+      "id": 47200050,
+      "patternimage": "Sail_Pattern_50",
+      "patternUiIcon": "Icon_Sail_Pattern_50_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 1500,
+      "unlockpointId": 100001,
+      "unlockpointval": 8500,
+      "unlockitemsId": [
+        23348544,
+        23347004
+      ],
+      "unlockitemsval": [
+        1,
+        10
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200051": {
+      "id": 47200051,
+      "patternimage": "Sail_Pattern_51",
+      "patternUiIcon": "Icon_Sail_Pattern_51_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 291500,
+      "unlockpointId": 100001,
+      "unlockpointval": 2329000,
+      "unlockitemsId": [
+        23348545
+      ],
+      "unlockitemsval": [
+        1
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200052": {
+      "id": 47200052,
+      "patternimage": "Sail_Pattern_52",
+      "patternUiIcon": "Icon_Sail_Pattern_52_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 291500,
+      "unlockpointId": 100001,
+      "unlockpointval": 2329000,
+      "unlockitemsId": [
+        23348546
+      ],
+      "unlockitemsval": [
+        1
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200053": {
+      "id": 47200053,
+      "patternimage": "Sail_Pattern_53",
+      "patternUiIcon": "Icon_Sail_Pattern_53_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 291500,
+      "unlockpointId": 100001,
+      "unlockpointval": 2329000,
+      "unlockitemsId": [
+        23348547
+      ],
+      "unlockitemsval": [
+        1
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200054": {
+      "id": 47200054,
+      "patternimage": "Sail_Pattern_54",
+      "patternUiIcon": "Icon_Sail_Pattern_54_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 291500,
+      "unlockpointId": 100001,
+      "unlockpointval": 2329000,
+      "unlockitemsId": [
+        23348548
+      ],
+      "unlockitemsval": [
+        1
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200056": {
+      "id": 47200056,
+      "patternimage": "Sail_Pattern_56",
+      "patternUiIcon": "Icon_Sail_Pattern_56_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 291500,
+      "unlockpointId": 100001,
+      "unlockpointval": 2329000,
+      "unlockitemsId": [
+        23348549
+      ],
+      "unlockitemsval": [
+        1
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47200057": {
+      "id": 47200057,
+      "patternimage": "Sail_Pattern_57",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": true,
+      "applypointId": 100001,
+      "applypointval": 291500,
+      "unlockpointId": 100001,
+      "unlockpointval": 2329000,
+      "unlockitemsId": [
+        23348550
+      ],
+      "unlockitemsval": [
+        1
+      ],
+      "defaultcolorId": [
+        47300001,
+        47300000
+      ]
+    },
+    "47210001": {
+      "id": 47210001,
+      "patternimage": "Sail_Pattern_13",
+      "patternUiIcon": "Icon_Sail_Pattern_13_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47300005,
+        47300009
+      ]
+    },
+    "47290001": {
+      "id": 47290001,
+      "patternimage": "Sail_Pattern_1",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47300002,
+        47300003
+      ]
+    },
+    "47290002": {
+      "id": 47290002,
+      "patternimage": "Sail_Pattern_3",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47300002,
+        47300004
+      ]
+    },
+    "47290003": {
+      "id": 47290003,
+      "patternimage": "Sail_Pattern_11",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47300002,
+        47300005
+      ]
+    },
+    "47290004": {
+      "id": 47290004,
+      "patternimage": "Sail_Pattern_5",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47300002,
+        47300008
+      ]
+    },
+    "47290005": {
+      "id": 47290005,
+      "patternimage": "Sail_Pattern_6",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47300002,
+        47300003
+      ]
+    },
+    "47290006": {
+      "id": 47290006,
+      "patternimage": "Sail_Pattern_8",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47300002,
+        47300004
+      ]
+    },
+    "47290007": {
+      "id": 47290007,
+      "patternimage": "Sail_Pattern_9",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47300002,
+        47300005
+      ]
+    },
+    "47290008": {
+      "id": 47290008,
+      "patternimage": "Sail_Pattern_16",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47300002,
+        47300008
+      ]
+    },
+    "47290009": {
+      "id": 47290009,
+      "patternimage": "Sail_Pattern_7",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47301006,
+        47301016
+      ]
+    },
+    "47290010": {
+      "id": 47290010,
+      "patternimage": "Sail_Pattern_00",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47301007
+      ]
+    },
+    "47290011": {
+      "id": 47290011,
+      "patternimage": "Sail_Pattern_3",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47301008
+      ]
+    },
+    "47290012": {
+      "id": 47290012,
+      "patternimage": "Sail_Pattern_5",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47301009
+      ]
+    },
+    "47290013": {
+      "id": 47290013,
+      "patternimage": "Sail_Pattern_6",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47301010
+      ]
+    },
+    "47290014": {
+      "id": 47290014,
+      "patternimage": "Sail_Pattern_14",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47301011,
+        47301017
+      ]
+    },
+    "47290015": {
+      "id": 47290015,
+      "patternimage": "Sail_Pattern_00",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47301012
+      ]
+    },
+    "47290016": {
+      "id": 47290016,
+      "patternimage": "Sail_Pattern_7",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47301013,
+        47301018
+      ]
+    },
+    "47290017": {
+      "id": 47290017,
+      "patternimage": "Sail_Pattern_11",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47301014
+      ]
+    },
+    "47290018": {
+      "id": 47290018,
+      "patternimage": "Sail_Pattern_00",
+      "patternUiIcon": "Icon_Sail_Pattern_57_Sprite",
+      "isExposure": false,
+      "defaultcolorId": [
+        47301015
+      ]
+    }
+  }
+}

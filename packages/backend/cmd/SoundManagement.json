@@ -1,0 +1,528 @@
+{
+  ":SoundManagement": {
+    ":type": {
+      "id": "key",
+      "type": "number",
+      "soundGroupId": [
+        "number",
+        "number"
+      ],
+      "localBitflag": "bit"
+    },
+    ":required": {
+      "type": 1,
+      "soundGroupId": [
+        1
+      ],
+      "localBitflag": 1
+    },
+    ":min": {
+      "type": 1,
+      "soundGroupId": [
+        97000000,
+        97000000
+      ]
+    },
+    ":max": {
+      "type": 2,
+      "soundGroupId": [
+        97999999,
+        97999999
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "soundGroupId": [
+        [
+          "SoundGroup"
+        ],
+        [
+          "SoundGroup"
+        ]
+      ]
+    }
+  },
+  "SoundManagement": {
+    "99000000": {
+      "id": 99000000,
+      "type": 1,
+      "soundGroupId": [
+        97000000
+      ],
+      "localBitflag": 219
+    },
+    "99000001": {
+      "id": 99000001,
+      "type": 1,
+      "soundGroupId": [
+        97000001
+      ],
+      "localBitflag": 219
+    },
+    "99000002": {
+      "id": 99000002,
+      "type": 1,
+      "soundGroupId": [
+        97000002
+      ],
+      "localBitflag": 219
+    },
+    "99000003": {
+      "id": 99000003,
+      "type": 1,
+      "soundGroupId": [
+        97000003
+      ],
+      "localBitflag": 219
+    },
+    "99000004": {
+      "id": 99000004,
+      "type": 1,
+      "soundGroupId": [
+        97000004
+      ],
+      "localBitflag": 219
+    },
+    "99000005": {
+      "id": 99000005,
+      "type": 1,
+      "soundGroupId": [
+        97000005
+      ],
+      "localBitflag": 219
+    },
+    "99000006": {
+      "id": 99000006,
+      "type": 1,
+      "soundGroupId": [
+        97000006
+      ],
+      "localBitflag": 219
+    },
+    "99000007": {
+      "id": 99000007,
+      "type": 1,
+      "soundGroupId": [
+        97000009
+      ],
+      "localBitflag": 219
+    },
+    "99000008": {
+      "id": 99000008,
+      "type": 1,
+      "soundGroupId": [
+        97000010
+      ],
+      "localBitflag": 219
+    },
+    "99000009": {
+      "id": 99000009,
+      "type": 1,
+      "soundGroupId": [
+        97000011
+      ],
+      "localBitflag": 219
+    },
+    "99000010": {
+      "id": 99000010,
+      "type": 1,
+      "soundGroupId": [
+        97000012
+      ],
+      "localBitflag": 219
+    },
+    "99000011": {
+      "id": 99000011,
+      "type": 1,
+      "soundGroupId": [
+        97000013
+      ],
+      "localBitflag": 219
+    },
+    "99000012": {
+      "id": 99000012,
+      "type": 1,
+      "soundGroupId": [
+        97000014
+      ],
+      "localBitflag": 219
+    },
+    "99000013": {
+      "id": 99000013,
+      "type": 1,
+      "soundGroupId": [
+        97000015
+      ],
+      "localBitflag": 219
+    },
+    "99000014": {
+      "id": 99000014,
+      "type": 1,
+      "soundGroupId": [
+        97000016
+      ],
+      "localBitflag": 219
+    },
+    "99000015": {
+      "id": 99000015,
+      "type": 1,
+      "soundGroupId": [
+        97000017
+      ],
+      "localBitflag": 219
+    },
+    "99000016": {
+      "id": 99000016,
+      "type": 1,
+      "soundGroupId": [
+        97000018
+      ],
+      "localBitflag": 219
+    },
+    "99000017": {
+      "id": 99000017,
+      "type": 1,
+      "soundGroupId": [
+        97000019
+      ],
+      "localBitflag": 219
+    },
+    "99000018": {
+      "id": 99000018,
+      "type": 1,
+      "soundGroupId": [
+        97000020
+      ],
+      "localBitflag": 219
+    },
+    "99000019": {
+      "id": 99000019,
+      "type": 1,
+      "soundGroupId": [
+        97000021
+      ],
+      "localBitflag": 219
+    },
+    "99000020": {
+      "id": 99000020,
+      "type": 1,
+      "soundGroupId": [
+        97000022
+      ],
+      "localBitflag": 219
+    },
+    "99000021": {
+      "id": 99000021,
+      "type": 1,
+      "soundGroupId": [
+        97000023
+      ],
+      "localBitflag": 219
+    },
+    "99000022": {
+      "id": 99000022,
+      "type": 1,
+      "soundGroupId": [
+        97000024
+      ],
+      "localBitflag": 219
+    },
+    "99000023": {
+      "id": 99000023,
+      "type": 1,
+      "soundGroupId": [
+        97000033
+      ],
+      "localBitflag": 219
+    },
+    "99000024": {
+      "id": 99000024,
+      "type": 1,
+      "soundGroupId": [
+        97000034
+      ],
+      "localBitflag": 219
+    },
+    "99000025": {
+      "id": 99000025,
+      "type": 1,
+      "soundGroupId": [
+        97000036
+      ],
+      "localBitflag": 219
+    },
+    "99000026": {
+      "id": 99000026,
+      "type": 1,
+      "soundGroupId": [
+        97000037
+      ],
+      "localBitflag": 219
+    },
+    "99000027": {
+      "id": 99000027,
+      "type": 1,
+      "soundGroupId": [
+        97000038
+      ],
+      "localBitflag": 219
+    },
+    "99000028": {
+      "id": 99000028,
+      "type": 1,
+      "soundGroupId": [
+        97000039
+      ],
+      "localBitflag": 219
+    },
+    "99000029": {
+      "id": 99000029,
+      "type": 1,
+      "soundGroupId": [
+        97000040
+      ],
+      "localBitflag": 219
+    },
+    "99000030": {
+      "id": 99000030,
+      "type": 1,
+      "soundGroupId": [
+        97000041
+      ],
+      "localBitflag": 219
+    },
+    "99000031": {
+      "id": 99000031,
+      "type": 1,
+      "soundGroupId": [
+        97000042
+      ],
+      "localBitflag": 219
+    },
+    "99000032": {
+      "id": 99000032,
+      "type": 1,
+      "soundGroupId": [
+        97000043
+      ],
+      "localBitflag": 219
+    },
+    "99000033": {
+      "id": 99000033,
+      "type": 1,
+      "soundGroupId": [
+        97000044
+      ],
+      "localBitflag": 219
+    },
+    "99000034": {
+      "id": 99000034,
+      "type": 1,
+      "soundGroupId": [
+        97000045
+      ],
+      "localBitflag": 219
+    },
+    "99000035": {
+      "id": 99000035,
+      "type": 1,
+      "soundGroupId": [
+        97000046
+      ],
+      "localBitflag": 219
+    },
+    "99000036": {
+      "id": 99000036,
+      "type": 1,
+      "soundGroupId": [
+        97000057
+      ],
+      "localBitflag": 219
+    },
+    "99000037": {
+      "id": 99000037,
+      "type": 1,
+      "soundGroupId": [
+        97000058
+      ],
+      "localBitflag": 219
+    },
+    "99000038": {
+      "id": 99000038,
+      "type": 1,
+      "soundGroupId": [
+        97000047
+      ],
+      "localBitflag": 219
+    },
+    "99000039": {
+      "id": 99000039,
+      "type": 1,
+      "soundGroupId": [
+        97000048
+      ],
+      "localBitflag": 219
+    },
+    "99000040": {
+      "id": 99000040,
+      "type": 1,
+      "soundGroupId": [
+        97000049
+      ],
+      "localBitflag": 219
+    },
+    "99000041": {
+      "id": 99000041,
+      "type": 1,
+      "soundGroupId": [
+        97000050
+      ],
+      "localBitflag": 219
+    },
+    "99000042": {
+      "id": 99000042,
+      "type": 1,
+      "soundGroupId": [
+        97000051
+      ],
+      "localBitflag": 219
+    },
+    "99000043": {
+      "id": 99000043,
+      "type": 1,
+      "soundGroupId": [
+        97000052
+      ],
+      "localBitflag": 219
+    },
+    "99000044": {
+      "id": 99000044,
+      "type": 1,
+      "soundGroupId": [
+        97000053
+      ],
+      "localBitflag": 219
+    },
+    "99000045": {
+      "id": 99000045,
+      "type": 1,
+      "soundGroupId": [
+        97000054
+      ],
+      "localBitflag": 219
+    },
+    "99000046": {
+      "id": 99000046,
+      "type": 1,
+      "soundGroupId": [
+        97000062
+      ],
+      "localBitflag": 219
+    },
+    "99000047": {
+      "id": 99000047,
+      "type": 1,
+      "soundGroupId": [
+        97000063
+      ],
+      "localBitflag": 219
+    },
+    "99000048": {
+      "id": 99000048,
+      "type": 1,
+      "soundGroupId": [
+        97000064
+      ],
+      "localBitflag": 219
+    },
+    "99000049": {
+      "id": 99000049,
+      "type": 1,
+      "soundGroupId": [
+        97000065
+      ],
+      "localBitflag": 219
+    },
+    "99000050": {
+      "id": 99000050,
+      "type": 1,
+      "soundGroupId": [
+        97000066
+      ],
+      "localBitflag": 219
+    },
+    "99000051": {
+      "id": 99000051,
+      "type": 1,
+      "soundGroupId": [
+        97000067
+      ],
+      "localBitflag": 219
+    },
+    "99000052": {
+      "id": 99000052,
+      "type": 1,
+      "soundGroupId": [
+        97000068
+      ],
+      "localBitflag": 219
+    },
+    "99000053": {
+      "id": 99000053,
+      "type": 1,
+      "soundGroupId": [
+        97000069
+      ],
+      "localBitflag": 219
+    },
+    "99000054": {
+      "id": 99000054,
+      "type": 1,
+      "soundGroupId": [
+        97000070
+      ],
+      "localBitflag": 219
+    },
+    "99000055": {
+      "id": 99000055,
+      "type": 1,
+      "soundGroupId": [
+        97000071
+      ],
+      "localBitflag": 219
+    },
+    "99000056": {
+      "id": 99000056,
+      "type": 1,
+      "soundGroupId": [
+        97000073
+      ],
+      "localBitflag": 219
+    },
+    "99000057": {
+      "id": 99000057,
+      "type": 1,
+      "soundGroupId": [
+        97000074
+      ],
+      "localBitflag": 219
+    },
+    "99000058": {
+      "id": 99000058,
+      "type": 1,
+      "soundGroupId": [
+        97000075
+      ],
+      "localBitflag": 219
+    },
+    "99000059": {
+      "id": 99000059,
+      "type": 2,
+      "soundGroupId": [
+        97002001,
+        97002002
+      ],
+      "localBitflag": 219
+    }
+  }
+}

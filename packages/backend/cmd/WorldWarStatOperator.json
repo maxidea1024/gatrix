@@ -1,0 +1,57 @@
+{
+  ":WorldWarStatOperator": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "minValue": "number",
+      "maxValue": "number"
+    },
+    ":required": {
+      "name": 1,
+      "minValue": 1,
+      "maxValue": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "WorldWarStatOperator": {
+    "0": {
+      "id": 0,
+      "name": "내구도",
+      "minValue": 1,
+      "maxValue": 10000
+    },
+    "1": {
+      "id": 1,
+      "name": "적재량",
+      "minValue": 1,
+      "maxValue": 10000
+    },
+    "2": {
+      "id": 2,
+      "name": "항해 속도",
+      "minValue": 1,
+      "maxValue": 10000
+    },
+    "3": {
+      "id": 3,
+      "name": "선박 공격력",
+      "minValue": 1,
+      "maxValue": 10000
+    },
+    "4": {
+      "id": 4,
+      "name": "선박 방어력",
+      "minValue": 1,
+      "maxValue": 10000
+    },
+    "5": {
+      "id": 5,
+      "name": "증원력",
+      "minValue": 1,
+      "maxValue": 10000
+    }
+  }
+}

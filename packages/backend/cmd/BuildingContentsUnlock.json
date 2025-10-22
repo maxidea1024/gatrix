@@ -1,0 +1,763 @@
+{
+  ":BuildingContentsUnlock": {
+    ":type": {
+      "id": "key",
+      "buildingType": "number",
+      "isDisplay": "bool",
+      "buildingMenuId": [
+        "number",
+        "number"
+      ],
+      "contentsTerms": [
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        },
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        }
+      ]
+    },
+    ":required": {
+      "isDisplay": 1
+    },
+    ":requiredInObject": {
+      "contentsTerms": [
+        {
+          "Id": 1,
+          "Count": 1
+        },
+        {
+          "Id": 1,
+          "Count": 1
+        }
+      ]
+    },
+    ":min": {
+      "buildingType": 0,
+      "buildingMenuId": [
+        38400000,
+        38400000
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000
+        },
+        {
+          "Id": 81000000
+        }
+      ]
+    },
+    ":max": {
+      "buildingType": 54,
+      "buildingMenuId": [
+        38419999,
+        38419999
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81999999
+        },
+        {
+          "Id": 81999999
+        }
+      ]
+    },
+    ":enum": {},
+    ":asset": {},
+    ":links": {
+      "buildingMenuId": [
+        [
+          "BuildingMenu"
+        ],
+        [
+          "BuildingMenu"
+        ]
+      ],
+      "contentsTerms": [
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        },
+        {
+          "Id": [
+            "ContentsTerms"
+          ]
+        }
+      ]
+    }
+  },
+  "BuildingContentsUnlock": {
+    "38300000": {
+      "id": 38300000,
+      "buildingType": 0,
+      "isDisplay": false,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300001": {
+      "id": 38300001,
+      "buildingType": 9,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400009
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300002": {
+      "id": 38300002,
+      "buildingType": 9,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400010
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300003": {
+      "id": 38300003,
+      "buildingType": 9,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400011
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300004": {
+      "id": 38300004,
+      "buildingType": 12,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400021
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300005": {
+      "id": 38300005,
+      "buildingType": 11,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400014
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300006": {
+      "id": 38300006,
+      "buildingType": 11,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400015
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300007": {
+      "id": 38300007,
+      "buildingType": 11,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400017,
+        38400022
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300008": {
+      "id": 38300008,
+      "buildingType": 11,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400018
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300009": {
+      "id": 38300009,
+      "buildingType": 4,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400003
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300010": {
+      "id": 38300010,
+      "buildingType": 2,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400000
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300011": {
+      "id": 38300011,
+      "buildingType": 2,
+      "isDisplay": true,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300012": {
+      "id": 38300012,
+      "buildingType": 2,
+      "isDisplay": true,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300013": {
+      "id": 38300013,
+      "buildingType": 4,
+      "isDisplay": false,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300014": {
+      "id": 38300014,
+      "buildingType": 4,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400004
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300015": {
+      "id": 38300015,
+      "buildingType": 5,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400006
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300016": {
+      "id": 38300016,
+      "buildingType": 5,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400007
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300017": {
+      "id": 38300017,
+      "buildingType": 5,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400008
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300018": {
+      "id": 38300018,
+      "buildingType": 1,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400030
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 1
+        }
+      ]
+    },
+    "38300019": {
+      "id": 38300019,
+      "buildingType": 1,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400032
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 1
+        },
+        {
+          "Id": 81000001,
+          "Count": 20
+        }
+      ]
+    },
+    "38300020": {
+      "id": 38300020,
+      "buildingType": 1,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400031
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 1
+        }
+      ]
+    },
+    "38300021": {
+      "id": 38300021,
+      "buildingType": 7,
+      "isDisplay": false,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300022": {
+      "id": 38300022,
+      "buildingType": 7,
+      "isDisplay": false,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300023": {
+      "id": 38300023,
+      "buildingType": 8,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400039
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300024": {
+      "id": 38300024,
+      "buildingType": 8,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400033
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 1
+        }
+      ]
+    },
+    "38300025": {
+      "id": 38300025,
+      "buildingType": 3,
+      "isDisplay": false,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300026": {
+      "id": 38300026,
+      "buildingType": 10,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400012
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300027": {
+      "id": 38300027,
+      "buildingType": 10,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400013
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300028": {
+      "id": 38300028,
+      "buildingType": 4,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400005
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300029": {
+      "id": 38300029,
+      "buildingType": 13,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400029
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300030": {
+      "id": 38300030,
+      "buildingType": 8,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400034
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 1
+        }
+      ]
+    },
+    "38300031": {
+      "id": 38300031,
+      "buildingType": 8,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400035
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 1
+        }
+      ]
+    },
+    "38300032": {
+      "id": 38300032,
+      "buildingType": 13,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400037
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300033": {
+      "id": 38300033,
+      "buildingType": 13,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400038
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300034": {
+      "id": 38300034,
+      "buildingType": 2,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400040
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300035": {
+      "id": 38300035,
+      "buildingType": 11,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400041
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300036": {
+      "id": 38300036,
+      "buildingType": 11,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400042
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300037": {
+      "id": 38300037,
+      "buildingType": 1,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400043
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 1
+        }
+      ]
+    },
+    "38300038": {
+      "id": 38300038,
+      "buildingType": 11,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400016
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300039": {
+      "id": 38300039,
+      "buildingType": 3,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400044
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300040": {
+      "id": 38300040,
+      "buildingType": 8,
+      "isDisplay": false,
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 1
+        }
+      ]
+    },
+    "38300041": {
+      "id": 38300041,
+      "buildingType": 13,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400048
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300042": {
+      "id": 38300042,
+      "buildingType": 13,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400049
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300043": {
+      "id": 38300043,
+      "buildingType": 2,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400050
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300044": {
+      "id": 38300044,
+      "buildingType": 14,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400051
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300045": {
+      "id": 38300045,
+      "buildingType": 11,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400052
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300046": {
+      "id": 38300046,
+      "buildingType": 5,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400053
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300047": {
+      "id": 38300047,
+      "buildingType": 13,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400054
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    },
+    "38300048": {
+      "id": 38300048,
+      "buildingType": 11,
+      "isDisplay": false,
+      "buildingMenuId": [
+        38400055
+      ],
+      "contentsTerms": [
+        {
+          "Id": 81000000,
+          "Count": 0
+        }
+      ]
+    }
+  }
+}

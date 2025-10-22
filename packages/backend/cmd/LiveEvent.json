@@ -1,0 +1,2658 @@
+{
+  ":LiveEvent": {
+    ":type": {
+      "id": "key",
+      "loginBgmTag": "string",
+      "loginVoiceSoundTag": "string",
+      "startDate": "string",
+      "endDate": "string",
+      "localBitflag": "bit",
+      "isQuest": "bool",
+      "eventMateJob": [
+        "number"
+      ],
+      "eventMateBuffGradeC": "number",
+      "eventMateBuffGradeB": "number",
+      "eventMateBuffGradeA": "number",
+      "eventMateBuffGradeS": "number"
+    },
+    ":required": {
+      "loginBgmTag": 1,
+      "loginVoiceSoundTag": 1,
+      "localBitflag": 1,
+      "isQuest": 1
+    },
+    ":min": {
+      "eventMateJob": [
+        21400000
+      ],
+      "eventMateBuffGradeC": 38000000,
+      "eventMateBuffGradeB": 38000000,
+      "eventMateBuffGradeA": 38000000,
+      "eventMateBuffGradeS": 38000000
+    },
+    ":max": {
+      "eventMateJob": [
+        21499999
+      ],
+      "eventMateBuffGradeC": 38099999,
+      "eventMateBuffGradeB": 38099999,
+      "eventMateBuffGradeA": 38099999,
+      "eventMateBuffGradeS": 38099999
+    },
+    ":enum": {},
+    ":links": {
+      "eventMateJob": [
+        [
+          "Job"
+        ]
+      ],
+      "eventMateBuffGradeC": [
+        "WorldBuff"
+      ],
+      "eventMateBuffGradeB": [
+        "WorldBuff"
+      ],
+      "eventMateBuffGradeA": [
+        "WorldBuff"
+      ],
+      "eventMateBuffGradeS": [
+        "WorldBuff"
+      ]
+    }
+  },
+  "LiveEvent": {
+    "99800001": {
+      "id": 99800001,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2022/09/01/00:00:00",
+      "endDate": "2022/09/21/23:59:59",
+      "localBitflag": 127,
+      "isQuest": true
+    },
+    "99800004": {
+      "id": 99800004,
+      "loginBgmTag": "성탄",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2022/12/21/00:00:00",
+      "endDate": "2023/01/04/23:59:59",
+      "localBitflag": 127,
+      "isQuest": true
+    },
+    "99800005": {
+      "id": 99800005,
+      "loginBgmTag": "성탄",
+      "loginVoiceSoundTag": "성탄",
+      "startDate": "2022/12/24/00:00:00",
+      "endDate": "2022/12/25/23:59:59",
+      "localBitflag": 127,
+      "isQuest": true
+    },
+    "99800006": {
+      "id": 99800006,
+      "loginBgmTag": "흑묘새해",
+      "loginVoiceSoundTag": "새해",
+      "startDate": "2023/01/18/00:00:00",
+      "endDate": "2023/01/31/23:59:59",
+      "localBitflag": 127,
+      "isQuest": true
+    },
+    "99800007": {
+      "id": 99800007,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2023/03/30/00:00:00",
+      "endDate": "2023/04/11/23:59:59",
+      "localBitflag": 127,
+      "isQuest": true
+    },
+    "99800008": {
+      "id": 99800008,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2023/08/02/00:00:00",
+      "endDate": "2023/08/29/23:59:59",
+      "localBitflag": 127,
+      "isQuest": true
+    },
+    "99800009": {
+      "id": 99800009,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2023/08/17/00:00:00",
+      "endDate": "2023/09/12/23:59:59",
+      "localBitflag": 3,
+      "isQuest": true
+    },
+    "99800010": {
+      "id": 99800010,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2023/09/20/00:00:00",
+      "endDate": "2023/10/03/23:59:59",
+      "localBitflag": 3,
+      "isQuest": true
+    },
+    "99800011": {
+      "id": 99800011,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2023/10/11/00:00:00",
+      "endDate": "2023/10/24/23:59:59",
+      "localBitflag": 24,
+      "isQuest": true
+    },
+    "99800012": {
+      "id": 99800012,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "추석",
+      "startDate": "2023/09/28/00:00:00",
+      "endDate": "2023/09/30/23:59:59",
+      "localBitflag": 3,
+      "isQuest": false
+    },
+    "99800013": {
+      "id": 99800013,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2023/12/06/00:00:00",
+      "endDate": "2024/01/16/23:59:59",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99800014": {
+      "id": 99800014,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2023/12/26/00:00:00",
+      "endDate": "2023/12/31/23:59:59",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800015": {
+      "id": 99800015,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2023/11/22/12:00:00",
+      "endDate": "2024/01/17/11:59:59",
+      "localBitflag": 3,
+      "isQuest": false
+    },
+    "99800016": {
+      "id": 99800016,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2023/12/06/12:00:00",
+      "endDate": "2024/01/16/23:59:59",
+      "localBitflag": 24,
+      "isQuest": false
+    },
+    "99800017": {
+      "id": 99800017,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "성탄",
+      "startDate": "2023/12/24/00:00:00",
+      "endDate": "2023/12/25/23:59:59",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800018": {
+      "id": 99800018,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "새해",
+      "startDate": "2024/01/01/00:00:00",
+      "endDate": "2024/01/01/23:59:59",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800019": {
+      "id": 99800019,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/02/07/00:00:00",
+      "endDate": "2024/02/27/23:59:59",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99800020": {
+      "id": 99800020,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/02/01/00:00:00",
+      "endDate": "2024/02/20/23:59:59",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800021": {
+      "id": 99800021,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "새해",
+      "startDate": "2024/02/09/00:00:00",
+      "endDate": "2024/02/12/23:59:59",
+      "localBitflag": 3,
+      "isQuest": false
+    },
+    "99800022": {
+      "id": 99800022,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/07/29/00:00:00",
+      "endDate": "2024/08/11/23:59:59",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99800023": {
+      "id": 99800023,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2023/09/02/00:00:00",
+      "endDate": "2023/09/08/23:59:59",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800024": {
+      "id": 99800024,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/01/00:00:00",
+      "endDate": "2025/10/07/23:59:59",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800025": {
+      "id": 99800025,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/02/28/00:00:00",
+      "endDate": "2024/03/26/23:59:59",
+      "localBitflag": 24,
+      "isQuest": true
+    },
+    "99800026": {
+      "id": 99800026,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/03/13/00:00:00",
+      "endDate": "2024/05/07/23:59:58",
+      "localBitflag": 3,
+      "isQuest": true
+    },
+    "99800027": {
+      "id": 99800027,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/03/27/00:00:00",
+      "endDate": "2024/05/21/23:59:59",
+      "localBitflag": 24,
+      "isQuest": true
+    },
+    "99800028": {
+      "id": 99800028,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/25/00:00:00",
+      "endDate": "2024/05/15/23:59:59",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99800029": {
+      "id": 99800029,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/25/08:00:00",
+      "endDate": "2024/04/25/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800030": {
+      "id": 99800030,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/25/14:00:00",
+      "endDate": "2024/04/25/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800031": {
+      "id": 99800031,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/25/20:00:00",
+      "endDate": "2024/04/25/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800032": {
+      "id": 99800032,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/26/08:00:00",
+      "endDate": "2024/04/26/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800033": {
+      "id": 99800033,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/26/14:00:00",
+      "endDate": "2024/04/26/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800034": {
+      "id": 99800034,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/26/20:00:00",
+      "endDate": "2024/04/26/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800035": {
+      "id": 99800035,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/27/08:00:00",
+      "endDate": "2024/04/27/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800036": {
+      "id": 99800036,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/27/14:00:00",
+      "endDate": "2024/04/27/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800037": {
+      "id": 99800037,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/27/20:00:00",
+      "endDate": "2024/04/27/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800038": {
+      "id": 99800038,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/28/08:00:00",
+      "endDate": "2024/04/28/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800039": {
+      "id": 99800039,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/28/14:00:00",
+      "endDate": "2024/04/28/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800040": {
+      "id": 99800040,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/28/20:00:00",
+      "endDate": "2024/04/28/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800041": {
+      "id": 99800041,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/29/08:00:00",
+      "endDate": "2024/04/29/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800042": {
+      "id": 99800042,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/29/14:00:00",
+      "endDate": "2024/04/29/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800043": {
+      "id": 99800043,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/29/20:00:00",
+      "endDate": "2024/04/29/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800044": {
+      "id": 99800044,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/30/08:00:00",
+      "endDate": "2024/04/30/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800045": {
+      "id": 99800045,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/30/14:00:00",
+      "endDate": "2024/04/30/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800046": {
+      "id": 99800046,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/30/20:00:00",
+      "endDate": "2024/04/30/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800047": {
+      "id": 99800047,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/01/08:00:00",
+      "endDate": "2024/05/01/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800048": {
+      "id": 99800048,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/01/14:00:00",
+      "endDate": "2024/05/01/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800049": {
+      "id": 99800049,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/01/20:00:00",
+      "endDate": "2024/05/01/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800050": {
+      "id": 99800050,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/02/08:00:00",
+      "endDate": "2024/05/02/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800051": {
+      "id": 99800051,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/02/14:00:00",
+      "endDate": "2024/05/02/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800052": {
+      "id": 99800052,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/02/20:00:00",
+      "endDate": "2024/05/02/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800053": {
+      "id": 99800053,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/03/08:00:00",
+      "endDate": "2024/05/03/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800054": {
+      "id": 99800054,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/03/14:00:00",
+      "endDate": "2024/05/03/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800055": {
+      "id": 99800055,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/03/20:00:00",
+      "endDate": "2024/05/03/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800056": {
+      "id": 99800056,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/04/08:00:00",
+      "endDate": "2024/05/04/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800057": {
+      "id": 99800057,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/04/14:00:00",
+      "endDate": "2024/05/04/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800058": {
+      "id": 99800058,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/04/20:00:00",
+      "endDate": "2024/05/04/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800059": {
+      "id": 99800059,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/05/08:00:00",
+      "endDate": "2024/05/05/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800060": {
+      "id": 99800060,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/05/14:00:00",
+      "endDate": "2024/05/05/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800061": {
+      "id": 99800061,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/05/20:00:00",
+      "endDate": "2024/05/05/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800062": {
+      "id": 99800062,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/06/08:00:00",
+      "endDate": "2024/05/06/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800063": {
+      "id": 99800063,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/06/14:00:00",
+      "endDate": "2024/05/06/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800064": {
+      "id": 99800064,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/06/20:00:00",
+      "endDate": "2024/05/06/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800065": {
+      "id": 99800065,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/07/08:00:00",
+      "endDate": "2024/05/07/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800066": {
+      "id": 99800066,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/07/14:00:00",
+      "endDate": "2024/05/07/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800067": {
+      "id": 99800067,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/07/20:00:00",
+      "endDate": "2024/05/07/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800068": {
+      "id": 99800068,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/08/08:00:00",
+      "endDate": "2024/05/08/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800069": {
+      "id": 99800069,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/08/14:00:00",
+      "endDate": "2024/05/08/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800070": {
+      "id": 99800070,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/08/20:00:00",
+      "endDate": "2024/05/08/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800071": {
+      "id": 99800071,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/09/08:00:00",
+      "endDate": "2024/05/09/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800072": {
+      "id": 99800072,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/09/14:00:00",
+      "endDate": "2024/05/09/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800073": {
+      "id": 99800073,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/09/20:00:00",
+      "endDate": "2024/05/09/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800074": {
+      "id": 99800074,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/10/08:00:00",
+      "endDate": "2024/05/10/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800075": {
+      "id": 99800075,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/10/14:00:00",
+      "endDate": "2024/05/10/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800076": {
+      "id": 99800076,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/10/20:00:00",
+      "endDate": "2024/05/10/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800077": {
+      "id": 99800077,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/11/08:00:00",
+      "endDate": "2024/05/11/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800078": {
+      "id": 99800078,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/11/14:00:00",
+      "endDate": "2024/05/11/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800079": {
+      "id": 99800079,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/11/20:00:00",
+      "endDate": "2024/05/11/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800080": {
+      "id": 99800080,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/12/08:00:00",
+      "endDate": "2024/05/12/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800081": {
+      "id": 99800081,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/12/14:00:00",
+      "endDate": "2024/05/12/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800082": {
+      "id": 99800082,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/12/20:00:00",
+      "endDate": "2024/05/12/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800083": {
+      "id": 99800083,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/13/08:00:00",
+      "endDate": "2024/05/13/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800084": {
+      "id": 99800084,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/13/14:00:00",
+      "endDate": "2024/05/13/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800085": {
+      "id": 99800085,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/13/20:00:00",
+      "endDate": "2024/05/13/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800086": {
+      "id": 99800086,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/14/08:00:00",
+      "endDate": "2024/05/14/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800087": {
+      "id": 99800087,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/14/14:00:00",
+      "endDate": "2024/05/14/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800088": {
+      "id": 99800088,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/14/20:00:00",
+      "endDate": "2024/05/14/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800089": {
+      "id": 99800089,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/15/08:00:00",
+      "endDate": "2024/05/15/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800090": {
+      "id": 99800090,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/15/14:00:00",
+      "endDate": "2024/05/15/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800091": {
+      "id": 99800091,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/05/15/20:00:00",
+      "endDate": "2024/05/15/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800092": {
+      "id": 99800092,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/04/09/00:00:00",
+      "endDate": "2024/04/30/23:00:00",
+      "localBitflag": 3,
+      "isQuest": false
+    },
+    "99800093": {
+      "id": 99800093,
+      "loginBgmTag": "여름",
+      "loginVoiceSoundTag": "여름",
+      "startDate": "2024/07/18/00:00:00",
+      "endDate": "2024/08/27/23:59:59",
+      "localBitflag": 127,
+      "isQuest": true
+    },
+    "99800094": {
+      "id": 99800094,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/08/23/00:00:00",
+      "endDate": "2024/09/24/23:59:59",
+      "localBitflag": 3,
+      "isQuest": true
+    },
+    "99800095": {
+      "id": 99800095,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/09/12/00:00:00",
+      "endDate": "2024/10/22/23:59:59",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99800096": {
+      "id": 99800096,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/07/00:00:00",
+      "endDate": "2024/12/04/23:59:59",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99800097": {
+      "id": 99800097,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/07/08:00:00",
+      "endDate": "2024/11/07/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800098": {
+      "id": 99800098,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/07/14:00:00",
+      "endDate": "2024/11/07/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800099": {
+      "id": 99800099,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/07/20:00:00",
+      "endDate": "2024/11/07/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800100": {
+      "id": 99800100,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/08/08:00:00",
+      "endDate": "2024/11/08/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800101": {
+      "id": 99800101,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/08/14:00:00",
+      "endDate": "2024/11/08/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800102": {
+      "id": 99800102,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/08/20:00:00",
+      "endDate": "2024/11/08/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800103": {
+      "id": 99800103,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/09/08:00:00",
+      "endDate": "2024/11/09/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800104": {
+      "id": 99800104,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/09/14:00:00",
+      "endDate": "2024/11/09/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800105": {
+      "id": 99800105,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/09/20:00:00",
+      "endDate": "2024/11/09/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800106": {
+      "id": 99800106,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/10/08:00:00",
+      "endDate": "2024/11/10/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800107": {
+      "id": 99800107,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/10/14:00:00",
+      "endDate": "2024/11/10/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800108": {
+      "id": 99800108,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/10/20:00:00",
+      "endDate": "2024/11/10/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800109": {
+      "id": 99800109,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/11/08:00:00",
+      "endDate": "2024/11/11/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800110": {
+      "id": 99800110,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/11/14:00:00",
+      "endDate": "2024/11/11/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800111": {
+      "id": 99800111,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/11/20:00:00",
+      "endDate": "2024/11/11/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800112": {
+      "id": 99800112,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/12/08:00:00",
+      "endDate": "2024/11/12/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800113": {
+      "id": 99800113,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/12/14:00:00",
+      "endDate": "2024/11/12/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800114": {
+      "id": 99800114,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/12/20:00:00",
+      "endDate": "2024/11/12/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800115": {
+      "id": 99800115,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/13/08:00:00",
+      "endDate": "2024/11/13/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800116": {
+      "id": 99800116,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/13/14:00:00",
+      "endDate": "2024/11/13/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800117": {
+      "id": 99800117,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/13/20:00:00",
+      "endDate": "2024/11/13/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800118": {
+      "id": 99800118,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/14/08:00:00",
+      "endDate": "2024/11/14/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800119": {
+      "id": 99800119,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/14/14:00:00",
+      "endDate": "2024/11/14/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800120": {
+      "id": 99800120,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/14/20:00:00",
+      "endDate": "2024/11/14/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800121": {
+      "id": 99800121,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/15/08:00:00",
+      "endDate": "2024/11/15/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800122": {
+      "id": 99800122,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/15/14:00:00",
+      "endDate": "2024/11/15/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800123": {
+      "id": 99800123,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/15/20:00:00",
+      "endDate": "2024/11/15/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800124": {
+      "id": 99800124,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/16/08:00:00",
+      "endDate": "2024/11/16/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800125": {
+      "id": 99800125,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/16/14:00:00",
+      "endDate": "2024/11/16/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800126": {
+      "id": 99800126,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/16/20:00:00",
+      "endDate": "2024/11/16/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800127": {
+      "id": 99800127,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/17/08:00:00",
+      "endDate": "2024/11/17/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800128": {
+      "id": 99800128,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/17/14:00:00",
+      "endDate": "2024/11/17/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800129": {
+      "id": 99800129,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/17/20:00:00",
+      "endDate": "2024/11/17/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800130": {
+      "id": 99800130,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/18/08:00:00",
+      "endDate": "2024/11/18/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800131": {
+      "id": 99800131,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/18/14:00:00",
+      "endDate": "2024/11/18/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800132": {
+      "id": 99800132,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/18/20:00:00",
+      "endDate": "2024/11/18/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800133": {
+      "id": 99800133,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/19/08:00:00",
+      "endDate": "2024/11/19/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800134": {
+      "id": 99800134,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/19/14:00:00",
+      "endDate": "2024/11/19/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800135": {
+      "id": 99800135,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/19/20:00:00",
+      "endDate": "2024/11/19/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800136": {
+      "id": 99800136,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/20/08:00:00",
+      "endDate": "2024/11/20/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800137": {
+      "id": 99800137,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/20/14:00:00",
+      "endDate": "2024/11/20/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800138": {
+      "id": 99800138,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/20/20:00:00",
+      "endDate": "2024/11/20/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800139": {
+      "id": 99800139,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/21/08:00:00",
+      "endDate": "2024/11/21/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800140": {
+      "id": 99800140,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/21/14:00:00",
+      "endDate": "2024/11/21/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800141": {
+      "id": 99800141,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/21/20:00:00",
+      "endDate": "2024/11/21/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800142": {
+      "id": 99800142,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/22/08:00:00",
+      "endDate": "2024/11/22/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800143": {
+      "id": 99800143,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/22/14:00:00",
+      "endDate": "2024/11/22/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800144": {
+      "id": 99800144,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/22/20:00:00",
+      "endDate": "2024/11/22/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800145": {
+      "id": 99800145,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/23/08:00:00",
+      "endDate": "2024/11/23/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800146": {
+      "id": 99800146,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/23/14:00:00",
+      "endDate": "2024/11/23/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800147": {
+      "id": 99800147,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/23/20:00:00",
+      "endDate": "2024/11/23/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800148": {
+      "id": 99800148,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/24/08:00:00",
+      "endDate": "2024/11/24/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800149": {
+      "id": 99800149,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/24/14:00:00",
+      "endDate": "2024/11/24/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800150": {
+      "id": 99800150,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/24/20:00:00",
+      "endDate": "2024/11/24/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800151": {
+      "id": 99800151,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/25/08:00:00",
+      "endDate": "2024/11/25/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800152": {
+      "id": 99800152,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/25/14:00:00",
+      "endDate": "2024/11/25/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800153": {
+      "id": 99800153,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/25/20:00:00",
+      "endDate": "2024/11/25/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800154": {
+      "id": 99800154,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/26/08:00:00",
+      "endDate": "2024/11/26/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800155": {
+      "id": 99800155,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/26/14:00:00",
+      "endDate": "2024/11/26/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800156": {
+      "id": 99800156,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/26/20:00:00",
+      "endDate": "2024/11/26/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800157": {
+      "id": 99800157,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/27/08:00:00",
+      "endDate": "2024/11/27/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800158": {
+      "id": 99800158,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/27/14:00:00",
+      "endDate": "2024/11/27/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800159": {
+      "id": 99800159,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/27/20:00:00",
+      "endDate": "2024/11/27/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800160": {
+      "id": 99800160,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/28/08:00:00",
+      "endDate": "2024/11/28/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800161": {
+      "id": 99800161,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/28/14:00:00",
+      "endDate": "2024/11/28/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800162": {
+      "id": 99800162,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/28/20:00:00",
+      "endDate": "2024/11/28/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800163": {
+      "id": 99800163,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/29/08:00:00",
+      "endDate": "2024/11/29/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800164": {
+      "id": 99800164,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/29/14:00:00",
+      "endDate": "2024/11/29/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800165": {
+      "id": 99800165,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/29/20:00:00",
+      "endDate": "2024/11/29/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800166": {
+      "id": 99800166,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/30/08:00:00",
+      "endDate": "2024/11/30/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800167": {
+      "id": 99800167,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/30/14:00:00",
+      "endDate": "2024/11/30/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800168": {
+      "id": 99800168,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/30/20:00:00",
+      "endDate": "2024/11/30/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800169": {
+      "id": 99800169,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/12/01/08:00:00",
+      "endDate": "2024/12/01/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800170": {
+      "id": 99800170,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/12/01/14:00:00",
+      "endDate": "2024/12/01/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800171": {
+      "id": 99800171,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/12/01/20:00:00",
+      "endDate": "2024/12/01/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800172": {
+      "id": 99800172,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/12/02/08:00:00",
+      "endDate": "2024/12/02/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800173": {
+      "id": 99800173,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/12/02/14:00:00",
+      "endDate": "2024/12/02/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800174": {
+      "id": 99800174,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/12/02/20:00:00",
+      "endDate": "2024/12/02/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800175": {
+      "id": 99800175,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/12/03/08:00:00",
+      "endDate": "2024/12/03/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800176": {
+      "id": 99800176,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/12/03/14:00:00",
+      "endDate": "2024/12/03/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800177": {
+      "id": 99800177,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/12/03/20:00:00",
+      "endDate": "2024/12/03/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800178": {
+      "id": 99800178,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/12/04/08:00:00",
+      "endDate": "2024/12/04/11:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800179": {
+      "id": 99800179,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/12/04/14:00:00",
+      "endDate": "2024/12/04/17:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800180": {
+      "id": 99800180,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/12/04/20:00:00",
+      "endDate": "2024/12/04/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800181": {
+      "id": 99800181,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/12/05/00:00:00",
+      "endDate": "2025/01/21/23:59:59",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99800182": {
+      "id": 99800182,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/01/22/00:00:00",
+      "endDate": "2025/02/12/23:59:59",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800183": {
+      "id": 99800183,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/02/12/00:00:00",
+      "endDate": "2025/02/26/23:59:59",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99800184": {
+      "id": 99800184,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/03/12/00:00:00",
+      "endDate": "2025/03/23/23:59:59",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800185": {
+      "id": 99800185,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/03/05/00:00:00",
+      "endDate": "2025/04/01/23:59:59",
+      "localBitflag": 24,
+      "isQuest": true
+    },
+    "99800186": {
+      "id": 99800186,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/03/24/00:00:00",
+      "endDate": "2025/04/23/23:59:59",
+      "localBitflag": 27,
+      "isQuest": false
+    },
+    "99800187": {
+      "id": 99800187,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/04/24/00:00:00",
+      "endDate": "2025/05/23/23:59:59",
+      "localBitflag": 27,
+      "isQuest": false
+    },
+    "99800188": {
+      "id": 99800188,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/24/00:00:00",
+      "endDate": "2025/06/23/23:59:59",
+      "localBitflag": 27,
+      "isQuest": false
+    },
+    "99800189": {
+      "id": 99800189,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/03/24/00:00:00",
+      "endDate": "2025/06/23/23:59:59",
+      "localBitflag": 27,
+      "isQuest": false
+    },
+    "99800190": {
+      "id": 99800190,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/04/23/00:00:00",
+      "endDate": "2025/05/14/23:59:59",
+      "localBitflag": 3,
+      "isQuest": true
+    },
+    "99800191": {
+      "id": 99800191,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/28/00:00:00",
+      "endDate": "2025/06/25/23:59:59",
+      "localBitflag": 24,
+      "isQuest": true
+    },
+    "99800192": {
+      "id": 99800192,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/15/00:00:00",
+      "endDate": "2025/05/27/23:59:59",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99800193": {
+      "id": 99800193,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/15/20:00:00",
+      "endDate": "2025/05/15/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800194": {
+      "id": 99800194,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/16/20:00:00",
+      "endDate": "2025/05/16/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800195": {
+      "id": 99800195,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/17/20:00:00",
+      "endDate": "2025/05/17/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800196": {
+      "id": 99800196,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/18/20:00:00",
+      "endDate": "2025/05/18/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800197": {
+      "id": 99800197,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/19/20:00:00",
+      "endDate": "2025/05/19/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800198": {
+      "id": 99800198,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/20/20:00:00",
+      "endDate": "2025/05/20/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800199": {
+      "id": 99800199,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/21/20:00:00",
+      "endDate": "2025/05/21/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800200": {
+      "id": 99800200,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/22/20:00:00",
+      "endDate": "2025/05/22/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800201": {
+      "id": 99800201,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/23/20:00:00",
+      "endDate": "2025/05/23/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800202": {
+      "id": 99800202,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/24/20:00:00",
+      "endDate": "2025/05/24/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800203": {
+      "id": 99800203,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/25/20:00:00",
+      "endDate": "2025/05/25/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800204": {
+      "id": 99800204,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/26/20:00:00",
+      "endDate": "2025/05/26/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800205": {
+      "id": 99800205,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/27/20:00:00",
+      "endDate": "2025/05/27/23:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99800206": {
+      "id": 99800206,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/05/28/00:00:00",
+      "endDate": "2025/06/24/23:59:59",
+      "localBitflag": 3,
+      "isQuest": true
+    },
+    "99800207": {
+      "id": 99800207,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/06/11/00:00:00",
+      "endDate": "2025/07/08/23:59:59",
+      "localBitflag": 24,
+      "isQuest": true
+    },
+    "99800208": {
+      "id": 99800208,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/07/10/00:00:00",
+      "endDate": "2025/08/05/23:59:59",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99800209": {
+      "id": 99800209,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/06/11/00:00:00",
+      "endDate": "2025/06/24/23:59:59",
+      "localBitflag": 3,
+      "isQuest": true
+    },
+    "99800210": {
+      "id": 99800210,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/06/25/00:00:00",
+      "endDate": "2025/07/08/23:59:59",
+      "localBitflag": 24,
+      "isQuest": true
+    },
+    "99800211": {
+      "id": 99800211,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/06/25/00:00:00",
+      "endDate": "2025/08/26/23:59:58",
+      "localBitflag": 3,
+      "isQuest": true
+    },
+    "99800212": {
+      "id": 99800212,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/07/09/00:00:00",
+      "endDate": "2025/08/26/23:59:58",
+      "localBitflag": 24,
+      "isQuest": true
+    },
+    "99809001": {
+      "id": 99809001,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/03/13/00:00:00",
+      "endDate": "2024/04/30/10:01:00",
+      "localBitflag": 3,
+      "isQuest": false
+    },
+    "99809002": {
+      "id": 99809002,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/03/27/00:00:00",
+      "endDate": "2024/06/21/23:59:59",
+      "localBitflag": 24,
+      "isQuest": false
+    },
+    "99809003": {
+      "id": 99809003,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/06/06/00:00:00",
+      "endDate": "2024/06/30/23:59:59",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99809004": {
+      "id": 99809004,
+      "loginBgmTag": "여름",
+      "loginVoiceSoundTag": "여름",
+      "startDate": "2024/07/18/00:00:00",
+      "endDate": "2024/08/27/23:59:59",
+      "localBitflag": 127,
+      "isQuest": false
+    },
+    "99809005": {
+      "id": 99809005,
+      "loginBgmTag": "성탄",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/11/20/12:00:00",
+      "endDate": "2025/01/22/11:59:59",
+      "localBitflag": 0,
+      "isQuest": false
+    },
+    "99809006": {
+      "id": 99809006,
+      "loginBgmTag": "성탄",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2024/12/04/12:00:00",
+      "endDate": "2025/01/08/11:59:59",
+      "localBitflag": 0,
+      "isQuest": false
+    },
+    "99809007": {
+      "id": 99809007,
+      "loginBgmTag": "성탄",
+      "loginVoiceSoundTag": "성탄",
+      "startDate": "2024/12/24/00:00:00",
+      "endDate": "2024/12/25/23:59:59",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809008": {
+      "id": 99809008,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "새해",
+      "startDate": "2025/01/01/00:00:00",
+      "endDate": "2025/01/01/23:59:59",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809009": {
+      "id": 99809009,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "새해",
+      "startDate": "2025/01/28/00:00:00",
+      "endDate": "2025/01/30/23:59:59",
+      "localBitflag": 3,
+      "isQuest": false
+    },
+    "99809010": {
+      "id": 99809010,
+      "loginBgmTag": "여름",
+      "loginVoiceSoundTag": "여름",
+      "startDate": "2025/07/10/00:00:00",
+      "endDate": "2025/08/05/23:59:59",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809011": {
+      "id": 99809011,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/06/25/00:00:00",
+      "endDate": "2025/07/22/23:59:59",
+      "localBitflag": 27,
+      "isQuest": false
+    },
+    "99809012": {
+      "id": 99809012,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/07/23/00:00:00",
+      "endDate": "2025/08/19/23:59:59",
+      "localBitflag": 27,
+      "isQuest": false
+    },
+    "99809013": {
+      "id": 99809013,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/08/20/00:00:00",
+      "endDate": "2025/09/21/23:59:59",
+      "localBitflag": 27,
+      "isQuest": false
+    },
+    "99809014": {
+      "id": 99809014,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/06/25/00:00:00",
+      "endDate": "2025/09/21/23:59:59",
+      "localBitflag": 27,
+      "isQuest": false
+    },
+    "99809015": {
+      "id": 99809015,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/08/27/00:00:00",
+      "endDate": "2025/09/23/23:59:59",
+      "localBitflag": 27,
+      "isQuest": false
+    },
+    "99809016": {
+      "id": 99809016,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/17/20:00:00",
+      "endDate": "2025/09/17/22:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809017": {
+      "id": 99809017,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/18/20:00:00",
+      "endDate": "2025/09/18/22:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809018": {
+      "id": 99809018,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/19/20:00:00",
+      "endDate": "2025/09/19/22:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809019": {
+      "id": 99809019,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/20/18:00:00",
+      "endDate": "2025/09/20/20:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809020": {
+      "id": 99809020,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/21/18:00:00",
+      "endDate": "2025/09/21/20:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809021": {
+      "id": 99809021,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/22/20:00:00",
+      "endDate": "2025/09/22/22:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809022": {
+      "id": 99809022,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/23/20:00:00",
+      "endDate": "2025/09/23/22:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809023": {
+      "id": 99809023,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/08/27/00:00:00",
+      "endDate": "2025/09/23/23:59:59",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99809024": {
+      "id": 99809024,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/10/20:00:00",
+      "endDate": "2025/09/10/22:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809025": {
+      "id": 99809025,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/11/20:00:00",
+      "endDate": "2025/09/11/22:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809026": {
+      "id": 99809026,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/12/20:00:00",
+      "endDate": "2025/09/12/22:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809027": {
+      "id": 99809027,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/13/18:00:00",
+      "endDate": "2025/09/13/20:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809028": {
+      "id": 99809028,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/14/18:00:00",
+      "endDate": "2025/09/14/20:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809029": {
+      "id": 99809029,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/15/20:00:00",
+      "endDate": "2025/09/15/22:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809030": {
+      "id": 99809030,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/16/20:00:00",
+      "endDate": "2025/09/16/22:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809031": {
+      "id": 99809031,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/10/20:00:00",
+      "endDate": "2025/09/10/22:00:00",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99809032": {
+      "id": 99809032,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/11/20:00:00",
+      "endDate": "2025/09/11/22:00:00",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99809033": {
+      "id": 99809033,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/12/20:00:00",
+      "endDate": "2025/09/12/22:00:00",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99809034": {
+      "id": 99809034,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/13/18:00:00",
+      "endDate": "2025/09/13/20:00:00",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99809035": {
+      "id": 99809035,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/14/18:00:00",
+      "endDate": "2025/09/14/20:00:00",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99809036": {
+      "id": 99809036,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/15/20:00:00",
+      "endDate": "2025/09/15/22:00:00",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99809037": {
+      "id": 99809037,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/16/20:00:00",
+      "endDate": "2025/09/16/22:00:00",
+      "localBitflag": 31,
+      "isQuest": true
+    },
+    "99809038": {
+      "id": 99809038,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/24/00:00:00",
+      "endDate": "2025/10/28/23:59:59",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809039": {
+      "id": 99809039,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/03/00:00:00",
+      "endDate": "2025/10/12/23:59:59",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809040": {
+      "id": 99809040,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/24/18:00:00",
+      "endDate": "2025/09/24/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809041": {
+      "id": 99809041,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/25/18:00:00",
+      "endDate": "2025/09/25/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809042": {
+      "id": 99809042,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/26/18:00:00",
+      "endDate": "2025/09/26/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809043": {
+      "id": 99809043,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/27/18:00:00",
+      "endDate": "2025/09/27/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809044": {
+      "id": 99809044,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/28/18:00:00",
+      "endDate": "2025/09/28/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809045": {
+      "id": 99809045,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/29/18:00:00",
+      "endDate": "2025/09/29/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809046": {
+      "id": 99809046,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/30/18:00:00",
+      "endDate": "2025/09/30/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809047": {
+      "id": 99809047,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/01/18:00:00",
+      "endDate": "2025/10/01/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809048": {
+      "id": 99809048,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/02/18:00:00",
+      "endDate": "2025/10/02/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809049": {
+      "id": 99809049,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/03/18:00:00",
+      "endDate": "2025/10/03/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809050": {
+      "id": 99809050,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/04/18:00:00",
+      "endDate": "2025/10/04/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809051": {
+      "id": 99809051,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/05/18:00:00",
+      "endDate": "2025/10/05/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809052": {
+      "id": 99809052,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/06/18:00:00",
+      "endDate": "2025/10/06/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809053": {
+      "id": 99809053,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/07/18:00:00",
+      "endDate": "2025/10/07/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809054": {
+      "id": 99809054,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/08/18:00:00",
+      "endDate": "2025/10/08/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809055": {
+      "id": 99809055,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/09/18:00:00",
+      "endDate": "2025/10/09/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809056": {
+      "id": 99809056,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/10/18:00:00",
+      "endDate": "2025/10/10/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809057": {
+      "id": 99809057,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/11/18:00:00",
+      "endDate": "2025/10/11/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809058": {
+      "id": 99809058,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/12/18:00:00",
+      "endDate": "2025/10/12/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809059": {
+      "id": 99809059,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/13/18:00:00",
+      "endDate": "2025/10/13/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809060": {
+      "id": 99809060,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/14/18:00:00",
+      "endDate": "2025/10/14/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809061": {
+      "id": 99809061,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/15/18:00:00",
+      "endDate": "2025/10/15/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809062": {
+      "id": 99809062,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/16/18:00:00",
+      "endDate": "2025/10/16/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809063": {
+      "id": 99809063,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/17/18:00:00",
+      "endDate": "2025/10/17/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809064": {
+      "id": 99809064,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/18/18:00:00",
+      "endDate": "2025/10/18/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809065": {
+      "id": 99809065,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/19/18:00:00",
+      "endDate": "2025/10/19/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809066": {
+      "id": 99809066,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/20/18:00:00",
+      "endDate": "2025/10/20/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809067": {
+      "id": 99809067,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/21/18:00:00",
+      "endDate": "2025/10/21/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809068": {
+      "id": 99809068,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/22/18:00:00",
+      "endDate": "2025/10/22/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809069": {
+      "id": 99809069,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/23/18:00:00",
+      "endDate": "2025/10/23/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809070": {
+      "id": 99809070,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/24/18:00:00",
+      "endDate": "2025/10/24/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809071": {
+      "id": 99809071,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/25/18:00:00",
+      "endDate": "2025/10/25/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809072": {
+      "id": 99809072,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/26/18:00:00",
+      "endDate": "2025/10/26/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809073": {
+      "id": 99809073,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/27/18:00:00",
+      "endDate": "2025/10/27/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809074": {
+      "id": 99809074,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/28/18:00:00",
+      "endDate": "2025/10/28/19:00:00",
+      "localBitflag": 31,
+      "isQuest": false
+    },
+    "99809075": {
+      "id": 99809075,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/09/24/00:00:00",
+      "endDate": "2025/10/21/23:59:59",
+      "localBitflag": 27,
+      "isQuest": false
+    },
+    "99809076": {
+      "id": 99809076,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/22/00:00:00",
+      "endDate": "2025/11/18/23:59:59",
+      "localBitflag": 27,
+      "isQuest": false
+    },
+    "99809077": {
+      "id": 99809077,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/11/19/00:00:00",
+      "endDate": "2025/12/14/23:59:59",
+      "localBitflag": 27,
+      "isQuest": false
+    },
+    "99809078": {
+      "id": 99809078,
+      "loginBgmTag": "Default",
+      "loginVoiceSoundTag": "Default",
+      "startDate": "2025/10/08/00:00:00",
+      "endDate": "2025/10/14/23:59:59",
+      "localBitflag": 27,
+      "isQuest": true
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  ":DefaultMail": {
+    ":type": {
+      "id": "key",
+      "mailId": "number"
+    },
+    ":required": {
+      "mailId": 1
+    },
+    ":min": {
+      "mailId": 92000000
+    },
+    ":max": {
+      "mailId": 92999999
+    },
+    ":enum": {},
+    ":links": {
+      "mailId": [
+        "Mail"
+      ]
+    }
+  },
+  "DefaultMail": {
+    "201": {
+      "id": 201,
+      "mailId": 92000003
+    }
+  }
+}

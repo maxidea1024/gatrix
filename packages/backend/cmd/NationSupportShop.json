@@ -1,0 +1,230 @@
+{
+  ":NationSupportShop": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "nameFormatTexts": [
+        "text"
+      ],
+      "desc": "text",
+      "descFormatTexts": [
+        "text"
+      ],
+      "order": "number",
+      "localBitFlag": "bit",
+      "stratDate": "string",
+      "endDate": "string",
+      "needResourceType": "number",
+      "needResourceId": "number",
+      "needResourceVal": "number",
+      "rewardFixedId": "number"
+    },
+    ":required": {
+      "name": 1,
+      "desc": 1,
+      "order": 1,
+      "localBitFlag": 1,
+      "needResourceType": 1,
+      "needResourceId": 1,
+      "needResourceVal": 1,
+      "rewardFixedId": 1
+    },
+    ":requiredInObject": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":asset": {},
+    ":links": {
+      "needResourceId": [
+        "Point",
+        "Item"
+      ],
+      "rewardFixedId": [
+        "RewardFixed"
+      ]
+    }
+  },
+  "NationSupportShop": {
+    "10180001": {
+      "id": 10180001,
+      "name": "취임 선물 {0}",
+      "nameFormatTexts": [
+        "1"
+      ],
+      "desc": "취임 기념 선물입니다. 모든 국민에게 제공됩니다.",
+      "order": 1,
+      "localBitFlag": 27,
+      "needResourceType": 1,
+      "needResourceId": 100001,
+      "needResourceVal": 0,
+      "rewardFixedId": 94112001
+    },
+    "10180002": {
+      "id": 10180002,
+      "name": "취임 선물 {0}",
+      "nameFormatTexts": [
+        "2"
+      ],
+      "desc": "취임 기념 선물입니다. 모든 국민에게 제공됩니다.",
+      "order": 2,
+      "localBitFlag": 27,
+      "needResourceType": 1,
+      "needResourceId": 100001,
+      "needResourceVal": 0,
+      "rewardFixedId": 94112002
+    },
+    "10180003": {
+      "id": 10180003,
+      "name": "투자 격려 {0}",
+      "nameFormatTexts": [
+        "1"
+      ],
+      "desc": "{0}|hpp(을,를) 격려하기 위해 총리님이 보내신 응원입니다.",
+      "descFormatTexts": [
+        "투자"
+      ],
+      "order": 3,
+      "localBitFlag": 0,
+      "needResourceType": 1,
+      "needResourceId": 100001,
+      "needResourceVal": 1000000000,
+      "rewardFixedId": 94112003
+    },
+    "10180004": {
+      "id": 10180004,
+      "name": "투자 격려 {0}",
+      "nameFormatTexts": [
+        "2"
+      ],
+      "desc": "{0}|hpp(을,를) 격려하기 위해 총리님이 보내신 응원입니다.",
+      "descFormatTexts": [
+        "투자"
+      ],
+      "order": 4,
+      "localBitFlag": 0,
+      "needResourceType": 1,
+      "needResourceId": 100003,
+      "needResourceVal": 10000,
+      "rewardFixedId": 94112004
+    },
+    "10180005": {
+      "id": 10180005,
+      "name": "투자 격려 {0}",
+      "nameFormatTexts": [
+        "3"
+      ],
+      "desc": "{0}|hpp(을,를) 격려하기 위해 총리님이 보내신 응원입니다.",
+      "descFormatTexts": [
+        "투자"
+      ],
+      "order": 5,
+      "localBitFlag": 0,
+      "needResourceType": 1,
+      "needResourceId": 100004,
+      "needResourceVal": 10000,
+      "rewardFixedId": 94112005
+    },
+    "10180006": {
+      "id": 10180006,
+      "name": "건조 격려 {0}",
+      "nameFormatTexts": [
+        "1"
+      ],
+      "desc": "{0}|hpp(을,를) 격려하기 위해 총리님이 보내신 응원입니다.",
+      "descFormatTexts": [
+        "건조"
+      ],
+      "order": 6,
+      "localBitFlag": 27,
+      "needResourceType": 1,
+      "needResourceId": 100001,
+      "needResourceVal": 2000000000,
+      "rewardFixedId": 94112006
+    },
+    "10180007": {
+      "id": 10180007,
+      "name": "건조 격려 {0}",
+      "nameFormatTexts": [
+        "2"
+      ],
+      "desc": "{0}|hpp(을,를) 격려하기 위해 총리님이 보내신 응원입니다.",
+      "descFormatTexts": [
+        "건조"
+      ],
+      "order": 7,
+      "localBitFlag": 27,
+      "needResourceType": 1,
+      "needResourceId": 100003,
+      "needResourceVal": 10000,
+      "rewardFixedId": 94112007
+    },
+    "10180008": {
+      "id": 10180008,
+      "name": "건조 격려 {0}",
+      "nameFormatTexts": [
+        "3"
+      ],
+      "desc": "{0}|hpp(을,를) 격려하기 위해 총리님이 보내신 응원입니다.",
+      "descFormatTexts": [
+        "건조"
+      ],
+      "order": 8,
+      "localBitFlag": 27,
+      "needResourceType": 1,
+      "needResourceId": 100004,
+      "needResourceVal": 10000,
+      "rewardFixedId": 94112008
+    },
+    "10180009": {
+      "id": 10180009,
+      "name": "성장 격려 {0}",
+      "nameFormatTexts": [
+        "1"
+      ],
+      "desc": "{0}|hpp(을,를) 격려하기 위해 총리님이 보내신 응원입니다.",
+      "descFormatTexts": [
+        "성장"
+      ],
+      "order": 9,
+      "localBitFlag": 27,
+      "needResourceType": 1,
+      "needResourceId": 100001,
+      "needResourceVal": 1000000000,
+      "rewardFixedId": 94112009
+    },
+    "10180010": {
+      "id": 10180010,
+      "name": "성장 격려 {0}",
+      "nameFormatTexts": [
+        "2"
+      ],
+      "desc": "{0}|hpp(을,를) 격려하기 위해 총리님이 보내신 응원입니다.",
+      "descFormatTexts": [
+        "성장"
+      ],
+      "order": 10,
+      "localBitFlag": 27,
+      "needResourceType": 1,
+      "needResourceId": 100003,
+      "needResourceVal": 10000,
+      "rewardFixedId": 94112010
+    },
+    "10180011": {
+      "id": 10180011,
+      "name": "성장 격려 {0}",
+      "nameFormatTexts": [
+        "3"
+      ],
+      "desc": "{0}|hpp(을,를) 격려하기 위해 총리님이 보내신 응원입니다.",
+      "descFormatTexts": [
+        "성장"
+      ],
+      "order": 11,
+      "localBitFlag": 27,
+      "needResourceType": 1,
+      "needResourceId": 100004,
+      "needResourceVal": 15000,
+      "rewardFixedId": 94112011
+    }
+  }
+}

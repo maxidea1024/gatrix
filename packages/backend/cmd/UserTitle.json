@@ -1,0 +1,2059 @@
+{
+  ":UserTitle": {
+    ":type": {
+      "id": "key",
+      "localBitFlag": "bit",
+      "category": "number",
+      "period": {
+        "Type": "number",
+        "Hour": "number"
+      },
+      "sortingOrder": "number",
+      "startDate": "string",
+      "name": "text",
+      "flavorText": "text",
+      "hintText": "text",
+      "worldBuffId": [
+        "number",
+        "number"
+      ]
+    },
+    ":required": {
+      "category": 1,
+      "period": {
+        "Type": 1
+      },
+      "sortingOrder": 1,
+      "name": 1,
+      "flavorText": 1,
+      "hintText": 1,
+      "worldBuffId": [
+        1
+      ]
+    },
+    ":min": {
+      "category": 0,
+      "period": {
+        "Type": 0
+      }
+    },
+    ":max": {
+      "category": 4,
+      "period": {
+        "Type": 2
+      }
+    },
+    ":enum": {},
+    ":links": {
+      "worldBuffId": [
+        [
+          "WorldBuff"
+        ],
+        [
+          "WorldBuff"
+        ]
+      ]
+    }
+  },
+  "UserTitle": {
+    "1400000": {
+      "id": 1400000,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 1
+      },
+      "sortingOrder": 0,
+      "name": "전설적인 도시의 큰 손",
+      "flavorText": "길부터 건물까지, 어느 하나 그의 투자가 이루어지지 않은 곳이 없습니다.",
+      "hintText": "24년 10월 23일 이전 주간 투자 순위 1위",
+      "worldBuffId": [
+        38096003
+      ]
+    },
+    "1400001": {
+      "id": 1400001,
+      "localBitFlag": 27,
+      "category": 2,
+      "period": {
+        "Type": 1
+      },
+      "sortingOrder": 1,
+      "name": "전설의 거상",
+      "flavorText": "큰돈을 굴린다는 것은 탄탄한 배경과 실력, 그리고 시간이 필요합니다.",
+      "hintText": "주간 거래 점수 순위 1위",
+      "worldBuffId": [
+        38096001
+      ]
+    },
+    "1400002": {
+      "id": 1400002,
+      "localBitFlag": 27,
+      "category": 3,
+      "period": {
+        "Type": 1
+      },
+      "sortingOrder": 2,
+      "name": "해전의 지배자",
+      "flavorText": "감히 그에게 대적할 자가 있겠습니까? 이미 상어의 밥이 되었을걸요.",
+      "hintText": "주간 PvP 승리 순위 1위",
+      "worldBuffId": [
+        38096000
+      ]
+    },
+    "1400003": {
+      "id": 1400003,
+      "localBitFlag": 27,
+      "category": 1,
+      "period": {
+        "Type": 1
+      },
+      "sortingOrder": 3,
+      "name": "시대의 모험가",
+      "flavorText": "매 순간이 발견인 그에게 이 칭호는 새로운 발견 중 하나에 불과할 겁니다.",
+      "hintText": "주간 발견 보고 순위 1위",
+      "worldBuffId": [
+        38096002
+      ]
+    },
+    "1400004": {
+      "id": 1400004,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 1
+      },
+      "sortingOrder": 4,
+      "name": "도시의 큰 손",
+      "flavorText": "길부터 건물까지, 어느 하나 그의 투자가 이루어지지 않은 곳이 없습니다.",
+      "hintText": "주간 투자 순위 1위",
+      "worldBuffId": [
+        38096034
+      ]
+    },
+    "1401000": {
+      "id": 1401000,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 1000,
+      "name": "11인의 제독",
+      "flavorText": "이제 더 이상 제독을 손가락으로는 셀 수 없습니다. 도와줄 회계사가 필요하겠군요.",
+      "hintText": "강력한 선단은 더 많은 제독을 필요로 합니다.",
+      "worldBuffId": [
+        38096004
+      ]
+    },
+    "1401001": {
+      "id": 1401001,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 1001,
+      "name": "인도의 방문자",
+      "flavorText": "캘리컷을 방문한 지금이야말로, 대항해시대를 살아가는 제독이라 할 수 있을 것입니다.",
+      "hintText": "대항해시대의 목적지는 향신료의 도시였습니다.",
+      "worldBuffId": [
+        38096005
+      ]
+    },
+    "1401002": {
+      "id": 1401002,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 999,
+      "name": "새내기 제독",
+      "flavorText": "바다에 띄울 배 한 척과 여정을 함께할 동료 선원, 꿈이 있다면 항해를 떠날 준비를 마쳤습니다.",
+      "hintText": "대항해시대에 첫 발걸음",
+      "worldBuffId": [
+        38096009
+      ]
+    },
+    "1401003": {
+      "id": 1401003,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 998,
+      "name": "베테랑 제독",
+      "flavorText": "이제는 충분히 베테랑 제독입니다.",
+      "hintText": "업적 단계 51 달성",
+      "worldBuffId": [
+        38096042
+      ]
+    },
+    "1401004": {
+      "id": 1401004,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 997,
+      "name": "전설의 제독",
+      "flavorText": "거의 모든것에 통달한 제독입니다.",
+      "hintText": "업적 단계 80 달성",
+      "worldBuffId": [
+        38096043
+      ]
+    },
+    "1401005": {
+      "id": 1401005,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 996,
+      "name": "데우스 엑스 마키나",
+      "flavorText": "모든 분쟁을 끝내러, 여기 한 제독이 도착했습니다.",
+      "hintText": "업적 단계 100 달성",
+      "worldBuffId": [
+        38096044
+      ]
+    },
+    "1402001": {
+      "id": 1402001,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 300,
+      "name": "365일의 항해",
+      "flavorText": "제독님과 함께라면 거친 항해도 이겨낼 수 있습니다.",
+      "hintText": "대항해시대 오리진 1주년 상품",
+      "worldBuffId": [
+        38096006
+      ]
+    },
+    "1402002": {
+      "id": 1402002,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 301,
+      "name": "365일의 감사",
+      "flavorText": "제독님과 함께한 시간, 벌써 1년이 되었습니다.",
+      "hintText": "대항해시대 오리진 1주년 상품",
+      "worldBuffId": [
+        38096007
+      ]
+    },
+    "1402003": {
+      "id": 1402003,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 302,
+      "name": "반주년의 항해",
+      "flavorText": "Bon Voyage…",
+      "hintText": "대항해시대 오리진 반주년 상품",
+      "worldBuffId": [
+        38096006
+      ]
+    },
+    "1402004": {
+      "id": 1402004,
+      "localBitFlag": 24,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 303,
+      "name": "반주년의 동반자",
+      "flavorText": "Bon Voyage…",
+      "hintText": "대항해시대 오리진 반주년 상품",
+      "worldBuffId": [
+        38096007
+      ]
+    },
+    "1402005": {
+      "id": 1402005,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 304,
+      "startDate": "2024/01/01/00:00:00",
+      "name": "2024년 근하신년",
+      "flavorText": "새해 복 많이 받으세요!",
+      "hintText": "2024년 새해 출석부 보상",
+      "worldBuffId": [
+        38096014
+      ]
+    },
+    "1402006": {
+      "id": 1402006,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 305,
+      "startDate": "2023/12/06/12:00:00",
+      "name": "즐거운 연휴",
+      "flavorText": "즐거운 연휴 되세요!",
+      "hintText": "2023년 Happy Holiday 상품",
+      "worldBuffId": [
+        38096015
+      ]
+    },
+    "1402007": {
+      "id": 1402007,
+      "localBitFlag": 27,
+      "category": 1,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 306,
+      "startDate": "2024/06/06/00:00:00",
+      "name": "낙원 개척자",
+      "flavorText": "당신만 제 곁에 있어 준다면, 그 어떤 불모지도 낙원으로 만들 수 있어요.",
+      "hintText": "푸른 여전사, 에스메랄다의 여정 보상",
+      "worldBuffId": [
+        38096024
+      ]
+    },
+    "1402008": {
+      "id": 1402008,
+      "localBitFlag": 27,
+      "category": 2,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 307,
+      "startDate": "2024/08/23/12:00:00",
+      "name": "2주년의 약속",
+      "flavorText": "제독님! 함께 하자는 약속을 지켜주셔서 감사해요.\n그 약속, 우리 변치 말아요.",
+      "hintText": "대항해시대 오리진 2주년 상품",
+      "worldBuffId": [
+        38096026
+      ]
+    },
+    "1402009": {
+      "id": 1402009,
+      "localBitFlag": 27,
+      "category": 3,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 308,
+      "startDate": "2024/08/23/00:00:00",
+      "name": "2주년의 축포",
+      "flavorText": "자자, 모두 모이셨습니까?\n지금부터 2주년 기념 불꽃 놀이를 시작하겠습니다!",
+      "hintText": "대항해시대 오리진 2주년 보상",
+      "worldBuffId": [
+        38096027
+      ]
+    },
+    "1402010": {
+      "id": 1402010,
+      "localBitFlag": 27,
+      "category": 2,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 309,
+      "startDate": "2024/07/31/00:00:00",
+      "name": "새로운 물결",
+      "flavorText": "맑은 물이 바다로 흘러갑니다.\n제독님은 새로운 물결입니다!",
+      "hintText": "원양 항해 패키지 상품",
+      "worldBuffId": [
+        38096028
+      ]
+    },
+    "1402011": {
+      "id": 1402011,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 672
+      },
+      "sortingOrder": 310,
+      "startDate": "2024/08/28/00:00:00",
+      "name": "돌아온 제독",
+      "flavorText": "돌아오신 제독님을 환영합니다!",
+      "hintText": "복귀 유저 패키지 1 상품",
+      "worldBuffId": [
+        38096029
+      ]
+    },
+    "1402012": {
+      "id": 1402012,
+      "localBitFlag": 27,
+      "category": 3,
+      "period": {
+        "Type": 2,
+        "Hour": 672
+      },
+      "sortingOrder": 311,
+      "name": "첫 번째 등대의 주인",
+      "flavorText": "등대가 비추는 바다에서 누구보다 많은 해적을 누구보다 빠르게 가라앉힌 역전의 제독님께 드리는 칭호입니다.",
+      "hintText": "폐허의 등대 순위 1위",
+      "worldBuffId": [
+        38096031
+      ]
+    },
+    "1402013": {
+      "id": 1402013,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 312,
+      "name": "푸른 바다의 현자",
+      "flavorText": "당신의 가르침으로 인해 많은 사람들이 도움을 받았습니다.\n이제 당신은 현자로 칭송받아도 마땅합니다.",
+      "hintText": "최고의 공략 작성 이벤트 보상",
+      "worldBuffId": [
+        38096030
+      ]
+    },
+    "1402014": {
+      "id": 1402014,
+      "localBitFlag": 27,
+      "category": 2,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 313,
+      "startDate": "2024/11/06/12:00:00",
+      "name": "만물상",
+      "flavorText": "무엇이든 거래할 수 있습니다!",
+      "hintText": "안전 해역 상자 상품",
+      "worldBuffId": [
+        38096032
+      ]
+    },
+    "1402015": {
+      "id": 1402015,
+      "localBitFlag": 27,
+      "category": 2,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 314,
+      "name": "작은 발걸음",
+      "flavorText": "대양을 누비는 발걸음은 이제 시작입니다!",
+      "hintText": "업적 보상",
+      "worldBuffId": [
+        38096033
+      ]
+    },
+    "1402016": {
+      "id": 1402016,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 315,
+      "startDate": "2025/01/01/00:00:00",
+      "name": "2025년 근하신년",
+      "flavorText": "새해 복 많이 받으세요!",
+      "hintText": "2025년 새해 출석부 보상",
+      "worldBuffId": [
+        38096036
+      ]
+    },
+    "1402017": {
+      "id": 1402017,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 316,
+      "startDate": "2025/08/20/00:00:00",
+      "name": "3주년의 기쁨",
+      "flavorText": "제독님과의 시간은 기쁨이 가득합니다.",
+      "hintText": "대항해시대 오리진 한국 3주년 보상",
+      "worldBuffId": [
+        38096067
+      ]
+    },
+    "1402018": {
+      "id": 1402018,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 317,
+      "startDate": "2025/08/27/12:00:00",
+      "name": "3주년의 행복",
+      "flavorText": "제독님과의 여정에 행복이 가득합니다.",
+      "hintText": "대항해시대 오리진 한국 3주년 상품",
+      "worldBuffId": [
+        38096068
+      ]
+    },
+    "1403001": {
+      "id": 1403001,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 50,
+      "name": "전설의 포르투갈의 총리",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "24년 10월 23일 이전 포르투갈의 총리로 선출",
+      "worldBuffId": [
+        38096008
+      ]
+    },
+    "1403002": {
+      "id": 1403002,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 51,
+      "name": "전설의 에스파냐의 총리",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "24년 10월 23일 이전 에스파냐의 총리로 선출",
+      "worldBuffId": [
+        38096008
+      ]
+    },
+    "1403003": {
+      "id": 1403003,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 52,
+      "name": "전설의 잉글랜드의 총리",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "24년 10월 23일 이전 잉글랜드의 총리로 선출",
+      "worldBuffId": [
+        38096008
+      ]
+    },
+    "1403004": {
+      "id": 1403004,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 53,
+      "name": "전설의 네덜란드의 총리",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "24년 10월 23일 이전 네덜란드의 총리로 선출",
+      "worldBuffId": [
+        38096008
+      ]
+    },
+    "1403005": {
+      "id": 1403005,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 54,
+      "name": "전설의 오스만의 총리",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "24년 10월 23일 이전 오스만의 총리로 선출",
+      "worldBuffId": [
+        38096008
+      ]
+    },
+    "1403006": {
+      "id": 1403006,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 55,
+      "name": "전설의 명의 재상",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "24년 10월 23일 이전 명의 재상으로 선출",
+      "worldBuffId": [
+        38096008
+      ]
+    },
+    "1403007": {
+      "id": 1403007,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 56,
+      "name": "전설의 일본의 태정대신",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "24년 10월 23일 이전 일본의 태정대신으로 선출",
+      "worldBuffId": [
+        38096008
+      ]
+    },
+    "1403008": {
+      "id": 1403008,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 57,
+      "name": "전설의 조선의 재상",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "24년 10월 23일 이전 조선의 재상으로 선출",
+      "worldBuffId": [
+        38096008
+      ]
+    },
+    "1403009": {
+      "id": 1403009,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 58,
+      "name": "해적왕",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "해적왕으로 선출",
+      "worldBuffId": [
+        38096008
+      ]
+    },
+    "1403010": {
+      "id": 1403010,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 59,
+      "name": "총리",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "총리 당선 안내",
+      "worldBuffId": [
+        38096008
+      ]
+    },
+    "1403011": {
+      "id": 1403011,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 60,
+      "name": "후원가",
+      "flavorText": "당신의 선의는 국가의 기반이 됩니다.",
+      "hintText": "주간 국가 기부 순위 1위",
+      "worldBuffId": [
+        38096018
+      ]
+    },
+    "1403012": {
+      "id": 1403012,
+      "localBitFlag": 27,
+      "category": 3,
+      "period": {
+        "Type": 2,
+        "Hour": 336
+      },
+      "sortingOrder": 18,
+      "name": "모비딕 토벌 공로자",
+      "flavorText": "모비딕 토벌에 큰 공을 세운 제독님께 드리는 칭호입니다.",
+      "hintText": "모비딕 토벌 1위",
+      "worldBuffId": [
+        38096021
+      ]
+    },
+    "1403013": {
+      "id": 1403013,
+      "localBitFlag": 27,
+      "category": 3,
+      "period": {
+        "Type": 2,
+        "Hour": 336
+      },
+      "sortingOrder": 17,
+      "name": "거대 가오리 토벌 공로자",
+      "flavorText": "거대 가오리 토벌에 큰 공을 세운 제독님께 드리는 칭호입니다.",
+      "hintText": "거대 가오리 토벌 1위",
+      "worldBuffId": [
+        38096025
+      ]
+    },
+    "1403014": {
+      "id": 1403014,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 61,
+      "name": "포르투갈의 총리",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "포르투갈의 총리로 선출",
+      "worldBuffId": [
+        38096035
+      ]
+    },
+    "1403015": {
+      "id": 1403015,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 62,
+      "name": "에스파냐의 총리",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "에스파냐의 총리로 선출",
+      "worldBuffId": [
+        38096035
+      ]
+    },
+    "1403016": {
+      "id": 1403016,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 63,
+      "name": "잉글랜드의 총리",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "잉글랜드의 총리로 선출",
+      "worldBuffId": [
+        38096035
+      ]
+    },
+    "1403017": {
+      "id": 1403017,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 64,
+      "name": "네덜란드의 총리",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "네덜란드의 총리로 선출",
+      "worldBuffId": [
+        38096035
+      ]
+    },
+    "1403018": {
+      "id": 1403018,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 65,
+      "name": "오스만의 총리",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "오스만의 총리로 선출",
+      "worldBuffId": [
+        38096035
+      ]
+    },
+    "1403019": {
+      "id": 1403019,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 66,
+      "name": "명의 재상",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "명의 재상으로 선출",
+      "worldBuffId": [
+        38096035
+      ]
+    },
+    "1403020": {
+      "id": 1403020,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 67,
+      "name": "일본의 태정대신",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "일본의 태정대신으로 선출",
+      "worldBuffId": [
+        38096035
+      ]
+    },
+    "1403021": {
+      "id": 1403021,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 335
+      },
+      "sortingOrder": 68,
+      "name": "조선의 재상",
+      "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
+      "hintText": "조선의 재상으로 선출",
+      "worldBuffId": [
+        38096035
+      ]
+    },
+    "1403022": {
+      "id": 1403022,
+      "localBitFlag": 27,
+      "category": 3,
+      "period": {
+        "Type": 2,
+        "Hour": 336
+      },
+      "sortingOrder": 16,
+      "name": "아이든 레이스 토벌 공로자",
+      "flavorText": "아이든 레이스 토벌에 큰 공을 세운 제독님께 드리는 칭호입니다.",
+      "hintText": "아이든 레이스 토벌 1위",
+      "worldBuffId": [
+        38096045
+      ]
+    },
+    "1403023": {
+      "id": 1403023,
+      "localBitFlag": 27,
+      "category": 3,
+      "period": {
+        "Type": 2,
+        "Hour": 336
+      },
+      "sortingOrder": 15,
+      "name": "돌아온 튜 토벌 공로자",
+      "flavorText": "돌아온 토마스 튜 토벌에 큰 공을 세운 제독님께 드리는 칭호입니다.",
+      "hintText": "돌아온 토마스 튜 토벌 1위",
+      "worldBuffId": [
+        38096051
+      ]
+    },
+    "1403024": {
+      "id": 1403024,
+      "localBitFlag": 27,
+      "category": 3,
+      "period": {
+        "Type": 2,
+        "Hour": 336
+      },
+      "sortingOrder": 19,
+      "name": "야코프 발바커 토벌 공로자",
+      "flavorText": "야코프 발바커 토벌에 큰 공을 세운 제독님께 드리는 칭호입니다.",
+      "hintText": "야코프 발바커 토벌 1위",
+      "worldBuffId": [
+        38096070
+      ]
+    },
+    "1404001": {
+      "id": 1404001,
+      "localBitFlag": 27,
+      "category": 2,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 100,
+      "startDate": "2023/12/26/00:00:00",
+      "name": "2023년 교역왕",
+      "flavorText": "2023년 연말 교역 경쟁전에서 1위를 달성한 제독님께 드리는 칭호입니다.",
+      "hintText": "2023년 연말 교역 경쟁전 1위",
+      "worldBuffId": [
+        38096011
+      ]
+    },
+    "1404002": {
+      "id": 1404002,
+      "localBitFlag": 27,
+      "category": 1,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 101,
+      "startDate": "2023/12/26/00:00:00",
+      "name": "2023년 모험왕",
+      "flavorText": "2023년 연말 모험 경쟁전에서 1위를 달성한 제독님께 드리는 칭호입니다.",
+      "hintText": "2023년 연말 모험 경쟁전 1위",
+      "worldBuffId": [
+        38096012
+      ]
+    },
+    "1404003": {
+      "id": 1404003,
+      "localBitFlag": 27,
+      "category": 3,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 102,
+      "startDate": "2023/12/26/00:00:00",
+      "name": "2023년 전투왕",
+      "flavorText": "2023년 연말 전투 경쟁전에서 1위를 달성한 제독님께 드리는 칭호입니다.",
+      "hintText": "2023년 연말 전투 경쟁전 1위",
+      "worldBuffId": [
+        38096010
+      ]
+    },
+    "1404004": {
+      "id": 1404004,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 103,
+      "startDate": "2024/02/10/00:00:00",
+      "name": "사랑꾼",
+      "flavorText": "2024년 밸런타인 경쟁전에서 1위를 달성한 제독님께 드리는 칭호입니다.",
+      "hintText": "2024년 밸런타인 경쟁전 1위",
+      "worldBuffId": [
+        38096019
+      ]
+    },
+    "1404005": {
+      "id": 1404005,
+      "localBitFlag": 27,
+      "category": 1,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 104,
+      "startDate": "2024/05/04/00:00:00",
+      "name": "보물 사냥꾼",
+      "flavorText": "2024년 보물 탐사 경쟁전에서 1위를 달성한 제독님께 드리는 칭호입니다.",
+      "hintText": "2024년 보물 탐사 경쟁전 1위",
+      "worldBuffId": [
+        38096022
+      ]
+    },
+    "1405000": {
+      "id": 1405000,
+      "localBitFlag": 3,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 1101,
+      "name": "위대한 제독",
+      "flavorText": "오늘 진실로 죽음을 각오하오니, 하늘에 바라옵건대 반드시 이 적을 섬멸하게 하여 주소서.",
+      "hintText": "위대한 제독 패키지",
+      "worldBuffId": [
+        38096016
+      ]
+    },
+    "1405001": {
+      "id": 1405001,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 1102,
+      "name": "구국의 영웅",
+      "flavorText": "역사 속 수많은 영웅이 존재했지만, 나라를 구한 역전의 용사는 절대 흔하지 않습니다.",
+      "hintText": "제독 칭호 패키지",
+      "worldBuffId": [
+        38096017
+      ]
+    },
+    "1406000": {
+      "id": 1406000,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 105,
+      "startDate": "2024/12/05/00:00:00",
+      "name": "대양의 첫 모험가",
+      "flavorText": "가장 위대한 발자취 너머",
+      "hintText": "투자 시즌 0 참가",
+      "worldBuffId": [
+        38096037
+      ]
+    },
+    "1406001": {
+      "id": 1406001,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 107,
+      "startDate": "2024/12/05/00:00:00",
+      "name": "신화의 시즌 1 제독",
+      "flavorText": "투자 시즌 1에 신화적인 발자취를 남긴 제독을 위한 칭호입니다.",
+      "hintText": "투자 시즌 1 상점 구매",
+      "worldBuffId": [
+        38096038
+      ]
+    },
+    "1406002": {
+      "id": 1406002,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 108,
+      "startDate": "2024/12/05/00:00:00",
+      "name": "전설의 시즌 1 제독",
+      "flavorText": "투자 시즌 1에 전설적인 발자취를 남긴 제독을 위한 칭호입니다.",
+      "hintText": "투자 시즌 1 상점 구매",
+      "worldBuffId": [
+        38096039
+      ]
+    },
+    "1406003": {
+      "id": 1406003,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 109,
+      "startDate": "2024/12/05/00:00:00",
+      "name": "역사의 시즌 1 제독",
+      "flavorText": "투자 시즌 1에 역사적인 발자취를 남긴 제독을 위한 칭호입니다.",
+      "hintText": "투자 시즌 1 상점 구매",
+      "worldBuffId": [
+        38096040
+      ]
+    },
+    "1406004": {
+      "id": 1406004,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 106,
+      "startDate": "2024/12/05/00:00:00",
+      "name": "옛 항로의 별",
+      "flavorText": "시간이 삼킨 바다 위 전설이 된 이정표. 그 빛은 모두를 인도하리라, 끝없는 수평선 너머까지.",
+      "hintText": "투자 시즌 0 종료 시 시장 3석 이상 보유 제독 보상",
+      "worldBuffId": [
+        38096041
+      ]
+    },
+    "1406005": {
+      "id": 1406005,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 201,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 종합 1위",
+      "worldBuffId": [
+        38096046
+      ]
+    },
+    "1406006": {
+      "id": 1406006,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 211,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "포르투갈의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 포르투갈 1위",
+      "worldBuffId": [
+        38096048
+      ]
+    },
+    "1406007": {
+      "id": 1406007,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 212,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "에스파냐의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 에스파냐 1위",
+      "worldBuffId": [
+        38096048
+      ]
+    },
+    "1406008": {
+      "id": 1406008,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 213,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "잉글랜드의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 잉글랜드 1위",
+      "worldBuffId": [
+        38096048
+      ]
+    },
+    "1406009": {
+      "id": 1406009,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 214,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "네덜란드의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 네덜란드 1위",
+      "worldBuffId": [
+        38096048
+      ]
+    },
+    "1406010": {
+      "id": 1406010,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 215,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "오스만의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 오스만 1위",
+      "worldBuffId": [
+        38096048
+      ]
+    },
+    "1406011": {
+      "id": 1406011,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 216,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "명의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 명 1위",
+      "worldBuffId": [
+        38096048
+      ]
+    },
+    "1406012": {
+      "id": 1406012,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 217,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "조선의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 조선 1위",
+      "worldBuffId": [
+        38096048
+      ]
+    },
+    "1406013": {
+      "id": 1406013,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 218,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "일본의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 일본 1위",
+      "worldBuffId": [
+        38096048
+      ]
+    },
+    "1406014": {
+      "id": 1406014,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 202,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 종합 2~10위",
+      "worldBuffId": [
+        38096047
+      ]
+    },
+    "1406015": {
+      "id": 1406015,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 221,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "포르투갈의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 포르투갈 2~10위",
+      "worldBuffId": [
+        38096049
+      ]
+    },
+    "1406016": {
+      "id": 1406016,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 222,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "에스파냐의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 에스파냐 2~10위",
+      "worldBuffId": [
+        38096049
+      ]
+    },
+    "1406017": {
+      "id": 1406017,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 223,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "잉글랜드의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 잉글랜드 2~10위",
+      "worldBuffId": [
+        38096049
+      ]
+    },
+    "1406018": {
+      "id": 1406018,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 224,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "네덜란드의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 네덜란드 2~10위",
+      "worldBuffId": [
+        38096049
+      ]
+    },
+    "1406019": {
+      "id": 1406019,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 225,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "오스만의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 오스만 2~10위",
+      "worldBuffId": [
+        38096049
+      ]
+    },
+    "1406020": {
+      "id": 1406020,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 226,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "명의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 명 2~10위",
+      "worldBuffId": [
+        38096049
+      ]
+    },
+    "1406021": {
+      "id": 1406021,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 227,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "조선의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 조선 2~10위",
+      "worldBuffId": [
+        38096049
+      ]
+    },
+    "1406022": {
+      "id": 1406022,
+      "localBitFlag": 0,
+      "category": 0,
+      "period": {
+        "Type": 2,
+        "Hour": 2688
+      },
+      "sortingOrder": 228,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "일본의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 종료 시 일본 2~10위",
+      "worldBuffId": [
+        38096049
+      ]
+    },
+    "1406023": {
+      "id": 1406023,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 110,
+      "startDate": "2025/03/24/00:00:00",
+      "name": "역전의 용사",
+      "flavorText": "투자 시즌 2에서 영웅적인 전투에 참여한 제독을 위한 칭호입니다.",
+      "hintText": "투자 시즌 2 상점 구매",
+      "worldBuffId": [
+        38096050
+      ]
+    },
+    "1406024": {
+      "id": 1406024,
+      "localBitFlag": 3,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 720
+      },
+      "sortingOrder": 5,
+      "name": "지중해의 햇살",
+      "flavorText": "새로운 세계를 탐험하실 제독님을 위한 칭호입니다.",
+      "hintText": "지중해 서버 전용 보상",
+      "worldBuffId": [
+        38096055,
+        38096056
+      ]
+    },
+    "1406025": {
+      "id": 1406025,
+      "localBitFlag": 3,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 24
+      },
+      "sortingOrder": 300,
+      "name": "뜨거운 전진",
+      "flavorText": "이벤트에 참여한 제독님을 위한 칭호입니다.",
+      "hintText": "GM 이벤트 보상",
+      "worldBuffId": [
+        38096057
+      ]
+    },
+    "1410000": {
+      "id": 1410000,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 201,
+      "name": "최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 종합 1위",
+      "worldBuffId": [
+        38096058
+      ]
+    },
+    "1410002": {
+      "id": 1410002,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 211,
+      "name": "포르투갈의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 포르투갈 1위",
+      "worldBuffId": [
+        38096060
+      ]
+    },
+    "1410004": {
+      "id": 1410004,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 212,
+      "name": "에스파냐의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 에스파냐 1위",
+      "worldBuffId": [
+        38096060
+      ]
+    },
+    "1410006": {
+      "id": 1410006,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 213,
+      "name": "잉글랜드의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 잉글랜드 1위",
+      "worldBuffId": [
+        38096060
+      ]
+    },
+    "1410008": {
+      "id": 1410008,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 214,
+      "name": "네덜란드의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 네덜란드 1위",
+      "worldBuffId": [
+        38096060
+      ]
+    },
+    "1410010": {
+      "id": 1410010,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 215,
+      "name": "오스만의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 오스만 1위",
+      "worldBuffId": [
+        38096060
+      ]
+    },
+    "1410012": {
+      "id": 1410012,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 216,
+      "name": "명의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 명 1위",
+      "worldBuffId": [
+        38096060
+      ]
+    },
+    "1410014": {
+      "id": 1410014,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 217,
+      "name": "조선의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 조선 1위",
+      "worldBuffId": [
+        38096060
+      ]
+    },
+    "1410016": {
+      "id": 1410016,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 218,
+      "name": "일본의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 일본 1위",
+      "worldBuffId": [
+        38096060
+      ]
+    },
+    "1410018": {
+      "id": 1410018,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 202,
+      "name": "도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 종합 2~10위",
+      "worldBuffId": [
+        38096059
+      ]
+    },
+    "1410020": {
+      "id": 1410020,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 221,
+      "name": "포르투갈의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 포르투갈 2~3위",
+      "worldBuffId": [
+        38096061
+      ]
+    },
+    "1410022": {
+      "id": 1410022,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 222,
+      "name": "에스파냐의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 에스파냐 2~3위",
+      "worldBuffId": [
+        38096061
+      ]
+    },
+    "1410024": {
+      "id": 1410024,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 223,
+      "name": "잉글랜드의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 잉글랜드 2~3위",
+      "worldBuffId": [
+        38096061
+      ]
+    },
+    "1410026": {
+      "id": 1410026,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 224,
+      "name": "네덜란드의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 네덜란드 2~3위",
+      "worldBuffId": [
+        38096061
+      ]
+    },
+    "1410028": {
+      "id": 1410028,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 225,
+      "name": "오스만의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 오스만 2~3위",
+      "worldBuffId": [
+        38096061
+      ]
+    },
+    "1410030": {
+      "id": 1410030,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 226,
+      "name": "명의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 명 2~3위",
+      "worldBuffId": [
+        38096061
+      ]
+    },
+    "1410032": {
+      "id": 1410032,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 227,
+      "name": "조선의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 조선 2~3위",
+      "worldBuffId": [
+        38096061
+      ]
+    },
+    "1410034": {
+      "id": 1410034,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 228,
+      "name": "일본의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 2 종료 시 일본 2~3위",
+      "worldBuffId": [
+        38096061
+      ]
+    },
+    "1410035": {
+      "id": 1410035,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 111,
+      "startDate": "2025/06/22/00:00:00",
+      "name": "황금 항로의 개척자",
+      "flavorText": "투자 시즌 3에서 영웅적인 전투에 참여한 제독을 위한 칭호입니다.",
+      "hintText": "투자 시즌 3 상점 구매",
+      "worldBuffId": [
+        38096066
+      ]
+    },
+    "1410036": {
+      "id": 1410036,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 201,
+      "name": "최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 종합 1위",
+      "worldBuffId": [
+        38096062
+      ]
+    },
+    "1410037": {
+      "id": 1410037,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 211,
+      "name": "포르투갈의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 포르투갈 1위",
+      "worldBuffId": [
+        38096064
+      ]
+    },
+    "1410038": {
+      "id": 1410038,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 212,
+      "name": "에스파냐의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 에스파냐 1위",
+      "worldBuffId": [
+        38096064
+      ]
+    },
+    "1410039": {
+      "id": 1410039,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 213,
+      "name": "잉글랜드의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 잉글랜드 1위",
+      "worldBuffId": [
+        38096064
+      ]
+    },
+    "1410040": {
+      "id": 1410040,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 214,
+      "name": "네덜란드의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 네덜란드 1위",
+      "worldBuffId": [
+        38096064
+      ]
+    },
+    "1410041": {
+      "id": 1410041,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 215,
+      "name": "오스만의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 오스만 1위",
+      "worldBuffId": [
+        38096064
+      ]
+    },
+    "1410042": {
+      "id": 1410042,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 216,
+      "name": "명의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 명 1위",
+      "worldBuffId": [
+        38096064
+      ]
+    },
+    "1410043": {
+      "id": 1410043,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 217,
+      "name": "조선의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 조선 1위",
+      "worldBuffId": [
+        38096064
+      ]
+    },
+    "1410044": {
+      "id": 1410044,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 218,
+      "name": "일본의 최강자",
+      "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 일본 1위",
+      "worldBuffId": [
+        38096064
+      ]
+    },
+    "1410045": {
+      "id": 1410045,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 202,
+      "name": "도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 종합 2~10위",
+      "worldBuffId": [
+        38096063
+      ]
+    },
+    "1410046": {
+      "id": 1410046,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 221,
+      "name": "포르투갈의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 포르투갈 2~3위",
+      "worldBuffId": [
+        38096065
+      ]
+    },
+    "1410047": {
+      "id": 1410047,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 222,
+      "name": "에스파냐의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 에스파냐 2~3위",
+      "worldBuffId": [
+        38096065
+      ]
+    },
+    "1410048": {
+      "id": 1410048,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 223,
+      "name": "잉글랜드의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 잉글랜드 2~3위",
+      "worldBuffId": [
+        38096065
+      ]
+    },
+    "1410049": {
+      "id": 1410049,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 224,
+      "name": "네덜란드의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 네덜란드 2~3위",
+      "worldBuffId": [
+        38096065
+      ]
+    },
+    "1410050": {
+      "id": 1410050,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 225,
+      "name": "오스만의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 오스만 2~3위",
+      "worldBuffId": [
+        38096065
+      ]
+    },
+    "1410051": {
+      "id": 1410051,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 226,
+      "name": "명의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 명 2~3위",
+      "worldBuffId": [
+        38096065
+      ]
+    },
+    "1410052": {
+      "id": 1410052,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 227,
+      "name": "조선의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 조선 2~3위",
+      "worldBuffId": [
+        38096065
+      ]
+    },
+    "1410053": {
+      "id": 1410053,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 2,
+        "Hour": 2184
+      },
+      "sortingOrder": 228,
+      "name": "일본의 도전자",
+      "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
+      "hintText": "투자 시즌 3 종료 시 일본 2~3위",
+      "worldBuffId": [
+        38096065
+      ]
+    },
+    "1410054": {
+      "id": 1410054,
+      "localBitFlag": 27,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 111,
+      "startDate": "2025/09/22/00:00:00",
+      "name": "동방의 탐구자",
+      "flavorText": "투자 시즌 4에서 위대한 모험에 참여한 제독을 위한 칭호입니다.",
+      "hintText": "투자 시즌 4 상점 구매",
+      "worldBuffId": [
+        38096069
+      ]
+    },
+    "1410055": {
+      "id": 1410055,
+      "localBitFlag": 0,
+      "category": 4,
+      "period": {
+        "Type": 0
+      },
+      "sortingOrder": 111,
+      "name": "백전노장",
+      "flavorText": "100 레벨을 달성한 제독님을 기념하기 위한 칭호입니다.",
+      "hintText": "100 레벨 달성 상점 구매",
+      "worldBuffId": [
+        38096071
+      ]
+    }
+  }
+}

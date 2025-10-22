@@ -1,0 +1,37 @@
+{
+  ":WaveRate": {
+    ":type": {
+      "id": "key",
+      "waveRate": "number"
+    },
+    ":required": {
+      "waveRate": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "WaveRate": {
+    "0": {
+      "id": 0,
+      "waveRate": 0
+    },
+    "1": {
+      "id": 1,
+      "waveRate": 3.25
+    },
+    "2": {
+      "id": 2,
+      "waveRate": 6.5
+    },
+    "3": {
+      "id": 3,
+      "waveRate": 9.75
+    },
+    "4": {
+      "id": 4,
+      "waveRate": 13
+    }
+  }
+}

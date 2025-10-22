@@ -1,0 +1,113 @@
+{
+  ":GuildEmblemBorder": {
+    ":type": {
+      "id": "key",
+      "isExposure": "bool"
+    },
+    ":required": {
+      "isExposure": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "GuildEmblemBorder": {
+    "201": {
+      "id": 201,
+      "isExposure": true
+    },
+    "202": {
+      "id": 202,
+      "isExposure": true
+    },
+    "203": {
+      "id": 203,
+      "isExposure": true
+    },
+    "204": {
+      "id": 204,
+      "isExposure": true
+    },
+    "205": {
+      "id": 205,
+      "isExposure": true
+    },
+    "206": {
+      "id": 206,
+      "isExposure": true
+    },
+    "207": {
+      "id": 207,
+      "isExposure": true
+    },
+    "208": {
+      "id": 208,
+      "isExposure": true
+    },
+    "209": {
+      "id": 209,
+      "isExposure": true
+    },
+    "210": {
+      "id": 210,
+      "isExposure": true
+    },
+    "211": {
+      "id": 211,
+      "isExposure": true
+    },
+    "212": {
+      "id": 212,
+      "isExposure": true
+    },
+    "213": {
+      "id": 213,
+      "isExposure": true
+    },
+    "214": {
+      "id": 214,
+      "isExposure": true
+    },
+    "215": {
+      "id": 215,
+      "isExposure": true
+    },
+    "216": {
+      "id": 216,
+      "isExposure": true
+    },
+    "217": {
+      "id": 217,
+      "isExposure": true
+    },
+    "218": {
+      "id": 218,
+      "isExposure": true
+    },
+    "219": {
+      "id": 219,
+      "isExposure": true
+    },
+    "220": {
+      "id": 220,
+      "isExposure": true
+    },
+    "221": {
+      "id": 221,
+      "isExposure": true
+    },
+    "222": {
+      "id": 222,
+      "isExposure": true
+    },
+    "223": {
+      "id": 223,
+      "isExposure": true
+    },
+    "224": {
+      "id": 224,
+      "isExposure": true
+    }
+  }
+}

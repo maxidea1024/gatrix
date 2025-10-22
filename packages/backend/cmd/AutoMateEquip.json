@@ -1,0 +1,6535 @@
+{
+  ":AutoMateEquip": {
+    ":type": {
+      "id": "key",
+      "name": "string",
+      "equipment": [
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        },
+        {
+          "id": "number",
+          "needLv": "number"
+        }
+      ]
+    },
+    ":required": {
+      "name": 1
+    },
+    ":requiredInObject": {
+      "equipment": [
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        },
+        {
+          "id": 1,
+          "needLv": 1
+        }
+      ]
+    },
+    ":min": {
+      "equipment": [
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        },
+        {
+          "id": 22000000
+        }
+      ]
+    },
+    ":max": {
+      "equipment": [
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        },
+        {
+          "id": 22999999
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "equipment": [
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        },
+        {
+          "id": [
+            "CEquip"
+          ]
+        }
+      ]
+    }
+  },
+  "AutoMateEquip": {
+    "64100001": {
+      "id": 64100001,
+      "name": "공통",
+      "equipment": [
+        {
+          "id": 22910001,
+          "needLv": 1
+        },
+        {
+          "id": 22910002,
+          "needLv": 2
+        },
+        {
+          "id": 22910003,
+          "needLv": 3
+        },
+        {
+          "id": 22910004,
+          "needLv": 4
+        },
+        {
+          "id": 22910005,
+          "needLv": 5
+        },
+        {
+          "id": 22910006,
+          "needLv": 6
+        },
+        {
+          "id": 22910007,
+          "needLv": 7
+        },
+        {
+          "id": 22910008,
+          "needLv": 8
+        },
+        {
+          "id": 22910009,
+          "needLv": 9
+        },
+        {
+          "id": 22910010,
+          "needLv": 10
+        },
+        {
+          "id": 22910011,
+          "needLv": 11
+        },
+        {
+          "id": 22910012,
+          "needLv": 12
+        },
+        {
+          "id": 22910013,
+          "needLv": 13
+        },
+        {
+          "id": 22910014,
+          "needLv": 14
+        },
+        {
+          "id": 22910015,
+          "needLv": 15
+        },
+        {
+          "id": 22910016,
+          "needLv": 16
+        },
+        {
+          "id": 22910017,
+          "needLv": 17
+        },
+        {
+          "id": 22910018,
+          "needLv": 18
+        },
+        {
+          "id": 22910019,
+          "needLv": 19
+        },
+        {
+          "id": 22910020,
+          "needLv": 20
+        },
+        {
+          "id": 22910021,
+          "needLv": 21
+        },
+        {
+          "id": 22910022,
+          "needLv": 22
+        },
+        {
+          "id": 22910023,
+          "needLv": 23
+        },
+        {
+          "id": 22910024,
+          "needLv": 24
+        },
+        {
+          "id": 22910025,
+          "needLv": 25
+        },
+        {
+          "id": 22910026,
+          "needLv": 26
+        },
+        {
+          "id": 22910027,
+          "needLv": 27
+        },
+        {
+          "id": 22910028,
+          "needLv": 28
+        },
+        {
+          "id": 22910029,
+          "needLv": 29
+        },
+        {
+          "id": 22910030,
+          "needLv": 30
+        },
+        {
+          "id": 22910031,
+          "needLv": 31
+        },
+        {
+          "id": 22910032,
+          "needLv": 32
+        },
+        {
+          "id": 22910033,
+          "needLv": 33
+        },
+        {
+          "id": 22910034,
+          "needLv": 34
+        },
+        {
+          "id": 22910035,
+          "needLv": 35
+        },
+        {
+          "id": 22910036,
+          "needLv": 36
+        },
+        {
+          "id": 22910037,
+          "needLv": 37
+        },
+        {
+          "id": 22910038,
+          "needLv": 38
+        },
+        {
+          "id": 22910039,
+          "needLv": 39
+        },
+        {
+          "id": 22910040,
+          "needLv": 40
+        },
+        {
+          "id": 22910041,
+          "needLv": 41
+        },
+        {
+          "id": 22910042,
+          "needLv": 42
+        },
+        {
+          "id": 22910043,
+          "needLv": 43
+        },
+        {
+          "id": 22910044,
+          "needLv": 44
+        },
+        {
+          "id": 22910045,
+          "needLv": 45
+        },
+        {
+          "id": 22910046,
+          "needLv": 46
+        },
+        {
+          "id": 22910047,
+          "needLv": 47
+        },
+        {
+          "id": 22910048,
+          "needLv": 48
+        },
+        {
+          "id": 22910049,
+          "needLv": 49
+        },
+        {
+          "id": 22910050,
+          "needLv": 50
+        },
+        {
+          "id": 22910051,
+          "needLv": 51
+        },
+        {
+          "id": 22910052,
+          "needLv": 52
+        },
+        {
+          "id": 22910053,
+          "needLv": 53
+        },
+        {
+          "id": 22910054,
+          "needLv": 54
+        },
+        {
+          "id": 22910055,
+          "needLv": 55
+        },
+        {
+          "id": 22910056,
+          "needLv": 56
+        },
+        {
+          "id": 22910057,
+          "needLv": 57
+        },
+        {
+          "id": 22910058,
+          "needLv": 58
+        },
+        {
+          "id": 22910059,
+          "needLv": 59
+        },
+        {
+          "id": 22910060,
+          "needLv": 60
+        },
+        {
+          "id": 22910061,
+          "needLv": 61
+        },
+        {
+          "id": 22910062,
+          "needLv": 62
+        },
+        {
+          "id": 22910063,
+          "needLv": 63
+        },
+        {
+          "id": 22910064,
+          "needLv": 64
+        },
+        {
+          "id": 22910065,
+          "needLv": 65
+        },
+        {
+          "id": 22910066,
+          "needLv": 66
+        },
+        {
+          "id": 22910067,
+          "needLv": 67
+        },
+        {
+          "id": 22910068,
+          "needLv": 68
+        },
+        {
+          "id": 22910069,
+          "needLv": 69
+        },
+        {
+          "id": 22910070,
+          "needLv": 70
+        },
+        {
+          "id": 22910071,
+          "needLv": 71
+        },
+        {
+          "id": 22910072,
+          "needLv": 72
+        },
+        {
+          "id": 22910073,
+          "needLv": 73
+        },
+        {
+          "id": 22910074,
+          "needLv": 74
+        },
+        {
+          "id": 22910075,
+          "needLv": 75
+        },
+        {
+          "id": 22910076,
+          "needLv": 76
+        },
+        {
+          "id": 22910077,
+          "needLv": 77
+        },
+        {
+          "id": 22910078,
+          "needLv": 78
+        },
+        {
+          "id": 22910079,
+          "needLv": 79
+        },
+        {
+          "id": 22910080,
+          "needLv": 80
+        },
+        {
+          "id": 22910081,
+          "needLv": 81
+        },
+        {
+          "id": 22910082,
+          "needLv": 82
+        },
+        {
+          "id": 22910083,
+          "needLv": 83
+        },
+        {
+          "id": 22910084,
+          "needLv": 84
+        },
+        {
+          "id": 22910085,
+          "needLv": 85
+        },
+        {
+          "id": 22910086,
+          "needLv": 86
+        },
+        {
+          "id": 22910087,
+          "needLv": 87
+        },
+        {
+          "id": 22910088,
+          "needLv": 88
+        },
+        {
+          "id": 22910089,
+          "needLv": 89
+        },
+        {
+          "id": 22910090,
+          "needLv": 90
+        },
+        {
+          "id": 22910091,
+          "needLv": 91
+        },
+        {
+          "id": 22910092,
+          "needLv": 92
+        },
+        {
+          "id": 22910093,
+          "needLv": 93
+        },
+        {
+          "id": 22910094,
+          "needLv": 94
+        },
+        {
+          "id": 22910095,
+          "needLv": 95
+        },
+        {
+          "id": 22910096,
+          "needLv": 96
+        },
+        {
+          "id": 22910097,
+          "needLv": 97
+        },
+        {
+          "id": 22910098,
+          "needLv": 98
+        },
+        {
+          "id": 22910099,
+          "needLv": 99
+        }
+      ]
+    },
+    "64100002": {
+      "id": 64100002,
+      "name": "엘리트_전용",
+      "equipment": [
+        {
+          "id": 22910100,
+          "needLv": 1
+        },
+        {
+          "id": 22910101,
+          "needLv": 2
+        },
+        {
+          "id": 22910102,
+          "needLv": 3
+        },
+        {
+          "id": 22910103,
+          "needLv": 4
+        },
+        {
+          "id": 22910104,
+          "needLv": 5
+        },
+        {
+          "id": 22910105,
+          "needLv": 6
+        },
+        {
+          "id": 22910106,
+          "needLv": 7
+        },
+        {
+          "id": 22910107,
+          "needLv": 8
+        },
+        {
+          "id": 22910108,
+          "needLv": 9
+        },
+        {
+          "id": 22910109,
+          "needLv": 10
+        },
+        {
+          "id": 22910110,
+          "needLv": 11
+        },
+        {
+          "id": 22910111,
+          "needLv": 12
+        },
+        {
+          "id": 22910112,
+          "needLv": 13
+        },
+        {
+          "id": 22910113,
+          "needLv": 14
+        },
+        {
+          "id": 22910114,
+          "needLv": 15
+        },
+        {
+          "id": 22910115,
+          "needLv": 16
+        },
+        {
+          "id": 22910116,
+          "needLv": 17
+        },
+        {
+          "id": 22910117,
+          "needLv": 18
+        },
+        {
+          "id": 22910118,
+          "needLv": 19
+        },
+        {
+          "id": 22910119,
+          "needLv": 20
+        },
+        {
+          "id": 22910120,
+          "needLv": 21
+        },
+        {
+          "id": 22910121,
+          "needLv": 22
+        },
+        {
+          "id": 22910122,
+          "needLv": 23
+        },
+        {
+          "id": 22910123,
+          "needLv": 24
+        },
+        {
+          "id": 22910124,
+          "needLv": 25
+        },
+        {
+          "id": 22910125,
+          "needLv": 26
+        },
+        {
+          "id": 22910126,
+          "needLv": 27
+        },
+        {
+          "id": 22910127,
+          "needLv": 28
+        },
+        {
+          "id": 22910128,
+          "needLv": 29
+        },
+        {
+          "id": 22910129,
+          "needLv": 30
+        },
+        {
+          "id": 22910130,
+          "needLv": 31
+        },
+        {
+          "id": 22910131,
+          "needLv": 32
+        },
+        {
+          "id": 22910132,
+          "needLv": 33
+        },
+        {
+          "id": 22910133,
+          "needLv": 34
+        },
+        {
+          "id": 22910134,
+          "needLv": 35
+        },
+        {
+          "id": 22910135,
+          "needLv": 36
+        },
+        {
+          "id": 22910136,
+          "needLv": 37
+        },
+        {
+          "id": 22910137,
+          "needLv": 38
+        },
+        {
+          "id": 22910138,
+          "needLv": 39
+        },
+        {
+          "id": 22910139,
+          "needLv": 40
+        },
+        {
+          "id": 22910140,
+          "needLv": 41
+        },
+        {
+          "id": 22910141,
+          "needLv": 42
+        },
+        {
+          "id": 22910142,
+          "needLv": 43
+        },
+        {
+          "id": 22910143,
+          "needLv": 44
+        },
+        {
+          "id": 22910144,
+          "needLv": 45
+        },
+        {
+          "id": 22910145,
+          "needLv": 46
+        },
+        {
+          "id": 22910146,
+          "needLv": 47
+        },
+        {
+          "id": 22910147,
+          "needLv": 48
+        },
+        {
+          "id": 22910148,
+          "needLv": 49
+        },
+        {
+          "id": 22910149,
+          "needLv": 50
+        },
+        {
+          "id": 22910150,
+          "needLv": 51
+        },
+        {
+          "id": 22910151,
+          "needLv": 52
+        },
+        {
+          "id": 22910152,
+          "needLv": 53
+        },
+        {
+          "id": 22910153,
+          "needLv": 54
+        },
+        {
+          "id": 22910154,
+          "needLv": 55
+        },
+        {
+          "id": 22910155,
+          "needLv": 56
+        },
+        {
+          "id": 22910156,
+          "needLv": 57
+        },
+        {
+          "id": 22910157,
+          "needLv": 58
+        },
+        {
+          "id": 22910158,
+          "needLv": 59
+        },
+        {
+          "id": 22910159,
+          "needLv": 60
+        },
+        {
+          "id": 22910160,
+          "needLv": 61
+        },
+        {
+          "id": 22910161,
+          "needLv": 62
+        },
+        {
+          "id": 22910162,
+          "needLv": 63
+        },
+        {
+          "id": 22910163,
+          "needLv": 64
+        },
+        {
+          "id": 22910164,
+          "needLv": 65
+        },
+        {
+          "id": 22910165,
+          "needLv": 66
+        },
+        {
+          "id": 22910166,
+          "needLv": 67
+        },
+        {
+          "id": 22910167,
+          "needLv": 68
+        },
+        {
+          "id": 22910168,
+          "needLv": 69
+        },
+        {
+          "id": 22910169,
+          "needLv": 70
+        },
+        {
+          "id": 22910170,
+          "needLv": 71
+        },
+        {
+          "id": 22910171,
+          "needLv": 72
+        },
+        {
+          "id": 22910172,
+          "needLv": 73
+        },
+        {
+          "id": 22910173,
+          "needLv": 74
+        },
+        {
+          "id": 22910174,
+          "needLv": 75
+        },
+        {
+          "id": 22910175,
+          "needLv": 76
+        },
+        {
+          "id": 22910176,
+          "needLv": 77
+        },
+        {
+          "id": 22910177,
+          "needLv": 78
+        },
+        {
+          "id": 22910178,
+          "needLv": 79
+        },
+        {
+          "id": 22910179,
+          "needLv": 80
+        },
+        {
+          "id": 22910180,
+          "needLv": 81
+        },
+        {
+          "id": 22910181,
+          "needLv": 82
+        },
+        {
+          "id": 22910182,
+          "needLv": 83
+        },
+        {
+          "id": 22910183,
+          "needLv": 84
+        },
+        {
+          "id": 22910184,
+          "needLv": 85
+        },
+        {
+          "id": 22910185,
+          "needLv": 86
+        },
+        {
+          "id": 22910186,
+          "needLv": 87
+        },
+        {
+          "id": 22910187,
+          "needLv": 88
+        },
+        {
+          "id": 22910188,
+          "needLv": 89
+        },
+        {
+          "id": 22910189,
+          "needLv": 90
+        },
+        {
+          "id": 22910190,
+          "needLv": 91
+        },
+        {
+          "id": 22910191,
+          "needLv": 92
+        },
+        {
+          "id": 22910192,
+          "needLv": 93
+        },
+        {
+          "id": 22910193,
+          "needLv": 94
+        },
+        {
+          "id": 22910194,
+          "needLv": 95
+        },
+        {
+          "id": 22910195,
+          "needLv": 96
+        },
+        {
+          "id": 22910196,
+          "needLv": 97
+        },
+        {
+          "id": 22910197,
+          "needLv": 98
+        },
+        {
+          "id": 22910198,
+          "needLv": 99
+        }
+      ]
+    },
+    "64100003": {
+      "id": 64100003,
+      "name": "퀘스트용_2배",
+      "equipment": [
+        {
+          "id": 22910199,
+          "needLv": 1
+        },
+        {
+          "id": 22910200,
+          "needLv": 2
+        },
+        {
+          "id": 22910201,
+          "needLv": 3
+        },
+        {
+          "id": 22910202,
+          "needLv": 4
+        },
+        {
+          "id": 22910203,
+          "needLv": 5
+        },
+        {
+          "id": 22910204,
+          "needLv": 6
+        },
+        {
+          "id": 22910205,
+          "needLv": 7
+        },
+        {
+          "id": 22910206,
+          "needLv": 8
+        },
+        {
+          "id": 22910207,
+          "needLv": 9
+        },
+        {
+          "id": 22910208,
+          "needLv": 10
+        },
+        {
+          "id": 22910209,
+          "needLv": 11
+        },
+        {
+          "id": 22910210,
+          "needLv": 12
+        },
+        {
+          "id": 22910211,
+          "needLv": 13
+        },
+        {
+          "id": 22910212,
+          "needLv": 14
+        },
+        {
+          "id": 22910213,
+          "needLv": 15
+        },
+        {
+          "id": 22910214,
+          "needLv": 16
+        },
+        {
+          "id": 22910215,
+          "needLv": 17
+        },
+        {
+          "id": 22910216,
+          "needLv": 18
+        },
+        {
+          "id": 22910217,
+          "needLv": 19
+        },
+        {
+          "id": 22910218,
+          "needLv": 20
+        },
+        {
+          "id": 22910219,
+          "needLv": 21
+        },
+        {
+          "id": 22910220,
+          "needLv": 22
+        },
+        {
+          "id": 22910221,
+          "needLv": 23
+        },
+        {
+          "id": 22910222,
+          "needLv": 24
+        },
+        {
+          "id": 22910223,
+          "needLv": 25
+        },
+        {
+          "id": 22910224,
+          "needLv": 26
+        },
+        {
+          "id": 22910225,
+          "needLv": 27
+        },
+        {
+          "id": 22910226,
+          "needLv": 28
+        },
+        {
+          "id": 22910227,
+          "needLv": 29
+        },
+        {
+          "id": 22910228,
+          "needLv": 30
+        },
+        {
+          "id": 22910229,
+          "needLv": 31
+        },
+        {
+          "id": 22910230,
+          "needLv": 32
+        },
+        {
+          "id": 22910231,
+          "needLv": 33
+        },
+        {
+          "id": 22910232,
+          "needLv": 34
+        },
+        {
+          "id": 22910233,
+          "needLv": 35
+        },
+        {
+          "id": 22910234,
+          "needLv": 36
+        },
+        {
+          "id": 22910235,
+          "needLv": 37
+        },
+        {
+          "id": 22910236,
+          "needLv": 38
+        },
+        {
+          "id": 22910237,
+          "needLv": 39
+        },
+        {
+          "id": 22910238,
+          "needLv": 40
+        },
+        {
+          "id": 22910239,
+          "needLv": 41
+        },
+        {
+          "id": 22910240,
+          "needLv": 42
+        },
+        {
+          "id": 22910241,
+          "needLv": 43
+        },
+        {
+          "id": 22910242,
+          "needLv": 44
+        },
+        {
+          "id": 22910243,
+          "needLv": 45
+        },
+        {
+          "id": 22910244,
+          "needLv": 46
+        },
+        {
+          "id": 22910245,
+          "needLv": 47
+        },
+        {
+          "id": 22910246,
+          "needLv": 48
+        },
+        {
+          "id": 22910247,
+          "needLv": 49
+        },
+        {
+          "id": 22910248,
+          "needLv": 50
+        },
+        {
+          "id": 22910249,
+          "needLv": 51
+        },
+        {
+          "id": 22910250,
+          "needLv": 52
+        },
+        {
+          "id": 22910251,
+          "needLv": 53
+        },
+        {
+          "id": 22910252,
+          "needLv": 54
+        },
+        {
+          "id": 22910253,
+          "needLv": 55
+        },
+        {
+          "id": 22910254,
+          "needLv": 56
+        },
+        {
+          "id": 22910255,
+          "needLv": 57
+        },
+        {
+          "id": 22910256,
+          "needLv": 58
+        },
+        {
+          "id": 22910257,
+          "needLv": 59
+        },
+        {
+          "id": 22910258,
+          "needLv": 60
+        },
+        {
+          "id": 22910259,
+          "needLv": 61
+        },
+        {
+          "id": 22910260,
+          "needLv": 62
+        },
+        {
+          "id": 22910261,
+          "needLv": 63
+        },
+        {
+          "id": 22910262,
+          "needLv": 64
+        },
+        {
+          "id": 22910263,
+          "needLv": 65
+        },
+        {
+          "id": 22910264,
+          "needLv": 66
+        },
+        {
+          "id": 22910265,
+          "needLv": 67
+        },
+        {
+          "id": 22910266,
+          "needLv": 68
+        },
+        {
+          "id": 22910267,
+          "needLv": 69
+        },
+        {
+          "id": 22910268,
+          "needLv": 70
+        },
+        {
+          "id": 22910269,
+          "needLv": 71
+        },
+        {
+          "id": 22910270,
+          "needLv": 72
+        },
+        {
+          "id": 22910271,
+          "needLv": 73
+        },
+        {
+          "id": 22910272,
+          "needLv": 74
+        },
+        {
+          "id": 22910273,
+          "needLv": 75
+        },
+        {
+          "id": 22910274,
+          "needLv": 76
+        },
+        {
+          "id": 22910275,
+          "needLv": 77
+        },
+        {
+          "id": 22910276,
+          "needLv": 78
+        },
+        {
+          "id": 22910277,
+          "needLv": 79
+        },
+        {
+          "id": 22910278,
+          "needLv": 80
+        },
+        {
+          "id": 22910279,
+          "needLv": 81
+        },
+        {
+          "id": 22910280,
+          "needLv": 82
+        },
+        {
+          "id": 22910281,
+          "needLv": 83
+        },
+        {
+          "id": 22910282,
+          "needLv": 84
+        },
+        {
+          "id": 22910283,
+          "needLv": 85
+        },
+        {
+          "id": 22910284,
+          "needLv": 86
+        },
+        {
+          "id": 22910285,
+          "needLv": 87
+        },
+        {
+          "id": 22910286,
+          "needLv": 88
+        },
+        {
+          "id": 22910287,
+          "needLv": 89
+        },
+        {
+          "id": 22910288,
+          "needLv": 90
+        },
+        {
+          "id": 22910289,
+          "needLv": 91
+        },
+        {
+          "id": 22910290,
+          "needLv": 92
+        },
+        {
+          "id": 22910291,
+          "needLv": 93
+        },
+        {
+          "id": 22910292,
+          "needLv": 94
+        },
+        {
+          "id": 22910293,
+          "needLv": 95
+        },
+        {
+          "id": 22910294,
+          "needLv": 96
+        },
+        {
+          "id": 22910295,
+          "needLv": 97
+        },
+        {
+          "id": 22910296,
+          "needLv": 98
+        },
+        {
+          "id": 22910297,
+          "needLv": 99
+        }
+      ]
+    },
+    "64100004": {
+      "id": 64100004,
+      "name": "퀘스트용_3배",
+      "equipment": [
+        {
+          "id": 22910298,
+          "needLv": 1
+        },
+        {
+          "id": 22910299,
+          "needLv": 2
+        },
+        {
+          "id": 22910300,
+          "needLv": 3
+        },
+        {
+          "id": 22910301,
+          "needLv": 4
+        },
+        {
+          "id": 22910302,
+          "needLv": 5
+        },
+        {
+          "id": 22910303,
+          "needLv": 6
+        },
+        {
+          "id": 22910304,
+          "needLv": 7
+        },
+        {
+          "id": 22910305,
+          "needLv": 8
+        },
+        {
+          "id": 22910306,
+          "needLv": 9
+        },
+        {
+          "id": 22910307,
+          "needLv": 10
+        },
+        {
+          "id": 22910308,
+          "needLv": 11
+        },
+        {
+          "id": 22910309,
+          "needLv": 12
+        },
+        {
+          "id": 22910310,
+          "needLv": 13
+        },
+        {
+          "id": 22910311,
+          "needLv": 14
+        },
+        {
+          "id": 22910312,
+          "needLv": 15
+        },
+        {
+          "id": 22910313,
+          "needLv": 16
+        },
+        {
+          "id": 22910314,
+          "needLv": 17
+        },
+        {
+          "id": 22910315,
+          "needLv": 18
+        },
+        {
+          "id": 22910316,
+          "needLv": 19
+        },
+        {
+          "id": 22910317,
+          "needLv": 20
+        },
+        {
+          "id": 22910318,
+          "needLv": 21
+        },
+        {
+          "id": 22910319,
+          "needLv": 22
+        },
+        {
+          "id": 22910320,
+          "needLv": 23
+        },
+        {
+          "id": 22910321,
+          "needLv": 24
+        },
+        {
+          "id": 22910322,
+          "needLv": 25
+        },
+        {
+          "id": 22910323,
+          "needLv": 26
+        },
+        {
+          "id": 22910324,
+          "needLv": 27
+        },
+        {
+          "id": 22910325,
+          "needLv": 28
+        },
+        {
+          "id": 22910326,
+          "needLv": 29
+        },
+        {
+          "id": 22910327,
+          "needLv": 30
+        },
+        {
+          "id": 22910328,
+          "needLv": 31
+        },
+        {
+          "id": 22910329,
+          "needLv": 32
+        },
+        {
+          "id": 22910330,
+          "needLv": 33
+        },
+        {
+          "id": 22910331,
+          "needLv": 34
+        },
+        {
+          "id": 22910332,
+          "needLv": 35
+        },
+        {
+          "id": 22910333,
+          "needLv": 36
+        },
+        {
+          "id": 22910334,
+          "needLv": 37
+        },
+        {
+          "id": 22910335,
+          "needLv": 38
+        },
+        {
+          "id": 22910336,
+          "needLv": 39
+        },
+        {
+          "id": 22910337,
+          "needLv": 40
+        },
+        {
+          "id": 22910338,
+          "needLv": 41
+        },
+        {
+          "id": 22910339,
+          "needLv": 42
+        },
+        {
+          "id": 22910340,
+          "needLv": 43
+        },
+        {
+          "id": 22910341,
+          "needLv": 44
+        },
+        {
+          "id": 22910342,
+          "needLv": 45
+        },
+        {
+          "id": 22910343,
+          "needLv": 46
+        },
+        {
+          "id": 22910344,
+          "needLv": 47
+        },
+        {
+          "id": 22910345,
+          "needLv": 48
+        },
+        {
+          "id": 22910346,
+          "needLv": 49
+        },
+        {
+          "id": 22910347,
+          "needLv": 50
+        },
+        {
+          "id": 22910348,
+          "needLv": 51
+        },
+        {
+          "id": 22910349,
+          "needLv": 52
+        },
+        {
+          "id": 22910350,
+          "needLv": 53
+        },
+        {
+          "id": 22910351,
+          "needLv": 54
+        },
+        {
+          "id": 22910352,
+          "needLv": 55
+        },
+        {
+          "id": 22910353,
+          "needLv": 56
+        },
+        {
+          "id": 22910354,
+          "needLv": 57
+        },
+        {
+          "id": 22910355,
+          "needLv": 58
+        },
+        {
+          "id": 22910356,
+          "needLv": 59
+        },
+        {
+          "id": 22910357,
+          "needLv": 60
+        },
+        {
+          "id": 22910358,
+          "needLv": 61
+        },
+        {
+          "id": 22910359,
+          "needLv": 62
+        },
+        {
+          "id": 22910360,
+          "needLv": 63
+        },
+        {
+          "id": 22910361,
+          "needLv": 64
+        },
+        {
+          "id": 22910362,
+          "needLv": 65
+        },
+        {
+          "id": 22910363,
+          "needLv": 66
+        },
+        {
+          "id": 22910364,
+          "needLv": 67
+        },
+        {
+          "id": 22910365,
+          "needLv": 68
+        },
+        {
+          "id": 22910366,
+          "needLv": 69
+        },
+        {
+          "id": 22910367,
+          "needLv": 70
+        },
+        {
+          "id": 22910368,
+          "needLv": 71
+        },
+        {
+          "id": 22910369,
+          "needLv": 72
+        },
+        {
+          "id": 22910370,
+          "needLv": 73
+        },
+        {
+          "id": 22910371,
+          "needLv": 74
+        },
+        {
+          "id": 22910372,
+          "needLv": 75
+        },
+        {
+          "id": 22910373,
+          "needLv": 76
+        },
+        {
+          "id": 22910374,
+          "needLv": 77
+        },
+        {
+          "id": 22910375,
+          "needLv": 78
+        },
+        {
+          "id": 22910376,
+          "needLv": 79
+        },
+        {
+          "id": 22910377,
+          "needLv": 80
+        },
+        {
+          "id": 22910378,
+          "needLv": 81
+        },
+        {
+          "id": 22910379,
+          "needLv": 82
+        },
+        {
+          "id": 22910380,
+          "needLv": 83
+        },
+        {
+          "id": 22910381,
+          "needLv": 84
+        },
+        {
+          "id": 22910382,
+          "needLv": 85
+        },
+        {
+          "id": 22910383,
+          "needLv": 86
+        },
+        {
+          "id": 22910384,
+          "needLv": 87
+        },
+        {
+          "id": 22910385,
+          "needLv": 88
+        },
+        {
+          "id": 22910386,
+          "needLv": 89
+        },
+        {
+          "id": 22910387,
+          "needLv": 90
+        },
+        {
+          "id": 22910388,
+          "needLv": 91
+        },
+        {
+          "id": 22910389,
+          "needLv": 92
+        },
+        {
+          "id": 22910390,
+          "needLv": 93
+        },
+        {
+          "id": 22910391,
+          "needLv": 94
+        },
+        {
+          "id": 22910392,
+          "needLv": 95
+        },
+        {
+          "id": 22910393,
+          "needLv": 96
+        },
+        {
+          "id": 22910394,
+          "needLv": 97
+        },
+        {
+          "id": 22910395,
+          "needLv": 98
+        },
+        {
+          "id": 22910396,
+          "needLv": 99
+        }
+      ]
+    },
+    "64100005": {
+      "id": 64100005,
+      "name": "퀘스트용_4배",
+      "equipment": [
+        {
+          "id": 22910397,
+          "needLv": 1
+        },
+        {
+          "id": 22910398,
+          "needLv": 2
+        },
+        {
+          "id": 22910399,
+          "needLv": 3
+        },
+        {
+          "id": 22910400,
+          "needLv": 4
+        },
+        {
+          "id": 22910401,
+          "needLv": 5
+        },
+        {
+          "id": 22910402,
+          "needLv": 6
+        },
+        {
+          "id": 22910403,
+          "needLv": 7
+        },
+        {
+          "id": 22910404,
+          "needLv": 8
+        },
+        {
+          "id": 22910405,
+          "needLv": 9
+        },
+        {
+          "id": 22910406,
+          "needLv": 10
+        },
+        {
+          "id": 22910407,
+          "needLv": 11
+        },
+        {
+          "id": 22910408,
+          "needLv": 12
+        },
+        {
+          "id": 22910409,
+          "needLv": 13
+        },
+        {
+          "id": 22910410,
+          "needLv": 14
+        },
+        {
+          "id": 22910411,
+          "needLv": 15
+        },
+        {
+          "id": 22910412,
+          "needLv": 16
+        },
+        {
+          "id": 22910413,
+          "needLv": 17
+        },
+        {
+          "id": 22910414,
+          "needLv": 18
+        },
+        {
+          "id": 22910415,
+          "needLv": 19
+        },
+        {
+          "id": 22910416,
+          "needLv": 20
+        },
+        {
+          "id": 22910417,
+          "needLv": 21
+        },
+        {
+          "id": 22910418,
+          "needLv": 22
+        },
+        {
+          "id": 22910419,
+          "needLv": 23
+        },
+        {
+          "id": 22910420,
+          "needLv": 24
+        },
+        {
+          "id": 22910421,
+          "needLv": 25
+        },
+        {
+          "id": 22910422,
+          "needLv": 26
+        },
+        {
+          "id": 22910423,
+          "needLv": 27
+        },
+        {
+          "id": 22910424,
+          "needLv": 28
+        },
+        {
+          "id": 22910425,
+          "needLv": 29
+        },
+        {
+          "id": 22910426,
+          "needLv": 30
+        },
+        {
+          "id": 22910427,
+          "needLv": 31
+        },
+        {
+          "id": 22910428,
+          "needLv": 32
+        },
+        {
+          "id": 22910429,
+          "needLv": 33
+        },
+        {
+          "id": 22910430,
+          "needLv": 34
+        },
+        {
+          "id": 22910431,
+          "needLv": 35
+        },
+        {
+          "id": 22910432,
+          "needLv": 36
+        },
+        {
+          "id": 22910433,
+          "needLv": 37
+        },
+        {
+          "id": 22910434,
+          "needLv": 38
+        },
+        {
+          "id": 22910435,
+          "needLv": 39
+        },
+        {
+          "id": 22910436,
+          "needLv": 40
+        },
+        {
+          "id": 22910437,
+          "needLv": 41
+        },
+        {
+          "id": 22910438,
+          "needLv": 42
+        },
+        {
+          "id": 22910439,
+          "needLv": 43
+        },
+        {
+          "id": 22910440,
+          "needLv": 44
+        },
+        {
+          "id": 22910441,
+          "needLv": 45
+        },
+        {
+          "id": 22910442,
+          "needLv": 46
+        },
+        {
+          "id": 22910443,
+          "needLv": 47
+        },
+        {
+          "id": 22910444,
+          "needLv": 48
+        },
+        {
+          "id": 22910445,
+          "needLv": 49
+        },
+        {
+          "id": 22910446,
+          "needLv": 50
+        },
+        {
+          "id": 22910447,
+          "needLv": 51
+        },
+        {
+          "id": 22910448,
+          "needLv": 52
+        },
+        {
+          "id": 22910449,
+          "needLv": 53
+        },
+        {
+          "id": 22910450,
+          "needLv": 54
+        },
+        {
+          "id": 22910451,
+          "needLv": 55
+        },
+        {
+          "id": 22910452,
+          "needLv": 56
+        },
+        {
+          "id": 22910453,
+          "needLv": 57
+        },
+        {
+          "id": 22910454,
+          "needLv": 58
+        },
+        {
+          "id": 22910455,
+          "needLv": 59
+        },
+        {
+          "id": 22910456,
+          "needLv": 60
+        },
+        {
+          "id": 22910457,
+          "needLv": 61
+        },
+        {
+          "id": 22910458,
+          "needLv": 62
+        },
+        {
+          "id": 22910459,
+          "needLv": 63
+        },
+        {
+          "id": 22910460,
+          "needLv": 64
+        },
+        {
+          "id": 22910461,
+          "needLv": 65
+        },
+        {
+          "id": 22910462,
+          "needLv": 66
+        },
+        {
+          "id": 22910463,
+          "needLv": 67
+        },
+        {
+          "id": 22910464,
+          "needLv": 68
+        },
+        {
+          "id": 22910465,
+          "needLv": 69
+        },
+        {
+          "id": 22910466,
+          "needLv": 70
+        },
+        {
+          "id": 22910467,
+          "needLv": 71
+        },
+        {
+          "id": 22910468,
+          "needLv": 72
+        },
+        {
+          "id": 22910469,
+          "needLv": 73
+        },
+        {
+          "id": 22910470,
+          "needLv": 74
+        },
+        {
+          "id": 22910471,
+          "needLv": 75
+        },
+        {
+          "id": 22910472,
+          "needLv": 76
+        },
+        {
+          "id": 22910473,
+          "needLv": 77
+        },
+        {
+          "id": 22910474,
+          "needLv": 78
+        },
+        {
+          "id": 22910475,
+          "needLv": 79
+        },
+        {
+          "id": 22910476,
+          "needLv": 80
+        },
+        {
+          "id": 22910477,
+          "needLv": 81
+        },
+        {
+          "id": 22910478,
+          "needLv": 82
+        },
+        {
+          "id": 22910479,
+          "needLv": 83
+        },
+        {
+          "id": 22910480,
+          "needLv": 84
+        },
+        {
+          "id": 22910481,
+          "needLv": 85
+        },
+        {
+          "id": 22910482,
+          "needLv": 86
+        },
+        {
+          "id": 22910483,
+          "needLv": 87
+        },
+        {
+          "id": 22910484,
+          "needLv": 88
+        },
+        {
+          "id": 22910485,
+          "needLv": 89
+        },
+        {
+          "id": 22910486,
+          "needLv": 90
+        },
+        {
+          "id": 22910487,
+          "needLv": 91
+        },
+        {
+          "id": 22910488,
+          "needLv": 92
+        },
+        {
+          "id": 22910489,
+          "needLv": 93
+        },
+        {
+          "id": 22910490,
+          "needLv": 94
+        },
+        {
+          "id": 22910491,
+          "needLv": 95
+        },
+        {
+          "id": 22910492,
+          "needLv": 96
+        },
+        {
+          "id": 22910493,
+          "needLv": 97
+        },
+        {
+          "id": 22910494,
+          "needLv": 98
+        },
+        {
+          "id": 22910495,
+          "needLv": 99
+        }
+      ]
+    },
+    "64100006": {
+      "id": 64100006,
+      "name": "퀘스트용_5배",
+      "equipment": [
+        {
+          "id": 22910496,
+          "needLv": 1
+        },
+        {
+          "id": 22910497,
+          "needLv": 2
+        },
+        {
+          "id": 22910498,
+          "needLv": 3
+        },
+        {
+          "id": 22910499,
+          "needLv": 4
+        },
+        {
+          "id": 22910500,
+          "needLv": 5
+        },
+        {
+          "id": 22910501,
+          "needLv": 6
+        },
+        {
+          "id": 22910502,
+          "needLv": 7
+        },
+        {
+          "id": 22910503,
+          "needLv": 8
+        },
+        {
+          "id": 22910504,
+          "needLv": 9
+        },
+        {
+          "id": 22910505,
+          "needLv": 10
+        },
+        {
+          "id": 22910506,
+          "needLv": 11
+        },
+        {
+          "id": 22910507,
+          "needLv": 12
+        },
+        {
+          "id": 22910508,
+          "needLv": 13
+        },
+        {
+          "id": 22910509,
+          "needLv": 14
+        },
+        {
+          "id": 22910510,
+          "needLv": 15
+        },
+        {
+          "id": 22910511,
+          "needLv": 16
+        },
+        {
+          "id": 22910512,
+          "needLv": 17
+        },
+        {
+          "id": 22910513,
+          "needLv": 18
+        },
+        {
+          "id": 22910514,
+          "needLv": 19
+        },
+        {
+          "id": 22910515,
+          "needLv": 20
+        },
+        {
+          "id": 22910516,
+          "needLv": 21
+        },
+        {
+          "id": 22910517,
+          "needLv": 22
+        },
+        {
+          "id": 22910518,
+          "needLv": 23
+        },
+        {
+          "id": 22910519,
+          "needLv": 24
+        },
+        {
+          "id": 22910520,
+          "needLv": 25
+        },
+        {
+          "id": 22910521,
+          "needLv": 26
+        },
+        {
+          "id": 22910522,
+          "needLv": 27
+        },
+        {
+          "id": 22910523,
+          "needLv": 28
+        },
+        {
+          "id": 22910524,
+          "needLv": 29
+        },
+        {
+          "id": 22910525,
+          "needLv": 30
+        },
+        {
+          "id": 22910526,
+          "needLv": 31
+        },
+        {
+          "id": 22910527,
+          "needLv": 32
+        },
+        {
+          "id": 22910528,
+          "needLv": 33
+        },
+        {
+          "id": 22910529,
+          "needLv": 34
+        },
+        {
+          "id": 22910530,
+          "needLv": 35
+        },
+        {
+          "id": 22910531,
+          "needLv": 36
+        },
+        {
+          "id": 22910532,
+          "needLv": 37
+        },
+        {
+          "id": 22910533,
+          "needLv": 38
+        },
+        {
+          "id": 22910534,
+          "needLv": 39
+        },
+        {
+          "id": 22910535,
+          "needLv": 40
+        },
+        {
+          "id": 22910536,
+          "needLv": 41
+        },
+        {
+          "id": 22910537,
+          "needLv": 42
+        },
+        {
+          "id": 22910538,
+          "needLv": 43
+        },
+        {
+          "id": 22910539,
+          "needLv": 44
+        },
+        {
+          "id": 22910540,
+          "needLv": 45
+        },
+        {
+          "id": 22910541,
+          "needLv": 46
+        },
+        {
+          "id": 22910542,
+          "needLv": 47
+        },
+        {
+          "id": 22910543,
+          "needLv": 48
+        },
+        {
+          "id": 22910544,
+          "needLv": 49
+        },
+        {
+          "id": 22910545,
+          "needLv": 50
+        },
+        {
+          "id": 22910546,
+          "needLv": 51
+        },
+        {
+          "id": 22910547,
+          "needLv": 52
+        },
+        {
+          "id": 22910548,
+          "needLv": 53
+        },
+        {
+          "id": 22910549,
+          "needLv": 54
+        },
+        {
+          "id": 22910550,
+          "needLv": 55
+        },
+        {
+          "id": 22910551,
+          "needLv": 56
+        },
+        {
+          "id": 22910552,
+          "needLv": 57
+        },
+        {
+          "id": 22910553,
+          "needLv": 58
+        },
+        {
+          "id": 22910554,
+          "needLv": 59
+        },
+        {
+          "id": 22910555,
+          "needLv": 60
+        },
+        {
+          "id": 22910556,
+          "needLv": 61
+        },
+        {
+          "id": 22910557,
+          "needLv": 62
+        },
+        {
+          "id": 22910558,
+          "needLv": 63
+        },
+        {
+          "id": 22910559,
+          "needLv": 64
+        },
+        {
+          "id": 22910560,
+          "needLv": 65
+        },
+        {
+          "id": 22910561,
+          "needLv": 66
+        },
+        {
+          "id": 22910562,
+          "needLv": 67
+        },
+        {
+          "id": 22910563,
+          "needLv": 68
+        },
+        {
+          "id": 22910564,
+          "needLv": 69
+        },
+        {
+          "id": 22910565,
+          "needLv": 70
+        },
+        {
+          "id": 22910566,
+          "needLv": 71
+        },
+        {
+          "id": 22910567,
+          "needLv": 72
+        },
+        {
+          "id": 22910568,
+          "needLv": 73
+        },
+        {
+          "id": 22910569,
+          "needLv": 74
+        },
+        {
+          "id": 22910570,
+          "needLv": 75
+        },
+        {
+          "id": 22910571,
+          "needLv": 76
+        },
+        {
+          "id": 22910572,
+          "needLv": 77
+        },
+        {
+          "id": 22910573,
+          "needLv": 78
+        },
+        {
+          "id": 22910574,
+          "needLv": 79
+        },
+        {
+          "id": 22910575,
+          "needLv": 80
+        },
+        {
+          "id": 22910576,
+          "needLv": 81
+        },
+        {
+          "id": 22910577,
+          "needLv": 82
+        },
+        {
+          "id": 22910578,
+          "needLv": 83
+        },
+        {
+          "id": 22910579,
+          "needLv": 84
+        },
+        {
+          "id": 22910580,
+          "needLv": 85
+        },
+        {
+          "id": 22910581,
+          "needLv": 86
+        },
+        {
+          "id": 22910582,
+          "needLv": 87
+        },
+        {
+          "id": 22910583,
+          "needLv": 88
+        },
+        {
+          "id": 22910584,
+          "needLv": 89
+        },
+        {
+          "id": 22910585,
+          "needLv": 90
+        },
+        {
+          "id": 22910586,
+          "needLv": 91
+        },
+        {
+          "id": 22910587,
+          "needLv": 92
+        },
+        {
+          "id": 22910588,
+          "needLv": 93
+        },
+        {
+          "id": 22910589,
+          "needLv": 94
+        },
+        {
+          "id": 22910590,
+          "needLv": 95
+        },
+        {
+          "id": 22910591,
+          "needLv": 96
+        },
+        {
+          "id": 22910592,
+          "needLv": 97
+        },
+        {
+          "id": 22910593,
+          "needLv": 98
+        },
+        {
+          "id": 22910594,
+          "needLv": 99
+        }
+      ]
+    },
+    "64100007": {
+      "id": 64100007,
+      "name": "퀘스트용_6배",
+      "equipment": [
+        {
+          "id": 22910595,
+          "needLv": 1
+        },
+        {
+          "id": 22910596,
+          "needLv": 2
+        },
+        {
+          "id": 22910597,
+          "needLv": 3
+        },
+        {
+          "id": 22910598,
+          "needLv": 4
+        },
+        {
+          "id": 22910599,
+          "needLv": 5
+        },
+        {
+          "id": 22910600,
+          "needLv": 6
+        },
+        {
+          "id": 22910601,
+          "needLv": 7
+        },
+        {
+          "id": 22910602,
+          "needLv": 8
+        },
+        {
+          "id": 22910603,
+          "needLv": 9
+        },
+        {
+          "id": 22910604,
+          "needLv": 10
+        },
+        {
+          "id": 22910605,
+          "needLv": 11
+        },
+        {
+          "id": 22910606,
+          "needLv": 12
+        },
+        {
+          "id": 22910607,
+          "needLv": 13
+        },
+        {
+          "id": 22910608,
+          "needLv": 14
+        },
+        {
+          "id": 22910609,
+          "needLv": 15
+        },
+        {
+          "id": 22910610,
+          "needLv": 16
+        },
+        {
+          "id": 22910611,
+          "needLv": 17
+        },
+        {
+          "id": 22910612,
+          "needLv": 18
+        },
+        {
+          "id": 22910613,
+          "needLv": 19
+        },
+        {
+          "id": 22910614,
+          "needLv": 20
+        },
+        {
+          "id": 22910615,
+          "needLv": 21
+        },
+        {
+          "id": 22910616,
+          "needLv": 22
+        },
+        {
+          "id": 22910617,
+          "needLv": 23
+        },
+        {
+          "id": 22910618,
+          "needLv": 24
+        },
+        {
+          "id": 22910619,
+          "needLv": 25
+        },
+        {
+          "id": 22910620,
+          "needLv": 26
+        },
+        {
+          "id": 22910621,
+          "needLv": 27
+        },
+        {
+          "id": 22910622,
+          "needLv": 28
+        },
+        {
+          "id": 22910623,
+          "needLv": 29
+        },
+        {
+          "id": 22910624,
+          "needLv": 30
+        },
+        {
+          "id": 22910625,
+          "needLv": 31
+        },
+        {
+          "id": 22910626,
+          "needLv": 32
+        },
+        {
+          "id": 22910627,
+          "needLv": 33
+        },
+        {
+          "id": 22910628,
+          "needLv": 34
+        },
+        {
+          "id": 22910629,
+          "needLv": 35
+        },
+        {
+          "id": 22910630,
+          "needLv": 36
+        },
+        {
+          "id": 22910631,
+          "needLv": 37
+        },
+        {
+          "id": 22910632,
+          "needLv": 38
+        },
+        {
+          "id": 22910633,
+          "needLv": 39
+        },
+        {
+          "id": 22910634,
+          "needLv": 40
+        },
+        {
+          "id": 22910635,
+          "needLv": 41
+        },
+        {
+          "id": 22910636,
+          "needLv": 42
+        },
+        {
+          "id": 22910637,
+          "needLv": 43
+        },
+        {
+          "id": 22910638,
+          "needLv": 44
+        },
+        {
+          "id": 22910639,
+          "needLv": 45
+        },
+        {
+          "id": 22910640,
+          "needLv": 46
+        },
+        {
+          "id": 22910641,
+          "needLv": 47
+        },
+        {
+          "id": 22910642,
+          "needLv": 48
+        },
+        {
+          "id": 22910643,
+          "needLv": 49
+        },
+        {
+          "id": 22910644,
+          "needLv": 50
+        },
+        {
+          "id": 22910645,
+          "needLv": 51
+        },
+        {
+          "id": 22910646,
+          "needLv": 52
+        },
+        {
+          "id": 22910647,
+          "needLv": 53
+        },
+        {
+          "id": 22910648,
+          "needLv": 54
+        },
+        {
+          "id": 22910649,
+          "needLv": 55
+        },
+        {
+          "id": 22910650,
+          "needLv": 56
+        },
+        {
+          "id": 22910651,
+          "needLv": 57
+        },
+        {
+          "id": 22910652,
+          "needLv": 58
+        },
+        {
+          "id": 22910653,
+          "needLv": 59
+        },
+        {
+          "id": 22910654,
+          "needLv": 60
+        },
+        {
+          "id": 22910655,
+          "needLv": 61
+        },
+        {
+          "id": 22910656,
+          "needLv": 62
+        },
+        {
+          "id": 22910657,
+          "needLv": 63
+        },
+        {
+          "id": 22910658,
+          "needLv": 64
+        },
+        {
+          "id": 22910659,
+          "needLv": 65
+        },
+        {
+          "id": 22910660,
+          "needLv": 66
+        },
+        {
+          "id": 22910661,
+          "needLv": 67
+        },
+        {
+          "id": 22910662,
+          "needLv": 68
+        },
+        {
+          "id": 22910663,
+          "needLv": 69
+        },
+        {
+          "id": 22910664,
+          "needLv": 70
+        },
+        {
+          "id": 22910665,
+          "needLv": 71
+        },
+        {
+          "id": 22910666,
+          "needLv": 72
+        },
+        {
+          "id": 22910667,
+          "needLv": 73
+        },
+        {
+          "id": 22910668,
+          "needLv": 74
+        },
+        {
+          "id": 22910669,
+          "needLv": 75
+        },
+        {
+          "id": 22910670,
+          "needLv": 76
+        },
+        {
+          "id": 22910671,
+          "needLv": 77
+        },
+        {
+          "id": 22910672,
+          "needLv": 78
+        },
+        {
+          "id": 22910673,
+          "needLv": 79
+        },
+        {
+          "id": 22910674,
+          "needLv": 80
+        },
+        {
+          "id": 22910675,
+          "needLv": 81
+        },
+        {
+          "id": 22910676,
+          "needLv": 82
+        },
+        {
+          "id": 22910677,
+          "needLv": 83
+        },
+        {
+          "id": 22910678,
+          "needLv": 84
+        },
+        {
+          "id": 22910679,
+          "needLv": 85
+        },
+        {
+          "id": 22910680,
+          "needLv": 86
+        },
+        {
+          "id": 22910681,
+          "needLv": 87
+        },
+        {
+          "id": 22910682,
+          "needLv": 88
+        },
+        {
+          "id": 22910683,
+          "needLv": 89
+        },
+        {
+          "id": 22910684,
+          "needLv": 90
+        },
+        {
+          "id": 22910685,
+          "needLv": 91
+        },
+        {
+          "id": 22910686,
+          "needLv": 92
+        },
+        {
+          "id": 22910687,
+          "needLv": 93
+        },
+        {
+          "id": 22910688,
+          "needLv": 94
+        },
+        {
+          "id": 22910689,
+          "needLv": 95
+        },
+        {
+          "id": 22910690,
+          "needLv": 96
+        },
+        {
+          "id": 22910691,
+          "needLv": 97
+        },
+        {
+          "id": 22910692,
+          "needLv": 98
+        },
+        {
+          "id": 22910693,
+          "needLv": 99
+        }
+      ]
+    },
+    "64100008": {
+      "id": 64100008,
+      "name": "퀘스트용_7배",
+      "equipment": [
+        {
+          "id": 22910694,
+          "needLv": 1
+        },
+        {
+          "id": 22910695,
+          "needLv": 2
+        },
+        {
+          "id": 22910696,
+          "needLv": 3
+        },
+        {
+          "id": 22910697,
+          "needLv": 4
+        },
+        {
+          "id": 22910698,
+          "needLv": 5
+        },
+        {
+          "id": 22910699,
+          "needLv": 6
+        },
+        {
+          "id": 22910700,
+          "needLv": 7
+        },
+        {
+          "id": 22910701,
+          "needLv": 8
+        },
+        {
+          "id": 22910702,
+          "needLv": 9
+        },
+        {
+          "id": 22910703,
+          "needLv": 10
+        },
+        {
+          "id": 22910704,
+          "needLv": 11
+        },
+        {
+          "id": 22910705,
+          "needLv": 12
+        },
+        {
+          "id": 22910706,
+          "needLv": 13
+        },
+        {
+          "id": 22910707,
+          "needLv": 14
+        },
+        {
+          "id": 22910708,
+          "needLv": 15
+        },
+        {
+          "id": 22910709,
+          "needLv": 16
+        },
+        {
+          "id": 22910710,
+          "needLv": 17
+        },
+        {
+          "id": 22910711,
+          "needLv": 18
+        },
+        {
+          "id": 22910712,
+          "needLv": 19
+        },
+        {
+          "id": 22910713,
+          "needLv": 20
+        },
+        {
+          "id": 22910714,
+          "needLv": 21
+        },
+        {
+          "id": 22910715,
+          "needLv": 22
+        },
+        {
+          "id": 22910716,
+          "needLv": 23
+        },
+        {
+          "id": 22910717,
+          "needLv": 24
+        },
+        {
+          "id": 22910718,
+          "needLv": 25
+        },
+        {
+          "id": 22910719,
+          "needLv": 26
+        },
+        {
+          "id": 22910720,
+          "needLv": 27
+        },
+        {
+          "id": 22910721,
+          "needLv": 28
+        },
+        {
+          "id": 22910722,
+          "needLv": 29
+        },
+        {
+          "id": 22910723,
+          "needLv": 30
+        },
+        {
+          "id": 22910724,
+          "needLv": 31
+        },
+        {
+          "id": 22910725,
+          "needLv": 32
+        },
+        {
+          "id": 22910726,
+          "needLv": 33
+        },
+        {
+          "id": 22910727,
+          "needLv": 34
+        },
+        {
+          "id": 22910728,
+          "needLv": 35
+        },
+        {
+          "id": 22910729,
+          "needLv": 36
+        },
+        {
+          "id": 22910730,
+          "needLv": 37
+        },
+        {
+          "id": 22910731,
+          "needLv": 38
+        },
+        {
+          "id": 22910732,
+          "needLv": 39
+        },
+        {
+          "id": 22910733,
+          "needLv": 40
+        },
+        {
+          "id": 22910734,
+          "needLv": 41
+        },
+        {
+          "id": 22910735,
+          "needLv": 42
+        },
+        {
+          "id": 22910736,
+          "needLv": 43
+        },
+        {
+          "id": 22910737,
+          "needLv": 44
+        },
+        {
+          "id": 22910738,
+          "needLv": 45
+        },
+        {
+          "id": 22910739,
+          "needLv": 46
+        },
+        {
+          "id": 22910740,
+          "needLv": 47
+        },
+        {
+          "id": 22910741,
+          "needLv": 48
+        },
+        {
+          "id": 22910742,
+          "needLv": 49
+        },
+        {
+          "id": 22910743,
+          "needLv": 50
+        },
+        {
+          "id": 22910744,
+          "needLv": 51
+        },
+        {
+          "id": 22910745,
+          "needLv": 52
+        },
+        {
+          "id": 22910746,
+          "needLv": 53
+        },
+        {
+          "id": 22910747,
+          "needLv": 54
+        },
+        {
+          "id": 22910748,
+          "needLv": 55
+        },
+        {
+          "id": 22910749,
+          "needLv": 56
+        },
+        {
+          "id": 22910750,
+          "needLv": 57
+        },
+        {
+          "id": 22910751,
+          "needLv": 58
+        },
+        {
+          "id": 22910752,
+          "needLv": 59
+        },
+        {
+          "id": 22910753,
+          "needLv": 60
+        },
+        {
+          "id": 22910754,
+          "needLv": 61
+        },
+        {
+          "id": 22910755,
+          "needLv": 62
+        },
+        {
+          "id": 22910756,
+          "needLv": 63
+        },
+        {
+          "id": 22910757,
+          "needLv": 64
+        },
+        {
+          "id": 22910758,
+          "needLv": 65
+        },
+        {
+          "id": 22910759,
+          "needLv": 66
+        },
+        {
+          "id": 22910760,
+          "needLv": 67
+        },
+        {
+          "id": 22910761,
+          "needLv": 68
+        },
+        {
+          "id": 22910762,
+          "needLv": 69
+        },
+        {
+          "id": 22910763,
+          "needLv": 70
+        },
+        {
+          "id": 22910764,
+          "needLv": 71
+        },
+        {
+          "id": 22910765,
+          "needLv": 72
+        },
+        {
+          "id": 22910766,
+          "needLv": 73
+        },
+        {
+          "id": 22910767,
+          "needLv": 74
+        },
+        {
+          "id": 22910768,
+          "needLv": 75
+        },
+        {
+          "id": 22910769,
+          "needLv": 76
+        },
+        {
+          "id": 22910770,
+          "needLv": 77
+        },
+        {
+          "id": 22910771,
+          "needLv": 78
+        },
+        {
+          "id": 22910772,
+          "needLv": 79
+        },
+        {
+          "id": 22910773,
+          "needLv": 80
+        },
+        {
+          "id": 22910774,
+          "needLv": 81
+        },
+        {
+          "id": 22910775,
+          "needLv": 82
+        },
+        {
+          "id": 22910776,
+          "needLv": 83
+        },
+        {
+          "id": 22910777,
+          "needLv": 84
+        },
+        {
+          "id": 22910778,
+          "needLv": 85
+        },
+        {
+          "id": 22910779,
+          "needLv": 86
+        },
+        {
+          "id": 22910780,
+          "needLv": 87
+        },
+        {
+          "id": 22910781,
+          "needLv": 88
+        },
+        {
+          "id": 22910782,
+          "needLv": 89
+        },
+        {
+          "id": 22910783,
+          "needLv": 90
+        },
+        {
+          "id": 22910784,
+          "needLv": 91
+        },
+        {
+          "id": 22910785,
+          "needLv": 92
+        },
+        {
+          "id": 22910786,
+          "needLv": 93
+        },
+        {
+          "id": 22910787,
+          "needLv": 94
+        },
+        {
+          "id": 22910788,
+          "needLv": 95
+        },
+        {
+          "id": 22910789,
+          "needLv": 96
+        },
+        {
+          "id": 22910790,
+          "needLv": 97
+        },
+        {
+          "id": 22910791,
+          "needLv": 98
+        },
+        {
+          "id": 22910792,
+          "needLv": 99
+        }
+      ]
+    },
+    "64100009": {
+      "id": 64100009,
+      "name": "퀘스트용_8배",
+      "equipment": [
+        {
+          "id": 22910793,
+          "needLv": 1
+        },
+        {
+          "id": 22910794,
+          "needLv": 2
+        },
+        {
+          "id": 22910795,
+          "needLv": 3
+        },
+        {
+          "id": 22910796,
+          "needLv": 4
+        },
+        {
+          "id": 22910797,
+          "needLv": 5
+        },
+        {
+          "id": 22910798,
+          "needLv": 6
+        },
+        {
+          "id": 22910799,
+          "needLv": 7
+        },
+        {
+          "id": 22910800,
+          "needLv": 8
+        },
+        {
+          "id": 22910801,
+          "needLv": 9
+        },
+        {
+          "id": 22910802,
+          "needLv": 10
+        },
+        {
+          "id": 22910803,
+          "needLv": 11
+        },
+        {
+          "id": 22910804,
+          "needLv": 12
+        },
+        {
+          "id": 22910805,
+          "needLv": 13
+        },
+        {
+          "id": 22910806,
+          "needLv": 14
+        },
+        {
+          "id": 22910807,
+          "needLv": 15
+        },
+        {
+          "id": 22910808,
+          "needLv": 16
+        },
+        {
+          "id": 22910809,
+          "needLv": 17
+        },
+        {
+          "id": 22910810,
+          "needLv": 18
+        },
+        {
+          "id": 22910811,
+          "needLv": 19
+        },
+        {
+          "id": 22910812,
+          "needLv": 20
+        },
+        {
+          "id": 22910813,
+          "needLv": 21
+        },
+        {
+          "id": 22910814,
+          "needLv": 22
+        },
+        {
+          "id": 22910815,
+          "needLv": 23
+        },
+        {
+          "id": 22910816,
+          "needLv": 24
+        },
+        {
+          "id": 22910817,
+          "needLv": 25
+        },
+        {
+          "id": 22910818,
+          "needLv": 26
+        },
+        {
+          "id": 22910819,
+          "needLv": 27
+        },
+        {
+          "id": 22910820,
+          "needLv": 28
+        },
+        {
+          "id": 22910821,
+          "needLv": 29
+        },
+        {
+          "id": 22910822,
+          "needLv": 30
+        },
+        {
+          "id": 22910823,
+          "needLv": 31
+        },
+        {
+          "id": 22910824,
+          "needLv": 32
+        },
+        {
+          "id": 22910825,
+          "needLv": 33
+        },
+        {
+          "id": 22910826,
+          "needLv": 34
+        },
+        {
+          "id": 22910827,
+          "needLv": 35
+        },
+        {
+          "id": 22910828,
+          "needLv": 36
+        },
+        {
+          "id": 22910829,
+          "needLv": 37
+        },
+        {
+          "id": 22910830,
+          "needLv": 38
+        },
+        {
+          "id": 22910831,
+          "needLv": 39
+        },
+        {
+          "id": 22910832,
+          "needLv": 40
+        },
+        {
+          "id": 22910833,
+          "needLv": 41
+        },
+        {
+          "id": 22910834,
+          "needLv": 42
+        },
+        {
+          "id": 22910835,
+          "needLv": 43
+        },
+        {
+          "id": 22910836,
+          "needLv": 44
+        },
+        {
+          "id": 22910837,
+          "needLv": 45
+        },
+        {
+          "id": 22910838,
+          "needLv": 46
+        },
+        {
+          "id": 22910839,
+          "needLv": 47
+        },
+        {
+          "id": 22910840,
+          "needLv": 48
+        },
+        {
+          "id": 22910841,
+          "needLv": 49
+        },
+        {
+          "id": 22910842,
+          "needLv": 50
+        },
+        {
+          "id": 22910843,
+          "needLv": 51
+        },
+        {
+          "id": 22910844,
+          "needLv": 52
+        },
+        {
+          "id": 22910845,
+          "needLv": 53
+        },
+        {
+          "id": 22910846,
+          "needLv": 54
+        },
+        {
+          "id": 22910847,
+          "needLv": 55
+        },
+        {
+          "id": 22910848,
+          "needLv": 56
+        },
+        {
+          "id": 22910849,
+          "needLv": 57
+        },
+        {
+          "id": 22910850,
+          "needLv": 58
+        },
+        {
+          "id": 22910851,
+          "needLv": 59
+        },
+        {
+          "id": 22910852,
+          "needLv": 60
+        },
+        {
+          "id": 22910853,
+          "needLv": 61
+        },
+        {
+          "id": 22910854,
+          "needLv": 62
+        },
+        {
+          "id": 22910855,
+          "needLv": 63
+        },
+        {
+          "id": 22910856,
+          "needLv": 64
+        },
+        {
+          "id": 22910857,
+          "needLv": 65
+        },
+        {
+          "id": 22910858,
+          "needLv": 66
+        },
+        {
+          "id": 22910859,
+          "needLv": 67
+        },
+        {
+          "id": 22910860,
+          "needLv": 68
+        },
+        {
+          "id": 22910861,
+          "needLv": 69
+        },
+        {
+          "id": 22910862,
+          "needLv": 70
+        },
+        {
+          "id": 22910863,
+          "needLv": 71
+        },
+        {
+          "id": 22910864,
+          "needLv": 72
+        },
+        {
+          "id": 22910865,
+          "needLv": 73
+        },
+        {
+          "id": 22910866,
+          "needLv": 74
+        },
+        {
+          "id": 22910867,
+          "needLv": 75
+        },
+        {
+          "id": 22910868,
+          "needLv": 76
+        },
+        {
+          "id": 22910869,
+          "needLv": 77
+        },
+        {
+          "id": 22910870,
+          "needLv": 78
+        },
+        {
+          "id": 22910871,
+          "needLv": 79
+        },
+        {
+          "id": 22910872,
+          "needLv": 80
+        },
+        {
+          "id": 22910873,
+          "needLv": 81
+        },
+        {
+          "id": 22910874,
+          "needLv": 82
+        },
+        {
+          "id": 22910875,
+          "needLv": 83
+        },
+        {
+          "id": 22910876,
+          "needLv": 84
+        },
+        {
+          "id": 22910877,
+          "needLv": 85
+        },
+        {
+          "id": 22910878,
+          "needLv": 86
+        },
+        {
+          "id": 22910879,
+          "needLv": 87
+        },
+        {
+          "id": 22910880,
+          "needLv": 88
+        },
+        {
+          "id": 22910881,
+          "needLv": 89
+        },
+        {
+          "id": 22910882,
+          "needLv": 90
+        },
+        {
+          "id": 22910883,
+          "needLv": 91
+        },
+        {
+          "id": 22910884,
+          "needLv": 92
+        },
+        {
+          "id": 22910885,
+          "needLv": 93
+        },
+        {
+          "id": 22910886,
+          "needLv": 94
+        },
+        {
+          "id": 22910887,
+          "needLv": 95
+        },
+        {
+          "id": 22910888,
+          "needLv": 96
+        },
+        {
+          "id": 22910889,
+          "needLv": 97
+        },
+        {
+          "id": 22910890,
+          "needLv": 98
+        },
+        {
+          "id": 22910891,
+          "needLv": 99
+        }
+      ]
+    },
+    "64100010": {
+      "id": 64100010,
+      "name": "퀘스트용_9배",
+      "equipment": [
+        {
+          "id": 22910892,
+          "needLv": 1
+        },
+        {
+          "id": 22910893,
+          "needLv": 2
+        },
+        {
+          "id": 22910894,
+          "needLv": 3
+        },
+        {
+          "id": 22910895,
+          "needLv": 4
+        },
+        {
+          "id": 22910896,
+          "needLv": 5
+        },
+        {
+          "id": 22910897,
+          "needLv": 6
+        },
+        {
+          "id": 22910898,
+          "needLv": 7
+        },
+        {
+          "id": 22910899,
+          "needLv": 8
+        },
+        {
+          "id": 22910900,
+          "needLv": 9
+        },
+        {
+          "id": 22910901,
+          "needLv": 10
+        },
+        {
+          "id": 22910902,
+          "needLv": 11
+        },
+        {
+          "id": 22910903,
+          "needLv": 12
+        },
+        {
+          "id": 22910904,
+          "needLv": 13
+        },
+        {
+          "id": 22910905,
+          "needLv": 14
+        },
+        {
+          "id": 22910906,
+          "needLv": 15
+        },
+        {
+          "id": 22910907,
+          "needLv": 16
+        },
+        {
+          "id": 22910908,
+          "needLv": 17
+        },
+        {
+          "id": 22910909,
+          "needLv": 18
+        },
+        {
+          "id": 22910910,
+          "needLv": 19
+        },
+        {
+          "id": 22910911,
+          "needLv": 20
+        },
+        {
+          "id": 22910912,
+          "needLv": 21
+        },
+        {
+          "id": 22910913,
+          "needLv": 22
+        },
+        {
+          "id": 22910914,
+          "needLv": 23
+        },
+        {
+          "id": 22910915,
+          "needLv": 24
+        },
+        {
+          "id": 22910916,
+          "needLv": 25
+        },
+        {
+          "id": 22910917,
+          "needLv": 26
+        },
+        {
+          "id": 22910918,
+          "needLv": 27
+        },
+        {
+          "id": 22910919,
+          "needLv": 28
+        },
+        {
+          "id": 22910920,
+          "needLv": 29
+        },
+        {
+          "id": 22910921,
+          "needLv": 30
+        },
+        {
+          "id": 22910922,
+          "needLv": 31
+        },
+        {
+          "id": 22910923,
+          "needLv": 32
+        },
+        {
+          "id": 22910924,
+          "needLv": 33
+        },
+        {
+          "id": 22910925,
+          "needLv": 34
+        },
+        {
+          "id": 22910926,
+          "needLv": 35
+        },
+        {
+          "id": 22910927,
+          "needLv": 36
+        },
+        {
+          "id": 22910928,
+          "needLv": 37
+        },
+        {
+          "id": 22910929,
+          "needLv": 38
+        },
+        {
+          "id": 22910930,
+          "needLv": 39
+        },
+        {
+          "id": 22910931,
+          "needLv": 40
+        },
+        {
+          "id": 22910932,
+          "needLv": 41
+        },
+        {
+          "id": 22910933,
+          "needLv": 42
+        },
+        {
+          "id": 22910934,
+          "needLv": 43
+        },
+        {
+          "id": 22910935,
+          "needLv": 44
+        },
+        {
+          "id": 22910936,
+          "needLv": 45
+        },
+        {
+          "id": 22910937,
+          "needLv": 46
+        },
+        {
+          "id": 22910938,
+          "needLv": 47
+        },
+        {
+          "id": 22910939,
+          "needLv": 48
+        },
+        {
+          "id": 22910940,
+          "needLv": 49
+        },
+        {
+          "id": 22910941,
+          "needLv": 50
+        },
+        {
+          "id": 22910942,
+          "needLv": 51
+        },
+        {
+          "id": 22910943,
+          "needLv": 52
+        },
+        {
+          "id": 22910944,
+          "needLv": 53
+        },
+        {
+          "id": 22910945,
+          "needLv": 54
+        },
+        {
+          "id": 22910946,
+          "needLv": 55
+        },
+        {
+          "id": 22910947,
+          "needLv": 56
+        },
+        {
+          "id": 22910948,
+          "needLv": 57
+        },
+        {
+          "id": 22910949,
+          "needLv": 58
+        },
+        {
+          "id": 22910950,
+          "needLv": 59
+        },
+        {
+          "id": 22910951,
+          "needLv": 60
+        },
+        {
+          "id": 22910952,
+          "needLv": 61
+        },
+        {
+          "id": 22910953,
+          "needLv": 62
+        },
+        {
+          "id": 22910954,
+          "needLv": 63
+        },
+        {
+          "id": 22910955,
+          "needLv": 64
+        },
+        {
+          "id": 22910956,
+          "needLv": 65
+        },
+        {
+          "id": 22910957,
+          "needLv": 66
+        },
+        {
+          "id": 22910958,
+          "needLv": 67
+        },
+        {
+          "id": 22910959,
+          "needLv": 68
+        },
+        {
+          "id": 22910960,
+          "needLv": 69
+        },
+        {
+          "id": 22910961,
+          "needLv": 70
+        },
+        {
+          "id": 22910962,
+          "needLv": 71
+        },
+        {
+          "id": 22910963,
+          "needLv": 72
+        },
+        {
+          "id": 22910964,
+          "needLv": 73
+        },
+        {
+          "id": 22910965,
+          "needLv": 74
+        },
+        {
+          "id": 22910966,
+          "needLv": 75
+        },
+        {
+          "id": 22910967,
+          "needLv": 76
+        },
+        {
+          "id": 22910968,
+          "needLv": 77
+        },
+        {
+          "id": 22910969,
+          "needLv": 78
+        },
+        {
+          "id": 22910970,
+          "needLv": 79
+        },
+        {
+          "id": 22910971,
+          "needLv": 80
+        },
+        {
+          "id": 22910972,
+          "needLv": 81
+        },
+        {
+          "id": 22910973,
+          "needLv": 82
+        },
+        {
+          "id": 22910974,
+          "needLv": 83
+        },
+        {
+          "id": 22910975,
+          "needLv": 84
+        },
+        {
+          "id": 22910976,
+          "needLv": 85
+        },
+        {
+          "id": 22910977,
+          "needLv": 86
+        },
+        {
+          "id": 22910978,
+          "needLv": 87
+        },
+        {
+          "id": 22910979,
+          "needLv": 88
+        },
+        {
+          "id": 22910980,
+          "needLv": 89
+        },
+        {
+          "id": 22910981,
+          "needLv": 90
+        },
+        {
+          "id": 22910982,
+          "needLv": 91
+        },
+        {
+          "id": 22910983,
+          "needLv": 92
+        },
+        {
+          "id": 22910984,
+          "needLv": 93
+        },
+        {
+          "id": 22910985,
+          "needLv": 94
+        },
+        {
+          "id": 22910986,
+          "needLv": 95
+        },
+        {
+          "id": 22910987,
+          "needLv": 96
+        },
+        {
+          "id": 22910988,
+          "needLv": 97
+        },
+        {
+          "id": 22910989,
+          "needLv": 98
+        },
+        {
+          "id": 22910990,
+          "needLv": 99
+        }
+      ]
+    },
+    "64100011": {
+      "id": 64100011,
+      "name": "퀘스트용_10배",
+      "equipment": [
+        {
+          "id": 22910991,
+          "needLv": 1
+        },
+        {
+          "id": 22910992,
+          "needLv": 2
+        },
+        {
+          "id": 22910993,
+          "needLv": 3
+        },
+        {
+          "id": 22910994,
+          "needLv": 4
+        },
+        {
+          "id": 22910995,
+          "needLv": 5
+        },
+        {
+          "id": 22910996,
+          "needLv": 6
+        },
+        {
+          "id": 22910997,
+          "needLv": 7
+        },
+        {
+          "id": 22910998,
+          "needLv": 8
+        },
+        {
+          "id": 22910999,
+          "needLv": 9
+        },
+        {
+          "id": 22911000,
+          "needLv": 10
+        },
+        {
+          "id": 22911001,
+          "needLv": 11
+        },
+        {
+          "id": 22911002,
+          "needLv": 12
+        },
+        {
+          "id": 22911003,
+          "needLv": 13
+        },
+        {
+          "id": 22911004,
+          "needLv": 14
+        },
+        {
+          "id": 22911005,
+          "needLv": 15
+        },
+        {
+          "id": 22911006,
+          "needLv": 16
+        },
+        {
+          "id": 22911007,
+          "needLv": 17
+        },
+        {
+          "id": 22911008,
+          "needLv": 18
+        },
+        {
+          "id": 22911009,
+          "needLv": 19
+        },
+        {
+          "id": 22911010,
+          "needLv": 20
+        },
+        {
+          "id": 22911011,
+          "needLv": 21
+        },
+        {
+          "id": 22911012,
+          "needLv": 22
+        },
+        {
+          "id": 22911013,
+          "needLv": 23
+        },
+        {
+          "id": 22911014,
+          "needLv": 24
+        },
+        {
+          "id": 22911015,
+          "needLv": 25
+        },
+        {
+          "id": 22911016,
+          "needLv": 26
+        },
+        {
+          "id": 22911017,
+          "needLv": 27
+        },
+        {
+          "id": 22911018,
+          "needLv": 28
+        },
+        {
+          "id": 22911019,
+          "needLv": 29
+        },
+        {
+          "id": 22911020,
+          "needLv": 30
+        },
+        {
+          "id": 22911021,
+          "needLv": 31
+        },
+        {
+          "id": 22911022,
+          "needLv": 32
+        },
+        {
+          "id": 22911023,
+          "needLv": 33
+        },
+        {
+          "id": 22911024,
+          "needLv": 34
+        },
+        {
+          "id": 22911025,
+          "needLv": 35
+        },
+        {
+          "id": 22911026,
+          "needLv": 36
+        },
+        {
+          "id": 22911027,
+          "needLv": 37
+        },
+        {
+          "id": 22911028,
+          "needLv": 38
+        },
+        {
+          "id": 22911029,
+          "needLv": 39
+        },
+        {
+          "id": 22911030,
+          "needLv": 40
+        },
+        {
+          "id": 22911031,
+          "needLv": 41
+        },
+        {
+          "id": 22911032,
+          "needLv": 42
+        },
+        {
+          "id": 22911033,
+          "needLv": 43
+        },
+        {
+          "id": 22911034,
+          "needLv": 44
+        },
+        {
+          "id": 22911035,
+          "needLv": 45
+        },
+        {
+          "id": 22911036,
+          "needLv": 46
+        },
+        {
+          "id": 22911037,
+          "needLv": 47
+        },
+        {
+          "id": 22911038,
+          "needLv": 48
+        },
+        {
+          "id": 22911039,
+          "needLv": 49
+        },
+        {
+          "id": 22911040,
+          "needLv": 50
+        },
+        {
+          "id": 22911041,
+          "needLv": 51
+        },
+        {
+          "id": 22911042,
+          "needLv": 52
+        },
+        {
+          "id": 22911043,
+          "needLv": 53
+        },
+        {
+          "id": 22911044,
+          "needLv": 54
+        },
+        {
+          "id": 22911045,
+          "needLv": 55
+        },
+        {
+          "id": 22911046,
+          "needLv": 56
+        },
+        {
+          "id": 22911047,
+          "needLv": 57
+        },
+        {
+          "id": 22911048,
+          "needLv": 58
+        },
+        {
+          "id": 22911049,
+          "needLv": 59
+        },
+        {
+          "id": 22911050,
+          "needLv": 60
+        },
+        {
+          "id": 22911051,
+          "needLv": 61
+        },
+        {
+          "id": 22911052,
+          "needLv": 62
+        },
+        {
+          "id": 22911053,
+          "needLv": 63
+        },
+        {
+          "id": 22911054,
+          "needLv": 64
+        },
+        {
+          "id": 22911055,
+          "needLv": 65
+        },
+        {
+          "id": 22911056,
+          "needLv": 66
+        },
+        {
+          "id": 22911057,
+          "needLv": 67
+        },
+        {
+          "id": 22911058,
+          "needLv": 68
+        },
+        {
+          "id": 22911059,
+          "needLv": 69
+        },
+        {
+          "id": 22911060,
+          "needLv": 70
+        },
+        {
+          "id": 22911061,
+          "needLv": 71
+        },
+        {
+          "id": 22911062,
+          "needLv": 72
+        },
+        {
+          "id": 22911063,
+          "needLv": 73
+        },
+        {
+          "id": 22911064,
+          "needLv": 74
+        },
+        {
+          "id": 22911065,
+          "needLv": 75
+        },
+        {
+          "id": 22911066,
+          "needLv": 76
+        },
+        {
+          "id": 22911067,
+          "needLv": 77
+        },
+        {
+          "id": 22911068,
+          "needLv": 78
+        },
+        {
+          "id": 22911069,
+          "needLv": 79
+        },
+        {
+          "id": 22911070,
+          "needLv": 80
+        },
+        {
+          "id": 22911071,
+          "needLv": 81
+        },
+        {
+          "id": 22911072,
+          "needLv": 82
+        },
+        {
+          "id": 22911073,
+          "needLv": 83
+        },
+        {
+          "id": 22911074,
+          "needLv": 84
+        },
+        {
+          "id": 22911075,
+          "needLv": 85
+        },
+        {
+          "id": 22911076,
+          "needLv": 86
+        },
+        {
+          "id": 22911077,
+          "needLv": 87
+        },
+        {
+          "id": 22911078,
+          "needLv": 88
+        },
+        {
+          "id": 22911079,
+          "needLv": 89
+        },
+        {
+          "id": 22911080,
+          "needLv": 90
+        },
+        {
+          "id": 22911081,
+          "needLv": 91
+        },
+        {
+          "id": 22911082,
+          "needLv": 92
+        },
+        {
+          "id": 22911083,
+          "needLv": 93
+        },
+        {
+          "id": 22911084,
+          "needLv": 94
+        },
+        {
+          "id": 22911085,
+          "needLv": 95
+        },
+        {
+          "id": 22911086,
+          "needLv": 96
+        },
+        {
+          "id": 22911087,
+          "needLv": 97
+        },
+        {
+          "id": 22911088,
+          "needLv": 98
+        },
+        {
+          "id": 22911089,
+          "needLv": 99
+        }
+      ]
+    },
+    "64110001": {
+      "id": 64110001,
+      "name": "할로윈_몸_남자",
+      "equipment": [
+        {
+          "id": 22264807,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110002": {
+      "id": 64110002,
+      "name": "할로윈_머리_남자",
+      "equipment": [
+        {
+          "id": 22364807,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110003": {
+      "id": 64110003,
+      "name": "할로윈_얼굴 장식_남자",
+      "equipment": [
+        {
+          "id": 22664801,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110004": {
+      "id": 64110004,
+      "name": "할로윈_망토_남자",
+      "equipment": [
+        {
+          "id": 22564801,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110005": {
+      "id": 64110005,
+      "name": "할로윈_몸_여자",
+      "equipment": [
+        {
+          "id": 22264808,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110006": {
+      "id": 64110006,
+      "name": "할로윈_머리_여자",
+      "equipment": [
+        {
+          "id": 22364808,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110007": {
+      "id": 64110007,
+      "name": "할로윈_얼굴 장식_여자",
+      "equipment": [
+        {
+          "id": 22664802,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110008": {
+      "id": 64110008,
+      "name": "할로윈_망토_여자",
+      "equipment": [
+        {
+          "id": 22564802,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110009": {
+      "id": 64110009,
+      "name": "폐허의 등대_그레이스 전용 무기",
+      "equipment": [
+        {
+          "id": 22164513,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110010": {
+      "id": 64110010,
+      "name": "폐허의 등대_정성공 전용 무기",
+      "equipment": [
+        {
+          "id": 22155007,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110011": {
+      "id": 64110011,
+      "name": "폐허의 등대_척계광 전용 장신구",
+      "equipment": [
+        {
+          "id": 22476029,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110012": {
+      "id": 64110012,
+      "name": "폐허의 등대_사이이다 전용 무기",
+      "equipment": [
+        {
+          "id": 22164511,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110013": {
+      "id": 64110013,
+      "name": "폐허의 등대_그레이스 전용 의복",
+      "equipment": [
+        {
+          "id": 22264013,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110014": {
+      "id": 64110014,
+      "name": "폐허의 등대_정성공 전용 의복",
+      "equipment": [
+        {
+          "id": 22264014,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110015": {
+      "id": 64110015,
+      "name": "폐허의 등대_척계광 전용 의복",
+      "equipment": [
+        {
+          "id": 22264012,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110016": {
+      "id": 64110016,
+      "name": "폐허의 등대_사이이다 전용 의복",
+      "equipment": [
+        {
+          "id": 22264023,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110017": {
+      "id": 64110017,
+      "name": "폐허의 등대_줄리 도비니 전용 장신구",
+      "equipment": [
+        {
+          "id": 22164533,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110018": {
+      "id": 64110018,
+      "name": "폐허의 등대_존 호킨스 장신구",
+      "equipment": [
+        {
+          "id": 22476081,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110019": {
+      "id": 64110019,
+      "name": "폐허의 등대_마리벨_전용 무기",
+      "equipment": [
+        {
+          "id": 22164526,
+          "needLv": 1
+        }
+      ]
+    },
+    "64110020": {
+      "id": 64110020,
+      "name": "폐허의 등대_마리벨 전용 의복",
+      "equipment": [
+        {
+          "id": 22264200,
+          "needLv": 1
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  ":GuildResource": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "hardCap": "number"
+    },
+    ":required": {
+      "name": 1,
+      "hardCap": 1
+    },
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":asset": {},
+    ":links": {}
+  },
+  "GuildResource": {
+    "150000": {
+      "id": 150000,
+      "name": "금화",
+      "hardCap": 900000000000000
+    },
+    "150001": {
+      "id": 150001,
+      "name": "사파이어",
+      "hardCap": 900000000000000
+    }
+  }
+}

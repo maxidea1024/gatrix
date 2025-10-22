@@ -1,0 +1,43 @@
+{
+  ":EventBattleChallenge": {
+    ":type": {
+      "id": "key",
+      "order": "number",
+      "groupId": "number",
+      "startDate": "string",
+      "endDate": "string"
+    },
+    ":required": {
+      "order": 1,
+      "groupId": 1
+    },
+    ":requiredInObject": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {
+      "groupId": [
+        "BattleChallengeGroup"
+      ]
+    }
+  },
+  "EventBattleChallenge": {
+    "79020001": {
+      "id": 79020001,
+      "order": 1,
+      "groupId": 79100001
+    },
+    "79020002": {
+      "id": 79020002,
+      "order": 2,
+      "groupId": 79100002
+    },
+    "79020003": {
+      "id": 79020003,
+      "order": 3,
+      "groupId": 79100001,
+      "startDate": "2022/03/01/00:00:00",
+      "endDate": "2022/06/30/23:59:59"
+    }
+  }
+}

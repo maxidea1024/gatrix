@@ -1,0 +1,535 @@
+{
+  ":CashShopTab": {
+    ":type": {
+      "id": "key",
+      "sortOrder": "number",
+      "productCategory": "number",
+      "productSize": "number",
+      "name": "text",
+      "productEntryType": "number",
+      "useEventButton": "bool"
+    },
+    ":required": {
+      "sortOrder": 1,
+      "productCategory": 1,
+      "productSize": 1,
+      "name": 1,
+      "productEntryType": 1
+    },
+    ":requiredInObject": {},
+    ":min": {
+      "productCategory": 1
+    },
+    ":max": {
+      "productCategory": 14
+    },
+    ":enum": {},
+    ":links": {}
+  },
+  "CashShopTab": {
+    "101": {
+      "id": 101,
+      "sortOrder": 3,
+      "productCategory": 3,
+      "productSize": 2,
+      "name": "이벤트",
+      "productEntryType": 2,
+      "useEventButton": true
+    },
+    "102": {
+      "id": 102,
+      "sortOrder": 5,
+      "productCategory": 3,
+      "productSize": 1,
+      "name": "선박 재료",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "103": {
+      "id": 103,
+      "sortOrder": 13,
+      "productCategory": 3,
+      "productSize": 1,
+      "name": "특수 합성",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "104": {
+      "id": 104,
+      "sortOrder": 4,
+      "productCategory": 3,
+      "productSize": 1,
+      "name": "특별",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "105": {
+      "id": 105,
+      "sortOrder": 8,
+      "productCategory": 3,
+      "productSize": 1,
+      "name": "소모",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "106": {
+      "id": 106,
+      "sortOrder": 6,
+      "productCategory": 3,
+      "productSize": 2,
+      "name": "항해사",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "107": {
+      "id": 107,
+      "sortOrder": 7,
+      "productCategory": 3,
+      "productSize": 1,
+      "name": "주간/월간",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "108": {
+      "id": 108,
+      "sortOrder": 2,
+      "productCategory": 3,
+      "productSize": 1,
+      "name": "기간 한정",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "109": {
+      "id": 109,
+      "sortOrder": 1,
+      "productCategory": 3,
+      "productSize": 1,
+      "name": "추석",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "110": {
+      "id": 110,
+      "sortOrder": 10,
+      "productCategory": 3,
+      "productSize": 1,
+      "name": "소모X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "111": {
+      "id": 111,
+      "sortOrder": 11,
+      "productCategory": 3,
+      "productSize": 1,
+      "name": "장비/부품X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "112": {
+      "id": 112,
+      "sortOrder": 12,
+      "productCategory": 3,
+      "productSize": 1,
+      "name": "선박 재료X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "113": {
+      "id": 113,
+      "sortOrder": 13,
+      "productCategory": 3,
+      "productSize": 2,
+      "name": "외형X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "114": {
+      "id": 114,
+      "sortOrder": 14,
+      "productCategory": 3,
+      "productSize": 2,
+      "name": "효과X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "201": {
+      "id": 201,
+      "sortOrder": 1,
+      "productCategory": 11,
+      "productSize": 2,
+      "name": "특별X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "202": {
+      "id": 202,
+      "sortOrder": 2,
+      "productCategory": 11,
+      "productSize": 2,
+      "name": "재화X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "203": {
+      "id": 203,
+      "sortOrder": 3,
+      "productCategory": 11,
+      "productSize": 2,
+      "name": "티켓X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "204": {
+      "id": 204,
+      "sortOrder": 4,
+      "productCategory": 11,
+      "productSize": 2,
+      "name": "아이템X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "301": {
+      "id": 301,
+      "sortOrder": 1,
+      "productCategory": 10,
+      "productSize": 2,
+      "name": "특별",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "302": {
+      "id": 302,
+      "sortOrder": 2,
+      "productCategory": 10,
+      "productSize": 2,
+      "name": "황금의 시대",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "303": {
+      "id": 303,
+      "sortOrder": 3,
+      "productCategory": 10,
+      "productSize": 2,
+      "name": "항해사",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "304": {
+      "id": 304,
+      "sortOrder": 4,
+      "productCategory": 10,
+      "productSize": 2,
+      "name": "성장",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "305": {
+      "id": 305,
+      "sortOrder": 5,
+      "productCategory": 10,
+      "productSize": 2,
+      "name": "선단강화",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "306": {
+      "id": 306,
+      "sortOrder": 6,
+      "productCategory": 10,
+      "productSize": 2,
+      "name": "생산",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "307": {
+      "id": 307,
+      "sortOrder": 2,
+      "productCategory": 10,
+      "productSize": 2,
+      "name": "동방의 물결",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "401": {
+      "id": 401,
+      "sortOrder": 1,
+      "productCategory": 6,
+      "productSize": 2,
+      "name": "특별X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "402": {
+      "id": 402,
+      "sortOrder": 2,
+      "productCategory": 6,
+      "productSize": 2,
+      "name": "항해사X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "403": {
+      "id": 403,
+      "sortOrder": 3,
+      "productCategory": 6,
+      "productSize": 2,
+      "name": "아이템X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "404": {
+      "id": 404,
+      "sortOrder": 4,
+      "productCategory": 6,
+      "productSize": 2,
+      "name": "콜라보X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "405": {
+      "id": 405,
+      "sortOrder": 5,
+      "productCategory": 6,
+      "productSize": 2,
+      "name": "연대기X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "406": {
+      "id": 406,
+      "sortOrder": 6,
+      "productCategory": 6,
+      "productSize": 2,
+      "name": "픽업X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "407": {
+      "id": 407,
+      "sortOrder": 7,
+      "productCategory": 6,
+      "productSize": 2,
+      "name": "인연X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "408": {
+      "id": 408,
+      "sortOrder": 8,
+      "productCategory": 6,
+      "productSize": 2,
+      "name": "종업원X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "501": {
+      "id": 501,
+      "sortOrder": 1,
+      "productCategory": 7,
+      "productSize": 2,
+      "name": "신규X",
+      "productEntryType": 2,
+      "useEventButton": false
+    },
+    "502": {
+      "id": 502,
+      "sortOrder": 2,
+      "productCategory": 7,
+      "productSize": 2,
+      "name": "모험",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "503": {
+      "id": 503,
+      "sortOrder": 3,
+      "productCategory": 7,
+      "productSize": 2,
+      "name": "교역",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "504": {
+      "id": 504,
+      "sortOrder": 4,
+      "productCategory": 7,
+      "productSize": 2,
+      "name": "전투",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "601": {
+      "id": 601,
+      "sortOrder": 1,
+      "productCategory": 8,
+      "productSize": 1,
+      "name": "마일리지",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "602": {
+      "id": 602,
+      "sortOrder": 3,
+      "productCategory": 8,
+      "productSize": 1,
+      "name": "특별",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "603": {
+      "id": 603,
+      "sortOrder": 2,
+      "productCategory": 8,
+      "productSize": 1,
+      "name": "레드젬",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "701": {
+      "id": 701,
+      "sortOrder": 1,
+      "productCategory": 14,
+      "productSize": 1,
+      "name": "레오니다스",
+      "productEntryType": 4,
+      "useEventButton": false
+    },
+    "702": {
+      "id": 702,
+      "sortOrder": 4,
+      "productCategory": 14,
+      "productSize": 1,
+      "name": "블랙 레이븐",
+      "productEntryType": 4,
+      "useEventButton": false
+    },
+    "703": {
+      "id": 703,
+      "sortOrder": 5,
+      "productCategory": 14,
+      "productSize": 1,
+      "name": "카라 마우에",
+      "productEntryType": 4,
+      "useEventButton": false
+    },
+    "704": {
+      "id": 704,
+      "sortOrder": 2,
+      "productCategory": 14,
+      "productSize": 1,
+      "name": "특수 합성",
+      "productEntryType": 4,
+      "useEventButton": false
+    },
+    "705": {
+      "id": 705,
+      "sortOrder": 2,
+      "productCategory": 14,
+      "productSize": 1,
+      "name": "잔수",
+      "productEntryType": 4,
+      "useEventButton": false
+    },
+    "1101": {
+      "id": 1101,
+      "sortOrder": 15,
+      "productCategory": 3,
+      "productSize": 2,
+      "name": "이벤트X",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "1102": {
+      "id": 1102,
+      "sortOrder": 16,
+      "productCategory": 3,
+      "productSize": 2,
+      "name": "선박 재료X",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "1103": {
+      "id": 1103,
+      "sortOrder": 17,
+      "productCategory": 3,
+      "productSize": 2,
+      "name": "특수 합성X",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "1104": {
+      "id": 1104,
+      "sortOrder": 18,
+      "productCategory": 3,
+      "productSize": 2,
+      "name": "특별X",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "1105": {
+      "id": 1105,
+      "sortOrder": 19,
+      "productCategory": 3,
+      "productSize": 1,
+      "name": "소모X",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "1106": {
+      "id": 1106,
+      "sortOrder": 20,
+      "productCategory": 3,
+      "productSize": 2,
+      "name": "항해사X",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "1201": {
+      "id": 1201,
+      "sortOrder": 1,
+      "productCategory": 5,
+      "productSize": 2,
+      "name": "가호",
+      "productEntryType": 5,
+      "useEventButton": false
+    },
+    "1202": {
+      "id": 1202,
+      "sortOrder": 2,
+      "productCategory": 5,
+      "productSize": 2,
+      "name": "효과",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "1301": {
+      "id": 1301,
+      "sortOrder": 1,
+      "productCategory": 13,
+      "productSize": 2,
+      "name": "의상",
+      "productEntryType": 3,
+      "useEventButton": false
+    },
+    "1302": {
+      "id": 1302,
+      "sortOrder": 2,
+      "productCategory": 13,
+      "productSize": 2,
+      "name": "펫",
+      "productEntryType": 1,
+      "useEventButton": false
+    },
+    "1303": {
+      "id": 1303,
+      "sortOrder": 3,
+      "productCategory": 13,
+      "productSize": 2,
+      "name": "외형",
+      "productEntryType": 1,
+      "useEventButton": false
+    }
+  }
+}

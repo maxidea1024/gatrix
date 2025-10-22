@@ -1,0 +1,20 @@
+{
+  ":DiscoveryTalk": {
+    ":type": {
+      "id": "key"
+    },
+    ":required": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {}
+  },
+  "DiscoveryTalk": {
+    "70910001": {
+      "id": 70910001
+    },
+    "70910002": {
+      "id": 70910002
+    }
+  }
+}

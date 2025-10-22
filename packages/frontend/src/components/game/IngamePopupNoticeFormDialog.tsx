@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Drawer,
   Button,
   TextField,
   FormControlLabel,
@@ -20,6 +19,7 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
+import ResizableDrawer from '../common/ResizableDrawer';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
@@ -211,31 +211,16 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
   };
 
   return (
-    <Drawer
-      anchor="right"
+    <ResizableDrawer
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: { width: { xs: '100%', sm: 600, md: 800 } }
-      }}
+      title={notice ? t('ingamePopupNotices.editNotice') : t('ingamePopupNotices.createNotice')}
+      subtitle={notice ? t('ingamePopupNotices.editNoticeSubtitle') : t('ingamePopupNotices.createNoticeSubtitle')}
+      storageKey="ingamePopupNoticeFormDrawerWidth"
+      defaultWidth={800}
+      minWidth={600}
+      zIndex={1300}
     >
-      {/* Header */}
-      <AppBar position="static" color="default" elevation={0} sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Toolbar>
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h6">
-              {notice ? t('ingamePopupNotices.editNotice') : t('ingamePopupNotices.createNotice')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {notice ? t('ingamePopupNotices.editNoticeSubtitle') : t('ingamePopupNotices.createNoticeSubtitle')}
-            </Typography>
-          </Box>
-          <IconButton edge="end" onClick={onClose}>
-            <CloseIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-
       {/* Content */}
       <Box
         sx={{
@@ -489,7 +474,7 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
           {notice ? t('common.update') : t('common.create')}
         </Button>
       </Box>
-    </Drawer>
+    </ResizableDrawer>
   );
 };
 

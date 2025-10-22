@@ -1,0 +1,127 @@
+{
+  ":GuildEmblemImage": {
+    ":type": {
+      "id": "key",
+      "guildLevel": "number",
+      "isExposure": "bool"
+    },
+    ":required": {
+      "guildLevel": 1,
+      "isExposure": 1
+    },
+    ":min": {
+      "guildLevel": 1
+    },
+    ":max": {
+      "guildLevel": 100
+    },
+    ":enum": {},
+    ":links": {
+      "guildLevel": [
+        "Guild"
+      ]
+    }
+  },
+  "GuildEmblemImage": {
+    "401": {
+      "id": 401,
+      "guildLevel": 1,
+      "isExposure": true
+    },
+    "402": {
+      "id": 402,
+      "guildLevel": 1,
+      "isExposure": true
+    },
+    "403": {
+      "id": 403,
+      "guildLevel": 1,
+      "isExposure": true
+    },
+    "404": {
+      "id": 404,
+      "guildLevel": 1,
+      "isExposure": true
+    },
+    "405": {
+      "id": 405,
+      "guildLevel": 2,
+      "isExposure": true
+    },
+    "406": {
+      "id": 406,
+      "guildLevel": 2,
+      "isExposure": true
+    },
+    "407": {
+      "id": 407,
+      "guildLevel": 2,
+      "isExposure": true
+    },
+    "408": {
+      "id": 408,
+      "guildLevel": 2,
+      "isExposure": true
+    },
+    "409": {
+      "id": 409,
+      "guildLevel": 3,
+      "isExposure": true
+    },
+    "410": {
+      "id": 410,
+      "guildLevel": 3,
+      "isExposure": true
+    },
+    "411": {
+      "id": 411,
+      "guildLevel": 3,
+      "isExposure": true
+    },
+    "412": {
+      "id": 412,
+      "guildLevel": 3,
+      "isExposure": true
+    },
+    "413": {
+      "id": 413,
+      "guildLevel": 4,
+      "isExposure": true
+    },
+    "414": {
+      "id": 414,
+      "guildLevel": 4,
+      "isExposure": true
+    },
+    "415": {
+      "id": 415,
+      "guildLevel": 4,
+      "isExposure": true
+    },
+    "416": {
+      "id": 416,
+      "guildLevel": 4,
+      "isExposure": true
+    },
+    "417": {
+      "id": 417,
+      "guildLevel": 5,
+      "isExposure": true
+    },
+    "418": {
+      "id": 418,
+      "guildLevel": 5,
+      "isExposure": true
+    },
+    "419": {
+      "id": 419,
+      "guildLevel": 5,
+      "isExposure": true
+    },
+    "420": {
+      "id": 420,
+      "guildLevel": 5,
+      "isExposure": true
+    }
+  }
+}

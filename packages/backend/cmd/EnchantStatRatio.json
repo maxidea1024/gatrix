@@ -1,0 +1,310 @@
+{
+  ":EnchantStatRatio": {
+    ":type": {
+      "id": "key",
+      "enchantType": "number",
+      "enchantLv": "number",
+      "enchantRate": "number",
+      "enchantItemId": "number",
+      "enchantItemVal": "number",
+      "enchantPointId": "number",
+      "enchantPointVal": "number",
+      "enchantKeepItemId": "number",
+      "enchantKeepItemVal": "number",
+      "enchantspecialItem": "number",
+      "enchantspecialRate": "number"
+    },
+    ":required": {
+      "enchantPointId": 1,
+      "enchantPointVal": 1
+    },
+    ":requiredInObject": {},
+    ":min": {
+      "enchantType": 0,
+      "enchantItemId": 23000000,
+      "enchantPointId": 100000,
+      "enchantKeepItemId": 23000000,
+      "enchantspecialItem": 23000000
+    },
+    ":max": {
+      "enchantType": 1,
+      "enchantItemId": 23999999,
+      "enchantPointId": 199999,
+      "enchantKeepItemId": 23999999,
+      "enchantspecialItem": 23999999
+    },
+    ":enum": {},
+    ":links": {
+      "enchantItemId": [
+        "Item"
+      ],
+      "enchantPointId": [
+        "Point"
+      ],
+      "enchantKeepItemId": [
+        "Item"
+      ],
+      "enchantspecialItem": [
+        "Item"
+      ]
+    }
+  },
+  "EnchantStatRatio": {
+    "71600000": {
+      "id": 71600000,
+      "enchantType": 0,
+      "enchantLv": 1,
+      "enchantRate": 1000,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 1,
+      "enchantPointId": 100003,
+      "enchantPointVal": 1000,
+      "enchantspecialItem": 23900120,
+      "enchantspecialRate": 1000
+    },
+    "71600001": {
+      "id": 71600001,
+      "enchantType": 0,
+      "enchantLv": 2,
+      "enchantRate": 1000,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 1,
+      "enchantPointId": 100003,
+      "enchantPointVal": 1000,
+      "enchantspecialItem": 23900121,
+      "enchantspecialRate": 1000
+    },
+    "71600002": {
+      "id": 71600002,
+      "enchantType": 0,
+      "enchantLv": 3,
+      "enchantRate": 1000,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 2,
+      "enchantPointId": 100003,
+      "enchantPointVal": 1000,
+      "enchantspecialItem": 23900122,
+      "enchantspecialRate": 1000
+    },
+    "71600003": {
+      "id": 71600003,
+      "enchantType": 0,
+      "enchantLv": 4,
+      "enchantRate": 1000,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 2,
+      "enchantPointId": 100003,
+      "enchantPointVal": 1000,
+      "enchantspecialItem": 23900123,
+      "enchantspecialRate": 1000
+    },
+    "71600004": {
+      "id": 71600004,
+      "enchantType": 0,
+      "enchantLv": 5,
+      "enchantRate": 1000,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 2,
+      "enchantPointId": 100003,
+      "enchantPointVal": 1000,
+      "enchantspecialItem": 23900124,
+      "enchantspecialRate": 1000
+    },
+    "71600005": {
+      "id": 71600005,
+      "enchantType": 0,
+      "enchantLv": 6,
+      "enchantRate": 800,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 6,
+      "enchantPointId": 100003,
+      "enchantPointVal": 1000,
+      "enchantKeepItemId": 23900103,
+      "enchantKeepItemVal": 1,
+      "enchantspecialItem": 23900125,
+      "enchantspecialRate": 1000
+    },
+    "71600006": {
+      "id": 71600006,
+      "enchantType": 0,
+      "enchantLv": 7,
+      "enchantRate": 600,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 6,
+      "enchantPointId": 100003,
+      "enchantPointVal": 1000,
+      "enchantKeepItemId": 23900103,
+      "enchantKeepItemVal": 2,
+      "enchantspecialItem": 23900126,
+      "enchantspecialRate": 1000
+    },
+    "71600007": {
+      "id": 71600007,
+      "enchantType": 0,
+      "enchantLv": 8,
+      "enchantRate": 500,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 10,
+      "enchantPointId": 100003,
+      "enchantPointVal": 1000,
+      "enchantKeepItemId": 23900103,
+      "enchantKeepItemVal": 4,
+      "enchantspecialItem": 23900127,
+      "enchantspecialRate": 1000
+    },
+    "71600008": {
+      "id": 71600008,
+      "enchantType": 0,
+      "enchantLv": 9,
+      "enchantRate": 400,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 10,
+      "enchantPointId": 100003,
+      "enchantPointVal": 1000,
+      "enchantKeepItemId": 23900103,
+      "enchantKeepItemVal": 8,
+      "enchantspecialItem": 23900128,
+      "enchantspecialRate": 1000
+    },
+    "71600009": {
+      "id": 71600009,
+      "enchantType": 0,
+      "enchantLv": 10,
+      "enchantRate": 300,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 20,
+      "enchantPointId": 100003,
+      "enchantPointVal": 1000,
+      "enchantKeepItemId": 23900103,
+      "enchantKeepItemVal": 16,
+      "enchantspecialItem": 23900129,
+      "enchantspecialRate": 1000
+    },
+    "71600010": {
+      "id": 71600010,
+      "enchantType": 1,
+      "enchantLv": 1,
+      "enchantRate": 1000,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 1,
+      "enchantPointId": 100003,
+      "enchantPointVal": 100,
+      "enchantspecialItem": 23900130,
+      "enchantspecialRate": 1000
+    },
+    "71600011": {
+      "id": 71600011,
+      "enchantType": 1,
+      "enchantLv": 2,
+      "enchantRate": 1000,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 1,
+      "enchantPointId": 100003,
+      "enchantPointVal": 100,
+      "enchantspecialItem": 23900131,
+      "enchantspecialRate": 1000
+    },
+    "71600012": {
+      "id": 71600012,
+      "enchantType": 1,
+      "enchantLv": 3,
+      "enchantRate": 1000,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 1,
+      "enchantPointId": 100003,
+      "enchantPointVal": 100,
+      "enchantspecialItem": 23900132,
+      "enchantspecialRate": 1000
+    },
+    "71600013": {
+      "id": 71600013,
+      "enchantType": 1,
+      "enchantLv": 4,
+      "enchantRate": 1000,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 1,
+      "enchantPointId": 100003,
+      "enchantPointVal": 100,
+      "enchantspecialItem": 23900133,
+      "enchantspecialRate": 1000
+    },
+    "71600014": {
+      "id": 71600014,
+      "enchantType": 1,
+      "enchantLv": 5,
+      "enchantRate": 1000,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 1,
+      "enchantPointId": 100003,
+      "enchantPointVal": 100,
+      "enchantspecialItem": 23900134,
+      "enchantspecialRate": 1000
+    },
+    "71600015": {
+      "id": 71600015,
+      "enchantType": 1,
+      "enchantLv": 6,
+      "enchantRate": 1000,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 2,
+      "enchantPointId": 100003,
+      "enchantPointVal": 100,
+      "enchantspecialItem": 23900135,
+      "enchantspecialRate": 1000
+    },
+    "71600016": {
+      "id": 71600016,
+      "enchantType": 1,
+      "enchantLv": 7,
+      "enchantRate": 1000,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 2,
+      "enchantPointId": 100003,
+      "enchantPointVal": 100,
+      "enchantspecialItem": 23900136,
+      "enchantspecialRate": 1000
+    },
+    "71600017": {
+      "id": 71600017,
+      "enchantType": 1,
+      "enchantLv": 8,
+      "enchantRate": 800,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 3,
+      "enchantPointId": 100003,
+      "enchantPointVal": 100,
+      "enchantKeepItemId": 23900103,
+      "enchantKeepItemVal": 1,
+      "enchantspecialItem": 23900137,
+      "enchantspecialRate": 1000
+    },
+    "71600018": {
+      "id": 71600018,
+      "enchantType": 1,
+      "enchantLv": 9,
+      "enchantRate": 700,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 3,
+      "enchantPointId": 100003,
+      "enchantPointVal": 100,
+      "enchantKeepItemId": 23900103,
+      "enchantKeepItemVal": 1,
+      "enchantspecialItem": 23900138,
+      "enchantspecialRate": 1000
+    },
+    "71600019": {
+      "id": 71600019,
+      "enchantType": 1,
+      "enchantLv": 10,
+      "enchantRate": 500,
+      "enchantItemId": 23900101,
+      "enchantItemVal": 4,
+      "enchantPointId": 100003,
+      "enchantPointVal": 100,
+      "enchantKeepItemId": 23900103,
+      "enchantKeepItemVal": 1,
+      "enchantspecialItem": 23900139,
+      "enchantspecialRate": 1000
+    }
+  }
+}

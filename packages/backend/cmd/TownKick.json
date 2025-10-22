@@ -1,0 +1,170 @@
+{
+  ":TownKick": {
+    ":type": {
+      "id": "key",
+      "kickSituationType": "number",
+      "kickSituationVal": "number",
+      "kickResultType": "number",
+      "royalTitleId": "number",
+      "intimacyTerms": "number",
+      "reputationTerms": "number",
+      "minTownTime": "number",
+      "maxTownTime": "number",
+      "ratio": "number"
+    },
+    ":required": {},
+    ":min": {
+      "kickSituationType": 1,
+      "kickResultType": 1,
+      "royalTitleId": 21700000
+    },
+    ":max": {
+      "kickSituationType": 2,
+      "kickResultType": 2,
+      "royalTitleId": 21709999
+    },
+    ":enum": {},
+    ":links": {
+      "royalTitleId": [
+        "RoyalTitle"
+      ]
+    }
+  },
+  "TownKick": {
+    "19600001": {
+      "id": 19600001,
+      "kickSituationType": 1,
+      "kickSituationVal": 0,
+      "kickResultType": 1,
+      "intimacyTerms": 0,
+      "reputationTerms": 25001,
+      "ratio": 30
+    },
+    "19600002": {
+      "id": 19600002,
+      "kickSituationType": 1,
+      "kickSituationVal": 1,
+      "kickResultType": 1,
+      "intimacyTerms": 0,
+      "reputationTerms": 25001,
+      "ratio": 100
+    },
+    "19600003": {
+      "id": 19600003,
+      "kickSituationType": 1,
+      "kickSituationVal": 2,
+      "kickResultType": 1,
+      "intimacyTerms": 0,
+      "reputationTerms": 25001,
+      "ratio": 50
+    },
+    "19600005": {
+      "id": 19600005,
+      "kickSituationType": 2,
+      "kickSituationVal": 1,
+      "kickResultType": 1,
+      "intimacyTerms": 0,
+      "reputationTerms": 25001,
+      "ratio": 30
+    },
+    "19600006": {
+      "id": 19600006,
+      "kickSituationType": 2,
+      "kickSituationVal": 2,
+      "kickResultType": 1,
+      "intimacyTerms": 0,
+      "reputationTerms": 25001,
+      "ratio": 30
+    },
+    "19600007": {
+      "id": 19600007,
+      "kickSituationType": 2,
+      "kickSituationVal": 3,
+      "kickResultType": 1,
+      "intimacyTerms": 0,
+      "reputationTerms": 25001,
+      "ratio": 30
+    },
+    "19600008": {
+      "id": 19600008,
+      "kickSituationType": 2,
+      "kickSituationVal": 4,
+      "kickResultType": 1,
+      "intimacyTerms": 0,
+      "reputationTerms": 25001,
+      "ratio": 0
+    },
+    "19600009": {
+      "id": 19600009,
+      "kickSituationType": 2,
+      "kickSituationVal": 5,
+      "kickResultType": 1,
+      "intimacyTerms": 0,
+      "reputationTerms": 25001,
+      "ratio": 30
+    },
+    "19600010": {
+      "id": 19600010,
+      "kickSituationType": 2,
+      "kickSituationVal": 6,
+      "kickResultType": 1,
+      "intimacyTerms": 0,
+      "reputationTerms": 25001,
+      "ratio": 30
+    },
+    "19600011": {
+      "id": 19600011,
+      "kickSituationType": 2,
+      "kickSituationVal": 7,
+      "kickResultType": 1,
+      "intimacyTerms": 0,
+      "reputationTerms": 25001,
+      "ratio": 30
+    },
+    "19600012": {
+      "id": 19600012,
+      "kickSituationType": 2,
+      "kickSituationVal": 9,
+      "kickResultType": 1,
+      "intimacyTerms": 0,
+      "reputationTerms": 25001,
+      "ratio": 30
+    },
+    "19600013": {
+      "id": 19600013,
+      "kickSituationType": 2,
+      "kickSituationVal": 10,
+      "kickResultType": 1,
+      "intimacyTerms": 0,
+      "reputationTerms": 25001,
+      "ratio": 30
+    },
+    "19600014": {
+      "id": 19600014,
+      "kickSituationType": 2,
+      "kickSituationVal": 11,
+      "kickResultType": 1,
+      "intimacyTerms": 0,
+      "reputationTerms": 25001,
+      "ratio": 30
+    },
+    "19600015": {
+      "id": 19600015,
+      "kickSituationType": 2,
+      "kickSituationVal": 12,
+      "kickResultType": 1,
+      "intimacyTerms": 0,
+      "reputationTerms": 25001,
+      "ratio": 0
+    },
+    "19600016": {
+      "id": 19600016,
+      "kickSituationType": 2,
+      "kickSituationVal": 13,
+      "kickResultType": 1,
+      "intimacyTerms": 0,
+      "reputationTerms": 25001,
+      "ratio": 30
+    }
+  }
+}

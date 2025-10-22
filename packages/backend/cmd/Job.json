@@ -1,0 +1,4290 @@
+{
+  ":Job": {
+    ":type": {
+      "id": "key",
+      "name": "text",
+      "jobType": "number",
+      "jobBattleType": "number",
+      "charType": "number",
+      "freeRoaming": "number",
+      "pathRoaming": "number",
+      "anchor": "number",
+      "amityCabin": [
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number"
+      ],
+      "autoJobPassiveId": "number",
+      "autoBattleSkillJobType": "number",
+      "autoBattleSkillJobLv": "number",
+      "WorldPassive": [
+        {
+          "Id": "number",
+          "JobType": "number",
+          "JobLv": "number"
+        },
+        {
+          "Id": "number",
+          "JobType": "number",
+          "JobLv": "number"
+        }
+      ],
+      "specialStatMultiple": [
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number"
+      ],
+      "statEffect": [
+        {
+          "Type": "number",
+          "Id": "number",
+          "Bonus": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Bonus": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Bonus": "number"
+        },
+        {
+          "Type": "number",
+          "Id": "number",
+          "Bonus": "number"
+        }
+      ]
+    },
+    ":required": {
+      "jobType": 1,
+      "jobBattleType": 1,
+      "charType": 1,
+      "specialStatMultiple": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    ":requiredInObject": {
+      "WorldPassive": [
+        {
+          "Id": 1,
+          "JobType": 1,
+          "JobLv": 1
+        },
+        {
+          "Id": 1,
+          "JobType": 1,
+          "JobLv": 1
+        }
+      ],
+      "specialStatMultiple": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 1,
+          "Bonus": 1
+        },
+        {
+          "Type": 1,
+          "Id": 1,
+          "Bonus": 1
+        },
+        {
+          "Type": 1,
+          "Id": 1,
+          "Bonus": 1
+        },
+        {
+          "Type": 1,
+          "Id": 1,
+          "Bonus": 1
+        }
+      ]
+    },
+    ":min": {
+      "jobType": 0,
+      "jobBattleType": 0,
+      "charType": 0,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200000,
+      "WorldPassive": [
+        {
+          "Id": 75200000
+        },
+        {
+          "Id": 75200000
+        }
+      ]
+    },
+    ":max": {
+      "jobType": 3,
+      "jobBattleType": 4,
+      "charType": 3,
+      "amityCabin": [
+        70399999,
+        70399999,
+        70399999,
+        70399999,
+        70399999,
+        70399999,
+        70399999,
+        70399999,
+        70399999,
+        70399999
+      ],
+      "autoJobPassiveId": 65299999,
+      "autoBattleSkillJobType": 3,
+      "WorldPassive": [
+        {
+          "Id": 75299999,
+          "JobType": 3,
+          "JobLv": 100
+        },
+        {
+          "Id": 75299999,
+          "JobType": 3,
+          "JobLv": 100
+        }
+      ],
+      "specialStatMultiple": [
+        99999999,
+        99999999,
+        99999999,
+        99999999,
+        99999999,
+        99999999,
+        99999999,
+        99999999,
+        99999999,
+        99999999,
+        99999999,
+        99999999
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 99999999,
+          "Bonus": 99999999
+        },
+        {
+          "Type": 1,
+          "Id": 99999999,
+          "Bonus": 99999999
+        },
+        {
+          "Type": 1,
+          "Id": 99999999,
+          "Bonus": 99999999
+        },
+        {
+          "Type": 1,
+          "Id": 99999999,
+          "Bonus": 99999999
+        }
+      ]
+    },
+    ":enum": {},
+    ":links": {
+      "amityCabin": [
+        [
+          "ShipCabinRelation"
+        ],
+        [
+          "ShipCabinRelation"
+        ],
+        [
+          "ShipCabinRelation"
+        ],
+        [
+          "ShipCabinRelation"
+        ],
+        [
+          "ShipCabinRelation"
+        ],
+        [
+          "ShipCabinRelation"
+        ],
+        [
+          "ShipCabinRelation"
+        ],
+        [
+          "ShipCabinRelation"
+        ],
+        [
+          "ShipCabinRelation"
+        ],
+        [
+          "ShipCabinRelation"
+        ]
+      ],
+      "autoJobPassiveId": [
+        "AutoJobPassive"
+      ],
+      "WorldPassive": [
+        {
+          "Id": [
+            "WorldPassive"
+          ]
+        },
+        {
+          "Id": [
+            "WorldPassive"
+          ]
+        }
+      ],
+      "statEffect": [
+        {
+          "Id": [
+            "StatOperator",
+            "WorldPassiveEffect"
+          ]
+        },
+        {
+          "Id": [
+            "StatOperator",
+            "WorldPassiveEffect"
+          ]
+        },
+        {
+          "Id": [
+            "StatOperator",
+            "WorldPassiveEffect"
+          ]
+        },
+        {
+          "Id": [
+            "StatOperator",
+            "WorldPassiveEffect"
+          ]
+        }
+      ]
+    }
+  },
+  "Job": {
+    "21400000": {
+      "id": 21400000,
+      "name": "없음",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200001,
+      "specialStatMultiple": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ]
+    },
+    "21400001": {
+      "id": 21400001,
+      "name": "유탄수",
+      "jobType": 3,
+      "jobBattleType": 3,
+      "charType": 0,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300010,
+        70300008,
+        70301010,
+        70301008,
+        70302010,
+        70302008,
+        70303010,
+        70303008,
+        70304010,
+        70304008
+      ],
+      "autoJobPassiveId": 65200002,
+      "specialStatMultiple": [
+        720,
+        280,
+        240,
+        320,
+        80,
+        200,
+        160,
+        120,
+        360,
+        240,
+        280,
+        320
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1023,
+          "Bonus": 20
+        }
+      ]
+    },
+    "21400002": {
+      "id": 21400002,
+      "name": "함포수",
+      "jobType": 3,
+      "jobBattleType": 3,
+      "charType": 0,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300010,
+        70300008,
+        70301010,
+        70301008,
+        70302010,
+        70302008,
+        70303010,
+        70303008,
+        70304010,
+        70304008
+      ],
+      "autoJobPassiveId": 65200001,
+      "specialStatMultiple": [
+        720,
+        280,
+        240,
+        320,
+        280,
+        320,
+        360,
+        240,
+        160,
+        80,
+        200,
+        120
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1029,
+          "Bonus": 20
+        }
+      ]
+    },
+    "21400003": {
+      "id": 21400003,
+      "name": "대사수",
+      "jobType": 3,
+      "jobBattleType": 3,
+      "charType": 0,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300010,
+        70300008,
+        70301010,
+        70301008,
+        70302010,
+        70302008,
+        70303010,
+        70303008,
+        70304010,
+        70304008
+      ],
+      "autoJobPassiveId": 65200000,
+      "specialStatMultiple": [
+        720,
+        280,
+        240,
+        320,
+        80,
+        200,
+        160,
+        120,
+        320,
+        360,
+        280,
+        240
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1027,
+          "Bonus": 20
+        }
+      ]
+    },
+    "21400004": {
+      "id": 21400004,
+      "name": "조타원",
+      "jobType": 3,
+      "jobBattleType": 1,
+      "charType": 0,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300005,
+        70300002,
+        70301005,
+        70301002,
+        70302005,
+        70302002,
+        70303005,
+        70303002,
+        70304005,
+        70304002
+      ],
+      "autoJobPassiveId": 65200005,
+      "specialStatMultiple": [
+        320,
+        720,
+        240,
+        280,
+        240,
+        280,
+        320,
+        360,
+        200,
+        160,
+        120,
+        80
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1111,
+          "Bonus": 20
+        }
+      ]
+    },
+    "21400005": {
+      "id": 21400005,
+      "name": "조타수",
+      "jobType": 3,
+      "jobBattleType": 1,
+      "charType": 0,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300005,
+        70300002,
+        70301005,
+        70301002,
+        70302005,
+        70302002,
+        70303005,
+        70303002,
+        70304005,
+        70304002
+      ],
+      "autoJobPassiveId": 65200004,
+      "specialStatMultiple": [
+        320,
+        720,
+        240,
+        280,
+        160,
+        120,
+        80,
+        200,
+        280,
+        240,
+        360,
+        320
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1053,
+          "Bonus": 20
+        }
+      ]
+    },
+    "21400006": {
+      "id": 21400006,
+      "name": "조타장",
+      "jobType": 3,
+      "jobBattleType": 1,
+      "charType": 0,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300005,
+        70300002,
+        70301005,
+        70301002,
+        70302005,
+        70302002,
+        70303005,
+        70303002,
+        70304005,
+        70304002
+      ],
+      "autoJobPassiveId": 65200003,
+      "specialStatMultiple": [
+        320,
+        720,
+        240,
+        280,
+        360,
+        240,
+        280,
+        320,
+        120,
+        200,
+        80,
+        160
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1091,
+          "Bonus": 20
+        }
+      ]
+    },
+    "21400007": {
+      "id": 21400007,
+      "name": "백병대",
+      "jobType": 3,
+      "jobBattleType": 4,
+      "charType": 0,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300011,
+        70300017,
+        70301011,
+        70301017,
+        70302011,
+        70302017,
+        70303011,
+        70303017,
+        70304011,
+        70304017
+      ],
+      "autoJobPassiveId": 65200008,
+      "specialStatMultiple": [
+        280,
+        320,
+        240,
+        720,
+        200,
+        160,
+        120,
+        80,
+        240,
+        280,
+        320,
+        360
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1038,
+          "Bonus": 20
+        }
+      ]
+    },
+    "21400008": {
+      "id": 21400008,
+      "name": "타격대",
+      "jobType": 3,
+      "jobBattleType": 4,
+      "charType": 0,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300011,
+        70300017,
+        70301011,
+        70301017,
+        70302011,
+        70302017,
+        70303011,
+        70303017,
+        70304011,
+        70304017
+      ],
+      "autoJobPassiveId": 65200007,
+      "specialStatMultiple": [
+        280,
+        320,
+        240,
+        720,
+        360,
+        240,
+        280,
+        320,
+        80,
+        120,
+        160,
+        200
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1042,
+          "Bonus": 20
+        }
+      ]
+    },
+    "21400009": {
+      "id": 21400009,
+      "name": "특공대",
+      "jobType": 3,
+      "jobBattleType": 4,
+      "charType": 0,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300011,
+        70300017,
+        70301011,
+        70301017,
+        70302011,
+        70302017,
+        70303011,
+        70303017,
+        70304011,
+        70304017
+      ],
+      "autoJobPassiveId": 65200006,
+      "specialStatMultiple": [
+        280,
+        320,
+        240,
+        720,
+        120,
+        80,
+        200,
+        160,
+        320,
+        360,
+        240,
+        280
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1044,
+          "Bonus": 20
+        }
+      ]
+    },
+    "21400010": {
+      "id": 21400010,
+      "name": "수련의",
+      "jobType": 3,
+      "jobBattleType": 2,
+      "charType": 0,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300015,
+        70300014,
+        70301015,
+        70301014,
+        70302015,
+        70302014,
+        70303015,
+        70303014,
+        70304015,
+        70304014
+      ],
+      "autoJobPassiveId": 65200011,
+      "specialStatMultiple": [
+        280,
+        320,
+        720,
+        240,
+        240,
+        280,
+        320,
+        360,
+        200,
+        160,
+        120,
+        80
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1060,
+          "Bonus": 20
+        }
+      ]
+    },
+    "21400011": {
+      "id": 21400011,
+      "name": "일반의",
+      "jobType": 3,
+      "jobBattleType": 2,
+      "charType": 0,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300015,
+        70300014,
+        70301015,
+        70301014,
+        70302015,
+        70302014,
+        70303015,
+        70303014,
+        70304015,
+        70304014
+      ],
+      "autoJobPassiveId": 65200010,
+      "specialStatMultiple": [
+        240,
+        280,
+        720,
+        320,
+        160,
+        120,
+        80,
+        200,
+        280,
+        320,
+        360,
+        240
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1097,
+          "Bonus": 20
+        }
+      ]
+    },
+    "21400012": {
+      "id": 21400012,
+      "name": "전문의",
+      "jobType": 3,
+      "jobBattleType": 2,
+      "charType": 0,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300015,
+        70300014,
+        70301015,
+        70301014,
+        70302015,
+        70302014,
+        70303015,
+        70303014,
+        70304015,
+        70304014
+      ],
+      "autoJobPassiveId": 65200009,
+      "specialStatMultiple": [
+        320,
+        240,
+        720,
+        280,
+        320,
+        360,
+        240,
+        280,
+        120,
+        80,
+        200,
+        160
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1113,
+          "Bonus": 20
+        }
+      ]
+    },
+    "21400013": {
+      "id": 21400013,
+      "name": "수리공",
+      "jobType": 3,
+      "jobBattleType": 2,
+      "charType": 0,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300020,
+        70300003,
+        70301020,
+        70301003,
+        70302020,
+        70302003,
+        70303020,
+        70303003,
+        70304020,
+        70304003
+      ],
+      "autoJobPassiveId": 65200014,
+      "specialStatMultiple": [
+        320,
+        280,
+        720,
+        240,
+        200,
+        160,
+        120,
+        80,
+        240,
+        280,
+        320,
+        360
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1057,
+          "Bonus": 20
+        }
+      ]
+    },
+    "21400014": {
+      "id": 21400014,
+      "name": "조선공",
+      "jobType": 3,
+      "jobBattleType": 2,
+      "charType": 0,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300020,
+        70300003,
+        70301020,
+        70301003,
+        70302020,
+        70302003,
+        70303020,
+        70303003,
+        70304020,
+        70304003
+      ],
+      "autoJobPassiveId": 65200013,
+      "specialStatMultiple": [
+        240,
+        320,
+        720,
+        280,
+        280,
+        320,
+        360,
+        240,
+        160,
+        120,
+        80,
+        200
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1095,
+          "Bonus": 20
+        }
+      ]
+    },
+    "21400015": {
+      "id": 21400015,
+      "name": "설계사",
+      "jobType": 3,
+      "jobBattleType": 2,
+      "charType": 0,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300020,
+        70300003,
+        70301020,
+        70301003,
+        70302020,
+        70302003,
+        70303020,
+        70303003,
+        70304020,
+        70304003
+      ],
+      "autoJobPassiveId": 65200012,
+      "specialStatMultiple": [
+        280,
+        240,
+        720,
+        320,
+        200,
+        160,
+        280,
+        240,
+        240,
+        280,
+        160,
+        200
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 1112,
+          "Bonus": 20
+        }
+      ]
+    },
+    "21400016": {
+      "id": 21400016,
+      "name": "해군 장교",
+      "jobType": 3,
+      "jobBattleType": 3,
+      "charType": 1,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200045,
+      "specialStatMultiple": [
+        640,
+        400,
+        400,
+        800,
+        280,
+        320,
+        240,
+        360,
+        120,
+        80,
+        200,
+        160
+      ]
+    },
+    "21400017": {
+      "id": 21400017,
+      "name": "사략 해적",
+      "jobType": 3,
+      "jobBattleType": 3,
+      "charType": 1,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200046,
+      "specialStatMultiple": [
+        800,
+        640,
+        400,
+        400,
+        80,
+        120,
+        200,
+        160,
+        320,
+        360,
+        240,
+        280
+      ]
+    },
+    "21400018": {
+      "id": 21400018,
+      "name": "알제 해적",
+      "jobType": 3,
+      "jobBattleType": 4,
+      "charType": 1,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200047,
+      "specialStatMultiple": [
+        400,
+        640,
+        400,
+        800,
+        200,
+        160,
+        80,
+        120,
+        280,
+        240,
+        360,
+        320
+      ]
+    },
+    "21400019": {
+      "id": 21400019,
+      "name": "척가군 대장",
+      "jobType": 3,
+      "jobBattleType": 2,
+      "charType": 1,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200048,
+      "specialStatMultiple": [
+        800,
+        400,
+        400,
+        640,
+        240,
+        280,
+        320,
+        360,
+        160,
+        120,
+        80,
+        200
+      ]
+    },
+    "21400020": {
+      "id": 21400020,
+      "name": "충의지사",
+      "jobType": 3,
+      "jobBattleType": 4,
+      "charType": 1,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200049,
+      "specialStatMultiple": [
+        400,
+        640,
+        400,
+        800,
+        360,
+        240,
+        280,
+        320,
+        80,
+        160,
+        200,
+        120
+      ]
+    },
+    "21400021": {
+      "id": 21400021,
+      "name": "수군절도사",
+      "jobType": 3,
+      "jobBattleType": 3,
+      "charType": 1,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200050,
+      "specialStatMultiple": [
+        800,
+        400,
+        400,
+        640,
+        320,
+        360,
+        240,
+        280,
+        200,
+        80,
+        120,
+        160
+      ]
+    },
+    "21400022": {
+      "id": 21400022,
+      "name": "나사우 해적",
+      "jobType": 3,
+      "jobBattleType": 4,
+      "charType": 1,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200054,
+      "specialStatMultiple": [
+        640,
+        400,
+        400,
+        800,
+        160,
+        200,
+        120,
+        80,
+        240,
+        320,
+        280,
+        360
+      ]
+    },
+    "21400023": {
+      "id": 21400023,
+      "name": "스카이피아 통치자",
+      "jobType": 3,
+      "jobBattleType": 1,
+      "charType": 1,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200073,
+      "specialStatMultiple": [
+        640,
+        720,
+        480,
+        480,
+        160,
+        120,
+        80,
+        200,
+        280,
+        320,
+        360,
+        240
+      ]
+    },
+    "21400024": {
+      "id": 21400024,
+      "name": "더치맨함 선장",
+      "jobType": 3,
+      "jobBattleType": 1,
+      "charType": 1,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200073,
+      "specialStatMultiple": [
+        640,
+        480,
+        640,
+        720,
+        120,
+        80,
+        200,
+        160,
+        320,
+        360,
+        240,
+        280
+      ]
+    },
+    "21400025": {
+      "id": 21400025,
+      "name": "아일랜드 해적",
+      "jobType": 3,
+      "jobBattleType": 1,
+      "charType": 1,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200055,
+      "specialStatMultiple": [
+        640,
+        800,
+        400,
+        400,
+        200,
+        160,
+        120,
+        80,
+        360,
+        280,
+        320,
+        240
+      ]
+    },
+    "21400026": {
+      "id": 21400026,
+      "name": "테투안 영주",
+      "jobType": 3,
+      "jobBattleType": 2,
+      "charType": 1,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200056,
+      "specialStatMultiple": [
+        400,
+        400,
+        800,
+        640,
+        280,
+        320,
+        360,
+        240,
+        120,
+        200,
+        160,
+        80
+      ]
+    },
+    "21400027": {
+      "id": 21400027,
+      "name": "신대륙 정복자",
+      "jobType": 3,
+      "jobBattleType": 2,
+      "charType": 1,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200057,
+      "specialStatMultiple": [
+        400,
+        640,
+        400,
+        800,
+        120,
+        80,
+        160,
+        200,
+        320,
+        360,
+        240,
+        280
+      ]
+    },
+    "21400028": {
+      "id": 21400028,
+      "name": "자유로운 영웅",
+      "jobType": 3,
+      "jobBattleType": 4,
+      "charType": 1,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200081,
+      "specialStatMultiple": [
+        400,
+        400,
+        640,
+        800,
+        200,
+        120,
+        160,
+        80,
+        360,
+        320,
+        240,
+        280
+      ]
+    },
+    "21400029": {
+      "id": 21400029,
+      "name": "죽음의 군주",
+      "jobType": 3,
+      "jobBattleType": 4,
+      "charType": 1,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200085,
+      "specialStatMultiple": [
+        400,
+        640,
+        400,
+        800,
+        120,
+        160,
+        80,
+        200,
+        360,
+        240,
+        280,
+        320
+      ]
+    },
+    "21401001": {
+      "id": 21401001,
+      "name": "식품상",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300004,
+        70300000,
+        70301004,
+        70300000,
+        70302004,
+        70300000,
+        70303004,
+        70300000,
+        70304004,
+        70300000
+      ],
+      "autoJobPassiveId": 65200015,
+      "specialStatMultiple": [
+        80,
+        120,
+        200,
+        160,
+        720,
+        320,
+        240,
+        280,
+        360,
+        320,
+        240,
+        280
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75300151,
+          "Bonus": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300141,
+          "Bonus": 10
+        }
+      ]
+    },
+    "21401002": {
+      "id": 21401002,
+      "name": "가축상",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300004,
+        70300000,
+        70301004,
+        70300000,
+        70302004,
+        70300000,
+        70303004,
+        70300000,
+        70304004,
+        70300000
+      ],
+      "autoJobPassiveId": 65200016,
+      "specialStatMultiple": [
+        120,
+        80,
+        160,
+        200,
+        720,
+        320,
+        280,
+        240,
+        320,
+        240,
+        280,
+        360
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75300161,
+          "Bonus": 10
+        }
+      ]
+    },
+    "21401003": {
+      "id": 21401003,
+      "name": "약품상",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300004,
+        70300000,
+        70301004,
+        70300000,
+        70302004,
+        70300000,
+        70303004,
+        70300000,
+        70304004,
+        70300000
+      ],
+      "autoJobPassiveId": 65200017,
+      "specialStatMultiple": [
+        80,
+        120,
+        200,
+        160,
+        240,
+        720,
+        320,
+        280,
+        240,
+        280,
+        360,
+        320
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75300171,
+          "Bonus": 10
+        }
+      ]
+    },
+    "21401004": {
+      "id": 21401004,
+      "name": "잡화상",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300004,
+        70300000,
+        70301004,
+        70300000,
+        70302004,
+        70300000,
+        70303004,
+        70300000,
+        70304004,
+        70300000
+      ],
+      "autoJobPassiveId": 65200018,
+      "specialStatMultiple": [
+        160,
+        80,
+        200,
+        120,
+        720,
+        280,
+        320,
+        240,
+        280,
+        360,
+        320,
+        240
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75300221,
+          "Bonus": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300181,
+          "Bonus": 10
+        }
+      ]
+    },
+    "21401005": {
+      "id": 21401005,
+      "name": "주류상",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300004,
+        70300000,
+        70301004,
+        70300000,
+        70302004,
+        70300000,
+        70303004,
+        70300000,
+        70304004,
+        70300000
+      ],
+      "autoJobPassiveId": 65200019,
+      "specialStatMultiple": [
+        80,
+        120,
+        160,
+        200,
+        240,
+        720,
+        280,
+        320,
+        360,
+        320,
+        240,
+        280
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75300191,
+          "Bonus": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300231,
+          "Bonus": 10
+        }
+      ]
+    },
+    "21401006": {
+      "id": 21401006,
+      "name": "염료상",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300004,
+        70300000,
+        70301004,
+        70300000,
+        70302004,
+        70300000,
+        70303004,
+        70300000,
+        70304004,
+        70300000
+      ],
+      "autoJobPassiveId": 65200020,
+      "specialStatMultiple": [
+        80,
+        120,
+        160,
+        200,
+        720,
+        240,
+        320,
+        280,
+        320,
+        240,
+        280,
+        360
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75300201,
+          "Bonus": 10
+        }
+      ]
+    },
+    "21401007": {
+      "id": 21401007,
+      "name": "광물상",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300004,
+        70300000,
+        70301004,
+        70300000,
+        70302004,
+        70300000,
+        70303004,
+        70300000,
+        70304004,
+        70300000
+      ],
+      "autoJobPassiveId": 65200021,
+      "specialStatMultiple": [
+        160,
+        200,
+        120,
+        80,
+        280,
+        320,
+        720,
+        240,
+        240,
+        280,
+        360,
+        320
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75300211,
+          "Bonus": 10
+        }
+      ]
+    },
+    "21401008": {
+      "id": 21401008,
+      "name": "방적상",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300004,
+        70300000,
+        70301004,
+        70300000,
+        70302004,
+        70300000,
+        70303004,
+        70300000,
+        70304004,
+        70300000
+      ],
+      "autoJobPassiveId": 65200022,
+      "specialStatMultiple": [
+        160,
+        200,
+        120,
+        80,
+        240,
+        720,
+        280,
+        320,
+        280,
+        360,
+        320,
+        240
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75300251,
+          "Bonus": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300241,
+          "Bonus": 10
+        }
+      ]
+    },
+    "21401009": {
+      "id": 21401009,
+      "name": "미술상",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300002,
+        70300013,
+        70301002,
+        70301013,
+        70302002,
+        70302013,
+        70303002,
+        70303013,
+        70304002,
+        70304013
+      ],
+      "autoJobPassiveId": 65200023,
+      "specialStatMultiple": [
+        80,
+        200,
+        120,
+        160,
+        280,
+        240,
+        720,
+        320,
+        360,
+        320,
+        240,
+        280
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75300291,
+          "Bonus": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300281,
+          "Bonus": 10
+        }
+      ]
+    },
+    "21401010": {
+      "id": 21401010,
+      "name": "향료상",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300004,
+        70300000,
+        70301004,
+        70300000,
+        70302004,
+        70300000,
+        70303004,
+        70300000,
+        70304004,
+        70300000
+      ],
+      "autoJobPassiveId": 65200024,
+      "specialStatMultiple": [
+        200,
+        80,
+        160,
+        120,
+        280,
+        720,
+        320,
+        240,
+        320,
+        240,
+        280,
+        360
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75300321,
+          "Bonus": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300301,
+          "Bonus": 10
+        }
+      ]
+    },
+    "21401011": {
+      "id": 21401011,
+      "name": "보석상",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300020,
+        70300021,
+        70301020,
+        70301021,
+        70302020,
+        70302021,
+        70303020,
+        70303021,
+        70304020,
+        70304021
+      ],
+      "autoJobPassiveId": 65200025,
+      "specialStatMultiple": [
+        120,
+        200,
+        160,
+        80,
+        320,
+        240,
+        720,
+        280,
+        240,
+        280,
+        360,
+        320
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75300331,
+          "Bonus": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300311,
+          "Bonus": 10
+        }
+      ]
+    },
+    "21401012": {
+      "id": 21401012,
+      "name": "가공상",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300020,
+        70300021,
+        70301020,
+        70301021,
+        70302020,
+        70302021,
+        70303020,
+        70303021,
+        70304020,
+        70304021
+      ],
+      "autoJobPassiveId": 65200026,
+      "specialStatMultiple": [
+        120,
+        160,
+        200,
+        80,
+        280,
+        320,
+        240,
+        720,
+        280,
+        360,
+        320,
+        240
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75300271,
+          "Bonus": 10
+        },
+        {
+          "Type": 1,
+          "Id": 75300261,
+          "Bonus": 10
+        }
+      ]
+    },
+    "21401013": {
+      "id": 21401013,
+      "name": "회계사",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300020,
+        70300021,
+        70301020,
+        70301021,
+        70302020,
+        70302021,
+        70303020,
+        70303021,
+        70304020,
+        70304021
+      ],
+      "autoJobPassiveId": 65200027,
+      "specialStatMultiple": [
+        200,
+        120,
+        160,
+        80,
+        320,
+        240,
+        280,
+        720,
+        360,
+        320,
+        240,
+        280
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75312096,
+          "Bonus": 2
+        }
+      ]
+    },
+    "21401014": {
+      "id": 21401014,
+      "name": "투자가",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300020,
+        70300021,
+        70301020,
+        70301021,
+        70302020,
+        70302021,
+        70303020,
+        70303021,
+        70304020,
+        70304021
+      ],
+      "autoJobPassiveId": 65200028,
+      "specialStatMultiple": [
+        200,
+        80,
+        160,
+        120,
+        320,
+        280,
+        240,
+        720,
+        320,
+        240,
+        280,
+        360
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 2007,
+          "Bonus": 1000
+        }
+      ]
+    },
+    "21401015": {
+      "id": 21401015,
+      "name": "협상가",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300002,
+        70300018,
+        70301002,
+        70301018,
+        70302002,
+        70302018,
+        70303002,
+        70303018,
+        70304002,
+        70304018
+      ],
+      "autoJobPassiveId": 65200029,
+      "specialStatMultiple": [
+        200,
+        80,
+        160,
+        120,
+        320,
+        280,
+        720,
+        240,
+        240,
+        280,
+        360,
+        320
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75312104,
+          "Bonus": 2
+        }
+      ]
+    },
+    "21401016": {
+      "id": 21401016,
+      "name": "오스만 무역상",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300001,
+        70300017,
+        70301001,
+        70301017,
+        70302001,
+        70302017,
+        70303001,
+        70303017,
+        70304001,
+        70304017
+      ],
+      "autoJobPassiveId": 65200058,
+      "specialStatMultiple": [
+        80,
+        160,
+        200,
+        120,
+        800,
+        640,
+        400,
+        400,
+        360,
+        320,
+        240,
+        280
+      ]
+    },
+    "21401017": {
+      "id": 21401017,
+      "name": "센다이 번주",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300001,
+        70300005,
+        70301001,
+        70301005,
+        70302001,
+        70302005,
+        70303001,
+        70303005,
+        70304001,
+        70304005
+      ],
+      "autoJobPassiveId": 65200059,
+      "specialStatMultiple": [
+        200,
+        120,
+        80,
+        160,
+        800,
+        400,
+        640,
+        400,
+        320,
+        240,
+        280,
+        360
+      ]
+    },
+    "21401018": {
+      "id": 21401018,
+      "name": "바로크워크스 사장",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300001,
+        70300016,
+        70301001,
+        70301016,
+        70302001,
+        70302016,
+        70303001,
+        70303016,
+        70304001,
+        70304016
+      ],
+      "autoJobPassiveId": 65200068,
+      "specialStatMultiple": [
+        80,
+        120,
+        200,
+        160,
+        400,
+        800,
+        400,
+        640,
+        240,
+        280,
+        360,
+        320
+      ]
+    },
+    "21401019": {
+      "id": 21401019,
+      "name": "제주 상단 상인",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300001,
+        70300004,
+        70301001,
+        70301004,
+        70302001,
+        70302004,
+        70303001,
+        70303004,
+        70304001,
+        70304004
+      ],
+      "autoJobPassiveId": 65200060,
+      "specialStatMultiple": [
+        160,
+        80,
+        200,
+        120,
+        640,
+        800,
+        400,
+        400,
+        280,
+        360,
+        320,
+        240
+      ]
+    },
+    "21401020": {
+      "id": 21401020,
+      "name": "비자푸르 섭정",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300001,
+        70300020,
+        70301001,
+        70301020,
+        70302001,
+        70302020,
+        70303001,
+        70303020,
+        70304001,
+        70304020
+      ],
+      "autoJobPassiveId": 65200061,
+      "specialStatMultiple": [
+        120,
+        160,
+        80,
+        200,
+        400,
+        640,
+        800,
+        400,
+        360,
+        320,
+        240,
+        280
+      ]
+    },
+    "21401021": {
+      "id": 21401021,
+      "name": "백화 상인",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300001,
+        70300014,
+        70301001,
+        70301014,
+        70302001,
+        70302014,
+        70303001,
+        70303014,
+        70304001,
+        70304014
+      ],
+      "autoJobPassiveId": 65200062,
+      "specialStatMultiple": [
+        200,
+        120,
+        160,
+        80,
+        400,
+        400,
+        800,
+        640,
+        320,
+        240,
+        280,
+        360
+      ]
+    },
+    "21401022": {
+      "id": 21401022,
+      "name": "차르",
+      "jobType": 3,
+      "jobBattleType": 3,
+      "charType": 1,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300001,
+        70300011,
+        70301001,
+        70301011,
+        70302001,
+        70302011,
+        70303001,
+        70303011,
+        70304001,
+        70304011
+      ],
+      "autoJobPassiveId": 65200063,
+      "specialStatMultiple": [
+        800,
+        640,
+        400,
+        400,
+        80,
+        120,
+        200,
+        160,
+        320,
+        360,
+        240,
+        280
+      ]
+    },
+    "21401023": {
+      "id": 21401023,
+      "name": "동인도회사 총독",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300001,
+        70300007,
+        70301001,
+        70301007,
+        70302001,
+        70302007,
+        70303001,
+        70303007,
+        70304001,
+        70304007
+      ],
+      "autoJobPassiveId": 65200068,
+      "specialStatMultiple": [
+        160,
+        80,
+        120,
+        200,
+        400,
+        640,
+        400,
+        800,
+        280,
+        360,
+        320,
+        240
+      ]
+    },
+    "21401024": {
+      "id": 21401024,
+      "name": "말라카 해적 영주",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300001,
+        70300010,
+        70301001,
+        70301010,
+        70302001,
+        70302010,
+        70303001,
+        70303010,
+        70304001,
+        70304010
+      ],
+      "autoJobPassiveId": 65200068,
+      "specialStatMultiple": [
+        200,
+        160,
+        80,
+        120,
+        800,
+        640,
+        400,
+        400,
+        360,
+        320,
+        240,
+        280
+      ]
+    },
+    "21401025": {
+      "id": 21401025,
+      "name": "남만 항해사",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300001,
+        70300010,
+        70301001,
+        70301010,
+        70302001,
+        70302010,
+        70303001,
+        70303010,
+        70304001,
+        70304010
+      ],
+      "autoJobPassiveId": 65200078,
+      "specialStatMultiple": [
+        120,
+        80,
+        200,
+        160,
+        400,
+        800,
+        640,
+        400,
+        280,
+        320,
+        360,
+        240
+      ]
+    },
+    "21401026": {
+      "id": 21401026,
+      "name": "소가의 새가주",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300001,
+        70300010,
+        70301001,
+        70301010,
+        70302001,
+        70302010,
+        70303001,
+        70303010,
+        70304001,
+        70304010
+      ],
+      "autoJobPassiveId": 65200082,
+      "specialStatMultiple": [
+        80,
+        200,
+        120,
+        160,
+        400,
+        400,
+        640,
+        800,
+        240,
+        280,
+        360,
+        320
+      ]
+    },
+    "21401027": {
+      "id": 21401027,
+      "name": "베네치아 총독",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300004,
+        70300000,
+        70301004,
+        70300000,
+        70302004,
+        70300000,
+        70303004,
+        70300000,
+        70304004,
+        70300000
+      ],
+      "autoJobPassiveId": 65200083,
+      "specialStatMultiple": [
+        120,
+        160,
+        200,
+        80,
+        640,
+        800,
+        400,
+        400,
+        320,
+        280,
+        240,
+        360
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75312094,
+          "Bonus": 5
+        }
+      ]
+    },
+    "21401028": {
+      "id": 21401028,
+      "name": "런던의 균형추",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300004,
+        70300000,
+        70301004,
+        70300000,
+        70302004,
+        70300000,
+        70303004,
+        70300000,
+        70304004,
+        70300000
+      ],
+      "autoJobPassiveId": 65200084,
+      "specialStatMultiple": [
+        200,
+        120,
+        160,
+        80,
+        640,
+        400,
+        400,
+        800,
+        360,
+        320,
+        240,
+        280
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75312094,
+          "Bonus": 5
+        }
+      ]
+    },
+    "21401029": {
+      "id": 21401029,
+      "name": "비단상",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 300,
+      "anchor": 400,
+      "amityCabin": [
+        70300004,
+        70300000,
+        70301004,
+        70300000,
+        70302004,
+        70300000,
+        70303004,
+        70300000,
+        70304004,
+        70300000
+      ],
+      "autoJobPassiveId": 65200086,
+      "specialStatMultiple": [
+        200,
+        80,
+        160,
+        120,
+        400,
+        640,
+        400,
+        800,
+        360,
+        320,
+        280,
+        240
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75312094,
+          "Bonus": 5
+        }
+      ]
+    },
+    "21402001": {
+      "id": 21402001,
+      "name": "지리학자",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300008,
+        70300009,
+        70301008,
+        70301009,
+        70302008,
+        70302009,
+        70303008,
+        70303009,
+        70304008,
+        70304009
+      ],
+      "autoJobPassiveId": 65200030,
+      "specialStatMultiple": [
+        80,
+        200,
+        160,
+        120,
+        280,
+        320,
+        240,
+        360,
+        720,
+        320,
+        240,
+        280
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75311124,
+          "Bonus": 2
+        }
+      ]
+    },
+    "21402002": {
+      "id": 21402002,
+      "name": "고고학자",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300008,
+        70300009,
+        70301008,
+        70301009,
+        70302008,
+        70302009,
+        70303008,
+        70303009,
+        70304008,
+        70304009
+      ],
+      "autoJobPassiveId": 65200031,
+      "specialStatMultiple": [
+        120,
+        200,
+        160,
+        80,
+        320,
+        280,
+        360,
+        240,
+        720,
+        280,
+        320,
+        240
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 3148,
+          "Bonus": 0.3
+        }
+      ]
+    },
+    "21402003": {
+      "id": 21402003,
+      "name": "생물학자",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300008,
+        70300009,
+        70301008,
+        70301009,
+        70302008,
+        70302009,
+        70303008,
+        70303009,
+        70304008,
+        70304009
+      ],
+      "autoJobPassiveId": 65200032,
+      "specialStatMultiple": [
+        80,
+        120,
+        200,
+        160,
+        240,
+        320,
+        280,
+        360,
+        720,
+        240,
+        280,
+        320
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 3149,
+          "Bonus": 0.3
+        }
+      ]
+    },
+    "21402004": {
+      "id": 21402004,
+      "name": "예술학자",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300008,
+        70300009,
+        70301008,
+        70301009,
+        70302008,
+        70302009,
+        70303008,
+        70303009,
+        70304008,
+        70304009
+      ],
+      "autoJobPassiveId": 65200033,
+      "specialStatMultiple": [
+        120,
+        80,
+        160,
+        200,
+        320,
+        280,
+        240,
+        360,
+        720,
+        240,
+        320,
+        280
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75311120,
+          "Bonus": 2
+        }
+      ]
+    },
+    "21402005": {
+      "id": 21402005,
+      "name": "통역가",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300018,
+        70300019,
+        70301018,
+        70301019,
+        70302018,
+        70302019,
+        70303018,
+        70303019,
+        70304018,
+        70304019
+      ],
+      "autoJobPassiveId": 65200034,
+      "specialStatMultiple": [
+        120,
+        200,
+        160,
+        80,
+        360,
+        240,
+        320,
+        280,
+        320,
+        720,
+        280,
+        240
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75312075,
+          "Bonus": 2
+        }
+      ]
+    },
+    "21402006": {
+      "id": 21402006,
+      "name": "수렵가",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300017,
+        70300009,
+        70301017,
+        70301009,
+        70302017,
+        70302009,
+        70303017,
+        70303009,
+        70304017,
+        70304009
+      ],
+      "autoJobPassiveId": 65200035,
+      "specialStatMultiple": [
+        80,
+        120,
+        160,
+        200,
+        320,
+        360,
+        240,
+        280,
+        280,
+        720,
+        320,
+        240
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 3150,
+          "Bonus": 0.3
+        }
+      ]
+    },
+    "21402007": {
+      "id": 21402007,
+      "name": "탐험가",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300002,
+        70300017,
+        70301002,
+        70301017,
+        70302002,
+        70302017,
+        70303002,
+        70303017,
+        70304002,
+        70304017
+      ],
+      "autoJobPassiveId": 65200036,
+      "specialStatMultiple": [
+        80,
+        120,
+        160,
+        200,
+        280,
+        360,
+        320,
+        240,
+        240,
+        720,
+        280,
+        320
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75312073,
+          "Bonus": 2
+        }
+      ]
+    },
+    "21402008": {
+      "id": 21402008,
+      "name": "조범수",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300007,
+        70300006,
+        70301007,
+        70301006,
+        70302007,
+        70302006,
+        70303007,
+        70303006,
+        70304007,
+        70304006
+      ],
+      "autoJobPassiveId": 65200037,
+      "specialStatMultiple": [
+        200,
+        80,
+        160,
+        120,
+        240,
+        360,
+        280,
+        320,
+        320,
+        720,
+        240,
+        280
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75311126,
+          "Bonus": 2
+        }
+      ]
+    },
+    "21402009": {
+      "id": 21402009,
+      "name": "갑판장",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300006,
+        70300002,
+        70301006,
+        70301002,
+        70302006,
+        70302002,
+        70303006,
+        70303002,
+        70304006,
+        70304002
+      ],
+      "autoJobPassiveId": 65200038,
+      "specialStatMultiple": [
+        160,
+        120,
+        200,
+        80,
+        360,
+        280,
+        320,
+        240,
+        280,
+        320,
+        720,
+        240
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75311106,
+          "Bonus": 2
+        }
+      ]
+    },
+    "21402010": {
+      "id": 21402010,
+      "name": "수석 항해사",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300005,
+        70300000,
+        70301005,
+        70300000,
+        70302005,
+        70300000,
+        70303005,
+        70300000,
+        70304005,
+        70300000
+      ],
+      "autoJobPassiveId": 65200039,
+      "specialStatMultiple": [
+        160,
+        120,
+        200,
+        80,
+        240,
+        320,
+        360,
+        280,
+        240,
+        280,
+        720,
+        320
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75311024,
+          "Bonus": 2
+        }
+      ]
+    },
+    "21402011": {
+      "id": 21402011,
+      "name": "측량사",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300009,
+        70300000,
+        70301009,
+        70300000,
+        70302009,
+        70300000,
+        70303009,
+        70300000,
+        70304009,
+        70300000
+      ],
+      "autoJobPassiveId": 65200040,
+      "specialStatMultiple": [
+        80,
+        200,
+        160,
+        120,
+        280,
+        320,
+        240,
+        360,
+        240,
+        320,
+        720,
+        280
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75311009,
+          "Bonus": 2
+        }
+      ]
+    },
+    "21402012": {
+      "id": 21402012,
+      "name": "항해장",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300007,
+        70300002,
+        70301007,
+        70301002,
+        70302007,
+        70302002,
+        70303007,
+        70303002,
+        70304007,
+        70304002
+      ],
+      "autoJobPassiveId": 65200041,
+      "specialStatMultiple": [
+        120,
+        80,
+        200,
+        160,
+        240,
+        280,
+        360,
+        320,
+        320,
+        280,
+        720,
+        240
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75311008,
+          "Bonus": 2
+        }
+      ]
+    },
+    "21402013": {
+      "id": 21402013,
+      "name": "보급장",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300002,
+        70300000,
+        70301002,
+        70300000,
+        70302002,
+        70300000,
+        70303002,
+        70300000,
+        70304002,
+        70300000
+      ],
+      "autoJobPassiveId": 65200042,
+      "specialStatMultiple": [
+        200,
+        80,
+        160,
+        120,
+        280,
+        240,
+        360,
+        320,
+        280,
+        320,
+        240,
+        720
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75311102,
+          "Bonus": 2
+        }
+      ]
+    },
+    "21402014": {
+      "id": 21402014,
+      "name": "상담사",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300021,
+        70300000,
+        70301021,
+        70300000,
+        70302021,
+        70300000,
+        70303021,
+        70300000,
+        70304021,
+        70300000
+      ],
+      "autoJobPassiveId": 65200043,
+      "specialStatMultiple": [
+        120,
+        160,
+        200,
+        80,
+        320,
+        360,
+        280,
+        240,
+        240,
+        280,
+        320,
+        720
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75311018,
+          "Bonus": 2
+        }
+      ]
+    },
+    "21402015": {
+      "id": 21402015,
+      "name": "위생사",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300017,
+        70300000,
+        70301017,
+        70300000,
+        70302017,
+        70300000,
+        70303017,
+        70300000,
+        70304017,
+        70300000
+      ],
+      "autoJobPassiveId": 65200044,
+      "specialStatMultiple": [
+        160,
+        80,
+        200,
+        120,
+        360,
+        240,
+        280,
+        320,
+        240,
+        320,
+        280,
+        720
+      ],
+      "statEffect": [
+        {
+          "Type": 1,
+          "Id": 75311100,
+          "Bonus": 2
+        }
+      ]
+    },
+    "21402016": {
+      "id": 21402016,
+      "name": "지리학 강사",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200064,
+      "specialStatMultiple": [
+        80,
+        200,
+        160,
+        120,
+        360,
+        240,
+        280,
+        320,
+        800,
+        640,
+        400,
+        400
+      ]
+    },
+    "21402017": {
+      "id": 21402017,
+      "name": "태감",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200065,
+      "specialStatMultiple": [
+        200,
+        120,
+        80,
+        160,
+        320,
+        360,
+        280,
+        240,
+        800,
+        400,
+        640,
+        400
+      ]
+    },
+    "21402018": {
+      "id": 21402018,
+      "name": "광역 해적",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200054,
+      "specialStatMultiple": [
+        80,
+        160,
+        120,
+        200,
+        280,
+        320,
+        240,
+        360,
+        800,
+        400,
+        400,
+        640
+      ]
+    },
+    "21402019": {
+      "id": 21402019,
+      "name": "오스만 제독",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200067,
+      "specialStatMultiple": [
+        200,
+        160,
+        80,
+        120,
+        280,
+        360,
+        320,
+        240,
+        800,
+        640,
+        400,
+        400
+      ]
+    },
+    "21402020": {
+      "id": 21402020,
+      "name": "캐리비안 해적",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200068,
+      "specialStatMultiple": [
+        120,
+        80,
+        200,
+        160,
+        240,
+        320,
+        360,
+        280,
+        640,
+        800,
+        400,
+        400
+      ]
+    },
+    "21402021": {
+      "id": 21402021,
+      "name": "카스피 해적 영주",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200068,
+      "specialStatMultiple": [
+        200,
+        120,
+        80,
+        160,
+        320,
+        360,
+        240,
+        280,
+        400,
+        800,
+        640,
+        400
+      ]
+    },
+    "21402022": {
+      "id": 21402022,
+      "name": "왕국 탐험가",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200068,
+      "specialStatMultiple": [
+        80,
+        200,
+        160,
+        120,
+        360,
+        280,
+        320,
+        240,
+        400,
+        800,
+        400,
+        640
+      ]
+    },
+    "21402023": {
+      "id": 21402023,
+      "name": "오지 탐험가",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200069,
+      "specialStatMultiple": [
+        120,
+        160,
+        200,
+        80,
+        240,
+        280,
+        360,
+        320,
+        640,
+        800,
+        400,
+        400
+      ]
+    },
+    "21402024": {
+      "id": 21402024,
+      "name": "비경 탐험가",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200070,
+      "specialStatMultiple": [
+        80,
+        120,
+        200,
+        160,
+        240,
+        360,
+        280,
+        320,
+        400,
+        640,
+        800,
+        400
+      ]
+    },
+    "21402025": {
+      "id": 21402025,
+      "name": "밀짚모자 해적",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200068,
+      "specialStatMultiple": [
+        160,
+        80,
+        200,
+        120,
+        360,
+        240,
+        320,
+        280,
+        400,
+        400,
+        800,
+        640
+      ]
+    },
+    "21402026": {
+      "id": 21402026,
+      "name": "활빈당 당주",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200071,
+      "specialStatMultiple": [
+        120,
+        160,
+        80,
+        200,
+        320,
+        280,
+        240,
+        360,
+        400,
+        640,
+        800,
+        400
+      ]
+    },
+    "21402027": {
+      "id": 21402027,
+      "name": "유적 탐험가",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200072,
+      "specialStatMultiple": [
+        120,
+        160,
+        200,
+        80,
+        280,
+        320,
+        240,
+        360,
+        640,
+        400,
+        800,
+        400
+      ]
+    },
+    "21402028": {
+      "id": 21402028,
+      "name": "버기 해적단장",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200068,
+      "specialStatMultiple": [
+        80,
+        160,
+        120,
+        200,
+        240,
+        320,
+        280,
+        360,
+        400,
+        640,
+        400,
+        800
+      ]
+    },
+    "21402029": {
+      "id": 21402029,
+      "name": "페레로 가주",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200073,
+      "specialStatMultiple": [
+        200,
+        80,
+        120,
+        160,
+        640,
+        800,
+        400,
+        400,
+        280,
+        240,
+        360,
+        320
+      ]
+    },
+    "21402030": {
+      "id": 21402030,
+      "name": "방랑 해적",
+      "jobType": 3,
+      "jobBattleType": 3,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200075,
+      "specialStatMultiple": [
+        800,
+        640,
+        400,
+        400,
+        80,
+        120,
+        200,
+        160,
+        320,
+        360,
+        240,
+        280
+      ]
+    },
+    "21402031": {
+      "id": 21402031,
+      "name": "전설의 고래",
+      "jobType": 3,
+      "jobBattleType": 1,
+      "charType": 1,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200001,
+      "specialStatMultiple": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ]
+    },
+    "21402032": {
+      "id": 21402032,
+      "name": "복수의 여왕",
+      "jobType": 3,
+      "jobBattleType": 4,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200076,
+      "specialStatMultiple": [
+        400,
+        640,
+        400,
+        800,
+        280,
+        240,
+        320,
+        360,
+        200,
+        120,
+        80,
+        160
+      ]
+    },
+    "21402033": {
+      "id": 21402033,
+      "name": "조선소 소장",
+      "jobType": 3,
+      "jobBattleType": 2,
+      "charType": 1,
+      "freeRoaming": 200,
+      "pathRoaming": 200,
+      "anchor": 600,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200077,
+      "specialStatMultiple": [
+        640,
+        400,
+        800,
+        400,
+        200,
+        160,
+        80,
+        120,
+        280,
+        240,
+        360,
+        320
+      ]
+    },
+    "21402034": {
+      "id": 21402034,
+      "name": "깊은 바다의 가오리",
+      "jobType": 3,
+      "jobBattleType": 1,
+      "charType": 1,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200001,
+      "specialStatMultiple": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ]
+    },
+    "21402035": {
+      "id": 21402035,
+      "name": "잉글랜드 사략해적",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200079,
+      "specialStatMultiple": [
+        160,
+        80,
+        120,
+        200,
+        320,
+        240,
+        280,
+        360,
+        640,
+        800,
+        400,
+        400
+      ]
+    },
+    "21402036": {
+      "id": 21402036,
+      "name": "왕립학회장",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 0,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300008,
+        70300009,
+        70301008,
+        70301009,
+        70302008,
+        70302009,
+        70303008,
+        70303009,
+        70304008,
+        70304009
+      ],
+      "autoJobPassiveId": 65200080,
+      "specialStatMultiple": [
+        200,
+        80,
+        160,
+        120,
+        320,
+        240,
+        360,
+        280,
+        800,
+        640,
+        400,
+        400
+      ],
+      "statEffect": [
+        {
+          "Type": 0,
+          "Id": 3148,
+          "Bonus": 3
+        },
+        {
+          "Type": 0,
+          "Id": 3149,
+          "Bonus": 3
+        },
+        {
+          "Type": 0,
+          "Id": 3150,
+          "Bonus": 3
+        }
+      ]
+    },
+    "21489999": {
+      "id": 21489999,
+      "name": "테스트용 직업",
+      "jobType": 2,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200073,
+      "specialStatMultiple": [
+        200,
+        80,
+        120,
+        160,
+        640,
+        800,
+        400,
+        400,
+        280,
+        240,
+        360,
+        320
+      ]
+    },
+    "21490000": {
+      "id": 21490000,
+      "name": "페레로 가주",
+      "jobType": 1,
+      "jobBattleType": 0,
+      "charType": 1,
+      "freeRoaming": 300,
+      "pathRoaming": 200,
+      "anchor": 500,
+      "amityCabin": [
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000,
+        70300000
+      ],
+      "autoJobPassiveId": 65200074,
+      "specialStatMultiple": [
+        80,
+        120,
+        160,
+        200,
+        320,
+        280,
+        360,
+        240,
+        400,
+        400,
+        640,
+        800
+      ]
+    }
+  }
+}

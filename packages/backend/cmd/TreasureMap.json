@@ -1,0 +1,89 @@
+{
+  ":TreasureMap": {
+    ":type": {
+      "id": "key",
+      "group": "number",
+      "isUnique": "bool",
+      "eventType": "number",
+      "eventId": "number",
+      "prob": "number",
+      "culturalArea": "number",
+      "mapImage": "string",
+      "mapLatitude": "number",
+      "mapLongitude": "number",
+      "xMarkLatitude": "number",
+      "xMarkLongitude": "number",
+      "radius": "number",
+      "contentsTerms": [
+        {
+          "Id": "number",
+          "Target": "number",
+          "Count": "number"
+        }
+      ]
+    },
+    ":required": {},
+    ":min": {},
+    ":max": {},
+    ":enum": {},
+    ":links": {
+      "culturalArea": [
+        "CulturalArea"
+      ]
+    }
+  },
+  "TreasureMap": {
+    "99900000": {
+      "id": 99900000,
+      "group": 100,
+      "isUnique": false,
+      "eventType": 0,
+      "eventId": 90113093,
+      "prob": 500,
+      "culturalArea": 12200001,
+      "mapImage": "Icon_Item_23000001_Sprite",
+      "mapLatitude": 38.6575,
+      "mapLongitude": -18.66708,
+      "xMarkLatitude": 38.6575,
+      "xMarkLongitude": -18.66708,
+      "radius": 15000,
+      "contentsTerms": [
+        {
+          "Id": 81000054,
+          "Target": 23340005,
+          "Count": 1
+        }
+      ]
+    },
+    "99900001": {
+      "id": 99900001,
+      "group": 100,
+      "isUnique": false,
+      "eventType": 1,
+      "eventId": 82010146,
+      "prob": 500,
+      "culturalArea": 12200002,
+      "mapImage": "Icon_Item_23000002_Sprite",
+      "mapLatitude": 40.41,
+      "mapLongitude": -13.61,
+      "xMarkLatitude": 40.41,
+      "xMarkLongitude": -13.61,
+      "radius": 15000
+    },
+    "99900002": {
+      "id": 99900002,
+      "group": 100,
+      "isUnique": false,
+      "eventType": 2,
+      "eventId": 200108,
+      "prob": 500,
+      "culturalArea": 12200003,
+      "mapImage": "Icon_Item_23000003_Sprite",
+      "mapLatitude": 37.11,
+      "mapLongitude": -12.74,
+      "xMarkLatitude": 37.11,
+      "xMarkLongitude": -12.74,
+      "radius": 15000
+    }
+  }
+}
