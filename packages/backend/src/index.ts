@@ -196,6 +196,15 @@ const startServer = async () => {
       logger.warn('ApiTokenUsageService initialization failed, continuing without token usage tracking:', error);
     }
 
+    // Initialize system-defined KV items
+    try {
+      const { initializeSystemKV } = await import('./utils/systemKV');
+      await initializeSystemKV();
+      logger.info('System KV items initialized successfully');
+    } catch (error) {
+      logger.warn('System KV initialization failed, continuing:', error);
+    }
+
     // Start HTTP server (WebSocket? 梨꾪똿?쒕쾭?먯꽌 吏곸젒 泥섎━)
     const server = createServer(app);
 

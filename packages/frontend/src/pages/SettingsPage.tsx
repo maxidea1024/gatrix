@@ -14,6 +14,7 @@ import {
   Divider,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import moment from 'moment-timezone';
 import { getStoredTimezone, getStoredDateTimeFormat, setStoredTimezone, setStoredDateTimeFormat } from '@/utils/dateFormat';
 import { useI18n, getLanguageDisplayName } from '@/contexts/I18nContext';
@@ -22,6 +23,7 @@ import { varsService } from '@/services/varsService';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthService } from '@/services/auth';
 import { useSnackbar } from 'notistack';
+import KeyValuePage from './settings/KeyValuePage';
 
 const formatPresets = [
   'YYYY-MM-DD HH:mm:ss',
@@ -38,14 +40,17 @@ const SettingsPage: React.FC = () => {
   const { mode, setTheme } = useTheme();
   const { user, refreshAuth } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const tzOptions = useMemo(() => moment.tz.names(), []);
   const [timezone, setTimezone] = useState<string>(getStoredTimezone());
   const [dtFormat, setDtFormat] = useState<string>(getStoredDateTimeFormat());
   const [preview, setPreview] = useState<string>('');
 
-  // Tabs
-  const [tab, setTab] = useState(0);
+  // Tabs - read from URL query parameter
+  const tabFromUrl = searchParams.get('tab');
+  const initialTab = tabFromUrl ? parseInt(tabFromUrl, 10) : 0;
+  const [tab, setTab] = useState(initialTab >= 0 && initialTab <= 3 ? initialTab : 0);
 
   // Network settings
   const [admindUrl, setAdmindUrl] = useState('');
@@ -123,15 +128,25 @@ const SettingsPage: React.FC = () => {
 
       <Card>
         <CardContent>
-          <Tabs value={tab} onChange={(_, v)=>setTab(v)} sx={{ mb: 2 }}>
+          <Tabs
+            value={tab}
+            onChange={(_, v) => {
+              setTab(v);
+              setSearchParams({ tab: v.toString() });
+            }}
+            sx={{ mb: 2 }}
+          >
             <Tab label={t('settings.general.title')} />
             <Tab label={t('settings.network.title')} />
             <Tab label={t('settings.integrations.title')} />
+            <Tab label={t('settings.kv.title')} />
           </Tabs>
 
           {tab === 0 && (
             <>
-              <Typography variant="h6" sx={{ mb: 2 }}>{t('settings.general.title')}</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('settings.general.subtitle')}
+              </Typography>
               <Stack spacing={2} sx={{ maxWidth: 560 }}>
                 {/* Language */}
                 <Autocomplete
@@ -203,7 +218,9 @@ const SettingsPage: React.FC = () => {
 
           {tab === 1 && (
             <>
-              <Typography variant="h6" sx={{ mb: 2 }}>{t('settings.network.title')}</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('settings.network.subtitle')}
+              </Typography>
               <Stack spacing={2} sx={{ maxWidth: 640 }}>
                 <TextField
                   fullWidth
@@ -224,7 +241,9 @@ const SettingsPage: React.FC = () => {
 
           {tab === 2 && (
             <>
-              <Typography variant="h6" sx={{ mb: 2 }}>{t('settings.integrations.title')}</Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('settings.integrations.subtitle')}
+              </Typography>
               <Stack spacing={2} sx={{ maxWidth: 640 }}>
                 <TextField
                   fullWidth
@@ -249,6 +268,10 @@ const SettingsPage: React.FC = () => {
                 </Stack>
               </Stack>
             </>
+          )}
+
+          {tab === 3 && (
+            <KeyValuePage />
           )}
         </CardContent>
       </Card>

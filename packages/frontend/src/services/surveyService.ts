@@ -21,6 +21,12 @@ export interface Survey {
   rewardMailTitle?: string;
   rewardMailContent?: string;
   isActive: boolean;
+  // Targeting fields
+  targetPlatforms?: string[] | null;
+  targetWorlds?: string[] | null;
+  targetMarkets?: string[] | null;
+  targetClientVersions?: string[] | null;
+  targetAccountIds?: string[] | null;
   createdBy?: number;
   updatedBy?: number;
   createdAt: string;
@@ -43,6 +49,12 @@ export interface CreateSurveyInput {
   rewardMailTitle?: string;
   rewardMailContent?: string;
   isActive?: boolean;
+  // Targeting fields
+  targetPlatforms?: string[] | null;
+  targetWorlds?: string[] | null;
+  targetMarkets?: string[] | null;
+  targetClientVersions?: string[] | null;
+  targetAccountIds?: string[] | null;
 }
 
 export interface UpdateSurveyInput {
@@ -54,6 +66,12 @@ export interface UpdateSurveyInput {
   rewardMailTitle?: string;
   rewardMailContent?: string;
   isActive?: boolean;
+  // Targeting fields
+  targetPlatforms?: string[] | null;
+  targetWorlds?: string[] | null;
+  targetMarkets?: string[] | null;
+  targetClientVersions?: string[] | null;
+  targetAccountIds?: string[] | null;
 }
 
 export interface GetSurveysParams {

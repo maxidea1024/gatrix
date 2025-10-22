@@ -68,8 +68,8 @@ const SurveysPage: React.FC = () => {
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  // Column configuration
-  const [columns, setColumns] = useState<ColumnConfig[]>([
+  // Default columns for reset
+  const defaultColumns: ColumnConfig[] = [
     { id: 'checkbox', labelKey: '', visible: true },
     { id: 'platformSurveyId', labelKey: 'surveys.platformSurveyId', visible: true },
     { id: 'surveyTitle', labelKey: 'surveys.surveyTitle', visible: true },
@@ -78,7 +78,29 @@ const SurveysPage: React.FC = () => {
     { id: 'status', labelKey: 'surveys.status', visible: true },
     { id: 'createdAt', labelKey: 'surveys.createdAt', visible: true },
     { id: 'actions', labelKey: 'common.actions', visible: true },
-  ]);
+  ];
+
+  // Column configuration (persisted in localStorage)
+  const [columns, setColumns] = useState<ColumnConfig[]>(() => {
+    const saved = localStorage.getItem('surveysColumns');
+    if (saved) {
+      try {
+        const savedColumns = JSON.parse(saved);
+        // Merge saved columns with defaults, preserving saved order
+        const mergedColumns = savedColumns.map((savedCol: ColumnConfig) => {
+          const defaultCol = defaultColumns.find(c => c.id === savedCol.id);
+          return defaultCol ? { ...defaultCol, ...savedCol } : savedCol;
+        });
+        // Add any new columns that weren't in saved state
+        const savedIds = new Set(savedColumns.map((c: ColumnConfig) => c.id));
+        const newColumns = defaultColumns.filter(c => !savedIds.has(c.id));
+        return [...mergedColumns, ...newColumns];
+      } catch (e) {
+        return defaultColumns;
+      }
+    }
+    return defaultColumns;
+  });
 
   // Extract filter values from activeFilters
   const isActiveFilter = useMemo(() => {
@@ -186,18 +208,6 @@ const SurveysPage: React.FC = () => {
     ));
   };
 
-  // Default columns for reset
-  const defaultColumns: ColumnConfig[] = [
-    { id: 'checkbox', labelKey: '', visible: true },
-    { id: 'platformSurveyId', labelKey: 'surveys.platformSurveyId', visible: true },
-    { id: 'surveyTitle', labelKey: 'surveys.surveyTitle', visible: true },
-    { id: 'triggerConditions', labelKey: 'surveys.triggerConditions', visible: true },
-    { id: 'rewards', labelKey: 'surveys.rewards', visible: true },
-    { id: 'status', labelKey: 'surveys.status', visible: true },
-    { id: 'createdAt', labelKey: 'surveys.createdAt', visible: true },
-    { id: 'actions', labelKey: 'common.actions', visible: true },
-  ];
-
   // Column handlers
   const handleColumnsChange = (newColumns: ColumnConfig[]) => {
     // Merge with checkbox and actions columns
@@ -211,10 +221,12 @@ const SurveysPage: React.FC = () => {
     ];
 
     setColumns(updatedColumns);
+    localStorage.setItem('surveysColumns', JSON.stringify(updatedColumns));
   };
 
   const handleResetColumns = () => {
     setColumns(defaultColumns);
+    localStorage.setItem('surveysColumns', JSON.stringify(defaultColumns));
   };
 
   // Selection handlers

@@ -17,19 +17,19 @@ router.get('/', ServiceNoticeController.getServiceNotices);
 router.get('/:id', ServiceNoticeController.getServiceNoticeById);
 
 // Create service notice
-router.post('/', auditServiceNoticeCreate, ServiceNoticeController.createServiceNotice);
+router.post('/', auditServiceNoticeCreate as any, ServiceNoticeController.createServiceNotice as any);
 
 // Update service notice
-router.put('/:id', auditServiceNoticeUpdate, ServiceNoticeController.updateServiceNotice);
+router.put('/:id', auditServiceNoticeUpdate as any, ServiceNoticeController.updateServiceNotice as any);
 
 // Delete service notice
-router.delete('/:id', auditServiceNoticeDelete, ServiceNoticeController.deleteServiceNotice);
+router.delete('/:id', auditServiceNoticeDelete as any, ServiceNoticeController.deleteServiceNotice as any);
 
 // Delete multiple service notices
-router.post('/bulk-delete', auditServiceNoticeBulkDelete, ServiceNoticeController.deleteMultipleServiceNotices);
+router.post('/bulk-delete', auditServiceNoticeBulkDelete as any, ServiceNoticeController.deleteMultipleServiceNotices as any);
 
 // Toggle active status
-router.patch('/:id/toggle-active', auditServiceNoticeToggleActive, ServiceNoticeController.toggleActive);
+router.patch('/:id/toggle-active', auditServiceNoticeToggleActive as any, ServiceNoticeController.toggleActive as any);
 
 export default router;
 

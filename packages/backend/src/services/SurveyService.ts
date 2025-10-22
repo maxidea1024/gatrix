@@ -24,6 +24,12 @@ export interface Survey {
   rewardMailTitle?: string;
   rewardMailContent?: string;
   isActive: boolean;
+  // Targeting fields
+  targetPlatforms?: string[] | null;
+  targetWorlds?: string[] | null;
+  targetMarkets?: string[] | null;
+  targetClientVersions?: string[] | null;
+  targetAccountIds?: string[] | null;
   createdBy?: number;
   updatedBy?: number;
   createdAt: Date;
@@ -46,6 +52,12 @@ export interface CreateSurveyInput {
   rewardMailTitle?: string;
   rewardMailContent?: string;
   isActive?: boolean;
+  // Targeting fields
+  targetPlatforms?: string[] | null;
+  targetWorlds?: string[] | null;
+  targetMarkets?: string[] | null;
+  targetClientVersions?: string[] | null;
+  targetAccountIds?: string[] | null;
   createdBy?: number;
 }
 
@@ -58,6 +70,12 @@ export interface UpdateSurveyInput {
   rewardMailTitle?: string;
   rewardMailContent?: string;
   isActive?: boolean;
+  // Targeting fields
+  targetPlatforms?: string[] | null;
+  targetWorlds?: string[] | null;
+  targetMarkets?: string[] | null;
+  targetClientVersions?: string[] | null;
+  targetAccountIds?: string[] | null;
   updatedBy?: number;
 }
 
@@ -76,8 +94,8 @@ export class SurveyService {
     const limit = params.limit || 20;
     const offset = (page - 1) * limit;
 
-    let whereConditions: string[] = [];
-    let queryParams: any[] = [];
+    const whereConditions: string[] = [];
+    const queryParams: any[] = [];
 
     if (params.isActive !== undefined) {
       whereConditions.push('isActive = ?');
@@ -202,10 +220,12 @@ export class SurveyService {
     const isActive = input.isActive !== undefined ? input.isActive : true;
 
     await pool.execute(
-      `INSERT INTO g_surveys 
-      (id, platformSurveyId, surveyTitle, surveyContent, triggerConditions, 
-       participationRewards, rewardMailTitle, rewardMailContent, isActive, createdBy)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO g_surveys
+      (id, platformSurveyId, surveyTitle, surveyContent, triggerConditions,
+       participationRewards, rewardMailTitle, rewardMailContent, isActive,
+       targetPlatforms, targetWorlds, targetMarkets, targetClientVersions, targetAccountIds,
+       createdBy)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         input.platformSurveyId,
@@ -216,6 +236,11 @@ export class SurveyService {
         input.rewardMailTitle || null,
         input.rewardMailContent || null,
         isActive,
+        input.targetPlatforms ? JSON.stringify(input.targetPlatforms) : null,
+        input.targetWorlds ? JSON.stringify(input.targetWorlds) : null,
+        input.targetMarkets ? JSON.stringify(input.targetMarkets) : null,
+        input.targetClientVersions ? JSON.stringify(input.targetClientVersions) : null,
+        input.targetAccountIds ? JSON.stringify(input.targetAccountIds) : null,
         input.createdBy || null,
       ]
     );
@@ -282,6 +307,26 @@ export class SurveyService {
     if (input.isActive !== undefined) {
       updates.push('isActive = ?');
       values.push(input.isActive);
+    }
+    if (input.targetPlatforms !== undefined) {
+      updates.push('targetPlatforms = ?');
+      values.push(input.targetPlatforms ? JSON.stringify(input.targetPlatforms) : null);
+    }
+    if (input.targetWorlds !== undefined) {
+      updates.push('targetWorlds = ?');
+      values.push(input.targetWorlds ? JSON.stringify(input.targetWorlds) : null);
+    }
+    if (input.targetMarkets !== undefined) {
+      updates.push('targetMarkets = ?');
+      values.push(input.targetMarkets ? JSON.stringify(input.targetMarkets) : null);
+    }
+    if (input.targetClientVersions !== undefined) {
+      updates.push('targetClientVersions = ?');
+      values.push(input.targetClientVersions ? JSON.stringify(input.targetClientVersions) : null);
+    }
+    if (input.targetAccountIds !== undefined) {
+      updates.push('targetAccountIds = ?');
+      values.push(input.targetAccountIds ? JSON.stringify(input.targetAccountIds) : null);
     }
     if (input.updatedBy !== undefined) {
       updates.push('updatedBy = ?');

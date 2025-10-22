@@ -17,6 +17,7 @@ import {
   Paper,
   Stack,
   Collapse,
+  OutlinedInput,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -59,10 +60,18 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
   const [isActive, setIsActive] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
+  // Targeting state
+  const [targetPlatforms, setTargetPlatforms] = useState<string[]>([]);
+  const [targetWorlds, setTargetWorlds] = useState<string[]>([]);
+  const [targetMarkets, setTargetMarkets] = useState<string[]>([]);
+  const [targetClientVersions, setTargetClientVersions] = useState<string[]>([]);
+  const [targetAccountIds, setTargetAccountIds] = useState<string[]>([]);
+
   // Collapse states
   const [triggerConditionsExpanded, setTriggerConditionsExpanded] = useState(true);
   const [participationMailExpanded, setParticipationMailExpanded] = useState(true);
   const [rewardsExpanded, setRewardsExpanded] = useState(true);
+  const [targetingExpanded, setTargetingExpanded] = useState(true);
 
   // Initialize form with survey data
   useEffect(() => {
@@ -75,6 +84,11 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       setRewardMailTitle(survey.rewardMailTitle || '');
       setRewardMailContent(survey.rewardMailContent || '');
       setIsActive(survey.isActive);
+      setTargetPlatforms(Array.isArray(survey.targetPlatforms) ? survey.targetPlatforms : []);
+      setTargetWorlds(Array.isArray(survey.targetWorlds) ? survey.targetWorlds : []);
+      setTargetMarkets(Array.isArray(survey.targetMarkets) ? survey.targetMarkets : []);
+      setTargetClientVersions(Array.isArray(survey.targetClientVersions) ? survey.targetClientVersions : []);
+      setTargetAccountIds(Array.isArray(survey.targetAccountIds) ? survey.targetAccountIds : []);
     } else {
       // Reset form
       setPlatformSurveyId('');
@@ -85,6 +99,11 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       setRewardMailTitle('');
       setRewardMailContent('');
       setIsActive(true);
+      setTargetPlatforms([]);
+      setTargetWorlds([]);
+      setTargetMarkets([]);
+      setTargetClientVersions([]);
+      setTargetAccountIds([]);
     }
   }, [survey, open]);
 
@@ -186,6 +205,11 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         rewardMailTitle: rewardMailTitle.trim() || undefined,
         rewardMailContent: rewardMailContent.trim() || undefined,
         isActive,
+        targetPlatforms: targetPlatforms.length > 0 ? targetPlatforms : null,
+        targetWorlds: targetWorlds.length > 0 ? targetWorlds : null,
+        targetMarkets: targetMarkets.length > 0 ? targetMarkets : null,
+        targetClientVersions: targetClientVersions.length > 0 ? targetClientVersions : null,
+        targetAccountIds: targetAccountIds.length > 0 ? targetAccountIds : null,
       };
 
       if (survey) {
@@ -290,6 +314,100 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
             fullWidth
             helperText={t('surveys.platformSurveyIdHelp')}
           />
+
+          {/* Targeting */}
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                mb: targetingExpanded ? 1 : 0,
+                cursor: 'pointer',
+              }}
+              onClick={() => setTargetingExpanded(!targetingExpanded)}
+            >
+              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                {t('surveys.targeting')}
+              </Typography>
+              <IconButton size="small" sx={{ pointerEvents: 'none' }}>
+                {targetingExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </IconButton>
+            </Box>
+            <Collapse in={targetingExpanded}>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                {t('surveys.targetingHelp')}
+              </Typography>
+              <Stack spacing={2}>
+                {/* Target Platforms */}
+                <FormControl fullWidth>
+                  <InputLabel>{t('surveys.targetPlatforms')}</InputLabel>
+                  <Select
+                    multiple
+                    value={targetPlatforms}
+                    onChange={(e) => setTargetPlatforms(typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value)}
+                    input={<OutlinedInput label={t('surveys.targetPlatforms')} />}
+                    renderValue={(selected) => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {selected.map((value) => (
+                          <Chip key={value} label={value} size="small" />
+                        ))}
+                      </Box>
+                    )}
+                  >
+                    {['pc', 'pc-wegame', 'ios', 'android', 'harmonyos'].map((platform) => (
+                      <MenuItem key={platform} value={platform}>
+                        {platform}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, ml: 1.75 }}>
+                    {t('surveys.targetPlatformsHelp')}
+                  </Typography>
+                </FormControl>
+
+                {/* Target Worlds */}
+                <TextField
+                  label={t('surveys.targetWorlds')}
+                  value={targetWorlds.join(', ')}
+                  onChange={(e) => setTargetWorlds(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
+                  fullWidth
+                  placeholder={t('surveys.targetWorldsPlaceholder')}
+                  helperText={t('surveys.targetWorldsHelp')}
+                />
+
+                {/* Target Markets */}
+                <TextField
+                  label={t('surveys.targetMarkets')}
+                  value={targetMarkets.join(', ')}
+                  onChange={(e) => setTargetMarkets(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
+                  fullWidth
+                  placeholder={t('surveys.targetMarketsPlaceholder')}
+                  helperText={t('surveys.targetMarketsHelp')}
+                />
+
+                {/* Target Client Versions */}
+                <TextField
+                  label={t('surveys.targetClientVersions')}
+                  value={targetClientVersions.join(', ')}
+                  onChange={(e) => setTargetClientVersions(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
+                  fullWidth
+                  placeholder={t('surveys.targetClientVersionsPlaceholder')}
+                  helperText={t('surveys.targetClientVersionsHelp')}
+                />
+
+                {/* Target Account IDs */}
+                <TextField
+                  label={t('surveys.targetAccountIds')}
+                  value={targetAccountIds.join(', ')}
+                  onChange={(e) => setTargetAccountIds(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
+                  fullWidth
+                  placeholder={t('surveys.targetAccountIdsPlaceholder')}
+                  helperText={t('surveys.targetAccountIdsHelp')}
+                />
+              </Stack>
+            </Collapse>
+          </Paper>
 
           {/* Trigger Conditions */}
           <Paper variant="outlined" sx={{ p: 2 }}>

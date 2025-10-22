@@ -1,0 +1,334 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  IconButton,
+  LinearProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tooltip,
+  Typography,
+  Chip,
+} from '@mui/material';
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Lock as LockIcon,
+  ContentCopy as CopyIcon,
+  FileCopy as DuplicateIcon,
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
+import { varsService, VarItem } from '@/services/varsService';
+import EmptyTableRow from '@/components/common/EmptyTableRow';
+import { formatDateTimeDetailed } from '@/utils/dateFormat';
+import ConfirmDeleteDialog from '@/components/common/ConfirmDeleteDialog';
+import KeyValueFormDrawer from '@/components/settings/KeyValueFormDrawer';
+
+const KeyValuePage: React.FC = () => {
+  const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const [items, setItems] = useState<VarItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<VarItem | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; item: VarItem | null }>({
+    open: false,
+    item: null,
+  });
+
+  // Load KV items
+  const loadItems = async () => {
+    setLoading(true);
+    try {
+      const data = await varsService.getAllKV();
+      setItems(data);
+    } catch (error: any) {
+      enqueueSnackbar(error.message || t('settings.kv.loadFailed'), { variant: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadItems();
+  }, []);
+
+  // Handle create
+  const handleCreate = () => {
+    setEditingItem(null);
+    setDrawerOpen(true);
+  };
+
+  // Handle edit
+  const handleEdit = (item: VarItem) => {
+    setEditingItem(item);
+    setDrawerOpen(true);
+  };
+
+  // Handle duplicate
+  const handleDuplicate = (item: VarItem) => {
+    // Create a copy with _copy suffix
+    const baseKey = item.varKey.replace('kv:', '');
+    const newKey = `${baseKey}_copy`;
+
+    // Create a new item with copied data
+    const duplicatedItem: VarItem = {
+      ...item,
+      varKey: `kv:${newKey}`,
+      isSystemDefined: false, // Duplicated items are never system-defined
+    };
+
+    setEditingItem(duplicatedItem);
+    setDrawerOpen(true);
+  };
+
+  // Handle copy key name
+  const handleCopyKeyName = (keyName: string) => {
+    navigator.clipboard.writeText(keyName);
+    enqueueSnackbar(t('common.copied'), { variant: 'success' });
+  };
+
+  // Get chip color based on type
+  const getTypeChipColor = (type: string): 'default' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning' => {
+    switch (type) {
+      case 'string':
+        return 'primary';
+      case 'number':
+        return 'info';
+      case 'boolean':
+        return 'success';
+      case 'color':
+        return 'secondary';
+      case 'array':
+        return 'warning';
+      case 'object':
+        return 'error';
+      default:
+        return 'default';
+    }
+  };
+
+  // Format type display
+  const formatTypeDisplay = (item: VarItem): string => {
+    if (item.valueType === 'array') {
+      const elementType = item.description?.match(/\[elementType:(\w+)\]/)?.[1] || 'unknown';
+      return `${elementType}[]`;
+    }
+    return item.valueType;
+  };
+
+  // Handle delete
+  const handleDeleteClick = (item: VarItem) => {
+    setDeleteConfirm({ open: true, item });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirm.item) return;
+
+    try {
+      await varsService.deleteKV(deleteConfirm.item.varKey.replace('kv:', ''));
+      enqueueSnackbar(t('settings.kv.deleteSuccess'), { variant: 'success' });
+      setDeleteConfirm({ open: false, item: null });
+      loadItems();
+    } catch (error: any) {
+      enqueueSnackbar(error.message || t('settings.kv.deleteFailed'), { variant: 'error' });
+    }
+  };
+
+  // Render value display in table
+  const renderValueDisplay = (item: VarItem) => {
+    switch (item.valueType) {
+      case 'boolean':
+        return (
+          <Chip
+            label={item.varValue}
+            size="small"
+            color={item.varValue === 'true' ? 'success' : 'default'}
+          />
+        );
+      case 'color':
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box
+              sx={{
+                width: 24,
+                height: 24,
+                borderRadius: 1,
+                bgcolor: item.varValue,
+                border: 1,
+                borderColor: 'divider',
+              }}
+            />
+            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+              {item.varValue}
+            </Typography>
+          </Box>
+        );
+      case 'object':
+      case 'array':
+        return (
+          <Typography
+            variant="body2"
+            sx={{
+              fontFamily: 'monospace',
+              maxWidth: 300,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {item.varValue}
+          </Typography>
+        );
+      case 'string':
+        return (
+          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+            "{item.varValue}"
+          </Typography>
+        );
+      default:
+        return <Typography variant="body2">{item.varValue}</Typography>;
+    }
+  };
+
+  return (
+    <Box>
+      {/* Header */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="body2" color="text.secondary">
+          {t('settings.kv.subtitle')}
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={handleCreate}
+        >
+          {t('settings.kv.create')}
+        </Button>
+      </Box>
+
+      {/* Table */}
+      <Card>
+        <CardContent sx={{ p: 0 }}>
+          {loading && <LinearProgress />}
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t('settings.kv.key')}</TableCell>
+                  <TableCell>{t('settings.kv.value')}</TableCell>
+                  <TableCell>{t('settings.kv.type')}</TableCell>
+                  <TableCell>{t('settings.kv.description')}</TableCell>
+                  <TableCell>{t('common.updatedAt')}</TableCell>
+                  <TableCell align="center">{t('common.actions')}</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {items.length === 0 ? (
+                  <EmptyTableRow colSpan={6} message={t('settings.kv.noItems')} />
+                ) : (
+                  items.map((item) => (
+                    <TableRow key={item.varKey} hover>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                            {item.varKey.replace('kv:', '')}
+                          </Typography>
+                          <Tooltip title={t('common.copy')}>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleCopyKeyName(item.varKey.replace('kv:', ''))}
+                              sx={{ p: 0.5 }}
+                            >
+                              <CopyIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          {item.isSystemDefined && (
+                            <Tooltip title={t('settings.kv.systemDefined')}>
+                              <LockIcon fontSize="small" color="action" />
+                            </Tooltip>
+                          )}
+                        </Box>
+                      </TableCell>
+                      <TableCell>{renderValueDisplay(item)}</TableCell>
+                      <TableCell>
+                        <Chip
+                          label={formatTypeDisplay(item)}
+                          size="small"
+                          color={getTypeChipColor(item.valueType)}
+                          variant="outlined"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {item.description?.replace(/\[elementType:\w+\]\s*/, '') || '-'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {formatDateTimeDetailed(item.updatedAt)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Tooltip title={t('common.edit')}>
+                          <IconButton size="small" onClick={() => handleEdit(item)}>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('common.duplicate')}>
+                          <IconButton size="small" onClick={() => handleDuplicate(item)}>
+                            <DuplicateIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={item.isSystemDefined ? t('settings.kv.systemDefined') : t('common.delete')}>
+                          <span>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleDeleteClick(item)}
+                              disabled={item.isSystemDefined}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </CardContent>
+      </Card>
+
+      {/* Form Drawer */}
+      <KeyValueFormDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onSuccess={loadItems}
+        item={editingItem}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDeleteDialog
+        open={deleteConfirm.open}
+        onClose={() => setDeleteConfirm({ open: false, item: null })}
+        onConfirm={handleDeleteConfirm}
+        title={t('settings.kv.deleteConfirmTitle')}
+        message={t('settings.kv.deleteConfirmMessage', { key: deleteConfirm.item?.varKey.replace('kv:', '') || '' })}
+      />
+    </Box>
+  );
+};
+
+export default KeyValuePage;
+
