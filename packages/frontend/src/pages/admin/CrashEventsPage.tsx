@@ -743,7 +743,35 @@ const CrashEventsPage: React.FC = () => {
       case 'userName':
         return event.userName || '-';
       case 'firstLine':
-        return (event as any).firstLine || '-';
+        return (
+          <Typography
+            variant="body2"
+            sx={{
+              cursor: 'pointer',
+              '&:hover': {
+                color: 'primary.main',
+                textDecoration: 'underline'
+              }
+            }}
+            onClick={async () => {
+              try {
+                const stackData = await crashService.getStackTrace(event.id);
+                setSelectedEvent(event);
+                setStackTraceMap(prev => ({
+                  ...prev,
+                  [event.id]: stackData.stackTrace,
+                }));
+                setDrawerType('stackTrace');
+                setDrawerOpen(true);
+              } catch (error) {
+                console.error('Failed to load stack trace:', error);
+                enqueueSnackbar(t('crashes.loadError'), { variant: 'error' });
+              }
+            }}
+          >
+            {(event as any).firstLine || '-'}
+          </Typography>
+        );
       case 'userMessage':
         return (
           <Tooltip title={event.userMessage || ''} arrow>

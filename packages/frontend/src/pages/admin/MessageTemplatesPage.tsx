@@ -646,7 +646,20 @@ const MessageTemplatesPage: React.FC = () => {
       case 'name':
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="body2" sx={{ fontWeight: 500 }}>{template.name}</Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 500,
+                cursor: 'pointer',
+                '&:hover': {
+                  color: 'primary.main',
+                  textDecoration: 'underline'
+                }
+              }}
+              onClick={() => handleEdit(template)}
+            >
+              {template.name}
+            </Typography>
             <Tooltip title={t('common.copy')}>
               <IconButton size="small" onClick={() => copyWithToast(template.name, t('messageTemplates.name'), false)}>
                 <ContentCopyIcon fontSize="small" />

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Drawer,
   Button,
   TextField,
   FormControl,
@@ -21,7 +20,6 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  IconButton,
 } from '@mui/material';
 import {
   Cancel as CancelIcon,
@@ -29,8 +27,8 @@ import {
   FileCopy as CopyIcon,
   ExpandMore as ExpandMoreIcon,
   Build as BuildIcon,
-  Close as CloseIcon,
 } from '@mui/icons-material';
+import ResizableDrawer from '../common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
@@ -574,23 +572,28 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
     }
   };
 
+  const title = isCopyMode
+    ? t('clientVersions.form.copyTitle')
+    : isEdit
+      ? t('clientVersions.form.editTitle')
+      : t('clientVersions.form.title');
+
+  const subtitle = isCopyMode
+    ? t('clientVersions.form.copyDescription')
+    : isEdit
+      ? t('clientVersions.form.editDescription')
+      : t('clientVersions.form.createDescription');
+
   return (
-    <Drawer
-      anchor="right"
+    <ResizableDrawer
       open={open}
       onClose={handleClose}
-      sx={{
-        zIndex: 1300,
-        '& .MuiDrawer-paper': {
-          width: { xs: '100%', sm: 700 },
-          maxWidth: '100vw',
-          display: 'flex',
-          flexDirection: 'column'
-        }
-      }}
-      ModalProps={{
-        keepMounted: false
-      }}
+      title={title}
+      subtitle={subtitle}
+      storageKey="clientVersionFormDrawerWidth"
+      defaultWidth={700}
+      minWidth={500}
+      zIndex={1300}
     >
       <form
         onSubmit={handleSubmit(onSubmit as SubmitHandler<ClientVersionFormData>, (errors) => {
@@ -602,47 +605,6 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
           height: '100%'
         }}
       >
-        {/* Header - Fixed */}
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          p: 2,
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          bgcolor: 'background.paper'
-        }}>
-          <Box>
-            <Typography variant="h6" component="h2">
-              {isCopyMode
-                ? t('clientVersions.form.copyTitle')
-                : isEdit
-                  ? t('clientVersions.form.editTitle')
-                  : t('clientVersions.form.title')
-              }
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {isCopyMode
-                ? t('clientVersions.form.copyDescription')
-                : isEdit
-                  ? t('clientVersions.form.editDescription')
-                  : t('clientVersions.form.createDescription')
-              }
-            </Typography>
-          </Box>
-          <IconButton
-            onClick={handleClose}
-            size="small"
-            sx={{
-              '&:hover': {
-                backgroundColor: 'action.hover'
-              }
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
         {/* Content - Scrollable */}
         <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
           {duplicateError && (

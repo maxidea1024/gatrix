@@ -1134,7 +1134,18 @@ const GameWorldsPage: React.FC = () => {
       case 'worldId':
         return (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 500,
+                cursor: 'pointer',
+                '&:hover': {
+                  color: 'primary.main',
+                  textDecoration: 'underline'
+                }
+              }}
+              onClick={() => handleEdit(world)}
+            >
               {world.worldId}
             </Typography>
             <Tooltip title={t('common.copy')}>

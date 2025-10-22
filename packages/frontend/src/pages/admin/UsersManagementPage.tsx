@@ -1084,7 +1084,18 @@ const UsersManagementPage: React.FC = () => {
               {user.name?.charAt(0).toUpperCase()}
             </Avatar>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  '&:hover': {
+                    color: 'primary.main',
+                    textDecoration: 'underline'
+                  }
+                }}
+                onClick={() => handleEditUser(user)}
+              >
                 {user.name}
               </Typography>
               <IconButton

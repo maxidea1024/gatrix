@@ -1091,7 +1091,18 @@ const ClientVersionsPage: React.FC = () => {
           <Chip
             label={clientVersion.clientVersion}
             size="small"
-            sx={getVersionColorStyle(clientVersion.clientVersion, theme.palette.mode === 'dark')}
+            sx={{
+              ...getVersionColorStyle(clientVersion.clientVersion, theme.palette.mode === 'dark'),
+              cursor: 'pointer',
+              '&:hover': {
+                opacity: 0.8,
+              }
+            }}
+            onClick={() => {
+              setEditingClientVersion(clientVersion);
+              setIsCopyMode(false);
+              setFormDialogOpen(true);
+            }}
           />
         );
       case 'clientStatus':

@@ -361,7 +361,10 @@ const MaintenancePage: React.FC = () => {
                                 const duration = endsAt.diff(startsAt, 'minute');
                                 const hours = Math.floor(duration / 60);
                                 const minutes = duration % 60;
-                                const durationText = `${hours > 0 ? `${hours}${t('maintenance.hoursUnit')} ` : ''}${minutes}${t('maintenance.minutesUnit')}`;
+                                const durationParts = [];
+                                if (hours > 0) durationParts.push(`${hours}${t('maintenance.hoursUnit')}`);
+                                if (minutes > 0) durationParts.push(`${minutes}${t('maintenance.minutesUnit')}`);
+                                const durationText = durationParts.join(' ');
                                 return (
                                   <Box component="span">
                                     {startsAt.format('YYYY-MM-DD A h:mm')} ~ {endsAt.format('YYYY-MM-DD A h:mm')}
@@ -880,7 +883,10 @@ const MaintenancePage: React.FC = () => {
                           const duration = endsAt.diff(startsAt, 'minute');
                           const hours = Math.floor(duration / 60);
                           const minutes = duration % 60;
-                          const durationText = `${hours > 0 ? `${hours}${t('maintenance.hoursUnit')} ` : ''}${minutes}${t('maintenance.minutesUnit')}`;
+                          const durationParts = [];
+                          if (hours > 0) durationParts.push(`${hours}${t('maintenance.hoursUnit')}`);
+                          if (minutes > 0) durationParts.push(`${minutes}${t('maintenance.minutesUnit')}`);
+                          const durationText = durationParts.join(' ');
                           return (
                             <Box component="span">
                               {startsAt.format('YYYY-MM-DD A h:mm')} ~ {endsAt.format('YYYY-MM-DD A h:mm')}
@@ -1022,22 +1028,6 @@ const MaintenancePage: React.FC = () => {
                       </Box>
                     </Box>
                   )}
-
-                  {/* 설정 시간 (Dialog에서는 현재 시간) */}
-                  <Box component="tr">
-                    <Box component="td" sx={{
-                      fontWeight: 500,
-                      fontSize: '0.875rem',
-                      width: '140px',
-                      verticalAlign: 'top',
-                      pr: 2
-                    }}>
-                      {confirmMode === 'update' ? t('maintenance.updatedAt') : t('maintenance.setAt')}:
-                    </Box>
-                    <Box component="td" sx={{ fontSize: '0.875rem', verticalAlign: 'top' }}>
-                      {dayjs().format('YYYY-MM-DD A h:mm')} ({dayjs().toISOString()})
-                    </Box>
-                  </Box>
                 </Box>
               </Box>
             </Box>
