@@ -205,6 +205,15 @@ const startServer = async () => {
       logger.warn('System KV initialization failed, continuing:', error);
     }
 
+    // Initialize Planning Data (reward lookup)
+    try {
+      const { PlanningDataService } = await import('./services/PlanningDataService');
+      await PlanningDataService.initialize();
+      logger.info('Planning data initialized successfully');
+    } catch (error) {
+      logger.warn('Planning data initialization failed, continuing:', error);
+    }
+
     // Start HTTP server (WebSocket? 梨꾪똿?쒕쾭?먯꽌 吏곸젒 泥섎━)
     const server = createServer(app);
 

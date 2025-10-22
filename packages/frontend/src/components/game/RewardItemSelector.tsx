@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Box,
   FormControl,
@@ -10,6 +10,8 @@ import {
   Autocomplete,
   CircularProgress,
   Alert,
+  Paper,
+  Divider,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -47,24 +49,8 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
   const [items, setItems] = useState<RewardItem[]>([]);
   const [loadingTypes, setLoadingTypes] = useState(false);
   const [loadingItems, setLoadingItems] = useState(false);
-  const [itemSearchTerm, setItemSearchTerm] = useState('');
 
-  const debouncedItemSearch = useDebounce(itemSearchTerm, 300);
-
-  // Load reward types on mount
-  useEffect(() => {
-    loadRewardTypes();
-  }, []);
-
-  // Load items when reward type changes
-  useEffect(() => {
-    if (value.rewardType) {
-      loadItems(parseInt(value.rewardType));
-    } else {
-      setItems([]);
-    }
-  }, [value.rewardType]);
-
+  // Function to load reward types
   const loadRewardTypes = async () => {
     try {
       setLoadingTypes(true);
@@ -77,11 +63,12 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
     }
   };
 
-  const loadItems = async (rewardType: number) => {
+  // Function to load items for a specific reward type
+  const loadItems = useCallback(async (rewardType: number) => {
     try {
       setLoadingItems(true);
       const typeInfo = rewardTypes.find(t => t.value === rewardType);
-      
+
       if (typeInfo && typeInfo.hasTable) {
         const itemList = await planningDataService.getRewardTypeItems(rewardType);
         setItems(itemList);
@@ -94,12 +81,30 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
     } finally {
       setLoadingItems(false);
     }
-  };
+  }, [rewardTypes, enqueueSnackbar, t]);
+
+  // Load reward types on mount
+  useEffect(() => {
+    loadRewardTypes();
+  }, []);
+
+  // Load items when reward type changes or reward types are loaded
+  useEffect(() => {
+    if (value.rewardType && rewardTypes.length > 0) {
+      loadItems(parseInt(value.rewardType));
+    } else {
+      setItems([]);
+    }
+  }, [value.rewardType, rewardTypes, loadItems]);
 
   const handleRewardTypeChange = (newRewardType: string) => {
+    // For reward types without table, set itemId to "0"
+    const typeInfo = rewardTypes.find(t => t.value === parseInt(newRewardType));
+    const itemId = typeInfo?.hasTable ? '' : '0';
+
     onChange({
       rewardType: newRewardType,
-      itemId: '',
+      itemId: itemId,
       quantity: minQuantity,
     });
   };
@@ -126,32 +131,45 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
     return rewardTypes.find(t => t.value === parseInt(value.rewardType));
   }, [value.rewardType, rewardTypes]);
 
-  // Filter items based on search term
-  const filteredItems = useMemo(() => {
-    if (!debouncedItemSearch) return items;
-    const searchLower = debouncedItemSearch.toLowerCase();
-    return items.filter(item =>
-      item.name.toLowerCase().includes(searchLower) ||
-      item.id.toString().includes(searchLower)
-    );
-  }, [items, debouncedItemSearch]);
+
 
   // Get selected item
   const selectedItem = useMemo(() => {
     if (!value.itemId) return null;
-    return items.find(item => item.id === parseInt(value.itemId));
+    return items.find(item => item.id === parseInt(value.itemId)) || null;
   }, [value.itemId, items]);
 
   return (
-    <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
-      {/* Reward Type Selector */}
-      <FormControl sx={{ flex: 1 }} size="small" disabled={disabled} error={error}>
-        <InputLabel>{t('rewards.rewardType')}</InputLabel>
+    <Paper
+      variant="outlined"
+      sx={{
+        p: 1,
+        backgroundColor: disabled ? 'action.disabledBackground' : 'background.paper',
+        borderColor: error ? 'error.main' : 'divider',
+      }}
+    >
+      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+        {/* Reward Type Selector */}
         <Select
-          value={value.rewardType}
+          value={rewardTypes.length > 0 ? value.rewardType : ''}
           onChange={(e) => handleRewardTypeChange(e.target.value)}
-          label={t('rewards.rewardType')}
+          disabled={disabled || loadingTypes}
+          size="small"
+          displayEmpty
+          variant="outlined"
+          sx={{
+            width: 200,
+            flexShrink: 0,
+            '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+            '& .MuiSelect-select': {
+              py: 0.75,
+              fontSize: '0.875rem',
+            }
+          }}
         >
+          <MenuItem value="" disabled>
+            <em>{t('rewards.rewardType')}</em>
+          </MenuItem>
           {loadingTypes ? (
             <MenuItem disabled>
               <CircularProgress size={20} />
@@ -159,103 +177,121 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
           ) : (
             rewardTypes.map((type) => (
               <MenuItem key={type.value} value={type.value.toString()}>
-                {t(type.nameKey)} ({type.name})
-                {type.hasTable && ` - ${type.itemCount} ${t('rewards.items')}`}
+                [{type.value}] {t(type.nameKey)}
               </MenuItem>
             ))
           )}
         </Select>
-      </FormControl>
 
-      {/* Item Selector (only if reward type has table) */}
-      {selectedTypeInfo?.hasTable && (
-        <FormControl sx={{ flex: 1 }} size="small" disabled={disabled || loadingItems} error={error}>
-          <Autocomplete
-            value={selectedItem}
-            onChange={(event, newValue) => {
-              handleItemIdChange(newValue ? newValue.id.toString() : '');
-            }}
-            inputValue={itemSearchTerm}
-            onInputChange={(event, newInputValue) => {
-              setItemSearchTerm(newInputValue);
-            }}
-            options={filteredItems}
-            getOptionLabel={(option) => `[${option.id}] ${option.name}`}
-            loading={loadingItems}
-            disabled={disabled || loadingItems}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={t('rewards.item')}
-                error={error}
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {loadingItems ? <CircularProgress color="inherit" size={20} /> : null}
-                      {params.InputProps.endAdornment}
-                    </>
-                  ),
-                }}
-              />
-            )}
-            renderOption={(props, option) => (
-              <li {...props} key={option.id}>
-                <Box>
+        <Divider orientation="vertical" flexItem />
+
+        {/* Item Selector (only if reward type has table) */}
+        {selectedTypeInfo?.hasTable && (
+          <>
+            <Autocomplete
+              value={selectedItem ?? null}
+              onChange={(event, newValue) => {
+                handleItemIdChange(newValue ? newValue.id.toString() : '');
+              }}
+              options={items}
+              getOptionLabel={(option) => `[${option.id}] ${option.name}`}
+              loading={loadingItems}
+              disabled={disabled || loadingItems}
+              sx={{ minWidth: 250, flex: '2 1 auto' }}
+              filterOptions={(options, state) => {
+                const inputValue = state.inputValue.toLowerCase();
+                if (!inputValue) return options;
+                return options.filter(option =>
+                  option.name.toLowerCase().includes(inputValue) ||
+                  option.id.toString().includes(inputValue)
+                );
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder={t('rewards.item')}
+                  error={error}
+                  size="small"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { border: 'none' },
+                      fontSize: '0.875rem',
+                      py: 0,
+                    }
+                  }}
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {loadingItems ? <CircularProgress color="inherit" size={16} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
+                />
+              )}
+              renderOption={(props, option) => (
+                <li {...props} key={option.id}>
                   <Typography variant="body2">
                     <strong>[{option.id}]</strong> {option.name}
                   </Typography>
-                </Box>
-              </li>
-            )}
-            noOptionsText={t('rewards.noItemsFound')}
-            size="small"
-          />
-        </FormControl>
-      )}
+                </li>
+              )}
+              noOptionsText={t('rewards.noItemsFound')}
+              size="small"
+            />
+            <Divider orientation="vertical" flexItem />
+          </>
+        )}
 
-      {/* Description for types without table */}
-      {selectedTypeInfo && !selectedTypeInfo.hasTable && selectedTypeInfo.descriptionKey && (
-        <Box sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-          <Alert severity="info" sx={{ width: '100%', py: 0 }}>
-            <Typography variant="caption">
+        {/* Description for types without table */}
+        {selectedTypeInfo && !selectedTypeInfo.hasTable && selectedTypeInfo.descriptionKey && (
+          <>
+            <Typography variant="caption" color="text.secondary" sx={{ flex: '1 1 auto', px: 1 }}>
               {t(selectedTypeInfo.descriptionKey)}
             </Typography>
-          </Alert>
-        </Box>
-      )}
+            <Divider orientation="vertical" flexItem />
+          </>
+        )}
 
-      {/* Quantity Input */}
-      <TextField
-        label={t('rewards.quantity')}
-        type="number"
-        value={value.quantity}
-        onChange={(e) => handleQuantityChange(parseInt(e.target.value) || minQuantity)}
-        disabled={disabled}
-        error={error}
-        size="small"
-        sx={{
-          width: 120,
-          '& input[type=number]': {
-            MozAppearance: 'textfield',
-          },
-          '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
-            WebkitAppearance: 'none',
-            margin: 0,
-          },
-        }}
-        inputProps={{
-          min: minQuantity,
-          step: 1,
-        }}
-      />
+        {/* Quantity Input */}
+        <TextField
+          type="number"
+          value={value.quantity}
+          onChange={(e) => handleQuantityChange(parseInt(e.target.value) || minQuantity)}
+          disabled={disabled}
+          error={error}
+          placeholder={t('rewards.quantity')}
+          size="small"
+          sx={{
+            width: 90,
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': { border: 'none' },
+              fontSize: '0.875rem',
+            },
+            '& input[type=number]': {
+              MozAppearance: 'textfield',
+              textAlign: 'right',
+              py: 0.75,
+            },
+            '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+              WebkitAppearance: 'none',
+              margin: 0,
+            },
+          }}
+          inputProps={{
+            min: minQuantity,
+            step: 1,
+          }}
+        />
+      </Box>
 
       {helperText && (
-        <Typography variant="caption" color={error ? 'error' : 'text.secondary'} sx={{ mt: 0.5 }}>
+        <Typography variant="caption" color={error ? 'error' : 'text.secondary'} sx={{ mt: 0.5, display: 'block', px: 1 }}>
           {helperText}
         </Typography>
       )}
-    </Box>
+    </Paper>
   );
 };
 

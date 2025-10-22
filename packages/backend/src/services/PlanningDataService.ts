@@ -36,6 +36,36 @@ export class PlanningDataService {
   private static cmsPath = path.join(__dirname, '../contents/cms');
   private static rewardLookupPath = path.join(PlanningDataService.cmsPath, 'reward-lookup.json');
   private static rewardTypeListPath = path.join(PlanningDataService.cmsPath, 'reward-type-list.json');
+  private static initialized = false;
+
+  /**
+   * Initialize planning data on server startup
+   * Builds reward lookup if files don't exist
+   */
+  static async initialize(): Promise<void> {
+    if (this.initialized) {
+      return;
+    }
+
+    try {
+      // Check if reward lookup files exist
+      const lookupExists = await fs.access(this.rewardLookupPath).then(() => true).catch(() => false);
+      const typeListExists = await fs.access(this.rewardTypeListPath).then(() => true).catch(() => false);
+
+      if (!lookupExists || !typeListExists) {
+        logger.info('Planning data files not found. Building initial data...');
+        await this.rebuildRewardLookup();
+        logger.info('Planning data initialized successfully');
+      } else {
+        logger.info('Planning data files found. Skipping initial build.');
+      }
+
+      this.initialized = true;
+    } catch (error) {
+      logger.error('Failed to initialize planning data', { error });
+      // Don't throw error - allow server to start even if planning data fails
+    }
+  }
 
   /**
    * Get reward lookup data (cached in memory)

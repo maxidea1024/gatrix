@@ -2973,7 +2973,10 @@
     "joinedSecretKeyHelp": "用于问卷参与验证的密钥",
     "configLoadFailed": "加载配置失败",
     "configUpdateSuccess": "配置保存成功",
-    "configUpdateFailed": "保存配置失败"
+    "configUpdateFailed": "保存配置失败",
+    "noRewards": "无奖励",
+    "unknownReward": "未知奖励",
+    "moreRewards": "个更多"
   },
   "hotTimeButtonEvent": {
     "title": "热时按钮活动",
@@ -3012,7 +3015,7 @@
   "rewards": {
     "rewardType": "奖励类型",
     "item": "物品",
-    "quantity": "数量",
+    "quantity": "值",
     "items": "个",
     "noItemsFound": "未找到物品"
   },

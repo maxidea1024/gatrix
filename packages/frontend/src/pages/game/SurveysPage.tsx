@@ -43,6 +43,7 @@ import SurveyFormDialog from '../../components/game/SurveyFormDialog';
 import SurveyConfigDialog from '../../components/game/SurveyConfigDialog';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
+import RewardDisplay from '../../components/game/RewardDisplay';
 
 const SurveysPage: React.FC = () => {
   const { t } = useTranslation();
@@ -604,9 +605,7 @@ const SurveysPage: React.FC = () => {
                         if (column.id === 'rewards') {
                           return (
                             <TableCell key={column.id}>
-                              <Typography variant="body2" color="text.secondary">
-                                {t('surveys.rewardsPlaceholder')}
-                              </Typography>
+                              <RewardDisplay rewards={survey.participationRewards} maxDisplay={2} />
                             </TableCell>
                           );
                         }

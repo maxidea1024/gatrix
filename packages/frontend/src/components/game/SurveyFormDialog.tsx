@@ -84,7 +84,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       setParticipationRewards(survey.participationRewards || []);
       setRewardMailTitle(survey.rewardMailTitle || '');
       setRewardMailContent(survey.rewardMailContent || '');
-      setIsActive(survey.isActive);
+      setIsActive(Boolean(survey.isActive));
       setTargetPlatforms(Array.isArray(survey.targetPlatforms) ? survey.targetPlatforms : []);
       setTargetWorlds(Array.isArray(survey.targetWorlds) ? survey.targetWorlds : []);
       setTargetMarkets(Array.isArray(survey.targetMarkets) ? survey.targetMarkets : []);
@@ -206,7 +206,7 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         surveyTitle: surveyTitle.trim(),
         surveyContent: surveyContent.trim() || undefined,
         triggerConditions,
-        participationRewards: participationRewards.length > 0 ? participationRewards : undefined,
+        participationRewards,
         rewardMailTitle: rewardMailTitle.trim() || undefined,
         rewardMailContent: rewardMailContent.trim() || undefined,
         isActive,

@@ -2929,7 +2929,10 @@
     "joinedSecretKeyHelp": "Secret key for survey participation verification",
     "configLoadFailed": "Failed to load configuration",
     "configUpdateSuccess": "Configuration saved successfully",
-    "configUpdateFailed": "Failed to save configuration"
+    "configUpdateFailed": "Failed to save configuration",
+    "noRewards": "No rewards",
+    "unknownReward": "Unknown reward",
+    "moreRewards": "more"
   },
   "hotTimeButtonEvent": {
     "title": "Hot Time Button Event",
@@ -2968,7 +2971,7 @@
   "rewards": {
     "rewardType": "Reward Type",
     "item": "Item",
-    "quantity": "Quantity",
+    "quantity": "Value",
     "items": "items",
     "noItemsFound": "No items found"
   },
