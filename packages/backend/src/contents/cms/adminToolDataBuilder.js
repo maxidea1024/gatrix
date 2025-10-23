@@ -729,6 +729,23 @@ function buildRewardLookupTable(cmsDir, loctab = {}) {
               nameKr: formattedName,  // Korean name
             };
 
+            // Special handling for Point items with paid/free distinction
+            if (item._original.tooltipDesc && item._original.name) {
+              const isPaid = item._original.tooltipDesc.includes('유료 획득');
+              const isRedGem = item._original.name === '레드젬' || item._original.name === '레드젬 파편';
+
+              if (isPaid || isRedGem) {
+                const baseName = item._original.name;
+                const baseCn = loctab[baseName] || baseName;
+                const suffix = isPaid ? '유료' : '무료';
+                const suffixCn = loctab[suffix] || suffix;
+
+                itemData.nameCn = `${baseCn} (${suffixCn})`;
+                itemData.nameEn = formattedName;
+                return itemData;
+              }
+            }
+
             // Add Chinese translation from loctab
             if (loctab && loctab[formattedName]) {
               itemData.nameCn = loctab[formattedName];
@@ -941,6 +958,12 @@ function generateUIListData(cmsDir, loctab = {}) {
         }
       }
 
+      // Remove @ and everything after it (comment marker)
+      const atIndex = nameKr.indexOf('@');
+      if (atIndex !== -1) {
+        nameKr = nameKr.substring(0, atIndex).trim();
+      }
+
       uiListData.mates.push({
         id: mate.id,
         name: nameKr,
@@ -970,6 +993,12 @@ function generateUIListData(cmsDir, loctab = {}) {
         nameKr = character.firstName;
       } else if (character.name) {
         nameKr = character.name;
+      }
+
+      // Remove @ and everything after it (comment marker)
+      const atIndex = nameKr.indexOf('@');
+      if (atIndex !== -1) {
+        nameKr = nameKr.substring(0, atIndex).trim();
       }
 
       uiListData.characters.push({
@@ -1129,16 +1158,20 @@ function generateUIListData(cmsDir, loctab = {}) {
       let nameCn = loctab[item.name] || nameKr;
       let nameEn = nameKr;
 
+      // Debug: Check if this is a red gem
+      const isRedGem = item.name === '레드젬' || item.name === '레드젬 파편';
+      const hasPaidDesc = item.tooltipDesc && item.tooltipDesc.includes('유료 획득');
+
       // Apply same logic as formatItemName for paid/free distinction
       if (item.tooltipDesc && item.name) {
-        if (item.tooltipDesc.includes('유료 획득')) {
+        if (hasPaidDesc) {
           // Paid item - compose localized name
           nameKr = `${item.name} (유료)`;
           const baseCn = loctab[item.name] || item.name;
           const paidCn = loctab['유료'] || '유료';
           nameCn = `${baseCn} (${paidCn})`;
           nameEn = nameKr;
-        } else if (item.name === '레드젬' || item.name === '레드젬 파편') {
+        } else if (isRedGem) {
           // Free red gem - compose localized name
           nameKr = `${item.name} (무료)`;
           const baseCn = loctab[item.name] || item.name;
@@ -1162,6 +1195,7 @@ function generateUIListData(cmsDir, loctab = {}) {
     pointList.sort((a, b) => a.id - b.id);
     uiListData.points = pointList;
   } else {
+    console.log('   ⚠️  Point table not found or empty');
     uiListData.points = [];
   }
   console.log(`   ✅ Loaded ${uiListData.points.length} points`);

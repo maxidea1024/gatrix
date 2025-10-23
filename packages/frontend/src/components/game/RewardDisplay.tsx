@@ -105,9 +105,10 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }
     if (typeInfo.hasTable) {
       const item = rewardItemsMap.get(`${rewardType}_${reward.itemId}`);
       if (item) {
-        return `${item.name} x${reward.quantity}`;
+        // Use + prefix for all rewards (unified format)
+        return `${item.name} +${reward.quantity}`;
       } else {
-        return `${typeName} #${reward.itemId} x${reward.quantity}`;
+        return `${typeName} #${reward.itemId} +${reward.quantity}`;
       }
     } else {
       // Value-based reward (no item table) - use + prefix for experience, fame, etc.

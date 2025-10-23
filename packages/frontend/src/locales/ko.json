@@ -2950,6 +2950,7 @@
     "showingFirst100": "처음 100개 항목만 표시 중 (전체: {{total}}개)",
     "searchPlaceholder": "아이템 이름 또는 ID로 검색",
     "category": "카테고리",
+    "viewAll": "모아보기",
     "noTableForRewardType": "이 보상 타입은 연관된 아이템 테이블이 없습니다. 지정한 수치만큼 직접 적용됩니다. (예: 경험치 +100, 명성 +50 등)",
     "tabs": {
       "rewardTypes": "보상 타입 목록",

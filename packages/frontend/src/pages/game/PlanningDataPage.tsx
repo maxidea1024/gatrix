@@ -23,6 +23,8 @@ import {
   Select,
   MenuItem,
   TableSortLabel,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
 import {
   Storage as StorageIcon,
@@ -30,6 +32,8 @@ import {
   CheckCircle as CheckCircleIcon,
   Search as SearchIcon,
   Clear as ClearIcon,
+  CardGiftcard as GiftIcon,
+  Category as CategoryIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -78,6 +82,16 @@ const PlanningDataPage: React.FC = () => {
   // Sort state
   const [sortBy, setSortBy] = useState<'id' | 'name'>('id');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+
+  // View all state - persist in sessionStorage
+  const [viewAllRewardItems, setViewAllRewardItems] = useState(() => {
+    const saved = sessionStorage.getItem('planningDataViewAllRewardItems');
+    return saved === 'true';
+  });
+  const [viewAllUiItems, setViewAllUiItems] = useState(() => {
+    const saved = sessionStorage.getItem('planningDataViewAllUiItems');
+    return saved === 'true';
+  });
 
   // Load stats on mount
   useEffect(() => {
@@ -364,8 +378,18 @@ const PlanningDataPage: React.FC = () => {
           {/* Tabs */}
           <Card>
             <Tabs value={activeTab} onChange={handleTabChange}>
-              <Tab label={t('planningData.tabs.rewardTypes')} />
-              <Tab label={t('planningData.tabs.uiLists')} />
+              <Tab
+                icon={<GiftIcon />}
+                iconPosition="start"
+                label={t('planningData.tabs.rewardTypes')}
+                sx={{ minHeight: 48 }}
+              />
+              <Tab
+                icon={<CategoryIcon />}
+                iconPosition="start"
+                label={t('planningData.tabs.uiLists')}
+                sx={{ minHeight: 48 }}
+              />
             </Tabs>
 
             <CardContent>
@@ -470,6 +494,25 @@ const PlanningDataPage: React.FC = () => {
                             size="small"
                           />
                         )}
+
+                        {/* View All checkbox - only for types with table */}
+                        {currentRewardType.hasTable && (
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={viewAllRewardItems}
+                                onChange={(e) => {
+                                  const newValue = e.target.checked;
+                                  setViewAllRewardItems(newValue);
+                                  sessionStorage.setItem('planningDataViewAllRewardItems', newValue.toString());
+                                }}
+                                size="small"
+                              />
+                            }
+                            label={t('planningData.viewAll')}
+                            sx={{ ml: 1 }}
+                          />
+                        )}
                       </Box>
 
                       {loadingRewardType === currentRewardType.value ? (
@@ -478,53 +521,120 @@ const PlanningDataPage: React.FC = () => {
                         </Box>
                       ) : currentRewardType.hasTable && rewardTypeItems[currentRewardType.value] ? (
                         <>
-                          <TableContainer component={Paper} variant="outlined">
-                            <Table size="small">
-                              <TableHead>
-                                <TableRow>
-                                  <TableCell width="150px">
-                                    <TableSortLabel
-                                      active={sortBy === 'id'}
-                                      direction={sortBy === 'id' ? sortOrder : 'asc'}
-                                      onClick={() => handleSort('id')}
-                                    >
-                                      ID
-                                    </TableSortLabel>
-                                  </TableCell>
-                                  <TableCell>
-                                    <TableSortLabel
-                                      active={sortBy === 'name'}
-                                      direction={sortBy === 'name' ? sortOrder : 'asc'}
-                                      onClick={() => handleSort('name')}
-                                    >
-                                      {t('planningData.table.name')}
-                                    </TableSortLabel>
-                                  </TableCell>
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {paginatedRewardItems.map((item: any) => (
-                                  <TableRow key={item.id} hover>
-                                    <TableCell>
-                                      <Chip label={item.id} size="small" variant="outlined" />
-                                    </TableCell>
-                                    <TableCell>{item.name}</TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </TableContainer>
+                          {viewAllRewardItems ? (
+                            /* Chip view - show all items */
+                            <Box sx={{
+                              display: 'flex',
+                              flexWrap: 'wrap',
+                              justifyContent: 'center',
+                              gap: 1.5,
+                              p: 3,
+                              bgcolor: 'background.paper',
+                              borderRadius: 2,
+                              border: '1px solid',
+                              borderColor: 'divider',
+                              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                            }}>
+                              {filteredRewardItems.map((item: any) => {
+                                // Get localized name based on current language
+                                let displayName = item.name;
+                                if (i18n.language === 'zh' && item.nameCn) {
+                                  displayName = item.nameCn;
+                                } else if (i18n.language === 'en' && item.nameEn) {
+                                  displayName = item.nameEn;
+                                } else if (item.nameKr) {
+                                  displayName = item.nameKr;
+                                }
 
-                          {/* Pagination */}
-                          {filteredRewardItems.length > 0 && (
-                            <SimplePagination
-                              count={filteredRewardItems.length}
-                              page={page}
-                              rowsPerPage={rowsPerPage}
-                              onPageChange={handlePageChange}
-                              onRowsPerPageChange={handleRowsPerPageChange}
-                              rowsPerPageOptions={[10, 20, 50, 100]}
-                            />
+                                return (
+                                  <Chip
+                                    key={item.id}
+                                    icon={<GiftIcon />}
+                                    label={`${item.id}: ${displayName}`}
+                                    size="small"
+                                    variant="outlined"
+                                    sx={{
+                                      height: 'auto',
+                                      py: 0.75,
+                                      px: 1,
+                                      fontSize: '0.8125rem',
+                                      fontWeight: 500,
+                                      borderRadius: 1.5,
+                                      transition: 'all 0.2s',
+                                      '&:hover': {
+                                        bgcolor: 'action.hover',
+                                        transform: 'translateY(-1px)',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                      }
+                                    }}
+                                  />
+                                );
+                              })}
+                            </Box>
+                          ) : (
+                            /* Table view - paginated */
+                            <>
+                              <TableContainer component={Paper} variant="outlined">
+                                <Table size="small">
+                                  <TableHead>
+                                    <TableRow>
+                                      <TableCell width="150px">
+                                        <TableSortLabel
+                                          active={sortBy === 'id'}
+                                          direction={sortBy === 'id' ? sortOrder : 'asc'}
+                                          onClick={() => handleSort('id')}
+                                        >
+                                          ID
+                                        </TableSortLabel>
+                                      </TableCell>
+                                      <TableCell>
+                                        <TableSortLabel
+                                          active={sortBy === 'name'}
+                                          direction={sortBy === 'name' ? sortOrder : 'asc'}
+                                          onClick={() => handleSort('name')}
+                                        >
+                                          {t('planningData.table.name')}
+                                        </TableSortLabel>
+                                      </TableCell>
+                                    </TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                    {paginatedRewardItems.map((item: any) => {
+                                      // Get localized name based on current language
+                                      let displayName = item.name;
+                                      if (i18n.language === 'zh' && item.nameCn) {
+                                        displayName = item.nameCn;
+                                      } else if (i18n.language === 'en' && item.nameEn) {
+                                        displayName = item.nameEn;
+                                      } else if (item.nameKr) {
+                                        displayName = item.nameKr;
+                                      }
+
+                                      return (
+                                        <TableRow key={item.id} hover>
+                                          <TableCell>
+                                            <Chip label={item.id} size="small" variant="outlined" />
+                                          </TableCell>
+                                          <TableCell>{displayName}</TableCell>
+                                        </TableRow>
+                                      );
+                                    })}
+                                  </TableBody>
+                                </Table>
+                              </TableContainer>
+
+                              {/* Pagination */}
+                              {filteredRewardItems.length > 0 && (
+                                <SimplePagination
+                                  count={filteredRewardItems.length}
+                                  page={page}
+                                  rowsPerPage={rowsPerPage}
+                                  onPageChange={handlePageChange}
+                                  onRowsPerPageChange={handleRowsPerPageChange}
+                                  rowsPerPageOptions={[10, 20, 50, 100]}
+                                />
+                              )}
+                            </>
                           )}
                         </>
                       ) : !currentRewardType.hasTable ? (
@@ -655,55 +765,139 @@ const PlanningDataPage: React.FC = () => {
                               }}
                               size="small"
                             />
+
+                            {/* View All checkbox */}
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={viewAllUiItems}
+                                  onChange={(e) => {
+                                    const newValue = e.target.checked;
+                                    setViewAllUiItems(newValue);
+                                    sessionStorage.setItem('planningDataViewAllUiItems', newValue.toString());
+                                  }}
+                                  size="small"
+                                />
+                              }
+                              label={t('planningData.viewAll')}
+                              sx={{ ml: 1 }}
+                            />
                           </Box>
 
-                          <TableContainer component={Paper} variant="outlined">
-                            <Table size="small">
-                              <TableHead>
-                                <TableRow>
-                                  <TableCell width="150px">
-                                    <TableSortLabel
-                                      active={sortBy === 'id'}
-                                      direction={sortBy === 'id' ? sortOrder : 'asc'}
-                                      onClick={() => handleSort('id')}
-                                    >
-                                      ID
-                                    </TableSortLabel>
-                                  </TableCell>
-                                  <TableCell>
-                                    <TableSortLabel
-                                      active={sortBy === 'name'}
-                                      direction={sortBy === 'name' ? sortOrder : 'asc'}
-                                      onClick={() => handleSort('name')}
-                                    >
-                                      {t('planningData.table.name')}
-                                    </TableSortLabel>
-                                  </TableCell>
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {paginatedItems.map((item: any) => (
-                                  <TableRow key={item.id} hover>
-                                    <TableCell>
-                                      <Chip label={item.id} size="small" variant="outlined" />
-                                    </TableCell>
-                                    <TableCell>{item.name}</TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </TableContainer>
+                          {viewAllUiItems ? (
+                            /* Chip view - show all items */
+                            <Box sx={{
+                              display: 'flex',
+                              flexWrap: 'wrap',
+                              justifyContent: 'center',
+                              gap: 1.5,
+                              p: 3,
+                              bgcolor: 'background.paper',
+                              borderRadius: 2,
+                              border: '1px solid',
+                              borderColor: 'divider',
+                              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                            }}>
+                              {filteredItems.map((item: any) => {
+                                // Get localized name based on current language
+                                let displayName = item.name;
+                                if (i18n.language === 'zh' && item.nameCn) {
+                                  displayName = item.nameCn;
+                                } else if (i18n.language === 'en' && item.nameEn) {
+                                  displayName = item.nameEn;
+                                } else if (item.nameKr) {
+                                  displayName = item.nameKr;
+                                }
 
-                          {/* Pagination */}
-                          {filteredItems.length > 0 && (
-                            <SimplePagination
-                              count={filteredItems.length}
-                              page={page}
-                              rowsPerPage={rowsPerPage}
-                              onPageChange={handlePageChange}
-                              onRowsPerPageChange={handleRowsPerPageChange}
-                              rowsPerPageOptions={[10, 20, 50, 100]}
-                            />
+                                return (
+                                  <Chip
+                                    key={item.id}
+                                    icon={<CategoryIcon />}
+                                    label={`${item.id}: ${displayName}`}
+                                    size="small"
+                                    variant="outlined"
+                                    sx={{
+                                      height: 'auto',
+                                      py: 0.75,
+                                      px: 1,
+                                      fontSize: '0.8125rem',
+                                      fontWeight: 500,
+                                      borderRadius: 1.5,
+                                      transition: 'all 0.2s',
+                                      '&:hover': {
+                                        bgcolor: 'action.hover',
+                                        transform: 'translateY(-1px)',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                      }
+                                    }}
+                                  />
+                                );
+                              })}
+                            </Box>
+                          ) : (
+                            /* Table view - paginated */
+                            <>
+                              <TableContainer component={Paper} variant="outlined">
+                                <Table size="small">
+                                  <TableHead>
+                                    <TableRow>
+                                      <TableCell width="150px">
+                                        <TableSortLabel
+                                          active={sortBy === 'id'}
+                                          direction={sortBy === 'id' ? sortOrder : 'asc'}
+                                          onClick={() => handleSort('id')}
+                                        >
+                                          ID
+                                        </TableSortLabel>
+                                      </TableCell>
+                                      <TableCell>
+                                        <TableSortLabel
+                                          active={sortBy === 'name'}
+                                          direction={sortBy === 'name' ? sortOrder : 'asc'}
+                                          onClick={() => handleSort('name')}
+                                        >
+                                          {t('planningData.table.name')}
+                                        </TableSortLabel>
+                                      </TableCell>
+                                    </TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                    {paginatedItems.map((item: any) => {
+                                      // Get localized name based on current language
+                                      let displayName = item.name;
+                                      if (i18n.language === 'zh' && item.nameCn) {
+                                        displayName = item.nameCn;
+                                      } else if (i18n.language === 'en' && item.nameEn) {
+                                        displayName = item.nameEn;
+                                      } else if (item.nameKr) {
+                                        displayName = item.nameKr;
+                                      }
+
+                                      return (
+                                        <TableRow key={item.id} hover>
+                                          <TableCell>
+                                            <Chip label={item.id} size="small" variant="outlined" />
+                                          </TableCell>
+                                          <TableCell>{displayName}</TableCell>
+                                        </TableRow>
+                                      );
+                                    })}
+                                  </TableBody>
+                                </Table>
+                              </TableContainer>
+
+                              {/* Pagination */}
+                              {filteredItems.length > 0 && (
+                                <SimplePagination
+                                  count={filteredItems.length}
+                                  page={page}
+                                  rowsPerPage={rowsPerPage}
+                                  onPageChange={handlePageChange}
+                                  onRowsPerPageChange={handleRowsPerPageChange}
+                                  rowsPerPageOptions={[10, 20, 50, 100]}
+                                />
+                              )}
+                            </>
                           )}
                         </>
                       ) : null}
