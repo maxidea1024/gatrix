@@ -56,6 +56,7 @@ export interface PlanningDataStats {
   rewardTypes: Array<{
     value: number;
     name: string;
+    nameKey: string;
     hasTable: boolean;
     itemCount: number;
   }>;

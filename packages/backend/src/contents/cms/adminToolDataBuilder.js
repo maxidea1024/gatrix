@@ -459,33 +459,64 @@ function extractItemsFromTable(tableData, tableName, rewardType) {
 function formatItemName(item, allCmsTables) {
   // Special handling for Mail - use languageMailTitle[0] (Korean)
   if (item.languageMailTitle && Array.isArray(item.languageMailTitle) && item.languageMailTitle.length > 0) {
-    return item.languageMailTitle[0] || `Mail ${item.id}`;
+    return removeCommentFromName(item.languageMailTitle[0] || `Mail ${item.id}`);
   }
 
   // Special handling for Quest - use name field
   if (item.name && (item.nodes || item.category !== undefined)) {
     // Quest has 'nodes' array or 'category' field
-    return item.name;
+    return removeCommentFromName(item.name);
   }
 
   // Special handling for EventMission - use eventTask if available
   if (item.eventTaskId && allCmsTables.EventTask && allCmsTables.EventTask[item.eventTaskId]) {
     const eventTask = allCmsTables.EventTask[item.eventTaskId];
     if (eventTask.overrideDesc) {
-      return eventTask.overrideDesc;
+      return removeCommentFromName(eventTask.overrideDesc);
     }
     return `EventMission ${item.id}`;
   }
 
   // Special handling for Mate - get name from Character table
   if (item.characterId && allCmsTables.Character && allCmsTables.Character[item.characterId]) {
-    return makeCharacterDisplayName(allCmsTables.Character[item.characterId]);
+    return removeCommentFromName(makeCharacterDisplayName(allCmsTables.Character[item.characterId]));
   }
 
   // Special handling for ShipBlueprint - get name from Ship table
   if (item.shipId && allCmsTables.Ship && allCmsTables.Ship[item.shipId]) {
     const ship = allCmsTables.Ship[item.shipId];
-    return ship.name ? `${ship.name} 도면` : `Ship ${item.shipId} 도면`;
+    const shipName = ship.name ? `${ship.name} 도면` : `Ship ${item.shipId} 도면`;
+    return removeCommentFromName(shipName);
+  }
+
+  // Special handling for TaxFreePermit - combine nation name, typeName and permitName
+  if (item.typeName !== undefined && item.permitName !== undefined) {
+    let name = '';
+
+    // Add nation name if nationId exists
+    if (item.nationId && allCmsTables.Nation && allCmsTables.Nation[item.nationId]) {
+      const nation = allCmsTables.Nation[item.nationId];
+      const nationName = nation.name || `Nation ${item.nationId}`;
+      name = `[${nationName}] ${item.typeName} ${item.permitName}`;
+    } else {
+      name = `${item.typeName} ${item.permitName}`;
+    }
+
+    return removeCommentFromName(name);
+  }
+
+  // Special handling for Point - distinguish paid/free red gems and shards
+  if (item.tooltipDesc !== undefined && item.name) {
+    // Check if this is a paid item (유료 획득)
+    if (item.tooltipDesc.includes('유료 획득')) {
+      return removeCommentFromName(`${item.name} (유료)`);
+    }
+    // Check if this is a red gem or red gem shard (add "무료" for clarity)
+    if (item.name === '레드젬' || item.name === '레드젬 파편') {
+      return removeCommentFromName(`${item.name} (무료)`);
+    }
+    // For other points, just return the name
+    return removeCommentFromName(item.name);
   }
 
   // Special handling for RewardSeasonItems - get name from InvestSeason table
@@ -522,15 +553,15 @@ function formatItemName(item, allCmsTables) {
 
     // Return season name with first reward item for distinction
     if (rewardNames.length > 0) {
-      return `${seasonName} (${rewardNames[0]})`;
+      return removeCommentFromName(`${seasonName} (${rewardNames[0]})`);
     }
 
-    return seasonName;
+    return removeCommentFromName(seasonName);
   }
 
   // If no formatting info, return original name
   if (!item.descFormat || !item.descFormatType) {
-    return item.name;
+    return removeCommentFromName(item.name);
   }
 
   // Helper function to get formatted text for a descFormat type
@@ -583,7 +614,26 @@ function formatItemName(item, allCmsTables) {
   });
 
   // Replace placeholders in item name
-  return stringFormat(item.name, formattedTexts);
+  return removeCommentFromName(stringFormat(item.name, formattedTexts));
+}
+
+/**
+ * Remove comment part from item name (everything after @)
+ * @param {string} name - Item name
+ * @returns {string} - Cleaned name
+ */
+function removeCommentFromName(name) {
+  if (!name || typeof name !== 'string') {
+    return name;
+  }
+
+  // Remove @ and everything after it
+  const atIndex = name.indexOf('@');
+  if (atIndex !== -1) {
+    return name.substring(0, atIndex).trim();
+  }
+
+  return name;
 }
 
 // ============================================================================
@@ -604,7 +654,7 @@ function buildRewardLookupTable(cmsDir, loctab = {}) {
   // First, load all CMS tables that might be referenced for item name formatting
   console.log('   Loading reference CMS tables for item name formatting...');
   const allCmsTables = {};
-  const referenceTables = ['Ship', 'Mate', 'Character', 'ShipBlueprint', 'Item', 'InvestSeason'];
+  const referenceTables = ['Ship', 'Mate', 'Character', 'ShipBlueprint', 'Item', 'InvestSeason', 'Nation'];
 
   for (const tableName of referenceTables) {
     const filePath = path.join(cmsDir, `${tableName}.json`);
@@ -618,7 +668,7 @@ function buildRewardLookupTable(cmsDir, loctab = {}) {
       if (tableData) {
         allCmsTables[tableName] = {};
 
-        if (tableName === 'Character' || tableName === 'InvestSeason') {
+        if (tableName === 'Character' || tableName === 'InvestSeason' || tableName === 'Nation') {
           const table = tableData[tableName];
           for (const [key, entry] of Object.entries(table)) {
             if (entry && entry.id && !key.startsWith(':')) {
@@ -1055,8 +1105,42 @@ function generateUIListData(cmsDir, loctab = {}) {
   uiListData.cEquips = extractList('CEquip', 'cEquips', ['type', 'grade', 'job'], loctab);
   console.log(`   ✅ Loaded ${uiListData.cEquips.length} character equipments`);
 
-  // 16. Point (포인트)
-  uiListData.points = extractList('Point', 'points', [], loctab);
+  // 16. Point (포인트) - Special handling for paid/free red gems
+  const pointTable = loadTable('Point');
+  if (pointTable && pointTable.Point) {
+    const pointList = [];
+    for (const [key, item] of Object.entries(pointTable.Point)) {
+      if (!item || !item.id || key.startsWith(':')) {
+        continue;
+      }
+
+      let nameKr = item.name || `Point ${item.id}`;
+
+      // Apply same logic as formatItemName for paid/free distinction
+      if (item.tooltipDesc && item.name) {
+        if (item.tooltipDesc.includes('유료 획득')) {
+          nameKr = `${item.name} (유료)`;
+        } else if (item.name === '레드젬' || item.name === '레드젬 파편') {
+          nameKr = `${item.name} (무료)`;
+        }
+        // else: use original name for other points
+      }
+
+      const entry = {
+        id: item.id,
+        name: nameKr,
+        nameKr: nameKr,
+        nameCn: loctab[item.name] || loctab[nameKr] || nameKr,
+        nameEn: nameKr,
+      };
+
+      pointList.push(entry);
+    }
+    pointList.sort((a, b) => a.id - b.id);
+    uiListData.points = pointList;
+  } else {
+    uiListData.points = [];
+  }
   console.log(`   ✅ Loaded ${uiListData.points.length} points`);
 
   // 17. UserTitle (칭호)
@@ -1117,6 +1201,12 @@ function generateUIListData(cmsDir, loctab = {}) {
 
             // Replace {0}, {1}, {2}, etc. with formatted texts
             nameKr = stringFormat(nameKr, formattedTexts);
+          }
+
+          // Remove @ and everything after it (comment marker)
+          const atIndex = nameKr.indexOf('@');
+          if (atIndex !== -1) {
+            nameKr = nameKr.substring(0, atIndex).trim();
           }
         }
       }

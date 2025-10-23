@@ -93,14 +93,14 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }
   const getRewardLabel = (reward: ParticipationReward): string => {
     const rewardType = parseInt(reward.rewardType);
     const typeInfo = rewardTypeMap.get(rewardType);
-    
+
     if (!typeInfo) {
       return `${t('surveys.unknownReward')} (${reward.rewardType})`;
     }
 
     // Get localized type name
     const typeName = t(typeInfo.nameKey);
-    
+
     // If has table, get item name
     if (typeInfo.hasTable) {
       const item = rewardItemsMap.get(`${rewardType}_${reward.itemId}`);
@@ -110,8 +110,8 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }
         return `${typeName} #${reward.itemId} x${reward.quantity}`;
       }
     } else {
-      // Value-based reward (no item table)
-      return `${typeName} x${reward.quantity}`;
+      // Value-based reward (no item table) - use + prefix for experience, fame, etc.
+      return `${typeName} +${reward.quantity}`;
     }
   };
 

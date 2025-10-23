@@ -2994,6 +2994,7 @@
     "showingFirst100": "仅显示前100项（总计：{{total}}）",
     "searchPlaceholder": "按物品名称或ID搜索",
     "category": "类别",
+    "noTableForRewardType": "此奖励类型没有关联的物品表。直接应用指定的数值。（例：经验值 +100，声望 +50 等）",
     "tabs": {
       "rewardTypes": "奖励类型",
       "uiLists": "UI列表"

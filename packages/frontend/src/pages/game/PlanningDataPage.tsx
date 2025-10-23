@@ -16,13 +16,13 @@ import {
   Chip,
   Tabs,
   Tab,
-  Alert,
   TextField,
   InputAdornment,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
+  TableSortLabel,
 } from '@mui/material';
 import {
   Storage as StorageIcon,
@@ -33,7 +33,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import planningDataService, { PlanningDataStats } from '../../services/planningDataService';
-import RewardItemSelector, { RewardSelection } from '../../components/game/RewardItemSelector';
 import SimplePagination from '../../components/common/SimplePagination';
 import { useDebounce } from '../../hooks/useDebounce';
 
@@ -69,8 +68,15 @@ const PlanningDataPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  // Reward type filter state
-  const [selectedRewardType, setSelectedRewardType] = useState<number | 'all'>('all');
+  // Reward type filter state - persist in sessionStorage
+  const [selectedRewardTypeIndex, setSelectedRewardTypeIndex] = useState(() => {
+    const saved = sessionStorage.getItem('planningDataSelectedRewardType');
+    return saved ? parseInt(saved) : 0;
+  });
+
+  // Sort state
+  const [sortBy, setSortBy] = useState<'id' | 'name'>('id');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   // Load stats on mount
   useEffect(() => {
@@ -83,7 +89,14 @@ const PlanningDataPage: React.FC = () => {
       const data = await planningDataService.getStats();
       setStats(data);
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('planningData.errors.loadStatsFailed'), { variant: 'error' });
+      // Extract user-friendly error message
+      let errorMessage = t('planningData.errors.loadStatsFailed');
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message && !error.message.includes('function')) {
+        errorMessage = error.message;
+      }
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -97,7 +110,14 @@ const PlanningDataPage: React.FC = () => {
       // Reload stats
       await loadStats();
     } catch (error: any) {
-      enqueueSnackbar(error.message || t('planningData.errors.rebuildFailed'), { variant: 'error' });
+      // Extract user-friendly error message
+      let errorMessage = t('planningData.errors.rebuildFailed');
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message && !error.message.includes('function')) {
+        errorMessage = error.message;
+      }
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setRebuilding(false);
     }
@@ -128,7 +148,14 @@ const PlanningDataPage: React.FC = () => {
           const items = await planningDataService.getUIListItems(currentCategory, language);
           setCategoryItems(prev => ({ ...prev, [currentCategory]: items }));
         } catch (error: any) {
-          enqueueSnackbar(error.message || t('planningData.errors.loadItemsFailed'), { variant: 'error' });
+          // Extract user-friendly error message
+          let errorMessage = t('planningData.errors.loadItemsFailed');
+          if (error.response?.data?.message) {
+            errorMessage = error.response.data.message;
+          } else if (error.message && !error.message.includes('function')) {
+            errorMessage = error.message;
+          }
+          enqueueSnackbar(errorMessage, { variant: 'error' });
         } finally {
           setLoadingCategory(null);
         }
@@ -137,22 +164,109 @@ const PlanningDataPage: React.FC = () => {
     }
   }, [activeTab, currentCategory, categoryItems, i18n.language, enqueueSnackbar, t]);
 
-  // Filtered items based on search
+  // Get current selected reward type
+  const currentRewardType = useMemo(() => {
+    if (!stats?.rewardTypes || stats.rewardTypes.length === 0) return null;
+    return stats.rewardTypes[selectedRewardTypeIndex] || null;
+  }, [stats?.rewardTypes, selectedRewardTypeIndex]);
+
+  // Load reward items for current reward type
+  const [rewardTypeItems, setRewardTypeItems] = useState<Record<number, any[]>>({});
+  const [loadingRewardType, setLoadingRewardType] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (activeTab === 0 && currentRewardType && currentRewardType.hasTable && !rewardTypeItems[currentRewardType.value]) {
+      const loadItems = async () => {
+        try {
+          setLoadingRewardType(currentRewardType.value);
+          const language = i18n.language === 'zh' ? 'cn' : i18n.language === 'en' ? 'en' : 'kr';
+          const items = await planningDataService.getRewardTypeItems(currentRewardType.value, language);
+          setRewardTypeItems(prev => ({ ...prev, [currentRewardType.value]: items }));
+        } catch (error: any) {
+          // Extract user-friendly error message
+          let errorMessage = t('planningData.errors.loadItemsFailed');
+          if (error.response?.data?.message) {
+            errorMessage = error.response.data.message;
+          } else if (error.message && !error.message.includes('function')) {
+            errorMessage = error.message;
+          }
+          enqueueSnackbar(errorMessage, { variant: 'error' });
+        } finally {
+          setLoadingRewardType(null);
+        }
+      };
+      loadItems();
+    }
+  }, [activeTab, currentRewardType, rewardTypeItems, i18n.language, enqueueSnackbar, t]);
+
+  // Filtered reward items based on search
+  const filteredRewardItems = useMemo(() => {
+    if (!currentRewardType || !rewardTypeItems[currentRewardType.value]) return [];
+    let items = rewardTypeItems[currentRewardType.value];
+
+    // Apply search filter
+    if (debouncedSearchTerm) {
+      const searchLower = debouncedSearchTerm.toLowerCase();
+      items = items.filter((item: any) => {
+        // Search by ID (convert to string for comparison)
+        const idMatch = item.id.toString().includes(searchLower);
+        // Search by name
+        const nameMatch = item.name?.toLowerCase().includes(searchLower);
+        return idMatch || nameMatch;
+      });
+    }
+
+    // Apply sorting
+    const sorted = [...items].sort((a: any, b: any) => {
+      let compareResult = 0;
+      if (sortBy === 'id') {
+        compareResult = a.id - b.id;
+      } else {
+        compareResult = (a.name || '').localeCompare(b.name || '');
+      }
+      return sortOrder === 'asc' ? compareResult : -compareResult;
+    });
+
+    return sorted;
+  }, [currentRewardType, rewardTypeItems, debouncedSearchTerm, sortBy, sortOrder]);
+
+  // Paginated reward items
+  const paginatedRewardItems = useMemo(() => {
+    const start = page * rowsPerPage;
+    const end = start + rowsPerPage;
+    return filteredRewardItems.slice(start, end);
+  }, [filteredRewardItems, page, rowsPerPage]);
+
+  // Filtered items based on search (for UI Lists tab)
   const filteredItems = useMemo(() => {
     if (!currentCategory || !categoryItems[currentCategory]) return [];
-    const items = categoryItems[currentCategory];
+    let items = categoryItems[currentCategory];
 
-    if (!debouncedSearchTerm) return items;
+    // Apply search filter
+    if (debouncedSearchTerm) {
+      const searchLower = debouncedSearchTerm.toLowerCase();
+      items = items.filter((item: any) => {
+        // Search by ID (convert to string for comparison)
+        const idMatch = item.id.toString().includes(searchLower);
+        // Search by name
+        const nameMatch = item.name?.toLowerCase().includes(searchLower);
+        return idMatch || nameMatch;
+      });
+    }
 
-    const searchLower = debouncedSearchTerm.toLowerCase();
-    return items.filter((item: any) => {
-      // Search by ID (convert to string for comparison)
-      const idMatch = item.id.toString().includes(searchLower);
-      // Search by name
-      const nameMatch = item.name?.toLowerCase().includes(searchLower);
-      return idMatch || nameMatch;
+    // Apply sorting
+    const sorted = [...items].sort((a: any, b: any) => {
+      let compareResult = 0;
+      if (sortBy === 'id') {
+        compareResult = a.id - b.id;
+      } else {
+        compareResult = (a.name || '').localeCompare(b.name || '');
+      }
+      return sortOrder === 'asc' ? compareResult : -compareResult;
     });
-  }, [currentCategory, categoryItems, debouncedSearchTerm]);
+
+    return sorted;
+  }, [currentCategory, categoryItems, debouncedSearchTerm, sortBy, sortOrder]);
 
   // Paginated items
   const paginatedItems = useMemo(() => {
@@ -165,6 +279,14 @@ const PlanningDataPage: React.FC = () => {
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
     sessionStorage.setItem('planningDataActiveTab', newValue.toString());
+  };
+
+  const handleRewardTypeChange = (event: any) => {
+    const newValue = typeof event === 'number' ? event : event.target.value;
+    setSelectedRewardTypeIndex(newValue);
+    sessionStorage.setItem('planningDataSelectedRewardType', newValue.toString());
+    setPage(0); // Reset page when changing reward type
+    setSearchTerm(''); // Clear search when changing reward type
   };
 
   const handleUiListTabChange = (event: any) => {
@@ -183,6 +305,19 @@ const PlanningDataPage: React.FC = () => {
   const handleRowsPerPageChange = (event: any) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  // Handle sort
+  const handleSort = (column: 'id' | 'name') => {
+    if (sortBy === column) {
+      // Toggle sort order
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Change sort column and reset to ascending
+      setSortBy(column);
+      setSortOrder('asc');
+    }
+    setPage(0); // Reset to first page when sorting
   };
 
   return (
@@ -218,25 +353,13 @@ const PlanningDataPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Statistics Summary */}
+      {/* Content */}
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
           <CircularProgress />
         </Box>
       ) : stats ? (
         <>
-          {/* Simple Statistics Line */}
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                {t('planningData.stats.totalRewardTypes')}: <strong>{stats.totalRewardTypes}</strong> | {' '}
-                {t('planningData.stats.withTable')}: <strong style={{ color: '#2e7d32' }}>{stats.rewardTypesWithTable}</strong> | {' '}
-                {t('planningData.stats.withoutTable')}: <strong style={{ color: '#ed6c02' }}>{stats.rewardTypesWithoutTable}</strong> | {' '}
-                {t('planningData.stats.totalItems')}: <strong>{stats.totalItems.toLocaleString()}</strong>
-              </Typography>
-            </CardContent>
-          </Card>
-
           {/* Tabs */}
           <Card>
             <Tabs value={activeTab} onChange={handleTabChange}>
@@ -247,60 +370,168 @@ const PlanningDataPage: React.FC = () => {
             <CardContent>
               {/* Reward Types Table */}
               {activeTab === 0 && (
-                <>
-                  {/* Test Component */}
-                  <Alert severity="info" sx={{ mb: 2 }}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      {t('planningData.testComponent.title')}
-                    </Typography>
-                    <Box sx={{ mt: 1 }}>
-                      <RewardItemSelector
-                        value={testReward}
-                        onChange={setTestReward}
-                      />
-                    </Box>
-                  </Alert>
+                <Box>
+                  {/* Reward Type Items */}
+                  {currentRewardType && (
+                    <>
+                      {/* Reward Type Selector - Always visible */}
+                      <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
+                        <FormControl sx={{ minWidth: 250 }}>
+                          <InputLabel id="reward-type-select-label">
+                            {t('planningData.table.rewardType')}
+                          </InputLabel>
+                          <Select
+                            labelId="reward-type-select-label"
+                            value={selectedRewardTypeIndex}
+                            onChange={handleRewardTypeChange}
+                            label={t('planningData.table.rewardType')}
+                            size="small"
+                          >
+                            {stats.rewardTypes.map((type, index) => (
+                              <MenuItem key={type.value} value={index}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
+                                  <Typography variant="body2" sx={{ flexGrow: 1 }}>
+                                    [{type.value}] {t(type.nameKey)}
+                                  </Typography>
+                                  {type.hasTable && (
+                                    <Chip label={type.itemCount} size="small" />
+                                  )}
+                                </Box>
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
 
-                  <TableContainer component={Paper} variant="outlined">
-                    <Table size="small">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>{t('planningData.table.rewardType')}</TableCell>
-                          <TableCell>{t('planningData.table.name')}</TableCell>
-                          <TableCell align="center">{t('planningData.table.hasTable')}</TableCell>
-                          <TableCell align="right">{t('planningData.table.itemCount')}</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {stats.rewardTypes.map((type) => {
-                          const translatedName = t(type.nameKey);
-                          // Debug: log if translation failed
-                          if (translatedName === type.nameKey) {
-                            console.warn(`Translation missing for key: ${type.nameKey}`);
-                          }
-                          return (
-                            <TableRow key={type.value}>
-                              <TableCell>
-                                <Chip label={type.value} size="small" />
-                              </TableCell>
-                              <TableCell>{translatedName}</TableCell>
-                              <TableCell align="center">
-                                {type.hasTable ? (
-                                  <CheckCircleIcon color="success" fontSize="small" />
-                                ) : (
-                                  <Typography variant="caption" color="text.secondary">-</Typography>
-                                )}
-                              </TableCell>
-                              <TableCell align="right">
-                                {type.hasTable ? type.itemCount.toLocaleString() : '-'}
-                              </TableCell>
-                            </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </>
+                        {/* Search box - only for types with table */}
+                        {currentRewardType.hasTable && (
+                          <TextField
+                            placeholder={t('planningData.searchPlaceholder')}
+                            value={searchTerm}
+                            onChange={(e) => {
+                              setSearchTerm(e.target.value);
+                              setPage(0);
+                            }}
+                            sx={{
+                              flexGrow: 1,
+                              maxWidth: 750,
+                              '& .MuiOutlinedInput-root': {
+                                height: '40px',
+                                borderRadius: '20px',
+                                bgcolor: 'background.paper',
+                                transition: 'all 0.2s ease-in-out',
+                                '& fieldset': {
+                                  borderColor: 'divider',
+                                },
+                                '&:hover': {
+                                  bgcolor: 'action.hover',
+                                  '& fieldset': {
+                                    borderColor: 'primary.light',
+                                  }
+                                },
+                                '&.Mui-focused': {
+                                  bgcolor: 'background.paper',
+                                  boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                                  '& fieldset': {
+                                    borderColor: 'primary.main',
+                                    borderWidth: '1px',
+                                  }
+                                }
+                              },
+                              '& .MuiInputBase-input': {
+                                fontSize: '0.875rem',
+                              }
+                            }}
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                </InputAdornment>
+                              ),
+                            }}
+                            size="small"
+                          />
+                        )}
+                      </Box>
+
+                      {loadingRewardType === currentRewardType.value ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                          <CircularProgress />
+                        </Box>
+                      ) : currentRewardType.hasTable && rewardTypeItems[currentRewardType.value] ? (
+                        <>
+                          <TableContainer component={Paper} variant="outlined">
+                            <Table size="small">
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell width="150px">
+                                    <TableSortLabel
+                                      active={sortBy === 'id'}
+                                      direction={sortBy === 'id' ? sortOrder : 'asc'}
+                                      onClick={() => handleSort('id')}
+                                    >
+                                      ID
+                                    </TableSortLabel>
+                                  </TableCell>
+                                  <TableCell>
+                                    <TableSortLabel
+                                      active={sortBy === 'name'}
+                                      direction={sortBy === 'name' ? sortOrder : 'asc'}
+                                      onClick={() => handleSort('name')}
+                                    >
+                                      {t('planningData.table.name')}
+                                    </TableSortLabel>
+                                  </TableCell>
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {paginatedRewardItems.map((item: any) => (
+                                  <TableRow key={item.id} hover>
+                                    <TableCell>
+                                      <Chip label={item.id} size="small" variant="outlined" />
+                                    </TableCell>
+                                    <TableCell>{item.name}</TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </TableContainer>
+
+                          {/* Pagination */}
+                          {filteredRewardItems.length > 0 && (
+                            <SimplePagination
+                              count={filteredRewardItems.length}
+                              page={page}
+                              rowsPerPage={rowsPerPage}
+                              onPageChange={handlePageChange}
+                              onRowsPerPageChange={handleRowsPerPageChange}
+                              rowsPerPageOptions={[10, 20, 50, 100]}
+                            />
+                          )}
+                        </>
+                      ) : !currentRewardType.hasTable ? (
+                        <Box sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          py: 8,
+                          px: 4,
+                          bgcolor: 'background.paper',
+                          borderRadius: 2,
+                          border: '1px solid',
+                          borderColor: 'divider'
+                        }}>
+                          <Typography variant="body1" color="text.primary" sx={{ mb: 1, fontWeight: 500 }}>
+                            📊 {t(currentRewardType.nameKey)}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', maxWidth: 600 }}>
+                            {t('planningData.noTableForRewardType')}
+                          </Typography>
+                        </Box>
+                      ) : null}
+                    </>
+                  )}
+                </Box>
               )}
 
               {/* UI Lists */}
@@ -317,7 +548,7 @@ const PlanningDataPage: React.FC = () => {
                         <>
                           {/* Category Selector and Search Box */}
                           <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
-                            <FormControl sx={{ minWidth: 200 }}>
+                            <FormControl sx={{ minWidth: 250 }}>
                               <InputLabel id="category-select-label">
                                 {t('planningData.category')}
                               </InputLabel>
@@ -393,8 +624,24 @@ const PlanningDataPage: React.FC = () => {
                             <Table size="small">
                               <TableHead>
                                 <TableRow>
-                                  <TableCell width="150px">ID</TableCell>
-                                  <TableCell>{t('planningData.table.name')}</TableCell>
+                                  <TableCell width="150px">
+                                    <TableSortLabel
+                                      active={sortBy === 'id'}
+                                      direction={sortBy === 'id' ? sortOrder : 'asc'}
+                                      onClick={() => handleSort('id')}
+                                    >
+                                      ID
+                                    </TableSortLabel>
+                                  </TableCell>
+                                  <TableCell>
+                                    <TableSortLabel
+                                      active={sortBy === 'name'}
+                                      direction={sortBy === 'name' ? sortOrder : 'asc'}
+                                      onClick={() => handleSort('name')}
+                                    >
+                                      {t('planningData.table.name')}
+                                    </TableSortLabel>
+                                  </TableCell>
                                 </TableRow>
                               </TableHead>
                               <TableBody>

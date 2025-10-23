@@ -340,6 +340,7 @@ export class PlanningDataService {
         rewardTypes: typeList.map(t => ({
           value: t.value,
           name: t.name,
+          nameKey: t.nameKey,
           hasTable: t.hasTable,
           itemCount: t.itemCount,
         })),
