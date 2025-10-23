@@ -511,16 +511,19 @@ function formatItemName(item, allCmsTables) {
 
   // Special handling for Point - distinguish paid/free red gems and shards
   if (item.tooltipDesc !== undefined && item.name) {
+    // Remove @ comment first before checking
+    const baseName = removeCommentFromName(item.name);
+
     // Check if this is a paid item (유료 획득)
     if (item.tooltipDesc.includes('유료 획득')) {
-      return removeCommentFromName(`${item.name} (유료)`);
+      return `${baseName} (유료)`;
     }
     // Check if this is a red gem or red gem shard (add "무료" for clarity)
-    if (item.name === '레드젬' || item.name === '레드젬 파편') {
-      return removeCommentFromName(`${item.name} (무료)`);
+    if (baseName === '레드젬' || baseName === '레드젬 파편') {
+      return `${baseName} (무료)`;
     }
     // For other points, just return the name
-    return removeCommentFromName(item.name);
+    return baseName;
   }
 
   // Special handling for RewardSeasonItems - get name from InvestSeason table
@@ -731,11 +734,13 @@ function buildRewardLookupTable(cmsDir, loctab = {}) {
 
             // Special handling for Point items with paid/free distinction
             if (item._original.tooltipDesc && item._original.name) {
+              // Remove @ comment before checking
+              const cleanName = removeCommentFromName(item._original.name);
               const isPaid = item._original.tooltipDesc.includes('유료 획득');
-              const isRedGem = item._original.name === '레드젬' || item._original.name === '레드젬 파편';
+              const isRedGem = cleanName === '레드젬' || cleanName === '레드젬 파편';
 
               if (isPaid || isRedGem) {
-                const baseName = item._original.name;
+                const baseName = cleanName;
                 const baseCn = loctab[baseName] || baseName;
                 const suffix = isPaid ? '유료' : '무료';
                 const suffixCn = loctab[suffix] || suffix;
@@ -1191,12 +1196,12 @@ function generateUIListData(cmsDir, loctab = {}) {
       let nameCn = loctab[nameKr] || nameKr;
       let nameEn = nameKr;
 
-      // Debug: Check if this is a red gem
+      // Check if this is a red gem and if it's paid or free
       const isRedGem = nameKr === '레드젬' || nameKr === '레드젬 파편';
       const hasPaidDesc = item.tooltipDesc && item.tooltipDesc.includes('유료 획득');
 
-      // Apply same logic as formatItemName for paid/free distinction
-      if (item.tooltipDesc && nameKr) {
+      // Apply paid/free distinction for red gems
+      if (isRedGem || hasPaidDesc) {
         if (hasPaidDesc) {
           // Paid item - compose localized name
           const baseName = nameKr;
@@ -1214,7 +1219,6 @@ function generateUIListData(cmsDir, loctab = {}) {
           nameCn = `${baseCn} (${freeCn})`;
           nameEn = nameKr;
         }
-        // else: use original name for other points
       }
 
       const entry = {
