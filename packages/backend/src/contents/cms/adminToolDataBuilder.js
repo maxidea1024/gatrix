@@ -1022,7 +1022,14 @@ function generateUIListData(cmsDir, loctab = {}) {
       if (!item || !item.id || key.startsWith(':') || item.type === 7) {
         continue;
       }
-      const nameKr = item.name || `Item ${item.id}`;
+      let nameKr = item.name || `Item ${item.id}`;
+
+      // Remove @ and everything after it (comment marker)
+      const atIndex = nameKr.indexOf('@');
+      if (atIndex !== -1) {
+        nameKr = nameKr.substring(0, atIndex).trim();
+      }
+
       uiListData.items.push({
         id: item.id,
         name: nameKr,
@@ -1043,7 +1050,14 @@ function generateUIListData(cmsDir, loctab = {}) {
       if (!item || !item.id || key.startsWith(':') || item.type !== 7) {
         continue;
       }
-      const nameKr = item.name || `Quest Item ${item.id}`;
+      let nameKr = item.name || `Quest Item ${item.id}`;
+
+      // Remove @ and everything after it (comment marker)
+      const atIndex = nameKr.indexOf('@');
+      if (atIndex !== -1) {
+        nameKr = nameKr.substring(0, atIndex).trim();
+      }
+
       uiListData.questItems.push({
         id: item.id,
         name: nameKr,
@@ -1078,6 +1092,12 @@ function generateUIListData(cmsDir, loctab = {}) {
 
         // Replace {0}, {1}, {2}, etc. with formatted texts
         nameKr = stringFormat(nameKr, formattedTexts);
+      }
+
+      // Remove @ and everything after it (comment marker)
+      const atIndex = nameKr.indexOf('@');
+      if (atIndex !== -1) {
+        nameKr = nameKr.substring(0, atIndex).trim();
       }
 
       uiListData.quests.push({
@@ -1124,7 +1144,13 @@ function generateUIListData(cmsDir, loctab = {}) {
       let nameKr = `ShipBlueprint ${blueprint.id}`;
 
       if (ship && ship.name) {
-        nameKr = `${ship.name} 도면`;
+        let shipName = ship.name;
+        // Remove @ and everything after it (comment marker)
+        const atIndex = shipName.indexOf('@');
+        if (atIndex !== -1) {
+          shipName = shipName.substring(0, atIndex).trim();
+        }
+        nameKr = `${shipName} 도면`;
       }
 
       uiListData.shipBlueprints.push({
@@ -1155,26 +1181,35 @@ function generateUIListData(cmsDir, loctab = {}) {
       }
 
       let nameKr = item.name || `Point ${item.id}`;
-      let nameCn = loctab[item.name] || nameKr;
+
+      // Remove @ and everything after it (comment marker) from base name
+      const atIndex = nameKr.indexOf('@');
+      if (atIndex !== -1) {
+        nameKr = nameKr.substring(0, atIndex).trim();
+      }
+
+      let nameCn = loctab[nameKr] || nameKr;
       let nameEn = nameKr;
 
       // Debug: Check if this is a red gem
-      const isRedGem = item.name === '레드젬' || item.name === '레드젬 파편';
+      const isRedGem = nameKr === '레드젬' || nameKr === '레드젬 파편';
       const hasPaidDesc = item.tooltipDesc && item.tooltipDesc.includes('유료 획득');
 
       // Apply same logic as formatItemName for paid/free distinction
-      if (item.tooltipDesc && item.name) {
+      if (item.tooltipDesc && nameKr) {
         if (hasPaidDesc) {
           // Paid item - compose localized name
-          nameKr = `${item.name} (유료)`;
-          const baseCn = loctab[item.name] || item.name;
+          const baseName = nameKr;
+          nameKr = `${baseName} (유료)`;
+          const baseCn = loctab[baseName] || baseName;
           const paidCn = loctab['유료'] || '유료';
           nameCn = `${baseCn} (${paidCn})`;
           nameEn = nameKr;
         } else if (isRedGem) {
           // Free red gem - compose localized name
-          nameKr = `${item.name} (무료)`;
-          const baseCn = loctab[item.name] || item.name;
+          const baseName = nameKr;
+          nameKr = `${baseName} (무료)`;
+          const baseCn = loctab[baseName] || baseName;
           const freeCn = loctab['무료'] || '무료';
           nameCn = `${baseCn} (${freeCn})`;
           nameEn = nameKr;
@@ -1319,6 +1354,12 @@ function generateUIListData(cmsDir, loctab = {}) {
           // Replace {0}, {1}, {2}, etc. with formatted texts
           nameKr = stringFormat(nameKr, formattedTexts);
         }
+      }
+
+      // Remove @ and everything after it (comment marker)
+      const atIndex = nameKr.indexOf('@');
+      if (atIndex !== -1) {
+        nameKr = nameKr.substring(0, atIndex).trim();
       }
 
       uiListData.mails.push({

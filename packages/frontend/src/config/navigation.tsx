@@ -82,7 +82,6 @@ export const gameMenuItems: MenuItem[] = [
       { text: 'sidebar.liveEvent', icon: <CelebrationIcon />, path: '/game/live-event', adminOnly: true },
     ]
   },
-  { text: 'sidebar.itemRewards', icon: <CardGiftcardIcon />, path: '/game/item-rewards', adminOnly: true },
   { text: 'sidebar.planningData', icon: <StorageIcon />, path: '/game/planning-data', adminOnly: true },
 ];
 

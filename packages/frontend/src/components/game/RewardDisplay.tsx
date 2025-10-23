@@ -127,8 +127,14 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }
           key={idx}
           label={getRewardLabel(reward)}
           size="small"
-          color="primary"
           variant="outlined"
+          sx={{
+            borderColor: '#ff9800',
+            color: '#ff9800',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 152, 0, 0.08)',
+            }
+          }}
         />
       ))}
       {hasMore && (

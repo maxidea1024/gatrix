@@ -530,9 +530,7 @@ const SurveysPage: React.FC = () => {
                               <Typography
                                 sx={{
                                   cursor: 'pointer',
-                                  color: 'primary.main',
                                   '&:hover': {
-                                    color: 'primary.main',
                                     textDecoration: 'underline'
                                   }
                                 }}
@@ -549,9 +547,7 @@ const SurveysPage: React.FC = () => {
                               <Typography
                                 sx={{
                                   cursor: 'pointer',
-                                  color: 'primary.main',
                                   '&:hover': {
-                                    color: 'primary.main',
                                     textDecoration: 'underline'
                                   }
                                 }}

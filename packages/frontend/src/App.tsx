@@ -81,7 +81,6 @@ import ServerListPage from './pages/admin/ServerListPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
 // Pages - Game
-import ItemRewardsPage from './pages/game/ItemRewardsPage';
 import ServiceNoticesPage from './pages/game/ServiceNoticesPage';
 import ServiceNoticesPreviewPage from './pages/game/ServiceNoticesPreviewPage';
 import IngamePopupNoticesPage from './pages/game/IngamePopupNoticesPage';
@@ -388,7 +387,6 @@ const AppContent: React.FC = () => {
                   <ProtectedRoute requiredRoles={['admin']}>
                     <MainLayout>
                       <Routes>
-                        <Route path="item-rewards" element={<ItemRewardsPage />} />
                         <Route path="service-notices" element={<ServiceNoticesPage />} />
                         <Route path="ingame-popup-notices" element={<IngamePopupNoticesPage />} />
                         <Route path="coupons" element={<CouponsPage />} />

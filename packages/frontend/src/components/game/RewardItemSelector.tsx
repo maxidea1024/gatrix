@@ -173,7 +173,7 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
     >
       <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
         {/* Gift Icon */}
-        <GiftIcon sx={{ color: 'primary.main', fontSize: 24, ml: 0.5 }} />
+        <GiftIcon sx={{ color: '#ff9800', fontSize: 24, ml: 0.5 }} />
 
         {/* Reward Type Selector */}
         <Select

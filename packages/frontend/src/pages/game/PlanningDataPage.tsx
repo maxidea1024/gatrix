@@ -25,6 +25,7 @@ import {
   TableSortLabel,
   FormControlLabel,
   Checkbox,
+  Tooltip,
 } from '@mui/material';
 import {
   Storage as StorageIcon,
@@ -522,18 +523,15 @@ const PlanningDataPage: React.FC = () => {
                       ) : currentRewardType.hasTable && rewardTypeItems[currentRewardType.value] ? (
                         <>
                           {viewAllRewardItems ? (
-                            /* Chip view - show all items */
+                            /* Grid view - show all items in table-like layout */
                             <Box sx={{
-                              display: 'flex',
-                              flexWrap: 'wrap',
-                              justifyContent: 'center',
-                              gap: 1.5,
-                              p: 3,
-                              bgcolor: 'background.paper',
-                              borderRadius: 2,
-                              border: '1px solid',
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                              gap: 0,
+                              border: '1px dashed',
                               borderColor: 'divider',
-                              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                              borderRadius: 1,
+                              overflow: 'hidden',
                             }}>
                               {filteredRewardItems.map((item: any) => {
                                 // Get localized name based on current language
@@ -546,28 +544,30 @@ const PlanningDataPage: React.FC = () => {
                                   displayName = item.nameKr;
                                 }
 
+                                const label = `${item.id}: ${displayName}`;
+
                                 return (
-                                  <Chip
-                                    key={item.id}
-                                    icon={<GiftIcon />}
-                                    label={`${item.id}: ${displayName}`}
-                                    size="small"
-                                    variant="outlined"
-                                    sx={{
-                                      height: 'auto',
-                                      py: 0.75,
-                                      px: 1,
-                                      fontSize: '0.8125rem',
-                                      fontWeight: 500,
-                                      borderRadius: 1.5,
-                                      transition: 'all 0.2s',
-                                      '&:hover': {
-                                        bgcolor: 'action.hover',
-                                        transform: 'translateY(-1px)',
-                                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                      }
-                                    }}
-                                  />
+                                  <Tooltip key={item.id} title={label} arrow>
+                                    <Box
+                                      sx={{
+                                        p: 1,
+                                        borderRight: '1px dashed',
+                                        borderBottom: '1px dashed',
+                                        borderColor: 'divider',
+                                        fontSize: '0.8125rem',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        bgcolor: 'background.paper',
+                                        transition: 'background-color 0.2s',
+                                        '&:hover': {
+                                          bgcolor: 'action.hover',
+                                        }
+                                      }}
+                                    >
+                                      {label}
+                                    </Box>
+                                  </Tooltip>
                                 );
                               })}
                             </Box>
@@ -785,18 +785,15 @@ const PlanningDataPage: React.FC = () => {
                           </Box>
 
                           {viewAllUiItems ? (
-                            /* Chip view - show all items */
+                            /* Grid view - show all items in table-like layout */
                             <Box sx={{
-                              display: 'flex',
-                              flexWrap: 'wrap',
-                              justifyContent: 'center',
-                              gap: 1.5,
-                              p: 3,
-                              bgcolor: 'background.paper',
-                              borderRadius: 2,
-                              border: '1px solid',
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                              gap: 0,
+                              border: '1px dashed',
                               borderColor: 'divider',
-                              boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                              borderRadius: 1,
+                              overflow: 'hidden',
                             }}>
                               {filteredItems.map((item: any) => {
                                 // Get localized name based on current language
@@ -809,28 +806,30 @@ const PlanningDataPage: React.FC = () => {
                                   displayName = item.nameKr;
                                 }
 
+                                const label = `${item.id}: ${displayName}`;
+
                                 return (
-                                  <Chip
-                                    key={item.id}
-                                    icon={<CategoryIcon />}
-                                    label={`${item.id}: ${displayName}`}
-                                    size="small"
-                                    variant="outlined"
-                                    sx={{
-                                      height: 'auto',
-                                      py: 0.75,
-                                      px: 1,
-                                      fontSize: '0.8125rem',
-                                      fontWeight: 500,
-                                      borderRadius: 1.5,
-                                      transition: 'all 0.2s',
-                                      '&:hover': {
-                                        bgcolor: 'action.hover',
-                                        transform: 'translateY(-1px)',
-                                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                      }
-                                    }}
-                                  />
+                                  <Tooltip key={item.id} title={label} arrow>
+                                    <Box
+                                      sx={{
+                                        p: 1,
+                                        borderRight: '1px dashed',
+                                        borderBottom: '1px dashed',
+                                        borderColor: 'divider',
+                                        fontSize: '0.8125rem',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        bgcolor: 'background.paper',
+                                        transition: 'background-color 0.2s',
+                                        '&:hover': {
+                                          bgcolor: 'action.hover',
+                                        }
+                                      }}
+                                    >
+                                      {label}
+                                    </Box>
+                                  </Tooltip>
                                 );
                               })}
                             </Box>
