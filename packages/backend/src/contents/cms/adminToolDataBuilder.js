@@ -871,7 +871,14 @@ function generateUIListData(cmsDir, loctab = {}) {
         continue;
       }
 
-      const nameKr = item.name || item.Name || `${tableName} ${item.id}`;
+      let nameKr = item.name || item.Name || `${tableName} ${item.id}`;
+
+      // Remove @ and everything after it (comment marker)
+      const atIndex = nameKr.indexOf('@');
+      if (atIndex !== -1) {
+        nameKr = nameKr.substring(0, atIndex).trim();
+      }
+
       const entry = {
         id: item.id,
         name: nameKr,
@@ -1119,13 +1126,25 @@ function generateUIListData(cmsDir, loctab = {}) {
       }
 
       let nameKr = item.name || `Point ${item.id}`;
+      let nameCn = loctab[item.name] || nameKr;
+      let nameEn = nameKr;
 
       // Apply same logic as formatItemName for paid/free distinction
       if (item.tooltipDesc && item.name) {
         if (item.tooltipDesc.includes('유료 획득')) {
+          // Paid item - compose localized name
           nameKr = `${item.name} (유료)`;
+          const baseCn = loctab[item.name] || item.name;
+          const paidCn = loctab['유료'] || '유료';
+          nameCn = `${baseCn} (${paidCn})`;
+          nameEn = nameKr;
         } else if (item.name === '레드젬' || item.name === '레드젬 파편') {
+          // Free red gem - compose localized name
           nameKr = `${item.name} (무료)`;
+          const baseCn = loctab[item.name] || item.name;
+          const freeCn = loctab['무료'] || '무료';
+          nameCn = `${baseCn} (${freeCn})`;
+          nameEn = nameKr;
         }
         // else: use original name for other points
       }
@@ -1134,8 +1153,8 @@ function generateUIListData(cmsDir, loctab = {}) {
         id: item.id,
         name: nameKr,
         nameKr: nameKr,
-        nameCn: loctab[item.name] || loctab[nameKr] || nameKr,
-        nameEn: nameKr,
+        nameCn: nameCn,
+        nameEn: nameEn,
       };
 
       pointList.push(entry);

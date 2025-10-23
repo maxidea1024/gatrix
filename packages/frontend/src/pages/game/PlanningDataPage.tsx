@@ -29,6 +29,7 @@ import {
   Refresh as RefreshIcon,
   CheckCircle as CheckCircleIcon,
   Search as SearchIcon,
+  Clear as ClearIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -447,6 +448,24 @@ const PlanningDataPage: React.FC = () => {
                                   <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
                                 </InputAdornment>
                               ),
+                              endAdornment: searchTerm && (
+                                <InputAdornment position="end">
+                                  <ClearIcon
+                                    sx={{
+                                      color: 'text.secondary',
+                                      fontSize: 20,
+                                      cursor: 'pointer',
+                                      '&:hover': {
+                                        color: 'text.primary',
+                                      }
+                                    }}
+                                    onClick={() => {
+                                      setSearchTerm('');
+                                      setPage(0);
+                                    }}
+                                  />
+                                </InputAdornment>
+                              ),
                             }}
                             size="small"
                           />
@@ -613,6 +632,24 @@ const PlanningDataPage: React.FC = () => {
                                 startAdornment: (
                                   <InputAdornment position="start">
                                     <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                  </InputAdornment>
+                                ),
+                                endAdornment: searchTerm && (
+                                  <InputAdornment position="end">
+                                    <ClearIcon
+                                      sx={{
+                                        color: 'text.secondary',
+                                        fontSize: 20,
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                          color: 'text.primary',
+                                        }
+                                      }}
+                                      onClick={() => {
+                                        setSearchTerm('');
+                                        setPage(0);
+                                      }}
+                                    />
                                   </InputAdornment>
                                 ),
                               }}
