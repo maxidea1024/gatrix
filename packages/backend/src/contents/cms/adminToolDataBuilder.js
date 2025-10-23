@@ -1023,17 +1023,23 @@ function generateUIListData(cmsDir, loctab = {}) {
   // 7. Item (아이템) - 일반 아이템만 (type != 7)
   const itemTable = loadTable('Item');
   if (itemTable && itemTable.Item) {
+    // Load all CMS tables for formatItemName function
+    const allCmsTables = {
+      Ship: loadTable('Ship')?.Ship,
+      Mate: loadTable('Mate')?.Mate,
+      Character: loadTable('Character')?.Character,
+      ShipBlueprint: loadTable('ShipBlueprint')?.ShipBlueprint,
+      Item: itemTable.Item,
+      InvestSeason: loadTable('InvestSeason')?.InvestSeason,
+    };
+
     for (const [key, item] of Object.entries(itemTable.Item)) {
       if (!item || !item.id || key.startsWith(':') || item.type === 7) {
         continue;
       }
-      let nameKr = item.name || `Item ${item.id}`;
 
-      // Remove @ and everything after it (comment marker)
-      const atIndex = nameKr.indexOf('@');
-      if (atIndex !== -1) {
-        nameKr = nameKr.substring(0, atIndex).trim();
-      }
+      // Use formatItemName to handle placeholders
+      let nameKr = formatItemName(item, allCmsTables);
 
       uiListData.items.push({
         id: item.id,
