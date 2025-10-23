@@ -496,13 +496,17 @@ function formatItemName(item, allCmsTables) {
     // Add nation name if nationId exists
     if (item.nationId && allCmsTables.Nation && allCmsTables.Nation[item.nationId]) {
       const nation = allCmsTables.Nation[item.nationId];
-      const nationName = nation.name || `Nation ${item.nationId}`;
-      name = `[${nationName}] ${item.typeName} ${item.permitName}`;
+      const nationName = removeCommentFromName(nation.name) || `Nation ${item.nationId}`;
+      const typeName = removeCommentFromName(item.typeName);
+      const permitName = removeCommentFromName(item.permitName);
+      name = `[${nationName}] ${typeName} ${permitName}`;
     } else {
-      name = `${item.typeName} ${item.permitName}`;
+      const typeName = removeCommentFromName(item.typeName);
+      const permitName = removeCommentFromName(item.permitName);
+      name = `${typeName} ${permitName}`;
     }
 
-    return removeCommentFromName(name);
+    return name;
   }
 
   // Special handling for Point - distinguish paid/free red gems and shards
