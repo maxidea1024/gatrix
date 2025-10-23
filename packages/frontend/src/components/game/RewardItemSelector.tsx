@@ -41,7 +41,7 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
   error = false,
   helperText,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
 
   // State
@@ -49,13 +49,26 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
   const [items, setItems] = useState<RewardItem[]>([]);
   const [loadingTypes, setLoadingTypes] = useState(false);
   const [loadingItems, setLoadingItems] = useState(false);
+  const [rewardLocalization, setRewardLocalization] = useState<Record<string, string>>({});
 
-  // Function to load reward types
+
+
+  // Function to load reward types and localization
   const loadRewardTypes = async () => {
     try {
       setLoadingTypes(true);
       const types = await planningDataService.getRewardTypeList();
       setRewardTypes(types);
+
+      // Load reward localization based on current language
+      const languageMap: Record<string, 'kr' | 'us' | 'cn'> = {
+        'ko': 'kr',
+        'en': 'us',
+        'zh': 'cn',
+      };
+      const localizationLang = languageMap[i18n.language] || 'kr';
+      const localization = await planningDataService.getRewardLocalization(localizationLang);
+      setRewardLocalization(localization);
     } catch (error: any) {
       enqueueSnackbar(error.message || t('planningData.errors.loadRewardTypesFailed'), { variant: 'error' });
     } finally {
@@ -70,7 +83,16 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
       const typeInfo = rewardTypes.find(t => t.value === rewardType);
 
       if (typeInfo && typeInfo.hasTable) {
-        const itemList = await planningDataService.getRewardTypeItems(rewardType);
+        // Map i18n language to backend language code
+        const languageMap: Record<string, 'kr' | 'en' | 'cn'> = {
+          'ko': 'kr',
+          'en': 'en',
+          'zh': 'cn',
+        };
+        const language = languageMap[i18n.language] || 'kr';
+
+        const itemList = await planningDataService.getRewardTypeItems(rewardType, language);
+        console.log('[RewardItemSelector] Loaded items with language:', language, itemList.slice(0, 3)); // Log first 3 items
         setItems(itemList);
       } else {
         setItems([]);
@@ -81,21 +103,21 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
     } finally {
       setLoadingItems(false);
     }
-  }, [rewardTypes, enqueueSnackbar, t]);
+  }, [rewardTypes, enqueueSnackbar, t, i18n.language]);
 
-  // Load reward types on mount
+  // Load reward types on mount and when language changes
   useEffect(() => {
     loadRewardTypes();
-  }, []);
+  }, [i18n.language]);
 
-  // Load items when reward type changes or reward types are loaded
+  // Load items when reward type changes, reward types are loaded, or language changes
   useEffect(() => {
     if (value.rewardType && rewardTypes.length > 0) {
       loadItems(parseInt(value.rewardType));
     } else {
       setItems([]);
     }
-  }, [value.rewardType, rewardTypes, loadItems]);
+  }, [value.rewardType, rewardTypes, loadItems, i18n.language]);
 
   const handleRewardTypeChange = (newRewardType: string) => {
     // For reward types without table, set itemId to "0"
@@ -177,7 +199,7 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
           ) : (
             rewardTypes.map((type) => (
               <MenuItem key={type.value} value={type.value.toString()}>
-                [{type.value}] {t(type.nameKey)}
+                [{type.value}] {rewardLocalization[type.nameKey] || type.nameKey}
               </MenuItem>
             ))
           )}
@@ -190,7 +212,7 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
           <>
             <Autocomplete
               value={selectedItem ?? null}
-              onChange={(event, newValue) => {
+              onChange={(_event, newValue) => {
                 handleItemIdChange(newValue ? newValue.id.toString() : '');
               }}
               options={items}

@@ -14,6 +14,7 @@ router.get('/reward-types', PlanningDataController.getRewardTypeList);
 router.get('/reward-types/:rewardType/items', PlanningDataController.getRewardTypeItems);
 router.get('/localization/:language', PlanningDataController.getLocalization);
 router.get('/ui-list', PlanningDataController.getUIListData);
+router.get('/ui-list/:category/items', PlanningDataController.getUIListItems);
 router.post('/rebuild', PlanningDataController.rebuildRewardLookup);
 router.get('/stats', PlanningDataController.getStats);
 

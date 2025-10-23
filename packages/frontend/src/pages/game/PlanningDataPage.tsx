@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Typography,
   Card,
   CardContent,
   Button,
-  Grid,
-  Alert,
   CircularProgress,
   Table,
   TableBody,
@@ -16,24 +14,63 @@ import {
   TableRow,
   Paper,
   Chip,
+  Tabs,
+  Tab,
+  Alert,
+  TextField,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import {
   Storage as StorageIcon,
   Refresh as RefreshIcon,
   CheckCircle as CheckCircleIcon,
+  Search as SearchIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import planningDataService, { PlanningDataStats } from '../../services/planningDataService';
+import RewardItemSelector, { RewardSelection } from '../../components/game/RewardItemSelector';
+import SimplePagination from '../../components/common/SimplePagination';
+import { useDebounce } from '../../hooks/useDebounce';
 
 const PlanningDataPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+
+  // Force reload translations on mount
+  useEffect(() => {
+    i18n.reloadResources();
+  }, [i18n]);
 
   // State
   const [stats, setStats] = useState<PlanningDataStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
+  const [activeTab, setActiveTab] = useState(() => {
+    const saved = sessionStorage.getItem('planningDataActiveTab');
+    return saved ? parseInt(saved) : 0;
+  });
+  const [uiListTab, setUiListTab] = useState(() => {
+    const saved = sessionStorage.getItem('planningDataUiListTab');
+    return saved ? parseInt(saved) : 0;
+  });
+  const [categoryItems, setCategoryItems] = useState<Record<string, any[]>>({});
+  const [loadingCategory, setLoadingCategory] = useState<string | null>(null);
+
+  // Pagination state
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(20);
+
+  // Search state
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  // Reward type filter state
+  const [selectedRewardType, setSelectedRewardType] = useState<number | 'all'>('all');
 
   // Load stats on mount
   useEffect(() => {
@@ -64,6 +101,88 @@ const PlanningDataPage: React.FC = () => {
     } finally {
       setRebuilding(false);
     }
+  };
+
+  // UI List categories
+  const uiListCategories = useMemo(() => {
+    if (!stats?.uiListCounts) return [];
+    return Object.entries(stats.uiListCounts).map(([key, count]) => ({
+      key,
+      count,
+    }));
+  }, [stats]);
+
+  // Get current UI list category
+  const currentCategory = useMemo(() => {
+    if (uiListCategories.length === 0) return null;
+    return uiListCategories[uiListTab]?.key || null;
+  }, [uiListCategories, uiListTab]);
+
+  // Load items for current category
+  useEffect(() => {
+    if (activeTab === 1 && currentCategory && !categoryItems[currentCategory]) {
+      const loadItems = async () => {
+        try {
+          setLoadingCategory(currentCategory);
+          const language = i18n.language === 'zh' ? 'cn' : i18n.language === 'en' ? 'en' : 'kr';
+          const items = await planningDataService.getUIListItems(currentCategory, language);
+          setCategoryItems(prev => ({ ...prev, [currentCategory]: items }));
+        } catch (error: any) {
+          enqueueSnackbar(error.message || t('planningData.errors.loadItemsFailed'), { variant: 'error' });
+        } finally {
+          setLoadingCategory(null);
+        }
+      };
+      loadItems();
+    }
+  }, [activeTab, currentCategory, categoryItems, i18n.language, enqueueSnackbar, t]);
+
+  // Filtered items based on search
+  const filteredItems = useMemo(() => {
+    if (!currentCategory || !categoryItems[currentCategory]) return [];
+    const items = categoryItems[currentCategory];
+
+    if (!debouncedSearchTerm) return items;
+
+    const searchLower = debouncedSearchTerm.toLowerCase();
+    return items.filter((item: any) => {
+      // Search by ID (convert to string for comparison)
+      const idMatch = item.id.toString().includes(searchLower);
+      // Search by name
+      const nameMatch = item.name?.toLowerCase().includes(searchLower);
+      return idMatch || nameMatch;
+    });
+  }, [currentCategory, categoryItems, debouncedSearchTerm]);
+
+  // Paginated items
+  const paginatedItems = useMemo(() => {
+    const start = page * rowsPerPage;
+    const end = start + rowsPerPage;
+    return filteredItems.slice(start, end);
+  }, [filteredItems, page, rowsPerPage]);
+
+  // Handle tab changes
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+    sessionStorage.setItem('planningDataActiveTab', newValue.toString());
+  };
+
+  const handleUiListTabChange = (event: any) => {
+    const newValue = typeof event === 'number' ? event : event.target.value;
+    setUiListTab(newValue);
+    setPage(0); // Reset page when changing category
+    setSearchTerm(''); // Clear search when changing category
+    sessionStorage.setItem('planningDataUiListTab', newValue.toString());
+  };
+
+  // Handle pagination
+  const handlePageChange = (_event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (event: any) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   return (
@@ -99,193 +218,215 @@ const PlanningDataPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Info Alert */}
-      <Alert severity="info" sx={{ mb: 3 }}>
-        <Typography variant="body2" gutterBottom>
-          {t('planningData.description')}
-        </Typography>
-        <Typography variant="caption" component="div" sx={{ mt: 1 }}>
-          <strong>{t('planningData.generatedFiles')}:</strong>
-        </Typography>
-        <Typography variant="caption" component="ul" sx={{ mt: 0.5, pl: 2 }}>
-          <li>reward-lookup.json - {t('planningData.files.rewardLookup')}</li>
-          <li>reward-type-list.json - {t('planningData.files.rewardTypeList')}</li>
-          <li>reward-localization-kr/us/cn.json - {t('planningData.files.localization')}</li>
-          <li>ui-list-data.json - {t('planningData.files.uiListData')}</li>
-          <li>loctab.json - {t('planningData.files.loctab')}</li>
-        </Typography>
-      </Alert>
-
-      {/* Statistics Cards */}
+      {/* Statistics Summary */}
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
           <CircularProgress />
         </Box>
       ) : stats ? (
         <>
-          {/* Statistics Cards */}
-          <Grid container spacing={3} sx={{ mb: 3 }}>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card>
-                <CardContent>
-                  <Typography color="text.secondary" gutterBottom variant="body2">
-                    {t('planningData.stats.totalRewardTypes')}
-                  </Typography>
-                  <Typography variant="h4" component="div">
-                    {stats.totalRewardTypes}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card>
-                <CardContent>
-                  <Typography color="text.secondary" gutterBottom variant="body2">
-                    {t('planningData.stats.withTable')}
-                  </Typography>
-                  <Typography variant="h4" component="div" color="success.main">
-                    {stats.rewardTypesWithTable}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card>
-                <CardContent>
-                  <Typography color="text.secondary" gutterBottom variant="body2">
-                    {t('planningData.stats.withoutTable')}
-                  </Typography>
-                  <Typography variant="h4" component="div" color="warning.main">
-                    {stats.rewardTypesWithoutTable}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card>
-                <CardContent>
-                  <Typography color="text.secondary" gutterBottom variant="body2">
-                    {t('planningData.stats.totalItems')}
-                  </Typography>
-                  <Typography variant="h4" component="div">
-                    {stats.totalItems.toLocaleString()}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-
-          {/* Generated Files Status */}
-          {stats.filesExist && (
-            <Card sx={{ mb: 3 }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  {t('planningData.generatedFilesStatus')}
-                </Typography>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {stats.filesExist.rewardLookup ? (
-                        <CheckCircleIcon color="success" fontSize="small" />
-                      ) : (
-                        <Typography variant="caption" color="error">✗</Typography>
-                      )}
-                      <Typography variant="body2">reward-lookup.json</Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {stats.filesExist.rewardTypeList ? (
-                        <CheckCircleIcon color="success" fontSize="small" />
-                      ) : (
-                        <Typography variant="caption" color="error">✗</Typography>
-                      )}
-                      <Typography variant="body2">reward-type-list.json</Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {stats.filesExist.localizationKr ? (
-                        <CheckCircleIcon color="success" fontSize="small" />
-                      ) : (
-                        <Typography variant="caption" color="error">✗</Typography>
-                      )}
-                      <Typography variant="body2">reward-localization-kr.json</Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {stats.filesExist.localizationUs ? (
-                        <CheckCircleIcon color="success" fontSize="small" />
-                      ) : (
-                        <Typography variant="caption" color="error">✗</Typography>
-                      )}
-                      <Typography variant="body2">reward-localization-us.json</Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {stats.filesExist.localizationCn ? (
-                        <CheckCircleIcon color="success" fontSize="small" />
-                      ) : (
-                        <Typography variant="caption" color="error">✗</Typography>
-                      )}
-                      <Typography variant="body2">reward-localization-cn.json</Typography>
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} sm={6} md={4}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {stats.filesExist.uiListData ? (
-                        <CheckCircleIcon color="success" fontSize="small" />
-                      ) : (
-                        <Typography variant="caption" color="error">✗</Typography>
-                      )}
-                      <Typography variant="body2">ui-list-data.json</Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Reward Types Table */}
-          <Card>
+          {/* Simple Statistics Line */}
+          <Card sx={{ mb: 3 }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom>
-                {t('planningData.rewardTypesList')}
+              <Typography variant="body2" color="text.secondary">
+                {t('planningData.stats.totalRewardTypes')}: <strong>{stats.totalRewardTypes}</strong> | {' '}
+                {t('planningData.stats.withTable')}: <strong style={{ color: '#2e7d32' }}>{stats.rewardTypesWithTable}</strong> | {' '}
+                {t('planningData.stats.withoutTable')}: <strong style={{ color: '#ed6c02' }}>{stats.rewardTypesWithoutTable}</strong> | {' '}
+                {t('planningData.stats.totalItems')}: <strong>{stats.totalItems.toLocaleString()}</strong>
               </Typography>
-              <TableContainer component={Paper} variant="outlined">
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>{t('planningData.table.rewardType')}</TableCell>
-                      <TableCell>{t('planningData.table.name')}</TableCell>
-                      <TableCell align="center">{t('planningData.table.hasTable')}</TableCell>
-                      <TableCell align="right">{t('planningData.table.itemCount')}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {stats.rewardTypes.map((type) => (
-                      <TableRow key={type.value}>
-                        <TableCell>
-                          <Chip label={type.value} size="small" />
-                        </TableCell>
-                        <TableCell>{type.name}</TableCell>
-                        <TableCell align="center">
-                          {type.hasTable ? (
-                            <CheckCircleIcon color="success" fontSize="small" />
-                          ) : (
-                            <Typography variant="caption" color="text.secondary">-</Typography>
+            </CardContent>
+          </Card>
+
+          {/* Tabs */}
+          <Card>
+            <Tabs value={activeTab} onChange={handleTabChange}>
+              <Tab label={t('planningData.tabs.rewardTypes')} />
+              <Tab label={t('planningData.tabs.uiLists')} />
+            </Tabs>
+
+            <CardContent>
+              {/* Reward Types Table */}
+              {activeTab === 0 && (
+                <>
+                  {/* Test Component */}
+                  <Alert severity="info" sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" gutterBottom>
+                      {t('planningData.testComponent.title')}
+                    </Typography>
+                    <Box sx={{ mt: 1 }}>
+                      <RewardItemSelector
+                        value={testReward}
+                        onChange={setTestReward}
+                      />
+                    </Box>
+                  </Alert>
+
+                  <TableContainer component={Paper} variant="outlined">
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>{t('planningData.table.rewardType')}</TableCell>
+                          <TableCell>{t('planningData.table.name')}</TableCell>
+                          <TableCell align="center">{t('planningData.table.hasTable')}</TableCell>
+                          <TableCell align="right">{t('planningData.table.itemCount')}</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {stats.rewardTypes.map((type) => {
+                          const translatedName = t(type.nameKey);
+                          // Debug: log if translation failed
+                          if (translatedName === type.nameKey) {
+                            console.warn(`Translation missing for key: ${type.nameKey}`);
+                          }
+                          return (
+                            <TableRow key={type.value}>
+                              <TableCell>
+                                <Chip label={type.value} size="small" />
+                              </TableCell>
+                              <TableCell>{translatedName}</TableCell>
+                              <TableCell align="center">
+                                {type.hasTable ? (
+                                  <CheckCircleIcon color="success" fontSize="small" />
+                                ) : (
+                                  <Typography variant="caption" color="text.secondary">-</Typography>
+                                )}
+                              </TableCell>
+                              <TableCell align="right">
+                                {type.hasTable ? type.itemCount.toLocaleString() : '-'}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </>
+              )}
+
+              {/* UI Lists */}
+              {activeTab === 1 && uiListCategories.length > 0 && (
+                <Box>
+                  {/* Category Items */}
+                  {currentCategory && (
+                    <>
+                      {loadingCategory === currentCategory ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                          <CircularProgress />
+                        </Box>
+                      ) : categoryItems[currentCategory] ? (
+                        <>
+                          {/* Category Selector and Search Box */}
+                          <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
+                            <FormControl sx={{ minWidth: 200 }}>
+                              <InputLabel id="category-select-label">
+                                {t('planningData.category')}
+                              </InputLabel>
+                              <Select
+                                labelId="category-select-label"
+                                value={uiListTab}
+                                onChange={handleUiListTabChange}
+                                label={t('planningData.category')}
+                                size="small"
+                              >
+                                {uiListCategories.map((category, index) => (
+                                  <MenuItem key={category.key} value={index}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
+                                      <Typography variant="body2" sx={{ flexGrow: 1 }}>
+                                        {category.key}
+                                      </Typography>
+                                      <Chip label={category.count} size="small" />
+                                    </Box>
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+
+                            <TextField
+                              placeholder={t('planningData.searchPlaceholder')}
+                              value={searchTerm}
+                              onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                setPage(0); // Reset to first page when searching
+                              }}
+                              sx={{
+                                flexGrow: 1,
+                                maxWidth: 750,
+                                '& .MuiOutlinedInput-root': {
+                                  height: '40px',
+                                  borderRadius: '20px',
+                                  bgcolor: 'background.paper',
+                                  transition: 'all 0.2s ease-in-out',
+                                  '& fieldset': {
+                                    borderColor: 'divider',
+                                  },
+                                  '&:hover': {
+                                    bgcolor: 'action.hover',
+                                    '& fieldset': {
+                                      borderColor: 'primary.light',
+                                    }
+                                  },
+                                  '&.Mui-focused': {
+                                    bgcolor: 'background.paper',
+                                    boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                                    '& fieldset': {
+                                      borderColor: 'primary.main',
+                                      borderWidth: '1px',
+                                    }
+                                  }
+                                },
+                                '& .MuiInputBase-input': {
+                                  fontSize: '0.875rem',
+                                }
+                              }}
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                                  </InputAdornment>
+                                ),
+                              }}
+                              size="small"
+                            />
+                          </Box>
+
+                          <TableContainer component={Paper} variant="outlined">
+                            <Table size="small">
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell width="150px">ID</TableCell>
+                                  <TableCell>{t('planningData.table.name')}</TableCell>
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {paginatedItems.map((item: any) => (
+                                  <TableRow key={item.id} hover>
+                                    <TableCell>
+                                      <Chip label={item.id} size="small" variant="outlined" />
+                                    </TableCell>
+                                    <TableCell>{item.name}</TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </TableContainer>
+
+                          {/* Pagination */}
+                          {filteredItems.length > 0 && (
+                            <SimplePagination
+                              count={filteredItems.length}
+                              page={page}
+                              rowsPerPage={rowsPerPage}
+                              onPageChange={handlePageChange}
+                              onRowsPerPageChange={handleRowsPerPageChange}
+                              rowsPerPageOptions={[10, 20, 50, 100]}
+                            />
                           )}
-                        </TableCell>
-                        <TableCell align="right">
-                          {type.hasTable ? type.itemCount.toLocaleString() : '-'}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                        </>
+                      ) : null}
+                    </>
+                  )}
+                </Box>
+              )}
             </CardContent>
           </Card>
         </>

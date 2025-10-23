@@ -289,8 +289,8 @@
   },
   {
     "value": 38,
-    "name": "REWERD_SEASON_ITEMS",
-    "nameKey": "REWARD_TYPE_REWERD_SEASON_ITEMS",
+    "name": "REWARD_SEASON_ITEMS",
+    "nameKey": "REWARD_TYPE_REWARD_SEASON_ITEMS",
     "hasTable": true,
     "tableFile": "RewardSeasonItems.json",
     "itemCount": 810,
@@ -303,7 +303,7 @@
     "hasTable": false,
     "tableFile": null,
     "itemCount": 0,
-    "descriptionKey": "REWARD_TYPE_DESC_CAPTURED_SHIP"
+    "descriptionKey": null
   },
   {
     "value": 101,
@@ -312,6 +312,6 @@
     "hasTable": false,
     "tableFile": null,
     "itemCount": 0,
-    "descriptionKey": "REWARD_TYPE_DESC_SOUND_PACK"
+    "descriptionKey": null
   }
 ]

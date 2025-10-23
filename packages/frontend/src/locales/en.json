@@ -2945,18 +2945,14 @@
   "planningData": {
     "title": "Planning Data",
     "subtitle": "Manage game planning data",
-    "description": "After updating CMS files, click 'Reload Data' button to refresh all admin tool data files.",
     "rebuildData": "Reload Data",
     "rebuildSuccess": "Planning data has been successfully reloaded",
-    "rewardTypesList": "Reward Types List",
-    "generatedFiles": "Generated Files",
-    "generatedFilesStatus": "Generated Files Status",
-    "files": {
-      "rewardLookup": "Complete reward item data (~1.5MB)",
-      "rewardTypeList": "Reward type dropdown list (~7KB)",
-      "localization": "Multi-language localization (KR/EN/CN, ~3KB each)",
-      "uiListData": "UI list data for nations/towns/villages (~50KB)",
-      "loctab": "Korean→Chinese translation table"
+    "showingFirst100": "Showing first 100 items (Total: {{total}})",
+    "searchPlaceholder": "Search by item name or ID",
+    "category": "Category",
+    "tabs": {
+      "rewardTypes": "Reward Types",
+      "uiLists": "UI Lists"
     },
     "stats": {
       "totalRewardTypes": "Total Reward Types",
@@ -2968,7 +2964,11 @@
       "rewardType": "Reward Type",
       "name": "Name",
       "hasTable": "Has Table",
-      "itemCount": "Item Count"
+      "itemCount": "Item Count",
+      "listName": "List Name"
+    },
+    "testComponent": {
+      "title": "Test Component (Data Verification)"
     },
     "errors": {
       "loadRewardTypesFailed": "Failed to load reward types",
@@ -3035,9 +3035,7 @@
   "REWARD_TYPE_DESC_BUY_SWEEP_TICKET": "Paid sweep ticket (increases by amount)",
   "REWARD_TYPE_PET": "Pet",
   "REWARD_TYPE_SMUGGLE_GOODS": "Smuggle Goods",
-  "REWARD_TYPE_REWERD_SEASON_ITEMS": "Season Reward Items",
+  "REWARD_TYPE_REWARD_SEASON_ITEMS": "Season Reward Items",
   "REWARD_TYPE_CAPTURED_SHIP": "Captured Ship",
-  "REWARD_TYPE_DESC_CAPTURED_SHIP": "Captured ship (ID: Ship ID, special handling)",
-  "REWARD_TYPE_SOUND_PACK": "Sound Pack",
-  "REWARD_TYPE_DESC_SOUND_PACK": "Sound pack"
+  "REWARD_TYPE_SOUND_PACK": "Sound Pack"
 }

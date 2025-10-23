@@ -36,11 +36,16 @@ export class PlanningDataController {
 
   /**
    * Get items for a specific reward type
-   * GET /api/v1/admin/planning-data/reward-types/:rewardType/items
+   * GET /api/v1/admin/planning-data/reward-types/:rewardType/items?lang=kr|en|cn
    */
   static getRewardTypeItems = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { rewardType } = req.params;
-    const data = await PlanningDataService.getRewardTypeItems(parseInt(rewardType));
+    const { lang } = req.query;
+
+    // Default to Korean if no language specified
+    const language = (lang as string) || 'kr';
+
+    const data = await PlanningDataService.getRewardTypeItems(parseInt(rewardType), language as 'kr' | 'en' | 'cn');
 
     res.json({
       success: true,
@@ -106,6 +111,40 @@ export class PlanningDataController {
       success: true,
       data,
       message: 'UI list data retrieved successfully',
+    });
+  });
+
+  /**
+   * Get items for a specific UI list category
+   * GET /api/v1/admin/planning-data/ui-list/:category/items?lang=kr|en|cn
+   */
+  static getUIListItems = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { category } = req.params;
+    const { lang } = req.query;
+
+    // Default to Korean if no language specified
+    const language = (lang as string) || 'kr';
+
+    const data = await PlanningDataService.getUIListItems(category, language as 'kr' | 'en' | 'cn');
+
+    res.json({
+      success: true,
+      data,
+      message: `UI list items for ${category} retrieved successfully`,
+    });
+  });
+
+  /**
+   * Get localization table (loctab)
+   * GET /api/v1/admin/planning-data/loctab
+   */
+  static getLoctab = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const data = await PlanningDataService.getLoctab();
+
+    res.json({
+      success: true,
+      data,
+      message: 'Localization table retrieved successfully',
     });
   });
 

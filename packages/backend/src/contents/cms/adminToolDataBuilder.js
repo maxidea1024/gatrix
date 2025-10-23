@@ -39,254 +39,257 @@ const DEFAULT_OUTPUT_DIR = __dirname;
 const DEFAULT_LOCTAB_SOURCE = path.join(__dirname, 'loctab-source');
 
 // ============================================================================
-// REWARD_TYPE Definitions
+// REWARD_TYPE Definitions (from game server rewardDesc.ts)
 // ============================================================================
 
 const REWARD_TYPE = {
   POINT: 1,
   ITEM: 2,
-  SHIP: 3,
-  MATE: 4,
-  SHIP_PARTS: 5,
-  SHIP_OPTION: 6,
-  SHIP_FIGURE: 7,
-  SHIP_ORNAMENT: 8,
-  SHIP_SPECIAL_OPTION: 9,
+  DEPART_SUPPLY: 3,
+  TRADE_GOODS: 4,
+  MATE_EQUIP: 5,
+  SHIP: 6,
+  MATE: 7,
+  SHIP_BLUEPRINT: 8,
+  SHIP_SLOT_ITEM: 9,
   QUEST_ITEM: 10,
   BATTLE_EXP: 11,
-  ADVENTURE_EXP: 12,
-  TRADE_EXP: 13,
+  TRADE_EXP: 12,
+  ADVENTURE_EXP: 13,
   BATTLE_FAME: 14,
-  ADVENTURE_FAME: 15,
-  TRADE_FAME: 16,
-  SHIP_SAILOR: 17,
-  SHIP_CAPACITY: 18,
-  SHIP_DURABILITY: 19,
-  SHIP_ATTACK: 20,
-  SHIP_DEFENSE: 21,
-  SHIP_SPEED: 22,
-  SHIP_TURN: 23,
-  SHIP_WAVE: 24,
-  SHIP_MATERIAL: 25,
-  SHIP_ALCHEMY: 26,
-  SHIP_BIOLOGY: 27,
-  SHIP_ASTRONOMY: 28,
-  SHIP_FINANCE: 29,
-  SHIP_INDUSTRY: 30,
-  SHIP_WINE: 31,
-  SHIP_ART: 32,
+  TRADE_FAME: 15,
+  ADVENTURE_FAME: 16,
+  SAILOR: 17,
+  MATE_INTIMACY_OR_LOYALTY: 18,
+  ENERGY: 19,
+  TAX_FREE_PERMIT: 22,
+  SHIELD_NON_PURCHASE_COUNT: 25,
+  SHIELD_PURCHASE_COUNT: 26,
+  ARENA_TICKET: 27,
+  WESTERN_SHIP_BUILD_EXP: 28,
+  ORIENTAL_SHIP_BUILD_EXP: 29,
+  CHOICE_BOX: 31,
+  SHIP_CAMOUFLAGE: 32,
   USER_TITLE: 33,
-  SHIP_BLUEPRINT: 34,
-  REWARD_SEASON_ITEMS: 35,
+  FREE_SWEEP_TICKET: 34,
+  BUY_SWEEP_TICKET: 35,
+  PET: 36,
+  SMUGGLE_GOODS: 37,
+  REWARD_SEASON_ITEMS: 38,
+  CAPTURED_SHIP: 100,
+  SOUND_PACK: 101,
 };
 
 const REWARD_TYPE_NAMES = {
   1: 'POINT',
   2: 'ITEM',
-  3: 'SHIP',
-  4: 'MATE',
-  5: 'SHIP_PARTS',
-  6: 'SHIP_OPTION',
-  7: 'SHIP_FIGURE',
-  8: 'SHIP_ORNAMENT',
-  9: 'SHIP_SPECIAL_OPTION',
+  3: 'DEPART_SUPPLY',
+  4: 'TRADE_GOODS',
+  5: 'MATE_EQUIP',
+  6: 'SHIP',
+  7: 'MATE',
+  8: 'SHIP_BLUEPRINT',
+  9: 'SHIP_SLOT_ITEM',
   10: 'QUEST_ITEM',
   11: 'BATTLE_EXP',
-  12: 'ADVENTURE_EXP',
-  13: 'TRADE_EXP',
+  12: 'TRADE_EXP',
+  13: 'ADVENTURE_EXP',
   14: 'BATTLE_FAME',
-  15: 'ADVENTURE_FAME',
-  16: 'TRADE_FAME',
-  17: 'SHIP_SAILOR',
-  18: 'SHIP_CAPACITY',
-  19: 'SHIP_DURABILITY',
-  20: 'SHIP_ATTACK',
-  21: 'SHIP_DEFENSE',
-  22: 'SHIP_SPEED',
-  23: 'SHIP_TURN',
-  24: 'SHIP_WAVE',
-  25: 'SHIP_MATERIAL',
-  26: 'SHIP_ALCHEMY',
-  27: 'SHIP_BIOLOGY',
-  28: 'SHIP_ASTRONOMY',
-  29: 'SHIP_FINANCE',
-  30: 'SHIP_INDUSTRY',
-  31: 'SHIP_WINE',
-  32: 'SHIP_ART',
+  15: 'TRADE_FAME',
+  16: 'ADVENTURE_FAME',
+  17: 'SAILOR',
+  18: 'MATE_INTIMACY_OR_LOYALTY',
+  19: 'ENERGY',
+  22: 'TAX_FREE_PERMIT',
+  25: 'SHIELD_NON_PURCHASE_COUNT',
+  26: 'SHIELD_PURCHASE_COUNT',
+  27: 'ARENA_TICKET',
+  28: 'WESTERN_SHIP_BUILD_EXP',
+  29: 'ORIENTAL_SHIP_BUILD_EXP',
+  31: 'CHOICE_BOX',
+  32: 'SHIP_CAMOUFLAGE',
   33: 'USER_TITLE',
-  34: 'SHIP_BLUEPRINT',
-  35: 'REWARD_SEASON_ITEMS',
+  34: 'FREE_SWEEP_TICKET',
+  35: 'BUY_SWEEP_TICKET',
+  36: 'PET',
+  37: 'SMUGGLE_GOODS',
+  38: 'REWARD_SEASON_ITEMS',
+  100: 'CAPTURED_SHIP',
+  101: 'SOUND_PACK',
 };
 
 const REWARD_TYPE_TO_TABLE = {
   1: 'Point',
   2: 'Item',
-  3: 'Ship',
-  4: 'Mate',
-  5: 'ShipParts',
-  6: 'ShipOption',
-  7: 'ShipFigure',
-  8: 'ShipOrnament',
-  9: 'ShipSpecialOption',
+  3: 'DepartSupply',
+  4: 'TradeGoods',
+  5: 'CEquip', // MATE_EQUIP
+  6: 'Ship',
+  7: 'Mate',
+  8: 'ShipBlueprint',
+  9: 'ShipSlot', // SHIP_SLOT_ITEM
   10: 'Item', // QUEST_ITEM uses Item table with type filter
+  22: 'TaxFreePermit',
+  25: 'Shield', // SHIELD_NON_PURCHASE_COUNT
+  26: 'Shield', // SHIELD_PURCHASE_COUNT
+  32: 'ShipCamouflage',
   33: 'UserTitle',
-  34: 'ShipBlueprint',
-  35: 'RewardSeasonItems',
+  36: 'Pet',
+  37: 'SmuggleGoods',
+  38: 'RewardSeasonItems',
 };
 
 const REWARD_TYPE_DESCRIPTIONS = {
   11: 'REWARD_TYPE_DESC_BATTLE_EXP',
-  12: 'REWARD_TYPE_DESC_ADVENTURE_EXP',
-  13: 'REWARD_TYPE_DESC_TRADE_EXP',
+  12: 'REWARD_TYPE_DESC_TRADE_EXP',
+  13: 'REWARD_TYPE_DESC_ADVENTURE_EXP',
   14: 'REWARD_TYPE_DESC_BATTLE_FAME',
-  15: 'REWARD_TYPE_DESC_ADVENTURE_FAME',
-  16: 'REWARD_TYPE_DESC_TRADE_FAME',
-  17: 'REWARD_TYPE_DESC_SHIP_SAILOR',
-  18: 'REWARD_TYPE_DESC_SHIP_CAPACITY',
-  19: 'REWARD_TYPE_DESC_SHIP_DURABILITY',
-  20: 'REWARD_TYPE_DESC_SHIP_ATTACK',
-  21: 'REWARD_TYPE_DESC_SHIP_DEFENSE',
-  22: 'REWARD_TYPE_DESC_SHIP_SPEED',
-  23: 'REWARD_TYPE_DESC_SHIP_TURN',
-  24: 'REWARD_TYPE_DESC_SHIP_WAVE',
-  25: 'REWARD_TYPE_DESC_SHIP_MATERIAL',
-  26: 'REWARD_TYPE_DESC_SHIP_ALCHEMY',
-  27: 'REWARD_TYPE_DESC_SHIP_BIOLOGY',
-  28: 'REWARD_TYPE_DESC_SHIP_ASTRONOMY',
-  29: 'REWARD_TYPE_DESC_SHIP_FINANCE',
-  30: 'REWARD_TYPE_DESC_SHIP_INDUSTRY',
-  31: 'REWARD_TYPE_DESC_SHIP_WINE',
-  32: 'REWARD_TYPE_DESC_SHIP_ART',
+  15: 'REWARD_TYPE_DESC_TRADE_FAME',
+  16: 'REWARD_TYPE_DESC_ADVENTURE_FAME',
+  17: 'REWARD_TYPE_DESC_SAILOR',
+  18: 'REWARD_TYPE_DESC_MATE_INTIMACY_OR_LOYALTY',
+  19: 'REWARD_TYPE_DESC_ENERGY',
+  27: 'REWARD_TYPE_DESC_ARENA_TICKET',
+  28: 'REWARD_TYPE_DESC_WESTERN_SHIP_BUILD_EXP',
+  29: 'REWARD_TYPE_DESC_ORIENTAL_SHIP_BUILD_EXP',
+  31: 'REWARD_TYPE_DESC_CHOICE_BOX',
+  34: 'REWARD_TYPE_DESC_FREE_SWEEP_TICKET',
+  35: 'REWARD_TYPE_DESC_BUY_SWEEP_TICKET',
 };
 
 const REWARD_TYPE_ID_FIELD_NAMES = {
   1: 'pointId',
   2: 'itemId',
-  3: 'shipId',
-  4: 'mateId',
-  5: 'shipPartsId',
-  6: 'shipOptionId',
-  7: 'shipFigureId',
-  8: 'shipOrnamentId',
-  9: 'shipSpecialOptionId',
+  3: 'departSupplyId',
+  4: 'tradeGoodsId',
+  5: 'mateEquipId',
+  6: 'shipId',
+  7: 'mateId',
+  8: 'shipBlueprintId',
+  9: 'shipSlotItemId',
   10: 'questItemId',
+  22: 'taxFreePermitId',
+  25: 'shieldId',
+  26: 'shieldId',
+  32: 'shipCamouflageId',
   33: 'userTitleId',
-  34: 'shipBlueprintId',
-  35: 'rewardSeasonItemsId',
+  36: 'petId',
+  37: 'smuggleGoodsId',
+  38: 'rewardSeasonItemsId',
 };
 
-// Localization translations
+// Localization translations - MUST match actual REWARD_TYPE enum from game server
 const REWARD_TYPE_TRANSLATIONS = {
   kr: {
     POINT: '포인트',
     ITEM: '아이템',
+    DEPART_SUPPLY: '출항 보급품',
+    TRADE_GOODS: '교역품',
+    MATE_EQUIP: '항해사 장비',
     SHIP: '선박',
     MATE: '항해사',
-    SHIP_PARTS: '선박 부품',
-    SHIP_OPTION: '선박 옵션',
-    SHIP_FIGURE: '선수상',
-    SHIP_ORNAMENT: '선박 장식',
-    SHIP_SPECIAL_OPTION: '선박 특수 옵션',
+    SHIP_BLUEPRINT: '선박 설계도',
+    SHIP_SLOT_ITEM: '선박 슬롯 아이템',
     QUEST_ITEM: '퀘스트 아이템',
     BATTLE_EXP: '전투 경험치',
-    ADVENTURE_EXP: '모험 경험치',
     TRADE_EXP: '교역 경험치',
+    ADVENTURE_EXP: '모험 경험치',
     BATTLE_FAME: '전투 명성',
-    ADVENTURE_FAME: '모험 명성',
     TRADE_FAME: '교역 명성',
-    SHIP_SAILOR: '선원 수',
-    SHIP_CAPACITY: '적재량',
-    SHIP_DURABILITY: '내구도',
-    SHIP_ATTACK: '공격력',
-    SHIP_DEFENSE: '방어력',
-    SHIP_SPEED: '속도',
-    SHIP_TURN: '선회',
-    SHIP_WAVE: '대파',
-    SHIP_MATERIAL: '공예',
-    SHIP_ALCHEMY: '연금술',
-    SHIP_BIOLOGY: '생물학',
-    SHIP_ASTRONOMY: '천문학',
-    SHIP_FINANCE: '재정학',
-    SHIP_INDUSTRY: '공업',
-    SHIP_WINE: '주조',
-    SHIP_ART: '미술',
+    ADVENTURE_FAME: '모험 명성',
+    SAILOR: '선원',
+    MATE_INTIMACY_OR_LOYALTY: '항해사 친밀도/충성도',
+    ENERGY: '행동력',
+    TAX_FREE_PERMIT: '면세 허가증',
+    SHIELD_NON_PURCHASE_COUNT: '보호막 (비구매)',
+    SHIELD_PURCHASE_COUNT: '보호막 (구매)',
+    ARENA_TICKET: '모의전 입장권',
+    WESTERN_SHIP_BUILD_EXP: '서양 조선 경험치',
+    ORIENTAL_SHIP_BUILD_EXP: '동양 조선 경험치',
+    CHOICE_BOX: '초이스 박스',
+    SHIP_CAMOUFLAGE: '선박 위장',
     USER_TITLE: '칭호',
-    SHIP_BLUEPRINT: '선박 설계도',
+    FREE_SWEEP_TICKET: '무료 소탕권',
+    BUY_SWEEP_TICKET: '유료 소탕권',
+    PET: '펫',
+    SMUGGLE_GOODS: '밀수품',
     REWARD_SEASON_ITEMS: '시즌 보상 아이템',
+    CAPTURED_SHIP: '나포 선박',
+    SOUND_PACK: '사운드 팩',
   },
   us: {
     POINT: 'Point',
     ITEM: 'Item',
+    DEPART_SUPPLY: 'Departure Supply',
+    TRADE_GOODS: 'Trade Goods',
+    MATE_EQUIP: 'Mate Equipment',
     SHIP: 'Ship',
     MATE: 'Mate',
-    SHIP_PARTS: 'Ship Parts',
-    SHIP_OPTION: 'Ship Option',
-    SHIP_FIGURE: 'Ship Figure',
-    SHIP_ORNAMENT: 'Ship Ornament',
-    SHIP_SPECIAL_OPTION: 'Ship Special Option',
+    SHIP_BLUEPRINT: 'Ship Blueprint',
+    SHIP_SLOT_ITEM: 'Ship Slot Item',
     QUEST_ITEM: 'Quest Item',
     BATTLE_EXP: 'Battle EXP',
-    ADVENTURE_EXP: 'Adventure EXP',
     TRADE_EXP: 'Trade EXP',
+    ADVENTURE_EXP: 'Adventure EXP',
     BATTLE_FAME: 'Battle Fame',
-    ADVENTURE_FAME: 'Adventure Fame',
     TRADE_FAME: 'Trade Fame',
-    SHIP_SAILOR: 'Sailor',
-    SHIP_CAPACITY: 'Capacity',
-    SHIP_DURABILITY: 'Durability',
-    SHIP_ATTACK: 'Attack',
-    SHIP_DEFENSE: 'Defense',
-    SHIP_SPEED: 'Speed',
-    SHIP_TURN: 'Turn',
-    SHIP_WAVE: 'Wave',
-    SHIP_MATERIAL: 'Material',
-    SHIP_ALCHEMY: 'Alchemy',
-    SHIP_BIOLOGY: 'Biology',
-    SHIP_ASTRONOMY: 'Astronomy',
-    SHIP_FINANCE: 'Finance',
-    SHIP_INDUSTRY: 'Industry',
-    SHIP_WINE: 'Wine',
-    SHIP_ART: 'Art',
+    ADVENTURE_FAME: 'Adventure Fame',
+    SAILOR: 'Sailor',
+    MATE_INTIMACY_OR_LOYALTY: 'Mate Intimacy/Loyalty',
+    ENERGY: 'Energy',
+    TAX_FREE_PERMIT: 'Tax Free Permit',
+    SHIELD_NON_PURCHASE_COUNT: 'Shield (Non-Purchase)',
+    SHIELD_PURCHASE_COUNT: 'Shield (Purchase)',
+    ARENA_TICKET: 'Arena Ticket',
+    WESTERN_SHIP_BUILD_EXP: 'Western Shipbuilding EXP',
+    ORIENTAL_SHIP_BUILD_EXP: 'Oriental Shipbuilding EXP',
+    CHOICE_BOX: 'Choice Box',
+    SHIP_CAMOUFLAGE: 'Ship Camouflage',
     USER_TITLE: 'Title',
-    SHIP_BLUEPRINT: 'Ship Blueprint',
+    FREE_SWEEP_TICKET: 'Free Sweep Ticket',
+    BUY_SWEEP_TICKET: 'Paid Sweep Ticket',
+    PET: 'Pet',
+    SMUGGLE_GOODS: 'Smuggle Goods',
     REWARD_SEASON_ITEMS: 'Season Reward Items',
+    CAPTURED_SHIP: 'Captured Ship',
+    SOUND_PACK: 'Sound Pack',
   },
   cn: {
     POINT: '点数',
     ITEM: '道具',
+    DEPART_SUPPLY: '出航补给品',
+    TRADE_GOODS: '贸易商品',
+    MATE_EQUIP: '航海士装备',
     SHIP: '船只',
     MATE: '航海士',
-    SHIP_PARTS: '船只部件',
-    SHIP_OPTION: '船只选项',
-    SHIP_FIGURE: '船首像',
-    SHIP_ORNAMENT: '船只装饰',
-    SHIP_SPECIAL_OPTION: '船只特殊选项',
+    SHIP_BLUEPRINT: '船只设计图',
+    SHIP_SLOT_ITEM: '船只槽位道具',
     QUEST_ITEM: '任务道具',
     BATTLE_EXP: '战斗经验值',
-    ADVENTURE_EXP: '冒险经验值',
     TRADE_EXP: '贸易经验值',
+    ADVENTURE_EXP: '冒险经验值',
     BATTLE_FAME: '战斗声望',
-    ADVENTURE_FAME: '冒险声望',
     TRADE_FAME: '贸易声望',
-    SHIP_SAILOR: '船员数',
-    SHIP_CAPACITY: '装载量',
-    SHIP_DURABILITY: '耐久度',
-    SHIP_ATTACK: '攻击力',
-    SHIP_DEFENSE: '防御力',
-    SHIP_SPEED: '速度',
-    SHIP_TURN: '转向',
-    SHIP_WAVE: '抗浪',
-    SHIP_MATERIAL: '工艺',
-    SHIP_ALCHEMY: '炼金术',
-    SHIP_BIOLOGY: '生物学',
-    SHIP_ASTRONOMY: '天文学',
-    SHIP_FINANCE: '财政学',
-    SHIP_INDUSTRY: '工业',
-    SHIP_WINE: '酿酒',
-    SHIP_ART: '美术',
+    ADVENTURE_FAME: '冒险声望',
+    SAILOR: '船员',
+    MATE_INTIMACY_OR_LOYALTY: '航海士亲密度/忠诚度',
+    ENERGY: '行动力',
+    TAX_FREE_PERMIT: '免税许可证',
+    SHIELD_NON_PURCHASE_COUNT: '护盾 (非购买)',
+    SHIELD_PURCHASE_COUNT: '护盾 (购买)',
+    ARENA_TICKET: '竞技场门票',
+    WESTERN_SHIP_BUILD_EXP: '西洋造船经验值',
+    ORIENTAL_SHIP_BUILD_EXP: '东洋造船经验值',
+    CHOICE_BOX: '选择箱',
+    SHIP_CAMOUFLAGE: '船只伪装',
     USER_TITLE: '称号',
-    SHIP_BLUEPRINT: '船只设计图',
+    FREE_SWEEP_TICKET: '免费扫荡券',
+    BUY_SWEEP_TICKET: '付费扫荡券',
+    PET: '宠物',
+    SMUGGLE_GOODS: '走私品',
     REWARD_SEASON_ITEMS: '赛季奖励道具',
+    CAPTURED_SHIP: '捕获船只',
+    SOUND_PACK: '音效包',
   },
 };
 
@@ -430,9 +433,19 @@ function extractItemsFromTable(tableData, tableName, rewardType) {
       }
     }
 
+    // Get item name - special handling for Mate and ShipBlueprint
+    let itemName = item.name || `${tableName} ${item.id}`;
+
+    // Mate and ShipBlueprint don't have name field, but have descFormat
+    // The name will be formatted later in formatItemName()
+    if ((tableName === 'Mate' || tableName === 'ShipBlueprint') && !item.name) {
+      // Use a placeholder that will be replaced by formatItemName
+      itemName = item.name || `${tableName} ${item.id}`;
+    }
+
     items.push({
       id: item.id,
-      name: item.name || `${tableName} ${item.id}`,
+      name: itemName,
       _original: item, // Keep original for formatting
     });
   }
@@ -444,6 +457,77 @@ function extractItemsFromTable(tableData, tableName, rewardType) {
  * Format item name by replacing placeholders with actual values
  */
 function formatItemName(item, allCmsTables) {
+  // Special handling for Mail - use languageMailTitle[0] (Korean)
+  if (item.languageMailTitle && Array.isArray(item.languageMailTitle) && item.languageMailTitle.length > 0) {
+    return item.languageMailTitle[0] || `Mail ${item.id}`;
+  }
+
+  // Special handling for Quest - use name field
+  if (item.name && (item.nodes || item.category !== undefined)) {
+    // Quest has 'nodes' array or 'category' field
+    return item.name;
+  }
+
+  // Special handling for EventMission - use eventTask if available
+  if (item.eventTaskId && allCmsTables.EventTask && allCmsTables.EventTask[item.eventTaskId]) {
+    const eventTask = allCmsTables.EventTask[item.eventTaskId];
+    if (eventTask.overrideDesc) {
+      return eventTask.overrideDesc;
+    }
+    return `EventMission ${item.id}`;
+  }
+
+  // Special handling for Mate - get name from Character table
+  if (item.characterId && allCmsTables.Character && allCmsTables.Character[item.characterId]) {
+    return makeCharacterDisplayName(allCmsTables.Character[item.characterId]);
+  }
+
+  // Special handling for ShipBlueprint - get name from Ship table
+  if (item.shipId && allCmsTables.Ship && allCmsTables.Ship[item.shipId]) {
+    const ship = allCmsTables.Ship[item.shipId];
+    return ship.name ? `${ship.name} 도면` : `Ship ${item.shipId} 도면`;
+  }
+
+  // Special handling for RewardSeasonItems - get name from InvestSeason table
+  if (item.reward && Array.isArray(item.reward) && item.reward.length > 0) {
+    // RewardSeasonItems has reward array with SeasonId
+    const firstReward = item.reward[0];
+    let seasonName = `Season ${firstReward.SeasonId}`;
+
+    if (firstReward.SeasonId && allCmsTables.InvestSeason && allCmsTables.InvestSeason[firstReward.SeasonId]) {
+      const season = allCmsTables.InvestSeason[firstReward.SeasonId];
+      // InvestSeason has name field with placeholder like "투자 시즌 {0}"
+      if (season.name && season.nameFormatTexts && season.nameFormatTexts.length > 0) {
+        seasonName = stringFormat(season.name, season.nameFormatTexts);
+      } else if (season.name) {
+        seasonName = season.name;
+      }
+    }
+
+    // Get reward item names to distinguish between different RewardSeasonItems
+    const rewardNames = [];
+    for (const reward of item.reward) {
+      if (reward.Type && reward.Id) {
+        const tableName = REWARD_TYPE_TO_TABLE[reward.Type];
+        if (tableName && allCmsTables[tableName] && allCmsTables[tableName][reward.Id]) {
+          const rewardItem = allCmsTables[tableName][reward.Id];
+          const itemName = rewardItem.name || `ID ${reward.Id}`;
+          const qty = reward.MinQuantity === reward.MaxQuantity
+            ? `${reward.MinQuantity}개`
+            : `${reward.MinQuantity}-${reward.MaxQuantity}개`;
+          rewardNames.push(`${itemName} ${qty}`);
+        }
+      }
+    }
+
+    // Return season name with first reward item for distinction
+    if (rewardNames.length > 0) {
+      return `${seasonName} (${rewardNames[0]})`;
+    }
+
+    return seasonName;
+  }
+
   // If no formatting info, return original name
   if (!item.descFormat || !item.descFormatType) {
     return item.name;
@@ -495,7 +579,7 @@ function formatItemName(item, allCmsTables) {
     if (typeof target !== 'number') {
       return '[Invalid-Target]';
     }
-    return getDescFormatText(fmt, target);
+    return getDescFormatText(fmt.Type, target);
   });
 
   // Replace placeholders in item name
@@ -508,8 +592,10 @@ function formatItemName(item, allCmsTables) {
 
 /**
  * Build reward lookup table
+ * @param {string} cmsDir - CMS directory path
+ * @param {Object} loctab - Localization table (Korean → Chinese)
  */
-function buildRewardLookupTable(cmsDir) {
+function buildRewardLookupTable(cmsDir, loctab = {}) {
   const lookupTable = {};
 
   console.log('📦 Building reward lookup table...');
@@ -578,13 +664,26 @@ function buildRewardLookupTable(cmsDir) {
         if (tableData) {
           let items = extractItemsFromTable(tableData, tableName, rewardTypeNum);
 
-          // Format item names
+          // Format item names with translations
           items = items.map(item => {
             const formattedName = formatItemName(item._original, allCmsTables);
-            return {
+
+            // Add translations
+            const itemData = {
               id: item.id,
-              name: formattedName,
+              name: formattedName,  // Korean name (default)
+              nameKr: formattedName,  // Korean name
             };
+
+            // Add Chinese translation from loctab
+            if (loctab && loctab[formattedName]) {
+              itemData.nameCn = loctab[formattedName];
+            }
+
+            // English name is same as Korean for now (no English translation table)
+            itemData.nameEn = formattedName;
+
+            return itemData;
           });
 
           // Sort by ID
@@ -660,7 +759,7 @@ function generateLocalizations(lookupTable) {
  * Generate UI list data for various CMS tables
  * Includes: Nation, Town, Village, Ship, Mate, Character, Item, Quest, Discovery, etc.
  */
-function generateUIListData(cmsDir) {
+function generateUIListData(cmsDir, loctab = {}) {
   console.log('🗺️  Building UI list data...');
 
   const uiListData = {
@@ -705,8 +804,8 @@ function generateUIListData(cmsDir) {
     return null;
   };
 
-  // Helper function to extract basic list from a table
-  const extractList = (tableName, listKey, additionalFields = []) => {
+  // Helper function to extract basic list from a table with localization
+  const extractList = (tableName, listKey, additionalFields = [], loctab = {}) => {
     const table = loadTable(tableName);
     if (!table || !table[tableName]) {
       return [];
@@ -718,9 +817,13 @@ function generateUIListData(cmsDir) {
         continue;
       }
 
+      const nameKr = item.name || item.Name || `${tableName} ${item.id}`;
       const entry = {
         id: item.id,
-        name: item.name || item.Name || `${tableName} ${item.id}`,
+        name: nameKr,
+        nameKr: nameKr,
+        nameCn: loctab[nameKr] || nameKr,
+        nameEn: nameKr, // English translation not available, use Korean
       };
 
       // Add additional fields if specified
@@ -738,28 +841,89 @@ function generateUIListData(cmsDir) {
   };
 
   // 1. Nation (국가)
-  uiListData.nations = extractList('Nation', 'nations');
+  uiListData.nations = extractList('Nation', 'nations', [], loctab);
   console.log(`   ✅ Loaded ${uiListData.nations.length} nations`);
 
   // 2. Town (마을/항구)
-  uiListData.towns = extractList('Town', 'towns', ['nationId', 'type']);
+  uiListData.towns = extractList('Town', 'towns', ['nationId', 'type'], loctab);
   console.log(`   ✅ Loaded ${uiListData.towns.length} towns`);
 
   // 3. Village (촌락)
-  uiListData.villages = extractList('Village', 'villages');
+  uiListData.villages = extractList('Village', 'villages', [], loctab);
   console.log(`   ✅ Loaded ${uiListData.villages.length} villages`);
 
-  // 4. Ship (선박)
-  uiListData.ships = extractList('Ship', 'ships', ['shipClass', 'grade', 'type']);
+  // 4. Ship (선박) - name 필드 사용
+  uiListData.ships = extractList('Ship', 'ships', ['shipClass', 'grade', 'type'], loctab);
   console.log(`   ✅ Loaded ${uiListData.ships.length} ships`);
 
-  // 5. Mate (항해사)
-  uiListData.mates = extractList('Mate', 'mates', ['characterId', 'grade', 'job']);
-  console.log(`   ✅ Loaded ${uiListData.mates.length} mates`);
+  // 5. Mate (항해사) - Character 테이블에서 이름 가져오기
+  const mateTable = loadTable('Mate');
+  const characterTable = loadTable('Character');
+  if (mateTable && mateTable.Mate && characterTable && characterTable.Character) {
+    for (const [key, mate] of Object.entries(mateTable.Mate)) {
+      if (!mate || !mate.id || key.startsWith(':')) {
+        continue;
+      }
 
-  // 6. Character (캐릭터)
-  uiListData.characters = extractList('Character', 'characters', ['firstName', 'lastName']);
-  console.log(`   ✅ Loaded ${uiListData.characters.length} characters`);
+      // Get character name from Character table
+      const character = characterTable.Character[mate.characterId];
+      let nameKr = `Mate ${mate.id}`;
+
+      if (character) {
+        // Use firstName + lastName if available
+        if (character.firstName && character.lastName) {
+          nameKr = `${character.firstName} ${character.lastName}`;
+        } else if (character.firstName) {
+          nameKr = character.firstName;
+        } else if (character.name) {
+          nameKr = character.name;
+        }
+      }
+
+      uiListData.mates.push({
+        id: mate.id,
+        name: nameKr,
+        nameKr: nameKr,
+        nameCn: loctab[nameKr] || nameKr,
+        nameEn: nameKr,
+        characterId: mate.characterId,
+        grade: mate.mateGrade,
+        job: mate.jobId,
+      });
+    }
+    uiListData.mates.sort((a, b) => a.id - b.id);
+    console.log(`   ✅ Loaded ${uiListData.mates.length} mates`);
+  }
+
+  // 6. Character (캐릭터) - firstName + lastName 조합
+  if (characterTable && characterTable.Character) {
+    for (const [key, character] of Object.entries(characterTable.Character)) {
+      if (!character || !character.id || key.startsWith(':')) {
+        continue;
+      }
+
+      let nameKr = `Character ${character.id}`;
+      if (character.firstName && character.lastName) {
+        nameKr = `${character.firstName} ${character.lastName}`;
+      } else if (character.firstName) {
+        nameKr = character.firstName;
+      } else if (character.name) {
+        nameKr = character.name;
+      }
+
+      uiListData.characters.push({
+        id: character.id,
+        name: nameKr,
+        nameKr: nameKr,
+        nameCn: loctab[nameKr] || nameKr,
+        nameEn: nameKr,
+        firstName: character.firstName,
+        lastName: character.lastName,
+      });
+    }
+    uiListData.characters.sort((a, b) => a.id - b.id);
+    console.log(`   ✅ Loaded ${uiListData.characters.length} characters`);
+  }
 
   // 7. Item (아이템) - 일반 아이템만 (type != 7)
   const itemTable = loadTable('Item');
@@ -768,9 +932,13 @@ function generateUIListData(cmsDir) {
       if (!item || !item.id || key.startsWith(':') || item.type === 7) {
         continue;
       }
+      const nameKr = item.name || `Item ${item.id}`;
       uiListData.items.push({
         id: item.id,
-        name: item.name || `Item ${item.id}`,
+        name: nameKr,
+        nameKr: nameKr,
+        nameCn: loctab[nameKr] || nameKr,
+        nameEn: nameKr,
         type: item.type,
         grade: item.grade,
       });
@@ -785,82 +953,239 @@ function generateUIListData(cmsDir) {
       if (!item || !item.id || key.startsWith(':') || item.type !== 7) {
         continue;
       }
+      const nameKr = item.name || `Quest Item ${item.id}`;
       uiListData.questItems.push({
         id: item.id,
-        name: item.name || `Quest Item ${item.id}`,
+        name: nameKr,
+        nameKr: nameKr,
+        nameCn: loctab[nameKr] || nameKr,
+        nameEn: nameKr,
       });
     }
     uiListData.questItems.sort((a, b) => a.id - b.id);
     console.log(`   ✅ Loaded ${uiListData.questItems.length} quest items`);
   }
 
-  // 9. Quest (퀘스트)
-  uiListData.quests = extractList('Quest', 'quests', ['type', 'level']);
-  console.log(`   ✅ Loaded ${uiListData.quests.length} quests`);
+  // 9. Quest (퀘스트) - formatTexts로 플레이스홀더 치환
+  const questTable = loadTable('Quest');
+  if (questTable && questTable.Quest) {
+    for (const [key, quest] of Object.entries(questTable.Quest)) {
+      if (!quest || !quest.id || key.startsWith(':')) {
+        continue;
+      }
+
+      let nameKr = quest.name || `Quest ${quest.id}`;
+
+      // Replace placeholders if formatTexts exists
+      if (quest.formatTexts && Array.isArray(quest.formatTexts)) {
+        const formattedTexts = quest.formatTexts.map((fmt) => {
+          // Type 0 = Direct value from Val field
+          if (fmt.Type === 0 && fmt.Val) {
+            return fmt.Val;
+          }
+          return '[Unknown]';
+        });
+
+        // Replace {0}, {1}, {2}, etc. with formatted texts
+        nameKr = stringFormat(nameKr, formattedTexts);
+      }
+
+      uiListData.quests.push({
+        id: quest.id,
+        name: nameKr,
+        nameKr: nameKr,
+        nameCn: loctab[nameKr] || nameKr,
+        nameEn: nameKr,
+        type: quest.type,
+        level: quest.level,
+      });
+    }
+    uiListData.quests.sort((a, b) => a.id - b.id);
+    console.log(`   ✅ Loaded ${uiListData.quests.length} quests`);
+  }
 
   // 10. Discovery (발견물)
-  uiListData.discoveries = extractList('Discovery', 'discoveries', ['type', 'grade']);
+  uiListData.discoveries = extractList('Discovery', 'discoveries', ['type', 'grade'], loctab);
   console.log(`   ✅ Loaded ${uiListData.discoveries.length} discoveries`);
 
   // 11. Job (직업)
-  uiListData.jobs = extractList('Job', 'jobs', ['type']);
+  uiListData.jobs = extractList('Job', 'jobs', ['type'], loctab);
   console.log(`   ✅ Loaded ${uiListData.jobs.length} jobs`);
 
   // 12. TradeGoods (교역품)
-  uiListData.tradeGoods = extractList('TradeGoods', 'tradeGoods', ['category', 'grade']);
+  uiListData.tradeGoods = extractList('TradeGoods', 'tradeGoods', ['category', 'grade'], loctab);
   console.log(`   ✅ Loaded ${uiListData.tradeGoods.length} trade goods`);
 
   // 13. Recipe (레시피)
-  uiListData.recipes = extractList('Recipe', 'recipes', ['type']);
+  uiListData.recipes = extractList('Recipe', 'recipes', ['type'], loctab);
   console.log(`   ✅ Loaded ${uiListData.recipes.length} recipes`);
 
-  // 14. ShipBlueprint (선박 도면)
-  uiListData.shipBlueprints = extractList('ShipBlueprint', 'shipBlueprints', ['shipId', 'grade']);
-  console.log(`   ✅ Loaded ${uiListData.shipBlueprints.length} ship blueprints`);
+  // 14. ShipBlueprint (선박 도면) - Ship 테이블에서 이름 가져오기
+  const shipBlueprintTable = loadTable('ShipBlueprint');
+  const shipTable = loadTable('Ship');
+  if (shipBlueprintTable && shipBlueprintTable.ShipBlueprint && shipTable && shipTable.Ship) {
+    for (const [key, blueprint] of Object.entries(shipBlueprintTable.ShipBlueprint)) {
+      if (!blueprint || !blueprint.id || key.startsWith(':')) {
+        continue;
+      }
+
+      // Get ship name from Ship table
+      const ship = shipTable.Ship[blueprint.shipId];
+      let nameKr = `ShipBlueprint ${blueprint.id}`;
+
+      if (ship && ship.name) {
+        nameKr = `${ship.name} 도면`;
+      }
+
+      uiListData.shipBlueprints.push({
+        id: blueprint.id,
+        name: nameKr,
+        nameKr: nameKr,
+        nameCn: loctab[nameKr] || nameKr,
+        nameEn: nameKr,
+        shipId: blueprint.shipId,
+        grade: blueprint.grade,
+      });
+    }
+    uiListData.shipBlueprints.sort((a, b) => a.id - b.id);
+    console.log(`   ✅ Loaded ${uiListData.shipBlueprints.length} ship blueprints`);
+  }
 
   // 15. CEquip (캐릭터 장비)
-  uiListData.cEquips = extractList('CEquip', 'cEquips', ['type', 'grade', 'job']);
+  uiListData.cEquips = extractList('CEquip', 'cEquips', ['type', 'grade', 'job'], loctab);
   console.log(`   ✅ Loaded ${uiListData.cEquips.length} character equipments`);
 
   // 16. Point (포인트)
-  uiListData.points = extractList('Point', 'points');
+  uiListData.points = extractList('Point', 'points', [], loctab);
   console.log(`   ✅ Loaded ${uiListData.points.length} points`);
 
   // 17. UserTitle (칭호)
-  uiListData.userTitles = extractList('UserTitle', 'userTitles', ['type']);
+  uiListData.userTitles = extractList('UserTitle', 'userTitles', ['type'], loctab);
   console.log(`   ✅ Loaded ${uiListData.userTitles.length} user titles`);
 
   // 18. Achievement (업적)
-  uiListData.achievements = extractList('Achievement', 'achievements', ['type', 'grade']);
+  uiListData.achievements = extractList('Achievement', 'achievements', ['type', 'grade'], loctab);
   console.log(`   ✅ Loaded ${uiListData.achievements.length} achievements`);
 
   // 19. Collection (수집)
-  uiListData.collections = extractList('Collection', 'collections', ['type']);
+  uiListData.collections = extractList('Collection', 'collections', ['type'], loctab);
   console.log(`   ✅ Loaded ${uiListData.collections.length} collections`);
 
   // 20. BattleSkill (전투 스킬)
-  uiListData.battleSkills = extractList('BattleSkill', 'battleSkills', ['type', 'grade']);
+  uiListData.battleSkills = extractList('BattleSkill', 'battleSkills', ['type', 'grade'], loctab);
   console.log(`   ✅ Loaded ${uiListData.battleSkills.length} battle skills`);
 
   // 21. WorldSkill (월드 스킬)
-  uiListData.worldSkills = extractList('WorldSkill', 'worldSkills', ['type']);
+  uiListData.worldSkills = extractList('WorldSkill', 'worldSkills', ['type'], loctab);
   console.log(`   ✅ Loaded ${uiListData.worldSkills.length} world skills`);
 
   // 22. BattleBuff (전투 버프)
-  uiListData.battleBuffs = extractList('BattleBuff', 'battleBuffs', ['type']);
+  uiListData.battleBuffs = extractList('BattleBuff', 'battleBuffs', ['type'], loctab);
   console.log(`   ✅ Loaded ${uiListData.battleBuffs.length} battle buffs`);
 
   // 23. WorldBuff (월드 버프)
-  uiListData.worldBuffs = extractList('WorldBuff', 'worldBuffs', ['type']);
+  uiListData.worldBuffs = extractList('WorldBuff', 'worldBuffs', ['type'], loctab);
   console.log(`   ✅ Loaded ${uiListData.worldBuffs.length} world buffs`);
 
-  // 24. EventMission (이벤트 미션)
-  uiListData.eventMissions = extractList('EventMission', 'eventMissions', ['type']);
-  console.log(`   ✅ Loaded ${uiListData.eventMissions.length} event missions`);
+  // 24. EventMission (이벤트 미션) - EventTask에서 설명 가져오기
+  const eventMissionTable = loadTable('EventMission');
+  const eventTaskTable = loadTable('EventTask');
+  if (eventMissionTable && eventMissionTable.EventMission) {
+    for (const [key, mission] of Object.entries(eventMissionTable.EventMission)) {
+      if (!mission || !mission.id || key.startsWith(':')) {
+        continue;
+      }
 
-  // 25. Mail (메일)
-  uiListData.mails = extractList('Mail', 'mails', ['type']);
-  console.log(`   ✅ Loaded ${uiListData.mails.length} mails`);
+      let nameKr = `EventMission ${mission.id}`;
+
+      // Get description from EventTask if available
+      if (mission.eventTaskId && eventTaskTable && eventTaskTable.EventTask) {
+        const eventTask = eventTaskTable.EventTask[mission.eventTaskId];
+        if (eventTask && eventTask.overrideDesc) {
+          nameKr = eventTask.overrideDesc;
+
+          // Replace placeholders if descFormat exists
+          if (eventTask.descFormat && Array.isArray(eventTask.descFormat)) {
+            const formattedTexts = eventTask.descFormat.map((fmt) => {
+              // Type 1 = COUNT, use eventTaskCount
+              if (fmt.Type === 1) {
+                return eventTask.eventTaskCount ? eventTask.eventTaskCount.toString() : '0';
+              }
+              // Type 2 = CMS_NAME, Type 3 = ENUM_NAME - not implemented for EventTask
+              return '[Unknown]';
+            });
+
+            // Replace {0}, {1}, {2}, etc. with formatted texts
+            nameKr = stringFormat(nameKr, formattedTexts);
+          }
+        }
+      }
+
+      uiListData.eventMissions.push({
+        id: mission.id,
+        name: nameKr,
+        nameKr: nameKr,
+        nameCn: loctab[nameKr] || nameKr,
+        nameEn: nameKr,
+        type: mission.type,
+        eventTaskId: mission.eventTaskId,
+      });
+    }
+    uiListData.eventMissions.sort((a, b) => a.id - b.id);
+    console.log(`   ✅ Loaded ${uiListData.eventMissions.length} event missions`);
+  }
+
+  // 25. Mail (메일) - languageMailTitle[0] 사용 + descFormat 플레이스홀더 치환
+  const mailTable = loadTable('Mail');
+  const townTable = loadTable('Town');
+  if (mailTable && mailTable.Mail) {
+    for (const [key, mail] of Object.entries(mailTable.Mail)) {
+      if (!mail || !mail.id || key.startsWith(':')) {
+        continue;
+      }
+
+      let nameKr = `Mail ${mail.id}`;
+
+      // Use languageMailTitle[0] (Korean) if available
+      if (mail.languageMailTitle && Array.isArray(mail.languageMailTitle) && mail.languageMailTitle.length > 0) {
+        nameKr = mail.languageMailTitle[0] || nameKr;
+
+        // Replace placeholders if descFormat exists
+        if (mail.descFormat && Array.isArray(mail.descFormat)) {
+          const formattedTexts = mail.descFormat.map((fmt) => {
+            // Type 2 = CMS_NAME (e.g., Town, Item, etc.)
+            if (fmt.Type === 2) {
+              if (fmt.TypeName === 'Town') {
+                // For Town, use generic placeholder since we don't have specific town ID
+                return '[도시명]';
+              }
+              // Add more TypeName handling as needed
+              return '[CMS]';
+            }
+            // Type 1 = COUNT
+            if (fmt.Type === 1) {
+              return '[수량]';
+            }
+            return '[Unknown]';
+          });
+
+          // Replace {0}, {1}, {2}, etc. with formatted texts
+          nameKr = stringFormat(nameKr, formattedTexts);
+        }
+      }
+
+      uiListData.mails.push({
+        id: mail.id,
+        name: nameKr,
+        nameKr: nameKr,
+        nameCn: loctab[nameKr] || nameKr,
+        nameEn: nameKr,
+        type: mail.mailType,
+      });
+    }
+    uiListData.mails.sort((a, b) => a.id - b.id);
+    console.log(`   ✅ Loaded ${uiListData.mails.length} mails`);
+  }
 
   console.log('   ✅ UI list data built successfully!\n');
   return uiListData;
@@ -1026,9 +1351,21 @@ Examples:
   const startTime = Date.now();
   const generatedFiles = [];
 
-  // Build reward lookup tables
+  // Build localization table FIRST (needed for reward lookup)
+  let loctab = {};
+  if (buildLocalization || buildRewards) {
+    const loctabSource = path.join(outputDir, 'loctab-source');
+    const loctabOutput = path.join(outputDir, 'loctab');
+
+    loctab = convertLocalizationTable(loctabSource, loctabOutput);
+    if (loctab && buildLocalization) {
+      generatedFiles.push({ name: 'loctab.json', description: 'Localization table (Korean → Chinese)' });
+    }
+  }
+
+  // Build reward lookup tables (with loctab for translations)
   if (buildRewards) {
-    const lookupTable = buildRewardLookupTable(cmsDir);
+    const lookupTable = buildRewardLookupTable(cmsDir, loctab);
 
     // Save full lookup table
     const lookupFile = path.join(outputDir, 'reward-lookup.json');
@@ -1057,24 +1394,13 @@ Examples:
     generatedFiles.push({ name: 'reward-localization-cn.json', description: 'Chinese localization' });
   }
 
-  // Build UI list data
+  // Build UI list data (with loctab for translations)
   if (buildUILists) {
-    const uiListData = generateUIListData(cmsDir);
+    const uiListData = generateUIListData(cmsDir, loctab);
 
     const uiListFile = path.join(outputDir, 'ui-list-data.json');
     fs.writeFileSync(uiListFile, JSON.stringify(uiListData, null, 2), 'utf8');
     generatedFiles.push({ name: 'ui-list-data.json', description: 'UI list data (Nation/Town/Village)' });
-  }
-
-  // Build localization table
-  if (buildLocalization) {
-    const loctabSource = path.join(outputDir, 'loctab-source');
-    const loctabOutput = path.join(outputDir, 'loctab');
-
-    const loctab = convertLocalizationTable(loctabSource, loctabOutput);
-    if (loctab) {
-      generatedFiles.push({ name: 'loctab', description: 'Localization table (Korean → Chinese)' });
-    }
   }
 
   const endTime = Date.now();

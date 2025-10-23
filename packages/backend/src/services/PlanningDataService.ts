@@ -16,6 +16,9 @@ export interface RewardTypeInfo {
 export interface RewardItem {
   id: number;
   name: string;
+  nameKr?: string;  // Korean name (original)
+  nameEn?: string;  // English name (from localization)
+  nameCn?: string;  // Chinese name (from loctab)
 }
 
 export interface RewardLookupData {
@@ -40,6 +43,7 @@ export class PlanningDataService {
   private static localizationUsPath = path.join(PlanningDataService.cmsPath, 'reward-localization-us.json');
   private static localizationCnPath = path.join(PlanningDataService.cmsPath, 'reward-localization-cn.json');
   private static uiListDataPath = path.join(PlanningDataService.cmsPath, 'ui-list-data.json');
+  private static loctabPath = path.join(PlanningDataService.cmsPath, 'loctab.json');
   private static initialized = false;
 
   /**
@@ -98,24 +102,59 @@ export class PlanningDataService {
   }
 
   /**
-   * Get items for a specific reward type
+   * Get items for a specific reward type with localized names
+   * @param rewardType - Reward type number
+   * @param language - Language code (kr, en, cn)
    */
-  static async getRewardTypeItems(rewardType: number): Promise<RewardItem[]> {
+  static async getRewardTypeItems(rewardType: number, language: 'kr' | 'en' | 'cn' = 'kr'): Promise<RewardItem[]> {
     try {
       const lookupData = await PlanningDataService.getRewardLookup();
       const typeData = lookupData[rewardType.toString()];
-      
+
       if (!typeData) {
         throw new CustomError(`Reward type ${rewardType} not found`, 404);
       }
 
-      return typeData.items || [];
+      const items = typeData.items || [];
+
+      // Return items with localized names based on language
+      return items.map(item => {
+        let localizedName = item.name;
+
+        if (language === 'cn' && item.nameCn) {
+          localizedName = item.nameCn;
+        } else if (language === 'en' && item.nameEn) {
+          localizedName = item.nameEn;
+        } else if (item.nameKr) {
+          localizedName = item.nameKr;
+        }
+
+        return {
+          ...item,
+          name: localizedName, // Override name with localized version
+        };
+      });
     } catch (error) {
       if (error instanceof CustomError) {
         throw error;
       }
-      logger.error('Failed to get reward type items', { error, rewardType });
+      logger.error('Failed to get reward type items', { error, rewardType, language });
       throw new CustomError('Failed to load reward type items', 500);
+    }
+  }
+
+  /**
+   * Get localization table (loctab.json)
+   * Maps Korean text to Chinese text
+   */
+  static async getLoctab(): Promise<Record<string, string>> {
+    try {
+      const data = await fs.readFile(PlanningDataService.loctabPath, 'utf-8');
+      return JSON.parse(data);
+    } catch (error) {
+      logger.error('Failed to load loctab', { error });
+      // Return empty object if file doesn't exist
+      return {};
     }
   }
 
@@ -235,12 +274,43 @@ export class PlanningDataService {
   }
 
   /**
+   * Get UI list items for a specific category with language support
+   */
+  static async getUIListItems(category: string, language: string = 'kr'): Promise<any[]> {
+    try {
+      const uiListData = await PlanningDataService.getUIListData();
+
+      if (!uiListData[category]) {
+        throw new CustomError(`Category '${category}' not found`, 404);
+      }
+
+      const items = uiListData[category];
+
+      // Map items to use the appropriate language field as 'name'
+      return items.map((item: any) => {
+        const nameField = language === 'cn' ? 'nameCn' : language === 'en' ? 'nameEn' : 'nameKr';
+        return {
+          ...item,
+          name: item[nameField] || item.name || item.nameKr,
+        };
+      });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      logger.error('Failed to get UI list items', { error, category, language });
+      throw new CustomError('Failed to load UI list items', 500);
+    }
+  }
+
+  /**
    * Get planning data statistics
    */
   static async getStats(): Promise<any> {
     try {
       const lookupData = await PlanningDataService.getRewardLookup();
       const typeList = await PlanningDataService.getRewardTypeList();
+      const uiListData = await PlanningDataService.getUIListData();
 
       // Check which files exist
       const filesExist = {
@@ -252,12 +322,21 @@ export class PlanningDataService {
         uiListData: await fs.access(this.uiListDataPath).then(() => true).catch(() => false),
       };
 
+      // Calculate UI list counts
+      const uiListCounts: Record<string, number> = {};
+      for (const [key, value] of Object.entries(uiListData)) {
+        if (Array.isArray(value)) {
+          uiListCounts[key] = value.length;
+        }
+      }
+
       return {
         totalRewardTypes: typeList.length,
         rewardTypesWithTable: typeList.filter(t => t.hasTable).length,
         rewardTypesWithoutTable: typeList.filter(t => !t.hasTable).length,
         totalItems: Object.values(lookupData).reduce((sum, type) => sum + type.itemCount, 0),
         filesExist,
+        uiListCounts,
         rewardTypes: typeList.map(t => ({
           value: t.value,
           name: t.name,

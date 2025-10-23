@@ -2945,18 +2945,14 @@
   "planningData": {
     "title": "기획데이터",
     "subtitle": "게임 기획 데이터를 관리합니다",
-    "description": "CMS 파일을 업데이트한 후 '데이터 다시 불러오기' 버튼을 눌러 운영툴에서 사용하는 모든 데이터 파일을 갱신할 수 있습니다.",
     "rebuildData": "데이터 다시 불러오기",
     "rebuildSuccess": "기획데이터가 성공적으로 다시 불러와졌습니다",
-    "rewardTypesList": "보상 타입 목록",
-    "generatedFiles": "생성되는 파일",
-    "generatedFilesStatus": "생성된 파일 상태",
-    "files": {
-      "rewardLookup": "전체 보상 아이템 데이터 (~1.5MB)",
-      "rewardTypeList": "보상 타입 드롭다운용 목록 (~7KB)",
-      "localization": "다국어 로컬라이징 (한/영/중, 각 ~3KB)",
-      "uiListData": "국가/마을/촌락 등 UI 목록 데이터 (~50KB)",
-      "loctab": "한글→중국어 번역 테이블"
+    "showingFirst100": "처음 100개 항목만 표시 중 (전체: {{total}}개)",
+    "searchPlaceholder": "아이템 이름 또는 ID로 검색",
+    "category": "카테고리",
+    "tabs": {
+      "rewardTypes": "보상 타입 목록",
+      "uiLists": "UI 목록 데이터"
     },
     "stats": {
       "totalRewardTypes": "전체 보상 타입",
@@ -2968,7 +2964,11 @@
       "rewardType": "보상 타입",
       "name": "이름",
       "hasTable": "테이블 보유",
-      "itemCount": "아이템 수"
+      "itemCount": "아이템 수",
+      "listName": "목록 이름"
+    },
+    "testComponent": {
+      "title": "테스트 컴포넌트 (데이터 확인용)"
     },
     "errors": {
       "loadRewardTypesFailed": "보상 타입 목록을 불러오는데 실패했습니다",
@@ -3035,9 +3035,7 @@
   "REWARD_TYPE_DESC_BUY_SWEEP_TICKET": "유료 소탕권 (수치만큼 소탕권 증가)",
   "REWARD_TYPE_PET": "펫",
   "REWARD_TYPE_SMUGGLE_GOODS": "밀수품",
-  "REWARD_TYPE_REWERD_SEASON_ITEMS": "시즌 보상 아이템",
+  "REWARD_TYPE_REWARD_SEASON_ITEMS": "시즌 보상 아이템",
   "REWARD_TYPE_CAPTURED_SHIP": "나포 선박",
-  "REWARD_TYPE_DESC_CAPTURED_SHIP": "나포 선박 (ID: 선박 ID, 특수 처리)",
-  "REWARD_TYPE_SOUND_PACK": "사운드 팩",
-  "REWARD_TYPE_DESC_SOUND_PACK": "사운드 팩"
+  "REWARD_TYPE_SOUND_PACK": "사운드 팩"
 }

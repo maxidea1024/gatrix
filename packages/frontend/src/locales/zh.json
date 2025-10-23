@@ -2989,18 +2989,14 @@
   "planningData": {
     "title": "策划数据",
     "subtitle": "管理游戏策划数据",
-    "description": "更新CMS文件后，点击'重新加载数据'按钮以刷新运营工具使用的所有数据文件。",
     "rebuildData": "重新加载数据",
     "rebuildSuccess": "策划数据已成功重新加载",
-    "rewardTypesList": "奖励类型列表",
-    "generatedFiles": "生成的文件",
-    "generatedFilesStatus": "生成的文件状态",
-    "files": {
-      "rewardLookup": "完整奖励物品数据 (~1.5MB)",
-      "rewardTypeList": "奖励类型下拉列表 (~7KB)",
-      "localization": "多语言本地化 (韩/英/中，各~3KB)",
-      "uiListData": "国家/城镇/村庄等UI列表数据 (~50KB)",
-      "loctab": "韩文→中文翻译表"
+    "showingFirst100": "仅显示前100项（总计：{{total}}）",
+    "searchPlaceholder": "按物品名称或ID搜索",
+    "category": "类别",
+    "tabs": {
+      "rewardTypes": "奖励类型",
+      "uiLists": "UI列表"
     },
     "stats": {
       "totalRewardTypes": "总奖励类型",
@@ -3012,7 +3008,11 @@
       "rewardType": "奖励类型",
       "name": "名称",
       "hasTable": "有表",
-      "itemCount": "物品数量"
+      "itemCount": "物品数量",
+      "listName": "列表名称"
+    },
+    "testComponent": {
+      "title": "测试组件（数据验证）"
     },
     "errors": {
       "loadRewardTypesFailed": "加载奖励类型失败",
@@ -3079,9 +3079,7 @@
   "REWARD_TYPE_DESC_BUY_SWEEP_TICKET": "付费扫荡券 (增加指定数值的扫荡券)",
   "REWARD_TYPE_PET": "宠物",
   "REWARD_TYPE_SMUGGLE_GOODS": "走私品",
-  "REWARD_TYPE_REWERD_SEASON_ITEMS": "赛季奖励道具",
+  "REWARD_TYPE_REWARD_SEASON_ITEMS": "赛季奖励道具",
   "REWARD_TYPE_CAPTURED_SHIP": "俘获船舶",
-  "REWARD_TYPE_DESC_CAPTURED_SHIP": "俘获船舶 (ID: 船舶ID, 特殊处理)",
-  "REWARD_TYPE_SOUND_PACK": "音效包",
-  "REWARD_TYPE_DESC_SOUND_PACK": "音效包"
+  "REWARD_TYPE_SOUND_PACK": "音效包"
 }
