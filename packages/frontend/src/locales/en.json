@@ -2951,6 +2951,7 @@
     "searchPlaceholder": "Search by item name or ID",
     "category": "Category",
     "viewAll": "View All",
+    "viewAllWarning": "View All feature may be very slow with many items",
     "noTableForRewardType": "This reward type has no associated item table. The specified value is applied directly. (e.g., Experience +100, Fame +50, etc.)",
     "tabs": {
       "rewardTypes": "Reward Types",

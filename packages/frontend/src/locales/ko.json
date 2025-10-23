@@ -2951,6 +2951,7 @@
     "searchPlaceholder": "아이템 이름 또는 ID로 검색",
     "category": "카테고리",
     "viewAll": "모아보기",
+    "viewAllWarning": "모아보기 기능은 많은 항목이 있을 경우 매우 느려질 수 있습니다",
     "noTableForRewardType": "이 보상 타입은 연관된 아이템 테이블이 없습니다. 지정한 수치만큼 직접 적용됩니다. (예: 경험치 +100, 명성 +50 등)",
     "tabs": {
       "rewardTypes": "보상 타입 목록",

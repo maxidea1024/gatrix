@@ -1243,8 +1243,150 @@ function generateUIListData(cmsDir, loctab = {}) {
   uiListData.userTitles = extractList('UserTitle', 'userTitles', ['type'], loctab);
   console.log(`   ✅ Loaded ${uiListData.userTitles.length} user titles`);
 
-  // 18. Achievement (업적)
-  uiListData.achievements = extractList('Achievement', 'achievements', ['type', 'grade'], loctab);
+  // 18. Achievement (업적) - Special handling for descFormat placeholders
+  const achievementTable = loadTable('Achievement');
+  if (achievementTable && achievementTable.Achievement) {
+    // Pre-load commonly used tables for achievement formatting to avoid repeated loadTable calls
+    const preloadedTables = {};
+    const tablesToPreload = ['Ship', 'Item', 'Discovery', 'Nation', 'Town', 'Job', 'TradeGoods', 'BattleSkill', 'WorldSkill', 'Mate', 'Character', 'Quest', 'QuestNode'];
+    for (const tableName of tablesToPreload) {
+      const table = loadTable(tableName);
+      if (table && table[tableName]) {
+        preloadedTables[tableName] = table[tableName];
+      }
+    }
+
+    for (const [key, achievement] of Object.entries(achievementTable.Achievement)) {
+      if (!achievement || !achievement.id || key.startsWith(':')) {
+        continue;
+      }
+
+      let nameKr = achievement.name || `Achievement ${achievement.id}`;
+
+      // Remove @ and everything after it (comment marker)
+      const atIndex = nameKr.indexOf('@');
+      if (atIndex !== -1) {
+        nameKr = nameKr.substring(0, atIndex).trim();
+      }
+
+      // Special handling for "달성 보상" - add achievement target details with item names
+      if (nameKr === '달성 보상' && achievement.achievementTarget && achievement.achievementTarget.length > 0) {
+        const targetDetails = [];
+
+        for (let i = 0; i < Math.min(achievement.achievementTarget.length, 2); i++) {
+          const targetId = achievement.achievementTarget[i];
+          let itemName = null;
+
+          // Try to find the item in common tables
+          const tablesToCheck = ['Quest', 'QuestNode', 'Item', 'Discovery', 'Ship', 'Mate', 'Character'];
+          for (const tableName of tablesToCheck) {
+            if (preloadedTables[tableName] && preloadedTables[tableName][targetId]) {
+              const targetItem = preloadedTables[tableName][targetId];
+
+              // Special handling for Mate - get name from Character table
+              if (tableName === 'Mate' && targetItem.characterId && preloadedTables['Character']) {
+                const character = preloadedTables['Character'][targetItem.characterId];
+                if (character) {
+                  itemName = removeCommentFromName(makeCharacterDisplayName(character));
+                }
+              } else {
+                itemName = removeCommentFromName(targetItem.name || targetItem.Name || '');
+
+                // Special handling for Quest - format placeholders using formatTexts
+                if (tableName === 'Quest' && targetItem.formatTexts && Array.isArray(targetItem.formatTexts) && targetItem.formatTexts.length > 0) {
+                  const formatValues = targetItem.formatTexts.map(ft => ft.Val || '');
+                  if (formatValues.length > 0) {
+                    itemName = stringFormat(itemName, formatValues);
+                  }
+                }
+              }
+
+              if (itemName) {
+                break;
+              }
+            }
+          }
+
+          if (itemName) {
+            targetDetails.push(`${targetId}:${itemName}`);
+          } else {
+            targetDetails.push(`${targetId}`);
+          }
+        }
+
+        if (targetDetails.length > 0) {
+          nameKr = `달성 보상 (${targetDetails.join(', ')})`;
+        }
+      }
+
+      // Format placeholders using descFormat and achievementTarget
+      if (achievement.descFormat && Array.isArray(achievement.descFormat) && achievement.descFormat.length > 0) {
+        const formatTexts = [];
+
+        for (let i = 0; i < achievement.descFormat.length; i++) {
+          const format = achievement.descFormat[i];
+          let formatText = '';
+
+          // Get the table name from Type or TypeName
+          const tableName = format.TypeName || REWARD_TYPE_TO_TABLE[format.Type];
+
+          if (tableName && achievement.achievementTarget && achievement.achievementTarget[i] !== undefined) {
+            const targetId = achievement.achievementTarget[i];
+
+            // Use preloaded table if available, otherwise load on demand
+            let targetTable = preloadedTables[tableName];
+            if (!targetTable) {
+              const table = loadTable(tableName);
+              if (table && table[tableName]) {
+                targetTable = table[tableName];
+                preloadedTables[tableName] = targetTable; // Cache it
+              }
+            }
+
+            if (targetTable && targetTable[targetId]) {
+              const targetItem = targetTable[targetId];
+
+              // Special handling for Mate - get name from Character table
+              if (tableName === 'Mate' && targetItem.characterId && preloadedTables['Character']) {
+                const character = preloadedTables['Character'][targetItem.characterId];
+                if (character) {
+                  formatText = removeCommentFromName(makeCharacterDisplayName(character));
+                } else {
+                  formatText = `Mate ${targetId}`;
+                }
+              } else {
+                formatText = removeCommentFromName(targetItem.name || targetItem.Name || `${tableName} ${targetId}`);
+              }
+            } else {
+              formatText = `${tableName} ${targetId}`;
+            }
+          } else {
+            formatText = `Unknown ${i}`;
+          }
+
+          formatTexts.push(formatText);
+        }
+
+        // Replace placeholders {0}, {1}, etc.
+        if (formatTexts.length > 0) {
+          nameKr = stringFormat(nameKr, formatTexts);
+        }
+      }
+
+      uiListData.achievements.push({
+        id: achievement.id,
+        name: nameKr,
+        nameKr: nameKr,
+        nameCn: loctab[nameKr] || nameKr,
+        nameEn: nameKr,
+        type: achievement.achievementType,
+        grade: achievement.grade,
+      });
+    }
+    uiListData.achievements.sort((a, b) => a.id - b.id);
+  } else {
+    uiListData.achievements = [];
+  }
   console.log(`   ✅ Loaded ${uiListData.achievements.length} achievements`);
 
   // 19. Collection (수집)

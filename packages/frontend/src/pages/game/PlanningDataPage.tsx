@@ -35,6 +35,7 @@ import {
   Clear as ClearIcon,
   CardGiftcard as GiftIcon,
   Category as CategoryIcon,
+  Warning as WarningIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -136,6 +137,18 @@ const PlanningDataPage: React.FC = () => {
       enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setRebuilding(false);
+    }
+  };
+
+  // Copy to clipboard on Ctrl+Click
+  const handleCellClick = (event: React.MouseEvent, text: string) => {
+    if (event.ctrlKey || event.metaKey) {
+      event.preventDefault();
+      navigator.clipboard.writeText(text).then(() => {
+        enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+      }).catch(() => {
+        enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
+      });
     }
   };
 
@@ -498,21 +511,28 @@ const PlanningDataPage: React.FC = () => {
 
                         {/* View All checkbox - only for types with table */}
                         {currentRewardType.hasTable && (
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={viewAllRewardItems}
-                                onChange={(e) => {
-                                  const newValue = e.target.checked;
-                                  setViewAllRewardItems(newValue);
-                                  sessionStorage.setItem('planningDataViewAllRewardItems', newValue.toString());
-                                }}
-                                size="small"
-                              />
-                            }
-                            label={t('planningData.viewAll')}
-                            sx={{ ml: 1 }}
-                          />
+                          <Box sx={{ display: 'flex', alignItems: 'center', ml: 1, gap: 1 }}>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={viewAllRewardItems}
+                                  onChange={(e) => {
+                                    const newValue = e.target.checked;
+                                    setViewAllRewardItems(newValue);
+                                    sessionStorage.setItem('planningDataViewAllRewardItems', newValue.toString());
+                                  }}
+                                  size="small"
+                                />
+                              }
+                              label={t('planningData.viewAll')}
+                            />
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                              <WarningIcon sx={{ fontSize: 16, color: 'warning.main', mr: 0.5 }} />
+                              <Typography variant="caption" color="warning.main">
+                                {t('planningData.viewAllWarning')}
+                              </Typography>
+                            </Box>
+                          </Box>
                         )}
                       </Box>
 
@@ -612,10 +632,18 @@ const PlanningDataPage: React.FC = () => {
 
                                       return (
                                         <TableRow key={item.id} hover>
-                                          <TableCell>
+                                          <TableCell
+                                            onClick={(e) => handleCellClick(e, item.id.toString())}
+                                            sx={{ cursor: 'pointer' }}
+                                          >
                                             <Chip label={item.id} size="small" variant="outlined" />
                                           </TableCell>
-                                          <TableCell>{displayName}</TableCell>
+                                          <TableCell
+                                            onClick={(e) => handleCellClick(e, displayName)}
+                                            sx={{ cursor: 'pointer' }}
+                                          >
+                                            {displayName}
+                                          </TableCell>
                                         </TableRow>
                                       );
                                     })}
@@ -767,21 +795,28 @@ const PlanningDataPage: React.FC = () => {
                             />
 
                             {/* View All checkbox */}
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={viewAllUiItems}
-                                  onChange={(e) => {
-                                    const newValue = e.target.checked;
-                                    setViewAllUiItems(newValue);
-                                    sessionStorage.setItem('planningDataViewAllUiItems', newValue.toString());
-                                  }}
-                                  size="small"
-                                />
-                              }
-                              label={t('planningData.viewAll')}
-                              sx={{ ml: 1 }}
-                            />
+                            <Box sx={{ display: 'flex', alignItems: 'center', ml: 1, gap: 1 }}>
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    checked={viewAllUiItems}
+                                    onChange={(e) => {
+                                      const newValue = e.target.checked;
+                                      setViewAllUiItems(newValue);
+                                      sessionStorage.setItem('planningDataViewAllUiItems', newValue.toString());
+                                    }}
+                                    size="small"
+                                  />
+                                }
+                                label={t('planningData.viewAll')}
+                              />
+                              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                <WarningIcon sx={{ fontSize: 16, color: 'warning.main', mr: 0.5 }} />
+                                <Typography variant="caption" color="warning.main">
+                                  {t('planningData.viewAllWarning')}
+                                </Typography>
+                              </Box>
+                            </Box>
                           </Box>
 
                           {viewAllUiItems ? (
@@ -874,10 +909,18 @@ const PlanningDataPage: React.FC = () => {
 
                                       return (
                                         <TableRow key={item.id} hover>
-                                          <TableCell>
+                                          <TableCell
+                                            onClick={(e) => handleCellClick(e, item.id.toString())}
+                                            sx={{ cursor: 'pointer' }}
+                                          >
                                             <Chip label={item.id} size="small" variant="outlined" />
                                           </TableCell>
-                                          <TableCell>{displayName}</TableCell>
+                                          <TableCell
+                                            onClick={(e) => handleCellClick(e, displayName)}
+                                            sx={{ cursor: 'pointer' }}
+                                          >
+                                            {displayName}
+                                          </TableCell>
                                         </TableRow>
                                       );
                                     })}
