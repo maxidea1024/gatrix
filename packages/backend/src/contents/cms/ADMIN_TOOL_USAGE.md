@@ -1,8 +1,21 @@
 # 운영툴에서 보상 선택 UI 구현 가이드
 
+## 🎯 주요 기능
+
+이 빌더는 다음과 같은 기능을 제공합니다:
+
+- ✅ **REWARD_TYPE별 아이템 목록 생성**: 35개 REWARD_TYPE에 대한 완전한 아이템 목록
+- ✅ **다국어 지원**: 한국어(kr), 영어(us), 중국어 간체(cn) 3개 언어
+- ✅ **아이템 이름 자동 포맷팅**: 플레이스홀더(`{0}`, `{1}` 등)를 실제 이름으로 자동 변환
+  - 선박 도면: `{0} 도면` → `타렛테 도면`, `바르카 도면` 등
+  - 항해사 계약서: `{0} 계약서` → `조안 페레로 계약서`, `카탈리나 에란초 계약서` 등
+  - 시즌 보상 아이템: `RewardSeasonItems 100090001` → `투자 시즌 1 - 투자 시즌 1 종료 상자 (외 3개)` 등
+- ✅ **참조 테이블 자동 해석**: Ship, Mate, Character, InvestSeason 등 참조 테이블 자동 조회
+- ✅ **UI 목록 데이터 생성**: 국가, 마을, 촌락 검색/선택 UI용 데이터 자동 생성
+
 ## 📦 생성된 파일들
 
-빌더를 실행하면 3개의 JSON 파일이 생성됩니다:
+빌더를 실행하면 6개의 JSON 파일이 생성됩니다:
 
 ### 1. `reward-type-list.json` - REWARD_TYPE 드롭다운용
 운영툴에서 REWARD_TYPE 드롭다운을 만들 때 사용합니다.
@@ -165,6 +178,144 @@ function populateItemDropdown(items) {
   });
   
   select.style.display = 'block';
+}
+```
+
+## 🗺️ UI 목록 데이터 사용 (국가/마을/촌락)
+
+### 6. `ui-list-data.json` - 국가/마을/촌락 검색 UI용
+
+운영툴에서 국가, 마을, 촌락을 검색하거나 선택할 때 사용하는 목록 데이터입니다.
+
+```json
+{
+  "nations": [
+    {
+      "id": 10000000,
+      "name": "포르투갈"
+    },
+    {
+      "id": 10000001,
+      "name": "에스파냐"
+    }
+  ],
+  "towns": [
+    {
+      "id": 11000000,
+      "name": "리스본",
+      "nationId": 10000000
+    },
+    {
+      "id": 11000001,
+      "name": "세비야",
+      "nationId": 10000001
+    }
+  ],
+  "villages": [
+    {
+      "id": 70500000,
+      "name": "스비아인의 마을"
+    },
+    {
+      "id": 70500001,
+      "name": "흑해 인근 마을"
+    }
+  ]
+}
+```
+
+### UI 목록 데이터 사용 예제
+
+```javascript
+// 데이터 로드
+import uiListData from './ui-list-data.json';
+
+// 국가 드롭다운 생성
+function createNationDropdown() {
+  const select = document.getElementById('nationId');
+  select.innerHTML = '<option value="">국가 선택</option>';
+
+  uiListData.nations.forEach(nation => {
+    const option = document.createElement('option');
+    option.value = nation.id;
+    option.textContent = `[${nation.id}] ${nation.name}`;
+    select.appendChild(option);
+  });
+}
+
+// 마을 검색 (국가별 필터링)
+function searchTowns(nationId, searchText) {
+  let filteredTowns = uiListData.towns;
+
+  // 국가별 필터링
+  if (nationId) {
+    filteredTowns = filteredTowns.filter(town => town.nationId === nationId);
+  }
+
+  // 텍스트 검색
+  if (searchText) {
+    filteredTowns = filteredTowns.filter(town =>
+      town.name.includes(searchText) ||
+      town.id.toString().includes(searchText)
+    );
+  }
+
+  return filteredTowns;
+}
+
+// 촌락 자동완성
+function autocompleteVillage(searchText) {
+  return uiListData.villages
+    .filter(village =>
+      village.name.includes(searchText) ||
+      village.id.toString().includes(searchText)
+    )
+    .slice(0, 10); // 최대 10개만 표시
+}
+```
+
+### React 예제 - 국가/마을 선택
+
+```jsx
+import React, { useState } from 'react';
+import uiListData from './ui-list-data.json';
+
+function LocationSelector() {
+  const [selectedNation, setSelectedNation] = useState('');
+  const [selectedTown, setSelectedTown] = useState('');
+
+  // 선택된 국가에 속한 마을만 필터링
+  const filteredTowns = selectedNation
+    ? uiListData.towns.filter(town => town.nationId === parseInt(selectedNation))
+    : uiListData.towns;
+
+  return (
+    <div>
+      <div>
+        <label>국가:</label>
+        <select value={selectedNation} onChange={e => setSelectedNation(e.target.value)}>
+          <option value="">전체</option>
+          {uiListData.nations.map(nation => (
+            <option key={nation.id} value={nation.id}>
+              [{nation.id}] {nation.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label>마을:</label>
+        <select value={selectedTown} onChange={e => setSelectedTown(e.target.value)}>
+          <option value="">선택하세요</option>
+          {filteredTowns.map(town => (
+            <option key={town.id} value={town.id}>
+              [{town.id}] {town.name}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
 }
 ```
 

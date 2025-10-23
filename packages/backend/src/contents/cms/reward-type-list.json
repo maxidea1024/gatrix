@@ -14,7 +14,7 @@
     "nameKey": "REWARD_TYPE_ITEM",
     "hasTable": true,
     "tableFile": "Item.json",
-    "itemCount": 2827,
+    "itemCount": 2813,
     "descriptionKey": null
   },
   {
@@ -86,7 +86,7 @@
     "nameKey": "REWARD_TYPE_QUEST_ITEM",
     "hasTable": true,
     "tableFile": "Item.json",
-    "itemCount": 2827,
+    "itemCount": 14,
     "descriptionKey": null
   },
   {

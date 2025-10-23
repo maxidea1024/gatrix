@@ -29,11 +29,26 @@ export interface RewardLookupData {
   };
 }
 
+export interface UIListData {
+  nations: Array<{ id: number; name: string }>;
+  towns: Array<{ id: number; name: string; nationId?: number }>;
+  villages: Array<{ id: number; name: string; townId?: number }>;
+  [key: string]: any; // For other lists like ships, mates, etc.
+}
+
 export interface PlanningDataStats {
   totalRewardTypes: number;
   rewardTypesWithTable: number;
   rewardTypesWithoutTable: number;
   totalItems: number;
+  filesExist?: {
+    rewardLookup: boolean;
+    rewardTypeList: boolean;
+    localizationKr: boolean;
+    localizationUs: boolean;
+    localizationCn: boolean;
+    uiListData: boolean;
+  };
   rewardTypes: Array<{
     value: number;
     name: string;
@@ -72,6 +87,22 @@ class PlanningDataService {
    */
   async rebuildRewardLookup(): Promise<{ success: boolean; message: string; stats?: any }> {
     const response = await api.post('/admin/planning-data/rebuild');
+    return response.data;
+  }
+
+  /**
+   * Get localization data for a specific language
+   */
+  async getLocalization(language: 'kr' | 'us' | 'cn'): Promise<Record<string, string>> {
+    const response = await api.get(`/admin/planning-data/localization/${language}`);
+    return response.data;
+  }
+
+  /**
+   * Get UI list data (nations, towns, villages, etc.)
+   */
+  async getUIListData(): Promise<UIListData> {
+    const response = await api.get('/admin/planning-data/ui-list');
     return response.data;
   }
 

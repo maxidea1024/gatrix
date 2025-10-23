@@ -36,6 +36,10 @@ export class PlanningDataService {
   private static cmsPath = path.join(__dirname, '../contents/cms');
   private static rewardLookupPath = path.join(PlanningDataService.cmsPath, 'reward-lookup.json');
   private static rewardTypeListPath = path.join(PlanningDataService.cmsPath, 'reward-type-list.json');
+  private static localizationKrPath = path.join(PlanningDataService.cmsPath, 'reward-localization-kr.json');
+  private static localizationUsPath = path.join(PlanningDataService.cmsPath, 'reward-localization-us.json');
+  private static localizationCnPath = path.join(PlanningDataService.cmsPath, 'reward-localization-cn.json');
+  private static uiListDataPath = path.join(PlanningDataService.cmsPath, 'ui-list-data.json');
   private static initialized = false;
 
   /**
@@ -116,20 +120,20 @@ export class PlanningDataService {
   }
 
   /**
-   * Rebuild reward lookup data from CMS files
+   * Rebuild all planning data from CMS files using adminToolDataBuilder.js
    * This should be called when CMS files are updated
    */
   static async rebuildRewardLookup(): Promise<{ success: boolean; message: string; stats?: any }> {
     try {
-      logger.info('Starting reward lookup rebuild...');
+      logger.info('Starting planning data rebuild using adminToolDataBuilder.js...');
 
-      // Check if rewardLookupBuilder.js exists
-      const builderPath = path.join(PlanningDataService.cmsPath, 'rewardLookupBuilder.js');
+      // Check if adminToolDataBuilder.js exists
+      const builderPath = path.join(PlanningDataService.cmsPath, 'adminToolDataBuilder.js');
 
       try {
         await fs.access(builderPath);
       } catch {
-        throw new CustomError('Reward lookup builder not found', 500);
+        throw new CustomError('Admin tool data builder not found', 500);
       }
 
       // Get the actual CMS directory path (where Point.json, Item.json, etc. are located)
@@ -137,43 +141,96 @@ export class PlanningDataService {
       const actualCmsDir = path.join(__dirname, '../../cmd');
 
       // Execute the builder with the correct CMS directory
+      // This will generate all 7 files: reward-lookup.json, reward-type-list.json,
+      // reward-localization-kr/us/cn.json, ui-list-data.json, loctab.json
       const { execSync } = require('child_process');
-      const output = execSync(`node "${builderPath}" --cms-dir "${actualCmsDir}"`, {
+      const output = execSync(`node "${builderPath}" --all --cms-dir "${actualCmsDir}" --output-dir "${PlanningDataService.cmsPath}"`, {
         cwd: PlanningDataService.cmsPath,
         encoding: 'utf-8',
       });
 
-      logger.info('Reward lookup rebuild completed', { output });
+      logger.info('Planning data rebuild completed', { output });
 
-      // Verify the files were created
+      // Verify the core files were created
       try {
         await fs.access(PlanningDataService.rewardLookupPath);
         await fs.access(PlanningDataService.rewardTypeListPath);
       } catch {
-        throw new CustomError('Reward lookup files were not created', 500);
+        throw new CustomError('Planning data files were not created', 500);
       }
 
       // Get stats
       const lookupData = await PlanningDataService.getRewardLookup();
       const typeList = await PlanningDataService.getRewardTypeList();
+      const uiListData = await PlanningDataService.getUIListData();
 
       const stats = {
         totalRewardTypes: typeList.length,
         rewardTypesWithTable: typeList.filter(t => t.hasTable).length,
         totalItems: Object.values(lookupData).reduce((sum, type) => sum + type.itemCount, 0),
+        uiListCounts: {
+          nations: uiListData.nations?.length || 0,
+          towns: uiListData.towns?.length || 0,
+          villages: uiListData.villages?.length || 0,
+        },
       };
 
       return {
         success: true,
-        message: 'Reward lookup data rebuilt successfully',
+        message: 'All planning data rebuilt successfully (7 files generated)',
         stats,
       };
     } catch (error) {
       if (error instanceof CustomError) {
         throw error;
       }
-      logger.error('Failed to rebuild reward lookup', { error });
-      throw new CustomError('Failed to rebuild reward lookup data', 500);
+      logger.error('Failed to rebuild planning data', { error });
+      throw new CustomError('Failed to rebuild planning data', 500);
+    }
+  }
+
+  /**
+   * Get localization data for a specific language
+   */
+  static async getLocalization(language: 'kr' | 'us' | 'cn'): Promise<Record<string, string>> {
+    try {
+      const pathMap = {
+        kr: this.localizationKrPath,
+        us: this.localizationUsPath,
+        cn: this.localizationCnPath,
+      };
+
+      const filePath = pathMap[language];
+      const exists = await fs.access(filePath).then(() => true).catch(() => false);
+
+      if (!exists) {
+        return {};
+      }
+
+      const data = await fs.readFile(filePath, 'utf-8');
+      return JSON.parse(data);
+    } catch (error) {
+      logger.error('Failed to read localization data', { error, language });
+      throw new CustomError(`Failed to load localization data for ${language}`, 500);
+    }
+  }
+
+  /**
+   * Get UI list data (nations, towns, villages)
+   */
+  static async getUIListData(): Promise<any> {
+    try {
+      const exists = await fs.access(this.uiListDataPath).then(() => true).catch(() => false);
+
+      if (!exists) {
+        return { nations: [], towns: [], villages: [] };
+      }
+
+      const data = await fs.readFile(this.uiListDataPath, 'utf-8');
+      return JSON.parse(data);
+    } catch (error) {
+      logger.error('Failed to read UI list data', { error });
+      throw new CustomError('Failed to load UI list data', 500);
     }
   }
 
@@ -185,11 +242,22 @@ export class PlanningDataService {
       const lookupData = await PlanningDataService.getRewardLookup();
       const typeList = await PlanningDataService.getRewardTypeList();
 
+      // Check which files exist
+      const filesExist = {
+        rewardLookup: await fs.access(this.rewardLookupPath).then(() => true).catch(() => false),
+        rewardTypeList: await fs.access(this.rewardTypeListPath).then(() => true).catch(() => false),
+        localizationKr: await fs.access(this.localizationKrPath).then(() => true).catch(() => false),
+        localizationUs: await fs.access(this.localizationUsPath).then(() => true).catch(() => false),
+        localizationCn: await fs.access(this.localizationCnPath).then(() => true).catch(() => false),
+        uiListData: await fs.access(this.uiListDataPath).then(() => true).catch(() => false),
+      };
+
       return {
         totalRewardTypes: typeList.length,
         rewardTypesWithTable: typeList.filter(t => t.hasTable).length,
         rewardTypesWithoutTable: typeList.filter(t => !t.hasTable).length,
         totalItems: Object.values(lookupData).reduce((sum, type) => sum + type.itemCount, 0),
+        filesExist,
         rewardTypes: typeList.map(t => ({
           value: t.value,
           name: t.name,

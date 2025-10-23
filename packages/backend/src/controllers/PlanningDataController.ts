@@ -73,6 +73,43 @@ export class PlanningDataController {
   });
 
   /**
+   * Get localization data
+   * GET /api/v1/admin/planning-data/localization/:language
+   */
+  static getLocalization = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { language } = req.params;
+
+    if (!['kr', 'us', 'cn'].includes(language)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid language. Must be kr, us, or cn',
+      });
+    }
+
+    const data = await PlanningDataService.getLocalization(language as 'kr' | 'us' | 'cn');
+
+    res.json({
+      success: true,
+      data,
+      message: `Localization data for ${language} retrieved successfully`,
+    });
+  });
+
+  /**
+   * Get UI list data (nations, towns, villages)
+   * GET /api/v1/admin/planning-data/ui-list
+   */
+  static getUIListData = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const data = await PlanningDataService.getUIListData();
+
+    res.json({
+      success: true,
+      data,
+      message: 'UI list data retrieved successfully',
+    });
+  });
+
+  /**
    * Get planning data statistics
    * GET /api/v1/admin/planning-data/stats
    */

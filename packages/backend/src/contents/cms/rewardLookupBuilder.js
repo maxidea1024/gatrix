@@ -89,6 +89,13 @@ const REWARD_TYPE_TO_TABLE = {
   [REWARD_TYPE.SHIP_CAMOUFLAGE]: 'ShipCamouflage',
 };
 
+// DESC_FORMAT_TYPE enum (from displayNameUtil.ts)
+const DESC_FORMAT_TYPE = {
+  COUNT: 1,
+  CMS_NAME: 2,
+  ENUM_NAME: 3,
+};
+
 // Descriptions for reward types without tables
 // Based on rewardAndPaymentChangeSpec.ts processing logic
 const REWARD_TYPE_DESCRIPTIONS = {
@@ -150,32 +157,55 @@ function loadJson5File(filePath) {
 
 /**
  * Extract items from a CMS table
+ * @param {object} tableData - CMS table data
+ * @param {string} tableName - Table name
+ * @param {number} rewardType - REWARD_TYPE value (optional, for filtering)
  */
-function extractItemsFromTable(tableData, tableName) {
+function extractItemsFromTable(tableData, tableName, rewardType) {
   const items = [];
-  
+
   if (!tableData || !tableData[tableName]) {
     return items;
   }
-  
+
   const table = tableData[tableName];
-  
+
   for (const [key, item] of Object.entries(table)) {
     if (!item || !item.id || key.startsWith(':')) {
       continue;
     }
-    
+
+    // For Item table, filter by type based on REWARD_TYPE
+    if (tableName === 'Item') {
+      if (rewardType === REWARD_TYPE.QUEST_ITEM) {
+        // QUEST_ITEM: only include type 7 (quest items)
+        if (item.type !== 7) {
+          continue;
+        }
+      } else if (rewardType === REWARD_TYPE.ITEM) {
+        // ITEM: exclude type 7 (quest items are handled separately)
+        if (item.type === 7) {
+          continue;
+        }
+      }
+    }
+
     const name = item.name || `${tableName} ${item.id}`;
-    
+
+    // Include all item properties for formatting
     items.push({
       id: item.id,
       name: name,
+      descFormat: item.descFormat,
+      descFormatType: item.descFormatType,
+      // Keep reference to original item for any other fields that might be needed
+      _original: item,
     });
   }
-  
+
   // Sort by id
   items.sort((a, b) => a.id - b.id);
-  
+
   return items;
 }
 
@@ -187,6 +217,45 @@ function buildRewardLookupTable(cmsDir) {
 
   console.log('Building reward lookup table...');
   console.log(`CMS directory: ${cmsDir}\n`);
+
+  // First, load all CMS tables that might be referenced for item name formatting
+  console.log('Loading reference CMS tables for item name formatting...');
+  const allCmsTables = {};
+  const referenceTables = ['Ship', 'Mate', 'Character', 'ShipBlueprint', 'Item', 'InvestSeason'];
+
+  for (const tableName of referenceTables) {
+    const filePath = path.join(cmsDir, `${tableName}.json`);
+    let actualFilePath = filePath;
+    if (!fs.existsSync(filePath)) {
+      actualFilePath = path.join(cmsDir, `${tableName}.json5`);
+    }
+
+    if (fs.existsSync(actualFilePath)) {
+      console.log(`  Loading ${tableName}...`);
+      const tableData = loadJson5File(actualFilePath);
+      if (tableData) {
+        // Convert to flat object with ID as key
+        allCmsTables[tableName] = {};
+
+        // For Character and InvestSeason tables, we need to keep the full object
+        if (tableName === 'Character' || tableName === 'InvestSeason') {
+          const table = tableData[tableName];
+          for (const [key, entry] of Object.entries(table)) {
+            if (entry && entry.id && !key.startsWith(':')) {
+              allCmsTables[tableName][entry.id] = entry;
+            }
+          }
+        } else {
+          // For reference tables, don't filter by REWARD_TYPE
+          const entries = extractItemsFromTable(tableData, tableName, null);
+          for (const entry of entries) {
+            allCmsTables[tableName][entry.id] = entry._original || entry;
+          }
+        }
+      }
+    }
+  }
+  console.log('');
 
   // Process each REWARD_TYPE
   for (const [rewardType, rewardTypeName] of Object.entries(REWARD_TYPE_NAMES)) {
@@ -219,7 +288,63 @@ function buildRewardLookupTable(cmsDir) {
         const tableData = loadJson5File(actualFilePath);
 
         if (tableData) {
-          info.items = extractItemsFromTable(tableData, tableName);
+          // Pass rewardType to filter items appropriately
+          info.items = extractItemsFromTable(tableData, tableName, rewardTypeNum);
+
+          // Format item names if they have placeholders
+          for (const item of info.items) {
+            // Special handling for RewardSeasonItems
+            if (tableName === 'RewardSeasonItems' && item._original) {
+              const rewards = item._original.reward;
+              if (rewards && rewards.length > 0) {
+                // Use first season's reward info
+                const firstReward = rewards[0];
+                const seasonId = firstReward.SeasonId;
+                const itemId = firstReward.Id;
+
+                // Get season name and format it
+                const season = allCmsTables['InvestSeason']?.[seasonId];
+                let seasonName = season?.name || `Season ${seasonId}`;
+
+                // Format season name if it has placeholders
+                if (season && season.nameFormatTexts && season.nameFormatTexts.length > 0) {
+                  seasonName = stringFormat(seasonName, season.nameFormatTexts);
+                }
+
+                // Get item name and format it
+                const rewardItem = allCmsTables['Item']?.[itemId];
+                let itemName = rewardItem?.name || `Item ${itemId}`;
+
+                // Format item name if it has placeholders
+                if (rewardItem) {
+                  const formattedItemName = formatItemName(rewardItem, allCmsTables);
+                  if (formattedItemName !== rewardItem.name) {
+                    itemName = formattedItemName;
+                  }
+                }
+
+                // Format: "시즌 이름 - 아이템 이름 (외 N개)"
+                const otherCount = rewards.length - 1;
+                if (otherCount > 0) {
+                  item.name = `${seasonName} - ${itemName} (외 ${otherCount}개)`;
+                } else {
+                  item.name = `${seasonName} - ${itemName}`;
+                }
+              }
+            } else {
+              // Normal item name formatting
+              const formattedName = formatItemName(item, allCmsTables);
+              if (formattedName !== item.name) {
+                item.name = formattedName;
+              }
+            }
+
+            // Clean up temporary fields before output
+            delete item.descFormat;
+            delete item.descFormatType;
+            delete item._original;
+          }
+
           info.itemCount = info.items.length;
           console.log(`  Found ${info.itemCount} items`);
         }
@@ -440,6 +565,211 @@ const DESCRIPTION_TRANSLATIONS = {
 };
 
 /**
+ * String format function (from mutil.ts)
+ * Replaces {0}, {1}, etc. with values from args array
+ */
+function stringFormat(formatted, args) {
+  if (!formatted || !args) {
+    return formatted;
+  }
+  for (let i = 0; i < args.length; i++) {
+    formatted = formatted.replace('{' + i + '}', args[i]);
+  }
+  return formatted;
+}
+
+/**
+ * Make character display name from Character CMS
+ * Based on makeCharacterDisplayName() from displayNameUtil.ts
+ */
+function makeCharacterDisplayName(characterCms) {
+  if (!characterCms) {
+    return '[Invalid-Character]';
+  }
+
+  let firstName = characterCms.firstName || '';
+  let middleName = characterCms.middleName || '';
+  let familyName = characterCms.familyName || '';
+
+  // Remove @ prefix if exists
+  if (firstName.includes('@')) {
+    const arr = firstName.split('@');
+    firstName = arr[arr.length - 1];
+  }
+  if (middleName && middleName.includes('@')) {
+    const arr = middleName.split('@');
+    middleName = arr[arr.length - 1];
+  }
+  if (familyName && familyName.includes('@')) {
+    const arr = familyName.split('@');
+    familyName = arr[arr.length - 1];
+  }
+
+  let mateName = firstName;
+
+  if (middleName) {
+    mateName += ' ' + middleName;
+  }
+  if (familyName) {
+    mateName += ' ' + familyName;
+  }
+
+  return mateName;
+}
+
+/**
+ * Format item name by replacing placeholders with actual values
+ * Based on makeItemDisplayName() from displayNameUtil.ts
+ */
+function formatItemName(item, allCmsTables) {
+  // If no formatting info, return original name
+  if (!item.descFormat || !item.descFormatType) {
+    return item.name;
+  }
+
+  // Get display name from CMS table
+  const getDisplayName = (cmsName, target) => {
+    const refTable = allCmsTables[cmsName];
+    if (!refTable) {
+      return `[Unknown-Table:${cmsName}]`;
+    }
+
+    // Special handling for Mate table
+    if (cmsName === 'Mate') {
+      const mate = refTable[target];
+      if (!mate) {
+        return `[Unknown-Mate:${target}]`;
+      }
+      // Mate references Character table via characterId
+      const characterId = mate.characterId || mate._original?.characterId;
+      if (!characterId) {
+        return `[No-Character:${target}]`;
+      }
+      const character = allCmsTables['Character']?.[characterId];
+      return makeCharacterDisplayName(character);
+    }
+
+    // Default: just get name from table
+    const entry = refTable[target];
+    return entry?.name ?? `[Unknown-${cmsName}:${target}]`;
+  };
+
+  // Format each placeholder
+  const getDescFormatText = (fmt, target) => {
+    switch (fmt.Type) {
+      case DESC_FORMAT_TYPE.COUNT:
+        // Format as number with locale formatting
+        return target.toLocaleString();
+
+      case DESC_FORMAT_TYPE.CMS_NAME:
+        // Look up name from another CMS table
+        return getDisplayName(fmt.TypeName, target);
+
+      case DESC_FORMAT_TYPE.ENUM_NAME:
+        // Not implemented in original code
+        return '[Not-Implemented]';
+
+      default:
+        return `[Invalid-Format-Type:${fmt.Type}]`;
+    }
+  };
+
+  // Build array of formatted texts
+  const formattedTexts = item.descFormat.map((fmt, index) => {
+    const target = item.descFormatType[index]?.target;
+    if (typeof target !== 'number') {
+      return '[Invalid-Target]';
+    }
+    return getDescFormatText(fmt, target);
+  });
+
+  // Replace placeholders in item name
+  return stringFormat(item.name, formattedTexts);
+}
+
+/**
+ * Generate UI list data for Nation, Town, Village
+ * This data is used for dropdown/search lists in admin tool UI
+ */
+function generateUIListData(cmsDir) {
+  console.log('Loading CMS tables for UI list data...');
+
+  const uiListData = {
+    nations: [],
+    towns: [],
+    villages: []
+  };
+
+  // Helper function to load a CMS table
+  const loadTable = (tableName) => {
+    const filePath = path.join(cmsDir, `${tableName}.json`);
+    let actualFilePath = filePath;
+    if (!fs.existsSync(filePath)) {
+      actualFilePath = path.join(cmsDir, `${tableName}.json5`);
+    }
+
+    if (fs.existsSync(actualFilePath)) {
+      return loadJson5File(actualFilePath);
+    }
+    return null;
+  };
+
+  // Load Nation table
+  const nationTable = loadTable('Nation');
+  if (nationTable && nationTable.Nation) {
+    for (const [key, nation] of Object.entries(nationTable.Nation)) {
+      if (!nation || !nation.id || key.startsWith(':')) {
+        continue;
+      }
+
+      uiListData.nations.push({
+        id: nation.id,
+        name: nation.name || `Nation ${nation.id}`,
+      });
+    }
+    uiListData.nations.sort((a, b) => a.id - b.id);
+    console.log(`  ✅ Loaded ${uiListData.nations.length} nations`);
+  }
+
+  // Load Town table
+  const townTable = loadTable('Town');
+  if (townTable && townTable.Town) {
+    for (const [key, town] of Object.entries(townTable.Town)) {
+      if (!town || !town.id || key.startsWith(':')) {
+        continue;
+      }
+
+      uiListData.towns.push({
+        id: town.id,
+        name: town.name || `Town ${town.id}`,
+        nationId: town.nationId || 0,
+      });
+    }
+    uiListData.towns.sort((a, b) => a.id - b.id);
+    console.log(`  ✅ Loaded ${uiListData.towns.length} towns`);
+  }
+
+  // Load Village table
+  const villageTable = loadTable('Village');
+  if (villageTable && villageTable.Village) {
+    for (const [key, village] of Object.entries(villageTable.Village)) {
+      if (!village || !village.id || key.startsWith(':')) {
+        continue;
+      }
+
+      uiListData.villages.push({
+        id: village.id,
+        name: village.name || `Village ${village.id}`,
+      });
+    }
+    uiListData.villages.sort((a, b) => a.id - b.id);
+    console.log(`  ✅ Loaded ${uiListData.villages.length} villages`);
+  }
+
+  return uiListData;
+}
+
+/**
  * Generate localization files for kr, us, cn
  */
 function generateLocalizations(lookupTable) {
@@ -523,6 +853,15 @@ function main() {
   fs.writeFileSync(locCnFile, JSON.stringify(localizations.cn, null, 2), 'utf8');
   console.log('Chinese localization saved successfully!');
 
+  // Generate and save UI list data (Nation, Town, Village)
+  console.log('\n📋 Generating UI list data...');
+  const uiListData = generateUIListData(cmsDir);
+
+  const uiListFile = path.join(path.dirname(outputJson), 'ui-list-data.json');
+  console.log(`\nSaving UI list data to: ${uiListFile}`);
+  fs.writeFileSync(uiListFile, JSON.stringify(uiListData, null, 2), 'utf8');
+  console.log('UI list data saved successfully!');
+
   console.log('\n✅ All done!');
   console.log(`\nGenerated files:`);
   console.log(`  - ${outputJson} (full lookup table)`);
@@ -530,6 +869,7 @@ function main() {
   console.log(`  - ${locKrFile} (Korean localization)`);
   console.log(`  - ${locUsFile} (English localization)`);
   console.log(`  - ${locCnFile} (Chinese localization)`);
+  console.log(`  - ${uiListFile} (UI list data for Nation/Town/Village)`);
   console.log(`\nYou can now use these JSON files in your admin tool`);
 }
 

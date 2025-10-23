@@ -2945,10 +2945,19 @@
   "planningData": {
     "title": "Planning Data",
     "subtitle": "Manage game planning data",
-    "description": "After updating CMS files, click 'Reload Data' button to refresh the reward item selection UI.",
+    "description": "After updating CMS files, click 'Reload Data' button to refresh all admin tool data files.",
     "rebuildData": "Reload Data",
     "rebuildSuccess": "Planning data has been successfully reloaded",
     "rewardTypesList": "Reward Types List",
+    "generatedFiles": "Generated Files",
+    "generatedFilesStatus": "Generated Files Status",
+    "files": {
+      "rewardLookup": "Complete reward item data (~1.5MB)",
+      "rewardTypeList": "Reward type dropdown list (~7KB)",
+      "localization": "Multi-language localization (KR/EN/CN, ~3KB each)",
+      "uiListData": "UI list data for nations/towns/villages (~50KB)",
+      "loctab": "Korean→Chinese translation table"
+    },
     "stats": {
       "totalRewardTypes": "Total Reward Types",
       "withTable": "With Table",

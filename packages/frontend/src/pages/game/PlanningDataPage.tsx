@@ -101,8 +101,18 @@ const PlanningDataPage: React.FC = () => {
 
       {/* Info Alert */}
       <Alert severity="info" sx={{ mb: 3 }}>
-        <Typography variant="body2">
+        <Typography variant="body2" gutterBottom>
           {t('planningData.description')}
+        </Typography>
+        <Typography variant="caption" component="div" sx={{ mt: 1 }}>
+          <strong>{t('planningData.generatedFiles')}:</strong>
+        </Typography>
+        <Typography variant="caption" component="ul" sx={{ mt: 0.5, pl: 2 }}>
+          <li>reward-lookup.json - {t('planningData.files.rewardLookup')}</li>
+          <li>reward-type-list.json - {t('planningData.files.rewardTypeList')}</li>
+          <li>reward-localization-kr/us/cn.json - {t('planningData.files.localization')}</li>
+          <li>ui-list-data.json - {t('planningData.files.uiListData')}</li>
+          <li>loctab.json - {t('planningData.files.loctab')}</li>
         </Typography>
       </Alert>
 
@@ -113,6 +123,7 @@ const PlanningDataPage: React.FC = () => {
         </Box>
       ) : stats ? (
         <>
+          {/* Statistics Cards */}
           <Grid container spacing={3} sx={{ mb: 3 }}>
             <Grid item xs={12} sm={6} md={3}>
               <Card>
@@ -163,6 +174,79 @@ const PlanningDataPage: React.FC = () => {
               </Card>
             </Grid>
           </Grid>
+
+          {/* Generated Files Status */}
+          {stats.filesExist && (
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  {t('planningData.generatedFilesStatus')}
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {stats.filesExist.rewardLookup ? (
+                        <CheckCircleIcon color="success" fontSize="small" />
+                      ) : (
+                        <Typography variant="caption" color="error">✗</Typography>
+                      )}
+                      <Typography variant="body2">reward-lookup.json</Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {stats.filesExist.rewardTypeList ? (
+                        <CheckCircleIcon color="success" fontSize="small" />
+                      ) : (
+                        <Typography variant="caption" color="error">✗</Typography>
+                      )}
+                      <Typography variant="body2">reward-type-list.json</Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {stats.filesExist.localizationKr ? (
+                        <CheckCircleIcon color="success" fontSize="small" />
+                      ) : (
+                        <Typography variant="caption" color="error">✗</Typography>
+                      )}
+                      <Typography variant="body2">reward-localization-kr.json</Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {stats.filesExist.localizationUs ? (
+                        <CheckCircleIcon color="success" fontSize="small" />
+                      ) : (
+                        <Typography variant="caption" color="error">✗</Typography>
+                      )}
+                      <Typography variant="body2">reward-localization-us.json</Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {stats.filesExist.localizationCn ? (
+                        <CheckCircleIcon color="success" fontSize="small" />
+                      ) : (
+                        <Typography variant="caption" color="error">✗</Typography>
+                      )}
+                      <Typography variant="body2">reward-localization-cn.json</Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      {stats.filesExist.uiListData ? (
+                        <CheckCircleIcon color="success" fontSize="small" />
+                      ) : (
+                        <Typography variant="caption" color="error">✗</Typography>
+                      )}
+                      <Typography variant="body2">ui-list-data.json</Typography>
+                    </Box>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Reward Types Table */}
           <Card>

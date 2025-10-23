@@ -10,8 +10,12 @@
 - ✅ **완전 독립 실행**: 게임 코드 의존성 없음 (REWARD_TYPE 등 모두 자체 정의)
 - ✅ **CMS 파일 직접 읽기**: JSON/JSON5 파일을 직접 파싱
 - ✅ **JSON 출력**: 운영툴 API에서 사용할 수 있는 JSON 데이터 생성
-- ✅ **HTML 출력**: 브라우저에서 확인 가능한 시각화된 결과
-- ✅ **검색 기능**: 아이템 이름/ID로 검색 가능한 예제 UI 제공
+- ✅ **다국어 지원**: 한국어(kr), 영어(us), 중국어 간체(cn) 3개 언어
+- ✅ **아이템 이름 자동 포맷팅**: 플레이스홀더를 실제 이름으로 자동 변환
+  - 선박 도면: `{0} 도면` → `타렛테 도면`, `바르카 도면` 등
+  - 항해사 계약서: `{0} 계약서` → `조안 페레로 계약서`, `카탈리나 에란초 계약서` 등
+  - 시즌 보상 아이템: 시즌 이름과 보상 아이템 정보 자동 조합
+- ✅ **UI 목록 데이터 생성**: 국가, 마을, 촌락 검색/선택 UI용 데이터 자동 생성
 
 ## 📁 파일 구조
 
@@ -19,10 +23,17 @@
 server/node/tools/
 ├── rewardLookupBuilder.js          # 메인 빌더 스크립트
 ├── README.md                        # 이 파일
-├── ADMIN_TOOL_INTEGRATION_GUIDE.md # 운영툴 통합 가이드
-├── example-admin-ui.html           # 실제 사용 가능한 UI 예제
-├── reward-lookup.json              # 생성된 JSON 데이터 (빌더 실행 후)
-└── reward-lookup.html              # 생성된 HTML 결과 (빌더 실행 후)
+├── ADMIN_TOOL_USAGE.md             # 운영툴 사용 가이드
+├── HOW_IT_WORKS.md                 # 동작 원리 설명
+├── REWARD_TYPE_REFERENCE.md        # REWARD_TYPE 참조 문서
+│
+└── 생성된 파일들 (빌더 실행 후):
+    ├── reward-lookup.json           # 전체 아이템 데이터
+    ├── reward-type-list.json        # REWARD_TYPE 드롭다운용
+    ├── reward-localization-kr.json  # 한국어 로컬라이징
+    ├── reward-localization-us.json  # 영어 로컬라이징
+    ├── reward-localization-cn.json  # 중국어 로컬라이징
+    └── ui-list-data.json            # 국가/마을/촌락 목록 데이터
 ```
 
 ## 🚀 빠른 시작
@@ -36,12 +47,18 @@ node rewardLookupBuilder.js
 
 ### 2. 생성된 파일 확인
 
-- `reward-lookup.json`: 운영툴에서 사용할 JSON 데이터
-- `reward-lookup.html`: 브라우저에서 확인할 수 있는 HTML 파일
+6개의 JSON 파일이 생성됩니다:
 
-### 3. 예제 UI 확인
+- `reward-lookup.json`: 전체 아이템 데이터 (~1.7MB)
+- `reward-type-list.json`: REWARD_TYPE 드롭다운용 (~10KB)
+- `reward-localization-kr.json`: 한국어 로컬라이징 (~2KB)
+- `reward-localization-us.json`: 영어 로컬라이징 (~2KB)
+- `reward-localization-cn.json`: 중국어 간체 로컬라이징 (~2KB)
+- `ui-list-data.json`: 국가/마을/촌락 목록 데이터 (~50KB)
 
-`example-admin-ui.html` 파일을 브라우저에서 열어서 실제 동작을 확인하세요.
+### 3. 운영툴 통합
+
+`ADMIN_TOOL_USAGE.md` 파일을 참고하여 운영툴에 통합하세요.
 
 ## 📊 생성되는 데이터 구조
 

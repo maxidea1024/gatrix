@@ -2989,10 +2989,19 @@
   "planningData": {
     "title": "策划数据",
     "subtitle": "管理游戏策划数据",
-    "description": "更新CMS文件后，点击'重新加载数据'按钮以刷新奖励物品选择界面。",
+    "description": "更新CMS文件后，点击'重新加载数据'按钮以刷新运营工具使用的所有数据文件。",
     "rebuildData": "重新加载数据",
     "rebuildSuccess": "策划数据已成功重新加载",
     "rewardTypesList": "奖励类型列表",
+    "generatedFiles": "生成的文件",
+    "generatedFilesStatus": "生成的文件状态",
+    "files": {
+      "rewardLookup": "完整奖励物品数据 (~1.5MB)",
+      "rewardTypeList": "奖励类型下拉列表 (~7KB)",
+      "localization": "多语言本地化 (韩/英/中，各~3KB)",
+      "uiListData": "国家/城镇/村庄等UI列表数据 (~50KB)",
+      "loctab": "韩文→中文翻译表"
+    },
     "stats": {
       "totalRewardTypes": "总奖励类型",
       "withTable": "有表",
