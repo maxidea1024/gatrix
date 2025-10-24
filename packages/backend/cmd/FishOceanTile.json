@@ -2,6 +2,8 @@
   ":FishOceanTile": {
     ":type": {
       "id": "key",
+      "name": "string",
+      "lvForTool": "number",
       "costItemId": "number",
       "costItemAmount": "number",
       "correctRatio": "number",
@@ -38,6 +40,8 @@
   "FishOceanTile": {
     "72000000": {
       "id": 72000000,
+      "name": "추크치해",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -56,6 +60,8 @@
     },
     "72000001": {
       "id": 72000001,
+      "name": "보버트해",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -74,6 +80,8 @@
     },
     "72000004": {
       "id": 72000004,
+      "name": "알레스카만",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -92,6 +100,8 @@
     },
     "72000005": {
       "id": 72000005,
+      "name": "북 태평양",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -110,6 +120,8 @@
     },
     "72000006": {
       "id": 72000006,
+      "name": "북동 태평양",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -128,6 +140,8 @@
     },
     "72000007": {
       "id": 72000007,
+      "name": "북미 서해안",
+      "lvForTool": 11,
       "costItemId": 23600003,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -146,6 +160,8 @@
     },
     "72000008": {
       "id": 72000008,
+      "name": "샌프란시스코 앞바다",
+      "lvForTool": 11,
       "costItemId": 23600003,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -164,6 +180,8 @@
     },
     "72000009": {
       "id": 72000009,
+      "name": "하와이 앞바다",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -182,6 +200,8 @@
     },
     "72000010": {
       "id": 72000010,
+      "name": "캘리포니아만",
+      "lvForTool": 11,
       "costItemId": 23600003,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -200,6 +220,8 @@
     },
     "72000011": {
       "id": 72000011,
+      "name": "중앙 태평양 서쪽",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -218,6 +240,8 @@
     },
     "72000012": {
       "id": 72000012,
+      "name": "중앙 태평양",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -236,6 +260,8 @@
     },
     "72000013": {
       "id": 72000013,
+      "name": "중앙 태평양 동쪽",
+      "lvForTool": 11,
       "costItemId": 23600003,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -254,6 +280,8 @@
     },
     "72000014": {
       "id": 72000014,
+      "name": "남 태평양 북쪽",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -272,6 +300,8 @@
     },
     "72000015": {
       "id": 72000015,
+      "name": "남 태평양 서쪽",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -290,6 +320,8 @@
     },
     "72000016": {
       "id": 72000016,
+      "name": "남 태평양 남쪽",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -308,6 +340,8 @@
     },
     "72000017": {
       "id": 72000017,
+      "name": "남 태평양 동쪽",
+      "lvForTool": 11,
       "costItemId": 23600003,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -326,6 +360,8 @@
     },
     "72000018": {
       "id": 72000018,
+      "name": "중앙 아메리카",
+      "lvForTool": 9,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -344,6 +380,8 @@
     },
     "72000019": {
       "id": 72000019,
+      "name": "남 아메리카 서해안",
+      "lvForTool": 9,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -362,6 +400,8 @@
     },
     "72000020": {
       "id": 72000020,
+      "name": "남 아메리카 서해안 남쪽",
+      "lvForTool": 8,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -380,6 +420,8 @@
     },
     "72000021": {
       "id": 72000021,
+      "name": "드레이크 해협",
+      "lvForTool": 8,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -398,6 +440,8 @@
     },
     "72000022": {
       "id": 72000022,
+      "name": "남아메리카 강",
+      "lvForTool": 8,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -416,6 +460,8 @@
     },
     "72000023": {
       "id": 72000023,
+      "name": "남서 대서양",
+      "lvForTool": 7,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -434,6 +480,8 @@
     },
     "72000024": {
       "id": 72000024,
+      "name": "남 대서양",
+      "lvForTool": 7,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -452,6 +500,8 @@
     },
     "72000025": {
       "id": 72000025,
+      "name": "스코샤해",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -470,6 +520,8 @@
     },
     "72000026": {
       "id": 72000026,
+      "name": "중앙 대서양",
+      "lvForTool": 6,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -488,6 +540,8 @@
     },
     "72000027": {
       "id": 72000027,
+      "name": "아마존강 유역",
+      "lvForTool": 6,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -506,6 +560,8 @@
     },
     "72000028": {
       "id": 72000028,
+      "name": "카리브해",
+      "lvForTool": 6,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -524,6 +580,8 @@
     },
     "72000029": {
       "id": 72000029,
+      "name": "북아메리카 강",
+      "lvForTool": 6,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -542,6 +600,8 @@
     },
     "72000030": {
       "id": 72000030,
+      "name": "버뮤다 제도",
+      "lvForTool": 6,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -560,6 +620,8 @@
     },
     "72000031": {
       "id": 72000031,
+      "name": "서 대서양",
+      "lvForTool": 4,
       "costItemId": 23600000,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -578,6 +640,8 @@
     },
     "72000033": {
       "id": 72000033,
+      "name": "테라노바 앞바다",
+      "lvForTool": 6,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -596,6 +660,8 @@
     },
     "72000034": {
       "id": 72000034,
+      "name": "북 대서양",
+      "lvForTool": 6,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -614,6 +680,8 @@
     },
     "72000035": {
       "id": 72000035,
+      "name": "레브라도해",
+      "lvForTool": 8,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -632,6 +700,8 @@
     },
     "72000039": {
       "id": 72000039,
+      "name": "허드슨만",
+      "lvForTool": 8,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -650,6 +720,8 @@
     },
     "72000040": {
       "id": 72000040,
+      "name": "북극제도 앞바다",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -668,6 +740,8 @@
     },
     "72000041": {
       "id": 72000041,
+      "name": "북 대서양 북쪽",
+      "lvForTool": 4,
       "costItemId": 23600000,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -686,6 +760,8 @@
     },
     "72000042": {
       "id": 72000042,
+      "name": "그린란드해",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -704,6 +780,8 @@
     },
     "72000043": {
       "id": 72000043,
+      "name": "노르웨이해",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -722,6 +800,8 @@
     },
     "72000044": {
       "id": 72000044,
+      "name": "발트해",
+      "lvForTool": 1,
       "costItemId": 23600000,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -740,6 +820,8 @@
     },
     "72000046": {
       "id": 72000046,
+      "name": "북해",
+      "lvForTool": 1,
       "costItemId": 23600000,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -758,6 +840,8 @@
     },
     "72000047": {
       "id": 72000047,
+      "name": "북동 대서양",
+      "lvForTool": 1,
       "costItemId": 23600000,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -776,6 +860,8 @@
     },
     "72000048": {
       "id": 72000048,
+      "name": "동 대서양",
+      "lvForTool": 1,
       "costItemId": 23600000,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -794,6 +880,8 @@
     },
     "72000049": {
       "id": 72000049,
+      "name": "리스본 앞바다",
+      "lvForTool": 4,
       "costItemId": 23600000,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -812,6 +900,8 @@
     },
     "72000052": {
       "id": 72000052,
+      "name": "서 지중해",
+      "lvForTool": 1,
       "costItemId": 23600000,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -830,6 +920,8 @@
     },
     "72000053": {
       "id": 72000053,
+      "name": "아오니아해",
+      "lvForTool": 1,
       "costItemId": 23600000,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -848,6 +940,8 @@
     },
     "72000054": {
       "id": 72000054,
+      "name": "동 지중해",
+      "lvForTool": 1,
       "costItemId": 23600000,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -866,6 +960,8 @@
     },
     "72000055": {
       "id": 72000055,
+      "name": "흑해",
+      "lvForTool": 1,
       "costItemId": 23600000,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -884,6 +980,8 @@
     },
     "72000056": {
       "id": 72000056,
+      "name": "곡물 해안",
+      "lvForTool": 5,
       "costItemId": 23600000,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -902,6 +1000,8 @@
     },
     "72000057": {
       "id": 72000057,
+      "name": "황금 해안",
+      "lvForTool": 5,
       "costItemId": 23600000,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -920,6 +1020,8 @@
     },
     "72000058": {
       "id": 72000058,
+      "name": "나미비아 앞바다",
+      "lvForTool": 6,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -938,6 +1040,8 @@
     },
     "72000060": {
       "id": 72000060,
+      "name": "희망봉 앞바다",
+      "lvForTool": 6,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -956,6 +1060,8 @@
     },
     "72000061": {
       "id": 72000061,
+      "name": "케이프 해저분지",
+      "lvForTool": 6,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -974,6 +1080,8 @@
     },
     "72000062": {
       "id": 72000062,
+      "name": "모잠비크 해협",
+      "lvForTool": 7,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -992,6 +1100,8 @@
     },
     "72000063": {
       "id": 72000063,
+      "name": "아굴라스 해저분지",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1010,6 +1120,8 @@
     },
     "72000064": {
       "id": 72000064,
+      "name": "남서 인도양",
+      "lvForTool": 7,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1028,6 +1140,8 @@
     },
     "72000065": {
       "id": 72000065,
+      "name": "남 인도양",
+      "lvForTool": 8,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1046,6 +1160,8 @@
     },
     "72000066": {
       "id": 72000066,
+      "name": "서 인도양",
+      "lvForTool": 7,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1064,6 +1180,8 @@
     },
     "72000067": {
       "id": 72000067,
+      "name": "아프리카 강",
+      "lvForTool": 6,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1082,6 +1200,8 @@
     },
     "72000068": {
       "id": 72000068,
+      "name": "잔지바르 앞바다",
+      "lvForTool": 7,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1100,6 +1220,8 @@
     },
     "72000069": {
       "id": 72000069,
+      "name": "나일강",
+      "lvForTool": 6,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1118,6 +1240,8 @@
     },
     "72000070": {
       "id": 72000070,
+      "name": "아라비아해",
+      "lvForTool": 7,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1136,6 +1260,8 @@
     },
     "72000071": {
       "id": 72000071,
+      "name": "페르시아만",
+      "lvForTool": 7,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1154,6 +1280,8 @@
     },
     "72000073": {
       "id": 72000073,
+      "name": "인도 남쪽",
+      "lvForTool": 8,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1172,6 +1300,8 @@
     },
     "72000075": {
       "id": 72000075,
+      "name": "안다만해",
+      "lvForTool": 8,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1190,6 +1320,8 @@
     },
     "72000076": {
       "id": 72000076,
+      "name": "중앙 인도양",
+      "lvForTool": 8,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1208,6 +1340,8 @@
     },
     "72000077": {
       "id": 72000077,
+      "name": "동 인도양",
+      "lvForTool": 9,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1226,6 +1360,8 @@
     },
     "72000078": {
       "id": 72000078,
+      "name": "남동 인도양",
+      "lvForTool": 9,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1244,6 +1380,8 @@
     },
     "72000079": {
       "id": 72000079,
+      "name": "퍼스 해저분지",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1262,6 +1400,8 @@
     },
     "72000080": {
       "id": 72000080,
+      "name": "호주 남부",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1280,6 +1420,8 @@
     },
     "72000081": {
       "id": 72000081,
+      "name": "호주 서부",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1298,6 +1440,8 @@
     },
     "72000084": {
       "id": 72000084,
+      "name": "자바해",
+      "lvForTool": 9,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1316,6 +1460,8 @@
     },
     "72000085": {
       "id": 72000085,
+      "name": "반다해",
+      "lvForTool": 9,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1334,6 +1480,8 @@
     },
     "72000086": {
       "id": 72000086,
+      "name": "셀레베스해",
+      "lvForTool": 9,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1352,6 +1500,8 @@
     },
     "72000087": {
       "id": 72000087,
+      "name": "남중국해",
+      "lvForTool": 9,
       "costItemId": 23600002,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1370,6 +1520,8 @@
     },
     "72000088": {
       "id": 72000088,
+      "name": "중국 내륙 강",
+      "lvForTool": 10,
       "costItemId": 23600003,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1388,6 +1540,8 @@
     },
     "72000089": {
       "id": 72000089,
+      "name": "동중국해",
+      "lvForTool": 10,
       "costItemId": 23600003,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1406,6 +1560,8 @@
     },
     "72000090": {
       "id": 72000090,
+      "name": "황해",
+      "lvForTool": 10,
       "costItemId": 23600003,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1424,6 +1580,8 @@
     },
     "72000092": {
       "id": 72000092,
+      "name": "동해",
+      "lvForTool": 10,
       "costItemId": 23600003,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1442,6 +1600,8 @@
     },
     "72000093": {
       "id": 72000093,
+      "name": "동아시아 동부",
+      "lvForTool": 10,
       "costItemId": 23600003,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1460,6 +1620,8 @@
     },
     "72000094": {
       "id": 72000094,
+      "name": "서 캐롤린 해저",
+      "lvForTool": 10,
       "costItemId": 23600003,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1478,6 +1640,8 @@
     },
     "72000095": {
       "id": 72000095,
+      "name": "오호츠크해",
+      "lvForTool": 10,
       "costItemId": 23600003,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1496,6 +1660,8 @@
     },
     "72000096": {
       "id": 72000096,
+      "name": "북서 태평양",
+      "lvForTool": 10,
       "costItemId": 23600003,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1514,6 +1680,8 @@
     },
     "72000097": {
       "id": 72000097,
+      "name": "멜라네시아",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1532,6 +1700,8 @@
     },
     "72000098": {
       "id": 72000098,
+      "name": "동 캐롤린 해저",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1550,6 +1720,8 @@
     },
     "72000099": {
       "id": 72000099,
+      "name": "서 태평양",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1568,6 +1740,8 @@
     },
     "72000100": {
       "id": 72000100,
+      "name": "아라푸라해",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1586,6 +1760,8 @@
     },
     "72000101": {
       "id": 72000101,
+      "name": "산호해",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1604,6 +1780,8 @@
     },
     "72000102": {
       "id": 72000102,
+      "name": "태즈먼해",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1622,6 +1800,8 @@
     },
     "72000103": {
       "id": 72000103,
+      "name": "사모아섬",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1640,6 +1820,8 @@
     },
     "72000104": {
       "id": 72000104,
+      "name": "서 베링해",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1658,6 +1840,8 @@
     },
     "72000105": {
       "id": 72000105,
+      "name": "동 시베리아해",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1676,6 +1860,8 @@
     },
     "72000108": {
       "id": 72000108,
+      "name": "바렌츠해",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1694,6 +1880,8 @@
     },
     "72000109": {
       "id": 72000109,
+      "name": "러시아 강",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1712,6 +1900,8 @@
     },
     "72000110": {
       "id": 72000110,
+      "name": "남극",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1730,6 +1920,8 @@
     },
     "72060001": {
       "id": 72060001,
+      "name": "실러캔스",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1748,6 +1940,8 @@
     },
     "72060002": {
       "id": 72060002,
+      "name": "녹새치",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1766,6 +1960,8 @@
     },
     "72060003": {
       "id": 72060003,
+      "name": "대왕 오징어",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1784,6 +1980,8 @@
     },
     "72060004": {
       "id": 72060004,
+      "name": "백상아리",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1802,6 +2000,8 @@
     },
     "72060005": {
       "id": 72060005,
+      "name": "청상아리",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1820,6 +2020,8 @@
     },
     "72060006": {
       "id": 72060006,
+      "name": "향유고래",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1838,6 +2040,8 @@
     },
     "72060007": {
       "id": 72060007,
+      "name": "남극대구",
+      "lvForTool": 7,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1856,6 +2060,8 @@
     },
     "72060008": {
       "id": 72060008,
+      "name": "남극하트지느러미오징어",
+      "lvForTool": 7,
       "costItemId": 23600001,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1874,6 +2080,8 @@
     },
     "72060009": {
       "id": 72060009,
+      "name": "잠꾸러기상어",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1892,6 +2100,8 @@
     },
     "72060010": {
       "id": 72060010,
+      "name": "피라이바",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1910,6 +2120,8 @@
     },
     "72090001": {
       "id": 72090001,
+      "name": "호주_110",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1928,6 +2140,8 @@
     },
     "72090002": {
       "id": 72090002,
+      "name": "일본_120",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1946,6 +2160,8 @@
     },
     "72090003": {
       "id": 72090003,
+      "name": "중남미_120",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1964,6 +2180,8 @@
     },
     "72090004": {
       "id": 72090004,
+      "name": "버뮤다_강적",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -1982,6 +2200,8 @@
     },
     "72090005": {
       "id": 72090005,
+      "name": "체르스키 부근",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -2000,6 +2220,8 @@
     },
     "72090006": {
       "id": 72090006,
+      "name": "배로우 부근",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -2018,6 +2240,8 @@
     },
     "72090007": {
       "id": 72090007,
+      "name": "통가 부근",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,
@@ -2036,6 +2260,8 @@
     },
     "72090008": {
       "id": 72090008,
+      "name": "몰디브 부근",
+      "lvForTool": 12,
       "costItemId": 23600004,
       "costItemAmount": 1,
       "correctRatio": 0,

@@ -3,7 +3,9 @@
     ":type": {
       "id": "key",
       "loadingType": "number",
-      "disguiseType": "number"
+      "disguiseType": "number",
+      "loadingImage": "string",
+      "guideText": "text"
     },
     ":required": {
       "loadingType": 1
@@ -11,462 +13,676 @@
     ":min": {},
     ":max": {},
     ":enum": {},
-    ":asset": {},
+    ":asset": {
+      "loadingImage": 1
+    },
     ":links": {}
   },
   "LoadingPage": {
     "501": {
       "id": 501,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_10_Sprite",
+      "guideText": "항해 도중 게임을 종료하더라도 목적지까지 자동으로 항해할 수 있습니다."
     },
     "502": {
       "id": 502,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_03_Sprite",
+      "guideText": "함대의 선박이 침몰하면 항해 속도가 줄어듭니다."
     },
     "503": {
       "id": 503,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_14_Sprite",
+      "guideText": "조선소에서 선박을 개조하면 선박 기본 능력 중 3개의 수치가 상승합니다."
     },
     "504": {
       "id": 504,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_07_Sprite",
+      "guideText": "작위가 오르면 많은 혜택을 받을 수 있습니다."
     },
     "505": {
       "id": 505,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Prologue_01_Sprite",
+      "guideText": "행위에 따라 명성이 감소할 수도 있습니다."
     },
     "506": {
       "id": 506,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_05_Sprite",
+      "guideText": "태업 중인 항해사는 선박에 탑승시킬 수 없습니다."
     },
     "507": {
       "id": 507,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_04_Sprite",
+      "guideText": "선실의 상성과 맞는 항해사를 배치해야 전문 지식이 100%로 발휘됩니다."
     },
     "508": {
       "id": 508,
       "loadingType": 1,
-      "disguiseType": 1
+      "disguiseType": 1,
+      "loadingImage": "Illustration_Loading_Port_02_Sprite",
+      "guideText": "전투 중 다친 동료가 있나요? 여관에서 바로 치료할 수 있습니다."
     },
     "509": {
       "id": 509,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_06_Sprite",
+      "guideText": "충성도가 낮은 항해사는 태업에 들어갈 수 있습니다."
     },
     "510": {
       "id": 510,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_06_Sprite",
+      "guideText": "선박의 전문 지식 LV은 선박에 탑승한 항해사들의 전문 지식의 합으로 결정됩니다."
     },
     "511": {
       "id": 511,
       "loadingType": 1,
-      "disguiseType": 1
+      "disguiseType": 1,
+      "loadingImage": "Illustration_Loading_Port_03_Sprite",
+      "guideText": "여관에 들러 어떤 항해사가 왔는지 확인해 보세요."
     },
     "512": {
       "id": 512,
       "loadingType": 1,
-      "disguiseType": 2
+      "disguiseType": 2,
+      "loadingImage": "Illustration_Loading_Port_04_Sprite",
+      "guideText": "조선소와 출항소에서는 재화를 사용하여 선박을 수리할 수 있습니다."
     },
     "513": {
       "id": 513,
       "loadingType": 1,
-      "disguiseType": 2
+      "disguiseType": 2,
+      "loadingImage": "Illustration_Loading_Port_05_Sprite",
+      "guideText": "공관에서 투자 보상을 획득하려면 최소 투자 점수를 획득해야 합니다."
     },
     "514": {
       "id": 514,
       "loadingType": 1,
-      "disguiseType": 3
+      "disguiseType": 3,
+      "loadingImage": "Illustration_Loading_Port_06_Sprite",
+      "guideText": "바람이 강하게 부는 날은 항해 속도가 빨라집니다."
     },
     "515": {
       "id": 515,
       "loadingType": 1,
-      "disguiseType": 4
+      "disguiseType": 4,
+      "loadingImage": "Illustration_Loading_Port_08_Sprite",
+      "guideText": "공관에서 항구에 투자하면 여러 혜택을 받을 수 있습니다."
     },
     "516": {
       "id": 516,
       "loadingType": 1,
-      "disguiseType": 4
+      "disguiseType": 4,
+      "loadingImage": "Illustration_Loading_Port_09_Sprite",
+      "guideText": "일반 비용으로 모집할 수 있는 선원 수를 넘어서면 긴급 모집 비용이 추가됩니다."
     },
     "517": {
       "id": 517,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Common_05_Sprite",
+      "guideText": "선단명은 선단 관리에서 변경할 수 있습니다."
     },
     "518": {
       "id": 518,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_11_Sprite",
+      "guideText": "선박 관리에서 선박의 이름을 변경해 보세요."
     },
     "519": {
       "id": 519,
       "loadingType": 1,
-      "disguiseType": 5
+      "disguiseType": 5,
+      "loadingImage": "Illustration_Loading_Port_07_Sprite",
+      "guideText": "여관에서는 항해사의 충성도를 보다 저렴한 비용으로 회복할 수 있습니다."
     },
     "520": {
       "id": 520,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_09_Sprite",
+      "guideText": "기함의 선장실에는 제독만 탑승할 수 있습니다."
     },
     "521": {
       "id": 521,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_14_Sprite",
+      "guideText": "제독에 따라 사용할 수 있는 명령이 다릅니다. 제독 정보 > 기술에서 확인해 보세요."
     },
     "522": {
       "id": 522,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_06_Sprite",
+      "guideText": "장거리 항해엔 넉넉한 식량과 물은 필수입니다."
     },
     "523": {
       "id": 523,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Sail_01_Sprite",
+      "guideText": "가로돛 능력치가 높은 선박은 순풍일 때 효과적입니다."
     },
     "524": {
       "id": 524,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_17_Sprite",
+      "guideText": "세로돛 능력치가 높은 선박은 역풍일 때 효과적입니다."
     },
     "525": {
       "id": 525,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Common_06_Sprite",
+      "guideText": "자동 항해보다 수동 조작이 더 빠를 때도 있습니다."
     },
     "526": {
       "id": 526,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Common_06_Sprite",
+      "guideText": "항해 중에는 선박이나 항해사를 교체할 수 없습니다."
     },
     "527": {
       "id": 527,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_01_Sprite",
+      "guideText": "항해 중 내구도가 감소한 선박은 자재를 사용하여 긴급 수리할 수 있습니다."
     },
     "528": {
       "id": 528,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_07_Sprite",
+      "guideText": "항해 중 침몰한 선박은 인양 공구를 사용하여 긴급 복구할 수 있습니다."
     },
     "529": {
       "id": 529,
       "loadingType": 1,
-      "disguiseType": 6
+      "disguiseType": 6,
+      "loadingImage": "Illustration_Loading_Port_12_Sprite",
+      "guideText": "항구에 가장 많이 투자한 선단장은 시장으로 임명됩니다."
     },
     "530": {
       "id": 530,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_17_Sprite",
+      "guideText": "상점에서 회고록을 구매하면 연대기 완료 시 추가 보상을 획득합니다."
     },
     "531": {
       "id": 531,
-      "loadingType": 3
+      "loadingType": 3,
+      "loadingImage": "Illustration_Loading_Battle_01_Sprite",
+      "guideText": "포격 시 대포의 발사각에 따라, 장애물을 넘지 못할 수도 있습니다."
     },
     "533": {
       "id": 533,
-      "loadingType": 3
+      "loadingType": 3,
+      "loadingImage": "Illustration_Loading_Battle_01_Sprite",
+      "guideText": "전장 외곽 영역으로 이동하면 피해 없이 전투를 벗어날 수 있습니다."
     },
     "534": {
       "id": 534,
-      "loadingType": 3
+      "loadingType": 3,
+      "loadingImage": "Illustration_Loading_Prologue_02_Sprite",
+      "guideText": "전투에서는 매 턴이 지날 때마다 물과 식량을 소비합니다."
     },
     "535": {
       "id": 535,
-      "loadingType": 3
+      "loadingType": 3,
+      "loadingImage": "Illustration_Loading_Battle_02_Sprite",
+      "guideText": "상대보다 기동력이 높으면 먼저 행동할 수 있습니다."
     },
     "536": {
       "id": 536,
       "loadingType": 1,
-      "disguiseType": 7
+      "disguiseType": 7,
+      "loadingImage": "Illustration_Loading_Port_13_Sprite",
+      "guideText": "교역소에서 교역품을 사고팔 수 있습니다."
     },
     "537": {
       "id": 537,
       "loadingType": 1,
-      "disguiseType": 8
+      "disguiseType": 8,
+      "loadingImage": "Illustration_Loading_Port_14_Sprite",
+      "guideText": "교역품은 시세에 따라서 가격이 변동됩니다."
     },
     "538": {
       "id": 538,
       "loadingType": 1,
-      "disguiseType": 8
+      "disguiseType": 8,
+      "loadingImage": "Illustration_Loading_Port_15_Sprite",
+      "guideText": "자국에 속한 항구는 관세 혜택을 받을 수 있습니다."
     },
     "539": {
       "id": 539,
       "loadingType": 1,
-      "disguiseType": 9
+      "disguiseType": 9,
+      "loadingImage": "Illustration_Loading_Port_16_Sprite",
+      "guideText": "싸게 사서 비싸게 파는 것이 교역의 기본입니다."
     },
     "540": {
       "id": 540,
       "loadingType": 1,
-      "disguiseType": 9
+      "disguiseType": 9,
+      "loadingImage": "Illustration_Loading_Port_17_Sprite",
+      "guideText": "가격이 폭락한 상품이 있다고요? 싼값에 사들일 기회입니다."
     },
     "541": {
       "id": 541,
       "loadingType": 1,
-      "disguiseType": 10
+      "disguiseType": 10,
+      "loadingImage": "Illustration_Loading_Port_20_Sprite",
+      "guideText": "가격이 폭등한 상품이 있다고요? 지금이 바로 팔아야 할 때입니다."
     },
     "542": {
       "id": 542,
       "loadingType": 1,
-      "disguiseType": 11
+      "disguiseType": 11,
+      "loadingImage": "Illustration_Loading_Port_21_Sprite",
+      "guideText": "명산품을 거래하면 교역 명성을 얻을 수 있습니다."
     },
     "543": {
       "id": 543,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_07_Sprite",
+      "guideText": "해전 보호는 항구에서만 활성화할 수 있습니다."
     },
     "544": {
       "id": 544,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Sail_01_Sprite",
+      "guideText": "해전 보호 상태에서는 적에게 공격을 받을 때마다 보호 횟수가 1씩 감소합니다."
     },
     "545": {
       "id": 545,
       "loadingType": 1,
-      "disguiseType": 1
+      "disguiseType": 1,
+      "loadingImage": "Illustration_Loading_Port_02_Sprite",
+      "guideText": "마을이나 항구에 상륙하면 재해가 해소됩니다."
     },
     "546": {
       "id": 546,
       "loadingType": 1,
-      "disguiseType": 1
+      "disguiseType": 1,
+      "loadingImage": "Illustration_Loading_Port_03_Sprite",
+      "guideText": "어떤 도구점에서는 밤에 암시장을 열어 특별한 상품을 판매합니다."
     },
     "547": {
       "id": 547,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_17_Sprite",
+      "guideText": "선단 관리에서 우리 선단의 돛과 선체를 꾸며 보세요."
     },
     "548": {
       "id": 548,
       "loadingType": 1,
-      "disguiseType": 2
+      "disguiseType": 2,
+      "loadingImage": "Illustration_Loading_Port_04_Sprite",
+      "guideText": "여관의 항해사와 친밀도를 쌓아보세요. 고용 후 높은 충성도로 보답할 것입니다."
     },
     "549": {
       "id": 549,
       "loadingType": 1,
-      "disguiseType": 2
+      "disguiseType": 2,
+      "loadingImage": "Illustration_Loading_Port_05_Sprite",
+      "guideText": "어떤 여관에서는 종업원을 만나볼 수 있습니다."
     },
     "550": {
       "id": 550,
       "loadingType": 1,
-      "disguiseType": 3
+      "disguiseType": 3,
+      "loadingImage": "Illustration_Loading_Port_06_Sprite",
+      "guideText": "왕궁에 들러 면세증을 발급받고 관세를 감면받으세요."
     },
     "551": {
       "id": 551,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Common_06_Sprite",
+      "guideText": "자재가 없으면 항해 중 선박이 파손되어도 수리할 수 없습니다."
     },
     "552": {
       "id": 552,
-      "loadingType": 3
+      "loadingType": 3,
+      "loadingImage": "Illustration_Loading_Prologue_02_Sprite",
+      "guideText": "포탄이 없으면 해상전에서 포격 공격을 사용할 수 없습니다."
     },
     "553": {
       "id": 553,
-      "loadingType": 5
+      "loadingType": 5,
+      "loadingImage": "Illustration_Loading_Prologue_01_Sprite",
+      "guideText": "동서양을 잇는 육로, 비단길을 장악한 오스만과 유럽 열강의 마찰은\n신항로 개척에 대한 열망을 불러일으켰고, 이에 수많은 탐험가는\n수평선 너머 미지의 세계로 항해를 나섰다.\n\n포르투갈로 귀향 중인 페레로 선단 역시, 일확천금을 노리고\n인도 무역 사업에 도전한 많은 상회 중 하나였다."
     },
     "554": {
       "id": 554,
-      "loadingType": 6
+      "loadingType": 6,
+      "loadingImage": "Illustration_Loading_Prologue_02_Sprite",
+      "guideText": "전투에서는 매 턴이 지날 때마다 물과 식량을 소비합니다."
     },
     "555": {
       "id": 555,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Common_05_Sprite",
+      "guideText": "새로운 선박을 획득했나요? 함대 편성에서 배치해 보세요."
     },
     "556": {
       "id": 556,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_10_Sprite",
+      "guideText": "부관실에 항해사를 배치하면, 적의 전투력을 보다 정확하게 예측할 수 있습니다."
     },
     "557": {
       "id": 557,
       "loadingType": 1,
-      "disguiseType": 4
+      "disguiseType": 4,
+      "loadingImage": "Illustration_Loading_Port_08_Sprite",
+      "guideText": "항해사의 친밀도는 고용 협상에 실패한 경우에도 소폭 증가합니다."
     },
     "561": {
       "id": 561,
-      "loadingType": 4
+      "loadingType": 4,
+      "loadingImage": "Illustration_Loading_Port_01_Sprite",
+      "guideText": "보험에 가입해 두세요. 항해 불능 상태에 빠졌을 때 재산 피해를 줄일 수 있습니다."
     },
     "562": {
       "id": 562,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_10_Sprite",
+      "guideText": "선박을 함대에 배치할 때는 반드시 1명의 동료가 선장을 맡아야 합니다."
     },
     "563": {
       "id": 563,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Sail_02_Sprite",
+      "guideText": "어떤 장비는 특정 성별의 항해사만 착용할 수 있습니다."
     },
     "564": {
       "id": 564,
       "loadingType": 1,
-      "disguiseType": 4
+      "disguiseType": 4,
+      "loadingImage": "Illustration_Loading_Port_09_Sprite",
+      "guideText": "본거지의 도구점은 24시간 영업합니다."
     },
     "565": {
       "id": 565,
-      "loadingType": 4
+      "loadingType": 4,
+      "loadingImage": "Illustration_Loading_Sail_02_Sprite",
+      "guideText": "해전 보호 효과를 받고 있으면, 다른 함대와의 교전 발생을 피할 수 있습니다."
     },
     "566": {
       "id": 566,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Sail_02_Sprite",
+      "guideText": "해안선을 따라 항해하는 것이 안전한 항해의 지름길입니다."
     },
     "567": {
       "id": 567,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_11_Sprite",
+      "guideText": "원양으로 나갈 때는 보급품을 든든하게 챙겨야 합니다."
     },
     "568": {
       "id": 568,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Prologue_01_Sprite",
+      "guideText": "오랜 시간 항해를 하게 되면 다양한 재해가 발생할 수 있습니다."
     },
     "569": {
       "id": 569,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_01_Sprite",
+      "guideText": "재해를 방치한 채로 항해하면, 선박에 지속적인 피해가 발생합니다."
     },
     "570": {
       "id": 570,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_01_Sprite",
+      "guideText": "재해 해소 도구는 출항 전 넉넉하게 구비하세요!"
     },
     "571": {
       "id": 571,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_10_Sprite",
+      "guideText": "풍향과 해류를 잘 파악하면 더 빠르게 이동할 수 있습니다."
     },
     "572": {
       "id": 572,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Sail_01_Sprite",
+      "guideText": "어떤 지역은 특정 조건을 만족해야만 이동할 수 있습니다."
     },
     "573": {
       "id": 573,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_11_Sprite",
+      "guideText": "내파, 돌파, 조력과 같은 수치는 함대에 배치된 모든 선박의 평균값을 사용합니다."
     },
     "574": {
       "id": 574,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Prologue_01_Sprite",
+      "guideText": "재해를 내버려 두면 돛이나 키, 노가 손상될 수 있습니다."
     },
     "575": {
       "id": 575,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_11_Sprite",
+      "guideText": "손상된 돛이나 키, 노를 수리하기 위해서는 예비 부품이 필요합니다."
     },
     "576": {
       "id": 576,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_11_Sprite",
+      "guideText": "세계지도에서 해역정보를 통해 주변 정보를 확인할 수 있습니다."
     },
     "577": {
       "id": 577,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Common_05_Sprite",
+      "guideText": "세계지도에서 발견한 항구의 정보를 확인할 수 있습니다."
     },
     "578": {
       "id": 578,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_10_Sprite",
+      "guideText": "세계지도에서 구름이 가리고 있는 영역으로 이동하면 구름을 걷어낼 수 있습니다."
     },
     "579": {
       "id": 579,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Sail_02_Sprite",
+      "guideText": "항해 중 아름다운 밤하늘을 보신 적 있나요?"
     },
     "580": {
       "id": 580,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_11_Sprite",
+      "guideText": "지도에 해적이 보인다면 우회하며 나아가는 것이 안전합니다."
     },
     "581": {
       "id": 581,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Common_05_Sprite",
+      "guideText": "항해 중엔 항상 주변을 살피세요. 가까이 있는 해적과 교전이 벌어질 수 있습니다."
     },
     "582": {
       "id": 582,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_07_Sprite",
+      "guideText": "강력한 해적들은 이름에 특별한 장식이 달려 있습니다."
     },
     "583": {
       "id": 583,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Sail_01_Sprite",
+      "guideText": "물과 식량이 고갈된 채로 항해를 지속하면… 선원 수가 점점 감소합니다."
     },
     "584": {
       "id": 584,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_07_Sprite",
+      "guideText": "항해 중 빠른 해류를 탈 수 있는 곳은 특별한 표시가 되어 있답니다."
     },
     "585": {
       "id": 585,
-      "loadingType": 3
+      "loadingType": 3,
+      "loadingImage": "Illustration_Loading_Battle_01_Sprite",
+      "guideText": "게임 설정 > 설정 메뉴에서 간편 대기를 활성화하면, 전투 시 즉시 행동 종료를 할 수 있습니다."
     },
     "586": {
       "id": 586,
-      "loadingType": 3
+      "loadingType": 3,
+      "loadingImage": "Illustration_Loading_Prologue_02_Sprite",
+      "guideText": "대기를 통한 행동 종료가 번거로울 경우 게임 설정 > 설정 메뉴에서 간편 대기를 활성화하세요."
     },
     "587": {
       "id": 587,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_17_Sprite",
+      "guideText": "어떤 항구에서는 유리구슬, 홍차, 유향 같은 특정한 교역품을 비싸게 사줍니다."
     },
     "588": {
       "id": 588,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_11_Sprite",
+      "guideText": "교역소마다 선호하는 교역품이 다릅니다. 비싸게 팔 수 있는 곳을 찾아보세요."
     },
     "589": {
       "id": 589,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_10_Sprite",
+      "guideText": "교역품을 비싸게 팔고 싶다면, 멀리 있는 항구를 찾아가세요."
     },
     "590": {
       "id": 590,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_11_Sprite",
+      "guideText": "조선소 > 설계도에서 선박의 선실을 변경할 수 있습니다."
     },
     "591": {
       "id": 591,
       "loadingType": 1,
-      "disguiseType": 5
+      "disguiseType": 5,
+      "loadingImage": "Illustration_Loading_Port_07_Sprite",
+      "guideText": "시장 임기 중에는 선단명과 소속 국가를 변경할 수 없습니다."
     },
     "592": {
       "id": 592,
       "loadingType": 1,
-      "disguiseType": 6
+      "disguiseType": 6,
+      "loadingImage": "Illustration_Loading_Port_12_Sprite",
+      "guideText": "시장은 공관에서 항구의 국가별 관세를 정할 수 있습니다."
     },
     "593": {
       "id": 593,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Sail_01_Sprite",
+      "guideText": "수명이 소진된 선박은 주요 능력치가 50% 감소합니다."
     },
     "594": {
       "id": 594,
       "loadingType": 1,
-      "disguiseType": 7
+      "disguiseType": 7,
+      "loadingImage": "Illustration_Loading_Port_13_Sprite",
+      "guideText": "선박의 수명을 복원하려면 조선소에 방문하세요."
     },
     "595": {
       "id": 595,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Sail_02_Sprite",
+      "guideText": "회식 자리에 원하는 항해사가 오지 않았나요? 다음에 다시 방문해 보세요."
     },
     "596": {
       "id": 596,
       "loadingType": 1,
-      "disguiseType": 8
+      "disguiseType": 8,
+      "loadingImage": "Illustration_Loading_Port_14_Sprite",
+      "guideText": "태업 중인 항해사가 있나요? 선물과 수당 지급으로 항해사의 충성도를 올려 보세요."
     },
     "597": {
       "id": 597,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Sail_03_Sprite",
+      "guideText": "태업 중인 항해사를 태운 채로 항해하면, 선박에 더 큰 피해가 발생할 수 있습니다."
     },
     "598": {
       "id": 598,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_10_Sprite",
+      "guideText": "공헌도는 해전과 명산품 판매, 발견물 보고를 통해 획득할 수 있습니다."
     },
     "599": {
       "id": 599,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_09_Sprite",
+      "guideText": "선단 LV이 상승하면 행동력이 회복됩니다."
     },
     "600": {
       "id": 600,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_13_Sprite",
+      "guideText": "각 선박의 설계도 LV은 동일한 선박을 건조할수록 상승합니다."
     },
     "601": {
       "id": 601,
-      "loadingType": 4
+      "loadingType": 4,
+      "loadingImage": "Illustration_Loading_Prologue_01_Sprite",
+      "guideText": "건조 LV을 올려보세요. 더욱 성능이 좋은 선박을 건조할 수 있게 됩니다."
     },
     "602": {
       "id": 602,
-      "loadingType": 0
+      "loadingType": 0,
+      "loadingImage": "Illustration_Loading_Port_16_Sprite",
+      "guideText": "설계도 LV을 올려보세요. 추가 선실을 사용할 수 있습니다."
     },
     "603": {
       "id": 603,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Port_11_Sprite",
+      "guideText": "육지 근처로 항해하여 육지 탐색을 진행해 보세요."
     },
     "604": {
       "id": 604,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Sail_03_Sprite",
+      "guideText": "지역 특성에 따라 육지 탐색을 통해 획득할 수 있는 물품이 달라집니다."
     },
     "605": {
       "id": 605,
-      "loadingType": 4
+      "loadingType": 4,
+      "loadingImage": "Illustration_Loading_Port_10_Sprite",
+      "guideText": "부활을 사용하면, 재화와 적재물 피해 없이 항해를 계속할 수 있습니다."
     },
     "606": {
       "id": 606,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Sail_02_Sprite",
+      "guideText": "먼 바다에서 오도가도 못하는 상황에 처했다면, 항해 포기를 고려해 보세요."
     },
     "607": {
       "id": 607,
       "loadingType": 1,
-      "disguiseType": 8
+      "disguiseType": 8,
+      "loadingImage": "Illustration_Loading_Port_15_Sprite",
+      "guideText": "점술관에서는 다음 작위 획득을 위해 필요한 명성치를 확인할 수 있답니다."
     },
     "608": {
       "id": 608,
       "loadingType": 1,
-      "disguiseType": 9
+      "disguiseType": 9,
+      "loadingImage": "Illustration_Loading_Port_16_Sprite",
+      "guideText": "어떤 문화권에서는 특정 교역품을 아예 받아주지 않는 경우도 있습니다."
     },
     "609": {
       "id": 609,
-      "loadingType": 2
+      "loadingType": 2,
+      "loadingImage": "Illustration_Loading_Sail_01_Sprite",
+      "guideText": "안심하세요. 자동 항해 중이라면 게임을 종료하더라도 우리 함대는 목적지까지 이동합니다."
     },
     "610": {
       "id": 610,
-      "loadingType": 7
+      "loadingType": 7,
+      "loadingImage": "Illustration_Loading_Port_22_Sprite",
+      "guideText": "운하를 이용하는 데에는 추가 재화가 소비되지만, 정말 많은 항해 시간을 단축할 수 있습니다."
     }
   }
 }

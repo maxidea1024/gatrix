@@ -3,6 +3,7 @@
     ":type": {
       "id": "key",
       "name": "string",
+      "uiText": "text",
       "isPercent": "bool",
       "isValueReference": "bool",
       "isPlusNeeded": "bool",
@@ -48,6 +49,7 @@
     "75300000": {
       "id": 75300000,
       "name": "선단 추가 경험치",
+      "uiText": "선단 경험치 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -64,6 +66,7 @@
     "75300001": {
       "id": 75300001,
       "name": "선단 추가 경험치%",
+      "uiText": "선단 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -80,6 +83,7 @@
     "75300010": {
       "id": 75300010,
       "name": "항해사 전체 추가 경험치",
+      "uiText": "모든 계열 경험치 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -99,6 +103,7 @@
     "75300011": {
       "id": 75300011,
       "name": "항해사 전체 추가 경험치%",
+      "uiText": "모든 계열 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -118,6 +123,7 @@
     "75300020": {
       "id": 75300020,
       "name": "항해사 전투 추가 경험치",
+      "uiText": "전투 경험치 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -137,6 +143,7 @@
     "75300021": {
       "id": 75300021,
       "name": "항해사 전투 추가 경험치%",
+      "uiText": "전투 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -156,6 +163,7 @@
     "75300030": {
       "id": 75300030,
       "name": "항해사 교역 추가 경험치",
+      "uiText": "교역 경험치 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -175,6 +183,7 @@
     "75300031": {
       "id": 75300031,
       "name": "항해사 교역 추가 경험치%",
+      "uiText": "교역 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -194,6 +203,7 @@
     "75300040": {
       "id": 75300040,
       "name": "항해사 모험 추가 경험치",
+      "uiText": "모험 경험치 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -213,6 +223,7 @@
     "75300041": {
       "id": 75300041,
       "name": "항해사 모험 추가 경험치%",
+      "uiText": "모험 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -232,6 +243,7 @@
     "75300050": {
       "id": 75300050,
       "name": "전투 명성",
+      "uiText": "전투 명성 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -249,6 +261,7 @@
     "75300051": {
       "id": 75300051,
       "name": "전투 명성%",
+      "uiText": "전투 명성 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -266,6 +279,7 @@
     "75300060": {
       "id": 75300060,
       "name": "교역 명성",
+      "uiText": "교역 명성 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -283,6 +297,7 @@
     "75300061": {
       "id": 75300061,
       "name": "교역 명성%",
+      "uiText": "교역 명성 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -300,6 +315,7 @@
     "75300070": {
       "id": 75300070,
       "name": "모험 명성",
+      "uiText": "모험 명성 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -317,6 +333,7 @@
     "75300071": {
       "id": 75300071,
       "name": "모험 명성%",
+      "uiText": "모험 명성 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -334,6 +351,7 @@
     "75300080": {
       "id": 75300080,
       "name": "교역품 가격",
+      "uiText": "교역품 가격 변화",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -351,6 +369,7 @@
     "75300081": {
       "id": 75300081,
       "name": "교역품 가격%",
+      "uiText": "교역품 가격 변화%",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -368,6 +387,7 @@
     "75300090": {
       "id": 75300090,
       "name": "가격 협상 할인율",
+      "uiText": "가격 협상 시 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -390,6 +410,7 @@
     "75300100": {
       "id": 75300100,
       "name": "가격 협상 할증률",
+      "uiText": "가격 협상 시 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -412,6 +433,7 @@
     "75300110": {
       "id": 75300110,
       "name": "관세율",
+      "uiText": "관세율 인하",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -429,6 +451,7 @@
     "75300120": {
       "id": 75300120,
       "name": "교역품 재입고 시간",
+      "uiText": "재입고 시간 단축",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -446,6 +469,7 @@
     "75300121": {
       "id": 75300121,
       "name": "교역품 재입고 시간%",
+      "uiText": "재입고 시간 단축",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -463,6 +487,7 @@
     "75300130": {
       "id": 75300130,
       "name": "상업 발전",
+      "uiText": "상업 발전",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -479,6 +504,7 @@
     "75300131": {
       "id": 75300131,
       "name": "상업 발전%",
+      "uiText": "상업 발전",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -495,6 +521,7 @@
     "75300132": {
       "id": 75300132,
       "name": "군사 발전",
+      "uiText": "군사 발전",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -511,6 +538,7 @@
     "75300133": {
       "id": 75300133,
       "name": "군사 발전%",
+      "uiText": "군사 발전",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -527,6 +555,7 @@
     "75300134": {
       "id": 75300134,
       "name": "공업 발전",
+      "uiText": "공업 발전",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -543,6 +572,7 @@
     "75300135": {
       "id": 75300135,
       "name": "공업 발전%",
+      "uiText": "공업 발전",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -559,6 +589,7 @@
     "75300140": {
       "id": 75300140,
       "name": "식료품 구매 가능 수량",
+      "uiText": "식료품 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -576,6 +607,7 @@
     "75300141": {
       "id": 75300141,
       "name": "식료품 구매 가능 수량%",
+      "uiText": "식료품 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -598,6 +630,7 @@
     "75300150": {
       "id": 75300150,
       "name": "조미료 구매 가능 수량",
+      "uiText": "조미료 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -615,6 +648,7 @@
     "75300151": {
       "id": 75300151,
       "name": "조미료 구매 가능 수량%",
+      "uiText": "조미료 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -637,6 +671,7 @@
     "75300160": {
       "id": 75300160,
       "name": "가축 구매 가능 수량",
+      "uiText": "가축 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -654,6 +689,7 @@
     "75300161": {
       "id": 75300161,
       "name": "가축 구매 가능 수량%",
+      "uiText": "가축 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -676,6 +712,7 @@
     "75300170": {
       "id": 75300170,
       "name": "의약품 구매 가능 수량",
+      "uiText": "의약품 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -693,6 +730,7 @@
     "75300171": {
       "id": 75300171,
       "name": "의약품 구매 가능 수량%",
+      "uiText": "의약품 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -715,6 +753,7 @@
     "75300180": {
       "id": 75300180,
       "name": "잡화 구매 가능 수량",
+      "uiText": "잡화 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -732,6 +771,7 @@
     "75300181": {
       "id": 75300181,
       "name": "잡화 구매 가능 수량%",
+      "uiText": "잡화 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -754,6 +794,7 @@
     "75300190": {
       "id": 75300190,
       "name": "주류 구매 가능 수량",
+      "uiText": "주류 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -771,6 +812,7 @@
     "75300191": {
       "id": 75300191,
       "name": "주류 구매 가능 수량%",
+      "uiText": "주류 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -793,6 +835,7 @@
     "75300200": {
       "id": 75300200,
       "name": "염료 구매 가능 수량",
+      "uiText": "염료 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -810,6 +853,7 @@
     "75300201": {
       "id": 75300201,
       "name": "염료 구매 가능 수량%",
+      "uiText": "염료 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -832,6 +876,7 @@
     "75300210": {
       "id": 75300210,
       "name": "광석 구매 가능 수량",
+      "uiText": "광석 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -849,6 +894,7 @@
     "75300211": {
       "id": 75300211,
       "name": "광석 구매 가능 수량%",
+      "uiText": "광석 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -871,6 +917,7 @@
     "75300220": {
       "id": 75300220,
       "name": "공업품 구매 가능 수량",
+      "uiText": "공업품 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -888,6 +935,7 @@
     "75300221": {
       "id": 75300221,
       "name": "공업품 구매 가능 수량%",
+      "uiText": "공업품 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -910,6 +958,7 @@
     "75300230": {
       "id": 75300230,
       "name": "기호품 구매 가능 수량",
+      "uiText": "기호품 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -927,6 +976,7 @@
     "75300231": {
       "id": 75300231,
       "name": "기호품 구매 가능 수량%",
+      "uiText": "기호품 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -949,6 +999,7 @@
     "75300240": {
       "id": 75300240,
       "name": "섬유 구매 가능 수량",
+      "uiText": "섬유 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -966,6 +1017,7 @@
     "75300241": {
       "id": 75300241,
       "name": "섬유 구매 가능 수량%",
+      "uiText": "섬유 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -988,6 +1040,7 @@
     "75300250": {
       "id": 75300250,
       "name": "직물 구매 가능 수량",
+      "uiText": "직물 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1005,6 +1058,7 @@
     "75300251": {
       "id": 75300251,
       "name": "직물 구매 가능 수량%",
+      "uiText": "직물 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1027,6 +1081,7 @@
     "75300260": {
       "id": 75300260,
       "name": "무기류 구매 가능 수량",
+      "uiText": "무기류 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1044,6 +1099,7 @@
     "75300261": {
       "id": 75300261,
       "name": "무기류 구매 가능 수량%",
+      "uiText": "무기류 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1066,6 +1122,7 @@
     "75300270": {
       "id": 75300270,
       "name": "총포류 구매 가능 수량",
+      "uiText": "총포류 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1083,6 +1140,7 @@
     "75300271": {
       "id": 75300271,
       "name": "총포류 구매 가능 수량%",
+      "uiText": "총포류 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1105,6 +1163,7 @@
     "75300280": {
       "id": 75300280,
       "name": "공예품 구매 가능 수량",
+      "uiText": "공예품 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1122,6 +1181,7 @@
     "75300281": {
       "id": 75300281,
       "name": "공예품 구매 가능 수량%",
+      "uiText": "공예품 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1144,6 +1204,7 @@
     "75300290": {
       "id": 75300290,
       "name": "미술품 구매 가능 수량",
+      "uiText": "미술품 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1161,6 +1222,7 @@
     "75300291": {
       "id": 75300291,
       "name": "미술품 구매 가능 수량%",
+      "uiText": "미술품 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1183,6 +1245,7 @@
     "75300300": {
       "id": 75300300,
       "name": "향신료 구매 가능 수량",
+      "uiText": "향신료 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1200,6 +1263,7 @@
     "75300301": {
       "id": 75300301,
       "name": "향신료 구매 가능 수량%",
+      "uiText": "향신료 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1222,6 +1286,7 @@
     "75300310": {
       "id": 75300310,
       "name": "귀금속 구매 가능 수량",
+      "uiText": "귀금속 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1239,6 +1304,7 @@
     "75300311": {
       "id": 75300311,
       "name": "귀금속 구매 가능 수량%",
+      "uiText": "귀금속 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1261,6 +1327,7 @@
     "75300320": {
       "id": 75300320,
       "name": "향료 구매 가능 수량",
+      "uiText": "향료 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1278,6 +1345,7 @@
     "75300321": {
       "id": 75300321,
       "name": "향료 구매 가능 수량%",
+      "uiText": "향료 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1300,6 +1368,7 @@
     "75300330": {
       "id": 75300330,
       "name": "보석 구매 가능 수량",
+      "uiText": "보석 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1317,6 +1386,7 @@
     "75300331": {
       "id": 75300331,
       "name": "보석 구매 가능 수량%",
+      "uiText": "보석 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1339,6 +1409,7 @@
     "75300340": {
       "id": 75300340,
       "name": "식료품 구매 비용 할인%",
+      "uiText": "식료품 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1360,6 +1431,7 @@
     "75300350": {
       "id": 75300350,
       "name": "조미료 구매 비용 할인%",
+      "uiText": "조미료 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1381,6 +1453,7 @@
     "75300360": {
       "id": 75300360,
       "name": "가축 구매 비용 할인%",
+      "uiText": "가축 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1402,6 +1475,7 @@
     "75300370": {
       "id": 75300370,
       "name": "의약품 구매 비용 할인%",
+      "uiText": "의약품 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1423,6 +1497,7 @@
     "75300380": {
       "id": 75300380,
       "name": "잡화 구매 비용 할인%",
+      "uiText": "잡화 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1444,6 +1519,7 @@
     "75300390": {
       "id": 75300390,
       "name": "주류 구매 비용 할인%",
+      "uiText": "주류 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1465,6 +1541,7 @@
     "75300400": {
       "id": 75300400,
       "name": "염료 구매 비용 할인%",
+      "uiText": "염료 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1486,6 +1563,7 @@
     "75300410": {
       "id": 75300410,
       "name": "광석 구매 비용 할인%",
+      "uiText": "광석 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1507,6 +1585,7 @@
     "75300420": {
       "id": 75300420,
       "name": "공업품 구매 비용 할인%",
+      "uiText": "공업품 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1528,6 +1607,7 @@
     "75300430": {
       "id": 75300430,
       "name": "기호품 구매 비용 할인%",
+      "uiText": "기호품 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1549,6 +1629,7 @@
     "75300440": {
       "id": 75300440,
       "name": "섬유 구매 비용 할인%",
+      "uiText": "섬유 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1570,6 +1651,7 @@
     "75300450": {
       "id": 75300450,
       "name": "직물 구매 비용 할인%",
+      "uiText": "직물 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1591,6 +1673,7 @@
     "75300460": {
       "id": 75300460,
       "name": "무기류 구매 비용 할인%",
+      "uiText": "무기류 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1612,6 +1695,7 @@
     "75300470": {
       "id": 75300470,
       "name": "총포류 구매 비용 할인%",
+      "uiText": "총포류 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1633,6 +1717,7 @@
     "75300480": {
       "id": 75300480,
       "name": "공예품 구매 비용 할인%",
+      "uiText": "공예품 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1654,6 +1739,7 @@
     "75300490": {
       "id": 75300490,
       "name": "미술품 구매 비용 할인%",
+      "uiText": "미술품 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1675,6 +1761,7 @@
     "75300500": {
       "id": 75300500,
       "name": "향신료 구매 비용 할인%",
+      "uiText": "향신료 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1696,6 +1783,7 @@
     "75300510": {
       "id": 75300510,
       "name": "귀금속 구매 비용 할인%",
+      "uiText": "귀금속 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1717,6 +1805,7 @@
     "75300520": {
       "id": 75300520,
       "name": "향료 구매 비용 할인%",
+      "uiText": "향료 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1738,6 +1827,7 @@
     "75300530": {
       "id": 75300530,
       "name": "보석 구매 비용 할인%",
+      "uiText": "보석 구매 가격 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1759,6 +1849,7 @@
     "75300540": {
       "id": 75300540,
       "name": "식료품 판매 할증%",
+      "uiText": "식료품 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1780,6 +1871,7 @@
     "75300550": {
       "id": 75300550,
       "name": "조미료 판매 할증%",
+      "uiText": "조미료 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1801,6 +1893,7 @@
     "75300560": {
       "id": 75300560,
       "name": "가축 판매 할증%",
+      "uiText": "가축 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1822,6 +1915,7 @@
     "75300570": {
       "id": 75300570,
       "name": "의약품 판매 할증%",
+      "uiText": "의약품 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1843,6 +1937,7 @@
     "75300580": {
       "id": 75300580,
       "name": "잡화 판매 할증%",
+      "uiText": "잡화 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1864,6 +1959,7 @@
     "75300590": {
       "id": 75300590,
       "name": "주류 판매 할증%",
+      "uiText": "주류 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1885,6 +1981,7 @@
     "75300600": {
       "id": 75300600,
       "name": "염료 판매 할증%",
+      "uiText": "염료 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1906,6 +2003,7 @@
     "75300610": {
       "id": 75300610,
       "name": "광석 판매 할증%",
+      "uiText": "광석 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1927,6 +2025,7 @@
     "75300620": {
       "id": 75300620,
       "name": "공업품 판매 할증%",
+      "uiText": "공업품 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1948,6 +2047,7 @@
     "75300630": {
       "id": 75300630,
       "name": "기호품 판매 할증%",
+      "uiText": "기호품 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1969,6 +2069,7 @@
     "75300640": {
       "id": 75300640,
       "name": "섬유 판매 할증%",
+      "uiText": "섬유 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -1990,6 +2091,7 @@
     "75300650": {
       "id": 75300650,
       "name": "직물 판매 할증%",
+      "uiText": "직물 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2011,6 +2113,7 @@
     "75300660": {
       "id": 75300660,
       "name": "무기류 판매 할증%",
+      "uiText": "무기류 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2032,6 +2135,7 @@
     "75300670": {
       "id": 75300670,
       "name": "총포류 판매 할증%",
+      "uiText": "총포류 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2053,6 +2157,7 @@
     "75300680": {
       "id": 75300680,
       "name": "공예품 판매 할증%",
+      "uiText": "공예품 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2074,6 +2179,7 @@
     "75300690": {
       "id": 75300690,
       "name": "미술품 판매 할증%",
+      "uiText": "미술품 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2095,6 +2201,7 @@
     "75300700": {
       "id": 75300700,
       "name": "향신료 판매 할증%",
+      "uiText": "향신료 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2116,6 +2223,7 @@
     "75300710": {
       "id": 75300710,
       "name": "귀금속 판매 할증%",
+      "uiText": "귀금속 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2137,6 +2245,7 @@
     "75300720": {
       "id": 75300720,
       "name": "향료 판매 할증%",
+      "uiText": "향료 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2158,6 +2267,7 @@
     "75300730": {
       "id": 75300730,
       "name": "보석 판매 할증%",
+      "uiText": "보석 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2179,6 +2289,7 @@
     "75300740": {
       "id": 75300740,
       "name": "식료품 시세 정보",
+      "uiText": "식료품 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2196,6 +2307,7 @@
     "75300750": {
       "id": 75300750,
       "name": "조미료 시세 정보",
+      "uiText": "조미료 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2213,6 +2325,7 @@
     "75300760": {
       "id": 75300760,
       "name": "가축 시세 정보",
+      "uiText": "가축 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2230,6 +2343,7 @@
     "75300770": {
       "id": 75300770,
       "name": "의약품 시세 정보",
+      "uiText": "의약품 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2247,6 +2361,7 @@
     "75300780": {
       "id": 75300780,
       "name": "잡화 시세 정보",
+      "uiText": "잡화 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2264,6 +2379,7 @@
     "75300790": {
       "id": 75300790,
       "name": "주류 시세 정보",
+      "uiText": "주류 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2281,6 +2397,7 @@
     "75300800": {
       "id": 75300800,
       "name": "염료 시세 정보",
+      "uiText": "염료 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2298,6 +2415,7 @@
     "75300810": {
       "id": 75300810,
       "name": "광석 시세 정보",
+      "uiText": "광석 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2315,6 +2433,7 @@
     "75300820": {
       "id": 75300820,
       "name": "공업품 시세 정보",
+      "uiText": "공업품 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2332,6 +2451,7 @@
     "75300830": {
       "id": 75300830,
       "name": "기호품 시세 정보",
+      "uiText": "기호품 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2349,6 +2469,7 @@
     "75300840": {
       "id": 75300840,
       "name": "섬유 시세 정보",
+      "uiText": "섬유 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2366,6 +2487,7 @@
     "75300850": {
       "id": 75300850,
       "name": "직물 시세 정보",
+      "uiText": "직물 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2383,6 +2505,7 @@
     "75300860": {
       "id": 75300860,
       "name": "무기류 시세 정보",
+      "uiText": "무기류 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2400,6 +2523,7 @@
     "75300870": {
       "id": 75300870,
       "name": "총포류 시세 정보",
+      "uiText": "총포류 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2417,6 +2541,7 @@
     "75300880": {
       "id": 75300880,
       "name": "공예품 시세 정보",
+      "uiText": "공예품 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2434,6 +2559,7 @@
     "75300890": {
       "id": 75300890,
       "name": "미술품 시세 정보",
+      "uiText": "미술품 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2451,6 +2577,7 @@
     "75300900": {
       "id": 75300900,
       "name": "향신료 시세 정보",
+      "uiText": "향신료 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2468,6 +2595,7 @@
     "75300910": {
       "id": 75300910,
       "name": "귀금속 시세 정보",
+      "uiText": "귀금속 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2485,6 +2613,7 @@
     "75300920": {
       "id": 75300920,
       "name": "향료 시세 정보",
+      "uiText": "향료 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2502,6 +2631,7 @@
     "75300930": {
       "id": 75300930,
       "name": "보석 시세 정보",
+      "uiText": "보석 시세 정보 확인 범위",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2519,6 +2649,7 @@
     "75300940": {
       "id": 75300940,
       "name": "물물 교환 수량%",
+      "uiText": "물물 교환 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2539,6 +2670,7 @@
     "75300950": {
       "id": 75300950,
       "name": "선단 투자 점수 변화%",
+      "uiText": "선단 투자 점수",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2556,6 +2688,7 @@
     "75300960": {
       "id": 75300960,
       "name": "가축 번식 확률%",
+      "uiText": "가축 번식 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2573,6 +2706,7 @@
     "75300970": {
       "id": 75300970,
       "name": "구매 추천 수량",
+      "uiText": "추천 구매 품목",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2590,6 +2724,7 @@
     "75300971": {
       "id": 75300971,
       "name": "판매 추천 수량",
+      "uiText": "추천 판매 품목",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -2607,6 +2742,7 @@
     "75310000": {
       "id": 75310000,
       "name": "선박 속도 변화",
+      "uiText": "선박 속도",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2624,6 +2760,7 @@
     "75310001": {
       "id": 75310001,
       "name": "선박 속도% 변화",
+      "uiText": "선박 속도",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2641,6 +2778,7 @@
     "75310002": {
       "id": 75310002,
       "name": "일일 물 소모량 변화",
+      "uiText": "일일 물 소모량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2658,6 +2796,7 @@
     "75310003": {
       "id": 75310003,
       "name": "일일 물 소모량% 변화",
+      "uiText": "일일 물 소모량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2678,6 +2817,7 @@
     "75310004": {
       "id": 75310004,
       "name": "일일 식량 소모량 변화",
+      "uiText": "일일 식량 소모량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2695,6 +2835,7 @@
     "75310005": {
       "id": 75310005,
       "name": "일일 식량 소모량% 변화",
+      "uiText": "일일 식량 소모량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2715,6 +2856,7 @@
     "75310006": {
       "id": 75310006,
       "name": "돛 손상 확률",
+      "uiText": "돛 손상 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2732,6 +2874,7 @@
     "75310007": {
       "id": 75310007,
       "name": "키 손상 확률",
+      "uiText": "키 손상 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2749,6 +2892,7 @@
     "75310008": {
       "id": 75310008,
       "name": "입항 거리 변화",
+      "uiText": "입항 거리",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2767,6 +2911,7 @@
     "75310009": {
       "id": 75310009,
       "name": "조우 확률 변화",
+      "uiText": "교전 발생 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2784,6 +2929,7 @@
     "75310010": {
       "id": 75310010,
       "name": "항해사 부상 확률 변화",
+      "uiText": "부상 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2805,6 +2951,7 @@
     "75310011": {
       "id": 75310011,
       "name": "항해사 부상 시간% 변화",
+      "uiText": "부상 치유 소요 시간",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2826,6 +2973,7 @@
     "75310012": {
       "id": 75310012,
       "name": "항해사 부상 치료 확률 변화",
+      "uiText": "부상 치유 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2846,6 +2994,7 @@
     "75310013": {
       "id": 75310013,
       "name": "함대 속도 변화",
+      "uiText": "함대 속도",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2867,6 +3016,7 @@
     "75310014": {
       "id": 75310014,
       "name": "함대 속도% 변화",
+      "uiText": "함대 속도",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2887,6 +3037,7 @@
     "75310015": {
       "id": 75310015,
       "name": "가로돛 변화",
+      "uiText": "가로돛",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2904,6 +3055,7 @@
     "75310016": {
       "id": 75310016,
       "name": "가로돛 변화%",
+      "uiText": "가로돛",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2921,6 +3073,7 @@
     "75310017": {
       "id": 75310017,
       "name": "세로돛 변화",
+      "uiText": "세로돛",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2938,6 +3091,7 @@
     "75310018": {
       "id": 75310018,
       "name": "세로돛 변화%",
+      "uiText": "세로돛",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2955,6 +3109,7 @@
     "75310019": {
       "id": 75310019,
       "name": "조력 변화",
+      "uiText": "조력",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2972,6 +3127,7 @@
     "75310020": {
       "id": 75310020,
       "name": "조력 변화%",
+      "uiText": "조력",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -2989,6 +3145,7 @@
     "75311000": {
       "id": 75311000,
       "name": "재해 예측 변화%",
+      "uiText": "재해 예측",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3007,6 +3164,7 @@
     "75311001": {
       "id": 75311001,
       "name": "쥐 예방 확률",
+      "uiText": "쥐 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3028,6 +3186,7 @@
     "75311002": {
       "id": 75311002,
       "name": "비위생 예방 확률",
+      "uiText": "오염 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3049,6 +3208,7 @@
     "75311003": {
       "id": 75311003,
       "name": "괴혈병 예방 확률",
+      "uiText": "괴혈병 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3070,6 +3230,7 @@
     "75311004": {
       "id": 75311004,
       "name": "전염병 예방 확률",
+      "uiText": "전염병 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3091,6 +3252,7 @@
     "75311005": {
       "id": 75311005,
       "name": "부패 예방 확률",
+      "uiText": "부패 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3112,6 +3274,7 @@
     "75311006": {
       "id": 75311006,
       "name": "말라리아 예방 확률",
+      "uiText": "말라리아 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3130,6 +3293,7 @@
     "75311007": {
       "id": 75311007,
       "name": "화재 예방 확률",
+      "uiText": "화재 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3151,6 +3315,7 @@
     "75311008": {
       "id": 75311008,
       "name": "해초 예방 확률",
+      "uiText": "해초 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3172,6 +3337,7 @@
     "75311009": {
       "id": 75311009,
       "name": "암초 예방 확률",
+      "uiText": "암초 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3193,6 +3359,7 @@
     "75311010": {
       "id": 75311010,
       "name": "침수 예방 확률",
+      "uiText": "침수 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3214,6 +3381,7 @@
     "75311011": {
       "id": 75311011,
       "name": "대화재 예방 확률",
+      "uiText": "대화재 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3232,6 +3400,7 @@
     "75311012": {
       "id": 75311012,
       "name": "반란 예방 확률",
+      "uiText": "반란 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3253,6 +3422,7 @@
     "75311013": {
       "id": 75311013,
       "name": "싸움 예방 확률",
+      "uiText": "싸움 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3274,6 +3444,7 @@
     "75311014": {
       "id": 75311014,
       "name": "적재화물 도난 예방 확률",
+      "uiText": "화물 도난 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3295,6 +3466,7 @@
     "75311015": {
       "id": 75311015,
       "name": "적재화물 붕괴 예방 확률",
+      "uiText": "화물 붕괴 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3313,6 +3485,7 @@
     "75311016": {
       "id": 75311016,
       "name": "욕구불만 예방 확률",
+      "uiText": "욕구불만 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3334,6 +3507,7 @@
     "75311017": {
       "id": 75311017,
       "name": "정신 불안 예방 확률",
+      "uiText": "정서불안 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3355,6 +3529,7 @@
     "75311018": {
       "id": 75311018,
       "name": "향수병 예방 확률",
+      "uiText": "향수병 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3376,6 +3551,7 @@
     "75311019": {
       "id": 75311019,
       "name": "불면증 예방 확률",
+      "uiText": "불면증 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3397,6 +3573,7 @@
     "75311020": {
       "id": 75311020,
       "name": "폭풍 예방 확률",
+      "uiText": "폭풍 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3415,6 +3592,7 @@
     "75311021": {
       "id": 75311021,
       "name": "높은 파도 예방 확률",
+      "uiText": "격랑 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3433,6 +3611,7 @@
     "75311022": {
       "id": 75311022,
       "name": "눈보라 예방 확률",
+      "uiText": "눈보라 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3451,6 +3630,7 @@
     "75311023": {
       "id": 75311023,
       "name": "돌풍 예방 확률",
+      "uiText": "돌풍 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3472,6 +3652,7 @@
     "75311024": {
       "id": 75311024,
       "name": "무풍 예방 확률",
+      "uiText": "무풍 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3493,6 +3674,7 @@
     "75311025": {
       "id": 75311025,
       "name": "자기장 이상 예방 확률",
+      "uiText": "자기 이상 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3514,6 +3696,7 @@
     "75311026": {
       "id": 75311026,
       "name": "세이렌 예방 확률",
+      "uiText": "세이렌 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3535,6 +3718,7 @@
     "75311027": {
       "id": 75311027,
       "name": "식인상어 예방 확률",
+      "uiText": "식인상어 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3556,6 +3740,7 @@
     "75311028": {
       "id": 75311028,
       "name": "고래 충돌 예방 확률",
+      "uiText": "고래 충돌 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3574,6 +3759,7 @@
     "75311029": {
       "id": 75311029,
       "name": "저체온증 예방 확률",
+      "uiText": "저체온증 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3595,6 +3781,7 @@
     "75311030": {
       "id": 75311030,
       "name": "동상 예방 확률",
+      "uiText": "동상 예방 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3613,6 +3800,7 @@
     "75311100": {
       "id": 75311100,
       "name": "쥐 출몰 해소 확률 변화",
+      "uiText": "쥐 출몰 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3634,6 +3822,7 @@
     "75311101": {
       "id": 75311101,
       "name": "비위생 해소 확률 변화",
+      "uiText": "오염 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3655,6 +3844,7 @@
     "75311102": {
       "id": 75311102,
       "name": "괴혈병 해소 확률 변화",
+      "uiText": "괴혈병 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3676,6 +3866,7 @@
     "75311103": {
       "id": 75311103,
       "name": "전염병 해소 확률 변화",
+      "uiText": "전염병 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3697,6 +3888,7 @@
     "75311104": {
       "id": 75311104,
       "name": "부패 해소 확률 변화",
+      "uiText": "부패 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3718,6 +3910,7 @@
     "75311105": {
       "id": 75311105,
       "name": "말라리아 해소 확률 변화",
+      "uiText": "말라리아 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3736,6 +3929,7 @@
     "75311106": {
       "id": 75311106,
       "name": "화재 해소 확률 변화",
+      "uiText": "화재 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3757,6 +3951,7 @@
     "75311107": {
       "id": 75311107,
       "name": "해초 해소 확률 변화",
+      "uiText": "해초 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3778,6 +3973,7 @@
     "75311108": {
       "id": 75311108,
       "name": "침수 해소 확률 변화",
+      "uiText": "침수 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3799,6 +3995,7 @@
     "75311109": {
       "id": 75311109,
       "name": "대화재 해소 확률 변화",
+      "uiText": "대화재 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3817,6 +4014,7 @@
     "75311110": {
       "id": 75311110,
       "name": "반란 해소 확률 변화",
+      "uiText": "반란 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3838,6 +4036,7 @@
     "75311111": {
       "id": 75311111,
       "name": "싸움 해소 확률 변화",
+      "uiText": "싸움 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3859,6 +4058,7 @@
     "75311112": {
       "id": 75311112,
       "name": "욕구불만 해소 확률 변화",
+      "uiText": "욕구불만 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3880,6 +4080,7 @@
     "75311113": {
       "id": 75311113,
       "name": "정신 불안 해소 확률 변화",
+      "uiText": "정서불안 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3901,6 +4102,7 @@
     "75311114": {
       "id": 75311114,
       "name": "향수병 해소 확률 변화",
+      "uiText": "향수병 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3922,6 +4124,7 @@
     "75311115": {
       "id": 75311115,
       "name": "불면증 해소 확률 변화",
+      "uiText": "불면증 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3943,6 +4146,7 @@
     "75311116": {
       "id": 75311116,
       "name": "폭풍 해소 확률 변화",
+      "uiText": "폭풍 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3961,6 +4165,7 @@
     "75311117": {
       "id": 75311117,
       "name": "눈보라 해소 확률 변화",
+      "uiText": "눈보라 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -3979,6 +4184,7 @@
     "75311118": {
       "id": 75311118,
       "name": "무풍 해소 확률 변화",
+      "uiText": "무풍 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4000,6 +4206,7 @@
     "75311119": {
       "id": 75311119,
       "name": "자기장 이상 해소 확률 변화",
+      "uiText": "자기 이상 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4021,6 +4228,7 @@
     "75311120": {
       "id": 75311120,
       "name": "세이렌 해소 확률 변화",
+      "uiText": "세이렌 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4042,6 +4250,7 @@
     "75311121": {
       "id": 75311121,
       "name": "식인상어 해소 확률 변화",
+      "uiText": "식인상어 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4063,6 +4272,7 @@
     "75311122": {
       "id": 75311122,
       "name": "저체온증 해소 확률 변화",
+      "uiText": "저체온증 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4084,6 +4294,7 @@
     "75311123": {
       "id": 75311123,
       "name": "동상 해소 확률 변화",
+      "uiText": "동상 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4102,6 +4313,7 @@
     "75311124": {
       "id": 75311124,
       "name": "암초 해소 확률 변화",
+      "uiText": "암초 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4123,6 +4335,7 @@
     "75311125": {
       "id": 75311125,
       "name": "화물 도난 해소 확률 변화",
+      "uiText": "화물 도난 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4144,6 +4357,7 @@
     "75311126": {
       "id": 75311126,
       "name": "돌풍 해소 확률 변화",
+      "uiText": "돌풍 해소 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4165,6 +4379,7 @@
     "75311150": {
       "id": 75311150,
       "name": "유저 선공 받지 않음",
+      "uiText": "다른 사용자의 공격 무효화",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": false,
@@ -4182,6 +4397,7 @@
     "75311151": {
       "id": 75311151,
       "name": "NPC 선공 받지 않음",
+      "uiText": "NPC의 공격 무효화",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": false,
@@ -4199,6 +4415,7 @@
     "75312000": {
       "id": 75312000,
       "name": "재해 발생 확률 변화%",
+      "uiText": "재해 발생 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4220,6 +4437,7 @@
     "75312001": {
       "id": 75312001,
       "name": "무료 기적 횟수",
+      "uiText": "무료 기적 횟수",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4237,6 +4455,7 @@
     "75312002": {
       "id": 75312002,
       "name": "무료 턴 무르기 횟수",
+      "uiText": "한 턴 무르기 횟수 최대치",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4254,6 +4473,7 @@
     "75312003": {
       "id": 75312003,
       "name": "무료 쾌속 횟수",
+      "uiText": "무료 쾌속 횟수",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4271,6 +4491,7 @@
     "75312004": {
       "id": 75312004,
       "name": "턴 무르기 무제한",
+      "uiText": "무제한 한 턴 무르기",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": false,
@@ -4288,6 +4509,7 @@
     "75312005": {
       "id": 75312005,
       "name": "쾌속 무제한",
+      "uiText": "무제한 쾌속",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": false,
@@ -4305,6 +4527,7 @@
     "75312006": {
       "id": 75312006,
       "name": "특수 자원 발견 확률%",
+      "uiText": "특수 자원 발견 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4322,6 +4545,7 @@
     "75312007": {
       "id": 75312007,
       "name": "추가 발견 카드",
+      "uiText": "추가 발견 카드",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4339,6 +4563,7 @@
     "75312008": {
       "id": 75312008,
       "name": "입항 거부 면제",
+      "uiText": "입항 거부 면제",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": false,
@@ -4356,6 +4581,7 @@
     "75312009": {
       "id": 75312009,
       "name": "재해 보호",
+      "uiText": "재해 보호",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": true,
@@ -4373,6 +4599,7 @@
     "75312010": {
       "id": 75312010,
       "name": "보험 비용%",
+      "uiText": "보험 비용",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4390,6 +4617,7 @@
     "75312011": {
       "id": 75312011,
       "name": "충성도 감소 속도 변화%",
+      "uiText": "충성도 감소 속도 지연",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4409,6 +4637,7 @@
     "75312012": {
       "id": 75312012,
       "name": "선단 전체 전투 추가 경험치",
+      "uiText": "전투 경험치 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4426,6 +4655,7 @@
     "75312013": {
       "id": 75312013,
       "name": "선단 전체 전투 추가 경험치%",
+      "uiText": "전투 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4443,6 +4673,7 @@
     "75312014": {
       "id": 75312014,
       "name": "선단 전체 교역 추가 경험치",
+      "uiText": "교역 경험치 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4460,6 +4691,7 @@
     "75312015": {
       "id": 75312015,
       "name": "선단 전체 교역 추가 경험치%",
+      "uiText": "교역 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4477,6 +4709,7 @@
     "75312016": {
       "id": 75312016,
       "name": "선단 전체 모험 추가 경험치",
+      "uiText": "모험 경험치 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4494,6 +4727,7 @@
     "75312017": {
       "id": 75312017,
       "name": "선단 전체 모험 추가 경험치%",
+      "uiText": "모험 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4511,6 +4745,7 @@
     "75312018": {
       "id": 75312018,
       "name": "자연 발견 확률 증가",
+      "uiText": "자연 발견 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4532,6 +4767,7 @@
     "75312019": {
       "id": 75312019,
       "name": "동물 발견 확률 증가",
+      "uiText": "동물 발견 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4553,6 +4789,7 @@
     "75312020": {
       "id": 75312020,
       "name": "식물 발견 확률 증가",
+      "uiText": "식물 발견 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4574,6 +4811,7 @@
     "75312021": {
       "id": 75312021,
       "name": "건축 발견 확률 증가",
+      "uiText": "건축 발견 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4595,6 +4833,7 @@
     "75312022": {
       "id": 75312022,
       "name": "유물 발견 확률 증가",
+      "uiText": "유물 발견 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4616,6 +4855,7 @@
     "75312023": {
       "id": 75312023,
       "name": "보물 발견 확률 증가",
+      "uiText": "보물 발견 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4637,6 +4877,7 @@
     "75312024": {
       "id": 75312024,
       "name": "갤리류 선박 속도 변화",
+      "uiText": "갤리류 선박 속도",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4653,6 +4894,7 @@
     "75312025": {
       "id": 75312025,
       "name": "갤리류 선박 속도 변화%",
+      "uiText": "갤리류 선박 속도",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4672,6 +4914,7 @@
     "75312026": {
       "id": 75312026,
       "name": "두다드 보상 변화(재화)%",
+      "uiText": "부유물에서 획득하는 재화량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4691,6 +4934,7 @@
     "75312027": {
       "id": 75312027,
       "name": "두다드 보상 변화(아이템)",
+      "uiText": "부유물에서 획득하는 물품 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4710,6 +4954,7 @@
     "75312028": {
       "id": 75312028,
       "name": "에스파냐 추가 우호도 변화",
+      "uiText": "에스파냐 우호도",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4726,6 +4971,7 @@
     "75312029": {
       "id": 75312029,
       "name": "포르투갈 추가 우호도 변화",
+      "uiText": "포르투갈 우호도",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4742,6 +4988,7 @@
     "75312030": {
       "id": 75312030,
       "name": "네덜란드 추가 우호도 변화",
+      "uiText": "네덜란드 우호도",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4758,6 +5005,7 @@
     "75312031": {
       "id": 75312031,
       "name": "잉글랜드 추가 우호도 변화",
+      "uiText": "잉글랜드 우호도",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4774,6 +5022,7 @@
     "75312032": {
       "id": 75312032,
       "name": "오스만 추가 우호도 변화",
+      "uiText": "오스만 우호도",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4790,6 +5039,7 @@
     "75312033": {
       "id": 75312033,
       "name": "명 추가 우호도 변화",
+      "uiText": "명 우호도",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4806,6 +5056,7 @@
     "75312034": {
       "id": 75312034,
       "name": "조선 추가 우호도 변화",
+      "uiText": "조선 우호도",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4822,6 +5073,7 @@
     "75312035": {
       "id": 75312035,
       "name": "일본 추가 우호도 변화",
+      "uiText": "일본 우호도",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4838,6 +5090,7 @@
     "75312036": {
       "id": 75312036,
       "name": "함대 가속력 변화",
+      "uiText": "함대 가속력",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4854,6 +5107,7 @@
     "75312037": {
       "id": 75312037,
       "name": "함대 가속력 변화%",
+      "uiText": "함대 가속력",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4870,6 +5124,7 @@
     "75312038": {
       "id": 75312038,
       "name": "선박 가속력 변화",
+      "uiText": "선박 가속력",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4886,6 +5141,7 @@
     "75312039": {
       "id": 75312039,
       "name": "선박 가속력 변화%",
+      "uiText": "선박 가속력",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4902,6 +5158,7 @@
     "75312040": {
       "id": 75312040,
       "name": "함대 조타력 변화",
+      "uiText": "함대 조타력",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4918,6 +5175,7 @@
     "75312041": {
       "id": 75312041,
       "name": "함대 조타력 변화%",
+      "uiText": "함대 조타력",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4934,6 +5192,7 @@
     "75312042": {
       "id": 75312042,
       "name": "선박 조타력 변화",
+      "uiText": "선박 조타력",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4950,6 +5209,7 @@
     "75312043": {
       "id": 75312043,
       "name": "선박 조타력 변화%",
+      "uiText": "선박 조타력",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -4966,6 +5226,7 @@
     "75312044": {
       "id": 75312044,
       "name": "자연 발견 확률 증가",
+      "uiText": "자연 발견 확률",
       "isPercent": true,
       "isValueReference": false,
       "isPlusNeeded": true,
@@ -4987,6 +5248,7 @@
     "75312045": {
       "id": 75312045,
       "name": "동물 발견 확률 증가",
+      "uiText": "동물 발견 확률",
       "isPercent": true,
       "isValueReference": false,
       "isPlusNeeded": true,
@@ -5008,6 +5270,7 @@
     "75312046": {
       "id": 75312046,
       "name": "식물 발견 확률 증가",
+      "uiText": "식물 발견 확률",
       "isPercent": true,
       "isValueReference": false,
       "isPlusNeeded": true,
@@ -5029,6 +5292,7 @@
     "75312047": {
       "id": 75312047,
       "name": "유물 발견 확률 증가",
+      "uiText": "유물 발견 확률",
       "isPercent": true,
       "isValueReference": false,
       "isPlusNeeded": true,
@@ -5050,6 +5314,7 @@
     "75312048": {
       "id": 75312048,
       "name": "보물 발견 확률 증가",
+      "uiText": "보물 발견 확률",
       "isPercent": true,
       "isValueReference": false,
       "isPlusNeeded": true,
@@ -5071,6 +5336,7 @@
     "75312049": {
       "id": 75312049,
       "name": "건축 발견 확률 증가",
+      "uiText": "건축 발견 확률",
       "isPercent": true,
       "isValueReference": false,
       "isPlusNeeded": true,
@@ -5092,6 +5358,7 @@
     "75312050": {
       "id": 75312050,
       "name": "낚시 기술",
+      "uiText": "낚시 기술",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5113,6 +5380,7 @@
     "75312051": {
       "id": 75312051,
       "name": "상급 어종 발견 확률",
+      "uiText": "상급 어종 발견 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5134,6 +5402,7 @@
     "75312052": {
       "id": 75312052,
       "name": "인양 성공 확률",
+      "uiText": "인양 성공 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5154,6 +5423,7 @@
     "75312053": {
       "id": 75312053,
       "name": "예항 가능 시간",
+      "uiText": "예항 가능 시간",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5174,6 +5444,7 @@
     "75312054": {
       "id": 75312054,
       "name": "발견물 보고 시 재화 획득량 증가%",
+      "uiText": "발견물 보고 시 재화 획득량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5195,6 +5466,7 @@
     "75312055": {
       "id": 75312055,
       "name": "발견물 보고 시 명성 획득량 증가%",
+      "uiText": "발견물 보고 시 명성 획득량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5216,6 +5488,7 @@
     "75312056": {
       "id": 75312056,
       "name": "탐색 피해량 감소%",
+      "uiText": "탐색 중 피해량 감소",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5237,6 +5510,7 @@
     "75312057": {
       "id": 75312057,
       "name": "탐색 전투 발생 확률 감소",
+      "uiText": "탐색 중 전투 발생 확률 감소",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5257,6 +5531,7 @@
     "75312060": {
       "id": 75312060,
       "name": "자원 보고 시 재화 획득량 증가%",
+      "uiText": "자원 보고 시 재화 획득량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5278,6 +5553,7 @@
     "75312061": {
       "id": 75312061,
       "name": "자원 보고 시 명성 획득량 증가%",
+      "uiText": "자원 보고 시 명성 획득량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5299,6 +5575,7 @@
     "75312062": {
       "id": 75312062,
       "name": "탐험 항해사 부상률 감소%",
+      "uiText": "탐험 중 항해사 부상률 감소",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5320,6 +5597,7 @@
     "75312063": {
       "id": 75312063,
       "name": "탐험 선원 사망률 감소%",
+      "uiText": "탐험 중 선원 생존 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5341,6 +5619,7 @@
     "75312064": {
       "id": 75312064,
       "name": "탐험 전투 전리품 획득률 증가%",
+      "uiText": "탐험 전투 전리품 획득률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5362,6 +5641,7 @@
     "75312065": {
       "id": 75312065,
       "name": "탐험 탐색 전리품 획득률 증가%",
+      "uiText": "탐험 탐색 전리품 획득률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5383,6 +5663,7 @@
     "75312066": {
       "id": 75312066,
       "name": "탐험 채집 전리품 획득률 증가%",
+      "uiText": "탐험 채집 전리품 획득률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5404,6 +5685,7 @@
     "75312067": {
       "id": 75312067,
       "name": "탐험 물자 소비 감소%",
+      "uiText": "탐험 중 보급품 절약 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5425,6 +5707,7 @@
     "75312068": {
       "id": 75312068,
       "name": "탐험 높은 등급 확률 증가%",
+      "uiText": "고등급 탐험 등장 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5445,6 +5728,7 @@
     "75312069": {
       "id": 75312069,
       "name": "모험 도구 구매 비용 감소%",
+      "uiText": "모험 도구 구매 비용",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5466,6 +5750,7 @@
     "75312070": {
       "id": 75312070,
       "name": "탐험 해적 전투력 증가",
+      "uiText": "탐험 해적 상대 시 전투력",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5487,6 +5772,7 @@
     "75312071": {
       "id": 75312071,
       "name": "탐험 맹수 전투력 증가",
+      "uiText": "탐험 맹수 상대 시 전투력",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5508,6 +5794,7 @@
     "75312072": {
       "id": 75312072,
       "name": "탐험 발견물 발견 확률 증가%",
+      "uiText": "탐험 중 발견물 획득률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5529,6 +5816,7 @@
     "75312073": {
       "id": 75312073,
       "name": "탐험 자원 획득량 증가%",
+      "uiText": "탐험 중 보급품 획득량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5550,6 +5838,7 @@
     "75312074": {
       "id": 75312074,
       "name": "탐험 수련 입장 횟수 증가",
+      "uiText": "탐험 수련 입장 횟수 증가",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5568,6 +5857,7 @@
     "75312075": {
       "id": 75312075,
       "name": "마을 환대 우호도 증가량 증가%",
+      "uiText": "마을 환대 우호도 증가량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5588,6 +5878,7 @@
     "75312076": {
       "id": 75312076,
       "name": "마을 약탈 우호도 감소량 감소%",
+      "uiText": "마을 약탈 우호도 감소 방지량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5609,6 +5900,7 @@
     "75312077": {
       "id": 75312077,
       "name": "해양 탐색 거리 증가",
+      "uiText": "해상 탐색 거리 증가",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": true,
@@ -5628,6 +5920,7 @@
     "75312089": {
       "id": 75312089,
       "name": "전투 무르기 횟수",
+      "uiText": "매일 전투 무료 무르기",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5645,6 +5938,7 @@
     "75312090": {
       "id": 75312090,
       "name": "의뢰 새로 고침 횟수",
+      "uiText": "매일 의뢰 새로고침",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5662,6 +5956,7 @@
     "75312091": {
       "id": 75312091,
       "name": "교역소 재보급 횟수",
+      "uiText": "매일 교역품 재보급",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5679,6 +5974,7 @@
     "75312092": {
       "id": 75312092,
       "name": "무료 부활 횟수",
+      "uiText": "무료 부활 횟수",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5696,6 +5992,7 @@
     "75312093": {
       "id": 75312093,
       "name": "구매 가격 할인%",
+      "uiText": "구매 가격 할인률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5714,6 +6011,7 @@
     "75312094": {
       "id": 75312094,
       "name": "판매 가격 할증%",
+      "uiText": "판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5732,6 +6030,7 @@
     "75312095": {
       "id": 75312095,
       "name": "구매 수량 증가",
+      "uiText": "구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5749,6 +6048,7 @@
     "75312096": {
       "id": 75312096,
       "name": "협상 발생 확률 상승",
+      "uiText": "협상 발생 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5771,6 +6071,7 @@
     "75312097": {
       "id": 75312097,
       "name": "무료 페이즈 무르기 횟수",
+      "uiText": "무료 한 수 무르기 횟수",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5788,6 +6089,7 @@
     "75312098": {
       "id": 75312098,
       "name": "페이즈 무르기 무제한",
+      "uiText": "한 수 무르기 횟수 최대치",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": false,
@@ -5805,6 +6107,7 @@
     "75312099": {
       "id": 75312099,
       "name": "무료 회항 횟수",
+      "uiText": "무료 회항 횟수",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5822,6 +6125,7 @@
     "75312100": {
       "id": 75312100,
       "name": "조력 선박 속도 변화",
+      "uiText": "조력 선박 속도 변화",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5839,6 +6143,7 @@
     "75312101": {
       "id": 75312101,
       "name": "조력 선박 속도 변화 %",
+      "uiText": "조력 선박 속도 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5856,6 +6161,7 @@
     "75312102": {
       "id": 75312102,
       "name": "충성도 감소 방지",
+      "uiText": "충성도 감소 방지",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": false,
@@ -5873,6 +6179,7 @@
     "75312103": {
       "id": 75312103,
       "name": "부상 발생 방지",
+      "uiText": "부상 발생 방지",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": false,
@@ -5890,6 +6197,7 @@
     "75312104": {
       "id": 75312104,
       "name": "협상 성공 확률 상승",
+      "uiText": "협상 성공 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5912,6 +6220,7 @@
     "75312105": {
       "id": 75312105,
       "name": "육지 탐험 쾌속 횟수",
+      "uiText": "육지 탐험 쾌속 횟수",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5929,6 +6238,7 @@
     "75312106": {
       "id": 75312106,
       "name": "연속 전투 무료 횟수",
+      "uiText": "연속 전투 무료 횟수",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5946,6 +6256,7 @@
     "75312107": {
       "id": 75312107,
       "name": "함대 전투 명성",
+      "uiText": "전투 명성 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5963,6 +6274,7 @@
     "75312108": {
       "id": 75312108,
       "name": "함대 전투 명성%",
+      "uiText": "전투 명성 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5980,6 +6292,7 @@
     "75312109": {
       "id": 75312109,
       "name": "함대 교역 명성",
+      "uiText": "교역 명성 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -5997,6 +6310,7 @@
     "75312110": {
       "id": 75312110,
       "name": "함대 교역 명성%",
+      "uiText": "교역 명성 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6014,6 +6328,7 @@
     "75312111": {
       "id": 75312111,
       "name": "함대 모험 명성",
+      "uiText": "모험 명성 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6031,6 +6346,7 @@
     "75312112": {
       "id": 75312112,
       "name": "함대 모험 명성%",
+      "uiText": "모험 명성 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6048,6 +6364,7 @@
     "75312113": {
       "id": 75312113,
       "name": "함대 전투 추가 경험치",
+      "uiText": "전투 경험치 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6065,6 +6382,7 @@
     "75312114": {
       "id": 75312114,
       "name": "함대 전투 추가 경험치%",
+      "uiText": "전투 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6082,6 +6400,7 @@
     "75312115": {
       "id": 75312115,
       "name": "함대 교역 추가 경험치",
+      "uiText": "교역 경험치 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6099,6 +6418,7 @@
     "75312116": {
       "id": 75312116,
       "name": "함대 교역 추가 경험치%",
+      "uiText": "교역 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6116,6 +6436,7 @@
     "75312117": {
       "id": 75312117,
       "name": "함대 모험 추가 경험치",
+      "uiText": "모험 경험치 추가 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6133,6 +6454,7 @@
     "75312118": {
       "id": 75312118,
       "name": "함대 모험 추가 경험치%",
+      "uiText": "모험 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6150,6 +6472,7 @@
     "75312119": {
       "id": 75312119,
       "name": "거래 점수 기준 감소%",
+      "uiText": "거래 점수 기준 감소",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6170,6 +6493,7 @@
     "75312120": {
       "id": 75312120,
       "name": "선단 모든 추가 경험치%",
+      "uiText": "선단, 전투, 교역, 모험 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6186,6 +6510,7 @@
     "75312121": {
       "id": 75312121,
       "name": "판매 조합 배율 최대치 증가%",
+      "uiText": "판매 조합 배율 최대치 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6204,6 +6529,7 @@
     "75312122": {
       "id": 75312122,
       "name": "암시장 상시 입장",
+      "uiText": "암시장 상시 입장",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": false,
@@ -6221,6 +6547,7 @@
     "75312123": {
       "id": 75312123,
       "name": "자동 보급 무료 횟수",
+      "uiText": "자동 보급 무료 횟수",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6238,6 +6565,7 @@
     "75312124": {
       "id": 75312124,
       "name": "선박 나포 확률 증가",
+      "uiText": "선박 나포 확률 증가",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6255,6 +6583,7 @@
     "75312125": {
       "id": 75312125,
       "name": "숨겨진 전리품 확률",
+      "uiText": "숨겨진 전리품",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6272,6 +6601,7 @@
     "75312126": {
       "id": 75312126,
       "name": "파견 시간 변화",
+      "uiText": "파견 시간 단축",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6288,6 +6618,7 @@
     "75312127": {
       "id": 75312127,
       "name": "파견 시간 변화%",
+      "uiText": "파견 시간 단축",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6304,6 +6635,7 @@
     "75312128": {
       "id": 75312128,
       "name": "전투 파견 시간 변화",
+      "uiText": "전투 파견 시간 단축",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6320,6 +6652,7 @@
     "75312129": {
       "id": 75312129,
       "name": "전투 파견 시간 변화%",
+      "uiText": "전투 파견 시간 단축",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6336,6 +6669,7 @@
     "75312130": {
       "id": 75312130,
       "name": "교역 파견 시간 변화",
+      "uiText": "교역 파견 시간 단축",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6352,6 +6686,7 @@
     "75312131": {
       "id": 75312131,
       "name": "교역 파견 시간 변화%",
+      "uiText": "교역 파견 시간 단축",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6368,6 +6703,7 @@
     "75312132": {
       "id": 75312132,
       "name": "탐험 파견 시간 변화",
+      "uiText": "탐험 파견 시간 단축",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6384,6 +6720,7 @@
     "75312133": {
       "id": 75312133,
       "name": "탐험 파견 시간 변화%",
+      "uiText": "탐험 파견 시간 단축",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6400,6 +6737,7 @@
     "75312134": {
       "id": 75312134,
       "name": "조합 의뢰 성장 증가%",
+      "uiText": "조합 의뢰 명성, 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6416,6 +6754,7 @@
     "75312135": {
       "id": 75312135,
       "name": "일일 과제 보상 증가%",
+      "uiText": "일일 과제 보상 수량 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6432,6 +6771,7 @@
     "75312136": {
       "id": 75312136,
       "name": "면세 혜택",
+      "uiText": "면세 혜택",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": true,
@@ -6448,6 +6788,7 @@
     "75312137": {
       "id": 75312137,
       "name": "설계도 경험치%",
+      "uiText": "설계도 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6464,6 +6805,7 @@
     "75312138": {
       "id": 75312138,
       "name": "이해도 경험치%",
+      "uiText": "이해도 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6480,6 +6822,7 @@
     "75312139": {
       "id": 75312139,
       "name": "가호 혜택 적용",
+      "uiText": "가호 혜택 적용",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": true,
@@ -6496,6 +6839,7 @@
     "75312140": {
       "id": 75312140,
       "name": "육지 탐색 쾌속 무제한",
+      "uiText": "육지 탐색 무제한 쾌속",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": true,
@@ -6513,6 +6857,7 @@
     "75312141": {
       "id": 75312141,
       "name": "동양 건조 경험치%",
+      "uiText": "동양 건조 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6529,6 +6874,7 @@
     "75312142": {
       "id": 75312142,
       "name": "서양 건조 경험치%",
+      "uiText": "서양 건조 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6545,6 +6891,7 @@
     "75312143": {
       "id": 75312143,
       "name": "건조 경험치%",
+      "uiText": "동양, 서양 건조 경험치 추가 획득",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6561,6 +6908,7 @@
     "75312144": {
       "id": 75312144,
       "name": "교역품 구매 가능 수량%",
+      "uiText": "교역품 구매 가능 수량 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6578,6 +6926,7 @@
     "75312145": {
       "id": 75312145,
       "name": "선박 건조 시간%",
+      "uiText": "선박 건조 시간",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": false,
@@ -6594,6 +6943,7 @@
     "75312146": {
       "id": 75312146,
       "name": "표류자 등장 확률 조정%",
+      "uiText": "표류자 등장 확률 조정",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6611,6 +6961,7 @@
     "75312147": {
       "id": 75312147,
       "name": "보물상자 등장 확률 조정%",
+      "uiText": "보물상자 등장 확률 조정",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6628,6 +6979,7 @@
     "75312148": {
       "id": 75312148,
       "name": "자재 등장 확률 조정%",
+      "uiText": "자재 등장 확률 조정",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6645,6 +6997,7 @@
     "75312149": {
       "id": 75312149,
       "name": "오크통 등장 확률 조정%",
+      "uiText": "오크통 등장 확률 조정",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6662,6 +7015,7 @@
     "75312150": {
       "id": 75312150,
       "name": "유령선 등장 확률 조정%",
+      "uiText": "유령선 등장 확률 조정",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6679,6 +7033,7 @@
     "75312151": {
       "id": 75312151,
       "name": "교환 횟수 변화",
+      "uiText": "물물 교환 횟수",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6697,6 +7052,7 @@
     "75312152": {
       "id": 75312152,
       "name": "교환 수량 변화%",
+      "uiText": "교역품 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6715,6 +7071,7 @@
     "75312153": {
       "id": 75312153,
       "name": "식료품 교환 수량 변화%",
+      "uiText": "식료품 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6736,6 +7093,7 @@
     "75312154": {
       "id": 75312154,
       "name": "조미료 교환 수량 변화%",
+      "uiText": "조미료 교환획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6757,6 +7115,7 @@
     "75312155": {
       "id": 75312155,
       "name": "가축 교환 수량 변화%",
+      "uiText": "가축 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6778,6 +7137,7 @@
     "75312156": {
       "id": 75312156,
       "name": "의약품 교환 수량 변화%",
+      "uiText": "의약품 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6799,6 +7159,7 @@
     "75312157": {
       "id": 75312157,
       "name": "잡화 교환 수량 변화%",
+      "uiText": "잡화 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6820,6 +7181,7 @@
     "75312158": {
       "id": 75312158,
       "name": "주류 교환 수량 변화%",
+      "uiText": "주류 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6841,6 +7203,7 @@
     "75312159": {
       "id": 75312159,
       "name": "염료 교환 수량 변화%",
+      "uiText": "염료 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6862,6 +7225,7 @@
     "75312160": {
       "id": 75312160,
       "name": "광석 교환 수량 변화%",
+      "uiText": "광석 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6883,6 +7247,7 @@
     "75312161": {
       "id": 75312161,
       "name": "공업품 교환 수량 변화%",
+      "uiText": "공업품 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6904,6 +7269,7 @@
     "75312162": {
       "id": 75312162,
       "name": "기호품 교환 수량 변화%",
+      "uiText": "기호품 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6925,6 +7291,7 @@
     "75312163": {
       "id": 75312163,
       "name": "섬유 교환 수량 변화%",
+      "uiText": "섬유 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6946,6 +7313,7 @@
     "75312164": {
       "id": 75312164,
       "name": "직물 교환 수량 변화%",
+      "uiText": "직물 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6967,6 +7335,7 @@
     "75312165": {
       "id": 75312165,
       "name": "공예품 교환 수량 변화%",
+      "uiText": "공예품 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -6988,6 +7357,7 @@
     "75312166": {
       "id": 75312166,
       "name": "미술품 교환 수량 변화%",
+      "uiText": "미술품 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7009,6 +7379,7 @@
     "75312167": {
       "id": 75312167,
       "name": "향신료 교환 수량 변화%",
+      "uiText": "향신료 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7030,6 +7401,7 @@
     "75312168": {
       "id": 75312168,
       "name": "귀금속 교환 수량 변화%",
+      "uiText": "귀금속 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7051,6 +7423,7 @@
     "75312169": {
       "id": 75312169,
       "name": "향료 교환 수량 변화%",
+      "uiText": "향료 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7072,6 +7445,7 @@
     "75312170": {
       "id": 75312170,
       "name": "보석 교환 수량 변화%",
+      "uiText": "보석 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7093,6 +7467,7 @@
     "75312171": {
       "id": 75312171,
       "name": "무기류 교환 수량 변화%",
+      "uiText": "무기류 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7114,6 +7489,7 @@
     "75312172": {
       "id": 75312172,
       "name": "총포류 교환 수량 변화%",
+      "uiText": "총포류 교환 획득 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7135,6 +7511,7 @@
     "75312173": {
       "id": 75312173,
       "name": "교환 비용 변화%",
+      "uiText": "교역품 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7153,6 +7530,7 @@
     "75312174": {
       "id": 75312174,
       "name": "식료품 교환 비용 변화%",
+      "uiText": "식료품 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7174,6 +7552,7 @@
     "75312175": {
       "id": 75312175,
       "name": "조미료 교환 비용 변화%",
+      "uiText": "조미료 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7195,6 +7574,7 @@
     "75312176": {
       "id": 75312176,
       "name": "가축 교환 비용 변화%",
+      "uiText": "가축 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7216,6 +7596,7 @@
     "75312177": {
       "id": 75312177,
       "name": "의약품 교환 비용 변화%",
+      "uiText": "의약품 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7237,6 +7618,7 @@
     "75312178": {
       "id": 75312178,
       "name": "잡화 교환 비용 변화%",
+      "uiText": "잡화 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7258,6 +7640,7 @@
     "75312179": {
       "id": 75312179,
       "name": "주류 교환 비용 변화%",
+      "uiText": "주류 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7279,6 +7662,7 @@
     "75312180": {
       "id": 75312180,
       "name": "염료 교환 비용 변화%",
+      "uiText": "염료 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7300,6 +7684,7 @@
     "75312181": {
       "id": 75312181,
       "name": "광석 교환 비용 변화%",
+      "uiText": "광석 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7321,6 +7706,7 @@
     "75312182": {
       "id": 75312182,
       "name": "공업품 교환 비용 변화%",
+      "uiText": "공업품 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7342,6 +7728,7 @@
     "75312183": {
       "id": 75312183,
       "name": "기호품 교환 비용 변화%",
+      "uiText": "기호품 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7363,6 +7750,7 @@
     "75312184": {
       "id": 75312184,
       "name": "섬유 교환 비용 변화%",
+      "uiText": "섬유 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7384,6 +7772,7 @@
     "75312185": {
       "id": 75312185,
       "name": "직물 교환 비용 변화%",
+      "uiText": "직물 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7405,6 +7794,7 @@
     "75312186": {
       "id": 75312186,
       "name": "공예품 교환 비용 변화%",
+      "uiText": "공예품 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7426,6 +7816,7 @@
     "75312187": {
       "id": 75312187,
       "name": "미술품 교환 비용 변화%",
+      "uiText": "미술품 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7447,6 +7838,7 @@
     "75312188": {
       "id": 75312188,
       "name": "향신료 교환 비용 변화%",
+      "uiText": "향신료 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7468,6 +7860,7 @@
     "75312189": {
       "id": 75312189,
       "name": "귀금속 교환 비용 변화%",
+      "uiText": "귀금속 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7489,6 +7882,7 @@
     "75312190": {
       "id": 75312190,
       "name": "향료 교환 비용 변화%",
+      "uiText": "향료 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7510,6 +7904,7 @@
     "75312191": {
       "id": 75312191,
       "name": "보석 교환 비용 변화%",
+      "uiText": "보석 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7531,6 +7926,7 @@
     "75312192": {
       "id": 75312192,
       "name": "무기류 교환 비용 변화%",
+      "uiText": "무기류 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7552,6 +7948,7 @@
     "75312193": {
       "id": 75312193,
       "name": "총포류 교환 비용 변화%",
+      "uiText": "총포류 교환 소모 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7573,6 +7970,7 @@
     "75312194": {
       "id": 75312194,
       "name": "물물 교환 가격 협상 비용 변화",
+      "uiText": "가격 협상 우호도 소모량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7591,6 +7989,7 @@
     "75312195": {
       "id": 75312195,
       "name": "물물 교환 가격 협상 비용 변화%",
+      "uiText": "가격 협상 우호도 소모량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7609,6 +8008,7 @@
     "75312196": {
       "id": 75312196,
       "name": "물물 교환 수량 협상 비용 변화",
+      "uiText": "수량 협상 우호도 소모량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7627,6 +8027,7 @@
     "75312197": {
       "id": 75312197,
       "name": "물물 교환 수량 협상 비용 변화%",
+      "uiText": "수량 협상 우호도 소모량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7645,6 +8046,7 @@
     "75312198": {
       "id": 75312198,
       "name": "물물 교환 가격 협상 성공률 변화%",
+      "uiText": "가격 협상 성공률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7663,6 +8065,7 @@
     "75312199": {
       "id": 75312199,
       "name": "물물 교환 수량 협상 성공률 변화%",
+      "uiText": "수량 협상 성공률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7681,6 +8084,7 @@
     "75312200": {
       "id": 75312200,
       "name": "가속 발판 등장 확률 조정%",
+      "uiText": "가속 발판 등장 확률 조정",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7698,6 +8102,7 @@
     "75312201": {
       "id": 75312201,
       "name": "자원 추가 획득%",
+      "uiText": "자원 획득 시 추가 획득률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7715,6 +8120,7 @@
     "75312202": {
       "id": 75312202,
       "name": "투자 점수 추가 획득%",
+      "uiText": "투자 점수 획득 시 추가 획득률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7732,6 +8138,7 @@
     "75312203": {
       "id": 75312203,
       "name": "추적 성공률 증가%",
+      "uiText": "추적 성공률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7749,6 +8156,7 @@
     "75312204": {
       "id": 75312204,
       "name": "해적 소탕 시 업보 감소 변화",
+      "uiText": "해적 소탕 시 업보 감소량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7766,6 +8174,7 @@
     "75312205": {
       "id": 75312205,
       "name": "자동 낚시 성공률%",
+      "uiText": "자동 낚시 성공률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7783,6 +8192,7 @@
     "75312206": {
       "id": 75312206,
       "name": "해양 부유물 자동 수집",
+      "uiText": "해양 부유물 자동 수집",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7800,6 +8210,7 @@
     "75312207": {
       "id": 75312207,
       "name": "육지 탐색 지도 조각 획득 증가%",
+      "uiText": "육지 탐색 시 지도 조각 획득량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7817,6 +8228,7 @@
     "75312208": {
       "id": 75312208,
       "name": "인양 점수 획득 증가%",
+      "uiText": "인양 시 점수 획득량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7834,6 +8246,7 @@
     "75312209": {
       "id": 75312209,
       "name": "항해 중 물 획득 증가%",
+      "uiText": "항해 중 물 획득량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7851,6 +8264,7 @@
     "75312210": {
       "id": 75312210,
       "name": "월척 시 추가 자원 획득",
+      "uiText": "월척 시 추가 자원 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7868,6 +8282,7 @@
     "75312211": {
       "id": 75312211,
       "name": "교역품 구매 가능 수량",
+      "uiText": "교역품 구매 가능 수량 증가",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7885,6 +8300,7 @@
     "75312212": {
       "id": 75312212,
       "name": "보급 비용 변화%",
+      "uiText": "보급 비용",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7902,6 +8318,7 @@
     "75312213": {
       "id": 75312213,
       "name": "항해 중 물 획득",
+      "uiText": "항해 중 물 획득",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7919,6 +8336,7 @@
     "75312214": {
       "id": 75312214,
       "name": "원격 건조 무제한",
+      "uiText": "원격 건조",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": true,
@@ -7935,6 +8353,7 @@
     "75312215": {
       "id": 75312215,
       "name": "무료 탁송 무제한",
+      "uiText": "무료 탁송",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": true,
@@ -7951,6 +8370,7 @@
     "75312216": {
       "id": 75312216,
       "name": "소탕권 소모량 감소",
+      "uiText": "소탕권 소모량 감소",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7968,6 +8388,7 @@
     "75312217": {
       "id": 75312217,
       "name": "자동 낚시 치명타 확률 증가",
+      "uiText": "자동 낚시 치명타 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -7985,6 +8406,7 @@
     "75312218": {
       "id": 75312218,
       "name": "운하 기본 비용 증가%",
+      "uiText": "운하 기본 비용",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8001,6 +8423,7 @@
     "75312219": {
       "id": 75312219,
       "name": "운하 교역 운송 비용 증가%",
+      "uiText": "운하 교역 운송 비용",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8017,6 +8440,7 @@
     "75312220": {
       "id": 75312220,
       "name": "운하 교역 운송 무료 횟수 증가",
+      "uiText": "운하 교역 운송 무료 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8033,6 +8457,7 @@
     "75312221": {
       "id": 75312221,
       "name": "운하 이용 가능 횟수 증가",
+      "uiText": "운하 이용 가능 횟수",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8049,6 +8474,7 @@
     "75312222": {
       "id": 75312222,
       "name": "원격 투자",
+      "uiText": "원격 투자",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": true,
@@ -8065,6 +8491,7 @@
     "75312223": {
       "id": 75312223,
       "name": "탐험 내 채집력",
+      "uiText": "탐험 내 채집력",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8082,6 +8509,7 @@
     "75312224": {
       "id": 75312224,
       "name": "탐험 내 관찰력",
+      "uiText": "탐험 내 관찰력",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8099,6 +8527,7 @@
     "75312225": {
       "id": 75312225,
       "name": "탐험 내 전투력",
+      "uiText": "탐험 내 전투력",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8116,6 +8545,7 @@
     "75312226": {
       "id": 75312226,
       "name": "함대 속도 상한선 돌파",
+      "uiText": "함대 속도 상한선 돌파",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8134,6 +8564,7 @@
     "75312227": {
       "id": 75312227,
       "name": "심해 인양 점수 획득량 증가",
+      "uiText": "심해 인양 점수 획득량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8154,6 +8585,7 @@
     "75312228": {
       "id": 75312228,
       "name": "천해 인양 점수 획득량 증가",
+      "uiText": "천해 인양 점수 획득량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8174,6 +8606,7 @@
     "75312229": {
       "id": 75312229,
       "name": "심해 인양 보상 획득량 증가",
+      "uiText": "심해 인양 보상 획득량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8194,6 +8627,7 @@
     "75312230": {
       "id": 75312230,
       "name": "천해 인양 보상 획득량 증가",
+      "uiText": "천해 인양 보상 획득량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8214,6 +8648,7 @@
     "75312231": {
       "id": 75312231,
       "name": "심해 인양 보상 점수 감소",
+      "uiText": "심해 인양 보상 기준 점수",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8234,6 +8669,7 @@
     "75312232": {
       "id": 75312232,
       "name": "천해 인양 보상 점수 감소",
+      "uiText": "천해 인양 보상 기준 점수",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8254,6 +8690,7 @@
     "75312233": {
       "id": 75312233,
       "name": "천해 내구도 감소량 감소",
+      "uiText": "천해 내구도 감소량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8274,6 +8711,7 @@
     "75312234": {
       "id": 75312234,
       "name": "인양 보상 획득량 증가",
+      "uiText": "인양 보상 획득량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8293,6 +8731,7 @@
     "75312235": {
       "id": 75312235,
       "name": "산호초 인양 점수 획득량 증가",
+      "uiText": "산호초 인양 점수 획득량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8313,6 +8752,7 @@
     "75312236": {
       "id": 75312236,
       "name": "산호초 인양 보상 획득량 증가",
+      "uiText": "산호초 인양 보상 획득량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8333,6 +8773,7 @@
     "75312237": {
       "id": 75312237,
       "name": "산호초 인양 보상 점수 감소",
+      "uiText": "산호초 인양 보상 점수",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8353,6 +8794,7 @@
     "75312238": {
       "id": 75312238,
       "name": "대륙붕 인양 점수 획득량 증가",
+      "uiText": "대륙붕 인양 점수 획득량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8373,6 +8815,7 @@
     "75312239": {
       "id": 75312239,
       "name": "대륙붕 인양 보상 획득량 증가",
+      "uiText": "대륙붕 인양 보상 획득량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8393,6 +8836,7 @@
     "75312240": {
       "id": 75312240,
       "name": "대륙붕 인양 보상 점수 감소",
+      "uiText": "대륙붕 인양 보상 기준 점수",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8413,6 +8857,7 @@
     "75312241": {
       "id": 75312241,
       "name": "해구 인양 점수 획득량 증가",
+      "uiText": "해구 인양 점수 획득량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8433,6 +8878,7 @@
     "75312242": {
       "id": 75312242,
       "name": "해구 인양 보상 획득량 증가",
+      "uiText": "해구 인양 보상 획득량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8453,6 +8899,7 @@
     "75312243": {
       "id": 75312243,
       "name": "해구 인양 보상 점수 감소",
+      "uiText": "해구 인양 보상 기준 점수",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8473,6 +8920,7 @@
     "75312244": {
       "id": 75312244,
       "name": "해령 인양 점수 획득량 증가",
+      "uiText": "해령 인양 점수 획득량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8493,6 +8941,7 @@
     "75312245": {
       "id": 75312245,
       "name": "해령 인양 보상 획득량 증가",
+      "uiText": "해령 인양 보상 획득량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8513,6 +8962,7 @@
     "75312246": {
       "id": 75312246,
       "name": "해령 인양 보상 점수 감소",
+      "uiText": "해령 인양 보상 기준 점수",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8533,6 +8983,7 @@
     "75312247": {
       "id": 75312247,
       "name": "위험한 해역 재해 예방",
+      "uiText": "위험한 해역 재해 예방",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8550,6 +9001,7 @@
     "75312248": {
       "id": 75312248,
       "name": "거대한 해초 재해 예방",
+      "uiText": "거대한 해초 재해 예방",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8567,6 +9019,7 @@
     "75312249": {
       "id": 75312249,
       "name": "탈수 재해 예방",
+      "uiText": "탈수 재해 예방",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8584,6 +9037,7 @@
     "75312250": {
       "id": 75312250,
       "name": "극한의 허기 재해 예방",
+      "uiText": "극한의 허기 재해 예방",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8601,6 +9055,7 @@
     "75312251": {
       "id": 75312251,
       "name": "공포 재해 예방",
+      "uiText": "공포 재해 예방",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8618,6 +9073,7 @@
     "75312252": {
       "id": 75312252,
       "name": "위압 재해 예방",
+      "uiText": "위압 재해 예방",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8635,6 +9091,7 @@
     "75312253": {
       "id": 75312253,
       "name": "불행 재해 예방",
+      "uiText": "불행 재해 예방",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8652,6 +9109,7 @@
     "75312254": {
       "id": 75312254,
       "name": "질병 재해 예방",
+      "uiText": "질병 재해 예방",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8669,6 +9127,7 @@
     "75312255": {
       "id": 75312255,
       "name": "사고 재해 예방",
+      "uiText": "사고 재해 예방",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8686,6 +9145,7 @@
     "75312256": {
       "id": 75312256,
       "name": "심리 재해 예방",
+      "uiText": "심리 재해 예방",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8703,6 +9163,7 @@
     "75312257": {
       "id": 75312257,
       "name": "자연현상 재해 예방",
+      "uiText": "자연현상 재해 예방",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8720,6 +9181,7 @@
     "75312258": {
       "id": 75312258,
       "name": "밀수품 보유",
+      "uiText": "밀수품 보유",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": true,
@@ -8737,6 +9199,7 @@
     "75312259": {
       "id": 75312259,
       "name": "밀수품 구매 수량%",
+      "uiText": "밀수품 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8755,6 +9218,7 @@
     "75312260": {
       "id": 75312260,
       "name": "불법 밀수품 구매 수량%",
+      "uiText": "불법 밀수품 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8776,6 +9240,7 @@
     "75312261": {
       "id": 75312261,
       "name": "만용 밀수품 구매 수량%",
+      "uiText": "만용 밀수품 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8797,6 +9262,7 @@
     "75312262": {
       "id": 75312262,
       "name": "탐욕 밀수품 구매 수량%",
+      "uiText": "탐욕 밀수품 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8818,6 +9284,7 @@
     "75312263": {
       "id": 75312263,
       "name": "사치 밀수품 구매 수량%",
+      "uiText": "사치 밀수품 구매 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8839,6 +9306,7 @@
     "75312264": {
       "id": 75312264,
       "name": "밀수품 구매 수량",
+      "uiText": "밀수품 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8856,6 +9324,7 @@
     "75312265": {
       "id": 75312265,
       "name": "불법 밀수품 구매 수량",
+      "uiText": "불법 밀수품 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8873,6 +9342,7 @@
     "75312266": {
       "id": 75312266,
       "name": "만용 밀수품 구매 수량",
+      "uiText": "만용 밀수품 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8890,6 +9360,7 @@
     "75312267": {
       "id": 75312267,
       "name": "탐욕 밀수품 구매 수량",
+      "uiText": "탐욕 밀수품 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8907,6 +9378,7 @@
     "75312268": {
       "id": 75312268,
       "name": "사치 밀수품 구매 수량",
+      "uiText": "사치 밀수품 구매 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8924,6 +9396,7 @@
     "75312269": {
       "id": 75312269,
       "name": "밀수품 협상 발생 확률 변화%",
+      "uiText": "밀수품 협상 발생 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8942,6 +9415,7 @@
     "75312270": {
       "id": 75312270,
       "name": "밀수품 추가 협상 성공 확률 변화%",
+      "uiText": "밀수품 추가 협상 성공 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8960,6 +9434,7 @@
     "75312271": {
       "id": 75312271,
       "name": "밀수품 추가 협상 발생 횟수 변화",
+      "uiText": "밀수품 추가 협상 발생 횟수 변화",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8977,6 +9452,7 @@
     "75312272": {
       "id": 75312272,
       "name": "밀수품 협상 성공 확률 변화%",
+      "uiText": "밀수품 협상 성공 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -8995,6 +9471,7 @@
     "75312273": {
       "id": 75312273,
       "name": "밀수품 협상 성공 시 할인율",
+      "uiText": "밀수품 협상 성공 시 할인율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9013,6 +9490,7 @@
     "75312274": {
       "id": 75312274,
       "name": "밀수품 협상 성공 시 할증율",
+      "uiText": "밀수품 협상 성공 시 할증율",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9031,6 +9509,7 @@
     "75312275": {
       "id": 75312275,
       "name": "밀수품 구매 협상 성공 추가 수량%",
+      "uiText": "밀수품 구매 협상 성공 추가 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9048,6 +9527,7 @@
     "75312276": {
       "id": 75312276,
       "name": "불법 밀수품 구매 협상 성공 추가 수량%",
+      "uiText": "불법 밀수품 구매 협상 성공 추가 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9068,6 +9548,7 @@
     "75312277": {
       "id": 75312277,
       "name": "만용 밀수품 구매 협상 성공 추가 수량%",
+      "uiText": "만용 밀수품 구매 협상 성공 추가 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9088,6 +9569,7 @@
     "75312278": {
       "id": 75312278,
       "name": "탐욕 밀수품 구매 협상 성공 추가 수량%",
+      "uiText": "탐욕 밀수품 구매 협상 성공 추가 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9108,6 +9590,7 @@
     "75312279": {
       "id": 75312279,
       "name": "사치 밀수품 구매 협상 성공 추가 수량%",
+      "uiText": "사치 밀수품 구매 협상 성공 추가 수량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9128,6 +9611,7 @@
     "75312280": {
       "id": 75312280,
       "name": "밀수품 구매 협상 성공 추가 수량",
+      "uiText": "밀수품 구매 협상 성공 추가 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9145,6 +9629,7 @@
     "75312281": {
       "id": 75312281,
       "name": "불법 밀수품 구매 협상 성공 추가 수량",
+      "uiText": "불법 밀수품 구매 협상 성공 추가 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9162,6 +9647,7 @@
     "75312282": {
       "id": 75312282,
       "name": "만용 밀수품 구매 협상 성공 추가 수량",
+      "uiText": "만용 밀수품 구매 협상 성공 추가 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9179,6 +9665,7 @@
     "75312283": {
       "id": 75312283,
       "name": "탐욕 밀수품 구매 협상 성공 추가 수량",
+      "uiText": "탐욕 밀수품 구매 협상 성공 추가 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9196,6 +9683,7 @@
     "75312284": {
       "id": 75312284,
       "name": "사치 밀수품 구매 협상 성공 추가 수량",
+      "uiText": "사치 밀수품 구매 협상 성공 추가 수량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9213,6 +9701,7 @@
     "75312285": {
       "id": 75312285,
       "name": "밀수 검문 발동 확률 변화%",
+      "uiText": "밀수 검문 발동 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9231,6 +9720,7 @@
     "75312286": {
       "id": 75312286,
       "name": "밀수단 문서 조각 획득 확률%",
+      "uiText": "밀수단 문서 조각 획득 확률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9249,6 +9739,7 @@
     "75312287": {
       "id": 75312287,
       "name": "밀수단 문서 조각 획득량%",
+      "uiText": "밀수단 문서 조각 획득량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9267,6 +9758,7 @@
     "75312288": {
       "id": 75312288,
       "name": "밀수단 문서 조각 획득량",
+      "uiText": "밀수단 문서 조각 획득량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9284,6 +9776,7 @@
     "75312289": {
       "id": 75312289,
       "name": "밀수단 신용 증서 획득량%",
+      "uiText": "밀수단 신용 증서 획득량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9302,6 +9795,7 @@
     "75312290": {
       "id": 75312290,
       "name": "밀수단 신용 증서 획득량",
+      "uiText": "밀수단 신용 증서 획득량",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9319,6 +9813,7 @@
     "75312291": {
       "id": 75312291,
       "name": "밀수품 구매 가격 할인율%",
+      "uiText": "밀수품 구매 가격 할인율%",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9337,6 +9832,7 @@
     "75312292": {
       "id": 75312292,
       "name": "불법 밀수품 구매 가격 할인율%",
+      "uiText": "불법 밀수품 구매 가격 할인율%",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9358,6 +9854,7 @@
     "75312293": {
       "id": 75312293,
       "name": "만용 밀수품 구매 가격 할인율%",
+      "uiText": "만용 밀수품 구매 가격 할인율%",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9379,6 +9876,7 @@
     "75312294": {
       "id": 75312294,
       "name": "탐욕 밀수품 구매 가격 할인율%",
+      "uiText": "탐욕 밀수품 구매 가격 할인율%",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9400,6 +9898,7 @@
     "75312295": {
       "id": 75312295,
       "name": "사치 밀수품 구매 가격 할인율%",
+      "uiText": "사치 밀수품 구매 가격 할인율%",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9421,6 +9920,7 @@
     "75312296": {
       "id": 75312296,
       "name": "밀수품 구매 가격 할인",
+      "uiText": "밀수품 구매 가격 할인",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9439,6 +9939,7 @@
     "75312297": {
       "id": 75312297,
       "name": "불법 밀수품 구매 가격 할인",
+      "uiText": "불법 밀수품 구매 가격 할인",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9457,6 +9958,7 @@
     "75312298": {
       "id": 75312298,
       "name": "만용 밀수품 구매 가격 할인",
+      "uiText": "만용 밀수품 구매 가격 할인",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9475,6 +9977,7 @@
     "75312299": {
       "id": 75312299,
       "name": "탐욕 밀수품 구매 가격 할인",
+      "uiText": "탐욕 밀수품 구매 가격 할인",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9493,6 +9996,7 @@
     "75312300": {
       "id": 75312300,
       "name": "사치 밀수품 구매 가격 할인",
+      "uiText": "사치 밀수품 구매 가격 할인",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9511,6 +10015,7 @@
     "75312301": {
       "id": 75312301,
       "name": "밀수품 판매 가격 할증률%",
+      "uiText": "밀수품 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9529,6 +10034,7 @@
     "75312302": {
       "id": 75312302,
       "name": "불법 밀수품 판매 가격 할증률%",
+      "uiText": "불법 밀수품 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9550,6 +10056,7 @@
     "75312303": {
       "id": 75312303,
       "name": "만용 밀수품 판매 가격 할증률%",
+      "uiText": "만용 밀수품 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9571,6 +10078,7 @@
     "75312304": {
       "id": 75312304,
       "name": "탐욕 밀수품 판매 가격 할증률%",
+      "uiText": "탐욕 밀수품 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9592,6 +10100,7 @@
     "75312305": {
       "id": 75312305,
       "name": "사치 밀수품 판매 가격 할증률%",
+      "uiText": "사치 밀수품 판매 가격 할증률",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9613,6 +10122,7 @@
     "75312306": {
       "id": 75312306,
       "name": "밀수품 판매 가격 할증",
+      "uiText": "밀수품 판매 가격 할증",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9631,6 +10141,7 @@
     "75312307": {
       "id": 75312307,
       "name": "불법 밀수품 판매 가격 할증",
+      "uiText": "불법 밀수품 판매 가격 할증",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9649,6 +10160,7 @@
     "75312308": {
       "id": 75312308,
       "name": "만용 밀수품 판매 가격 할증",
+      "uiText": "만용 밀수품 판매 가격 할증",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9667,6 +10179,7 @@
     "75312309": {
       "id": 75312309,
       "name": "탐욕 밀수품 판매 가격 할증",
+      "uiText": "탐욕 밀수품 판매 가격 할증",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9685,6 +10198,7 @@
     "75312310": {
       "id": 75312310,
       "name": "사치 밀수품 판매 가격 할증",
+      "uiText": "사치 밀수품 판매 가격 할증",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9703,6 +10217,7 @@
     "75312311": {
       "id": 75312311,
       "name": "심해 내구도 감소량 감소",
+      "uiText": "심해 내구도 감소량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9723,6 +10238,7 @@
     "75312312": {
       "id": 75312312,
       "name": "산호초 내구도 감소량 감소",
+      "uiText": "산호초 내구도 감소량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9743,6 +10259,7 @@
     "75312313": {
       "id": 75312313,
       "name": "대륙붕 내구도 감소량 감소",
+      "uiText": "대륙붕 내구도 감소량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9763,6 +10280,7 @@
     "75312314": {
       "id": 75312314,
       "name": "해구 내구도 감소량 감소",
+      "uiText": "해구 내구도 감소량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9783,6 +10301,7 @@
     "75312315": {
       "id": 75312315,
       "name": "해령 내구도 감소량 감소",
+      "uiText": "해령 내구도 감소량",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9803,6 +10322,7 @@
     "75312316": {
       "id": 75312316,
       "name": "과제 자동 달성",
+      "uiText": "과제 자동 달성",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": false,
@@ -9820,6 +10340,7 @@
     "75312317": {
       "id": 75312317,
       "name": "생산 성공률 증가",
+      "uiText": "생산 성공률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9839,6 +10360,7 @@
     "75312318": {
       "id": 75312318,
       "name": "생산 대성공률 증가",
+      "uiText": "생산 대성공률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9858,6 +10380,7 @@
     "75312319": {
       "id": 75312319,
       "name": "생산품 추가 획득 확률 증가",
+      "uiText": "생산품 추가 획득 확률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9877,6 +10400,7 @@
     "75312320": {
       "id": 75312320,
       "name": "생산품 추가 획득 개수 증가",
+      "uiText": "생산품 추가 획득 개수 증가",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9896,6 +10420,7 @@
     "75312321": {
       "id": 75312321,
       "name": "생산 레벨 부스트",
+      "uiText": "생산 레벨 부스트",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9915,6 +10440,7 @@
     "75312322": {
       "id": 75312322,
       "name": "생산 경험치 획득량 증가%",
+      "uiText": "생산 경험치 획득량 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9934,6 +10460,7 @@
     "75312323": {
       "id": 75312323,
       "name": "조리 성공률 증가",
+      "uiText": "조리 성공률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9953,6 +10480,7 @@
     "75312324": {
       "id": 75312324,
       "name": "주조 성공률 증가",
+      "uiText": "주조 성공률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9972,6 +10500,7 @@
     "75312325": {
       "id": 75312325,
       "name": "공예 성공률 증가",
+      "uiText": "공예 성공률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -9991,6 +10520,7 @@
     "75312326": {
       "id": 75312326,
       "name": "봉제 성공률 증가",
+      "uiText": "봉제 성공률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10010,6 +10540,7 @@
     "75312327": {
       "id": 75312327,
       "name": "제약 성공률 증가",
+      "uiText": "제약 성공률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10029,6 +10560,7 @@
     "75312328": {
       "id": 75312328,
       "name": "조리 대성공률 증가",
+      "uiText": "조리 대성공률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10048,6 +10580,7 @@
     "75312329": {
       "id": 75312329,
       "name": "주조 대상공률 증가",
+      "uiText": "주조 대상공률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10067,6 +10600,7 @@
     "75312330": {
       "id": 75312330,
       "name": "공예 대성공률 증가",
+      "uiText": "공예 대성공률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10086,6 +10620,7 @@
     "75312331": {
       "id": 75312331,
       "name": "봉제 대성공률 증가",
+      "uiText": "봉제 대성공률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10105,6 +10640,7 @@
     "75312332": {
       "id": 75312332,
       "name": "제약 대성공률 증가",
+      "uiText": "제약 대성공률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10124,6 +10660,7 @@
     "75312333": {
       "id": 75312333,
       "name": "조리 생산품 추가 획득 확률 증가",
+      "uiText": "조리 생산품 추가 획득 확률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10146,6 +10683,7 @@
     "75312334": {
       "id": 75312334,
       "name": "주조 생산품 추가 획득 확률 증가",
+      "uiText": "주조 생산품 추가 획득 확률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10168,6 +10706,7 @@
     "75312335": {
       "id": 75312335,
       "name": "공예 생산품 추가 획득 확률 증가",
+      "uiText": "공예 생산품 추가 획득 확률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10190,6 +10729,7 @@
     "75312336": {
       "id": 75312336,
       "name": "봉제 생산품 추가 획득 확률 증가",
+      "uiText": "봉제 생산품 추가 획득 확률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10212,6 +10752,7 @@
     "75312337": {
       "id": 75312337,
       "name": "제약 생산품 추가 획득 확률 증가",
+      "uiText": "제약 생산품 추가 획득 확률 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10234,6 +10775,7 @@
     "75312338": {
       "id": 75312338,
       "name": "조리 생산품 추가 획득 개수 증가",
+      "uiText": "조리 생산품 추가 획득 개수 증가",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10256,6 +10798,7 @@
     "75312339": {
       "id": 75312339,
       "name": "주조 생산품 추가 획득 개수 증가",
+      "uiText": "주조 생산품 추가 획득 개수 증가",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10278,6 +10821,7 @@
     "75312340": {
       "id": 75312340,
       "name": "공예 생산품 추가 획득 개수 증가",
+      "uiText": "공예 생산품 추가 획득 개수 증가",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10300,6 +10844,7 @@
     "75312341": {
       "id": 75312341,
       "name": "봉제 생산품 추가 획득 개수 증가",
+      "uiText": "봉제 생산품 추가 획득 개수 증가",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10322,6 +10867,7 @@
     "75312342": {
       "id": 75312342,
       "name": "제약 생산품 추가 획득 개수 증가",
+      "uiText": "제약 생산품 추가 획득 개수 증가",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10344,6 +10890,7 @@
     "75312343": {
       "id": 75312343,
       "name": "조리 레벨 부스트",
+      "uiText": "조리 레벨 부스트",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10363,6 +10910,7 @@
     "75312344": {
       "id": 75312344,
       "name": "주조 레벨 부스트",
+      "uiText": "주조 레벨 부스트",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10382,6 +10930,7 @@
     "75312345": {
       "id": 75312345,
       "name": "공예 레벨 부스트",
+      "uiText": "공예 레벨 부스트",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10401,6 +10950,7 @@
     "75312346": {
       "id": 75312346,
       "name": "봉제 레벨 부스트",
+      "uiText": "봉제 레벨 부스트",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10420,6 +10970,7 @@
     "75312347": {
       "id": 75312347,
       "name": "제약 레벨 부스트",
+      "uiText": "제약 레벨 부스트",
       "isPercent": false,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10439,6 +10990,7 @@
     "75312348": {
       "id": 75312348,
       "name": "조리 경험치 획득량 증가",
+      "uiText": "조리 경험치 획득량 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10458,6 +11010,7 @@
     "75312349": {
       "id": 75312349,
       "name": "주조 경험치 획득량 증가",
+      "uiText": "주조 경험치 획득량 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10477,6 +11030,7 @@
     "75312350": {
       "id": 75312350,
       "name": "공예 경험치 획득량 증가",
+      "uiText": "공예 경험치 획득량 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10496,6 +11050,7 @@
     "75312351": {
       "id": 75312351,
       "name": "봉제 경험치 획득량 증가",
+      "uiText": "봉제 경험치 획득량 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10515,6 +11070,7 @@
     "75312352": {
       "id": 75312352,
       "name": "제약 경험치 획득량 증가",
+      "uiText": "제약 경험치 획득량 증가",
       "isPercent": true,
       "isValueReference": true,
       "isPlusNeeded": true,
@@ -10534,6 +11090,7 @@
     "75319999": {
       "id": 75319999,
       "name": "업데이트 내역",
+      "uiText": "시간이 흐름에 따라 자연스럽게 깨달을 수 있습니다.",
       "isPercent": false,
       "isValueReference": false,
       "isPlusNeeded": false,

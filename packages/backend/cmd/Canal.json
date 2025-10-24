@@ -73,7 +73,8 @@
         "X": "number",
         "Y": "number",
         "IsStart": "bool"
-      }
+      },
+      "loadingImage": "string"
     },
     ":required": {
       "groupId": 1,
@@ -93,7 +94,8 @@
       },
       "position2": {
         "IsStart": 1
-      }
+      },
+      "loadingImage": 1
     },
     ":requiredInObject": {
       "contentsTerms": [
@@ -352,7 +354,8 @@
         "X": 0,
         "Y": 30,
         "IsStart": true
-      }
+      },
+      "loadingImage": "Illustration_Loading_Port_22_Sprite"
     },
     "10900001": {
       "id": 10900001,
@@ -427,7 +430,8 @@
         "X": 0,
         "Y": 30,
         "IsStart": false
-      }
+      },
+      "loadingImage": "Illustration_Loading_Port_22_Sprite"
     },
     "10900002": {
       "id": 10900002,
@@ -502,7 +506,8 @@
         "X": 0,
         "Y": 30,
         "IsStart": true
-      }
+      },
+      "loadingImage": "Illustration_Loading_Port_23_Sprite"
     },
     "10900003": {
       "id": 10900003,
@@ -577,7 +582,8 @@
         "X": 0,
         "Y": 30,
         "IsStart": false
-      }
+      },
+      "loadingImage": "Illustration_Loading_Port_23_Sprite"
     }
   }
 }

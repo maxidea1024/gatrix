@@ -2948,14 +2948,30 @@
     "rebuildData": "데이터 다시 불러오기",
     "rebuildSuccess": "기획데이터가 성공적으로 다시 불러와졌습니다",
     "showingFirst100": "처음 100개 항목만 표시 중 (전체: {{total}}개)",
+    "search": "검색",
     "searchPlaceholder": "아이템 이름 또는 ID로 검색",
     "category": "카테고리",
     "viewAll": "모아보기",
     "viewAllWarning": "모아보기 기능은 많은 항목이 있을 경우 매우 느려질 수 있습니다",
+    "count": "갯수",
     "noTableForRewardType": "이 보상 타입은 연관된 아이템 테이블이 없습니다. 지정한 수치만큼 직접 적용됩니다. (예: 경험치 +100, 명성 +50 등)",
+    "radiusType": {
+      "none": "없음",
+      "circle": "원형",
+      "square": "정사각형",
+      "region": "리전"
+    },
+    "error": {
+      "npcNotFound": "⚠️ NPC가 OceanNpc 테이블에 존재하지 않습니다"
+    },
+    "errors": {
+      "loadStatsFailed": "기획데이터 통계를 불러오는데 실패했습니다",
+      "rebuildFailed": "데이터 다시 불러오기에 실패했습니다"
+    },
     "tabs": {
       "rewardTypes": "보상 타입 목록",
-      "uiLists": "UI 목록 데이터"
+      "uiLists": "UI 목록 데이터",
+      "hotTimeBuff": "핫타임 버프"
     },
     "stats": {
       "totalRewardTypes": "전체 보상 타입",
@@ -2973,6 +2989,7 @@
     "testComponent": {
       "title": "테스트 컴포넌트 (데이터 확인용)"
     },
+    "noData": "데이터가 없습니다",
     "errors": {
       "loadRewardTypesFailed": "보상 타입 목록을 불러오는데 실패했습니다",
       "loadItemsFailed": "아이템 목록을 불러오는데 실패했습니다",

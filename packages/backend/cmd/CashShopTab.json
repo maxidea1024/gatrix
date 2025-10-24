@@ -7,6 +7,7 @@
       "productSize": "number",
       "name": "text",
       "productEntryType": "number",
+      "bannereventImage": "string",
       "useEventButton": "bool"
     },
     ":required": {
@@ -394,6 +395,7 @@
       "productSize": 1,
       "name": "레오니다스",
       "productEntryType": 4,
+      "bannereventImage": "WT_StepUp08_Sprite",
       "useEventButton": false
     },
     "702": {
@@ -403,6 +405,7 @@
       "productSize": 1,
       "name": "블랙 레이븐",
       "productEntryType": 4,
+      "bannereventImage": "WT_StepUp05_Sprite",
       "useEventButton": false
     },
     "703": {
@@ -412,6 +415,7 @@
       "productSize": 1,
       "name": "카라 마우에",
       "productEntryType": 4,
+      "bannereventImage": "WT_StepUp06_Sprite",
       "useEventButton": false
     },
     "704": {
@@ -421,6 +425,7 @@
       "productSize": 1,
       "name": "특수 합성",
       "productEntryType": 4,
+      "bannereventImage": "WT_StepUp07_Sprite",
       "useEventButton": false
     },
     "705": {
@@ -430,6 +435,7 @@
       "productSize": 1,
       "name": "잔수",
       "productEntryType": 4,
+      "bannereventImage": "WT_StepUp09_Sprite",
       "useEventButton": false
     },
     "1101": {

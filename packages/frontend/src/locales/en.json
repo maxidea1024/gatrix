@@ -2948,14 +2948,30 @@
     "rebuildData": "Reload Data",
     "rebuildSuccess": "Planning data has been successfully reloaded",
     "showingFirst100": "Showing first 100 items (Total: {{total}})",
+    "search": "Search",
     "searchPlaceholder": "Search by item name or ID",
     "category": "Category",
     "viewAll": "View All",
     "viewAllWarning": "View All feature may be very slow with many items",
+    "count": "Count",
     "noTableForRewardType": "This reward type has no associated item table. The specified value is applied directly. (e.g., Experience +100, Fame +50, etc.)",
+    "radiusType": {
+      "none": "None",
+      "circle": "Circle",
+      "square": "Square",
+      "region": "Region"
+    },
+    "error": {
+      "npcNotFound": "⚠️ NPC not found in OceanNpc table"
+    },
+    "errors": {
+      "loadStatsFailed": "Failed to load planning data statistics",
+      "rebuildFailed": "Failed to rebuild data"
+    },
     "tabs": {
       "rewardTypes": "Reward Types",
-      "uiLists": "UI Lists"
+      "uiLists": "UI Lists",
+      "hotTimeBuff": "HotTimeBuff"
     },
     "stats": {
       "totalRewardTypes": "Total Reward Types",
@@ -2973,6 +2989,7 @@
     "testComponent": {
       "title": "Test Component (Data Verification)"
     },
+    "noData": "No data available",
     "errors": {
       "loadRewardTypesFailed": "Failed to load reward types",
       "loadItemsFailed": "Failed to load items",

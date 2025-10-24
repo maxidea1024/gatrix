@@ -3,28 +3,40 @@
     ":type": {
       "id": "key",
       "name": "text",
-      "hardCap": "number"
+      "hardCap": "number",
+      "icon": "string",
+      "displayFormat": "string",
+      "tooltipDesc": "text"
     },
     ":required": {
       "name": 1,
-      "hardCap": 1
+      "hardCap": 1,
+      "displayFormat": 1
     },
     ":min": {},
     ":max": {},
     ":enum": {},
-    ":asset": {},
+    ":asset": {
+      "icon": 1
+    },
     ":links": {}
   },
   "GuildResource": {
     "150000": {
       "id": 150000,
       "name": "금화",
-      "hardCap": 900000000000000
+      "hardCap": 900000000000000,
+      "icon": "WT_Currency_GuildDucat_Sprite",
+      "displayFormat": "[[GD]] {0}",
+      "tooltipDesc": "상회원의 두카트 기부로 획득하는 상회 재화"
     },
     "150001": {
       "id": 150001,
       "name": "사파이어",
-      "hardCap": 900000000000000
+      "hardCap": 900000000000000,
+      "icon": "WT_Currency_GuildBluegem_Sprite",
+      "displayFormat": "[[GB]] {0}",
+      "tooltipDesc": "상회원의 사파이어 기부로 획득하는 상회 재화"
     }
   }
 }

@@ -18,5 +18,25 @@ router.get('/ui-list/:category/items', PlanningDataController.getUIListItems);
 router.post('/rebuild', PlanningDataController.rebuildRewardLookup);
 router.get('/stats', PlanningDataController.getStats);
 
+// HotTimeBuff routes
+router.get('/hottimebuff', PlanningDataController.getHotTimeBuffLookup);
+router.post('/hottimebuff/build', PlanningDataController.buildHotTimeBuffLookup);
+
+// EventPage routes
+router.get('/eventpage', PlanningDataController.getEventPageLookup);
+router.post('/eventpage/build', PlanningDataController.buildEventPageLookup);
+
+// LiveEvent routes
+router.get('/liveevent', PlanningDataController.getLiveEventLookup);
+router.post('/liveevent/build', PlanningDataController.buildLiveEventLookup);
+
+// MateRecruitingGroup routes
+router.get('/materecruiting', PlanningDataController.getMateRecruitingGroupLookup);
+router.post('/materecruiting/build', PlanningDataController.buildMateRecruitingGroupLookup);
+
+// OceanNpcAreaSpawner routes
+router.get('/oceannpcarea', PlanningDataController.getOceanNpcAreaSpawnerLookup);
+router.post('/oceannpcarea/build', PlanningDataController.buildOceanNpcAreaSpawnerLookup);
+
 export default router;
 

@@ -161,5 +161,122 @@ export class PlanningDataController {
       message: 'Planning data statistics retrieved successfully',
     });
   });
+
+  /**
+   * Get HotTimeBuff lookup data
+   * GET /api/v1/admin/planning-data/hottimebuff
+   */
+  static getHotTimeBuffLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const data = await PlanningDataService.getHotTimeBuffLookup();
+
+    res.json({
+      success: true,
+      data,
+      message: 'HotTimeBuff lookup data retrieved successfully',
+    });
+  });
+
+  /**
+   * Build HotTimeBuff lookup data
+   * POST /api/v1/admin/planning-data/hottimebuff/build
+   */
+  static buildHotTimeBuffLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    logger.info('HotTimeBuff lookup build requested', {
+      userId: (req as any).userDetails?.id ?? (req as any).user?.id,
+    });
+
+    const result = await PlanningDataService.buildHotTimeBuffLookup();
+
+    // Invalidate cache across all servers
+    await pubSubService.invalidateByPattern('planning_data*');
+
+    logger.info('HotTimeBuff cache invalidated across all servers');
+
+    res.json({
+      success: true,
+      data: result,
+      message: 'HotTimeBuff lookup data built and cache invalidated successfully',
+    });
+  });
+
+  /**
+   * Get EventPage lookup data
+   * GET /api/v1/admin/planning-data/eventpage
+   */
+  static getEventPageLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const data = await PlanningDataService.getEventPageLookup();
+    res.json({ success: true, data, message: 'EventPage lookup data retrieved successfully' });
+  });
+
+  /**
+   * Build EventPage lookup data
+   * POST /api/v1/admin/planning-data/eventpage/build
+   */
+  static buildEventPageLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    logger.info('EventPage lookup build requested', { userId: (req as any).userDetails?.id ?? (req as any).user?.id });
+    const result = await PlanningDataService.buildEventPageLookup();
+    await pubSubService.invalidateByPattern('planning_data*');
+    res.json({ success: true, data: result, message: 'EventPage lookup data built and cache invalidated successfully' });
+  });
+
+  /**
+   * Get LiveEvent lookup data
+   * GET /api/v1/admin/planning-data/liveevent
+   */
+  static getLiveEventLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const data = await PlanningDataService.getLiveEventLookup();
+    res.json({ success: true, data, message: 'LiveEvent lookup data retrieved successfully' });
+  });
+
+  /**
+   * Build LiveEvent lookup data
+   * POST /api/v1/admin/planning-data/liveevent/build
+   */
+  static buildLiveEventLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    logger.info('LiveEvent lookup build requested', { userId: (req as any).userDetails?.id ?? (req as any).user?.id });
+    const result = await PlanningDataService.buildLiveEventLookup();
+    await pubSubService.invalidateByPattern('planning_data*');
+    res.json({ success: true, data: result, message: 'LiveEvent lookup data built and cache invalidated successfully' });
+  });
+
+  /**
+   * Get MateRecruitingGroup lookup data
+   * GET /api/v1/admin/planning-data/materecruiting
+   */
+  static getMateRecruitingGroupLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const data = await PlanningDataService.getMateRecruitingGroupLookup();
+    res.json({ success: true, data, message: 'MateRecruitingGroup lookup data retrieved successfully' });
+  });
+
+  /**
+   * Build MateRecruitingGroup lookup data
+   * POST /api/v1/admin/planning-data/materecruiting/build
+   */
+  static buildMateRecruitingGroupLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    logger.info('MateRecruitingGroup lookup build requested', { userId: (req as any).userDetails?.id ?? (req as any).user?.id });
+    const result = await PlanningDataService.buildMateRecruitingGroupLookup();
+    await pubSubService.invalidateByPattern('planning_data*');
+    res.json({ success: true, data: result, message: 'MateRecruitingGroup lookup data built and cache invalidated successfully' });
+  });
+
+  /**
+   * Get OceanNpcAreaSpawner lookup data
+   * GET /api/v1/admin/planning-data/oceannpcarea
+   */
+  static getOceanNpcAreaSpawnerLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const data = await PlanningDataService.getOceanNpcAreaSpawnerLookup();
+    res.json({ success: true, data, message: 'OceanNpcAreaSpawner lookup data retrieved successfully' });
+  });
+
+  /**
+   * Build OceanNpcAreaSpawner lookup data
+   * POST /api/v1/admin/planning-data/oceannpcarea/build
+   */
+  static buildOceanNpcAreaSpawnerLookup = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    logger.info('OceanNpcAreaSpawner lookup build requested', { userId: (req as any).userDetails?.id ?? (req as any).user?.id });
+    const result = await PlanningDataService.buildOceanNpcAreaSpawnerLookup();
+    await pubSubService.invalidateByPattern('planning_data*');
+    res.json({ success: true, data: result, message: 'OceanNpcAreaSpawner lookup data built and cache invalidated successfully' });
+  });
 }
 

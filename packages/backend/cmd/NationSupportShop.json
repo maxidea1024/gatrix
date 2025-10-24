@@ -11,6 +11,7 @@
         "text"
       ],
       "order": "number",
+      "productIcon": "string",
       "localBitFlag": "bit",
       "stratDate": "string",
       "endDate": "string",

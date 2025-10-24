@@ -4,6 +4,7 @@
       "id": "key",
       "name": "text",
       "desc": "string",
+      "lvForTool": "number",
       "inheritLandFeature": "number",
       "exploreImage": "string",
       "backgroundMap": "string",
@@ -157,6 +158,7 @@
       "id": 71400000,
       "name": "리스본 부근",
       "desc": "##코스타 델 솔",
+      "lvForTool": 1,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700017,
@@ -191,6 +193,7 @@
     "71400500": {
       "id": 71400500,
       "name": "마르세유 부근",
+      "lvForTool": 1,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700017,
@@ -225,6 +228,7 @@
     "71401000": {
       "id": 71401000,
       "name": "나폴리 부근",
+      "lvForTool": 1,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700017,
@@ -260,6 +264,7 @@
       "id": 71401500,
       "name": "아테네 부근",
       "desc": "##베르기나",
+      "lvForTool": 1,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700017,
@@ -294,6 +299,7 @@
     "71402000": {
       "id": 71402000,
       "name": "트라브존 부근",
+      "lvForTool": 1,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700017,
@@ -328,6 +334,7 @@
     "71402500": {
       "id": 71402500,
       "name": "낭트 부근",
+      "lvForTool": 1,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700017,
@@ -362,6 +369,7 @@
     "71403000": {
       "id": 71403000,
       "name": "딕손 부근",
+      "lvForTool": 19,
       "exploreImage": "Illustration_Loading_Sail_02_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700067,
@@ -396,6 +404,7 @@
     "71403001": {
       "id": 71403001,
       "name": "아르한겔스크 부근",
+      "lvForTool": 13,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Tundra",
       "consumeItemId": 23700067,
@@ -430,6 +439,7 @@
     "71403500": {
       "id": 71403500,
       "name": "베르겐 부근",
+      "lvForTool": 1,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Tundra",
       "consumeItemId": 23700017,
@@ -464,6 +474,7 @@
     "71403510": {
       "id": 71403510,
       "name": "나르비크 부근",
+      "lvForTool": 13,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Tundra",
       "consumeItemId": 23700067,
@@ -498,6 +509,7 @@
     "71404000": {
       "id": 71404000,
       "name": "런던 부근",
+      "lvForTool": 1,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700017,
@@ -532,6 +544,7 @@
     "71404500": {
       "id": 71404500,
       "name": "암스테르담 부근",
+      "lvForTool": 1,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700017,
@@ -566,6 +579,7 @@
     "71405000": {
       "id": 71405000,
       "name": "아이슬란드 북부",
+      "lvForTool": 13,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700067,
@@ -600,6 +614,7 @@
     "71405500": {
       "id": 71405500,
       "name": "케르치 부근",
+      "lvForTool": 1,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700017,
@@ -634,6 +649,7 @@
     "71406000": {
       "id": 71406000,
       "name": "스톡홀름 부근",
+      "lvForTool": 1,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Taiga",
       "consumeItemId": 23700017,
@@ -668,6 +684,7 @@
     "71410000": {
       "id": 71410000,
       "name": "카사블랑카 부근",
+      "lvForTool": 1,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700017,
@@ -702,6 +719,7 @@
     "71410500": {
       "id": 71410500,
       "name": "알렉산드리아 부근",
+      "lvForTool": 1,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700017,
@@ -736,6 +754,7 @@
     "71411000": {
       "id": 71411000,
       "name": "아르긴 부근",
+      "lvForTool": 2,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700017,
@@ -770,6 +789,7 @@
     "71411500": {
       "id": 71411500,
       "name": "베냉 부근",
+      "lvForTool": 3,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700017,
@@ -804,6 +824,7 @@
     "71411510": {
       "id": 71411510,
       "name": "나이저강",
+      "lvForTool": 3,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700017,
@@ -838,6 +859,7 @@
     "71411520": {
       "id": 71411520,
       "name": "콩고강",
+      "lvForTool": 4,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700017,
@@ -872,6 +894,7 @@
     "71412000": {
       "id": 71412000,
       "name": "벵겔라 부근",
+      "lvForTool": 4,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700017,
@@ -906,6 +929,7 @@
     "71413000": {
       "id": 71413000,
       "name": "나탈 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700023,
@@ -942,6 +966,7 @@
     "71413001": {
       "id": 71413001,
       "name": "나탈 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700023,
@@ -976,6 +1001,7 @@
     "71413002": {
       "id": 71413002,
       "name": "나탈 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700023,
@@ -1010,6 +1036,7 @@
     "71413010": {
       "id": 71413010,
       "name": "잠베지강",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700023,
@@ -1044,6 +1071,7 @@
     "71413011": {
       "id": 71413011,
       "name": "잠베지강",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700023,
@@ -1078,6 +1106,7 @@
     "71413500": {
       "id": 71413500,
       "name": "타마타브 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700023,
@@ -1114,6 +1143,7 @@
     "71413501": {
       "id": 71413501,
       "name": "타마타브 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700023,
@@ -1150,6 +1180,7 @@
     "71413502": {
       "id": 71413502,
       "name": "타마타브 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700023,
@@ -1185,6 +1216,7 @@
       "id": 71414500,
       "name": "마사와 부근",
       "desc": "##그레이트 짐바브웨 마카디카디 빅토리아 호수",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700023,
@@ -1220,6 +1252,7 @@
       "id": 71414501,
       "name": "마사와 부근",
       "desc": "##그레이트 짐바브웨 마카디카디 빅토리아 호수",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700023,
@@ -1255,6 +1288,7 @@
       "id": 71414502,
       "name": "마사와 부근",
       "desc": "##그레이트 짐바브웨 마카디카디 빅토리아 호수",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700023,
@@ -1292,6 +1326,7 @@
       "id": 71414503,
       "name": "마사와 부근",
       "desc": "##그레이트 짐바브웨 마카디카디 빅토리아 호수",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700023,
@@ -1328,6 +1363,7 @@
     "71415000": {
       "id": 71415000,
       "name": "나일강",
+      "lvForTool": 4,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700017,
@@ -1362,6 +1398,7 @@
     "71420000": {
       "id": 71420000,
       "name": "영일 부근",
+      "lvForTool": 11,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Hill",
       "consumeItemId": 23700024,
@@ -1398,6 +1435,7 @@
     "71420010": {
       "id": 71420010,
       "name": "한양 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1432,6 +1470,7 @@
     "71420011": {
       "id": 71420011,
       "name": "한양 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1466,6 +1505,7 @@
     "71420020": {
       "id": 71420020,
       "name": "제주 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1500,6 +1540,7 @@
     "71420500": {
       "id": 71420500,
       "name": "에도 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1534,6 +1575,7 @@
     "71420501": {
       "id": 71420501,
       "name": "에도 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1568,6 +1610,7 @@
     "71420502": {
       "id": 71420502,
       "name": "에도 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1604,6 +1647,7 @@
     "71420503": {
       "id": 71420503,
       "name": "에도 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1638,6 +1682,7 @@
     "71420504": {
       "id": 71420504,
       "name": "에도 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1672,6 +1717,7 @@
     "71420505": {
       "id": 71420505,
       "name": "에도 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1706,6 +1752,7 @@
     "71420506": {
       "id": 71420506,
       "name": "에도 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1742,6 +1789,7 @@
     "71420510": {
       "id": 71420510,
       "name": "북서 태평양 열도",
+      "lvForTool": 11,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1776,6 +1824,7 @@
     "71420511": {
       "id": 71420511,
       "name": "북서 태평양 열도",
+      "lvForTool": 11,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1810,6 +1859,7 @@
     "71420512": {
       "id": 71420512,
       "name": "북서 태평양 열도",
+      "lvForTool": 11,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1844,6 +1894,7 @@
     "71420513": {
       "id": 71420513,
       "name": "북서 태평양 열도",
+      "lvForTool": 11,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1878,6 +1929,7 @@
     "71420520": {
       "id": 71420520,
       "name": "에조 부근",
+      "lvForTool": 11,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1912,6 +1964,7 @@
     "71420521": {
       "id": 71420521,
       "name": "에조 부근",
+      "lvForTool": 11,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1948,6 +2001,7 @@
     "71420530": {
       "id": 71420530,
       "name": "나가사키 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -1982,6 +2036,7 @@
     "71420531": {
       "id": 71420531,
       "name": "나가사키 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -2016,6 +2071,7 @@
     "71421000": {
       "id": 71421000,
       "name": "항주 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -2050,6 +2106,7 @@
     "71421001": {
       "id": 71421001,
       "name": "항주 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -2086,6 +2143,7 @@
     "71421002": {
       "id": 71421002,
       "name": "항주 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -2120,6 +2178,7 @@
     "71421010": {
       "id": 71421010,
       "name": "마카오 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -2156,6 +2215,7 @@
     "71421011": {
       "id": 71421011,
       "name": "마카오 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -2190,6 +2250,7 @@
     "71421012": {
       "id": 71421012,
       "name": "마카오 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -2224,6 +2285,7 @@
     "71421020": {
       "id": 71421020,
       "name": "장강",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -2258,6 +2320,7 @@
     "71421030": {
       "id": 71421030,
       "name": "황허",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -2294,6 +2357,7 @@
     "71421500": {
       "id": 71421500,
       "name": "하노이 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -2328,6 +2392,7 @@
     "71421501": {
       "id": 71421501,
       "name": "홍강 부근",
+      "lvForTool": 23,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23710215,
@@ -2361,6 +2426,7 @@
     "71421502": {
       "id": 71421502,
       "name": "하노이 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -2397,6 +2463,7 @@
     "71421503": {
       "id": 71421503,
       "name": "하노이 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -2431,6 +2498,7 @@
     "71421504": {
       "id": 71421504,
       "name": "하노이 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -2465,6 +2533,7 @@
     "71421505": {
       "id": 71421505,
       "name": "하노이 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -2499,6 +2568,7 @@
     "71421506": {
       "id": 71421506,
       "name": "하노이 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -2533,6 +2603,7 @@
     "71421510": {
       "id": 71421510,
       "name": "페구 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -2567,6 +2638,7 @@
     "71421511": {
       "id": 71421511,
       "name": "페구 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -2603,6 +2675,7 @@
     "71422000": {
       "id": 71422000,
       "name": "도파르 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700023,
@@ -2637,6 +2710,7 @@
     "71422001": {
       "id": 71422001,
       "name": "도파르 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700023,
@@ -2673,6 +2747,7 @@
     "71422002": {
       "id": 71422002,
       "name": "도파르 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700023,
@@ -2709,6 +2784,7 @@
     "71422500": {
       "id": 71422500,
       "name": "호르무즈 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700023,
@@ -2743,6 +2819,7 @@
     "71422501": {
       "id": 71422501,
       "name": "호르무즈 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700023,
@@ -2779,6 +2856,7 @@
     "71422502": {
       "id": 71422502,
       "name": "호르무즈 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700023,
@@ -2815,6 +2893,7 @@
     "71422503": {
       "id": 71422503,
       "name": "호르무즈 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700023,
@@ -2849,6 +2928,7 @@
     "71423000": {
       "id": 71423000,
       "name": "고아 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -2883,6 +2963,7 @@
     "71423001": {
       "id": 71423001,
       "name": "고아 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -2919,6 +3000,7 @@
     "71423002": {
       "id": 71423002,
       "name": "고아 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -2953,6 +3035,7 @@
     "71423005": {
       "id": 71423005,
       "name": "말레 부근",
+      "lvForTool": 18,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -2986,6 +3069,7 @@
     "71423010": {
       "id": 71423010,
       "name": "마실리파트남 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -3020,6 +3104,7 @@
     "71423011": {
       "id": 71423011,
       "name": "마실리파트남 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -3056,6 +3141,7 @@
     "71423012": {
       "id": 71423012,
       "name": "마실리파트남 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -3090,6 +3176,7 @@
     "71423013": {
       "id": 71423013,
       "name": "마실리파트남 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -3126,6 +3213,7 @@
     "71423500": {
       "id": 71423500,
       "name": "브루나이 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -3160,6 +3248,7 @@
     "71423501": {
       "id": 71423501,
       "name": "브루나이 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -3194,6 +3283,7 @@
     "71423502": {
       "id": 71423502,
       "name": "브루나이 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -3230,6 +3320,7 @@
     "71423503": {
       "id": 71423503,
       "name": "브루나이 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -3266,6 +3357,7 @@
     "71423504": {
       "id": 71423504,
       "name": "브루나이 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -3300,6 +3392,7 @@
     "71423505": {
       "id": 71423505,
       "name": "브루나이 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -3334,6 +3427,7 @@
     "71423506": {
       "id": 71423506,
       "name": "브루나이 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -3368,6 +3462,7 @@
     "71423510": {
       "id": 71423510,
       "name": "수라바야 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -3402,6 +3497,7 @@
     "71423511": {
       "id": 71423511,
       "name": "수라바야 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -3436,6 +3532,7 @@
     "71423512": {
       "id": 71423512,
       "name": "수라바야 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -3470,6 +3567,7 @@
     "71423513": {
       "id": 71423513,
       "name": "수라바야 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -3504,6 +3602,7 @@
     "71423520": {
       "id": 71423520,
       "name": "쿠칭 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -3538,6 +3637,7 @@
     "71423521": {
       "id": 71423521,
       "name": "쿠칭 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -3572,6 +3672,7 @@
     "71423522": {
       "id": 71423522,
       "name": "쿠칭 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -3608,6 +3709,7 @@
     "71423523": {
       "id": 71423523,
       "name": "쿠칭 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -3642,6 +3744,7 @@
     "71423524": {
       "id": 71423524,
       "name": "쿠칭 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -3679,6 +3782,7 @@
       "id": 71424000,
       "name": "타이난 부근",
       "desc": "##팔선동 합류",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -3713,6 +3817,7 @@
     "71424500": {
       "id": 71424500,
       "name": "나하 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -3747,6 +3852,7 @@
     "71425000": {
       "id": 71425000,
       "name": "코르프 부근",
+      "lvForTool": 11,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Taiga",
       "consumeItemId": 23700024,
@@ -3780,6 +3886,7 @@
     "71430000": {
       "id": 71430000,
       "name": "코하셋 부근",
+      "lvForTool": 2,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Taiga",
       "consumeItemId": 23700017,
@@ -3814,6 +3921,7 @@
     "71430500": {
       "id": 71430500,
       "name": "미시시피강 하류",
+      "lvForTool": 2,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700017,
@@ -3848,6 +3956,7 @@
     "71430510": {
       "id": 71430510,
       "name": "미시시피강",
+      "lvForTool": 2,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700017,
@@ -3882,6 +3991,7 @@
     "71430515": {
       "id": 71430515,
       "name": "미시시피강 상류 부근",
+      "lvForTool": 20,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23710215,
@@ -3915,6 +4025,7 @@
     "71430520": {
       "id": 71430520,
       "name": "미시시피강",
+      "lvForTool": 2,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700017,
@@ -3949,6 +4060,7 @@
     "71431000": {
       "id": 71431000,
       "name": "오론 부근",
+      "lvForTool": 12,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Taiga",
       "consumeItemId": 23700067,
@@ -3983,6 +4095,7 @@
     "71431500": {
       "id": 71431500,
       "name": "아카풀코 부근",
+      "lvForTool": 11,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700024,
@@ -4017,6 +4130,7 @@
     "71432000": {
       "id": 71432000,
       "name": "카라카스 부근",
+      "lvForTool": 2,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700017,
@@ -4051,6 +4165,7 @@
     "71432010": {
       "id": 71432010,
       "name": "아마존 하류",
+      "lvForTool": 2,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700017,
@@ -4085,6 +4200,7 @@
     "71432020": {
       "id": 71432020,
       "name": "아마존 상류",
+      "lvForTool": 2,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700017,
@@ -4119,6 +4235,7 @@
     "71432500": {
       "id": 71432500,
       "name": "바이아 부근",
+      "lvForTool": 5,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -4153,6 +4270,7 @@
     "71432510": {
       "id": 71432510,
       "name": "라플라타강",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700023,
@@ -4187,6 +4305,7 @@
     "71433000": {
       "id": 71433000,
       "name": "툼베스 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Hill",
       "consumeItemId": 23700024,
@@ -4221,6 +4340,7 @@
     "71433500": {
       "id": 71433500,
       "name": "발파라이소 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Hill",
       "consumeItemId": 23700023,
@@ -4255,6 +4375,7 @@
     "71434000": {
       "id": 71434000,
       "name": "우수아이아 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700023,
@@ -4289,6 +4410,7 @@
     "71434500": {
       "id": 71434500,
       "name": "트루히요 부근",
+      "lvForTool": 2,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700017,
@@ -4323,6 +4445,7 @@
     "71435000": {
       "id": 71435000,
       "name": "산티아고 부근",
+      "lvForTool": 2,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700017,
@@ -4357,6 +4480,7 @@
     "71440000": {
       "id": 71440000,
       "name": "가리 부근",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -4393,6 +4517,7 @@
     "71440001": {
       "id": 71440001,
       "name": "가리 부근",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -4427,6 +4552,7 @@
     "71440002": {
       "id": 71440002,
       "name": "가리 부근",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -4463,6 +4589,7 @@
     "71440003": {
       "id": 71440003,
       "name": "가리 부근",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -4499,6 +4626,7 @@
     "71440500": {
       "id": 71440500,
       "name": "핀자라 부근",
+      "lvForTool": 9,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700024,
@@ -4535,6 +4663,7 @@
     "71440501": {
       "id": 71440501,
       "name": "핀자라 부근",
+      "lvForTool": 9,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700024,
@@ -4569,6 +4698,7 @@
     "71440502": {
       "id": 71440502,
       "name": "핀자라 부근",
+      "lvForTool": 9,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700024,
@@ -4603,6 +4733,7 @@
     "71440503": {
       "id": 71440503,
       "name": "핀자라 부근",
+      "lvForTool": 9,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700024,
@@ -4639,6 +4770,7 @@
     "71440504": {
       "id": 71440504,
       "name": "핀자라 부근",
+      "lvForTool": 9,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700024,
@@ -4673,6 +4805,7 @@
     "71441000": {
       "id": 71441000,
       "name": "포트피리 부근",
+      "lvForTool": 9,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700024,
@@ -4707,6 +4840,7 @@
     "71441001": {
       "id": 71441001,
       "name": "포트피리 부근",
+      "lvForTool": 9,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700024,
@@ -4741,6 +4875,7 @@
     "71441002": {
       "id": 71441002,
       "name": "포트피리 부근",
+      "lvForTool": 9,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700024,
@@ -4775,6 +4910,7 @@
     "71441003": {
       "id": 71441003,
       "name": "포트피리 부근",
+      "lvForTool": 9,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700024,
@@ -4811,6 +4947,7 @@
     "71441004": {
       "id": 71441004,
       "name": "포트피리 부근",
+      "lvForTool": 9,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
       "consumeItemId": 23700024,
@@ -4845,6 +4982,7 @@
     "71441500": {
       "id": 71441500,
       "name": "카카투와 부근",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -4879,6 +5017,7 @@
     "71441501": {
       "id": 71441501,
       "name": "카카투와 부근",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -4913,6 +5052,7 @@
     "71441502": {
       "id": 71441502,
       "name": "카카투와 부근",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -4947,6 +5087,7 @@
     "71441503": {
       "id": 71441503,
       "name": "카카투와 부근",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -4981,6 +5122,7 @@
     "71441504": {
       "id": 71441504,
       "name": "카카투와 부근",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -5015,6 +5157,7 @@
     "71442000": {
       "id": 71442000,
       "name": "반다 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -5050,6 +5193,7 @@
     "71442001": {
       "id": 71442001,
       "name": "반다 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -5083,6 +5227,7 @@
     "71442002": {
       "id": 71442002,
       "name": "반다 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -5116,6 +5261,7 @@
     "71442003": {
       "id": 71442003,
       "name": "반다 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -5149,6 +5295,7 @@
     "71442004": {
       "id": 71442004,
       "name": "반다 부근",
+      "lvForTool": 8,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -5184,6 +5331,7 @@
     "71442010": {
       "id": 71442010,
       "name": "사마라이 부근",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -5218,6 +5366,7 @@
     "71442011": {
       "id": 71442011,
       "name": "사마라이 부근",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -5252,6 +5401,7 @@
     "71442012": {
       "id": 71442012,
       "name": "사마라이 부근",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -5286,6 +5436,7 @@
     "71442500": {
       "id": 71442500,
       "name": "수바 부근",
+      "lvForTool": 14,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -5320,6 +5471,7 @@
     "71442501": {
       "id": 71442501,
       "name": "수바 부근",
+      "lvForTool": 14,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -5354,6 +5506,7 @@
     "71442502": {
       "id": 71442502,
       "name": "수바 부근",
+      "lvForTool": 14,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -5388,6 +5541,7 @@
     "71442503": {
       "id": 71442503,
       "name": "수바 부근",
+      "lvForTool": 14,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -5422,6 +5576,7 @@
     "71442504": {
       "id": 71442504,
       "name": "수바 부근",
+      "lvForTool": 14,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -5456,6 +5611,7 @@
     "71442505": {
       "id": 71442505,
       "name": "수바 부근",
+      "lvForTool": 14,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -5492,6 +5648,7 @@
     "71442506": {
       "id": 71442506,
       "name": "수바 부근",
+      "lvForTool": 14,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -5526,6 +5683,7 @@
     "71442507": {
       "id": 71442507,
       "name": "수바 부근",
+      "lvForTool": 14,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -5560,6 +5718,7 @@
     "71443000": {
       "id": 71443000,
       "name": "왕거누이 부근",
+      "lvForTool": 14,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -5594,6 +5753,7 @@
     "71443001": {
       "id": 71443001,
       "name": "왕거누이 부근",
+      "lvForTool": 14,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -5628,6 +5788,7 @@
     "71443002": {
       "id": 71443002,
       "name": "왕거누이 부근",
+      "lvForTool": 14,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -5664,6 +5825,7 @@
     "71443003": {
       "id": 71443003,
       "name": "왕거누이 부근",
+      "lvForTool": 14,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -5698,6 +5860,7 @@
     "71443004": {
       "id": 71443004,
       "name": "왕거누이 부근",
+      "lvForTool": 14,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -5732,6 +5895,7 @@
     "71445000": {
       "id": 71445000,
       "name": "하와이 부근",
+      "lvForTool": 15,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -5766,6 +5930,7 @@
     "71445500": {
       "id": 71445500,
       "name": "배로우 부근",
+      "lvForTool": 12,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700067,
@@ -5799,6 +5964,7 @@
     "71445505": {
       "id": 71445505,
       "name": "알래스카 북부",
+      "lvForTool": 12,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700067,
@@ -5832,6 +5998,7 @@
     "71445510": {
       "id": 71445510,
       "name": "캠브리지 베이 부근",
+      "lvForTool": 12,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700067,
@@ -5865,6 +6032,7 @@
     "71445515": {
       "id": 71445515,
       "name": "캠브리지 베이 부근",
+      "lvForTool": 12,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700067,
@@ -5898,6 +6066,7 @@
     "71445520": {
       "id": 71445520,
       "name": "캠브리지 베이 북부",
+      "lvForTool": 12,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700067,
@@ -5931,6 +6100,7 @@
     "71446000": {
       "id": 71446000,
       "name": "그린란드 북부",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700024,
@@ -5964,6 +6134,7 @@
     "71446005": {
       "id": 71446005,
       "name": "그린란드 서부",
+      "lvForTool": 12,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700067,
@@ -5997,6 +6168,7 @@
     "71446500": {
       "id": 71446500,
       "name": "아비앗 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Taiga",
       "consumeItemId": 23700023,
@@ -6031,6 +6203,7 @@
     "71447000": {
       "id": 71447000,
       "name": "축치 반도",
+      "lvForTool": 12,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Taiga",
       "consumeItemId": 23700067,
@@ -6064,6 +6237,7 @@
     "71447500": {
       "id": 71447500,
       "name": "로스 만 부근",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700024,
@@ -6097,6 +6271,7 @@
     "71447510": {
       "id": 71447510,
       "name": "남극 대륙",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700024,
@@ -6130,6 +6305,7 @@
     "71447520": {
       "id": 71447520,
       "name": "시들리 산 부근",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700024,
@@ -6163,6 +6339,7 @@
     "71447540": {
       "id": 71447540,
       "name": "남극 반도",
+      "lvForTool": 10,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700024,
@@ -6196,6 +6373,7 @@
     "71448000": {
       "id": 71448000,
       "name": "과테말라 부근",
+      "lvForTool": 7,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700024,
@@ -6230,6 +6408,7 @@
     "71448500": {
       "id": 71448500,
       "name": "그린란드 남부",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700023,
@@ -6264,6 +6443,7 @@
     "71449000": {
       "id": 71449000,
       "name": "아이슬란드 남부",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700023,
@@ -6298,6 +6478,7 @@
     "71449001": {
       "id": 71449001,
       "name": "인도양 외딴섬",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Tundra",
       "consumeItemId": 23700023,
@@ -6332,6 +6513,7 @@
     "71449002": {
       "id": 71449002,
       "name": "북극 초입",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700023,
@@ -6366,6 +6548,7 @@
     "71449003": {
       "id": 71449003,
       "name": "투아모투 제도",
+      "lvForTool": 13,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -6398,6 +6581,7 @@
     "71449004": {
       "id": 71449004,
       "name": "괌 부근",
+      "lvForTool": 13,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -6718,6 +6902,7 @@
     "71449014": {
       "id": 71449014,
       "name": "인도양 외딴섬",
+      "lvForTool": 17,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Tundra",
       "consumeItemId": 23700067,
@@ -6751,6 +6936,7 @@
     "71449015": {
       "id": 71449015,
       "name": "버뮤다섬",
+      "lvForTool": 17,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -6784,6 +6970,7 @@
     "71449016": {
       "id": 71449016,
       "name": "시베리아",
+      "lvForTool": 17,
       "exploreImage": "Illustration_Loading_Sail_02_Sprite",
       "backgroundMap": "M_Adventure_Tundra",
       "consumeItemId": 23700067,
@@ -6816,6 +7003,7 @@
     "71449017": {
       "id": 71449017,
       "name": "알래스카",
+      "lvForTool": 17,
       "exploreImage": "Illustration_Loading_Sail_02_Sprite",
       "backgroundMap": "M_Adventure_Tundra",
       "consumeItemId": 23700067,
@@ -6848,6 +7036,7 @@
     "71449018": {
       "id": 71449018,
       "name": "통가타푸 섬",
+      "lvForTool": 18,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
       "consumeItemId": 23700067,
@@ -6881,6 +7070,7 @@
       "id": 71450001,
       "name": "카사블랑카 부근",
       "desc": "##신화 속 최고의 스승",
+      "lvForTool": 1,
       "inheritLandFeature": 71410000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -6914,6 +7104,7 @@
       "id": 71450002,
       "name": "아테네 부근",
       "desc": "##옛 신들의 마을",
+      "lvForTool": 1,
       "inheritLandFeature": 71401500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -6947,6 +7138,7 @@
       "id": 71450003,
       "name": "벵겔라 부근",
       "desc": "##시선의 행방&거꾸로 꽂힌 나무",
+      "lvForTool": 4,
       "inheritLandFeature": 71412000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -6980,6 +7172,7 @@
       "id": 71450004,
       "name": "트라브존 부근",
       "desc": "##슬픔이 담긴 꽃",
+      "lvForTool": 1,
       "inheritLandFeature": 71402000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -7013,6 +7206,7 @@
       "id": 71450005,
       "name": "알렉산드리아 부근",
       "desc": "##사후세계를 여행하는 영혼을 위한 안내서&머리와 몸이 다른 존재&모래에 묻힌 신전&누이 호쿠",
+      "lvForTool": 1,
       "inheritLandFeature": 71410500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -7046,6 +7240,7 @@
       "id": 71450006,
       "name": "고아 부근",
       "desc": "##초일왕의 흔적",
+      "lvForTool": 5,
       "inheritLandFeature": 71423000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
@@ -7079,6 +7274,7 @@
       "id": 71450007,
       "name": "나폴리 부근",
       "desc": "##화산재 덮인 빵\n에르네스트 로페스 시나리오",
+      "lvForTool": 1,
       "inheritLandFeature": 71401000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -7112,6 +7308,7 @@
       "id": 71450008,
       "name": "과테말라 부근",
       "desc": "##거대한 신전의 진실",
+      "lvForTool": 7,
       "inheritLandFeature": 71448000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
@@ -7145,6 +7342,7 @@
       "id": 71450009,
       "name": "스톡홀름 부근",
       "desc": "##월계수 이름의 독성 식물",
+      "lvForTool": 1,
       "inheritLandFeature": 71406000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Taiga",
@@ -7178,6 +7376,7 @@
       "id": 71450010,
       "name": "도파르 부근",
       "desc": "##자연 속 청소부",
+      "lvForTool": 5,
       "inheritLandFeature": 71422000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -7211,6 +7410,7 @@
       "id": 71450011,
       "name": "알렉산드리아 부근",
       "desc": "##영웅의 마지막 흔적",
+      "lvForTool": 1,
       "inheritLandFeature": 71410500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -7244,6 +7444,7 @@
       "id": 71450012,
       "name": "나폴리 부근",
       "desc": "##죽지 않는 악마의 전설&가장 빛나는 별",
+      "lvForTool": 1,
       "inheritLandFeature": 71401000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -7277,6 +7478,7 @@
       "id": 71450013,
       "name": "영일 부근",
       "desc": "##기암절벽의 소문",
+      "lvForTool": 11,
       "inheritLandFeature": 71420000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -7310,6 +7512,7 @@
       "id": 71450015,
       "name": "고아 부근",
       "desc": "##작은 불청객",
+      "lvForTool": 5,
       "inheritLandFeature": 71423000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
@@ -7343,6 +7546,7 @@
       "id": 71450016,
       "name": "산티아고 부근",
       "desc": "##밤에 피는 꽃",
+      "lvForTool": 2,
       "inheritLandFeature": 71435000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
@@ -7376,6 +7580,7 @@
       "id": 71450020,
       "name": "영일 부근",
       "desc": "##이름 없는 비석",
+      "lvForTool": 11,
       "inheritLandFeature": 71420000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -7409,6 +7614,7 @@
       "id": 71450021,
       "name": "딕손 부근",
       "desc": "##얼음 위의 백색 곰",
+      "lvForTool": 19,
       "inheritLandFeature": 71403000,
       "exploreImage": "Illustration_Loading_Sail_02_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
@@ -7442,6 +7648,7 @@
       "id": 71450023,
       "name": "호르무즈 부근",
       "desc": "##눈에는 눈, 이에는 이",
+      "lvForTool": 5,
       "inheritLandFeature": 71422500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -7475,6 +7682,7 @@
       "id": 71450024,
       "name": "산티아고 부근",
       "desc": "##저주를 부르는 반지",
+      "lvForTool": 2,
       "inheritLandFeature": 71435000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
@@ -7508,6 +7716,7 @@
       "id": 71450025,
       "name": "벵겔라 부근",
       "desc": "##예언의 별",
+      "lvForTool": 4,
       "inheritLandFeature": 71412000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -7541,6 +7750,7 @@
       "id": 71450026,
       "name": "마실리파트남 부근",
       "desc": "##전설 속 수호신",
+      "lvForTool": 6,
       "inheritLandFeature": 71423010,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
@@ -7574,6 +7784,7 @@
       "id": 71450027,
       "name": "벵겔라 부근",
       "desc": "##오해를 부르는 향기",
+      "lvForTool": 4,
       "inheritLandFeature": 71412000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -7607,6 +7818,7 @@
       "id": 71450028,
       "name": "산티아고 부근",
       "desc": "##호수 아래의 성검",
+      "lvForTool": 2,
       "inheritLandFeature": 71435000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
@@ -7640,6 +7852,7 @@
       "id": 71450029,
       "name": "런던 부근",
       "desc": "##유령의 행렬",
+      "lvForTool": 1,
       "inheritLandFeature": 71404000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -7673,6 +7886,7 @@
       "id": 71450030,
       "name": "나일강",
       "desc": "##영혼을 붙잡는 힘",
+      "lvForTool": 4,
       "inheritLandFeature": 71415000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -7706,6 +7920,7 @@
       "id": 71450031,
       "name": "항주 부근",
       "desc": "##끝없는 요새",
+      "lvForTool": 8,
       "inheritLandFeature": 71421000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -7739,6 +7954,7 @@
       "id": 71450032,
       "name": "마르세유 부근",
       "desc": "##오랜 저주의 종결",
+      "lvForTool": 1,
       "inheritLandFeature": 71400500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -7772,6 +7988,7 @@
       "id": 71450033,
       "name": "알렉산드리아 부근",
       "desc": "##모험을 해보자",
+      "lvForTool": 1,
       "inheritLandFeature": 71410500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -7805,6 +8022,7 @@
       "id": 71450034,
       "name": "그린란드 남부",
       "desc": "##바다의 노랫소리",
+      "lvForTool": 6,
       "inheritLandFeature": 71448500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
@@ -7838,6 +8056,7 @@
       "id": 71450035,
       "name": "수바 부근",
       "desc": "##다리 없는 새",
+      "lvForTool": 14,
       "inheritLandFeature": 71442500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
@@ -7871,6 +8090,7 @@
       "id": 71450036,
       "name": "베르겐 부근",
       "desc": "##2023꽃놀이_메인1",
+      "lvForTool": 1,
       "inheritLandFeature": 71403500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Tundra",
@@ -7904,6 +8124,7 @@
       "id": 71450037,
       "name": "케르치 부근",
       "desc": "##2023꽃놀이_메인3",
+      "lvForTool": 1,
       "inheritLandFeature": 71405500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -7937,6 +8158,7 @@
       "id": 71450038,
       "name": "트루히요 부근",
       "desc": "##2023꽃놀이_메인5",
+      "lvForTool": 2,
       "inheritLandFeature": 71434500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
@@ -7970,6 +8192,7 @@
       "id": 71450039,
       "name": "나폴리 부근",
       "desc": "##영웅의 갑옷1",
+      "lvForTool": 1,
       "inheritLandFeature": 71401000,
       "exploreImage": "Illustration_Loading_Port_02_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -8003,6 +8226,7 @@
       "id": 71450040,
       "name": "카라카스 부근",
       "desc": "##새 박사의 새로운 새",
+      "lvForTool": 2,
       "inheritLandFeature": 71432000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
@@ -8036,6 +8260,7 @@
       "id": 71450041,
       "name": "트라브존 부근",
       "desc": "##새 박사의 새로운 새",
+      "lvForTool": 1,
       "inheritLandFeature": 71402000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -8069,6 +8294,7 @@
       "id": 71450042,
       "name": "리스본 부근",
       "desc": "##새 박사의 새로운 새",
+      "lvForTool": 1,
       "inheritLandFeature": 71400000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -8102,6 +8328,7 @@
       "id": 71450043,
       "name": "타마타브 부근",
       "desc": "##세기의 천재와의 만남4",
+      "lvForTool": 5,
       "inheritLandFeature": 71413500,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
@@ -8135,6 +8362,7 @@
       "id": 71450044,
       "name": "축치 반도",
       "desc": "##LV65 모험 양산 1_1",
+      "lvForTool": 12,
       "inheritLandFeature": 71447000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Taiga",
@@ -8168,6 +8396,7 @@
       "id": 71450045,
       "name": "축치 반도",
       "desc": "##LV65 모험 양산 1_2",
+      "lvForTool": 12,
       "inheritLandFeature": 71447000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Taiga",
@@ -8201,6 +8430,7 @@
       "id": 71450046,
       "name": "축치 반도",
       "desc": "##LV65 모험 양산 1_3",
+      "lvForTool": 12,
       "inheritLandFeature": 71447000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Taiga",
@@ -8234,6 +8464,7 @@
       "id": 71450047,
       "name": "축치 반도",
       "desc": "##LV65 모험 양산 1_4",
+      "lvForTool": 12,
       "inheritLandFeature": 71447000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Taiga",
@@ -8267,6 +8498,7 @@
       "id": 71450048,
       "name": "배로우 부근",
       "desc": "##LV65 모험 양산 2_1",
+      "lvForTool": 12,
       "inheritLandFeature": 71445500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
@@ -8300,6 +8532,7 @@
       "id": 71450049,
       "name": "배로우 부근",
       "desc": "##LV65 모험 양산 2_2",
+      "lvForTool": 12,
       "inheritLandFeature": 71445500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
@@ -8333,6 +8566,7 @@
       "id": 71450050,
       "name": "배로우 부근",
       "desc": "##LV65 모험 양산 2_3",
+      "lvForTool": 12,
       "inheritLandFeature": 71445500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
@@ -8366,6 +8600,7 @@
       "id": 71450051,
       "name": "나폴리 부근",
       "desc": "##천하제일의 영웅을 찾아라!",
+      "lvForTool": 1,
       "inheritLandFeature": 71401000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -8399,6 +8634,7 @@
       "id": 71450052,
       "name": "나일강",
       "desc": "##사기꾼을 잡아라!",
+      "lvForTool": 4,
       "inheritLandFeature": 71415000,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -8432,6 +8668,7 @@
       "id": 71450053,
       "name": "아테네 부근",
       "desc": "##1주년 이벤트_메인3",
+      "lvForTool": 1,
       "inheritLandFeature": 71401500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -8465,6 +8702,7 @@
       "id": 71450054,
       "name": "시베리아",
       "desc": "##북극 초입 양산 1",
+      "lvForTool": 16,
       "inheritLandFeature": 71449016,
       "exploreImage": "Illustration_Loading_Sail_02_Sprite",
       "backgroundMap": "M_Adventure_Tundra",
@@ -8498,6 +8736,7 @@
       "id": 71450055,
       "name": "알래스카",
       "desc": "##북극 초입 양산 2",
+      "lvForTool": 16,
       "inheritLandFeature": 71449017,
       "exploreImage": "Illustration_Loading_Sail_02_Sprite",
       "backgroundMap": "M_Adventure_Tundra",
@@ -8531,6 +8770,7 @@
       "id": 71450056,
       "name": "알래스카",
       "desc": "##북극 초입 양산 3",
+      "lvForTool": 16,
       "inheritLandFeature": 71449017,
       "exploreImage": "Illustration_Loading_Sail_02_Sprite",
       "backgroundMap": "M_Adventure_Tundra",
@@ -8564,6 +8804,7 @@
       "id": 71450057,
       "name": "알래스카",
       "desc": "##북극 초입 양산 4",
+      "lvForTool": 16,
       "inheritLandFeature": 71449017,
       "exploreImage": "Illustration_Loading_Sail_02_Sprite",
       "backgroundMap": "M_Adventure_Tundra",
@@ -8597,6 +8838,7 @@
       "id": 71450058,
       "name": "트라브존 부근",
       "desc": "##24년 에스메랄다 서브 퀘스트 1",
+      "lvForTool": 1,
       "inheritLandFeature": 71402000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -8630,6 +8872,7 @@
       "id": 71450059,
       "name": "바이아 부근",
       "desc": "##25년 여름 한정 모험 퀘스트",
+      "lvForTool": 5,
       "inheritLandFeature": 71432500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -8663,6 +8906,7 @@
       "id": 71450060,
       "name": "산티아고 부근",
       "desc": "##특수 합성 부품 의뢰1_60_7",
+      "lvForTool": 2,
       "inheritLandFeature": 71435000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
@@ -8696,6 +8940,7 @@
       "id": 71460001,
       "name": "나일강",
       "desc": "##밀란다 베르테",
+      "lvForTool": 4,
       "inheritLandFeature": 71415000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -8729,6 +8974,7 @@
       "id": 71460002,
       "name": "그린란드 남부",
       "desc": "##밀란다 베르테",
+      "lvForTool": 6,
       "inheritLandFeature": 71448500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
@@ -8762,6 +9008,7 @@
       "id": 71460003,
       "name": "발파라이소 부근",
       "desc": "##밀란다 베르테",
+      "lvForTool": 6,
       "inheritLandFeature": 71433500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Hill",
@@ -8795,6 +9042,7 @@
       "id": 71460004,
       "name": "고아 부근",
       "desc": "##밀란다 베르테",
+      "lvForTool": 5,
       "inheritLandFeature": 71423000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
@@ -8828,6 +9076,7 @@
       "id": 71460005,
       "name": "브루나이 부근",
       "desc": "##밀란다 베르테",
+      "lvForTool": 7,
       "inheritLandFeature": 71423500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
@@ -8861,6 +9110,7 @@
       "id": 71460006,
       "name": "황허",
       "desc": "##밀란다 베르테",
+      "lvForTool": 8,
       "inheritLandFeature": 71421030,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -8894,6 +9144,7 @@
       "id": 71460007,
       "name": "포트피리 부근",
       "desc": "##밀란다 베르테",
+      "lvForTool": 9,
       "inheritLandFeature": 71441000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -8927,6 +9178,7 @@
       "id": 71460008,
       "name": "코하셋 부근",
       "desc": "##앤 보니 발견물",
+      "lvForTool": 2,
       "inheritLandFeature": 71430510,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -8960,6 +9212,7 @@
       "id": 71460009,
       "name": "나일강",
       "desc": "##앤 보니 발견물",
+      "lvForTool": 4,
       "inheritLandFeature": 71415000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -8993,6 +9246,7 @@
       "id": 71460010,
       "name": "콩고강",
       "desc": "##앤 보니 발견물",
+      "lvForTool": 4,
       "inheritLandFeature": 71411520,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
@@ -9026,6 +9280,7 @@
       "id": 71460011,
       "name": "베르겐 부근",
       "desc": "##에르네스트 발견물",
+      "lvForTool": 1,
       "inheritLandFeature": 71403500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Tundra",
@@ -9059,6 +9314,7 @@
       "id": 71460012,
       "name": "리스본 부근",
       "desc": "##에르네스트 발견물",
+      "lvForTool": 1,
       "inheritLandFeature": 71400000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -9092,6 +9348,7 @@
       "id": 71460013,
       "name": "나이저강",
       "desc": "##에르네스트 발견물",
+      "lvForTool": 3,
       "inheritLandFeature": 71411510,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
@@ -9125,6 +9382,7 @@
       "id": 71460014,
       "name": "수라바야 부근",
       "desc": "##에르네스트 발견물",
+      "lvForTool": 7,
       "inheritLandFeature": 71423510,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
@@ -9158,6 +9416,7 @@
       "id": 71460015,
       "name": "수라바야 부근",
       "desc": "##에르네스트 발견물",
+      "lvForTool": 7,
       "inheritLandFeature": 71423510,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
@@ -9191,6 +9450,7 @@
       "id": 71460016,
       "name": "호르무즈 부근",
       "desc": "##에르네스트 발견물&누이 호쿠",
+      "lvForTool": 5,
       "inheritLandFeature": 71422500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -9224,6 +9484,7 @@
       "id": 71460017,
       "name": "런던 부근",
       "desc": "##에르네스트 발견물",
+      "lvForTool": 1,
       "inheritLandFeature": 71404000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -9257,6 +9518,7 @@
       "id": 71460018,
       "name": "낭트 부근",
       "desc": "##옷토 발견물",
+      "lvForTool": 1,
       "inheritLandFeature": 71402500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -9290,6 +9552,7 @@
       "id": 71460020,
       "name": "트라브존 부근",
       "desc": "##바다 민족의 정체",
+      "lvForTool": 1,
       "inheritLandFeature": 71402000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -9323,6 +9586,7 @@
       "id": 71460021,
       "name": "아테네 부근",
       "desc": "##델포이의 신탁",
+      "lvForTool": 1,
       "inheritLandFeature": 71401500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -9356,6 +9620,7 @@
       "id": 71460022,
       "name": "알렉산드리아 부근",
       "desc": "##꺼지지 않는 불",
+      "lvForTool": 1,
       "inheritLandFeature": 71410500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -9389,6 +9654,7 @@
       "id": 71460023,
       "name": "아테네 부근",
       "desc": "##카탈리나 발견물",
+      "lvForTool": 1,
       "inheritLandFeature": 71401500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -9422,6 +9688,7 @@
       "id": 71460024,
       "name": "나일강",
       "desc": "##콘티 발견물",
+      "lvForTool": 4,
       "inheritLandFeature": 71415000,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -9455,6 +9722,7 @@
       "id": 71460025,
       "name": "호르무즈 부근",
       "desc": "##콘티 발견물",
+      "lvForTool": 5,
       "inheritLandFeature": 71422500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -9488,6 +9756,7 @@
       "id": 71460026,
       "name": "과테말라 부근",
       "desc": "##밀란다 베르테",
+      "lvForTool": 7,
       "inheritLandFeature": 71448000,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
@@ -9521,6 +9790,7 @@
       "id": 71460027,
       "name": "타마타브 부근",
       "desc": "##살바도르 레이스",
+      "lvForTool": 5,
       "inheritLandFeature": 71413500,
       "exploreImage": "Illustration_Loading_Sail_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
@@ -9554,6 +9824,7 @@
       "id": 71460028,
       "name": "아테네 부근",
       "desc": "##누이 호쿠",
+      "lvForTool": 1,
       "inheritLandFeature": 71401500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
@@ -9587,6 +9858,7 @@
       "id": 71460029,
       "name": "호르무즈 부근",
       "desc": "##누이 호쿠",
+      "lvForTool": 5,
       "inheritLandFeature": 71422500,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Desert",
@@ -9620,6 +9892,7 @@
       "id": 71460030,
       "name": "아마존강 상류",
       "desc": "##피리 레이스",
+      "lvForTool": 2,
       "inheritLandFeature": 71432020,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Jungle",
@@ -9652,6 +9925,7 @@
     "71460300": {
       "id": 71460300,
       "name": "딕손 부근",
+      "lvForTool": 19,
       "exploreImage": "Illustration_Loading_Sail_02_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700067,
@@ -9686,6 +9960,7 @@
     "71460301": {
       "id": 71460301,
       "name": "아이슬란드 남부",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Glacier",
       "consumeItemId": 23700023,
@@ -9720,6 +9995,7 @@
     "71460302": {
       "id": 71460302,
       "name": "아비앗 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Taiga",
       "consumeItemId": 23700023,
@@ -9754,6 +10030,7 @@
     "71460303": {
       "id": 71460303,
       "name": "카라카스 부근",
+      "lvForTool": 2,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Savannah",
       "consumeItemId": 23700017,
@@ -9788,6 +10065,7 @@
     "71460304": {
       "id": 71460304,
       "name": "우수아이아 부근",
+      "lvForTool": 6,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700023,
@@ -9822,6 +10100,7 @@
     "71460305": {
       "id": 71460305,
       "name": "오론 부근",
+      "lvForTool": 12,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Mountain_Taiga",
       "consumeItemId": 23700067,
@@ -9856,6 +10135,7 @@
     "71460306": {
       "id": 71460306,
       "name": "한양 부근",
+      "lvForTool": 25,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700067,
@@ -9891,6 +10171,7 @@
       "id": 71460307,
       "name": "항주 경쟁전 지역",
       "desc": "##동방의 물결 경쟁전 지역",
+      "lvForTool": 25,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700024,
@@ -9925,6 +10206,7 @@
       "id": 71460308,
       "name": "캘커타 경쟁전 지역",
       "desc": "##동방의 물결 경쟁전 지역",
+      "lvForTool": 25,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700023,
@@ -9959,6 +10241,7 @@
       "id": 71460309,
       "name": "실론섬 경쟁전 지역",
       "desc": "##동방의 물결 경쟁전 지역",
+      "lvForTool": 25,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23700067,
@@ -9993,6 +10276,7 @@
       "id": 71460310,
       "name": "포트피리 인근 경쟁전 지역",
       "desc": "##동방의 물결 경쟁전 지역",
+      "lvForTool": 25,
       "exploreImage": "Illustration_Loading_Port_01_Sprite",
       "backgroundMap": "M_Adventure_Grassland",
       "consumeItemId": 23710215,

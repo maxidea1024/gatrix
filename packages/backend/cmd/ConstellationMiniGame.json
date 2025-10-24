@@ -1,0 +1,12867 @@
+{
+	":ConstellationMiniGame":
+	{
+		":type":
+		{
+			"id": "key",
+			"discoveryId": "number",
+			"star": [
+				{
+					"position":
+					{
+						"x": "number",
+						"y": "number"
+					},
+					"isAlpha": "bool",
+					"isClickable": "bool"
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": "number",
+						"y": "number"
+					},
+					"isDefault": "bool",
+					"hintStep": "number"
+				}
+			],
+			"background": "string"
+		},
+		":required":
+		{
+			"id": 1,
+			"discoveryId": 1,
+			"star": [
+				{
+					"position":
+					{
+						"x": 1,
+						"y": 1
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 1
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			]
+		},
+		":min":
+		{
+		},
+		":max":
+		{
+		},
+		":enum":
+		{
+		},
+		":links":
+		{
+		}
+	},
+	"ConstellationMiniGame":
+	{
+		"99910000":
+		{
+			"id": 99910000,
+			"discoveryId": 70414001,
+			"star": [
+				{
+					"position":
+					{
+						"x": -336,
+						"y": 220
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -80,
+						"y": -104
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 136,
+						"y": -96
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 364,
+						"y": -96
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 220,
+						"y": -308
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -128,
+						"y": 268
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Black_Sprite"
+		},
+		"99910001":
+		{
+			"id": 99910001,
+			"discoveryId": 70414003,
+			"star": [
+				{
+					"position":
+					{
+						"x": -136,
+						"y": 308
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 44,
+						"y": -8
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 8,
+						"y": -100
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -88,
+						"y": 20
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -112,
+						"y": -112
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -228,
+						"y": -380
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 308,
+						"y": 288
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Black_Sprite"
+		},
+		"99910002":
+		{
+			"id": 99910002,
+			"discoveryId": 70414004,
+			"star": [
+				{
+					"position":
+					{
+						"x": -276,
+						"y": 52
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -140,
+						"y": 392
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 184,
+						"y": 312
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 304,
+						"y": -4
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 212,
+						"y": -336
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -140,
+						"y": -272
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Black_Sprite"
+		},
+		"99910003":
+		{
+			"id": 99910003,
+			"discoveryId": 70414005,
+			"star": [
+				{
+					"position":
+					{
+						"x": 264,
+						"y": -212
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -44,
+						"y": 336
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -344,
+						"y": -192
+					},
+					"isAlpha": true,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Purple_Sprite"
+		},
+		"99910004":
+		{
+			"id": 99910004,
+			"discoveryId": 70414006,
+			"star": [
+				{
+					"position":
+					{
+						"x": 380,
+						"y": 392
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 232,
+						"y": 200
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 132,
+						"y": 140
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -12,
+						"y": 308
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -36,
+						"y": 144
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -152,
+						"y": -60
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -256,
+						"y": -168
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -264,
+						"y": -232
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": -156,
+						"y": -320
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -240,
+						"y": -384
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -328,
+						"y": -368
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -360,
+						"y": -252
+					},
+					"isAlpha": true,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 12
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Purple_Sprite"
+		},
+		"99910005":
+		{
+			"id": 99910005,
+			"discoveryId": 70414007,
+			"star": [
+				{
+					"position":
+					{
+						"x": 368,
+						"y": 140
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -344,
+						"y": -240
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -288,
+						"y": -316
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -216,
+						"y": -280
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -128,
+						"y": -252
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -128,
+						"y": 188
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 112,
+						"y": 24
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 176,
+						"y": 228
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 344,
+						"y": 380
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Black_Sprite"
+		},
+		"99910006":
+		{
+			"id": 99910006,
+			"discoveryId": 70414008,
+			"star": [
+				{
+					"position":
+					{
+						"x": 100,
+						"y": -340
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 300,
+						"y": -348
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 308,
+						"y": -20
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 236,
+						"y": 200
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -60,
+						"y": 252
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -104,
+						"y": 392
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -388,
+						"y": 60
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -12,
+						"y": 128
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 24,
+						"y": -224
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 200,
+						"y": -328
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Black_Sprite"
+		},
+		"99910007":
+		{
+			"id": 99910007,
+			"discoveryId": 70414009,
+			"star": [
+				{
+					"position":
+					{
+						"x": -4,
+						"y": -52
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -48,
+						"y": -96
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 72,
+						"y": -128
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 12,
+						"y": -144
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 204,
+						"y": -52
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 296,
+						"y": -40
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 396,
+						"y": -96
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 164,
+						"y": -180
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 260,
+						"y": -276
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 32,
+						"y": -280
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -48,
+						"y": -244
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -160,
+						"y": -348
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -304,
+						"y": 324
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -376,
+						"y": -40
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -228,
+						"y": -152
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -104,
+						"y": -152
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 228,
+						"y": 120
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 192,
+						"y": 60
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -152,
+						"y": 356
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -160,
+						"y": 248
+					},
+					"isAlpha": true,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 11
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 8
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 18
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 17,
+						"y": 18
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 16
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 15,
+						"y": 16
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 14,
+						"y": 15
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 14
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 20
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 19
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Green_Sprite"
+		},
+		"99910008":
+		{
+			"id": 99910008,
+			"discoveryId": 70414010,
+			"star": [
+				{
+					"position":
+					{
+						"x": 36,
+						"y": -60
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -16,
+						"y": -120
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -164,
+						"y": 68
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -236,
+						"y": -284
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 220,
+						"y": 308
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Green_Sprite"
+		},
+		"99910009":
+		{
+			"id": 99910009,
+			"discoveryId": 70414013,
+			"star": [
+				{
+					"position":
+					{
+						"x": 284,
+						"y": 280
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 212,
+						"y": 120
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -176,
+						"y": 300
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 12,
+						"y": -208
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -272,
+						"y": -212
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Green_Sprite"
+		},
+		"99910010":
+		{
+			"id": 99910010,
+			"discoveryId": 70414014,
+			"star": [
+				{
+					"position":
+					{
+						"x": 8,
+						"y": -28
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 88,
+						"y": 284
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 320,
+						"y": 212
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 340,
+						"y": 24
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -80,
+						"y": -220
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -360,
+						"y": -220
+					},
+					"isAlpha": true,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Green_Sprite"
+		},
+		"99910011":
+		{
+			"id": 99910011,
+			"discoveryId": 70414015,
+			"star": [
+				{
+					"position":
+					{
+						"x": 204,
+						"y": -76
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -252,
+						"y": 44
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 192,
+						"y": 348
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -164,
+						"y": -256
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910012":
+		{
+			"id": 99910012,
+			"discoveryId": 70414016,
+			"star": [
+				{
+					"position":
+					{
+						"x": -288,
+						"y": 8
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -328,
+						"y": -36
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 160,
+						"y": 184
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 388,
+						"y": 288
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -72,
+						"y": -248
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -296,
+						"y": -180
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -64,
+						"y": 60
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Green_Sprite"
+		},
+		"99910013":
+		{
+			"id": 99910013,
+			"discoveryId": 70414017,
+			"star": [
+				{
+					"position":
+					{
+						"x": -344,
+						"y": 284
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 64,
+						"y": -252
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 364,
+						"y": 216
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Purple_Sprite"
+		},
+		"99910014":
+		{
+			"id": 99910014,
+			"discoveryId": 70414021,
+			"star": [
+				{
+					"position":
+					{
+						"x": 64,
+						"y": 48
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -356,
+						"y": 188
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 220,
+						"y": -328
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 320,
+						"y": -404
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -124,
+						"y": -220
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -176,
+						"y": -156
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -212,
+						"y": -68
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 232,
+						"y": 340
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Red_Sprite"
+		},
+		"99910015":
+		{
+			"id": 99910015,
+			"discoveryId": 70414022,
+			"star": [
+				{
+					"position":
+					{
+						"x": 328,
+						"y": 348
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 108,
+						"y": -104
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -128,
+						"y": -144
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 12,
+						"y": -288
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -256,
+						"y": -280
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Black_Sprite"
+		},
+		"99910016":
+		{
+			"id": 99910016,
+			"discoveryId": 70414023,
+			"star": [
+				{
+					"position":
+					{
+						"x": 164,
+						"y": 216
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -120,
+						"y": 204
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -348,
+						"y": 84
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 100,
+						"y": -96
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 344,
+						"y": 68
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -12,
+						"y": -180
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -232,
+						"y": -120
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 6
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910017":
+		{
+			"id": 99910017,
+			"discoveryId": 70414024,
+			"star": [
+				{
+					"position":
+					{
+						"x": 380,
+						"y": -328
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 204,
+						"y": -248
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 80,
+						"y": -172
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 72,
+						"y": 172
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -80,
+						"y": -84
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -112,
+						"y": -68
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -276,
+						"y": 124
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -348,
+						"y": 348
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 3
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Green_Sprite"
+		},
+		"99910018":
+		{
+			"id": 99910018,
+			"discoveryId": 70414029,
+			"star": [
+				{
+					"position":
+					{
+						"x": 156,
+						"y": -48
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 116,
+						"y": -40
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 120,
+						"y": -124
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 276,
+						"y": 176
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 132,
+						"y": 376
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -148,
+						"y": 176
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 16,
+						"y": -152
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -204,
+						"y": -64
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -256,
+						"y": -352
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 7
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Purple_Sprite"
+		},
+		"99910019":
+		{
+			"id": 99910019,
+			"discoveryId": 70414030,
+			"star": [
+				{
+					"position":
+					{
+						"x": 352,
+						"y": -256
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -232,
+						"y": -304
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -312,
+						"y": 308
+					},
+					"isAlpha": true,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Red_Sprite"
+		},
+		"99910020":
+		{
+			"id": 99910020,
+			"discoveryId": 70414031,
+			"star": [
+				{
+					"position":
+					{
+						"x": -100,
+						"y": 436
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -84,
+						"y": 376
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 188,
+						"y": 368
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 168,
+						"y": 304
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 60,
+						"y": 284
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 120,
+						"y": -452
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 132,
+						"y": -304
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 20,
+						"y": 28
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -72,
+						"y": -204
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -168,
+						"y": -80
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -184,
+						"y": -180
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -56,
+						"y": 96
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 44,
+						"y": -144
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 13
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 13
+					},
+					"isDefault": false,
+					"hintStep": 7
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 8
+				},
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 9
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 13
+					},
+					"isDefault": false,
+					"hintStep": 10
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 11
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Red_Sprite"
+		},
+		"99910021":
+		{
+			"id": 99910021,
+			"discoveryId": 70414033,
+			"star": [
+				{
+					"position":
+					{
+						"x": 340,
+						"y": 188
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": 308,
+						"y": 232
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": 236,
+						"y": 224
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": 236,
+						"y": 152
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 304,
+						"y": 140
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": 408,
+						"y": 176
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": 140,
+						"y": 132
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -80,
+						"y": 124
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -256,
+						"y": 140
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -424,
+						"y": 192
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -328,
+						"y": 80
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -264,
+						"y": -24
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -164,
+						"y": -128
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -168,
+						"y": -196
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -200,
+						"y": -244
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -152,
+						"y": -296
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 15,
+						"y": 16
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 14,
+						"y": 15
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 14
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 13
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 1
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910022":
+		{
+			"id": 99910022,
+			"discoveryId": 70414034,
+			"star": [
+				{
+					"position":
+					{
+						"x": 100,
+						"y": 280
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 44,
+						"y": 228
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -100,
+						"y": 232
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -112,
+						"y": 344
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -276,
+						"y": 144
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -276,
+						"y": 72
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -216,
+						"y": 28
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -188,
+						"y": -52
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -4,
+						"y": -196
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 232,
+						"y": -360
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -28,
+						"y": 48
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 100,
+						"y": -28
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 256,
+						"y": 364
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 13
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 7
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Purple_Sprite"
+		},
+		"99910023":
+		{
+			"id": 99910023,
+			"discoveryId": 70414038,
+			"star": [
+				{
+					"position":
+					{
+						"x": 308,
+						"y": -72
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 244,
+						"y": 4
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 180,
+						"y": -24
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 148,
+						"y": 36
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 68,
+						"y": 40
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 32,
+						"y": 184
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -32,
+						"y": 244
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -80,
+						"y": 276
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -312,
+						"y": 196
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -436,
+						"y": 292
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 392,
+						"y": -252
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 268,
+						"y": -160
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 440,
+						"y": -232
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": 428,
+						"y": -276
+					},
+					"isAlpha": false,
+					"isClickable": false
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 12
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 14
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 14
+					},
+					"isDefault": true,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910024":
+		{
+			"id": 99910024,
+			"discoveryId": 70414039,
+			"star": [
+				{
+					"position":
+					{
+						"x": -24,
+						"y": -24
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 88,
+						"y": 320
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -208,
+						"y": -232
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Purple_Sprite"
+		},
+		"99910025":
+		{
+			"id": 99910025,
+			"discoveryId": 70414041,
+			"star": [
+				{
+					"position":
+					{
+						"x": -4,
+						"y": -12
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -168,
+						"y": 192
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -356,
+						"y": 288
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -348,
+						"y": 44
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -356,
+						"y": -8
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -284,
+						"y": 24
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 196,
+						"y": -184
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 244,
+						"y": -404
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 20,
+						"y": -252
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -124,
+						"y": -176
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -264,
+						"y": -144
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 168,
+						"y": 152
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 364,
+						"y": 348
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 10
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 7
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 13
+					},
+					"isDefault": false,
+					"hintStep": 8
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 9
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 10
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 11
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910026":
+		{
+			"id": 99910026,
+			"discoveryId": 70414042,
+			"star": [
+				{
+					"position":
+					{
+						"x": 332,
+						"y": 40
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 204,
+						"y": 68
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 224,
+						"y": 32
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 164,
+						"y": -48
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 44,
+						"y": -176
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -140,
+						"y": -96
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -96,
+						"y": -220
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 136,
+						"y": 156
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 396,
+						"y": -188
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 324,
+						"y": -88
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 152,
+						"y": 256
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 348,
+						"y": -348
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 296,
+						"y": -284
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 340,
+						"y": -276
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -200,
+						"y": 144
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -296,
+						"y": 28
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -384,
+						"y": -44
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -228,
+						"y": -56
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 4,
+						"y": 240
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -108,
+						"y": 236
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -128,
+						"y": 192
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -48,
+						"y": 392
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -44,
+						"y": 328
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 14
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 14
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 14
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 13
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 20
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 11
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 19
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 19,
+						"y": 23
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 22,
+						"y": 23
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 19
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 16,
+						"y": 17
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 16,
+						"y": 18
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 18
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 15,
+						"y": 16
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 15,
+						"y": 21
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 20,
+						"y": 21
+					},
+					"isDefault": true,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Purple_Sprite"
+		},
+		"99910027":
+		{
+			"id": 99910027,
+			"discoveryId": 70414045,
+			"star": [
+				{
+					"position":
+					{
+						"x": 324,
+						"y": 108
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -152,
+						"y": 364
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -76,
+						"y": -276
+					},
+					"isAlpha": true,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Black_Sprite"
+		},
+		"99910028":
+		{
+			"id": 99910028,
+			"discoveryId": 70414047,
+			"star": [
+				{
+					"position":
+					{
+						"x": 320,
+						"y": -4
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 240,
+						"y": 200
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 0,
+						"y": 248
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -136,
+						"y": 148
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -240,
+						"y": 52
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -272,
+						"y": -116
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -132,
+						"y": -316
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 6
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Purple_Sprite"
+		},
+		"99910029":
+		{
+			"id": 99910029,
+			"discoveryId": 70414048,
+			"star": [
+				{
+					"position":
+					{
+						"x": 144,
+						"y": -156
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -196,
+						"y": 156
+					},
+					"isAlpha": true,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910030":
+		{
+			"id": 99910030,
+			"discoveryId": 70414049,
+			"star": [
+				{
+					"position":
+					{
+						"x": -268,
+						"y": -4
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -420,
+						"y": 200
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 372,
+						"y": 44
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 416,
+						"y": -52
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 192,
+						"y": 60
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 152,
+						"y": -60
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 48,
+						"y": -92
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 24,
+						"y": -200
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 136,
+						"y": -320
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 196,
+						"y": -284
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -224,
+						"y": 124
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 7
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 8
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 9
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Red_Sprite"
+		},
+		"99910031":
+		{
+			"id": 99910031,
+			"discoveryId": 70414050,
+			"star": [
+				{
+					"position":
+					{
+						"x": -100,
+						"y": 368
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -216,
+						"y": -260
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 268,
+						"y": 24
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Red_Sprite"
+		},
+		"99910032":
+		{
+			"id": 99910032,
+			"discoveryId": 70414054,
+			"star": [
+				{
+					"position":
+					{
+						"x": -168,
+						"y": -192
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -200,
+						"y": -260
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 408,
+						"y": 208
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 324,
+						"y": 204
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 264,
+						"y": 180
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 188,
+						"y": 236
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 156,
+						"y": 40
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 216,
+						"y": -256
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 48,
+						"y": -204
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -76,
+						"y": -328
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -24,
+						"y": 400
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -212,
+						"y": 180
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -144,
+						"y": 8
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -268,
+						"y": -152
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 80,
+						"y": 320
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -52,
+						"y": 108
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -76,
+						"y": -184
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 17
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 17
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 14
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 13
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 16
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 15,
+						"y": 16
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 13
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 6
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910033":
+		{
+			"id": 99910033,
+			"discoveryId": 70414057,
+			"star": [
+				{
+					"position":
+					{
+						"x": 4,
+						"y": 76
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 104,
+						"y": -56
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 284,
+						"y": -196
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": 264,
+						"y": -224
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 448,
+						"y": -212
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 264,
+						"y": -280
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -164,
+						"y": 20
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -52,
+						"y": -116
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -280,
+						"y": -140
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -140,
+						"y": -280
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -400,
+						"y": -196
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 168,
+						"y": 188
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -8,
+						"y": 192
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": -8,
+						"y": 148
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -56,
+						"y": 316
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -124,
+						"y": 332
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 14
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 14
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 14
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 14
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 15
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 15,
+						"y": 16
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Purple_Sprite"
+		},
+		"99910034":
+		{
+			"id": 99910034,
+			"discoveryId": 70414064,
+			"star": [
+				{
+					"position":
+					{
+						"x": 40,
+						"y": 36
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 320,
+						"y": 156
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 360,
+						"y": 256
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -376,
+						"y": -72
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910035":
+		{
+			"id": 99910035,
+			"discoveryId": 70414065,
+			"star": [
+				{
+					"position":
+					{
+						"x": 108,
+						"y": -336
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 60,
+						"y": -336
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 56,
+						"y": -300
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -8,
+						"y": -276
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -44,
+						"y": -384
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -68,
+						"y": -360
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -144,
+						"y": -424
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -188,
+						"y": -424
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -212,
+						"y": -388
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -268,
+						"y": -384
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -276,
+						"y": -324
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 212,
+						"y": -112
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 244,
+						"y": -148
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 272,
+						"y": -180
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 284,
+						"y": -252
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 248,
+						"y": -336
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 172,
+						"y": -344
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 40,
+						"y": 80
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -48,
+						"y": 40
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 116,
+						"y": 188
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 192,
+						"y": 152
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -80,
+						"y": 52
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -124,
+						"y": -8
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 48,
+						"y": -128
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 96,
+						"y": -148
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 144,
+						"y": -144
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 324,
+						"y": 356
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 264,
+						"y": 348
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 328,
+						"y": 452
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 244,
+						"y": 152
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 11
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 1
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 17
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 17,
+						"y": 16
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 15,
+						"y": 16
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 14,
+						"y": 15
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 14
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 13
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 26
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 25,
+						"y": 26
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 24,
+						"y": 25
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 23,
+						"y": 24
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 22,
+						"y": 23
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 22,
+						"y": 19
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 18,
+						"y": 19
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 18,
+						"y": 20
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 20,
+						"y": 21
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 21,
+						"y": 30
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 28,
+						"y": 30
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 27,
+						"y": 28
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 27,
+						"y": 29
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Black_Sprite"
+		},
+		"99910036":
+		{
+			"id": 99910036,
+			"discoveryId": 70414066,
+			"star": [
+				{
+					"position":
+					{
+						"x": 404,
+						"y": 228
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -328,
+						"y": 228
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 264,
+						"y": -216
+					},
+					"isAlpha": true,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910037":
+		{
+			"id": 99910037,
+			"discoveryId": 70414067,
+			"star": [
+				{
+					"position":
+					{
+						"x": 120,
+						"y": 208
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 332,
+						"y": -156
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 352,
+						"y": -232
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -44,
+						"y": -76
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -188,
+						"y": -80
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -332,
+						"y": -84
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -396,
+						"y": -88
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -216,
+						"y": 120
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 68,
+						"y": 268
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 7
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 1
+					},
+					"isDefault": true,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910038":
+		{
+			"id": 99910038,
+			"discoveryId": 70414068,
+			"star": [
+				{
+					"position":
+					{
+						"x": 232,
+						"y": -152
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 108,
+						"y": 8
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -100,
+						"y": 128
+					},
+					"isAlpha": true,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Black_Sprite"
+		},
+		"99910039":
+		{
+			"id": 99910039,
+			"discoveryId": 70414069,
+			"star": [
+				{
+					"position":
+					{
+						"x": 284,
+						"y": -16
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 288,
+						"y": -120
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 248,
+						"y": -240
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": 188,
+						"y": -292
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 48,
+						"y": -44
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -24,
+						"y": -124
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -164,
+						"y": -76
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -212,
+						"y": -140
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -272,
+						"y": -268
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": -232,
+						"y": -284
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -144,
+						"y": -428
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 268,
+						"y": 60
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 228,
+						"y": 80
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -104,
+						"y": 404
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 4,
+						"y": 140
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -28,
+						"y": 164
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": -60,
+						"y": 184
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": 96,
+						"y": 320
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -28,
+						"y": 300
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -24,
+						"y": 268
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 8,
+						"y": -40
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": 124,
+						"y": 364
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": true,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 21
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 21
+					},
+					"isDefault": true,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 21
+					},
+					"isDefault": true,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 12
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 13
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 17
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 16,
+						"y": 17
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 15,
+						"y": 16
+					},
+					"isDefault": true,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 17,
+						"y": 20
+					},
+					"isDefault": true,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 19,
+						"y": 20
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 14,
+						"y": 17
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 15,
+						"y": 18
+					},
+					"isDefault": true,
+					"hintStep": 7
+				},
+				{
+					"starIndex":
+					{
+						"x": 18,
+						"y": 22
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 15
+					},
+					"isDefault": false,
+					"hintStep": 8
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Black_Sprite"
+		},
+		"99910040":
+		{
+			"id": 99910040,
+			"discoveryId": 70414071,
+			"star": [
+				{
+					"position":
+					{
+						"x": 332,
+						"y": -100
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 284,
+						"y": -32
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -92,
+						"y": 328
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -352,
+						"y": 288
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -80,
+						"y": -8
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 104,
+						"y": -308
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 0,
+						"y": -336
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Black_Sprite"
+		},
+		"99910041":
+		{
+			"id": 99910041,
+			"discoveryId": 70414072,
+			"star": [
+				{
+					"position":
+					{
+						"x": -384,
+						"y": 128
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -228,
+						"y": 12
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -96,
+						"y": -20
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": -44,
+						"y": -36
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 52,
+						"y": -208
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 416,
+						"y": -140
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -248,
+						"y": 188
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -140,
+						"y": 276
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -252,
+						"y": 336
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -408,
+						"y": 240
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -276,
+						"y": 124
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 7
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 11
+					},
+					"isDefault": true,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910042":
+		{
+			"id": 99910042,
+			"discoveryId": 70414073,
+			"star": [
+				{
+					"position":
+					{
+						"x": -284,
+						"y": 284
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -228,
+						"y": 340
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -324,
+						"y": 396
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -232,
+						"y": 400
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 156,
+						"y": 204
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -16,
+						"y": 192
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -136,
+						"y": 104
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -184,
+						"y": -44
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -248,
+						"y": -72
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -256,
+						"y": -40
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -404,
+						"y": -100
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -376,
+						"y": -12
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 356,
+						"y": -336
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 308,
+						"y": -232
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 268,
+						"y": 4
+					},
+					"isAlpha": true,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 11
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 12
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": true,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 10
+					},
+					"isDefault": true,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 7
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 8
+				},
+				{
+					"starIndex":
+					{
+						"x": 15,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 9
+				},
+				{
+					"starIndex":
+					{
+						"x": 14,
+						"y": 15
+					},
+					"isDefault": false,
+					"hintStep": 10
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 14
+					},
+					"isDefault": false,
+					"hintStep": 11
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Purple_Sprite"
+		},
+		"99910043":
+		{
+			"id": 99910043,
+			"discoveryId": 70414074,
+			"star": [
+				{
+					"position":
+					{
+						"x": 228,
+						"y": 52
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 72,
+						"y": 440
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 92,
+						"y": 288
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 24,
+						"y": 92
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 64,
+						"y": -272
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -180,
+						"y": -392
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 64,
+						"y": -80
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -64,
+						"y": -64
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -260,
+						"y": -188
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -312,
+						"y": -252
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 324,
+						"y": 272
+					},
+					"isAlpha": true,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 7
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 8
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 9
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 10
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Purple_Sprite"
+		},
+		"99910044":
+		{
+			"id": 99910044,
+			"discoveryId": 70414075,
+			"star": [
+				{
+					"position":
+					{
+						"x": 60,
+						"y": -40
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -64,
+						"y": 80
+					},
+					"isAlpha": true,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Red_Sprite"
+		},
+		"99910045":
+		{
+			"id": 99910045,
+			"discoveryId": 70414076,
+			"star": [
+				{
+					"position":
+					{
+						"x": 132,
+						"y": 248
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 64,
+						"y": 348
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -84,
+						"y": 192
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 4,
+						"y": 124
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -92,
+						"y": -52
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -60,
+						"y": -224
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -4,
+						"y": -360
+					},
+					"isAlpha": true,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 7
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Red_Sprite"
+		},
+		"99910046":
+		{
+			"id": 99910046,
+			"discoveryId": 70414077,
+			"star": [
+				{
+					"position":
+					{
+						"x": -380,
+						"y": 208
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 364,
+						"y": -92
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 344,
+						"y": -304
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -4,
+						"y": 76
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -272,
+						"y": 204
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -312,
+						"y": 256
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -340,
+						"y": 312
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -260,
+						"y": 384
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -112,
+						"y": 372
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -4,
+						"y": 332
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -4,
+						"y": 196
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 88,
+						"y": -128
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 132,
+						"y": -192
+					},
+					"isAlpha": true,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": 192,
+						"y": -216
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 348,
+						"y": -192
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 252,
+						"y": -420
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 308,
+						"y": -404
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 16,
+						"y": 17
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 17
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 15
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 15
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 14
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 14
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 13
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Purple_Sprite"
+		},
+		"99910047":
+		{
+			"id": 99910047,
+			"discoveryId": 70414078,
+			"star": [
+				{
+					"position":
+					{
+						"x": 48,
+						"y": 212
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 72,
+						"y": 80
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -184,
+						"y": 292
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -232,
+						"y": 220
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -360,
+						"y": 268
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -440,
+						"y": 136
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -232,
+						"y": 44
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -80,
+						"y": 32
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -28,
+						"y": -252
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 64,
+						"y": -120
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 180,
+						"y": -60
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 264,
+						"y": -120
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 380,
+						"y": -224
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 368,
+						"y": -324
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 264,
+						"y": -320
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 14,
+						"y": 15
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 14
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 13
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 11
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 7
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 8
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 9
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 10
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Purple_Sprite"
+		},
+		"99910048":
+		{
+			"id": 99910048,
+			"discoveryId": 70414079,
+			"star": [
+				{
+					"position":
+					{
+						"x": 288,
+						"y": 244
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 224,
+						"y": 212
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -248,
+						"y": 284
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -228,
+						"y": 172
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -212,
+						"y": 64
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 256,
+						"y": -12
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -292,
+						"y": -128
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 24,
+						"y": -292
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Black_Sprite"
+		},
+		"99910049":
+		{
+			"id": 99910049,
+			"discoveryId": 70414082,
+			"star": [
+				{
+					"position":
+					{
+						"x": 28,
+						"y": 248
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -60,
+						"y": 24
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -232,
+						"y": -8
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -320,
+						"y": -224
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 248,
+						"y": 144
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 5
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910050":
+		{
+			"id": 99910050,
+			"discoveryId": 70414084,
+			"star": [
+				{
+					"position":
+					{
+						"x": 288,
+						"y": -116
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 132,
+						"y": 84
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 116,
+						"y": 444
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -212,
+						"y": 448
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -64,
+						"y": 120
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -268,
+						"y": -92
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -304,
+						"y": -272
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 236,
+						"y": -296
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910051":
+		{
+			"id": 99910051,
+			"discoveryId": 70414085,
+			"star": [
+				{
+					"position":
+					{
+						"x": 340,
+						"y": 72
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 280,
+						"y": 140
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 128,
+						"y": 152
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -156,
+						"y": 380
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -228,
+						"y": 320
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -120,
+						"y": 336
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 36,
+						"y": -164
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -280,
+						"y": 0
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -240,
+						"y": -372
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 7
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910052":
+		{
+			"id": 99910052,
+			"discoveryId": 70414087,
+			"star": [
+				{
+					"position":
+					{
+						"x": -332,
+						"y": -160
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -272,
+						"y": -152
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -208,
+						"y": -152
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -156,
+						"y": -160
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -152,
+						"y": -212
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -32,
+						"y": -108
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 36,
+						"y": -140
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 76,
+						"y": -400
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 84,
+						"y": -240
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 192,
+						"y": -180
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 348,
+						"y": -40
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 272,
+						"y": -72
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 284,
+						"y": -220
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 328,
+						"y": -352
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 16,
+						"y": -4
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 136,
+						"y": 300
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -144,
+						"y": -40
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -252,
+						"y": 56
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -300,
+						"y": 168
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -296,
+						"y": 236
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -108,
+						"y": 364
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 60,
+						"y": 448
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 228,
+						"y": 372
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 15
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 12
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 12
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 13
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 14
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 15
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 15,
+						"y": 17
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 17,
+						"y": 18
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 18,
+						"y": 19
+					},
+					"isDefault": false,
+					"hintStep": 7
+				},
+				{
+					"starIndex":
+					{
+						"x": 19,
+						"y": 20
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 20,
+						"y": 21
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 21,
+						"y": 22
+					},
+					"isDefault": true,
+					"hintStep": 8
+				},
+				{
+					"starIndex":
+					{
+						"x": 16,
+						"y": 22
+					},
+					"isDefault": false,
+					"hintStep": 9
+				},
+				{
+					"starIndex":
+					{
+						"x": 22,
+						"y": 23
+					},
+					"isDefault": false,
+					"hintStep": 10
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Black_Sprite"
+		},
+		"99910053":
+		{
+			"id": 99910053,
+			"discoveryId": 70414088,
+			"star": [
+				{
+					"position":
+					{
+						"x": -56,
+						"y": 384
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -196,
+						"y": 268
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -184,
+						"y": 136
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -384,
+						"y": 32
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -284,
+						"y": 0
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -220,
+						"y": 16
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 84,
+						"y": 100
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -80,
+						"y": 16
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -148,
+						"y": -44
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 248,
+						"y": -48
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 128,
+						"y": -52
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 16,
+						"y": -192
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 108,
+						"y": -172
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -12,
+						"y": -268
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 116,
+						"y": -324
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 56,
+						"y": 356
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 14,
+						"y": 15
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 15
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 14
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 14
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 16
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Red_Sprite"
+		},
+		"99910054":
+		{
+			"id": 99910054,
+			"discoveryId": 70414089,
+			"star": [
+				{
+					"position":
+					{
+						"x": 180,
+						"y": -140
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 336,
+						"y": -248
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 208,
+						"y": -240
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 28,
+						"y": -176
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 24,
+						"y": -88
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -108,
+						"y": -56
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -144,
+						"y": -124
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -312,
+						"y": -148
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -408,
+						"y": -108
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 372,
+						"y": -28
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 256,
+						"y": -48
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 176,
+						"y": 128
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -40,
+						"y": 312
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 8,
+						"y": 116
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -104,
+						"y": 52
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 152,
+						"y": 164
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 14
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 16
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 14,
+						"y": 16
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 14,
+						"y": 15
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 15
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 15
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910055":
+		{
+			"id": 99910055,
+			"discoveryId": 70414095,
+			"star": [
+				{
+					"position":
+					{
+						"x": 260,
+						"y": 240
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 104,
+						"y": 208
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 348,
+						"y": 80
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 256,
+						"y": 84
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 72,
+						"y": 84
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 8,
+						"y": 184
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -264,
+						"y": 268
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -360,
+						"y": 12
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -48,
+						"y": -68
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 24,
+						"y": -144
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 48,
+						"y": -168
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": 196,
+						"y": -284
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 324,
+						"y": -232
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 13
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 12
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 11
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 7
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Purple_Sprite"
+		},
+		"99910056":
+		{
+			"id": 99910056,
+			"discoveryId": 70414096,
+			"star": [
+				{
+					"position":
+					{
+						"x": 0,
+						"y": 20
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -272,
+						"y": 152
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -192,
+						"y": 80
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 16,
+						"y": 136
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -12,
+						"y": 184
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 32,
+						"y": 200
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 112,
+						"y": -116
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 60,
+						"y": -220
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 4,
+						"y": -236
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 4,
+						"y": -340
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 68,
+						"y": -316
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 200,
+						"y": -280
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 396,
+						"y": -224
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 440,
+						"y": -156
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -88,
+						"y": -128
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -208,
+						"y": 392
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -272,
+						"y": 400
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -296,
+						"y": 276
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -376,
+						"y": -64
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -328,
+						"y": -112
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -276,
+						"y": -156
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -180,
+						"y": -68
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 14
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 13
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 11
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 15
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 15,
+						"y": 22
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 21,
+						"y": 22
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 20,
+						"y": 21
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 19,
+						"y": 20
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 18
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 17,
+						"y": 18
+					},
+					"isDefault": false,
+					"hintStep": 7
+				},
+				{
+					"starIndex":
+					{
+						"x": 16,
+						"y": 17
+					},
+					"isDefault": true,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910057":
+		{
+			"id": 99910057,
+			"discoveryId": 70414105,
+			"star": [
+				{
+					"position":
+					{
+						"x": 60,
+						"y": 120
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 60,
+						"y": 364
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 304,
+						"y": 428
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 352,
+						"y": 360
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 436,
+						"y": 280
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 356,
+						"y": 236
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 300,
+						"y": 184
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -108,
+						"y": -244
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -40,
+						"y": -380
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -132,
+						"y": -184
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 136,
+						"y": -28
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 68,
+						"y": -168
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 232,
+						"y": -44
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 216,
+						"y": -212
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 236,
+						"y": -308
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 292,
+						"y": -396
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 424,
+						"y": -324
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -436,
+						"y": 172
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -232,
+						"y": 192
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -316,
+						"y": 164
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -208,
+						"y": 4
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -156,
+						"y": -4
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -104,
+						"y": 44
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -16,
+						"y": 88
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -468,
+						"y": 208
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -464,
+						"y": 140
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 16,
+						"y": 17
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 15,
+						"y": 16
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 14,
+						"y": 15
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 13,
+						"y": 14
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 13
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 14
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 13
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 7
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 8
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 9
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 10
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 24
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 23,
+						"y": 24
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 22,
+						"y": 23
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 21,
+						"y": 22
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 20,
+						"y": 21
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 19,
+						"y": 20
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 18,
+						"y": 20
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 18,
+						"y": 26
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 18,
+						"y": 25
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 12
+					},
+					"isDefault": false,
+					"hintStep": 11
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 10
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 12
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Red_Sprite"
+		},
+		"99910058":
+		{
+			"id": 99910058,
+			"discoveryId": 70414106,
+			"star": [
+				{
+					"position":
+					{
+						"x": 172,
+						"y": 284
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 48,
+						"y": 44
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -236,
+						"y": -220
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 284,
+						"y": 212
+					},
+					"isAlpha": true,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 3
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Purple_Sprite"
+		},
+		"99910059":
+		{
+			"id": 99910059,
+			"discoveryId": 70414108,
+			"star": [
+				{
+					"position":
+					{
+						"x": 296,
+						"y": 356
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 304,
+						"y": 280
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 124,
+						"y": 204
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 152,
+						"y": 84
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -76,
+						"y": 196
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -124,
+						"y": 160
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -24,
+						"y": -184
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -136,
+						"y": -332
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -332,
+						"y": -152
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 84,
+						"y": 100
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 56,
+						"y": 40
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 11
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 10
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Black_Sprite"
+		},
+		"99910060":
+		{
+			"id": 99910060,
+			"discoveryId": 70414109,
+			"star": [
+				{
+					"position":
+					{
+						"x": 344,
+						"y": 228
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -292,
+						"y": 80
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -324,
+						"y": -20
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -328,
+						"y": -164
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -276,
+						"y": -248
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Black_Sprite"
+		},
+		"99910061":
+		{
+			"id": 99910061,
+			"discoveryId": 70414110,
+			"star": [
+				{
+					"position":
+					{
+						"x": -116,
+						"y": 280
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -44,
+						"y": 196
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 356,
+						"y": 68
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 348,
+						"y": -68
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 392,
+						"y": -108
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 420,
+						"y": -192
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 376,
+						"y": -260
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 308,
+						"y": -276
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 340,
+						"y": -320
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 380,
+						"y": -340
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -304,
+						"y": 52
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -204,
+						"y": 180
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -128,
+						"y": 228
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -408,
+						"y": -20
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 13
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 13
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 12
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 11,
+						"y": 14
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910063":
+		{
+			"id": 99910063,
+			"discoveryId": 70414112,
+			"star": [
+				{
+					"position":
+					{
+						"x": -20,
+						"y": 368
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -268,
+						"y": 124
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 200,
+						"y": -368
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 40,
+						"y": -356
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 4
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910064":
+		{
+			"id": 99910064,
+			"discoveryId": 70414113,
+			"star": [
+				{
+					"position":
+					{
+						"x": -188,
+						"y": 180
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -40,
+						"y": 236
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 88,
+						"y": 148
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 380,
+						"y": 276
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 312,
+						"y": 192
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 416,
+						"y": 88
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 280,
+						"y": 60
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": 244,
+						"y": 20
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 320,
+						"y": -72
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 148,
+						"y": -72
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 300,
+						"y": -248
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 264,
+						"y": -296
+					},
+					"isAlpha": false,
+					"isClickable": false
+				},
+				{
+					"position":
+					{
+						"x": 204,
+						"y": -312
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 80,
+						"y": -184
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 80,
+						"y": -308
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -440,
+						"y": 200
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -296,
+						"y": 256
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -256,
+						"y": 236
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -372,
+						"y": -96
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -220,
+						"y": -172
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -104,
+						"y": -156
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -40,
+						"y": -92
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -56,
+						"y": 116
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 100,
+						"y": 36
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -356,
+						"y": 160
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -164,
+						"y": 92
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -260,
+						"y": 48
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -400,
+						"y": 164
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -268,
+						"y": 384
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -328,
+						"y": -104
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 12,
+						"y": 13
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 10,
+						"y": 11
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 9,
+						"y": 10
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 9
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 8,
+						"y": 10
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 14,
+						"y": 15
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 7
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 18
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 17,
+						"y": 18
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 17,
+						"y": 29
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 16,
+						"y": 28
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 25,
+						"y": 28
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 25
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 23
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 23,
+						"y": 26
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 26,
+						"y": 27
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 19,
+						"y": 27
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 19,
+						"y": 30
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 23,
+						"y": 24
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 22,
+						"y": 24
+					},
+					"isDefault": false,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 21,
+						"y": 22
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 20,
+						"y": 21
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Purple_Sprite"
+		},
+		"99910065":
+		{
+			"id": 99910065,
+			"discoveryId": 70414114,
+			"star": [
+				{
+					"position":
+					{
+						"x": 292,
+						"y": 148
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 408,
+						"y": -96
+					},
+					"isAlpha": true,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 28,
+						"y": -268
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -216,
+						"y": 92
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -340,
+						"y": 76
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -428,
+						"y": -8
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 6
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 3
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 2
+					},
+					"isDefault": false,
+					"hintStep": 0
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		},
+		"99910066":
+		{
+			"id": 99910066,
+			"discoveryId": 70414115,
+			"star": [
+				{
+					"position":
+					{
+						"x": 192,
+						"y": 148
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -368,
+						"y": -208
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 400,
+						"y": -180
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 168,
+						"y": -120
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": 68,
+						"y": -248
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -64,
+						"y": 300
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -204,
+						"y": 224
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -208,
+						"y": -104
+					},
+					"isAlpha": false,
+					"isClickable": true
+				},
+				{
+					"position":
+					{
+						"x": -364,
+						"y": 0
+					},
+					"isAlpha": false,
+					"isClickable": true
+				}
+			],
+			"line": [
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 9
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 2,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 1
+				},
+				{
+					"starIndex":
+					{
+						"x": 7,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 2
+				},
+				{
+					"starIndex":
+					{
+						"x": 5,
+						"y": 8
+					},
+					"isDefault": false,
+					"hintStep": 3
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 5
+					},
+					"isDefault": false,
+					"hintStep": 4
+				},
+				{
+					"starIndex":
+					{
+						"x": 3,
+						"y": 4
+					},
+					"isDefault": false,
+					"hintStep": 5
+				},
+				{
+					"starIndex":
+					{
+						"x": 1,
+						"y": 3
+					},
+					"isDefault": true,
+					"hintStep": 0
+				},
+				{
+					"starIndex":
+					{
+						"x": 4,
+						"y": 6
+					},
+					"isDefault": false,
+					"hintStep": 6
+				},
+				{
+					"starIndex":
+					{
+						"x": 6,
+						"y": 7
+					},
+					"isDefault": false,
+					"hintStep": 7
+				}
+			],
+			"background": "Constellation_Minigame_BackGround_Blue_Sprite"
+		}
+	}
+}

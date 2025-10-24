@@ -100,6 +100,7 @@
           "Value": "number"
         }
       ],
+      "desc": "text",
       "skillIcon": "string"
     },
     ":required": {
@@ -111,7 +112,8 @@
       "researchLv": 1,
       "researchTaskId": [
         1
-      ]
+      ],
+      "desc": 1
     },
     ":requiredInObject": {
       "needResearch": [
@@ -341,6 +343,7 @@
           "Value": 10
         }
       ],
+      "desc": "가로돛과 세로돛이 10 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_characterEffect_adventure_19_Sprite"
     },
     "72500001": {
@@ -372,6 +375,7 @@
           "Value": 20
         }
       ],
+      "desc": "가로돛과 세로돛이 20 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_characterEffect_adventure_19_Sprite"
     },
     "72500002": {
@@ -403,6 +407,7 @@
           "Value": 30
         }
       ],
+      "desc": "가로돛과 세로돛이 30 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_characterEffect_adventure_19_Sprite"
     },
     "72500003": {
@@ -434,6 +439,7 @@
           "Value": 40
         }
       ],
+      "desc": "가로돛과 세로돛이 40 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_characterEffect_adventure_19_Sprite"
     },
     "72500004": {
@@ -465,6 +471,7 @@
           "Value": 50
         }
       ],
+      "desc": "가로돛과 세로돛이 50 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_characterEffect_adventure_19_Sprite"
     },
     "72500005": {
@@ -485,6 +492,7 @@
           "Value": 20
         }
       ],
+      "desc": "자동 낚시 성공 확률이 2% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_005_Sprite"
     },
     "72500006": {
@@ -511,6 +519,7 @@
           "Value": 40
         }
       ],
+      "desc": "자동 낚시 성공 확률이 4% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_005_Sprite"
     },
     "72500007": {
@@ -537,6 +546,7 @@
           "Value": 60
         }
       ],
+      "desc": "자동 낚시 성공 확률이 6% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_005_Sprite"
     },
     "72500008": {
@@ -563,6 +573,7 @@
           "Value": 80
         }
       ],
+      "desc": "자동 낚시 성공 확률이 8% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_005_Sprite"
     },
     "72500009": {
@@ -589,6 +600,7 @@
           "Value": 100
         }
       ],
+      "desc": "자동 낚시 성공 확률이 10% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_005_Sprite"
     },
     "72500010": {
@@ -635,6 +647,7 @@
           "Value": 20
         }
       ],
+      "desc": "세이렌, 불면증, 돌풍, 침수, 화재 발생 시 해소 확률이 2% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_001_Sprite"
     },
     "72500011": {
@@ -685,6 +698,7 @@
           "Value": 40
         }
       ],
+      "desc": "세이렌, 불면증, 돌풍, 침수, 화재 발생 시 해소 확률이 4% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_001_Sprite"
     },
     "72500012": {
@@ -735,6 +749,7 @@
           "Value": 60
         }
       ],
+      "desc": "세이렌, 불면증, 돌풍, 침수, 화재 발생 시 해소 확률이 6% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_001_Sprite"
     },
     "72500013": {
@@ -785,6 +800,7 @@
           "Value": 80
         }
       ],
+      "desc": "세이렌, 불면증, 돌풍, 침수, 화재 발생 시 해소 확률이 8% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_001_Sprite"
     },
     "72500014": {
@@ -835,6 +851,7 @@
           "Value": 100
         }
       ],
+      "desc": "세이렌, 불면증, 돌풍, 침수, 화재 발생 시 해소 확률이 10% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_001_Sprite"
     },
     "72500015": {
@@ -881,6 +898,7 @@
           "Value": 20
         }
       ],
+      "desc": "쥐, 오염, 괴혈병, 전염병, 부패 발생 시 해소 확률이 2% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_002_Sprite"
     },
     "72500016": {
@@ -931,6 +949,7 @@
           "Value": 40
         }
       ],
+      "desc": "쥐, 오염, 괴혈병, 전염병, 부패 발생 시 해소 확률이 4% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_002_Sprite"
     },
     "72500017": {
@@ -981,6 +1000,7 @@
           "Value": 60
         }
       ],
+      "desc": "쥐, 오염, 괴혈병, 전염병, 부패 발생 시 해소 확률이 6% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_002_Sprite"
     },
     "72500018": {
@@ -1031,6 +1051,7 @@
           "Value": 80
         }
       ],
+      "desc": "쥐, 오염, 괴혈병, 전염병, 부패 발생 시 해소 확률이 8% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_002_Sprite"
     },
     "72500019": {
@@ -1081,6 +1102,7 @@
           "Value": 100
         }
       ],
+      "desc": "쥐, 오염, 괴혈병, 전염병, 부패 발생 시 해소 확률이 10% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_002_Sprite"
     },
     "72500020": {
@@ -1127,6 +1149,7 @@
           "Value": 20
         }
       ],
+      "desc": "해초, 싸움, 욕구불만, 정서불안, 향수병 발생 시 해소 확률이 2% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_003_Sprite"
     },
     "72500021": {
@@ -1177,6 +1200,7 @@
           "Value": 40
         }
       ],
+      "desc": "해초, 싸움, 욕구불만, 정서불안, 향수병 발생 시 해소 확률이 4% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_003_Sprite"
     },
     "72500022": {
@@ -1227,6 +1251,7 @@
           "Value": 60
         }
       ],
+      "desc": "해초, 싸움, 욕구불만, 정서불안, 향수병 발생 시 해소 확률이 6% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_003_Sprite"
     },
     "72500023": {
@@ -1277,6 +1302,7 @@
           "Value": 80
         }
       ],
+      "desc": "해초, 싸움, 욕구불만, 정서불안, 향수병 발생 시 해소 확률이 8% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_003_Sprite"
     },
     "72500024": {
@@ -1327,6 +1353,7 @@
           "Value": 100
         }
       ],
+      "desc": "해초, 싸움, 욕구불만, 정서불안, 향수병 발생 시 해소 확률이 10% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_003_Sprite"
     },
     "72500025": {
@@ -1373,6 +1400,7 @@
           "Value": 20
         }
       ],
+      "desc": "암초, 화물 도난, 무풍, 식인상어, 저체온증 발생 시 해소 확률이 2% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_004_Sprite"
     },
     "72500026": {
@@ -1423,6 +1451,7 @@
           "Value": 40
         }
       ],
+      "desc": "암초, 화물 도난, 무풍, 식인상어, 저체온증 발생 시 해소 확률이 4% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_004_Sprite"
     },
     "72500027": {
@@ -1473,6 +1502,7 @@
           "Value": 60
         }
       ],
+      "desc": "암초, 화물 도난, 무풍, 식인상어, 저체온증 발생 시 해소 확률이 6% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_004_Sprite"
     },
     "72500028": {
@@ -1523,6 +1553,7 @@
           "Value": 80
         }
       ],
+      "desc": "암초, 화물 도난, 무풍, 식인상어, 저체온증 발생 시 해소 확률이 8% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_004_Sprite"
     },
     "72500029": {
@@ -1573,6 +1604,7 @@
           "Value": 100
         }
       ],
+      "desc": "암초, 화물 도난, 무풍, 식인상어, 저체온증 발생 시 해소 확률이 10% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_004_Sprite"
     },
     "72500030": {
@@ -1608,6 +1640,7 @@
           "Value": -10
         }
       ],
+      "desc": "심해와 천해 지역의 인양에서 로프 손상이 1% 감소합니다.",
       "skillIcon": "icon_shipResearch_adventure_006_Sprite"
     },
     "72500031": {
@@ -1647,6 +1680,7 @@
           "Value": -20
         }
       ],
+      "desc": "심해와 천해 지역의 인양에서 로프 손상이 2% 감소합니다.",
       "skillIcon": "icon_shipResearch_adventure_006_Sprite"
     },
     "72500032": {
@@ -1686,6 +1720,7 @@
           "Value": -30
         }
       ],
+      "desc": "심해와 천해 지역의 인양에서 로프 손상이 3% 감소합니다.",
       "skillIcon": "icon_shipResearch_adventure_006_Sprite"
     },
     "72500033": {
@@ -1725,6 +1760,7 @@
           "Value": -40
         }
       ],
+      "desc": "심해와 천해 지역의 인양에서 로프 손상이 4% 감소합니다.",
       "skillIcon": "icon_shipResearch_adventure_006_Sprite"
     },
     "72500034": {
@@ -1764,6 +1800,7 @@
           "Value": -50
         }
       ],
+      "desc": "심해와 천해 지역의 인양에서 로프 손상이 5% 감소합니다.",
       "skillIcon": "icon_shipResearch_adventure_006_Sprite"
     },
     "72500035": {
@@ -1794,6 +1831,7 @@
           "Value": 3
         }
       ],
+      "desc": "탐험 중 채집력이 3 증가합니다.",
       "skillIcon": "icon_characterEffect_adventure_91_Sprite"
     },
     "72500036": {
@@ -1828,6 +1866,7 @@
           "Value": 6
         }
       ],
+      "desc": "탐험 중 채집력이 6 증가합니다.",
       "skillIcon": "icon_characterEffect_adventure_91_Sprite"
     },
     "72500037": {
@@ -1862,6 +1901,7 @@
           "Value": 9
         }
       ],
+      "desc": "탐험 중 채집력이 9 증가합니다.",
       "skillIcon": "icon_characterEffect_adventure_91_Sprite"
     },
     "72500038": {
@@ -1896,6 +1936,7 @@
           "Value": 12
         }
       ],
+      "desc": "탐험 중 채집력이 12 증가합니다.",
       "skillIcon": "icon_characterEffect_adventure_91_Sprite"
     },
     "72500039": {
@@ -1930,6 +1971,7 @@
           "Value": 15
         }
       ],
+      "desc": "탐험 중 채집력이 15 증가합니다.",
       "skillIcon": "icon_characterEffect_adventure_91_Sprite"
     },
     "72500040": {
@@ -1961,6 +2003,7 @@
           "Value": -15
         }
       ],
+      "desc": "천해와 심해 지역의 인양에서 보상 기준 점수가 15 감소합니다.",
       "skillIcon": "icon_characterEffect_adventure_108_Sprite"
     },
     "72500041": {
@@ -1996,6 +2039,7 @@
           "Value": -30
         }
       ],
+      "desc": "천해와 심해 지역의 인양에서 보상 기준 점수가 30 감소합니다.",
       "skillIcon": "icon_characterEffect_adventure_108_Sprite"
     },
     "72500042": {
@@ -2031,6 +2075,7 @@
           "Value": -45
         }
       ],
+      "desc": "천해와 심해 지역의 인양에서 보상 기준 점수가 45 감소합니다.",
       "skillIcon": "icon_characterEffect_adventure_108_Sprite"
     },
     "72500043": {
@@ -2066,6 +2111,7 @@
           "Value": -60
         }
       ],
+      "desc": "천해와 심해 지역의 인양에서 보상 기준 점수가 60 감소합니다.",
       "skillIcon": "icon_characterEffect_adventure_108_Sprite"
     },
     "72500044": {
@@ -2101,6 +2147,7 @@
           "Value": -75
         }
       ],
+      "desc": "천해와 심해 지역의 인양에서 보상 기준 점수가 75 감소합니다.",
       "skillIcon": "icon_characterEffect_adventure_108_Sprite"
     },
     "72500045": {
@@ -2127,6 +2174,7 @@
           "Value": 3
         }
       ],
+      "desc": "탐험 중 관찰력이 3 증가합니다.",
       "skillIcon": "icon_characterEffect_adventure_90_Sprite"
     },
     "72500046": {
@@ -2157,6 +2205,7 @@
           "Value": 6
         }
       ],
+      "desc": "탐험 중 관찰력이 6 증가합니다.",
       "skillIcon": "icon_characterEffect_adventure_90_Sprite"
     },
     "72500047": {
@@ -2187,6 +2236,7 @@
           "Value": 9
         }
       ],
+      "desc": "탐험 중 관찰력이 9 증가합니다.",
       "skillIcon": "icon_characterEffect_adventure_90_Sprite"
     },
     "72500048": {
@@ -2217,6 +2267,7 @@
           "Value": 12
         }
       ],
+      "desc": "탐험 중 관찰력이 12 증가합니다.",
       "skillIcon": "icon_characterEffect_adventure_90_Sprite"
     },
     "72500049": {
@@ -2247,6 +2298,7 @@
           "Value": 15
         }
       ],
+      "desc": "탐험 중 관찰력이 15 증가합니다.",
       "skillIcon": "icon_characterEffect_adventure_90_Sprite"
     },
     "72500050": {
@@ -2278,6 +2330,7 @@
           "Value": 20
         }
       ],
+      "desc": "심해와 천해 지역의 인양에서 점수 획득량이 2% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_007_Sprite"
     },
     "72500051": {
@@ -2313,6 +2366,7 @@
           "Value": 40
         }
       ],
+      "desc": "심해와 천해 지역의 인양에서 점수 획득량이 4% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_007_Sprite"
     },
     "72500052": {
@@ -2348,6 +2402,7 @@
           "Value": 60
         }
       ],
+      "desc": "심해와 천해 지역의 인양에서 점수 획득량이 6% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_007_Sprite"
     },
     "72500053": {
@@ -2383,6 +2438,7 @@
           "Value": 80
         }
       ],
+      "desc": "심해와 천해 지역의 인양에서 점수 획득량이 8% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_007_Sprite"
     },
     "72500054": {
@@ -2418,6 +2474,7 @@
           "Value": 100
         }
       ],
+      "desc": "심해와 천해 지역의 인양에서 점수 획득량이 10% 증가합니다.",
       "skillIcon": "icon_shipResearch_adventure_007_Sprite"
     },
     "72500055": {
@@ -2444,6 +2501,7 @@
           "Value": 3
         }
       ],
+      "desc": "탐험 중 전투력이 3 증가합니다.",
       "skillIcon": "icon_characterEffect_adventure_92_Sprite"
     },
     "72500056": {
@@ -2474,6 +2532,7 @@
           "Value": 6
         }
       ],
+      "desc": "탐험 중 전투력이 6 증가합니다.",
       "skillIcon": "icon_characterEffect_adventure_92_Sprite"
     },
     "72500057": {
@@ -2504,6 +2563,7 @@
           "Value": 9
         }
       ],
+      "desc": "탐험 중 전투력이 9 증가합니다.",
       "skillIcon": "icon_characterEffect_adventure_92_Sprite"
     },
     "72500058": {
@@ -2534,6 +2594,7 @@
           "Value": 12
         }
       ],
+      "desc": "탐험 중 전투력이 12 증가합니다.",
       "skillIcon": "icon_characterEffect_adventure_92_Sprite"
     },
     "72500059": {
@@ -2564,6 +2625,7 @@
           "Value": 15
         }
       ],
+      "desc": "탐험 중 전투력이 15 증가합니다.",
       "skillIcon": "icon_characterEffect_adventure_92_Sprite"
     },
     "72500060": {
@@ -2599,6 +2661,7 @@
           "Value": -10
         }
       ],
+      "desc": "하루에 소모하는 물과 식량이 1% 감소합니다.",
       "skillIcon": "icon_worldPassive_adventure_026_Sprite"
     },
     "72500061": {
@@ -2638,6 +2701,7 @@
           "Value": -20
         }
       ],
+      "desc": "하루에 소모하는 물과 식량이 2% 감소합니다.",
       "skillIcon": "icon_worldPassive_adventure_026_Sprite"
     },
     "72500062": {
@@ -2677,6 +2741,7 @@
           "Value": -30
         }
       ],
+      "desc": "하루에 소모하는 물과 식량이 3% 감소합니다.",
       "skillIcon": "icon_worldPassive_adventure_026_Sprite"
     },
     "72500063": {
@@ -2716,6 +2781,7 @@
           "Value": -40
         }
       ],
+      "desc": "하루에 소모하는 물과 식량이 4% 감소합니다.",
       "skillIcon": "icon_worldPassive_adventure_026_Sprite"
     },
     "72500064": {
@@ -2755,6 +2821,7 @@
           "Value": -50
         }
       ],
+      "desc": "하루에 소모하는 물과 식량이 5% 감소합니다.",
       "skillIcon": "icon_worldPassive_adventure_026_Sprite"
     },
     "72600000": {
@@ -2820,6 +2887,7 @@
           "Value": 100
         }
       ],
+      "desc": "향료, 총포류, 미술품, 귀금속, 보석, 염료, 광석, 공업품, 기호품, 섬유 구매 가능 수량이 10% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_001_Sprite"
     },
     "72600001": {
@@ -2891,6 +2959,7 @@
           "Value": 200
         }
       ],
+      "desc": "향료, 총포류, 미술품, 귀금속, 보석, 염료, 광석, 공업품, 기호품, 섬유 구매 가능 수량이 20% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_001_Sprite"
     },
     "72600002": {
@@ -2962,6 +3031,7 @@
           "Value": 300
         }
       ],
+      "desc": "향료, 총포류, 미술품, 귀금속, 보석, 염료, 광석, 공업품, 기호품, 섬유 구매 가능 수량이 30% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_001_Sprite"
     },
     "72600003": {
@@ -3033,6 +3103,7 @@
           "Value": 400
         }
       ],
+      "desc": "향료, 총포류, 미술품, 귀금속, 보석, 염료, 광석, 공업품, 기호품, 섬유 구매 가능 수량이 40% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_001_Sprite"
     },
     "72600004": {
@@ -3104,6 +3175,7 @@
           "Value": 500
         }
       ],
+      "desc": "향료, 총포류, 미술품, 귀금속, 보석, 염료, 광석, 공업품, 기호품, 섬유 구매 가능 수량이 50% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_001_Sprite"
     },
     "72600005": {
@@ -3175,6 +3247,7 @@
           "Value": 100
         }
       ],
+      "desc": "향신료, 공예품, 무기류, 직물, 주류, 잡화, 의약품, 가축, 조미료, 식료품 구매 가능 수량이 10% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_002_Sprite"
     },
     "72600006": {
@@ -3250,6 +3323,7 @@
           "Value": 200
         }
       ],
+      "desc": "향신료, 공예품, 무기류, 직물, 주류, 잡화, 의약품, 가축, 조미료, 식료품 구매 가능 수량이 20% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_002_Sprite"
     },
     "72600007": {
@@ -3325,6 +3399,7 @@
           "Value": 300
         }
       ],
+      "desc": "향신료, 공예품, 무기류, 직물, 주류, 잡화, 의약품, 가축, 조미료, 식료품 구매 가능 수량이 30% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_002_Sprite"
     },
     "72600008": {
@@ -3400,6 +3475,7 @@
           "Value": 400
         }
       ],
+      "desc": "향신료, 공예품, 무기류, 직물, 주류, 잡화, 의약품, 가축, 조미료, 식료품 구매 가능 수량이 40% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_002_Sprite"
     },
     "72600009": {
@@ -3475,6 +3551,7 @@
           "Value": 500
         }
       ],
+      "desc": "향신료, 공예품, 무기류, 직물, 주류, 잡화, 의약품, 가축, 조미료, 식료품 구매 가능 수량이 50% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_002_Sprite"
     },
     "72600010": {
@@ -3546,6 +3623,7 @@
           "Value": 7
         }
       ],
+      "desc": "향료, 총포류, 미술품, 귀금속, 보석, 염료, 광석, 공업품, 기호품, 섬유 판매 시 0.7% 높은 가격에 판매할 수 있습니다.",
       "skillIcon": "icon_shipResearch_trade_009_Sprite"
     },
     "72600011": {
@@ -3621,6 +3699,7 @@
           "Value": 14
         }
       ],
+      "desc": "향료, 총포류, 미술품, 귀금속, 보석, 염료, 광석, 공업품, 기호품, 섬유 판매 시 1.4% 높은 가격에 판매할 수 있습니다.",
       "skillIcon": "icon_shipResearch_trade_009_Sprite"
     },
     "72600012": {
@@ -3696,6 +3775,7 @@
           "Value": 21
         }
       ],
+      "desc": "향료, 총포류, 미술품, 귀금속, 보석, 염료, 광석, 공업품, 기호품, 섬유 판매 시 2.1% 높은 가격에 판매할 수 있습니다.",
       "skillIcon": "icon_shipResearch_trade_009_Sprite"
     },
     "72600013": {
@@ -3771,6 +3851,7 @@
           "Value": 28
         }
       ],
+      "desc": "향료, 총포류, 미술품, 귀금속, 보석, 염료, 광석, 공업품, 기호품, 섬유 판매 시 2.8% 높은 가격에 판매할 수 있습니다.",
       "skillIcon": "icon_shipResearch_trade_009_Sprite"
     },
     "72600014": {
@@ -3846,6 +3927,7 @@
           "Value": 35
         }
       ],
+      "desc": "향료, 총포류, 미술품, 귀금속, 보석, 염료, 광석, 공업품, 기호품, 섬유 판매 시 3.5% 높은 가격에 판매할 수 있습니다.",
       "skillIcon": "icon_shipResearch_trade_009_Sprite"
     },
     "72600015": {
@@ -3917,6 +3999,7 @@
           "Value": 7
         }
       ],
+      "desc": "향신료, 공예품, 무기류, 직물, 주류, 잡화, 의약품, 가축, 조미료, 식료품 판매 시 0.7% 높은 가격에 판매할 수 있습니다.",
       "skillIcon": "icon_shipResearch_trade_010_Sprite"
     },
     "72600016": {
@@ -3992,6 +4075,7 @@
           "Value": 14
         }
       ],
+      "desc": "향신료, 공예품, 무기류, 직물, 주류, 잡화, 의약품, 가축, 조미료, 식료품 판매 시 1.4% 높은 가격에 판매할 수 있습니다.",
       "skillIcon": "icon_shipResearch_trade_010_Sprite"
     },
     "72600017": {
@@ -4067,6 +4151,7 @@
           "Value": 21
         }
       ],
+      "desc": "향신료, 공예품, 무기류, 직물, 주류, 잡화, 의약품, 가축, 조미료, 식료품 판매 시 2.1% 높은 가격에 판매할 수 있습니다.",
       "skillIcon": "icon_shipResearch_trade_010_Sprite"
     },
     "72600018": {
@@ -4142,6 +4227,7 @@
           "Value": 28
         }
       ],
+      "desc": "향신료, 공예품, 무기류, 직물, 주류, 잡화, 의약품, 가축, 조미료, 식료품 판매 시 2.8% 높은 가격에 판매할 수 있습니다.",
       "skillIcon": "icon_shipResearch_trade_010_Sprite"
     },
     "72600019": {
@@ -4217,6 +4303,7 @@
           "Value": 35
         }
       ],
+      "desc": "향신료, 공예품, 무기류, 직물, 주류, 잡화, 의약품, 가축, 조미료, 식료품 판매 시 3.5% 높은 가격에 판매할 수 있습니다.",
       "skillIcon": "icon_shipResearch_trade_010_Sprite"
     },
     "72600020": {
@@ -4243,6 +4330,7 @@
           "Value": -15
         }
       ],
+      "desc": "물물 교환 가격 협상 시 우호도 소모량이 1.5% 감소합니다.",
       "skillIcon": "icon_Effect_trade_90_Sprite"
     },
     "72600021": {
@@ -4273,6 +4361,7 @@
           "Value": -30
         }
       ],
+      "desc": "물물 교환 가격 협상 시 우호도 소모량이 3% 감소합니다.",
       "skillIcon": "icon_Effect_trade_90_Sprite"
     },
     "72600022": {
@@ -4303,6 +4392,7 @@
           "Value": -45
         }
       ],
+      "desc": "물물 교환 가격 협상 시 우호도 소모량이 4.5% 감소합니다.",
       "skillIcon": "icon_Effect_trade_90_Sprite"
     },
     "72600023": {
@@ -4333,6 +4423,7 @@
           "Value": -60
         }
       ],
+      "desc": "물물 교환 가격 협상 시 우호도 소모량이 6% 감소합니다.",
       "skillIcon": "icon_Effect_trade_90_Sprite"
     },
     "72600024": {
@@ -4363,6 +4454,7 @@
           "Value": -75
         }
       ],
+      "desc": "물물 교환 가격 협상 시 우호도 소모량이 7.5% 감소합니다.",
       "skillIcon": "icon_Effect_trade_90_Sprite"
     },
     "72600025": {
@@ -4389,6 +4481,7 @@
           "Value": -10
         }
       ],
+      "desc": "물물 교환 수량 협상 시 우호도 소모량이 1% 감소합니다.",
       "skillIcon": "icon_Effect_trade_91_Sprite"
     },
     "72600026": {
@@ -4419,6 +4512,7 @@
           "Value": -20
         }
       ],
+      "desc": "물물 교환 수량 협상 시 우호도 소모량이 2% 감소합니다.",
       "skillIcon": "icon_Effect_trade_91_Sprite"
     },
     "72600027": {
@@ -4449,6 +4543,7 @@
           "Value": -30
         }
       ],
+      "desc": "물물 교환 수량 협상 시 우호도 소모량이 3% 감소합니다.",
       "skillIcon": "icon_Effect_trade_91_Sprite"
     },
     "72600028": {
@@ -4479,6 +4574,7 @@
           "Value": -40
         }
       ],
+      "desc": "물물 교환 수량 협상 시 우호도 소모량이 4% 감소합니다.",
       "skillIcon": "icon_Effect_trade_91_Sprite"
     },
     "72600029": {
@@ -4509,6 +4605,7 @@
           "Value": -50
         }
       ],
+      "desc": "물물 교환 수량 협상 시 우호도 소모량이 5% 감소합니다.",
       "skillIcon": "icon_Effect_trade_91_Sprite"
     },
     "72600030": {
@@ -4535,6 +4632,7 @@
           "Value": 10
         }
       ],
+      "desc": "물물 교환 가격 협상 시 성공률이 1% 증가합니다.",
       "skillIcon": "icon_Effect_trade_92_Sprite"
     },
     "72600031": {
@@ -4565,6 +4663,7 @@
           "Value": 20
         }
       ],
+      "desc": "물물 교환 가격 협상 시 성공률이 2% 증가합니다.",
       "skillIcon": "icon_Effect_trade_92_Sprite"
     },
     "72600032": {
@@ -4595,6 +4694,7 @@
           "Value": 30
         }
       ],
+      "desc": "물물 교환 가격 협상 시 성공률이 3% 증가합니다.",
       "skillIcon": "icon_Effect_trade_92_Sprite"
     },
     "72600033": {
@@ -4625,6 +4725,7 @@
           "Value": 40
         }
       ],
+      "desc": "물물 교환 가격 협상 시 성공률이 4% 증가합니다.",
       "skillIcon": "icon_Effect_trade_92_Sprite"
     },
     "72600034": {
@@ -4655,6 +4756,7 @@
           "Value": 50
         }
       ],
+      "desc": "물물 교환 가격 협상 시 성공률이 5% 증가합니다.",
       "skillIcon": "icon_Effect_trade_92_Sprite"
     },
     "72600035": {
@@ -4681,6 +4783,7 @@
           "Value": 10
         }
       ],
+      "desc": "물물 교환 수량 협상 시 성공률이 1% 증가합니다.",
       "skillIcon": "icon_Effect_trade_93_Sprite"
     },
     "72600036": {
@@ -4711,6 +4814,7 @@
           "Value": 20
         }
       ],
+      "desc": "물물 교환 수량 협상 시 성공률이 2% 증가합니다.",
       "skillIcon": "icon_Effect_trade_93_Sprite"
     },
     "72600037": {
@@ -4741,6 +4845,7 @@
           "Value": 30
         }
       ],
+      "desc": "물물 교환 수량 협상 시 성공률이 3% 증가합니다.",
       "skillIcon": "icon_Effect_trade_93_Sprite"
     },
     "72600038": {
@@ -4771,6 +4876,7 @@
           "Value": 40
         }
       ],
+      "desc": "물물 교환 수량 협상 시 성공률이 4% 증가합니다.",
       "skillIcon": "icon_Effect_trade_93_Sprite"
     },
     "72600039": {
@@ -4801,6 +4907,7 @@
           "Value": 50
         }
       ],
+      "desc": "물물 교환 수량 협상 시 성공률이 5% 증가합니다.",
       "skillIcon": "icon_Effect_trade_93_Sprite"
     },
     "72600040": {
@@ -4832,6 +4939,7 @@
           "Value": 1
         }
       ],
+      "desc": "불법 & 만용 밀수품 구매 수량이 1 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_005_Sprite"
     },
     "72600041": {
@@ -4867,6 +4975,7 @@
           "Value": 2
         }
       ],
+      "desc": "불법 & 만용 밀수품 구매 수량이 2 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_005_Sprite"
     },
     "72600042": {
@@ -4902,6 +5011,7 @@
           "Value": 3
         }
       ],
+      "desc": "불법 & 만용 밀수품 구매 수량이 3 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_005_Sprite"
     },
     "72600043": {
@@ -4937,6 +5047,7 @@
           "Value": 4
         }
       ],
+      "desc": "불법 & 만용 밀수품 구매 수량이 4 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_005_Sprite"
     },
     "72600044": {
@@ -4972,6 +5083,7 @@
           "Value": 5
         }
       ],
+      "desc": "불법 & 만용 밀수품 구매 수량이 5 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_005_Sprite"
     },
     "72600045": {
@@ -5003,6 +5115,7 @@
           "Value": 10
         }
       ],
+      "desc": "불법 & 만용 밀수품 구매 가격이 1% 감소합니다.",
       "skillIcon": "icon_shipResearch_trade_007_Sprite"
     },
     "72600046": {
@@ -5038,6 +5151,7 @@
           "Value": 20
         }
       ],
+      "desc": "불법 & 만용 밀수품 구매 가격이 2% 감소합니다.",
       "skillIcon": "icon_shipResearch_trade_007_Sprite"
     },
     "72600047": {
@@ -5073,6 +5187,7 @@
           "Value": 30
         }
       ],
+      "desc": "불법 & 만용 밀수품 구매 가격이 3% 감소합니다.",
       "skillIcon": "icon_shipResearch_trade_007_Sprite"
     },
     "72600048": {
@@ -5108,6 +5223,7 @@
           "Value": 40
         }
       ],
+      "desc": "불법 & 만용 밀수품 구매 가격이 4% 감소합니다.",
       "skillIcon": "icon_shipResearch_trade_007_Sprite"
     },
     "72600049": {
@@ -5143,6 +5259,7 @@
           "Value": 50
         }
       ],
+      "desc": "불법 & 만용 밀수품 구매 가격이 5% 감소합니다.",
       "skillIcon": "icon_shipResearch_trade_007_Sprite"
     },
     "72600050": {
@@ -5174,6 +5291,7 @@
           "Value": 1
         }
       ],
+      "desc": "탐욕 & 사치 밀수품 구매 수량이 1 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_006_Sprite"
     },
     "72600051": {
@@ -5209,6 +5327,7 @@
           "Value": 2
         }
       ],
+      "desc": "탐욕 & 사치 밀수품 구매 수량이 2 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_006_Sprite"
     },
     "72600052": {
@@ -5244,6 +5363,7 @@
           "Value": 3
         }
       ],
+      "desc": "탐욕 & 사치 밀수품 구매 수량이 3 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_006_Sprite"
     },
     "72600053": {
@@ -5279,6 +5399,7 @@
           "Value": 4
         }
       ],
+      "desc": "탐욕 & 사치 밀수품 구매 수량이 4 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_006_Sprite"
     },
     "72600054": {
@@ -5314,6 +5435,7 @@
           "Value": 5
         }
       ],
+      "desc": "탐욕 & 사치 밀수품 구매 수량이 5 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_006_Sprite"
     },
     "72600055": {
@@ -5345,6 +5467,7 @@
           "Value": 10
         }
       ],
+      "desc": "탐욕 & 사치 밀수품 구매 가격이 1% 감소합니다.",
       "skillIcon": "icon_shipResearch_trade_008_Sprite"
     },
     "72600056": {
@@ -5380,6 +5503,7 @@
           "Value": 20
         }
       ],
+      "desc": "탐욕 & 사치 밀수품 구매 가격이 2% 감소합니다.",
       "skillIcon": "icon_shipResearch_trade_008_Sprite"
     },
     "72600057": {
@@ -5415,6 +5539,7 @@
           "Value": 30
         }
       ],
+      "desc": "탐욕 & 사치 밀수품 구매 가격이 3% 감소합니다.",
       "skillIcon": "icon_shipResearch_trade_008_Sprite"
     },
     "72600058": {
@@ -5450,6 +5575,7 @@
           "Value": 40
         }
       ],
+      "desc": "탐욕 & 사치 밀수품 구매 가격이 4% 감소합니다.",
       "skillIcon": "icon_shipResearch_trade_008_Sprite"
     },
     "72600059": {
@@ -5485,6 +5611,7 @@
           "Value": 50
         }
       ],
+      "desc": "탐욕 & 사치 밀수품 구매 가격이 5% 감소합니다.",
       "skillIcon": "icon_shipResearch_trade_008_Sprite"
     },
     "72600060": {
@@ -5524,6 +5651,7 @@
           "Value": 7
         }
       ],
+      "desc": "불법 & 만용 밀수품 판매 가격이 0.7% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_011_Sprite"
     },
     "72600061": {
@@ -5567,6 +5695,7 @@
           "Value": 14
         }
       ],
+      "desc": "불법 & 만용 밀수품 판매 가격이 1.4% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_011_Sprite"
     },
     "72600062": {
@@ -5610,6 +5739,7 @@
           "Value": 21
         }
       ],
+      "desc": "불법 & 만용 밀수품 판매 가격이 2.1% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_011_Sprite"
     },
     "72600063": {
@@ -5653,6 +5783,7 @@
           "Value": 28
         }
       ],
+      "desc": "불법 & 만용 밀수품 판매 가격이 2.8% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_011_Sprite"
     },
     "72600064": {
@@ -5696,6 +5827,7 @@
           "Value": 35
         }
       ],
+      "desc": "불법 & 만용 밀수품 판매 가격이 3.5% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_011_Sprite"
     },
     "72600065": {
@@ -5727,6 +5859,7 @@
           "Value": 7
         }
       ],
+      "desc": "탐욕 & 사치 밀수품 판매 가격이 0.7% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_012_Sprite"
     },
     "72600066": {
@@ -5762,6 +5895,7 @@
           "Value": 14
         }
       ],
+      "desc": "탐욕 & 사치 밀수품 판매 가격이 1.4% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_012_Sprite"
     },
     "72600067": {
@@ -5797,6 +5931,7 @@
           "Value": 21
         }
       ],
+      "desc": "탐욕 & 사치 밀수품 판매 가격이 2.1% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_012_Sprite"
     },
     "72600068": {
@@ -5832,6 +5967,7 @@
           "Value": 28
         }
       ],
+      "desc": "탐욕 & 사치 밀수품 판매 가격이 2.8% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_012_Sprite"
     },
     "72600069": {
@@ -5867,6 +6003,7 @@
           "Value": 35
         }
       ],
+      "desc": "탐욕 & 사치 밀수품 판매 가격이 3.5% 증가합니다.",
       "skillIcon": "icon_shipResearch_trade_012_Sprite"
     },
     "72700000": {
@@ -5892,6 +6029,7 @@
           "Value": 80
         }
       ],
+      "desc": "포격 위력이 4, 포격 수비력이 80 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_001_Sprite"
     },
     "72700001": {
@@ -5923,6 +6061,7 @@
           "Value": 160
         }
       ],
+      "desc": "포격 위력이 8, 포격 수비력이 160 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_001_Sprite"
     },
     "72700002": {
@@ -5954,6 +6093,7 @@
           "Value": 240
         }
       ],
+      "desc": "포격 위력이 12, 포격 수비력이 240 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_001_Sprite"
     },
     "72700003": {
@@ -5985,6 +6125,7 @@
           "Value": 320
         }
       ],
+      "desc": "포격 위력이 16, 포격 수비력이 320 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_001_Sprite"
     },
     "72700004": {
@@ -6016,6 +6157,7 @@
           "Value": 400
         }
       ],
+      "desc": "포격 위력이 20, 포격 수비력이 400 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_001_Sprite"
     },
     "72700005": {
@@ -6041,6 +6183,7 @@
           "Value": 80
         }
       ],
+      "desc": "충파 위력이 4, 충파 수비력이 80 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_004_Sprite"
     },
     "72700006": {
@@ -6072,6 +6215,7 @@
           "Value": 160
         }
       ],
+      "desc": "충파 위력이 8, 충파 수비력이 160 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_004_Sprite"
     },
     "72700007": {
@@ -6103,6 +6247,7 @@
           "Value": 240
         }
       ],
+      "desc": "충파 위력이 12, 충파 수비력이 240 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_004_Sprite"
     },
     "72700008": {
@@ -6134,6 +6279,7 @@
           "Value": 320
         }
       ],
+      "desc": "충파 위력이 16, 충파 수비력이 320 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_004_Sprite"
     },
     "72700009": {
@@ -6165,6 +6311,7 @@
           "Value": 400
         }
       ],
+      "desc": "충파 위력이 20, 충파 수비력이 400 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_004_Sprite"
     },
     "72700010": {
@@ -6190,6 +6337,7 @@
           "Value": 80
         }
       ],
+      "desc": "백병 위력이 4, 백병 수비력이 80 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_007_Sprite"
     },
     "72700011": {
@@ -6221,6 +6369,7 @@
           "Value": 160
         }
       ],
+      "desc": "백병 위력이 8, 백병 수비력이 160 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_007_Sprite"
     },
     "72700012": {
@@ -6252,6 +6401,7 @@
           "Value": 240
         }
       ],
+      "desc": "백병 위력이 12, 백병 수비력이 240 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_007_Sprite"
     },
     "72700013": {
@@ -6283,6 +6433,7 @@
           "Value": 320
         }
       ],
+      "desc": "백병 위력이 16, 백병 수비력이 320 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_007_Sprite"
     },
     "72700014": {
@@ -6314,6 +6465,7 @@
           "Value": 400
         }
       ],
+      "desc": "백병 위력이 20, 백병 수비력이 400 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_007_Sprite"
     },
     "72700015": {
@@ -6344,6 +6496,7 @@
           "Value": 50
         }
       ],
+      "desc": "추가 수리 회복량이 5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_318_Sprite"
     },
     "72700016": {
@@ -6378,6 +6531,7 @@
           "Value": 100
         }
       ],
+      "desc": "추가 수리 회복량이 10% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_318_Sprite"
     },
     "72700017": {
@@ -6412,6 +6566,7 @@
           "Value": 150
         }
       ],
+      "desc": "추가 수리 회복량이 15% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_318_Sprite"
     },
     "72700018": {
@@ -6446,6 +6601,7 @@
           "Value": 200
         }
       ],
+      "desc": "추가 수리 회복량이 20% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_318_Sprite"
     },
     "72700019": {
@@ -6480,6 +6636,7 @@
           "Value": 250
         }
       ],
+      "desc": "추가 수리 회복량이 25% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_318_Sprite"
     },
     "72700020": {
@@ -6506,6 +6663,7 @@
           "Value": 50
         }
       ],
+      "desc": "추가 의술 회복량이 5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_315_Sprite"
     },
     "72700021": {
@@ -6536,6 +6694,7 @@
           "Value": 100
         }
       ],
+      "desc": "추가 의술 회복량이 10% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_315_Sprite"
     },
     "72700022": {
@@ -6566,6 +6725,7 @@
           "Value": 150
         }
       ],
+      "desc": "추가 의술 회복량이 15% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_315_Sprite"
     },
     "72700023": {
@@ -6596,6 +6756,7 @@
           "Value": 200
         }
       ],
+      "desc": "추가 의술 회복량이 20% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_315_Sprite"
     },
     "72700024": {
@@ -6626,6 +6787,7 @@
           "Value": 250
         }
       ],
+      "desc": "추가 의술 회복량이 25% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_315_Sprite"
     },
     "72700025": {
@@ -6652,6 +6814,7 @@
           "Value": 500
         }
       ],
+      "desc": "최대 내구도가 500 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_081_Sprite"
     },
     "72700026": {
@@ -6682,6 +6845,7 @@
           "Value": 1000
         }
       ],
+      "desc": "최대 내구도가 1000 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_081_Sprite"
     },
     "72700027": {
@@ -6712,6 +6876,7 @@
           "Value": 1500
         }
       ],
+      "desc": "최대 내구도가 1500 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_081_Sprite"
     },
     "72700028": {
@@ -6742,6 +6907,7 @@
           "Value": 2000
         }
       ],
+      "desc": "최대 내구도가 2000 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_081_Sprite"
     },
     "72700029": {
@@ -6772,6 +6938,7 @@
           "Value": 2500
         }
       ],
+      "desc": "최대 내구도가 2500 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_081_Sprite"
     },
     "72700030": {
@@ -6798,6 +6965,7 @@
           "Value": 40
         }
       ],
+      "desc": "최대 선원 수가 40 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_082_Sprite"
     },
     "72700031": {
@@ -6828,6 +6996,7 @@
           "Value": 80
         }
       ],
+      "desc": "최대 선원 수가 80 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_082_Sprite"
     },
     "72700032": {
@@ -6858,6 +7027,7 @@
           "Value": 120
         }
       ],
+      "desc": "최대 선원 수가 120 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_082_Sprite"
     },
     "72700033": {
@@ -6888,6 +7058,7 @@
           "Value": 160
         }
       ],
+      "desc": "최대 선원 수가 160 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_082_Sprite"
     },
     "72700034": {
@@ -6918,6 +7089,7 @@
           "Value": 200
         }
       ],
+      "desc": "최대 선원 수가 200 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_082_Sprite"
     },
     "72700035": {
@@ -6954,6 +7126,7 @@
           "Value": -20
         }
       ],
+      "desc": "포격 피해량이 3% 증가하고, 적에게 받는 백병 피해와 충파 피해가 2% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_002_Sprite"
     },
     "72700036": {
@@ -6994,6 +7167,7 @@
           "Value": -40
         }
       ],
+      "desc": "포격 피해량이 6% 증가하고, 적에게 받는 백병 피해와 충파 피해가 4% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_002_Sprite"
     },
     "72700037": {
@@ -7034,6 +7208,7 @@
           "Value": -60
         }
       ],
+      "desc": "포격 피해량이 9% 증가하고, 적에게 받는 백병 피해와 충파 피해가 6% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_002_Sprite"
     },
     "72700038": {
@@ -7074,6 +7249,7 @@
           "Value": -80
         }
       ],
+      "desc": "포격 피해량이 12% 증가하고, 적에게 받는 백병 피해와 충파 피해가 8% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_002_Sprite"
     },
     "72700039": {
@@ -7114,6 +7290,7 @@
           "Value": -100
         }
       ],
+      "desc": "포격 피해량이 15% 증가하고, 적에게 받는 백병 피해와 충파 피해가 10% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_002_Sprite"
     },
     "72700040": {
@@ -7150,6 +7327,7 @@
           "Value": -20
         }
       ],
+      "desc": "충파 피해량이 3% 증가하고, 적에게 받는 백병 피해와 포격 피해가 2% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_005_Sprite"
     },
     "72700041": {
@@ -7190,6 +7368,7 @@
           "Value": -40
         }
       ],
+      "desc": "충파 피해량이 6% 증가하고, 적에게 받는 백병 피해와 포격 피해가 4% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_005_Sprite"
     },
     "72700042": {
@@ -7230,6 +7409,7 @@
           "Value": -60
         }
       ],
+      "desc": "충파 피해량이 9% 증가하고, 적에게 받는 백병 피해와 포격 피해가 6% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_005_Sprite"
     },
     "72700043": {
@@ -7270,6 +7450,7 @@
           "Value": -80
         }
       ],
+      "desc": "충파 피해량이 12% 증가하고, 적에게 받는 백병 피해와 포격 피해가 8% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_005_Sprite"
     },
     "72700044": {
@@ -7310,6 +7491,7 @@
           "Value": -100
         }
       ],
+      "desc": "충파 피해량이 15% 증가하고, 적에게 받는 백병 피해와 포격 피해가 10% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_005_Sprite"
     },
     "72700045": {
@@ -7346,6 +7528,7 @@
           "Value": -20
         }
       ],
+      "desc": "백병 피해량이 3% 증가하고, 적에게 받는 충파 피해와 포격 피해가 2% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_008_Sprite"
     },
     "72700046": {
@@ -7386,6 +7569,7 @@
           "Value": -40
         }
       ],
+      "desc": "백병 피해량이 6% 증가하고, 적에게 받는 충파 피해와 포격 피해가 4% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_008_Sprite"
     },
     "72700047": {
@@ -7426,6 +7610,7 @@
           "Value": -60
         }
       ],
+      "desc": "백병 피해량이 9% 증가하고, 적에게 받는 충파 피해와 포격 피해가 6% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_008_Sprite"
     },
     "72700048": {
@@ -7466,6 +7651,7 @@
           "Value": -80
         }
       ],
+      "desc": "백병 피해량이 12% 증가하고, 적에게 받는 충파 피해와 포격 피해가 8% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_008_Sprite"
     },
     "72700049": {
@@ -7506,6 +7692,7 @@
           "Value": -100
         }
       ],
+      "desc": "백병 피해량이 15% 증가하고, 적에게 받는 충파 피해와 포격 피해가 10% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_008_Sprite"
     },
     "72700050": {
@@ -7532,6 +7719,7 @@
           "Value": 25
         }
       ],
+      "desc": "포격 치명타 피해량이 2.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_089_Sprite"
     },
     "72700051": {
@@ -7562,6 +7750,7 @@
           "Value": 50
         }
       ],
+      "desc": "포격 치명타 피해량이 5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_089_Sprite"
     },
     "72700052": {
@@ -7592,6 +7781,7 @@
           "Value": 75
         }
       ],
+      "desc": "포격 치명타 피해량이 7.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_089_Sprite"
     },
     "72700053": {
@@ -7622,6 +7812,7 @@
           "Value": 100
         }
       ],
+      "desc": "포격 치명타 피해량이 10% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_089_Sprite"
     },
     "72700054": {
@@ -7652,6 +7843,7 @@
           "Value": 125
         }
       ],
+      "desc": "포격 치명타 피해량이 12.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_089_Sprite"
     },
     "72700055": {
@@ -7678,6 +7870,7 @@
           "Value": 25
         }
       ],
+      "desc": "충파 치명타 피해량이 2.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_091_Sprite"
     },
     "72700056": {
@@ -7708,6 +7901,7 @@
           "Value": 50
         }
       ],
+      "desc": "충파 치명타 피해량이 5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_091_Sprite"
     },
     "72700057": {
@@ -7738,6 +7932,7 @@
           "Value": 75
         }
       ],
+      "desc": "충파 치명타 피해량이 7.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_091_Sprite"
     },
     "72700058": {
@@ -7768,6 +7963,7 @@
           "Value": 100
         }
       ],
+      "desc": "충파 치명타 피해량이 10% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_091_Sprite"
     },
     "72700059": {
@@ -7798,6 +7994,7 @@
           "Value": 125
         }
       ],
+      "desc": "충파 치명타 피해량이 12.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_091_Sprite"
     },
     "72700060": {
@@ -7824,6 +8021,7 @@
           "Value": 25
         }
       ],
+      "desc": "백병 치명타 피해량이 2.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_090_Sprite"
     },
     "72700061": {
@@ -7854,6 +8052,7 @@
           "Value": 50
         }
       ],
+      "desc": "백병 치명타 피해량이 5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_090_Sprite"
     },
     "72700062": {
@@ -7884,6 +8083,7 @@
           "Value": 75
         }
       ],
+      "desc": "백병 치명타 피해량이 7.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_090_Sprite"
     },
     "72700063": {
@@ -7914,6 +8114,7 @@
           "Value": 100
         }
       ],
+      "desc": "백병 치명타 피해량이 10% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_090_Sprite"
     },
     "72700064": {
@@ -7944,6 +8145,7 @@
           "Value": 125
         }
       ],
+      "desc": "백병 치명타 피해량이 12.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_090_Sprite"
     },
     "72700065": {
@@ -7978,6 +8180,7 @@
           "Value": 10
         }
       ],
+      "desc": "추가 기동력이 1% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_006_Sprite"
     },
     "72700066": {
@@ -8016,6 +8219,7 @@
           "Value": 20
         }
       ],
+      "desc": "추가 기동력이 2% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_006_Sprite"
     },
     "72700067": {
@@ -8054,6 +8258,7 @@
           "Value": 30
         }
       ],
+      "desc": "추가 기동력이 3% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_006_Sprite"
     },
     "72700068": {
@@ -8092,6 +8297,7 @@
           "Value": 40
         }
       ],
+      "desc": "추가 기동력이 4% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_006_Sprite"
     },
     "72700069": {
@@ -8130,6 +8336,7 @@
           "Value": 50
         }
       ],
+      "desc": "추가 기동력이 5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_shipResearch_battle_006_Sprite"
     },
     "72700070": {
@@ -8161,6 +8368,7 @@
           "Value": 35
         }
       ],
+      "desc": "추가 포격 공격력이 5% 증가하고, 추가 포격 치명타 발생이 3.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_009_Sprite"
     },
     "72700071": {
@@ -8196,6 +8404,7 @@
           "Value": 70
         }
       ],
+      "desc": "추가 포격 공격력이 10% 증가하고, 추가 포격 치명타 발생이 7% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_009_Sprite"
     },
     "72700072": {
@@ -8231,6 +8440,7 @@
           "Value": 105
         }
       ],
+      "desc": "추가 포격 공격력이 15% 증가하고, 추가 포격 치명타 발생이 10.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_009_Sprite"
     },
     "72700073": {
@@ -8266,6 +8476,7 @@
           "Value": 140
         }
       ],
+      "desc": "추가 포격 공격력이 20% 증가하고, 추가 포격 치명타 발생이 14% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_009_Sprite"
     },
     "72700074": {
@@ -8301,6 +8512,7 @@
           "Value": 175
         }
       ],
+      "desc": "추가 포격 공격력이 25% 증가하고, 추가 포격 치명타 발생이 17.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_009_Sprite"
     },
     "72700075": {
@@ -8332,6 +8544,7 @@
           "Value": 35
         }
       ],
+      "desc": "추가 충파 공격력이 5% 증가하고, 추가 충파 치명타 발생이 3.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_011_Sprite"
     },
     "72700076": {
@@ -8367,6 +8580,7 @@
           "Value": 70
         }
       ],
+      "desc": "추가 충파 공격력이 10% 증가하고, 추가 충파 치명타 발생이 7% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_011_Sprite"
     },
     "72700077": {
@@ -8402,6 +8616,7 @@
           "Value": 105
         }
       ],
+      "desc": "추가 충파 공격력이 15% 증가하고, 추가 충파 치명타 발생이 10.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_011_Sprite"
     },
     "72700078": {
@@ -8437,6 +8652,7 @@
           "Value": 140
         }
       ],
+      "desc": "추가 충파 공격력이 20% 증가하고, 추가 충파 치명타 발생이 14% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_011_Sprite"
     },
     "72700079": {
@@ -8472,6 +8688,7 @@
           "Value": 175
         }
       ],
+      "desc": "추가 충파 공격력이 25% 증가하고, 추가 충파 치명타 발생이 17.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_011_Sprite"
     },
     "72700080": {
@@ -8503,6 +8720,7 @@
           "Value": 35
         }
       ],
+      "desc": "추가 백병 공격력이 5% 증가하고, 추가 백병 치명타 발생이 3.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_010_Sprite"
     },
     "72700081": {
@@ -8538,6 +8756,7 @@
           "Value": 70
         }
       ],
+      "desc": "추가 백병 공격력이 10% 증가하고, 추가 백병 치명타 발생이 7% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_010_Sprite"
     },
     "72700082": {
@@ -8573,6 +8792,7 @@
           "Value": 105
         }
       ],
+      "desc": "추가 백병 공격력이 15% 증가하고, 추가 백병 치명타 발생이 10.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_010_Sprite"
     },
     "72700083": {
@@ -8608,6 +8828,7 @@
           "Value": 140
         }
       ],
+      "desc": "추가 백병 공격력이 20% 증가하고, 추가 백병 치명타 발생이 14% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_010_Sprite"
     },
     "72700084": {
@@ -8643,6 +8864,7 @@
           "Value": 175
         }
       ],
+      "desc": "추가 백병 공격력이 25% 증가하고, 추가 백병 치명타 발생이 17.5% 증가합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_010_Sprite"
     },
     "72700085": {
@@ -8677,6 +8899,7 @@
           "Value": 30
         }
       ],
+      "desc": "광역 공격으로 받는 피해량이 3% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_036_Sprite"
     },
     "72700086": {
@@ -8715,6 +8938,7 @@
           "Value": 60
         }
       ],
+      "desc": "광역 공격으로 받는 피해량이 6% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_036_Sprite"
     },
     "72700087": {
@@ -8753,6 +8977,7 @@
           "Value": 90
         }
       ],
+      "desc": "광역 공격으로 받는 피해량이 9% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_036_Sprite"
     },
     "72700088": {
@@ -8791,6 +9016,7 @@
           "Value": 120
         }
       ],
+      "desc": "광역 공격으로 받는 피해량이 12% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_036_Sprite"
     },
     "72700089": {
@@ -8829,6 +9055,7 @@
           "Value": 150
         }
       ],
+      "desc": "광역 공격으로 받는 피해량이 15% 감소합니다.\n(해당 효과는 1함대에만 적용됩니다.)",
       "skillIcon": "icon_effect_battle_036_Sprite"
     }
   }

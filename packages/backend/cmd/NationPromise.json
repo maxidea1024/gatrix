@@ -11,6 +11,7 @@
         "text",
         "text"
       ],
+      "icon": "string",
       "type": "number",
       "group": "number",
       "groupOrder": "number",
@@ -60,6 +61,7 @@
         "지정한",
         "5,000,000,000"
       ],
+      "icon": "icon_NationPromise_01_Sprite",
       "type": 0,
       "group": 1100,
       "groupOrder": 1,
@@ -78,6 +80,7 @@
         "지정한",
         "10,000,000,000"
       ],
+      "icon": "icon_NationPromise_02_Sprite",
       "type": 0,
       "group": 1100,
       "groupOrder": 2,
@@ -95,6 +98,7 @@
       "descFormatText": [
         "지정한"
       ],
+      "icon": "icon_NationPromise_03_Sprite",
       "type": 0,
       "group": 1100,
       "groupOrder": 3,
@@ -112,6 +116,7 @@
       "descFormatText": [
         "지정한"
       ],
+      "icon": "icon_NationPromise_04_Sprite",
       "type": 0,
       "group": 1200,
       "groupOrder": 1,
@@ -129,6 +134,7 @@
       "descFormatText": [
         "지정한"
       ],
+      "icon": "icon_NationPromise_05_Sprite",
       "type": 0,
       "group": 1200,
       "groupOrder": 2,
@@ -146,6 +152,7 @@
       "descFormatText": [
         "지정한"
       ],
+      "icon": "icon_NationPromise_06_Sprite",
       "type": 0,
       "group": 1200,
       "groupOrder": 3,
@@ -157,6 +164,7 @@
       "id": 10120201,
       "name": "최고의 국가",
       "desc": "국력 순위 1위를 달성합니다.",
+      "icon": "icon_NationPromise_07_Sprite",
       "type": 0,
       "group": 1300,
       "groupOrder": 1,
@@ -168,6 +176,7 @@
       "id": 10120202,
       "name": "강력한 국가",
       "desc": "국력 순위를 2위 이상 달성합니다.",
+      "icon": "icon_NationPromise_08_Sprite",
       "type": 0,
       "group": 1300,
       "groupOrder": 2,
@@ -179,6 +188,7 @@
       "id": 10120203,
       "name": "발전하는 국가",
       "desc": "국력 순위를 3위 이상 달성합니다.",
+      "icon": "icon_NationPromise_09_Sprite",
       "type": 0,
       "group": 1300,
       "groupOrder": 3,
@@ -193,6 +203,7 @@
       "descFormatText": [
         "10,000,000,000"
       ],
+      "icon": "icon_NationPromise_10_Sprite",
       "type": 0,
       "group": 1400,
       "groupOrder": 1,
@@ -207,6 +218,7 @@
       "descFormatText": [
         "30,000,000,000"
       ],
+      "icon": "icon_NationPromise_11_Sprite",
       "type": 0,
       "group": 1400,
       "groupOrder": 2,

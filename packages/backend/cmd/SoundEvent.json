@@ -1,1496 +1,8507 @@
 {
   ":SoundEvent": {
     ":type": {
-      "id": "key"
+      "id": "key",
+      "name": "string",
+      "event": [
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        },
+        {
+          "Tag": "string",
+          "SoundGroupId": "number",
+          "DuckingAsset": "string"
+        }
+      ]
     },
-    ":required": {},
-    ":min": {},
-    ":max": {},
+    ":required": {
+      "name": 1,
+      "event": [
+        {
+          "Tag": 1
+        }
+      ]
+    },
+    ":min": {
+      "event": [
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        },
+        {
+          "SoundGroupId": 97000000
+        }
+      ]
+    },
+    ":max": {
+      "event": [
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        },
+        {
+          "SoundGroupId": 97999999
+        }
+      ]
+    },
     ":enum": {},
-    ":links": {}
+    ":links": {
+      "event": [
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        },
+        {
+          "SoundGroupId": [
+            "SoundGroup"
+          ]
+        }
+      ]
+    }
   },
   "SoundEvent": {
     "96000000": {
-      "id": 96000000
+      "id": 96000000,
+      "name": "BGM 유럽 항해",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000000,
+          "DuckingAsset": "SM_Sea"
+        }
+      ]
     },
     "96000001": {
-      "id": 96000001
+      "id": 96000001,
+      "name": "BGM 아프리카 항해",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000001,
+          "DuckingAsset": "SM_Sea"
+        }
+      ]
     },
     "96000002": {
-      "id": 96000002
+      "id": 96000002,
+      "name": "BGM 인도양 항해",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000002,
+          "DuckingAsset": "SM_Sea"
+        }
+      ]
     },
     "96000003": {
-      "id": 96000003
+      "id": 96000003,
+      "name": "BGM 동남아시아 항해",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000003,
+          "DuckingAsset": "SM_Sea"
+        }
+      ]
     },
     "96000004": {
-      "id": 96000004
+      "id": 96000004,
+      "name": "BGM 동아시아 항해",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000004,
+          "DuckingAsset": "SM_Sea"
+        }
+      ]
     },
     "96000005": {
-      "id": 96000005
+      "id": 96000005,
+      "name": "BGM 대양 항해",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000005,
+          "DuckingAsset": "SM_Sea"
+        },
+        {
+          "Tag": "DH3_Arctic",
+          "SoundGroupId": 97000129,
+          "DuckingAsset": "SM_Sea"
+        }
+      ]
     },
     "96000006": {
-      "id": 96000006
+      "id": 96000006,
+      "name": "BGM 신대륙 항해",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000006,
+          "DuckingAsset": "SM_Sea"
+        }
+      ]
     },
     "96000007": {
-      "id": 96000007
+      "id": 96000007,
+      "name": "BGM 유럽 항구",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000009,
+          "DuckingAsset": "SM_Town"
+        },
+        {
+          "Tag": "DH3",
+          "SoundGroupId": 97000126,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000008": {
-      "id": 96000008
+      "id": 96000008,
+      "name": "BGM 이슬람 항구",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000010,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000009": {
-      "id": 96000009
+      "id": 96000009,
+      "name": "BGM 아프리카 항구",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000011,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000010": {
-      "id": 96000010
+      "id": 96000010,
+      "name": "BGM 인도 항구",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000012,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000011": {
-      "id": 96000011
+      "id": 96000011,
+      "name": "BGM 동남아시아 항구",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000013,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000012": {
-      "id": 96000012
+      "id": 96000012,
+      "name": "BGM 신대륙 항구",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000014,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000013": {
-      "id": 96000013
+      "id": 96000013,
+      "name": "BGM 해적섬 항구",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000015,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000014": {
-      "id": 96000014
+      "id": 96000014,
+      "name": "BGM 대만 항구",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000016,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000015": {
-      "id": 96000015
+      "id": 96000015,
+      "name": "BGM 일본 항구",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000017,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000016": {
-      "id": 96000016
+      "id": 96000016,
+      "name": "BGM 조선 항구",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000018,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000017": {
-      "id": 96000017
+      "id": 96000017,
+      "name": "BGM 중국 항구",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000019,
+          "DuckingAsset": "SM_Town"
+        },
+        {
+          "Tag": "DH3",
+          "SoundGroupId": 97000125,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000018": {
-      "id": 96000018
+      "id": 96000018,
+      "name": "BGM 런던",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000020,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000019": {
-      "id": 96000019
+      "id": 96000019,
+      "name": "BGM 리스보아",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000021,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000020": {
-      "id": 96000020
+      "id": 96000020,
+      "name": "BGM 세비야",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000022,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000021": {
-      "id": 96000021
+      "id": 96000021,
+      "name": "BGM 암스테르담",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000023,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000022": {
-      "id": 96000022
+      "id": 96000022,
+      "name": "BGM 이스탄불",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000024,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000023": {
-      "id": 96000023
+      "id": 96000023,
+      "name": "BGM 해상전",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000033,
+          "DuckingAsset": "SM_Battle"
+        },
+        {
+          "Tag": "Strong",
+          "SoundGroupId": 97000033,
+          "DuckingAsset": "SM_Battle"
+        },
+        {
+          "Tag": "Normal",
+          "SoundGroupId": 97000035,
+          "DuckingAsset": "SM_Battle"
+        },
+        {
+          "Tag": "Weak",
+          "SoundGroupId": 97000034,
+          "DuckingAsset": "SM_Battle"
+        },
+        {
+          "Tag": "StrongM",
+          "SoundGroupId": 97000036,
+          "DuckingAsset": "SM_Battle"
+        },
+        {
+          "Tag": "NormalM",
+          "SoundGroupId": 97000036,
+          "DuckingAsset": "SM_Battle"
+        },
+        {
+          "Tag": "WeakM",
+          "SoundGroupId": 97000037,
+          "DuckingAsset": "SM_Battle"
+        },
+        {
+          "Tag": "Sudden",
+          "SoundGroupId": 97000036,
+          "DuckingAsset": "SM_Battle"
+        },
+        {
+          "Tag": "Raid1",
+          "SoundGroupId": 97000100,
+          "DuckingAsset": "SM_Battle"
+        },
+        {
+          "Tag": "Raid2",
+          "SoundGroupId": 97000101,
+          "DuckingAsset": "SM_Battle"
+        }
+      ]
     },
     "96000024": {
-      "id": 96000024
+      "id": 96000024,
+      "name": "BGM 육상전",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000038,
+          "DuckingAsset": "SM_Battle"
+        },
+        {
+          "Tag": "Weak",
+          "SoundGroupId": 97000039,
+          "DuckingAsset": "SM_Battle"
+        }
+      ]
     },
     "96000025": {
-      "id": 96000025
+      "id": 96000025,
+      "name": "BGM 결투",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000040,
+          "DuckingAsset": "SM_Duel"
+        },
+        {
+          "Tag": "Strong",
+          "SoundGroupId": 97000040,
+          "DuckingAsset": "SM_Duel"
+        },
+        {
+          "Tag": "Normal",
+          "SoundGroupId": 97000040,
+          "DuckingAsset": "SM_Duel"
+        },
+        {
+          "Tag": "Weak",
+          "SoundGroupId": 97000041,
+          "DuckingAsset": "SM_Duel"
+        },
+        {
+          "Tag": "Sudden",
+          "SoundGroupId": 97000040,
+          "DuckingAsset": "SM_Duel"
+        }
+      ]
     },
     "96000026": {
-      "id": 96000026
+      "id": 96000026,
+      "name": "BGM 탐험",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000042
+        },
+        {
+          "Tag": "Cave",
+          "SoundGroupId": 97000042,
+          "DuckingAsset": "SM_Exploration"
+        },
+        {
+          "Tag": "Dark",
+          "SoundGroupId": 97000043,
+          "DuckingAsset": "SM_Exploration"
+        },
+        {
+          "Tag": "Forest",
+          "SoundGroupId": 97000042,
+          "DuckingAsset": "SM_Exploration"
+        },
+        {
+          "Tag": "Land",
+          "SoundGroupId": 97000043,
+          "DuckingAsset": "SM_Exploration"
+        },
+        {
+          "Tag": "Mystery1",
+          "SoundGroupId": 97000042,
+          "DuckingAsset": "SM_Exploration"
+        },
+        {
+          "Tag": "Mystery2",
+          "SoundGroupId": 97000043,
+          "DuckingAsset": "SM_Exploration"
+        },
+        {
+          "Tag": "Mystery3",
+          "SoundGroupId": 97000042,
+          "DuckingAsset": "SM_Exploration"
+        },
+        {
+          "Tag": "Tech",
+          "SoundGroupId": 97000043,
+          "DuckingAsset": "SM_Exploration"
+        },
+        {
+          "Tag": "Humorous",
+          "SoundGroupId": 97000042,
+          "DuckingAsset": "SM_Exploration"
+        }
+      ]
     },
     "96000027": {
-      "id": 96000027
+      "id": 96000027,
+      "name": "BGM 건물",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000044,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "1",
+          "SoundGroupId": 97000044,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "2",
+          "SoundGroupId": 97000045,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "3",
+          "SoundGroupId": 97000049,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "4",
+          "SoundGroupId": 97000046,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "5",
+          "SoundGroupId": 97000050,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "6",
+          "SoundGroupId": 97000051,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "7",
+          "SoundGroupId": 97000056,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "8",
+          "SoundGroupId": 97000051,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "9",
+          "SoundGroupId": 97000052,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "10",
+          "SoundGroupId": 97000047,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "11",
+          "SoundGroupId": 97000053,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "12",
+          "SoundGroupId": 97000054,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "13",
+          "SoundGroupId": 97000048,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "NightStore",
+          "SoundGroupId": 97000055,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "CashShop",
+          "SoundGroupId": 97000061,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "7-1",
+          "SoundGroupId": 97000057,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "7-2",
+          "SoundGroupId": 97000058,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "7-3",
+          "SoundGroupId": 97000059,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "7-4",
+          "SoundGroupId": 97000060,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "PianoInn",
+          "SoundGroupId": 97000085,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "JazzInn",
+          "SoundGroupId": 97000104,
+          "DuckingAsset": "SM_Indoor"
+        }
+      ]
     },
     "96000028": {
-      "id": 96000028
+      "id": 96000028,
+      "name": "BGM 타이틀",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000073,
+          "DuckingAsset": "SM_Title"
+        },
+        {
+          "Tag": "새해",
+          "SoundGroupId": 97010096,
+          "DuckingAsset": "SM_Title"
+        },
+        {
+          "Tag": "추석",
+          "SoundGroupId": 97010097,
+          "DuckingAsset": "SM_Title"
+        },
+        {
+          "Tag": "성탄",
+          "SoundGroupId": 97010098,
+          "DuckingAsset": "SM_Title"
+        },
+        {
+          "Tag": "흑묘새해",
+          "SoundGroupId": 97010100
+        },
+        {
+          "Tag": "여름",
+          "SoundGroupId": 97000128,
+          "DuckingAsset": "SM-Title"
+        },
+        {
+          "Tag": "창세기전",
+          "SoundGroupId": 97010186,
+          "DuckingAsset": "SM-Title"
+        }
+      ]
     },
     "96000029": {
-      "id": 96000029
+      "id": 96000029,
+      "name": "BGM 제독 선택",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000074,
+          "DuckingAsset": "SM_Select"
+        }
+      ]
     },
     "96000030": {
-      "id": 96000030
+      "id": 96000030,
+      "name": "BGM 이벤트",
+      "event": [
+        {
+          "Tag": "Opening",
+          "SoundGroupId": 97000062,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Ending",
+          "SoundGroupId": 97000063,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Hope",
+          "SoundGroupId": 97000064,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Sad",
+          "SoundGroupId": 97000065,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Happy",
+          "SoundGroupId": 97000066,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Nervous",
+          "SoundGroupId": 97000067,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Calm",
+          "SoundGroupId": 97000068,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Anger",
+          "SoundGroupId": 97000069,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Surprise",
+          "SoundGroupId": 97000070,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Humorous",
+          "SoundGroupId": 97000071,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "StoryEnding",
+          "SoundGroupId": 97000072,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "PiratesbyKY",
+          "SoundGroupId": 97000095,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Pirates",
+          "SoundGroupId": 97000105,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Chrismas_Carol",
+          "SoundGroupId": 97000107,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Chrismas_Island",
+          "SoundGroupId": 97000108,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Chrismas_Pirate1",
+          "SoundGroupId": 97000109,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Chrismas_Pirate2",
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "IndiaDance",
+          "SoundGroupId": 97000121,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Sitar",
+          "SoundGroupId": 97000122,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Mystery",
+          "SoundGroupId": 97000123,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Relief",
+          "SoundGroupId": 97000123,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "DH1Ending",
+          "SoundGroupId": 97000118,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Mystery2",
+          "SoundGroupId": 97010140,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Love",
+          "SoundGroupId": 97000130,
+          "DuckingAsset": "SM_Event"
+        }
+      ]
     },
     "96000031": {
-      "id": 96000031
+      "id": 96000031,
+      "name": "BGM 이벤트(덕킹 변경 없음)",
+      "event": [
+        {
+          "Tag": "Opening",
+          "SoundGroupId": 97000062,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Ending",
+          "SoundGroupId": 97000063,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Hope",
+          "SoundGroupId": 97000064,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Sad",
+          "SoundGroupId": 97000065,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Happy",
+          "SoundGroupId": 97000066,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Nervous",
+          "SoundGroupId": 97000067,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Calm",
+          "SoundGroupId": 97000068,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Anger",
+          "SoundGroupId": 97000069,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Surprise",
+          "SoundGroupId": 97000070,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Humorous",
+          "SoundGroupId": 97000071,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "StoryEnding",
+          "SoundGroupId": 97000072,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "PiratesbyKY",
+          "SoundGroupId": 97000095,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Pirates",
+          "SoundGroupId": 97000105,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Chrismas_Carol",
+          "SoundGroupId": 97000107,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Chrismas_Island",
+          "SoundGroupId": 97000108,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Chrismas_Pirate1",
+          "SoundGroupId": 97000109,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Chrismas_Pirate2",
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "IndiaDance",
+          "SoundGroupId": 97000121,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Sitar",
+          "SoundGroupId": 97000122,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Mystery",
+          "SoundGroupId": 97000123,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Relief",
+          "SoundGroupId": 97000123,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "DH1Ending",
+          "SoundGroupId": 97000118,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Mystery2",
+          "SoundGroupId": 97010140,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Love",
+          "SoundGroupId": 97000130,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000032": {
-      "id": 96000032
+      "id": 96000032,
+      "name": "VO_타이틀콜",
+      "event": [
+        {
+          "Tag": "Default",
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "새해",
+          "SoundGroupId": 97010093,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "추석",
+          "SoundGroupId": 97010094,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "성탄",
+          "SoundGroupId": 97010095,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000033": {
-      "id": 96000033
+      "id": 96000033,
+      "name": "BGM 대항해시대1",
+      "event": [
+        {
+          "Tag": "Opening",
+          "SoundGroupId": 97000110,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Happy",
+          "SoundGroupId": 97000111,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Lisbon",
+          "SoundGroupId": 97000112,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Seville",
+          "SoundGroupId": 97000113,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Priate",
+          "SoundGroupId": 97000114,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Inn",
+          "SoundGroupId": 97000115,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Africa",
+          "SoundGroupId": 97000116,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Ending01",
+          "SoundGroupId": 97000117,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Ending02",
+          "SoundGroupId": 97000118,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Nervous",
+          "SoundGroupId": 97000119,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000034": {
-      "id": 96000034
+      "id": 96000034,
+      "name": "BGM 도전",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000040,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "Normal",
+          "SoundGroupId": 97000040,
+          "DuckingAsset": "SM_Indoor"
+        },
+        {
+          "Tag": "Lighthouse",
+          "SoundGroupId": 97000037,
+          "DuckingAsset": "SM_Indoor"
+        }
+      ]
     },
     "96000038": {
-      "id": 96000038
+      "id": 96000038,
+      "name": "BGM 난파",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000075,
+          "DuckingAsset": "SM_GameOver"
+        }
+      ]
     },
     "96000039": {
-      "id": 96000039
+      "id": 96000039,
+      "name": "제독_제독 임명",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002027,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000040": {
-      "id": 96000040
+      "id": 96000040,
+      "name": "공용SE_버튼음",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002076,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Positive",
+          "SoundGroupId": 97002001,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Negative",
+          "SoundGroupId": 97002002,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Option",
+          "SoundGroupId": 97002019,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000041": {
-      "id": 96000041
+      "id": 96000041,
+      "name": "ENV_건물 환경음_지중해",
+      "event": [
+        {
+          "Tag": "Default"
+        },
+        {
+          "Tag": "Palace"
+        },
+        {
+          "Tag": "Gover",
+          "SoundGroupId": 97001024,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Union",
+          "SoundGroupId": 97001016,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Pub",
+          "SoundGroupId": 97001003,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shop",
+          "SoundGroupId": 97001008,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Special"
+        },
+        {
+          "Tag": "Religion",
+          "SoundGroupId": 97001014,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Event",
+          "SoundGroupId": 97001015,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Bank",
+          "SoundGroupId": 97001011,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Trade",
+          "SoundGroupId": 97001017,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shipyard",
+          "SoundGroupId": 97001002,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Depart",
+          "SoundGroupId": 97001001,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Mantic",
+          "SoundGroupId": 97001009,
+          "DuckingAsset": "SM_TownEnv"
+        }
+      ]
     },
     "96000042": {
-      "id": 96000042
+      "id": 96000042,
+      "name": "ENV_건물 환경음_북해",
+      "event": [
+        {
+          "Tag": "Default"
+        },
+        {
+          "Tag": "Palace"
+        },
+        {
+          "Tag": "Gover",
+          "SoundGroupId": 97001024,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Union",
+          "SoundGroupId": 97001016,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Pub",
+          "SoundGroupId": 97001003,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shop",
+          "SoundGroupId": 97001008,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Special"
+        },
+        {
+          "Tag": "Religion",
+          "SoundGroupId": 97001014,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Event",
+          "SoundGroupId": 97001015,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Bank",
+          "SoundGroupId": 97001011,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Trade",
+          "SoundGroupId": 97001017,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shipyard",
+          "SoundGroupId": 97001002,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Depart",
+          "SoundGroupId": 97001001,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Mantic",
+          "SoundGroupId": 97001009,
+          "DuckingAsset": "SM_TownEnv"
+        }
+      ]
     },
     "96000043": {
-      "id": 96000043
+      "id": 96000043,
+      "name": "ENV_건물 환경음_이슬람",
+      "event": [
+        {
+          "Tag": "Default"
+        },
+        {
+          "Tag": "Palace"
+        },
+        {
+          "Tag": "Gover"
+        },
+        {
+          "Tag": "Union",
+          "SoundGroupId": 97001016,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Pub",
+          "SoundGroupId": 97001003,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shop",
+          "SoundGroupId": 97001008,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Special"
+        },
+        {
+          "Tag": "Religion",
+          "SoundGroupId": 97001007,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Event",
+          "SoundGroupId": 97001015,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Bank",
+          "SoundGroupId": 97001011,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Trade",
+          "SoundGroupId": 97001017,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shipyard",
+          "SoundGroupId": 97001002,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Depart",
+          "SoundGroupId": 97001001,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Mantic",
+          "SoundGroupId": 97001009,
+          "DuckingAsset": "SM_TownEnv"
+        }
+      ]
     },
     "96000044": {
-      "id": 96000044
+      "id": 96000044,
+      "name": "ENV_건물 환경음_아프리카",
+      "event": [
+        {
+          "Tag": "Default"
+        },
+        {
+          "Tag": "Palace"
+        },
+        {
+          "Tag": "Gover"
+        },
+        {
+          "Tag": "Union",
+          "SoundGroupId": 97001016,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Pub",
+          "SoundGroupId": 97001003,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shop",
+          "SoundGroupId": 97001008,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Special"
+        },
+        {
+          "Tag": "Religion",
+          "SoundGroupId": 97001007,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Event",
+          "SoundGroupId": 97001015,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Bank",
+          "SoundGroupId": 97001011,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Trade",
+          "SoundGroupId": 97001017,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shipyard",
+          "SoundGroupId": 97001002,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Depart",
+          "SoundGroupId": 97001001,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Mantic",
+          "SoundGroupId": 97001009,
+          "DuckingAsset": "SM_TownEnv"
+        }
+      ]
     },
     "96000045": {
-      "id": 96000045
+      "id": 96000045,
+      "name": "ENV_건물 환경음_동남아",
+      "event": [
+        {
+          "Tag": "Default"
+        },
+        {
+          "Tag": "Palace"
+        },
+        {
+          "Tag": "Gover",
+          "SoundGroupId": 97001024,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Union",
+          "SoundGroupId": 97001016,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Pub",
+          "SoundGroupId": 97001003,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shop",
+          "SoundGroupId": 97001008,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Special"
+        },
+        {
+          "Tag": "Religion",
+          "SoundGroupId": 97001007,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Event",
+          "SoundGroupId": 97001015,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Bank",
+          "SoundGroupId": 97001011,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Trade",
+          "SoundGroupId": 97001017,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shipyard",
+          "SoundGroupId": 97001002,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Depart",
+          "SoundGroupId": 97001001,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Mantic",
+          "SoundGroupId": 97001009,
+          "DuckingAsset": "SM_TownEnv"
+        }
+      ]
     },
     "96000046": {
-      "id": 96000046
+      "id": 96000046,
+      "name": "ENV_건물 환경음_인도",
+      "event": [
+        {
+          "Tag": "Default"
+        },
+        {
+          "Tag": "Palace"
+        },
+        {
+          "Tag": "Gover",
+          "SoundGroupId": 97001024,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Union",
+          "SoundGroupId": 97001016,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Pub",
+          "SoundGroupId": 97001003,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shop",
+          "SoundGroupId": 97001008,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Special"
+        },
+        {
+          "Tag": "Religion",
+          "SoundGroupId": 97001007,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Event",
+          "SoundGroupId": 97001015,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Bank",
+          "SoundGroupId": 97001011,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Trade",
+          "SoundGroupId": 97001017,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shipyard",
+          "SoundGroupId": 97001002,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Depart",
+          "SoundGroupId": 97001001,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Mantic",
+          "SoundGroupId": 97001009,
+          "DuckingAsset": "SM_TownEnv"
+        }
+      ]
     },
     "96000047": {
-      "id": 96000047
+      "id": 96000047,
+      "name": "ENV_건물 환경음_중국",
+      "event": [
+        {
+          "Tag": "Default"
+        },
+        {
+          "Tag": "Palace"
+        },
+        {
+          "Tag": "Gover",
+          "SoundGroupId": 97001024,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Union",
+          "SoundGroupId": 97001016,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Pub",
+          "SoundGroupId": 97001003,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shop",
+          "SoundGroupId": 97001008,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Special"
+        },
+        {
+          "Tag": "Religion",
+          "SoundGroupId": 97001007,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Event",
+          "SoundGroupId": 97001015,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Bank",
+          "SoundGroupId": 97001011,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Trade",
+          "SoundGroupId": 97001017,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shipyard",
+          "SoundGroupId": 97001002,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Depart",
+          "SoundGroupId": 97001001,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Mantic",
+          "SoundGroupId": 97001009,
+          "DuckingAsset": "SM_TownEnv"
+        }
+      ]
     },
     "96000048": {
-      "id": 96000048
+      "id": 96000048,
+      "name": "ENV_건물 환경음_일본",
+      "event": [
+        {
+          "Tag": "Default"
+        },
+        {
+          "Tag": "Palace"
+        },
+        {
+          "Tag": "Gover",
+          "SoundGroupId": 97001024,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Union",
+          "SoundGroupId": 97001016,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Pub",
+          "SoundGroupId": 97001003,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shop",
+          "SoundGroupId": 97001008,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Special"
+        },
+        {
+          "Tag": "Religion",
+          "SoundGroupId": 97001007,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Event",
+          "SoundGroupId": 97001015,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Bank",
+          "SoundGroupId": 97001011,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Trade",
+          "SoundGroupId": 97001017,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shipyard",
+          "SoundGroupId": 97001002,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Depart",
+          "SoundGroupId": 97001001,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Mantic",
+          "SoundGroupId": 97001009,
+          "DuckingAsset": "SM_TownEnv"
+        }
+      ]
     },
     "96000049": {
-      "id": 96000049
+      "id": 96000049,
+      "name": "ENV_건물 환경음_조선",
+      "event": [
+        {
+          "Tag": "Default"
+        },
+        {
+          "Tag": "Palace"
+        },
+        {
+          "Tag": "Gover",
+          "SoundGroupId": 97001024,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Union",
+          "SoundGroupId": 97001016,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Pub",
+          "SoundGroupId": 97001003,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shop",
+          "SoundGroupId": 97001008,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Special"
+        },
+        {
+          "Tag": "Religion",
+          "SoundGroupId": 97001007,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Event",
+          "SoundGroupId": 97001015,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Bank",
+          "SoundGroupId": 97001011,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Trade",
+          "SoundGroupId": 97001017,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shipyard",
+          "SoundGroupId": 97001002,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Depart",
+          "SoundGroupId": 97001001,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Mantic",
+          "SoundGroupId": 97001009,
+          "DuckingAsset": "SM_TownEnv"
+        }
+      ]
     },
     "96000050": {
-      "id": 96000050
+      "id": 96000050,
+      "name": "ENV_건물 환경음_아메리카",
+      "event": [
+        {
+          "Tag": "Default"
+        },
+        {
+          "Tag": "Palace"
+        },
+        {
+          "Tag": "Gover",
+          "SoundGroupId": 97001024,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Union",
+          "SoundGroupId": 97001016,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Pub",
+          "SoundGroupId": 97001003,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shop",
+          "SoundGroupId": 97001008,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Special"
+        },
+        {
+          "Tag": "Religion",
+          "SoundGroupId": 97001007,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Event",
+          "SoundGroupId": 97001015,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Bank",
+          "SoundGroupId": 97001011,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Trade",
+          "SoundGroupId": 97001017,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shipyard",
+          "SoundGroupId": 97001002,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Depart",
+          "SoundGroupId": 97001001,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Mantic",
+          "SoundGroupId": 97001009,
+          "DuckingAsset": "SM_TownEnv"
+        }
+      ]
     },
     "96000051": {
-      "id": 96000051
+      "id": 96000051,
+      "name": "ENV_건물 환경음_개척지",
+      "event": [
+        {
+          "Tag": "Default"
+        },
+        {
+          "Tag": "Palace"
+        },
+        {
+          "Tag": "Gover",
+          "SoundGroupId": 97001024,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Union",
+          "SoundGroupId": 97001016,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Pub",
+          "SoundGroupId": 97001003,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shop",
+          "SoundGroupId": 97001008,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Special"
+        },
+        {
+          "Tag": "Religion",
+          "SoundGroupId": 97001007,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Event",
+          "SoundGroupId": 97001015,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Bank",
+          "SoundGroupId": 97001011,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Trade",
+          "SoundGroupId": 97001017,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Shipyard",
+          "SoundGroupId": 97001002,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Depart",
+          "SoundGroupId": 97001001,
+          "DuckingAsset": "SM_TownEnv"
+        },
+        {
+          "Tag": "Mantic",
+          "SoundGroupId": 97001009,
+          "DuckingAsset": "SM_TownEnv"
+        }
+      ]
     },
     "96000052": {
-      "id": 96000052
+      "id": 96000052,
+      "name": "ENV_물소리",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97001004,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "냇물",
+          "SoundGroupId": 97001023,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000053": {
-      "id": 96000053
+      "id": 96000053,
+      "name": "ENV_갈매기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97001005,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000054": {
-      "id": 96000054
+      "id": 96000054,
+      "name": "강물X",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97001006,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000055": {
-      "id": 96000055
+      "id": 96000055,
+      "name": "공용SE_문소리",
+      "event": [
+        {
+          "Tag": "Enter",
+          "SoundGroupId": 97002003
+        },
+        {
+          "Tag": "Leave",
+          "SoundGroupId": 97002004
+        },
+        {
+          "Tag": "Locked",
+          "SoundGroupId": 97002016
+        }
+      ]
     },
     "96000056": {
-      "id": 96000056
+      "id": 96000056,
+      "name": "BGM 제독 테마",
+      "event": [
+        {
+          "Tag": "Otto",
+          "SoundGroupId": 97000076,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Joan",
+          "SoundGroupId": 97000077,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Catalina",
+          "SoundGroupId": 97000078,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Milanda",
+          "SoundGroupId": 97000079,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Sarvadle",
+          "SoundGroupId": 97000080,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Ernst",
+          "SoundGroupId": 97000081,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Pietro",
+          "SoundGroupId": 97000082,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Al",
+          "SoundGroupId": 97000083,
+          "DuckingAsset": "SM_Event"
+        },
+        {
+          "Tag": "Anne",
+          "SoundGroupId": 97000094,
+          "DuckingAsset": "SM_Event"
+        }
+      ]
     },
     "96000057": {
-      "id": 96000057
+      "id": 96000057,
+      "name": "BGM 부락",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000032,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000058": {
-      "id": 96000058
+      "id": 96000058,
+      "name": "연출_웅성웅성",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002023,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000059": {
-      "id": 96000059
+      "id": 96000059,
+      "name": "퀘스트 스크립트 효과음",
+      "event": [
+        {
+          "Tag": "문열림",
+          "SoundGroupId": 97002003,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "문닫힘",
+          "SoundGroupId": 97002004,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "포격",
+          "SoundGroupId": 97002054,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "지불",
+          "SoundGroupId": 97002008,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "상자",
+          "SoundGroupId": 97003035,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "쓰러짐",
+          "SoundGroupId": 97002055,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "패배",
+          "SoundGroupId": 97003147,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "동전",
+          "SoundGroupId": 97003024,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "한손검공격",
+          "SoundGroupId": 97002056,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "화재",
+          "SoundGroupId": 97002028,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "한손검피격",
+          "SoundGroupId": 97002057,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "웅성웅성",
+          "SoundGroupId": 97002023,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "주먹",
+          "SoundGroupId": 97002029,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "뛰기",
+          "SoundGroupId": 97002033,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "걷기",
+          "SoundGroupId": 97002047,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "개",
+          "SoundGroupId": 97002060,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "둔기피격",
+          "SoundGroupId": 97002058,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "포도탄피격",
+          "SoundGroupId": 97002059,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "환호",
+          "SoundGroupId": 97002053,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "반짝반짝",
+          "SoundGroupId": 97002077,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "챙챙",
+          "SoundGroupId": 97002078,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "와자작",
+          "SoundGroupId": 97002079,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "큰파도",
+          "SoundGroupId": 97010126,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "낙뢰",
+          "SoundGroupId": 97010127,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000060": {
-      "id": 96000060
+      "id": 96000060,
+      "name": "공용SE_정산 결과",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002005,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000061": {
-      "id": 96000061
+      "id": 96000061,
+      "name": "공용SE_도장",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002026,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000062": {
-      "id": 96000062
+      "id": 96000062,
+      "name": "공용SE_기능 확장",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002034,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000063": {
-      "id": 96000063
+      "id": 96000063,
+      "name": "공용SE_상자 열기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002050,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000064": {
-      "id": 96000064
+      "id": 96000064,
+      "name": "공용SE_재화 소모",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002008,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Blue",
+          "SoundGroupId": 97002009,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Red",
+          "SoundGroupId": 97002031,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Energy",
+          "SoundGroupId": 97002032,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000068": {
-      "id": 96000068
+      "id": 96000068,
+      "name": "BGM 재해",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000008,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Siren",
+          "SoundGroupId": 97000007
+        }
+      ]
     },
     "96000069": {
-      "id": 96000069
+      "id": 96000069,
+      "name": "캐릭터_걷기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003169,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Carpet",
+          "SoundGroupId": 97003170,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Sand",
+          "SoundGroupId": 97003168,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Snow",
+          "SoundGroupId": 97003171,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Stone",
+          "SoundGroupId": 97003169,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Water",
+          "SoundGroupId": 97003172,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000070": {
-      "id": 96000070
+      "id": 96000070,
+      "name": "국가_국가 선택",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002039,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000071": {
-      "id": 96000071
+      "id": 96000071,
+      "name": "BGM 인카운트",
+      "event": [
+        {
+          "Tag": "Attack",
+          "SoundGroupId": 97000039
+        },
+        {
+          "Tag": "Defense",
+          "SoundGroupId": 97000039
+        }
+      ]
     },
     "96000072": {
-      "id": 96000072
+      "id": 96000072,
+      "name": "인카운트 SFX",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003077,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000073": {
-      "id": 96000073
+      "id": 96000073,
+      "name": "이모티콘 SFX",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003194,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Positive",
+          "SoundGroupId": 97003195,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Negative",
+          "SoundGroupId": 97003196,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Question",
+          "SoundGroupId": 97003197,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Angry",
+          "SoundGroupId": 97003198,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Disappoint",
+          "SoundGroupId": 97003199,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "일반",
+          "SoundGroupId": 97003300,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "화려",
+          "SoundGroupId": 97003302,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000074": {
-      "id": 96000074
+      "id": 96000074,
+      "name": "보상 SFX",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002006,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000086": {
-      "id": 96000086
+      "id": 96000086,
+      "name": "탐험_정박완료",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003011,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000088": {
-      "id": 96000088
+      "id": 96000088,
+      "name": "탐험_탐색완료",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003013,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000090": {
-      "id": 96000090
+      "id": 96000090,
+      "name": "탐험_탐색시작",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003012,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000093": {
-      "id": 96000093
+      "id": 96000093,
+      "name": "발견물 획득",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003014,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "High",
+          "SoundGroupId": 97003015,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000096": {
-      "id": 96000096
+      "id": 96000096,
+      "name": "건물_은행_보험 계약 완료",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003002,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000097": {
-      "id": 96000097
+      "id": 96000097,
+      "name": "건물_공관_투자 완료",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003016,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000098": {
-      "id": 96000098
+      "id": 96000098,
+      "name": "건물_공관_발전도 레벨업",
+      "event": [
+        {
+          "Tag": "Industry",
+          "SoundGroupId": 97003017,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Trade",
+          "SoundGroupId": 97003018,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Millitary",
+          "SoundGroupId": 97003019,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000099": {
-      "id": 96000099
+      "id": 96000099,
+      "name": "임무_시작 및 완료",
+      "event": [
+        {
+          "Tag": "Start",
+          "SoundGroupId": 97003032,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Complete",
+          "SoundGroupId": 97003033,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000100": {
-      "id": 96000100
+      "id": 96000100,
+      "name": "임무_포기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002030,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Locked",
+          "SoundGroupId": 97002030,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000112": {
-      "id": 96000112
+      "id": 96000112,
+      "name": "건물_저택_계약",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003030,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000113": {
-      "id": 96000113
+      "id": 96000113,
+      "name": "건물_저택_지도제작 보고",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003031,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000114": {
-      "id": 96000114
+      "id": 96000114,
+      "name": "건물_왕궁_면세 구매",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003034,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000115": {
-      "id": 96000115
+      "id": 96000115,
+      "name": "건물_출항소_보급 완료",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003035,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000117": {
-      "id": 96000117
+      "id": 96000117,
+      "name": "건물_출항소_출항",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003037,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000118": {
-      "id": 96000118
+      "id": 96000118,
+      "name": "건물_출항소_수리 완료",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003036,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000119": {
-      "id": 96000119
+      "id": 96000119,
+      "name": "건물_종교_기도 기부",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003038,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000120": {
-      "id": 96000120
+      "id": 96000120,
+      "name": "건물_종교_특별 기도 기부",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003039,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000121": {
-      "id": 96000121
+      "id": 96000121,
+      "name": "건물_점술관_점술 시작",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003040,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000124": {
-      "id": 96000124
+      "id": 96000124,
+      "name": "건물_조선소_선실 개조",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003041,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000125": {
-      "id": 96000125
+      "id": 96000125,
+      "name": "건물_조선소_선박 건조 시작",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003042,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000126": {
-      "id": 96000126
+      "id": 96000126,
+      "name": "건물_조선소_해체",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003043,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000127": {
-      "id": 96000127
+      "id": 96000127,
+      "name": "건물_조선소_건조 시작",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003041,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000128": {
-      "id": 96000128
+      "id": 96000128,
+      "name": "BGM 조선소 건조",
+      "event": [
+        {
+          "Tag": "A",
+          "SoundGroupId": 97000102,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "B",
+          "SoundGroupId": 97000103
+        }
+      ]
     },
     "96000130": {
-      "id": 96000130
+      "id": 96000130,
+      "name": "BGM 스탭롤",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000084,
+          "DuckingAsset": "SM_StaffRoll"
+        },
+        {
+          "Tag": "Joan",
+          "SoundGroupId": 97000088,
+          "DuckingAsset": "SM_StaffRoll"
+        },
+        {
+          "Tag": "Catalina",
+          "SoundGroupId": 97000089,
+          "DuckingAsset": "SM_StaffRoll"
+        },
+        {
+          "Tag": "Al",
+          "SoundGroupId": 97000092,
+          "DuckingAsset": "SM_StaffRoll"
+        },
+        {
+          "Tag": "Otto",
+          "SoundGroupId": 97000087,
+          "DuckingAsset": "SM_StaffRoll"
+        },
+        {
+          "Tag": "Ernest",
+          "SoundGroupId": 97000090,
+          "DuckingAsset": "SM_StaffRoll"
+        },
+        {
+          "Tag": "Pietro",
+          "SoundGroupId": 97000091,
+          "DuckingAsset": "SM_StaffRoll"
+        },
+        {
+          "Tag": "Milanda",
+          "SoundGroupId": 97000079,
+          "DuckingAsset": "SM_StaffRoll"
+        },
+        {
+          "Tag": "Salvador",
+          "SoundGroupId": 97000080,
+          "DuckingAsset": "SM_StaffRoll"
+        },
+        {
+          "Tag": "Anne",
+          "SoundGroupId": 97000093,
+          "DuckingAsset": "SM_StaffRoll"
+        }
+      ]
     },
     "96000132": {
-      "id": 96000132
+      "id": 96000132,
+      "name": "BGM 제노바",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000082,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000133": {
-      "id": 96000133
+      "id": 96000133,
+      "name": "BGM 잉글랜드 영지",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000027,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000134": {
-      "id": 96000134
+      "id": 96000134,
+      "name": "BGM 포르투갈 영지",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000028,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000135": {
-      "id": 96000135
+      "id": 96000135,
+      "name": "BGM 에스파냐 영지",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000029,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000136": {
-      "id": 96000136
+      "id": 96000136,
+      "name": "BGM 네덜란드 영지",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000030,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000137": {
-      "id": 96000137
+      "id": 96000137,
+      "name": "BGM 오스만 영지",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000031,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000138": {
-      "id": 96000138
+      "id": 96000138,
+      "name": "BGM 알제",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000026,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000140": {
-      "id": 96000140
+      "id": 96000140,
+      "name": "카메라_조작",
+      "event": [
+        {
+          "Tag": "Zoomin",
+          "SoundGroupId": 97002045,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Zoomout",
+          "SoundGroupId": 97002046,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000143": {
-      "id": 96000143
+      "id": 96000143,
+      "name": "레벨업",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002036,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Adventure",
+          "SoundGroupId": 97002037,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Trade",
+          "SoundGroupId": 97002037,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Military",
+          "SoundGroupId": 97002037,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000144": {
-      "id": 96000144
+      "id": 96000144,
+      "name": "동료_승급",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003020,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000145": {
-      "id": 96000145
+      "id": 96000145,
+      "name": "제독_작위 상승",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002039,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000147": {
-      "id": 96000147
+      "id": 96000147,
+      "name": "친밀도_레벨업",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003175,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "PubStaff",
+          "SoundGroupId": 97003173,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000148": {
-      "id": 96000148
+      "id": 96000148,
+      "name": "친밀도_레벨업 텍스트",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003176,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "PubStaff",
+          "SoundGroupId": 97003174,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000149": {
-      "id": 96000149
+      "id": 96000149,
+      "name": "공용SE_선택",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002063,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000150": {
-      "id": 96000150
+      "id": 96000150,
+      "name": "공용SE_시간 제한 알림",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002062,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000151": {
-      "id": 96000151
+      "id": 96000151,
+      "name": "공용SE_게이지증가",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002042,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000152": {
-      "id": 96000152
+      "id": 96000152,
+      "name": "공용SE_게이지완료",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002043,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000154": {
-      "id": 96000154
+      "id": 96000154,
+      "name": "공용SE_알림",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002015,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Negative",
+          "SoundGroupId": 97002016,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "TradeAlarm",
+          "SoundGroupId": 97002035,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000156": {
-      "id": 96000156
+      "id": 96000156,
+      "name": "공용SE_버리기",
+      "event": [
+        {
+          "Tag": "ItemDelete",
+          "SoundGroupId": 97002044,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000157": {
-      "id": 96000157
+      "id": 96000157,
+      "name": "공용SE_고용 성공",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002064,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000158": {
-      "id": 96000158
+      "id": 96000158,
+      "name": "공용SE_파기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002030,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000159": {
-      "id": 96000159
+      "id": 96000159,
+      "name": "공용SE_해금",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002025,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000161": {
-      "id": 96000161
+      "id": 96000161,
+      "name": "공용SE_작성",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002007,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000163": {
-      "id": 96000163
+      "id": 96000163,
+      "name": "공용SE_성공",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002010,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000164": {
-      "id": 96000164
+      "id": 96000164,
+      "name": "공용SE_실패",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002011,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000165": {
-      "id": 96000165
+      "id": 96000165,
+      "name": "공용SE_주사위",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002021,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000166": {
-      "id": 96000166
+      "id": 96000166,
+      "name": "공용SE_고르기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002076,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000178": {
-      "id": 96000178
+      "id": 96000178,
+      "name": "선박 관리_항해사 배치",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002049,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000179": {
-      "id": 96000179
+      "id": 96000179,
+      "name": "함대 관리_선박 배치",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002048,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000182": {
-      "id": 96000182
+      "id": 96000182,
+      "name": "전투_효과_적용",
+      "event": [
+        {
+          "Tag": "Positive",
+          "SoundGroupId": 97003045,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Negative",
+          "SoundGroupId": 97003046,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000183": {
-      "id": 96000183
+      "id": 96000183,
+      "name": "전투_포격_피격",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003072,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Smoke",
+          "SoundGroupId": 97003074,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "WPShell",
+          "SoundGroupId": 97003073,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000184": {
-      "id": 96000184
+      "id": 96000184,
+      "name": "전투_효과_발동_컷인",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003050,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Negative",
+          "SoundGroupId": 97003051,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000185": {
-      "id": 96000185
+      "id": 96000185,
+      "name": "전투_스킬 컷인",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003054,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000186": {
-      "id": 96000186
+      "id": 96000186,
+      "name": "전투_난입",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003076,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "EnemyAppear",
+          "SoundGroupId": 97003075,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000187": {
-      "id": 96000187
+      "id": 96000187,
+      "name": "전투_충돌",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003069,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000188": {
-      "id": 96000188
+      "id": 96000188,
+      "name": "전투_턴_변경",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003047,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000189": {
-      "id": 96000189
+      "id": 96000189,
+      "name": "전투_선박 이동",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003067,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000190": {
-      "id": 96000190
+      "id": 96000190,
+      "name": "전투_전투 개시",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003052,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000191": {
-      "id": 96000191
+      "id": 96000191,
+      "name": "전투_포격 회피",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003053,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000192": {
-      "id": 96000192
+      "id": 96000192,
+      "name": "전투_전투 승리",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003065,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000193": {
-      "id": 96000193
+      "id": 96000193,
+      "name": "전투_전투 패배",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003066,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000194": {
-      "id": 96000194
+      "id": 96000194,
+      "name": "전투_페이즈 시작",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003048,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Hostile",
+          "SoundGroupId": 97003049,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000196": {
-      "id": 96000196
+      "id": 96000196,
+      "name": "전투_셀 선택",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002063,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Negative",
+          "SoundGroupId": 97002002,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000197": {
-      "id": 96000197
+      "id": 96000197,
+      "name": "건물_여관_고용 입장",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003022,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000198": {
-      "id": 96000198
+      "id": 96000198,
+      "name": "건물_여관_선원 모집",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003023,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000201": {
-      "id": 96000201
+      "id": 96000201,
+      "name": "건물_여관_수당 지급",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003026,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Special",
+          "SoundGroupId": 97003027,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000203": {
-      "id": 96000203
+      "id": 96000203,
+      "name": "항해사 대화",
+      "event": [
+        {
+          "Tag": "Mate",
+          "SoundGroupId": 97002013,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Address1",
+          "SoundGroupId": 97002080,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Address2",
+          "SoundGroupId": 97002024,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000204": {
-      "id": 96000204
+      "id": 96000204,
+      "name": "건물_여관_항해사 회복",
+      "event": [
+        {
+          "Tag": "Mate",
+          "SoundGroupId": 97003025,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000205": {
-      "id": 96000205
+      "id": 96000205,
+      "name": "건물_여관_후원",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003024,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000208": {
-      "id": 96000208
+      "id": 96000208,
+      "name": "이슬람X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000209": {
-      "id": 96000209
+      "id": 96000209,
+      "name": "낚시_낚싯대 던짐",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003177,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000210": {
-      "id": 96000210
+      "id": 96000210,
+      "name": "낚시_미끼 입수",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003178,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000211": {
-      "id": 96000211
+      "id": 96000211,
+      "name": "낚시_물고기 등장",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003179,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "B",
+          "SoundGroupId": 97003180,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "A",
+          "SoundGroupId": 97003181,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "S",
+          "SoundGroupId": 97003182,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000212": {
-      "id": 96000212
+      "id": 96000212,
+      "name": "낚시_입질",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003183,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000213": {
-      "id": 96000213
+      "id": 96000213,
+      "name": "낚시_파이트 시작",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003105,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Bubble",
+          "SoundGroupId": 97003185,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Draw",
+          "SoundGroupId": 97003184,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000214": {
-      "id": 96000214
+      "id": 96000214,
+      "name": "낚시_미끼 버튼",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003193,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000215": {
-      "id": 96000215
+      "id": 96000215,
+      "name": "낚시_물고기 도망",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003186,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000216": {
-      "id": 96000216
+      "id": 96000216,
+      "name": "낚시_히트",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003187,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Great",
+          "SoundGroupId": 97003188,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Critical",
+          "SoundGroupId": 97003189,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000217": {
-      "id": 96000217
+      "id": 96000217,
+      "name": "낚시_결과",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003190,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Fail",
+          "SoundGroupId": 97003191,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000218": {
-      "id": 96000218
+      "id": 96000218,
+      "name": "낚시_종료",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003192,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000227": {
-      "id": 96000227
+      "id": 96000227,
+      "name": "인카운트_유저 도망",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002010,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000229": {
-      "id": 96000229
+      "id": 96000229,
+      "name": "인카운트_적 교섭 시도",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003078,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Success",
+          "SoundGroupId": 97002010,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Fail",
+          "SoundGroupId": 97002011,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000230": {
-      "id": 96000230
+      "id": 96000230,
+      "name": "인카운트_적 도망",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003079,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000231": {
-      "id": 96000231
+      "id": 96000231,
+      "name": "인카운트_전투 개시",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003080,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000237": {
-      "id": 96000237
+      "id": 96000237,
+      "name": "동료 관리_장비 장착",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002040,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "axe",
+          "SoundGroupId": 97002065,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "sword",
+          "SoundGroupId": 97002068,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "blade",
+          "SoundGroupId": 97002072,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "bow",
+          "SoundGroupId": 97002071,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "crossbow",
+          "SoundGroupId": 97002069,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "pistol",
+          "SoundGroupId": 97002074,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "rifle",
+          "SoundGroupId": 97002066,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "spear",
+          "SoundGroupId": 97002070,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "thSword",
+          "SoundGroupId": 97002075,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "twinBlade",
+          "SoundGroupId": 97002073,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "ClothArmor",
+          "SoundGroupId": 97002040,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "LightArmor",
+          "SoundGroupId": 97002040,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Mail",
+          "SoundGroupId": 97002040,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Hat",
+          "SoundGroupId": 97002040,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Cape",
+          "SoundGroupId": 97002040,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Accessary",
+          "SoundGroupId": 97002040,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "FaceAcc",
+          "SoundGroupId": 97002040,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000238": {
-      "id": 96000238
+      "id": 96000238,
+      "name": "동료 관리_장비 해제",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002041,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "WeaponDisarm",
+          "SoundGroupId": 97002041,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "ArmorDisarm",
+          "SoundGroupId": 97002041,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000239": {
-      "id": 96000239
+      "id": 96000239,
+      "name": "선박 관리_부품 장착",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002052,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Sail",
+          "SoundGroupId": 97002017,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000241": {
-      "id": 96000241
+      "id": 96000241,
+      "name": "파도1X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000245": {
-      "id": 96000245
+      "id": 96000245,
+      "name": "채팅_전송",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002020,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000247": {
-      "id": 96000247
+      "id": 96000247,
+      "name": "지도_지도팝업",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002012,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000248": {
-      "id": 96000248
+      "id": 96000248,
+      "name": "도움말_넘김",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002051,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000249": {
-      "id": 96000249
+      "id": 96000249,
+      "name": "선단 관리_돛 커스터마이징",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002008,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000250": {
-      "id": 96000250
+      "id": 96000250,
+      "name": "선단 관리_도장 커스터마이징",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002008,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000259": {
-      "id": 96000259
+      "id": 96000259,
+      "name": "로그인_항해 시작",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003021,
+          "DuckingAsset": "SM_VO_TitleMix"
+        }
+      ]
     },
     "96000261": {
-      "id": 96000261
+      "id": 96000261,
+      "name": "전투_기술_의술",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003055,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000262": {
-      "id": 96000262
+      "id": 96000262,
+      "name": "전투_기술_수리",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003056,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000263": {
-      "id": 96000263
+      "id": 96000263,
+      "name": "전투_기술_기뢰 설치 (미구현)",
+      "event": [
+        {
+          "Tag": "Set",
+          "SoundGroupId": 97003057,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Hit",
+          "SoundGroupId": 97003058,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000265": {
-      "id": 96000265
+      "id": 96000265,
+      "name": "전투_아이템 사용",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003059,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Sand",
+          "SoundGroupId": 97003059,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Rope",
+          "SoundGroupId": 97003060,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Bucket",
+          "SoundGroupId": 97003061,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000266": {
-      "id": 96000266
+      "id": 96000266,
+      "name": "전투_타임라인 선택",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002019,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000267": {
-      "id": 96000267
+      "id": 96000267,
+      "name": "전투_설정",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002020,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000281": {
-      "id": 96000281
+      "id": 96000281,
+      "name": "ENV_선박 정박",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97001001,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000326": {
-      "id": 96000326
+      "id": 96000326,
+      "name": "결투_결과",
+      "event": [
+        {
+          "Tag": "Draw",
+          "SoundGroupId": 97003148,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Lose",
+          "SoundGroupId": 97003147,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Win",
+          "SoundGroupId": 97003146,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "BigWin",
+          "SoundGroupId": 97003145,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000327": {
-      "id": 96000327
+      "id": 96000327,
+      "name": "결투_액션 선택",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003102,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000328": {
-      "id": 96000328
+      "id": 96000328,
+      "name": "결투_시작",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003044,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000329": {
-      "id": 96000329
+      "id": 96000329,
+      "name": "결투_커맨드 시작",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003143,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000330": {
-      "id": 96000330
+      "id": 96000330,
+      "name": "결투_커맨드 표시",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003144,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000331": {
-      "id": 96000331
+      "id": 96000331,
+      "name": "결투_거절",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003106,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000332": {
-      "id": 96000332
+      "id": 96000332,
+      "name": "결투_신청",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003107,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000333": {
-      "id": 96000333
+      "id": 96000333,
+      "name": "결투_스킬 버튼",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003103,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000334": {
-      "id": 96000334
+      "id": 96000334,
+      "name": "해양_입항 선택",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003130,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000335": {
-      "id": 96000335
+      "id": 96000335,
+      "name": "해양_방향 전환",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003136,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000337": {
-      "id": 96000337
+      "id": 96000337,
+      "name": "해양_가호 효과음",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003128,
+          "DuckingAsset": "SM_OceanEvent"
+        },
+        {
+          "Tag": "Elmo",
+          "SoundGroupId": 97003127,
+          "DuckingAsset": "SM_OceanEvent"
+        },
+        {
+          "Tag": "Gull",
+          "SoundGroupId": 97003126,
+          "DuckingAsset": "SM_OceanEvent"
+        },
+        {
+          "Tag": "Dolphin",
+          "SoundGroupId": 97003125,
+          "DuckingAsset": "SM_OceanEvent"
+        }
+      ]
     },
     "96000338": {
-      "id": 96000338
+      "id": 96000338,
+      "name": "해양_재해 팝업 SFX",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002016,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Occur",
+          "SoundGroupId": 97002016,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Clear",
+          "SoundGroupId": 97002015
+        }
+      ]
     },
     "96000341": {
-      "id": 96000341
+      "id": 96000341,
+      "name": "해양_이동_닻",
+      "event": [
+        {
+          "Tag": "Start",
+          "SoundGroupId": 97003112,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Stop",
+          "SoundGroupId": 97003113,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000342": {
-      "id": 96000342
+      "id": 96000342,
+      "name": "해양_이동_돛",
+      "event": [
+        {
+          "Tag": "Start",
+          "SoundGroupId": 97003110,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Stop",
+          "SoundGroupId": 97003111,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000343": {
-      "id": 96000343
+      "id": 96000343,
+      "name": "해양_이동_밧줄",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003114,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000344": {
-      "id": 96000344
+      "id": 96000344,
+      "name": "해양_바람",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003115,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Headwind",
+          "SoundGroupId": 97003109,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Tornado",
+          "SoundGroupId": 97003116,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000345": {
-      "id": 96000345
+      "id": 96000345,
+      "name": "해양_가속",
+      "event": [
+        {
+          "Tag": "Start",
+          "SoundGroupId": 97003117,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Loop",
+          "SoundGroupId": 97003118,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000350": {
-      "id": 96000350
+      "id": 96000350,
+      "name": "해양_재해_사고",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003120,
+          "DuckingAsset": "SM_OceanEvent"
+        }
+      ]
     },
     "96000351": {
-      "id": 96000351
+      "id": 96000351,
+      "name": "해양_재해_질병",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003121,
+          "DuckingAsset": "SM_OceanEvent"
+        }
+      ]
     },
     "96000352": {
-      "id": 96000352
+      "id": 96000352,
+      "name": "해양_재해_멘탈",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003122,
+          "DuckingAsset": "SM_OceanEvent"
+        }
+      ]
     },
     "96000353": {
-      "id": 96000353
+      "id": 96000353,
+      "name": "해양_재해_자연 현상",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003123,
+          "DuckingAsset": "SM_OceanEvent"
+        }
+      ]
     },
     "96000354": {
-      "id": 96000354
+      "id": 96000354,
+      "name": "해양_재해_기타",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003119,
+          "DuckingAsset": "SM_OceanEvent"
+        }
+      ]
     },
     "96000355": {
-      "id": 96000355
+      "id": 96000355,
+      "name": "해양_항해 불능",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97002061,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000356": {
-      "id": 96000356
+      "id": 96000356,
+      "name": "해양_선원 감소",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003104,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000357": {
-      "id": 96000357
+      "id": 96000357,
+      "name": "해양_항구 발견",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003129,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000363": {
-      "id": 96000363
+      "id": 96000363,
+      "name": "해양_빙하_쇄빙",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003135,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000372": {
-      "id": 96000372
+      "id": 96000372,
+      "name": "ENV_군중",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97001015,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Crowd02",
+          "SoundGroupId": 97001016,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Crowd03",
+          "SoundGroupId": 97001017,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000374": {
-      "id": 96000374
+      "id": 96000374,
+      "name": "가정집X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000409": {
-      "id": 96000409
+      "id": 96000409,
+      "name": "ENV_아이들",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97001019,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000410": {
-      "id": 96000410
+      "id": 96000410,
+      "name": "ENV_나뭇잎",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97001020,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000465": {
-      "id": 96000465
+      "id": 96000465,
+      "name": "파도1X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000467": {
-      "id": 96000467
+      "id": 96000467,
+      "name": "정글X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000468": {
-      "id": 96000468
+      "id": 96000468,
+      "name": "호수X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000469": {
-      "id": 96000469
+      "id": 96000469,
+      "name": "냇물X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000493": {
-      "id": 96000493
+      "id": 96000493,
+      "name": "ENV_종소리",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97001024,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000515": {
-      "id": 96000515
+      "id": 96000515,
+      "name": "군중2X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000516": {
-      "id": 96000516
+      "id": 96000516,
+      "name": "군중3X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000531": {
-      "id": 96000531
+      "id": 96000531,
+      "name": "ENV_새",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97001025,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "새2",
+          "SoundGroupId": 97001026,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000532": {
-      "id": 96000532
+      "id": 96000532,
+      "name": "새2X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000535": {
-      "id": 96000535
+      "id": 96000535,
+      "name": "ENV_항해 환경음",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003101,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000549": {
-      "id": 96000549
+      "id": 96000549,
+      "name": "윈드X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000556": {
-      "id": 96000556
+      "id": 96000556,
+      "name": "정글X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000558": {
-      "id": 96000558
+      "id": 96000558,
+      "name": "ENV_귀뚜라미",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97001022,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000560": {
-      "id": 96000560
+      "id": 96000560,
+      "name": "성당X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000561": {
-      "id": 96000561
+      "id": 96000561,
+      "name": "ENV_숲",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97001006,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000562": {
-      "id": 96000562
+      "id": 96000562,
+      "name": "ENV_유령선",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97001031,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000573": {
-      "id": 96000573
+      "id": 96000573,
+      "name": "윈드X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000614": {
-      "id": 96000614
+      "id": 96000614,
+      "name": "ENV_파도",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97001010,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000616": {
-      "id": 96000616
+      "id": 96000616,
+      "name": "군중3X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000617": {
-      "id": 96000617
+      "id": 96000617,
+      "name": "크레인X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000618": {
-      "id": 96000618
+      "id": 96000618,
+      "name": "짐운반X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000619": {
-      "id": 96000619
+      "id": 96000619,
+      "name": "팡파레X",
+      "event": [
+        {
+          "Tag": "Default"
+        }
+      ]
     },
     "96000620": {
-      "id": 96000620
+      "id": 96000620,
+      "name": "ENV_도구점",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97001008,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000640": {
-      "id": 96000640
+      "id": 96000640,
+      "name": "묵음",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000086,
+          "DuckingAsset": "SM_Silence"
+        },
+        {
+          "Tag": "Env",
+          "DuckingAsset": "SM_Silence_Env"
+        },
+        {
+          "Tag": "BGM",
+          "SoundGroupId": 97000086,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "BGMEnv",
+          "SoundGroupId": 97000086,
+          "DuckingAsset": "SM_Silence_Env"
+        },
+        {
+          "Tag": "Effect",
+          "DuckingAsset": "SM_Silence_Effect"
+        },
+        {
+          "Tag": "EnvEffect",
+          "DuckingAsset": "SM_Silence_EnvEffect"
+        },
+        {
+          "Tag": "BGMEffect",
+          "SoundGroupId": 97000086,
+          "DuckingAsset": "SM_Silence_Effect"
+        },
+        {
+          "Tag": "초기화",
+          "DuckingAsset": "SM_Master"
+        }
+      ]
     },
     "96000642": {
-      "id": 96000642
+      "id": 96000642,
+      "name": "BGM 제독 테마(덕킹 없음)",
+      "event": [
+        {
+          "Tag": "Default",
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Otto",
+          "SoundGroupId": 97000076,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Joan",
+          "SoundGroupId": 97000077,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Catalina",
+          "SoundGroupId": 97000078,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Milanda",
+          "SoundGroupId": 97000079,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Sarvadle",
+          "SoundGroupId": 97000080,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Ernst",
+          "SoundGroupId": 97000081,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Pietro",
+          "SoundGroupId": 97000082,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Al",
+          "SoundGroupId": 97000083,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Anne",
+          "SoundGroupId": 97000094,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000643": {
-      "id": 96000643
+      "id": 96000643,
+      "name": "천갑옷 피격음 (Const에 기재됨)",
+      "event": [
+        {
+          "Tag": "Default",
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "0",
+          "SoundGroupId": 97003081,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "1",
+          "SoundGroupId": 97003082,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "2",
+          "SoundGroupId": 97003083,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "3",
+          "SoundGroupId": 97003084,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "4",
+          "SoundGroupId": 97003085,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "5",
+          "SoundGroupId": 97003086,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "6",
+          "SoundGroupId": 97003087,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "7",
+          "SoundGroupId": 97003088,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "8",
+          "SoundGroupId": 97003089,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "9",
+          "SoundGroupId": 97003090,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000644": {
-      "id": 96000644
+      "id": 96000644,
+      "name": "경갑 피격음 (Const에 기재됨)",
+      "event": [
+        {
+          "Tag": "Default",
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "0",
+          "SoundGroupId": 97003081,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "1",
+          "SoundGroupId": 97003082,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "2",
+          "SoundGroupId": 97003083,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "3",
+          "SoundGroupId": 97003084,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "4",
+          "SoundGroupId": 97003085,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "5",
+          "SoundGroupId": 97003086,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "6",
+          "SoundGroupId": 97003087,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "7",
+          "SoundGroupId": 97003088,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "8",
+          "SoundGroupId": 97003089,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "9",
+          "SoundGroupId": 97003090,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000645": {
-      "id": 96000645
+      "id": 96000645,
+      "name": "중갑 피격음 (Const에 기재됨)",
+      "event": [
+        {
+          "Tag": "Default",
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "0",
+          "SoundGroupId": 97003081,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "1",
+          "SoundGroupId": 97003082,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "2",
+          "SoundGroupId": 97003083,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "3",
+          "SoundGroupId": 97003084,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "4",
+          "SoundGroupId": 97003085,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "5",
+          "SoundGroupId": 97003086,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "6",
+          "SoundGroupId": 97003087,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "7",
+          "SoundGroupId": 97003088,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "8",
+          "SoundGroupId": 97003089,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "9",
+          "SoundGroupId": 97003090,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000667": {
-      "id": 96000667
+      "id": 96000667,
+      "name": "전투_침몰 (몽타주에 물려 있음)",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003070,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000668": {
-      "id": 96000668
+      "id": 96000668,
+      "name": "해양_오브젝트 터치 (OceanDoodad에 기재됨)",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003108,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000669": {
-      "id": 96000669
+      "id": 96000669,
+      "name": "VO_에르네스트 로페스",
+      "event": [
+        {
+          "Tag": "Default"
+        },
+        {
+          "Tag": "MateSelect1",
+          "SoundGroupId": 97003167,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000670": {
-      "id": 96000670
+      "id": 96000670,
+      "name": "VO_프롤로그",
+      "event": [
+        {
+          "Tag": "Default"
+        },
+        {
+          "Tag": "페레로1",
+          "SoundGroupId": 97010002,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "페레로2",
+          "SoundGroupId": 97010003,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "페레로3",
+          "SoundGroupId": 97010004,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "페레로4",
+          "SoundGroupId": 97010005,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "페레로5",
+          "SoundGroupId": 97010006,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "페레로6",
+          "SoundGroupId": 97010007,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "페레로7",
+          "SoundGroupId": 97010008,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "로코1",
+          "SoundGroupId": 97010009,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "로코2",
+          "SoundGroupId": 97010010,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "로코3",
+          "SoundGroupId": 97010011,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "로코4",
+          "SoundGroupId": 97010012,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "로코5",
+          "SoundGroupId": 97010013,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "로코6",
+          "SoundGroupId": 97010014,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "로코7",
+          "SoundGroupId": 97010015,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "로코8",
+          "SoundGroupId": 97010016,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "로코9",
+          "SoundGroupId": 97010017,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "표류자",
+          "SoundGroupId": 97010018,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "선원1",
+          "SoundGroupId": 97010019,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000671": {
-      "id": 96000671
+      "id": 96000671,
+      "name": "VO_프롤로그_나레이션",
+      "event": [
+        {
+          "Tag": "Default"
+        },
+        {
+          "Tag": "나레이션1",
+          "SoundGroupId": 97010020,
+          "DuckingAsset": "SM_Prologue_Narration"
+        },
+        {
+          "Tag": "나레이션2",
+          "SoundGroupId": 97010021,
+          "DuckingAsset": "SM_Prologue_Narration"
+        },
+        {
+          "Tag": "나레이션3",
+          "SoundGroupId": 97010022,
+          "DuckingAsset": "SM_Prologue_Narration"
+        },
+        {
+          "Tag": "나레이션4",
+          "SoundGroupId": 97010023,
+          "DuckingAsset": "SM_Prologue_Narration"
+        },
+        {
+          "Tag": "나레이션5",
+          "SoundGroupId": 97010024,
+          "DuckingAsset": "SM_Prologue_Narration"
+        },
+        {
+          "Tag": "나레이션6",
+          "SoundGroupId": 97010025,
+          "DuckingAsset": "SM_Prologue_Narration"
+        },
+        {
+          "Tag": "나레이션7",
+          "SoundGroupId": 97010026,
+          "DuckingAsset": "SM_Prologue_Narration"
+        },
+        {
+          "Tag": "나레이션8",
+          "SoundGroupId": 97010027,
+          "DuckingAsset": "SM_Prologue_Narration"
+        }
+      ]
     },
     "96000672": {
-      "id": 96000672
+      "id": 96000672,
+      "name": "스크린 이펙트",
+      "event": [
+        {
+          "Tag": "불",
+          "SoundGroupId": 97002028,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "안개",
+          "SoundGroupId": 97003201,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "번개",
+          "SoundGroupId": 97003200,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "하트",
+          "SoundGroupId": 97002077,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "공격",
+          "SoundGroupId": 97002056,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "집중",
+          "SoundGroupId": 97002058,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "웅성",
+          "SoundGroupId": 97002023,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "발도",
+          "SoundGroupId": 97010110,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000673": {
-      "id": 96000673
+      "id": 96000673,
+      "name": "BGM_탐험",
+      "event": [
+        {
+          "Tag": "초원",
+          "SoundGroupId": 97000096,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "산악",
+          "SoundGroupId": 97000096,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "정글",
+          "SoundGroupId": 97000097,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "사바나",
+          "SoundGroupId": 97000097,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "빙하",
+          "SoundGroupId": 97000098,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "타이가",
+          "SoundGroupId": 97000098,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "사막",
+          "SoundGroupId": 97000099,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "툰드라",
+          "SoundGroupId": 97000098,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000674": {
-      "id": 96000674
+      "id": 96000674,
+      "name": "탐험_결과",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010043,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000675": {
-      "id": 96000675
+      "id": 96000675,
+      "name": "SE_늑대_물기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010036,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000676": {
-      "id": 96000676
+      "id": 96000676,
+      "name": "SE_늑대_할퀴기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010037,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000677": {
-      "id": 96000677
+      "id": 96000677,
+      "name": "SE_늑대_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010040,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000678": {
-      "id": 96000678
+      "id": 96000678,
+      "name": "SE_늑대_승리_일멍",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010038,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000679": {
-      "id": 96000679
+      "id": 96000679,
+      "name": "SE_탐험_채집_곡괭이",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010041,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000680": {
-      "id": 96000680
+      "id": 96000680,
+      "name": "SE_탐험_화면넘김",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010042,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000681": {
-      "id": 96000681
+      "id": 96000681,
+      "name": "SE_탐험_결과창",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010043,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000682": {
-      "id": 96000682
+      "id": 96000682,
+      "name": "SE_탐험_채집_바닥",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010044,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000683": {
-      "id": 96000683
+      "id": 96000683,
+      "name": "SE_호랑이_물기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010045,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000684": {
-      "id": 96000684
+      "id": 96000684,
+      "name": "SE_호랑이_할퀴기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010046,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000685": {
-      "id": 96000685
+      "id": 96000685,
+      "name": "SE_호랑이_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010047,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000686": {
-      "id": 96000686
+      "id": 96000686,
+      "name": "SE_호랑이_승리",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010048,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000687": {
-      "id": 96000687
+      "id": 96000687,
+      "name": "SE_표범_물기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010049,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000688": {
-      "id": 96000688
+      "id": 96000688,
+      "name": "SE_표범_할퀴기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010050,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000689": {
-      "id": 96000689
+      "id": 96000689,
+      "name": "SE_표범_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010051,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000690": {
-      "id": 96000690
+      "id": 96000690,
+      "name": "SE_표범_승리",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010052,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000691": {
-      "id": 96000691
+      "id": 96000691,
+      "name": "SE_아시아물소_들이받기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010053,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000692": {
-      "id": 96000692
+      "id": 96000692,
+      "name": "SE_아시아물소_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010054,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000693": {
-      "id": 96000693
+      "id": 96000693,
+      "name": "SE_아시아물소_승리",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010055,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000694": {
-      "id": 96000694
+      "id": 96000694,
+      "name": "SE_뱀_물기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010056,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000695": {
-      "id": 96000695
+      "id": 96000695,
+      "name": "SE_뱀_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010057,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000696": {
-      "id": 96000696
+      "id": 96000696,
+      "name": "SE_뱀_승리",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010058,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000697": {
-      "id": 96000697
+      "id": 96000697,
+      "name": "SE_들소_들이받기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010059,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000698": {
-      "id": 96000698
+      "id": 96000698,
+      "name": "SE_들소_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010060,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000699": {
-      "id": 96000699
+      "id": 96000699,
+      "name": "SE_들소_승리",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010061,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000700": {
-      "id": 96000700
+      "id": 96000700,
+      "name": "SE_들개_물기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010062,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000701": {
-      "id": 96000701
+      "id": 96000701,
+      "name": "SE_들개_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010063,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000702": {
-      "id": 96000702
+      "id": 96000702,
+      "name": "SE_들개_승리",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010064,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000711": {
-      "id": 96000711
+      "id": 96000711,
+      "name": "SE_맹금류_쪼기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010073,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000712": {
-      "id": 96000712
+      "id": 96000712,
+      "name": "SE_맹금류_할퀴기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010074,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000713": {
-      "id": 96000713
+      "id": 96000713,
+      "name": "SE_맹금류_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010075,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000714": {
-      "id": 96000714
+      "id": 96000714,
+      "name": "SE_맹금류_승리",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010076,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000715": {
-      "id": 96000715
+      "id": 96000715,
+      "name": "SE_맹금류_울음소리_쪼기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010077,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000716": {
-      "id": 96000716
+      "id": 96000716,
+      "name": "SE_맹금류_울음소리_할퀴기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010078,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000717": {
-      "id": 96000717
+      "id": 96000717,
+      "name": "SE_맹금류_승리_날개",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010079,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000718": {
-      "id": 96000718
+      "id": 96000718,
+      "name": "SE_곰_후려치기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010032,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000719": {
-      "id": 96000719
+      "id": 96000719,
+      "name": "SE_곰_물기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010033,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000720": {
-      "id": 96000720
+      "id": 96000720,
+      "name": "SE_곰_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010035,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000721": {
-      "id": 96000721
+      "id": 96000721,
+      "name": "SE_곰_승리",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010034,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000722": {
-      "id": 96000722
+      "id": 96000722,
+      "name": "SE_환경음_초원",
+      "event": [
+        {
+          "Tag": "낮",
+          "SoundGroupId": 97010071,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "밤",
+          "SoundGroupId": 97010072,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000723": {
-      "id": 96000723
+      "id": 96000723,
+      "name": "SE_환경음_정글",
+      "event": [
+        {
+          "Tag": "낮",
+          "SoundGroupId": 97010067,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "밤",
+          "SoundGroupId": 97010068,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000724": {
-      "id": 96000724
+      "id": 96000724,
+      "name": "SE_환경음_사바나",
+      "event": [
+        {
+          "Tag": "낮",
+          "SoundGroupId": 97010071,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "밤",
+          "SoundGroupId": 97010072,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000725": {
-      "id": 96000725
+      "id": 96000725,
+      "name": "SE_환경음_타이가",
+      "event": [
+        {
+          "Tag": "낮",
+          "SoundGroupId": 97010065,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "밤",
+          "SoundGroupId": 97010066,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000726": {
-      "id": 96000726
+      "id": 96000726,
+      "name": "SE_환경음_빙하",
+      "event": [
+        {
+          "Tag": "낮",
+          "SoundGroupId": 97010065,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "밤",
+          "SoundGroupId": 97010066,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000727": {
-      "id": 96000727
+      "id": 96000727,
+      "name": "SE_환경음_툰드라",
+      "event": [
+        {
+          "Tag": "낮",
+          "SoundGroupId": 97010065,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "밤",
+          "SoundGroupId": 97010066,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000728": {
-      "id": 96000728
+      "id": 96000728,
+      "name": "SE_환경음_산악",
+      "event": [
+        {
+          "Tag": "낮",
+          "SoundGroupId": 97010071,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "밤",
+          "SoundGroupId": 97010071,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000729": {
-      "id": 96000729
+      "id": 96000729,
+      "name": "SE_환경음_사막",
+      "event": [
+        {
+          "Tag": "낮",
+          "SoundGroupId": 97010069,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "밤",
+          "SoundGroupId": 97010069,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000730": {
-      "id": 96000730
+      "id": 96000730,
+      "name": "SE_탐험_입장",
+      "event": [
+        {
+          "Tag": "초원",
+          "SoundGroupId": 97010028,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "정글",
+          "SoundGroupId": 97010028,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "사바나",
+          "SoundGroupId": 97010028,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "타이가",
+          "SoundGroupId": 97010030,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "빙하",
+          "SoundGroupId": 97010030,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "툰드라",
+          "SoundGroupId": 97010030,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "산악",
+          "SoundGroupId": 97010028,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "사막",
+          "SoundGroupId": 97010028,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000731": {
-      "id": 96000731
+      "id": 96000731,
+      "name": "SE_탐험_퇴장",
+      "event": [
+        {
+          "Tag": "초원",
+          "SoundGroupId": 97010029,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "정글",
+          "SoundGroupId": 97010029,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "사바나",
+          "SoundGroupId": 97010029,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "타이가",
+          "SoundGroupId": 97010030,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "빙하",
+          "SoundGroupId": 97010031,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "툰드라",
+          "SoundGroupId": 97010031,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "산악",
+          "SoundGroupId": 97010029,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "사막",
+          "SoundGroupId": 97010029,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000732": {
-      "id": 96000732
+      "id": 96000732,
+      "name": "SE_탐험_걸음",
+      "event": [
+        {
+          "Tag": "초원",
+          "SoundGroupId": 97010083,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "정글",
+          "SoundGroupId": 97010084,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "사바나",
+          "SoundGroupId": 97010085,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "타이가",
+          "SoundGroupId": 97010086,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "빙하",
+          "SoundGroupId": 97010087,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "툰드라",
+          "SoundGroupId": 97010088,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "산악",
+          "SoundGroupId": 97010090,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "사막",
+          "SoundGroupId": 97010089,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000733": {
-      "id": 96000733
+      "id": 96000733,
+      "name": "SE_늑대_승리_이멍",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010039,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000734": {
-      "id": 96000734
+      "id": 96000734,
+      "name": "SE_지역특성_발동",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010080,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000735": {
-      "id": 96000735
+      "id": 96000735,
+      "name": "SE_노트필기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010081,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000736": {
-      "id": 96000736
+      "id": 96000736,
+      "name": "SE_곡괭이",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010082,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000737": {
-      "id": 96000737
+      "id": 96000737,
+      "name": "SE_묵음",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010091,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000738": {
-      "id": 96000738
+      "id": 96000738,
+      "name": "VO_레온시코",
+      "event": [
+        {
+          "Tag": "Default"
+        },
+        {
+          "Tag": "Bow1",
+          "SoundGroupId": 97003202,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Bow2",
+          "SoundGroupId": 97003203,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000739": {
-      "id": 96000739
+      "id": 96000739,
+      "name": "BGM 산타섬",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000106,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000740": {
-      "id": 96000740
+      "id": 96000740,
+      "name": "SE_토벌_포격의제왕",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010099,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000741": {
-      "id": 96000741
+      "id": 96000741,
+      "name": "이모티콘 SFX_항해",
+      "event": [
+        {
+          "Tag": "일반",
+          "SoundGroupId": 97003301,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "화려",
+          "SoundGroupId": 97003303,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000742": {
-      "id": 96000742
+      "id": 96000742,
+      "name": "SE_보드판_효과음",
+      "event": [
+        {
+          "Tag": "칸도착",
+          "SoundGroupId": 97010101,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "주사위결과",
+          "SoundGroupId": 97010102,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "컵흔듦",
+          "SoundGroupId": 97010103,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "칸강화1",
+          "SoundGroupId": 97010104,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "칸강화2",
+          "SoundGroupId": 97010105,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000743": {
-      "id": 96000743
+      "id": 96000743,
+      "name": "전투_저주의외침",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010106,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000744": {
-      "id": 96000744
+      "id": 96000744,
+      "name": "전투_제물처형식",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010107,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000745": {
-      "id": 96000745
+      "id": 96000745,
+      "name": "전투_투창",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010108,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000746": {
-      "id": 96000746
+      "id": 96000746,
+      "name": "전투_투창피격",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010109,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000747": {
-      "id": 96000747
+      "id": 96000747,
+      "name": "파견_BGM",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000120,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000748": {
-      "id": 96000748
+      "id": 96000748,
+      "name": "파견_SFX",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97003304,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Enter",
+          "SoundGroupId": 97003304,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "LogBook",
+          "SoundGroupId": 97003305,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Completed",
+          "SoundGroupId": 97003306,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000749": {
-      "id": 96000749
+      "id": 96000749,
+      "name": "화공충파",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010111,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000750": {
-      "id": 96000750
+      "id": 96000750,
+      "name": "금전회유",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010112,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000751": {
-      "id": 96000751
+      "id": 96000751,
+      "name": "황금이가지고싶나",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010113,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000752": {
-      "id": 96000752
+      "id": 96000752,
+      "name": "자폭",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010114,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000753": {
-      "id": 96000753
+      "id": 96000753,
+      "name": "해역이탈",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010115,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000754": {
-      "id": 96000754
+      "id": 96000754,
+      "name": "BGM_항해사 가챠 컷씬",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010116,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000755": {
-      "id": 96000755
+      "id": 96000755,
+      "name": "SE_컷신_다테2",
+      "event": [
+        {
+          "Tag": "A",
+          "SoundGroupId": 97010117,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "B",
+          "SoundGroupId": 97010118,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "C",
+          "SoundGroupId": 97010119,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "D",
+          "SoundGroupId": 97010120,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "E",
+          "SoundGroupId": 97010121,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "ambiance",
+          "SoundGroupId": 97010122,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000756": {
-      "id": 96000756
+      "id": 96000756,
+      "name": "무기 막기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010124,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "날붙이막기",
+          "SoundGroupId": 97010124,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "둔기막기",
+          "SoundGroupId": 97010123,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "회피",
+          "SoundGroupId": 97010125,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000757": {
-      "id": 96000757
+      "id": 96000757,
+      "name": "BGM 소다섬",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97000127,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000758": {
-      "id": 96000758
+      "id": 96000758,
+      "name": "SE_베이킹",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010128,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000759": {
-      "id": 96000759
+      "id": 96000759,
+      "name": "SE_탐험_천문_미니게임_관측시작",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010129,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "1",
+          "SoundGroupId": 97010136,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "2",
+          "SoundGroupId": 97010137,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "3",
+          "SoundGroupId": 97010138,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "4"
+        }
+      ]
     },
     "96000760": {
-      "id": 96000760
+      "id": 96000760,
+      "name": "SE_탐험_천문_미니게임_연결성공",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010130,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000761": {
-      "id": 96000761
+      "id": 96000761,
+      "name": "SE_탐험_천문_미니게임_연결실패",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010131,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000762": {
-      "id": 96000762
+      "id": 96000762,
+      "name": "SE_탐험_천문_미니게임_관측성공",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010132,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000763": {
-      "id": 96000763
+      "id": 96000763,
+      "name": "BGM_KY",
+      "event": [
+        {
+          "Tag": "시작",
+          "SoundGroupId": 97010133,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "기쁨",
+          "SoundGroupId": 97010134
+        },
+        {
+          "Tag": "신대륙 항구",
+          "SoundGroupId": 97010135,
+          "DuckingAsset": "SM_Town"
+        }
+      ]
     },
     "96000764": {
-      "id": 96000764
+      "id": 96000764,
+      "name": "BGM_김만덕 엔딩",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010139,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000765": {
-      "id": 96000765
+      "id": 96000765,
+      "name": "SE_컷신_23가을이벤트_Eff",
+      "event": [
+        {
+          "Tag": "환경음1",
+          "SoundGroupId": 97010141
+        },
+        {
+          "Tag": "환경음2",
+          "SoundGroupId": 97010142
+        }
+      ]
     },
     "96000766": {
-      "id": 96000766
+      "id": 96000766,
+      "name": "SE_컷신_23가을이벤트_BGM",
+      "event": [
+        {
+          "Tag": "BGM",
+          "SoundGroupId": 97010143
+        }
+      ]
     },
     "96000767": {
-      "id": 96000767
+      "id": 96000767,
+      "name": "SE_컷신_정성공",
+      "event": [
+        {
+          "Tag": "Noisy",
+          "SoundGroupId": 97010144,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Drum",
+          "SoundGroupId": 97010145,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "March",
+          "SoundGroupId": 97010146,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "Cry",
+          "SoundGroupId": 97010147,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000768": {
-      "id": 96000768
+      "id": 96000768,
+      "name": "박치기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010148,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000769": {
-      "id": 96000769
+      "id": 96000769,
+      "name": "꼬리치기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010149,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000770": {
-      "id": 96000770
+      "id": 96000770,
+      "name": "물 뿜기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010150,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000771": {
-      "id": 96000771
+      "id": 96000771,
+      "name": "울음소리",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010151,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000772": {
-      "id": 96000772
+      "id": 96000772,
+      "name": "돌진",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010152,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000773": {
-      "id": 96000773
+      "id": 96000773,
+      "name": "잠수",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010153,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000774": {
-      "id": 96000774
+      "id": 96000774,
+      "name": "난동",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010154,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000775": {
-      "id": 96000775
+      "id": 96000775,
+      "name": "SE_멧돼지_공격",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010155,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000776": {
-      "id": 96000776
+      "id": 96000776,
+      "name": "SE_멧돼지_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010156,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000777": {
-      "id": 96000777
+      "id": 96000777,
+      "name": "SE_타조_공격",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010157,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000778": {
-      "id": 96000778
+      "id": 96000778,
+      "name": "SE_타조_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010158,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000779": {
-      "id": 96000779
+      "id": 96000779,
+      "name": "SE_고릴라_공격",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010159,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000780": {
-      "id": 96000780
+      "id": 96000780,
+      "name": "SE_고릴라_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010160,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000781": {
-      "id": 96000781
+      "id": 96000781,
+      "name": "SE_독수리_공격_01",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010161,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000782": {
-      "id": 96000782
+      "id": 96000782,
+      "name": "SE_독수리_공격_02",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010162,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000783": {
-      "id": 96000783
+      "id": 96000783,
+      "name": "SE_독수리_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010163,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000784": {
-      "id": 96000784
+      "id": 96000784,
+      "name": "SE_벌레떼_공격",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010164,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000785": {
-      "id": 96000785
+      "id": 96000785,
+      "name": "SE_벌레떼_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010165,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000786": {
-      "id": 96000786
+      "id": 96000786,
+      "name": "SE_악어_공격",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010166,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000787": {
-      "id": 96000787
+      "id": 96000787,
+      "name": "SE_악어_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010167,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000788": {
-      "id": 96000788
+      "id": 96000788,
+      "name": "SE_하마_공격",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010168,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000789": {
-      "id": 96000789
+      "id": 96000789,
+      "name": "SE_하마_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010169,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000790": {
-      "id": 96000790
+      "id": 96000790,
+      "name": "SE_싸움닭_공격",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010170,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000791": {
-      "id": 96000791
+      "id": 96000791,
+      "name": "SE_싸움닭_그로기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010171,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000792": {
-      "id": 96000792
+      "id": 96000792,
+      "name": "SE_날씨",
+      "event": [
+        {
+          "Tag": "Rain",
+          "SoundGroupId": 97010172,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000793": {
-      "id": 96000793
+      "id": 96000793,
+      "name": "SE_컷신_마리벨1_Eff",
+      "event": [
+        {
+          "Tag": "A",
+          "SoundGroupId": 97010173,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "B",
+          "SoundGroupId": 97010174,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000794": {
-      "id": 96000794
+      "id": 96000794,
+      "name": "SE_컷신_마리벨1_BGM",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010175,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000795": {
-      "id": 96000795
+      "id": 96000795,
+      "name": "SE_컷신_마리벨2_Eff",
+      "event": [
+        {
+          "Tag": "All",
+          "SoundGroupId": 97010176,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000796": {
-      "id": 96000796
+      "id": 96000796,
+      "name": "SE_컷신_마리벨3_Eff",
+      "event": [
+        {
+          "Tag": "A",
+          "SoundGroupId": 97010177,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "B",
+          "SoundGroupId": 97010178
+        },
+        {
+          "Tag": "C",
+          "SoundGroupId": 97010179
+        }
+      ]
     },
     "96000797": {
-      "id": 96000797
+      "id": 96000797,
+      "name": "SE_컷신_마리벨3_BGM",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010180,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000798": {
-      "id": 96000798
+      "id": 96000798,
+      "name": "SE_컷신_마리아_BGM",
+      "event": [
+        {
+          "Tag": "BGM1",
+          "SoundGroupId": 97010181,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "BGM2",
+          "SoundGroupId": 97010182,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000799": {
-      "id": 96000799
+      "id": 96000799,
+      "name": "SE_컷신_마리아_Eff",
+      "event": [
+        {
+          "Tag": "SE1",
+          "SoundGroupId": 97010183,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "SE2",
+          "SoundGroupId": 97010184,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "SE3",
+          "SoundGroupId": 97010185
+        }
+      ]
     },
     "96000800": {
-      "id": 96000800
+      "id": 96000800,
+      "name": "BGM 창세기전_타이틀",
+      "event": [
+        {
+          "Tag": "창세기전",
+          "SoundGroupId": 97010186,
+          "DuckingAsset": "SM_Title"
+        }
+      ]
     },
     "96000801": {
-      "id": 96000801
+      "id": 96000801,
+      "name": "BGM 창세기전_연대기 전투",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010187,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000802": {
-      "id": 96000802
+      "id": 96000802,
+      "name": "SE_컷신_마장기_BGM",
+      "event": [
+        {
+          "Tag": "BGM1",
+          "SoundGroupId": 97010188,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000803": {
-      "id": 96000803
+      "id": 96000803,
+      "name": "SE_컷신_마장기_Eff",
+      "event": [
+        {
+          "Tag": "SE1",
+          "SoundGroupId": 97010189,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000804": {
-      "id": 96000804
+      "id": 96000804,
+      "name": "SE_척가군의 진법",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010190,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000805": {
-      "id": 96000805
+      "id": 96000805,
+      "name": "SE_특수탄 배급",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010191,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000806": {
-      "id": 96000806
+      "id": 96000806,
+      "name": "SE_결사보국",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010192,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000807": {
-      "id": 96000807
+      "id": 96000807,
+      "name": "SE_반탄지력",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010193,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000808": {
-      "id": 96000808
+      "id": 96000808,
+      "name": "SE_오스만식 협상기술",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010194,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000809": {
-      "id": 96000809
+      "id": 96000809,
+      "name": "SE_필사즉생",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010195,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000810": {
-      "id": 96000810
+      "id": 96000810,
+      "name": "SE_필생즉사",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010196,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000811": {
-      "id": 96000811
+      "id": 96000811,
+      "name": "SE_해신의 축복",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010197,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000812": {
-      "id": 96000812
+      "id": 96000812,
+      "name": "SE_일휘소탕",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010198,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000813": {
-      "id": 96000813
+      "id": 96000813,
+      "name": "SE_마리벨의 가면",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010199,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000814": {
-      "id": 96000814
+      "id": 96000814,
+      "name": "SE_행운의 여신",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010200,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000815": {
-      "id": 96000815
+      "id": 96000815,
+      "name": "SE_복수의 다짐",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010201,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000816": {
-      "id": 96000816
+      "id": 96000816,
+      "name": "SE_혹한의 폭풍",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010202,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000817": {
-      "id": 96000817
+      "id": 96000817,
+      "name": "SE_쾌속 항해",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010203,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000818": {
-      "id": 96000818
+      "id": 96000818,
+      "name": "SE_품격 있는 협상",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010204,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000819": {
-      "id": 96000819
+      "id": 96000819,
+      "name": "SE_인력 동원",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010205,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000820": {
-      "id": 96000820
+      "id": 96000820,
+      "name": "SE_생존주의",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010206,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000821": {
-      "id": 96000821
+      "id": 96000821,
+      "name": "SE_진귀한 전리품",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010207,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000822": {
-      "id": 96000822
+      "id": 96000822,
+      "name": "SE_함대장악",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010208,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000823": {
-      "id": 96000823
+      "id": 96000823,
+      "name": "SE_전원 치유",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010209,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000824": {
-      "id": 96000824
+      "id": 96000824,
+      "name": "SE_함대 백병 강화",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010210,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000825": {
-      "id": 96000825
+      "id": 96000825,
+      "name": "SE_함대 충파 강화",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010211,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000826": {
-      "id": 96000826
+      "id": 96000826,
+      "name": "SE_라 지원 포격",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010212,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000827": {
-      "id": 96000827
+      "id": 96000827,
+      "name": "SE_로잘리아1_Eff",
+      "event": [
+        {
+          "Tag": "A",
+          "SoundGroupId": 97010213,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "B",
+          "SoundGroupId": 97010214,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "C",
+          "SoundGroupId": 97010215,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "D",
+          "SoundGroupId": 97010216,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000828": {
-      "id": 96000828
+      "id": 96000828,
+      "name": "SE_로잘리아2_Eff",
+      "event": [
+        {
+          "Tag": "A",
+          "SoundGroupId": 97010217,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "B",
+          "SoundGroupId": 97010218,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "C",
+          "SoundGroupId": 97010219,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "D",
+          "SoundGroupId": 97010220,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "E",
+          "SoundGroupId": 97010221,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "F",
+          "SoundGroupId": 97010222,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "G",
+          "SoundGroupId": 97010223,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000829": {
-      "id": 96000829
+      "id": 96000829,
+      "name": "SE_로잘리아3_Eff",
+      "event": [
+        {
+          "Tag": "A",
+          "SoundGroupId": 97010224,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "B",
+          "SoundGroupId": 97010225,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "C",
+          "SoundGroupId": 97010226,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "D",
+          "SoundGroupId": 97010227,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "E",
+          "SoundGroupId": 97010228,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "F",
+          "SoundGroupId": 97010229,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000830": {
-      "id": 96000830
+      "id": 96000830,
+      "name": "SE_강화",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010230,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000831": {
-      "id": 96000831
+      "id": 96000831,
+      "name": "SE_강화 성공",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010231,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000832": {
-      "id": 96000832
+      "id": 96000832,
+      "name": "SE_강화 실패",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010232,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000833": {
-      "id": 96000833
+      "id": 96000833,
+      "name": "SE_강화 실패 보호",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010233,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000834": {
-      "id": 96000834
+      "id": 96000834,
+      "name": "SE_컷신_에스메랄다1_Eff",
+      "event": [
+        {
+          "Tag": "A",
+          "SoundGroupId": 97010234,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000835": {
-      "id": 96000835
+      "id": 96000835,
+      "name": "SE_컷신_에스메랄다2_Eff",
+      "event": [
+        {
+          "Tag": "A",
+          "SoundGroupId": 97010235,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "B",
+          "SoundGroupId": 97010236,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "C",
+          "SoundGroupId": 97010237,
+          "DuckingAsset": "nop"
+        },
+        {
+          "Tag": "D",
+          "SoundGroupId": 97010238,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000836": {
-      "id": 96000836
+      "id": 96000836,
+      "name": "SE_부흥을 위한 전략",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010239,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000837": {
-      "id": 96000837
+      "id": 96000837,
+      "name": "SE_내수 활성화",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010240,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000838": {
-      "id": 96000838
+      "id": 96000838,
+      "name": "SE_불굴",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010241,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000839": {
-      "id": 96000839
+      "id": 96000839,
+      "name": "SE_함대 돌격",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010242,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000840": {
-      "id": 96000840
+      "id": 96000840,
+      "name": "SE_함대 충파 심화",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010243,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000841": {
-      "id": 96000841
+      "id": 96000841,
+      "name": "SE_협상가",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010244,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000842": {
-      "id": 96000842
+      "id": 96000842,
+      "name": "SE_돛 조종",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010245,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000843": {
-      "id": 96000843
+      "id": 96000843,
+      "name": "SE_신문물 확보",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010246,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000844": {
-      "id": 96000844
+      "id": 96000844,
+      "name": "SE_복수를 위한 결속",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010247,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000845": {
-      "id": 96000845
+      "id": 96000845,
+      "name": "SE_응급처치",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010248,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000846": {
-      "id": 96000846
+      "id": 96000846,
+      "name": "SE_재해 대책",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010249,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000847": {
-      "id": 96000847
+      "id": 96000847,
+      "name": "SE_회심",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010250,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000848": {
-      "id": 96000848
+      "id": 96000848,
+      "name": "SE_압도적인 돌격",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010251,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000849": {
-      "id": 96000849
+      "id": 96000849,
+      "name": "SE_눈도장",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010252,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000850": {
-      "id": 96000850
+      "id": 96000850,
+      "name": "SE_목숨을 건 돌격",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010253,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000851": {
-      "id": 96000851
+      "id": 96000851,
+      "name": "SE_속도전",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010254,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000852": {
-      "id": 96000852
+      "id": 96000852,
+      "name": "SE_탐험 지휘",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010255,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000853": {
-      "id": 96000853
+      "id": 96000853,
+      "name": "SE_민첩",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010256,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000854": {
-      "id": 96000854
+      "id": 96000854,
+      "name": "SE_풍향 정복",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010257,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000855": {
-      "id": 96000855
+      "id": 96000855,
+      "name": "SE_생존전략",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010258,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000856": {
-      "id": 96000856
+      "id": 96000856,
+      "name": "SE_긴급 충원",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010259,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000857": {
-      "id": 96000857
+      "id": 96000857,
+      "name": "SE_운용",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010260,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000858": {
-      "id": 96000858
+      "id": 96000858,
+      "name": "SE_함대 포격 강화",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010261,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000859": {
-      "id": 96000859
+      "id": 96000859,
+      "name": "SE_함대 정비",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010262,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000860": {
-      "id": 96000860
+      "id": 96000860,
+      "name": "SE_노련미",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010263,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000861": {
-      "id": 96000861
+      "id": 96000861,
+      "name": "SE_철벽",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010264,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000862": {
-      "id": 96000862
+      "id": 96000862,
+      "name": "SE_필중",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010265,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000863": {
-      "id": 96000863
+      "id": 96000863,
+      "name": "SE_판매의 화술",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010266,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000864": {
-      "id": 96000864
+      "id": 96000864,
+      "name": "SE_경계",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010267,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000865": {
-      "id": 96000865
+      "id": 96000865,
+      "name": "SE_교란",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010268,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000866": {
-      "id": 96000866
+      "id": 96000866,
+      "name": "SE_이마이류 판매술",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010269,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000867": {
-      "id": 96000867
+      "id": 96000867,
+      "name": "SE_이마이류 협상술",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010270,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000868": {
-      "id": 96000868
+      "id": 96000868,
+      "name": "SE_다테식 판매법",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010271,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000869": {
-      "id": 96000869
+      "id": 96000869,
+      "name": "SE_마사무네식 절약법",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010272,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000870": {
-      "id": 96000870
+      "id": 96000870,
+      "name": "SE_다테식 구매법",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010273,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000871": {
-      "id": 96000871
+      "id": 96000871,
+      "name": "SE_거상의 진가",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010274,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000872": {
-      "id": 96000872
+      "id": 96000872,
+      "name": "SE_선단 복지",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010275,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000873": {
-      "id": 96000873
+      "id": 96000873,
+      "name": "SE_제주의 달밤",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010276,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000874": {
-      "id": 96000874
+      "id": 96000874,
+      "name": "SE_신바람 항해",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010277,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000875": {
-      "id": 96000875
+      "id": 96000875,
+      "name": "SE_뛰어난 언변",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010278,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000876": {
-      "id": 96000876
+      "id": 96000876,
+      "name": "SE_신묘한 힘",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010279,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000877": {
-      "id": 96000877
+      "id": 96000877,
+      "name": "SE_홀리기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010280,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000878": {
-      "id": 96000878
+      "id": 96000878,
+      "name": "SE_오스만식 낚시기술",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010281,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000879": {
-      "id": 96000879
+      "id": 96000879,
+      "name": "SE_긴급 조달",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010282,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000880": {
-      "id": 96000880
+      "id": 96000880,
+      "name": "SE_피해 복구반 호출",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010283,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000881": {
-      "id": 96000881
+      "id": 96000881,
+      "name": "SE_장약 과충전",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010284,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000882": {
-      "id": 96000882
+      "id": 96000882,
+      "name": "SE_이중 보호처리",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010285,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000883": {
-      "id": 96000883
+      "id": 96000883,
+      "name": "SE_꼬리 찌르기 발동 1",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010286,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000884": {
-      "id": 96000884
+      "id": 96000884,
+      "name": "SE_꼬리 찌르기 발동 2",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010287,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000885": {
-      "id": 96000885
+      "id": 96000885,
+      "name": "SE_독안개",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010288,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000886": {
-      "id": 96000886
+      "id": 96000886,
+      "name": "SE_독 분출",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010289,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000887": {
-      "id": 96000887
+      "id": 96000887,
+      "name": "SE_날개치기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010290,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000888": {
-      "id": 96000888
+      "id": 96000888,
+      "name": "SE_맹독 폭격",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010291,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000889": {
-      "id": 96000889
+      "id": 96000889,
+      "name": "SE_전기 방류",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010292,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000890": {
-      "id": 96000890
+      "id": 96000890,
+      "name": "SE_가오리 죽음",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010293,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000891": {
-      "id": 96000891
+      "id": 96000891,
+      "name": "SE_남만인의 수완",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010294,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000892": {
-      "id": 96000892
+      "id": 96000892,
+      "name": "SE_예의바른 손님",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010295,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000893": {
-      "id": 96000893
+      "id": 96000893,
+      "name": "SE_진보한 포격술",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010296,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000894": {
-      "id": 96000894
+      "id": 96000894,
+      "name": "SE_제국의 포격술",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010297,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000895": {
-      "id": 96000895
+      "id": 96000895,
+      "name": "SE_신묘한 협상",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010298,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000896": {
-      "id": 96000896
+      "id": 96000896,
+      "name": "SE_교회 종소리",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010299,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000897": {
-      "id": 96000897
+      "id": 96000897,
+      "name": "SE_인양 종료",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010300,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000898": {
-      "id": 96000898
+      "id": 96000898,
+      "name": "SE_인양 결과 연출",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010301,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000899": {
-      "id": 96000899
+      "id": 96000899,
+      "name": "SE_인양 긍정 상호작용",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010302,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000900": {
-      "id": 96000900
+      "id": 96000900,
+      "name": "SE_인양 부정 상호작용",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010303,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000901": {
-      "id": 96000901
+      "id": 96000901,
+      "name": "SE_인양 피버타임",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010304,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000902": {
-      "id": 96000902
+      "id": 96000902,
+      "name": "SE_인양_점수감소무효",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010305,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000903": {
-      "id": 96000903
+      "id": 96000903,
+      "name": "SE_인양_흡수기",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010306,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000904": {
-      "id": 96000904
+      "id": 96000904,
+      "name": "SE_인양_로프튼튼",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010307,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000905": {
-      "id": 96000905
+      "id": 96000905,
+      "name": "SE_인양_진입연출",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010308,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000906": {
-      "id": 96000906
+      "id": 96000906,
+      "name": "SE_전설의 낚시꾼",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010309,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000907": {
-      "id": 96000907
+      "id": 96000907,
+      "name": "SE_보물 인양선 전문가",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010310,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000908": {
-      "id": 96000908
+      "id": 96000908,
+      "name": "SE_전략적인 언변",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010311,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000909": {
-      "id": 96000909
+      "id": 96000909,
+      "name": "SE_고대 유물 사냥꾼",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010312,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000910": {
-      "id": 96000910
+      "id": 96000910,
+      "name": "SE_연구 완료",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010313,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000911": {
-      "id": 96000911
+      "id": 96000911,
+      "name": "SE_시즌시작 BGM",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010314,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000912": {
-      "id": 96000912
+      "id": 96000912,
+      "name": "SE_시즌시작 연출 효과음",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010315,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000913": {
-      "id": 96000913
+      "id": 96000913,
+      "name": "SE_시즌시작 루프 폭죽음",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010316,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000914": {
-      "id": 96000914
+      "id": 96000914,
+      "name": "SE_포도탄 포격",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010317,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000915": {
-      "id": 96000915
+      "id": 96000915,
+      "name": "SE_시즌02시작 연출 로고 효과음",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010318,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000916": {
-      "id": 96000916
+      "id": 96000916,
+      "name": "SE_대격돌 승급",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010319,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000917": {
-      "id": 96000917
+      "id": 96000917,
+      "name": "SE_기뢰 투척",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010320,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000918": {
-      "id": 96000918
+      "id": 96000918,
+      "name": "SE_시즌03시작 연출 로고 효과음",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010321,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000919": {
-      "id": 96000919
+      "id": 96000919,
+      "name": "SE_컷신_판호 조안1_BGM",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010322,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000920": {
-      "id": 96000920
+      "id": 96000920,
+      "name": "SE_컷신_판호 조안2_BGM",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010323,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000921": {
-      "id": 96000921
+      "id": 96000921,
+      "name": "SE_컷신_판호 조안3_BGM",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010324,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000922": {
-      "id": 96000922
+      "id": 96000922,
+      "name": "SE_컷신_판호 조안4_BGM",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010325,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000923": {
-      "id": 96000923
+      "id": 96000923,
+      "name": "SE_컷신_판호 조안5_BGM",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010326,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000924": {
-      "id": 96000924
+      "id": 96000924,
+      "name": "SE_컷신_판호 조안6_BGM",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010327,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000925": {
-      "id": 96000925
+      "id": 96000925,
+      "name": "SE_컷신_판호 조안7_BGM",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010328,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000926": {
-      "id": 96000926
+      "id": 96000926,
+      "name": "SE_컷신_판호 조안8_BGM",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010329,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000927": {
-      "id": 96000927
+      "id": 96000927,
+      "name": "SE_아수라파천무",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010330,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000928": {
-      "id": 96000928
+      "id": 96000928,
+      "name": "SE_아수라파천무_GL",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010331,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000929": {
-      "id": 96000929
+      "id": 96000929,
+      "name": "SE_모험 시즌 로고",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010332,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000930": {
-      "id": 96000930
+      "id": 96000930,
+      "name": "SE_시즌 4 시작 효과음",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010333,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000931": {
-      "id": 96000931
+      "id": 96000931,
+      "name": "SE_쇄도하는 금빛",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010334,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000932": {
-      "id": 96000932
+      "id": 96000932,
+      "name": "SE_생산 Bellow",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010335,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000933": {
-      "id": 96000933
+      "id": 96000933,
+      "name": "SE_생산 BlackSmith",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010336,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000934": {
-      "id": 96000934
+      "id": 96000934,
+      "name": "SE_생산 BlackSmith2",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010337,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000935": {
-      "id": 96000935
+      "id": 96000935,
+      "name": "SE_생산 Cooking1",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010338,
+          "DuckingAsset": "nop"
+        }
+      ]
     },
     "96000936": {
-      "id": 96000936
+      "id": 96000936,
+      "name": "SE_생산 Cooking2",
+      "event": [
+        {
+          "Tag": "Default",
+          "SoundGroupId": 97010339,
+          "DuckingAsset": "nop"
+        }
+      ]
     }
   }
 }

@@ -11,6 +11,15 @@
       "sortingOrder": "number",
       "startDate": "string",
       "name": "text",
+      "userTitleDeco": {
+        "TopCenterDeco": "string",
+        "DecoColor": "string",
+        "MiddleSideDeco": "string",
+        "DecoFX": "string",
+        "PremiumDeco": "string",
+        "PremiumDecoColor": "string"
+      },
+      "notReverseSideDeco": "bool",
       "flavorText": "text",
       "hintText": "text",
       "worldBuffId": [
@@ -25,6 +34,9 @@
       },
       "sortingOrder": 1,
       "name": 1,
+      "userTitleDeco": {
+        "DecoColor": 1
+      },
       "flavorText": 1,
       "hintText": 1,
       "worldBuffId": [
@@ -65,6 +77,12 @@
       },
       "sortingOrder": 0,
       "name": "전설적인 도시의 큰 손",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFC00",
+        "MiddleSideDeco": "WT_UserTitle_Invest_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "길부터 건물까지, 어느 하나 그의 투자가 이루어지지 않은 곳이 없습니다.",
       "hintText": "24년 10월 23일 이전 주간 투자 순위 1위",
       "worldBuffId": [
@@ -80,6 +98,12 @@
       },
       "sortingOrder": 1,
       "name": "전설의 거상",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "1FE000",
+        "MiddleSideDeco": "WT_UserTitle_Trade_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "큰돈을 굴린다는 것은 탄탄한 배경과 실력, 그리고 시간이 필요합니다.",
       "hintText": "주간 거래 점수 순위 1위",
       "worldBuffId": [
@@ -95,6 +119,12 @@
       },
       "sortingOrder": 2,
       "name": "해전의 지배자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FF2600",
+        "MiddleSideDeco": "WT_UserTitle_Battle_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "감히 그에게 대적할 자가 있겠습니까? 이미 상어의 밥이 되었을걸요.",
       "hintText": "주간 PvP 승리 순위 1위",
       "worldBuffId": [
@@ -110,6 +140,12 @@
       },
       "sortingOrder": 3,
       "name": "시대의 모험가",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "00F3FF",
+        "MiddleSideDeco": "WT_UserTitle_Adventure_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "매 순간이 발견인 그에게 이 칭호는 새로운 발견 중 하나에 불과할 겁니다.",
       "hintText": "주간 발견 보고 순위 1위",
       "worldBuffId": [
@@ -125,6 +161,12 @@
       },
       "sortingOrder": 4,
       "name": "도시의 큰 손",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFC00",
+        "MiddleSideDeco": "WT_UserTitle_Invest_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "길부터 건물까지, 어느 하나 그의 투자가 이루어지지 않은 곳이 없습니다.",
       "hintText": "주간 투자 순위 1위",
       "worldBuffId": [
@@ -140,6 +182,11 @@
       },
       "sortingOrder": 1000,
       "name": "11인의 제독",
+      "userTitleDeco": {
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_Admiral_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "이제 더 이상 제독을 손가락으로는 셀 수 없습니다. 도와줄 회계사가 필요하겠군요.",
       "hintText": "강력한 선단은 더 많은 제독을 필요로 합니다.",
       "worldBuffId": [
@@ -155,6 +202,11 @@
       },
       "sortingOrder": 1001,
       "name": "인도의 방문자",
+      "userTitleDeco": {
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_Anchor_Cursor_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "캘리컷을 방문한 지금이야말로, 대항해시대를 살아가는 제독이라 할 수 있을 것입니다.",
       "hintText": "대항해시대의 목적지는 향신료의 도시였습니다.",
       "worldBuffId": [
@@ -170,6 +222,11 @@
       },
       "sortingOrder": 999,
       "name": "새내기 제독",
+      "userTitleDeco": {
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_Admiral_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "바다에 띄울 배 한 척과 여정을 함께할 동료 선원, 꿈이 있다면 항해를 떠날 준비를 마쳤습니다.",
       "hintText": "대항해시대에 첫 발걸음",
       "worldBuffId": [
@@ -185,6 +242,13 @@
       },
       "sortingOrder": 998,
       "name": "베테랑 제독",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_VeteranAdmiral_Sprite",
+        "DecoColor": "95DBD2",
+        "MiddleSideDeco": "WT_UserTitle_VeteranAdmiralDeco_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_04"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "이제는 충분히 베테랑 제독입니다.",
       "hintText": "업적 단계 51 달성",
       "worldBuffId": [
@@ -200,6 +264,13 @@
       },
       "sortingOrder": 997,
       "name": "전설의 제독",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_LegendaryAdmiral_Sprite",
+        "DecoColor": "FBE500",
+        "MiddleSideDeco": "WT_UserTitle_LegendaryAdmiralDeco_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_05"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "거의 모든것에 통달한 제독입니다.",
       "hintText": "업적 단계 80 달성",
       "worldBuffId": [
@@ -215,6 +286,13 @@
       },
       "sortingOrder": 996,
       "name": "데우스 엑스 마키나",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_DeusExMachina_Sprite",
+        "DecoColor": "FFCC78",
+        "MiddleSideDeco": "WT_UserTitleSide_DeusExMachina_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_06"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "모든 분쟁을 끝내러, 여기 한 제독이 도착했습니다.",
       "hintText": "업적 단계 100 달성",
       "worldBuffId": [
@@ -230,6 +308,11 @@
       },
       "sortingOrder": 300,
       "name": "365일의 항해",
+      "userTitleDeco": {
+        "DecoColor": "FF92E7",
+        "MiddleSideDeco": "WT_UserTitle_1year_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "Bon Voyage…",
       "hintText": "대항해시대 오리진 1주년 뒷풀이 상품",
       "worldBuffId": [
@@ -245,6 +328,11 @@
       },
       "sortingOrder": 301,
       "name": "365일의 감사",
+      "userTitleDeco": {
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_Event_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "Bon Voyage…",
       "hintText": "대항해시대 오리진 1주년 뒷풀이",
       "worldBuffId": [
@@ -260,6 +348,11 @@
       },
       "sortingOrder": 302,
       "name": "반주년의 항해",
+      "userTitleDeco": {
+        "DecoColor": "FF92E7",
+        "MiddleSideDeco": "WT_UserTitle_1year_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "Bon Voyage…",
       "hintText": "대항해시대 오리진 1주년 뒷풀이 상품",
       "worldBuffId": [
@@ -275,6 +368,11 @@
       },
       "sortingOrder": 303,
       "name": "반주년의 동반자",
+      "userTitleDeco": {
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_Event_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "Bon Voyage…",
       "hintText": "대항해시대 오리진 1주년 뒷풀이",
       "worldBuffId": [
@@ -291,6 +389,12 @@
       "sortingOrder": 304,
       "startDate": "2024/01/01/00:00:00",
       "name": "2024년 근하신년",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle_Dragon_Sprite",
+        "DecoColor": "00F3FF",
+        "MiddleSideDeco": "WT_UserTitle_Event_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "새해 복 많이 받으세요!",
       "hintText": "2024년 새해 출석부 보상",
       "worldBuffId": [
@@ -307,6 +411,11 @@
       "sortingOrder": 305,
       "startDate": "2023/12/06/12:00:00",
       "name": "즐거운 연휴",
+      "userTitleDeco": {
+        "DecoColor": "FF2600",
+        "MiddleSideDeco": "WT_UserTitle_Xmas_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "즐거운 연휴 되세요!",
       "hintText": "2023년 Happy Holiday 상품",
       "worldBuffId": [
@@ -323,6 +432,11 @@
       "sortingOrder": 306,
       "startDate": "2024/06/06/00:00:00",
       "name": "낙원 개척자",
+      "userTitleDeco": {
+        "DecoColor": "E3A200",
+        "MiddleSideDeco": "WT_UserTitleSide_EsmeraldaEvent_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신만 제 곁에 있어 준다면, 그 어떤 불모지도 낙원으로 만들 수 있어요.",
       "hintText": "푸른 여전사, 에스메랄다의 여정 보상",
       "worldBuffId": [
@@ -339,6 +453,11 @@
       "sortingOrder": 307,
       "startDate": "2024/08/23/12:00:00",
       "name": "2주년의 약속",
+      "userTitleDeco": {
+        "DecoColor": "FF98EF",
+        "MiddleSideDeco": "WT_UserTitle_2ndAnniversary_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "제독님! 함께 하자는 약속을 지켜주셔서 감사해요.\n그 약속, 우리 변치 말아요.",
       "hintText": "대항해시대 오리진 2주년 상품",
       "worldBuffId": [
@@ -355,6 +474,11 @@
       "sortingOrder": 308,
       "startDate": "2024/08/23/00:00:00",
       "name": "2주년의 축포",
+      "userTitleDeco": {
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_2ndAnniversaryFree_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "자자, 모두 모이셨습니까?\n지금부터 2주년 기념 불꽃 놀이를 시작하겠습니다!",
       "hintText": "대항해시대 오리진 2주년 보상",
       "worldBuffId": [
@@ -371,6 +495,11 @@
       "sortingOrder": 309,
       "startDate": "2024/07/31/00:00:00",
       "name": "새로운 물결",
+      "userTitleDeco": {
+        "DecoColor": "00FFF6",
+        "MiddleSideDeco": "WT_UserTitle_NewWave_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "맑은 물이 바다로 흘러갑니다.\n제독님은 새로운 물결입니다!",
       "hintText": "원양 항해 패키지 상품",
       "worldBuffId": [
@@ -388,6 +517,11 @@
       "sortingOrder": 310,
       "startDate": "2024/08/28/00:00:00",
       "name": "돌아온 제독",
+      "userTitleDeco": {
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_Admiral_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "돌아오신 제독님을 환영합니다!",
       "hintText": "복귀 유저 패키지 1 상품",
       "worldBuffId": [
@@ -404,6 +538,12 @@
       },
       "sortingOrder": 311,
       "name": "첫 번째 등대의 주인",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FF2600",
+        "MiddleSideDeco": "WT_UserTitle_LightHouse_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "등대가 비추는 바다에서 누구보다 많은 해적을 누구보다 빠르게 가라앉힌 역전의 제독님께 드리는 칭호입니다.",
       "hintText": "폐허의 등대 순위 1위",
       "worldBuffId": [
@@ -419,6 +559,13 @@
       },
       "sortingOrder": 312,
       "name": "푸른 바다의 현자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle_WisemanTop_Sprite",
+        "DecoColor": "D6F7FF",
+        "MiddleSideDeco": "WT_UserTitle_Wiseman_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_02"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신의 가르침으로 인해 많은 사람들이 도움을 받았습니다.\n이제 당신은 현자로 칭송받아도 마땅합니다.",
       "hintText": "최고의 공략 작성 이벤트 보상",
       "worldBuffId": [
@@ -435,6 +582,13 @@
       "sortingOrder": 313,
       "startDate": "2024/11/06/12:00:00",
       "name": "만물상",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_GeneralStore_Sprite",
+        "DecoColor": "FFFC00",
+        "MiddleSideDeco": "WT_UserTitleSide_GeneralStore_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_03"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "무엇이든 거래할 수 있습니다!",
       "hintText": "안전 해역 상자 상품",
       "worldBuffId": [
@@ -450,6 +604,11 @@
       },
       "sortingOrder": 314,
       "name": "작은 발걸음",
+      "userTitleDeco": {
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitleSide_SmallStep_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "대양을 누비는 발걸음은 이제 시작입니다!",
       "hintText": "업적 보상",
       "worldBuffId": [
@@ -466,6 +625,12 @@
       "sortingOrder": 315,
       "startDate": "2025/01/01/00:00:00",
       "name": "2025년 근하신년",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_25NewYear_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_Event_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "새해 복 많이 받으세요!",
       "hintText": "2025년 새해 출석부 보상",
       "worldBuffId": [
@@ -482,6 +647,11 @@
       "sortingOrder": 316,
       "startDate": "2025/08/20/00:00:00",
       "name": "3주년의 기쁨",
+      "userTitleDeco": {
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_3rdAnniversaryFree_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "제독님과의 시간은 기쁨이 가득합니다.",
       "hintText": "대항해시대 오리진 한국 3주년 보상",
       "worldBuffId": [
@@ -498,6 +668,11 @@
       "sortingOrder": 317,
       "startDate": "2025/08/27/12:00:00",
       "name": "3주년의 행복",
+      "userTitleDeco": {
+        "DecoColor": "FF89D3",
+        "MiddleSideDeco": "WT_UserTitle_3rdAnniversary_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "제독님과의 여정에 행복이 가득합니다.",
       "hintText": "대항해시대 오리진 한국 3주년 상품",
       "worldBuffId": [
@@ -514,6 +689,12 @@
       },
       "sortingOrder": 50,
       "name": "전설의 포르투갈의 총리",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "24년 10월 23일 이전 포르투갈의 총리로 선출",
       "worldBuffId": [
@@ -530,6 +711,12 @@
       },
       "sortingOrder": 51,
       "name": "전설의 에스파냐의 총리",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "24년 10월 23일 이전 에스파냐의 총리로 선출",
       "worldBuffId": [
@@ -546,6 +733,12 @@
       },
       "sortingOrder": 52,
       "name": "전설의 잉글랜드의 총리",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "24년 10월 23일 이전 잉글랜드의 총리로 선출",
       "worldBuffId": [
@@ -562,6 +755,12 @@
       },
       "sortingOrder": 53,
       "name": "전설의 네덜란드의 총리",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "24년 10월 23일 이전 네덜란드의 총리로 선출",
       "worldBuffId": [
@@ -578,6 +777,12 @@
       },
       "sortingOrder": 54,
       "name": "전설의 오스만의 총리",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "24년 10월 23일 이전 오스만의 총리로 선출",
       "worldBuffId": [
@@ -594,6 +799,12 @@
       },
       "sortingOrder": 55,
       "name": "전설의 명의 재상",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "24년 10월 23일 이전 명의 재상으로 선출",
       "worldBuffId": [
@@ -610,6 +821,12 @@
       },
       "sortingOrder": 56,
       "name": "전설의 일본의 태정대신",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "24년 10월 23일 이전 일본의 태정대신으로 선출",
       "worldBuffId": [
@@ -626,6 +843,12 @@
       },
       "sortingOrder": 57,
       "name": "전설의 조선의 재상",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "24년 10월 23일 이전 조선의 재상으로 선출",
       "worldBuffId": [
@@ -642,6 +865,12 @@
       },
       "sortingOrder": 58,
       "name": "해적왕",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "해적왕으로 선출",
       "worldBuffId": [
@@ -658,6 +887,12 @@
       },
       "sortingOrder": 59,
       "name": "총리",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "총리 당선 안내",
       "worldBuffId": [
@@ -673,6 +908,12 @@
       },
       "sortingOrder": 60,
       "name": "후원가",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFC00",
+        "MiddleSideDeco": "WT_UserTitle_Invest_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신의 선의는 국가의 기반이 됩니다.",
       "hintText": "주간 국가 기부 순위 1위",
       "worldBuffId": [
@@ -689,6 +930,12 @@
       },
       "sortingOrder": 18,
       "name": "모비딕 토벌 공로자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FF2600",
+        "MiddleSideDeco": "WT_UserTitle_Raid_MobyDick_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "모비딕 토벌에 큰 공을 세운 제독님께 드리는 칭호입니다.",
       "hintText": "모비딕 토벌 1위",
       "worldBuffId": [
@@ -705,6 +952,12 @@
       },
       "sortingOrder": 17,
       "name": "거대 가오리 토벌 공로자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FF2600",
+        "MiddleSideDeco": "WT_UserTitle_Raid_StingRay_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "거대 가오리 토벌에 큰 공을 세운 제독님께 드리는 칭호입니다.",
       "hintText": "거대 가오리 토벌 1위",
       "worldBuffId": [
@@ -721,6 +974,12 @@
       },
       "sortingOrder": 61,
       "name": "포르투갈의 총리",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "포르투갈의 총리로 선출",
       "worldBuffId": [
@@ -737,6 +996,12 @@
       },
       "sortingOrder": 62,
       "name": "에스파냐의 총리",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "에스파냐의 총리로 선출",
       "worldBuffId": [
@@ -753,6 +1018,12 @@
       },
       "sortingOrder": 63,
       "name": "잉글랜드의 총리",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "잉글랜드의 총리로 선출",
       "worldBuffId": [
@@ -769,6 +1040,12 @@
       },
       "sortingOrder": 64,
       "name": "네덜란드의 총리",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "네덜란드의 총리로 선출",
       "worldBuffId": [
@@ -785,6 +1062,12 @@
       },
       "sortingOrder": 65,
       "name": "오스만의 총리",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "오스만의 총리로 선출",
       "worldBuffId": [
@@ -801,6 +1084,12 @@
       },
       "sortingOrder": 66,
       "name": "명의 재상",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "명의 재상으로 선출",
       "worldBuffId": [
@@ -817,6 +1106,12 @@
       },
       "sortingOrder": 67,
       "name": "일본의 태정대신",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "일본의 태정대신으로 선출",
       "worldBuffId": [
@@ -833,6 +1128,12 @@
       },
       "sortingOrder": 68,
       "name": "조선의 재상",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitle_PrimeMinister_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "당신이 가리키는 곳이 곧 국가의 목적지가 될 것입니다.",
       "hintText": "조선의 재상으로 선출",
       "worldBuffId": [
@@ -849,6 +1150,12 @@
       },
       "sortingOrder": 16,
       "name": "아이든 레이스 토벌 공로자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FF2600",
+        "MiddleSideDeco": "WT_UserTitle_Raid_AydinLeis_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "아이든 레이스 토벌에 큰 공을 세운 제독님께 드리는 칭호입니다.",
       "hintText": "아이든 레이스 토벌 1위",
       "worldBuffId": [
@@ -865,6 +1172,12 @@
       },
       "sortingOrder": 15,
       "name": "돌아온 튜 토벌 공로자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FF2600",
+        "MiddleSideDeco": "WT_UserTitle_Raid_EnchantedThomasTew_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "돌아온 토마스 튜 토벌에 큰 공을 세운 제독님께 드리는 칭호입니다.",
       "hintText": "돌아온 토마스 튜 토벌 1위",
       "worldBuffId": [
@@ -881,6 +1194,12 @@
       },
       "sortingOrder": 19,
       "name": "야코프 발바커 토벌 공로자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FF2600",
+        "MiddleSideDeco": "WT_UserTitle_Raid_JakobWalweik_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "야코프 발바커 토벌에 큰 공을 세운 제독님께 드리는 칭호입니다.",
       "hintText": "야코프 발바커 토벌 1위",
       "worldBuffId": [
@@ -897,6 +1216,12 @@
       "sortingOrder": 100,
       "startDate": "2023/12/26/00:00:00",
       "name": "2023년 교역왕",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle_Medal_Sprite",
+        "DecoColor": "1FE000",
+        "MiddleSideDeco": "WT_UserTitle_Trade_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "2023년 연말 교역 경쟁전에서 1위를 달성한 제독님께 드리는 칭호입니다.",
       "hintText": "2023년 연말 교역 경쟁전 1위",
       "worldBuffId": [
@@ -913,6 +1238,12 @@
       "sortingOrder": 101,
       "startDate": "2023/12/26/00:00:00",
       "name": "2023년 모험왕",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle_Medal_Sprite",
+        "DecoColor": "00F3FF",
+        "MiddleSideDeco": "WT_UserTitle_Adventure_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "2023년 연말 모험 경쟁전에서 1위를 달성한 제독님께 드리는 칭호입니다.",
       "hintText": "2023년 연말 모험 경쟁전 1위",
       "worldBuffId": [
@@ -929,6 +1260,12 @@
       "sortingOrder": 102,
       "startDate": "2023/12/26/00:00:00",
       "name": "2023년 전투왕",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle_Medal_Sprite",
+        "DecoColor": "FF2600",
+        "MiddleSideDeco": "WT_UserTitle_Battle_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "2023년 연말 전투 경쟁전에서 1위를 달성한 제독님께 드리는 칭호입니다.",
       "hintText": "2023년 연말 전투 경쟁전 1위",
       "worldBuffId": [
@@ -945,6 +1282,12 @@
       "sortingOrder": 103,
       "startDate": "2024/02/10/00:00:00",
       "name": "사랑꾼",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FF98EF",
+        "MiddleSideDeco": "WT_UserTitle_Valentine_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "2024년 밸런타인 경쟁전에서 1위를 달성한 제독님께 드리는 칭호입니다.",
       "hintText": "2024년 밸런타인 경쟁전 1위",
       "worldBuffId": [
@@ -961,6 +1304,12 @@
       "sortingOrder": 104,
       "startDate": "2024/05/04/00:00:00",
       "name": "보물 사냥꾼",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle__Rank1_Sprite",
+        "DecoColor": "FFFC00",
+        "MiddleSideDeco": "WT_UserTitle_GoldenWeek_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "2024년 보물 탐사 경쟁전에서 1위를 달성한 제독님께 드리는 칭호입니다.",
       "hintText": "2024년 보물 탐사 경쟁전 1위",
       "worldBuffId": [
@@ -976,6 +1325,11 @@
       },
       "sortingOrder": 1101,
       "name": "위대한 제독",
+      "userTitleDeco": {
+        "DecoColor": "E3A200",
+        "MiddleSideDeco": "WT_UserTitleSide_IronTurtleShip_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "오늘 진실로 죽음을 각오하오니, 하늘에 바라옵건대 반드시 이 적을 섬멸하게 하여 주소서.",
       "hintText": "위대한 제독 패키지",
       "worldBuffId": [
@@ -991,6 +1345,13 @@
       },
       "sortingOrder": 1102,
       "name": "구국의 영웅",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitle_EventGrade_Sprite",
+        "DecoColor": "FFFEA1",
+        "MiddleSideDeco": "WT_UserTitle_IronTurtleShip_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_01"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "역사 속 수많은 영웅이 존재했지만, 나라를 구한 역전의 용사는 절대 흔하지 않습니다.",
       "hintText": "제독 칭호 패키지",
       "worldBuffId": [
@@ -1007,6 +1368,12 @@
       "sortingOrder": 105,
       "startDate": "2024/12/05/00:00:00",
       "name": "대양의 첫 모험가",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season0_Sprite",
+        "DecoColor": "86E7FF",
+        "MiddleSideDeco": "WT_UserTitleSide_Season0_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "가장 위대한 발자취 너머",
       "hintText": "사전 예약",
       "worldBuffId": [
@@ -1023,6 +1390,15 @@
       "sortingOrder": 107,
       "startDate": "2024/12/05/00:00:00",
       "name": "신화의 시즌 1 제독",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1_Sprite",
+        "DecoColor": "FFF68E",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1_Myth_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_08",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "투자 시즌 1에 신화적인 발자취를 남긴 제독을 위한 칭호입니다.",
       "hintText": "투자 시즌 1 상점 구매",
       "worldBuffId": [
@@ -1039,6 +1415,13 @@
       "sortingOrder": 108,
       "startDate": "2024/12/05/00:00:00",
       "name": "전설의 시즌 1 제독",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1_Sprite",
+        "DecoColor": "D1E7EB",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1_Legendary_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_09"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "투자 시즌 1에 전설적인 발자취를 남긴 제독을 위한 칭호입니다.",
       "hintText": "투자 시즌 1 상점 구매",
       "worldBuffId": [
@@ -1055,6 +1438,12 @@
       "sortingOrder": 109,
       "startDate": "2024/12/05/00:00:00",
       "name": "역사의 시즌 1 제독",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1_Sprite",
+        "DecoColor": "D5A892",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1_Historical_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "투자 시즌 1에 역사적인 발자취를 남긴 제독을 위한 칭호입니다.",
       "hintText": "투자 시즌 1 상점 구매",
       "worldBuffId": [
@@ -1071,6 +1460,13 @@
       "sortingOrder": 106,
       "startDate": "2024/12/05/00:00:00",
       "name": "옛 항로의 별",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season0Mayor_Sprite",
+        "DecoColor": "FFE600",
+        "MiddleSideDeco": "WT_UserTitleSide_Season0Mayor_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_07"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "시간이 삼킨 바다 위 전설이 된 이정표. 그 빛은 모두를 인도하리라, 끝없는 수평선 너머까지.",
       "hintText": "투자 시즌 0 종료 시 시장 3석 이상 보유 제독 보상",
       "worldBuffId": [
@@ -1088,6 +1484,15 @@
       "sortingOrder": 201,
       "startDate": "2025/03/24/00:00:00",
       "name": "최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 종합 1위",
       "worldBuffId": [
@@ -1105,6 +1510,15 @@
       "sortingOrder": 211,
       "startDate": "2025/03/24/00:00:00",
       "name": "포르투갈의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Portugal_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 포르투갈 1위",
       "worldBuffId": [
@@ -1122,6 +1536,15 @@
       "sortingOrder": 212,
       "startDate": "2025/03/24/00:00:00",
       "name": "에스파냐의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Espana_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 에스파냐 1위",
       "worldBuffId": [
@@ -1139,6 +1562,15 @@
       "sortingOrder": 213,
       "startDate": "2025/03/24/00:00:00",
       "name": "잉글랜드의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1England_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 잉글랜드 1위",
       "worldBuffId": [
@@ -1156,6 +1588,15 @@
       "sortingOrder": 214,
       "startDate": "2025/03/24/00:00:00",
       "name": "네덜란드의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Netherlands_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 네덜란드 1위",
       "worldBuffId": [
@@ -1173,6 +1614,15 @@
       "sortingOrder": 215,
       "startDate": "2025/03/24/00:00:00",
       "name": "오스만의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Ottoman_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 오스만 1위",
       "worldBuffId": [
@@ -1190,6 +1640,15 @@
       "sortingOrder": 216,
       "startDate": "2025/03/24/00:00:00",
       "name": "명의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Myoung_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 명 1위",
       "worldBuffId": [
@@ -1207,6 +1666,15 @@
       "sortingOrder": 217,
       "startDate": "2025/03/24/00:00:00",
       "name": "조선의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Korea_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 조선 1위",
       "worldBuffId": [
@@ -1224,6 +1692,15 @@
       "sortingOrder": 218,
       "startDate": "2025/03/24/00:00:00",
       "name": "일본의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Japan_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 일본 1위",
       "worldBuffId": [
@@ -1241,6 +1718,15 @@
       "sortingOrder": 202,
       "startDate": "2025/03/24/00:00:00",
       "name": "도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 종합 2~10위",
       "worldBuffId": [
@@ -1258,6 +1744,15 @@
       "sortingOrder": 221,
       "startDate": "2025/03/24/00:00:00",
       "name": "포르투갈의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Portugal_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 포르투갈 2~10위",
       "worldBuffId": [
@@ -1275,6 +1770,15 @@
       "sortingOrder": 222,
       "startDate": "2025/03/24/00:00:00",
       "name": "에스파냐의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Espana_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 에스파냐 2~10위",
       "worldBuffId": [
@@ -1292,6 +1796,15 @@
       "sortingOrder": 223,
       "startDate": "2025/03/24/00:00:00",
       "name": "잉글랜드의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1England_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 잉글랜드 2~10위",
       "worldBuffId": [
@@ -1309,6 +1822,15 @@
       "sortingOrder": 224,
       "startDate": "2025/03/24/00:00:00",
       "name": "네덜란드의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Netherlands_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 네덜란드 2~10위",
       "worldBuffId": [
@@ -1326,6 +1848,15 @@
       "sortingOrder": 225,
       "startDate": "2025/03/24/00:00:00",
       "name": "오스만의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Ottoman_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 오스만 2~10위",
       "worldBuffId": [
@@ -1343,6 +1874,15 @@
       "sortingOrder": 226,
       "startDate": "2025/03/24/00:00:00",
       "name": "명의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Myoung_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 명 2~10위",
       "worldBuffId": [
@@ -1360,6 +1900,15 @@
       "sortingOrder": 227,
       "startDate": "2025/03/24/00:00:00",
       "name": "조선의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Korea_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 조선 2~10위",
       "worldBuffId": [
@@ -1377,6 +1926,15 @@
       "sortingOrder": 228,
       "startDate": "2025/03/24/00:00:00",
       "name": "일본의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Japan_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 종료 시 일본 2~10위",
       "worldBuffId": [
@@ -1393,6 +1951,12 @@
       "sortingOrder": 110,
       "startDate": "2025/03/24/00:00:00",
       "name": "역전의 용사",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season2_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitleSide_Season2_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "투자 시즌 2에서 영웅적인 전투에 참여한 제독을 위한 칭호입니다.",
       "hintText": "투자 시즌 2 상점 구매",
       "worldBuffId": [
@@ -1409,6 +1973,12 @@
       },
       "sortingOrder": 5,
       "name": "지중해의 햇살",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_MediterraneanSunshine_Sprite",
+        "DecoColor": "FFF396",
+        "MiddleSideDeco": "WT_UserTitleSide_MediterraneanSunshine_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "새로운 세계를 탐험하실 제독님을 위한 칭호입니다.",
       "hintText": "지중해 서버 전용 보상",
       "worldBuffId": [
@@ -1426,6 +1996,12 @@
       },
       "sortingOrder": 300,
       "name": "뜨거운 전진",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_GMEvent_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitleSide_GMEvent_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "이벤트에 참여한 제독님을 위한 칭호입니다.",
       "hintText": "GM 이벤트 보상",
       "worldBuffId": [
@@ -1442,6 +2018,15 @@
       },
       "sortingOrder": 201,
       "name": "최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 종합 1위",
       "worldBuffId": [
@@ -1458,6 +2043,15 @@
       },
       "sortingOrder": 211,
       "name": "포르투갈의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Portugal_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 포르투갈 1위",
       "worldBuffId": [
@@ -1474,6 +2068,15 @@
       },
       "sortingOrder": 212,
       "name": "에스파냐의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Espana_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 에스파냐 1위",
       "worldBuffId": [
@@ -1490,6 +2093,15 @@
       },
       "sortingOrder": 213,
       "name": "잉글랜드의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1England_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 잉글랜드 1위",
       "worldBuffId": [
@@ -1506,6 +2118,15 @@
       },
       "sortingOrder": 214,
       "name": "네덜란드의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Netherlands_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 네덜란드 1위",
       "worldBuffId": [
@@ -1522,6 +2143,15 @@
       },
       "sortingOrder": 215,
       "name": "오스만의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Ottoman_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 오스만 1위",
       "worldBuffId": [
@@ -1538,6 +2168,15 @@
       },
       "sortingOrder": 216,
       "name": "명의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Myoung_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 명 1위",
       "worldBuffId": [
@@ -1554,6 +2193,15 @@
       },
       "sortingOrder": 217,
       "name": "조선의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Korea_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 조선 1위",
       "worldBuffId": [
@@ -1570,6 +2218,15 @@
       },
       "sortingOrder": 218,
       "name": "일본의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Japan_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 일본 1위",
       "worldBuffId": [
@@ -1586,6 +2243,15 @@
       },
       "sortingOrder": 202,
       "name": "도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 종합 2~10위",
       "worldBuffId": [
@@ -1602,6 +2268,15 @@
       },
       "sortingOrder": 221,
       "name": "포르투갈의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Portugal_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 포르투갈 2~3위",
       "worldBuffId": [
@@ -1618,6 +2293,15 @@
       },
       "sortingOrder": 222,
       "name": "에스파냐의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Espana_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 에스파냐 2~3위",
       "worldBuffId": [
@@ -1634,6 +2318,15 @@
       },
       "sortingOrder": 223,
       "name": "잉글랜드의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1England_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 잉글랜드 2~3위",
       "worldBuffId": [
@@ -1650,6 +2343,15 @@
       },
       "sortingOrder": 224,
       "name": "네덜란드의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Netherlands_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 네덜란드 2~3위",
       "worldBuffId": [
@@ -1666,6 +2368,15 @@
       },
       "sortingOrder": 225,
       "name": "오스만의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Ottoman_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 오스만 2~3위",
       "worldBuffId": [
@@ -1682,6 +2393,15 @@
       },
       "sortingOrder": 226,
       "name": "명의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Myoung_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 명 2~3위",
       "worldBuffId": [
@@ -1698,6 +2418,15 @@
       },
       "sortingOrder": 227,
       "name": "조선의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Korea_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 조선 2~3위",
       "worldBuffId": [
@@ -1714,6 +2443,15 @@
       },
       "sortingOrder": 228,
       "name": "일본의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Japan_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 2 종료 시 일본 2~3위",
       "worldBuffId": [
@@ -1730,6 +2468,12 @@
       "sortingOrder": 111,
       "startDate": "2025/06/22/00:00:00",
       "name": "황금 항로의 개척자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season3_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitleSide_Season3_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "투자 시즌 3에서 영웅적인 전투에 참여한 제독을 위한 칭호입니다.",
       "hintText": "투자 시즌 3 상점 구매",
       "worldBuffId": [
@@ -1746,6 +2490,15 @@
       },
       "sortingOrder": 201,
       "name": "최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 종합 1위",
       "worldBuffId": [
@@ -1762,6 +2515,15 @@
       },
       "sortingOrder": 211,
       "name": "포르투갈의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Portugal_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 포르투갈 1위",
       "worldBuffId": [
@@ -1778,6 +2540,15 @@
       },
       "sortingOrder": 212,
       "name": "에스파냐의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Espana_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 에스파냐 1위",
       "worldBuffId": [
@@ -1794,6 +2565,15 @@
       },
       "sortingOrder": 213,
       "name": "잉글랜드의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1England_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 잉글랜드 1위",
       "worldBuffId": [
@@ -1810,6 +2590,15 @@
       },
       "sortingOrder": 214,
       "name": "네덜란드의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Netherlands_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 네덜란드 1위",
       "worldBuffId": [
@@ -1826,6 +2615,15 @@
       },
       "sortingOrder": 215,
       "name": "오스만의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Ottoman_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 오스만 1위",
       "worldBuffId": [
@@ -1842,6 +2640,15 @@
       },
       "sortingOrder": 216,
       "name": "명의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Myoung_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 명 1위",
       "worldBuffId": [
@@ -1858,6 +2665,15 @@
       },
       "sortingOrder": 217,
       "name": "조선의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Korea_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 조선 1위",
       "worldBuffId": [
@@ -1874,6 +2690,15 @@
       },
       "sortingOrder": 218,
       "name": "일본의 최강자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward1_Sprite",
+        "DecoColor": "FFFBCD",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Japan_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_10",
+        "PremiumDeco": "WT_UserTitle_Deco_02_Sprite",
+        "PremiumDecoColor": "FFC300"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "최강의 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 일본 1위",
       "worldBuffId": [
@@ -1890,6 +2715,15 @@
       },
       "sortingOrder": 202,
       "name": "도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 종합 2~10위",
       "worldBuffId": [
@@ -1906,6 +2740,15 @@
       },
       "sortingOrder": 221,
       "name": "포르투갈의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Portugal_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 포르투갈 2~3위",
       "worldBuffId": [
@@ -1922,6 +2765,15 @@
       },
       "sortingOrder": 222,
       "name": "에스파냐의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Espana_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 에스파냐 2~3위",
       "worldBuffId": [
@@ -1938,6 +2790,15 @@
       },
       "sortingOrder": 223,
       "name": "잉글랜드의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1England_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 잉글랜드 2~3위",
       "worldBuffId": [
@@ -1954,6 +2815,15 @@
       },
       "sortingOrder": 224,
       "name": "네덜란드의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Netherlands_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 네덜란드 2~3위",
       "worldBuffId": [
@@ -1970,6 +2840,15 @@
       },
       "sortingOrder": 225,
       "name": "오스만의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Ottoman_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 오스만 2~3위",
       "worldBuffId": [
@@ -1986,6 +2865,15 @@
       },
       "sortingOrder": 226,
       "name": "명의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Myoung_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 명 2~3위",
       "worldBuffId": [
@@ -2002,6 +2890,15 @@
       },
       "sortingOrder": 227,
       "name": "조선의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Korea_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 조선 2~3위",
       "worldBuffId": [
@@ -2018,6 +2915,15 @@
       },
       "sortingOrder": 228,
       "name": "일본의 도전자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season1Reward2_Sprite",
+        "DecoColor": "E1D6CC",
+        "MiddleSideDeco": "WT_UserTitleSide_Season1Japan_Sprite",
+        "DecoFX": "WBP_FloatingUserTitleFX_11",
+        "PremiumDeco": "WT_UserTitle_Deco_03_Sprite",
+        "PremiumDecoColor": "B8AFA7"
+      },
+      "notReverseSideDeco": true,
       "flavorText": "다시 최강에 도전하실 제독에게 드리는 칭호입니다. 시즌마다 효과와 유효 시간이 변경됩니다.",
       "hintText": "투자 시즌 3 종료 시 일본 2~3위",
       "worldBuffId": [
@@ -2034,6 +2940,12 @@
       "sortingOrder": 111,
       "startDate": "2025/09/22/00:00:00",
       "name": "동방의 탐구자",
+      "userTitleDeco": {
+        "TopCenterDeco": "WT_UserTitleTop_Season4_Sprite",
+        "DecoColor": "FFFFFF",
+        "MiddleSideDeco": "WT_UserTitleSide_Season4_Sprite"
+      },
+      "notReverseSideDeco": false,
       "flavorText": "투자 시즌 4에서 위대한 모험에 참여한 제독을 위한 칭호입니다.",
       "hintText": "투자 시즌 4 상점 구매",
       "worldBuffId": [

@@ -1418,6 +1418,9 @@ function generateUIListData(cmsDir, loctab = {}) {
   // 24. EventMission (이벤트 미션) - EventTask에서 설명 가져오기
   const eventMissionTable = loadTable('EventMission');
   const eventTaskTable = loadTable('EventTask');
+  const achievementTermsTable = loadTable('AchievementTerms');
+  const contentsTermsTable = loadTable('ContentsTerms');
+
   if (eventMissionTable && eventMissionTable.EventMission) {
     for (const [key, mission] of Object.entries(eventMissionTable.EventMission)) {
       if (!mission || !mission.id || key.startsWith(':')) {
@@ -1425,33 +1428,93 @@ function generateUIListData(cmsDir, loctab = {}) {
       }
 
       let nameKr = `EventMission ${mission.id}`;
+      let hasError = false;
+      let errorMessage = null;
 
       // Get description from EventTask if available
       if (mission.eventTaskId && eventTaskTable && eventTaskTable.EventTask) {
         const eventTask = eventTaskTable.EventTask[mission.eventTaskId];
-        if (eventTask && eventTask.overrideDesc) {
-          nameKr = eventTask.overrideDesc;
+        if (eventTask) {
+          if (eventTask.overrideDesc) {
+            // Use overrideDesc from EventTask
+            nameKr = eventTask.overrideDesc;
 
-          // Replace placeholders if descFormat exists
-          if (eventTask.descFormat && Array.isArray(eventTask.descFormat)) {
-            const formattedTexts = eventTask.descFormat.map((fmt) => {
-              // Type 1 = COUNT, use eventTaskCount
-              if (fmt.Type === 1) {
-                return eventTask.eventTaskCount ? eventTask.eventTaskCount.toString() : '0';
+            // Replace placeholders if descFormat exists
+            if (eventTask.descFormat && Array.isArray(eventTask.descFormat)) {
+              const formattedTexts = eventTask.descFormat.map((fmt) => {
+                // Type 1 = COUNT, use eventTaskCount
+                if (fmt.Type === 1) {
+                  return eventTask.eventTaskCount ? eventTask.eventTaskCount.toString() : '0';
+                }
+                // Type 2 = CMS_NAME, Type 3 = ENUM_NAME - not implemented for EventTask
+                return '[Unknown]';
+              });
+
+              // Replace {0}, {1}, {2}, etc. with formatted texts
+              nameKr = stringFormat(nameKr, formattedTexts);
+            }
+
+            // Remove @ and everything after it (comment marker)
+            const atIndex = nameKr.indexOf('@');
+            if (atIndex !== -1) {
+              nameKr = nameKr.substring(0, atIndex).trim();
+            }
+          } else if (eventTask.eventTaskTermsId) {
+            // No overrideDesc - try to get description from AchievementTerms or ContentsTerms
+            let termsDesc = null;
+
+            // Check AchievementTerms first (87000000-87999999)
+            if (eventTask.eventTaskTermsId >= 87000000 && eventTask.eventTaskTermsId <= 87999999) {
+              if (achievementTermsTable && achievementTermsTable.AchievementTerms) {
+                const achievementTerm = achievementTermsTable.AchievementTerms[eventTask.eventTaskTermsId];
+                if (achievementTerm && achievementTerm.desc) {
+                  termsDesc = achievementTerm.desc;
+                }
               }
-              // Type 2 = CMS_NAME, Type 3 = ENUM_NAME - not implemented for EventTask
-              return '[Unknown]';
-            });
+            }
+            // Check ContentsTerms (81000000-81999999)
+            else if (eventTask.eventTaskTermsId >= 81000000 && eventTask.eventTaskTermsId <= 81999999) {
+              if (contentsTermsTable && contentsTermsTable.ContentsTerms) {
+                const contentsTerm = contentsTermsTable.ContentsTerms[eventTask.eventTaskTermsId];
+                if (contentsTerm && contentsTerm.desc) {
+                  termsDesc = contentsTerm.desc;
+                }
+              }
+            }
 
-            // Replace {0}, {1}, {2}, etc. with formatted texts
-            nameKr = stringFormat(nameKr, formattedTexts);
-          }
+            if (termsDesc) {
+              nameKr = termsDesc;
 
-          // Remove @ and everything after it (comment marker)
-          const atIndex = nameKr.indexOf('@');
-          if (atIndex !== -1) {
-            nameKr = nameKr.substring(0, atIndex).trim();
+              // Replace placeholders if descFormat exists
+              if (eventTask.descFormat && Array.isArray(eventTask.descFormat)) {
+                const formattedTexts = eventTask.descFormat.map((fmt) => {
+                  // Type 1 = COUNT, use eventTaskCount
+                  if (fmt.Type === 1) {
+                    return eventTask.eventTaskCount ? eventTask.eventTaskCount.toString() : '0';
+                  }
+                  // Type 2 = CMS_NAME, Type 3 = ENUM_NAME - not fully implemented
+                  return '[Unknown]';
+                });
+
+                // Replace {0}, {1}, {2}, etc. with formatted texts
+                nameKr = stringFormat(nameKr, formattedTexts);
+              }
+
+              // Remove @ and everything after it (comment marker)
+              const atIndex = nameKr.indexOf('@');
+              if (atIndex !== -1) {
+                nameKr = nameKr.substring(0, atIndex).trim();
+              }
+            } else {
+              // Fallback: use EventTask ID and type
+              nameKr = `EventMission ${mission.id} (Task:${eventTask.id})`;
+            }
           }
+        } else if (mission.eventTaskId) {
+          // EventTask ID specified but not found
+          hasError = true;
+          errorMessage = `EventTask ${mission.eventTaskId} not found`;
+          nameKr = `MISSING TASK ${mission.eventTaskId}`;
         }
       }
 
@@ -1463,6 +1526,8 @@ function generateUIListData(cmsDir, loctab = {}) {
         nameEn: nameKr,
         type: mission.type,
         eventTaskId: mission.eventTaskId,
+        hasError: hasError,
+        errorMessage: errorMessage,
       });
     }
     uiListData.eventMissions.sort((a, b) => a.id - b.id);
@@ -1528,7 +1593,17 @@ function generateUIListData(cmsDir, loctab = {}) {
   }
 
   console.log('   ✅ UI list data built successfully!\n');
-  return uiListData;
+
+  // Convert keys to SNAKE_CASE_UPPER
+  const convertedData = {};
+  for (const [key, value] of Object.entries(uiListData)) {
+    const snakeCaseKey = key
+      .replace(/([a-z])([A-Z])/g, '$1_$2')
+      .toUpperCase();
+    convertedData[snakeCaseKey] = value;
+  }
+
+  return convertedData;
 }
 
 /**

@@ -35,22 +35,17 @@ import {
   Clear as ClearIcon,
   CardGiftcard as GiftIcon,
   Category as CategoryIcon,
-  Warning as WarningIcon,
+  Schedule as ScheduleIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import planningDataService, { PlanningDataStats } from '../../services/planningDataService';
+import planningDataService, { PlanningDataStats, HotTimeBuffLookup, HotTimeBuffItem } from '../../services/planningDataService';
 import SimplePagination from '../../components/common/SimplePagination';
 import { useDebounce } from '../../hooks/useDebounce';
 
 const PlanningDataPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
-
-  // Force reload translations on mount
-  useEffect(() => {
-    i18n.reloadResources();
-  }, [i18n]);
 
   // State
   const [stats, setStats] = useState<PlanningDataStats | null>(null);
@@ -95,15 +90,98 @@ const PlanningDataPage: React.FC = () => {
     return saved === 'true';
   });
 
+  // HotTimeBuff state
+  const [hotTimeBuffData, setHotTimeBuffData] = useState<HotTimeBuffLookup | null>(null);
+  const [loadingHotTimeBuff, setLoadingHotTimeBuff] = useState(false);
+  const [hotTimeBuffPage, setHotTimeBuffPage] = useState(0);
+  const [hotTimeBuffRowsPerPage, setHotTimeBuffRowsPerPage] = useState(20);
+  const [hotTimeBuffSearchTerm, setHotTimeBuffSearchTerm] = useState('');
+  const debouncedHotTimeBuffSearchTerm = useDebounce(hotTimeBuffSearchTerm, 300);
+  const [hotTimeBuffSortBy, setHotTimeBuffSortBy] = useState<'id' | 'startDate'>('id');
+  const [hotTimeBuffSortOrder, setHotTimeBuffSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [viewAllHotTimeBuff, setViewAllHotTimeBuff] = useState(() => {
+    const saved = sessionStorage.getItem('planningDataViewAllHotTimeBuff');
+    return saved === 'true';
+  });
+
+  // EventPage state
+  const [eventPageData, setEventPageData] = useState<any>(null);
+  const [loadingEventPage, setLoadingEventPage] = useState(false);
+  const [eventPagePage, setEventPagePage] = useState(0);
+  const [eventPageRowsPerPage, setEventPageRowsPerPage] = useState(20);
+  const [eventPageSearchTerm, setEventPageSearchTerm] = useState('');
+  const debouncedEventPageSearchTerm = useDebounce(eventPageSearchTerm, 300);
+  const [viewAllEventPage, setViewAllEventPage] = useState(() => {
+    const saved = sessionStorage.getItem('planningDataViewAllEventPage');
+    return saved === 'true';
+  });
+
+  // LiveEvent state
+  const [liveEventData, setLiveEventData] = useState<any>(null);
+  const [loadingLiveEvent, setLoadingLiveEvent] = useState(false);
+  const [liveEventPage, setLiveEventPage] = useState(0);
+  const [liveEventRowsPerPage, setLiveEventRowsPerPage] = useState(20);
+  const [liveEventSearchTerm, setLiveEventSearchTerm] = useState('');
+  const debouncedLiveEventSearchTerm = useDebounce(liveEventSearchTerm, 300);
+  const [viewAllLiveEvent, setViewAllLiveEvent] = useState(() => {
+    const saved = sessionStorage.getItem('planningDataViewAllLiveEvent');
+    return saved === 'true';
+  });
+
+  // MateRecruitingGroup state
+  const [mateRecruitingGroupData, setMateRecruitingGroupData] = useState<any>(null);
+  const [loadingMateRecruitingGroup, setLoadingMateRecruitingGroup] = useState(false);
+  const [mateRecruitingGroupPage, setMateRecruitingGroupPage] = useState(0);
+  const [mateRecruitingGroupRowsPerPage, setMateRecruitingGroupRowsPerPage] = useState(20);
+  const [mateRecruitingGroupSearchTerm, setMateRecruitingGroupSearchTerm] = useState('');
+  const debouncedMateRecruitingGroupSearchTerm = useDebounce(mateRecruitingGroupSearchTerm, 300);
+  const [viewAllMateRecruitingGroup, setViewAllMateRecruitingGroup] = useState(() => {
+    const saved = sessionStorage.getItem('planningDataViewAllMateRecruitingGroup');
+    return saved === 'true';
+  });
+
+  // OceanNpcAreaSpawner state
+  const [oceanNpcAreaSpawnerData, setOceanNpcAreaSpawnerData] = useState<any>(null);
+  const [loadingOceanNpcAreaSpawner, setLoadingOceanNpcAreaSpawner] = useState(false);
+  const [oceanNpcAreaSpawnerPage, setOceanNpcAreaSpawnerPage] = useState(0);
+  const [oceanNpcAreaSpawnerRowsPerPage, setOceanNpcAreaSpawnerRowsPerPage] = useState(20);
+  const [oceanNpcAreaSpawnerSearchTerm, setOceanNpcAreaSpawnerSearchTerm] = useState('');
+  const debouncedOceanNpcAreaSpawnerSearchTerm = useDebounce(oceanNpcAreaSpawnerSearchTerm, 300);
+  const [viewAllOceanNpcAreaSpawner, setViewAllOceanNpcAreaSpawner] = useState(() => {
+    const saved = sessionStorage.getItem('planningDataViewAllOceanNpcAreaSpawner');
+    return saved === 'true';
+  });
+
+
+
   // Load stats on mount
   useEffect(() => {
     loadStats();
   }, []);
 
+  // Load data for active tab when tab changes or on mount
+  useEffect(() => {
+    if (activeTab === 2 && !hotTimeBuffData) {
+      loadHotTimeBuff();
+    } else if (activeTab === 3 && !eventPageData) {
+      loadEventPage();
+    } else if (activeTab === 4 && !liveEventData) {
+      loadLiveEvent();
+    } else if (activeTab === 5 && !mateRecruitingGroupData) {
+      loadMateRecruitingGroup();
+    } else if (activeTab === 6 && !oceanNpcAreaSpawnerData) {
+      loadOceanNpcAreaSpawner();
+    }
+  }, [activeTab, hotTimeBuffData, eventPageData, liveEventData, mateRecruitingGroupData, oceanNpcAreaSpawnerData]);
+
   const loadStats = async () => {
     try {
       setLoading(true);
       const data = await planningDataService.getStats();
+      console.log('Stats data received:', data);
+      if (!data) {
+        throw new Error('Stats data is null or undefined');
+      }
       setStats(data);
     } catch (error: any) {
       // Extract user-friendly error message
@@ -113,19 +191,139 @@ const PlanningDataPage: React.FC = () => {
       } else if (error.message && !error.message.includes('function')) {
         errorMessage = error.message;
       }
+      console.error('Error loading stats:', error);
       enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setLoading(false);
     }
   };
 
+  const loadHotTimeBuff = async () => {
+    try {
+      setLoadingHotTimeBuff(true);
+      const data = await planningDataService.getHotTimeBuffLookup();
+      setHotTimeBuffData(data);
+    } catch (error: any) {
+      let errorMessage = t('planningData.errors.loadStatsFailed');
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message && !error.message.includes('function')) {
+        errorMessage = error.message;
+      }
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    } finally {
+      setLoadingHotTimeBuff(false);
+    }
+  };
+
+  const loadEventPage = async () => {
+    try {
+      setLoadingEventPage(true);
+      const data = await planningDataService.getEventPageLookup();
+      setEventPageData(data);
+    } catch (error: any) {
+      let errorMessage = t('planningData.errors.loadStatsFailed');
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message && !error.message.includes('function')) {
+        errorMessage = error.message;
+      }
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    } finally {
+      setLoadingEventPage(false);
+    }
+  };
+
+  const loadLiveEvent = async () => {
+    try {
+      setLoadingLiveEvent(true);
+      const data = await planningDataService.getLiveEventLookup();
+      setLiveEventData(data);
+    } catch (error: any) {
+      let errorMessage = t('planningData.errors.loadStatsFailed');
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message && !error.message.includes('function')) {
+        errorMessage = error.message;
+      }
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    } finally {
+      setLoadingLiveEvent(false);
+    }
+  };
+
+  const loadMateRecruitingGroup = async () => {
+    try {
+      setLoadingMateRecruitingGroup(true);
+      const data = await planningDataService.getMateRecruitingGroupLookup();
+      setMateRecruitingGroupData(data);
+    } catch (error: any) {
+      let errorMessage = t('planningData.errors.loadStatsFailed');
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message && !error.message.includes('function')) {
+        errorMessage = error.message;
+      }
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    } finally {
+      setLoadingMateRecruitingGroup(false);
+    }
+  };
+
+  const loadOceanNpcAreaSpawner = async () => {
+    try {
+      setLoadingOceanNpcAreaSpawner(true);
+      const data = await planningDataService.getOceanNpcAreaSpawnerLookup();
+      setOceanNpcAreaSpawnerData(data);
+    } catch (error: any) {
+      let errorMessage = t('planningData.errors.loadStatsFailed');
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message && !error.message.includes('function')) {
+        errorMessage = error.message;
+      }
+      enqueueSnackbar(errorMessage, { variant: 'error' });
+    } finally {
+      setLoadingOceanNpcAreaSpawner(false);
+    }
+  };
+
   const handleRebuild = async () => {
     try {
       setRebuilding(true);
-      const result = await planningDataService.rebuildRewardLookup();
+      // Rebuild all planning data
+      await Promise.all([
+        planningDataService.rebuildRewardLookup(),
+        planningDataService.buildHotTimeBuffLookup(),
+        planningDataService.buildEventPageLookup(),
+        planningDataService.buildLiveEventLookup(),
+        planningDataService.buildMateRecruitingGroupLookup(),
+        planningDataService.buildOceanNpcAreaSpawnerLookup(),
+      ]);
       enqueueSnackbar(t('planningData.rebuildSuccess'), { variant: 'success' });
+
+      // Clear all cached data to force reload
+      setHotTimeBuffData(null);
+      setEventPageData(null);
+      setLiveEventData(null);
+      setMateRecruitingGroupData(null);
+      setOceanNpcAreaSpawnerData(null);
+
       // Reload stats
       await loadStats();
+
+      // Reload data for current tab
+      if (activeTab === 2) {
+        await loadHotTimeBuff();
+      } else if (activeTab === 3) {
+        await loadEventPage();
+      } else if (activeTab === 4) {
+        await loadLiveEvent();
+      } else if (activeTab === 5) {
+        await loadMateRecruitingGroup();
+      } else if (activeTab === 6) {
+        await loadOceanNpcAreaSpawner();
+      }
     } catch (error: any) {
       // Extract user-friendly error message
       let errorMessage = t('planningData.errors.rebuildFailed');
@@ -134,11 +332,14 @@ const PlanningDataPage: React.FC = () => {
       } else if (error.message && !error.message.includes('function')) {
         errorMessage = error.message;
       }
+      console.error('Rebuild error details:', error);
       enqueueSnackbar(errorMessage, { variant: 'error' });
     } finally {
       setRebuilding(false);
     }
   };
+
+
 
   // Copy to clipboard on Ctrl+Click
   const handleCellClick = (event: React.MouseEvent, text: string) => {
@@ -308,6 +509,18 @@ const PlanningDataPage: React.FC = () => {
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
     sessionStorage.setItem('planningDataActiveTab', newValue.toString());
+    // Load data when switching to each tab
+    if (newValue === 2 && !hotTimeBuffData) {
+      loadHotTimeBuff();
+    } else if (newValue === 3 && !eventPageData) {
+      loadEventPage();
+    } else if (newValue === 4 && !liveEventData) {
+      loadLiveEvent();
+    } else if (newValue === 5 && !mateRecruitingGroupData) {
+      loadMateRecruitingGroup();
+    } else if (newValue === 6 && !oceanNpcAreaSpawnerData) {
+      loadOceanNpcAreaSpawner();
+    }
   };
 
   const handleRewardTypeChange = (event: any) => {
@@ -347,6 +560,65 @@ const PlanningDataPage: React.FC = () => {
       setSortOrder('asc');
     }
     setPage(0); // Reset to first page when sorting
+  };
+
+  // Filtered HotTimeBuff items based on search
+  const filteredHotTimeBuffItems = useMemo(() => {
+    if (!hotTimeBuffData?.items) return [];
+    let items = hotTimeBuffData.items;
+
+    // Apply search filter
+    if (debouncedHotTimeBuffSearchTerm) {
+      const searchLower = debouncedHotTimeBuffSearchTerm.toLowerCase();
+      items = items.filter((item: HotTimeBuffItem) => {
+        const idMatch = item.id.toString().includes(searchLower);
+        const iconMatch = item.icon?.toLowerCase().includes(searchLower);
+        const startDateMatch = item.startDate?.toLowerCase().includes(searchLower);
+        const endDateMatch = item.endDate?.toLowerCase().includes(searchLower);
+        return idMatch || iconMatch || startDateMatch || endDateMatch;
+      });
+    }
+
+    // Apply sorting
+    const sorted = [...items].sort((a: HotTimeBuffItem, b: HotTimeBuffItem) => {
+      let compareResult = 0;
+      if (hotTimeBuffSortBy === 'id') {
+        compareResult = a.id - b.id;
+      } else {
+        compareResult = a.startDate.localeCompare(b.startDate);
+      }
+      return hotTimeBuffSortOrder === 'asc' ? compareResult : -compareResult;
+    });
+
+    return sorted;
+  }, [hotTimeBuffData?.items, debouncedHotTimeBuffSearchTerm, hotTimeBuffSortBy, hotTimeBuffSortOrder]);
+
+  // Paginated HotTimeBuff items
+  const paginatedHotTimeBuffItems = useMemo(() => {
+    const start = hotTimeBuffPage * hotTimeBuffRowsPerPage;
+    const end = start + hotTimeBuffRowsPerPage;
+    return filteredHotTimeBuffItems.slice(start, end);
+  }, [filteredHotTimeBuffItems, hotTimeBuffPage, hotTimeBuffRowsPerPage]);
+
+  // Handle HotTimeBuff pagination
+  const handleHotTimeBuffPageChange = (_event: unknown, newPage: number) => {
+    setHotTimeBuffPage(newPage);
+  };
+
+  const handleHotTimeBuffRowsPerPageChange = (event: any) => {
+    setHotTimeBuffRowsPerPage(parseInt(event.target.value, 10));
+    setHotTimeBuffPage(0);
+  };
+
+  // Handle HotTimeBuff sort
+  const handleHotTimeBuffSort = (column: 'id' | 'startDate') => {
+    if (hotTimeBuffSortBy === column) {
+      setHotTimeBuffSortOrder(hotTimeBuffSortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setHotTimeBuffSortBy(column);
+      setHotTimeBuffSortOrder('asc');
+    }
+    setHotTimeBuffPage(0);
   };
 
   return (
@@ -404,6 +676,36 @@ const PlanningDataPage: React.FC = () => {
                 label={t('planningData.tabs.uiLists')}
                 sx={{ minHeight: 48 }}
               />
+              <Tab
+                icon={<ScheduleIcon />}
+                iconPosition="start"
+                label="HotTimeBuff"
+                sx={{ minHeight: 48 }}
+              />
+              <Tab
+                icon={<ScheduleIcon />}
+                iconPosition="start"
+                label="EventPage"
+                sx={{ minHeight: 48 }}
+              />
+              <Tab
+                icon={<ScheduleIcon />}
+                iconPosition="start"
+                label="LiveEvent"
+                sx={{ minHeight: 48 }}
+              />
+              <Tab
+                icon={<ScheduleIcon />}
+                iconPosition="start"
+                label="MateRecruitingGroup"
+                sx={{ minHeight: 48 }}
+              />
+              <Tab
+                icon={<ScheduleIcon />}
+                iconPosition="start"
+                label="OceanNpcAreaSpawner"
+                sx={{ minHeight: 48 }}
+              />
             </Tabs>
 
             <CardContent>
@@ -451,8 +753,7 @@ const PlanningDataPage: React.FC = () => {
                               setPage(0);
                             }}
                             sx={{
-                              flexGrow: 1,
-                              maxWidth: 750,
+                              width: '30%',
                               '& .MuiOutlinedInput-root': {
                                 height: '40px',
                                 borderRadius: '20px',
@@ -511,7 +812,7 @@ const PlanningDataPage: React.FC = () => {
 
                         {/* View All checkbox - only for types with table */}
                         {currentRewardType.hasTable && (
-                          <Box sx={{ display: 'flex', alignItems: 'center', ml: 1, gap: 1 }}>
+                          <Tooltip title={t('planningData.viewAllWarning')} arrow>
                             <FormControlLabel
                               control={
                                 <Checkbox
@@ -526,13 +827,7 @@ const PlanningDataPage: React.FC = () => {
                               }
                               label={t('planningData.viewAll')}
                             />
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                              <WarningIcon sx={{ fontSize: 16, color: 'warning.main', mr: 0.5 }} />
-                              <Typography variant="caption" color="warning.main">
-                                {t('planningData.viewAllWarning')}
-                              </Typography>
-                            </Box>
-                          </Box>
+                          </Tooltip>
                         )}
                       </Box>
 
@@ -737,8 +1032,7 @@ const PlanningDataPage: React.FC = () => {
                                 setPage(0); // Reset to first page when searching
                               }}
                               sx={{
-                                flexGrow: 1,
-                                maxWidth: 750,
+                                width: '30%',
                                 '& .MuiOutlinedInput-root': {
                                   height: '40px',
                                   borderRadius: '20px',
@@ -795,7 +1089,7 @@ const PlanningDataPage: React.FC = () => {
                             />
 
                             {/* View All checkbox */}
-                            <Box sx={{ display: 'flex', alignItems: 'center', ml: 1, gap: 1 }}>
+                            <Tooltip title={t('planningData.viewAllWarning')} arrow>
                               <FormControlLabel
                                 control={
                                   <Checkbox
@@ -810,13 +1104,7 @@ const PlanningDataPage: React.FC = () => {
                                 }
                                 label={t('planningData.viewAll')}
                               />
-                              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <WarningIcon sx={{ fontSize: 16, color: 'warning.main', mr: 0.5 }} />
-                                <Typography variant="caption" color="warning.main">
-                                  {t('planningData.viewAllWarning')}
-                                </Typography>
-                              </Box>
-                            </Box>
+                            </Tooltip>
                           </Box>
 
                           {viewAllUiItems ? (
@@ -842,9 +1130,12 @@ const PlanningDataPage: React.FC = () => {
                                 }
 
                                 const label = `${item.id}: ${displayName}`;
+                                const tooltipTitle = item.hasError
+                                  ? `⚠️ 오류: ${item.errorMessage}\n${label}`
+                                  : label;
 
                                 return (
-                                  <Tooltip key={item.id} title={label} arrow>
+                                  <Tooltip key={item.id} title={tooltipTitle} arrow>
                                     <Box
                                       sx={{
                                         p: 1,
@@ -855,10 +1146,10 @@ const PlanningDataPage: React.FC = () => {
                                         overflow: 'hidden',
                                         textOverflow: 'ellipsis',
                                         whiteSpace: 'nowrap',
-                                        bgcolor: 'background.paper',
+                                        bgcolor: item.hasError ? 'rgba(255, 205, 210, 0.3)' : 'background.paper',
                                         transition: 'background-color 0.2s',
                                         '&:hover': {
-                                          bgcolor: 'action.hover',
+                                          bgcolor: item.hasError ? 'rgba(255, 205, 210, 0.5)' : 'action.hover',
                                         }
                                       }}
                                     >
@@ -908,7 +1199,16 @@ const PlanningDataPage: React.FC = () => {
                                       }
 
                                       return (
-                                        <TableRow key={item.id} hover>
+                                        <TableRow
+                                          key={item.id}
+                                          hover
+                                          sx={{
+                                            bgcolor: item.hasError ? 'rgba(255, 205, 210, 0.3)' : 'inherit',
+                                            '&:hover': {
+                                              bgcolor: item.hasError ? 'rgba(255, 205, 210, 0.5)' : 'action.hover',
+                                            }
+                                          }}
+                                        >
                                           <TableCell
                                             onClick={(e) => handleCellClick(e, item.id.toString())}
                                             sx={{ cursor: 'pointer' }}
@@ -919,7 +1219,9 @@ const PlanningDataPage: React.FC = () => {
                                             onClick={(e) => handleCellClick(e, displayName)}
                                             sx={{ cursor: 'pointer' }}
                                           >
-                                            {displayName}
+                                            <Tooltip title={item.hasError ? `⚠️ ${item.errorMessage}` : ''} arrow>
+                                              <span>{displayName}</span>
+                                            </Tooltip>
                                           </TableCell>
                                         </TableRow>
                                       );
@@ -947,6 +1249,1067 @@ const PlanningDataPage: React.FC = () => {
                   )}
                 </Box>
               )}
+
+              {/* HotTimeBuff Tab */}
+              {activeTab === 2 && (
+                <Box>
+                  {/* Search and View All controls */}
+                  <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
+                    {/* Search box */}
+                    <TextField
+                      placeholder={t('planningData.searchPlaceholder')}
+                      value={hotTimeBuffSearchTerm}
+                      onChange={(e) => {
+                        setHotTimeBuffSearchTerm(e.target.value);
+                        setHotTimeBuffPage(0);
+                      }}
+                      sx={{
+                        width: '30%',
+                        '& .MuiOutlinedInput-root': {
+                          height: '40px',
+                          borderRadius: '20px',
+                          bgcolor: 'background.paper',
+                          transition: 'all 0.2s ease-in-out',
+                          '& fieldset': {
+                            borderColor: 'divider',
+                          },
+                          '&:hover': {
+                            bgcolor: 'action.hover',
+                            '& fieldset': {
+                              borderColor: 'primary.light',
+                            }
+                          },
+                          '&.Mui-focused': {
+                            bgcolor: 'background.paper',
+                            boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                            '& fieldset': {
+                              borderColor: 'primary.main',
+                              borderWidth: '1px',
+                            }
+                          }
+                        },
+                        '& .MuiInputBase-input': {
+                          fontSize: '0.875rem',
+                        }
+                      }}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                          </InputAdornment>
+                        ),
+                        endAdornment: hotTimeBuffSearchTerm && (
+                          <InputAdornment position="end">
+                            <ClearIcon
+                              sx={{
+                                color: 'text.secondary',
+                                fontSize: 20,
+                                cursor: 'pointer',
+                                '&:hover': {
+                                  color: 'text.primary',
+                                }
+                              }}
+                              onClick={() => {
+                                setHotTimeBuffSearchTerm('');
+                                setHotTimeBuffPage(0);
+                              }}
+                            />
+                          </InputAdornment>
+                        ),
+                      }}
+                      size="small"
+                    />
+
+                    {/* View All checkbox */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', ml: 1, gap: 1 }}>
+                      <Tooltip title={t('planningData.viewAllWarning')} arrow>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={viewAllHotTimeBuff}
+                              onChange={(e) => {
+                                const newValue = e.target.checked;
+                                setViewAllHotTimeBuff(newValue);
+                                sessionStorage.setItem('planningDataViewAllHotTimeBuff', newValue.toString());
+                              }}
+                              size="small"
+                            />
+                          }
+                          label={t('planningData.viewAll')}
+                        />
+                      </Tooltip>
+                    </Box>
+                  </Box>
+
+                  {loadingHotTimeBuff && !hotTimeBuffData ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                      <CircularProgress />
+                    </Box>
+                  ) : hotTimeBuffData && hotTimeBuffData.items && hotTimeBuffData.items.length > 0 ? (
+                    <>
+                      {viewAllHotTimeBuff ? (
+                        /* Grid view - show all items in table-like layout */
+                        <Box sx={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                          gap: 0,
+                          border: '1px dashed',
+                          borderColor: 'divider',
+                          borderRadius: 1,
+                          overflow: 'hidden',
+                        }}>
+                          {filteredHotTimeBuffItems.map((item: HotTimeBuffItem) => {
+                            const buffNames = item.worldBuffNames?.join(', ') || item.worldBuffId?.join(', ') || 'No Buff';
+                            const label = `${item.id}: ${buffNames}`;
+                            return (
+                              <Tooltip key={item.id} title={label} arrow>
+                                <Box
+                                  sx={{
+                                    p: 1,
+                                    borderRight: '1px dashed',
+                                    borderBottom: '1px dashed',
+                                    borderColor: 'divider',
+                                    fontSize: '0.8125rem',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                    bgcolor: 'background.paper',
+                                    transition: 'background-color 0.2s',
+                                    '&:hover': {
+                                      bgcolor: 'action.hover',
+                                    }
+                                  }}
+                                >
+                                  {label}
+                                </Box>
+                              </Tooltip>
+                            );
+                          })}
+                        </Box>
+                      ) : (
+                        /* Table view - paginated */
+                        <>
+                          <TableContainer component={Paper} variant="outlined">
+                            <Table size="small">
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell>
+                                    <TableSortLabel
+                                      active={hotTimeBuffSortBy === 'id'}
+                                      direction={hotTimeBuffSortOrder}
+                                      onClick={() => handleHotTimeBuffSort('id')}
+                                    >
+                                      ID
+                                    </TableSortLabel>
+                                  </TableCell>
+                                  <TableCell>Icon</TableCell>
+                                  <TableCell>
+                                    <TableSortLabel
+                                      active={hotTimeBuffSortBy === 'startDate'}
+                                      direction={hotTimeBuffSortOrder}
+                                      onClick={() => handleHotTimeBuffSort('startDate')}
+                                    >
+                                      Start Date
+                                    </TableSortLabel>
+                                  </TableCell>
+                                  <TableCell>End Date</TableCell>
+                                  <TableCell>Start Hour</TableCell>
+                                  <TableCell>End Hour</TableCell>
+                                  <TableCell>Min Lv</TableCell>
+                                  <TableCell>Max Lv</TableCell>
+                                  <TableCell>Day of Week</TableCell>
+                                  <TableCell>World Buff</TableCell>
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {paginatedHotTimeBuffItems.map((item: HotTimeBuffItem) => (
+                                  <TableRow key={item.id} hover>
+                                    <TableCell
+                                      onClick={(e) => handleCellClick(e, item.id.toString())}
+                                      sx={{ cursor: 'pointer', fontWeight: 500 }}
+                                    >
+                                      {item.id}
+                                    </TableCell>
+                                    <TableCell
+                                      onClick={(e) => handleCellClick(e, item.icon)}
+                                      sx={{ cursor: 'pointer' }}
+                                    >
+                                      {item.icon}
+                                    </TableCell>
+                                    <TableCell
+                                      onClick={(e) => handleCellClick(e, item.startDate)}
+                                      sx={{ cursor: 'pointer' }}
+                                    >
+                                      {item.startDate}
+                                    </TableCell>
+                                    <TableCell
+                                      onClick={(e) => handleCellClick(e, item.endDate)}
+                                      sx={{ cursor: 'pointer' }}
+                                    >
+                                      {item.endDate}
+                                    </TableCell>
+                                    <TableCell>{item.startHour}</TableCell>
+                                    <TableCell>{item.endHour}</TableCell>
+                                    <TableCell>{item.minLv}</TableCell>
+                                    <TableCell>{item.maxLv}</TableCell>
+                                    <TableCell>{item.bitFlagDayOfWeek}</TableCell>
+                                    <TableCell>
+                                      {item.worldBuffNames && item.worldBuffNames.length > 0
+                                        ? item.worldBuffNames.join(', ')
+                                        : item.worldBuffId && item.worldBuffId.length > 0
+                                        ? item.worldBuffId.join(', ')
+                                        : '-'}
+                                    </TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </TableContainer>
+
+                          {/* Pagination */}
+                          {filteredHotTimeBuffItems.length > 0 && (
+                            <SimplePagination
+                              count={filteredHotTimeBuffItems.length}
+                              page={hotTimeBuffPage}
+                              rowsPerPage={hotTimeBuffRowsPerPage}
+                              onPageChange={handleHotTimeBuffPageChange}
+                              onRowsPerPageChange={handleHotTimeBuffRowsPerPageChange}
+                              rowsPerPageOptions={[10, 20, 50, 100]}
+                            />
+                          )}
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
+                      {t('planningData.noData')}
+                    </Typography>
+                  )}
+                </Box>
+              )}
+
+              {/* EventPage Tab */}
+              {activeTab === 3 && (
+                <Box>
+                  {loadingEventPage && !eventPageData ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                      <CircularProgress />
+                    </Box>
+                  ) : (
+                    <>
+                      <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}>
+                        <Chip label={`${t('planningData.count')}: ${eventPageData?.items?.length || 0}`} size="small" />
+                        <TextField
+                          placeholder={t('planningData.search')}
+                          value={eventPageSearchTerm}
+                          onChange={(e) => {
+                            setEventPageSearchTerm(e.target.value);
+                            setEventPagePage(0);
+                          }}
+                          sx={{
+                            width: '30%',
+                            '& .MuiOutlinedInput-root': {
+                              height: '40px',
+                              borderRadius: '20px',
+                              bgcolor: 'background.paper',
+                              transition: 'all 0.2s ease-in-out',
+                              '& fieldset': {
+                                borderColor: 'divider',
+                              },
+                              '&:hover': {
+                                bgcolor: 'action.hover',
+                                '& fieldset': {
+                                  borderColor: 'primary.light',
+                                }
+                              },
+                              '&.Mui-focused': {
+                                bgcolor: 'background.paper',
+                                boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                                '& fieldset': {
+                                  borderColor: 'primary.main',
+                                  borderWidth: '1px',
+                                }
+                              }
+                            },
+                            '& .MuiInputBase-input': {
+                              fontSize: '0.875rem',
+                            }
+                          }}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                              </InputAdornment>
+                            ),
+                            endAdornment: eventPageSearchTerm && (
+                              <InputAdornment position="end">
+                                <ClearIcon
+                                  sx={{
+                                    color: 'text.secondary',
+                                    fontSize: 20,
+                                    cursor: 'pointer',
+                                    '&:hover': { color: 'text.primary' }
+                                  }}
+                                  onClick={() => {
+                                    setEventPageSearchTerm('');
+                                    setEventPagePage(0);
+                                  }}
+                                />
+                              </InputAdornment>
+                            ),
+                          }}
+                          size="small"
+                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', ml: 1, gap: 1 }}>
+                          <Tooltip title={t('planningData.viewAllWarning')} arrow>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={viewAllEventPage}
+                                  onChange={(e) => {
+                                    const newValue = e.target.checked;
+                                    setViewAllEventPage(newValue);
+                                    sessionStorage.setItem('planningDataViewAllEventPage', newValue.toString());
+                                  }}
+                                  size="small"
+                                />
+                              }
+                              label={t('planningData.viewAll')}
+                            />
+                          </Tooltip>
+                        </Box>
+                      </Box>
+                      {eventPageData && eventPageData.items && eventPageData.items.length > 0 ? (
+                        <>
+                          {viewAllEventPage ? (
+                            /* Grid view - show all items in table-like layout */
+                            <Box sx={{
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                              gap: 0,
+                              border: '1px dashed',
+                              borderColor: 'divider',
+                              borderRadius: 1,
+                              overflow: 'hidden',
+                            }}>
+                              {eventPageData.items.map((item: any) => {
+                                const groupType = [item.pageGroupName, item.typeName]
+                                  .filter((v: any) => v && !String(v).startsWith('Unknown'))
+                                  .join('/');
+                                const label = groupType ? `${item.id}: ${item.name} (${groupType})` : `${item.id}: ${item.name}`;
+                                const fullLabel = `ID: ${item.id}\nName: ${item.name}\nPageGroup: ${(!item.pageGroupName || String(item.pageGroupName).startsWith('Unknown')) ? '-' : item.pageGroupName}\nType: ${(!item.typeName || String(item.typeName).startsWith('Unknown')) ? '-' : item.typeName}`;
+                                return (
+                                  <Tooltip key={item.id} title={fullLabel} arrow>
+                                    <Box
+                                      sx={{
+                                        p: 1,
+                                        borderRight: '1px dashed',
+                                        borderBottom: '1px dashed',
+                                        borderColor: 'divider',
+                                        fontSize: '0.8125rem',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        bgcolor: 'background.paper',
+                                        transition: 'background-color 0.2s',
+                                        '&:hover': {
+                                          bgcolor: 'action.hover',
+                                        }
+                                      }}
+                                    >
+                                      {label}
+                                    </Box>
+                                  </Tooltip>
+                                );
+                              })}
+                            </Box>
+                          ) : (
+                            /* Table view - paginated */
+                            <>
+                              <TableContainer component={Paper} variant="outlined">
+                                <Table size="small">
+                                  <TableHead>
+                                    <TableRow>
+                                      <TableCell width="150px">ID</TableCell>
+                                      <TableCell>Name</TableCell>
+                                      <TableCell>PageGroup</TableCell>
+                                      <TableCell>Type</TableCell>
+                                    </TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                    {eventPageData.items.slice(eventPagePage * eventPageRowsPerPage, (eventPagePage + 1) * eventPageRowsPerPage).map((item: any) => (
+                                      <TableRow key={item.id} hover>
+                                        <TableCell>
+                                          <Chip label={item.id} size="small" variant="outlined" />
+                                        </TableCell>
+                                        <TableCell>{item.name}</TableCell>
+                                        <TableCell>{(!item.pageGroupName || String(item.pageGroupName).startsWith('Unknown')) ? '-' : item.pageGroupName}</TableCell>
+                                        <TableCell>{(!item.typeName || String(item.typeName).startsWith('Unknown')) ? '-' : item.typeName}</TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </TableContainer>
+                              {eventPageData.items.length > 0 && (
+                                <SimplePagination
+                                  count={eventPageData.items.length}
+                                  page={eventPagePage}
+                                  rowsPerPage={eventPageRowsPerPage}
+                                  onPageChange={(_event, newPage) => setEventPagePage(newPage)}
+                                  onRowsPerPageChange={(event) => setEventPageRowsPerPage(Number(event.target.value))}
+                                  rowsPerPageOptions={[10, 20, 50, 100]}
+                                />
+                              )}
+                            </>
+                          )}
+                        </>
+                      ) : (
+                        <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
+                          {t('planningData.noData')}
+                        </Typography>
+                      )}
+                    </>
+                  )}
+                </Box>
+              )}
+
+              {/* LiveEvent Tab */}
+              {activeTab === 4 && (
+                <Box>
+                  {loadingLiveEvent && !liveEventData ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                      <CircularProgress />
+                    </Box>
+                  ) : (
+                    <>
+                      <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}>
+                        <Chip label={`${t('planningData.count')}: ${liveEventData?.items?.length || 0}`} size="small" />
+                        <TextField
+                          placeholder={t('planningData.search')}
+                          value={liveEventSearchTerm}
+                          onChange={(e) => {
+                            setLiveEventSearchTerm(e.target.value);
+                            setLiveEventPage(0);
+                          }}
+                          sx={{
+                            width: '30%',
+                            '& .MuiOutlinedInput-root': {
+                              height: '40px',
+                              borderRadius: '20px',
+                              bgcolor: 'background.paper',
+                              transition: 'all 0.2s ease-in-out',
+                              '& fieldset': {
+                                borderColor: 'divider',
+                              },
+                              '&:hover': {
+                                bgcolor: 'action.hover',
+                                '& fieldset': {
+                                  borderColor: 'primary.light',
+                                }
+                              },
+                              '&.Mui-focused': {
+                                bgcolor: 'background.paper',
+                                boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                                '& fieldset': {
+                                  borderColor: 'primary.main',
+                                  borderWidth: '1px',
+                                }
+                              }
+                            },
+                            '& .MuiInputBase-input': {
+                              fontSize: '0.875rem',
+                            }
+                          }}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                              </InputAdornment>
+                            ),
+                            endAdornment: liveEventSearchTerm && (
+                              <InputAdornment position="end">
+                                <ClearIcon
+                                  sx={{
+                                    color: 'text.secondary',
+                                    fontSize: 20,
+                                    cursor: 'pointer',
+                                    '&:hover': { color: 'text.primary' }
+                                  }}
+                                  onClick={() => {
+                                    setLiveEventSearchTerm('');
+                                    setLiveEventPage(0);
+                                  }}
+                                />
+                              </InputAdornment>
+                            ),
+                          }}
+                          size="small"
+                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', ml: 1, gap: 1 }}>
+                          <Tooltip title={t('planningData.viewAllWarning')} arrow>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={viewAllLiveEvent}
+                                  onChange={(e) => {
+                                    const newValue = e.target.checked;
+                                    setViewAllLiveEvent(newValue);
+                                    sessionStorage.setItem('planningDataViewAllLiveEvent', newValue.toString());
+                                  }}
+                                  size="small"
+                                />
+                              }
+                              label={t('planningData.viewAll')}
+                            />
+                          </Tooltip>
+                        </Box>
+                      </Box>
+                      {liveEventData && liveEventData.items && liveEventData.items.length > 0 ? (
+                        <>
+                          {viewAllLiveEvent ? (
+                            /* Grid view - show all items in table-like layout */
+                            <Box sx={{
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                              gap: 0,
+                              border: '1px dashed',
+                              borderColor: 'divider',
+                              borderRadius: 1,
+                              overflow: 'hidden',
+                            }}>
+                              {liveEventData.items.map((item: any) => {
+                                const label = `${item.id}: ${item.name ?? item.loginBgmTag ?? String(item.id)}`;
+                                return (
+                                  <Tooltip key={item.id} title={label} arrow>
+                                    <Box
+                                      sx={{
+                                        p: 1,
+                                        borderRight: '1px dashed',
+                                        borderBottom: '1px dashed',
+                                        borderColor: 'divider',
+                                        fontSize: '0.8125rem',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        bgcolor: 'background.paper',
+                                        transition: 'background-color 0.2s',
+                                        '&:hover': {
+                                          bgcolor: 'action.hover',
+                                        }
+                                      }}
+                                    >
+                                      {label}
+                                    </Box>
+                                  </Tooltip>
+                                );
+                              })}
+                            </Box>
+                          ) : (
+                            /* Table view - paginated */
+                            <>
+                              <TableContainer component={Paper} variant="outlined">
+                                <Table size="small">
+                                  <TableHead>
+                                    <TableRow>
+                                      <TableCell width="100px">ID</TableCell>
+                                      <TableCell>Name</TableCell>
+                                      <TableCell width="120px">Start Date</TableCell>
+                                      <TableCell width="120px">End Date</TableCell>
+                                      <TableCell width="100px">Local Bitflag</TableCell>
+                                      <TableCell width="120px">Login BGM Tag</TableCell>
+                                      <TableCell width="80px">Is Quest</TableCell>
+                                    </TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                    {liveEventData.items.slice(liveEventPage * liveEventRowsPerPage, (liveEventPage + 1) * liveEventRowsPerPage).map((item: any) => (
+                                      <TableRow key={item.id} hover>
+                                        <TableCell>
+                                          <Chip label={item.id} size="small" variant="outlined" />
+                                        </TableCell>
+                                        <TableCell>{item.name ?? item.loginBgmTag ?? item.id}</TableCell>
+                                        <TableCell>{item.startDate || '-'}</TableCell>
+                                        <TableCell>{item.endDate || '-'}</TableCell>
+                                        <TableCell>{item.localBitflag || '-'}</TableCell>
+                                        <TableCell>{item.loginBgmTag || '-'}</TableCell>
+                                        <TableCell>{item.isQuest ? 'Yes' : 'No'}</TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </TableContainer>
+                              {liveEventData.items.length > 0 && (
+                                <SimplePagination
+                                  count={liveEventData.items.length}
+                                  page={liveEventPage}
+                                  rowsPerPage={liveEventRowsPerPage}
+                                  onPageChange={(_event, newPage) => setLiveEventPage(newPage)}
+                                  onRowsPerPageChange={(event) => setLiveEventRowsPerPage(Number(event.target.value))}
+                                  rowsPerPageOptions={[10, 20, 50, 100]}
+                                />
+                              )}
+                            </>
+                          )}
+                        </>
+                      ) : (
+                        <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
+                          {t('planningData.noData')}
+                        </Typography>
+                      )}
+                    </>
+                  )}
+                </Box>
+              )}
+
+              {/* MateRecruitingGroup Tab */}
+              {activeTab === 5 && (
+                <Box>
+                  {loadingMateRecruitingGroup && !mateRecruitingGroupData ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                      <CircularProgress />
+                    </Box>
+                  ) : (
+                    <>
+                      <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}>
+                        <Chip label={`${t('planningData.count')}: ${mateRecruitingGroupData?.items?.length || 0}`} size="small" />
+                        <TextField
+                          placeholder={t('planningData.search')}
+                          value={mateRecruitingGroupSearchTerm}
+                          onChange={(e) => {
+                            setMateRecruitingGroupSearchTerm(e.target.value);
+                            setMateRecruitingGroupPage(0);
+                          }}
+                          sx={{
+                            width: '30%',
+                            '& .MuiOutlinedInput-root': {
+                              height: '40px',
+                              borderRadius: '20px',
+                              bgcolor: 'background.paper',
+                              transition: 'all 0.2s ease-in-out',
+                              '& fieldset': {
+                                borderColor: 'divider',
+                              },
+                              '&:hover': {
+                                bgcolor: 'action.hover',
+                                '& fieldset': {
+                                  borderColor: 'primary.light',
+                                }
+                              },
+                              '&.Mui-focused': {
+                                bgcolor: 'background.paper',
+                                boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                                '& fieldset': {
+                                  borderColor: 'primary.main',
+                                  borderWidth: '1px',
+                                }
+                              }
+                            },
+                            '& .MuiInputBase-input': {
+                              fontSize: '0.875rem',
+                            }
+                          }}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                              </InputAdornment>
+                            ),
+                            endAdornment: mateRecruitingGroupSearchTerm && (
+                              <InputAdornment position="end">
+                                <ClearIcon
+                                  sx={{
+                                    color: 'text.secondary',
+                                    fontSize: 20,
+                                    cursor: 'pointer',
+                                    '&:hover': { color: 'text.primary' }
+                                  }}
+                                  onClick={() => {
+                                    setMateRecruitingGroupSearchTerm('');
+                                    setMateRecruitingGroupPage(0);
+                                  }}
+                                />
+                              </InputAdornment>
+                            ),
+                          }}
+                          size="small"
+                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', ml: 1, gap: 1 }}>
+                          <Tooltip title={t('planningData.viewAllWarning')} arrow>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={viewAllMateRecruitingGroup}
+                                  onChange={(e) => {
+                                    const newValue = e.target.checked;
+                                    setViewAllMateRecruitingGroup(newValue);
+                                    sessionStorage.setItem('planningDataViewAllMateRecruitingGroup', newValue.toString());
+                                  }}
+                                  size="small"
+                                />
+                              }
+                              label={t('planningData.viewAll')}
+                            />
+                          </Tooltip>
+                        </Box>
+                      </Box>
+                      {mateRecruitingGroupData && mateRecruitingGroupData.items && mateRecruitingGroupData.items.length > 0 ? (
+                        <>
+                          {viewAllMateRecruitingGroup ? (
+                            /* Grid view - show all items in table-like layout */
+                            <Box sx={{
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                              gap: 0,
+                              border: '1px dashed',
+                              borderColor: 'divider',
+                              borderRadius: 1,
+                              overflow: 'hidden',
+                            }}>
+                              {mateRecruitingGroupData.items.map((item: any) => {
+                                const label = `${item.id}: ${item.name ?? (item.mateId ?? '')}`;
+                                const tooltipTitle = item.mateExists === false
+                                  ? `⚠️ 오류: 항해사가 MateTemplate에 존재하지 않습니다.\n${label}`
+                                  : label;
+                                return (
+                                  <Tooltip key={item.id} title={tooltipTitle} arrow>
+                                    <Box
+                                      sx={{
+                                        p: 1,
+                                        borderRight: '1px dashed',
+                                        borderBottom: '1px dashed',
+                                        borderColor: 'divider',
+                                        fontSize: '0.8125rem',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        bgcolor: item.mateExists === false ? 'rgba(255, 205, 210, 0.3)' : 'background.paper',
+                                        transition: 'background-color 0.2s',
+                                        '&:hover': {
+                                          bgcolor: item.mateExists === false ? 'rgba(255, 205, 210, 0.5)' : 'action.hover',
+                                        }
+                                      }}
+                                    >
+                                      {label}
+                                    </Box>
+                                  </Tooltip>
+                                );
+                              })}
+                            </Box>
+                          ) : (
+                            /* Table view - paginated */
+                            <>
+                              <TableContainer component={Paper} variant="outlined">
+                                <Table size="small">
+                                  <TableHead>
+                                    <TableRow>
+                                      <TableCell width="100px">ID</TableCell>
+                                      <TableCell>Name</TableCell>
+                                      <TableCell width="200px">Mate</TableCell>
+                                      <TableCell width="100px">Group</TableCell>
+                                      <TableCell>Towns</TableCell>
+                                    </TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                    {mateRecruitingGroupData.items.slice(mateRecruitingGroupPage * mateRecruitingGroupRowsPerPage, (mateRecruitingGroupPage + 1) * mateRecruitingGroupRowsPerPage).map((item: any) => (
+                                      <TableRow
+                                        key={item.id}
+                                        hover
+                                        sx={{
+                                          bgcolor: item.mateExists === false ? 'rgba(255, 205, 210, 0.3)' : 'inherit',
+                                          '&:hover': {
+                                            bgcolor: item.mateExists === false ? 'rgba(255, 205, 210, 0.5)' : 'action.hover',
+                                          }
+                                        }}
+                                      >
+                                        <TableCell>
+                                          <Chip label={item.id} size="small" variant="outlined" />
+                                        </TableCell>
+                                        <TableCell>
+                                          <Tooltip title={item.mateExists === false ? '⚠️ 항해사가 MateTemplate에 존재하지 않습니다' : ''} arrow>
+                                            <span>{item.name ?? item.mateId}</span>
+                                          </Tooltip>
+                                        </TableCell>
+                                        <TableCell>
+                                          <Tooltip title={item.mateExists === false ? '⚠️ 항해사가 MateTemplate에 존재하지 않습니다' : ''} arrow>
+                                            <Chip
+                                              label={`${item.mateId}: ${item.mateName ?? item.mateId}`}
+                                              size="small"
+                                              variant="outlined"
+                                              sx={{ maxWidth: '100%' }}
+                                            />
+                                          </Tooltip>
+                                        </TableCell>
+                                        <TableCell>{item.group}</TableCell>
+                                        <TableCell>{item.townNames || '-'}</TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </TableContainer>
+                              {mateRecruitingGroupData.items.length > 0 && (
+                                <SimplePagination
+                                  count={mateRecruitingGroupData.items.length}
+                                  page={mateRecruitingGroupPage}
+                                  rowsPerPage={mateRecruitingGroupRowsPerPage}
+                                  onPageChange={(_event, newPage) => setMateRecruitingGroupPage(newPage)}
+                                  onRowsPerPageChange={(event) => setMateRecruitingGroupRowsPerPage(Number(event.target.value))}
+                                  rowsPerPageOptions={[10, 20, 50, 100]}
+                                />
+                              )}
+                            </>
+                          )}
+                        </>
+                      ) : (
+                        <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
+                          {t('planningData.noData')}
+                        </Typography>
+                      )}
+                    </>
+                  )}
+                </Box>
+              )}
+
+              {/* OceanNpcAreaSpawner Tab */}
+              {activeTab === 6 && (
+                <Box>
+                  {loadingOceanNpcAreaSpawner && !oceanNpcAreaSpawnerData ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                      <CircularProgress />
+                    </Box>
+                  ) : (
+                    <>
+                      <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}>
+                        <Chip label={`${t('planningData.count')}: ${oceanNpcAreaSpawnerData?.items?.length || 0}`} size="small" />
+                        <TextField
+                          placeholder={t('planningData.search')}
+                          value={oceanNpcAreaSpawnerSearchTerm}
+                          onChange={(e) => {
+                            setOceanNpcAreaSpawnerSearchTerm(e.target.value);
+                            setOceanNpcAreaSpawnerPage(0);
+                          }}
+                          sx={{
+                            width: '30%',
+                            '& .MuiOutlinedInput-root': {
+                              height: '40px',
+                              borderRadius: '20px',
+                              bgcolor: 'background.paper',
+                              transition: 'all 0.2s ease-in-out',
+                              '& fieldset': {
+                                borderColor: 'divider',
+                              },
+                              '&:hover': {
+                                bgcolor: 'action.hover',
+                                '& fieldset': {
+                                  borderColor: 'primary.light',
+                                }
+                              },
+                              '&.Mui-focused': {
+                                bgcolor: 'background.paper',
+                                boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                                '& fieldset': {
+                                  borderColor: 'primary.main',
+                                  borderWidth: '1px',
+                                }
+                              }
+                            },
+                            '& .MuiInputBase-input': {
+                              fontSize: '0.875rem',
+                            }
+                          }}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                              </InputAdornment>
+                            ),
+                            endAdornment: oceanNpcAreaSpawnerSearchTerm && (
+                              <InputAdornment position="end">
+                                <ClearIcon
+                                  sx={{
+                                    color: 'text.secondary',
+                                    fontSize: 20,
+                                    cursor: 'pointer',
+                                    '&:hover': { color: 'text.primary' }
+                                  }}
+                                  onClick={() => {
+                                    setOceanNpcAreaSpawnerSearchTerm('');
+                                    setOceanNpcAreaSpawnerPage(0);
+                                  }}
+                                />
+                              </InputAdornment>
+                            ),
+                          }}
+                          size="small"
+                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', ml: 1, gap: 1 }}>
+                          <Tooltip title={t('planningData.viewAllWarning')} arrow>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={viewAllOceanNpcAreaSpawner}
+                                  onChange={(e) => {
+                                    const newValue = e.target.checked;
+                                    setViewAllOceanNpcAreaSpawner(newValue);
+                                    sessionStorage.setItem('planningDataViewAllOceanNpcAreaSpawner', newValue.toString());
+                                  }}
+                                  size="small"
+                                />
+                              }
+                              label={t('planningData.viewAll')}
+                            />
+                          </Tooltip>
+                        </Box>
+                      </Box>
+                      {oceanNpcAreaSpawnerData && oceanNpcAreaSpawnerData.items && oceanNpcAreaSpawnerData.items.length > 0 ? (
+                        <>
+                          {viewAllOceanNpcAreaSpawner ? (
+                            /* Grid view - show all items in table-like layout */
+                            <Box sx={{
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                              gap: 0,
+                              border: '1px dashed',
+                              borderColor: 'divider',
+                              borderRadius: 1,
+                              overflow: 'hidden',
+                            }}>
+                              {oceanNpcAreaSpawnerData.items.map((item: any) => {
+                                // Build name from localized parts
+                                const npcName = item.npcName ?? item.oceanNpcId;
+                                const label = `${item.id}: ${npcName}`;
+                                const tooltipTitle = item.npcExists === false
+                                  ? `${t('planningData.error.npcNotFound')}\n${label}`
+                                  : label;
+                                return (
+                                  <Tooltip key={item.id} title={tooltipTitle} arrow>
+                                    <Box
+                                      sx={{
+                                        p: 1,
+                                        borderRight: '1px dashed',
+                                        borderBottom: '1px dashed',
+                                        borderColor: 'divider',
+                                        fontSize: '0.8125rem',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        bgcolor: item.npcExists === false ? 'rgba(255, 205, 210, 0.3)' : 'background.paper',
+                                        transition: 'background-color 0.2s',
+                                        '&:hover': {
+                                          bgcolor: item.npcExists === false ? 'rgba(255, 205, 210, 0.5)' : 'action.hover',
+                                        }
+                                      }}
+                                    >
+                                      {label}
+                                    </Box>
+                                  </Tooltip>
+                                );
+                              })}
+                            </Box>
+                          ) : (
+                            /* Table view - paginated */
+                            <>
+                              <TableContainer component={Paper} variant="outlined">
+                                <Table size="small">
+                                  <TableHead>
+                                    <TableRow>
+                                      <TableCell width="100px">ID</TableCell>
+                                      <TableCell width="250px">Name</TableCell>
+                                      <TableCell width="200px">NPC</TableCell>
+                                      <TableCell width="100px">Radius Type</TableCell>
+                                      <TableCell width="100px">Radius</TableCell>
+                                      <TableCell width="100px">Latitude</TableCell>
+                                      <TableCell width="100px">Longitude</TableCell>
+                                      <TableCell width="100px">Regen Time</TableCell>
+                                      <TableCell width="120px">Start Date</TableCell>
+                                      <TableCell width="120px">End Date</TableCell>
+                                      <TableCell>Spawn Hours</TableCell>
+                                    </TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                    {oceanNpcAreaSpawnerData.items.slice(oceanNpcAreaSpawnerPage * oceanNpcAreaSpawnerRowsPerPage, (oceanNpcAreaSpawnerPage + 1) * oceanNpcAreaSpawnerRowsPerPage).map((item: any) => {
+                                      // Radius type mapping with localization
+                                      const radiusTypeMap: Record<number, string> = {
+                                        0: t('planningData.radiusType.none'),
+                                        1: t('planningData.radiusType.circle'),
+                                        2: t('planningData.radiusType.square'),
+                                        3: t('planningData.radiusType.region')
+                                      };
+                                      const radiusTypeName = radiusTypeMap[item.radiusType] || item.radiusType;
+
+                                      // Format spawn hours
+                                      const spawnHours = item.spawnHour && Array.isArray(item.spawnHour) && item.spawnHour.length > 0
+                                        ? item.spawnHour.join(', ')
+                                        : '-';
+
+                                      // Build name from ID and NPC name
+                                      const npcName = item.npcName ?? item.oceanNpcId;
+                                      const itemName = `${item.id}: ${npcName}`;
+
+                                      return (
+                                        <TableRow
+                                          key={item.id}
+                                          hover
+                                          sx={{
+                                            bgcolor: item.npcExists === false ? 'rgba(255, 205, 210, 0.3)' : 'inherit',
+                                            '&:hover': {
+                                              bgcolor: item.npcExists === false ? 'rgba(255, 205, 210, 0.5)' : 'action.hover',
+                                            }
+                                          }}
+                                        >
+                                          <TableCell>
+                                            <Chip label={item.id} size="small" variant="outlined" />
+                                          </TableCell>
+                                          <TableCell>
+                                            <Tooltip title={item.npcExists === false ? t('planningData.error.npcNotFound') : ''} arrow>
+                                              <span>{itemName}</span>
+                                            </Tooltip>
+                                          </TableCell>
+                                          <TableCell>
+                                            <Tooltip title={item.npcExists === false ? t('planningData.error.npcNotFound') : ''} arrow>
+                                              <Chip
+                                                label={`${item.oceanNpcId}: ${item.npcName ?? item.oceanNpcId}`}
+                                                size="small"
+                                                variant="outlined"
+                                                sx={{ maxWidth: '100%' }}
+                                              />
+                                            </Tooltip>
+                                          </TableCell>
+                                          <TableCell>{radiusTypeName}</TableCell>
+                                          <TableCell>{item.radius ?? '-'}</TableCell>
+                                          <TableCell>{item.latitude?.toFixed(2) ?? '-'}</TableCell>
+                                          <TableCell>{item.longitude?.toFixed(2) ?? '-'}</TableCell>
+                                          <TableCell>{item.regenTime ? `${item.regenTime}s` : '-'}</TableCell>
+                                          <TableCell>{item.startDate ?? '-'}</TableCell>
+                                          <TableCell>{item.endDate ?? '-'}</TableCell>
+                                          <TableCell>{spawnHours}</TableCell>
+                                        </TableRow>
+                                      );
+                                    })}
+                                  </TableBody>
+                                </Table>
+                              </TableContainer>
+                              {oceanNpcAreaSpawnerData.items.length > 0 && (
+                                <SimplePagination
+                                  count={oceanNpcAreaSpawnerData.items.length}
+                                  page={oceanNpcAreaSpawnerPage}
+                                  rowsPerPage={oceanNpcAreaSpawnerRowsPerPage}
+                                  onPageChange={(_event, newPage) => setOceanNpcAreaSpawnerPage(newPage)}
+                                  onRowsPerPageChange={(event) => setOceanNpcAreaSpawnerRowsPerPage(Number(event.target.value))}
+                                  rowsPerPageOptions={[10, 20, 50, 100]}
+                                />
+                              )}
+                            </>
+                          )}
+                        </>
+                      ) : (
+                        <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
+                          {t('planningData.noData')}
+                        </Typography>
+                      )}
+                    </>
+                  )}
+                </Box>
+              )}
+
             </CardContent>
           </Card>
         </>

@@ -4,6 +4,7 @@
       "id": "key",
       "groupId": "number",
       "tileOrder": "number",
+      "tileType": "number",
       "rewardId": [
         "number",
         "number",
@@ -46,6 +47,7 @@
     ":required": {
       "groupId": 1,
       "tileOrder": 1,
+      "tileType": 1,
       "rewardId": [
         1
       ]
@@ -171,6 +173,7 @@
       "id": 1,
       "groupId": 10001,
       "tileOrder": 1,
+      "tileType": 0,
       "rewardId": [
         95991749,
         95991750,
@@ -190,6 +193,7 @@
       "id": 2,
       "groupId": 10001,
       "tileOrder": 2,
+      "tileType": 2,
       "rewardId": [
         95991700,
         95991701,
@@ -209,6 +213,7 @@
       "id": 3,
       "groupId": 10001,
       "tileOrder": 3,
+      "tileType": 2,
       "rewardId": [
         95991703,
         95991704,
@@ -228,6 +233,7 @@
       "id": 4,
       "groupId": 10001,
       "tileOrder": 4,
+      "tileType": 2,
       "rewardId": [
         95991706,
         95991707,
@@ -247,6 +253,7 @@
       "id": 5,
       "groupId": 10001,
       "tileOrder": 5,
+      "tileType": 2,
       "rewardId": [
         95991709,
         95991710,
@@ -266,6 +273,7 @@
       "id": 6,
       "groupId": 10001,
       "tileOrder": 6,
+      "tileType": 1,
       "rewardId": [
         95991712,
         95991712,
@@ -285,6 +293,7 @@
       "id": 7,
       "groupId": 10001,
       "tileOrder": 7,
+      "tileType": 2,
       "rewardId": [
         95991713,
         95991714,
@@ -304,6 +313,7 @@
       "id": 8,
       "groupId": 10001,
       "tileOrder": 8,
+      "tileType": 2,
       "rewardId": [
         95991716,
         95991717,
@@ -323,6 +333,7 @@
       "id": 9,
       "groupId": 10001,
       "tileOrder": 9,
+      "tileType": 2,
       "rewardId": [
         95991719,
         95991720,
@@ -342,6 +353,7 @@
       "id": 10,
       "groupId": 10001,
       "tileOrder": 10,
+      "tileType": 2,
       "rewardId": [
         95991722,
         95991723,
@@ -361,6 +373,7 @@
       "id": 11,
       "groupId": 10001,
       "tileOrder": 11,
+      "tileType": 1,
       "rewardId": [
         95991725,
         95991725,
@@ -380,6 +393,7 @@
       "id": 12,
       "groupId": 10001,
       "tileOrder": 12,
+      "tileType": 2,
       "rewardId": [
         95991726,
         95991727,
@@ -399,6 +413,7 @@
       "id": 13,
       "groupId": 10001,
       "tileOrder": 13,
+      "tileType": 2,
       "rewardId": [
         95991729,
         95991730,
@@ -418,6 +433,7 @@
       "id": 14,
       "groupId": 10001,
       "tileOrder": 14,
+      "tileType": 2,
       "rewardId": [
         95991732,
         95991733,
@@ -437,6 +453,7 @@
       "id": 15,
       "groupId": 10001,
       "tileOrder": 15,
+      "tileType": 2,
       "rewardId": [
         95991735,
         95991736,
@@ -456,6 +473,7 @@
       "id": 16,
       "groupId": 10001,
       "tileOrder": 16,
+      "tileType": 1,
       "rewardId": [
         95991738,
         95991738,
@@ -475,6 +493,7 @@
       "id": 17,
       "groupId": 10001,
       "tileOrder": 17,
+      "tileType": 2,
       "rewardId": [
         95991739,
         95991740,
@@ -494,6 +513,7 @@
       "id": 18,
       "groupId": 10001,
       "tileOrder": 18,
+      "tileType": 2,
       "rewardId": [
         95991742,
         95991743,
@@ -513,6 +533,7 @@
       "id": 19,
       "groupId": 10001,
       "tileOrder": 19,
+      "tileType": 2,
       "rewardId": [
         95991745,
         95991746,
@@ -532,6 +553,7 @@
       "id": 20,
       "groupId": 10001,
       "tileOrder": 20,
+      "tileType": 1,
       "rewardId": [
         95991748,
         95991748,
@@ -551,6 +573,7 @@
       "id": 21,
       "groupId": 10002,
       "tileOrder": 1,
+      "tileType": 0,
       "rewardId": [
         95960225,
         95960226,
@@ -584,6 +607,7 @@
       "id": 22,
       "groupId": 10002,
       "tileOrder": 2,
+      "tileType": 2,
       "rewardId": [
         95960206
       ]
@@ -592,6 +616,7 @@
       "id": 23,
       "groupId": 10002,
       "tileOrder": 3,
+      "tileType": 2,
       "rewardId": [
         95960207
       ]
@@ -600,6 +625,7 @@
       "id": 24,
       "groupId": 10002,
       "tileOrder": 4,
+      "tileType": 2,
       "rewardId": [
         95960208
       ]
@@ -608,6 +634,7 @@
       "id": 25,
       "groupId": 10002,
       "tileOrder": 5,
+      "tileType": 2,
       "rewardId": [
         95960209
       ]
@@ -616,6 +643,7 @@
       "id": 26,
       "groupId": 10002,
       "tileOrder": 6,
+      "tileType": 1,
       "rewardId": [
         95960210
       ]
@@ -624,6 +652,7 @@
       "id": 27,
       "groupId": 10002,
       "tileOrder": 7,
+      "tileType": 2,
       "rewardId": [
         95960211
       ]
@@ -632,6 +661,7 @@
       "id": 28,
       "groupId": 10002,
       "tileOrder": 8,
+      "tileType": 2,
       "rewardId": [
         95960212
       ]
@@ -640,6 +670,7 @@
       "id": 29,
       "groupId": 10002,
       "tileOrder": 9,
+      "tileType": 2,
       "rewardId": [
         95960213
       ]
@@ -648,6 +679,7 @@
       "id": 30,
       "groupId": 10002,
       "tileOrder": 10,
+      "tileType": 2,
       "rewardId": [
         95960214
       ]
@@ -656,6 +688,7 @@
       "id": 31,
       "groupId": 10002,
       "tileOrder": 11,
+      "tileType": 1,
       "rewardId": [
         95960215
       ]
@@ -664,6 +697,7 @@
       "id": 32,
       "groupId": 10002,
       "tileOrder": 12,
+      "tileType": 2,
       "rewardId": [
         95960216
       ]
@@ -672,6 +706,7 @@
       "id": 33,
       "groupId": 10002,
       "tileOrder": 13,
+      "tileType": 2,
       "rewardId": [
         95960217
       ]
@@ -680,6 +715,7 @@
       "id": 34,
       "groupId": 10002,
       "tileOrder": 14,
+      "tileType": 2,
       "rewardId": [
         95960218
       ]
@@ -688,6 +724,7 @@
       "id": 35,
       "groupId": 10002,
       "tileOrder": 15,
+      "tileType": 2,
       "rewardId": [
         95960219
       ]
@@ -696,6 +733,7 @@
       "id": 36,
       "groupId": 10002,
       "tileOrder": 16,
+      "tileType": 1,
       "rewardId": [
         95960220
       ]
@@ -704,6 +742,7 @@
       "id": 37,
       "groupId": 10002,
       "tileOrder": 17,
+      "tileType": 2,
       "rewardId": [
         95960221
       ]
@@ -712,6 +751,7 @@
       "id": 38,
       "groupId": 10002,
       "tileOrder": 18,
+      "tileType": 2,
       "rewardId": [
         95960222
       ]
@@ -720,6 +760,7 @@
       "id": 39,
       "groupId": 10002,
       "tileOrder": 19,
+      "tileType": 2,
       "rewardId": [
         95960223
       ]
@@ -728,6 +769,7 @@
       "id": 40,
       "groupId": 10002,
       "tileOrder": 20,
+      "tileType": 2,
       "rewardId": [
         95960224
       ]
@@ -736,6 +778,7 @@
       "id": 41,
       "groupId": 10003,
       "tileOrder": 1,
+      "tileType": 0,
       "rewardId": [
         95960225,
         95960226,
@@ -769,6 +812,7 @@
       "id": 42,
       "groupId": 10003,
       "tileOrder": 2,
+      "tileType": 2,
       "rewardId": [
         95960206
       ]
@@ -777,6 +821,7 @@
       "id": 43,
       "groupId": 10003,
       "tileOrder": 3,
+      "tileType": 2,
       "rewardId": [
         95960207
       ]
@@ -785,6 +830,7 @@
       "id": 44,
       "groupId": 10003,
       "tileOrder": 4,
+      "tileType": 2,
       "rewardId": [
         95960208
       ]
@@ -793,6 +839,7 @@
       "id": 45,
       "groupId": 10003,
       "tileOrder": 5,
+      "tileType": 2,
       "rewardId": [
         95960209
       ]
@@ -801,6 +848,7 @@
       "id": 46,
       "groupId": 10003,
       "tileOrder": 6,
+      "tileType": 1,
       "rewardId": [
         95960210
       ]
@@ -809,6 +857,7 @@
       "id": 47,
       "groupId": 10003,
       "tileOrder": 7,
+      "tileType": 2,
       "rewardId": [
         95960211
       ]
@@ -817,6 +866,7 @@
       "id": 48,
       "groupId": 10003,
       "tileOrder": 8,
+      "tileType": 2,
       "rewardId": [
         95960212
       ]
@@ -825,6 +875,7 @@
       "id": 49,
       "groupId": 10003,
       "tileOrder": 9,
+      "tileType": 2,
       "rewardId": [
         95960213
       ]
@@ -833,6 +884,7 @@
       "id": 50,
       "groupId": 10003,
       "tileOrder": 10,
+      "tileType": 2,
       "rewardId": [
         95960214
       ]
@@ -841,6 +893,7 @@
       "id": 51,
       "groupId": 10003,
       "tileOrder": 11,
+      "tileType": 1,
       "rewardId": [
         95960215
       ]
@@ -849,6 +902,7 @@
       "id": 52,
       "groupId": 10003,
       "tileOrder": 12,
+      "tileType": 2,
       "rewardId": [
         95960216
       ]
@@ -857,6 +911,7 @@
       "id": 53,
       "groupId": 10003,
       "tileOrder": 13,
+      "tileType": 2,
       "rewardId": [
         95960217
       ]
@@ -865,6 +920,7 @@
       "id": 54,
       "groupId": 10003,
       "tileOrder": 14,
+      "tileType": 2,
       "rewardId": [
         95960218
       ]
@@ -873,6 +929,7 @@
       "id": 55,
       "groupId": 10003,
       "tileOrder": 15,
+      "tileType": 2,
       "rewardId": [
         95960219
       ]
@@ -881,6 +938,7 @@
       "id": 56,
       "groupId": 10003,
       "tileOrder": 16,
+      "tileType": 1,
       "rewardId": [
         95960220
       ]
@@ -889,6 +947,7 @@
       "id": 57,
       "groupId": 10003,
       "tileOrder": 17,
+      "tileType": 2,
       "rewardId": [
         95960221
       ]
@@ -897,6 +956,7 @@
       "id": 58,
       "groupId": 10003,
       "tileOrder": 18,
+      "tileType": 2,
       "rewardId": [
         95960222
       ]
@@ -905,6 +965,7 @@
       "id": 59,
       "groupId": 10003,
       "tileOrder": 19,
+      "tileType": 2,
       "rewardId": [
         95960223
       ]
@@ -913,6 +974,7 @@
       "id": 60,
       "groupId": 10003,
       "tileOrder": 20,
+      "tileType": 2,
       "rewardId": [
         95960224
       ]
@@ -921,6 +983,7 @@
       "id": 61,
       "groupId": 10004,
       "tileOrder": 1,
+      "tileType": 0,
       "rewardId": [
         95961065
       ]
@@ -929,6 +992,7 @@
       "id": 62,
       "groupId": 10004,
       "tileOrder": 2,
+      "tileType": 1,
       "rewardId": [
         95961066
       ]
@@ -937,6 +1001,7 @@
       "id": 63,
       "groupId": 10004,
       "tileOrder": 3,
+      "tileType": 1,
       "rewardId": [
         95961067
       ]
@@ -945,6 +1010,7 @@
       "id": 64,
       "groupId": 10004,
       "tileOrder": 4,
+      "tileType": 1,
       "rewardId": [
         95961068
       ]
@@ -953,6 +1019,7 @@
       "id": 65,
       "groupId": 10004,
       "tileOrder": 5,
+      "tileType": 1,
       "rewardId": [
         95961069
       ]
@@ -961,6 +1028,7 @@
       "id": 66,
       "groupId": 10004,
       "tileOrder": 6,
+      "tileType": 1,
       "rewardId": [
         95961070
       ]
@@ -969,6 +1037,7 @@
       "id": 67,
       "groupId": 10004,
       "tileOrder": 7,
+      "tileType": 1,
       "rewardId": [
         95961071
       ]
@@ -977,6 +1046,7 @@
       "id": 68,
       "groupId": 10004,
       "tileOrder": 8,
+      "tileType": 1,
       "rewardId": [
         95961072
       ]
@@ -985,6 +1055,7 @@
       "id": 69,
       "groupId": 10004,
       "tileOrder": 9,
+      "tileType": 1,
       "rewardId": [
         95961073
       ]
@@ -993,6 +1064,7 @@
       "id": 70,
       "groupId": 10004,
       "tileOrder": 10,
+      "tileType": 1,
       "rewardId": [
         95961074
       ]
@@ -1001,6 +1073,7 @@
       "id": 71,
       "groupId": 10004,
       "tileOrder": 11,
+      "tileType": 1,
       "rewardId": [
         95961075
       ]
@@ -1009,6 +1082,7 @@
       "id": 72,
       "groupId": 10004,
       "tileOrder": 12,
+      "tileType": 1,
       "rewardId": [
         95961076
       ]
@@ -1017,6 +1091,7 @@
       "id": 73,
       "groupId": 10004,
       "tileOrder": 13,
+      "tileType": 1,
       "rewardId": [
         95961077
       ]
@@ -1025,6 +1100,7 @@
       "id": 74,
       "groupId": 10004,
       "tileOrder": 14,
+      "tileType": 1,
       "rewardId": [
         95961078
       ]
@@ -1033,6 +1109,7 @@
       "id": 75,
       "groupId": 10004,
       "tileOrder": 15,
+      "tileType": 1,
       "rewardId": [
         95961079
       ]
@@ -1041,6 +1118,7 @@
       "id": 76,
       "groupId": 10004,
       "tileOrder": 16,
+      "tileType": 1,
       "rewardId": [
         95961080
       ]
@@ -1049,6 +1127,7 @@
       "id": 77,
       "groupId": 10004,
       "tileOrder": 17,
+      "tileType": 1,
       "rewardId": [
         95961081
       ]
@@ -1057,6 +1136,7 @@
       "id": 78,
       "groupId": 10004,
       "tileOrder": 18,
+      "tileType": 1,
       "rewardId": [
         95961082
       ]
@@ -1065,6 +1145,7 @@
       "id": 79,
       "groupId": 10004,
       "tileOrder": 19,
+      "tileType": 1,
       "rewardId": [
         95961083
       ]
@@ -1073,6 +1154,7 @@
       "id": 80,
       "groupId": 10004,
       "tileOrder": 20,
+      "tileType": 1,
       "rewardId": [
         95961084
       ]

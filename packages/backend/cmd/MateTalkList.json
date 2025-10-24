@@ -3,591 +3,1101 @@
     ":type": {
       "id": "key",
       "modeType": "number",
-      "talkColumn": "string"
+      "talkColumn": "string",
+      "voiceTagType": "number",
+      "target": "number",
+      "mateSearchingRule": "number",
+      "shipSlotIds": [
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number"
+      ]
     },
     ":required": {
       "modeType": 1,
-      "talkColumn": 1
+      "talkColumn": 1,
+      "target": 1,
+      "mateSearchingRule": 1
     },
     ":min": {
-      "modeType": 1
+      "modeType": 1,
+      "target": 0,
+      "mateSearchingRule": 1,
+      "shipSlotIds": [
+        70100000,
+        70100000,
+        70100000,
+        70100000,
+        70100000,
+        70100000,
+        70100000,
+        70100000,
+        70100000,
+        70100000,
+        70100000,
+        70100000,
+        70100000,
+        70100000,
+        70100000,
+        70100000,
+        70100000,
+        70100000,
+        70100000,
+        70100000
+      ]
     },
     ":max": {
-      "modeType": 6
+      "modeType": 6,
+      "target": 5,
+      "mateSearchingRule": 3,
+      "shipSlotIds": [
+        70199999,
+        70199999,
+        70199999,
+        70199999,
+        70199999,
+        70199999,
+        70199999,
+        70199999,
+        70199999,
+        70199999,
+        70199999,
+        70199999,
+        70199999,
+        70199999,
+        70199999,
+        70199999,
+        70199999,
+        70199999,
+        70199999,
+        70199999
+      ]
     },
     ":enum": {},
-    ":links": {}
+    ":links": {
+      "voiceTagType": [
+        "VoiceTag"
+      ],
+      "shipSlotIds": [
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ],
+        [
+          "ShipSlot"
+        ]
+      ]
+    }
   },
   "MateTalkList": {
     "17600000": {
       "id": 17600000,
       "modeType": 3,
-      "talkColumn": "recruitDialBasic"
+      "talkColumn": "recruitDialBasic",
+      "voiceTagType": 8,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600001": {
       "id": 17600001,
       "modeType": 1,
-      "talkColumn": "admiralAddress"
+      "talkColumn": "admiralAddress",
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600002": {
       "id": 17600002,
       "modeType": 3,
-      "talkColumn": "recruitDialFail"
+      "talkColumn": "recruitDialFail",
+      "voiceTagType": 68,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600004": {
       "id": 17600004,
       "modeType": 3,
-      "talkColumn": "insuranceNotice"
+      "talkColumn": "insuranceNotice",
+      "voiceTagType": 49,
+      "target": 2,
+      "mateSearchingRule": 2,
+      "shipSlotIds": [
+        70103001
+      ]
     },
     "17600007": {
       "id": 17600007,
       "modeType": 4,
-      "talkColumn": "battleStartNormalDefense"
+      "talkColumn": "battleStartNormalDefense",
+      "voiceTagType": 73,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600008": {
       "id": 17600008,
       "modeType": 4,
-      "talkColumn": "battleStartNormalAttack"
+      "talkColumn": "battleStartNormalAttack",
+      "voiceTagType": 72,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600015": {
       "id": 17600015,
       "modeType": 4,
-      "talkColumn": "battleWin"
+      "talkColumn": "battleWin",
+      "voiceTagType": 32,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600017": {
       "id": 17600017,
       "modeType": 3,
-      "talkColumn": "recruitDialDrink"
+      "talkColumn": "recruitDialDrink",
+      "voiceTagType": 38,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600018": {
       "id": 17600018,
       "modeType": 3,
-      "talkColumn": "recruitGiftGood"
+      "talkColumn": "recruitGiftGood",
+      "voiceTagType": 46,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600019": {
       "id": 17600019,
       "modeType": 3,
-      "talkColumn": "recruitGiftBad"
+      "talkColumn": "recruitGiftBad",
+      "voiceTagType": 44,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600021": {
       "id": 17600021,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice1"
+      "talkColumn": "oceanDisasterNotice1",
+      "voiceTagType": 104,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600022": {
       "id": 17600022,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice2"
+      "talkColumn": "oceanDisasterNotice2",
+      "voiceTagType": 79,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600023": {
       "id": 17600023,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice3"
+      "talkColumn": "oceanDisasterNotice3",
+      "voiceTagType": 80,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600024": {
       "id": 17600024,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice4"
+      "talkColumn": "oceanDisasterNotice4",
+      "voiceTagType": 90,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600025": {
       "id": 17600025,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice5"
+      "talkColumn": "oceanDisasterNotice5",
+      "voiceTagType": 99,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600026": {
       "id": 17600026,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice6"
+      "talkColumn": "oceanDisasterNotice6",
+      "voiceTagType": 81,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600027": {
       "id": 17600027,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice7"
+      "talkColumn": "oceanDisasterNotice7",
+      "voiceTagType": 96,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600028": {
       "id": 17600028,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice8"
+      "talkColumn": "oceanDisasterNotice8",
+      "voiceTagType": 97,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600029": {
       "id": 17600029,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice9"
+      "talkColumn": "oceanDisasterNotice9",
+      "voiceTagType": 106,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600030": {
       "id": 17600030,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice10"
+      "talkColumn": "oceanDisasterNotice10",
+      "voiceTagType": 91,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600031": {
       "id": 17600031,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice11"
+      "talkColumn": "oceanDisasterNotice11",
+      "voiceTagType": 89,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600032": {
       "id": 17600032,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice12"
+      "talkColumn": "oceanDisasterNotice12",
+      "voiceTagType": 82,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600033": {
       "id": 17600033,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice13"
+      "talkColumn": "oceanDisasterNotice13",
+      "voiceTagType": 92,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600034": {
       "id": 17600034,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice14"
+      "talkColumn": "oceanDisasterNotice14",
+      "voiceTagType": 105,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600035": {
       "id": 17600035,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice15"
+      "talkColumn": "oceanDisasterNotice15",
+      "voiceTagType": 98,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600036": {
       "id": 17600036,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice16"
+      "talkColumn": "oceanDisasterNotice16",
+      "voiceTagType": 107,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600037": {
       "id": 17600037,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice17"
+      "talkColumn": "oceanDisasterNotice17",
+      "voiceTagType": 83,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600038": {
       "id": 17600038,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice18"
+      "talkColumn": "oceanDisasterNotice18",
+      "voiceTagType": 93,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600039": {
       "id": 17600039,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice19"
+      "talkColumn": "oceanDisasterNotice19",
+      "voiceTagType": 100,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600040": {
       "id": 17600040,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice20"
+      "talkColumn": "oceanDisasterNotice20",
+      "voiceTagType": 84,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600041": {
       "id": 17600041,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice21"
+      "talkColumn": "oceanDisasterNotice21",
+      "voiceTagType": 94,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600042": {
       "id": 17600042,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice22"
+      "talkColumn": "oceanDisasterNotice22",
+      "voiceTagType": 102,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600043": {
       "id": 17600043,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice23"
+      "talkColumn": "oceanDisasterNotice23",
+      "voiceTagType": 101,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600044": {
       "id": 17600044,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice24"
+      "talkColumn": "oceanDisasterNotice24",
+      "voiceTagType": 85,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600045": {
       "id": 17600045,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice25"
+      "talkColumn": "oceanDisasterNotice25",
+      "voiceTagType": 86,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600046": {
       "id": 17600046,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice26"
+      "talkColumn": "oceanDisasterNotice26",
+      "voiceTagType": 87,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600047": {
       "id": 17600047,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice27"
+      "talkColumn": "oceanDisasterNotice27",
+      "voiceTagType": 88,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600048": {
       "id": 17600048,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice28"
+      "talkColumn": "oceanDisasterNotice28",
+      "voiceTagType": 95,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600049": {
       "id": 17600049,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice29"
+      "talkColumn": "oceanDisasterNotice29",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600050": {
       "id": 17600050,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice30"
+      "talkColumn": "oceanDisasterNotice30",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600051": {
       "id": 17600051,
       "modeType": 2,
-      "talkColumn": "oceanDisasterNotice31"
+      "talkColumn": "oceanDisasterNotice31",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600052": {
       "id": 17600052,
       "modeType": 3,
-      "talkColumn": "MateTalk"
+      "talkColumn": "MateTalk",
+      "voiceTagType": 8,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600053": {
       "id": 17600053,
       "modeType": 3,
-      "talkColumn": "MateReward"
+      "talkColumn": "MateReward",
+      "voiceTagType": 38,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600054": {
       "id": 17600054,
       "modeType": 3,
-      "talkColumn": "MateRecovery"
+      "talkColumn": "MateRecovery",
+      "voiceTagType": 49,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600055": {
       "id": 17600055,
       "modeType": 1,
-      "talkColumn": "employSpeech"
+      "talkColumn": "employSpeech",
+      "voiceTagType": 67,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600056": {
       "id": 17600056,
       "modeType": 3,
-      "talkColumn": "tradeEventNoticeCommon"
+      "talkColumn": "tradeEventNoticeCommon",
+      "voiceTagType": 46,
+      "target": 4,
+      "mateSearchingRule": 1,
+      "shipSlotIds": [
+        70103008,
+        70103028,
+        70103048,
+        70103068
+      ]
     },
     "17600057": {
       "id": 17600057,
       "modeType": 3,
-      "talkColumn": "tradeEventNoticeLoadup"
+      "talkColumn": "tradeEventNoticeLoadup",
+      "voiceTagType": 46,
+      "target": 4,
+      "mateSearchingRule": 1,
+      "shipSlotIds": [
+        70103008,
+        70103028,
+        70103048,
+        70103068
+      ]
     },
     "17600058": {
       "id": 17600058,
       "modeType": 3,
-      "talkColumn": "buyBargainingStart"
+      "talkColumn": "buyBargainingStart",
+      "target": 4,
+      "mateSearchingRule": 1,
+      "shipSlotIds": [
+        70103008,
+        70103028,
+        70103048,
+        70103068
+      ]
     },
     "17600059": {
       "id": 17600059,
       "modeType": 3,
-      "talkColumn": "sellBargainingStart"
+      "talkColumn": "sellBargainingStart",
+      "target": 4,
+      "mateSearchingRule": 1,
+      "shipSlotIds": [
+        70103008,
+        70103028,
+        70103048,
+        70103068
+      ]
     },
     "17600060": {
       "id": 17600060,
       "modeType": 3,
-      "talkColumn": "BargainingProgress"
+      "talkColumn": "BargainingProgress",
+      "target": 4,
+      "mateSearchingRule": 1,
+      "shipSlotIds": [
+        70103008,
+        70103028,
+        70103048,
+        70103068
+      ]
     },
     "17600061": {
       "id": 17600061,
       "modeType": 3,
-      "talkColumn": "BargainingLastProgress"
+      "talkColumn": "BargainingLastProgress",
+      "target": 4,
+      "mateSearchingRule": 1,
+      "shipSlotIds": [
+        70103008,
+        70103028,
+        70103048,
+        70103068
+      ]
     },
     "17600066": {
       "id": 17600066,
       "modeType": 1,
-      "talkColumn": "levelUpDiaMsg"
+      "talkColumn": "levelUpDiaMsg",
+      "voiceTagType": 1,
+      "target": 4,
+      "mateSearchingRule": 2
     },
     "17600067": {
       "id": 17600067,
       "modeType": 2,
-      "talkColumn": "quickSupply"
+      "talkColumn": "quickSupply",
+      "voiceTagType": 43,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600071": {
       "id": 17600071,
       "modeType": 4,
-      "talkColumn": "cannonCaster"
+      "talkColumn": "cannonCaster",
+      "voiceTagType": 11,
+      "target": 3,
+      "mateSearchingRule": 1,
+      "shipSlotIds": [
+        70103001
+      ]
     },
     "17600073": {
       "id": 17600073,
       "modeType": 4,
-      "talkColumn": "cannonCriticalCaster"
+      "talkColumn": "cannonCriticalCaster",
+      "voiceTagType": 13,
+      "target": 3,
+      "mateSearchingRule": 1,
+      "shipSlotIds": [
+        70103001
+      ]
     },
     "17600075": {
       "id": 17600075,
       "modeType": 4,
-      "talkColumn": "cannonAvoidTarget"
+      "talkColumn": "cannonAvoidTarget",
+      "voiceTagType": 46,
+      "target": 3,
+      "mateSearchingRule": 2
     },
     "17600076": {
       "id": 17600076,
       "modeType": 4,
-      "talkColumn": "cannonCriticalTarget"
+      "talkColumn": "cannonCriticalTarget",
+      "voiceTagType": 24,
+      "target": 3,
+      "mateSearchingRule": 2
     },
     "17600077": {
       "id": 17600077,
       "modeType": 4,
-      "talkColumn": "duelAttackerAttack"
+      "talkColumn": "duelAttackerAttack",
+      "voiceTagType": 15,
+      "target": 3,
+      "mateSearchingRule": 1,
+      "shipSlotIds": [
+        70103001
+      ]
     },
     "17600079": {
       "id": 17600079,
       "modeType": 4,
-      "talkColumn": "duelTargetDefense"
+      "talkColumn": "duelTargetDefense",
+      "voiceTagType": 46,
+      "target": 3,
+      "mateSearchingRule": 2
     },
     "17600080": {
       "id": 17600080,
       "modeType": 4,
-      "talkColumn": "duelTargetDamage"
+      "talkColumn": "duelTargetDamage",
+      "voiceTagType": 24,
+      "target": 3,
+      "mateSearchingRule": 2
     },
     "17600081": {
       "id": 17600081,
       "modeType": 4,
-      "talkColumn": "duelWin"
+      "talkColumn": "duelWin",
+      "voiceTagType": 38,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600085": {
       "id": 17600085,
       "modeType": 4,
-      "talkColumn": "repairTarget"
+      "talkColumn": "repairTarget",
+      "voiceTagType": 66,
+      "target": 3,
+      "mateSearchingRule": 2
     },
     "17600087": {
       "id": 17600087,
       "modeType": 4,
-      "talkColumn": "healTarget"
+      "talkColumn": "healTarget",
+      "voiceTagType": 17,
+      "target": 3,
+      "mateSearchingRule": 2
     },
     "17600088": {
       "id": 17600088,
       "modeType": 4,
-      "talkColumn": "jointAttackNormal"
+      "talkColumn": "jointAttackNormal",
+      "voiceTagType": 10,
+      "target": 3,
+      "mateSearchingRule": 2
     },
     "17600090": {
       "id": 17600090,
       "modeType": 4,
-      "talkColumn": "dead"
+      "talkColumn": "dead",
+      "voiceTagType": 21,
+      "target": 3,
+      "mateSearchingRule": 2,
+      "shipSlotIds": [
+        70103001
+      ]
     },
     "17600091": {
       "id": 17600091,
       "modeType": 4,
-      "talkColumn": "unitTriggerPositive"
+      "talkColumn": "unitTriggerPositive",
+      "voiceTagType": 18,
+      "target": 3,
+      "mateSearchingRule": 2
     },
     "17600092": {
       "id": 17600092,
       "modeType": 4,
-      "talkColumn": "unitTriggerNegative"
+      "talkColumn": "unitTriggerNegative",
+      "voiceTagType": 19,
+      "target": 3,
+      "mateSearchingRule": 2
     },
     "17600093": {
       "id": 17600093,
       "modeType": 4,
-      "talkColumn": "warning"
+      "talkColumn": "warning",
+      "voiceTagType": 35,
+      "target": 3,
+      "mateSearchingRule": 2
     },
     "17600094": {
       "id": 17600094,
       "modeType": 4,
-      "talkColumn": "addBuff"
+      "talkColumn": "addBuff",
+      "voiceTagType": 18,
+      "target": 3,
+      "mateSearchingRule": 2
     },
     "17600095": {
       "id": 17600095,
       "modeType": 4,
-      "talkColumn": "addDebuff"
+      "talkColumn": "addDebuff",
+      "voiceTagType": 19,
+      "target": 3,
+      "mateSearchingRule": 2
     },
     "17600096": {
       "id": 17600096,
       "modeType": 4,
-      "talkColumn": "clearBuff"
+      "talkColumn": "clearBuff",
+      "target": 3,
+      "mateSearchingRule": 2
     },
     "17600097": {
       "id": 17600097,
       "modeType": 4,
-      "talkColumn": "clearDebuff"
+      "talkColumn": "clearDebuff",
+      "target": 3,
+      "mateSearchingRule": 2
     },
     "17600103": {
       "id": 17600103,
       "modeType": 5,
-      "talkColumn": "LandingComplete"
+      "talkColumn": "LandingComplete",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600105": {
       "id": 17600105,
       "modeType": 5,
-      "talkColumn": "DiscoverySuccess"
+      "talkColumn": "DiscoverySuccess",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600106": {
       "id": 17600106,
       "modeType": 5,
-      "talkColumn": "DiscoveryFail"
+      "talkColumn": "DiscoveryFail",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600108": {
       "id": 17600108,
       "modeType": 1,
-      "talkColumn": "duelStart"
+      "talkColumn": "duelStart",
+      "voiceTagType": 74,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600109": {
       "id": 17600109,
       "modeType": 2,
-      "talkColumn": "NewTownDiscovery"
+      "talkColumn": "NewTownDiscovery",
+      "voiceTagType": 120,
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600110": {
       "id": 17600110,
       "modeType": 1,
-      "talkColumn": "kickEventRunBattle"
+      "talkColumn": "kickEventRunBattle",
+      "voiceTagType": 13,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600111": {
       "id": 17600111,
       "modeType": 1,
-      "talkColumn": "promotionDiaMsg"
+      "talkColumn": "promotionDiaMsg",
+      "voiceTagType": 28,
+      "target": 4,
+      "mateSearchingRule": 2
     },
     "17600112": {
       "id": 17600112,
       "modeType": 6,
-      "talkColumn": "commonStart"
+      "talkColumn": "commonStart",
+      "voiceTagType": 74,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600113": {
       "id": 17600113,
       "modeType": 6,
-      "talkColumn": "koikoiStart"
+      "talkColumn": "koikoiStart",
+      "voiceTagType": 38,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600114": {
       "id": 17600114,
       "modeType": 6,
-      "talkColumn": "holdumStart"
+      "talkColumn": "holdumStart",
+      "voiceTagType": 38,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600115": {
       "id": 17600115,
       "modeType": 6,
-      "talkColumn": "diceStart"
+      "talkColumn": "diceStart",
+      "voiceTagType": 38,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600116": {
       "id": 17600116,
       "modeType": 6,
-      "talkColumn": "dartStart"
+      "talkColumn": "dartStart",
+      "voiceTagType": 38,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600117": {
       "id": 17600117,
       "modeType": 6,
-      "talkColumn": "blackjackStart"
+      "talkColumn": "blackjackStart",
+      "voiceTagType": 38,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600118": {
       "id": 17600118,
       "modeType": 6,
-      "talkColumn": "commonWin"
+      "talkColumn": "commonWin",
+      "voiceTagType": 32,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600119": {
       "id": 17600119,
       "modeType": 6,
-      "talkColumn": "commonLose"
+      "talkColumn": "commonLose",
+      "voiceTagType": 33,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600120": {
       "id": 17600120,
       "modeType": 6,
-      "talkColumn": "commonDraw"
+      "talkColumn": "commonDraw",
+      "voiceTagType": 34,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600121": {
       "id": 17600121,
       "modeType": 2,
-      "talkColumn": "EncounterATK"
+      "talkColumn": "EncounterATK",
+      "voiceTagType": 16,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600122": {
       "id": 17600122,
       "modeType": 2,
-      "talkColumn": "EncounterDEF"
+      "talkColumn": "EncounterDEF",
+      "voiceTagType": 73,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600124": {
       "id": 17600124,
       "modeType": 2,
-      "talkColumn": "RunAttempt"
+      "talkColumn": "RunAttempt",
+      "voiceTagType": 75,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600125": {
       "id": 17600125,
       "modeType": 2,
-      "talkColumn": "SurrenderAttempt"
+      "talkColumn": "SurrenderAttempt",
+      "voiceTagType": 33,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600126": {
       "id": 17600126,
       "modeType": 2,
-      "talkColumn": "SurrenderDonation"
+      "talkColumn": "SurrenderDonation",
+      "voiceTagType": 46,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600127": {
       "id": 17600127,
       "modeType": 2,
-      "talkColumn": "NegotiationAttempt"
+      "talkColumn": "NegotiationAttempt",
+      "voiceTagType": 42,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600128": {
       "id": 17600128,
       "modeType": 2,
-      "talkColumn": "GoBattle"
+      "talkColumn": "GoBattle",
+      "voiceTagType": 72,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600129": {
       "id": 17600129,
       "modeType": 2,
-      "talkColumn": "RunSuccess"
+      "talkColumn": "RunSuccess",
+      "voiceTagType": 47,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600130": {
       "id": 17600130,
       "modeType": 2,
-      "talkColumn": "RunFail"
+      "talkColumn": "RunFail",
+      "voiceTagType": 72,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600131": {
       "id": 17600131,
       "modeType": 2,
-      "talkColumn": "NotChase"
+      "talkColumn": "NotChase",
+      "voiceTagType": 48,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600132": {
       "id": 17600132,
       "modeType": 2,
-      "talkColumn": "SurrenderSuccess"
+      "talkColumn": "SurrenderSuccess",
+      "voiceTagType": 43,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600133": {
       "id": 17600133,
       "modeType": 2,
-      "talkColumn": "SurrenderDeny"
+      "talkColumn": "SurrenderDeny",
+      "voiceTagType": 72,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600134": {
       "id": 17600134,
       "modeType": 2,
-      "talkColumn": "NegotiationSuccess"
+      "talkColumn": "NegotiationSuccess",
+      "voiceTagType": 43,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600135": {
       "id": 17600135,
       "modeType": 2,
-      "talkColumn": "NegotiationDeny"
+      "talkColumn": "NegotiationDeny",
+      "voiceTagType": 44,
+      "target": 4,
+      "mateSearchingRule": 3
     },
     "17600137": {
       "id": 17600137,
       "modeType": 5,
-      "talkColumn": "clueOceanDoodadCave"
+      "talkColumn": "clueOceanDoodadCave",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600138": {
       "id": 17600138,
       "modeType": 5,
-      "talkColumn": "clueOceanDoodadLandmark"
+      "talkColumn": "clueOceanDoodadLandmark",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600139": {
       "id": 17600139,
       "modeType": 5,
-      "talkColumn": "clueOceanDoodadBluehole"
+      "talkColumn": "clueOceanDoodadBluehole",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600140": {
       "id": 17600140,
       "modeType": 5,
-      "talkColumn": "clueOceanDoodadGlacial"
+      "talkColumn": "clueOceanDoodadGlacial",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600141": {
       "id": 17600141,
       "modeType": 5,
-      "talkColumn": "clueOceanDoodadMountain"
+      "talkColumn": "clueOceanDoodadMountain",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600142": {
       "id": 17600142,
       "modeType": 5,
-      "talkColumn": "clueOceanDoodadDelta"
+      "talkColumn": "clueOceanDoodadDelta",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600143": {
       "id": 17600143,
       "modeType": 5,
-      "talkColumn": "clueOceanDoodadWaterfall"
+      "talkColumn": "clueOceanDoodadWaterfall",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600144": {
       "id": 17600144,
       "modeType": 5,
-      "talkColumn": "clueOceanDoodadBeach"
+      "talkColumn": "clueOceanDoodadBeach",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600145": {
       "id": 17600145,
       "modeType": 5,
-      "talkColumn": "clueOceanDoodadConstellation"
+      "talkColumn": "clueOceanDoodadConstellation",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600146": {
       "id": 17600146,
       "modeType": 5,
-      "talkColumn": "clueOceanDoodadConstellationClueWreck"
+      "talkColumn": "clueOceanDoodadConstellationClueWreck",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600147": {
       "id": 17600147,
       "modeType": 5,
-      "talkColumn": "clueOceanDoodadConstellationClueLightHouse"
+      "talkColumn": "clueOceanDoodadConstellationClueLightHouse",
+      "target": 5,
+      "mateSearchingRule": 3
     },
     "17600148": {
       "id": 17600148,
       "modeType": 1,
-      "talkColumn": "promotionDiaMsg"
+      "talkColumn": "promotionDiaMsg",
+      "voiceTagType": 28,
+      "target": 4,
+      "mateSearchingRule": 3
     }
   }
 }

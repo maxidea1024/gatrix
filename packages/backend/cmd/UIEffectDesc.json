@@ -3,7 +3,8 @@
     ":type": {
       "id": "key",
       "icon": "string",
-      "isAsscending": "bool"
+      "isAsscending": "bool",
+      "description": "text"
     },
     ":required": {},
     ":min": {},
@@ -15,302 +16,362 @@
     "1": {
       "id": 1,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "포격 공격"
     },
     "2": {
       "id": 2,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "포격 방어"
     },
     "3": {
       "id": 3,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "포격 명중"
     },
     "4": {
       "id": 4,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "포격 회피"
     },
     "5": {
       "id": 5,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "포격 치명타 발생"
     },
     "6": {
       "id": 6,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "포격 치명타 피해량"
     },
     "7": {
       "id": 7,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "포격 반격"
     },
     "8": {
       "id": 8,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "백병 공격"
     },
     "9": {
       "id": 9,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "백병 방어"
     },
     "10": {
       "id": 10,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "백병 명중"
     },
     "11": {
       "id": 11,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "백병 회피"
     },
     "12": {
       "id": 12,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "백병 치명타 발생"
     },
     "13": {
       "id": 13,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "백병 치명타 피해량"
     },
     "14": {
       "id": 14,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "백병 반격"
     },
     "15": {
       "id": 15,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "충파 공격"
     },
     "16": {
       "id": 16,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "충파 방어"
     },
     "17": {
       "id": 17,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "충파 치명타 발생"
     },
     "18": {
       "id": 18,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "충파 치명타 피해량"
     },
     "19": {
       "id": 19,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "충파 반격"
     },
     "20": {
       "id": 20,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "수리 회복량"
     },
     "21": {
       "id": 21,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "수리 극대화 발생"
     },
     "22": {
       "id": 22,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "수리 극대화 회복량"
     },
     "23": {
       "id": 23,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "의술 회복량"
     },
     "24": {
       "id": 24,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "의술 극대화 발생"
     },
     "25": {
       "id": 25,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "의술 극대화 회복량"
     },
     "26": {
       "id": 26,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "이동력"
     },
     "27": {
       "id": 27,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "기동력"
     },
     "28": {
       "id": 28,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "기동력 회복"
     },
     "29": {
       "id": 29,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "선회력"
     },
     "30": {
       "id": 30,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "피해량 증가"
     },
     "31": {
       "id": 31,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "최대 내구도"
     },
     "32": {
       "id": 32,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "충파 거리 비례 추가 효과"
     },
     "33": {
       "id": 33,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "결투 선공 확률"
     },
     "34": {
       "id": 34,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "결투 공격력"
     },
     "35": {
       "id": 35,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "결투 방어력"
     },
     "603": {
       "id": 603,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "협상"
     },
     "606": {
       "id": 606,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "교역품 구매 수량 조정"
     },
     "607": {
       "id": 607,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "교역품 구매 가격 조정"
     },
     "608": {
       "id": 608,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "교역품 판매 가격 조정"
     },
     "609": {
       "id": 609,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "물물 교환"
     },
     "611": {
       "id": 611,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "음식 소모량 조정"
     },
     "614": {
       "id": 614,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "항해사 부상"
     },
     "615": {
       "id": 615,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "항해 속도 조정"
     },
     "612": {
       "id": 612,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "재해 예방 확률 조정"
     },
     "613": {
       "id": 613,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "재해 해소 확률 조정"
     },
     "630": {
       "id": 630,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "충성도 변화 조정"
     },
     "616": {
       "id": 616,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "발견 확률 조정"
     },
     "617": {
       "id": 617,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "부유물 획득 물품 수량 조정"
     },
     "618": {
       "id": 618,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "낚시 기술"
     },
     "619": {
       "id": 619,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "인양"
     },
     "620": {
       "id": 620,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "예항"
     },
     "621": {
       "id": 621,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "발견물 보고시 획득 보상 조정"
     },
     "623": {
       "id": 623,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "육지 탐험 전투 조정"
     },
     "622": {
       "id": 622,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "자원 보고 시 획득 보상 조정"
     },
     "624": {
       "id": 624,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "전리품 조정"
     },
     "625": {
       "id": 625,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "탐험 지속력 조정"
     },
     "629": {
       "id": 629,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "고등급 탐험 확률 조정"
     },
     "628": {
       "id": 628,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "마을 우호도 조정"
     },
     "627": {
       "id": 627,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "해양 탐색 거리 조정"
     },
     "626": {
       "id": 626,
       "icon": "icon_skill_battle_characterEffect_998_Sprite",
-      "isAsscending": true
+      "isAsscending": true,
+      "description": "거래 점수 기준 감소 조정"
     }
   }
 }

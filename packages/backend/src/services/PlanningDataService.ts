@@ -44,6 +44,11 @@ export class PlanningDataService {
   private static localizationCnPath = path.join(PlanningDataService.cmsPath, 'reward-localization-cn.json');
   private static uiListDataPath = path.join(PlanningDataService.cmsPath, 'ui-list-data.json');
   private static loctabPath = path.join(PlanningDataService.cmsPath, 'loctab.json');
+  private static hotTimeBuffPath = path.join(PlanningDataService.cmsPath, 'hottimebuff-lookup.json');
+  private static eventPagePath = path.join(PlanningDataService.cmsPath, 'eventpage-lookup.json');
+  private static liveEventPath = path.join(PlanningDataService.cmsPath, 'liveevent-lookup.json');
+  private static mateRecruitingGroupPath = path.join(PlanningDataService.cmsPath, 'materecruiting-lookup.json');
+  private static oceanNpcAreaSpawnerPath = path.join(PlanningDataService.cmsPath, 'oceannpcarea-lookup.json');
   private static initialized = false;
 
   /**
@@ -322,7 +327,7 @@ export class PlanningDataService {
         uiListData: await fs.access(this.uiListDataPath).then(() => true).catch(() => false),
       };
 
-      // Calculate UI list counts
+      // Calculate UI list counts (keys are already in SNAKE_CASE_UPPER from build)
       const uiListCounts: Record<string, number> = {};
       for (const [key, value] of Object.entries(uiListData)) {
         if (Array.isArray(value)) {
@@ -348,6 +353,446 @@ export class PlanningDataService {
     } catch (error) {
       logger.error('Failed to get planning data stats', { error });
       throw new CustomError('Failed to load planning data statistics', 500);
+    }
+  }
+
+  /**
+   * Get HotTimeBuff lookup data
+   */
+  static async getHotTimeBuffLookup(): Promise<Record<string, any>> {
+    try {
+      const exists = await fs.access(this.hotTimeBuffPath).then(() => true).catch(() => false);
+
+      if (!exists) {
+        return {};
+      }
+
+      const data = await fs.readFile(this.hotTimeBuffPath, 'utf-8');
+      return JSON.parse(data);
+    } catch (error) {
+      logger.error('Failed to read HotTimeBuff lookup data', { error });
+      throw new CustomError('Failed to load HotTimeBuff lookup data', 500);
+    }
+  }
+
+  /**
+   * Build HotTimeBuff lookup data from CMS file
+   */
+  static async buildHotTimeBuffLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
+    try {
+      logger.info('Building HotTimeBuff lookup data...');
+
+      // Read HotTimeBuff.json from cmd directory
+      const cmdDir = path.join(__dirname, '../../cmd');
+      const hotTimeBuffSourcePath = path.join(cmdDir, 'HotTimeBuff.json');
+      const worldBuffSourcePath = path.join(cmdDir, 'WorldBuff.json');
+
+      try {
+        await fs.access(hotTimeBuffSourcePath);
+      } catch {
+        throw new CustomError('HotTimeBuff.json not found in cmd directory', 500);
+      }
+
+      // Load WorldBuff data for name mapping
+      const worldBuffMap: Record<number, string> = {};
+      try {
+        const worldBuffData = await fs.readFile(worldBuffSourcePath, 'utf-8');
+        const worldBuffParsed = JSON.parse(worldBuffData);
+        const worldBuffs = worldBuffParsed.WorldBuff || {};
+
+        // Create a map of WorldBuff ID to name
+        Object.values(worldBuffs).forEach((buff: any) => {
+          if (buff.id && buff.name) {
+            worldBuffMap[buff.id] = buff.name;
+          }
+        });
+      } catch (error) {
+        logger.warn('Could not load WorldBuff data for name mapping', { error });
+      }
+
+      const sourceData = await fs.readFile(hotTimeBuffSourcePath, 'utf-8');
+      const parsedData = JSON.parse(sourceData);
+
+      // Extract HotTimeBuff data (skip metadata)
+      const hotTimeBuffData = parsedData.HotTimeBuff || {};
+
+      // Convert to array format for easier processing
+      const items = Object.values(hotTimeBuffData).map((item: any) => ({
+        id: item.id,
+        icon: item.icon,
+        startDate: item.startDate,
+        endDate: item.endDate,
+        localBitflag: item.localBitflag,
+        startHour: item.startHour,
+        endHour: item.endHour,
+        minLv: item.minLv,
+        maxLv: item.maxLv,
+        bitFlagDayOfWeek: item.bitFlagDayOfWeek,
+        worldBuffId: item.worldBuffId || [],
+        // Add world buff names for display
+        worldBuffNames: (item.worldBuffId || []).map((id: number) => worldBuffMap[id] || `Unknown (${id})`),
+      }));
+
+      // Save to lookup file
+      const lookupData = {
+        totalCount: items.length,
+        items,
+      };
+
+      await fs.writeFile(this.hotTimeBuffPath, JSON.stringify(lookupData, null, 2), 'utf-8');
+
+      logger.info('HotTimeBuff lookup data built successfully', { itemCount: items.length });
+
+      return {
+        success: true,
+        message: 'HotTimeBuff lookup data built successfully',
+        itemCount: items.length,
+      };
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      logger.error('Failed to build HotTimeBuff lookup data', { error });
+      throw new CustomError('Failed to build HotTimeBuff lookup data', 500);
+    }
+  }
+
+  /**
+   * Get EventPage lookup data
+   */
+  static async getEventPageLookup(): Promise<Record<string, any>> {
+    try {
+      const exists = await fs.access(this.eventPagePath).then(() => true).catch(() => false);
+      if (!exists) return { totalCount: 0, items: [] };
+      const data = await fs.readFile(this.eventPagePath, 'utf-8');
+      return JSON.parse(data);
+    } catch (error) {
+      logger.error('Failed to read EventPage lookup data', { error });
+      throw new CustomError('Failed to load EventPage lookup data', 500);
+    }
+  }
+
+  /**
+   * Build EventPage lookup data from CMS file
+   */
+  static async buildEventPageLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
+    try {
+      logger.info('Building EventPage lookup data...');
+      const cmdDir = path.join(__dirname, '../../cmd');
+      const sourceFilePath = path.join(cmdDir, 'EventPage.json');
+      try {
+        await fs.access(sourceFilePath);
+      } catch {
+        throw new CustomError('EventPage.json not found in cmd directory', 500);
+      }
+
+      // PageGroup and Type name mappings
+      const pageGroupNames: Record<number, string> = {
+        0: 'Normal',
+        1: 'Attendance',
+        2: 'Mission',
+        3: 'Ranking',
+        4: 'Special',
+      };
+
+      const typeNames: Record<number, string> = {
+        1: 'Daily',
+        2: 'Weekly',
+        3: 'Monthly',
+        4: 'Seasonal',
+        5: 'Limited',
+        6: 'Special',
+        7: 'Ranking',
+        8: 'Attendance',
+        9: 'Mission',
+        10: 'Challenge',
+        11: 'Event',
+        12: 'Promotion',
+        13: 'Maintenance',
+        14: 'Update',
+        15: 'Patch',
+        16: 'Hotfix',
+        17: 'Emergency',
+      };
+
+      const sourceData = await fs.readFile(sourceFilePath, 'utf-8');
+      const parsedData = JSON.parse(sourceData);
+      const eventPageData = parsedData.EventPage || {};
+      const items = Object.values(eventPageData).map((item: any) => ({
+        ...item,
+        pageGroupName: pageGroupNames[item.pageGroup] || `Unknown (${item.pageGroup})`,
+        typeName: typeNames[item.type] || `Unknown (${item.type})`,
+      }));
+      const lookupData = { totalCount: items.length, items };
+      await fs.writeFile(this.eventPagePath, JSON.stringify(lookupData, null, 2), 'utf-8');
+      logger.info('EventPage lookup data built successfully', { itemCount: items.length });
+      return { success: true, message: 'EventPage lookup data built successfully', itemCount: items.length };
+    } catch (error) {
+      if (error instanceof CustomError) throw error;
+      logger.error('Failed to build EventPage lookup data', { error });
+      throw new CustomError('Failed to build EventPage lookup data', 500);
+    }
+  }
+
+  /**
+   * Get LiveEvent lookup data
+   */
+  static async getLiveEventLookup(): Promise<Record<string, any>> {
+    try {
+      const exists = await fs.access(this.liveEventPath).then(() => true).catch(() => false);
+      if (!exists) return { totalCount: 0, items: [] };
+      const data = await fs.readFile(this.liveEventPath, 'utf-8');
+      return JSON.parse(data);
+    } catch (error) {
+      logger.error('Failed to read LiveEvent lookup data', { error });
+      throw new CustomError('Failed to load LiveEvent lookup data', 500);
+    }
+  }
+
+  /**
+   * Build LiveEvent lookup data from CMS file
+   */
+  static async buildLiveEventLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
+    try {
+      logger.info('Building LiveEvent lookup data...');
+      const cmdDir = path.join(__dirname, '../../cmd');
+      const sourceFilePath = path.join(cmdDir, 'LiveEvent.json');
+      try {
+        await fs.access(sourceFilePath);
+      } catch {
+        throw new CustomError('LiveEvent.json not found in cmd directory', 500);
+      }
+      const sourceData = await fs.readFile(sourceFilePath, 'utf-8');
+      const parsedData = JSON.parse(sourceData);
+      const liveEventData = parsedData.LiveEvent || {};
+
+      // Use name from source data directly (client table data includes name field)
+      const items = Object.values(liveEventData).map((item: any) => ({
+        ...item,
+        name: item.name || `LiveEvent ${item.id}`, // Fallback to ID if name is missing
+      }));
+
+      const lookupData = { totalCount: items.length, items };
+      await fs.writeFile(this.liveEventPath, JSON.stringify(lookupData, null, 2), 'utf-8');
+      logger.info('LiveEvent lookup data built successfully', { itemCount: items.length });
+      return { success: true, message: 'LiveEvent lookup data built successfully', itemCount: items.length };
+    } catch (error) {
+      if (error instanceof CustomError) throw error;
+      logger.error('Failed to build LiveEvent lookup data', { error });
+      throw new CustomError('Failed to build LiveEvent lookup data', 500);
+    }
+  }
+
+  /**
+   * Get MateRecruitingGroup lookup data
+   */
+  static async getMateRecruitingGroupLookup(): Promise<Record<string, any>> {
+    try {
+      const exists = await fs.access(this.mateRecruitingGroupPath).then(() => true).catch(() => false);
+      if (!exists) return { totalCount: 0, items: [] };
+      const data = await fs.readFile(this.mateRecruitingGroupPath, 'utf-8');
+      return JSON.parse(data);
+    } catch (error) {
+      logger.error('Failed to read MateRecruitingGroup lookup data', { error });
+      throw new CustomError('Failed to load MateRecruitingGroup lookup data', 500);
+    }
+  }
+
+  /**
+   * Build MateRecruitingGroup lookup data from CMS file
+   */
+  static async buildMateRecruitingGroupLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
+    try {
+      logger.info('Building MateRecruitingGroup lookup data...');
+      const cmdDir = path.join(__dirname, '../../cmd');
+      const sourceFilePath = path.join(cmdDir, 'MateRecruitingGroup.json');
+      const mateTemplateFilePath = path.join(cmdDir, 'MateTemplate.json');
+      const townFilePath = path.join(cmdDir, 'Town.json');
+
+      try {
+        await fs.access(sourceFilePath);
+        await fs.access(mateTemplateFilePath);
+        await fs.access(townFilePath);
+      } catch {
+        throw new CustomError('Required JSON files not found in cmd directory', 500);
+      }
+
+      const sourceData = await fs.readFile(sourceFilePath, 'utf-8');
+      const mateTemplateData = await fs.readFile(mateTemplateFilePath, 'utf-8');
+      const townData = await fs.readFile(townFilePath, 'utf-8');
+      const parsedData = JSON.parse(sourceData);
+      const parsedMateTemplate = JSON.parse(mateTemplateData);
+      const parsedTown = JSON.parse(townData);
+
+      // Load localization table
+      const loctabData = await fs.readFile(this.loctabPath, 'utf-8');
+      const loctab = JSON.parse(loctabData);
+
+      // Create a map of mateId to mate names (all languages)
+      const mateNameMap: Record<number, { nameKr: string; nameEn: string; nameCn: string }> = {};
+      const mateTemplates = parsedMateTemplate.MateTemplate || {};
+      Object.values(mateTemplates).forEach((mate: any) => {
+        if (mate.mateId && mate.name) {
+          mateNameMap[mate.mateId] = {
+            nameKr: mate.name,
+            nameEn: loctab[mate.name] || mate.name,
+            nameCn: loctab[mate.name] || mate.name,
+          };
+        }
+      });
+
+      // Create a map of mateRecruitingGroup to town names (all languages)
+      const groupToTownsMap: Record<number, Array<{ nameKr: string; nameEn: string; nameCn: string }>> = {};
+      const towns = parsedTown.Town || {};
+      Object.values(towns).forEach((town: any) => {
+        if (town.mateRecruitingGroup && town.name) {
+          if (!groupToTownsMap[town.mateRecruitingGroup]) {
+            groupToTownsMap[town.mateRecruitingGroup] = [];
+          }
+          groupToTownsMap[town.mateRecruitingGroup].push({
+            nameKr: town.name,
+            nameEn: loctab[town.name] || town.name,
+            nameCn: loctab[town.name] || town.name,
+          });
+        }
+      });
+
+      const mateRecruitingGroupData = parsedData.MateRecruitingGroup || {};
+      const items = Object.values(mateRecruitingGroupData).map((item: any) => {
+        // Check if mate exists in template
+        const mateExists = !!mateNameMap[item.mateId];
+        const mateNames = mateNameMap[item.mateId] || {
+          nameKr: `MISSING MATE ${item.mateId}`,
+          nameEn: `MISSING MATE ${item.mateId}`,
+          nameCn: `MISSING MATE ${item.mateId}`,
+        };
+
+        // Get town names for this group (all languages)
+        const townNamesList = groupToTownsMap[item.group] || [];
+        const townNamesKr = townNamesList.map(t => t.nameKr).join(', ');
+        const townNamesEn = townNamesList.map(t => t.nameEn).join(', ');
+        const townNamesCn = townNamesList.map(t => t.nameCn).join(', ');
+
+        // Build name for each language
+        const buildName = (mateName: string, townNames: string) => {
+          const nameParts: string[] = [];
+          nameParts.push(mateName);
+          if (townNames) {
+            nameParts.push(`- ${townNames}`);
+          }
+
+          const tags: string[] = [];
+          if (item.isMustAppear) {
+            tags.push('필수등장'); // TODO: localize
+          }
+          if (item.isReRecruit) {
+            tags.push('재고용전용'); // TODO: localize
+          }
+          if (item.Ratio && item.Ratio < 10000 && !item.isMustAppear) {
+            tags.push(`확률:${(item.Ratio / 100).toFixed(0)}%`); // TODO: localize
+          }
+
+          let name = nameParts.join(' ');
+          if (tags.length > 0) {
+            name = `${name} (${tags.join(', ')})`;
+          }
+          return name;
+        };
+
+        return {
+          ...item,
+          name: buildName(mateNames.nameKr, townNamesKr), // Default to Korean
+          nameKr: buildName(mateNames.nameKr, townNamesKr),
+          nameEn: buildName(mateNames.nameEn, townNamesEn),
+          nameCn: buildName(mateNames.nameCn, townNamesCn),
+          mateName: mateNames.nameKr,
+          mateNameKr: mateNames.nameKr,
+          mateNameEn: mateNames.nameEn,
+          mateNameCn: mateNames.nameCn,
+          townNames: townNamesKr,
+          townNamesKr: townNamesKr,
+          townNamesEn: townNamesEn,
+          townNamesCn: townNamesCn,
+          mateExists,
+        };
+      });
+
+      const lookupData = { totalCount: items.length, items };
+      await fs.writeFile(this.mateRecruitingGroupPath, JSON.stringify(lookupData, null, 2), 'utf-8');
+      logger.info('MateRecruitingGroup lookup data built successfully', { itemCount: items.length });
+      return { success: true, message: 'MateRecruitingGroup lookup data built successfully', itemCount: items.length };
+    } catch (error) {
+      if (error instanceof CustomError) throw error;
+      logger.error('Failed to build MateRecruitingGroup lookup data', { error });
+      throw new CustomError('Failed to build MateRecruitingGroup lookup data', 500);
+    }
+  }
+
+  /**
+   * Get OceanNpcAreaSpawner lookup data
+   */
+  static async getOceanNpcAreaSpawnerLookup(): Promise<Record<string, any>> {
+    try {
+      const exists = await fs.access(this.oceanNpcAreaSpawnerPath).then(() => true).catch(() => false);
+      if (!exists) return { totalCount: 0, items: [] };
+      const data = await fs.readFile(this.oceanNpcAreaSpawnerPath, 'utf-8');
+      return JSON.parse(data);
+    } catch (error) {
+      logger.error('Failed to read OceanNpcAreaSpawner lookup data', { error });
+      throw new CustomError('Failed to load OceanNpcAreaSpawner lookup data', 500);
+    }
+  }
+
+  /**
+   * Build OceanNpcAreaSpawner lookup data from CMS file
+   */
+  static async buildOceanNpcAreaSpawnerLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
+    try {
+      logger.info('Building OceanNpcAreaSpawner lookup data...');
+      const cmdDir = path.join(__dirname, '../../cmd');
+      const sourceFilePath = path.join(cmdDir, 'OceanNpcAreaSpawner.json');
+      const oceanNpcFilePath = path.join(cmdDir, 'OceanNpc.json');
+      try {
+        await fs.access(sourceFilePath);
+        await fs.access(oceanNpcFilePath);
+      } catch {
+        throw new CustomError('OceanNpcAreaSpawner.json or OceanNpc.json not found in cmd directory', 500);
+      }
+      const sourceData = await fs.readFile(sourceFilePath, 'utf-8');
+      const oceanNpcData = await fs.readFile(oceanNpcFilePath, 'utf-8');
+      const parsedData = JSON.parse(sourceData);
+      const parsedOceanNpc = JSON.parse(oceanNpcData);
+
+      // Create a map of oceanNpcId to ocean npc name
+      const oceanNpcNameMap: Record<number, string> = {};
+      const oceanNpcs = parsedOceanNpc.OceanNpc || {};
+      Object.values(oceanNpcs).forEach((npc: any) => {
+        if (npc.id && npc.name) {
+          oceanNpcNameMap[npc.id] = npc.name;
+        }
+      });
+
+      const oceanNpcAreaSpawnerData = parsedData.OceanNpcAreaSpawner || {};
+      const items = Object.values(oceanNpcAreaSpawnerData).map((item: any) => {
+        const npcExists = !!oceanNpcNameMap[item.oceanNpcId];
+        const npcName = oceanNpcNameMap[item.oceanNpcId] || `MISSING NPC ${item.oceanNpcId}`;
+
+        // Store separate fields for localization
+        // Name will be built on frontend with localized parts
+        return {
+          ...item,
+          npcName,
+          npcExists,
+        };
+      });
+      const lookupData = { totalCount: items.length, items };
+      await fs.writeFile(this.oceanNpcAreaSpawnerPath, JSON.stringify(lookupData, null, 2), 'utf-8');
+      logger.info('OceanNpcAreaSpawner lookup data built successfully', { itemCount: items.length });
+      return { success: true, message: 'OceanNpcAreaSpawner lookup data built successfully', itemCount: items.length };
+    } catch (error) {
+      if (error instanceof CustomError) throw error;
+      logger.error('Failed to build OceanNpcAreaSpawner lookup data', { error });
+      throw new CustomError('Failed to build OceanNpcAreaSpawner lookup data', 500);
     }
   }
 }

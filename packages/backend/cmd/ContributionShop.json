@@ -22,6 +22,7 @@
       ],
       "productBadge": "number",
       "productRewardFixedId": "number",
+      "productIcon": "string",
       "desc": "text"
     },
     ":required": {

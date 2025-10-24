@@ -2,6 +2,7 @@
   ":NationRankingEffect": {
     ":type": {
       "id": "key",
+      "name": "text",
       "rankingEffectVal": [
         "number",
         "number",
@@ -12,7 +13,15 @@
         "number",
         "number"
       ],
-      "iconFrame": "number"
+      "iconFrame": "number",
+      "image": "string",
+      "desc": "text",
+      "descFormat": [
+        {
+          "Type": "number",
+          "Val": "text"
+        }
+      ]
     },
     ":required": {
       "rankingEffectVal": [
@@ -26,20 +35,39 @@
         1
       ]
     },
-    ":requiredInObject": {},
+    ":requiredInObject": {
+      "descFormat": [
+        {
+          "Type": 1
+        }
+      ]
+    },
     ":min": {
-      "iconFrame": 0
+      "iconFrame": 0,
+      "descFormat": [
+        {
+          "Type": 0
+        }
+      ]
     },
     ":max": {
-      "iconFrame": 1
+      "iconFrame": 1,
+      "descFormat": [
+        {
+          "Type": 3
+        }
+      ]
     },
     ":enum": {},
-    ":asset": {},
+    ":asset": {
+      "image": 1
+    },
     ":links": {}
   },
   "NationRankingEffect": {
     "10300000": {
       "id": 10300000,
+      "name": "최초 선택 시 젬(Const) 지급",
       "rankingEffectVal": [
         0,
         100,
@@ -49,10 +77,12 @@
         1000,
         2000,
         3000
-      ]
+      ],
+      "desc": "최초 선택 시 젬(Const) 지급"
     },
     "10300001": {
       "id": 10300001,
+      "name": "교육 장려",
       "rankingEffectVal": [
         1000,
         1030,
@@ -62,10 +92,18 @@
         1150,
         1170,
         1200
+      ],
+      "image": "WT_BD_Effect1045_Sprite",
+      "desc": "경험치 {0}% 추가 획득",
+      "descFormat": [
+        {
+          "Type": 1
+        }
       ]
     },
     "10300002": {
       "id": 10300002,
+      "name": "고속 승진",
       "rankingEffectVal": [
         1000,
         1030,
@@ -75,10 +113,18 @@
         1150,
         1170,
         1200
+      ],
+      "image": "WT_BD_Effect1053_Sprite",
+      "desc": "명성 {0}% 추가 획득",
+      "descFormat": [
+        {
+          "Type": 1
+        }
       ]
     },
     "10300003": {
       "id": 10300003,
+      "name": "무역 장려",
       "rankingEffectVal": [
         0,
         -20,
@@ -88,10 +134,18 @@
         -130,
         -140,
         -150
+      ],
+      "image": "WT_BD_Effect1052_Sprite",
+      "desc": "타국 교역 시 관세 {0}% 인하",
+      "descFormat": [
+        {
+          "Type": 1
+        }
       ]
     },
     "10300004": {
       "id": 10300004,
+      "name": "활동 지원",
       "rankingEffectVal": [
         1000,
         1020,
@@ -101,10 +155,18 @@
         1200,
         1200,
         1200
+      ],
+      "image": "WT_BD_Effect1047_Sprite",
+      "desc": "전투나 발견 보고로 획득하는 재화 및 교역품 {0}% 증가",
+      "descFormat": [
+        {
+          "Type": 1
+        }
       ]
     },
     "10300005": {
       "id": 10300005,
+      "name": "보급 지원",
       "rankingEffectVal": [
         0,
         0,
@@ -114,6 +176,13 @@
         500,
         500,
         500
+      ],
+      "image": "WT_BD_Effect1048_Sprite",
+      "desc": "자국 항구 보급 비용 {0}% 인하",
+      "descFormat": [
+        {
+          "Type": 1
+        }
       ]
     }
   }

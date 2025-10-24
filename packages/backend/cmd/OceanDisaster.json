@@ -3,7 +3,10 @@
     ":type": {
       "id": "key",
       "name": "text",
+      "desc": "text",
+      "oceanDisasterPrediction": "text",
       "injuryCheckValue": "bool",
+      "mateDialogueColumnNumber": "number",
       "isLandingSolution": "bool",
       "isResolvable": "bool",
       "oceanDisasterCategory": "number",
@@ -46,10 +49,14 @@
       "clearWorldSkill": "number",
       "clearPoint": "number",
       "clearPointValue": "number",
-      "clearPointWorldBuffId": "number"
+      "clearPointWorldBuffId": "number",
+      "oceanillustration": "string",
+      "oceanDisasterFx": "string",
+      "disasterSound": "number"
     },
     ":required": {
       "name": 1,
+      "desc": 1,
       "injuryCheckValue": 1,
       "isLandingSolution": 1,
       "isResolvable": 1,
@@ -78,7 +85,9 @@
       "clearPointWorldBuffId": 38099999
     },
     ":enum": {},
-    ":asset": {},
+    ":asset": {
+      "oceanillustration": 1
+    },
     ":links": {
       "damageResistance": [
         "StatOperator"
@@ -104,7 +113,10 @@
     "16100001": {
       "id": 16100001,
       "name": "쥐",
+      "desc": "쥐들이 마구 번식한 모양입니다!",
+      "oceanDisasterPrediction": "이게 무슨 소리지?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 1,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 1,
@@ -121,12 +133,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 5,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100001_Sprite",
+      "oceanDisasterFx": "SailingDebuffRatHerd",
+      "disasterSound": 96000351
     },
     "16100002": {
       "id": 16100002,
       "name": "오염",
+      "desc": "청소를 언제 했는지 기억조차 나지 않습니다.",
+      "oceanDisasterPrediction": "이게 무슨 냄새지?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 2,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 1,
@@ -143,12 +161,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 5,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100001_Sprite",
+      "oceanDisasterFx": "SailingDebuffPollution",
+      "disasterSound": 96000351
     },
     "16100003": {
       "id": 16100003,
       "name": "괴혈병",
+      "desc": "선원들의 잇몸에서 피가 납니다.",
+      "oceanDisasterPrediction": "왜 이렇게 피곤하지?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 3,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 1,
@@ -165,12 +189,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 10,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100002_Sprite",
+      "oceanDisasterFx": "SailingDebuffScurvy",
+      "disasterSound": 96000351
     },
     "16100004": {
       "id": 16100004,
       "name": "전염병",
+      "desc": "알 수 없는 병이 번지고 있습니다.",
+      "oceanDisasterPrediction": "왜 이렇게 피곤하지?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 4,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 1,
@@ -187,12 +217,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 10,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100004_Sprite",
+      "oceanDisasterFx": "SailingDebuffEpidemic",
+      "disasterSound": 96000351
     },
     "16100005": {
       "id": 16100005,
       "name": "말라리아",
+      "desc": "어쩐지 모기가 들끓더니…",
+      "oceanDisasterPrediction": "왜이렇게 피곤하지?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 5,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 1,
@@ -209,12 +245,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 10,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100004_Sprite",
+      "oceanDisasterFx": "SailingDebuffFire",
+      "disasterSound": 96000351
     },
     "16100006": {
       "id": 16100006,
       "name": "화재",
+      "desc": "불이야!",
+      "oceanDisasterPrediction": "이게 무슨 냄새지?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 6,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 2,
@@ -231,12 +273,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 10,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100005_Sprite",
+      "oceanDisasterFx": "SailingDebuffFire",
+      "disasterSound": 96000350
     },
     "16100007": {
       "id": 16100007,
       "name": "해초",
+      "desc": "선박이 억센 해초에 걸렸습니다!",
+      "oceanDisasterPrediction": "바다 색깔이 이상한데?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 7,
       "isLandingSolution": true,
       "isResolvable": true,
       "oceanDisasterCategory": 2,
@@ -262,12 +310,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 5,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100006_Sprite",
+      "oceanDisasterFx": "SailingDebuffSeaweeds",
+      "disasterSound": 96000353
     },
     "16100008": {
       "id": 16100008,
       "name": "암초",
+      "desc": "날카로운 암초에 부딪혔습니다!",
+      "oceanDisasterPrediction": "바다 색깔이 이상한데?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 8,
       "isLandingSolution": true,
       "isResolvable": true,
       "oceanDisasterCategory": 2,
@@ -284,12 +338,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 5,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100007_Sprite",
+      "oceanDisasterFx": "SailingDebuffFlooding",
+      "disasterSound": 96000353
     },
     "16100009": {
       "id": 16100009,
       "name": "침수",
+      "desc": "선실에 물이 들어찹니다!",
+      "oceanDisasterPrediction": "이게 무슨 소리지?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 9,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 2,
@@ -325,12 +385,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 10,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100008_Sprite",
+      "oceanDisasterFx": "SailingDebuffFlooding",
+      "disasterSound": 96000353
     },
     "16100010": {
       "id": 16100010,
       "name": "대화재",
+      "desc": "불이야!\n배를 버려라!",
+      "oceanDisasterPrediction": "이게 무슨 냄새지?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 10,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 2,
@@ -366,12 +432,18 @@
       "clearItemValue": 3,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100005_Sprite",
+      "oceanDisasterFx": "SailingDebuffFire",
+      "disasterSound": 96000350
     },
     "16100011": {
       "id": 16100011,
       "name": "부패",
+      "desc": "무언가 썩는 냄새가 진동합니다!",
+      "oceanDisasterPrediction": "이게 무슨 냄새지?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 11,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 1,
@@ -407,12 +479,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 10,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100001_Sprite",
+      "oceanDisasterFx": "SailingDebuffCorruption",
+      "disasterSound": 96000351
     },
     "16100012": {
       "id": 16100012,
       "name": "싸움",
+      "desc": "선박의 질서가 무너졌습니다!",
+      "oceanDisasterPrediction": "다들 분위기가 이상한데?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 12,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 2,
@@ -448,12 +526,18 @@
       "clearItemValue": 2,
       "clearPoint": 100003,
       "clearPointValue": 10,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100011_Sprite",
+      "oceanDisasterFx": "SailingDebuffFight",
+      "disasterSound": 96000350
     },
     "16100013": {
       "id": 16100013,
       "name": "반란",
+      "desc": "누군가 선원들을 선동하고 있습니다!",
+      "oceanDisasterPrediction": "다들 분위기가 이상한데?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 13,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 2,
@@ -489,12 +573,18 @@
       "clearItemValue": 3,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100011_Sprite",
+      "oceanDisasterFx": "SailingDebuffRebellion",
+      "disasterSound": 96000350
     },
     "16100014": {
       "id": 16100014,
       "name": "화물 붕괴",
+      "desc": "쌓아둔 화물이 무너졌습니다!",
+      "oceanDisasterPrediction": "이게 무슨 소리지?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 14,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 2,
@@ -530,12 +620,18 @@
       "clearItemValue": 3,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100013_Sprite",
+      "oceanDisasterFx": "SailingDebuffBreakup",
+      "disasterSound": 96000352
     },
     "16100015": {
       "id": 16100015,
       "name": "화물 도난",
+      "desc": "화물이 온데간데없이 사라졌습니다!",
+      "oceanDisasterPrediction": "다들 분위기가 이상한데?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 15,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 2,
@@ -571,12 +667,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 5,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100014_Sprite",
+      "oceanDisasterFx": "SailingDebuffBreakup",
+      "disasterSound": 96000352
     },
     "16100016": {
       "id": 16100016,
       "name": "욕구불만",
+      "desc": "선원들의 인내심이 한계에 이르렀습니다.",
+      "oceanDisasterPrediction": "다들 분위기가 이상한데?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 16,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 3,
@@ -612,12 +714,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 10,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100015_Sprite",
+      "oceanDisasterFx": "SailingDebuffDissatisfaction",
+      "disasterSound": 96000352
     },
     "16100017": {
       "id": 16100017,
       "name": "향수병",
+      "desc": "나의 살던 고향은…",
+      "oceanDisasterPrediction": "왜 이렇게 피곤하지?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 17,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 3,
@@ -653,12 +761,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 5,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100015_Sprite",
+      "oceanDisasterFx": "SailingDebuffHomesick",
+      "disasterSound": 96000354
     },
     "16100018": {
       "id": 16100018,
       "name": "정서불안",
+      "desc": "누군가 미쳐 날뛰고 있습니다!",
+      "oceanDisasterPrediction": "왜 이렇게 피곤하지?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 18,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 3,
@@ -694,12 +808,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 10,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100015_Sprite",
+      "oceanDisasterFx": "SailingDebuffUnrest",
+      "disasterSound": 96000352
     },
     "16100019": {
       "id": 16100019,
       "name": "불면증",
+      "desc": "잠 못 드는 나날이 이어집니다…",
+      "oceanDisasterPrediction": "왜 이렇게 피곤하지?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 19,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 3,
@@ -735,12 +855,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 10,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100015_Sprite",
+      "oceanDisasterFx": "SailingDebuffInsomnia",
+      "disasterSound": 96000352
     },
     "16100020": {
       "id": 16100020,
       "name": "폭풍",
+      "desc": "폭풍우에 휘말렸습니다!",
+      "oceanDisasterPrediction": "하늘이 심상치 않은데?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 20,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 4,
@@ -760,12 +886,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012002
+      "clearPointWorldBuffId": 38012002,
+      "oceanillustration": "Illustration_Story_069_Sprite",
+      "oceanDisasterFx": "SailingDebuffStorm",
+      "disasterSound": 96000353
     },
     "16100021": {
       "id": 16100021,
       "name": "격랑",
+      "desc": "거센 파도가 몰아칩니다!",
+      "oceanDisasterPrediction": "바다 색깔이 이상한데?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 21,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 4,
@@ -801,12 +933,18 @@
       "clearItemValue": 3,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Story_069_Sprite",
+      "oceanDisasterFx": "SailingDebuffFlooding",
+      "disasterSound": 96000353
     },
     "16100022": {
       "id": 16100022,
       "name": "눈보라",
+      "desc": "거센 눈보라가 몰아칩니다!",
+      "oceanDisasterPrediction": "하늘이 심상치 않은데?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 22,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 4,
@@ -827,12 +965,18 @@
       "clearItemValue": 3,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012003
+      "clearPointWorldBuffId": 38012003,
+      "oceanillustration": "Illustration_Disaster_16100021_Sprite",
+      "oceanDisasterFx": "SailingDebuffFrost",
+      "disasterSound": 96000353
     },
     "16100023": {
       "id": 16100023,
       "name": "돌풍",
+      "desc": "바람에 돛이 찢어지려 합니다!",
+      "oceanDisasterPrediction": "하늘이 심상치 않은데?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 23,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 4,
@@ -874,12 +1018,18 @@
       "clearItemValue": 2,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Story_069_Sprite",
+      "oceanDisasterFx": "SailingDebuffStorm",
+      "disasterSound": 96000353
     },
     "16100024": {
       "id": 16100024,
       "name": "무풍",
+      "desc": "며칠째 바람 한 점 없습니다.",
+      "oceanDisasterPrediction": "하늘이 심상치 않은데?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 24,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 4,
@@ -899,12 +1049,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 5,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100023_Sprite",
+      "oceanDisasterFx": "SailingDebuffDoldrums",
+      "disasterSound": 96000354
     },
     "16100025": {
       "id": 16100025,
       "name": "자기 이상",
+      "desc": "나침반이 제멋대로 움직입니다!",
+      "oceanDisasterPrediction": "하늘이 심상치 않은데?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 25,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 4,
@@ -921,12 +1077,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 5,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100024_Sprite",
+      "oceanDisasterFx": "SailingDebuffUnrest",
+      "disasterSound": 96000354
     },
     "16100026": {
       "id": 16100026,
       "name": "세이렌",
+      "desc": "바다에서 이상한 노랫소리가…",
+      "oceanDisasterPrediction": "바다 색깔이 이상한데?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 26,
       "isLandingSolution": true,
       "isResolvable": true,
       "oceanDisasterCategory": 4,
@@ -962,12 +1124,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 10,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100025_Sprite",
+      "oceanDisasterFx": "SailingDebuffSiren",
+      "disasterSound": 96000354
     },
     "16100027": {
       "id": 16100027,
       "name": "식인상어",
+      "desc": "이 상어는 사람을 잡아먹습니다!",
+      "oceanDisasterPrediction": "바다 색깔이 이상한데?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 27,
       "isLandingSolution": true,
       "isResolvable": true,
       "oceanDisasterCategory": 4,
@@ -1009,12 +1177,18 @@
       "clearItemValue": 1,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100026_Sprite",
+      "oceanDisasterFx": "SailingDebuffShark",
+      "disasterSound": 96000353
     },
     "16100028": {
       "id": 16100028,
       "name": "고래 충돌",
+      "desc": "거대한 괴물과 부딪혔습니다!",
+      "oceanDisasterPrediction": "바다 색깔이 이상한데?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 28,
       "isLandingSolution": true,
       "isResolvable": true,
       "oceanDisasterCategory": 4,
@@ -1056,11 +1230,16 @@
       "clearItemValue": 3,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100027_Sprite",
+      "oceanDisasterFx": "SailingDebuffWhale",
+      "disasterSound": 96000353
     },
     "16100029": {
       "id": 16100029,
       "name": "대왕오징어",
+      "desc": "악마의 손이 선박을 휘감습니다!",
+      "oceanDisasterPrediction": "바다 색깔이 이상한데?",
       "injuryCheckValue": true,
       "isLandingSolution": false,
       "isResolvable": true,
@@ -1078,12 +1257,18 @@
       "clearItemValue": 2,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100026_Sprite",
+      "oceanDisasterFx": "SailingDebuffWhale",
+      "disasterSound": 96000350
     },
     "16100030": {
       "id": 16100030,
       "name": "저체온증",
+      "desc": "맹추위로 선원들이 꼼짝을 못합니다!",
+      "oceanDisasterPrediction": "하늘이 심상치 않은데?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 29,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 4,
@@ -1106,12 +1291,18 @@
       "clearItemValue": 2,
       "clearPoint": 100003,
       "clearPointValue": 10,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100028_Sprite",
+      "oceanDisasterFx": "SailingDebuffFrost",
+      "disasterSound": 96000351
     },
     "16100031": {
       "id": 16100031,
       "name": "동상",
+      "desc": "손발이 꽁꽁 얼어붙고 있습니다.",
+      "oceanDisasterPrediction": "하늘이 심상치 않은데?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 30,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 4,
@@ -1132,12 +1323,18 @@
       "clearItemValue": 3,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100029_Sprite",
+      "oceanDisasterFx": "SailingDebuffHypot",
+      "disasterSound": 96000351
     },
     "16100032": {
       "id": 16100032,
       "name": "버뮤다 삼각지대",
+      "desc": "선박과 선단에 미지의 공포가 드리웁니다.",
+      "oceanDisasterPrediction": "하늘이 심상치 않은데?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 31,
       "isLandingSolution": false,
       "isResolvable": false,
       "oceanDisasterCategory": 4,
@@ -1158,12 +1355,18 @@
       "clearItemValue": 3,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100024_Sprite",
+      "oceanDisasterFx": "SailingDebuffBermudatriangle",
+      "disasterSound": 96000354
     },
     "16100033": {
       "id": 16100033,
       "name": "위험한 해역",
+      "desc": "선박과 선단에 미지의 공포가 드리웁니다.",
+      "oceanDisasterPrediction": "하늘이 심상치 않은데?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 32,
       "isLandingSolution": false,
       "isResolvable": false,
       "oceanDisasterCategory": 4,
@@ -1184,12 +1387,18 @@
       "clearItemValue": 3,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100024_Sprite",
+      "oceanDisasterFx": "SailingDebuffFlooding",
+      "disasterSound": 96000354
     },
     "16100034": {
       "id": 16100034,
       "name": "거대한 해초",
+      "desc": "선박이 거대한 억센 해초에 걸렸습니다!",
+      "oceanDisasterPrediction": "바다 색깔이 이상한데?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 33,
       "isLandingSolution": false,
       "isResolvable": false,
       "oceanDisasterCategory": 4,
@@ -1212,12 +1421,18 @@
       "clearItemValue": 3,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100007_Sprite",
+      "oceanDisasterFx": "SailingDebuffSeaweeds",
+      "disasterSound": 96000354
     },
     "16100035": {
       "id": 16100035,
       "name": "탈수",
+      "desc": "선원들의 갈증이 심화되고 있습니다.",
+      "oceanDisasterPrediction": "다들 분위기가 이상한데?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 34,
       "isLandingSolution": false,
       "isResolvable": false,
       "oceanDisasterCategory": 4,
@@ -1240,12 +1455,18 @@
       "clearItemValue": 3,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100015_Sprite",
+      "oceanDisasterFx": "SailingDebuffDehydration",
+      "disasterSound": 96000354
     },
     "16100036": {
       "id": 16100036,
       "name": "극한의 허기",
+      "desc": "선원들이 배고픔이 극한에 도달했습니다.",
+      "oceanDisasterPrediction": "다들 분위기가 이상한데?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 35,
       "isLandingSolution": false,
       "isResolvable": false,
       "oceanDisasterCategory": 4,
@@ -1268,12 +1489,18 @@
       "clearItemValue": 3,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100015_Sprite",
+      "oceanDisasterFx": "SailingDebuffStarvation",
+      "disasterSound": 96000354
     },
     "16100037": {
       "id": 16100037,
       "name": "공포",
+      "desc": "거대한 해양 생물은 근원적 공포를 자아냅니다.",
+      "oceanDisasterPrediction": "다들 분위기가 이상한데?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 36,
       "isLandingSolution": false,
       "isResolvable": false,
       "oceanDisasterCategory": 4,
@@ -1290,12 +1517,18 @@
       "clearItemValue": 3,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100015_Sprite",
+      "oceanDisasterFx": "SailingDebuffThalassophobia",
+      "disasterSound": 96000354
     },
     "16100038": {
       "id": 16100038,
       "name": "위압",
+      "desc": "대해적에게서는 도망갈 수 없는 위압감이 뿜어져 나옵니다.",
+      "oceanDisasterPrediction": "다들 분위기가 이상한데?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 37,
       "isLandingSolution": false,
       "isResolvable": false,
       "oceanDisasterCategory": 4,
@@ -1312,12 +1545,18 @@
       "clearItemValue": 3,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100015_Sprite",
+      "oceanDisasterFx": "SailingDebuffPressure",
+      "disasterSound": 96000354
     },
     "16100039": {
       "id": 16100039,
       "name": "불행",
+      "desc": "선박과 선단에 최악의 불행이 찾아왔습니다.",
+      "oceanDisasterPrediction": "다들 분위기가 이상한데?",
       "injuryCheckValue": false,
+      "mateDialogueColumnNumber": 38,
       "isLandingSolution": false,
       "isResolvable": false,
       "oceanDisasterCategory": 4,
@@ -1334,12 +1573,18 @@
       "clearItemValue": 3,
       "clearPoint": 100003,
       "clearPointValue": 20,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100024_Sprite",
+      "oceanDisasterFx": "SailingDebuffMisery",
+      "disasterSound": 96000354
     },
     "16100040": {
       "id": 16100040,
       "name": "저체온증",
+      "desc": "맹추위로 선원들이 꼼짝을 못합니다!",
+      "oceanDisasterPrediction": "하늘이 심상치 않은데?",
       "injuryCheckValue": true,
+      "mateDialogueColumnNumber": 29,
       "isLandingSolution": false,
       "isResolvable": true,
       "oceanDisasterCategory": 4,
@@ -1360,7 +1605,10 @@
       "clearItemValue": 2,
       "clearPoint": 100003,
       "clearPointValue": 10,
-      "clearPointWorldBuffId": 38012000
+      "clearPointWorldBuffId": 38012000,
+      "oceanillustration": "Illustration_Disaster_16100028_Sprite",
+      "oceanDisasterFx": "SailingDebuffFrost",
+      "disasterSound": 96000351
     }
   }
 }

@@ -8,7 +8,12 @@
       "costItem": "number",
       "costCount": "number",
       "costUseRewardId": "number",
-      "dailyLimit": "number"
+      "rewardRepresentativeItem": "number",
+      "dailyLimit": "number",
+      "referPage": [
+        "number",
+        "number"
+      ]
     },
     ":required": {
       "name": 1,
@@ -26,6 +31,14 @@
       ],
       "costUseRewardId": [
         "RewardFixed"
+      ],
+      "referPage": [
+        [
+          "EventPage"
+        ],
+        [
+          "EventPage"
+        ]
       ]
     }
   },
@@ -36,7 +49,11 @@
       "type": 0,
       "groupId": 10001,
       "costItem": 23340003,
-      "costCount": 1
+      "costCount": 1,
+      "referPage": [
+        99320024,
+        99320026
+      ]
     },
     "10002": {
       "id": 10002,
@@ -44,7 +61,10 @@
       "type": 0,
       "groupId": 10002,
       "costItem": 23340011,
-      "costCount": 1
+      "costCount": 1,
+      "referPage": [
+        99320080
+      ]
     },
     "10003": {
       "id": 10003,
@@ -52,7 +72,10 @@
       "type": 0,
       "groupId": 10003,
       "costItem": 23340011,
-      "costCount": 1
+      "costCount": 1,
+      "referPage": [
+        99320081
+      ]
     },
     "10004": {
       "id": 10004,
@@ -60,7 +83,11 @@
       "type": 0,
       "groupId": 10004,
       "costItem": 23340048,
-      "costCount": 1
+      "costCount": 1,
+      "referPage": [
+        99320176,
+        99320178
+      ]
     }
   }
 }

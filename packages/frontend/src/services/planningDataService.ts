@@ -62,6 +62,26 @@ export interface PlanningDataStats {
   }>;
 }
 
+export interface HotTimeBuffItem {
+  id: number;
+  icon: string;
+  startDate: string;
+  endDate: string;
+  localBitflag: number;
+  startHour: number;
+  endHour: number;
+  minLv: number;
+  maxLv: number;
+  bitFlagDayOfWeek: number;
+  worldBuffId: number[];
+  worldBuffNames?: string[];
+}
+
+export interface HotTimeBuffLookup {
+  totalCount: number;
+  items: HotTimeBuffItem[];
+}
+
 class PlanningDataService {
   /**
    * Get reward lookup data
@@ -139,6 +159,86 @@ class PlanningDataService {
    */
   async getStats(): Promise<PlanningDataStats> {
     const response = await api.get('/admin/planning-data/stats');
+    return response.data;
+  }
+
+  /**
+   * Get HotTimeBuff lookup data
+   */
+  async getHotTimeBuffLookup(): Promise<HotTimeBuffLookup> {
+    const response = await api.get('/admin/planning-data/hottimebuff');
+    return response.data;
+  }
+
+  /**
+   * Build HotTimeBuff lookup data
+   */
+  async buildHotTimeBuffLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
+    const response = await api.post('/admin/planning-data/hottimebuff/build');
+    return response.data;
+  }
+
+  /**
+   * Get EventPage lookup data
+   */
+  async getEventPageLookup(): Promise<any> {
+    const response = await api.get('/admin/planning-data/eventpage');
+    return response.data;
+  }
+
+  /**
+   * Build EventPage lookup data
+   */
+  async buildEventPageLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
+    const response = await api.post('/admin/planning-data/eventpage/build');
+    return response.data;
+  }
+
+  /**
+   * Get LiveEvent lookup data
+   */
+  async getLiveEventLookup(): Promise<any> {
+    const response = await api.get('/admin/planning-data/liveevent');
+    return response.data;
+  }
+
+  /**
+   * Build LiveEvent lookup data
+   */
+  async buildLiveEventLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
+    const response = await api.post('/admin/planning-data/liveevent/build');
+    return response.data;
+  }
+
+  /**
+   * Get MateRecruitingGroup lookup data
+   */
+  async getMateRecruitingGroupLookup(): Promise<any> {
+    const response = await api.get('/admin/planning-data/materecruiting');
+    return response.data;
+  }
+
+  /**
+   * Build MateRecruitingGroup lookup data
+   */
+  async buildMateRecruitingGroupLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
+    const response = await api.post('/admin/planning-data/materecruiting/build');
+    return response.data;
+  }
+
+  /**
+   * Get OceanNpcAreaSpawner lookup data
+   */
+  async getOceanNpcAreaSpawnerLookup(): Promise<any> {
+    const response = await api.get('/admin/planning-data/oceannpcarea');
+    return response.data;
+  }
+
+  /**
+   * Build OceanNpcAreaSpawner lookup data
+   */
+  async buildOceanNpcAreaSpawnerLookup(): Promise<{ success: boolean; message: string; itemCount: number }> {
+    const response = await api.post('/admin/planning-data/oceannpcarea/build');
     return response.data;
   }
 }

@@ -35,13 +35,15 @@
         "text",
         "text"
       ],
+      "senderFaceId": "string",
       "rewardFixed": "number"
     },
     ":required": {
       "mailType": 1,
       "mailNotiType": 1,
       "mailKeepTime": 1,
-      "rsn": 1
+      "rsn": 1,
+      "senderFaceId": 1
     },
     ":min": {
       "mailType": 0,
@@ -81,7 +83,9 @@
         "RewardFixed"
       ]
     },
-    ":asset": {}
+    ":asset": {
+      "senderFaceId": 1
+    }
   },
   "Mail": {
     "92000001": {
@@ -99,6 +103,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000000
     },
     "92000002": {
@@ -116,6 +121,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000000
     },
     "92000003": {
@@ -133,6 +139,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000001
     },
     "92000011": {
@@ -150,6 +157,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600001
     },
     "92000012": {
@@ -167,6 +175,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600002
     },
     "92000013": {
@@ -184,6 +193,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600003
     },
     "92000014": {
@@ -201,6 +211,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600004
     },
     "92000015": {
@@ -218,6 +229,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600005
     },
     "92000016": {
@@ -235,6 +247,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600006
     },
     "92000017": {
@@ -252,6 +265,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600007
     },
     "92000018": {
@@ -269,6 +283,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600008
     },
     "92000019": {
@@ -286,6 +301,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600009
     },
     "92000101": {
@@ -303,6 +319,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600101
     },
     "92000102": {
@@ -320,6 +337,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600102
     },
     "92000103": {
@@ -337,6 +355,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600103
     },
     "92000104": {
@@ -354,6 +373,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600104
     },
     "92000105": {
@@ -371,6 +391,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600105
     },
     "92000106": {
@@ -388,6 +409,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600106
     },
     "92000107": {
@@ -405,6 +427,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600107
     },
     "92000108": {
@@ -422,6 +445,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600108
     },
     "92000109": {
@@ -439,6 +463,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600109
     },
     "92000110": {
@@ -456,6 +481,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600110
     },
     "92000111": {
@@ -473,6 +499,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600111
     },
     "92000112": {
@@ -490,6 +517,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600112
     },
     "92000113": {
@@ -507,6 +535,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600113
     },
     "92000114": {
@@ -524,6 +553,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600114
     },
     "92000115": {
@@ -541,6 +571,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600115
     },
     "92000116": {
@@ -558,6 +589,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600116
     },
     "92000117": {
@@ -575,6 +607,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600117
     },
     "92000118": {
@@ -592,6 +625,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600118
     },
     "92000119": {
@@ -609,6 +643,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600119
     },
     "92000120": {
@@ -626,6 +661,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600139
     },
     "92000121": {
@@ -643,6 +679,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600140
     },
     "92000122": {
@@ -660,6 +697,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600141
     },
     "92000123": {
@@ -677,6 +715,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600142
     },
     "92000124": {
@@ -694,6 +733,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600143
     },
     "92000125": {
@@ -711,6 +751,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600144
     },
     "92000126": {
@@ -728,6 +769,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600145
     },
     "92000127": {
@@ -745,6 +787,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600146
     },
     "92000128": {
@@ -762,6 +805,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600147
     },
     "92000129": {
@@ -779,6 +823,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600120
     },
     "92000130": {
@@ -796,6 +841,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600121
     },
     "92000131": {
@@ -813,6 +859,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600122
     },
     "92000132": {
@@ -830,6 +877,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600123
     },
     "92000133": {
@@ -847,6 +895,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600124
     },
     "92000134": {
@@ -864,6 +913,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600125
     },
     "92000135": {
@@ -881,6 +931,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600126
     },
     "92000136": {
@@ -898,6 +949,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600127
     },
     "92000137": {
@@ -915,6 +967,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600128
     },
     "92000138": {
@@ -932,6 +985,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600129
     },
     "92000139": {
@@ -949,6 +1003,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600130
     },
     "92000140": {
@@ -966,6 +1021,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600131
     },
     "92000141": {
@@ -983,6 +1039,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600132
     },
     "92000142": {
@@ -1000,6 +1057,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600133
     },
     "92000143": {
@@ -1017,6 +1075,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600134
     },
     "92000144": {
@@ -1034,6 +1093,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600135
     },
     "92000145": {
@@ -1051,6 +1111,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600136
     },
     "92000146": {
@@ -1068,6 +1129,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600137
     },
     "92000147": {
@@ -1085,6 +1147,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600138
     },
     "92000201": {
@@ -1102,6 +1165,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600201
     },
     "92000202": {
@@ -1119,6 +1183,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600202
     },
     "92000203": {
@@ -1136,6 +1201,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600203
     },
     "92000204": {
@@ -1153,6 +1219,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600204
     },
     "92000205": {
@@ -1170,6 +1237,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600205
     },
     "92000206": {
@@ -1187,6 +1255,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600206
     },
     "92000207": {
@@ -1204,6 +1273,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600207
     },
     "92000208": {
@@ -1221,6 +1291,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600208
     },
     "92000209": {
@@ -1238,6 +1309,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600209
     },
     "92000210": {
@@ -1255,6 +1327,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600210
     },
     "92000211": {
@@ -1272,6 +1345,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600211
     },
     "92000212": {
@@ -1289,6 +1363,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600212
     },
     "92000213": {
@@ -1306,6 +1381,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600213
     },
     "92000214": {
@@ -1323,6 +1399,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600214
     },
     "92000215": {
@@ -1340,6 +1417,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600215
     },
     "92000216": {
@@ -1357,6 +1435,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600216
     },
     "92000217": {
@@ -1374,6 +1453,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600217
     },
     "92000218": {
@@ -1391,6 +1471,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600218
     },
     "92000219": {
@@ -1408,6 +1489,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600219
     },
     "92000220": {
@@ -1425,6 +1507,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600220
     },
     "92001001": {
@@ -1448,6 +1531,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500001
     },
     "92001002": {
@@ -1471,6 +1555,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500002
     },
     "92001003": {
@@ -1494,6 +1579,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500003
     },
     "92001004": {
@@ -1517,6 +1603,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500004
     },
     "92001005": {
@@ -1540,6 +1627,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500005
     },
     "92001006": {
@@ -1563,6 +1651,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500006
     },
     "92001007": {
@@ -1586,6 +1675,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500007
     },
     "92001008": {
@@ -1609,6 +1699,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500008
     },
     "92001009": {
@@ -1632,6 +1723,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500009
     },
     "92001010": {
@@ -1655,6 +1747,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500010
     },
     "92001011": {
@@ -1678,6 +1771,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500011
     },
     "92001012": {
@@ -1701,6 +1795,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600010
     },
     "92001013": {
@@ -1724,6 +1819,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600011
     },
     "92001014": {
@@ -1747,6 +1843,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600012
     },
     "92001015": {
@@ -1770,6 +1867,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600013
     },
     "92001016": {
@@ -1793,6 +1891,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600014
     },
     "92001017": {
@@ -1816,6 +1915,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600015
     },
     "92001018": {
@@ -1839,6 +1939,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600016
     },
     "92001019": {
@@ -1862,6 +1963,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600017
     },
     "92001020": {
@@ -1885,6 +1987,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600018
     },
     "92001021": {
@@ -1908,6 +2011,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600019
     },
     "92001022": {
@@ -1931,6 +2035,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500012
     },
     "92001023": {
@@ -1954,6 +2059,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600020
     },
     "92001024": {
@@ -1977,6 +2083,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600021
     },
     "92001025": {
@@ -2000,6 +2107,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600022
     },
     "92001026": {
@@ -2023,6 +2131,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600023
     },
     "92001027": {
@@ -2046,6 +2155,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600024
     },
     "92001028": {
@@ -2069,6 +2179,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600025
     },
     "92001029": {
@@ -2092,6 +2203,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600026
     },
     "92001030": {
@@ -2115,6 +2227,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600027
     },
     "92001031": {
@@ -2138,6 +2251,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600028
     },
     "92001032": {
@@ -2161,6 +2275,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600029
     },
     "92001033": {
@@ -2184,6 +2299,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600030
     },
     "92001034": {
@@ -2207,6 +2323,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600031
     },
     "92001035": {
@@ -2230,6 +2347,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600032
     },
     "92001036": {
@@ -2253,6 +2371,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600033
     },
     "92001037": {
@@ -2276,6 +2395,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600034
     },
     "92001038": {
@@ -2299,6 +2419,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600035
     },
     "92001039": {
@@ -2322,6 +2443,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600036
     },
     "92001040": {
@@ -2345,6 +2467,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600037
     },
     "92001041": {
@@ -2368,6 +2491,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600038
     },
     "92001042": {
@@ -2391,6 +2515,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600039
     },
     "92001043": {
@@ -2414,6 +2539,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600040
     },
     "92001101": {
@@ -2431,6 +2557,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940147
     },
     "92001102": {
@@ -2448,6 +2575,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940148
     },
     "92001103": {
@@ -2465,6 +2593,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940149
     },
     "92001104": {
@@ -2482,6 +2611,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940150
     },
     "92001105": {
@@ -2499,6 +2629,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940151
     },
     "92001106": {
@@ -2516,6 +2647,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940152
     },
     "92001107": {
@@ -2533,6 +2665,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940153
     },
     "92001108": {
@@ -2550,6 +2683,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940154
     },
     "92001109": {
@@ -2567,6 +2701,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940155
     },
     "92001110": {
@@ -2584,6 +2719,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940156
     },
     "92001111": {
@@ -2601,6 +2737,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940157
     },
     "92001112": {
@@ -2618,6 +2755,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940158
     },
     "92001113": {
@@ -2635,6 +2773,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940159
     },
     "92001114": {
@@ -2652,6 +2791,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940160
     },
     "92001115": {
@@ -2669,6 +2809,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940161
     },
     "92001116": {
@@ -2686,6 +2827,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940162
     },
     "92001117": {
@@ -2703,6 +2845,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940163
     },
     "92001118": {
@@ -2720,6 +2863,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940164
     },
     "92001119": {
@@ -2737,6 +2881,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940165
     },
     "92001120": {
@@ -2754,6 +2899,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940166
     },
     "92001121": {
@@ -2771,6 +2917,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940167
     },
     "92001122": {
@@ -2788,6 +2935,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940168
     },
     "92001123": {
@@ -2805,6 +2953,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940170
     },
     "92001124": {
@@ -2822,6 +2971,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940171
     },
     "92001125": {
@@ -2839,6 +2989,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940172
     },
     "92001126": {
@@ -2856,6 +3007,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940173
     },
     "92001127": {
@@ -2873,6 +3025,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940174
     },
     "92001128": {
@@ -2890,6 +3043,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940175
     },
     "92001129": {
@@ -2907,6 +3061,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940176
     },
     "92001130": {
@@ -2924,6 +3079,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940177
     },
     "92001131": {
@@ -2941,6 +3097,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940178
     },
     "92001132": {
@@ -2958,6 +3115,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940179
     },
     "92001133": {
@@ -2975,6 +3133,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940180
     },
     "92001134": {
@@ -2992,6 +3151,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940181
     },
     "92001135": {
@@ -3009,6 +3169,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940182
     },
     "92001136": {
@@ -3026,6 +3187,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940183
     },
     "92001137": {
@@ -3043,6 +3205,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940184
     },
     "92001138": {
@@ -3060,6 +3223,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940185
     },
     "92001139": {
@@ -3077,6 +3241,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940186
     },
     "92001140": {
@@ -3094,6 +3259,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940187
     },
     "92001141": {
@@ -3111,6 +3277,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940188
     },
     "92001142": {
@@ -3128,6 +3295,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940189
     },
     "92001143": {
@@ -3145,6 +3313,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940190
     },
     "92001144": {
@@ -3162,6 +3331,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940191
     },
     "92001145": {
@@ -3185,6 +3355,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500001
     },
     "92001146": {
@@ -3208,6 +3379,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500002
     },
     "92001147": {
@@ -3231,6 +3403,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500003
     },
     "92001148": {
@@ -3254,6 +3427,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500004
     },
     "92001149": {
@@ -3277,6 +3451,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500005
     },
     "92001150": {
@@ -3300,6 +3475,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500006
     },
     "92001151": {
@@ -3323,6 +3499,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500007
     },
     "92001152": {
@@ -3346,6 +3523,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500008
     },
     "92001153": {
@@ -3369,6 +3547,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500009
     },
     "92001154": {
@@ -3392,6 +3571,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500010
     },
     "92001155": {
@@ -3415,6 +3595,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600010
     },
     "92001156": {
@@ -3438,6 +3619,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600011
     },
     "92001157": {
@@ -3461,6 +3643,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600012
     },
     "92001158": {
@@ -3484,6 +3667,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600013
     },
     "92001159": {
@@ -3507,6 +3691,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600014
     },
     "92001160": {
@@ -3530,6 +3715,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600015
     },
     "92001161": {
@@ -3553,6 +3739,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600016
     },
     "92001162": {
@@ -3576,6 +3763,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600017
     },
     "92001163": {
@@ -3599,6 +3787,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600018
     },
     "92001164": {
@@ -3622,6 +3811,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600019
     },
     "92001165": {
@@ -3645,6 +3835,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500012
     },
     "92001166": {
@@ -3668,6 +3859,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500001
     },
     "92001167": {
@@ -3691,6 +3883,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500002
     },
     "92001168": {
@@ -3714,6 +3907,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500003
     },
     "92001169": {
@@ -3737,6 +3931,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500004
     },
     "92001170": {
@@ -3760,6 +3955,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500005
     },
     "92001171": {
@@ -3783,6 +3979,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500006
     },
     "92001172": {
@@ -3806,6 +4003,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500007
     },
     "92001173": {
@@ -3829,6 +4027,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500008
     },
     "92001174": {
@@ -3852,6 +4051,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500009
     },
     "92001175": {
@@ -3875,6 +4075,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500010
     },
     "92001176": {
@@ -3898,6 +4099,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600010
     },
     "92001177": {
@@ -3921,6 +4123,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600011
     },
     "92001178": {
@@ -3944,6 +4147,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600012
     },
     "92001179": {
@@ -3967,6 +4171,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600013
     },
     "92001180": {
@@ -3990,6 +4195,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600014
     },
     "92001181": {
@@ -4013,6 +4219,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600015
     },
     "92001182": {
@@ -4036,6 +4243,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600016
     },
     "92001183": {
@@ -4059,6 +4267,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600017
     },
     "92001184": {
@@ -4082,6 +4291,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600018
     },
     "92001185": {
@@ -4105,6 +4315,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600019
     },
     "92001186": {
@@ -4128,6 +4339,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95500012
     },
     "92001187": {
@@ -4145,6 +4357,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940258
     },
     "92001188": {
@@ -4162,6 +4375,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940259
     },
     "92001189": {
@@ -4179,6 +4393,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940260
     },
     "92001190": {
@@ -4196,6 +4411,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940261
     },
     "92001191": {
@@ -4213,6 +4429,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940262
     },
     "92001192": {
@@ -4230,6 +4447,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940263
     },
     "92001193": {
@@ -4247,6 +4465,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940264
     },
     "92001194": {
@@ -4264,6 +4483,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940265
     },
     "92001195": {
@@ -4281,6 +4501,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940266
     },
     "92001196": {
@@ -4298,6 +4519,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940267
     },
     "92001197": {
@@ -4315,6 +4537,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940268
     },
     "92001198": {
@@ -4332,6 +4555,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940269
     },
     "92001199": {
@@ -4349,6 +4573,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940270
     },
     "92001200": {
@@ -4366,6 +4591,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940271
     },
     "92001201": {
@@ -4383,6 +4609,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940272
     },
     "92001202": {
@@ -4400,6 +4627,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940273
     },
     "92001203": {
@@ -4417,6 +4645,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940274
     },
     "92001204": {
@@ -4434,6 +4663,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940275
     },
     "92001205": {
@@ -4451,6 +4681,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940276
     },
     "92001206": {
@@ -4468,6 +4699,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940277
     },
     "92001207": {
@@ -4485,6 +4717,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940278
     },
     "92001208": {
@@ -4502,6 +4735,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940279
     },
     "92001209": {
@@ -4519,6 +4753,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940281
     },
     "92001210": {
@@ -4536,6 +4771,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940282
     },
     "92001211": {
@@ -4553,6 +4789,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940283
     },
     "92001212": {
@@ -4570,6 +4807,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940284
     },
     "92001213": {
@@ -4587,6 +4825,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940285
     },
     "92001214": {
@@ -4604,6 +4843,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940286
     },
     "92001215": {
@@ -4621,6 +4861,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940287
     },
     "92001216": {
@@ -4638,6 +4879,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940288
     },
     "92001217": {
@@ -4655,6 +4897,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940289
     },
     "92001218": {
@@ -4672,6 +4915,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940290
     },
     "92001219": {
@@ -4689,6 +4933,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940291
     },
     "92001220": {
@@ -4706,6 +4951,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940292
     },
     "92001221": {
@@ -4723,6 +4969,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940293
     },
     "92001222": {
@@ -4740,6 +4987,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940294
     },
     "92001223": {
@@ -4757,6 +5005,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940295
     },
     "92001224": {
@@ -4774,6 +5023,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940296
     },
     "92001225": {
@@ -4791,6 +5041,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940297
     },
     "92001226": {
@@ -4808,6 +5059,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940298
     },
     "92001227": {
@@ -4825,6 +5077,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940299
     },
     "92001228": {
@@ -4842,6 +5095,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940300
     },
     "92001229": {
@@ -4859,6 +5113,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940301
     },
     "92001230": {
@@ -4876,6 +5131,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95940302
     },
     "92001231": {
@@ -4899,6 +5155,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600301
     },
     "92001232": {
@@ -4922,6 +5179,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600302
     },
     "92001233": {
@@ -4945,6 +5203,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600303
     },
     "92001234": {
@@ -4968,6 +5227,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600304
     },
     "92001235": {
@@ -4991,6 +5251,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600305
     },
     "92001236": {
@@ -5014,6 +5275,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600306
     },
     "92001237": {
@@ -5037,6 +5299,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600307
     },
     "92001238": {
@@ -5060,6 +5323,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600308
     },
     "92001239": {
@@ -5083,6 +5347,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600309
     },
     "92001240": {
@@ -5106,6 +5371,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600310
     },
     "92001241": {
@@ -5129,6 +5395,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600311
     },
     "92001242": {
@@ -5152,6 +5419,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600312
     },
     "92001243": {
@@ -5175,6 +5443,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600313
     },
     "92001244": {
@@ -5198,6 +5467,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600314
     },
     "92001245": {
@@ -5221,6 +5491,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600315
     },
     "92001246": {
@@ -5244,6 +5515,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600316
     },
     "92001247": {
@@ -5267,6 +5539,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95600317
     },
     "92001248": {
@@ -5284,6 +5557,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997881
     },
     "92001249": {
@@ -5301,6 +5575,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997882
     },
     "92001250": {
@@ -5318,6 +5593,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997883
     },
     "92001251": {
@@ -5335,6 +5611,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997884
     },
     "92001252": {
@@ -5352,6 +5629,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997885
     },
     "92001253": {
@@ -5369,6 +5647,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997886
     },
     "92001254": {
@@ -5386,6 +5665,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997887
     },
     "92001255": {
@@ -5403,6 +5683,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997888
     },
     "92001256": {
@@ -5420,6 +5701,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997889
     },
     "92001257": {
@@ -5437,6 +5719,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997890
     },
     "92001258": {
@@ -5454,6 +5737,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997891
     },
     "92001259": {
@@ -5471,6 +5755,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997892
     },
     "92001260": {
@@ -5488,6 +5773,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997893
     },
     "92001261": {
@@ -5505,6 +5791,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997894
     },
     "92001262": {
@@ -5522,6 +5809,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997895
     },
     "92001263": {
@@ -5539,6 +5827,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997896
     },
     "92001264": {
@@ -5556,6 +5845,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997897
     },
     "92001265": {
@@ -5573,6 +5863,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997898
     },
     "92001266": {
@@ -5590,6 +5881,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997899
     },
     "92001267": {
@@ -5607,6 +5899,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997900
     },
     "92001268": {
@@ -5624,6 +5917,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997901
     },
     "92001269": {
@@ -5641,6 +5935,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997902
     },
     "92001270": {
@@ -5658,6 +5953,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997903
     },
     "92001271": {
@@ -5675,6 +5971,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997904
     },
     "92001272": {
@@ -5692,6 +5989,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997905
     },
     "92001273": {
@@ -5709,6 +6007,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997906
     },
     "92001274": {
@@ -5726,6 +6025,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997907
     },
     "92001275": {
@@ -5743,6 +6043,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997908
     },
     "92001276": {
@@ -5760,6 +6061,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997909
     },
     "92001277": {
@@ -5777,6 +6079,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997910
     },
     "92001278": {
@@ -5794,6 +6097,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997911
     },
     "92001279": {
@@ -5811,6 +6115,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997912
     },
     "92001280": {
@@ -5828,6 +6133,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997913
     },
     "92001281": {
@@ -5845,6 +6151,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997914
     },
     "92001282": {
@@ -5862,6 +6169,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997915
     },
     "92001283": {
@@ -5879,6 +6187,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997916
     },
     "92001284": {
@@ -5896,6 +6205,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997917
     },
     "92001285": {
@@ -5913,6 +6223,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997918
     },
     "92001286": {
@@ -5930,6 +6241,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997919
     },
     "92001287": {
@@ -5947,6 +6259,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997920
     },
     "92001288": {
@@ -5964,6 +6277,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997921
     },
     "92001289": {
@@ -5981,6 +6295,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997922
     },
     "92001290": {
@@ -5998,6 +6313,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997923
     },
     "92001291": {
@@ -6015,6 +6331,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997924
     },
     "92001292": {
@@ -6032,6 +6349,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997925
     },
     "92001293": {
@@ -6049,6 +6367,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997926
     },
     "92001294": {
@@ -6066,6 +6385,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997927
     },
     "92001295": {
@@ -6083,6 +6403,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997928
     },
     "92001296": {
@@ -6100,6 +6421,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997929
     },
     "92001297": {
@@ -6117,6 +6439,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997930
     },
     "92001298": {
@@ -6134,6 +6457,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997931
     },
     "92001299": {
@@ -6151,6 +6475,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997932
     },
     "92001300": {
@@ -6168,6 +6493,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997933
     },
     "92001301": {
@@ -6185,6 +6511,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997934
     },
     "92001302": {
@@ -6202,6 +6529,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997935
     },
     "92001303": {
@@ -6219,6 +6547,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997936
     },
     "92001304": {
@@ -6236,6 +6565,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997937
     },
     "92001305": {
@@ -6253,6 +6583,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997938
     },
     "92001306": {
@@ -6270,6 +6601,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997939
     },
     "92001307": {
@@ -6287,6 +6619,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997940
     },
     "92001308": {
@@ -6304,6 +6637,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997941
     },
     "92001309": {
@@ -6321,6 +6655,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997942
     },
     "92001310": {
@@ -6338,6 +6673,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997943
     },
     "92001311": {
@@ -6355,6 +6691,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997944
     },
     "92001312": {
@@ -6372,6 +6709,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997945
     },
     "92001313": {
@@ -6389,6 +6727,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997946
     },
     "92001314": {
@@ -6406,6 +6745,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997947
     },
     "92001315": {
@@ -6423,6 +6763,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997948
     },
     "92001316": {
@@ -6440,6 +6781,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997949
     },
     "92001317": {
@@ -6457,6 +6799,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997950
     },
     "92001318": {
@@ -6474,6 +6817,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997951
     },
     "92001319": {
@@ -6491,6 +6835,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997952
     },
     "92001320": {
@@ -6508,6 +6853,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997953
     },
     "92001321": {
@@ -6525,6 +6871,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997954
     },
     "92001322": {
@@ -6542,6 +6889,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997955
     },
     "92001323": {
@@ -6559,6 +6907,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997956
     },
     "92001324": {
@@ -6576,6 +6925,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997957
     },
     "92001325": {
@@ -6593,6 +6943,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997958
     },
     "92001326": {
@@ -6610,6 +6961,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997959
     },
     "92001327": {
@@ -6627,6 +6979,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997960
     },
     "92001328": {
@@ -6644,6 +6997,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997961
     },
     "92001329": {
@@ -6661,6 +7015,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997962
     },
     "92001330": {
@@ -6678,6 +7033,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997963
     },
     "92001331": {
@@ -6695,6 +7051,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997964
     },
     "92001332": {
@@ -6712,6 +7069,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997965
     },
     "92001333": {
@@ -6729,6 +7087,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997966
     },
     "92001334": {
@@ -6746,6 +7105,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997967
     },
     "92001335": {
@@ -6763,6 +7123,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997968
     },
     "92001336": {
@@ -6779,7 +7140,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92001337": {
       "id": 92001337,
@@ -6796,6 +7158,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997969
     },
     "92001338": {
@@ -6813,6 +7176,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997970
     },
     "92001339": {
@@ -6830,6 +7194,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997971
     },
     "92001340": {
@@ -6847,6 +7212,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997972
     },
     "92001341": {
@@ -6864,6 +7230,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997973
     },
     "92001342": {
@@ -6881,6 +7248,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997974
     },
     "92001343": {
@@ -6898,6 +7266,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997975
     },
     "92001344": {
@@ -6915,6 +7284,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997976
     },
     "92001345": {
@@ -6932,6 +7302,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997977
     },
     "92001346": {
@@ -6949,6 +7320,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997978
     },
     "92001347": {
@@ -6966,6 +7338,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997979
     },
     "92001348": {
@@ -6983,6 +7356,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997980
     },
     "92001349": {
@@ -7000,6 +7374,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997981
     },
     "92001350": {
@@ -7017,6 +7392,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997982
     },
     "92001351": {
@@ -7034,6 +7410,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997983
     },
     "92001352": {
@@ -7051,6 +7428,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997984
     },
     "92001353": {
@@ -7068,6 +7446,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997985
     },
     "92001354": {
@@ -7085,6 +7464,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997986
     },
     "92001355": {
@@ -7102,6 +7482,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997987
     },
     "92001356": {
@@ -7119,6 +7500,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997988
     },
     "92001357": {
@@ -7136,6 +7518,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997989
     },
     "92001358": {
@@ -7153,6 +7536,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997990
     },
     "92001359": {
@@ -7170,6 +7554,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997991
     },
     "92001360": {
@@ -7187,6 +7572,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997992
     },
     "92001361": {
@@ -7204,6 +7590,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997993
     },
     "92001362": {
@@ -7221,6 +7608,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997994
     },
     "92001363": {
@@ -7238,6 +7626,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997995
     },
     "92001364": {
@@ -7255,6 +7644,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997996
     },
     "92001365": {
@@ -7272,6 +7662,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997997
     },
     "92001366": {
@@ -7289,6 +7680,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997998
     },
     "92001367": {
@@ -7306,6 +7698,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95997999
     },
     "92001368": {
@@ -7323,6 +7716,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998000
     },
     "92001369": {
@@ -7340,6 +7734,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998001
     },
     "92001370": {
@@ -7357,6 +7752,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998002
     },
     "92001371": {
@@ -7374,6 +7770,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998003
     },
     "92001372": {
@@ -7391,6 +7788,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998004
     },
     "92001373": {
@@ -7408,6 +7806,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998005
     },
     "92001374": {
@@ -7425,6 +7824,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998006
     },
     "92001375": {
@@ -7442,6 +7842,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998007
     },
     "92001376": {
@@ -7459,6 +7860,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998008
     },
     "92001377": {
@@ -7476,6 +7878,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998009
     },
     "92001378": {
@@ -7493,6 +7896,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998010
     },
     "92001379": {
@@ -7510,6 +7914,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998011
     },
     "92001380": {
@@ -7527,6 +7932,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998012
     },
     "92001381": {
@@ -7544,6 +7950,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998013
     },
     "92001382": {
@@ -7561,6 +7968,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998014
     },
     "92001383": {
@@ -7578,6 +7986,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998015
     },
     "92001384": {
@@ -7595,6 +8004,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998016
     },
     "92001385": {
@@ -7612,6 +8022,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998017
     },
     "92001386": {
@@ -7629,6 +8040,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998018
     },
     "92001387": {
@@ -7646,6 +8058,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998019
     },
     "92001388": {
@@ -7663,6 +8076,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998020
     },
     "92001389": {
@@ -7680,6 +8094,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998021
     },
     "92001390": {
@@ -7697,6 +8112,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998022
     },
     "92001391": {
@@ -7714,6 +8130,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998023
     },
     "92001392": {
@@ -7731,6 +8148,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998024
     },
     "92001393": {
@@ -7748,6 +8166,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998025
     },
     "92001394": {
@@ -7765,6 +8184,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998026
     },
     "92001395": {
@@ -7782,6 +8202,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998027
     },
     "92001396": {
@@ -7799,6 +8220,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998028
     },
     "92001397": {
@@ -7816,6 +8238,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998029
     },
     "92001398": {
@@ -7833,6 +8256,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998030
     },
     "92001399": {
@@ -7850,6 +8274,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998031
     },
     "92001400": {
@@ -7867,6 +8292,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998032
     },
     "92001401": {
@@ -7884,6 +8310,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998033
     },
     "92001402": {
@@ -7901,6 +8328,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998034
     },
     "92001403": {
@@ -7918,6 +8346,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998035
     },
     "92001404": {
@@ -7935,6 +8364,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998036
     },
     "92001405": {
@@ -7952,6 +8382,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998037
     },
     "92001406": {
@@ -7969,6 +8400,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998038
     },
     "92001407": {
@@ -7986,6 +8418,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998039
     },
     "92001408": {
@@ -8003,6 +8436,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998040
     },
     "92001409": {
@@ -8020,6 +8454,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998041
     },
     "92001410": {
@@ -8037,6 +8472,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998042
     },
     "92001411": {
@@ -8054,6 +8490,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998043
     },
     "92001412": {
@@ -8071,6 +8508,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998044
     },
     "92001413": {
@@ -8088,6 +8526,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998045
     },
     "92001414": {
@@ -8105,6 +8544,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998046
     },
     "92001415": {
@@ -8122,6 +8562,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998047
     },
     "92001416": {
@@ -8139,6 +8580,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998048
     },
     "92001417": {
@@ -8156,6 +8598,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998049
     },
     "92001418": {
@@ -8173,6 +8616,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998050
     },
     "92001419": {
@@ -8190,6 +8634,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998051
     },
     "92001420": {
@@ -8207,6 +8652,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998052
     },
     "92001421": {
@@ -8224,6 +8670,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998053
     },
     "92001422": {
@@ -8241,6 +8688,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998054
     },
     "92001423": {
@@ -8258,6 +8706,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998055
     },
     "92001424": {
@@ -8275,6 +8724,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998056
     },
     "92001425": {
@@ -8292,6 +8742,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998057
     },
     "92001426": {
@@ -8309,6 +8760,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998058
     },
     "92001427": {
@@ -8326,6 +8778,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998059
     },
     "92001428": {
@@ -8343,6 +8796,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998060
     },
     "92001429": {
@@ -8360,6 +8814,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998061
     },
     "92001430": {
@@ -8377,6 +8832,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998062
     },
     "92001431": {
@@ -8394,6 +8850,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998063
     },
     "92001432": {
@@ -8411,6 +8868,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998064
     },
     "92001433": {
@@ -8428,6 +8886,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998065
     },
     "92001434": {
@@ -8445,6 +8904,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998066
     },
     "92001435": {
@@ -8462,6 +8922,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998067
     },
     "92001436": {
@@ -8479,6 +8940,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998068
     },
     "92001437": {
@@ -8496,6 +8958,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998069
     },
     "92001438": {
@@ -8513,6 +8976,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998070
     },
     "92001439": {
@@ -8530,6 +8994,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998071
     },
     "92001440": {
@@ -8547,6 +9012,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998072
     },
     "92001441": {
@@ -8564,6 +9030,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998073
     },
     "92001442": {
@@ -8581,6 +9048,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998074
     },
     "92001443": {
@@ -8598,6 +9066,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998075
     },
     "92001444": {
@@ -8615,6 +9084,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998076
     },
     "92001445": {
@@ -8632,6 +9102,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998077
     },
     "92001446": {
@@ -8649,6 +9120,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998078
     },
     "92001447": {
@@ -8666,6 +9138,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998079
     },
     "92001448": {
@@ -8683,6 +9156,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998080
     },
     "92001449": {
@@ -8700,6 +9174,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998081
     },
     "92001450": {
@@ -8717,6 +9192,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998082
     },
     "92001451": {
@@ -8734,6 +9210,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998083
     },
     "92001452": {
@@ -8751,6 +9228,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998084
     },
     "92001453": {
@@ -8768,6 +9246,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998085
     },
     "92001454": {
@@ -8785,6 +9264,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998086
     },
     "92001455": {
@@ -8802,6 +9282,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998087
     },
     "92001456": {
@@ -8819,6 +9300,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998088
     },
     "92001457": {
@@ -8836,6 +9318,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998089
     },
     "92001458": {
@@ -8853,6 +9336,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998090
     },
     "92001459": {
@@ -8870,6 +9354,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998091
     },
     "92001460": {
@@ -8887,6 +9372,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998092
     },
     "92001461": {
@@ -8904,6 +9390,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998093
     },
     "92001462": {
@@ -8921,6 +9408,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998094
     },
     "92001463": {
@@ -8938,6 +9426,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998095
     },
     "92001464": {
@@ -8955,6 +9444,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998096
     },
     "92001465": {
@@ -8972,6 +9462,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998097
     },
     "92001466": {
@@ -8989,6 +9480,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998098
     },
     "92001467": {
@@ -9006,6 +9498,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998099
     },
     "92001468": {
@@ -9023,6 +9516,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998100
     },
     "92001469": {
@@ -9040,6 +9534,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998101
     },
     "92001470": {
@@ -9057,6 +9552,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998102
     },
     "92001471": {
@@ -9074,6 +9570,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998103
     },
     "92001472": {
@@ -9091,6 +9588,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998104
     },
     "92001473": {
@@ -9108,6 +9606,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998105
     },
     "92001474": {
@@ -9125,6 +9624,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998106
     },
     "92001475": {
@@ -9142,6 +9642,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998107
     },
     "92001476": {
@@ -9159,6 +9660,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998108
     },
     "92001477": {
@@ -9176,6 +9678,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998109
     },
     "92001478": {
@@ -9193,6 +9696,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998110
     },
     "92001479": {
@@ -9210,6 +9714,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998111
     },
     "92001480": {
@@ -9227,6 +9732,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998112
     },
     "92001481": {
@@ -9244,6 +9750,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998113
     },
     "92001482": {
@@ -9261,6 +9768,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998114
     },
     "92001483": {
@@ -9278,6 +9786,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998115
     },
     "92001484": {
@@ -9295,6 +9804,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998116
     },
     "92001485": {
@@ -9312,6 +9822,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998117
     },
     "92001486": {
@@ -9329,6 +9840,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998118
     },
     "92001487": {
@@ -9346,6 +9858,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998119
     },
     "92001488": {
@@ -9363,6 +9876,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998120
     },
     "92001489": {
@@ -9380,6 +9894,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998121
     },
     "92001490": {
@@ -9397,6 +9912,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998122
     },
     "92001491": {
@@ -9414,6 +9930,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998123
     },
     "92001492": {
@@ -9431,6 +9948,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998124
     },
     "92001493": {
@@ -9448,6 +9966,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998125
     },
     "92001494": {
@@ -9465,6 +9984,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998126
     },
     "92001495": {
@@ -9482,6 +10002,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998127
     },
     "92001496": {
@@ -9499,6 +10020,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998128
     },
     "92001497": {
@@ -9516,6 +10038,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998129
     },
     "92001498": {
@@ -9533,6 +10056,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998130
     },
     "92001499": {
@@ -9550,6 +10074,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998131
     },
     "92001500": {
@@ -9567,6 +10092,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998132
     },
     "92001501": {
@@ -9584,6 +10110,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998133
     },
     "92001502": {
@@ -9601,6 +10128,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998134
     },
     "92001503": {
@@ -9618,6 +10146,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998135
     },
     "92001504": {
@@ -9635,6 +10164,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998136
     },
     "92001505": {
@@ -9652,6 +10182,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998137
     },
     "92001506": {
@@ -9669,6 +10200,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998138
     },
     "92001507": {
@@ -9686,6 +10218,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998139
     },
     "92001508": {
@@ -9703,6 +10236,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998140
     },
     "92001509": {
@@ -9720,6 +10254,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998141
     },
     "92001510": {
@@ -9737,6 +10272,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998142
     },
     "92001511": {
@@ -9754,6 +10290,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998143
     },
     "92001512": {
@@ -9771,6 +10308,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998144
     },
     "92001513": {
@@ -9788,6 +10326,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998338
     },
     "92001514": {
@@ -9805,6 +10344,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998339
     },
     "92001515": {
@@ -9822,6 +10362,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998340
     },
     "92001516": {
@@ -9839,6 +10380,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998341
     },
     "92001517": {
@@ -9856,6 +10398,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998342
     },
     "92001518": {
@@ -9873,6 +10416,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998343
     },
     "92001519": {
@@ -9890,6 +10434,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998344
     },
     "92001520": {
@@ -9907,6 +10452,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998345
     },
     "92001521": {
@@ -9924,6 +10470,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998346
     },
     "92001522": {
@@ -9941,6 +10488,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998347
     },
     "92001523": {
@@ -9958,6 +10506,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998348
     },
     "92001524": {
@@ -9975,6 +10524,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998349
     },
     "92001525": {
@@ -9992,6 +10542,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998350
     },
     "92001526": {
@@ -10009,6 +10560,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998351
     },
     "92001527": {
@@ -10026,6 +10578,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998352
     },
     "92001528": {
@@ -10043,6 +10596,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998353
     },
     "92001529": {
@@ -10060,6 +10614,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998354
     },
     "92001530": {
@@ -10077,6 +10632,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998355
     },
     "92001531": {
@@ -10094,6 +10650,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998356
     },
     "92001532": {
@@ -10111,6 +10668,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998357
     },
     "92001533": {
@@ -10128,6 +10686,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998358
     },
     "92001534": {
@@ -10145,6 +10704,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998359
     },
     "92001535": {
@@ -10162,6 +10722,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998360
     },
     "92001536": {
@@ -10179,6 +10740,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998361
     },
     "92001537": {
@@ -10196,6 +10758,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998362
     },
     "92001538": {
@@ -10213,6 +10776,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998363
     },
     "92001539": {
@@ -10230,6 +10794,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998364
     },
     "92001540": {
@@ -10247,6 +10812,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998365
     },
     "92001541": {
@@ -10264,6 +10830,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998366
     },
     "92001542": {
@@ -10281,6 +10848,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998367
     },
     "92001543": {
@@ -10298,6 +10866,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998368
     },
     "92001544": {
@@ -10315,6 +10884,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998369
     },
     "92001545": {
@@ -10332,6 +10902,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998370
     },
     "92001546": {
@@ -10349,6 +10920,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998371
     },
     "92001547": {
@@ -10366,6 +10938,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998372
     },
     "92001548": {
@@ -10383,6 +10956,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998373
     },
     "92001549": {
@@ -10400,6 +10974,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998374
     },
     "92001550": {
@@ -10417,6 +10992,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998375
     },
     "92001551": {
@@ -10434,6 +11010,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998376
     },
     "92001552": {
@@ -10451,6 +11028,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998377
     },
     "92001553": {
@@ -10468,6 +11046,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998378
     },
     "92001554": {
@@ -10485,6 +11064,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998379
     },
     "92001555": {
@@ -10502,6 +11082,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998380
     },
     "92001556": {
@@ -10519,6 +11100,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998381
     },
     "92001557": {
@@ -10536,6 +11118,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998514
     },
     "92001558": {
@@ -10553,6 +11136,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998515
     },
     "92001559": {
@@ -10570,6 +11154,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998516
     },
     "92001560": {
@@ -10587,6 +11172,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998517
     },
     "92001561": {
@@ -10604,6 +11190,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998518
     },
     "92001562": {
@@ -10621,6 +11208,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998519
     },
     "92001563": {
@@ -10638,6 +11226,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998520
     },
     "92001564": {
@@ -10655,6 +11244,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998521
     },
     "92001565": {
@@ -10672,6 +11262,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998522
     },
     "92001566": {
@@ -10689,6 +11280,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998523
     },
     "92001567": {
@@ -10706,6 +11298,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998524
     },
     "92001568": {
@@ -10723,6 +11316,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998525
     },
     "92001569": {
@@ -10740,6 +11334,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998526
     },
     "92001570": {
@@ -10757,6 +11352,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998527
     },
     "92001571": {
@@ -10774,6 +11370,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998528
     },
     "92001572": {
@@ -10791,6 +11388,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998529
     },
     "92001573": {
@@ -10808,6 +11406,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998530
     },
     "92001574": {
@@ -10825,6 +11424,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998531
     },
     "92001575": {
@@ -10842,6 +11442,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998532
     },
     "92001576": {
@@ -10859,6 +11460,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998533
     },
     "92001577": {
@@ -10876,6 +11478,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998534
     },
     "92001578": {
@@ -10893,6 +11496,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998535
     },
     "92001579": {
@@ -10910,6 +11514,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998536
     },
     "92001580": {
@@ -10927,6 +11532,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998537
     },
     "92001581": {
@@ -10944,6 +11550,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998538
     },
     "92001582": {
@@ -10961,6 +11568,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998539
     },
     "92001583": {
@@ -10978,6 +11586,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998540
     },
     "92001584": {
@@ -10995,6 +11604,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998541
     },
     "92001585": {
@@ -11012,6 +11622,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998542
     },
     "92001586": {
@@ -11029,6 +11640,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998543
     },
     "92001587": {
@@ -11046,6 +11658,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998544
     },
     "92001588": {
@@ -11063,6 +11676,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998545
     },
     "92001589": {
@@ -11080,6 +11694,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998546
     },
     "92001590": {
@@ -11097,6 +11712,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998547
     },
     "92001591": {
@@ -11114,6 +11730,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998548
     },
     "92001592": {
@@ -11131,6 +11748,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998549
     },
     "92001593": {
@@ -11148,6 +11766,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998550
     },
     "92001594": {
@@ -11165,6 +11784,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998551
     },
     "92001595": {
@@ -11182,6 +11802,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998552
     },
     "92001596": {
@@ -11199,6 +11820,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998553
     },
     "92001597": {
@@ -11216,6 +11838,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998554
     },
     "92001598": {
@@ -11233,6 +11856,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998555
     },
     "92001599": {
@@ -11250,6 +11874,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998556
     },
     "92001600": {
@@ -11267,6 +11892,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998557
     },
     "92001601": {
@@ -11284,6 +11910,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998558
     },
     "92001602": {
@@ -11301,6 +11928,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998559
     },
     "92001603": {
@@ -11318,6 +11946,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998560
     },
     "92001604": {
@@ -11335,6 +11964,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998561
     },
     "92001605": {
@@ -11352,6 +11982,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998562
     },
     "92001606": {
@@ -11369,6 +12000,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998563
     },
     "92001607": {
@@ -11386,6 +12018,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998564
     },
     "92001608": {
@@ -11403,6 +12036,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998565
     },
     "92001609": {
@@ -11420,6 +12054,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998566
     },
     "92001610": {
@@ -11437,6 +12072,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998567
     },
     "92001611": {
@@ -11454,6 +12090,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998568
     },
     "92001612": {
@@ -11471,6 +12108,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998569
     },
     "92001613": {
@@ -11488,6 +12126,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998570
     },
     "92001614": {
@@ -11505,6 +12144,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998571
     },
     "92001615": {
@@ -11522,6 +12162,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998572
     },
     "92001616": {
@@ -11539,6 +12180,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998573
     },
     "92001617": {
@@ -11556,6 +12198,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998574
     },
     "92001618": {
@@ -11573,6 +12216,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998575
     },
     "92001619": {
@@ -11590,6 +12234,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998576
     },
     "92001620": {
@@ -11607,6 +12252,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998577
     },
     "92001621": {
@@ -11624,6 +12270,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998578
     },
     "92001622": {
@@ -11641,6 +12288,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998579
     },
     "92001623": {
@@ -11658,6 +12306,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998580
     },
     "92001624": {
@@ -11675,6 +12324,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998581
     },
     "92001625": {
@@ -11692,6 +12342,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998582
     },
     "92001626": {
@@ -11709,6 +12360,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998583
     },
     "92001627": {
@@ -11726,6 +12378,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998584
     },
     "92001628": {
@@ -11743,6 +12396,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998585
     },
     "92001629": {
@@ -11760,6 +12414,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998586
     },
     "92001630": {
@@ -11777,6 +12432,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998587
     },
     "92001631": {
@@ -11794,6 +12450,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998588
     },
     "92001632": {
@@ -11811,6 +12468,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998589
     },
     "92001633": {
@@ -11828,6 +12486,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998590
     },
     "92001634": {
@@ -11845,6 +12504,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998591
     },
     "92001635": {
@@ -11862,6 +12522,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998592
     },
     "92001636": {
@@ -11879,6 +12540,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998593
     },
     "92001637": {
@@ -11896,6 +12558,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998594
     },
     "92001638": {
@@ -11913,6 +12576,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998595
     },
     "92001639": {
@@ -11930,6 +12594,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998596
     },
     "92001640": {
@@ -11947,6 +12612,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998597
     },
     "92001641": {
@@ -11964,6 +12630,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998598
     },
     "92001642": {
@@ -11981,6 +12648,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998599
     },
     "92001643": {
@@ -11998,6 +12666,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998600
     },
     "92001644": {
@@ -12015,6 +12684,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95998601
     },
     "92002001": {
@@ -12038,6 +12708,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "icon_crest_unlock_common_06_03_Sprite",
       "rewardFixed": 95500011
     },
     "92002002": {
@@ -12061,6 +12732,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "icon_crest_unlock_common_06_03_Sprite",
       "rewardFixed": 95500011
     },
     "92002003": {
@@ -12082,7 +12754,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92002004": {
       "id": 92002004,
@@ -12103,7 +12776,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92003001": {
       "id": 92003001,
@@ -12124,7 +12798,8 @@
       ],
       "languagesenderName": [
         "상회장"
-      ]
+      ],
+      "senderFaceId": "Icon_Item_23000019_Sprite"
     },
     "92003002": {
       "id": 92003002,
@@ -12145,7 +12820,8 @@
       ],
       "languagesenderName": [
         "상회장"
-      ]
+      ],
+      "senderFaceId": "Icon_Item_23000019_Sprite"
     },
     "92003003": {
       "id": 92003003,
@@ -12166,7 +12842,8 @@
       ],
       "languagesenderName": [
         "상회장"
-      ]
+      ],
+      "senderFaceId": "Icon_Item_23000019_Sprite"
     },
     "92003004": {
       "id": 92003004,
@@ -12187,7 +12864,8 @@
       ],
       "languagesenderName": [
         "상회장"
-      ]
+      ],
+      "senderFaceId": "Icon_Item_23000019_Sprite"
     },
     "92004000": {
       "id": 92004000,
@@ -12209,7 +12887,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92004001": {
       "id": 92004001,
@@ -12231,7 +12910,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92004002": {
       "id": 92004002,
@@ -12253,7 +12933,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92004003": {
       "id": 92004003,
@@ -12275,7 +12956,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92004004": {
       "id": 92004004,
@@ -12297,7 +12979,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92004005": {
       "id": 92004005,
@@ -12319,7 +13002,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92004006": {
       "id": 92004006,
@@ -12341,7 +13025,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92005001": {
       "id": 92005001,
@@ -12357,7 +13042,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_MissionRewardBox_3_Sprite"
     },
     "92005002": {
       "id": 92005002,
@@ -12373,7 +13059,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_MissionRewardBox_3_Sprite"
     },
     "92005003": {
       "id": 92005003,
@@ -12389,7 +13076,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_MissionRewardBox_3_Sprite"
     },
     "92005004": {
       "id": 92005004,
@@ -12405,7 +13093,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_MissionRewardBox_3_Sprite"
     },
     "92005005": {
       "id": 92005005,
@@ -12426,7 +13115,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_MissionRewardBox_3_Sprite"
     },
     "92005006": {
       "id": 92005006,
@@ -12447,7 +13137,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_MissionRewardBox_3_Sprite"
     },
     "92005007": {
       "id": 92005007,
@@ -12463,7 +13154,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_MissionRewardBox_3_Sprite"
     },
     "92005008": {
       "id": 92005008,
@@ -12479,7 +13171,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_MissionRewardBox_3_Sprite"
     },
     "92005009": {
       "id": 92005009,
@@ -12495,7 +13188,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_MissionRewardBox_3_Sprite"
     },
     "92006000": {
       "id": 92006000,
@@ -12511,7 +13205,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_MissionRewardBox_3_Sprite"
     },
     "92007001": {
       "id": 92007001,
@@ -12527,7 +13222,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92007002": {
       "id": 92007002,
@@ -12543,7 +13239,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92007003": {
       "id": 92007003,
@@ -12560,6 +13257,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95941002
     },
     "92007004": {
@@ -12576,7 +13274,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92007005": {
       "id": 92007005,
@@ -12593,6 +13292,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 94111001
     },
     "92007006": {
@@ -12610,6 +13310,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 94111002
     },
     "92007007": {
@@ -12627,6 +13328,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 94111003
     },
     "92007008": {
@@ -12644,6 +13346,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 94111004
     },
     "92007009": {
@@ -12661,6 +13364,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 94111005
     },
     "92007010": {
@@ -12678,6 +13382,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 94111006
     },
     "92007011": {
@@ -12695,6 +13400,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 94111007
     },
     "92007012": {
@@ -12712,6 +13418,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 94111008
     },
     "92007013": {
@@ -12729,6 +13436,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 94111009
     },
     "92007014": {
@@ -12746,6 +13454,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 94111010
     },
     "92007015": {
@@ -12763,6 +13472,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95941003
     },
     "92007016": {
@@ -12780,6 +13490,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95941004
     },
     "92007017": {
@@ -12797,6 +13508,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95941005
     },
     "92007018": {
@@ -12814,6 +13526,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95941006
     },
     "92007019": {
@@ -12831,6 +13544,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95941007
     },
     "92007020": {
@@ -12848,6 +13562,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95941008
     },
     "92007021": {
@@ -12865,6 +13580,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95941009
     },
     "92007022": {
@@ -12882,6 +13598,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite",
       "rewardFixed": 95941010
     },
     "92007023": {
@@ -12898,7 +13615,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92007024": {
       "id": 92007024,
@@ -12914,7 +13632,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92007025": {
       "id": 92007025,
@@ -12930,7 +13649,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92007026": {
       "id": 92007026,
@@ -12946,7 +13666,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92007027": {
       "id": 92007027,
@@ -12962,7 +13683,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92007028": {
       "id": 92007028,
@@ -12978,7 +13700,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92007029": {
       "id": 92007029,
@@ -12994,7 +13717,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92007030": {
       "id": 92007030,
@@ -13010,7 +13734,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92007031": {
       "id": 92007031,
@@ -13026,7 +13751,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Etc_Achievement_Open_Sprite"
     },
     "92900001": {
       "id": 92900001,
@@ -13042,7 +13768,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "icon_crest_unlock_common_07_01_Sprite"
     },
     "92100001": {
       "id": 92100001,
@@ -13058,7 +13785,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "icon_crest_unlock_common_07_01_Sprite"
     },
     "92100002": {
       "id": 92100002,
@@ -13074,7 +13802,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "icon_crest_unlock_common_07_01_Sprite"
     },
     "92100003": {
       "id": 92100003,
@@ -13090,7 +13819,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "icon_crest_unlock_common_07_01_Sprite"
     },
     "92100004": {
       "id": 92100004,
@@ -13106,7 +13836,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "icon_crest_unlock_common_07_01_Sprite"
     },
     "92100005": {
       "id": 92100005,
@@ -13122,7 +13853,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "icon_crest_unlock_common_07_01_Sprite"
     },
     "92100006": {
       "id": 92100006,
@@ -13138,7 +13870,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "icon_crest_unlock_common_07_01_Sprite"
     },
     "92100007": {
       "id": 92100007,
@@ -13154,7 +13887,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "icon_crest_unlock_common_06_02_Sprite"
     },
     "92100008": {
       "id": 92100008,
@@ -13176,7 +13910,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "icon_crest_unlock_common_06_03_Sprite"
     },
     "92100100": {
       "id": 92100100,
@@ -13192,7 +13927,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_MissionRewardBox_3_Sprite"
     },
     "92100101": {
       "id": 92100101,
@@ -13208,7 +13944,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Item_23340003_Sprite"
     },
     "92100102": {
       "id": 92100102,
@@ -13224,7 +13961,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "Icon_Item_23340010_Sprite"
     },
     "92100200": {
       "id": 92100200,
@@ -13241,6 +13979,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050002
     },
     "92100201": {
@@ -13258,6 +13997,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050003
     },
     "92100202": {
@@ -13275,6 +14015,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050004
     },
     "92100203": {
@@ -13292,6 +14033,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050005
     },
     "92100204": {
@@ -13309,6 +14051,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050006
     },
     "92100205": {
@@ -13326,6 +14069,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050007
     },
     "92100206": {
@@ -13343,6 +14087,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050008
     },
     "92100207": {
@@ -13360,6 +14105,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050009
     },
     "92100208": {
@@ -13377,6 +14123,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050010
     },
     "92100209": {
@@ -13394,6 +14141,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050011
     },
     "92100210": {
@@ -13411,6 +14159,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050012
     },
     "92100211": {
@@ -13428,6 +14177,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050013
     },
     "92100212": {
@@ -13445,6 +14195,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050014
     },
     "92100213": {
@@ -13462,6 +14213,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050015
     },
     "92100214": {
@@ -13479,6 +14231,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050016
     },
     "92100215": {
@@ -13496,6 +14249,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050017
     },
     "92100216": {
@@ -13513,6 +14267,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050018
     },
     "92100217": {
@@ -13530,6 +14285,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050019
     },
     "92100218": {
@@ -13547,6 +14303,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050020
     },
     "92100219": {
@@ -13564,6 +14321,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050021
     },
     "92100220": {
@@ -13581,6 +14339,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050022
     },
     "92100221": {
@@ -13598,6 +14357,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050023
     },
     "92100222": {
@@ -13615,6 +14375,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050024
     },
     "92100223": {
@@ -13632,6 +14393,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050025
     },
     "92100224": {
@@ -13649,6 +14411,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050026
     },
     "92100225": {
@@ -13666,6 +14429,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050027
     },
     "92100226": {
@@ -13683,6 +14447,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050028
     },
     "92100227": {
@@ -13700,6 +14465,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050029
     },
     "92100228": {
@@ -13717,6 +14483,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050030
     },
     "92100229": {
@@ -13734,6 +14501,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050031
     },
     "92100230": {
@@ -13751,6 +14519,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050032
     },
     "92100231": {
@@ -13768,6 +14537,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050033
     },
     "92100232": {
@@ -13785,6 +14555,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050034
     },
     "92100233": {
@@ -13802,6 +14573,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050035
     },
     "92100234": {
@@ -13819,6 +14591,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050036
     },
     "92100235": {
@@ -13836,6 +14609,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050037
     },
     "92100236": {
@@ -13853,6 +14627,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050038
     },
     "92100237": {
@@ -13870,6 +14645,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050039
     },
     "92100238": {
@@ -13887,6 +14663,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050040
     },
     "92100239": {
@@ -13904,6 +14681,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050041
     },
     "92100240": {
@@ -13921,6 +14699,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050044
     },
     "92100241": {
@@ -13938,6 +14717,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050042
     },
     "92100242": {
@@ -13955,6 +14735,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050043
     },
     "92100243": {
@@ -13972,6 +14753,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050045
     },
     "92100244": {
@@ -13993,7 +14775,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92100245": {
       "id": 92100245,
@@ -14010,6 +14793,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050046
     },
     "92100246": {
@@ -14027,6 +14811,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050047
     },
     "92100247": {
@@ -14044,6 +14829,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050048
     },
     "92100248": {
@@ -14061,6 +14847,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050049
     },
     "92100249": {
@@ -14078,6 +14865,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050050
     },
     "92100250": {
@@ -14095,6 +14883,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050051
     },
     "92100251": {
@@ -14112,6 +14901,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050052
     },
     "92100252": {
@@ -14129,6 +14919,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050053
     },
     "92100253": {
@@ -14146,6 +14937,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050054
     },
     "92100254": {
@@ -14163,6 +14955,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050055
     },
     "92100255": {
@@ -14180,6 +14973,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050056
     },
     "92100256": {
@@ -14197,6 +14991,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050057
     },
     "92100257": {
@@ -14214,6 +15009,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050058
     },
     "92100258": {
@@ -14231,6 +15027,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050059
     },
     "92100259": {
@@ -14248,6 +15045,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050060
     },
     "92100260": {
@@ -14265,6 +15063,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050061
     },
     "92100261": {
@@ -14282,6 +15081,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050062
     },
     "92100262": {
@@ -14299,6 +15099,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050063
     },
     "92100263": {
@@ -14316,6 +15117,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050064
     },
     "92100264": {
@@ -14333,6 +15135,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050065
     },
     "92100265": {
@@ -14350,6 +15153,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050066
     },
     "92100266": {
@@ -14367,6 +15171,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050067
     },
     "92100267": {
@@ -14384,6 +15189,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050068
     },
     "92100268": {
@@ -14401,6 +15207,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050069
     },
     "92100269": {
@@ -14418,6 +15225,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050070
     },
     "92100270": {
@@ -14435,6 +15243,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050071
     },
     "92100271": {
@@ -14452,6 +15261,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050072
     },
     "92100272": {
@@ -14469,6 +15279,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050073
     },
     "92100273": {
@@ -14486,6 +15297,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050074
     },
     "92100274": {
@@ -14503,6 +15315,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050075
     },
     "92100275": {
@@ -14520,6 +15333,7 @@
       "languagesenderName": [
         "디렉터"
       ],
+      "senderFaceId": "WT_CH_Officer_PT_AntonioDA0_S_Sprite",
       "rewardFixed": 94050076
     },
     "92100276": {
@@ -14537,6 +15351,7 @@
       "languagesenderName": [
         "디렉터"
       ],
+      "senderFaceId": "WT_CH_Officer_PT_AntonioDA0_S_Sprite",
       "rewardFixed": 94050077
     },
     "92100277": {
@@ -14554,6 +15369,7 @@
       "languagesenderName": [
         "디렉터"
       ],
+      "senderFaceId": "WT_CH_Officer_PT_AntonioDA0_S_Sprite",
       "rewardFixed": 94050078
     },
     "92100278": {
@@ -14571,6 +15387,7 @@
       "languagesenderName": [
         "디렉터"
       ],
+      "senderFaceId": "WT_CH_Officer_PT_AntonioDA0_S_Sprite",
       "rewardFixed": 94050079
     },
     "92100279": {
@@ -14588,6 +15405,7 @@
       "languagesenderName": [
         "디렉터"
       ],
+      "senderFaceId": "WT_CH_Officer_PT_AntonioDA0_S_Sprite",
       "rewardFixed": 94050080
     },
     "92100280": {
@@ -14605,6 +15423,7 @@
       "languagesenderName": [
         "디렉터"
       ],
+      "senderFaceId": "WT_CH_Officer_PT_AntonioDA0_S_Sprite",
       "rewardFixed": 94050081
     },
     "92100281": {
@@ -14622,6 +15441,7 @@
       "languagesenderName": [
         "디렉터"
       ],
+      "senderFaceId": "WT_CH_Officer_PT_AntonioDA0_S_Sprite",
       "rewardFixed": 94050082
     },
     "92100282": {
@@ -14639,6 +15459,7 @@
       "languagesenderName": [
         "디렉터"
       ],
+      "senderFaceId": "WT_CH_Officer_PT_AntonioDA0_S_Sprite",
       "rewardFixed": 94050083
     },
     "92100283": {
@@ -14656,6 +15477,7 @@
       "languagesenderName": [
         "디렉터"
       ],
+      "senderFaceId": "WT_CH_Officer_PT_AntonioDA0_S_Sprite",
       "rewardFixed": 94050084
     },
     "92100284": {
@@ -14673,6 +15495,7 @@
       "languagesenderName": [
         "디렉터"
       ],
+      "senderFaceId": "WT_CH_Officer_PT_AntonioDA0_S_Sprite",
       "rewardFixed": 94050085
     },
     "92100285": {
@@ -14690,6 +15513,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050086
     },
     "92100286": {
@@ -14707,6 +15531,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050086
     },
     "92100287": {
@@ -14724,6 +15549,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050076
     },
     "92100288": {
@@ -14741,6 +15567,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050077
     },
     "92100289": {
@@ -14758,6 +15585,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050078
     },
     "92100290": {
@@ -14775,6 +15603,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050079
     },
     "92100291": {
@@ -14792,6 +15621,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050080
     },
     "92100292": {
@@ -14809,6 +15639,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050081
     },
     "92100293": {
@@ -14826,6 +15657,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050082
     },
     "92100294": {
@@ -14843,6 +15675,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050083
     },
     "92100295": {
@@ -14860,6 +15693,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050084
     },
     "92100296": {
@@ -14877,6 +15711,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050085
     },
     "92100297": {
@@ -14894,6 +15729,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050087
     },
     "92100298": {
@@ -14911,6 +15747,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050087
     },
     "92100299": {
@@ -14928,6 +15765,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050088
     },
     "92100300": {
@@ -14945,6 +15783,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050089
     },
     "92100301": {
@@ -14962,6 +15801,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050090
     },
     "92100302": {
@@ -14979,6 +15819,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050091
     },
     "92100303": {
@@ -14996,6 +15837,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050092
     },
     "92100304": {
@@ -15013,6 +15855,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050092
     },
     "92100305": {
@@ -15030,6 +15873,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050093
     },
     "92100306": {
@@ -15047,6 +15891,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_EN_OttoS0_S_Sprite",
       "rewardFixed": 95961433
     },
     "92100307": {
@@ -15064,6 +15909,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050094
     },
     "92100308": {
@@ -15081,6 +15927,7 @@
       "languagesenderName": [
         "대항해시대 오리진"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050095
     },
     "92110000": {
@@ -15097,7 +15944,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110001": {
       "id": 92110001,
@@ -15113,7 +15961,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110002": {
       "id": 92110002,
@@ -15129,7 +15978,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110003": {
       "id": 92110003,
@@ -15145,7 +15995,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110004": {
       "id": 92110004,
@@ -15161,7 +16012,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110005": {
       "id": 92110005,
@@ -15177,7 +16029,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110006": {
       "id": 92110006,
@@ -15193,7 +16046,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110007": {
       "id": 92110007,
@@ -15209,7 +16063,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110008": {
       "id": 92110008,
@@ -15225,7 +16080,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110009": {
       "id": 92110009,
@@ -15241,7 +16097,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110010": {
       "id": 92110010,
@@ -15257,7 +16114,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110011": {
       "id": 92110011,
@@ -15273,7 +16131,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110012": {
       "id": 92110012,
@@ -15289,7 +16148,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110013": {
       "id": 92110013,
@@ -15305,7 +16165,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110014": {
       "id": 92110014,
@@ -15321,7 +16182,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110015": {
       "id": 92110015,
@@ -15337,7 +16199,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110016": {
       "id": 92110016,
@@ -15353,7 +16216,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110017": {
       "id": 92110017,
@@ -15369,7 +16233,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110018": {
       "id": 92110018,
@@ -15385,7 +16250,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110019": {
       "id": 92110019,
@@ -15401,7 +16267,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110020": {
       "id": 92110020,
@@ -15417,7 +16284,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110021": {
       "id": 92110021,
@@ -15433,7 +16301,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110022": {
       "id": 92110022,
@@ -15449,7 +16318,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110023": {
       "id": 92110023,
@@ -15465,7 +16335,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110024": {
       "id": 92110024,
@@ -15481,7 +16352,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110025": {
       "id": 92110025,
@@ -15497,7 +16369,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110026": {
       "id": 92110026,
@@ -15513,7 +16386,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110027": {
       "id": 92110027,
@@ -15529,7 +16403,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110028": {
       "id": 92110028,
@@ -15545,7 +16420,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110029": {
       "id": 92110029,
@@ -15561,7 +16437,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110030": {
       "id": 92110030,
@@ -15577,7 +16454,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110031": {
       "id": 92110031,
@@ -15593,7 +16471,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110032": {
       "id": 92110032,
@@ -15609,7 +16488,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110033": {
       "id": 92110033,
@@ -15625,7 +16505,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92110034": {
       "id": 92110034,
@@ -15641,7 +16522,8 @@
       ],
       "languagesenderName": [
         "대항해시대 오리진"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92120000": {
       "id": 92120000,
@@ -15658,6 +16540,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 95040001
     },
     "92120001": {
@@ -15674,7 +16557,8 @@
       ],
       "languagesenderName": [
         "Motif_QA"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     },
     "92120002": {
       "id": 92120002,
@@ -15691,6 +16575,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 95997405
     },
     "92990000": {
@@ -15708,6 +16593,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000257
     },
     "92990001": {
@@ -15725,6 +16611,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000258
     },
     "92990002": {
@@ -15742,6 +16629,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000259
     },
     "92990003": {
@@ -15759,6 +16647,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000260
     },
     "92990004": {
@@ -15776,6 +16665,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000261
     },
     "92990005": {
@@ -15793,6 +16683,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000262
     },
     "92990006": {
@@ -15810,6 +16701,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000263
     },
     "92990007": {
@@ -15827,6 +16719,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000264
     },
     "92990008": {
@@ -15844,6 +16737,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000265
     },
     "92990009": {
@@ -15861,6 +16755,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000266
     },
     "92990010": {
@@ -15878,6 +16773,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000267
     },
     "92990011": {
@@ -15895,6 +16791,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000268
     },
     "92990012": {
@@ -15912,6 +16809,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000269
     },
     "92990013": {
@@ -15929,6 +16827,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94000270
     },
     "92990014": {
@@ -15946,6 +16845,7 @@
       "languagesenderName": [
         "Motif_QA"
       ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite",
       "rewardFixed": 94050001
     },
     "92999000": {
@@ -15962,7 +16862,8 @@
       ],
       "languagesenderName": [
         "UWO GM"
-      ]
+      ],
+      "senderFaceId": "WT_CH_Admiral_ES_CatalinaE0_S_Sprite"
     }
   }
 }

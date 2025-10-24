@@ -1,9 +1,31 @@
 {
   ":TileToolDefine": {
     ":type": {
-      "id": "key"
+      "id": "key",
+      "jsonFileName": "string",
+      "inputData": "string",
+      "isInputIdx": "bool",
+      "inputSelectBox": [
+        {
+          "Name": "string",
+          "Value": "number"
+        },
+        {
+          "Name": "string",
+          "Value": "number"
+        }
+      ],
+      "displayInfo": [
+        {
+          "Text": "string",
+          "ColumnName": "string"
+        }
+      ]
     },
-    ":required": {},
+    ":required": {
+      "jsonFileName": 1,
+      "isInputIdx": 1
+    },
     ":min": {},
     ":max": {},
     ":enum": {},
@@ -11,64 +33,186 @@
   },
   "TileToolDefine": {
     "0": {
-      "id": 0
+      "id": 0,
+      "jsonFileName": "BattleMapOceanTile",
+      "inputData": "BattleMapGroup",
+      "isInputIdx": false
     },
     "1": {
-      "id": 1
+      "id": 1,
+      "jsonFileName": "CompanyLvOceanTile",
+      "inputData": "WorldTile",
+      "isInputIdx": false,
+      "displayInfo": [
+        {
+          "Text": "선단 LV",
+          "ColumnName": "moveLockVal"
+        }
+      ]
     },
     "2": {
-      "id": 2
+      "id": 2,
+      "jsonFileName": "EnterSeaAreaTile",
+      "inputData": "EnterSeaArea",
+      "isInputIdx": false
     },
     "3": {
-      "id": 3
+      "id": 3,
+      "jsonFileName": "FishTile",
+      "inputData": "FishOceanTile",
+      "isInputIdx": false,
+      "displayInfo": [
+        {
+          "Text": "낚시 등급",
+          "ColumnName": "lvForTool"
+        }
+      ]
     },
     "4": {
-      "id": 4
+      "id": 4,
+      "jsonFileName": "FOWOpenContinentTile",
+      "inputData": "FOWOpenContinentTown",
+      "isInputIdx": false
     },
     "5": {
-      "id": 5
+      "id": 5,
+      "jsonFileName": "IceBreakingOceanTile",
+      "inputData": "WorldTile",
+      "isInputIdx": false,
+      "displayInfo": [
+        {
+          "Text": "쇄빙",
+          "ColumnName": "moveLockVal"
+        }
+      ]
     },
     "6": {
-      "id": 6
+      "id": 6,
+      "jsonFileName": "ImmovableLandTile",
+      "isInputIdx": true,
+      "inputSelectBox": [
+        {
+          "Name": "육지",
+          "Value": 1
+        },
+        {
+          "Name": "해상",
+          "Value": 0
+        }
+      ]
     },
     "7": {
-      "id": 7
+      "id": 7,
+      "jsonFileName": "LandExploreTile",
+      "inputData": "LandExplore",
+      "isInputIdx": false,
+      "displayInfo": [
+        {
+          "Text": "탐험 등급",
+          "ColumnName": "lvForTool"
+        }
+      ]
     },
     "8": {
-      "id": 8
+      "id": 8,
+      "jsonFileName": "MapMakingTile",
+      "isInputIdx": true,
+      "inputSelectBox": [
+        {
+          "Name": "육지",
+          "Value": 71499999
+        }
+      ]
     },
     "9": {
-      "id": 9
+      "id": 9,
+      "jsonFileName": "NpcLocalSpawnerOceanTile",
+      "inputData": "OceanNpcLocalSpawner",
+      "isInputIdx": false
     },
     "10": {
-      "id": 10
+      "id": 10,
+      "jsonFileName": "NpcSpawnOceanTile",
+      "inputData": "OceanNpcSpawn",
+      "isInputIdx": false
     },
     "11": {
-      "id": 11
+      "id": 11,
+      "jsonFileName": "OceanRockTile",
+      "inputData": "WorldTile",
+      "isInputIdx": false,
+      "displayInfo": [
+        {
+          "Text": "조력",
+          "ColumnName": "moveLockVal"
+        }
+      ]
     },
     "12": {
-      "id": 12
+      "id": 12,
+      "jsonFileName": "OceanSeaweedTile",
+      "inputData": "WorldTile",
+      "isInputIdx": false,
+      "displayInfo": [
+        {
+          "Text": "돌파",
+          "ColumnName": "moveLockVal"
+        }
+      ]
     },
     "13": {
-      "id": 13
+      "id": 13,
+      "jsonFileName": "OceanZoneTile",
+      "inputData": "OceanZone",
+      "isInputIdx": false
     },
     "14": {
-      "id": 14
+      "id": 14,
+      "jsonFileName": "RegionOceanTile",
+      "inputData": "Region",
+      "isInputIdx": false
     },
     "15": {
-      "id": 15
+      "id": 15,
+      "jsonFileName": "ShipSizeOceanTile",
+      "inputData": "WorldTile",
+      "isInputIdx": false,
+      "displayInfo": [
+        {
+          "Text": "사이즈 이하",
+          "ColumnName": "moveLockVal"
+        }
+      ]
     },
     "16": {
-      "id": 16
+      "id": 16,
+      "jsonFileName": "WaterMapTile",
+      "inputData": "WorldTile",
+      "isInputIdx": false
     },
     "17": {
-      "id": 17
+      "id": 17,
+      "jsonFileName": "WaveResistanceOceanTile",
+      "inputData": "WorldTile",
+      "isInputIdx": false,
+      "displayInfo": [
+        {
+          "Text": "내파",
+          "ColumnName": "moveLockVal"
+        }
+      ]
     },
     "18": {
-      "id": 18
+      "id": 18,
+      "jsonFileName": "WeatherMapTile",
+      "inputData": "WeatherTile",
+      "isInputIdx": false
     },
     "19": {
-      "id": 19
+      "id": 19,
+      "jsonFileName": "OceanDisasterAreaTile",
+      "inputData": "OceanDisasterArea",
+      "isInputIdx": false
     }
   }
 }

@@ -2992,14 +2992,30 @@
     "rebuildData": "重新加载数据",
     "rebuildSuccess": "策划数据已成功重新加载",
     "showingFirst100": "仅显示前100项（总计：{{total}}）",
+    "search": "搜索",
     "searchPlaceholder": "按物品名称或ID搜索",
     "category": "类别",
     "viewAll": "查看全部",
     "viewAllWarning": "查看全部功能在项目较多时可能会非常慢",
+    "count": "数量",
     "noTableForRewardType": "此奖励类型没有关联的物品表。直接应用指定的数值。（例：经验值 +100，声望 +50 等）",
+    "radiusType": {
+      "none": "无",
+      "circle": "圆形",
+      "square": "正方形",
+      "region": "区域"
+    },
+    "error": {
+      "npcNotFound": "⚠️ NPC在OceanNpc表中不存在"
+    },
+    "errors": {
+      "loadStatsFailed": "加载策划数据统计失败",
+      "rebuildFailed": "重新加载数据失败"
+    },
     "tabs": {
       "rewardTypes": "奖励类型",
-      "uiLists": "UI列表"
+      "uiLists": "UI列表",
+      "hotTimeBuff": "热时间Buff"
     },
     "stats": {
       "totalRewardTypes": "总奖励类型",
@@ -3017,6 +3033,7 @@
     "testComponent": {
       "title": "测试组件（数据验证）"
     },
+    "noData": "没有可用数据",
     "errors": {
       "loadRewardTypesFailed": "加载奖励类型失败",
       "loadItemsFailed": "加载物品失败",

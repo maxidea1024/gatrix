@@ -2,6 +2,7 @@
   ":BuildingBuff": {
     ":type": {
       "id": "key",
+      "name": "text",
       "buildingType": "number",
       "buildingMenuId": [
         "number",
@@ -12,7 +13,15 @@
       "contentsTermsCount": "number",
       "statEffectType": "number",
       "statEffectId": "number",
-      "statEffectValue": "float"
+      "statEffectValue": "float",
+      "desc": "text",
+      "descFormatTexts": [
+        "text",
+        "text",
+        "text",
+        "text",
+        "text"
+      ]
     },
     ":required": {
       "statEffectId": 1,
@@ -61,6 +70,7 @@
   "BuildingBuff": {
     "38201003": {
       "id": 38201003,
+      "name": "기본 출금 수수료",
       "buildingType": 9,
       "buildingMenuId": [
         38400009
@@ -69,10 +79,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4001,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "출금 수수료"
+      ]
     },
     "38200000": {
       "id": 38200000,
+      "name": "출금 수수료 할인",
       "buildingType": 9,
       "buildingMenuId": [
         38400009
@@ -81,10 +96,16 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4001,
-      "statEffectValue": 975
+      "statEffectValue": 975,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "출금 수수료",
+        "2.5%"
+      ]
     },
     "38200001": {
       "id": 38200001,
+      "name": "출금 수수료 할인",
       "buildingType": 9,
       "buildingMenuId": [
         38400009
@@ -93,10 +114,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4001,
-      "statEffectValue": 950
+      "statEffectValue": 950,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "출금 수수료",
+        "5%"
+      ]
     },
     "38200002": {
       "id": 38200002,
+      "name": "출금 수수료 할인",
       "buildingType": 9,
       "buildingMenuId": [
         38400009
@@ -105,10 +132,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4001,
-      "statEffectValue": 900
+      "statEffectValue": 900,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "출금 수수료",
+        "10%"
+      ]
     },
     "38200003": {
       "id": 38200003,
+      "name": "출금 수수료 할인",
       "buildingType": 9,
       "buildingMenuId": [
         38400009
@@ -117,10 +150,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4001,
-      "statEffectValue": 850
+      "statEffectValue": 850,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "출금 수수료",
+        "15%"
+      ]
     },
     "38200004": {
       "id": 38200004,
+      "name": "출금 수수료 할인",
       "buildingType": 9,
       "buildingMenuId": [
         38400009
@@ -129,10 +168,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4001,
-      "statEffectValue": 800
+      "statEffectValue": 800,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "출금 수수료",
+        "20%"
+      ]
     },
     "38200005": {
       "id": 38200005,
+      "name": "기본 보급품 가격",
       "buildingType": 12,
       "buildingMenuId": [
         38400020
@@ -141,10 +186,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4002,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "보급품 가격"
+      ]
     },
     "38200006": {
       "id": 38200006,
+      "name": "기본 보급품 가격",
       "buildingType": 12,
       "buildingMenuId": [
         38400020
@@ -153,10 +203,15 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4002,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "보급품 가격"
+      ]
     },
     "38200007": {
       "id": 38200007,
+      "name": "보급품 가격 할인",
       "buildingType": 12,
       "buildingMenuId": [
         38400020
@@ -165,10 +220,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4002,
-      "statEffectValue": 950
+      "statEffectValue": 950,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "보급품 가격",
+        "5%"
+      ]
     },
     "38200008": {
       "id": 38200008,
+      "name": "보급품 가격 할인",
       "buildingType": 12,
       "buildingMenuId": [
         38400020
@@ -177,10 +238,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4002,
-      "statEffectValue": 900
+      "statEffectValue": 900,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "보급품 가격",
+        "10%"
+      ]
     },
     "38200009": {
       "id": 38200009,
+      "name": "보급품 가격 할인",
       "buildingType": 12,
       "buildingMenuId": [
         38400020
@@ -189,10 +256,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4002,
-      "statEffectValue": 850
+      "statEffectValue": 850,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "보급품 가격",
+        "15%"
+      ]
     },
     "38200010": {
       "id": 38200010,
+      "name": "보급품 가격 할인",
       "buildingType": 12,
       "buildingMenuId": [
         38400020
@@ -201,10 +274,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4002,
-      "statEffectValue": 800
+      "statEffectValue": 800,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "보급품 가격",
+        "20%"
+      ]
     },
     "38201004": {
       "id": 38201004,
+      "name": "기본 건조 비용",
       "buildingType": 11,
       "buildingMenuId": [
         38400014
@@ -213,10 +292,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4003,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "선박 건조 비용"
+      ]
     },
     "38200011": {
       "id": 38200011,
+      "name": "건조 비용 할인",
       "buildingType": 11,
       "buildingMenuId": [
         38400014
@@ -225,10 +309,16 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4003,
-      "statEffectValue": 990
+      "statEffectValue": 990,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "선박 건조 비용",
+        "1%"
+      ]
     },
     "38200012": {
       "id": 38200012,
+      "name": "건조 비용 할인",
       "buildingType": 11,
       "buildingMenuId": [
         38400014
@@ -237,10 +327,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4003,
-      "statEffectValue": 980
+      "statEffectValue": 980,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "선박 건조 비용",
+        "2%"
+      ]
     },
     "38200013": {
       "id": 38200013,
+      "name": "건조 비용 할인",
       "buildingType": 11,
       "buildingMenuId": [
         38400014
@@ -249,10 +345,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4003,
-      "statEffectValue": 970
+      "statEffectValue": 970,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "선박 건조 비용",
+        "3%"
+      ]
     },
     "38200014": {
       "id": 38200014,
+      "name": "건조 비용 할인",
       "buildingType": 11,
       "buildingMenuId": [
         38400014
@@ -261,10 +363,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4003,
-      "statEffectValue": 940
+      "statEffectValue": 940,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "선박 건조 비용",
+        "6%"
+      ]
     },
     "38200015": {
       "id": 38200015,
+      "name": "건조 비용 할인",
       "buildingType": 11,
       "buildingMenuId": [
         38400014
@@ -273,10 +381,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4003,
-      "statEffectValue": 900
+      "statEffectValue": 900,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "선박 건조 비용",
+        "10%"
+      ]
     },
     "38200016": {
       "id": 38200016,
+      "name": "기본 수리/복원 비용",
       "buildingType": 11,
       "buildingMenuId": [
         38400017,
@@ -286,10 +400,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4004,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "수리 및 복원 비용"
+      ]
     },
     "38200017": {
       "id": 38200017,
+      "name": "기본 수리/복원 비용",
       "buildingType": 11,
       "buildingMenuId": [
         38400017,
@@ -299,10 +418,15 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4004,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "수리 및 복원 비용"
+      ]
     },
     "38200018": {
       "id": 38200018,
+      "name": "수리/복원 비용 할인",
       "buildingType": 11,
       "buildingMenuId": [
         38400017,
@@ -312,10 +436,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4004,
-      "statEffectValue": 990
+      "statEffectValue": 990,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "수리 및 복원 비용",
+        "1%"
+      ]
     },
     "38200019": {
       "id": 38200019,
+      "name": "수리/복원 비용 할인",
       "buildingType": 11,
       "buildingMenuId": [
         38400017,
@@ -325,10 +455,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4004,
-      "statEffectValue": 970
+      "statEffectValue": 970,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "수리 및 복원 비용",
+        "3%"
+      ]
     },
     "38200020": {
       "id": 38200020,
+      "name": "수리/복원 비용 할인",
       "buildingType": 11,
       "buildingMenuId": [
         38400017,
@@ -338,10 +474,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4004,
-      "statEffectValue": 940
+      "statEffectValue": 940,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "수리 및 복원 비용",
+        "6%"
+      ]
     },
     "38200021": {
       "id": 38200021,
+      "name": "수리/복원 비용 할인",
       "buildingType": 11,
       "buildingMenuId": [
         38400017,
@@ -351,10 +493,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4004,
-      "statEffectValue": 900
+      "statEffectValue": 900,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "수리 및 복원 비용",
+        "10%"
+      ]
     },
     "38200022": {
       "id": 38200022,
+      "name": "기본 부품 가격",
       "buildingType": 11,
       "buildingMenuId": [
         38400016
@@ -363,10 +511,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4023,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "부품 구매 가격"
+      ]
     },
     "38200023": {
       "id": 38200023,
+      "name": "기본 부품 가격",
       "buildingType": 11,
       "buildingMenuId": [
         38400016
@@ -375,10 +528,15 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4023,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "부품 구매 가격"
+      ]
     },
     "38200024": {
       "id": 38200024,
+      "name": "부품 가격 할인",
       "buildingType": 11,
       "buildingMenuId": [
         38400016
@@ -387,10 +545,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4023,
-      "statEffectValue": 990
+      "statEffectValue": 990,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "부품 구매 가격",
+        "1%"
+      ]
     },
     "38200025": {
       "id": 38200025,
+      "name": "부품 가격 할인",
       "buildingType": 11,
       "buildingMenuId": [
         38400016
@@ -399,10 +563,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4023,
-      "statEffectValue": 970
+      "statEffectValue": 970,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "부품 구매 가격",
+        "3%"
+      ]
     },
     "38200026": {
       "id": 38200026,
+      "name": "부품 가격 할인",
       "buildingType": 11,
       "buildingMenuId": [
         38400016
@@ -411,10 +581,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4023,
-      "statEffectValue": 940
+      "statEffectValue": 940,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "부품 구매 가격",
+        "6%"
+      ]
     },
     "38200027": {
       "id": 38200027,
+      "name": "부품 가격 할인",
       "buildingType": 11,
       "buildingMenuId": [
         38400016
@@ -423,10 +599,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4023,
-      "statEffectValue": 900
+      "statEffectValue": 900,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "부품 구매 가격",
+        "10%"
+      ]
     },
     "38200028": {
       "id": 38200028,
+      "name": "기본 선원 모집 비용",
       "buildingType": 4,
       "buildingMenuId": [
         38400003,
@@ -436,10 +618,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4006,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "선원 모집 비용"
+      ]
     },
     "38200029": {
       "id": 38200029,
+      "name": "기본 선원 모집 비용",
       "buildingType": 4,
       "buildingMenuId": [
         38400003,
@@ -449,10 +636,15 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4006,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "선원 모집 비용"
+      ]
     },
     "38200030": {
       "id": 38200030,
+      "name": "선원 모집 비용 할인",
       "buildingType": 4,
       "buildingMenuId": [
         38400003,
@@ -462,10 +654,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4006,
-      "statEffectValue": 950
+      "statEffectValue": 950,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "선원 모집 비용",
+        "5%"
+      ]
     },
     "38200031": {
       "id": 38200031,
+      "name": "선원 모집 비용 할인",
       "buildingType": 4,
       "buildingMenuId": [
         38400003,
@@ -475,10 +673,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4006,
-      "statEffectValue": 900
+      "statEffectValue": 900,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "선원 모집 비용",
+        "10%"
+      ]
     },
     "38200032": {
       "id": 38200032,
+      "name": "선원 모집 비용 할인",
       "buildingType": 4,
       "buildingMenuId": [
         38400003,
@@ -488,10 +692,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4006,
-      "statEffectValue": 850
+      "statEffectValue": 850,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "선원 모집 비용",
+        "15%"
+      ]
     },
     "38200033": {
       "id": 38200033,
+      "name": "선원 모집 비용 할인",
       "buildingType": 4,
       "buildingMenuId": [
         38400003,
@@ -501,10 +711,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4006,
-      "statEffectValue": 800
+      "statEffectValue": 800,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "선원 모집 비용",
+        "20%"
+      ]
     },
     "38200034": {
       "id": 38200034,
+      "name": "항구 대기 선원 증가",
       "buildingType": 4,
       "buildingMenuId": [
         38400003,
@@ -514,10 +730,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4012,
-      "statEffectValue": 50
+      "statEffectValue": 50,
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "항구에서 모집할 수 있는 선원 수",
+        "50"
+      ]
     },
     "38200035": {
       "id": 38200035,
+      "name": "항구 대기 선원 증가",
       "buildingType": 4,
       "buildingMenuId": [
         38400003,
@@ -527,10 +749,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4012,
-      "statEffectValue": 100
+      "statEffectValue": 100,
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "항구에서 모집할 수 있는 선원 수",
+        "100"
+      ]
     },
     "38200036": {
       "id": 38200036,
+      "name": "기본 항해사 고용 비용",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -539,10 +767,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4007,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "항해사 고용 비용"
+      ]
     },
     "38200037": {
       "id": 38200037,
+      "name": "기본 항해사 고용 비용",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -551,10 +784,15 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4007,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "항해사 고용 비용"
+      ]
     },
     "38200038": {
       "id": 38200038,
+      "name": "항해사 고용 비용 할인",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -563,10 +801,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4007,
-      "statEffectValue": 990
+      "statEffectValue": 990,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "항해사 고용 비용",
+        "1%"
+      ]
     },
     "38200039": {
       "id": 38200039,
+      "name": "항해사 고용 비용 할인",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -575,10 +819,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4007,
-      "statEffectValue": 970
+      "statEffectValue": 970,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "항해사 고용 비용",
+        "3%"
+      ]
     },
     "38200040": {
       "id": 38200040,
+      "name": "항해사 고용 비용 할인",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -587,10 +837,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4007,
-      "statEffectValue": 940
+      "statEffectValue": 940,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "항해사 고용 비용",
+        "6%"
+      ]
     },
     "38200041": {
       "id": 38200041,
+      "name": "항해사 고용 비용 할인",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -599,10 +855,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4007,
-      "statEffectValue": 900
+      "statEffectValue": 900,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "항해사 고용 비용",
+        "10%"
+      ]
     },
     "38201000": {
       "id": 38201000,
+      "name": "기본 교역품 구매 가격",
       "buildingType": 10,
       "buildingMenuId": [
         38400012
@@ -611,10 +873,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4009,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "교역품 구매 가격"
+      ]
     },
     "38200042": {
       "id": 38200042,
+      "name": "기본 교역품 구매 가격",
       "buildingType": 10,
       "buildingMenuId": [
         38400012
@@ -623,10 +890,15 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4009,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "교역품 구매 가격"
+      ]
     },
     "38200043": {
       "id": 38200043,
+      "name": "교역품 구매 가격 할인",
       "buildingType": 10,
       "buildingMenuId": [
         38400012
@@ -635,10 +907,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4009,
-      "statEffectValue": 990
+      "statEffectValue": 990,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "교역품 구매 가격",
+        "1%"
+      ]
     },
     "38200044": {
       "id": 38200044,
+      "name": "교역품 구매 가격 할인",
       "buildingType": 10,
       "buildingMenuId": [
         38400012
@@ -647,10 +925,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4009,
-      "statEffectValue": 980
+      "statEffectValue": 980,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "교역품 구매 가격",
+        "2%"
+      ]
     },
     "38200045": {
       "id": 38200045,
+      "name": "교역품 구매 가격 할인",
       "buildingType": 10,
       "buildingMenuId": [
         38400012
@@ -659,10 +943,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4009,
-      "statEffectValue": 970
+      "statEffectValue": 970,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "교역품 구매 가격",
+        "3%"
+      ]
     },
     "38200046": {
       "id": 38200046,
+      "name": "교역품 구매 가격 할인",
       "buildingType": 10,
       "buildingMenuId": [
         38400012
@@ -671,10 +961,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4009,
-      "statEffectValue": 950
+      "statEffectValue": 950,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "교역품 구매 가격",
+        "5%"
+      ]
     },
     "38201001": {
       "id": 38201001,
+      "name": "기본 교역품 판매 가격",
       "buildingType": 10,
       "buildingMenuId": [
         38400013
@@ -683,10 +979,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4010,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "교역품 판매 가격"
+      ]
     },
     "38200047": {
       "id": 38200047,
+      "name": "기본 교역품 판매 가격",
       "buildingType": 10,
       "buildingMenuId": [
         38400013
@@ -695,10 +996,15 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4010,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "교역품 판매 가격"
+      ]
     },
     "38200048": {
       "id": 38200048,
+      "name": "교역품 판매 가격 할증",
       "buildingType": 10,
       "buildingMenuId": [
         38400013
@@ -707,10 +1013,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4010,
-      "statEffectValue": 1010
+      "statEffectValue": 1010,
+      "desc": "{0}|hpp(이,가) {1} 할증됩니다.",
+      "descFormatTexts": [
+        "교역품 판매 가격",
+        "1%"
+      ]
     },
     "38200049": {
       "id": 38200049,
+      "name": "교역품 판매 가격 할증",
       "buildingType": 10,
       "buildingMenuId": [
         38400013
@@ -719,10 +1031,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4010,
-      "statEffectValue": 1020
+      "statEffectValue": 1020,
+      "desc": "{0}|hpp(이,가) {1} 할증됩니다.",
+      "descFormatTexts": [
+        "교역품 판매 가격",
+        "2%"
+      ]
     },
     "38200050": {
       "id": 38200050,
+      "name": "교역품 판매 가격 할증",
       "buildingType": 10,
       "buildingMenuId": [
         38400013
@@ -731,10 +1049,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4010,
-      "statEffectValue": 1030
+      "statEffectValue": 1030,
+      "desc": "{0}|hpp(이,가) {1} 할증됩니다.",
+      "descFormatTexts": [
+        "교역품 판매 가격",
+        "3%"
+      ]
     },
     "38200051": {
       "id": 38200051,
+      "name": "교역품 판매 가격 할증",
       "buildingType": 10,
       "buildingMenuId": [
         38400013
@@ -743,10 +1067,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4010,
-      "statEffectValue": 1050
+      "statEffectValue": 1050,
+      "desc": "{0}|hpp(이,가) {1} 할증됩니다.",
+      "descFormatTexts": [
+        "교역품 판매 가격",
+        "5%"
+      ]
     },
     "38201002": {
       "id": 38201002,
+      "name": "기본 항해사 후원 비용",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -755,10 +1085,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4011,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "항해사 후원 비용"
+      ]
     },
     "38200052": {
       "id": 38200052,
+      "name": "기본 항해사 후원 비용",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -767,10 +1102,15 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4011,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "항해사 후원 비용"
+      ]
     },
     "38200053": {
       "id": 38200053,
+      "name": "항해사 후원 비용 할인",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -779,10 +1119,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4011,
-      "statEffectValue": 950
+      "statEffectValue": 950,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "항해사 후원 비용",
+        "5%"
+      ]
     },
     "38200054": {
       "id": 38200054,
+      "name": "항해사 후원 비용 할인",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -791,10 +1137,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4011,
-      "statEffectValue": 950
+      "statEffectValue": 950,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "항해사 후원 비용",
+        "5%"
+      ]
     },
     "38200055": {
       "id": 38200055,
+      "name": "항해사 후원 비용 할인",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -803,10 +1155,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4011,
-      "statEffectValue": 950
+      "statEffectValue": 950,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "항해사 후원 비용",
+        "5%"
+      ]
     },
     "38200056": {
       "id": 38200056,
+      "name": "항해사 후원 비용 할인",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -815,10 +1173,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4011,
-      "statEffectValue": 900
+      "statEffectValue": 900,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "항해사 후원 비용",
+        "10%"
+      ]
     },
     "38201005": {
       "id": 38201005,
+      "name": "기본 후원 친밀도",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -827,10 +1191,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4013,
-      "statEffectValue": 0
+      "statEffectValue": 0,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "항해사 후원 시 친밀도 상승량"
+      ]
     },
     "38200057": {
       "id": 38200057,
+      "name": "후원 시 친밀도 증가",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -839,10 +1208,16 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4013,
-      "statEffectValue": 1
+      "statEffectValue": 1,
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "항해사 후원 시 친밀도 상승량",
+        "1"
+      ]
     },
     "38200058": {
       "id": 38200058,
+      "name": "후원 시 친밀도 증가",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -851,10 +1226,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4013,
-      "statEffectValue": 1
+      "statEffectValue": 1,
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "항해사 후원 시 친밀도 상승량",
+        "1"
+      ]
     },
     "38200059": {
       "id": 38200059,
+      "name": "후원 시 친밀도 증가",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -863,10 +1244,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4013,
-      "statEffectValue": 2
+      "statEffectValue": 2,
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "항해사 후원 시 친밀도 상승량",
+        "2"
+      ]
     },
     "38200060": {
       "id": 38200060,
+      "name": "후원 시 친밀도 증가",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -875,10 +1262,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4013,
-      "statEffectValue": 2
+      "statEffectValue": 2,
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "항해사 후원 시 친밀도 상승량",
+        "2"
+      ]
     },
     "38200061": {
       "id": 38200061,
+      "name": "후원 시 친밀도 증가",
       "buildingType": 4,
       "buildingMenuId": [
         38400001
@@ -887,10 +1280,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4013,
-      "statEffectValue": 3
+      "statEffectValue": 3,
+      "desc": "{0}|hpp(이,가) {1} 증가합니다.",
+      "descFormatTexts": [
+        "항해사 후원 시 친밀도 상승량",
+        "3"
+      ]
     },
     "38201006": {
       "id": 38201006,
+      "name": "기본 장비 가격",
       "buildingType": 5,
       "buildingMenuId": [
         38400006
@@ -899,10 +1298,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4015,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "장비 구매 가격"
+      ]
     },
     "38200062": {
       "id": 38200062,
+      "name": "장비 가격 할인",
       "buildingType": 5,
       "buildingMenuId": [
         38400006
@@ -911,10 +1315,16 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4015,
-      "statEffectValue": 990
+      "statEffectValue": 990,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "장비 구매 가격",
+        "1%"
+      ]
     },
     "38200063": {
       "id": 38200063,
+      "name": "장비 가격 할인",
       "buildingType": 5,
       "buildingMenuId": [
         38400006
@@ -923,10 +1333,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4015,
-      "statEffectValue": 980
+      "statEffectValue": 980,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "장비 구매 가격",
+        "2%"
+      ]
     },
     "38200064": {
       "id": 38200064,
+      "name": "장비 가격 할인",
       "buildingType": 5,
       "buildingMenuId": [
         38400006
@@ -935,10 +1351,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4015,
-      "statEffectValue": 970
+      "statEffectValue": 970,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "장비 구매 가격",
+        "3%"
+      ]
     },
     "38200065": {
       "id": 38200065,
+      "name": "장비 가격 할인",
       "buildingType": 5,
       "buildingMenuId": [
         38400006
@@ -947,10 +1369,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4015,
-      "statEffectValue": 940
+      "statEffectValue": 940,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "장비 구매 가격",
+        "6%"
+      ]
     },
     "38200066": {
       "id": 38200066,
+      "name": "장비 가격 할인",
       "buildingType": 5,
       "buildingMenuId": [
         38400006
@@ -959,10 +1387,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4015,
-      "statEffectValue": 900
+      "statEffectValue": 900,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "장비 구매 가격",
+        "10%"
+      ]
     },
     "38201007": {
       "id": 38201007,
+      "name": "기본 기도 행동력 소모량",
       "buildingType": 7,
       "buildingMenuId": [
         38400025
@@ -971,10 +1405,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4014,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "기도 시 행동력 소모량"
+      ]
     },
     "38200067": {
       "id": 38200067,
+      "name": "기도 행동력 소모량 감소",
       "buildingType": 7,
       "buildingMenuId": [
         38400025
@@ -983,10 +1422,16 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4014,
-      "statEffectValue": 950
+      "statEffectValue": 950,
+      "desc": "{0}|hpp(이,가) {1} 감소합니다.",
+      "descFormatTexts": [
+        "기도 시 행동력 소모량",
+        "5%"
+      ]
     },
     "38200068": {
       "id": 38200068,
+      "name": "기도 행동력 소모량 감소",
       "buildingType": 7,
       "buildingMenuId": [
         38400025
@@ -995,10 +1440,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4014,
-      "statEffectValue": 900
+      "statEffectValue": 900,
+      "desc": "{0}|hpp(이,가) {1} 감소합니다.",
+      "descFormatTexts": [
+        "기도 시 행동력 소모량",
+        "10%"
+      ]
     },
     "38200069": {
       "id": 38200069,
+      "name": "기도 행동력 소모량 감소",
       "buildingType": 7,
       "buildingMenuId": [
         38400025
@@ -1007,10 +1458,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4014,
-      "statEffectValue": 850
+      "statEffectValue": 850,
+      "desc": "{0}|hpp(이,가) {1} 감소합니다.",
+      "descFormatTexts": [
+        "기도 시 행동력 소모량",
+        "15%"
+      ]
     },
     "38200070": {
       "id": 38200070,
+      "name": "기도 행동력 소모량 감소",
       "buildingType": 7,
       "buildingMenuId": [
         38400025
@@ -1019,10 +1476,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4014,
-      "statEffectValue": 800
+      "statEffectValue": 800,
+      "desc": "{0}|hpp(이,가) {1} 감소합니다.",
+      "descFormatTexts": [
+        "기도 시 행동력 소모량",
+        "20%"
+      ]
     },
     "38200071": {
       "id": 38200071,
+      "name": "기도 행동력 소모량 감소",
       "buildingType": 7,
       "buildingMenuId": [
         38400025
@@ -1031,10 +1494,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4014,
-      "statEffectValue": 750
+      "statEffectValue": 750,
+      "desc": "{0}|hpp(이,가) {1} 감소합니다.",
+      "descFormatTexts": [
+        "기도 시 행동력 소모량",
+        "25%"
+      ]
     },
     "38201008": {
       "id": 38201008,
+      "name": "기본 기부 비용",
       "buildingType": 7,
       "buildingMenuId": [
         38400026
@@ -1043,10 +1512,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4008,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "두카트 기부 비용"
+      ]
     },
     "38200072": {
       "id": 38200072,
+      "name": "기부 비용 할인",
       "buildingType": 7,
       "buildingMenuId": [
         38400026
@@ -1055,10 +1529,16 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4008,
-      "statEffectValue": 990
+      "statEffectValue": 990,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "두카트 기부 비용",
+        "1%"
+      ]
     },
     "38200073": {
       "id": 38200073,
+      "name": "기부 비용 할인",
       "buildingType": 7,
       "buildingMenuId": [
         38400026
@@ -1067,10 +1547,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4008,
-      "statEffectValue": 970
+      "statEffectValue": 970,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "두카트 기부 비용",
+        "3%"
+      ]
     },
     "38200074": {
       "id": 38200074,
+      "name": "기부 비용 할인",
       "buildingType": 7,
       "buildingMenuId": [
         38400026
@@ -1079,10 +1565,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4008,
-      "statEffectValue": 950
+      "statEffectValue": 950,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "두카트 기부 비용",
+        "5%"
+      ]
     },
     "38200075": {
       "id": 38200075,
+      "name": "기부 비용 할인",
       "buildingType": 7,
       "buildingMenuId": [
         38400026
@@ -1091,10 +1583,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4008,
-      "statEffectValue": 925
+      "statEffectValue": 925,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "두카트 기부 비용",
+        "7.5%"
+      ]
     },
     "38200076": {
       "id": 38200076,
+      "name": "기부 비용 할인",
       "buildingType": 7,
       "buildingMenuId": [
         38400026
@@ -1103,10 +1601,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4008,
-      "statEffectValue": 900
+      "statEffectValue": 900,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "두카트 기부 비용",
+        "10%"
+      ]
     },
     "38201009": {
       "id": 38201009,
+      "name": "기본 도구 가격",
       "buildingType": 5,
       "buildingMenuId": [
         38400007
@@ -1115,10 +1619,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4017,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "도구 구매 가격"
+      ]
     },
     "38200080": {
       "id": 38200080,
+      "name": "도구 가격 할인",
       "buildingType": 5,
       "buildingMenuId": [
         38400007
@@ -1127,10 +1636,16 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4017,
-      "statEffectValue": 990
+      "statEffectValue": 990,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "도구 구매 가격",
+        "1%"
+      ]
     },
     "38200081": {
       "id": 38200081,
+      "name": "도구 가격 할인",
       "buildingType": 5,
       "buildingMenuId": [
         38400007
@@ -1139,10 +1654,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4017,
-      "statEffectValue": 980
+      "statEffectValue": 980,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "도구 구매 가격",
+        "2%"
+      ]
     },
     "38200082": {
       "id": 38200082,
+      "name": "도구 가격 할인",
       "buildingType": 5,
       "buildingMenuId": [
         38400007
@@ -1151,10 +1672,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4017,
-      "statEffectValue": 970
+      "statEffectValue": 970,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "도구 구매 가격",
+        "3%"
+      ]
     },
     "38200083": {
       "id": 38200083,
+      "name": "도구 가격 할인",
       "buildingType": 5,
       "buildingMenuId": [
         38400007
@@ -1163,10 +1690,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4017,
-      "statEffectValue": 940
+      "statEffectValue": 940,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "도구 구매 가격",
+        "6%"
+      ]
     },
     "38200084": {
       "id": 38200084,
+      "name": "도구 가격 할인",
       "buildingType": 5,
       "buildingMenuId": [
         38400007
@@ -1175,10 +1708,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4017,
-      "statEffectValue": 900
+      "statEffectValue": 900,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "도구 구매 가격",
+        "10%"
+      ]
     },
     "38201010": {
       "id": 38201010,
+      "name": "기본 암시장 물가",
       "buildingType": 5,
       "buildingMenuId": [
         38400008
@@ -1187,10 +1726,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4019,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "암시장의 두카트 상품 가격"
+      ]
     },
     "38200085": {
       "id": 38200085,
+      "name": "암시장 물가 할인",
       "buildingType": 5,
       "buildingMenuId": [
         38400008
@@ -1199,10 +1743,16 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4019,
-      "statEffectValue": 990
+      "statEffectValue": 990,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "암시장의 두카트 상품 가격",
+        "1%"
+      ]
     },
     "38200086": {
       "id": 38200086,
+      "name": "암시장 물가 할인",
       "buildingType": 5,
       "buildingMenuId": [
         38400008
@@ -1211,10 +1761,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4019,
-      "statEffectValue": 980
+      "statEffectValue": 980,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "암시장의 두카트 상품 가격",
+        "2%"
+      ]
     },
     "38200087": {
       "id": 38200087,
+      "name": "암시장 물가 할인",
       "buildingType": 5,
       "buildingMenuId": [
         38400008
@@ -1223,10 +1779,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4019,
-      "statEffectValue": 970
+      "statEffectValue": 970,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "암시장의 두카트 상품 가격",
+        "3%"
+      ]
     },
     "38200088": {
       "id": 38200088,
+      "name": "암시장 물가 할인",
       "buildingType": 5,
       "buildingMenuId": [
         38400008
@@ -1235,10 +1797,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4019,
-      "statEffectValue": 940
+      "statEffectValue": 940,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "암시장의 두카트 상품 가격",
+        "6%"
+      ]
     },
     "38200089": {
       "id": 38200089,
+      "name": "암시장 물가 할인",
       "buildingType": 5,
       "buildingMenuId": [
         38400008
@@ -1247,10 +1815,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4019,
-      "statEffectValue": 900
+      "statEffectValue": 900,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "암시장의 두카트 상품 가격",
+        "10%"
+      ]
     },
     "38201011": {
       "id": 38201011,
+      "name": "_기본 운세 비용",
       "buildingType": 13,
       "buildingMenuId": [
         38400029
@@ -1259,10 +1833,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4022,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "_운세 비용"
+      ]
     },
     "38200090": {
       "id": 38200090,
+      "name": "_운세 비용 할인",
       "buildingType": 13,
       "buildingMenuId": [
         38400029
@@ -1271,10 +1850,16 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4022,
-      "statEffectValue": 950
+      "statEffectValue": 950,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "_운세 비용",
+        "5%"
+      ]
     },
     "38200091": {
       "id": 38200091,
+      "name": "_운세 비용 할인",
       "buildingType": 13,
       "buildingMenuId": [
         38400029
@@ -1283,10 +1868,16 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4022,
-      "statEffectValue": 900
+      "statEffectValue": 900,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "_운세 비용",
+        "10%"
+      ]
     },
     "38200092": {
       "id": 38200092,
+      "name": "_운세 비용 할인",
       "buildingType": 13,
       "buildingMenuId": [
         38400029
@@ -1295,10 +1886,16 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4022,
-      "statEffectValue": 850
+      "statEffectValue": 850,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "_운세 비용",
+        "15%"
+      ]
     },
     "38200093": {
       "id": 38200093,
+      "name": "_운세 비용 할인",
       "buildingType": 13,
       "buildingMenuId": [
         38400029
@@ -1307,10 +1904,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4022,
-      "statEffectValue": 800
+      "statEffectValue": 800,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "_운세 비용",
+        "20%"
+      ]
     },
     "38200094": {
       "id": 38200094,
+      "name": "_운세 비용 할인",
       "buildingType": 13,
       "buildingMenuId": [
         38400029
@@ -1319,10 +1922,16 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4022,
-      "statEffectValue": 750
+      "statEffectValue": 750,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "_운세 비용",
+        "25%"
+      ]
     },
     "38200095": {
       "id": 38200095,
+      "name": "기본 장비 판매가",
       "buildingType": 5,
       "buildingMenuId": [
         38400036
@@ -1331,10 +1940,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4016,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "장비 판매 비용"
+      ]
     },
     "38200096": {
       "id": 38200096,
+      "name": "기본 장비 판매가",
       "buildingType": 5,
       "buildingMenuId": [
         38400036
@@ -1343,10 +1957,15 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4016,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "장비 판매 비용"
+      ]
     },
     "38200097": {
       "id": 38200097,
+      "name": "기본 장비 판매가",
       "buildingType": 5,
       "buildingMenuId": [
         38400036
@@ -1355,10 +1974,15 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4016,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "장비 판매 비용"
+      ]
     },
     "38200098": {
       "id": 38200098,
+      "name": "기본 장비 판매가",
       "buildingType": 5,
       "buildingMenuId": [
         38400036
@@ -1367,10 +1991,15 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4016,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "장비 판매 비용"
+      ]
     },
     "38200099": {
       "id": 38200099,
+      "name": "기본 장비 판매가",
       "buildingType": 5,
       "buildingMenuId": [
         38400036
@@ -1379,10 +2008,15 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4016,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "장비 판매 비용"
+      ]
     },
     "38200100": {
       "id": 38200100,
+      "name": "기본 장비 판매가",
       "buildingType": 5,
       "buildingMenuId": [
         38400036
@@ -1391,10 +2025,15 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4016,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "장비 판매 비용"
+      ]
     },
     "38200101": {
       "id": 38200101,
+      "name": "기본 도구 판매가",
       "buildingType": 5,
       "buildingMenuId": [
         38400036
@@ -1403,10 +2042,15 @@
       "contentsTermsCount": 0,
       "statEffectType": 0,
       "statEffectId": 4018,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "도구 판매 비용"
+      ]
     },
     "38200102": {
       "id": 38200102,
+      "name": "기본 도구 판매가",
       "buildingType": 5,
       "buildingMenuId": [
         38400036
@@ -1415,10 +2059,15 @@
       "contentsTermsCount": 1,
       "statEffectType": 0,
       "statEffectId": 4018,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "도구 판매 비용"
+      ]
     },
     "38200103": {
       "id": 38200103,
+      "name": "기본 도구 판매가",
       "buildingType": 5,
       "buildingMenuId": [
         38400036
@@ -1427,10 +2076,15 @@
       "contentsTermsCount": 2,
       "statEffectType": 0,
       "statEffectId": 4018,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "도구 판매 비용"
+      ]
     },
     "38200104": {
       "id": 38200104,
+      "name": "기본 도구 판매가",
       "buildingType": 5,
       "buildingMenuId": [
         38400036
@@ -1439,10 +2093,15 @@
       "contentsTermsCount": 3,
       "statEffectType": 0,
       "statEffectId": 4018,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "도구 판매 비용"
+      ]
     },
     "38200105": {
       "id": 38200105,
+      "name": "기본 도구 판매가",
       "buildingType": 5,
       "buildingMenuId": [
         38400036
@@ -1451,10 +2110,15 @@
       "contentsTermsCount": 4,
       "statEffectType": 0,
       "statEffectId": 4018,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "도구 판매 비용"
+      ]
     },
     "38200106": {
       "id": 38200106,
+      "name": "기본 도구 판매가",
       "buildingType": 5,
       "buildingMenuId": [
         38400036
@@ -1463,10 +2127,15 @@
       "contentsTermsCount": 5,
       "statEffectType": 0,
       "statEffectId": 4018,
-      "statEffectValue": 1000
+      "statEffectValue": 1000,
+      "desc": "{0}|hpp(이,가) 기본적인 수준으로 책정됩니다.",
+      "descFormatTexts": [
+        "도구 판매 비용"
+      ]
     },
     "38200107": {
       "id": 38200107,
+      "name": "운하 기본 이용 비용",
       "buildingType": 14,
       "buildingMenuId": [
         38400051
@@ -1475,10 +2144,16 @@
       "contentsTermsCount": 4,
       "statEffectType": 1,
       "statEffectId": 75312218,
-      "statEffectValue": -50
+      "statEffectValue": -50,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "운하 기본 이용 비용",
+        "5%"
+      ]
     },
     "38200108": {
       "id": 38200108,
+      "name": "운하 기본 이용 비용",
       "buildingType": 14,
       "buildingMenuId": [
         38400051
@@ -1487,7 +2162,12 @@
       "contentsTermsCount": 5,
       "statEffectType": 1,
       "statEffectId": 75312218,
-      "statEffectValue": -100
+      "statEffectValue": -100,
+      "desc": "{0}|hpp(이,가) {1} 할인됩니다.",
+      "descFormatTexts": [
+        "운하 기본 이용 비용",
+        "10%"
+      ]
     }
   }
 }
