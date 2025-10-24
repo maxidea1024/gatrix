@@ -42,10 +42,24 @@ import { useSnackbar } from 'notistack';
 import planningDataService, { PlanningDataStats, HotTimeBuffLookup, HotTimeBuffItem } from '../../services/planningDataService';
 import SimplePagination from '../../components/common/SimplePagination';
 import { useDebounce } from '../../hooks/useDebounce';
+import { formatDateTimeDetailed } from '../../utils/dateFormat';
 
 const PlanningDataPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+
+  // Helper function to get localized field based on current language
+  const getLocalizedField = (item: any, fieldPrefix: string) => {
+    const lang = i18n.language;
+    if (lang === 'en' && item[`${fieldPrefix}En`]) {
+      return item[`${fieldPrefix}En`];
+    } else if (lang === 'zh' && item[`${fieldPrefix}Cn`]) {
+      return item[`${fieldPrefix}Cn`];
+    } else if (item[`${fieldPrefix}Kr`]) {
+      return item[`${fieldPrefix}Kr`];
+    }
+    return item[fieldPrefix];
+  };
 
   // State
   const [stats, setStats] = useState<PlanningDataStats | null>(null);
@@ -890,10 +904,10 @@ const PlanningDataPage: React.FC = () => {
                             /* Table view - paginated */
                             <>
                               <TableContainer component={Paper} variant="outlined">
-                                <Table size="small">
+                                <Table size="small" sx={{ tableLayout: 'auto' }}>
                                   <TableHead>
                                     <TableRow>
-                                      <TableCell width="150px">
+                                      <TableCell>
                                         <TableSortLabel
                                           active={sortBy === 'id'}
                                           direction={sortBy === 'id' ? sortOrder : 'asc'}
@@ -1163,10 +1177,10 @@ const PlanningDataPage: React.FC = () => {
                             /* Table view - paginated */
                             <>
                               <TableContainer component={Paper} variant="outlined">
-                                <Table size="small">
+                                <Table size="small" sx={{ tableLayout: 'auto' }}>
                                   <TableHead>
                                     <TableRow>
-                                      <TableCell width="150px">
+                                      <TableCell>
                                         <TableSortLabel
                                           active={sortBy === 'id'}
                                           direction={sortBy === 'id' ? sortOrder : 'asc'}
@@ -1390,7 +1404,7 @@ const PlanningDataPage: React.FC = () => {
                         /* Table view - paginated */
                         <>
                           <TableContainer component={Paper} variant="outlined">
-                            <Table size="small">
+                            <Table size="small" sx={{ tableLayout: 'auto' }}>
                               <TableHead>
                                 <TableRow>
                                   <TableCell>
@@ -1402,19 +1416,12 @@ const PlanningDataPage: React.FC = () => {
                                       ID
                                     </TableSortLabel>
                                   </TableCell>
-                                  <TableCell>Icon</TableCell>
-                                  <TableCell>
-                                    <TableSortLabel
-                                      active={hotTimeBuffSortBy === 'startDate'}
-                                      direction={hotTimeBuffSortOrder}
-                                      onClick={() => handleHotTimeBuffSort('startDate')}
-                                    >
-                                      Start Date
-                                    </TableSortLabel>
-                                  </TableCell>
+                                  <TableCell>Name</TableCell>
+                                  <TableCell>Start Date</TableCell>
                                   <TableCell>End Date</TableCell>
-                                  <TableCell>Start Hour</TableCell>
-                                  <TableCell>End Hour</TableCell>
+                                  <TableCell>Period</TableCell>
+                                  <TableCell>Start Hour (UTC)</TableCell>
+                                  <TableCell>End Hour (UTC)</TableCell>
                                   <TableCell>Min Lv</TableCell>
                                   <TableCell>Max Lv</TableCell>
                                   <TableCell>Day of Week</TableCell>
@@ -1422,46 +1429,119 @@ const PlanningDataPage: React.FC = () => {
                                 </TableRow>
                               </TableHead>
                               <TableBody>
-                                {paginatedHotTimeBuffItems.map((item: HotTimeBuffItem) => (
-                                  <TableRow key={item.id} hover>
-                                    <TableCell
-                                      onClick={(e) => handleCellClick(e, item.id.toString())}
-                                      sx={{ cursor: 'pointer', fontWeight: 500 }}
-                                    >
-                                      {item.id}
-                                    </TableCell>
-                                    <TableCell
-                                      onClick={(e) => handleCellClick(e, item.icon)}
-                                      sx={{ cursor: 'pointer' }}
-                                    >
-                                      {item.icon}
-                                    </TableCell>
-                                    <TableCell
-                                      onClick={(e) => handleCellClick(e, item.startDate)}
-                                      sx={{ cursor: 'pointer' }}
-                                    >
-                                      {item.startDate}
-                                    </TableCell>
-                                    <TableCell
-                                      onClick={(e) => handleCellClick(e, item.endDate)}
-                                      sx={{ cursor: 'pointer' }}
-                                    >
-                                      {item.endDate}
-                                    </TableCell>
-                                    <TableCell>{item.startHour}</TableCell>
-                                    <TableCell>{item.endHour}</TableCell>
-                                    <TableCell>{item.minLv}</TableCell>
-                                    <TableCell>{item.maxLv}</TableCell>
-                                    <TableCell>{item.bitFlagDayOfWeek}</TableCell>
-                                    <TableCell>
-                                      {item.worldBuffNames && item.worldBuffNames.length > 0
-                                        ? item.worldBuffNames.join(', ')
-                                        : item.worldBuffId && item.worldBuffId.length > 0
-                                        ? item.worldBuffId.join(', ')
-                                        : '-'}
-                                    </TableCell>
-                                  </TableRow>
-                                ))}
+                                {paginatedHotTimeBuffItems.map((item: HotTimeBuffItem) => {
+                                  // Format date - returns { display, utc }
+                                  const formatDate = (isoString: string | null) => {
+                                    if (!isoString) return { display: '-', utc: '' };
+                                    try {
+                                      const date = new Date(isoString);
+                                      const localFormatted = formatDateTimeDetailed(isoString);
+                                      // Remove milliseconds from UTC time (.000Z -> Z)
+                                      const utcDate = date.toISOString().replace(/\.\d{3}Z$/, 'Z');
+                                      return { display: localFormatted, utc: utcDate };
+                                    } catch {
+                                      return { display: '-', utc: '' };
+                                    }
+                                  };
+
+                                  // Calculate period in days
+                                  const calculatePeriod = (startDate: string | null, endDate: string | null) => {
+                                    if (!startDate || !endDate) return '-';
+                                    try {
+                                      const start = new Date(startDate);
+                                      const end = new Date(endDate);
+                                      const diffTime = Math.abs(end.getTime() - start.getTime());
+                                      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                      return `${diffDays} days`;
+                                    } catch {
+                                      return '-';
+                                    }
+                                  };
+
+                                  // Format hour - returns { display, utc }
+                                  const formatHour = (utcHour: number) => {
+                                    // Create a date with the UTC hour
+                                    const utcDate = new Date();
+                                    utcDate.setUTCHours(utcHour, 0, 0, 0);
+
+                                    // Format in user's timezone
+                                    const localFormatted = formatDateTimeDetailed(utcDate.toISOString());
+                                    const localTime = localFormatted.split(' ')[1] || '00:00:00';
+                                    const localHourMin = localTime.substring(0, 5); // HH:mm
+
+                                    // Format UTC time
+                                    const utcFormatted = `${utcHour.toString().padStart(2, '0')}:00`;
+
+                                    return { display: localHourMin, utc: utcFormatted };
+                                  };
+
+                                  const startDate = formatDate(item.startDate);
+                                  const endDate = formatDate(item.endDate);
+                                  const startHour = formatHour(item.startHour);
+                                  const endHour = formatHour(item.endHour);
+
+                                  return (
+                                    <TableRow key={item.id} hover>
+                                      <TableCell
+                                        onClick={(e) => handleCellClick(e, item.id.toString())}
+                                        sx={{ cursor: 'pointer' }}
+                                      >
+                                        <Chip label={item.id} size="small" variant="outlined" />
+                                      </TableCell>
+                                      <TableCell
+                                        onClick={(e) => handleCellClick(e, item.name || '-')}
+                                        sx={{ cursor: 'pointer' }}
+                                      >
+                                        {item.name || '-'}
+                                      </TableCell>
+                                      <Tooltip title={`UTC: ${startDate.utc}`} arrow>
+                                        <TableCell
+                                          onClick={(e) => handleCellClick(e, startDate.display)}
+                                          sx={{ cursor: 'pointer' }}
+                                        >
+                                          {startDate.display}
+                                        </TableCell>
+                                      </Tooltip>
+                                      <Tooltip title={`UTC: ${endDate.utc}`} arrow>
+                                        <TableCell
+                                          onClick={(e) => handleCellClick(e, endDate.display)}
+                                          sx={{ cursor: 'pointer' }}
+                                        >
+                                          {endDate.display}
+                                        </TableCell>
+                                      </Tooltip>
+                                      <TableCell>{calculatePeriod(item.startDate, item.endDate)}</TableCell>
+                                      <Tooltip title={`UTC: ${startHour.utc}`} arrow>
+                                        <TableCell>{startHour.display}</TableCell>
+                                      </Tooltip>
+                                      <Tooltip title={`UTC: ${endHour.utc}`} arrow>
+                                        <TableCell>{endHour.display}</TableCell>
+                                      </Tooltip>
+                                      <TableCell>{item.minLv}</TableCell>
+                                      <TableCell>{item.maxLv}</TableCell>
+                                      <TableCell>{item.bitFlagDayOfWeek}</TableCell>
+                                      <TableCell>
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                          {item.worldBuffId && item.worldBuffId.length > 0 ? (
+                                            item.worldBuffId.map((buffId, index) => {
+                                              const buffName = item.worldBuffNames?.[index] || buffId;
+                                              return (
+                                                <Chip
+                                                  key={buffId}
+                                                  label={`${buffId}: ${buffName}`}
+                                                  size="small"
+                                                  variant="outlined"
+                                                />
+                                              );
+                                            })
+                                          ) : (
+                                            '-'
+                                          )}
+                                        </Box>
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                })}
                               </TableBody>
                             </Table>
                           </TableContainer>
@@ -1627,10 +1707,10 @@ const PlanningDataPage: React.FC = () => {
                             /* Table view - paginated */
                             <>
                               <TableContainer component={Paper} variant="outlined">
-                                <Table size="small">
+                                <Table size="small" sx={{ tableLayout: 'auto' }}>
                                   <TableHead>
                                     <TableRow>
-                                      <TableCell width="150px">ID</TableCell>
+                                      <TableCell>ID</TableCell>
                                       <TableCell>Name</TableCell>
                                       <TableCell>PageGroup</TableCell>
                                       <TableCell>Type</TableCell>
@@ -1808,32 +1888,83 @@ const PlanningDataPage: React.FC = () => {
                             /* Table view - paginated */
                             <>
                               <TableContainer component={Paper} variant="outlined">
-                                <Table size="small">
+                                <Table size="small" sx={{ tableLayout: 'auto' }}>
                                   <TableHead>
                                     <TableRow>
-                                      <TableCell width="100px">ID</TableCell>
+                                      <TableCell>ID</TableCell>
                                       <TableCell>Name</TableCell>
-                                      <TableCell width="120px">Start Date</TableCell>
-                                      <TableCell width="120px">End Date</TableCell>
-                                      <TableCell width="100px">Local Bitflag</TableCell>
-                                      <TableCell width="120px">Login BGM Tag</TableCell>
-                                      <TableCell width="80px">Is Quest</TableCell>
+                                      <TableCell>Start Date</TableCell>
+                                      <TableCell>End Date</TableCell>
+                                      <TableCell>Period</TableCell>
+                                      <TableCell>Local Bitflag</TableCell>
+                                      <TableCell>Is Quest</TableCell>
                                     </TableRow>
                                   </TableHead>
                                   <TableBody>
-                                    {liveEventData.items.slice(liveEventPage * liveEventRowsPerPage, (liveEventPage + 1) * liveEventRowsPerPage).map((item: any) => (
-                                      <TableRow key={item.id} hover>
-                                        <TableCell>
-                                          <Chip label={item.id} size="small" variant="outlined" />
-                                        </TableCell>
-                                        <TableCell>{item.name ?? item.loginBgmTag ?? item.id}</TableCell>
-                                        <TableCell>{item.startDate || '-'}</TableCell>
-                                        <TableCell>{item.endDate || '-'}</TableCell>
-                                        <TableCell>{item.localBitflag || '-'}</TableCell>
-                                        <TableCell>{item.loginBgmTag || '-'}</TableCell>
-                                        <TableCell>{item.isQuest ? 'Yes' : 'No'}</TableCell>
-                                      </TableRow>
-                                    ))}
+                                    {liveEventData.items.slice(liveEventPage * liveEventRowsPerPage, (liveEventPage + 1) * liveEventRowsPerPage).map((item: any) => {
+                                      // Format date - returns { display, utc }
+                                      const formatDate = (isoString: string | null) => {
+                                        if (!isoString) return { display: '-', utc: '' };
+                                        try {
+                                          // Convert to ISO8601 if needed
+                                          const iso = isoString.includes('T') ? isoString : new Date(isoString).toISOString();
+                                          const date = new Date(iso);
+                                          const localFormatted = formatDateTimeDetailed(iso);
+                                          // Remove milliseconds from UTC time (.000Z -> Z)
+                                          const utcDate = date.toISOString().replace(/\.\d{3}Z$/, 'Z');
+                                          return { display: localFormatted, utc: utcDate };
+                                        } catch {
+                                          return { display: '-', utc: '' };
+                                        }
+                                      };
+
+                                      // Calculate period in days
+                                      const calculatePeriod = (startDate: string | null, endDate: string | null) => {
+                                        if (!startDate || !endDate) return '-';
+                                        try {
+                                          const startISO = startDate.includes('T') ? startDate : new Date(startDate).toISOString();
+                                          const endISO = endDate.includes('T') ? endDate : new Date(endDate).toISOString();
+                                          const start = new Date(startISO);
+                                          const end = new Date(endISO);
+                                          const diffTime = Math.abs(end.getTime() - start.getTime());
+                                          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                          return `${diffDays} days`;
+                                        } catch {
+                                          return '-';
+                                        }
+                                      };
+
+                                      const startDate = formatDate(item.startDate);
+                                      const endDate = formatDate(item.endDate);
+
+                                      return (
+                                        <TableRow key={item.id} hover>
+                                          <TableCell>
+                                            <Chip label={item.id} size="small" variant="outlined" />
+                                          </TableCell>
+                                          <TableCell>{item.name ?? item.id}</TableCell>
+                                          <Tooltip title={`UTC: ${startDate.utc}`} arrow>
+                                            <TableCell
+                                              onClick={(e) => handleCellClick(e, startDate.display)}
+                                              sx={{ cursor: 'pointer' }}
+                                            >
+                                              {startDate.display}
+                                            </TableCell>
+                                          </Tooltip>
+                                          <Tooltip title={`UTC: ${endDate.utc}`} arrow>
+                                            <TableCell
+                                              onClick={(e) => handleCellClick(e, endDate.display)}
+                                              sx={{ cursor: 'pointer' }}
+                                            >
+                                              {endDate.display}
+                                            </TableCell>
+                                          </Tooltip>
+                                          <TableCell>{calculatePeriod(item.startDate, item.endDate)}</TableCell>
+                                          <TableCell>{item.localBitflag || '-'}</TableCell>
+                                          <TableCell>{item.isQuest ? 'Yes' : 'No'}</TableCell>
+                                        </TableRow>
+                                      );
+                                    })}
                                   </TableBody>
                                 </Table>
                               </TableContainer>
@@ -1965,7 +2096,8 @@ const PlanningDataPage: React.FC = () => {
                               overflow: 'hidden',
                             }}>
                               {mateRecruitingGroupData.items.map((item: any) => {
-                                const label = `${item.id}: ${item.name ?? (item.mateId ?? '')}`;
+                                const itemName = getLocalizedField(item, 'name');
+                                const label = `${item.id}: ${itemName ?? (item.mateId ?? '')}`;
                                 const tooltipTitle = item.mateExists === false
                                   ? `⚠️ 오류: 항해사가 MateTemplate에 존재하지 않습니다.\n${label}`
                                   : label;
@@ -1998,50 +2130,80 @@ const PlanningDataPage: React.FC = () => {
                             /* Table view - paginated */
                             <>
                               <TableContainer component={Paper} variant="outlined">
-                                <Table size="small">
+                                <Table size="small" sx={{ tableLayout: 'auto' }}>
                                   <TableHead>
                                     <TableRow>
-                                      <TableCell width="100px">ID</TableCell>
+                                      <TableCell>ID</TableCell>
                                       <TableCell>Name</TableCell>
-                                      <TableCell width="200px">Mate</TableCell>
-                                      <TableCell width="100px">Group</TableCell>
+                                      <TableCell>Mate</TableCell>
+                                      <TableCell>Group</TableCell>
                                       <TableCell>Towns</TableCell>
                                     </TableRow>
                                   </TableHead>
                                   <TableBody>
-                                    {mateRecruitingGroupData.items.slice(mateRecruitingGroupPage * mateRecruitingGroupRowsPerPage, (mateRecruitingGroupPage + 1) * mateRecruitingGroupRowsPerPage).map((item: any) => (
-                                      <TableRow
-                                        key={item.id}
-                                        hover
-                                        sx={{
-                                          bgcolor: item.mateExists === false ? 'rgba(255, 205, 210, 0.3)' : 'inherit',
-                                          '&:hover': {
-                                            bgcolor: item.mateExists === false ? 'rgba(255, 205, 210, 0.5)' : 'action.hover',
-                                          }
-                                        }}
-                                      >
-                                        <TableCell>
-                                          <Chip label={item.id} size="small" variant="outlined" />
-                                        </TableCell>
-                                        <TableCell>
-                                          <Tooltip title={item.mateExists === false ? '⚠️ 항해사가 MateTemplate에 존재하지 않습니다' : ''} arrow>
-                                            <span>{item.name ?? item.mateId}</span>
-                                          </Tooltip>
-                                        </TableCell>
-                                        <TableCell>
-                                          <Tooltip title={item.mateExists === false ? '⚠️ 항해사가 MateTemplate에 존재하지 않습니다' : ''} arrow>
-                                            <Chip
-                                              label={`${item.mateId}: ${item.mateName ?? item.mateId}`}
-                                              size="small"
-                                              variant="outlined"
-                                              sx={{ maxWidth: '100%' }}
-                                            />
-                                          </Tooltip>
-                                        </TableCell>
-                                        <TableCell>{item.group}</TableCell>
-                                        <TableCell>{item.townNames || '-'}</TableCell>
-                                      </TableRow>
-                                    ))}
+                                    {mateRecruitingGroupData.items.slice(mateRecruitingGroupPage * mateRecruitingGroupRowsPerPage, (mateRecruitingGroupPage + 1) * mateRecruitingGroupRowsPerPage).map((item: any) => {
+                                      const itemName = getLocalizedField(item, 'name');
+                                      const mateName = getLocalizedField(item, 'mateName');
+
+                                      return (
+                                        <TableRow
+                                          key={item.id}
+                                          hover
+                                          sx={{
+                                            bgcolor: item.mateExists === false ? 'rgba(255, 205, 210, 0.3)' : 'inherit',
+                                            '&:hover': {
+                                              bgcolor: item.mateExists === false ? 'rgba(255, 205, 210, 0.5)' : 'action.hover',
+                                            }
+                                          }}
+                                        >
+                                          <TableCell>
+                                            <Chip label={item.id} size="small" variant="outlined" />
+                                          </TableCell>
+                                          <TableCell>
+                                            <Tooltip title={item.mateExists === false ? '⚠️ 항해사가 MateTemplate에 존재하지 않습니다' : ''} arrow>
+                                              <span>{itemName ?? item.mateId}</span>
+                                            </Tooltip>
+                                          </TableCell>
+                                          <TableCell>
+                                            <Tooltip title={item.mateExists === false ? '⚠️ 항해사가 MateTemplate에 존재하지 않습니다' : ''} arrow>
+                                              <Chip
+                                                label={`${item.mateId}: ${mateName ?? item.mateId}`}
+                                                size="small"
+                                                variant="outlined"
+                                                sx={{ maxWidth: '100%' }}
+                                              />
+                                            </Tooltip>
+                                          </TableCell>
+                                          <TableCell>{item.group}</TableCell>
+                                          <TableCell>
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                              {item.towns && item.towns.length > 0 ? (
+                                                item.towns.map((town: any) => {
+                                                  // Get localized town name
+                                                  let townName = town.nameKr;
+                                                  if (i18n.language === 'zh' && town.nameCn) {
+                                                    townName = town.nameCn;
+                                                  } else if (i18n.language === 'en' && town.nameEn) {
+                                                    townName = town.nameEn;
+                                                  }
+
+                                                  return (
+                                                    <Chip
+                                                      key={town.id}
+                                                      label={`${town.id}: ${townName}`}
+                                                      size="small"
+                                                      variant="outlined"
+                                                    />
+                                                  );
+                                                })
+                                              ) : (
+                                                '-'
+                                              )}
+                                            </Box>
+                                          </TableCell>
+                                        </TableRow>
+                                      );
+                                    })}
                                   </TableBody>
                                 </Table>
                               </TableContainer>
@@ -2173,9 +2335,9 @@ const PlanningDataPage: React.FC = () => {
                               overflow: 'hidden',
                             }}>
                               {oceanNpcAreaSpawnerData.items.map((item: any) => {
-                                // Build name from localized parts
-                                const npcName = item.npcName ?? item.oceanNpcId;
-                                const label = `${item.id}: ${npcName}`;
+                                // Use localized name
+                                const itemName = getLocalizedField(item, 'name');
+                                const label = itemName ?? `${item.id}: ${item.oceanNpcId}`;
                                 const tooltipTitle = item.npcExists === false
                                   ? `${t('planningData.error.npcNotFound')}\n${label}`
                                   : label;
@@ -2208,20 +2370,21 @@ const PlanningDataPage: React.FC = () => {
                             /* Table view - paginated */
                             <>
                               <TableContainer component={Paper} variant="outlined">
-                                <Table size="small">
+                                <Table size="small" sx={{ tableLayout: 'auto' }}>
                                   <TableHead>
                                     <TableRow>
-                                      <TableCell width="100px">ID</TableCell>
-                                      <TableCell width="250px">Name</TableCell>
-                                      <TableCell width="200px">NPC</TableCell>
-                                      <TableCell width="100px">Radius Type</TableCell>
-                                      <TableCell width="100px">Radius</TableCell>
-                                      <TableCell width="100px">Latitude</TableCell>
-                                      <TableCell width="100px">Longitude</TableCell>
-                                      <TableCell width="100px">Regen Time</TableCell>
-                                      <TableCell width="120px">Start Date</TableCell>
-                                      <TableCell width="120px">End Date</TableCell>
-                                      <TableCell>Spawn Hours</TableCell>
+                                      <TableCell>ID</TableCell>
+                                      <TableCell>Name</TableCell>
+                                      <TableCell>NPC</TableCell>
+                                      <TableCell>Radius Type</TableCell>
+                                      <TableCell>Radius</TableCell>
+                                      <TableCell>Latitude</TableCell>
+                                      <TableCell>Longitude</TableCell>
+                                      <TableCell>Regen Time</TableCell>
+                                      <TableCell>Start Date</TableCell>
+                                      <TableCell>End Date</TableCell>
+                                      <TableCell>Period</TableCell>
+                                      <TableCell>Spawn Hours (UTC)</TableCell>
                                     </TableRow>
                                   </TableHead>
                                   <TableBody>
@@ -2235,14 +2398,70 @@ const PlanningDataPage: React.FC = () => {
                                       };
                                       const radiusTypeName = radiusTypeMap[item.radiusType] || item.radiusType;
 
-                                      // Format spawn hours
-                                      const spawnHours = item.spawnHour && Array.isArray(item.spawnHour) && item.spawnHour.length > 0
-                                        ? item.spawnHour.join(', ')
-                                        : '-';
+                                      // Format date - returns { display, utc }
+                                      const formatDate = (isoString: string | null) => {
+                                        if (!isoString) return { display: '-', utc: '' };
+                                        try {
+                                          // Convert to ISO8601 if needed
+                                          const iso = isoString.includes('T') ? isoString : new Date(isoString).toISOString();
+                                          const date = new Date(iso);
+                                          const localFormatted = formatDateTimeDetailed(iso);
+                                          // Remove milliseconds from UTC time (.000Z -> Z)
+                                          const utcDate = date.toISOString().replace(/\.\d{3}Z$/, 'Z');
+                                          return { display: localFormatted, utc: utcDate };
+                                        } catch {
+                                          return { display: '-', utc: '' };
+                                        }
+                                      };
 
-                                      // Build name from ID and NPC name
-                                      const npcName = item.npcName ?? item.oceanNpcId;
-                                      const itemName = `${item.id}: ${npcName}`;
+                                      // Calculate period in days
+                                      const calculatePeriod = (startDate: string | null, endDate: string | null) => {
+                                        if (!startDate || !endDate) return '-';
+                                        try {
+                                          const startISO = startDate.includes('T') ? startDate : new Date(startDate).toISOString();
+                                          const endISO = endDate.includes('T') ? endDate : new Date(endDate).toISOString();
+                                          const start = new Date(startISO);
+                                          const end = new Date(endISO);
+                                          const diffTime = Math.abs(end.getTime() - start.getTime());
+                                          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                          return `${diffDays} days`;
+                                        } catch {
+                                          return '-';
+                                        }
+                                      };
+
+                                      // Format spawn hours - returns { display, utc }
+                                      const formatSpawnHours = (hours: number[] | null) => {
+                                        if (!hours || !Array.isArray(hours) || hours.length === 0) return { display: '-', utc: '' };
+
+                                        const formatted = hours.map(utcHour => {
+                                          // Create a date with the UTC hour
+                                          const utcDate = new Date();
+                                          utcDate.setUTCHours(utcHour, 0, 0, 0);
+
+                                          // Format in user's timezone
+                                          const localFormatted = formatDateTimeDetailed(utcDate.toISOString());
+                                          const localTime = localFormatted.split(' ')[1] || '00:00:00';
+                                          const localHourMin = localTime.substring(0, 5); // HH:mm
+
+                                          // Format UTC time
+                                          const utcFormatted = `${utcHour.toString().padStart(2, '0')}:00`;
+
+                                          return { local: localHourMin, utc: utcFormatted };
+                                        });
+
+                                        const displayText = formatted.map(h => h.local).join(', ');
+                                        const utcText = formatted.map(h => h.utc).join(', ');
+                                        return { display: displayText, utc: utcText };
+                                      };
+
+                                      // Use localized fields
+                                      const itemName = getLocalizedField(item, 'name');
+                                      const npcName = getLocalizedField(item, 'npcName');
+
+                                      const startDate = formatDate(item.startDate);
+                                      const endDate = formatDate(item.endDate);
+                                      const spawnHours = formatSpawnHours(item.spawnHours);
 
                                       return (
                                         <TableRow
@@ -2260,13 +2479,13 @@ const PlanningDataPage: React.FC = () => {
                                           </TableCell>
                                           <TableCell>
                                             <Tooltip title={item.npcExists === false ? t('planningData.error.npcNotFound') : ''} arrow>
-                                              <span>{itemName}</span>
+                                              <span>{itemName ?? `${item.id}: ${item.oceanNpcId}`}</span>
                                             </Tooltip>
                                           </TableCell>
                                           <TableCell>
                                             <Tooltip title={item.npcExists === false ? t('planningData.error.npcNotFound') : ''} arrow>
                                               <Chip
-                                                label={`${item.oceanNpcId}: ${item.npcName ?? item.oceanNpcId}`}
+                                                label={`${item.oceanNpcId}: ${npcName ?? item.oceanNpcId}`}
                                                 size="small"
                                                 variant="outlined"
                                                 sx={{ maxWidth: '100%' }}
@@ -2278,9 +2497,26 @@ const PlanningDataPage: React.FC = () => {
                                           <TableCell>{item.latitude?.toFixed(2) ?? '-'}</TableCell>
                                           <TableCell>{item.longitude?.toFixed(2) ?? '-'}</TableCell>
                                           <TableCell>{item.regenTime ? `${item.regenTime}s` : '-'}</TableCell>
-                                          <TableCell>{item.startDate ?? '-'}</TableCell>
-                                          <TableCell>{item.endDate ?? '-'}</TableCell>
-                                          <TableCell>{spawnHours}</TableCell>
+                                          <Tooltip title={`UTC: ${startDate.utc}`} arrow>
+                                            <TableCell
+                                              onClick={(e) => handleCellClick(e, startDate.display)}
+                                              sx={{ cursor: 'pointer' }}
+                                            >
+                                              {startDate.display}
+                                            </TableCell>
+                                          </Tooltip>
+                                          <Tooltip title={`UTC: ${endDate.utc}`} arrow>
+                                            <TableCell
+                                              onClick={(e) => handleCellClick(e, endDate.display)}
+                                              sx={{ cursor: 'pointer' }}
+                                            >
+                                              {endDate.display}
+                                            </TableCell>
+                                          </Tooltip>
+                                          <TableCell>{calculatePeriod(item.startDate, item.endDate)}</TableCell>
+                                          <Tooltip title={`UTC: ${spawnHours.utc}`} arrow>
+                                            <TableCell>{spawnHours.display}</TableCell>
+                                          </Tooltip>
                                         </TableRow>
                                       );
                                     })}

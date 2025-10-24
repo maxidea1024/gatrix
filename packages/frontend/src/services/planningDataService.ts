@@ -64,12 +64,12 @@ export interface PlanningDataStats {
 
 export interface HotTimeBuffItem {
   id: number;
-  icon: string;
-  startDate: string;
-  endDate: string;
+  name?: string; // Display name based on world buffs
+  startDate: string; // ISO8601 format (UTC)
+  endDate: string; // ISO8601 format (UTC)
   localBitflag: number;
-  startHour: number;
-  endHour: number;
+  startHour: number; // UTC hour (0-23)
+  endHour: number; // UTC hour (0-23)
   minLv: number;
   maxLv: number;
   bitFlagDayOfWeek: number;

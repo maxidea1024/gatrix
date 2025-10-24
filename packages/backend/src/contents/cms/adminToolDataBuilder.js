@@ -643,6 +643,20 @@ function removeCommentFromName(name) {
   return name;
 }
 
+/**
+ * Remove game client tags from text
+ * Tags like [[D]], [[B]], [[R]], [[CR]], [[/]], etc.
+ * @param {string} text - Text with game tags
+ * @returns {string} - Text without game tags
+ */
+function removeGameTags(text) {
+  if (!text || typeof text !== 'string') {
+    return text;
+  }
+  // Remove all [[...]] tags
+  return text.replace(/\[\[.*?\]\]/g, '').trim();
+}
+
 // ============================================================================
 // Builder Functions
 // ============================================================================
@@ -1069,6 +1083,9 @@ function generateUIListData(cmsDir, loctab = {}) {
         nameKr = nameKr.substring(0, atIndex).trim();
       }
 
+      // Add (퀘스트) suffix to distinguish quest items
+      nameKr = `${nameKr} (퀘스트)`;
+
       uiListData.questItems.push({
         id: item.id,
         name: nameKr,
@@ -1420,8 +1437,19 @@ function generateUIListData(cmsDir, loctab = {}) {
   const eventTaskTable = loadTable('EventTask');
   const achievementTermsTable = loadTable('AchievementTerms');
   const contentsTermsTable = loadTable('ContentsTerms');
+  const eventMissionExpTable = loadTable('EventMissionExp');
 
   if (eventMissionTable && eventMissionTable.EventMission) {
+    // Pre-load commonly used tables for EventMission formatting
+    const preloadedTables = {};
+    const tablesToPreload = ['Ship', 'Item', 'Discovery', 'Nation', 'Town', 'Village', 'Region', 'Job', 'TradeGoods', 'BattleSkill', 'WorldSkill', 'Mate', 'Character', 'Quest', 'QuestNode', 'Point'];
+    for (const tableName of tablesToPreload) {
+      const table = loadTable(tableName);
+      if (table && table[tableName]) {
+        preloadedTables[tableName] = table[tableName];
+      }
+    }
+
     for (const [key, mission] of Object.entries(eventMissionTable.EventMission)) {
       if (!mission || !mission.id || key.startsWith(':')) {
         continue;
@@ -1431,22 +1459,94 @@ function generateUIListData(cmsDir, loctab = {}) {
       let hasError = false;
       let errorMessage = null;
 
+      // Type 2: BASE_REWARD - 기본 보상 (레벨 달성)
+      if (mission.type === 2) {
+        const level = mission.val || 0;
+        const expInfo = eventMissionExpTable && eventMissionExpTable.EventMissionExp
+          ? eventMissionExpTable.EventMissionExp[level]
+          : null;
+        if (expInfo) {
+          nameKr = `레벨 ${level} 기본 보상 (누적 경험치: ${expInfo.accumulateExp})`;
+        } else {
+          nameKr = `레벨 ${level} 기본 보상`;
+        }
+      }
+      // Type 3: ADDITIONAL_REWARD - 추가 보상 (프리미엄 패스)
+      else if (mission.type === 3) {
+        const level = mission.val || 0;
+        const expInfo = eventMissionExpTable && eventMissionExpTable.EventMissionExp
+          ? eventMissionExpTable.EventMissionExp[level]
+          : null;
+        if (expInfo) {
+          nameKr = `레벨 ${level} 추가 보상 (누적 경험치: ${expInfo.accumulateExp})`;
+        } else {
+          nameKr = `레벨 ${level} 추가 보상`;
+        }
+      }
+      // Type 1 missions require eventTaskId
+      else if (mission.type === 1 && !mission.eventTaskId) {
+        hasError = true;
+        errorMessage = `MISSING eventTaskId for type 1 mission`;
+        nameKr = `EventMission ${mission.id}`;
+      }
       // Get description from EventTask if available
-      if (mission.eventTaskId && eventTaskTable && eventTaskTable.EventTask) {
+      else if (mission.eventTaskId && eventTaskTable && eventTaskTable.EventTask) {
         const eventTask = eventTaskTable.EventTask[mission.eventTaskId];
-        if (eventTask) {
+        if (!eventTask) {
+          hasError = true;
+          errorMessage = `MISSING TASK ${mission.eventTaskId}`;
+          nameKr = `EventMission ${mission.id}`;
+        } else {
           if (eventTask.overrideDesc) {
             // Use overrideDesc from EventTask
             nameKr = eventTask.overrideDesc;
 
             // Replace placeholders if descFormat exists
             if (eventTask.descFormat && Array.isArray(eventTask.descFormat)) {
-              const formattedTexts = eventTask.descFormat.map((fmt) => {
+              const formattedTexts = eventTask.descFormat.map((fmt, index) => {
                 // Type 1 = COUNT, use eventTaskCount
                 if (fmt.Type === 1) {
                   return eventTask.eventTaskCount ? eventTask.eventTaskCount.toString() : '0';
                 }
-                // Type 2 = CMS_NAME, Type 3 = ENUM_NAME - not implemented for EventTask
+
+                // Type 2 = CMS_NAME, get name from CMS table
+                if (fmt.Type === 2 && fmt.TypeName) {
+                  const tableName = fmt.TypeName;
+                  const targetId = eventTask.descFormatType && eventTask.descFormatType[index]
+                    ? eventTask.descFormatType[index].target
+                    : null;
+
+                  if (targetId && preloadedTables[tableName] && preloadedTables[tableName][targetId]) {
+                    const targetItem = preloadedTables[tableName][targetId];
+                    return removeCommentFromName(targetItem.name || targetItem.Name || `${tableName} ${targetId}`);
+                  }
+                  return `[${tableName} ${targetId || 'Unknown'}]`;
+                }
+
+                // Type 3 = ENUM_NAME - get enum value from eventTaskTargets
+                if (fmt.Type === 3 && fmt.TypeName) {
+                  const enumValue = eventTask.eventTaskTargets && eventTask.eventTaskTargets[index]
+                    ? eventTask.eventTaskTargets[index]
+                    : null;
+
+                  // Handle JOB_TYPE enum
+                  if (fmt.TypeName === 'JOB_TYPE' && enumValue !== null && preloadedTables['Job']) {
+                    // Find job with matching jobType
+                    const jobWithType = Object.values(preloadedTables['Job']).find(j => j.jobType === enumValue);
+                    if (jobWithType) {
+                      // Return job type name based on jobType value
+                      const jobTypeNames = {
+                        1: '모험',
+                        2: '교역',
+                        3: '전투'
+                      };
+                      return jobTypeNames[enumValue] || `JobType ${enumValue}`;
+                    }
+                  }
+
+                  return `[${fmt.TypeName} ${enumValue || 'Unknown'}]`;
+                }
+
                 return '[Unknown]';
               });
 
@@ -1459,9 +1559,13 @@ function generateUIListData(cmsDir, loctab = {}) {
             if (atIndex !== -1) {
               nameKr = nameKr.substring(0, atIndex).trim();
             }
+
+            // Remove game client tags like [[D]], [[CR]], [[/]], etc.
+            nameKr = removeGameTags(nameKr);
           } else if (eventTask.eventTaskTermsId) {
             // No overrideDesc - try to get description from AchievementTerms or ContentsTerms
             let termsDesc = null;
+            let termsDescFormat = null;
 
             // Check AchievementTerms first (87000000-87999999)
             if (eventTask.eventTaskTermsId >= 87000000 && eventTask.eventTaskTermsId <= 87999999) {
@@ -1469,6 +1573,7 @@ function generateUIListData(cmsDir, loctab = {}) {
                 const achievementTerm = achievementTermsTable.AchievementTerms[eventTask.eventTaskTermsId];
                 if (achievementTerm && achievementTerm.desc) {
                   termsDesc = achievementTerm.desc;
+                  termsDescFormat = achievementTerm.descFormat;
                 }
               }
             }
@@ -1478,6 +1583,7 @@ function generateUIListData(cmsDir, loctab = {}) {
                 const contentsTerm = contentsTermsTable.ContentsTerms[eventTask.eventTaskTermsId];
                 if (contentsTerm && contentsTerm.desc) {
                   termsDesc = contentsTerm.desc;
+                  termsDescFormat = contentsTerm.descFormat;
                 }
               }
             }
@@ -1485,14 +1591,52 @@ function generateUIListData(cmsDir, loctab = {}) {
             if (termsDesc) {
               nameKr = termsDesc;
 
-              // Replace placeholders if descFormat exists
-              if (eventTask.descFormat && Array.isArray(eventTask.descFormat)) {
-                const formattedTexts = eventTask.descFormat.map((fmt) => {
+              // Replace placeholders if descFormat exists (from AchievementTerms or ContentsTerms)
+              if (termsDescFormat && Array.isArray(termsDescFormat)) {
+                const formattedTexts = termsDescFormat.map((fmt, index) => {
                   // Type 1 = COUNT, use eventTaskCount
                   if (fmt.Type === 1) {
                     return eventTask.eventTaskCount ? eventTask.eventTaskCount.toString() : '0';
                   }
-                  // Type 2 = CMS_NAME, Type 3 = ENUM_NAME - not fully implemented
+
+                  // Type 2 = CMS_NAME, get name from CMS table
+                  if (fmt.Type === 2 && fmt.TypeName) {
+                    const tableName = fmt.TypeName;
+                    const targetId = eventTask.descFormatType && eventTask.descFormatType[index]
+                      ? eventTask.descFormatType[index].target
+                      : null;
+
+                    if (targetId && preloadedTables[tableName] && preloadedTables[tableName][targetId]) {
+                      const targetItem = preloadedTables[tableName][targetId];
+                      return removeCommentFromName(targetItem.name || targetItem.Name || `${tableName} ${targetId}`);
+                    }
+                    return `[${tableName} ${targetId || 'Unknown'}]`;
+                  }
+
+                  // Type 3 = ENUM_NAME - get enum value from eventTaskTargets
+                  if (fmt.Type === 3 && fmt.TypeName) {
+                    const enumValue = eventTask.eventTaskTargets && eventTask.eventTaskTargets[index]
+                      ? eventTask.eventTaskTargets[index]
+                      : null;
+
+                    // Handle JOB_TYPE enum
+                    if (fmt.TypeName === 'JOB_TYPE' && enumValue !== null && preloadedTables['Job']) {
+                      // Find job with matching jobType
+                      const jobWithType = Object.values(preloadedTables['Job']).find(j => j.jobType === enumValue);
+                      if (jobWithType) {
+                        // Return job type name based on jobType value
+                        const jobTypeNames = {
+                          1: '모험',
+                          2: '교역',
+                          3: '전투'
+                        };
+                        return jobTypeNames[enumValue] || `JobType ${enumValue}`;
+                      }
+                    }
+
+                    return `[${fmt.TypeName} ${enumValue || 'Unknown'}]`;
+                  }
+
                   return '[Unknown]';
                 });
 
@@ -1505,17 +1649,21 @@ function generateUIListData(cmsDir, loctab = {}) {
               if (atIndex !== -1) {
                 nameKr = nameKr.substring(0, atIndex).trim();
               }
+
+              // Remove game client tags like [[D]], [[CR]], [[/]], etc.
+              nameKr = removeGameTags(nameKr);
             } else {
               // Fallback: use EventTask ID and type
               nameKr = `EventMission ${mission.id} (Task:${eventTask.id})`;
             }
           }
-        } else if (mission.eventTaskId) {
-          // EventTask ID specified but not found
-          hasError = true;
-          errorMessage = `EventTask ${mission.eventTaskId} not found`;
-          nameKr = `MISSING TASK ${mission.eventTaskId}`;
         }
+      }
+
+      // Check for "Unknown" references in the name (indicates missing data)
+      if (!hasError && nameKr && nameKr.includes('Unknown')) {
+        hasError = true;
+        errorMessage = 'Missing reference data (Unknown found in name)';
       }
 
       uiListData.eventMissions.push({
@@ -1770,7 +1918,7 @@ Examples:
   let loctab = {};
   if (buildLocalization || buildRewards) {
     const loctabSource = path.join(outputDir, 'loctab-source');
-    const loctabOutput = path.join(outputDir, 'loctab');
+    const loctabOutput = path.join(outputDir, 'loctab.json');
 
     loctab = convertLocalizationTable(loctabSource, loctabOutput);
     if (loctab && buildLocalization) {

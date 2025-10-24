@@ -417,21 +417,34 @@ export class PlanningDataService {
       const hotTimeBuffData = parsedData.HotTimeBuff || {};
 
       // Convert to array format for easier processing
-      const items = Object.values(hotTimeBuffData).map((item: any) => ({
-        id: item.id,
-        icon: item.icon,
-        startDate: item.startDate,
-        endDate: item.endDate,
-        localBitflag: item.localBitflag,
-        startHour: item.startHour,
-        endHour: item.endHour,
-        minLv: item.minLv,
-        maxLv: item.maxLv,
-        bitFlagDayOfWeek: item.bitFlagDayOfWeek,
-        worldBuffId: item.worldBuffId || [],
-        // Add world buff names for display
-        worldBuffNames: (item.worldBuffId || []).map((id: number) => worldBuffMap[id] || `Unknown (${id})`),
-      }));
+      const items = Object.values(hotTimeBuffData).map((item: any) => {
+        // Convert UTC dates to ISO8601 format
+        const startDateISO = item.startDate ? new Date(item.startDate).toISOString() : null;
+        const endDateISO = item.endDate ? new Date(item.endDate).toISOString() : null;
+
+        // Get world buff names
+        const worldBuffNames = (item.worldBuffId || []).map((id: number) => worldBuffMap[id] || `Unknown (${id})`);
+
+        // Build name from world buff names
+        const name = worldBuffNames.length > 0 ? worldBuffNames.join(', ') : `HotTimeBuff ${item.id}`;
+
+        return {
+          id: item.id,
+          name, // Display name based on world buffs
+          // icon field removed - not needed
+          startDate: startDateISO,
+          endDate: endDateISO,
+          localBitflag: item.localBitflag,
+          startHour: item.startHour, // UTC hour (0-23)
+          endHour: item.endHour, // UTC hour (0-23)
+          minLv: item.minLv,
+          maxLv: item.maxLv,
+          bitFlagDayOfWeek: item.bitFlagDayOfWeek,
+          worldBuffId: item.worldBuffId || [],
+          // Add world buff names for display
+          worldBuffNames,
+        };
+      });
 
       // Save to lookup file
       const lookupData = {
@@ -567,10 +580,22 @@ export class PlanningDataService {
       const liveEventData = parsedData.LiveEvent || {};
 
       // Use name from source data directly (client table data includes name field)
-      const items = Object.values(liveEventData).map((item: any) => ({
-        ...item,
-        name: item.name || `LiveEvent ${item.id}`, // Fallback to ID if name is missing
-      }));
+      // Remove loginBgmTag field - not needed
+      // Convert dates to ISO8601 format
+      const items = Object.values(liveEventData).map((item: any) => {
+        const { loginBgmTag, ...rest } = item;
+
+        // Convert startDate and endDate to ISO8601 format if they exist
+        const startDateISO = item.startDate ? new Date(item.startDate).toISOString() : null;
+        const endDateISO = item.endDate ? new Date(item.endDate).toISOString() : null;
+
+        return {
+          ...rest,
+          name: item.name || `LiveEvent ${item.id}`, // Fallback to ID if name is missing
+          startDate: startDateISO,
+          endDate: endDateISO,
+        };
+      });
 
       const lookupData = { totalCount: items.length, items };
       await fs.writeFile(this.liveEventPath, JSON.stringify(lookupData, null, 2), 'utf-8');
@@ -641,8 +666,8 @@ export class PlanningDataService {
         }
       });
 
-      // Create a map of mateRecruitingGroup to town names (all languages)
-      const groupToTownsMap: Record<number, Array<{ nameKr: string; nameEn: string; nameCn: string }>> = {};
+      // Create a map of mateRecruitingGroup to town info (all languages with IDs)
+      const groupToTownsMap: Record<number, Array<{ id: number; nameKr: string; nameEn: string; nameCn: string }>> = {};
       const towns = parsedTown.Town || {};
       Object.values(towns).forEach((town: any) => {
         if (town.mateRecruitingGroup && town.name) {
@@ -650,6 +675,7 @@ export class PlanningDataService {
             groupToTownsMap[town.mateRecruitingGroup] = [];
           }
           groupToTownsMap[town.mateRecruitingGroup].push({
+            id: town.id,
             nameKr: town.name,
             nameEn: loctab[town.name] || town.name,
             nameCn: loctab[town.name] || town.name,
@@ -667,11 +693,11 @@ export class PlanningDataService {
           nameCn: `MISSING MATE ${item.mateId}`,
         };
 
-        // Get town names for this group (all languages)
-        const townNamesList = groupToTownsMap[item.group] || [];
-        const townNamesKr = townNamesList.map(t => t.nameKr).join(', ');
-        const townNamesEn = townNamesList.map(t => t.nameEn).join(', ');
-        const townNamesCn = townNamesList.map(t => t.nameCn).join(', ');
+        // Get town info for this group (all languages with IDs)
+        const townsList = groupToTownsMap[item.group] || [];
+        const townNamesKr = townsList.map(t => t.nameKr).join(', ');
+        const townNamesEn = townsList.map(t => t.nameEn).join(', ');
+        const townNamesCn = townsList.map(t => t.nameCn).join(', ');
 
         // Build name for each language
         const buildName = (mateName: string, townNames: string) => {
@@ -713,6 +739,7 @@ export class PlanningDataService {
           townNamesKr: townNamesKr,
           townNamesEn: townNamesEn,
           townNamesCn: townNamesCn,
+          towns: townsList, // Array of { id, nameKr, nameEn, nameCn }
           mateExists,
         };
       });
@@ -752,39 +779,70 @@ export class PlanningDataService {
       const cmdDir = path.join(__dirname, '../../cmd');
       const sourceFilePath = path.join(cmdDir, 'OceanNpcAreaSpawner.json');
       const oceanNpcFilePath = path.join(cmdDir, 'OceanNpc.json');
+
       try {
         await fs.access(sourceFilePath);
         await fs.access(oceanNpcFilePath);
       } catch {
         throw new CustomError('OceanNpcAreaSpawner.json or OceanNpc.json not found in cmd directory', 500);
       }
+
       const sourceData = await fs.readFile(sourceFilePath, 'utf-8');
       const oceanNpcData = await fs.readFile(oceanNpcFilePath, 'utf-8');
       const parsedData = JSON.parse(sourceData);
       const parsedOceanNpc = JSON.parse(oceanNpcData);
 
-      // Create a map of oceanNpcId to ocean npc name
-      const oceanNpcNameMap: Record<number, string> = {};
+      // Load localization table
+      const loctabData = await fs.readFile(this.loctabPath, 'utf-8');
+      const loctab = JSON.parse(loctabData);
+
+      // Create a map of oceanNpcId to ocean npc names (all languages)
+      const oceanNpcNameMap: Record<number, { nameKr: string; nameEn: string; nameCn: string }> = {};
       const oceanNpcs = parsedOceanNpc.OceanNpc || {};
       Object.values(oceanNpcs).forEach((npc: any) => {
         if (npc.id && npc.name) {
-          oceanNpcNameMap[npc.id] = npc.name;
+          oceanNpcNameMap[npc.id] = {
+            nameKr: npc.name,
+            nameEn: loctab[npc.name] || npc.name,
+            nameCn: loctab[npc.name] || npc.name,
+          };
         }
       });
 
       const oceanNpcAreaSpawnerData = parsedData.OceanNpcAreaSpawner || {};
       const items = Object.values(oceanNpcAreaSpawnerData).map((item: any) => {
         const npcExists = !!oceanNpcNameMap[item.oceanNpcId];
-        const npcName = oceanNpcNameMap[item.oceanNpcId] || `MISSING NPC ${item.oceanNpcId}`;
+        const npcNames = oceanNpcNameMap[item.oceanNpcId] || {
+          nameKr: `MISSING NPC ${item.oceanNpcId}`,
+          nameEn: `MISSING NPC ${item.oceanNpcId}`,
+          nameCn: `MISSING NPC ${item.oceanNpcId}`,
+        };
 
-        // Store separate fields for localization
-        // Name will be built on frontend with localized parts
+        // Build name for each language: Spawner - {npcName}
+        const nameKr = `Spawner - ${npcNames.nameKr}`;
+        const nameEn = `Spawner - ${npcNames.nameEn}`;
+        const nameCn = `Spawner - ${npcNames.nameCn}`;
+
+        // Convert startDate and endDate to ISO8601 format if they exist
+        const startDateISO = item.startDate ? new Date(item.startDate).toISOString() : null;
+        const endDateISO = item.endDate ? new Date(item.endDate).toISOString() : null;
+
         return {
           ...item,
-          npcName,
+          name: nameKr, // Default to Korean
+          nameKr,
+          nameEn,
+          nameCn,
+          npcName: npcNames.nameKr,
+          npcNameKr: npcNames.nameKr,
+          npcNameEn: npcNames.nameEn,
+          npcNameCn: npcNames.nameCn,
           npcExists,
+          startDate: startDateISO,
+          endDate: endDateISO,
         };
       });
+
       const lookupData = { totalCount: items.length, items };
       await fs.writeFile(this.oceanNpcAreaSpawnerPath, JSON.stringify(lookupData, null, 2), 'utf-8');
       logger.info('OceanNpcAreaSpawner lookup data built successfully', { itemCount: items.length });
