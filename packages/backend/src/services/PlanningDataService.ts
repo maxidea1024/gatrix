@@ -725,6 +725,11 @@ export class PlanningDataService {
           return name;
         };
 
+        // Calculate probability percentage
+        const probability = item.Ratio && item.Ratio < 10000 && !item.isMustAppear
+          ? (item.Ratio / 100).toFixed(0)
+          : null;
+
         return {
           ...item,
           name: buildName(mateNames.nameKr, townNamesKr), // Default to Korean
@@ -740,6 +745,7 @@ export class PlanningDataService {
           townNamesEn: townNamesEn,
           townNamesCn: townNamesCn,
           towns: townsList, // Array of { id, nameKr, nameEn, nameCn }
+          probability, // Probability percentage (e.g., "50" for 50%)
           mateExists,
         };
       });

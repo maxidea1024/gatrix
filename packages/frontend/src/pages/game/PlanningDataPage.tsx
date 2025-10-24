@@ -1420,8 +1420,8 @@ const PlanningDataPage: React.FC = () => {
                                   <TableCell>Start Date</TableCell>
                                   <TableCell>End Date</TableCell>
                                   <TableCell>Period</TableCell>
-                                  <TableCell>Start Hour (UTC)</TableCell>
-                                  <TableCell>End Hour (UTC)</TableCell>
+                                  <TableCell>Start Hour</TableCell>
+                                  <TableCell>End Hour</TableCell>
                                   <TableCell>Min Lv</TableCell>
                                   <TableCell>Max Lv</TableCell>
                                   <TableCell>Day of Week</TableCell>
@@ -2138,6 +2138,7 @@ const PlanningDataPage: React.FC = () => {
                                       <TableCell>Mate</TableCell>
                                       <TableCell>Group</TableCell>
                                       <TableCell>Towns</TableCell>
+                                      <TableCell>Probability</TableCell>
                                     </TableRow>
                                   </TableHead>
                                   <TableBody>
@@ -2200,6 +2201,9 @@ const PlanningDataPage: React.FC = () => {
                                                 '-'
                                               )}
                                             </Box>
+                                          </TableCell>
+                                          <TableCell>
+                                            {item.probability ? `${item.probability}%` : '-'}
                                           </TableCell>
                                         </TableRow>
                                       );
@@ -2384,7 +2388,7 @@ const PlanningDataPage: React.FC = () => {
                                       <TableCell>Start Date</TableCell>
                                       <TableCell>End Date</TableCell>
                                       <TableCell>Period</TableCell>
-                                      <TableCell>Spawn Hours (UTC)</TableCell>
+                                      <TableCell>Spawn Hours</TableCell>
                                     </TableRow>
                                   </TableHead>
                                   <TableBody>
