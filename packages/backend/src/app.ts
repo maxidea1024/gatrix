@@ -64,6 +64,7 @@ app.use(compression({
     const url = req.url || '';
     if (typeof accept === 'string' && accept.includes('text/event-stream')) return false;
     if (url.includes('/api/v1/admin/notifications/sse')) return false;
+    if (url.includes('/api/v1/admin/services/sse')) return false;
     return compression.filter(req, res);
   }
 }) as any);

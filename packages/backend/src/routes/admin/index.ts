@@ -29,12 +29,14 @@ import surveyRoutes from './surveys';
 import serviceNoticeRoutes from './serviceNotices';
 import ingamePopupNoticeRoutes from './ingamePopupNotices';
 import planningDataRoutes from './planningData';
+import serviceDiscoveryRoutes from './serviceDiscovery';
 
 const router = express.Router();
 
-// Mount notification routes first (before authentication middleware)
-// This allows SSE endpoint to use its own authentication
+// Mount routes with SSE endpoints first (before authentication middleware)
+// This allows SSE endpoints to use their own authentication (query parameter tokens)
 router.use('/notifications', notificationRoutes);
+router.use('/services', serviceDiscoveryRoutes);
 
 // Apply authentication middleware to all other admin routes
 router.use(authenticate as any);

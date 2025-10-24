@@ -1926,6 +1926,20 @@
       "title": "Network Settings",
       "subtitle": "Manage network-related URLs and connection settings"
     },
+    "serviceDiscovery": {
+      "title": "Service Discovery",
+      "subtitle": "Manage service discovery backend and settings. Changes require server restart to take effect.",
+      "mode": "Backend Mode",
+      "modeHelp": "Select service discovery backend (Redis or etcd)",
+      "etcdHosts": "etcd Hosts",
+      "etcdHostsHelp": "etcd server addresses (comma-separated, e.g., http://localhost:2379)",
+      "defaultTtl": "Default TTL (seconds)",
+      "defaultTtlHelp": "Default TTL for service instances (10-300 seconds)",
+      "heartbeatInterval": "Heartbeat Interval (seconds)",
+      "heartbeatIntervalHelp": "Heartbeat transmission interval (5-60 seconds)",
+      "saved": "Service discovery settings saved. Please restart the server to apply changes.",
+      "saveFailed": "Failed to save service discovery settings"
+    },
     "kv": {
       "title": "Key-Value Settings",
       "subtitle": "Manage system key-value configuration settings",
@@ -3010,7 +3024,45 @@
   },
   "serverList": {
     "title": "Server List",
-    "subtitle": "View server list and status through server discovery and control servers with commands"
+    "subtitle": "View server list and status through server discovery and control servers with commands",
+    "searchPlaceholder": "Search by ID, type, host, port...",
+    "realTimeConnected": "Real-time Connected",
+    "errorLoading": "Failed to load server list",
+    "noData": "No registered servers",
+    "columnSettings": "Column Settings",
+    "pauseUpdates": "Pause Real-time Updates",
+    "resumeUpdates": "Resume Real-time Updates",
+    "cleanup": "Clean Up Server List",
+    "cleanupConfirmTitle": "Confirm Server List Cleanup",
+    "cleanupConfirmMessage": "Are you sure you want to remove terminated and error servers from the list?",
+    "viewMode": {
+      "list": "List View",
+      "grid": "Grid View",
+      "card": "Card View"
+    },
+    "filters": {
+      "type": "Server Type",
+      "status": "Status"
+    },
+    "status": {
+      "initializing": "Initializing",
+      "ready": "Online",
+      "shuttingDown": "Shutting Down",
+      "error": "Error",
+      "terminated": "Terminated"
+    },
+    "table": {
+      "instanceId": "Instance ID",
+      "type": "Type",
+      "hostname": "Hostname",
+      "externalAddress": "External IP",
+      "internalAddress": "Internal IP",
+      "ports": "Ports",
+      "status": "Status",
+      "instanceStats": "Instance Stats",
+      "meta": "Meta Info",
+      "updatedAt": "Updated At"
+    }
   },
   "REWARD_TYPE_POINT": "Point",
   "REWARD_TYPE_ITEM": "Item",

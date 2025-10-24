@@ -1981,6 +1981,20 @@
       "title": "网络设置",
       "subtitle": "管理网络相关的 URL 和连接设置"
     },
+    "serviceDiscovery": {
+      "title": "服务发现",
+      "subtitle": "管理服务发现后端和设置。更改需要重启服务器才能生效。",
+      "mode": "后端模式",
+      "modeHelp": "选择服务发现后端（Redis 或 etcd）",
+      "etcdHosts": "etcd 主机",
+      "etcdHostsHelp": "etcd 服务器地址（逗号分隔，例如：http://localhost:2379）",
+      "defaultTtl": "默认 TTL（秒）",
+      "defaultTtlHelp": "服务实例的默认 TTL（10-300 秒）",
+      "heartbeatInterval": "心跳间隔（秒）",
+      "heartbeatIntervalHelp": "心跳传输间隔（5-60 秒）",
+      "saved": "服务发现设置已保存。请重启服务器以应用更改。",
+      "saveFailed": "保存服务发现设置失败"
+    },
     "kv": {
       "title": "键值设置",
       "subtitle": "管理系统键值配置设置",
@@ -3054,7 +3068,45 @@
   },
   "serverList": {
     "title": "服务器列表",
-    "subtitle": "通过服务器发现查看服务器列表和状态，并使用命令控制服务器"
+    "subtitle": "通过服务器发现查看服务器列表和状态，并使用命令控制服务器",
+    "searchPlaceholder": "按ID、类型、主机、端口搜索...",
+    "realTimeConnected": "实时连接",
+    "errorLoading": "加载服务器列表失败",
+    "noData": "没有注册的服务器",
+    "columnSettings": "列设置",
+    "pauseUpdates": "暂停实时更新",
+    "resumeUpdates": "恢复实时更新",
+    "cleanup": "清理服务器列表",
+    "cleanupConfirmTitle": "确认清理服务器列表",
+    "cleanupConfirmMessage": "确定要从列表中删除已终止和错误状态的服务器吗？",
+    "viewMode": {
+      "list": "列表视图",
+      "grid": "网格视图",
+      "card": "卡片视图"
+    },
+    "filters": {
+      "type": "服务器类型",
+      "status": "状态"
+    },
+    "status": {
+      "initializing": "初始化中",
+      "ready": "在线",
+      "shuttingDown": "关闭中",
+      "error": "错误",
+      "terminated": "已终止"
+    },
+    "table": {
+      "instanceId": "实例ID",
+      "type": "类型",
+      "hostname": "主机名",
+      "externalAddress": "外部IP",
+      "internalAddress": "内部IP",
+      "ports": "端口",
+      "status": "状态",
+      "instanceStats": "实例统计",
+      "meta": "元信息",
+      "updatedAt": "更新时间"
+    }
   },
   "REWARD_TYPE_POINT": "点数",
   "REWARD_TYPE_ITEM": "道具",

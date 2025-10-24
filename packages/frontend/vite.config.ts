@@ -66,14 +66,14 @@ export default defineConfig({
             proxyReq.setHeader('X-Forwarded-Proto', 'http');
 
             // SSE 요청인 경우 특별 처리
-            if (req.url?.includes('/notifications/sse')) {
+            if (req.url?.includes('/notifications/sse') || req.url?.includes('/services/sse')) {
               proxyReq.setHeader('Cache-Control', 'no-cache');
               proxyReq.setHeader('Connection', 'keep-alive');
             }
           });
           proxy.on('proxyRes', (proxyRes, req, res) => {
             // SSE 응답인 경우 특별 처리
-            if (req.url?.includes('/notifications/sse')) {
+            if (req.url?.includes('/notifications/sse') || req.url?.includes('/services/sse')) {
               proxyRes.headers['cache-control'] = 'no-cache';
               proxyRes.headers['connection'] = 'keep-alive';
               proxyRes.headers['content-type'] = 'text/event-stream';

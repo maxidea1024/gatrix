@@ -73,6 +73,9 @@ services:
       DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE:-ko}
       # Chat Server Integration
       CHAT_SERVER_URL: http://chat-server:3001
+      # Service Discovery
+      SERVICE_DISCOVERY_MODE: ${SERVICE_DISCOVERY_MODE:-redis}
+      ETCD_HOSTS: ${ETCD_HOSTS:-http://etcd:2379}
     ports:
       - "${BACKEND_PORT:-5000}:5000"
     depends_on:
@@ -284,6 +287,37 @@ services:
       interval: 30s
       start_period: 30s
 
+  # etcd for service discovery (optional)
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.12
+    container_name: gatrix-etcd
+    restart: unless-stopped
+    command:
+      - /usr/local/bin/etcd
+      - --name=etcd0
+      - --data-dir=/etcd-data
+      - --listen-client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://etcd:2379
+      - --listen-peer-urls=http://0.0.0.0:2380
+      - --initial-advertise-peer-urls=http://etcd:2380
+      - --initial-cluster=etcd0=http://etcd:2380
+      - --initial-cluster-token=etcd-cluster
+      - --initial-cluster-state=new
+      - --log-level=info
+    ports:
+      - "${ETCD_PORT:-2379}:2379"
+      - "2380:2380"
+    volumes:
+      - etcd_data:/etcd-data
+    networks:
+      - gatrix-network
+    healthcheck:
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
 volumes:
   mysql_data:
     driver: local
@@ -298,6 +332,8 @@ volumes:
   chat_server_uploads:
     driver: local
   chat_server_logs:
+    driver: local
+  etcd_data:
     driver: local
 
 networks:

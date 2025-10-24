@@ -1926,6 +1926,20 @@
       "title": "네트워크 설정",
       "subtitle": "네트워크 관련 URL 및 연결 설정을 관리합니다"
     },
+    "serviceDiscovery": {
+      "title": "서비스 디스커버리",
+      "subtitle": "서비스 디스커버리 백엔드 및 설정을 관리합니다. 변경사항은 서버 재시작 후 적용됩니다.",
+      "mode": "백엔드 모드",
+      "modeHelp": "서비스 디스커버리 백엔드를 선택하세요 (Redis 또는 etcd)",
+      "etcdHosts": "etcd 호스트",
+      "etcdHostsHelp": "etcd 서버 주소 (쉼표로 구분, 예: http://localhost:2379)",
+      "defaultTtl": "기본 TTL (초)",
+      "defaultTtlHelp": "서비스 인스턴스의 기본 TTL (10-300초)",
+      "heartbeatInterval": "하트비트 간격 (초)",
+      "heartbeatIntervalHelp": "하트비트 전송 간격 (5-60초)",
+      "saved": "서비스 디스커버리 설정이 저장되었습니다. 변경사항을 적용하려면 서버를 재시작하세요.",
+      "saveFailed": "서비스 디스커버리 설정 저장에 실패했습니다"
+    },
     "kv": {
       "title": "키-값 설정",
       "subtitle": "시스템 키-값 구성 설정을 관리합니다",
@@ -3010,7 +3024,45 @@
   },
   "serverList": {
     "title": "서버목록",
-    "subtitle": "서버 디스커버리를 통해 서버 목록과 상태를 조회하고 제어합니다"
+    "subtitle": "서버 디스커버리를 통해 서버 목록과 상태를 조회하고 제어합니다",
+    "searchPlaceholder": "ID, 타입, 호스트, 포트로 검색...",
+    "realTimeConnected": "실시간 연결됨",
+    "errorLoading": "서버 목록을 불러오는데 실패했습니다",
+    "noData": "등록된 서버가 없습니다",
+    "columnSettings": "컬럼 설정",
+    "pauseUpdates": "실시간 업데이트 일시 중지",
+    "resumeUpdates": "실시간 업데이트 재개",
+    "cleanup": "서버 목록 정리",
+    "cleanupConfirmTitle": "서버 목록 정리 확인",
+    "cleanupConfirmMessage": "종료됨 및 오류 상태의 서버를 목록에서 제거하시겠습니까?",
+    "viewMode": {
+      "list": "리스트 뷰",
+      "grid": "그리드 뷰",
+      "card": "카드 뷰"
+    },
+    "filters": {
+      "type": "서버 타입",
+      "status": "상태"
+    },
+    "status": {
+      "initializing": "초기화 중",
+      "ready": "온라인",
+      "shuttingDown": "종료 중",
+      "error": "오류",
+      "terminated": "종료됨"
+    },
+    "table": {
+      "instanceId": "인스턴스 ID",
+      "type": "타입",
+      "hostname": "호스트명",
+      "externalAddress": "공인 IP",
+      "internalAddress": "내부 IP",
+      "ports": "포트",
+      "status": "상태",
+      "instanceStats": "인스턴스 통계",
+      "meta": "메타 정보",
+      "updatedAt": "업데이트 시간"
+    }
   },
   "REWARD_TYPE_POINT": "포인트",
   "REWARD_TYPE_ITEM": "아이템",

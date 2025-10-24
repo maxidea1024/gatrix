@@ -22,6 +22,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { varsService } from '@/services/varsService';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthService } from '@/services/auth';
+import { serviceDiscoveryConfigService, ServiceDiscoveryConfig } from '@/services/serviceDiscoveryConfigService';
 import { useSnackbar } from 'notistack';
 import KeyValuePage from './settings/KeyValuePage';
 
@@ -50,7 +51,7 @@ const SettingsPage: React.FC = () => {
   // Tabs - read from URL query parameter
   const tabFromUrl = searchParams.get('tab');
   const initialTab = tabFromUrl ? parseInt(tabFromUrl, 10) : 0;
-  const [tab, setTab] = useState(initialTab >= 0 && initialTab <= 3 ? initialTab : 0);
+  const [tab, setTab] = useState(initialTab >= 0 && initialTab <= 4 ? initialTab : 0);
 
   // Network settings
   const [admindUrl, setAdmindUrl] = useState('');
@@ -58,6 +59,14 @@ const SettingsPage: React.FC = () => {
   // Integration settings
   const [slackWebhookUrl, setSlackWebhookUrl] = useState('');
   const [genericWebhookUrl, setGenericWebhookUrl] = useState('');
+
+  // Service Discovery settings
+  const [sdConfig, setSdConfig] = useState<ServiceDiscoveryConfig>({
+    mode: 'redis',
+    etcdHosts: 'http://localhost:2379',
+    defaultTtl: 30,
+    heartbeatInterval: 15,
+  });
 
   useEffect(() => {
     const now = new Date();
@@ -88,6 +97,20 @@ const SettingsPage: React.FC = () => {
     })();
   }, []);
 
+  // Load service discovery config
+  useEffect(() => {
+    if (user?.role === 'admin') {
+      (async () => {
+        try {
+          const config = await serviceDiscoveryConfigService.getConfig();
+          setSdConfig(config);
+        } catch (e) {
+          console.error('Failed to load service discovery config:', e);
+        }
+      })();
+    }
+  }, [user]);
+
   // Auto-save on change
   useEffect(() => { setStoredTimezone(timezone); }, [timezone]);
   useEffect(() => { setStoredDateTimeFormat(dtFormat); }, [dtFormat]);
@@ -115,6 +138,16 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  // Save service discovery config
+  const handleSaveServiceDiscoveryConfig = async () => {
+    try {
+      await serviceDiscoveryConfigService.updateConfig(sdConfig);
+      enqueueSnackbar(t('settings.serviceDiscovery.saved'), { variant: 'success' });
+    } catch (error: any) {
+      enqueueSnackbar(error.message || t('settings.serviceDiscovery.saveFailed'), { variant: 'error' });
+    }
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ mb: 4 }}>
@@ -139,6 +172,7 @@ const SettingsPage: React.FC = () => {
             <Tab label={t('settings.general.title')} />
             <Tab label={t('settings.network.title')} />
             <Tab label={t('settings.integrations.title')} />
+            {user?.role === 'admin' && <Tab label={t('settings.serviceDiscovery.title')} />}
             <Tab label={t('settings.kv.title')} />
           </Tabs>
 
@@ -270,7 +304,61 @@ const SettingsPage: React.FC = () => {
             </>
           )}
 
-          {tab === 3 && (
+          {user?.role === 'admin' && tab === 3 && (
+            <>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {t('settings.serviceDiscovery.subtitle')}
+              </Typography>
+              <Stack spacing={2} sx={{ maxWidth: 640 }}>
+                <TextField
+                  select
+                  label={t('settings.serviceDiscovery.mode')}
+                  value={sdConfig.mode}
+                  onChange={(e) => setSdConfig({ ...sdConfig, mode: e.target.value as 'redis' | 'etcd' })}
+                  helperText={t('settings.serviceDiscovery.modeHelp')}
+                >
+                  <MenuItem value="redis">Redis</MenuItem>
+                  <MenuItem value="etcd">etcd</MenuItem>
+                </TextField>
+
+                <TextField
+                  fullWidth
+                  label={t('settings.serviceDiscovery.etcdHosts')}
+                  placeholder="http://localhost:2379"
+                  value={sdConfig.etcdHosts}
+                  onChange={(e) => setSdConfig({ ...sdConfig, etcdHosts: e.target.value })}
+                  helperText={t('settings.serviceDiscovery.etcdHostsHelp')}
+                  disabled={sdConfig.mode !== 'etcd'}
+                />
+
+                <TextField
+                  type="number"
+                  label={t('settings.serviceDiscovery.defaultTtl')}
+                  value={sdConfig.defaultTtl}
+                  onChange={(e) => setSdConfig({ ...sdConfig, defaultTtl: parseInt(e.target.value, 10) })}
+                  helperText={t('settings.serviceDiscovery.defaultTtlHelp')}
+                  inputProps={{ min: 10, max: 300 }}
+                />
+
+                <TextField
+                  type="number"
+                  label={t('settings.serviceDiscovery.heartbeatInterval')}
+                  value={sdConfig.heartbeatInterval}
+                  onChange={(e) => setSdConfig({ ...sdConfig, heartbeatInterval: parseInt(e.target.value, 10) })}
+                  helperText={t('settings.serviceDiscovery.heartbeatIntervalHelp')}
+                  inputProps={{ min: 5, max: 60 }}
+                />
+
+                <Stack direction="row" spacing={1}>
+                  <Button variant="contained" onClick={handleSaveServiceDiscoveryConfig}>
+                    {t('common.save')}
+                  </Button>
+                </Stack>
+              </Stack>
+            </>
+          )}
+
+          {tab === (user?.role === 'admin' ? 4 : 3) && (
             <KeyValuePage />
           )}
         </CardContent>
