@@ -511,22 +511,13 @@ const ServerListPage: React.FC = () => {
     );
   };
 
-  // Type chip component with color
+  // Type chip component
   const getTypeChip = (type: string) => {
-    const typeColors: Record<string, 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info'> = {
-      world: 'primary',
-      auth: 'secondary',
-      channel: 'info',
-      chat: 'success',
-      lobby: 'warning',
-      match: 'error',
-    };
-
     return (
       <Chip
         label={type}
         size="small"
-        color={typeColors[type] || 'default'}
+        variant="outlined"
         sx={{ fontWeight: 600 }}
       />
     );
