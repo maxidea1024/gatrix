@@ -223,6 +223,7 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
               getOptionLabel={(option) => `[${option.id}] ${option.name}`}
               loading={loadingItems}
               disabled={disabled || loadingItems}
+              disableClearable
               sx={{ minWidth: 250, flex: '2 1 auto' }}
               filterOptions={(options, state) => {
                 const inputValue = state.inputValue.toLowerCase();

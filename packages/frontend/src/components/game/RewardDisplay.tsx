@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Chip, Typography, Skeleton } from '@mui/material';
+import { Box, Chip, Typography, Skeleton, Tooltip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { ParticipationReward } from '../../services/surveyService';
 import planningDataService, { RewardTypeInfo, RewardItem } from '../../services/planningDataService';
@@ -18,6 +18,7 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }
   const [rewardTypeMap, setRewardTypeMap] = useState<Map<number, RewardTypeInfo>>(new Map());
   const [rewardItemsMap, setRewardItemsMap] = useState<Map<string, RewardItem>>(new Map());
   const [loading, setLoading] = useState(true);
+  const [showAll, setShowAll] = useState(false);
 
   // Load reward types and items
   useEffect(() => {
@@ -116,30 +117,87 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }
     }
   };
 
+  // Get reward tooltip
+  const getRewardTooltip = (reward: ParticipationReward): string => {
+    const rewardType = parseInt(reward.rewardType);
+    const typeInfo = rewardTypeMap.get(rewardType);
+
+    if (!typeInfo) {
+      return `${t('surveys.unknownReward')} (${reward.rewardType})`;
+    }
+
+    // Get localized type name
+    const typeName = t(typeInfo.nameKey);
+
+    // If has table, get item name
+    if (typeInfo.hasTable) {
+      const item = rewardItemsMap.get(`${rewardType}_${reward.itemId}`);
+      if (item) {
+        return `[${typeName}] ${reward.itemId}:${item.name} +${reward.quantity}`;
+      } else {
+        return `[${typeName}] ${reward.itemId}:Unknown +${reward.quantity}`;
+      }
+    } else {
+      // Value-based reward (no item table)
+      return `[${typeName}] +${reward.quantity}`;
+    }
+  };
+
   // Display rewards
-  const displayRewards = rewards.slice(0, maxDisplay);
+  const displayRewards = showAll ? rewards : rewards.slice(0, maxDisplay);
   const hasMore = rewards.length > maxDisplay;
+
+  // Darker orange color (15% darker than #ff9800)
+  const orangeColor = '#d98200';
 
   return (
     <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
       {displayRewards.map((reward, idx) => (
-        <Chip
-          key={idx}
-          label={getRewardLabel(reward)}
-          size="small"
-          variant="outlined"
+        <Tooltip key={idx} title={getRewardTooltip(reward)} arrow>
+          <Chip
+            label={getRewardLabel(reward)}
+            size="small"
+            variant="outlined"
+            sx={{
+              borderColor: orangeColor,
+              color: orangeColor,
+              '&:hover': {
+                backgroundColor: `${orangeColor}14`,
+              }
+            }}
+          />
+        </Tooltip>
+      ))}
+      {hasMore && !showAll && (
+        <Typography
+          variant="caption"
+          color="primary"
           sx={{
-            borderColor: '#ff9800',
-            color: '#ff9800',
+            cursor: 'pointer',
+            textDecoration: 'underline',
             '&:hover': {
-              backgroundColor: 'rgba(255, 152, 0, 0.08)',
+              color: 'primary.dark',
             }
           }}
-        />
-      ))}
-      {hasMore && (
-        <Typography variant="caption" color="text.secondary">
+          onClick={() => setShowAll(true)}
+        >
           +{rewards.length - maxDisplay} {t('surveys.moreRewards')}
+        </Typography>
+      )}
+      {showAll && hasMore && (
+        <Typography
+          variant="caption"
+          color="primary"
+          sx={{
+            cursor: 'pointer',
+            textDecoration: 'underline',
+            '&:hover': {
+              color: 'primary.dark',
+            }
+          }}
+          onClick={() => setShowAll(false)}
+        >
+          {t('surveys.showLess')}
         </Typography>
       )}
     </Box>

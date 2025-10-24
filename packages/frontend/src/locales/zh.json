@@ -2976,7 +2976,11 @@
     "configUpdateFailed": "保存配置失败",
     "noRewards": "无奖励",
     "unknownReward": "未知奖励",
-    "moreRewards": "个更多"
+    "moreRewards": "个更多",
+    "showLess": "收起",
+    "rewardTypeRequired": "请选择第{{index}}个奖励的奖励类型",
+    "rewardItemRequired": "请选择第{{index}}个奖励的物品",
+    "rewardQuantityRequired": "请输入第{{index}}个奖励的数量"
   },
   "hotTimeButtonEvent": {
     "title": "热时按钮活动",

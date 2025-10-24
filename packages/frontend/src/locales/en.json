@@ -2932,7 +2932,11 @@
     "configUpdateFailed": "Failed to save configuration",
     "noRewards": "No rewards",
     "unknownReward": "Unknown reward",
-    "moreRewards": "more"
+    "moreRewards": "more",
+    "showLess": "Show less",
+    "rewardTypeRequired": "Please select reward type for reward #{{index}}",
+    "rewardItemRequired": "Please select item for reward #{{index}}",
+    "rewardQuantityRequired": "Please enter quantity for reward #{{index}}"
   },
   "hotTimeButtonEvent": {
     "title": "Hot Time Button Event",

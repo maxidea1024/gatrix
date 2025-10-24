@@ -2932,7 +2932,11 @@
     "configUpdateFailed": "설정 저장에 실패했습니다",
     "noRewards": "보상 없음",
     "unknownReward": "알 수 없는 보상",
-    "moreRewards": "개 더보기"
+    "moreRewards": "개 더보기",
+    "showLess": "접기",
+    "rewardTypeRequired": "{{index}}번째 보상의 보상 타입을 선택해주세요",
+    "rewardItemRequired": "{{index}}번째 보상의 아이템을 선택해주세요",
+    "rewardQuantityRequired": "{{index}}번째 보상의 수량을 입력해주세요"
   },
   "hotTimeButtonEvent": {
     "title": "핫타임버튼 이벤트",

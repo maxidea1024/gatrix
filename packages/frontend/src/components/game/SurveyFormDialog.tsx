@@ -199,6 +199,24 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       return;
     }
 
+    // Validate participation rewards
+    for (let i = 0; i < participationRewards.length; i++) {
+      const reward = participationRewards[i];
+      if (!reward.rewardType) {
+        enqueueSnackbar(t('surveys.rewardTypeRequired', { index: i + 1 }), { variant: 'error' });
+        return;
+      }
+      // Check if itemId is required (for reward types with table)
+      if (!reward.itemId || reward.itemId === '') {
+        enqueueSnackbar(t('surveys.rewardItemRequired', { index: i + 1 }), { variant: 'error' });
+        return;
+      }
+      if (!reward.quantity || reward.quantity <= 0) {
+        enqueueSnackbar(t('surveys.rewardQuantityRequired', { index: i + 1 }), { variant: 'error' });
+        return;
+      }
+    }
+
     try {
       setSubmitting(true);
       const data = {
