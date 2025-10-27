@@ -193,25 +193,38 @@ const LoginPage: React.FC = () => {
 
   // Initialize form with remembered credentials
   useEffect(() => {
-    const rememberedEmail = AuthService.getRememberedEmail();
-    const isRememberMeEnabled = AuthService.isRememberMeEnabled();
+    // Check if coming from registration page with email
+    const registeredEmail = (location.state as any)?.registeredEmail;
 
-    // 기억된 이메일과 설정이 모두 있을 때만 폼에 설정
-    if (rememberedEmail && isRememberMeEnabled) {
+    if (registeredEmail) {
+      // Use registered email from signup (highest priority)
       reset({
-        email: rememberedEmail,
-        password: '',
-        rememberMe: true,
-      });
-    } else {
-      // 기억된 설정이 없거나 불일치하면 초기화
-      reset({
-        email: '',
+        email: registeredEmail,
         password: '',
         rememberMe: false,
       });
+    } else {
+      // Otherwise, use remembered email if available
+      const rememberedEmail = AuthService.getRememberedEmail();
+      const isRememberMeEnabled = AuthService.isRememberMeEnabled();
+
+      // 기억된 이메일과 설정이 모두 있을 때만 폼에 설정
+      if (rememberedEmail && isRememberMeEnabled) {
+        reset({
+          email: rememberedEmail,
+          password: '',
+          rememberMe: true,
+        });
+      } else {
+        // 기억된 설정이 없거나 불일치하면 초기화
+        reset({
+          email: '',
+          password: '',
+          rememberMe: false,
+        });
+      }
     }
-  }, [reset]);
+  }, [reset, location.state]);
 
   // Re-validate form when language changes
   useEffect(() => {

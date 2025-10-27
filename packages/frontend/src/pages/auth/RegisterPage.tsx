@@ -54,6 +54,7 @@ const RegisterPage: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [registerSuccess, setRegisterSuccess] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState<string>(''); // Store registered email
   const [oauthLoading, setOauthLoading] = useState<string | null>(null); // 'google', 'github', 'qq', etc.
   const [isShaking, setIsShaking] = useState(false);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
@@ -81,8 +82,10 @@ const RegisterPage: React.FC = () => {
       .required(t('auth.passwordRequired')),
     confirmPassword: yup
       .string()
-      .oneOf([yup.ref('password')], t('auth.passwordsNotMatch'))
-      .required(t('auth.confirmPasswordRequired')),
+      .required(t('auth.confirmPasswordRequired'))
+      .test('passwords-match', t('auth.passwordsNotMatch'), function(value) {
+        return this.parent.password === value;
+      }),
   }), [t]);
 
   const resolver = useMemo(() => yupResolver(registerSchema), [registerSchema]);
@@ -236,6 +239,7 @@ const RegisterPage: React.FC = () => {
 
       // 성공 시에만 에러 메시지 지우기
       setRegisterError(null);
+      setRegisteredEmail(data.email); // Save registered email
       setRegisterSuccess(true);
       enqueueSnackbar(t('auth.registerSuccess'), { variant: 'success' });
     } catch (err: any) {
@@ -330,7 +334,7 @@ const RegisterPage: React.FC = () => {
             </Typography>
             <Button
               variant="contained"
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/login', { state: { registeredEmail } })}
               sx={{ mt: 2 }}
             >
               {t('auth.signIn')}
@@ -589,13 +593,21 @@ const RegisterPage: React.FC = () => {
             const hasConfirmPasswordValue = field.value && field.value.length > 0;
             const showMatchIndicator = hasConfirmPasswordValue && watchedPassword;
 
+            // Determine helper text based on validation state
+            let helperText = t('auth.confirmPasswordHelp');
+            if (errors.confirmPassword?.message) {
+              helperText = errors.confirmPassword.message;
+            } else if (isPasswordMatch) {
+              helperText = t('auth.passwordsMatch');
+            }
+
             return (
               <TextField
                 {...field}
                 fullWidth
                 label={`${t('auth.confirmPassword')} *`}
                 type={showConfirmPassword ? 'text' : 'password'}
-                helperText={errors.confirmPassword?.message || t('auth.confirmPasswordHelp')}
+                helperText={helperText}
                 autoComplete="new-password"
                 sx={{
                   mb: 2,

@@ -1301,6 +1301,7 @@
     "emailHelp": "请输入用于登录和通知的有效邮箱地址",
     "passwordHelp": "请输入至少6位字符的安全密码",
     "confirmPasswordHelp": "请重新输入与上面相同的密码",
+    "passwordsMatch": "密码匹配",
     "loginWithGoogle": "使用Google登录",
     "loginWithGitHub": "使用GitHub登录",
     "loginWithQQ": "使用QQ登录",

@@ -1246,6 +1246,7 @@
     "emailHelp": "Enter a valid email address for login and notifications",
     "passwordHelp": "Enter a secure password with at least 6 characters",
     "confirmPasswordHelp": "Re-enter the same password as above",
+    "passwordsMatch": "Passwords match",
     "loginWithGoogle": "Login with Google",
     "loginWithGitHub": "Login with GitHub",
     "loginWithQQ": "Login with QQ",
