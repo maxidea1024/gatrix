@@ -200,9 +200,19 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
           const type = parts[2];
           const id = parts[3];
           
+          // Emit a minimal instance object for delete events to satisfy typing
           callback({
             type: 'delete',
-            instance: { id, type } as ServiceInstance,
+            instance: {
+              instanceId: id,
+              type,
+              hostname: '',
+              externalAddress: '',
+              internalAddress: '',
+              ports: {},
+              status: 'terminated',
+              updatedAt: new Date().toISOString(),
+            } as ServiceInstance,
           });
         } catch (error) {
           logger.error('Failed to parse delete event:', error);

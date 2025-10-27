@@ -170,7 +170,7 @@ const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({
       <ClickAwayListener onClickAway={onClose}>
         <Box sx={{ p: 2, minWidth: 250 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="subtitle2">{t('users.columnSettings')}</Typography>
+            <Typography variant="subtitle2">{t('common.columnSettings')}</Typography>
             <Button size="small" onClick={onReset}>
               {t('common.reset')}
             </Button>

@@ -2093,6 +2093,8 @@
     "serviceNotices": "服务公告",
     "ingamePopupNotices": "游戏内弹窗公告",
     "coupons": "优惠券",
+    "couponSettings": "优惠券定义",
+    "couponUsage": "优惠券使用记录",
     "surveys": "问卷调查",
     "operationEvents": "运营活动管理",
     "hotTimeButtonEvent": "热时按钮活动",
@@ -2881,6 +2883,37 @@
   },
   "coupons": {
     "title": "优惠券",
+    "couponSettings": {
+      "title": "优惠券定义",
+      "subtitle": "定义优惠券设置、目标和限制。",
+      "form": {
+        "nameKey": "名称键",
+        "descriptionKey": "描述键",
+        "code": "代码",
+        "perUserLimit": "每用户限制",
+        "maxTotalUses": "总使用限制",
+        "startsAt": "开始时间",
+        "expiresAt": "结束时间"
+      }
+    },
+    "couponUsage": {
+      "title": "优惠券使用记录",
+      "subtitle": "查看和筛选优惠券兑换记录。",
+      "filters": {
+        "platform": "平台",
+        "gameWorldId": "游戏世界",
+        "from": "起始",
+        "to": "结束"
+      },
+      "columns": {
+        "userId": "用户ID",
+        "userName": "用户名",
+        "sequence": "序号",
+        "usedAt": "使用时间",
+        "gameWorldId": "游戏世界",
+        "platform": "平台"
+      }
+    },
     "subtitle": "创建和管理游戏优惠券"
   },
   "surveys": {

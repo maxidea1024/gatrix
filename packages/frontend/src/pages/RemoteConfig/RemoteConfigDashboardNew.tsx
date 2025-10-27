@@ -759,7 +759,7 @@ const RemoteConfigDashboard: React.FC = () => {
             )}
           </Box>
         </Paper>
-      </Container>
+      </Box>
     </EnvironmentProvider>
   );
 };

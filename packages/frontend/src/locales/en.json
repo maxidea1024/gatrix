@@ -2038,6 +2038,8 @@
     "serviceNotices": "Service Notices",
     "ingamePopupNotices": "In-game Popup Notices",
     "coupons": "Coupons",
+    "couponSettings": "Coupon Settings",
+    "couponUsage": "Coupon Usage",
     "surveys": "Surveys",
     "operationEvents": "Operation Events",
     "hotTimeButtonEvent": "Hot Time Button Event",
@@ -2837,6 +2839,53 @@
   },
   "coupons": {
     "title": "Coupons",
+    "couponSettings": {
+      "title": "Coupon Settings",
+      "subtitle": "Define coupon settings, targeting, and limits.",
+      "createCoupon": "Create Coupon",
+      "editCoupon": "Edit Coupon",
+      "form": {
+        "name": "Name",
+        "description": "Description",
+        "code": "Code",
+        "perUserLimit": "Per User Limit",
+        "maxTotalUses": "Max Total Uses",
+        "startsAt": "Starts At",
+        "expiresAt": "Expires At",
+        "nameHelp": "Enter a descriptive coupon name.",
+        "descriptionHelp": "Provide a brief description for this coupon.",
+        "codeHelp": "Enter a coupon code. (SPECIAL: typically required, NORMAL: optional)",
+        "perUserLimitHelp": "Number of times each user can use this coupon.",
+        "maxTotalUsesHelp": "Total usage limit across all users. Set to unlimited if not restricted.",
+        "unlimited": "Unlimited",
+        "startsAtHelp": "Select when the coupon becomes valid.",
+        "expiresAtHelp": "Select when the coupon expires.",
+        "quantity": "Quantity",
+        "quantityHelp": "Enter the number of coupons to generate.",
+        "applicablePeriod": "Applicable Period",
+        "codeMinError": "Minimum 4 characters.",
+        "quantityMinError": "Must be at least 1.",
+        "maxTotalUsesMinError": "Must be at least 1."
+      }
+    },
+    "couponUsage": {
+      "title": "Coupon Usage Records",
+      "subtitle": "View, filter, and export coupon redemption records.",
+      "filters": {
+        "platform": "Platform",
+        "gameWorldId": "Game World",
+        "from": "From",
+        "to": "To"
+      },
+      "columns": {
+        "userId": "User ID",
+        "userName": "User Name",
+        "sequence": "Sequence",
+        "usedAt": "Used At",
+        "gameWorldId": "Game World",
+        "platform": "Platform"
+      }
+    },
     "subtitle": "Create and manage game coupons"
   },
   "surveys": {

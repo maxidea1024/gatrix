@@ -1,6 +1,7 @@
 import { Queue, Worker, Job, QueueEvents, RepeatableJob } from 'bullmq';
 import logger from '../config/logger';
 import { BullBoardConfig } from '../config/bullboard';
+import { CouponSettingsService } from './CouponSettingsService';
 
 export interface QueueJobData {
   type: string;
@@ -41,6 +42,20 @@ export class QueueService {
       await this.createQueue('audit-log', this.processAuditLogJob.bind(this));
       await this.createQueue('cleanup', this.processCleanupJob.bind(this));
       await this.createQueue('scheduler', this.processSchedulerJob.bind(this));
+
+      // Register repeatable scheduler jobs (idempotent)
+      try {
+        const repeatables = await this.listRepeatable('scheduler');
+        const exists = repeatables.some((r) => r.name === 'coupon:expire');
+        if (!exists) {
+          await this.addJob('scheduler', 'coupon:expire', {}, { repeat: { pattern: '* * * * *' } });
+          logger.info('Registered repeatable job: coupon:expire (every minute)');
+        } else {
+          logger.info('Repeatable job already exists: coupon:expire');
+        }
+      } catch (e) {
+        logger.error('Failed to register repeatable scheduler jobs:', e);
+      }
 
       this.isInitialized = true;
       logger.info('Queue service initialized successfully');
@@ -395,16 +410,24 @@ export class QueueService {
    * Process scheduler job - for now just console.log
    */
   private async processSchedulerJob(job: Job<QueueJobData>): Promise<void> {
-    logger.info('Processing scheduler job (console only):', {
-      jobId: job.id,
-      payload: job.data?.payload,
-      timestamp: new Date().toISOString(),
-    });
+    const jobType = job.name || job.data?.type;
+    logger.info('Processing scheduler job:', { jobId: job.id, jobType });
 
-    logger.info('[SchedulerJob]', {
-      id: job.id,
-      data: job.data,
-    });
+    try {
+      switch (jobType) {
+        case 'coupon:expire': {
+          const affected = await CouponSettingsService.disableExpiredCoupons();
+          logger.info('coupon:expire completed', { jobId: job.id, affected });
+          break;
+        }
+        default: {
+          logger.info('Unhandled scheduler job type, logging only', { jobId: job.id, jobType, payload: job.data?.payload });
+        }
+      }
+    } catch (error) {
+      logger.error('Scheduler job failed', { jobId: job.id, jobType, error });
+      throw error;
+    }
   }
 
   /**

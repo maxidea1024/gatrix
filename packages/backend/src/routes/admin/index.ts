@@ -29,6 +29,7 @@ import surveyRoutes from './surveys';
 import serviceNoticeRoutes from './serviceNotices';
 import ingamePopupNoticeRoutes from './ingamePopupNotices';
 import planningDataRoutes from './planningData';
+import couponSettingsRoutes from './couponSettings';
 import serviceDiscoveryRoutes from './serviceDiscovery';
 
 const router = express.Router();
@@ -69,5 +70,6 @@ router.use('/surveys', surveyRoutes);
 router.use('/service-notices', serviceNoticeRoutes);
 router.use('/ingame-popup-notices', ingamePopupNoticeRoutes);
 router.use('/planning-data', planningDataRoutes);
+router.use('/coupon-settings', couponSettingsRoutes);
 
 export default router;

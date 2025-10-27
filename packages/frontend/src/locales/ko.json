@@ -2038,6 +2038,8 @@
     "serviceNotices": "서비스 공지",
     "ingamePopupNotices": "인게임 팝업 공지",
     "coupons": "쿠폰",
+    "couponSettings": "쿠폰 정의",
+    "couponUsage": "쿠폰 사용 기록",
     "surveys": "설문지",
     "operationEvents": "운영이벤트 관리",
     "hotTimeButtonEvent": "핫타임버튼 이벤트",
@@ -2837,6 +2839,53 @@
   },
   "coupons": {
     "title": "쿠폰",
+    "couponSettings": {
+      "title": "쿠폰 정의",
+      "subtitle": "쿠폰 설정, 대상, 제한을 정의합니다.",
+      "createCoupon": "쿠폰 생성",
+      "editCoupon": "쿠폰 수정",
+      "form": {
+        "name": "이름",
+        "description": "설명",
+        "code": "코드",
+        "perUserLimit": "사용자당 제한",
+        "maxTotalUses": "총 사용 제한",
+        "startsAt": "시작 일시",
+        "expiresAt": "종료 일시",
+        "nameHelp": "쿠폰 이름을 입력합니다.",
+        "descriptionHelp": "쿠폰 설명을 입력합니다.",
+        "codeHelp": "쿠폰 코드를 입력합니다. (SPECIAL 타입: 보통 필수, NORMAL 타입: 선택)",
+        "perUserLimitHelp": "각 사용자가 이 쿠폰을 사용할 수 있는 횟수입니다.",
+        "maxTotalUsesHelp": "전체 사용자 기준 총 사용 횟수 제한입니다. 무제한으로 설정할 수 있습니다.",
+        "unlimited": "무제한",
+        "startsAtHelp": "쿠폰이 유효해지는 시작 일시를 선택합니다.",
+        "expiresAtHelp": "쿠폰이 만료되는 종료 일시를 선택합니다.",
+        "quantity": "발행 수량",
+        "quantityHelp": "생성할 쿠폰의 개수를 입력합니다.",
+        "applicablePeriod": "적용 기간",
+        "codeMinError": "최소 4자 이상이어야 합니다.",
+        "quantityMinError": "최소 1개 이상이어야 합니다.",
+        "maxTotalUsesMinError": "1 이상이어야 합니다."
+      }
+    },
+    "couponUsage": {
+      "title": "쿠폰 사용 기록",
+      "subtitle": "쿠폰 사용 내역을 조회하고 필터링합니다.",
+      "filters": {
+        "platform": "플랫폼",
+        "gameWorldId": "게임 월드",
+        "from": "시작",
+        "to": "종료"
+      },
+      "columns": {
+        "userId": "사용자 ID",
+        "userName": "사용자명",
+        "sequence": "순번",
+        "usedAt": "사용 일시",
+        "gameWorldId": "게임 월드",
+        "platform": "플랫폼"
+      }
+    },
     "subtitle": "게임 쿠폰을 생성하고 관리합니다"
   },
   "surveys": {

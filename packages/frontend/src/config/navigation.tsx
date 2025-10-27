@@ -71,7 +71,10 @@ export const adminMenuItems: MenuItem[] = [
 export const gameMenuItems: MenuItem[] = [
   { text: 'sidebar.serviceNotices', icon: <AnnouncementIcon />, path: '/game/service-notices', adminOnly: true },
   { text: 'sidebar.ingamePopupNotices', icon: <NotificationsIcon />, path: '/game/ingame-popup-notices', adminOnly: true },
-  { text: 'sidebar.coupons', icon: <ConfirmationNumberIcon />, path: '/game/coupons', adminOnly: true },
+  { text: 'sidebar.coupons', icon: <ConfirmationNumberIcon />, adminOnly: true, children: [
+    { text: 'sidebar.couponSettings', icon: <SettingsIcon />, path: '/game/coupon-settings', adminOnly: true },
+    { text: 'sidebar.couponUsage', icon: <HistoryIcon />, path: '/game/coupon-usage', adminOnly: true },
+  ] },
   { text: 'sidebar.surveys', icon: <PollIcon />, path: '/game/surveys', adminOnly: true },
   {
     text: 'sidebar.operationEvents',
