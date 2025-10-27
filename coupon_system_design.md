@@ -18,13 +18,16 @@
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
 | id | CHAR(26) PK | ULID 기반 쿠폰 고유 ID |
-| code | VARCHAR(32) UNIQUE | 쿠폰 코드 (16자리 + 하이픈 포함) |
+| code | VARCHAR(64) UNIQUE | 식별 문자열(SPECIAL: 쿠폰이름, NORMAL: 단일코드 시 사용) |
 | type | ENUM('SPECIAL','NORMAL') | 쿠폰 타입 |
 | nameKey | VARCHAR(128) | 로컬라이징 키(쿠폰명) |
 | descriptionKey | VARCHAR(128) | 로컬라이징 키(설명) |
 | tags | JSON | 태그 리스트(Array<String>) |
 | total | BIGINT | 발행 수량 (NORMAL용) |
 | used | BIGINT | 사용 수량 |
+| maxTotalUses | BIGINT NULL | SPECIAL \uc120
+a
+a
 | perUserLimit | INT | 유저별 최대 사용 횟수 |
 | rewardData | JSON | 보상 정보 |
 | startsAt | DATETIME | 사용 시작 시간 (MySQL 형식) |
@@ -39,6 +42,27 @@
   - 컬럼명은 camelCase 유지. 기존 snake_case는 마이그레이션 시 camelCase로 정리
   - nameKey/descriptionKey는 i18n 키로 저장. 추가 시 로컬라이징 테이블 중복 키 여부 반드시 확인
   - MySQL은 ISO 8601(YYYY-MM-DDTHH:MM:SSZ)을 직접 받지 못하므로 앱에서 DATETIME으로 변환하여 저장
+  - maxTotalUses: SPECIAL 
+
+
+#### couponIssuances (발행 회차)
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | CHAR(26) PK | ULID 기반 발행 회차 ID(issuanceId) |
+| couponId | CHAR(26) | coupons.id 참조(해당 정의의 발행 회차) |
+| roundNo | INT NULL | 해당 쿠폰 내 회차 번호(선택). UNIQUE(couponId, roundNo) 권장 |
+| plannedCount | BIGINT NULL | 계획 발행 수량(코드 생성 예정 수) |
+| issuedCount | BIGINT DEFAULT 0 | 실제 생성/발행된 코드 수 |
+| status | ENUM('PENDING','RUNNING','DONE','FAILED') | 발행/코드생성 진행 상태 |
+| createdAt | DATETIME | 생성일 |
+| updatedAt | DATETIME | 수정일 |
+| UNIQUE | (couponId, roundNo) | 회차 번호 중복 방지(선택) |
+
+- 비고
+  - NORMAL 대량 발급 시 반드시 issuanceId를 생성한 후 couponCodes에 해당 issuanceId로 코드를 귀속합니다.
+  - SPECIAL은 발행 회차 없이 정의만으로 운영합니다(issuanceId 불필요).
+  - 배치/Export Job은 issuanceId를 포함하여 진행 현황을 추적합니다.
+
 
 #### couponTargetWorlds
 | 컬럼 | 타입 | 설명 |
@@ -83,12 +107,13 @@
 |------|------|------|
 | id | CHAR(26) PK | ULID 기반 고유 ID |
 | couponId | CHAR(26) | coupons.id 참조 |
+| issuanceId | CHAR(26) NULL | couponIssuances.id 참조(NORMAL 대량 발급 회차) |
 | code | VARCHAR(32) UNIQUE | 개별 쿠폰 코드(대문자+하이픈 권장) |
 | status | ENUM('ISSUED','USED','REVOKED') | 코드 상태 |
 | issuedBatchJobId | CHAR(26) NULL | couponBatchJobs.id 참조(해당 배치에서 생성된 코드일 경우) |
 | createdAt | DATETIME | 생성일(발급 시점) |
 | usedAt | DATETIME NULL | 사용 시점 |
-| INDEX | (couponId, status) | 상태별 조회 최적화 |
+| INDEX | (couponId, issuanceId, status) | 상태/회차별 조회 최적화 |
 
 - Redeem 시 코드 검색: 우선 couponCodes.code에서 조회하고, 없으면 coupons.code에서 조회(단일 코드형)
 - NORMAL 대량 발급 시 couponCodes에 저장하고, SPECIAL/단일코드형은 coupons.code만 사용 가능
@@ -98,6 +123,7 @@
 |------|------|------|
 | id | CHAR(26) PK | ULID 기반 고유 ID |
 | couponId | CHAR(26) | coupons.id 참조 |
+| issuanceId | CHAR(26) NULL | couponIssuances.id 참조(NORMAL 코드 사용 시 회차 정보; SPECIAL은 NULL) |
 | userId | BIGINT | 유저 ID |
 | userName | VARCHAR(128) | 유저 표시명(로그/조회용) — 저장 시 XSS-safe sanitize 적용 |
 | sequence | INT | 1부터 perUserLimit까지 사용 순서 |
@@ -107,7 +133,7 @@
 | channel | VARCHAR(64) NULL | 사용 시점 채널(선택) |
 | subchannel | VARCHAR(64) NULL | 사용 시점 서브채널(선택) |
 | UNIQUE | (couponId, userId, sequence) | 유저별 중복 사용 제한 관리 |
-| INDEX | (couponId, usedAt) | 시간순 조회 최적화 |
+| INDEX | (couponId, issuanceId, usedAt) | 시간/회차별 조회 최적화 |
 
 #### couponLogs
 | 컬럼 | 타입 | 설명 |
@@ -123,25 +149,57 @@
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
 | id | CHAR(26) PK | ULID 기반 배치 Job ID |
+| couponId | CHAR(26) | coupons.id 참조 |
+| issuanceId | CHAR(26) NULL | couponIssuances.id 참조(NORMAL 대량 발급 시) |
 | totalCount | BIGINT | 배치에서 발급할 총 쿠폰 수 |
 | issuedCount | BIGINT | 현재까지 발급된 쿠폰 수 |
 | status | ENUM('PENDING','RUNNING','DONE','FAILED') | Job 상태 |
 | createdAt | DATETIME | 생성 시간 |
 | updatedAt | DATETIME | 마지막 업데이트 |
 
+#### rewardTemplates
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | CHAR(26) PK | ULID 기반 보상 템플릿 ID |
+| nameKey | VARCHAR(128) NULL | 템플릿 표시용 이름 키(i18n) |
+| descriptionKey | VARCHAR(128) NULL | 템플릿 설명 키(i18n) |
+| createdAt | DATETIME | 생성일 |
+| updatedAt | DATETIME | 수정일 |
+
+#### rewardItems
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| id | CHAR(26) PK | ULID 기반 고유 ID |
+| rewardTemplateId | CHAR(26) | rewardTemplates.id 참조 |
+| itemType | VARCHAR(64) | 보상 유형(예: gold, item, currency 등) |
+| itemId | VARCHAR(64) NULL | 아이템 식별자(유형에 따라 선택) |
+| amount | BIGINT | 수량 |
+| data | JSON NULL | 추가 메타데이터(JSON) — MySQL JSON은 드라이버가 객체로 반환하므로 JSON.parse 금지 |
+| createdAt | DATETIME | 생성일 |
+| INDEX | (rewardTemplateId) | 템플릿별 조회 최적화 |
+
+
 ---
 
 ## 3. Redis 캐싱 전략
 - **쿠폰 코드별 Hash**: 메타 정보, 사용량 등 캐싱
   - key: `coupon:special:{code}` / `coupon:normal:{code}`
-  - fields(hset): { type, status, startsAt, expiresAt, perUserLimit, used, nameKey, descriptionKey }
+  - fields(hset): { type, status, startsAt, expiresAt, perUserLimit, maxTotalUses, nameKey, descriptionKey }
   - TTL: expiresAt 기준으로 설정(초 단위). DISABLED 시 즉시 삭제 또는 status 필드만 DISABLED로 갱신
 - **최근 사용 유저 캐시(선택)**: 이름 표시가 필요한 경우
   - key: `coupon:normal:{code}:recentUsers` (hash) → field=`{userId}`, value=`{"name":"<sanitized>","lastUsedAt":<ts>}`
   - 주의: Redis에 저장된 JSON 문자열은 앱 레이어에서 타입 체크 후 parse. MySQL JSON과 혼동 금지
 
 - **유저별 사용 기록**: 누적 count 기반
+- **선착순(글로벌) 사용 카운터(SPECIAL 전용)**
+  - key: `coupon:special:{code}:globalUsed`
+  - 의미: 현재까지의 전체 사용량. `maxTotalUses`가 null이 아니면 Lua 스크립트에서 perUserLimit 체크와 함께 원자적으로 증가/검사
+
   - key: `coupon:normal:{code}:usedCount:{userId}`
+  - key: `coupon:special:{code}:usedCount:{userId}`
+
+  - NORMAL(선택): 발행 회차 단위 집계를 원하면 다음 키를 병행
+    - key: `coupon:issuance:{issuanceId}:userUsedCount:{userId}`
   - key: `coupon:normal:{code}:used:zset` → score = timestamp, value = userId (UI용 최근 사용 유저 조회)
 - 장점: 실시간 UI에서 **사용자 리스트, 사용 횟수, 최근 사용 시간** 조회 가능
 - TTL로 자동 만료 처리 가능
@@ -154,7 +212,7 @@
 ---
 
 ## 4. 쿠폰 생성 및 발급
-- 생성 파라미터(쿠폰 정의 반영): nameKey, descriptionKey, tags[], startsAt, expiresAt, targetGameWorldIds[], targetPlatforms[], targetChannels[], targetSubchannels[]
+- 생성 파라미터(쿠폰 정의 반영): type, code?(SPECIAL은 쿠폰이름으로 사용), nameKey, descriptionKey, tags[], startsAt, expiresAt, perUserLimit?(SPECIAL 기본=1), maxTotalUses?(SPECIAL 선착순 한도; null이면 제한 없음), targetGameWorldIds[], targetPlatforms[], targetChannels[], targetSubchannels[]
 - 유효성 검사:
   - startsAt <= expiresAt
   - nameKey/descriptionKey 존재 및 중복 키 미존재 확인(로컬라이징 테이블)
@@ -242,6 +300,9 @@ UI
 - 장애 시 자동 재연결 및 백오프 적용
 
 ---
+- 스페셜(SPECIAL): 기본적으로 유저당 1회 사용만 허용합니다(perUserLimit 기본=1).
+- 스페셜 선착순 제한: maxTotalUses가 설정되어 있으면, 전체 사용량이 해당 한도를 초과하지 않도록 원자적으로 검사/증가해야 합니다(null이면 선착순 제한 없음).
+
 
 ## 7. 쿠폰 사용 (Redeem) 처리
 
@@ -274,6 +335,8 @@ Response 예시
     "reward": { /* rewardData에서 계산된 실제 보상 */ },
     "userUsedCount": 2,
     "globalUsed": 35001,
+
+
     "sequence": 2,
     "usedAt": "2025-10-27 12:34:56"
   }
@@ -284,6 +347,11 @@ Response 예시
 - 공통 오류 포맷: `{ "success": false, "error": { "code": "...", "message": "...", "details": {...} } }`
 - 404 NOT_FOUND: 코드가 없거나 삭제/비활성화된 쿠폰
 - 409 CONFLICT: perUserLimit 초과, 재시도 불가 상태
+- 409 LIMIT_REACHED: 스페셜 선착순 한도 소진(추가 사용 불가)
+- 422 INVALID_TEMPLATE: rewardTemplateId가 존재하지 않거나 비활성 상태
+- 400 INVALID_PARAMETERS: rewardTemplateId와 rewardData를 동시에 지정함(서로 배타적)
+
+
 - 422 UNPROCESSABLE_ENTITY: 기간 외 사용(startsAt/expiresAt 불만족), 타겟팅 미충족, 입력값 유효성 실패(userName 길이 초과 등)
 - 429 TOO_MANY_REQUESTS: 동일 유저/코드에 대한 과도한 요청(스팸) 제한
 - 500 INTERNAL_ERROR: 서버 내부 오류
@@ -295,12 +363,18 @@ Response 예시
 2) Redis 원자 연산(Lua 스크립트 권장)으로 perUserLimit 체크 및 증가를 함께 수행
    - 키 예: `coupon:normal:{code}:usedCount:{userId}`
    - 현재값이 perUserLimit 이상이면 즉시 거부; 아니면 INCR 후 해당 값이 sequence가 됨
+- SPECIAL 선착순 처리: `coupon:special:{code}:globalUsed` < `maxTotalUses`일 때만 증가 허용. 초과 시 409 LIMIT_REACHED 반환
+
 3) MySQL 트랜잭션 시작
-   - coupons.used = used + 1 업데이트(또는 couponCodes.status를 USED로 전이)
-   - couponUses에 insert: { couponId, userId, userName, sequence, usedAt(now), gameWorldId?, platform?, channel?, subchannel? }
+   - 코드형(NORMAL): couponCodes.status를 USED로 전이(행 잠금). 집계는 별도(예: couponIssuances 기준 배치 집계)
+   - couponUses에 insert: { couponId, issuanceId?, userId, userName, sequence, usedAt(now), gameWorldId?, platform?, channel?, subchannel? }
    - 성공 시 커밋, 실패 시 롤백 및 Redis 보정(decr 또는 보정 Job 큐)
-4) 쿠폰 로그(couponLogs) 기록: action='USE', detail에 컨텍스트 저장(IP, userAgent 등)
-5) SSE 이벤트 전송: `coupon.used` → { code, userId, userName, usedCount, usedAt }
+4) 보상 계산 및 응답 데이터 구성
+   - rewardTemplateId가 존재하면 rewardItems에서 {itemType,itemId,amount,data} 목록을 조회하여 보상 구성
+   - 없다면 coupons.rewardData(JSON)를 그대로 사용
+   - 응답 payload에는 계산된 reward를 포함
+5) 쿠폰 로그(couponLogs) 기록: action='USE', detail에 컨텍스트 저장(IP, userAgent 등)
+6) SSE 이벤트 전송: `coupon.used` → { code, userId, userName, usedCount, usedAt, issuanceId? }
 
 Idempotency(중복요청 방지)
 - requestId를 Body에 허용하여, {code,userId,requestId} 기준으로 멱등 처리
@@ -380,11 +454,14 @@ Idempotency(중복요청 방지)
   ```json
   {
     "type": "SPECIAL|NORMAL",
+    "code": "THANKYOU2025",
     "nameKey": "coupons.summer2025.name",
     "descriptionKey": "coupons.summer2025.desc",
     "tags": ["summer", "event"],
-    "rewardData": { "gold": 1000, "items": ["ticket"] },
-    "perUserLimit": 2,
+    "rewardTemplateId": "01JABCDE7XY89PQRSTUVWXZYZ",
+    "rewardData": null,
+    "perUserLimit": 1,
+    "maxTotalUses": null,
     "startsAt": "2025-07-01 00:00:00",
     "expiresAt": "2025-08-31 23:59:59",
     "targetGameWorldIds": [101,102],
@@ -393,6 +470,10 @@ Idempotency(중복요청 방지)
     "targetSubchannels": ["promotion"]
   }
   ```
+  - SPECIAL: `code`는 사용자에게 안내되는 쿠폰이름이며, `perUserLimit` 기본=1, `maxTotalUses`로 선착순 한도 설정(null이면 제한 없음)
+  - NORMAL: 단일코드형은 `code`를 사용, 대량 코드형은 `couponCodes` 생성/관리(섹션 2 참조)
+  - 보상: `rewardTemplateId`가 지정되면 서버는 rewardItems 테이블에서 보상 구성을 조회하여 처리합니다. `rewardTemplateId`와 `rewardData`는 동시에 지정하지 않습니다(둘 다 지정 시 400 INVALID_PARAMETERS). `rewardTemplateId`가 유효하지 않으면 422 INVALID_TEMPLATE.
+
   - Response: 생성된 쿠폰(및 타겟팅) 요약 반환
 - GET `/coupons`
   - Query: `page`, `perPage`, `status?`, `type?`, `tag?`
@@ -407,6 +488,8 @@ Idempotency(중복요청 방지)
 
 ### 12.3 쿠폰 사용(Redeem)
 - POST `/coupons/{code}/redeem` (자세한 플로우는 섹션 7 참고)
+  - 스페셜 쿠폰(SPECIAL)은 `{code}` 위치에 '쿠폰이름'을 그대로 사용합니다(예: `/coupons/THANKYOU2025/redeem`).
+
   - Body: `{ userId, userName, gameWorldId?, platform?, channel?, subchannel?, requestId? }`
   - 주요 검증: perUserLimit, 기간, 상태, 타겟팅, 입력 유효성
   - 응답: `{ success, data: { reward, userUsedCount, globalUsed, sequence, usedAt } }`
@@ -432,15 +515,16 @@ Idempotency(중복요청 방지)
 
 ### 12.5 SSE(실시간)
 - GET `/coupons/{id}/events`
-  - Event `coupon.used`: `{ code, userId, userName, usedCount, usedAt }`
-  - Event `batch.progress`: `{ jobId, totalCount, issuedCount, status }`
+  - Event `coupon.used`: `{ code, userId, userName, usedCount, usedAt, issuanceId? }`
+  - Event `batch.progress`: `{ jobId, issuanceId, totalCount, issuedCount, status }`
+  - Event `codes.export.progress`: `{ exportJobId, issuanceId, totalCount, processed, status, updatedAt }`
 
 ### 12.6 배치 발급(Job)
 - POST `/coupons/batch`
-  - Body: `{ totalCount, meta? }`
+  - Body: `{ couponId, issuanceId, totalCount, meta? }`
   - Response: `{ jobId }`
-- GET `/coupons/batch/{jobId}`: 상태 조회
-- SSE `batch.progress`로 실시간 진행률 수신
+- GET `/coupons/batch/{jobId}`: 상태 조회(응답에 issuanceId 포함)
+- SSE `batch.progress`로 실시간 진행률 수신(페이로드에 issuanceId 포함)
 
 ### 12.7 속도 제한/멱등성
 - Rate Limit: 코드+유저 기준(예: 1 req/sec)으로 스팸 방지
@@ -453,15 +537,15 @@ Idempotency(중복요청 방지)
 
 ### 12.9 발급된 코드 목록 조회
 - GET `/coupons/{id}/codes`
-  - Query: `page`, `perPage`, `status?=ISSUED|USED|REVOKED`, `jobId?`
+  - Query: `page`, `perPage`, `status?=ISSUED|USED|REVOKED`, `jobId?`, `issuanceId?`
   - Response 예시
   ```json
   {
     "success": true,
     "data": {
       "items": [
-        { "code": "ABCD-EFGH-IJKL-MN12", "status": "ISSUED", "createdAt": "2025-07-01 00:00:00", "usedAt": null },
-        { "code": "PQRS-TUVW-XYZ1-2345", "status": "USED", "createdAt": "2025-07-01 00:00:01", "usedAt": "2025-07-15 12:10:00" }
+        { "code": "ABCD-EFGH-IJKL-MN12", "status": "ISSUED", "createdAt": "2025-07-01 00:00:00", "usedAt": null, "issuanceId": "01J..." },
+        { "code": "PQRS-TUVW-XYZ1-2345", "status": "USED", "createdAt": "2025-07-01 00:00:01", "usedAt": "2025-07-15 12:10:00", "issuanceId": "01J..." }
       ],
       "total": 100000,
       "page": 1,
@@ -473,16 +557,43 @@ Idempotency(중복요청 방지)
 
 ### 12.10 발급 코드 다운로드(Export)
 - 소량(예: ≤ 50,000건): 동기 CSV 스트리밍 가능
-  - GET `/coupons/{id}/codes/export.csv?status?&jobId?`
+  - GET `/coupons/{id}/codes/export.csv?status?&jobId?&issuanceId?`
   - 헤더: `Content-Type: text/csv; charset=utf-8`, `Content-Disposition: attachment; filename="coupon-codes.csv"`
+  - Excel 호환성: UTF-8 with BOM 권장(문서 첫 바이트 `\uFEFF`)
+- 보안: 대량 Export URL은 서명된 일회성 URL(예: 10분 유효)로 제공, 접근/다운로드는 감사 로그에 기록
 - 대량: 비동기 Export Job 권장
   - POST `/coupons/{id}/codes/export`
-    - Body: `{ status?: "ISSUED|USED|REVOKED", jobId?: string, includeUser?: boolean }`
+    - Body: `{ status?: "ISSUED|USED|REVOKED", jobId?: string, issuanceId?: string, includeUser?: boolean }`
     - Response: `{ exportJobId }`
   - GET `/coupons/{id}/codes/export/{exportJobId}`
     - Response: `{ status: "PENDING|RUNNING|DONE|FAILED", processed, totalCount, url? }`
   - SSE 이벤트: `codes.export.progress` 로 진행률 통지
 - CSV 컬럼(권장): `code,status,createdAt,usedAt,userId?,userName?`
+
+### 12.11 발행 회차 생성
+- POST `/coupons/{id}/issuances`
+  - Body: `{ roundNo?: number, plannedCount?: number }`
+  - Response: `{ issuanceId }`
+  - 비고: NORMAL 대량 발급 시 먼저 issuanceId를 만든 뒤, 해당 issuanceId로 배치 코드 생성(섹션 12.6) 실행
+
+### 12.12 발행 회차 목록 조회
+- GET `/coupons/{id}/issuances`
+  - Query: `page`, `perPage`
+  - Response 예시
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [
+        { "id": "01J...", "roundNo": 1, "plannedCount": 100000, "issuedCount": 100000, "status": "DONE", "createdAt": "2025-07-01 00:00:00" }
+      ],
+      "total": 1,
+      "page": 1,
+      "perPage": 20
+    }
+  }
+  ```
+
   - includeUser=true일 때만 userId/userName 포함(PII 최소화)
 
 
@@ -535,6 +646,38 @@ ALTER TABLE couponBatchJobs CHANGE COLUMN created_at createdAt DATETIME NOT NULL
 ALTER TABLE couponBatchJobs CHANGE COLUMN updated_at updatedAt DATETIME NOT NULL;
 ```
 6) 애플리케이션 업데이트
+### 13.4 정의/발행 분리 도입(issuances)
+1) 신규 테이블 생성
+```sql
+CREATE TABLE couponIssuances (
+  id CHAR(26) PRIMARY KEY,
+  couponId CHAR(26) NOT NULL,
+  roundNo INT NULL,
+  plannedCount BIGINT NULL,
+  issuedCount BIGINT NOT NULL DEFAULT 0,
+  status ENUM('PENDING','RUNNING','DONE','FAILED') NOT NULL,
+  createdAt DATETIME NOT NULL,
+  updatedAt DATETIME NOT NULL,
+  UNIQUE KEY uniq_coupon_round (couponId, roundNo),
+  INDEX idx_coupon_status (couponId, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+2) 연관 컬럼 추가
+```sql
+ALTER TABLE couponCodes ADD COLUMN issuanceId CHAR(26) NULL AFTER couponId;
+ALTER TABLE couponUses ADD COLUMN issuanceId CHAR(26) NULL AFTER couponId;
+ALTER TABLE couponBatchJobs ADD COLUMN issuanceId CHAR(26) NULL AFTER couponId;
+```
+3) 보상 템플릿 도입
+```sql
+ALTER TABLE coupons ADD COLUMN rewardTemplateId CHAR(26) NULL AFTER tags;
+ALTER TABLE coupons MODIFY COLUMN rewardData JSON NULL;
+```
+4) 데이터 마이그레이션 가이드
+- NORMAL 대량코드형의 경우, 기존 쿠폰별로 기본 issuance(예: roundNo=1)를 생성하고, 해당 쿠폰의 couponCodes.issuanceId를 일괄 세팅
+- SPECIAL은 issuanceId 없이 운영하므로 NULL 유지
+- 기존 coupons.total/used 집계가 있었다면, 통계 테이블 또는 배치 집계로 이전(정의 테이블에서 제거)
+
 - ORM/SQL 매핑, DTO, 응답 스키마(field 이름) camelCase 반영
 - Redeem API에 `userName` 필수 반영 및 sanitize 적용
 
@@ -578,8 +721,19 @@ async function redeemCoupon(code: string, input: any, opts?: { idempotencyKey?: 
   const res = await fetch(`${BASE}/coupons/${code}/redeem`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...AUTH, ...(opts?.idempotencyKey?{'Idempotency-Key':opts.idempotencyKey}:{}) }, body: JSON.stringify(input) });
   return await res.json();
 }
+
+// SPECIAL by name helper
+async function redeemByName(name: string, input: any, opts?: { idempotencyKey?: string }){
+  return redeemCoupon(name, input, opts);
+}
 ```
+
+
 - 성공 시: `{ success: true, data: { reward, userUsedCount, globalUsed, sequence, usedAt } }`
+- SPECIAL Redeem: `{code}` 자리에 쿠폰이름(예: THANKYOU2025)을 그대로 전달하세요.
+- FCFS 제한(maxTotalUses)이 있는 SPECIAL은 409 LIMIT_REACHED 발생 시 재시도 금지
+
+- SPECIAL  cRedeem:  c`code` c  c c c c c c ca c c c c c c c
 
 ### 14.4 멱등성·재시도 가이드
 - 멱등성: `requestId`(Body) 또는 헤더 `Idempotency-Key`를 항상 포함해 재시도 안전성 확보
