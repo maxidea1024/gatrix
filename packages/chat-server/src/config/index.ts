@@ -68,7 +68,12 @@ export const config = {
 
   // CORS
   cors: {
-    origin: (process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:3000,http://localhost:3002').split(','),
+    // Allow wildcard "*" in dev by converting ["*"] to "*" for Socket.IO
+    get origin() {
+      const corsEnv = process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:3000,http://localhost:3002';
+      const list = corsEnv.split(',');
+      return list.includes('*') ? '*' : list;
+    },
     credentials: true,
   },
 

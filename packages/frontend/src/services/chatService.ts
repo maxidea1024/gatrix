@@ -16,7 +16,7 @@ import {
 } from '../types/chat';
 
 export class ChatService {
-  private static readonly BASE_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1'}/chat`;
+  private static readonly BASE_URL = '/chat';
 
   // Channel management
   static async getChannels(params?: GetChannelsRequest): Promise<Channel[]> {
@@ -414,25 +414,14 @@ export class ChatService {
       // 토큰 만료 체크 및 갱신
       await this.ensureValidToken();
 
-      const response = await fetch(`${this.BASE_URL}/channels/${channelId}/invite`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-        body: JSON.stringify({
+      const response = await apiService.post(
+        `${this.BASE_URL}/channels/${channelId}/invite`,
+        {
           inviteeId: userId,
-          message: message
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Failed to send invitation');
-      }
-
-      console.log(`✅ ChatService.inviteUser success:`, data);
+          message
+        }
+      );
+      console.log(`✅ ChatService.inviteUser success:`, response);
     } catch (error: any) {
       console.error(`❌ ChatService.inviteUser failed:`, error);
 
@@ -442,25 +431,14 @@ export class ChatService {
           console.log(`🔄 Token expired, refreshing and retrying inviteUser...`);
           await this.refreshTokenAndRetry();
 
-          const response = await fetch(`${this.BASE_URL}/channels/${channelId}/invite`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-            },
-            body: JSON.stringify({
+          const response = await apiService.post(
+            `${this.BASE_URL}/channels/${channelId}/invite`,
+            {
               inviteeId: userId,
-              message: message
-            }),
-          });
-
-          const data = await response.json();
-
-          if (!response.ok || !data.success) {
-            throw new Error(data.error || 'Failed to send invitation');
-          }
-
-          console.log(`✅ ChatService.inviteUser retry success:`, data);
+              message
+            }
+          );
+          console.log(`✅ ChatService.inviteUser retry success:`, response);
           return;
         } catch (retryError) {
           console.error(`❌ ChatService.inviteUser retry failed:`, retryError);

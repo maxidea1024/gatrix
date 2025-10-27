@@ -48,8 +48,8 @@ export default defineConfig({
       usePolling: true, // Required for Docker on Windows/WSL
       interval: 100,
     },
+    // Let Vite infer the HMR host from the page URL so LAN clients use the correct IP
     hmr: {
-      host: 'localhost', // HMR host for browser connection
       port: 3000,
     },
     proxy: {
@@ -60,12 +60,14 @@ export default defineConfig({
         // SSE 지원을 위한 설정
         configure: (proxy, options) => {
           proxy.on('proxyReq', (proxyReq, req, res) => {
-            // Preserve original host for OAuth callbacks
-            proxyReq.setHeader('Host', 'localhost:3000');
-            proxyReq.setHeader('X-Forwarded-Host', 'localhost:3000');
-            proxyReq.setHeader('X-Forwarded-Proto', 'http');
+            // Preserve the actual incoming host and protocol (works for LAN access)
+            const incomingHost = (req.headers['x-forwarded-host'] as string) || (req.headers.host as string) || 'localhost:3000';
+            const incomingProto = (req.headers['x-forwarded-proto'] as string) || (req.socket as any)?.encrypted ? 'https' : 'http';
+            proxyReq.setHeader('Host', incomingHost);
+            proxyReq.setHeader('X-Forwarded-Host', incomingHost);
+            proxyReq.setHeader('X-Forwarded-Proto', incomingProto);
 
-            // SSE 요청인 경우 특별 처리
+            // SSE requests need special headers to keep the stream open
             if (req.url?.includes('/notifications/sse') || req.url?.includes('/services/sse')) {
               proxyReq.setHeader('Cache-Control', 'no-cache');
               proxyReq.setHeader('Connection', 'keep-alive');

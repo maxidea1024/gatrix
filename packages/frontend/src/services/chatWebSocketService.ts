@@ -331,10 +331,20 @@ export class ChatWebSocketService {
   }
 
   private getSocketUrl(): string {
-    // 환경에 따라 채팅서버 URL 설정
-    return process.env.NODE_ENV === 'production'
-      ? process.env.VITE_CHAT_SERVER_URL || 'wss://chat.yourdomain.com'
-      : 'http://localhost:3001'; // 개발환경에서는 직접 연결
+    // Choose chat server URL based on environment and current page host
+    // In dev: use current host to support LAN access (avoid hardcoded localhost)
+    // In prod: prefer runtime/window config then build-time env
+    const env = import.meta.env;
+
+    // Runtime-injected config (for production docker/nginx)
+    const runtimeUrl = (window as any)?.ENV?.VITE_CHAT_SERVER_URL as string | undefined;
+    if (env.PROD) {
+      return runtimeUrl || (env.VITE_CHAT_SERVER_URL as string) || `${location.protocol === 'https:' ? 'https' : 'http'}://${location.hostname}:3001`;
+    }
+
+    // Development: use the current host/IP so other machines can connect
+    const protocol = location.protocol === 'https:' ? 'https' : 'http';
+    return `${protocol}://${location.hostname}:3001`;
   }
 
   private reconnect(): void {

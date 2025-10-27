@@ -58,6 +58,12 @@ const RegisterPage: React.FC = () => {
   const [oauthLoading, setOauthLoading] = useState<string | null>(null); // 'google', 'github', 'qq', etc.
   const [isShaking, setIsShaking] = useState(false);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+  const [passwordFieldType, setPasswordFieldType] = useState<'text' | 'password'>('text'); // Start as text to prevent autofill
+  const [confirmPasswordFieldType, setConfirmPasswordFieldType] = useState<'text' | 'password'>('text'); // Start as text to prevent autofill
+  const isWebkit = useMemo(() => {
+    if (typeof navigator === 'undefined') return true;
+    return /AppleWebKit|Chrome|Safari|Edg/.test(navigator.userAgent);
+  }, []);
 
   // 초대 관련 상태
   const [inviteToken, setInviteToken] = useState<string | null>(null);
@@ -104,7 +110,7 @@ const RegisterPage: React.FC = () => {
     mode: 'onChange', // 실시간 검증을 위해 onChange로 변경
     defaultValues: {
       name: '',
-      email: prefilledEmail,
+      email: '',
       password: '',
       confirmPassword: '',
     },
@@ -112,6 +118,13 @@ const RegisterPage: React.FC = () => {
 
   // Watch password for real-time confirmation validation
   const watchedPassword = watch('password');
+
+  // Set email from location state if available
+  useEffect(() => {
+    if (prefilledEmail) {
+      setValue('email', prefilledEmail);
+    }
+  }, [prefilledEmail, setValue]);
 
   // Re-validate form when language changes
   useEffect(() => {
@@ -125,6 +138,8 @@ const RegisterPage: React.FC = () => {
       trigger('confirmPassword');
     }
   }, [watchedPassword, trigger]);
+
+
 
   // 초대 토큰 확인
   useEffect(() => {
@@ -241,7 +256,6 @@ const RegisterPage: React.FC = () => {
       setRegisterError(null);
       setRegisteredEmail(data.email); // Save registered email
       setRegisterSuccess(true);
-      enqueueSnackbar(t('auth.registerSuccess'), { variant: 'success' });
     } catch (err: any) {
       // 에러 시에도 최소 2초 대기
       const elapsed = Date.now() - startTime;
@@ -314,34 +328,49 @@ const RegisterPage: React.FC = () => {
 
   if (registerSuccess) {
     return (
-      <AuthLayout
-        title={t('auth.registerSuccess')}
-        subtitle=""
-        leftContent={{
-          title: t('auth.welcomeTitle'),
-          subtitle: '',
-          description: t('auth.welcomeDescription')
+      <Box
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: (theme) => theme.palette.mode === 'dark'
+            ? 'linear-gradient(135deg, #0f0f0f 0%, #050505 100%)'
+            : 'linear-gradient(135deg, #9e9e9e 0%, #757575 100%)',
+          p: 2,
         }}
       >
         <Card
           sx={{
             maxWidth: 400,
             width: '100%',
-            animation: 'successBounce 0.6s ease-out',
-            '@keyframes successBounce': {
+            animation: 'rumbleIn 0.6s ease-out',
+            '@keyframes rumbleIn': {
               '0%': {
-                transform: 'scale(0.3)',
                 opacity: 0,
+                transform: 'scale(0.3) rotate(0deg)',
               },
-              '50%': {
-                transform: 'scale(1.05)',
+              '25%': {
+                transform: 'scale(1.1) rotate(-2deg)',
               },
-              '70%': {
-                transform: 'scale(0.95)',
+              '35%': {
+                transform: 'scale(1.05) rotate(2deg)',
+              },
+              '45%': {
+                transform: 'scale(1.02) rotate(-1deg)',
+              },
+              '55%': {
+                transform: 'scale(1.01) rotate(1deg)',
+              },
+              '65%': {
+                transform: 'scale(1) rotate(-0.5deg)',
+              },
+              '75%': {
+                transform: 'scale(1) rotate(0.5deg)',
               },
               '100%': {
-                transform: 'scale(1)',
                 opacity: 1,
+                transform: 'scale(1) rotate(0deg)',
               },
             },
           }}
@@ -349,27 +378,30 @@ const RegisterPage: React.FC = () => {
           <CardContent sx={{ p: 4, textAlign: 'center' }}>
             <Box
               sx={{
-                display: 'inline-block',
-                animation: 'celebrate 1s ease-in-out infinite',
-                '@keyframes celebrate': {
-                  '0%, 100%': {
-                    transform: 'rotate(0deg)',
-                  },
-                  '25%': {
-                    transform: 'rotate(-10deg)',
-                  },
-                  '75%': {
-                    transform: 'rotate(10deg)',
-                  },
-                },
+                mb: 2,
               }}
             >
               <Typography
                 variant="h1"
                 component="div"
                 sx={{
-                  fontSize: '4rem',
-                  mb: 2,
+                  fontSize: '3rem',
+                  display: 'inline-block',
+                  animation: 'bounce 1s ease-in-out infinite',
+                  '@keyframes bounce': {
+                    '0%, 100%': {
+                      transform: 'translateY(0) scale(1)',
+                    },
+                    '25%': {
+                      transform: 'translateY(-15px) scale(1.1)',
+                    },
+                    '50%': {
+                      transform: 'translateY(0) scale(0.95)',
+                    },
+                    '75%': {
+                      transform: 'translateY(-7px) scale(1.05)',
+                    },
+                  },
                 }}
               >
                 🎉
@@ -382,63 +414,52 @@ const RegisterPage: React.FC = () => {
               color="success.main"
               sx={{
                 fontWeight: 600,
-                animation: 'fadeInUp 0.8s ease-out 0.3s both',
-                '@keyframes fadeInUp': {
-                  '0%': {
-                    opacity: 0,
-                    transform: 'translateY(20px)',
+                textShadow: '2px 2px 4px rgba(0, 0, 0, 0.3), 0px 0px 8px rgba(76, 175, 80, 0.4)',
+                '& > span': {
+                  display: 'inline-block',
+                  animation: 'wave 1.5s ease-in-out infinite',
+                },
+                '& > span:nth-of-type(1)': { animationDelay: '0s' },
+                '& > span:nth-of-type(2)': { animationDelay: '0.1s' },
+                '& > span:nth-of-type(3)': { animationDelay: '0.2s' },
+                '& > span:nth-of-type(4)': { animationDelay: '0.3s' },
+                '& > span:nth-of-type(5)': { animationDelay: '0.4s' },
+                '& > span:nth-of-type(6)': { animationDelay: '0.5s' },
+                '& > span:nth-of-type(7)': { animationDelay: '0.6s' },
+                '& > span:nth-of-type(8)': { animationDelay: '0.7s' },
+                '& > span:nth-of-type(9)': { animationDelay: '0.8s' },
+                '& > span:nth-of-type(10)': { animationDelay: '0.9s' },
+                '@keyframes wave': {
+                  '0%, 100%': {
+                    transform: 'translateY(0px)',
                   },
-                  '100%': {
-                    opacity: 1,
-                    transform: 'translateY(0)',
+                  '50%': {
+                    transform: 'translateY(-5px)',
                   },
                 },
               }}
             >
-              {t('auth.registerSuccess')}
+              {t('auth.registerSuccess').split('').map((char, index) => (
+                <span key={index}>{char === ' ' ? '\u00A0' : char}</span>
+              ))}
             </Typography>
             <Typography
               variant="body1"
               paragraph
-              sx={{
-                animation: 'fadeInUp 0.8s ease-out 0.5s both',
-                '@keyframes fadeInUp': {
-                  '0%': {
-                    opacity: 0,
-                    transform: 'translateY(20px)',
-                  },
-                  '100%': {
-                    opacity: 1,
-                    transform: 'translateY(0)',
-                  },
-                },
-              }}
+              sx={{ mt: 2 }}
             >
               {t('auth.registerSuccessDescription')}
             </Typography>
             <Button
               variant="contained"
               onClick={() => navigate('/login', { state: { registeredEmail } })}
-              sx={{
-                mt: 2,
-                animation: 'fadeInUp 0.8s ease-out 0.7s both',
-                '@keyframes fadeInUp': {
-                  '0%': {
-                    opacity: 0,
-                    transform: 'translateY(20px)',
-                  },
-                  '100%': {
-                    opacity: 1,
-                    transform: 'translateY(0)',
-                  },
-                },
-              }}
+              sx={{ mt: 2 }}
             >
               {t('auth.signIn')}
             </Button>
           </CardContent>
         </Card>
-      </AuthLayout>
+      </Box>
     );
   }
 
@@ -471,6 +492,26 @@ const RegisterPage: React.FC = () => {
         onSubmit={handleSubmit(onSubmit)}
         autoComplete="off"
       >
+        {/* Hidden real-named fields to absorb browser autofill */}
+        <input
+          type="text"
+          name="username"
+          autoComplete="username"
+          style={{ position: 'absolute', top: '-9999px', left: '-9999px' }}
+          tabIndex={-1}
+          aria-hidden="true"
+          readOnly
+        />
+        <input
+          type="password"
+          name="password"
+          autoComplete="new-password"
+          style={{ position: 'absolute', top: '-9999px', left: '-9999px' }}
+          tabIndex={-1}
+          aria-hidden="true"
+          readOnly
+        />
+
         {/* Invitation Status */}
         {invitationLoading && (
           <Alert severity="info" sx={{ mb: 3 }}>
@@ -552,7 +593,7 @@ const RegisterPage: React.FC = () => {
               fullWidth
               label={`${t('auth.name')} *`}
               helperText={errors.name?.message || t('auth.nameHelp')}
-              autoComplete="name"
+              autoComplete="off"
               autoFocus
               sx={{
                 mb: 2,
@@ -593,7 +634,7 @@ const RegisterPage: React.FC = () => {
               label={`${t('auth.email')} *`}
               type="email"
               helperText={errors.email?.message || t('auth.emailHelp')}
-              autoComplete="email"
+              autoComplete="off"
               sx={{
                 mb: 2,
                 '& .MuiOutlinedInput-root': {
@@ -631,9 +672,16 @@ const RegisterPage: React.FC = () => {
               {...field}
               fullWidth
               label={`${t('auth.password')} *`}
-              type={showPassword ? 'text' : 'password'}
+              type={isWebkit ? 'text' : (showPassword ? 'text' : passwordFieldType)}
               helperText={errors.password?.message || t('auth.passwordHelp')}
-              autoComplete="new-password"
+              autoComplete="off"
+              onFocus={(e) => {
+                // Remove readonly on focus to allow user input
+                if (!isWebkit) {
+                  setPasswordFieldType('password');
+                }
+                e.target.removeAttribute('readonly');
+              }}
               sx={{
                 mb: 2,
                 '& .MuiOutlinedInput-root': {
@@ -653,15 +701,23 @@ const RegisterPage: React.FC = () => {
                 },
                 '& .MuiInputBase-input': {
                   color: 'white',
+                  // Mask characters when using type=text on WebKit browsers
+                  ...(isWebkit && !showPassword ? {
+                    WebkitTextSecurity: 'disc',
+                  } : {}),
                 },
                 '& .MuiFormHelperText-root': {
                   color: errors.password ? 'rgba(255, 182, 193, 0.8)' : 'rgba(255, 255, 255, 0.6)',
                 },
               }}
               inputProps={{
-                autoComplete: 'new-password',
+                autoComplete: 'off',
                 'data-lpignore': 'true',
                 'data-form-type': 'other',
+                'data-1p-ignore': 'true',
+                'aria-autocomplete': 'none',
+                readOnly: true, // Prevent autofill, will be removed on focus
+                name: `password-${Math.random().toString(36).substring(7)}`, // Random name to prevent autofill
               }}
               InputProps={{
                 endAdornment: (
@@ -704,9 +760,16 @@ const RegisterPage: React.FC = () => {
                 {...field}
                 fullWidth
                 label={`${t('auth.confirmPassword')} *`}
-                type={showConfirmPassword ? 'text' : 'password'}
+                type={isWebkit ? 'text' : (showConfirmPassword ? 'text' : confirmPasswordFieldType)}
                 helperText={helperText}
-                autoComplete="new-password"
+                autoComplete="off"
+                onFocus={(e) => {
+                  // Remove readonly on focus to allow user input
+                  if (!isWebkit) {
+                    setConfirmPasswordFieldType('password');
+                  }
+                  e.target.removeAttribute('readonly');
+                }}
                 sx={{
                   mb: 2,
                   '& .MuiOutlinedInput-root': {
@@ -732,6 +795,10 @@ const RegisterPage: React.FC = () => {
                   },
                   '& .MuiInputBase-input': {
                     color: 'white',
+                    // Mask characters when using type=text on WebKit browsers
+                    ...(isWebkit && !showConfirmPassword ? {
+                      WebkitTextSecurity: 'disc',
+                    } : {}),
                   },
                   '& .MuiFormHelperText-root': {
                     color: errors.confirmPassword
@@ -742,9 +809,13 @@ const RegisterPage: React.FC = () => {
                   },
               }}
               inputProps={{
-                autoComplete: 'new-password',
+                autoComplete: 'off',
                 'data-lpignore': 'true',
                 'data-form-type': 'other',
+                'data-1p-ignore': 'true',
+                'aria-autocomplete': 'none',
+                readOnly: true, // Prevent autofill, will be removed on focus
+                name: `confirm-password-${Math.random().toString(36).substring(7)}`, // Random name to prevent autofill
               }}
               InputProps={{
                 endAdornment: (

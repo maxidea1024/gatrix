@@ -102,6 +102,11 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [oauthLoading, setOauthLoading] = useState<string | null>(null); // 'google', 'github', 'qq', etc.
+  const [passwordFieldType, setPasswordFieldType] = useState<'text' | 'password'>('text'); // Start as text to prevent autofill
+  const isWebkit = useMemo(() => {
+    if (typeof navigator === 'undefined') return true;
+    return /AppleWebKit|Chrome|Safari|Edg/.test(navigator.userAgent);
+  }, []);
   const [showRememberMeWarning, setShowRememberMeWarning] = useState(false);
   const [pendingRememberMe, setPendingRememberMe] = useState(false);
 
@@ -417,6 +422,26 @@ const LoginPage: React.FC = () => {
 
       {/* Login Form */}
       <Box component="form" onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+        {/* Hidden real-named fields to absorb browser autofill */}
+        <input
+          type="text"
+          name="username"
+          autoComplete="username"
+          style={{ position: 'absolute', top: '-9999px', left: '-9999px' }}
+          tabIndex={-1}
+          aria-hidden="true"
+          readOnly
+        />
+        <input
+          type="password"
+          name="password"
+          autoComplete="current-password"
+          style={{ position: 'absolute', top: '-9999px', left: '-9999px' }}
+          tabIndex={-1}
+          aria-hidden="true"
+          readOnly
+        />
+
         {/* Error Alert - Smooth height transition */}
         {loginError && (
           <Box
@@ -490,10 +515,10 @@ const LoginPage: React.FC = () => {
                 },
               }}
               inputProps={{
-                autoComplete: 'new-password',
-                form: {
-                  autoComplete: 'off'
-                }
+                autoComplete: 'off',
+                'data-lpignore': 'true',
+                'data-form-type': 'other',
+                'data-1p-ignore': 'true',
               }}
             />
           )}
@@ -507,11 +532,19 @@ const LoginPage: React.FC = () => {
               {...field}
               fullWidth
               label={t('auth.password')}
-              type={showPassword ? 'text' : 'password'}
+              type={isWebkit ? 'text' : (showPassword ? 'text' : passwordFieldType)}
               error={false}
               helperText=""
               margin="normal"
-              autoComplete="current-password"
+              autoComplete="off"
+              onFocus={(e) => {
+                // Remove readonly on focus to allow user input
+                if (!isWebkit) {
+                  // For non-WebKit, switch to password to maintain masking
+                  setPasswordFieldType('password');
+                }
+                e.target.removeAttribute('readonly');
+              }}
               sx={{
                 mb: 2,
                 '& .MuiOutlinedInput-root': {
@@ -531,12 +564,20 @@ const LoginPage: React.FC = () => {
                 },
                 '& .MuiInputBase-input': {
                   color: 'white',
+                  // Mask characters when using type=text on WebKit browsers
+                  ...(isWebkit && !showPassword ? {
+                    WebkitTextSecurity: 'disc',
+                  } : {}),
                 },
               }}
               inputProps={{
-                autoComplete: 'current-password',
+                autoComplete: 'off',
                 'data-lpignore': 'true',
                 'data-form-type': 'other',
+                'data-1p-ignore': 'true',
+                'aria-autocomplete': 'none',
+                readOnly: true, // Prevent autofill, will be removed on focus
+                name: `password-${Math.random().toString(36).substring(7)}`, // Random name to prevent autofill
               }}
               InputProps={{
                 endAdornment: (
