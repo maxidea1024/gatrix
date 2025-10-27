@@ -314,34 +314,131 @@ const RegisterPage: React.FC = () => {
 
   if (registerSuccess) {
     return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          p: 2,
+      <AuthLayout
+        title={t('auth.registerSuccess')}
+        subtitle=""
+        leftContent={{
+          title: t('auth.welcomeTitle'),
+          subtitle: '',
+          description: t('auth.welcomeDescription')
         }}
       >
-        <Card sx={{ maxWidth: 400, width: '100%' }}>
+        <Card
+          sx={{
+            maxWidth: 400,
+            width: '100%',
+            animation: 'successBounce 0.6s ease-out',
+            '@keyframes successBounce': {
+              '0%': {
+                transform: 'scale(0.3)',
+                opacity: 0,
+              },
+              '50%': {
+                transform: 'scale(1.05)',
+              },
+              '70%': {
+                transform: 'scale(0.95)',
+              },
+              '100%': {
+                transform: 'scale(1)',
+                opacity: 1,
+              },
+            },
+          }}
+        >
           <CardContent sx={{ p: 4, textAlign: 'center' }}>
-            <Typography variant="h4" component="h1" gutterBottom color="success.main">
+            <Box
+              sx={{
+                display: 'inline-block',
+                animation: 'celebrate 1s ease-in-out infinite',
+                '@keyframes celebrate': {
+                  '0%, 100%': {
+                    transform: 'rotate(0deg)',
+                  },
+                  '25%': {
+                    transform: 'rotate(-10deg)',
+                  },
+                  '75%': {
+                    transform: 'rotate(10deg)',
+                  },
+                },
+              }}
+            >
+              <Typography
+                variant="h1"
+                component="div"
+                sx={{
+                  fontSize: '4rem',
+                  mb: 2,
+                }}
+              >
+                🎉
+              </Typography>
+            </Box>
+            <Typography
+              variant="h4"
+              component="h1"
+              gutterBottom
+              color="success.main"
+              sx={{
+                fontWeight: 600,
+                animation: 'fadeInUp 0.8s ease-out 0.3s both',
+                '@keyframes fadeInUp': {
+                  '0%': {
+                    opacity: 0,
+                    transform: 'translateY(20px)',
+                  },
+                  '100%': {
+                    opacity: 1,
+                    transform: 'translateY(0)',
+                  },
+                },
+              }}
+            >
               {t('auth.registerSuccess')}
             </Typography>
-            <Typography variant="body1" paragraph>
+            <Typography
+              variant="body1"
+              paragraph
+              sx={{
+                animation: 'fadeInUp 0.8s ease-out 0.5s both',
+                '@keyframes fadeInUp': {
+                  '0%': {
+                    opacity: 0,
+                    transform: 'translateY(20px)',
+                  },
+                  '100%': {
+                    opacity: 1,
+                    transform: 'translateY(0)',
+                  },
+                },
+              }}
+            >
               {t('auth.registerSuccessDescription')}
             </Typography>
             <Button
               variant="contained"
               onClick={() => navigate('/login', { state: { registeredEmail } })}
-              sx={{ mt: 2 }}
+              sx={{
+                mt: 2,
+                animation: 'fadeInUp 0.8s ease-out 0.7s both',
+                '@keyframes fadeInUp': {
+                  '0%': {
+                    opacity: 0,
+                    transform: 'translateY(20px)',
+                  },
+                  '100%': {
+                    opacity: 1,
+                    transform: 'translateY(0)',
+                  },
+                },
+              }}
             >
               {t('auth.signIn')}
             </Button>
           </CardContent>
         </Card>
-      </Box>
+      </AuthLayout>
     );
   }
 
@@ -573,6 +670,7 @@ const RegisterPage: React.FC = () => {
                       aria-label="toggle password visibility"
                       onClick={togglePasswordVisibility}
                       edge="end"
+                      tabIndex={-1}
                       sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
@@ -655,6 +753,7 @@ const RegisterPage: React.FC = () => {
                       aria-label="toggle confirm password visibility"
                       onClick={toggleConfirmPasswordVisibility}
                       edge="end"
+                      tabIndex={-1}
                       sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
                     >
                       {showConfirmPassword ? <VisibilityOff /> : <Visibility />}

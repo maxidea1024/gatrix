@@ -545,6 +545,7 @@ const LoginPage: React.FC = () => {
                       aria-label="toggle password visibility"
                       onClick={togglePasswordVisibility}
                       edge="end"
+                      tabIndex={-1}
                       sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
