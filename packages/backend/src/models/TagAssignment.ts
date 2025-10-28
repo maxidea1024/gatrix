@@ -4,12 +4,12 @@ export interface TagAssignment {
   id: number;
   tagId: number;
   entityType: string;
-  entityId: number;
+  entityId: string | number;
   createdAt: string;
 }
 
 export default class TagAssignmentModel {
-  static async setTagsForEntity(entityType: string, entityId: number, tagIds: number[], createdBy?: number): Promise<void> {
+  static async setTagsForEntity(entityType: string, entityId: string | number, tagIds: number[], createdBy?: number): Promise<void> {
     await db.transaction(async (trx) => {
       await trx('g_tag_assignments')
         .where('entityType', entityType)
@@ -28,12 +28,12 @@ export default class TagAssignmentModel {
     });
   }
 
-  static async listTagsForEntity(entityType: string, entityId: number): Promise<any[]> {
+  static async listTagsForEntity(entityType: string, entityId: string | number): Promise<any[]> {
     const rows = await db('g_tag_assignments as a')
       .join('g_tags as t', 't.id', 'a.tagId')
       .select('t.*')
       .where('a.entityType', entityType)
-      .where('a.entityId', entityId)
+      .where('a.entityId', String(entityId))
       .orderBy('t.name');
     return rows;
   }

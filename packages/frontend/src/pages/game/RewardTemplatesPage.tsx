@@ -15,26 +15,33 @@ import {
   InputAdornment,
   Tooltip,
   Checkbox,
-  Skeleton,
+  Card,
+  CardContent,
   Divider,
+  TableSortLabel,
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   Search as SearchIcon,
-  Refresh as RefreshIcon,
+  ViewColumn as ViewColumnIcon,
   CardGiftcard as GiftIcon,
+  FilterList as FilterListIcon,
+  ContentCopy as ContentCopyIcon,
+  Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import rewardTemplateService, { RewardTemplate } from '../../services/rewardTemplateService';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
+import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
 import { useDebounce } from '../../hooks/useDebounce';
 import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import ConfirmDeleteDialog from '../../components/common/ConfirmDeleteDialog';
 import RewardTemplateFormDialog from '../../components/game/RewardTemplateFormDialog';
+import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 
 const RewardTemplatesPage: React.FC = () => {
   const { t } = useTranslation();
@@ -53,8 +60,138 @@ const RewardTemplatesPage: React.FC = () => {
   const [editingTemplate, setEditingTemplate] = useState<RewardTemplate | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingTemplate, setDeletingTemplate] = useState<RewardTemplate | null>(null);
+  const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<null | HTMLElement>(null);
+  const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
+
+  // Sorting state with localStorage persistence
+  const [orderBy, setOrderBy] = useState<string>(() => {
+    const saved = localStorage.getItem('rewardTemplatesSortBy');
+    return saved || 'createdAt';
+  });
+  const [order, setOrder] = useState<'asc' | 'desc'>(() => {
+    const saved = localStorage.getItem('rewardTemplatesSortOrder');
+    return (saved as 'asc' | 'desc') || 'desc';
+  });
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  // Dynamic filter state with localStorage persistence
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(() => {
+    try {
+      const saved = localStorage.getItem('rewardTemplatesActiveFilters');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Get all unique tags from templates for filter options
+  const allTags = useMemo(() => {
+    const tagMap = new Map<number, any>();
+    templates.forEach((template, idx) => {
+      if (template.tags && Array.isArray(template.tags)) {
+        template.tags.forEach(tag => {
+          if (tag && typeof tag === 'object' && 'id' in tag) {
+            tagMap.set(tag.id, tag);
+          }
+        });
+      }
+    });
+    const result = Array.from(tagMap.values());
+    console.log('[RewardTemplatesPage] allTags computed:', {
+      templateCount: templates.length,
+      uniqueTagCount: result.length,
+      tags: result.map(t => ({ id: t.id, name: t.name })),
+      templateTags: templates.map((t, idx) => ({
+        templateId: t.id,
+        templateName: t.name,
+        tagIds: t.tags?.map((tag: any) => tag.id) || [],
+      })),
+    });
+    return result;
+  }, [templates]);
+
+  // Filter definitions
+  const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
+    {
+      key: 'tags',
+      label: t('rewardTemplates.tags'),
+      type: 'tags',
+      operator: 'include_all',
+      allowOperatorToggle: true,
+      options: allTags.map(tag => ({
+        value: tag.id,
+        label: tag.name,
+        color: tag.color,
+      })),
+    },
+  ], [t, allTags]);
+
+  // Default columns for reset
+  const defaultColumns: ColumnConfig[] = [
+    { id: 'checkbox', labelKey: '', visible: true },
+    { id: 'name', labelKey: 'rewardTemplates.name', visible: true },
+    { id: 'description', labelKey: 'rewardTemplates.description', visible: true },
+    { id: 'tags', labelKey: 'rewardTemplates.tags', visible: true },
+    { id: 'createdAt', labelKey: 'rewardTemplates.createdAt', visible: true },
+    { id: 'actions', labelKey: 'common.actions', visible: true },
+  ];
+
+  // Column configuration (persisted in localStorage)
+  const [columns, setColumns] = useState<ColumnConfig[]>(() => {
+    const saved = localStorage.getItem('rewardTemplatesColumns');
+    if (saved) {
+      try {
+        const savedColumns = JSON.parse(saved);
+        // Merge saved columns with defaults, preserving saved order
+        const mergedColumns = savedColumns.map((savedCol: ColumnConfig) => {
+          const defaultCol = defaultColumns.find(c => c.id === savedCol.id);
+          return defaultCol ? { ...defaultCol, ...savedCol } : savedCol;
+        });
+        // Add any new columns that weren't in saved state
+        const savedIds = new Set(savedColumns.map((c: ColumnConfig) => c.id));
+        const newColumns = defaultColumns.filter(c => !savedIds.has(c.id));
+        return [...mergedColumns, ...newColumns];
+      } catch (e) {
+        return defaultColumns;
+      }
+    }
+    return defaultColumns;
+  });
+
+  // Apply dynamic filters to templates
+  const applyFilters = (templatesToFilter: RewardTemplate[]): RewardTemplate[] => {
+    if (activeFilters.length === 0) {
+      return templatesToFilter;
+    }
+
+    return templatesToFilter.filter(template => {
+      return activeFilters.every(filter => {
+        // Handle tags filter
+        if (filter.key === 'tags') {
+          const selectedTagIds = Array.isArray(filter.value) ? filter.value : [];
+          if (selectedTagIds.length === 0) return true;
+
+          const templateTags = template.tags || [];
+          const templateTagIds = templateTags.map(t => {
+            if (typeof t === 'object' && t !== null && 'id' in t) {
+              return t.id;
+            }
+            return null;
+          }).filter(id => id !== null);
+
+          // include_all: all selected tags must be present
+          // any_of: at least one selected tag must be present
+          if (filter.operator === 'include_all') {
+            return selectedTagIds.every(tagId => templateTagIds.includes(tagId));
+          } else {
+            return selectedTagIds.some(tagId => templateTagIds.includes(tagId));
+          }
+        }
+        return true;
+      });
+    });
+  };
 
   // Load templates
   const loadTemplates = async () => {
@@ -64,10 +201,43 @@ const RewardTemplatesPage: React.FC = () => {
         page: page + 1,
         limit: rowsPerPage,
         search: debouncedSearchTerm || undefined,
+        sortBy: orderBy,
+        sortOrder: order,
       });
 
       if (result && typeof result === 'object' && 'templates' in result && Array.isArray(result.templates)) {
-        setTemplates(result.templates);
+        // Create a deep copy of templates to avoid mutation issues
+        const templatesCopy = result.templates.map(t => {
+          // Deep copy tags array
+          const tagsCopy = t.tags && Array.isArray(t.tags)
+            ? t.tags.map(tag => {
+                if (typeof tag === 'object' && tag !== null) {
+                  return { ...tag };
+                }
+                return tag;
+              })
+            : [];
+
+          // Deep copy rewardItems array
+          const rewardItemsCopy = t.rewardItems && Array.isArray(t.rewardItems)
+            ? t.rewardItems.map(item => {
+                if (typeof item === 'object' && item !== null) {
+                  return { ...item };
+                }
+                return item;
+              })
+            : [];
+
+          return {
+            ...t,
+            tags: tagsCopy,
+            rewardItems: rewardItemsCopy,
+          };
+        });
+
+        // Apply dynamic filters
+        const filteredTemplates = applyFilters(templatesCopy);
+        setTemplates(filteredTemplates);
         // Ensure total is a valid number, default to 0 if undefined or NaN
         const totalCount = result.total;
         const validTotal = typeof totalCount === 'number' && !isNaN(totalCount) ? totalCount : 0;
@@ -88,9 +258,69 @@ const RewardTemplatesPage: React.FC = () => {
     }
   };
 
+  // Save active filters to localStorage
+  useEffect(() => {
+    localStorage.setItem('rewardTemplatesActiveFilters', JSON.stringify(activeFilters));
+  }, [activeFilters]);
+
   useEffect(() => {
     loadTemplates();
-  }, [page, rowsPerPage, debouncedSearchTerm]);
+  }, [page, rowsPerPage, debouncedSearchTerm, orderBy, order, activeFilters]);
+
+  // Column handlers
+  const handleColumnsChange = (newColumns: ColumnConfig[]) => {
+    // Merge with checkbox and actions columns
+    const checkboxCol = columns.find(c => c.id === 'checkbox');
+    const actionsCol = columns.find(c => c.id === 'actions');
+
+    const updatedColumns = [
+      checkboxCol!,
+      ...newColumns,
+      actionsCol!,
+    ];
+
+    setColumns(updatedColumns);
+    localStorage.setItem('rewardTemplatesColumns', JSON.stringify(updatedColumns));
+  };
+
+  const handleResetColumns = () => {
+    setColumns(defaultColumns);
+    localStorage.setItem('rewardTemplatesColumns', JSON.stringify(defaultColumns));
+  };
+
+  // Sort handler
+  const handleSort = (colId: string) => {
+    let newOrder: 'asc' | 'desc' = 'asc';
+    if (orderBy === colId) {
+      newOrder = order === 'asc' ? 'desc' : 'asc';
+    }
+    setOrderBy(colId);
+    setOrder(newOrder);
+    localStorage.setItem('rewardTemplatesSortBy', colId);
+    localStorage.setItem('rewardTemplatesSortOrder', newOrder);
+    setPage(0); // Reset to first page when sorting
+  };
+
+  // Filter handlers
+  const handleFilterAdd = (filter: ActiveFilter) => {
+    setActiveFilters(prev => [...prev, filter]);
+  };
+
+  const handleFilterRemove = (key: string) => {
+    setActiveFilters(prev => prev.filter(f => f.key !== key));
+  };
+
+  const handleDynamicFilterChange = (key: string, value: any) => {
+    setActiveFilters(prev =>
+      prev.map(f => (f.key === key ? { ...f, value } : f))
+    );
+  };
+
+  const handleOperatorChange = (key: string, operator: 'any_of' | 'include_all') => {
+    setActiveFilters(prev =>
+      prev.map(f => (f.key === key ? { ...f, operator } : f))
+    );
+  };
 
   // CRUD handlers
   const handleCreate = () => {
@@ -99,7 +329,27 @@ const RewardTemplatesPage: React.FC = () => {
   };
 
   const handleEdit = (template: RewardTemplate) => {
-    setEditingTemplate(template);
+    // Deep copy template to avoid reference sharing
+    const templateCopy: RewardTemplate = {
+      ...template,
+      tags: template.tags ? template.tags.map(tag => ({ ...tag })) : [],
+      rewardItems: template.rewardItems ? template.rewardItems.map(item => ({ ...item })) : [],
+    };
+    setEditingTemplate(templateCopy);
+    setFormDrawerOpen(true);
+  };
+
+  const handleCopy = (template: RewardTemplate) => {
+    // Create a copy with modified name
+    const copiedName = `${template.name} (${t('common.copy')})`;
+    const copiedTemplate: RewardTemplate = {
+      ...template,
+      id: '', // Remove ID so it's treated as a new template
+      name: copiedName,
+      tags: template.tags ? template.tags.map(tag => ({ ...tag })) : [],
+      rewardItems: template.rewardItems ? template.rewardItems.map(item => ({ ...item })) : [],
+    };
+    setEditingTemplate(copiedTemplate);
     setFormDrawerOpen(true);
   };
 
@@ -111,18 +361,13 @@ const RewardTemplatesPage: React.FC = () => {
   const handleFormSave = async () => {
     handleFormClose();
     setPage(0);
+    setSelectedIds([]);
     await loadTemplates();
   };
 
-  const handleDeleteClick = async (template: RewardTemplate) => {
-    try {
-      // Check references before showing delete dialog
-      const references = await rewardTemplateService.checkReferences(template.id);
-      setDeletingTemplate({ ...template, references } as any);
-      setDeleteConfirmOpen(true);
-    } catch (error: any) {
-      enqueueSnackbar(error.message || t('common.error'), { variant: 'error' });
-    }
+  const handleDelete = (template: RewardTemplate) => {
+    setDeletingTemplate(template);
+    setDeleteConfirmOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
@@ -131,18 +376,43 @@ const RewardTemplatesPage: React.FC = () => {
     try {
       await rewardTemplateService.deleteRewardTemplate(deletingTemplate.id);
       enqueueSnackbar(t('rewardTemplates.deleteSuccess'), { variant: 'success' });
-      setDeleteConfirmOpen(false);
-      setDeletingTemplate(null);
-      setPage(0);
-      await loadTemplates();
+      setSelectedIds([]);
+      loadTemplates();
     } catch (error: any) {
       enqueueSnackbar(error.message || t('rewardTemplates.deleteFailed'), { variant: 'error' });
+    } finally {
+      setDeleteConfirmOpen(false);
+      setDeletingTemplate(null);
     }
   };
 
-  const handleRefresh = () => {
-    setPage(0);
-    loadTemplates();
+  const handleDeleteCancel = () => {
+    setDeleteConfirmOpen(false);
+    setDeletingTemplate(null);
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) return;
+    setBulkDeleteConfirmOpen(true);
+  };
+
+  const handleBulkDeleteConfirm = async () => {
+    if (selectedIds.length === 0) return;
+
+    try {
+      await Promise.all(selectedIds.map(id => rewardTemplateService.deleteRewardTemplate(id)));
+      enqueueSnackbar(t('rewardTemplates.bulkDeleteSuccess'), { variant: 'success' });
+      setSelectedIds([]);
+      loadTemplates();
+    } catch (error: any) {
+      enqueueSnackbar(error.message || t('rewardTemplates.bulkDeleteFailed'), { variant: 'error' });
+    } finally {
+      setBulkDeleteConfirmOpen(false);
+    }
+  };
+
+  const handleBulkDeleteCancel = () => {
+    setBulkDeleteConfirmOpen(false);
   };
 
   // Selection handlers
@@ -160,8 +430,8 @@ const RewardTemplatesPage: React.FC = () => {
     );
   };
 
-  const isAllSelected = templates.length > 0 && selectedIds.length === templates.length;
-  const isIndeterminate = selectedIds.length > 0 && selectedIds.length < templates.length;
+  // Visible columns
+  const visibleColumns = columns.filter(col => col.visible);
 
   return (
     <Box sx={{ p: 3 }}>
@@ -184,129 +454,319 @@ const RewardTemplatesPage: React.FC = () => {
           >
             {t('rewardTemplates.createTemplate')}
           </Button>
-          <Tooltip title={t('common.refresh')}>
-            <IconButton onClick={handleRefresh} disabled={loading}>
-              <RefreshIcon />
-            </IconButton>
-          </Tooltip>
         </Box>
       </Box>
 
-      {/* Search */}
-      <Box sx={{ mb: 3 }}>
-        <TextField
-          fullWidth
-          placeholder={t('rewardTemplates.searchPlaceholder')}
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setPage(0);
-          }}
-          size="small"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Box>
+      {/* Search and Filters */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', justifyContent: 'space-between' }}>
+            {/* Left side: Search and Filters */}
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', flex: 1 }}>
+              <TextField
+                placeholder={t('rewardTemplates.searchPlaceholder')}
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setPage(0);
+                }}
+                sx={{
+                  minWidth: 200,
+                  flexGrow: 1,
+                  maxWidth: 320,
+                  '& .MuiOutlinedInput-root': {
+                    height: '40px',
+                    borderRadius: '20px',
+                    bgcolor: 'background.paper',
+                    transition: 'all 0.2s ease-in-out',
+                    '& fieldset': {
+                      borderColor: 'divider',
+                    },
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      '& fieldset': {
+                        borderColor: 'primary.light',
+                      }
+                    },
+                    '&.Mui-focused': {
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.1)',
+                      '& fieldset': {
+                        borderColor: 'primary.main',
+                        borderWidth: '1px',
+                      }
+                    }
+                  },
+                  '& .MuiInputBase-input': {
+                    fontSize: '0.875rem',
+                  }
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                    </InputAdornment>
+                  ),
+                }}
+                size="small"
+              />
+
+              {/* Dynamic Filter Bar */}
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleDynamicFilterChange}
+                onOperatorChange={handleOperatorChange}
+                afterFilterAddActions={
+                  <Tooltip title={t('common.columnSettings')}>
+                    <IconButton
+                      onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                      sx={{
+                        bgcolor: 'background.paper',
+                        border: 1,
+                        borderColor: 'divider',
+                        '&:hover': {
+                          bgcolor: 'action.hover',
+                        },
+                      }}
+                    >
+                      <ViewColumnIcon />
+                    </IconButton>
+                  </Tooltip>
+                }
+              />
+            </Box>
+
+            {/* Right side: Refresh Button */}
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Tooltip title={t('common.refresh')}>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={loadTemplates}
+                    disabled={loading}
+                  >
+                    <RefreshIcon />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
+
+      {/* Bulk Actions */}
+      {selectedIds.length > 0 && (
+        <Box sx={{ mb: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
+          <Typography variant="body2" color="text.secondary">
+            {t('common.selectedCount', { count: selectedIds.length })}
+          </Typography>
+          <Button
+            variant="outlined"
+            color="error"
+            size="small"
+            startIcon={<DeleteIcon />}
+            onClick={handleBulkDelete}
+          >
+            {t('common.deleteSelected')}
+          </Button>
+        </Box>
+      )}
 
       {/* Table */}
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow sx={{ backgroundColor: 'action.hover' }}>
-              <TableCell padding="checkbox">
-                <Checkbox
-                  checked={isAllSelected}
-                  indeterminate={isIndeterminate}
-                  onChange={handleSelectAll}
-                />
-              </TableCell>
-              <TableCell>{t('rewardTemplates.name')}</TableCell>
-              <TableCell>{t('rewardTemplates.description')}</TableCell>
-              <TableCell>{t('rewardTemplates.tags')}</TableCell>
-              <TableCell>{t('rewardTemplates.createdAt')}</TableCell>
-              <TableCell align="right">{t('common.actions')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading && isInitialLoad ? (
-              Array.from({ length: rowsPerPage }).map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell colSpan={6}>
-                    <Skeleton />
-                  </TableCell>
+      <Card>
+        <CardContent sx={{ p: 0 }}>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  {visibleColumns.map((column) => {
+                    if (column.id === 'checkbox') {
+                      return (
+                        <TableCell key={column.id} padding="checkbox">
+                          <Checkbox
+                            indeterminate={selectedIds.length > 0 && selectedIds.length < templates.length}
+                            checked={templates.length > 0 && selectedIds.length === templates.length}
+                            onChange={handleSelectAll}
+                          />
+                        </TableCell>
+                      );
+                    }
+                    if (column.id === 'actions') {
+                      return (
+                        <TableCell key={column.id} align="center">
+                          {t(column.labelKey)}
+                        </TableCell>
+                      );
+                    }
+                    // Sortable columns: name, createdAt
+                    const isSortable = ['name', 'createdAt'].includes(column.id);
+                    return (
+                      <TableCell key={column.id}>
+                        {isSortable ? (
+                          <TableSortLabel
+                            active={orderBy === column.id}
+                            direction={orderBy === column.id ? order : 'asc'}
+                            onClick={() => handleSort(column.id)}
+                          >
+                            {t(column.labelKey)}
+                          </TableSortLabel>
+                        ) : (
+                          t(column.labelKey)
+                        )}
+                      </TableCell>
+                    );
+                  })}
                 </TableRow>
-              ))
-            ) : templates.length === 0 ? (
-              <EmptyTableRow colSpan={6} message={t('rewardTemplates.noTemplatesFound')} />
-            ) : (
-              templates.map((template) => (
-                <TableRow key={template.id} hover>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={selectedIds.includes(template.id)}
-                      onChange={() => handleSelectOne(template.id)}
-                    />
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 500 }}>{template.name}</TableCell>
-                  <TableCell sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {template.description || '-'}
-                  </TableCell>
-                  <TableCell>
-                    {template.tags && template.tags.length > 0 ? (
-                      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                        {template.tags.map((tag) => (
-                          <Chip key={tag} label={tag} size="small" variant="outlined" />
-                        ))}
-                      </Box>
-                    ) : (
-                      '-'
-                    )}
-                  </TableCell>
-                  <TableCell>{formatDateTimeDetailed(template.createdAt)}</TableCell>
-                  <TableCell align="right">
-                    <Tooltip title={t('common.edit')}>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleEdit(template)}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={t('common.delete')}>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDeleteClick(template)}
-                        color="error"
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              </TableHead>
+              <TableBody>
+                {loading && isInitialLoad ? (
+                  <EmptyTableRow
+                    colSpan={visibleColumns.length}
+                    loading={true}
+                    message=""
+                    loadingMessage={t('common.loadingData')}
+                  />
+                ) : templates.length === 0 ? (
+                  <EmptyTableRow
+                    colSpan={visibleColumns.length}
+                    loading={false}
+                    message={t('rewardTemplates.noTemplatesFound')}
+                    loadingMessage=""
+                  />
+                ) : (
+                  templates.map((template) => (
+                    <TableRow
+                      key={template.id}
+                      hover
+                      selected={selectedIds.includes(template.id)}
+                    >
+                      {visibleColumns.map((column) => {
+                        if (column.id === 'checkbox') {
+                          return (
+                            <TableCell key={column.id} padding="checkbox">
+                              <Checkbox
+                                checked={selectedIds.includes(template.id)}
+                                onChange={() => handleSelectOne(template.id)}
+                              />
+                            </TableCell>
+                          );
+                        }
+                        if (column.id === 'name') {
+                          return (
+                            <TableCell key={column.id}>
+                              <Typography
+                                sx={{
+                                  cursor: 'pointer',
+                                  '&:hover': {
+                                    textDecoration: 'underline'
+                                  }
+                                }}
+                                onClick={() => handleEdit(template)}
+                              >
+                                {template.name}
+                              </Typography>
+                            </TableCell>
+                          );
+                        }
+                        if (column.id === 'description') {
+                          return (
+                            <TableCell key={column.id}>
+                              {template.description || '-'}
+                            </TableCell>
+                          );
+                        }
+                        if (column.id === 'tags') {
+                          return (
+                            <TableCell key={column.id}>
+                              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', maxWidth: 220 }}>
+                                {template.tags && template.tags.length > 0 ? (
+                                  template.tags.slice(0, 6).map((tag, idx) => (
+                                    <Tooltip key={`${tag.id}-${idx}`} title={tag.description || t('tags.noDescription')} arrow>
+                                      <Chip label={tag.name} size="small" sx={{ bgcolor: tag.color, color: '#fff', cursor: 'help' }} />
+                                    </Tooltip>
+                                  ))
+                                ) : (
+                                  <Typography variant="body2" color="text.secondary">-</Typography>
+                                )}
+                              </Box>
+                            </TableCell>
+                          );
+                        }
+                        if (column.id === 'createdAt') {
+                          return (
+                            <TableCell key={column.id}>
+                              {formatDateTimeDetailed(template.createdAt)}
+                            </TableCell>
+                          );
+                        }
+                        if (column.id === 'actions') {
+                          return (
+                            <TableCell key={column.id} align="center">
+                              <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                                <Tooltip title={t('common.edit')}>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleEdit(template)}
+                                  >
+                                    <EditIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title={t('rewardTemplates.copyTemplate')}>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleCopy(template)}
+                                  >
+                                    <ContentCopyIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title={t('common.delete')}>
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => handleDelete(template)}
+                                  >
+                                    <DeleteIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                              </Box>
+                            </TableCell>
+                          );
+                        }
+                        return null;
+                      })}
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-      {/* Pagination */}
-      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-        <SimplePagination
-          count={total}
-          page={page}
-          rowsPerPage={rowsPerPage}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          onRowsPerPageChange={(e) => {
-            setRowsPerPage(parseInt(e.target.value, 10));
-            setPage(0);
-          }}
-        />
-      </Box>
+          {/* Pagination */}
+          {!loading && templates.length > 0 && (
+            <SimplePagination
+              page={page}
+              rowsPerPage={rowsPerPage}
+              count={total}
+              onPageChange={(event, newPage) => setPage(newPage)}
+              onRowsPerPageChange={(event) => {
+                setRowsPerPage(Number(event.target.value));
+                setPage(0);
+              }}
+            />
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Column Settings Dialog */}
+      <ColumnSettingsDialog
+        anchorEl={columnSettingsAnchor}
+        onClose={() => setColumnSettingsAnchor(null)}
+        columns={columns.filter(col => col.id !== 'checkbox' && col.id !== 'actions')}
+        onColumnsChange={handleColumnsChange}
+        onReset={handleResetColumns}
+      />
 
       {/* Form Dialog */}
       <RewardTemplateFormDialog
@@ -316,57 +776,25 @@ const RewardTemplatesPage: React.FC = () => {
         template={editingTemplate}
       />
 
-      {/* Delete Confirm Dialog */}
+      {/* Delete Confirmation Dialog */}
       <ConfirmDeleteDialog
         open={deleteConfirmOpen}
-        title={t('rewardTemplates.deleteConfirmTitle')}
-        message={t('rewardTemplates.deleteConfirmMessage', { name: deletingTemplate?.name })}
+        onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        onCancel={() => {
-          setDeleteConfirmOpen(false);
-          setDeletingTemplate(null);
-        }}
-        additionalContent={
-          deletingTemplate?.references && (
-            <Box sx={{ mt: 2, p: 2, backgroundColor: 'warning.light', borderRadius: 1 }}>
-              {(deletingTemplate.references.coupons?.length > 0 || deletingTemplate.references.surveys?.length > 0) && (
-                <>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-                    {t('rewardTemplates.referencedBy')}
-                  </Typography>
-                  {deletingTemplate.references.coupons?.length > 0 && (
-                    <Box sx={{ mb: 1 }}>
-                      <Typography variant="caption" sx={{ fontWeight: 500 }}>
-                        {t('rewardTemplates.coupons')} ({deletingTemplate.references.coupons.length})
-                      </Typography>
-                      <Box sx={{ ml: 1 }}>
-                        {deletingTemplate.references.coupons.map((coupon: any) => (
-                          <Typography key={coupon.id} variant="caption" display="block">
-                            • {coupon.name} ({coupon.code})
-                          </Typography>
-                        ))}
-                      </Box>
-                    </Box>
-                  )}
-                  {deletingTemplate.references.surveys?.length > 0 && (
-                    <Box>
-                      <Typography variant="caption" sx={{ fontWeight: 500 }}>
-                        {t('rewardTemplates.surveys')} ({deletingTemplate.references.surveys.length})
-                      </Typography>
-                      <Box sx={{ ml: 1 }}>
-                        {deletingTemplate.references.surveys.map((survey: any) => (
-                          <Typography key={survey.id} variant="caption" display="block">
-                            • {survey.title}
-                          </Typography>
-                        ))}
-                      </Box>
-                    </Box>
-                  )}
-                </>
-              )}
-            </Box>
-          )
-        }
+        title={t('rewardTemplates.deleteConfirmTitle')}
+        message={t('rewardTemplates.deleteConfirmMessage', {
+          name: deletingTemplate?.name || ''
+        })}
+      />
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <ConfirmDeleteDialog
+        open={bulkDeleteConfirmOpen}
+        onClose={handleBulkDeleteCancel}
+        onConfirm={handleBulkDeleteConfirm}
+        title={t('rewardTemplates.bulkDeleteConfirmTitle')}
+        message={t('rewardTemplates.bulkDeleteConfirmMessage', { count: selectedIds.length })}
+        warning={t('rewardTemplates.bulkDeleteWarning')}
       />
     </Box>
   );

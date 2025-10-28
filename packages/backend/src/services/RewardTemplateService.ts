@@ -2,6 +2,7 @@ import { ulid } from 'ulid';
 import database from '../config/database';
 import { CustomError } from '../middleware/errorHandler';
 import logger from '../config/logger';
+import { TagService } from './TagService';
 
 export interface ParticipationReward {
   rewardType: string;
@@ -41,6 +42,8 @@ export interface GetRewardTemplatesParams {
   page?: number;
   limit?: number;
   search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface GetRewardTemplatesResponse {
@@ -59,6 +62,8 @@ class RewardTemplateService {
     const page = params?.page || 1;
     const limit = params?.limit || 10;
     const search = params?.search || '';
+    const sortBy = params?.sortBy || 'createdAt';
+    const sortOrder = (params?.sortOrder || 'desc').toUpperCase();
 
     const offset = (page - 1) * limit;
 
@@ -73,6 +78,11 @@ class RewardTemplateService {
 
       const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
+      // Validate sortBy to prevent SQL injection
+      const validSortColumns = ['name', 'createdAt', 'updatedAt'];
+      const safeSortBy = validSortColumns.includes(sortBy) ? sortBy : 'createdAt';
+      const safeSortOrder = sortOrder === 'ASC' ? 'ASC' : 'DESC';
+
       // Get total count
       const [countRows] = await pool.execute<any[]>(
         `SELECT COUNT(*) as count FROM g_reward_item_templates ${whereClause}`,
@@ -80,17 +90,21 @@ class RewardTemplateService {
       );
       const total = countRows[0]?.count || 0;
 
-      // Get templates
+      // Get templates with sorting
       const [templates] = await pool.execute<any[]>(
-        `SELECT * FROM g_reward_item_templates ${whereClause} ORDER BY createdAt DESC LIMIT ${limit} OFFSET ${offset}`,
+        `SELECT * FROM g_reward_item_templates ${whereClause} ORDER BY ${safeSortBy} ${safeSortOrder} LIMIT ${limit} OFFSET ${offset}`,
         queryParams
       );
 
-      // Parse JSON fields
-      const parsedTemplates = (templates as any[]).map(t => ({
-        ...t,
-        rewardItems: typeof t.rewardItems === 'string' ? JSON.parse(t.rewardItems) : t.rewardItems,
-        tags: typeof t.tags === 'string' ? JSON.parse(t.tags) : (t.tags || []),
+      // Parse JSON fields and load tags
+      const parsedTemplates = await Promise.all((templates as any[]).map(async (t) => {
+        const tags = await TagService.listTagsForEntity('reward_template', t.id);
+        logger.debug(`Loaded tags for template ${t.id}:`, { templateId: t.id, tagCount: tags.length, tags });
+        return {
+          ...t,
+          rewardItems: typeof t.rewardItems === 'string' ? JSON.parse(t.rewardItems) : t.rewardItems,
+          tags: tags,
+        };
       }));
 
       return {
@@ -121,10 +135,11 @@ class RewardTemplateService {
       }
 
       const template = templates[0];
+      const tags = await TagService.listTagsForEntity('reward_template', id);
       return {
         ...template,
         rewardItems: typeof template.rewardItems === 'string' ? JSON.parse(template.rewardItems) : template.rewardItems,
-        tags: typeof template.tags === 'string' ? JSON.parse(template.tags) : (template.tags || []),
+        tags: tags,
       };
     } catch (error) {
       if (error instanceof CustomError) throw error;

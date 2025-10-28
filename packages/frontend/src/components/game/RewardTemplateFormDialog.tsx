@@ -12,6 +12,8 @@ import {
   Stack,
   Collapse,
   OutlinedInput,
+  Autocomplete,
+  Tooltip,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -25,6 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import rewardTemplateService, { RewardTemplate, ParticipationReward } from '../../services/rewardTemplateService';
 import RewardItemSelector, { RewardSelection } from './RewardItemSelector';
+import { tagService, Tag } from '../../services/tagService';
 
 interface RewardTemplateFormDialogProps {
   open: boolean;
@@ -46,26 +49,103 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [rewardItems, setRewardItems] = useState<ParticipationReward[]>([]);
-  const [tags, setTags] = useState<string[]>([]);
-  const [tagInput, setTagInput] = useState('');
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
   const [rewardsExpanded, setRewardsExpanded] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [loadingTags, setLoadingTags] = useState(false);
+  const [isCopy, setIsCopy] = useState(false);
+  const nameInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Load available tags
+  useEffect(() => {
+    const loadTags = async () => {
+      try {
+        setLoadingTags(true);
+        const tags = await tagService.list();
+        setAvailableTags(tags);
+      } catch (error) {
+        console.error('Failed to load tags:', error);
+      } finally {
+        setLoadingTags(false);
+      }
+    };
+
+    if (open) {
+      loadTags();
+    }
+  }, [open]);
 
   // Initialize form
   useEffect(() => {
     if (template) {
+      // Check if this is a copy operation (template has no ID)
+      const isCopyOperation = !template.id;
+      setIsCopy(isCopyOperation);
+
       setName(template.name);
       setDescription(template.description || '');
-      setRewardItems(template.rewardItems || []);
-      setTags(template.tags || []);
+
+      // Deep copy rewardItems to avoid reference sharing
+      const rewardItemsCopy = template.rewardItems && Array.isArray(template.rewardItems)
+        ? template.rewardItems.map(item => {
+            if (typeof item === 'object' && item !== null) {
+              return { ...item };
+            }
+            return item;
+          })
+        : [];
+      setRewardItems(rewardItemsCopy);
+
+      // Convert tags to Tag objects - deep copy to avoid reference sharing
+      if (template.tags && Array.isArray(template.tags)) {
+        const selectedTagObjects = availableTags
+          .filter(tag =>
+            template.tags?.some(t => {
+              // Handle both Tag objects and string tags
+              if (typeof t === 'object' && t !== null && 'id' in t) {
+                return t.id === tag.id;
+              }
+              return false;
+            })
+          )
+          .map(tag => {
+            // Deep copy each tag to avoid reference sharing
+            if (typeof tag === 'object' && tag !== null) {
+              return { ...tag };
+            }
+            return tag;
+          });
+        console.log('[RewardTemplateFormDialog] Form initialized with template:', {
+          templateId: template.id,
+          templateName: template.name,
+          templateTagIds: template.tags?.map((t: any) => t.id) || [],
+          selectedTagIds: selectedTagObjects.map(t => t.id),
+          availableTagCount: availableTags.length,
+        });
+        setSelectedTags(selectedTagObjects);
+      } else {
+        console.log('[RewardTemplateFormDialog] Form initialized with template (no tags):', {
+          templateId: template.id,
+          templateName: template.name,
+        });
+        setSelectedTags([]);
+      }
     } else {
       setName('');
       setDescription('');
       setRewardItems([]);
-      setTags([]);
+      setSelectedTags([]);
+      setIsCopy(false);
     }
-    setTagInput('');
-  }, [template, open]);
+
+    // Focus on name input when drawer opens
+    if (open) {
+      setTimeout(() => {
+        nameInputRef.current?.focus();
+      }, 100);
+    }
+  }, [template, open, availableTags]);
 
   // Handlers
   const handleAddReward = () => {
@@ -83,17 +163,6 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
     const updated = [...rewardItems];
     updated[index] = reward;
     setRewardItems(updated);
-  };
-
-  const handleAddTag = () => {
-    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
-      setTags([...tags, tagInput.trim()]);
-      setTagInput('');
-    }
-  };
-
-  const handleRemoveTag = (tag: string) => {
-    setTags(tags.filter(t => t !== tag));
   };
 
   const handleSave = async () => {
@@ -127,22 +196,44 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
 
     setSaving(true);
     try {
-      if (template) {
-        await rewardTemplateService.updateRewardTemplate(template.id, {
+      const tagIds = selectedTags.map(tag => tag.id);
+      console.log('[RewardTemplateFormDialog] Saving template:', {
+        templateId: template?.id || 'NEW',
+        templateName: name.trim(),
+        tagIds,
+        selectedTagCount: selectedTags.length,
+      });
+      if (template && template.id) {
+        // Update existing template
+        const updatePayload = {
           name: name.trim(),
           description: description.trim() || undefined,
           rewardItems,
-          tags,
+          tagIds,
+        };
+        console.log('[RewardTemplateFormDialog] Sending update request:', {
+          templateId: template.id,
+          payload: updatePayload,
+        });
+        const result = await rewardTemplateService.updateRewardTemplate(template.id, updatePayload);
+        console.log('[RewardTemplateFormDialog] Template updated successfully:', {
+          templateId: template.id,
+          tagIds,
+          resultTags: result.tags?.map((t: any) => ({ id: t.id, name: t.name })) || [],
         });
         enqueueSnackbar(t('rewardTemplates.updateSuccess'), { variant: 'success' });
       } else {
+        // Create new template (including copied templates)
         await rewardTemplateService.createRewardTemplate({
           name: name.trim(),
           description: description.trim() || undefined,
           rewardItems,
-          tags,
+          tagIds,
         });
-        enqueueSnackbar(t('rewardTemplates.createSuccess'), { variant: 'success' });
+        // Check if this is a copy operation (name contains " (Copy)" or localized equivalent)
+        const isCopy = name.includes(`(${t('common.copy')})`);
+        const message = isCopy ? t('rewardTemplates.copySuccess') : t('rewardTemplates.createSuccess');
+        enqueueSnackbar(message, { variant: 'success' });
       }
       onSave();
     } catch (error: any) {
@@ -156,8 +247,18 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
     <ResizableDrawer
       open={open}
       onClose={onClose}
-      title={template ? t('rewardTemplates.editTemplate') : t('rewardTemplates.createTemplate')}
-      subtitle={t('rewardTemplates.formSubtitle')}
+      title={
+        isCopy
+          ? t('rewardTemplates.copyTemplate')
+          : template
+          ? t('rewardTemplates.editTemplate')
+          : t('rewardTemplates.createTemplate')
+      }
+      subtitle={
+        isCopy
+          ? t('rewardTemplates.formSubtitle')
+          : t('rewardTemplates.formSubtitle')
+      }
       storageKey="rewardTemplateFormDrawerWidth"
       defaultWidth={800}
       minWidth={600}
@@ -170,12 +271,12 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
             <Box>
               <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('rewardTemplates.name')}</Typography>
               <TextField
+                inputRef={nameInputRef}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 fullWidth
                 size="small"
                 placeholder={t('rewardTemplates.nameHelp')}
-                helperText={t('rewardTemplates.nameHelp')}
               />
             </Box>
 
@@ -190,7 +291,6 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
                 rows={3}
                 size="small"
                 placeholder={t('rewardTemplates.descriptionHelp')}
-                helperText={t('rewardTemplates.descriptionHelp')}
               />
             </Box>
 
@@ -257,44 +357,35 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
 
             {/* Tags */}
             <Box>
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('rewardTemplates.tags')}</Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                {t('rewardTemplates.tagsHelp')}
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                <OutlinedInput
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddTag();
-                    }
-                  }}
-                  placeholder={t('rewardTemplates.addTag')}
-                  size="small"
-                  sx={{ flex: 1 }}
-                />
-                <Button
-                  variant="outlined"
-                  onClick={handleAddTag}
-                  sx={{ whiteSpace: 'nowrap' }}
-                >
-                  {t('rewardTemplates.addTag')}
-                </Button>
-              </Box>
-              {tags.length > 0 && (
-                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                  {tags.map((tag) => (
-                    <Chip
-                      key={tag}
-                      label={tag}
-                      onDelete={() => handleRemoveTag(tag)}
-                      size="small"
-                    />
-                  ))}
-                </Box>
-              )}
+              <Autocomplete
+                multiple
+                options={availableTags.filter(tag => typeof tag !== 'string')}
+                getOptionLabel={(option) => option.name}
+                filterSelectedOptions
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                value={selectedTags}
+                onChange={(_, value) => setSelectedTags(value)}
+                loading={loadingTags}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...chipProps } = getTagProps({ index });
+                    return (
+                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                        <Chip
+                          variant="outlined"
+                          label={option.name}
+                          size="small"
+                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          {...chipProps}
+                        />
+                      </Tooltip>
+                    );
+                  })
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label={t('rewardTemplates.tags')} />
+                )}
+              />
             </Box>
           </Stack>
         </Box>

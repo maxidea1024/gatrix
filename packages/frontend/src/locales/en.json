@@ -3119,7 +3119,14 @@
     "atLeastOneReward": "At least one reward item is required",
     "referencedBy": "Referenced by the following items",
     "coupons": "Coupons",
-    "surveys": "Surveys"
+    "surveys": "Surveys",
+    "bulkDeleteSuccess": "{{count}} reward templates have been deleted",
+    "bulkDeleteFailed": "Failed to bulk delete reward templates",
+    "bulkDeleteConfirmTitle": "Bulk Delete Reward Templates",
+    "bulkDeleteConfirmMessage": "Are you sure you want to delete {{count}} selected reward templates?",
+    "bulkDeleteWarning": "This action cannot be undone.",
+    "copyTemplate": "Copy Template",
+    "copySuccess": "Template copied successfully"
   },
   "hotTimeButtonEvent": {
     "title": "Hot Time Button Event",

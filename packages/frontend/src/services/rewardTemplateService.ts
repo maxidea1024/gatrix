@@ -1,4 +1,5 @@
 import api from './api';
+import { Tag } from './tagService';
 
 export interface ParticipationReward {
   rewardType: string;
@@ -11,7 +12,7 @@ export interface RewardTemplate {
   name: string;
   description?: string;
   rewardItems: ParticipationReward[];
-  tags?: string[];
+  tags?: Tag[];
   createdBy?: number;
   updatedBy?: number;
   createdAt: string;
@@ -22,20 +23,22 @@ export interface CreateRewardTemplateInput {
   name: string;
   description?: string;
   rewardItems: ParticipationReward[];
-  tags?: string[];
+  tagIds?: number[];
 }
 
 export interface UpdateRewardTemplateInput {
   name?: string;
   description?: string;
   rewardItems?: ParticipationReward[];
-  tags?: string[];
+  tagIds?: number[];
 }
 
 export interface GetRewardTemplatesParams {
   page?: number;
   limit?: number;
   search?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface GetRewardTemplatesResponse {
@@ -51,7 +54,8 @@ class RewardTemplateService {
    */
   async getRewardTemplates(params?: GetRewardTemplatesParams): Promise<GetRewardTemplatesResponse> {
     const response = await api.get('/admin/reward-templates', { params });
-    return response.data.data;
+    // API service already unwraps response.data, so response = { success: true, data: { templates, total, page, limit }, message: "..." }
+    return response.data;
   }
 
   /**
@@ -59,7 +63,8 @@ class RewardTemplateService {
    */
   async getRewardTemplateById(id: string): Promise<RewardTemplate> {
     const response = await api.get(`/admin/reward-templates/${id}`);
-    return response.data.data.template;
+    // API service already unwraps response.data, so response = { success: true, data: { template }, message: "..." }
+    return response.data.template;
   }
 
   /**
@@ -67,7 +72,8 @@ class RewardTemplateService {
    */
   async createRewardTemplate(input: CreateRewardTemplateInput): Promise<RewardTemplate> {
     const response = await api.post('/admin/reward-templates', input);
-    return response.data.data.template;
+    // API service already unwraps response.data, so response = { success: true, data: { template }, message: "..." }
+    return response.data.template;
   }
 
   /**
@@ -75,7 +81,8 @@ class RewardTemplateService {
    */
   async updateRewardTemplate(id: string, input: UpdateRewardTemplateInput): Promise<RewardTemplate> {
     const response = await api.put(`/admin/reward-templates/${id}`, input);
-    return response.data.data.template;
+    // API service already unwraps response.data, so response = { success: true, data: { template }, message: "..." }
+    return response.data.template;
   }
 
   /**

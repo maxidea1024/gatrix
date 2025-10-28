@@ -3163,7 +3163,14 @@
     "atLeastOneReward": "至少需要一个奖励物品",
     "referencedBy": "以下项目正在引用",
     "coupons": "优惠券",
-    "surveys": "问卷"
+    "surveys": "问卷",
+    "bulkDeleteSuccess": "已删除{{count}}个奖励物品模板",
+    "bulkDeleteFailed": "批量删除奖励物品模板失败",
+    "bulkDeleteConfirmTitle": "批量删除奖励物品模板",
+    "bulkDeleteConfirmMessage": "确定要删除选中的{{count}}个奖励物品模板吗？",
+    "bulkDeleteWarning": "此操作无法撤销。",
+    "copyTemplate": "复制模板",
+    "copySuccess": "模板已复制"
   },
   "hotTimeButtonEvent": {
     "title": "热时按钮活动",

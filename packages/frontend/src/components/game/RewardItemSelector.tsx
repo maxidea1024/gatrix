@@ -1,15 +1,12 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Box,
-  FormControl,
-  InputLabel,
   Select,
   MenuItem,
   TextField,
   Typography,
   Autocomplete,
   CircularProgress,
-  Alert,
   Paper,
   Divider,
 } from '@mui/material';
@@ -17,7 +14,6 @@ import { CardGiftcard as GiftIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import planningDataService, { RewardTypeInfo, RewardItem } from '../../services/planningDataService';
-import { useDebounce } from '../../hooks/useDebounce';
 
 export interface RewardSelection {
   rewardType: string;
@@ -55,7 +51,7 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
 
 
   // Function to load reward types and localization
-  const loadRewardTypes = async () => {
+  const loadRewardTypes = useCallback(async () => {
     try {
       setLoadingTypes(true);
       const types = await planningDataService.getRewardTypeList();
@@ -75,7 +71,7 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
     } finally {
       setLoadingTypes(false);
     }
-  };
+  }, [i18n.language, enqueueSnackbar, t]);
 
   // Function to load items for a specific reward type
   const loadItems = useCallback(async (rewardType: number) => {
@@ -109,7 +105,7 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
   // Load reward types on mount and when language changes
   useEffect(() => {
     loadRewardTypes();
-  }, [i18n.language]);
+  }, [loadRewardTypes]);
 
   // Load items when reward type changes, reward types are loaded, or language changes
   useEffect(() => {
@@ -177,7 +173,13 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
 
         {/* Reward Type Selector */}
         <Select
-          value={rewardTypes.length > 0 ? value.rewardType : ''}
+          value={
+            loadingTypes || rewardTypes.length === 0
+              ? ''
+              : value.rewardType && rewardTypes.some(t => t.value === parseInt(value.rewardType))
+              ? String(value.rewardType)
+              : ''
+          }
           onChange={(e) => handleRewardTypeChange(e.target.value)}
           disabled={disabled || loadingTypes}
           size="small"
@@ -224,7 +226,7 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
               loading={loadingItems}
               disabled={disabled || loadingItems}
               disableClearable
-              sx={{ minWidth: 250, flex: '2 1 auto' }}
+              sx={{ flex: '1 1 200px', minWidth: 0 }}
               filterOptions={(options, state) => {
                 const inputValue = state.inputValue.toLowerCase();
                 if (!inputValue) return options;
@@ -281,36 +283,38 @@ const RewardItemSelector: React.FC<RewardItemSelectorProps> = ({
           </>
         )}
 
-        {/* Quantity Input */}
-        <TextField
-          type="number"
-          value={value.quantity}
-          onChange={(e) => handleQuantityChange(parseInt(e.target.value) || minQuantity)}
-          disabled={disabled}
-          error={error}
-          placeholder={t('rewards.quantity')}
-          size="small"
-          sx={{
-            width: 90,
-            '& .MuiOutlinedInput-root': {
-              '& fieldset': { border: 'none' },
-              fontSize: '0.875rem',
-            },
-            '& input[type=number]': {
-              MozAppearance: 'textfield',
-              textAlign: 'right',
-              py: 0.75,
-            },
-            '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
-              WebkitAppearance: 'none',
-              margin: 0,
-            },
-          }}
-          inputProps={{
-            min: minQuantity,
-            step: 1,
-          }}
-        />
+        {/* Quantity Input - Only show if reward type is selected */}
+        {value.rewardType && (
+          <TextField
+            type="number"
+            value={value.quantity}
+            onChange={(e) => handleQuantityChange(parseInt(e.target.value) || minQuantity)}
+            disabled={disabled}
+            error={error}
+            placeholder={t('rewards.quantity')}
+            size="small"
+            sx={{
+              width: 90,
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { border: 'none' },
+                fontSize: '0.875rem',
+              },
+              '& input[type=number]': {
+                MozAppearance: 'textfield',
+                textAlign: 'right',
+                py: 0.75,
+              },
+              '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+                WebkitAppearance: 'none',
+                margin: 0,
+              },
+            }}
+            inputProps={{
+              min: minQuantity,
+              step: 1,
+            }}
+          />
+        )}
       </Box>
 
       {helperText && (

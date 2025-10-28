@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { asyncHandler, CustomError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/auth';
 import RewardTemplateService from '../services/RewardTemplateService';
+import { TagService } from '../services/TagService';
 
 export class RewardTemplateController {
   /**
@@ -9,12 +10,14 @@ export class RewardTemplateController {
    * GET /api/v1/admin/reward-templates
    */
   static getRewardTemplates = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { page, limit, search } = req.query;
+    const { page, limit, search, sortBy, sortOrder } = req.query;
 
     const result = await RewardTemplateService.getRewardTemplates({
       page: page ? parseInt(page as string) : undefined,
       limit: limit ? parseInt(limit as string) : undefined,
       search: search as string,
+      sortBy: sortBy as string,
+      sortOrder: (sortOrder as string)?.toLowerCase() as 'asc' | 'desc',
     });
 
     res.json({
@@ -55,7 +58,7 @@ export class RewardTemplateController {
       throw new CustomError('User authentication required', 401);
     }
 
-    const { name, description, rewardItems, tags } = req.body;
+    const { name, description, rewardItems, tagIds } = req.body;
 
     // Validate template name
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
@@ -88,13 +91,20 @@ export class RewardTemplateController {
       name: name.trim(),
       description: description ? description.trim() : undefined,
       rewardItems,
-      tags,
       createdBy: authenticatedUserId,
     });
 
+    // Set tags for the template
+    if (Array.isArray(tagIds) && tagIds.length > 0) {
+      await TagService.setTagsForEntity('reward_template', template.id, tagIds.map(Number), authenticatedUserId);
+    }
+
+    // Load tags for response
+    const tags = await TagService.listTagsForEntity('reward_template', template.id);
+
     res.status(201).json({
       success: true,
-      data: { template },
+      data: { template: { ...template, tags } },
       message: 'Reward template created successfully',
     });
   });
@@ -115,7 +125,7 @@ export class RewardTemplateController {
       throw new CustomError('User authentication required', 401);
     }
 
-    const { name, description, rewardItems, tags } = req.body;
+    const { name, description, rewardItems, tagIds } = req.body;
 
     // Validate template name if provided
     if (name !== undefined && (!name || typeof name !== 'string' || name.trim().length === 0)) {
@@ -150,13 +160,20 @@ export class RewardTemplateController {
       name: name ? name.trim() : undefined,
       description: description ? description.trim() : undefined,
       rewardItems,
-      tags,
       updatedBy: authenticatedUserId,
     });
 
+    // Set tags for the template
+    if (Array.isArray(tagIds)) {
+      await TagService.setTagsForEntity('reward_template', template.id, tagIds.map(Number), authenticatedUserId);
+    }
+
+    // Load tags for response
+    const tags = await TagService.listTagsForEntity('reward_template', template.id);
+
     res.json({
       success: true,
-      data: { template },
+      data: { template: { ...template, tags } },
       message: 'Reward template updated successfully',
     });
   });

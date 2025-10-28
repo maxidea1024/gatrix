@@ -3120,7 +3120,14 @@
     "rewardTypeRequired": "{{index}}번째 보상의 보상 타입을 선택해주세요",
     "rewardItemRequired": "{{index}}번째 보상의 아이템을 선택해주세요",
     "rewardQuantityRequired": "{{index}}번째 보상의 수량을 입력해주세요",
-    "atLeastOneReward": "최소 하나 이상의 보상아이템이 필요합니다"
+    "atLeastOneReward": "최소 하나 이상의 보상아이템이 필요합니다",
+    "bulkDeleteSuccess": "{{count}}개의 보상아이템 템플릿이 삭제되었습니다",
+    "bulkDeleteFailed": "보상아이템 템플릿 일괄 삭제에 실패했습니다",
+    "bulkDeleteConfirmTitle": "보상아이템 템플릿 일괄 삭제",
+    "bulkDeleteConfirmMessage": "선택한 {{count}}개의 보상아이템 템플릿을 삭제하시겠습니까?",
+    "bulkDeleteWarning": "이 작업은 되돌릴 수 없습니다.",
+    "copyTemplate": "템플릿 복사",
+    "copySuccess": "템플릿이 복사되었습니다"
   },
   "hotTimeButtonEvent": {
     "title": "핫타임버튼 이벤트",

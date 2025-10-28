@@ -76,7 +76,6 @@ export const gameMenuItems: MenuItem[] = [
     { text: 'sidebar.couponUsage', icon: <HistoryIcon />, path: '/game/coupon-usage', adminOnly: true },
   ] },
   { text: 'sidebar.surveys', icon: <PollIcon />, path: '/game/surveys', adminOnly: true },
-  { text: 'sidebar.rewardTemplates', icon: <CardGiftcardIcon />, path: '/game/reward-templates', adminOnly: true },
   {
     text: 'sidebar.operationEvents',
     icon: <EventIcon />,
@@ -86,6 +85,7 @@ export const gameMenuItems: MenuItem[] = [
       { text: 'sidebar.liveEvent', icon: <CelebrationIcon />, path: '/game/live-event', adminOnly: true },
     ]
   },
+  { text: 'sidebar.rewardTemplates', icon: <CardGiftcardIcon />, path: '/game/reward-templates', adminOnly: true },
   { text: 'sidebar.planningData', icon: <StorageIcon />, path: '/game/planning-data', adminOnly: true },
 ];
 
