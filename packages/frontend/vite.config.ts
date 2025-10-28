@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import http from 'http'
+import https from 'https'
 
 // Force platform for WSL compatibility
 process.env.ROLLUP_BINARY_PATH = process.env.ROLLUP_BINARY_PATH || '';
@@ -13,6 +15,25 @@ const isDocker = process.env.VITE_DOCKER_ENV === 'true' || process.env.DOCKER_EN
 const backendHost = isDocker ? 'backend-dev' : 'localhost';
 const backendPort = isDocker ? '5000' : (process.env.BACKEND_PORT || '5000');
 const backendUrl = `http://${backendHost}:${backendPort}`;
+
+// Create HTTP agents with DNS caching disabled
+const httpAgent = new http.Agent({
+  keepAlive: true,
+  keepAliveMsecs: 1000,
+  maxSockets: 50,
+  maxFreeSockets: 10,
+  timeout: 60000,
+  freeSocketTimeout: 30000,
+});
+
+const httpsAgent = new https.Agent({
+  keepAlive: true,
+  keepAliveMsecs: 1000,
+  maxSockets: 50,
+  maxFreeSockets: 10,
+  timeout: 60000,
+  freeSocketTimeout: 30000,
+});
 
 console.log(`🔧 Vite proxy configuration:`, {
   isDocker,
@@ -55,25 +76,19 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: backendUrl,
-        changeOrigin: false, // Keep original host header
+        changeOrigin: true, // Change origin to backend URL
         secure: false,
+        agent: httpAgent,
         // SSE 지원을 위한 설정
-        configure: (proxy, options) => {
-          proxy.on('proxyReq', (proxyReq, req, res) => {
-            // Preserve the actual incoming host and protocol (works for LAN access)
-            const incomingHost = (req.headers['x-forwarded-host'] as string) || (req.headers.host as string) || 'localhost:3000';
-            const incomingProto = (req.headers['x-forwarded-proto'] as string) || (req.socket as any)?.encrypted ? 'https' : 'http';
-            proxyReq.setHeader('Host', incomingHost);
-            proxyReq.setHeader('X-Forwarded-Host', incomingHost);
-            proxyReq.setHeader('X-Forwarded-Proto', incomingProto);
-
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
             // SSE requests need special headers to keep the stream open
             if (req.url?.includes('/notifications/sse') || req.url?.includes('/services/sse')) {
               proxyReq.setHeader('Cache-Control', 'no-cache');
               proxyReq.setHeader('Connection', 'keep-alive');
             }
           });
-          proxy.on('proxyRes', (proxyRes, req, res) => {
+          proxy.on('proxyRes', (proxyRes, req) => {
             // SSE 응답인 경우 특별 처리
             if (req.url?.includes('/notifications/sse') || req.url?.includes('/services/sse')) {
               proxyRes.headers['cache-control'] = 'no-cache';
@@ -85,13 +100,9 @@ export default defineConfig({
       },
       '/admin/queues': {
         target: backendUrl,
-        changeOrigin: false,
+        changeOrigin: true,
         secure: false,
-        configure: (proxy, options) => {
-          proxy.on('proxyReq', (proxyReq, req, res) => {
-            proxyReq.setHeader('Host', 'localhost:3000');
-          });
-        },
+        agent: httpAgent,
       },
 
     },

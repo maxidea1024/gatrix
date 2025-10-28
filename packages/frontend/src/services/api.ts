@@ -6,8 +6,13 @@ class ApiService {
   private accessToken: string | null = null;
 
   constructor() {
+    // Use relative path for API calls - Vite proxy will handle routing to backend
+    // In development: Vite proxy routes /api to backend (http://localhost:5000)
+    // In production: API calls go to the same origin
+    const baseURL = import.meta.env.VITE_API_URL || '/api/v1';
+
     this.api = axios.create({
-      baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api/v1',
+      baseURL,
       timeout: 60000,
       withCredentials: true,
       headers: {

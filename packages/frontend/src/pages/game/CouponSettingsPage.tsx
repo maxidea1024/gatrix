@@ -82,6 +82,10 @@ const CouponSettingsPage: React.FC = () => {
   const [codesStats, setCodesStats] = useState<{ issued: number; used: number; unused: number }>({ issued: 0, used: 0, unused: 0 });
   const [exportingCodes, setExportingCodes] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
+  const [exportProcessedCount, setExportProcessedCount] = useState(0);
+  const [exportError, setExportError] = useState<string | null>(null);
+  const [exportSuccess, setExportSuccess] = useState(false);
+  const [exportFormat, setExportFormat] = useState<'csv' | 'xlsx' | null>(null);
   const exportAbortControllerRef = useRef<AbortController | null>(null);
 
   // SDK Guide drawer state
@@ -118,8 +122,20 @@ const CouponSettingsPage: React.FC = () => {
       return;
     }
 
-    setExportingCodes(true);
-    setExportProgress(0);
+    const totalCodes = codesStats.issued || 0;
+    const shouldShowProgress = totalCodes > 1000;
+
+    // Only show progress dialog for large datasets
+    if (shouldShowProgress) {
+      setExportingCodes(true);
+      setExportProgress(0);
+      setExportProcessedCount(0);
+      setExportError(null);
+      setExportSuccess(false);
+      setExportFormat(format);
+    }
+
+    setCodesExportMenuAnchor(null);
     exportAbortControllerRef.current = new AbortController();
 
     try {
@@ -131,7 +147,12 @@ const CouponSettingsPage: React.FC = () => {
       let hasMore = true;
 
       // Fetch all codes in chunks
-      while (hasMore && !exportAbortControllerRef.current.signal.aborted) {
+      while (hasMore && !exportAbortControllerRef.current?.signal.aborted) {
+        // Check if export was cancelled
+        if (exportAbortControllerRef.current?.signal.aborted) {
+          throw new Error('Export cancelled');
+        }
+
         try {
           const res = await couponService.getIssuedCodesForExport(codesSetting.id, {
             offset,
@@ -139,12 +160,15 @@ const CouponSettingsPage: React.FC = () => {
             search: debouncedCodesSearch || undefined,
           });
           allCodes.push(...(res.codes || []));
-          hasMore = res.hasMore || false;
+          hasMore = (res as any).hasMore || false;
           offset += chunkSize;
 
-          // Update progress
-          const progress = Math.min(100, Math.round((allCodes.length / (codesStats.issued || 1)) * 100));
-          setExportProgress(progress);
+          // Update progress only for large datasets
+          if (shouldShowProgress) {
+            setExportProcessedCount(allCodes.length);
+            const progress = Math.min(100, Math.round((allCodes.length / (totalCodes || 1)) * 100));
+            setExportProgress(progress);
+          }
         } catch (error) {
           if ((error as any).name === 'AbortError') {
             throw new Error('Export cancelled');
@@ -154,7 +178,11 @@ const CouponSettingsPage: React.FC = () => {
       }
 
       if (allCodes.length === 0) {
-        enqueueSnackbar(t('coupons.couponSettings.noDataToExport'), { variant: 'warning' });
+        if (shouldShowProgress) {
+          setExportError(t('coupons.couponSettings.noDataToExport'));
+        } else {
+          enqueueSnackbar(t('coupons.couponSettings.noDataToExport'), { variant: 'warning' });
+        }
         return;
       }
 
@@ -193,7 +221,11 @@ const CouponSettingsPage: React.FC = () => {
         blob = new Blob([xlsxBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         filename = `issued-codes-${codesSetting.code || 'export'}-${dateTimeStr}.xlsx`;
       } else {
-        enqueueSnackbar('Unsupported export format', { variant: 'warning' });
+        if (shouldShowProgress) {
+          setExportError('Unsupported export format');
+        } else {
+          enqueueSnackbar('Unsupported export format', { variant: 'warning' });
+        }
         return;
       }
 
@@ -206,14 +238,34 @@ const CouponSettingsPage: React.FC = () => {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
-      enqueueSnackbar(t('coupons.couponSettings.exportSuccess'), { variant: 'success' });
-      setCodesExportMenuAnchor(null);
+      if (shouldShowProgress) {
+        setExportingCodes(false);
+        setExportSuccess(true);
+        setExportProgress(100);
+      } else {
+        enqueueSnackbar(t('coupons.couponSettings.exportSuccess'), { variant: 'success' });
+      }
     } catch (error: any) {
       console.error('Error exporting issued codes:', error);
-      enqueueSnackbar(error.message || t('coupons.couponSettings.exportError'), { variant: 'error' });
+      // Don't show error dialog if export was cancelled
+      if (error.message === 'Export cancelled') {
+        if (shouldShowProgress) {
+          setExportingCodes(false);
+          setExportError(null);
+          setExportSuccess(false);
+          setExportProgress(0);
+          setExportProcessedCount(0);
+          setExportFormat(null);
+        }
+      } else {
+        if (shouldShowProgress) {
+          setExportingCodes(false);
+          setExportError(error.message || t('coupons.couponSettings.exportError'));
+        } else {
+          enqueueSnackbar(error.message || t('coupons.couponSettings.exportError'), { variant: 'error' });
+        }
+      }
     } finally {
-      setExportingCodes(false);
-      setExportProgress(0);
       exportAbortControllerRef.current = null;
     }
   }, [codesSetting, debouncedCodesSearch, codesStats?.issued || 0, t, enqueueSnackbar]);
@@ -864,7 +916,6 @@ const CouponSettingsPage: React.FC = () => {
                                                 top: '50%',
                                                 left: '50%',
                                                 transform: 'translate(-50%, -50%)',
-                                                fontWeight: 600,
                                                 fontSize: '0.75rem',
                                                 color: 'text.primary',
                                                 whiteSpace: 'nowrap',
@@ -1343,7 +1394,7 @@ const CouponSettingsPage: React.FC = () => {
                 disabled={exportingCodes}
                 sx={{ minWidth: 130, height: 40, flexShrink: 0 }}
               >
-                {exportingCodes ? `${exportProgress}%` : t('common.export')}
+                {t('common.export')}
               </Button>
               <Menu
                 anchorEl={codesExportMenuAnchor}
@@ -1366,19 +1417,6 @@ const CouponSettingsPage: React.FC = () => {
                   <ExcelIcon sx={{ mr: 1 }} />
                   Excel (XLSX)
                 </MenuItem>
-                {exportingCodes && (
-                  <>
-                    <Divider />
-                    <MenuItem onClick={() => {
-                      exportAbortControllerRef.current?.abort();
-                      setExportingCodes(false);
-                      setExportProgress(0);
-                      setCodesExportMenuAnchor(null);
-                    }}>
-                      {t('common.cancel')}
-                    </MenuItem>
-                  </>
-                )}
               </Menu>
             </Stack>
 
@@ -1475,6 +1513,130 @@ const CouponSettingsPage: React.FC = () => {
           <Button onClick={handleDeleteConfirm} color="error" variant="contained">
             {t('common.delete')}
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Export Progress Dialog - Only show for large datasets (>1000 codes) */}
+      <Dialog
+        open={(exportingCodes || exportSuccess || exportError !== null) && (codesStats.issued || 0) > 1000}
+        onClose={() => {
+          if (!exportingCodes) {
+            setExportSuccess(false);
+            setExportError(null);
+            setExportProgress(0);
+            setExportProcessedCount(0);
+            setExportFormat(null);
+          }
+        }}
+        maxWidth="sm"
+        fullWidth
+        disableEscapeKeyDown={exportingCodes}
+      >
+        <DialogTitle>
+          {exportSuccess
+            ? t('coupons.couponSettings.exportDialog.completed')
+            : exportError
+            ? t('coupons.couponSettings.exportDialog.failed')
+            : t('coupons.couponSettings.exportDialog.title')}
+        </DialogTitle>
+        <DialogContent sx={{ py: 3 }}>
+          {exportingCodes ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                {t('coupons.couponSettings.exportDialog.processing')}
+              </Typography>
+              <Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={exportProgress}
+                  sx={{ height: 8, borderRadius: 1 }}
+                />
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                  {t('coupons.couponSettings.exportDialog.progress', {
+                    current: exportProcessedCount.toLocaleString(),
+                    total: (codesStats.issued || 0).toLocaleString(),
+                  })}
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                  {exportProgress}%
+                </Typography>
+              </Box>
+            </Box>
+          ) : exportSuccess ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center', py: 2 }}>
+              <CheckCircleIcon sx={{ fontSize: 48, color: 'success.main' }} />
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+                {t('coupons.couponSettings.exportDialog.completed')}
+              </Typography>
+            </Box>
+          ) : exportError ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Typography variant="body2" color="error">
+                {exportError}
+              </Typography>
+            </Box>
+          ) : null}
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          {exportingCodes ? (
+            <Button
+              onClick={() => {
+                // Abort the export operation immediately
+                exportAbortControllerRef.current?.abort();
+                // Reset all export states immediately
+                setExportingCodes(false);
+                setExportProgress(0);
+                setExportProcessedCount(0);
+                setExportFormat(null);
+                setExportError(null);
+                setExportSuccess(false);
+              }}
+              color="inherit"
+            >
+              {t('coupons.couponSettings.exportDialog.cancel')}
+            </Button>
+          ) : exportSuccess ? (
+            <Button
+              onClick={() => {
+                setExportSuccess(false);
+                setExportProgress(0);
+                setExportProcessedCount(0);
+                setExportFormat(null);
+                enqueueSnackbar(t('coupons.couponSettings.exportSuccess'), { variant: 'success' });
+              }}
+              variant="contained"
+              color="primary"
+            >
+              {t('coupons.couponSettings.exportDialog.close')}
+            </Button>
+          ) : exportError ? (
+            <>
+              <Button
+                onClick={() => {
+                  setExportError(null);
+                  setExportProgress(0);
+                  setExportProcessedCount(0);
+                  setExportFormat(null);
+                }}
+                color="inherit"
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                onClick={() => {
+                  if (exportFormat) {
+                    handleExportIssuedCodes(exportFormat);
+                  }
+                }}
+                variant="contained"
+                color="primary"
+              >
+                {t('coupons.couponSettings.exportDialog.retry')}
+              </Button>
+            </>
+          ) : null}
         </DialogActions>
       </Dialog>
     </Box>
