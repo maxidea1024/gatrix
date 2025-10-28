@@ -128,6 +128,27 @@ export class CouponSettingsController {
     res.json({ success: true, data });
   });
 
+  // Get status statistics for issued coupon codes
+  static getIssuedCodesStats = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+    if (!id) throw new CustomError('id is required', 400);
+    const stats = await CouponSettingsService.getIssuedCodesStats(id);
+    res.json({ success: true, data: stats });
+  });
+
+  // Get issued codes for export (chunked)
+  static getIssuedCodesForExport = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+    if (!id) throw new CustomError('id is required', 400);
+    const { offset, limit, search } = req.query;
+    const data = await CouponSettingsService.getIssuedCodesForExport(id, {
+      offset: offset ? parseInt(offset as string) : undefined,
+      limit: limit ? parseInt(limit as string) : undefined,
+      search: search as string,
+    });
+    res.json({ success: true, data });
+  });
+
   // List issued codes for NORMAL type settings
   static getIssuedCodes = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
@@ -147,6 +168,20 @@ export class CouponSettingsController {
     if (!id) throw new CustomError('id is required', 400);
     const status = await CouponSettingsService.getGenerationStatus(id);
     res.json({ success: true, data: status });
+  });
+
+  // Recalculate cache for all coupon settings (admin only)
+  static recalculateCacheAll = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const mismatches = await CouponSettingsService.recalculateCacheForAll();
+    res.json({ success: true, data: { mismatches, count: mismatches.length } });
+  });
+
+  // Recalculate cache for a specific coupon setting (admin only)
+  static recalculateCacheForSetting = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+    if (!id) throw new CustomError('id is required', 400);
+    const result = await CouponSettingsService.recalculateCacheForSetting(id);
+    res.json({ success: true, data: result });
   });
 }
 

@@ -381,7 +381,7 @@ export class CouponSettingsService {
     const pool = database.getPool();
 
     // Ensure setting exists
-    await this.getSettingById(id);
+    const setting = await this.getSettingById(id);
 
     const page = query.page || 1;
     const limit = query.limit || 20;
@@ -389,6 +389,9 @@ export class CouponSettingsService {
 
     const where: string[] = ['settingId = ?'];
     const args: any[] = [id];
+
+    // Track if any filters are applied
+    const hasFilters = query.search || query.platform || query.gameWorldId || query.from || query.to;
 
     if (query.search) {
       where.push('(userId LIKE ? OR userName LIKE ?)');
@@ -414,11 +417,17 @@ export class CouponSettingsService {
 
     const whereSql = `WHERE ${where.join(' AND ')}`;
 
-    const [countRows] = await pool.execute<RowDataPacket[]>(
-      `SELECT COUNT(*) as total FROM g_coupon_uses ${whereSql}`,
-      args
-    );
-    const total = Number(countRows[0].total || 0);
+    // Use cached count if no filters applied
+    let total: number;
+    if (!hasFilters) {
+      total = Number(setting.usedCount || 0);
+    } else {
+      const [countRows] = await pool.execute<RowDataPacket[]>(
+        `SELECT COUNT(*) as total FROM g_coupon_uses ${whereSql}`,
+        args
+      );
+      total = Number(countRows[0].total || 0);
+    }
 
     const [rows] = await pool.execute<RowDataPacket[]>(
       `SELECT * FROM g_coupon_uses ${whereSql} ORDER BY usedAt DESC LIMIT ${limit} OFFSET ${offset}`,
@@ -429,13 +438,77 @@ export class CouponSettingsService {
   }
 
   /**
-   * List issued coupon codes for a specific setting with pagination and optional search
+   * Get status statistics for issued coupon codes (optimized with direct query)
    */
-  static async getIssuedCodes(settingId: string, query: { page?: number; limit?: number; search?: string }) {
+  static async getIssuedCodesStats(settingId: string): Promise<{ issued: number; used: number; unused: number }> {
+    const pool = database.getPool();
+
+    // Direct query to get only the cached counts (no full setting fetch)
+    const [rows] = await pool.execute<RowDataPacket[]>(
+      'SELECT issuedCount, usedCount FROM g_coupon_settings WHERE id = ? AND status != ?',
+      [settingId, 'DELETED']
+    );
+
+    if (rows.length === 0) {
+      throw new CustomError('Coupon setting not found', 404);
+    }
+
+    const row = rows[0] as any;
+    const issued = Number(row.issuedCount || 0);
+    const used = Number(row.usedCount || 0);
+    const unused = issued - used;
+
+    console.log(`[CouponStats] settingId=${settingId}, issued=${issued}, used=${used}, unused=${unused}`);
+
+    return { issued, used, unused };
+  }
+
+  /**
+   * Get all issued coupon codes for export (with optional search filter)
+   * Returns codes in chunks for streaming/pagination
+   */
+  static async getIssuedCodesForExport(settingId: string, query: { search?: string; offset?: number; limit?: number } = {}) {
     const pool = database.getPool();
 
     // Ensure setting exists
     await this.getSettingById(settingId);
+
+    const offset = query.offset || 0;
+    const limit = Math.min(query.limit || 1000, 10000); // Max 10000 per request
+
+    const where: string[] = ['settingId = ?'];
+    const args: any[] = [settingId];
+
+    if (query.search) {
+      where.push('code LIKE ?');
+      args.push(`%${query.search}%`);
+    }
+
+    const whereSql = `WHERE ${where.join(' AND ')}`;
+
+    // Get total count
+    const [countRows] = await pool.execute<RowDataPacket[]>(
+      `SELECT COUNT(*) as total FROM g_coupons ${whereSql}`,
+      args
+    );
+    const total = Number(countRows[0].total || 0);
+
+    // Get codes
+    const [rows] = await pool.execute<RowDataPacket[]>(
+      `SELECT id, settingId, code, status, createdAt, usedAt FROM g_coupons ${whereSql} ORDER BY createdAt DESC LIMIT ${limit} OFFSET ${offset}`,
+      args
+    );
+
+    return { codes: rows, total, offset, limit, hasMore: offset + limit < total };
+  }
+
+  /**
+   * List issued coupon codes for a specific setting with pagination and optional search
+   * Optimized: Using covering index for fast pagination on large datasets
+   */
+  static async getIssuedCodes(settingId: string, query: { page?: number; limit?: number; search?: string }) {
+    const pool = database.getPool();
+    const startTime = Date.now();
 
     const page = query.page || 1;
     const limit = query.limit || 20;
@@ -451,16 +524,40 @@ export class CouponSettingsService {
 
     const whereSql = `WHERE ${where.join(' AND ')}`;
 
-    const [countRows] = await pool.execute<RowDataPacket[]>(
-      `SELECT COUNT(*) as total FROM g_coupons ${whereSql}`,
-      args
-    );
-    const total = Number(countRows[0].total || 0);
+    // Get total count
+    let total: number;
+    if (!query.search) {
+      // Use cached count from g_coupon_settings if no search filter
+      const [settingRows] = await pool.execute<RowDataPacket[]>(
+        'SELECT issuedCount FROM g_coupon_settings WHERE id = ? AND status != ?',
+        [settingId, 'DELETED']
+      );
 
+      if (settingRows.length === 0) {
+        throw new CustomError('Coupon setting not found', 404);
+      }
+
+      total = Number(settingRows[0].issuedCount || 0);
+      console.log(`[getIssuedCodes] Cache hit: total=${total}, time=${Date.now() - startTime}ms`);
+    } else {
+      // Count only when search filter is applied
+      const countStart = Date.now();
+      const [countRows] = await pool.execute<RowDataPacket[]>(
+        `SELECT COUNT(*) as total FROM g_coupons ${whereSql}`,
+        args
+      );
+      total = Number(countRows[0].total || 0);
+      console.log(`[getIssuedCodes] COUNT query: total=${total}, time=${Date.now() - countStart}ms`);
+    }
+
+    // Get codes using covering index for fast pagination
+    // The index (settingId, createdAt DESC, id) allows MySQL to satisfy the query without accessing the table
+    const dataStart = Date.now();
     const [rows] = await pool.execute<RowDataPacket[]>(
       `SELECT id, settingId, code, status, createdAt, usedAt FROM g_coupons ${whereSql} ORDER BY createdAt DESC LIMIT ${limit} OFFSET ${offset}`,
       args
     );
+    console.log(`[getIssuedCodes] Data query: rows=${rows.length}, offset=${offset}, time=${Date.now() - dataStart}ms, total=${Date.now() - startTime}ms`);
 
     return { codes: rows, total, page, limit };
   }

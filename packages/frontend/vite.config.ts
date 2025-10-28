@@ -11,7 +11,7 @@ process.env.ROLLUP_BINARY_PATH = process.env.ROLLUP_BINARY_PATH || '';
 // Note: Vite only exposes VITE_* env vars to the client, but in vite.config.ts we can access all env vars
 const isDocker = process.env.VITE_DOCKER_ENV === 'true' || process.env.DOCKER_ENV === 'true';
 const backendHost = isDocker ? 'backend-dev' : 'localhost';
-const backendPort = isDocker ? '5000' : (process.env.BACKEND_PORT || '5001');
+const backendPort = isDocker ? '5000' : (process.env.BACKEND_PORT || '5000');
 const backendUrl = `http://${backendHost}:${backendPort}`;
 
 console.log(`🔧 Vite proxy configuration:`, {

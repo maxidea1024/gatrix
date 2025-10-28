@@ -21,11 +21,23 @@ router.delete('/:id', CouponSettingsController.remove);
 // Usage records for a setting
 router.get('/:id/usage', CouponSettingsController.usage);
 
+// Issued codes statistics for a setting
+router.get('/:id/issued-codes-stats', CouponSettingsController.getIssuedCodesStats);
+
+// Issued codes for export (chunked)
+router.get('/:id/issued-codes-export', CouponSettingsController.getIssuedCodesForExport);
+
 // Issued codes for a setting
 router.get('/:id/issued-codes', CouponSettingsController.getIssuedCodes);
 
 // Generation status for async coupon code generation
 router.get('/:id/generation-status', CouponSettingsController.getGenerationStatus);
+
+// Recalculate cache for all coupon settings (admin maintenance)
+router.post('/admin/recalculate-cache-all', CouponSettingsController.recalculateCacheAll);
+
+// Recalculate cache for a specific coupon setting (admin maintenance)
+router.post('/:id/recalculate-cache', CouponSettingsController.recalculateCacheForSetting);
 
 export default router;
 

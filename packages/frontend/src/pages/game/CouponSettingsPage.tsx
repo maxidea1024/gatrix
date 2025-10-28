@@ -73,11 +73,16 @@ const CouponSettingsPage: React.FC = () => {
   const [codesSearch, setCodesSearch] = useState('');
   const debouncedCodesSearch = useDebounce(codesSearch, 500);
   const [codesLoading, setCodesLoading] = useState(false);
+  const [codesStatsLoading, setCodesStatsLoading] = useState(false);
   const [codesItems, setCodesItems] = useState<IssuedCouponCode[]>([]);
   const [codesTotal, setCodesTotal] = useState(0);
   const [codesPage, setCodesPage] = useState(0);
   const [codesRowsPerPage, setCodesRowsPerPage] = useState(20);
   const [codesExportMenuAnchor, setCodesExportMenuAnchor] = useState<null | HTMLElement>(null);
+  const [codesStats, setCodesStats] = useState<{ issued: number; used: number; unused: number }>({ issued: 0, used: 0, unused: 0 });
+  const [exportingCodes, setExportingCodes] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
+  const exportAbortControllerRef = useRef<AbortController | null>(null);
 
   // SDK Guide drawer state
   const [openSDKGuide, setOpenSDKGuide] = useState(false);
@@ -106,23 +111,60 @@ const CouponSettingsPage: React.FC = () => {
     }
   };
 
-  // Export issued codes to CSV
+  // Export all issued codes to CSV/XLSX (chunked for large datasets)
   const handleExportIssuedCodes = useCallback(async (format: 'csv' | 'xlsx') => {
-    if (!codesItems || codesItems.length === 0) {
+    if (!codesSetting) {
       enqueueSnackbar(t('coupons.couponSettings.noDataToExport'), { variant: 'warning' });
       return;
     }
 
+    setExportingCodes(true);
+    setExportProgress(0);
+    exportAbortControllerRef.current = new AbortController();
+
     try {
-      let blob: Blob;
-      let filename: string;
       const now = new Date();
       const dateTimeStr = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      const allCodes: IssuedCouponCode[] = [];
+      const chunkSize = 1000;
+      let offset = 0;
+      let hasMore = true;
+
+      // Fetch all codes in chunks
+      while (hasMore && !exportAbortControllerRef.current.signal.aborted) {
+        try {
+          const res = await couponService.getIssuedCodesForExport(codesSetting.id, {
+            offset,
+            limit: chunkSize,
+            search: debouncedCodesSearch || undefined,
+          });
+          allCodes.push(...(res.codes || []));
+          hasMore = res.hasMore || false;
+          offset += chunkSize;
+
+          // Update progress
+          const progress = Math.min(100, Math.round((allCodes.length / (codesStats.issued || 1)) * 100));
+          setExportProgress(progress);
+        } catch (error) {
+          if ((error as any).name === 'AbortError') {
+            throw new Error('Export cancelled');
+          }
+          throw error;
+        }
+      }
+
+      if (allCodes.length === 0) {
+        enqueueSnackbar(t('coupons.couponSettings.noDataToExport'), { variant: 'warning' });
+        return;
+      }
+
+      let blob: Blob;
+      let filename: string;
 
       if (format === 'csv') {
         // CSV export
         const headers = ['Code', 'Status', 'Issued At', 'Used At'];
-        const rows = codesItems.map(c => [
+        const rows = allCodes.map(c => [
           formatCouponCode(c.code),
           c.status,
           formatDateTime(c.createdAt),
@@ -135,11 +177,11 @@ const CouponSettingsPage: React.FC = () => {
         ].join('\n');
 
         blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        filename = `issued-codes-${codesSetting?.code || 'export'}-${dateTimeStr}.csv`;
+        filename = `issued-codes-${codesSetting.code || 'export'}-${dateTimeStr}.csv`;
       } else if (format === 'xlsx') {
         // XLSX export using xlsx library
         const XLSX = await import('xlsx');
-        const ws = XLSX.utils.json_to_sheet(codesItems.map(c => ({
+        const ws = XLSX.utils.json_to_sheet(allCodes.map(c => ({
           'Code': formatCouponCode(c.code),
           'Status': c.status,
           'Issued At': formatDateTime(c.createdAt),
@@ -149,7 +191,7 @@ const CouponSettingsPage: React.FC = () => {
         XLSX.utils.book_append_sheet(wb, ws, 'Issued Codes');
         const xlsxBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
         blob = new Blob([xlsxBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        filename = `issued-codes-${codesSetting?.code || 'export'}-${dateTimeStr}.xlsx`;
+        filename = `issued-codes-${codesSetting.code || 'export'}-${dateTimeStr}.xlsx`;
       } else {
         enqueueSnackbar('Unsupported export format', { variant: 'warning' });
         return;
@@ -169,8 +211,12 @@ const CouponSettingsPage: React.FC = () => {
     } catch (error: any) {
       console.error('Error exporting issued codes:', error);
       enqueueSnackbar(error.message || t('coupons.couponSettings.exportError'), { variant: 'error' });
+    } finally {
+      setExportingCodes(false);
+      setExportProgress(0);
+      exportAbortControllerRef.current = null;
     }
-  }, [codesItems, codesSetting, t, enqueueSnackbar]);
+  }, [codesSetting, debouncedCodesSearch, codesStats?.issued || 0, t, enqueueSnackbar]);
 
   const handleOpenCodes = (it: CouponSetting) => {
     setCodesSetting(it);
@@ -440,7 +486,7 @@ const CouponSettingsPage: React.FC = () => {
     return () => clearInterval(interval);
   }, [items]);
 
-  const loadCodes = useMemo(() => async () => {
+  const loadCodes = useCallback(async () => {
     if (!codesSetting) return;
     setCodesLoading(true);
     try {
@@ -457,11 +503,42 @@ const CouponSettingsPage: React.FC = () => {
     }
   }, [codesSetting, codesPage, codesRowsPerPage, debouncedCodesSearch]);
 
+  // Load stats only once when drawer opens, not on every page change
+  const loadCodesStats = useCallback(async () => {
+    if (!codesSetting) {
+      console.log('[loadCodesStats] codesSetting is null, skipping');
+      return;
+    }
+    console.log('[loadCodesStats] Loading stats for:', codesSetting.id);
+    setCodesStatsLoading(true);
+    try {
+      const stats = await couponService.getIssuedCodesStats(codesSetting.id);
+      console.log('[loadCodesStats] Loaded stats:', stats);
+      setCodesStats(stats);
+    } catch (error) {
+      console.error('[loadCodesStats] Failed to load codes stats', error);
+      // Set default stats on error
+      setCodesStats({ issued: 0, used: 0, unused: 0 });
+    } finally {
+      setCodesStatsLoading(false);
+    }
+  }, [codesSetting]);
+
+  // Load codes and stats when drawer opens
   useEffect(() => {
-    if (openCodes) {
+    if (openCodes && codesSetting) {
+      console.log('[CouponSettingsPage] Loading codes and stats for:', codesSetting.id);
+      loadCodes();
+      loadCodesStats();
+    }
+  }, [openCodes, codesSetting, loadCodes, loadCodesStats]);
+
+  // Load codes when pagination or search changes (but not stats)
+  useEffect(() => {
+    if (openCodes && codesSetting) {
       loadCodes();
     }
-  }, [openCodes, loadCodes]);
+  }, [openCodes, codesSetting, codesPage, codesRowsPerPage, debouncedCodesSearch, loadCodes]);
 
 
   const handleSave = async () => {
@@ -1190,7 +1267,7 @@ const CouponSettingsPage: React.FC = () => {
                       <Typography variant="caption" color="text.secondary">
                         {t('coupons.couponSettings.statistics.total')}
                       </Typography>
-                      <Typography variant="h6">{codesTotal.toLocaleString()}</Typography>
+                      <Typography variant="h6">{(codesStats?.issued || 0).toLocaleString()}</Typography>
                     </Box>
                   </Stack>
                 </CardContent>
@@ -1203,7 +1280,7 @@ const CouponSettingsPage: React.FC = () => {
                       <Typography variant="caption" color="text.secondary">
                         {t('coupons.couponSettings.statistics.used')}
                       </Typography>
-                      <Typography variant="h6">{codesItems.filter(c => c.status === 'USED').length.toLocaleString()}</Typography>
+                      <Typography variant="h6">{(codesStats?.used || 0).toLocaleString()}</Typography>
                     </Box>
                   </Stack>
                 </CardContent>
@@ -1216,7 +1293,7 @@ const CouponSettingsPage: React.FC = () => {
                       <Typography variant="caption" color="text.secondary">
                         {t('coupons.couponSettings.statistics.unused')}
                       </Typography>
-                      <Typography variant="h6">{codesItems.filter(c => c.status === 'ISSUED').length.toLocaleString()}</Typography>
+                      <Typography variant="h6">{(codesStats?.unused || 0).toLocaleString()}</Typography>
                     </Box>
                   </Stack>
                 </CardContent>
@@ -1229,6 +1306,7 @@ const CouponSettingsPage: React.FC = () => {
                 placeholder={t('coupons.couponSettings.issuedCodesDrawer.searchPlaceholder') as string}
                 value={codesSearch}
                 onChange={(e) => setCodesSearch(e.target.value)}
+                disabled={exportingCodes}
                 sx={{
                   flex: 1,
                   minWidth: 200,
@@ -1262,9 +1340,10 @@ const CouponSettingsPage: React.FC = () => {
                 startIcon={<DownloadIcon />}
                 endIcon={<ArrowDropDownIcon />}
                 onClick={(e) => setCodesExportMenuAnchor(e.currentTarget)}
+                disabled={exportingCodes}
                 sx={{ minWidth: 130, height: 40, flexShrink: 0 }}
               >
-                {t('common.export')}
+                {exportingCodes ? `${exportProgress}%` : t('common.export')}
               </Button>
               <Menu
                 anchorEl={codesExportMenuAnchor}
@@ -1279,14 +1358,27 @@ const CouponSettingsPage: React.FC = () => {
                   horizontal: 'right',
                 }}
               >
-                <MenuItem onClick={() => handleExportIssuedCodes('csv')}>
+                <MenuItem onClick={() => handleExportIssuedCodes('csv')} disabled={exportingCodes}>
                   <TableChartIcon sx={{ mr: 1 }} />
                   CSV
                 </MenuItem>
-                <MenuItem onClick={() => handleExportIssuedCodes('xlsx')}>
+                <MenuItem onClick={() => handleExportIssuedCodes('xlsx')} disabled={exportingCodes}>
                   <ExcelIcon sx={{ mr: 1 }} />
                   Excel (XLSX)
                 </MenuItem>
+                {exportingCodes && (
+                  <>
+                    <Divider />
+                    <MenuItem onClick={() => {
+                      exportAbortControllerRef.current?.abort();
+                      setExportingCodes(false);
+                      setExportProgress(0);
+                      setCodesExportMenuAnchor(null);
+                    }}>
+                      {t('common.cancel')}
+                    </MenuItem>
+                  </>
+                )}
               </Menu>
             </Stack>
 

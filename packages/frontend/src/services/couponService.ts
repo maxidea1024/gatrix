@@ -86,8 +86,14 @@ export interface IssuedCouponCode {
 export interface IssuedCodesResponse {
   codes: IssuedCouponCode[];
   total: number;
-  page: number;
-  limit: number;
+  page?: number;
+  limit?: number;
+}
+
+export interface IssuedCodesStats {
+  issued: number;
+  used: number;
+  unused: number;
 }
 
 // Generation status types
@@ -122,8 +128,22 @@ export const couponService = {
     const res = await api.get(`/admin/coupon-settings/${settingId}/usage`, { params });
     return res.data;
   },
+  async getIssuedCodesStats(settingId: string): Promise<IssuedCodesStats> {
+    const res = await api.get(`/admin/coupon-settings/${settingId}/issued-codes-stats`);
+    console.log('[couponService] getIssuedCodesStats response:', res);
+    // API service already unwraps response.data, so res = { success: true, data: { issued, used, unused } }
+    return res.data;
+  },
+  async getIssuedCodesForExport(settingId: string, params?: { offset?: number; limit?: number; search?: string }): Promise<IssuedCodesResponse> {
+    const res = await api.get(`/admin/coupon-settings/${settingId}/issued-codes-export`, { params });
+    console.log('[couponService] getIssuedCodesForExport response:', res);
+    // API service already unwraps response.data, so res = { success: true, data: { codes, total, offset, limit, hasMore } }
+    return res.data;
+  },
   async getIssuedCodes(settingId: string, params?: { page?: number; limit?: number; search?: string }): Promise<IssuedCodesResponse> {
     const res = await api.get(`/admin/coupon-settings/${settingId}/issued-codes`, { params });
+    console.log('[couponService] getIssuedCodes response:', res);
+    // API service already unwraps response.data, so res = { success: true, data: { codes, total, page, limit } }
     return res.data;
   },
   async getGenerationStatus(settingId: string): Promise<GenerationStatus> {
