@@ -119,8 +119,6 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    extra_hosts:
-      - "backend-dev:172.21.0.8"
     command: yarn workspace @gatrix/frontend dev
 
   # Adminer for database management

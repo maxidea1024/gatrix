@@ -1313,6 +1313,31 @@ const CouponSettingsPage: React.FC = () => {
               <MenuItem value="ACTIVE">{t('common.enabled')}</MenuItem>
               <MenuItem value="DISABLED">{t('common.disabled')}</MenuItem>
             </TextField>
+
+            {/* 12. Rewards */}
+            <Box sx={{ pt: 1 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                {t('surveys.participationRewards')}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                {t('surveys.participationRewardsHelp')}
+              </Typography>
+              <RewardSelector
+                value={form.rewardData || []}
+                onChange={(rewards) => setForm((s: any) => ({ ...s, rewardData: rewards }))}
+                onModeChange={(mode, templateId) => {
+                  setRewardMode(mode);
+                  if (mode === 'template') {
+                    setForm((s: any) => ({ ...s, rewardTemplateId: templateId || null }));
+                  } else {
+                    setForm((s: any) => ({ ...s, rewardTemplateId: null }));
+                  }
+                }}
+                minQuantity={1}
+                initialMode={rewardMode}
+                initialTemplateId={form.rewardTemplateId || ''}
+              />
+            </Box>
           </Stack>
         </Box>
 

@@ -62,6 +62,22 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
     loadTemplates();
   }, []);
 
+  // Update mode and selectedTemplateId when initialMode or initialTemplateId changes
+  useEffect(() => {
+    setMode(initialMode);
+    setSelectedTemplateId(initialTemplateId);
+  }, [initialMode, initialTemplateId]);
+
+  // Auto-load template rewards when initialTemplateId is set and templates are loaded
+  useEffect(() => {
+    if (initialMode === 'template' && initialTemplateId && templates.length > 0 && value.length === 0) {
+      const template = templates.find(t => t.id === initialTemplateId);
+      if (template && template.rewardItems && template.rewardItems.length > 0) {
+        onChange([...template.rewardItems]);
+      }
+    }
+  }, [templates, initialTemplateId, initialMode, value.length]);
+
   const loadTemplates = async () => {
     try {
       setLoadingTemplates(true);
@@ -125,7 +141,6 @@ const RewardSelector: React.FC<RewardSelectorProps> = ({
     if (template && template.rewardItems && template.rewardItems.length > 0) {
       onChange([...template.rewardItems]);
       onModeChange?.('template', templateId);
-      enqueueSnackbar(t('rewardSelector.templateApplied'), { variant: 'success' });
     } else if (template) {
       enqueueSnackbar(t('rewardSelector.templateEmpty'), { variant: 'warning' });
     }
