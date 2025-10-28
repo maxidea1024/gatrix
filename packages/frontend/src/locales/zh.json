@@ -2929,10 +2929,15 @@
         "quantityHelp": "输入要生成的优惠券数量。",
         "applicablePeriod": "适用期间",
         "codeMinError": "最少需要 4 个字符。",
+        "codeFormatError": "优惠券代码只能包含大写字母(A-Z)和数字(0-9)。",
         "quantityMinError": "最少需要 1 个。",
         "maxTotalUsesMinError": "必须大于等于 1。",
         "perUserLimitMinError": "必须大于等于 1。"
       },
+      "deleteConfirmTitle": "确认删除",
+      "deleteConfirmMessage": "确定要删除'{name}'吗？此操作无法撤销。",
+      "deleteSuccess": "优惠券已删除。",
+      "alreadyDeleted": "此优惠券已被删除。",
       "sdkGuideDrawer": {
         "title": "优惠券兑换 API 集成指南",
         "subtitle": "了解如何从客户端调用优惠券兑换 API。",

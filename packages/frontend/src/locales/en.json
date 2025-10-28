@@ -2910,10 +2910,15 @@
         "quantityHelp": "Enter the number of coupons to generate.",
         "applicablePeriod": "Applicable Period",
         "codeMinError": "Minimum 4 characters.",
+        "codeFormatError": "Coupon code can only contain uppercase letters (A-Z) and numbers (0-9).",
         "quantityMinError": "Must be at least 1.",
         "maxTotalUsesMinError": "Must be at least 1.",
         "perUserLimitMinError": "Must be at least 1."
-      }
+      },
+      "deleteConfirmTitle": "Confirm Deletion",
+      "deleteConfirmMessage": "Are you sure you want to delete '{name}'? This action cannot be undone.",
+      "deleteSuccess": "Coupon has been deleted.",
+      "alreadyDeleted": "This coupon has already been deleted."
     },
     "issuedCodes": {
       "code": "Code",

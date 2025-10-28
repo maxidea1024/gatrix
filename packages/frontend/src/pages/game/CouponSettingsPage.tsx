@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react';
-import { Box, Typography, Button, TextField, IconButton, Chip, MenuItem, Stack, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, InputAdornment, Tooltip, TableSortLabel, FormControlLabel, Checkbox, Snackbar, LinearProgress } from '@mui/material';
+import { Box, Typography, Button, TextField, IconButton, Chip, MenuItem, Stack, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, InputAdornment, Tooltip, TableSortLabel, FormControlLabel, Checkbox, Snackbar, LinearProgress, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Settings as SettingsIcon, Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon, Search as SearchIcon, ViewColumn as ViewColumnIcon, List as ListIcon, ContentCopy as ContentCopyIcon, Code as CodeIcon, CardGiftcard as CardGiftcardIcon, HourglassEmpty as HourglassEmptyIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -15,6 +15,13 @@ import ResizableDrawer from '@/components/common/ResizableDrawer';
 import SDKGuideDrawer from '@/components/coupons/SDKGuideDrawer';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Dayjs } from 'dayjs';
+
+// Format coupon code with hyphens every 4 characters
+const formatCouponCode = (code: string): string => {
+  if (!code) return '';
+  return code.match(/.{1,4}/g)?.join('-') || code;
+};
+
 // Coupon Settings page (list and management of coupon definitions)
 const CouponSettingsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -63,6 +70,10 @@ const CouponSettingsPage: React.FC = () => {
 
   // SDK Guide drawer state
   const [openSDKGuide, setOpenSDKGuide] = useState(false);
+
+  // Delete confirmation dialog state
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<CouponSetting | null>(null);
 
   const [copyOpen, setCopyOpen] = useState(false);
   const [copyMessage, setCopyMessage] = useState('');
@@ -229,7 +240,22 @@ const CouponSettingsPage: React.FC = () => {
 
   }, [items, orderBy, order]);
   const isSpecial = form.type === 'SPECIAL';
-  const codeError = isSpecial && (!form.code || String(form.code).trim().length < 4);
+  const codeError = isSpecial && (
+    !form.code ||
+    String(form.code).trim().length < 4 ||
+    !/^[A-Z0-9]+$/.test(String(form.code).trim())
+  );
+
+  const getCodeErrorMessage = () => {
+    if (!form.code || String(form.code).trim().length < 4) {
+      return t('coupons.couponSettings.form.codeMinError');
+    }
+    if (!/^[A-Z0-9]+$/.test(String(form.code).trim())) {
+      return t('coupons.couponSettings.form.codeFormatError');
+    }
+    return t('coupons.couponSettings.form.codeHelp');
+  };
+
   const quantityError = form.type === 'NORMAL' && (!form.quantity || Number(form.quantity) < 1);
   const maxTotalUsesError = isSpecial && form.maxTotalUses !== null && Number(form.maxTotalUses) < 1;
   const perUserLimitError = form.type === 'NORMAL' && (form.perUserLimit == null || Number(form.perUserLimit) < 1);
@@ -433,10 +459,28 @@ const CouponSettingsPage: React.FC = () => {
     setOpenForm(true);
   };
 
-  const handleDelete = async (it: CouponSetting) => {
-    if (!confirm(t('common.confirmDelete') || 'Delete?')) return;
-    await couponService.deleteSetting(it.id);
-    await load();
+  const handleDeleteClick = (setting: CouponSetting) => {
+    setDeleteTarget(setting);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+
+    try {
+      await couponService.deleteSetting(deleteTarget.id);
+      enqueueSnackbar(t('coupons.couponSettings.deleteSuccess'), { variant: 'success' });
+      setDeleteConfirmOpen(false);
+      setDeleteTarget(null);
+      await load();
+    } catch (error: any) {
+      enqueueSnackbar(error.message || t('common.error'), { variant: 'error' });
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmOpen(false);
+    setDeleteTarget(null);
   };
 
 
@@ -744,9 +788,18 @@ const CouponSettingsPage: React.FC = () => {
                           <IconButton size="small" onClick={() => handleEdit(it)} color="primary">
                             <EditIcon fontSize="small" />
                           </IconButton>
-                          <IconButton size="small" onClick={() => handleDelete(it)} color="error">
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
+                          <Tooltip title={it.status === 'DELETED' ? t('coupons.couponSettings.alreadyDeleted') : ''}>
+                            <span>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleDeleteClick(it)}
+                                color="error"
+                                disabled={it.status === 'DELETED'}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
                         </Box>
                       </TableCell>
                     </TableRow>
@@ -837,9 +890,15 @@ const CouponSettingsPage: React.FC = () => {
                 fullWidth
                 label={t('coupons.couponSettings.form.code')}
                 value={form.code}
-                onChange={(e) => setForm((s: any) => ({ ...s, code: e.target.value }))}
+                onChange={(e) => {
+                  const value = e.target.value.toUpperCase();
+                  setForm((s: any) => ({ ...s, code: value }));
+                }}
                 error={codeError}
-                helperText={codeError ? t('coupons.couponSettings.form.codeMinError') : t('coupons.couponSettings.form.codeHelp')}
+                helperText={codeError ? getCodeErrorMessage() : t('coupons.couponSettings.form.codeHelp')}
+                inputProps={{
+                  style: { textTransform: 'uppercase' }
+                }}
               />
             )}
             {/* 5. Quantity (NORMAL only) */}
@@ -1007,7 +1066,7 @@ const CouponSettingsPage: React.FC = () => {
                       <TableRow key={c.id} hover>
                         <TableCell>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>{c.code}</Typography>
+                            <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>{formatCouponCode(c.code)}</Typography>
                             <Tooltip title={t('coupons.couponSettings.copyCode')}>
                               <IconButton size="small" onClick={() => handleCopyCode(c.code)}>
                                 <ContentCopyIcon fontSize="inherit" />
@@ -1066,6 +1125,29 @@ const CouponSettingsPage: React.FC = () => {
 
       {/* SDK Guide Drawer */}
       <SDKGuideDrawer open={openSDKGuide} onClose={() => setOpenSDKGuide(false)} />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteConfirmOpen}
+        onClose={handleDeleteCancel}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>{t('coupons.couponSettings.deleteConfirmTitle')}</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {t('coupons.couponSettings.deleteConfirmMessage', { name: deleteTarget?.name || '' })}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel} color="inherit">
+            {t('common.cancel')}
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="error" variant="contained">
+            {t('common.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
