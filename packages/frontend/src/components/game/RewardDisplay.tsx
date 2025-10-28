@@ -3,22 +3,45 @@ import { Box, Chip, Typography, Skeleton, Tooltip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { ParticipationReward } from '../../services/surveyService';
 import planningDataService, { RewardTypeInfo, RewardItem } from '../../services/planningDataService';
+import rewardTemplateService from '../../services/rewardTemplateService';
 
 interface RewardDisplayProps {
   rewards?: ParticipationReward[];
+  rewardTemplateId?: string | null;
   maxDisplay?: number;
 }
 
 /**
  * Display component for participation rewards
  * Shows reward type and item name with quantity
+ * Can display either direct rewards or rewards from a template
  */
-const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }) => {
+const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, rewardTemplateId, maxDisplay = 3 }) => {
   const { t } = useTranslation();
   const [rewardTypeMap, setRewardTypeMap] = useState<Map<number, RewardTypeInfo>>(new Map());
   const [rewardItemsMap, setRewardItemsMap] = useState<Map<string, RewardItem>>(new Map());
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
+  const [displayRewards, setDisplayRewards] = useState<ParticipationReward[]>([]);
+
+  // Load template rewards if rewardTemplateId is provided
+  useEffect(() => {
+    const loadTemplateRewards = async () => {
+      if (rewardTemplateId) {
+        try {
+          const template = await rewardTemplateService.getRewardTemplateById(rewardTemplateId);
+          setDisplayRewards(template.rewardItems || []);
+        } catch (error) {
+          console.error('Failed to load reward template:', error);
+          setDisplayRewards([]);
+        }
+      } else {
+        setDisplayRewards(rewards || []);
+      }
+    };
+
+    loadTemplateRewards();
+  }, [rewardTemplateId, rewards]);
 
   // Load reward types and items
   useEffect(() => {
@@ -35,12 +58,12 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }
         setRewardTypeMap(typeMap);
 
         // Load all reward items for the types used in rewards
-        if (rewards && rewards.length > 0) {
+        if (displayRewards && displayRewards.length > 0) {
           const itemsMap = new Map<string, RewardItem>();
-          
+
           // Get unique reward types
-          const uniqueTypes = [...new Set(rewards.map(r => parseInt(r.rewardType)))];
-          
+          const uniqueTypes = [...new Set(displayRewards.map(r => parseInt(r.rewardType)))];
+
           // Load items for each type that has a table
           await Promise.all(
             uniqueTypes.map(async (rewardType) => {
@@ -57,7 +80,7 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }
               }
             })
           );
-          
+
           setRewardItemsMap(itemsMap);
         }
       } catch (error) {
@@ -68,10 +91,10 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }
     };
 
     loadRewardData();
-  }, [rewards]);
+  }, [displayRewards]);
 
   // No rewards
-  if (!rewards || rewards.length === 0) {
+  if (!displayRewards || displayRewards.length === 0) {
     return (
       <Typography variant="body2" color="text.secondary">
         {t('surveys.noRewards')}
@@ -83,7 +106,7 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }
   if (loading) {
     return (
       <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-        {[...Array(Math.min(rewards.length, maxDisplay))].map((_, idx) => (
+        {[...Array(Math.min(displayRewards.length, maxDisplay))].map((_, idx) => (
           <Skeleton key={idx} variant="rectangular" width={120} height={24} sx={{ borderRadius: 1 }} />
         ))}
       </Box>
@@ -144,15 +167,15 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }
   };
 
   // Display rewards
-  const displayRewards = showAll ? rewards : rewards.slice(0, maxDisplay);
-  const hasMore = rewards.length > maxDisplay;
+  const rewardsToDisplay = showAll ? displayRewards : displayRewards.slice(0, maxDisplay);
+  const hasMore = displayRewards.length > maxDisplay;
 
   // Darker orange color (15% darker than #ff9800)
   const orangeColor = '#d98200';
 
   return (
     <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', alignItems: 'center' }}>
-      {displayRewards.map((reward, idx) => (
+      {rewardsToDisplay.map((reward, idx) => (
         <Tooltip key={idx} title={getRewardTooltip(reward)} arrow>
           <Chip
             label={getRewardLabel(reward)}
@@ -181,7 +204,7 @@ const RewardDisplay: React.FC<RewardDisplayProps> = ({ rewards, maxDisplay = 3 }
           }}
           onClick={() => setShowAll(true)}
         >
-          +{rewards.length - maxDisplay} {t('surveys.moreRewards')}
+          +{displayRewards.length - maxDisplay} {t('surveys.moreRewards')}
         </Typography>
       )}
       {showAll && hasMore && (

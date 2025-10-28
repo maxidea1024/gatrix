@@ -601,7 +601,11 @@ const SurveysPage: React.FC = () => {
                         if (column.id === 'rewards') {
                           return (
                             <TableCell key={column.id}>
-                              <RewardDisplay rewards={survey.participationRewards} maxDisplay={2} />
+                              <RewardDisplay
+                                rewards={survey.participationRewards}
+                                rewardTemplateId={survey.rewardTemplateId}
+                                maxDisplay={2}
+                              />
                             </TableCell>
                           );
                         }

@@ -85,14 +85,14 @@ class RewardTemplateService {
 
       // Get total count
       const [countRows] = await pool.execute<any[]>(
-        `SELECT COUNT(*) as count FROM g_reward_item_templates ${whereClause}`,
+        `SELECT COUNT(*) as count FROM g_reward_templates ${whereClause}`,
         queryParams
       );
       const total = countRows[0]?.count || 0;
 
       // Get templates with sorting
       const [templates] = await pool.execute<any[]>(
-        `SELECT * FROM g_reward_item_templates ${whereClause} ORDER BY ${safeSortBy} ${safeSortOrder} LIMIT ${limit} OFFSET ${offset}`,
+        `SELECT * FROM g_reward_templates ${whereClause} ORDER BY ${safeSortBy} ${safeSortOrder} LIMIT ${limit} OFFSET ${offset}`,
         queryParams
       );
 
@@ -126,7 +126,7 @@ class RewardTemplateService {
     const pool = database.getPool();
     try {
       const [templates] = await pool.execute<any[]>(
-        'SELECT * FROM g_reward_item_templates WHERE id = ?',
+        'SELECT * FROM g_reward_templates WHERE id = ?',
         [id]
       );
 
@@ -157,7 +157,7 @@ class RewardTemplateService {
 
     try {
       await pool.execute(
-        `INSERT INTO g_reward_item_templates
+        `INSERT INTO g_reward_templates
          (id, name, description, rewardItems, tags, createdBy, createdAt, updatedAt)
          VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
         [
@@ -219,7 +219,7 @@ class RewardTemplateService {
       params.push(id);
 
       await pool.execute(
-        `UPDATE g_reward_item_templates SET ${updates.join(', ')} WHERE id = ?`,
+        `UPDATE g_reward_templates SET ${updates.join(', ')} WHERE id = ?`,
         params
       );
 
@@ -271,7 +271,7 @@ class RewardTemplateService {
       await this.getRewardTemplateById(id);
 
       await pool.execute(
-        'DELETE FROM g_reward_item_templates WHERE id = ?',
+        'DELETE FROM g_reward_templates WHERE id = ?',
         [id]
       );
     } catch (error) {
