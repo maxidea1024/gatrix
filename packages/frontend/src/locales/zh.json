@@ -3127,6 +3127,25 @@
     "rewardItemRequired": "请选择第{{index}}个奖励的物品",
     "rewardQuantityRequired": "请输入第{{index}}个奖励的数量"
   },
+  "rewardSelector": {
+    "selectMode": "奖励配置方式",
+    "directMode": "直接添加",
+    "templateMode": "选择模板",
+    "rewards": "奖励",
+    "addReward": "添加奖励",
+    "directModeHelp": "直接添加奖励物品来配置奖励。",
+    "selectTemplate": "选择模板",
+    "templateModeHelp": "选择预定义的奖励模板来应用。",
+    "templateReadOnlyHelp": "所选模板的奖励物品。(只读)",
+    "noRewards": "未添加奖励。",
+    "noTemplates": "没有可用的模板。",
+    "itemCount": "{{count}}个物品",
+    "appliedRewards": "已应用的奖励",
+    "templateApplied": "模板应用成功。",
+    "templateEmpty": "所选模板没有奖励物品。",
+    "modeChangeWarning": "更改模式",
+    "modeChangeWarningMessage": "更改模式将删除所有当前奖励。您要继续吗？"
+  },
   "rewardTemplates": {
     "title": "奖励物品模板",
     "subtitle": "创建和管理可重用的奖励物品模板",

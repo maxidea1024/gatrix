@@ -30,7 +30,7 @@ import ResizableDrawer from '../common/ResizableDrawer';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import surveyService, { Survey, TriggerCondition, ParticipationReward } from '../../services/surveyService';
-import RewardItemSelector, { RewardSelection } from './RewardItemSelector';
+import RewardSelector from './RewardSelector';
 
 interface SurveyFormDialogProps {
   open: boolean;
@@ -56,6 +56,8 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
     { type: 'userLevel', value: 1 },
   ]);
   const [participationRewards, setParticipationRewards] = useState<ParticipationReward[]>([]);
+  const [rewardTemplateId, setRewardTemplateId] = useState<string | null>(null);
+  const [rewardMode, setRewardMode] = useState<'direct' | 'template'>('direct');
   const [rewardMailTitle, setRewardMailTitle] = useState('');
   const [rewardMailContent, setRewardMailContent] = useState('');
   const [isActive, setIsActive] = useState(true);
@@ -81,7 +83,18 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       setSurveyTitle(survey.surveyTitle);
       setSurveyContent(survey.surveyContent || '');
       setTriggerConditions(survey.triggerConditions);
-      setParticipationRewards(survey.participationRewards || []);
+
+      // Set reward mode and data based on rewardTemplateId
+      if (survey.rewardTemplateId) {
+        setRewardMode('template');
+        setRewardTemplateId(survey.rewardTemplateId);
+        setParticipationRewards([]);
+      } else {
+        setRewardMode('direct');
+        setRewardTemplateId(null);
+        setParticipationRewards(survey.participationRewards || []);
+      }
+
       setRewardMailTitle(survey.rewardMailTitle || '');
       setRewardMailContent(survey.rewardMailContent || '');
       setIsActive(Boolean(survey.isActive));
@@ -97,6 +110,8 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       setSurveyContent('');
       setTriggerConditions([{ type: 'userLevel', value: 1 }]);
       setParticipationRewards([]);
+      setRewardTemplateId(null);
+      setRewardMode('direct');
       setRewardMailTitle('');
       setRewardMailContent('');
       setIsActive(true);
@@ -161,28 +176,6 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
     setTriggerConditions(updated);
   };
 
-  // Reward handlers
-  const handleAddReward = () => {
-    setParticipationRewards([
-      ...participationRewards,
-      { rewardType: '', itemId: '', quantity: 1 },
-    ]);
-  };
-
-  const handleRemoveReward = (index: number) => {
-    setParticipationRewards(participationRewards.filter((_, i) => i !== index));
-  };
-
-  const handleRewardChange = (index: number, selection: RewardSelection) => {
-    const updated = [...participationRewards];
-    updated[index] = {
-      rewardType: selection.rewardType,
-      itemId: selection.itemId,
-      quantity: selection.quantity,
-    };
-    setParticipationRewards(updated);
-  };
-
   // Submit handler
   const handleSubmit = async () => {
     // Validation
@@ -199,21 +192,33 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
       return;
     }
 
-    // Validate participation rewards
-    for (let i = 0; i < participationRewards.length; i++) {
-      const reward = participationRewards[i];
-      if (!reward.rewardType) {
-        enqueueSnackbar(t('surveys.rewardTypeRequired', { index: i + 1 }), { variant: 'error' });
-        return;
-      }
-      // Check if itemId is required (for reward types with table)
-      if (!reward.itemId || reward.itemId === '') {
-        enqueueSnackbar(t('surveys.rewardItemRequired', { index: i + 1 }), { variant: 'error' });
-        return;
-      }
-      if (!reward.quantity || reward.quantity <= 0) {
-        enqueueSnackbar(t('surveys.rewardQuantityRequired', { index: i + 1 }), { variant: 'error' });
-        return;
+    // Validate that either participationRewards or rewardTemplateId is provided
+    if (rewardMode === 'direct' && participationRewards.length === 0) {
+      enqueueSnackbar(t('surveys.atLeastOneReward'), { variant: 'error' });
+      return;
+    }
+    if (rewardMode === 'template' && !rewardTemplateId) {
+      enqueueSnackbar(t('rewardSelector.selectTemplate'), { variant: 'error' });
+      return;
+    }
+
+    // Validate participation rewards if in direct mode
+    if (rewardMode === 'direct') {
+      for (let i = 0; i < participationRewards.length; i++) {
+        const reward = participationRewards[i];
+        if (!reward.rewardType) {
+          enqueueSnackbar(t('surveys.rewardTypeRequired', { index: i + 1 }), { variant: 'error' });
+          return;
+        }
+        // Check if itemId is required (for reward types with table)
+        if (!reward.itemId || reward.itemId === '') {
+          enqueueSnackbar(t('surveys.rewardItemRequired', { index: i + 1 }), { variant: 'error' });
+          return;
+        }
+        if (!reward.quantity || reward.quantity <= 0) {
+          enqueueSnackbar(t('surveys.rewardQuantityRequired', { index: i + 1 }), { variant: 'error' });
+          return;
+        }
       }
     }
 
@@ -224,7 +229,8 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
         surveyTitle: surveyTitle.trim(),
         surveyContent: surveyContent.trim() || undefined,
         triggerConditions,
-        participationRewards,
+        participationRewards: rewardMode === 'direct' ? participationRewards : null,
+        rewardTemplateId: rewardMode === 'template' ? rewardTemplateId : null,
         rewardMailTitle: rewardMailTitle.trim() || undefined,
         rewardMailContent: rewardMailContent.trim() || undefined,
         isActive,
@@ -633,33 +639,27 @@ const SurveyFormDialog: React.FC<SurveyFormDialogProps> = ({
 
               {/* Participation Rewards */}
               <Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-                  <Typography variant="subtitle2">{t('surveys.participationRewards')}</Typography>
-                  <Button size="small" startIcon={<AddIcon />} onClick={handleAddReward}>
-                    {t('surveys.addReward')}
-                  </Button>
-                </Box>
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                  {t('surveys.participationRewards')}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
                   {t('surveys.participationRewardsHelp')}
                 </Typography>
-                {participationRewards.map((reward, index) => (
-                  <Box key={index} sx={{ display: 'flex', gap: 1, mb: 1, alignItems: 'flex-start' }}>
-                    <Box sx={{ flex: 1 }}>
-                      <RewardItemSelector
-                        value={{
-                          rewardType: reward.rewardType,
-                          itemId: reward.itemId,
-                          quantity: reward.quantity,
-                        }}
-                        onChange={(selection) => handleRewardChange(index, selection)}
-                        minQuantity={1}
-                      />
-                    </Box>
-                    <IconButton onClick={() => handleRemoveReward(index)} size="small" sx={{ mt: 0.5 }}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                ))}
+                <RewardSelector
+                  value={participationRewards}
+                  onChange={setParticipationRewards}
+                  onModeChange={(mode, templateId) => {
+                    setRewardMode(mode);
+                    if (mode === 'template') {
+                      setRewardTemplateId(templateId || null);
+                    } else {
+                      setRewardTemplateId(null);
+                    }
+                  }}
+                  minQuantity={1}
+                  initialMode={rewardMode}
+                  initialTemplateId={rewardTemplateId || ''}
+                />
               </Box>
               </Stack>
             </Collapse>

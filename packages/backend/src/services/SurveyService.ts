@@ -20,7 +20,8 @@ export interface Survey {
   surveyTitle: string;
   surveyContent?: string;
   triggerConditions: TriggerCondition[];
-  participationRewards?: ParticipationReward[];
+  participationRewards?: ParticipationReward[] | null;
+  rewardTemplateId?: string | null;
   rewardMailTitle?: string;
   rewardMailContent?: string;
   isActive: boolean;
@@ -48,7 +49,8 @@ export interface CreateSurveyInput {
   surveyTitle: string;
   surveyContent?: string;
   triggerConditions: TriggerCondition[];
-  participationRewards?: ParticipationReward[];
+  participationRewards?: ParticipationReward[] | null;
+  rewardTemplateId?: string | null;
   rewardMailTitle?: string;
   rewardMailContent?: string;
   isActive?: boolean;
@@ -66,7 +68,8 @@ export interface UpdateSurveyInput {
   surveyTitle?: string;
   surveyContent?: string;
   triggerConditions?: TriggerCondition[];
-  participationRewards?: ParticipationReward[];
+  participationRewards?: ParticipationReward[] | null;
+  rewardTemplateId?: string | null;
   rewardMailTitle?: string;
   rewardMailContent?: string;
   isActive?: boolean;
@@ -206,6 +209,11 @@ export class SurveyService {
       throw new CustomError('At least one trigger condition is required', 400);
     }
 
+    // Validate that either participationRewards or rewardTemplateId is provided, but not both
+    if (input.participationRewards && input.rewardTemplateId) {
+      throw new CustomError('Cannot specify both participationRewards and rewardTemplateId', 400);
+    }
+
     // Check if platformSurveyId already exists
     const [existing] = await pool.execute<RowDataPacket[]>(
       'SELECT id FROM g_surveys WHERE platformSurveyId = ?',
@@ -222,10 +230,10 @@ export class SurveyService {
     await pool.execute(
       `INSERT INTO g_surveys
       (id, platformSurveyId, surveyTitle, surveyContent, triggerConditions,
-       participationRewards, rewardMailTitle, rewardMailContent, isActive,
+       participationRewards, rewardTemplateId, rewardMailTitle, rewardMailContent, isActive,
        targetPlatforms, targetWorlds, targetMarkets, targetClientVersions, targetAccountIds,
        createdBy)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         input.platformSurveyId,
@@ -233,6 +241,7 @@ export class SurveyService {
         input.surveyContent || null,
         JSON.stringify(input.triggerConditions),
         input.participationRewards ? JSON.stringify(input.participationRewards) : null,
+        input.rewardTemplateId || null,
         input.rewardMailTitle || null,
         input.rewardMailContent || null,
         isActive,
@@ -273,6 +282,13 @@ export class SurveyService {
       throw new CustomError('At least one trigger condition is required', 400);
     }
 
+    // Validate that either participationRewards or rewardTemplateId is provided, but not both
+    if (input.participationRewards !== undefined && input.rewardTemplateId !== undefined) {
+      if (input.participationRewards && input.rewardTemplateId) {
+        throw new CustomError('Cannot specify both participationRewards and rewardTemplateId', 400);
+      }
+    }
+
     const updates: string[] = [];
     const values: any[] = [];
 
@@ -295,6 +311,10 @@ export class SurveyService {
     if (input.participationRewards !== undefined) {
       updates.push('participationRewards = ?');
       values.push(input.participationRewards ? JSON.stringify(input.participationRewards) : null);
+    }
+    if (input.rewardTemplateId !== undefined) {
+      updates.push('rewardTemplateId = ?');
+      values.push(input.rewardTemplateId || null);
     }
     if (input.rewardMailTitle !== undefined) {
       updates.push('rewardMailTitle = ?');

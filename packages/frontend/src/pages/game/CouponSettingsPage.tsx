@@ -13,6 +13,7 @@ import { formatDateTime, parseUTCForPicker } from '@/utils/dateFormat';
 import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSettingsDialog';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import SDKGuideDrawer from '@/components/coupons/SDKGuideDrawer';
+import RewardSelector from '@/components/game/RewardSelector';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Dayjs } from 'dayjs';
 
@@ -290,11 +291,15 @@ const CouponSettingsPage: React.FC = () => {
     startsAt: null as Dayjs | null,
     expiresAt: null as Dayjs | null,
     status: 'ACTIVE' as CouponStatus,
+    rewardData: [],
+    rewardTemplateId: null as string | null,
   });
+  const [rewardMode, setRewardMode] = useState<'direct' | 'template'>('direct');
 
   const resetForm = () => {
     setEditing(null);
-    setForm({ code: '', type: 'NORMAL', name: '', description: '', quantity: 1, perUserLimit: 1, maxTotalUses: null, startsAt: null, expiresAt: null, status: 'ACTIVE' });
+    setForm({ code: '', type: 'NORMAL', name: '', description: '', quantity: 1, perUserLimit: 1, maxTotalUses: null, startsAt: null, expiresAt: null, status: 'ACTIVE', rewardData: [], rewardTemplateId: null });
+    setRewardMode('direct');
   };
 
   const availableFilterDefinitions: FilterDefinition[] = [
@@ -598,10 +603,22 @@ const CouponSettingsPage: React.FC = () => {
     if (!form.name || !form.startsAt || !form.expiresAt) return;
     if (codeError || quantityError || maxTotalUsesError || perUserLimitError) return;
 
+    // Validate that either rewardData or rewardTemplateId is provided
+    if (rewardMode === 'direct' && (!form.rewardData || form.rewardData.length === 0)) {
+      enqueueSnackbar(t('surveys.atLeastOneReward'), { variant: 'error' });
+      return;
+    }
+    if (rewardMode === 'template' && !form.rewardTemplateId) {
+      enqueueSnackbar(t('rewardSelector.selectTemplate'), { variant: 'error' });
+      return;
+    }
+
     const payload: any = {
       ...form,
       startsAt: (form.startsAt as Dayjs).toDate().toISOString(),
       expiresAt: (form.expiresAt as Dayjs).toDate().toISOString(),
+      rewardData: rewardMode === 'direct' ? form.rewardData : null,
+      rewardTemplateId: rewardMode === 'template' ? form.rewardTemplateId : null,
     };
 
     // Debug: log payload to inspect server-side validation issues
@@ -659,6 +676,14 @@ const CouponSettingsPage: React.FC = () => {
 
   const handleEdit = (it: CouponSetting) => {
     setEditing(it);
+
+    // Set reward mode and data based on rewardTemplateId
+    if (it.rewardTemplateId) {
+      setRewardMode('template');
+    } else {
+      setRewardMode('direct');
+    }
+
     setForm({
       code: it.code || '',
       type: it.type,
@@ -670,6 +695,8 @@ const CouponSettingsPage: React.FC = () => {
       startsAt: parseUTCForPicker(it.startsAt),
       expiresAt: parseUTCForPicker(it.expiresAt),
       status: it.status,
+      rewardData: it.rewardData || [],
+      rewardTemplateId: it.rewardTemplateId || null,
     });
     setOpenForm(true);
   };

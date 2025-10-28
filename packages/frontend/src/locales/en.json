@@ -3083,6 +3083,25 @@
     "rewardItemRequired": "Please select item for reward #{{index}}",
     "rewardQuantityRequired": "Please enter quantity for reward #{{index}}"
   },
+  "rewardSelector": {
+    "selectMode": "Reward Configuration Method",
+    "directMode": "Add Directly",
+    "templateMode": "Select Template",
+    "rewards": "Rewards",
+    "addReward": "Add Reward",
+    "directModeHelp": "Add reward items directly to configure rewards.",
+    "selectTemplate": "Select Template",
+    "templateModeHelp": "Select a predefined reward template to apply.",
+    "templateReadOnlyHelp": "Reward items from the selected template. (Read-only)",
+    "noRewards": "No rewards added.",
+    "noTemplates": "No templates available.",
+    "itemCount": "{{count}} items",
+    "appliedRewards": "Applied Rewards",
+    "templateApplied": "Template applied successfully.",
+    "templateEmpty": "The selected template has no reward items.",
+    "modeChangeWarning": "Change Mode",
+    "modeChangeWarningMessage": "Changing the mode will delete all current rewards. Do you want to continue?"
+  },
   "rewardTemplates": {
     "title": "Reward Item Templates",
     "subtitle": "Create and manage reusable reward item templates",

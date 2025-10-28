@@ -17,7 +17,8 @@ export interface Survey {
   surveyTitle: string;
   surveyContent?: string;
   triggerConditions: TriggerCondition[];
-  participationRewards?: ParticipationReward[];
+  participationRewards?: ParticipationReward[] | null;
+  rewardTemplateId?: string | null;
   rewardMailTitle?: string;
   rewardMailContent?: string;
   isActive: boolean;
@@ -45,7 +46,8 @@ export interface CreateSurveyInput {
   surveyTitle: string;
   surveyContent?: string;
   triggerConditions: TriggerCondition[];
-  participationRewards?: ParticipationReward[];
+  participationRewards?: ParticipationReward[] | null;
+  rewardTemplateId?: string | null;
   rewardMailTitle?: string;
   rewardMailContent?: string;
   isActive?: boolean;
@@ -62,7 +64,8 @@ export interface UpdateSurveyInput {
   surveyTitle?: string;
   surveyContent?: string;
   triggerConditions?: TriggerCondition[];
-  participationRewards?: ParticipationReward[];
+  participationRewards?: ParticipationReward[] | null;
+  rewardTemplateId?: string | null;
   rewardMailTitle?: string;
   rewardMailContent?: string;
   isActive?: boolean;

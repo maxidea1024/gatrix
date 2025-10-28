@@ -3087,6 +3087,25 @@
     "coupons": "쿠폰",
     "surveys": "설문지"
   },
+  "rewardSelector": {
+    "selectMode": "보상 설정 방식",
+    "directMode": "직접 추가",
+    "templateMode": "템플릿 선택",
+    "rewards": "보상",
+    "addReward": "보상 추가",
+    "directModeHelp": "보상 아이템을 직접 추가하여 구성합니다.",
+    "selectTemplate": "템플릿 선택",
+    "templateModeHelp": "미리 정의된 보상 템플릿을 선택하여 적용합니다.",
+    "templateReadOnlyHelp": "선택된 템플릿의 보상 아이템입니다. (읽기 전용)",
+    "noRewards": "추가된 보상이 없습니다.",
+    "noTemplates": "사용 가능한 템플릿이 없습니다.",
+    "itemCount": "{{count}}개 아이템",
+    "appliedRewards": "적용된 보상",
+    "templateApplied": "템플릿이 적용되었습니다.",
+    "templateEmpty": "선택한 템플릿에 보상 아이템이 없습니다.",
+    "modeChangeWarning": "모드 변경",
+    "modeChangeWarningMessage": "모드를 변경하면 현재 입력된 보상이 모두 삭제됩니다. 계속하시겠습니까?"
+  },
   "rewardTemplates": {
     "title": "보상아이템 템플릿",
     "subtitle": "재사용 가능한 보상아이템 템플릿을 생성하고 관리합니다",
