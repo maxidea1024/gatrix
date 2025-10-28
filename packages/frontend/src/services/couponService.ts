@@ -17,6 +17,12 @@ export interface CouponSetting {
   startsAt: string; // ISO from server wrapper
   expiresAt: string;
   status: CouponStatus;
+  createdAt?: string;
+  generationStatus?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
+  generatedCount?: number;
+  totalCount?: number;
+  issuedCount?: number; // Actual issued code count from g_coupons table
+  usedCount?: number; // Number of times the coupon has been used
 }
 
 export interface ListSettingsParams {
@@ -67,6 +73,31 @@ export interface UsageListResponse {
   limit: number;
 }
 
+// Issued codes types
+export interface IssuedCouponCode {
+  id: string;
+  settingId: string;
+  code: string;
+  status: 'ISSUED' | 'USED' | 'REVOKED';
+  createdAt: string;
+  usedAt: string | null;
+}
+
+export interface IssuedCodesResponse {
+  codes: IssuedCouponCode[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+// Generation status types
+export interface GenerationStatus {
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
+  generatedCount: number;
+  totalCount: number;
+  progress: number;
+}
+
 export const couponService = {
   async listSettings(params?: ListSettingsParams): Promise<ListSettingsResponse> {
     const res = await api.get('/admin/coupon-settings', { params });
@@ -90,6 +121,14 @@ export const couponService = {
   async getUsage(settingId: string, params?: { page?: number; limit?: number; search?: string; platform?: string; gameWorldId?: string; from?: string; to?: string; }): Promise<UsageListResponse> {
     const res = await api.get(`/admin/coupon-settings/${settingId}/usage`, { params });
     return res.data;
+  },
+  async getIssuedCodes(settingId: string, params?: { page?: number; limit?: number; search?: string }): Promise<IssuedCodesResponse> {
+    const res = await api.get(`/admin/coupon-settings/${settingId}/issued-codes`, { params });
+    return res.data;
+  },
+  async getGenerationStatus(settingId: string): Promise<GenerationStatus> {
+    const res = await api.get(`/admin/coupon-settings/${settingId}/generation-status`);
+    return res.data.data;
   }
 };
 

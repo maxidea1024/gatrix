@@ -2844,10 +2844,55 @@
       "subtitle": "Define coupon settings, targeting, and limits.",
       "createCoupon": "Create Coupon",
       "editCoupon": "Edit Coupon",
+      "viewIssuedCodes": "View Issued Codes",
+      "copyCode": "Copy code",
+      "codeCopied": "Coupon code has been copied.",
+      "copyName": "Copy coupon name",
+      "nameCopied": "Coupon name has been copied.",
+      "issuedCount": "Issued Codes",
+      "generatingCodes": "Generating codes",
+      "generatingInBackground": "Generating coupons in the background.",
+      "issuedCodesDrawer": {
+        "title": "Issued Coupon Codes",
+        "subtitle": "Coupon Setting: {name}",
+        "subtitlePrefix": "Coupon Setting:",
+        "searchPlaceholder": "Search by code"
+      },
+      "sdkGuide": "SDK Integration Guide",
+      "sdkGuideDrawer": {
+        "title": "Coupon Redeem API Integration Guide",
+        "subtitle": "Learn how to call the Coupon Redeem API from your client.",
+        "description": "Call the following API to redeem a coupon code and receive rewards.",
+        "endpoint": "API Endpoint",
+        "method": "Method",
+        "requiredHeaders": "Required Headers",
+        "headerApiToken": "API Token (required) - Token for API authentication",
+        "headerAppName": "Application Name (required) - Identifier of the application sending the request",
+        "headerContentType": "Content-Type (required) - Request body format",
+        "requestBody": "Request Body",
+        "responseExample": "Response Example",
+        "errorCodes": "Error Codes",
+        "parameters": "Parameter Description",
+        "paramUserId": "User ID (required)",
+        "paramUserName": "User Name (required)",
+        "paramGameWorldId": "Game World ID (required)",
+        "paramPlatform": "Platform (required)",
+        "paramChannel": "Channel (required)",
+        "error400": "400 Bad Request - Missing required parameters or invalid request",
+        "error404": "404 Not Found - Coupon code not found",
+        "error409": "409 Conflict - Coupon already used or usage limit exceeded",
+        "error422": "422 Unprocessable Entity - Coupon period expired or targeting conditions not met",
+        "copiedToClipboard": "Code copied to clipboard."
+      },
+      "columns": {
+        "code": "Coupon Code",
+        "usageRate": "Usage Rate"
+      },
       "form": {
         "name": "Name",
         "description": "Description",
         "code": "Code",
+        "type": "Type",
         "perUserLimit": "Per User Limit",
         "maxTotalUses": "Max Total Uses",
         "startsAt": "Starts At",
@@ -2855,6 +2900,7 @@
         "nameHelp": "Enter a descriptive coupon name.",
         "descriptionHelp": "Provide a brief description for this coupon.",
         "codeHelp": "Enter a coupon code. (SPECIAL: typically required, NORMAL: optional)",
+        "typeCannotBeChanged": "Coupon type cannot be changed after creation.",
         "perUserLimitHelp": "Number of times each user can use this coupon.",
         "maxTotalUsesHelp": "Total usage limit across all users. Set to unlimited if not restricted.",
         "unlimited": "Unlimited",
@@ -2865,8 +2911,18 @@
         "applicablePeriod": "Applicable Period",
         "codeMinError": "Minimum 4 characters.",
         "quantityMinError": "Must be at least 1.",
-        "maxTotalUsesMinError": "Must be at least 1."
+        "maxTotalUsesMinError": "Must be at least 1.",
+        "perUserLimitMinError": "Must be at least 1."
       }
+    },
+    "issuedCodes": {
+      "code": "Code",
+      "status": "Status",
+      "issuedAt": "Issued At",
+      "usedAt": "Used At",
+      "statusIssued": "Issued",
+      "statusUsed": "Used",
+      "statusRevoked": "Revoked"
     },
     "couponUsage": {
       "title": "Coupon Usage Records",

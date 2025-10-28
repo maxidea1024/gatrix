@@ -1,21 +1,24 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Typography, Button, TextField, IconButton, Chip, MenuItem, Stack, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, InputAdornment, Tooltip, TableSortLabel, FormControlLabel, Checkbox } from '@mui/material';
-import { Settings as SettingsIcon, Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon, Search as SearchIcon, ViewColumn as ViewColumnIcon } from '@mui/icons-material';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
+import { Box, Typography, Button, TextField, IconButton, Chip, MenuItem, Stack, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, InputAdornment, Tooltip, TableSortLabel, FormControlLabel, Checkbox, Snackbar, LinearProgress } from '@mui/material';
+import { Settings as SettingsIcon, Delete as DeleteIcon, Edit as EditIcon, Add as AddIcon, Search as SearchIcon, ViewColumn as ViewColumnIcon, List as ListIcon, ContentCopy as ContentCopyIcon, Code as CodeIcon, CardGiftcard as CardGiftcardIcon, HourglassEmpty as HourglassEmptyIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useSnackbar } from 'notistack';
 import { useDebounce } from '@/hooks/useDebounce';
 import SimplePagination from '@/components/common/SimplePagination';
-import { couponService, CouponSetting, CouponStatus, CouponType } from '@/services/couponService';
+import { couponService, CouponSetting, CouponStatus, CouponType, IssuedCouponCode } from '@/services/couponService';
 
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
 import { formatDateTime, parseUTCForPicker } from '@/utils/dateFormat';
 import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSettingsDialog';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
+import SDKGuideDrawer from '@/components/coupons/SDKGuideDrawer';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 // Coupon Settings page (list and management of coupon definitions)
 const CouponSettingsPage: React.FC = () => {
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
 
   // list state
   const [items, setItems] = useState<CouponSetting[]>([]);
@@ -23,6 +26,10 @@ const CouponSettingsPage: React.FC = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
+
+
+  // selection state for table rows
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   // filters
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,12 +49,58 @@ const CouponSettingsPage: React.FC = () => {
   const typeFilterString = useMemo(() => typeFilter || '', [typeFilter]);
   const statusFilterString = useMemo(() => statusFilter || '', [statusFilter]);
 
+
+  // Issued codes drawer state
+  const [openCodes, setOpenCodes] = useState(false);
+  const [codesSetting, setCodesSetting] = useState<CouponSetting | null>(null);
+  const [codesSearch, setCodesSearch] = useState('');
+  const debouncedCodesSearch = useDebounce(codesSearch, 500);
+  const [codesLoading, setCodesLoading] = useState(false);
+  const [codesItems, setCodesItems] = useState<IssuedCouponCode[]>([]);
+  const [codesTotal, setCodesTotal] = useState(0);
+  const [codesPage, setCodesPage] = useState(0);
+  const [codesRowsPerPage, setCodesRowsPerPage] = useState(20);
+
+  // SDK Guide drawer state
+  const [openSDKGuide, setOpenSDKGuide] = useState(false);
+
+  const [copyOpen, setCopyOpen] = useState(false);
+  const [copyMessage, setCopyMessage] = useState('');
+
+  const handleCopyCode = async (code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopyMessage(t('coupons.couponSettings.codeCopied') as string);
+      setCopyOpen(true);
+    } catch (e) {
+      // noop: clipboard may not be available in some contexts
+      console.error('Failed to copy coupon code', e);
+    }
+  };
+
+  const handleCopyName = async (name: string) => {
+    try {
+      await navigator.clipboard.writeText(name);
+      setCopyMessage(t('coupons.couponSettings.nameCopied') as string);
+      setCopyOpen(true);
+    } catch (e) {
+      // noop: clipboard may not be available in some contexts
+      console.error('Failed to copy coupon name', e);
+    }
+  };
+
+  const handleOpenCodes = (it: CouponSetting) => {
+    setCodesSetting(it);
+    setOpenCodes(true);
+    setCodesPage(0);
+  };
+
   // form dialog state
   const [openForm, setOpenForm] = useState(false);
   const [editing, setEditing] = useState<CouponSetting | null>(null);
   const [form, setForm] = useState<any>({
     code: '',
-    type: 'SPECIAL' as CouponType,
+    type: 'NORMAL' as CouponType,
     name: '',
     description: '',
     quantity: 1,
@@ -60,7 +113,7 @@ const CouponSettingsPage: React.FC = () => {
 
   const resetForm = () => {
     setEditing(null);
-    setForm({ code: '', type: 'SPECIAL', name: '', description: '', quantity: 1, perUserLimit: 1, maxTotalUses: null, startsAt: null, expiresAt: null, status: 'ACTIVE' });
+    setForm({ code: '', type: 'NORMAL', name: '', description: '', quantity: 1, perUserLimit: 1, maxTotalUses: null, startsAt: null, expiresAt: null, status: 'ACTIVE' });
   };
 
   const availableFilterDefinitions: FilterDefinition[] = [
@@ -89,10 +142,14 @@ const CouponSettingsPage: React.FC = () => {
   // Column settings (visible columns with localStorage persistence)
   const defaultColumns: ColumnConfig[] = [
     { id: 'name', labelKey: 'common.name', visible: true },
+    { id: 'code', labelKey: 'coupons.couponSettings.columns.code', visible: true },
     { id: 'type', labelKey: 'common.type', visible: true },
     { id: 'status', labelKey: 'common.status', visible: true },
+    { id: 'usageRate', labelKey: 'coupons.couponSettings.columns.usageRate', visible: true },
     { id: 'start', labelKey: 'common.start', visible: true },
     { id: 'end', labelKey: 'common.end', visible: true },
+    { id: 'createdAt', labelKey: 'common.createdAt', visible: true },
+    { id: 'description', labelKey: 'common.description', visible: true },
   ];
 
   const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLElement | null>(null);
@@ -144,6 +201,17 @@ const CouponSettingsPage: React.FC = () => {
           return it.startsAt || '';
         case 'end':
           return it.expiresAt || '';
+        case 'description':
+          return ((it as any).description || '').toLowerCase();
+        case 'usageRate': {
+          // Calculate usage rate percentage for sorting
+          if (it.type === 'SPECIAL') {
+            return it.maxTotalUses ? (it.usedCount || 0) / it.maxTotalUses * 100 : 0;
+          } else {
+            const totalIssued = it.generatedCount || it.issuedCount || 0;
+            return totalIssued > 0 ? (it.usedCount || 0) / totalIssued * 100 : 0;
+          }
+        }
         default:
           return '';
       }
@@ -157,11 +225,14 @@ const CouponSettingsPage: React.FC = () => {
       return 0;
     });
     return arr;
+
+
   }, [items, orderBy, order]);
   const isSpecial = form.type === 'SPECIAL';
   const codeError = isSpecial && (!form.code || String(form.code).trim().length < 4);
   const quantityError = form.type === 'NORMAL' && (!form.quantity || Number(form.quantity) < 1);
   const maxTotalUsesError = isSpecial && form.maxTotalUses !== null && Number(form.maxTotalUses) < 1;
+  const perUserLimitError = form.type === 'NORMAL' && (form.perUserLimit == null || Number(form.perUserLimit) < 1);
 
 
 
@@ -171,6 +242,8 @@ const CouponSettingsPage: React.FC = () => {
   };
 
   const handleResetColumns = () => {
+
+
     setColumns(defaultColumns);
     localStorage.setItem('couponSettingsColumns', JSON.stringify(defaultColumns));
   };
@@ -191,6 +264,21 @@ const CouponSettingsPage: React.FC = () => {
     setPage(0);
   };
 
+  const colCount = visibleColumns.length + 2; // +1 for actions, +1 for selection checkbox
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(sortedItems.map((it) => it.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: string, checked: boolean) => {
+    setSelectedIds((prev) => (checked ? [...prev, id] : prev.filter((x) => x !== id)));
+  };
+
+
   const load = useMemo(() => async () => {
     setLoading(true);
     try {
@@ -210,16 +298,73 @@ const CouponSettingsPage: React.FC = () => {
 
   useEffect(() => { load(); }, [load]);
 
+  // Auto-refresh for items with IN_PROGRESS generation status (partial update only)
+  useEffect(() => {
+    const inProgressItems = items.filter(it => it.generationStatus === 'IN_PROGRESS' || it.generationStatus === 'PENDING');
+    if (inProgressItems.length === 0) return;
+
+    const interval = setInterval(async () => {
+      try {
+        // Fetch only the in-progress items to update their progress
+        const updatedItems = await Promise.all(
+          inProgressItems.map(async (it) => {
+            const res = await couponService.getSetting(it.id);
+            return res.setting;
+          })
+        );
+
+        // Update only the changed items in the list
+        setItems(prevItems =>
+          prevItems.map(item => {
+            const updated = updatedItems.find(u => u.id === item.id);
+            return updated ? { ...item, ...updated } : item;
+          })
+        );
+      } catch (error) {
+        console.error('Failed to update progress', error);
+      }
+    }, 5000); // Refresh every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [items]);
+
+  const loadCodes = useMemo(() => async () => {
+    if (!codesSetting) return;
+    setCodesLoading(true);
+    try {
+      const res = await couponService.getIssuedCodes(codesSetting.id, {
+        page: codesPage + 1,
+        limit: codesRowsPerPage,
+        search: debouncedCodesSearch || undefined,
+      });
+      const data: any = (res as any).data ? (res as any).data : res;
+      setCodesItems(data.codes || []);
+      setCodesTotal(data.total || 0);
+    } finally {
+      setCodesLoading(false);
+    }
+  }, [codesSetting, codesPage, codesRowsPerPage, debouncedCodesSearch]);
+
+  useEffect(() => {
+    if (openCodes) {
+      loadCodes();
+    }
+  }, [openCodes, loadCodes]);
+
+
   const handleSave = async () => {
     // Basic validation
     if (!form.name || !form.startsAt || !form.expiresAt) return;
-    if (codeError || quantityError || maxTotalUsesError) return;
+    if (codeError || quantityError || maxTotalUsesError || perUserLimitError) return;
 
     const payload: any = {
       ...form,
       startsAt: (form.startsAt as Dayjs).toDate().toISOString(),
       expiresAt: (form.expiresAt as Dayjs).toDate().toISOString(),
     };
+
+    // Debug: log payload to inspect server-side validation issues
+    console.log('[CouponSettings] create/update payload', { editing: !!editing, payload });
 
     if (payload.type === 'SPECIAL') {
       // SPECIAL: per-user limit forced to 1
@@ -229,6 +374,8 @@ const CouponSettingsPage: React.FC = () => {
       payload.code = null;
       payload.maxTotalUses = null;
       payload.quantity = form.quantity || 1;
+      // Ensure numeric and >= 1
+      payload.perUserLimit = Math.max(1, Number(form.perUserLimit ?? 1));
     }
 
     if (payload.maxTotalUses === '') payload.maxTotalUses = null;
@@ -241,14 +388,31 @@ const CouponSettingsPage: React.FC = () => {
     try {
       if (editing) {
         await couponService.updateSetting(editing.id, payload);
+        setOpenForm(false);
+        resetForm();
+        await load();
       } else {
-        await couponService.createSetting(payload);
+        // For create: close form immediately and load in background
+        const result = await couponService.createSetting(payload);
+        setOpenForm(false);
+        resetForm();
+
+        // Show success message
+        const isLargeQuantity = payload.type === 'NORMAL' && (payload.quantity || 1) >= 10000;
+        if (isLargeQuantity) {
+          enqueueSnackbar(t('coupons.couponSettings.generatingInBackground') as string, { variant: 'info' });
+        } else {
+          enqueueSnackbar(t('common.saveSuccess') as string, { variant: 'success' });
+        }
+
+        // Load list in background (don't await)
+        load();
       }
-      setOpenForm(false);
-      resetForm();
-      await load();
     } catch (e) {
-      console.error(e);
+      const err: any = e;
+      const errorMessage = err?.response?.data?.error?.message || err?.message || t('common.saveFailed');
+      console.error('[CouponSettings] save failed', err?.response?.status, err?.response?.data || err?.message || err);
+      enqueueSnackbar(errorMessage, { variant: 'error' });
     }
   };
 
@@ -275,6 +439,8 @@ const CouponSettingsPage: React.FC = () => {
     await load();
   };
 
+
+
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
@@ -289,6 +455,9 @@ const CouponSettingsPage: React.FC = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button variant="outlined" startIcon={<CodeIcon />} onClick={() => setOpenSDKGuide(true)}>
+            {t('coupons.couponSettings.sdkGuide')}
+          </Button>
           <Button variant="contained" startIcon={<AddIcon />} onClick={() => { resetForm(); setOpenForm(true); }}>
             {t('coupons.couponSettings.createCoupon')}
           </Button>
@@ -336,6 +505,7 @@ const CouponSettingsPage: React.FC = () => {
               <DynamicFilterBar
                 availableFilters={availableFilterDefinitions}
                 activeFilters={activeFilters}
+
                 onFilterAdd={handleFilterAdd}
                 onFilterRemove={handleFilterRemove}
                 onFilterChange={handleDynamicFilterChange}
@@ -363,6 +533,12 @@ const CouponSettingsPage: React.FC = () => {
         </CardContent>
       </Card>
 
+            {selectedIds.length > 0 && (
+              <Typography variant="body2" sx={{ px: 2, pb: 1 }}>
+                {t('common.selectedCount', { count: selectedIds.length })}
+              </Typography>
+            )}
+
       {/* List */}
       <Card>
         <CardContent sx={{ p: 0 }}>
@@ -370,6 +546,13 @@ const CouponSettingsPage: React.FC = () => {
             <Table size="small">
               <TableHead>
                 <TableRow>
+                  <TableCell padding="checkbox" sx={{ width: 48 }}>
+                    <Checkbox
+                      indeterminate={sortedItems.some((it) => selectedIds.includes(it.id)) && !sortedItems.every((it) => selectedIds.includes(it.id))}
+                      checked={sortedItems.length > 0 && sortedItems.every((it) => selectedIds.includes(it.id))}
+                      onChange={(e) => handleSelectAll(e.target.checked)}
+                    />
+                  </TableCell>
                   {visibleColumns.map((col) => (
                     <TableCell key={col.id} sortDirection={orderBy === col.id ? order : false as any}>
                       <TableSortLabel
@@ -386,25 +569,100 @@ const CouponSettingsPage: React.FC = () => {
               </TableHead>
               <TableBody>
                 {loading ? (
-                  <EmptyTableRow colSpan={visibleColumns.length + 1} loading={true} message={t('common.loading') as string} />
+                  <EmptyTableRow colSpan={colCount} loading={true} message={t('common.loading') as string} />
                 ) : items.length === 0 ? (
-                  <EmptyTableRow colSpan={visibleColumns.length + 1} loading={false} message={t('common.noData') as string} />
+                  <EmptyTableRow colSpan={colCount} loading={false} message={t('common.noData') as string} />
                 ) : (
                   sortedItems.map((it) => (
                     <TableRow key={it.id} hover>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={selectedIds.includes(it.id)}
+                          onChange={(e) => handleSelectOne(it.id, e.target.checked)}
+                        />
+                      </TableCell>
                       {visibleColumns.map((col) => {
                         switch (col.id) {
                           case 'name':
                             return (
                               <TableCell key="name">
-                                <Typography variant="body2">{it.name}</Typography>
-                                <Typography variant="caption" color="text.secondary">{it.code || '-'}</Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Typography variant="body2">{it.name}</Typography>
+                                  <Tooltip title={t('coupons.couponSettings.copyName')}>
+                                    <IconButton size="small" onClick={() => handleCopyName(it.name)}>
+                                      <ContentCopyIcon fontSize="inherit" />
+                                    </IconButton>
+                                  </Tooltip>
+                                </Box>
+                              </TableCell>
+                            );
+                          case 'code':
+                            return (
+                              <TableCell key="code">
+                                {it.type === 'SPECIAL' ? (
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <Typography variant="caption" color="text.secondary" sx={{ fontFamily: 'monospace' }}>
+                                      {it.code || '-'}
+                                    </Typography>
+                                    {it.code && (
+                                      <Tooltip title={t('coupons.couponSettings.copyCode')}>
+                                        <IconButton size="small" onClick={() => handleCopyCode(it.code!)}>
+                                          <ContentCopyIcon fontSize="inherit" />
+                                        </IconButton>
+                                      </Tooltip>
+                                    )}
+                                  </Box>
+                                ) : (
+                                  <Box>
+                                    {it.generationStatus === 'IN_PROGRESS' || it.generationStatus === 'PENDING' ? (
+                                      <Box sx={{ width: '100%', minWidth: 200 }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                                          <HourglassEmptyIcon
+                                            fontSize="small"
+                                            sx={{
+                                              animation: 'spin 1s linear infinite',
+                                              '@keyframes spin': {
+                                                '0%': { transform: 'rotate(0deg)' },
+                                                '100%': { transform: 'rotate(360deg)' },
+                                              },
+                                              flexShrink: 0,
+                                            }}
+                                          />
+                                          <LinearProgress
+                                            variant="determinate"
+                                            value={it.totalCount ? Math.round((it.generatedCount || 0) / it.totalCount * 100) : 0}
+                                            sx={{ flex: 1 }}
+                                          />
+                                        </Box>
+                                        <Typography variant="caption" color="text.secondary">
+                                          {t('coupons.couponSettings.generatingCodes')} ({(it.generatedCount || 0).toLocaleString()} / {(it.totalCount || 0).toLocaleString()})
+                                        </Typography>
+                                      </Box>
+                                    ) : (
+                                      <Box>
+                                        <Button size="small" color="secondary" onClick={() => handleOpenCodes(it)} startIcon={<ListIcon fontSize="small" />}>
+                                          {t('coupons.couponSettings.viewIssuedCodes')}
+                                        </Button>
+                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                                          {t('coupons.couponSettings.issuedCount')}: {(it.generatedCount || it.issuedCount || 0).toLocaleString()}
+                                        </Typography>
+                                      </Box>
+                                    )}
+                                  </Box>
+                                )}
                               </TableCell>
                             );
                           case 'type':
                             return (
-                              <TableCell key="type">
-                                <Chip size="small" label={it.type} />
+                              <TableCell key="type" align="center">
+                                <Tooltip title={it.type}>
+                                  <CardGiftcardIcon
+                                    fontSize="small"
+                                    sx={{
+                                      color: it.type === 'SPECIAL' ? 'primary.main' : 'action.disabled',
+                                    }}
+                                  />
+                                </Tooltip>
                               </TableCell>
                             );
                           case 'status':
@@ -417,6 +675,39 @@ const CouponSettingsPage: React.FC = () => {
                                 />
                               </TableCell>
                             );
+                          case 'usageRate': {
+                            let numerator = it.usedCount || 0;
+                            let denominator: number | string;
+                            let percentage: string | number = '0.0';
+                            let tooltipText = '';
+
+                            if (it.type === 'SPECIAL') {
+                              denominator = it.maxTotalUses ?? t('coupons.couponSettings.form.unlimited');
+                              if (it.maxTotalUses && it.maxTotalUses > 0) {
+                                percentage = ((numerator / it.maxTotalUses) * 100).toFixed(1);
+                                tooltipText = `${numerator.toLocaleString()} / ${denominator.toLocaleString()}`;
+                              } else {
+                                tooltipText = `${numerator.toLocaleString()} / ${denominator}`;
+                              }
+                            } else {
+                              const totalIssued = it.generatedCount || it.issuedCount || 0;
+                              denominator = totalIssued;
+                              if (totalIssued > 0) {
+                                percentage = ((numerator / totalIssued) * 100).toFixed(1);
+                              }
+                              tooltipText = `${numerator.toLocaleString()} / ${denominator.toLocaleString()}`;
+                            }
+
+                            return (
+                              <TableCell key="usageRate">
+                                <Tooltip title={tooltipText}>
+                                  <Typography variant="caption" color="text.secondary" sx={{ cursor: 'help' }}>
+                                    {percentage}%
+                                  </Typography>
+                                </Tooltip>
+                              </TableCell>
+                            );
+                          }
                           case 'start':
                             return (
                               <TableCell key="start">
@@ -429,19 +720,32 @@ const CouponSettingsPage: React.FC = () => {
                                 <Typography variant="caption">{formatDateTime(it.expiresAt)}</Typography>
                               </TableCell>
                             );
+                          case 'createdAt':
+                            return (
+                              <TableCell key="createdAt">
+                                <Typography variant="caption">{formatDateTime((it as any).createdAt)}</Typography>
+                              </TableCell>
+                            );
+                          case 'description':
+                            return (
+                              <TableCell key="description" sx={{ maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                <Typography variant="body2">{(it as any).description || '-'}</Typography>
+                              </TableCell>
+                            );
                           default:
+
+
                             return null;
                         }
                       })}
                       <TableCell align="center">
                         <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+
                           <IconButton size="small" onClick={() => handleEdit(it)} color="primary">
                             <EditIcon fontSize="small" />
                           </IconButton>
                           <IconButton size="small" onClick={() => handleDelete(it)} color="error">
                             <DeleteIcon fontSize="small" />
-
-
                           </IconButton>
                         </Box>
                       </TableCell>
@@ -490,6 +794,7 @@ const CouponSettingsPage: React.FC = () => {
             {/* 1. Name */}
             <TextField
               required
+              autoFocus
               label={t('coupons.couponSettings.form.name')}
               value={form.name}
               onChange={(e) => setForm((s: any) => ({ ...s, name: e.target.value }))}
@@ -509,8 +814,9 @@ const CouponSettingsPage: React.FC = () => {
               select
               required
               fullWidth
-              label={t('common.type')}
+              label={t('coupons.couponSettings.form.type')}
               value={form.type}
+              disabled={!!editing}
               onChange={(e) => setForm((s: any) => ({
                 ...s,
                 type: e.target.value,
@@ -519,6 +825,7 @@ const CouponSettingsPage: React.FC = () => {
                 code: e.target.value === 'NORMAL' ? '' : s.code,
                 quantity: e.target.value === 'NORMAL' ? (s.quantity || 1) : 1,
               }))}
+              helperText={!!editing ? t('coupons.couponSettings.form.typeCannotBeChanged') : undefined}
             >
               <MenuItem value="SPECIAL">SPECIAL</MenuItem>
               <MenuItem value="NORMAL">NORMAL</MenuItem>
@@ -550,6 +857,8 @@ const CouponSettingsPage: React.FC = () => {
                   '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
                 }}
               />
+
+
             )}
             {/* 6. PerUserLimit (NORMAL only) */}
             {form.type === 'NORMAL' && (
@@ -559,7 +868,8 @@ const CouponSettingsPage: React.FC = () => {
                 label={t('coupons.couponSettings.form.perUserLimit')}
                 value={form.perUserLimit}
                 onChange={(e) => setForm((s: any) => ({ ...s, perUserLimit: Number(e.target.value) }))}
-                helperText={t('coupons.couponSettings.form.perUserLimitHelp')}
+                error={perUserLimitError}
+                helperText={perUserLimitError ? t('coupons.couponSettings.form.perUserLimitMinError') : t('coupons.couponSettings.form.perUserLimitHelp')}
                 sx={{
                   '& input[type=number]': { MozAppearance: 'textfield' },
                   '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
@@ -647,6 +957,115 @@ const CouponSettingsPage: React.FC = () => {
           <Button onClick={handleSave} variant="contained">{t('common.save')}</Button>
         </Box>
       </ResizableDrawer>
+
+      {/* Issued Codes Drawer */}
+      <ResizableDrawer
+        open={openCodes}
+        onClose={() => setOpenCodes(false)}
+        title={t('coupons.couponSettings.issuedCodesDrawer.title') as string}
+        subtitle={codesSetting ? `${t('coupons.couponSettings.issuedCodesDrawer.subtitlePrefix')} ${(codesSetting as any).name}` : ''}
+        storageKey="couponSettings.issuedCodes.drawer.width"
+        defaultWidth={720}
+        minWidth={560}
+      >
+        <Box sx={{ p: 3, overflowY: 'auto', flex: 1 }}>
+          <Stack spacing={2}>
+            <TextField
+              fullWidth
+              placeholder={t('coupons.couponSettings.issuedCodesDrawer.searchPlaceholder') as string}
+              value={codesSearch}
+              onChange={(e) => setCodesSearch(e.target.value)}
+              size="small"
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>{t('coupons.issuedCodes.code')}</TableCell>
+                    <TableCell>{t('coupons.issuedCodes.status')}</TableCell>
+                    <TableCell>{t('coupons.issuedCodes.issuedAt')}</TableCell>
+                    <TableCell>{t('coupons.issuedCodes.usedAt')}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {codesLoading ? (
+                    <EmptyTableRow colSpan={4} loading={true} message={t('common.loading') as string} />
+                  ) : codesItems.length === 0 ? (
+                    <EmptyTableRow colSpan={4} loading={false} message={t('common.noData') as string} />
+                  ) : (
+                    codesItems.map((c) => (
+                      <TableRow key={c.id} hover>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>{c.code}</Typography>
+                            <Tooltip title={t('coupons.couponSettings.copyCode')}>
+                              <IconButton size="small" onClick={() => handleCopyCode(c.code)}>
+                                <ContentCopyIcon fontSize="inherit" />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            size="small"
+                            color={c.status === 'USED' ? 'success' : c.status === 'REVOKED' ? 'warning' : 'default'}
+                            label={
+                              c.status === 'USED'
+                                ? t('coupons.issuedCodes.statusUsed')
+                                : c.status === 'REVOKED'
+                                ? t('coupons.issuedCodes.statusRevoked')
+                                : t('coupons.issuedCodes.statusIssued')
+                            }
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="caption">{formatDateTime(c.createdAt)}</Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="caption">{c.usedAt ? formatDateTime(c.usedAt) : '-'}</Typography>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Stack>
+        </Box>
+        <Box sx={{ p: 2, display: 'flex', justifyContent: 'center', gap: 2, bgcolor: 'background.paper', borderTop: 1, borderColor: 'divider' }}>
+          <SimplePagination
+            count={codesTotal}
+            page={codesPage}
+            rowsPerPage={codesRowsPerPage}
+            onPageChange={(_, p) => setCodesPage(p)}
+            onRowsPerPageChange={(e) => {
+              const val = Number(e.target.value);
+              setCodesRowsPerPage(val);
+              setCodesPage(0);
+            }}
+          />
+        </Box>
+      </ResizableDrawer>
+      <Snackbar
+        open={copyOpen}
+        autoHideDuration={2000}
+        onClose={() => setCopyOpen(false)}
+        message={copyMessage}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      />
+
+      {/* SDK Guide Drawer */}
+      <SDKGuideDrawer open={openSDKGuide} onClose={() => setOpenSDKGuide(false)} />
     </Box>
   );
 };

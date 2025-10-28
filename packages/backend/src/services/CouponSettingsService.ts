@@ -3,6 +3,8 @@ import { CustomError } from '../middleware/errorHandler';
 import { ulid } from 'ulid';
 import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import { convertToMySQLDateTime } from '../utils/dateUtils';
+import { queueService } from './QueueService';
+import logger from '../config/logger';
 
 export type CouponType = 'SPECIAL' | 'NORMAL';
 export type CouponStatus = 'ACTIVE' | 'DISABLED' | 'DELETED';
@@ -68,7 +70,7 @@ export class CouponSettingsService {
     search?: string;
     type?: CouponType;
     status?: CouponStatus;
-  }): Promise<{ settings: CouponSetting[]; total: number; page: number; limit: number }>{
+  }): Promise<{ settings: any[]; total: number; page: number; limit: number }>{
     const pool = database.getPool();
     const page = params.page || 1;
     const limit = params.limit || 20;
@@ -104,11 +106,42 @@ export class CouponSettingsService {
       args
     );
 
+    // Get actual issued code counts and used counts
+    const settingIds = rows.map((r: any) => r.id);
+    let issuedCountMap: { [key: string]: number } = {};
+    let usedCountMap: { [key: string]: number } = {};
+
+    if (settingIds.length > 0) {
+      const placeholders = settingIds.map(() => '?').join(',');
+
+      // Get issued code counts from g_coupons
+      const [issuedRows] = await pool.execute<RowDataPacket[]>(
+        `SELECT settingId, COUNT(*) as issuedCount FROM g_coupons WHERE settingId IN (${placeholders}) GROUP BY settingId`,
+        settingIds
+      );
+
+      issuedRows.forEach((row: any) => {
+        issuedCountMap[row.settingId] = Number(row.issuedCount || 0);
+      });
+
+      // Get used counts from g_coupon_uses
+      const [usedRows] = await pool.execute<RowDataPacket[]>(
+        `SELECT settingId, COUNT(*) as usedCount FROM g_coupon_uses WHERE settingId IN (${placeholders}) GROUP BY settingId`,
+        settingIds
+      );
+
+      usedRows.forEach((row: any) => {
+        usedCountMap[row.settingId] = Number(row.usedCount || 0);
+      });
+    }
+
     const settings = rows.map((r: any) => ({
       ...r,
       tags: typeof r.tags === 'string' ? JSON.parse(r.tags) : r.tags,
       rewardData: typeof r.rewardData === 'string' ? JSON.parse(r.rewardData) : r.rewardData,
-    })) as CouponSetting[];
+      issuedCount: issuedCountMap[r.id] || 0, // Actual issued code count
+      usedCount: usedCountMap[r.id] || 0, // Number of times the coupon has been used
+    })) as any[];
 
     return { settings, total, page, limit };
   }
@@ -208,46 +241,34 @@ export class CouponSettingsService {
     );
 
     // Helper to bulk insert targeting arrays
-    // If NORMAL, generate issued coupon codes
+    // If NORMAL, handle coupon code generation (sync or async based on quantity)
     if (isNormal) {
       const quantity = Math.max(1, Number(input.quantity || 1));
-      const localSet = new Set<string>();
-      const genCode = () => ulid().substring(0, 16).toUpperCase();
-      const codes: Array<[string, string, string]> = [];
-      for (let i = 0; i < quantity; i++) {
-        let code: string;
-        // Try to find a unique code
-        // Note: Very low collision probability; add DB check to be safe
-        for (let attempt = 0; ; attempt++) {
-          code = genCode();
-          if (localSet.has(code)) continue;
-          const [dup] = await pool.execute<RowDataPacket[]>(
-            'SELECT 1 as ok FROM g_coupons WHERE code = ? LIMIT 1',
-            [code]
-          );
-          if (dup.length === 0) break;
-          if (attempt > 5) break; // fallback after few attempts
-        }
-        localSet.add(code!);
-        codes.push([ulid(), id, code!]);
-      }
-      if (codes.length > 0) {
-        const placeholders = codes.map(() => '(?, ?, ?)').join(',');
-        await pool.execute(
-          `INSERT INTO g_coupons (id, settingId, code) VALUES ${placeholders}`,
-          codes.flat()
-        );
+      const ASYNC_THRESHOLD = 10000; // Use async for quantities >= 10,000
+
+      if (quantity < ASYNC_THRESHOLD) {
+        // Synchronous processing for small quantities
+        await this.generateCouponCodesSynchronous(id, quantity);
+      } else {
+        // Asynchronous processing for large quantities
+        await this.generateCouponCodesAsynchronous(id, quantity);
       }
     }
 
     const insertTargets = async (table: string, column: string, values?: string[] | null) => {
       if (!values || values.length === 0) return;
+      const BATCH_SIZE = 1000; // Batch size to avoid MySQL prepared statement placeholder limit
       const rows = values.map(v => [ulid(), id, v]);
-      const placeholders = rows.map(() => '(?, ?, ?)').join(',');
-      await pool.execute(
-        `INSERT INTO ${table} (id, settingId, ${column}) VALUES ${placeholders}`,
-        rows.flat()
-      );
+
+      // Insert in batches
+      for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+        const batch = rows.slice(i, i + BATCH_SIZE);
+        const placeholders = batch.map(() => '(?, ?, ?)').join(',');
+        await pool.execute(
+          `INSERT INTO ${table} (id, settingId, ${column}) VALUES ${placeholders}`,
+          batch.flat()
+        );
+      }
     };
 
     await insertTargets('g_coupon_target_worlds', 'gameWorldId', input.targetWorlds);
@@ -403,6 +424,165 @@ export class CouponSettingsService {
     );
 
     return { records: rows, total, page, limit };
+  }
+
+  /**
+   * List issued coupon codes for a specific setting with pagination and optional search
+   */
+  static async getIssuedCodes(settingId: string, query: { page?: number; limit?: number; search?: string }) {
+    const pool = database.getPool();
+
+    // Ensure setting exists
+    await this.getSettingById(settingId);
+
+    const page = query.page || 1;
+    const limit = query.limit || 20;
+    const offset = (page - 1) * limit;
+
+    const where: string[] = ['settingId = ?'];
+    const args: any[] = [settingId];
+
+    if (query.search) {
+      where.push('code LIKE ?');
+      args.push(`%${query.search}%`);
+    }
+
+    const whereSql = `WHERE ${where.join(' AND ')}`;
+
+    const [countRows] = await pool.execute<RowDataPacket[]>(
+      `SELECT COUNT(*) as total FROM g_coupons ${whereSql}`,
+      args
+    );
+    const total = Number(countRows[0].total || 0);
+
+    const [rows] = await pool.execute<RowDataPacket[]>(
+      `SELECT id, settingId, code, status, createdAt, usedAt FROM g_coupons ${whereSql} ORDER BY createdAt DESC LIMIT ${limit} OFFSET ${offset}`,
+      args
+    );
+
+    return { codes: rows, total, page, limit };
+  }
+
+  /**
+   * Get generation status for async coupon code generation
+   */
+  static async getGenerationStatus(settingId: string): Promise<any> {
+    const pool = database.getPool();
+
+    const [rows] = await pool.execute<RowDataPacket[]>(
+      'SELECT generationStatus, generatedCount, totalCount FROM g_coupon_settings WHERE id = ?',
+      [settingId]
+    );
+
+    if (rows.length === 0) throw new CustomError('Coupon setting not found', 404);
+
+    const row = rows[0] as any;
+    return {
+      status: row.generationStatus || 'COMPLETED',
+      generatedCount: row.generatedCount || 0,
+      totalCount: row.totalCount || 0,
+      progress: row.totalCount > 0 ? Math.round((row.generatedCount / row.totalCount) * 100) : 0,
+    };
+  }
+
+  /**
+   * Generate coupon codes synchronously (for small quantities)
+   */
+  private static async generateCouponCodesSynchronous(settingId: string, quantity: number): Promise<void> {
+    const pool = database.getPool();
+    const BATCH_SIZE = 1000;
+    const DUPLICATE_CHECK_BATCH = 100;
+    const localSet = new Set<string>();
+    const genCode = () => ulid().substring(0, 16).toUpperCase();
+    const codes: Array<[string, string, string]> = [];
+
+    // Generate all codes
+    for (let i = 0; i < quantity; i++) {
+      let code: string;
+      let found = false;
+
+      // Try to find a unique code
+      for (let attempt = 0; attempt < 10; attempt++) {
+        code = genCode();
+        if (localSet.has(code)) continue;
+
+        // Check database for duplicates in batches
+        if (i % DUPLICATE_CHECK_BATCH === 0) {
+          const [dup] = await pool.execute<RowDataPacket[]>(
+            'SELECT 1 as ok FROM g_coupons WHERE code = ? LIMIT 1',
+            [code]
+          );
+          if (dup.length === 0) {
+            found = true;
+            break;
+          }
+        } else {
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        logger.warn('Failed to generate unique code after 10 attempts', { settingId, attempt: i });
+        continue;
+      }
+
+      localSet.add(code!);
+      codes.push([ulid(), settingId, code!]);
+    }
+
+    // Insert codes in batches
+    if (codes.length > 0) {
+      for (let i = 0; i < codes.length; i += BATCH_SIZE) {
+        const batch = codes.slice(i, i + BATCH_SIZE);
+        const placeholders = batch.map(() => '(?, ?, ?)').join(',');
+        await pool.execute(
+          `INSERT INTO g_coupons (id, settingId, code) VALUES ${placeholders}`,
+          batch.flat()
+        );
+      }
+    }
+  }
+
+  /**
+   * Generate coupon codes asynchronously (for large quantities)
+   * Enqueues a BullMQ job and returns immediately
+   */
+  private static async generateCouponCodesAsynchronous(settingId: string, quantity: number): Promise<void> {
+    try {
+      // Update status to PENDING
+      const pool = database.getPool();
+      await pool.execute(
+        'UPDATE g_coupon_settings SET generationStatus = ?, totalCount = ? WHERE id = ?',
+        ['PENDING', quantity, settingId]
+      );
+
+      // Create queue if not exists
+      const queueName = 'coupon-generation';
+      if (!queueService.getQueue(queueName)) {
+        const { CouponGenerationJob } = await import('./jobs/CouponGenerationJob');
+        await queueService.createQueue(queueName, async (job: any) => {
+          await CouponGenerationJob.process(job);
+        }, {
+          concurrency: 1,
+          removeOnComplete: 100,
+          removeOnFail: 50,
+        });
+      }
+
+      // Enqueue job
+      const job = await queueService.addJob(queueName, 'generate-codes', {
+        settingId,
+        quantity,
+      });
+
+      if (job) {
+        logger.info('Coupon generation job enqueued', { jobId: job.id, settingId, quantity });
+      }
+    } catch (error) {
+      logger.error('Failed to enqueue coupon generation job', { settingId, quantity, error });
+      throw new CustomError('Failed to enqueue coupon generation job', 500);
+    }
   }
 }
 

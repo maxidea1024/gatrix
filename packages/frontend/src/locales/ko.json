@@ -2844,10 +2844,55 @@
       "subtitle": "쿠폰 설정, 대상, 제한을 정의합니다.",
       "createCoupon": "쿠폰 생성",
       "editCoupon": "쿠폰 수정",
+      "viewIssuedCodes": "발행된 코드 보기",
+      "copyCode": "쿠폰 코드 복사",
+      "codeCopied": "쿠폰 코드가 복사되었습니다.",
+      "copyName": "쿠폰 이름 복사",
+      "nameCopied": "쿠폰 이름이 복사되었습니다.",
+      "issuedCount": "발행된 코드 수",
+      "generatingCodes": "쿠폰 생성 중",
+      "generatingInBackground": "쿠폰을 백그라운드에서 발급 중입니다.",
+      "issuedCodesDrawer": {
+        "title": "발행된 쿠폰 코드 목록",
+        "subtitle": "쿠폰 설정: {name}",
+        "subtitlePrefix": "쿠폰 설정:",
+        "searchPlaceholder": "코드로 검색"
+      },
+      "sdkGuide": "SDK 연동 가이드",
+      "sdkGuideDrawer": {
+        "title": "쿠폰 사용 API 연동 가이드",
+        "subtitle": "클라이언트에서 쿠폰 Redeem API를 호출하는 방법을 안내합니다.",
+        "description": "쿠폰 코드를 사용하여 보상을 받기 위해 다음 API를 호출합니다.",
+        "endpoint": "API 엔드포인트",
+        "method": "메서드",
+        "requiredHeaders": "필수 헤더",
+        "headerApiToken": "API 토큰 (필수) - API 인증을 위한 토큰",
+        "headerAppName": "애플리케이션 이름 (필수) - 요청을 보내는 애플리케이션 식별자",
+        "headerContentType": "Content-Type (필수) - 요청 본문 형식",
+        "requestBody": "요청 본문",
+        "responseExample": "응답 예제",
+        "errorCodes": "에러 코드",
+        "parameters": "파라미터 설명",
+        "paramUserId": "사용자 ID (필수)",
+        "paramUserName": "사용자명 (필수)",
+        "paramGameWorldId": "게임 월드 ID (필수)",
+        "paramPlatform": "플랫폼 (필수)",
+        "paramChannel": "채널 (필수)",
+        "error400": "400 Bad Request - 필수 파라미터 누락 또는 잘못된 요청",
+        "error404": "404 Not Found - 쿠폰 코드를 찾을 수 없음",
+        "error409": "409 Conflict - 이미 사용된 쿠폰 또는 사용 한도 초과",
+        "error422": "422 Unprocessable Entity - 쿠폰 기간 만료 또는 타겟팅 조건 불일치",
+        "copiedToClipboard": "코드가 클립보드에 복사되었습니다."
+      },
+      "columns": {
+        "code": "쿠폰 코드",
+        "usageRate": "사용률"
+      },
       "form": {
         "name": "이름",
         "description": "설명",
         "code": "코드",
+        "type": "유형",
         "perUserLimit": "사용자당 제한",
         "maxTotalUses": "총 사용 제한",
         "startsAt": "시작 일시",
@@ -2855,6 +2900,7 @@
         "nameHelp": "쿠폰 이름을 입력합니다.",
         "descriptionHelp": "쿠폰 설명을 입력합니다.",
         "codeHelp": "쿠폰 코드를 입력합니다. (SPECIAL 타입: 보통 필수, NORMAL 타입: 선택)",
+        "typeCannotBeChanged": "쿠폰 유형은 생성 후 변경할 수 없습니다.",
         "perUserLimitHelp": "각 사용자가 이 쿠폰을 사용할 수 있는 횟수입니다.",
         "maxTotalUsesHelp": "전체 사용자 기준 총 사용 횟수 제한입니다. 무제한으로 설정할 수 있습니다.",
         "unlimited": "무제한",
@@ -2865,8 +2911,18 @@
         "applicablePeriod": "적용 기간",
         "codeMinError": "최소 4자 이상이어야 합니다.",
         "quantityMinError": "최소 1개 이상이어야 합니다.",
-        "maxTotalUsesMinError": "1 이상이어야 합니다."
+        "maxTotalUsesMinError": "1 이상이어야 합니다.",
+        "perUserLimitMinError": "1 이상이어야 합니다."
       }
+    },
+    "issuedCodes": {
+      "code": "코드",
+      "status": "상태",
+      "issuedAt": "발급일시",
+      "usedAt": "사용일시",
+      "statusIssued": "발급됨",
+      "statusUsed": "사용됨",
+      "statusRevoked": "취소됨"
     },
     "couponUsage": {
       "title": "쿠폰 사용 기록",

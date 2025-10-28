@@ -21,5 +21,11 @@ router.delete('/:id', CouponSettingsController.remove);
 // Usage records for a setting
 router.get('/:id/usage', CouponSettingsController.usage);
 
+// Issued codes for a setting
+router.get('/:id/issued-codes', CouponSettingsController.getIssuedCodes);
+
+// Generation status for async coupon code generation
+router.get('/:id/generation-status', CouponSettingsController.getGenerationStatus);
+
 export default router;
 

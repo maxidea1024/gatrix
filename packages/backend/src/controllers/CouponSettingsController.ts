@@ -22,16 +22,37 @@ const createSchema = Joi.object({
   startsAt: Joi.string().isoDate().required(),
   expiresAt: Joi.string().isoDate().required(),
   status: Joi.string().valid('ACTIVE', 'DISABLED', 'DELETED').default('ACTIVE'),
-  quantity: Joi.number().integer().min(1).optional().when('type', { is: 'NORMAL', then: Joi.optional(), otherwise: Joi.forbidden() }),
+  quantity: Joi.number().integer().min(1).optional(),
   targetWorlds: Joi.array().items(Joi.string()).allow(null),
   targetPlatforms: Joi.array().items(Joi.string()).allow(null),
   targetChannels: Joi.array().items(Joi.string()).allow(null),
   targetSubchannels: Joi.array().items(Joi.string()).allow(null),
-});
+}).unknown(false);
 
-const updateSchema = createSchema.fork([
-  'type','name','startsAt','expiresAt'
-], (s) => s.optional());
+// Update schema: make most fields optional, but forbid quantity
+const updateSchema = Joi.object({
+  code: Joi.alternatives().conditional('type', {
+    is: 'SPECIAL',
+    then: Joi.string().min(4).max(64),
+    otherwise: Joi.string().max(64).allow(null, ''),
+  }).optional(),
+  type: Joi.string().valid('SPECIAL', 'NORMAL').optional(),
+  name: Joi.string().max(128).optional(),
+  description: Joi.string().max(128).allow(null, '').optional(),
+  tags: Joi.alternatives(Joi.object(), Joi.array(), Joi.string()).optional().allow(null),
+  maxTotalUses: Joi.number().integer().min(1).allow(null).optional(),
+  perUserLimit: Joi.number().integer().min(1).optional(),
+  rewardTemplateId: Joi.string().length(26).allow(null).optional(),
+  rewardData: Joi.alternatives(Joi.object(), Joi.array(), Joi.string()).allow(null).optional(),
+  startsAt: Joi.string().isoDate().optional(),
+  expiresAt: Joi.string().isoDate().optional(),
+  status: Joi.string().valid('ACTIVE', 'DISABLED', 'DELETED').optional(),
+  quantity: Joi.forbidden(), // quantity is NOT allowed in updates
+  targetWorlds: Joi.array().items(Joi.string()).allow(null).optional(),
+  targetPlatforms: Joi.array().items(Joi.string()).allow(null).optional(),
+  targetChannels: Joi.array().items(Joi.string()).allow(null).optional(),
+  targetSubchannels: Joi.array().items(Joi.string()).allow(null).optional(),
+}).unknown(false);
 
 export class CouponSettingsController {
   static list = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
@@ -57,7 +78,15 @@ export class CouponSettingsController {
 
   static create = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { error, value } = createSchema.validate(req.body);
-    if (error) throw new CustomError(error.message, 400);
+    if (error) {
+      // Debug: log Joi validation error details
+      console.warn('CouponSettingsController.create validation error', {
+        message: error.message,
+        details: error.details,
+        payload: req.body,
+      });
+      throw new CustomError(error.message, 400);
+    }
 
     const authenticatedUserId = (req as any).userDetails?.id ?? (req as any).user?.id ?? (req as any).user?.userId;
     const setting = await CouponSettingsService.createSetting({ ...value, createdBy: authenticatedUserId ?? null });
@@ -97,6 +126,27 @@ export class CouponSettingsController {
       to: to as string,
     });
     res.json({ success: true, data });
+  });
+
+  // List issued codes for NORMAL type settings
+  static getIssuedCodes = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+    if (!id) throw new CustomError('id is required', 400);
+    const { page, limit, search } = req.query;
+    const data = await CouponSettingsService.getIssuedCodes(id, {
+      page: page ? parseInt(page as string) : undefined,
+      limit: limit ? parseInt(limit as string) : undefined,
+      search: search as string,
+    });
+    res.json({ success: true, data });
+  });
+
+  // Get generation status for async coupon code generation
+  static getGenerationStatus = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+    if (!id) throw new CustomError('id is required', 400);
+    const status = await CouponSettingsService.getGenerationStatus(id);
+    res.json({ success: true, data: status });
   });
 }
 

@@ -11,6 +11,7 @@ import publicRoutes from './public';
 import userRoutes from './users';
 import linkPreviewRoutes from './linkPreview';
 import mailRoutes from './mails';
+import couponRoutes from './coupons';
 
 const router = express.Router();
 
@@ -32,6 +33,7 @@ router.use('/auth', authLimiter as any, authRoutes);
 router.use('/users', userRoutes);
 router.use('/link-preview', linkPreviewRoutes);
 router.use('/mails', mailRoutes);
+router.use('/coupons', couponRoutes);
 router.use('/', publicRoutes);
 
 export default router;
