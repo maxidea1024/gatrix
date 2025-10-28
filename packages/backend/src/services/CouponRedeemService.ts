@@ -107,10 +107,11 @@ export class CouponRedeemService {
       }
 
       // 8. Update coupon status to USED
-      const usedAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
+      const usedAtISO = now.toISOString(); // ISO 8601 format for API response
+      const usedAtMySQL = now.toISOString().slice(0, 19).replace('T', ' '); // MySQL DATETIME format for storage
       await connection.execute(
         'UPDATE g_coupons SET status = ?, usedAt = ? WHERE id = ?',
-        ['USED', usedAt, coupon.id]
+        ['USED', usedAtMySQL, coupon.id]
       );
 
       // 9. Record usage
@@ -118,7 +119,7 @@ export class CouponRedeemService {
       const useId = ulid();
 
       await connection.execute(
-        `INSERT INTO g_coupon_uses 
+        `INSERT INTO g_coupon_uses
          (id, settingId, issuedCouponId, userId, userName, sequence, usedAt, gameWorldId, platform, channel, subchannel)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
@@ -128,7 +129,7 @@ export class CouponRedeemService {
           request.userId,
           sanitizedUserName,
           sequence,
-          usedAt,
+          usedAtMySQL,
           request.gameWorldId || null,
           request.platform || null,
           request.channel || null,
@@ -136,7 +137,14 @@ export class CouponRedeemService {
         ]
       );
 
-      // 10. Commit transaction
+      // 10. Update usedCount cache in g_coupon_settings (within transaction for consistency)
+      // This ensures cache is only updated if the entire transaction succeeds
+      await connection.execute(
+        'UPDATE g_coupon_settings SET usedCount = usedCount + 1 WHERE id = ?',
+        [setting.id]
+      );
+
+      // 11. Commit transaction (all changes including cache update are atomic)
       await connection.commit();
 
       logger.info('Coupon redeemed successfully', {
@@ -153,7 +161,7 @@ export class CouponRedeemService {
         reward,
         userUsedCount: sequence,
         sequence,
-        usedAt,
+        usedAt: usedAtISO, // Return ISO 8601 format for API response
       };
     } catch (error) {
       await connection.rollback();

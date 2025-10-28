@@ -1573,6 +1573,7 @@
     "end": "종료",
     "error": "오류",
     "expand": "펼치기",
+    "example": "예시",
     "export": "내보내기",
     "filter": {
       "addFilter": "필터 추가",
@@ -2866,9 +2867,9 @@
         "endpoint": "API 엔드포인트",
         "method": "메서드",
         "requiredHeaders": "필수 헤더",
-        "headerApiToken": "API 토큰 (필수) - API 인증을 위한 토큰",
-        "headerAppName": "애플리케이션 이름 (필수) - 요청을 보내는 애플리케이션 식별자",
-        "headerContentType": "Content-Type (필수) - 요청 본문 형식",
+        "headerApiToken": "API 인증을 위한 토큰",
+        "headerAppName": "요청을 보내는 애플리케이션 식별자",
+        "headerContentType": "application/json",
         "requestBody": "요청 본문",
         "responseExample": "응답 예제",
         "errorCodes": "에러 코드",
@@ -2899,7 +2900,7 @@
         "expiresAt": "종료 일시",
         "nameHelp": "쿠폰 이름을 입력합니다.",
         "descriptionHelp": "쿠폰 설명을 입력합니다.",
-        "codeHelp": "쿠폰 코드를 입력합니다. (SPECIAL 타입: 보통 필수, NORMAL 타입: 선택)",
+        "codeHelp": "쿠폰 코드를 입력합니다. (대문자 영문 A-Z, 숫자 0-9만 가능)",
         "typeCannotBeChanged": "쿠폰 유형은 생성 후 변경할 수 없습니다.",
         "perUserLimitHelp": "각 사용자가 이 쿠폰을 사용할 수 있는 횟수입니다.",
         "maxTotalUsesHelp": "전체 사용자 기준 총 사용 횟수 제한입니다. 무제한으로 설정할 수 있습니다.",
@@ -2918,7 +2919,15 @@
       "deleteConfirmTitle": "쿠폰 삭제 확인",
       "deleteConfirmMessage": "'{name}' 쿠폰을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
       "deleteSuccess": "쿠폰이 삭제되었습니다.",
-      "alreadyDeleted": "이미 삭제된 쿠폰입니다."
+      "alreadyDeleted": "이미 삭제된 쿠폰입니다.",
+      "exportSuccess": "쿠폰 코드를 내보냈습니다.",
+      "exportError": "쿠폰 코드 내보내기 오류가 발생했습니다.",
+      "noDataToExport": "내보낼 데이터가 없습니다.",
+      "statistics": {
+        "total": "전체 쿠폰 수",
+        "used": "사용된 쿠폰",
+        "unused": "미사용 쿠폰"
+      }
     },
     "issuedCodes": {
       "code": "코드",

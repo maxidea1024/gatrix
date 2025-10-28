@@ -1573,6 +1573,7 @@
     "end": "end",
     "error": "Error",
     "expand": "Expand",
+    "example": "Example",
     "export": "Export",
     "filter": {
       "addFilter": "Add filter",
@@ -2866,9 +2867,9 @@
         "endpoint": "API Endpoint",
         "method": "Method",
         "requiredHeaders": "Required Headers",
-        "headerApiToken": "API Token (required) - Token for API authentication",
-        "headerAppName": "Application Name (required) - Identifier of the application sending the request",
-        "headerContentType": "Content-Type (required) - Request body format",
+        "headerApiToken": "Token for API authentication",
+        "headerAppName": "Identifier of the application sending the request",
+        "headerContentType": "application/json",
         "requestBody": "Request Body",
         "responseExample": "Response Example",
         "errorCodes": "Error Codes",
@@ -2899,7 +2900,7 @@
         "expiresAt": "Expires At",
         "nameHelp": "Enter a descriptive coupon name.",
         "descriptionHelp": "Provide a brief description for this coupon.",
-        "codeHelp": "Enter a coupon code. (SPECIAL: typically required, NORMAL: optional)",
+        "codeHelp": "Enter a coupon code. (Uppercase letters A-Z and numbers 0-9 only)",
         "typeCannotBeChanged": "Coupon type cannot be changed after creation.",
         "perUserLimitHelp": "Number of times each user can use this coupon.",
         "maxTotalUsesHelp": "Total usage limit across all users. Set to unlimited if not restricted.",
@@ -2918,7 +2919,15 @@
       "deleteConfirmTitle": "Confirm Deletion",
       "deleteConfirmMessage": "Are you sure you want to delete '{name}'? This action cannot be undone.",
       "deleteSuccess": "Coupon has been deleted.",
-      "alreadyDeleted": "This coupon has already been deleted."
+      "alreadyDeleted": "This coupon has already been deleted.",
+      "exportSuccess": "Coupon codes have been exported.",
+      "exportError": "An error occurred while exporting coupon codes.",
+      "noDataToExport": "No data to export.",
+      "statistics": {
+        "total": "Total Coupons",
+        "used": "Used Coupons",
+        "unused": "Unused Coupons"
+      }
     },
     "issuedCodes": {
       "code": "Code",

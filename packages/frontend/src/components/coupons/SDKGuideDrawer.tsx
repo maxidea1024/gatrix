@@ -60,7 +60,7 @@ curl -X POST http://localhost:5000/api/v1/coupons/{COUPON_CODE}/redeem \\
     "reward": {},
     "userUsedCount": 1,
     "sequence": 1,
-    "usedAt": "2025-10-28 04:17:05"
+    "usedAt": "2025-10-28T04:17:05.123Z"
   }
 }`;
 

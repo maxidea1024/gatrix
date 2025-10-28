@@ -138,9 +138,10 @@ export class CouponGenerationJob {
       }
 
       // Final progress update - set both generatedCount and totalCount to actual generated count
+      // Also update issuedCount cache
       await pool.execute(
-        'UPDATE g_coupon_settings SET generationStatus = ?, generatedCount = ?, totalCount = ?, generationJobId = NULL WHERE id = ?',
-        ['COMPLETED', totalGenerated, totalGenerated, settingId]
+        'UPDATE g_coupon_settings SET generationStatus = ?, generatedCount = ?, totalCount = ?, issuedCount = ?, generationJobId = NULL WHERE id = ?',
+        ['COMPLETED', totalGenerated, totalGenerated, totalGenerated, settingId]
       );
       await job.updateProgress(100);
 

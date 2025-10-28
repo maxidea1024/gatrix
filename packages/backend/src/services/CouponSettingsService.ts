@@ -88,59 +88,32 @@ export class CouponSettingsService {
       args.push(params.status);
     }
     if (params.search) {
-      where.push('(code LIKE ? OR name LIKE ?)');
+      where.push('(code LIKE ? OR nameKey LIKE ?)');
       const pattern = `%${params.search}%`;
       args.push(pattern, pattern);
     }
 
     const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
 
+    // Get total count
     const [countRows] = await pool.execute<RowDataPacket[]>(
       `SELECT COUNT(*) as total FROM g_coupon_settings ${whereSql}`,
       args
     );
     const total = Number(countRows[0].total || 0);
 
+    // Get paginated settings (use cached count columns)
     const [rows] = await pool.execute<RowDataPacket[]>(
       `SELECT * FROM g_coupon_settings ${whereSql} ORDER BY createdAt DESC LIMIT ${limit} OFFSET ${offset}`,
       args
     );
 
-    // Get actual issued code counts and used counts
-    const settingIds = rows.map((r: any) => r.id);
-    let issuedCountMap: { [key: string]: number } = {};
-    let usedCountMap: { [key: string]: number } = {};
-
-    if (settingIds.length > 0) {
-      const placeholders = settingIds.map(() => '?').join(',');
-
-      // Get issued code counts from g_coupons
-      const [issuedRows] = await pool.execute<RowDataPacket[]>(
-        `SELECT settingId, COUNT(*) as issuedCount FROM g_coupons WHERE settingId IN (${placeholders}) GROUP BY settingId`,
-        settingIds
-      );
-
-      issuedRows.forEach((row: any) => {
-        issuedCountMap[row.settingId] = Number(row.issuedCount || 0);
-      });
-
-      // Get used counts from g_coupon_uses
-      const [usedRows] = await pool.execute<RowDataPacket[]>(
-        `SELECT settingId, COUNT(*) as usedCount FROM g_coupon_uses WHERE settingId IN (${placeholders}) GROUP BY settingId`,
-        settingIds
-      );
-
-      usedRows.forEach((row: any) => {
-        usedCountMap[row.settingId] = Number(row.usedCount || 0);
-      });
-    }
-
     const settings = rows.map((r: any) => ({
       ...r,
       tags: typeof r.tags === 'string' ? JSON.parse(r.tags) : r.tags,
       rewardData: typeof r.rewardData === 'string' ? JSON.parse(r.rewardData) : r.rewardData,
-      issuedCount: issuedCountMap[r.id] || 0, // Actual issued code count
-      usedCount: usedCountMap[r.id] || 0, // Number of times the coupon has been used
+      issuedCount: Number(r.issuedCount || 0),
+      usedCount: Number(r.usedCount || 0),
     })) as any[];
 
     return { settings, total, page, limit };
@@ -378,9 +351,9 @@ export class CouponSettingsService {
       }
     }
 
-    // Update status to DELETED
+    // Update status to DELETED and reset cache
     const [res] = await pool.execute<ResultSetHeader>(
-      `UPDATE g_coupon_settings SET status = 'DELETED', generationStatus = 'FAILED' WHERE id = ?`,
+      `UPDATE g_coupon_settings SET status = 'DELETED', generationStatus = 'FAILED', issuedCount = 0, usedCount = 0 WHERE id = ?`,
       [id]
     );
     if (res.affectedRows === 0) throw new CustomError('Coupon setting not found', 404);
@@ -515,6 +488,102 @@ export class CouponSettingsService {
   }
 
   /**
+   * Recalculate and verify cache consistency for all coupon settings
+   * Returns list of settings with cache mismatches
+   */
+  static async recalculateCacheForAll(): Promise<any[]> {
+    const pool = database.getPool();
+
+    try {
+      // Get all settings with their actual counts
+      const [results] = await pool.execute<RowDataPacket[]>(`
+        SELECT
+          cs.id,
+          cs.issuedCount as cached_issued,
+          COALESCE(c.actual_issued, 0) as actual_issued,
+          cs.usedCount as cached_used,
+          COALESCE(cu.actual_used, 0) as actual_used
+        FROM g_coupon_settings cs
+        LEFT JOIN (
+          SELECT settingId, COUNT(*) as actual_issued
+          FROM g_coupons
+          GROUP BY settingId
+        ) c ON cs.id = c.settingId
+        LEFT JOIN (
+          SELECT settingId, COUNT(*) as actual_used
+          FROM g_coupon_uses
+          GROUP BY settingId
+        ) cu ON cs.id = cu.settingId
+      `);
+
+      const mismatches: any[] = [];
+
+      // Update cache for all settings
+      for (const row of results as any[]) {
+        if (row.cached_issued !== row.actual_issued || row.cached_used !== row.actual_used) {
+          mismatches.push({
+            settingId: row.id,
+            cached_issued: row.cached_issued,
+            actual_issued: row.actual_issued,
+            cached_used: row.cached_used,
+            actual_used: row.actual_used,
+          });
+
+          // Update cache
+          await pool.execute(
+            'UPDATE g_coupon_settings SET issuedCount = ?, usedCount = ? WHERE id = ?',
+            [row.actual_issued, row.actual_used, row.id]
+          );
+        }
+      }
+
+      if (mismatches.length > 0) {
+        logger.warn('Cache mismatches found and fixed', { count: mismatches.length, mismatches });
+      }
+
+      return mismatches;
+    } catch (error) {
+      logger.error('Failed to recalculate cache', { error });
+      throw new CustomError('Failed to recalculate cache', 500);
+    }
+  }
+
+  /**
+   * Recalculate cache for a specific coupon setting
+   */
+  static async recalculateCacheForSetting(settingId: string): Promise<{ issued: number; used: number }> {
+    const pool = database.getPool();
+
+    try {
+      // Get actual counts
+      const [issuedResult] = await pool.execute<RowDataPacket[]>(
+        'SELECT COUNT(*) as count FROM g_coupons WHERE settingId = ?',
+        [settingId]
+      );
+      const issuedCount = (issuedResult[0] as any).count || 0;
+
+      const [usedResult] = await pool.execute<RowDataPacket[]>(
+        'SELECT COUNT(*) as count FROM g_coupon_uses WHERE settingId = ?',
+        [settingId]
+      );
+      const usedCount = (usedResult[0] as any).count || 0;
+
+      // Update cache
+      await pool.execute(
+        'UPDATE g_coupon_settings SET issuedCount = ?, usedCount = ? WHERE id = ?',
+        [issuedCount, usedCount, settingId]
+      );
+
+      logger.info('Cache recalculated for setting', { settingId, issuedCount, usedCount });
+
+      return { issued: issuedCount, used: usedCount };
+    } catch (error) {
+      logger.error('Failed to recalculate cache for setting', { settingId, error });
+      throw new CustomError('Failed to recalculate cache', 500);
+    }
+  }
+
+  /**
    * Generate coupon codes synchronously (for small quantities)
    */
   private static async generateCouponCodesSynchronous(settingId: string, quantity: number): Promise<void> {
@@ -570,6 +639,12 @@ export class CouponSettingsService {
           batch.flat()
         );
       }
+
+      // Update issuedCount cache
+      await pool.execute(
+        'UPDATE g_coupon_settings SET issuedCount = ? WHERE id = ?',
+        [codes.length, settingId]
+      );
     }
   }
 
