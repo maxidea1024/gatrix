@@ -350,8 +350,37 @@ export class CouponSettingsService {
   // Soft delete setting
   static async deleteSetting(id: string): Promise<void> {
     const pool = database.getPool();
+
+    // Get the setting to check if there's an active generation job
+    const [settingRows] = await pool.execute<RowDataPacket[]>(
+      `SELECT generationJobId, generationStatus FROM g_coupon_settings WHERE id = ?`,
+      [id]
+    );
+
+    if (settingRows.length === 0) throw new CustomError('Coupon setting not found', 404);
+
+    const setting = settingRows[0] as any;
+
+    // Cancel BullMQ job if it's in progress
+    if (setting.generationJobId && (setting.generationStatus === 'IN_PROGRESS' || setting.generationStatus === 'PENDING')) {
+      try {
+        const queue = queueService.getQueue('coupon-generation');
+        if (queue) {
+          const job = await queue.getJob(setting.generationJobId);
+          if (job) {
+            await job.remove();
+            logger.info('Cancelled coupon generation job', { jobId: setting.generationJobId, settingId: id });
+          }
+        }
+      } catch (error) {
+        logger.error('Failed to cancel coupon generation job', { jobId: setting.generationJobId, settingId: id, error });
+        // Continue with deletion even if job cancellation fails
+      }
+    }
+
+    // Update status to DELETED
     const [res] = await pool.execute<ResultSetHeader>(
-      `UPDATE g_coupon_settings SET status = 'DELETED' WHERE id = ?`,
+      `UPDATE g_coupon_settings SET status = 'DELETED', generationStatus = 'FAILED' WHERE id = ?`,
       [id]
     );
     if (res.affectedRows === 0) throw new CustomError('Coupon setting not found', 404);

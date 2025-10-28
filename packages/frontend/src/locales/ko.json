@@ -2910,10 +2910,15 @@
         "quantityHelp": "생성할 쿠폰의 개수를 입력합니다.",
         "applicablePeriod": "적용 기간",
         "codeMinError": "최소 4자 이상이어야 합니다.",
+        "codeFormatError": "쿠폰 코드는 대문자 영문(A-Z)과 숫자(0-9)만 사용할 수 있습니다.",
         "quantityMinError": "최소 1개 이상이어야 합니다.",
         "maxTotalUsesMinError": "1 이상이어야 합니다.",
         "perUserLimitMinError": "1 이상이어야 합니다."
-      }
+      },
+      "deleteConfirmTitle": "쿠폰 삭제 확인",
+      "deleteConfirmMessage": "'{name}' 쿠폰을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+      "deleteSuccess": "쿠폰이 삭제되었습니다.",
+      "alreadyDeleted": "이미 삭제된 쿠폰입니다."
     },
     "issuedCodes": {
       "code": "코드",
