@@ -6,6 +6,7 @@ import { useSnackbar } from 'notistack';
 import { useDebounce } from '@/hooks/useDebounce';
 import SimplePagination from '@/components/common/SimplePagination';
 import { couponService, CouponSetting, CouponStatus, CouponType, IssuedCouponCode } from '@/services/couponService';
+import { generateExampleCouponCode, CodePattern } from '@/utils/couponCodeGenerator';
 
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '@/components/common/DynamicFilterBar';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
@@ -16,12 +17,6 @@ import SDKGuideDrawer from '@/components/coupons/SDKGuideDrawer';
 import RewardSelector from '@/components/game/RewardSelector';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Dayjs } from 'dayjs';
-
-// Format coupon code with hyphens every 4 characters
-const formatCouponCode = (code: string): string => {
-  if (!code) return '';
-  return code.match(/.{1,4}/g)?.join('-') || code;
-};
 
 // Coupon Settings page (list and management of coupon definitions)
 const CouponSettingsPage: React.FC = () => {
@@ -194,7 +189,7 @@ const CouponSettingsPage: React.FC = () => {
         // CSV export
         const headers = ['Code', 'Status', 'Issued At', 'Used At'];
         const rows = allCodes.map(c => [
-          formatCouponCode(c.code),
+          c.code,
           c.status,
           formatDateTime(c.createdAt),
           c.usedAt ? formatDateTime(c.usedAt) : '-'
@@ -211,7 +206,7 @@ const CouponSettingsPage: React.FC = () => {
         // XLSX export using xlsx library
         const XLSX = await import('xlsx');
         const ws = XLSX.utils.json_to_sheet(allCodes.map(c => ({
-          'Code': formatCouponCode(c.code),
+          'Code': c.code,
           'Status': c.status,
           'Issued At': formatDateTime(c.createdAt),
           'Used At': c.usedAt ? formatDateTime(c.usedAt) : '-'
@@ -760,12 +755,12 @@ const CouponSettingsPage: React.FC = () => {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-          <Button variant="outlined" startIcon={<CodeIcon />} onClick={() => setOpenSDKGuide(true)}>
-            {t('coupons.couponSettings.sdkGuide')}
-          </Button>
-          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
           <Button variant="contained" startIcon={<AddIcon />} onClick={() => { resetForm(); setOpenForm(true); }}>
             {t('coupons.couponSettings.createCoupon')}
+          </Button>
+          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+          <Button variant="outlined" startIcon={<CodeIcon />} onClick={() => setOpenSDKGuide(true)}>
+            {t('coupons.couponSettings.sdkGuide')}
           </Button>
         </Box>
       </Box>
@@ -1220,6 +1215,22 @@ const CouponSettingsPage: React.FC = () => {
               <MenuItem value="SPECIAL">SPECIAL</MenuItem>
               <MenuItem value="NORMAL">NORMAL</MenuItem>
             </TextField>
+            {/* 3-1. Code Pattern (NORMAL only) */}
+            {form.type === 'NORMAL' && (
+              <TextField
+                select
+                fullWidth
+                label={t('coupons.couponSettings.form.codePattern')}
+                value={form.codePattern || 'ALPHANUMERIC_8'}
+                onChange={(e) => setForm((s: any) => ({ ...s, codePattern: e.target.value }))}
+                disabled={!!editing}
+                helperText={!!editing ? t('coupons.couponSettings.form.codePatternCannotBeChanged') : t('coupons.couponSettings.form.codePatternExample', { code: generateExampleCouponCode((form.codePattern || 'ALPHANUMERIC_8') as CodePattern) })}
+              >
+                <MenuItem value="ALPHANUMERIC_8">{t('coupons.couponSettings.form.codePattern8')}</MenuItem>
+                <MenuItem value="ALPHANUMERIC_16">{t('coupons.couponSettings.form.codePattern16')}</MenuItem>
+                <MenuItem value="ALPHANUMERIC_16_HYPHEN">{t('coupons.couponSettings.form.codePattern16Hyphen')}</MenuItem>
+              </TextField>
+            )}
             {/* 4. Code (SPECIAL only) */}
             {form.type === 'SPECIAL' && (
               <TextField
@@ -1253,8 +1264,6 @@ const CouponSettingsPage: React.FC = () => {
                   '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
                 }}
               />
-
-
             )}
             {/* 6. PerUserLimit (NORMAL only) */}
             {form.type === 'NORMAL' && (
@@ -1553,7 +1562,7 @@ const CouponSettingsPage: React.FC = () => {
                       <TableRow key={c.id} hover sx={{ height: 48 }}>
                         <TableCell sx={{ py: 1, px: 2 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>{formatCouponCode(c.code)}</Typography>
+                            <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>{c.code}</Typography>
                             <Tooltip title={t('coupons.couponSettings.copyCode')}>
                               <IconButton size="small" onClick={() => handleCopyCode(c.code)}>
                                 <ContentCopyIcon fontSize="inherit" />

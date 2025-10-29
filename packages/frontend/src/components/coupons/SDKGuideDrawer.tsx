@@ -32,25 +32,26 @@ const SDKGuideDrawer: React.FC<SDKGuideDrawerProps> = ({ open, onClose }) => {
 
   // curl example code
   const curlExample = `# Coupon Redeem API Example
-curl -X POST http://localhost:5000/api/v1/coupons/{COUPON_CODE}/redeem \\
+curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
   -H "Content-Type: application/json" \\
   -H "X-API-Token: your-api-token-here" \\
-  -H "X-Application-Name: your-app-name" \\
   -d '{
     "userId": "user123",
     "userName": "John Doe",
-    "gameWorldId": "world01",
+    "worldId": "world01",
     "platform": "ios",
-    "channel": "kakao"
+    "channel": "kakao",
+    "subChannel": "google"
   }'`;
 
   // JSON request example
   const jsonRequest = `{
   "userId": "user123",
   "userName": "John Doe",
-  "gameWorldId": "world01",
+  "worldId": "world01",
   "platform": "ios",
-  "channel": "kakao"
+  "channel": "kakao",
+  "subChannel": "google"
 }`;
 
   // JSON response example
@@ -165,7 +166,7 @@ curl -X POST http://localhost:5000/api/v1/coupons/{COUPON_CODE}/redeem \\
             <strong>{t('coupons.couponSettings.sdkGuideDrawer.method')}:</strong> POST
           </Typography>
           <Typography component="div" sx={{ wordBreak: 'break-all' }}>
-            /api/v1/coupons/{'{'}<strong>code</strong>{'}'}
+            /api/v1/server/coupons/{'{'}<strong>code</strong>{'}'}
             /redeem
           </Typography>
         </Paper>
@@ -184,13 +185,16 @@ curl -X POST http://localhost:5000/api/v1/coupons/{COUPON_CODE}/redeem \\
             • <strong>userName</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramUserName')}
           </Typography>
           <Typography variant="body2">
-            • <strong>gameWorldId</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramGameWorldId')}
+            • <strong>worldId</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramWorldId')}
           </Typography>
           <Typography variant="body2">
             • <strong>platform</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramPlatform')}
           </Typography>
           <Typography variant="body2">
             • <strong>channel</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramChannel')}
+          </Typography>
+          <Typography variant="body2">
+            • <strong>subChannel</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramSubChannel')}
           </Typography>
         </Stack>
 

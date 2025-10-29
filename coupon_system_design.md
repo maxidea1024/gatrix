@@ -297,7 +297,7 @@ UI
 
 - 유저 사용 시 반드시 userId와 userName을 함께 지정해야 합니다.
 - userName은 저장 전에 XSS-safe sanitize를 적용하고, 최대 길이 128자로 제한합니다.
-- 타겟팅 조건(gameWorldId, platform, channel, subchannel)이 설정되어 있다면, 사용 요청의 컨텍스트가 조건을 충족해야 합니다.
+- 타겟팅 조건(worldId, platform, channel, subChannel)이 설정되어 있다면, 사용 요청의 컨텍스트가 조건을 충족해야 합니다.
 
 엔드포인트
 - POST /api/v1/coupons/{code}/redeem
@@ -307,10 +307,10 @@ Request Body 예시
 {
   "userId": "123456",
   "userName": "홍길동",
-  "gameWorldId": "101",
+  "worldId": "101",
   "platform": "ios",
   "channel": "kakao",
-  "subchannel": "promotion",
+  "subChannel": "promotion",
   "requestId": "b2c1a0f8-5e91-4b8b-a7a9-1a2b3c4d5e6f"
 }
 ```
@@ -721,13 +721,14 @@ export class CouponSDK {
 - axios 사용 시에는 `axios.create({ baseURL, headers })` 패턴 권장
 
 ### 14.3 Redeem 호출 (userId + userName 필수)
-- Endpoint: `POST /coupons/{code}/redeem`
-- Body: `{ userId, userName, gameWorldId?, platform?, channel?, subchannel?, requestId? }`
+- Endpoint: `POST /server/coupons/{code}/redeem`
+- Authentication: `X-API-Token` 헤더 (Server SDK 토큰 필수)
+- Body: `{ userId, userName, worldId?, platform?, channel?, subChannel?, requestId? }`
 - userName은 API에서 저장 전 sanitize 적용. SDK 단에서는 추가 가공 없이 원문 전달 권장
 ```ts
 // Example: redeem
 async function redeemCoupon(code: string, input: any, opts?: { idempotencyKey?: string }) {
-  const res = await fetch(`${BASE}/coupons/${code}/redeem`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...AUTH, ...(opts?.idempotencyKey?{'Idempotency-Key':opts.idempotencyKey}:{}) }, body: JSON.stringify(input) });
+  const res = await fetch(`${BASE}/server/coupons/${code}/redeem`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Token': API_TOKEN, ...(opts?.idempotencyKey?{'Idempotency-Key':opts.idempotencyKey}:{}) }, body: JSON.stringify(input) });
   return await res.json();
 }
 

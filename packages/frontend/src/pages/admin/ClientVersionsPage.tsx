@@ -78,6 +78,7 @@ import {
   ArrowDropDown as ArrowDropDownIcon,
   TableChart as TableChartIcon,
   Code as JsonIcon,
+  Code as CodeIcon,
   Description as ExcelIcon,
 
   ContentCopy as CopyIcon,
@@ -120,6 +121,7 @@ import { formatDateTimeDetailed, parseUTCForPicker } from '../../utils/dateForma
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
+import ClientVersionGuideDrawer from '../../components/admin/ClientVersionGuideDrawer';
 
 // HSV를 RGB로 변환하는 함수
 const hsvToRgb = (h: number, s: number, v: number): [number, number, number] => {
@@ -385,6 +387,9 @@ const ClientVersionsPage: React.FC = () => {
   // 내보내기 메뉴 상태
   const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
   const [selectedExportMenuAnchor, setSelectedExportMenuAnchor] = useState<null | HTMLElement>(null);
+
+  // SDK 가이드 상태
+  const [openSDKGuide, setOpenSDKGuide] = useState(false);
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
@@ -1250,6 +1255,14 @@ const ClientVersionsPage: React.FC = () => {
               <SettingsIcon />
             </IconButton>
           </Tooltip>
+          <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+          <Button
+            variant="outlined"
+            startIcon={<CodeIcon />}
+            onClick={() => setOpenSDKGuide(true)}
+          >
+            {t('clientVersions.sdkGuide')}
+          </Button>
         </Box>
       </Box>
 
@@ -2195,6 +2208,9 @@ const ClientVersionsPage: React.FC = () => {
           </Box>
         </ClickAwayListener>
       </Popover>
+
+      {/* Client Version Guide Drawer */}
+      <ClientVersionGuideDrawer open={openSDKGuide} onClose={() => setOpenSDKGuide(false)} />
     </Box>
   );
 };

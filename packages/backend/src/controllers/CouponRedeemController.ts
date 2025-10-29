@@ -8,17 +8,18 @@ import { CouponRedeemService } from '../services/CouponRedeemService';
 const redeemSchema = Joi.object({
   userId: Joi.string().max(64).required(),
   userName: Joi.string().max(128).required(),
-  gameWorldId: Joi.string().max(64).optional().allow(null, ''),
+  worldId: Joi.string().max(64).optional().allow(null, ''),
   platform: Joi.string().max(32).optional().allow(null, ''),
   channel: Joi.string().max(64).optional().allow(null, ''),
-  subchannel: Joi.string().max(64).optional().allow(null, ''),
+  subChannel: Joi.string().max(64).optional().allow(null, ''),
   requestId: Joi.string().optional().allow(null, ''),
 });
 
 export class CouponRedeemController {
   /**
    * Redeem a coupon code
-   * POST /api/v1/coupons/:code/redeem
+   * POST /api/v1/server/coupons/:code/redeem
+   * Requires: X-API-Token header (server SDK token)
    */
   static redeem = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { code } = req.params;

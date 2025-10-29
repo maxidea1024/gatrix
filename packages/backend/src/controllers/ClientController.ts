@@ -6,6 +6,7 @@ import { pubSubService } from '../services/PubSubService';
 import { GAME_WORLDS, DEFAULT_CONFIG } from '../constants/cacheKeys';
 import logger from '../config/logger';
 import { asyncHandler } from '../utils/asyncHandler';
+import VarsModel from '../models/Vars';
 
 export class ClientController {
   /**
@@ -49,6 +50,17 @@ export class ClientController {
       });
     }
 
+    // Get clientVersionPassiveData from KV settings
+    let meta = {};
+    try {
+      const passiveDataStr = await VarsModel.get('kv:clientVersionPassiveData');
+      if (passiveDataStr) {
+        meta = JSON.parse(passiveDataStr);
+      }
+    } catch (error) {
+      logger.warn('Failed to parse clientVersionPassiveData:', error);
+    }
+
     // Transform data for client consumption (remove sensitive fields)
     const clientData = {
       id: record.id,
@@ -65,6 +77,7 @@ export class ClientController {
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
       timestamp: new Date().toISOString(),
+      meta,
       // areaId: '...',
       // groupId: '...'
     };

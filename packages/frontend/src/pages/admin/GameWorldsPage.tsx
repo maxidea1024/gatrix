@@ -64,6 +64,7 @@ import {
   Translate as TranslateIcon,
   Refresh as RefreshIcon,
   ExpandMore as ExpandMoreIcon,
+  Code as CodeIcon,
 } from '@mui/icons-material';
 import {
   DndContext,
@@ -106,6 +107,7 @@ import JsonEditor from '@/components/common/JsonEditor';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import MaintenanceSettingsInput from '../../components/common/MaintenanceSettingsInput';
 import { messageTemplateService, MessageTemplate } from '@/services/messageTemplateService';
+import SDKGuideDrawer from '../../components/coupons/SDKGuideDrawer';
 
 // Column definition interface
 interface ColumnConfig {
@@ -496,6 +498,9 @@ const GameWorldsPage: React.FC = () => {
     };
     loadTemplates();
   }, []);
+
+  // SDK 가이드 상태
+  const [openSDKGuide, setOpenSDKGuide] = useState(false);
 
   // 점검 메시지 로케일 관리 함수들
   const addMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
@@ -1244,15 +1249,23 @@ const GameWorldsPage: React.FC = () => {
             </Typography>
           </Box>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleAddWorld}
-        >
-          {t('gameWorlds.addGameWorld')}
-
-
-        </Button>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleAddWorld}
+          >
+            {t('gameWorlds.addGameWorld')}
+          </Button>
+          <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+          <Button
+            variant="outlined"
+            startIcon={<CodeIcon />}
+            onClick={() => setOpenSDKGuide(true)}
+          >
+            {t('coupons.couponSettings.sdkGuide')}
+          </Button>
+        </Box>
       </Box>
 
 
@@ -2138,6 +2151,9 @@ const GameWorldsPage: React.FC = () => {
           </Box>
         </ClickAwayListener>
       </Popover>
+
+      {/* SDK Guide Drawer */}
+      <SDKGuideDrawer open={openSDKGuide} onClose={() => setOpenSDKGuide(false)} />
     </Box>
   );
 };

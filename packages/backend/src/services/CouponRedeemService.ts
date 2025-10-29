@@ -7,10 +7,10 @@ import logger from '../config/logger';
 export interface RedeemRequest {
   userId: string;
   userName: string;
-  gameWorldId?: string;
+  worldId?: string;
   platform?: string;
   channel?: string;
-  subchannel?: string;
+  subChannel?: string;
   requestId?: string;
 }
 
@@ -138,10 +138,10 @@ export class CouponRedeemService {
           sanitizedUserName,
           sequence,
           usedAtMySQL,
-          request.gameWorldId || null,
+          request.worldId || null,
           request.platform || null,
           request.channel || null,
-          request.subchannel || null,
+          request.subChannel || null,
         ]
       );
 
@@ -216,10 +216,10 @@ export class CouponRedeemService {
     const hasSubchannelTargeting = (subchannelRows[0] as any).count > 0;
 
     // Validate world targeting
-    if (hasWorldTargeting && request.gameWorldId) {
+    if (hasWorldTargeting && request.worldId) {
       const [worldMatch] = await connection.execute<RowDataPacket[]>(
         'SELECT COUNT(*) as count FROM g_coupon_target_worlds WHERE settingId = ? AND gameWorldId = ?',
-        [settingId, request.gameWorldId]
+        [settingId, request.worldId]
       );
       if ((worldMatch[0] as any).count === 0) {
         const error = new CustomError('Coupon is not available for this game world', 422, true, 'UNPROCESSABLE_ENTITY');
@@ -252,10 +252,10 @@ export class CouponRedeemService {
     }
 
     // Validate subchannel targeting
-    if (hasSubchannelTargeting && request.subchannel) {
+    if (hasSubchannelTargeting && request.subChannel) {
       const [subchannelMatch] = await connection.execute<RowDataPacket[]>(
         'SELECT COUNT(*) as count FROM g_coupon_target_subchannels WHERE settingId = ? AND subchannel = ?',
-        [settingId, request.subchannel]
+        [settingId, request.subChannel]
       );
       if ((subchannelMatch[0] as any).count === 0) {
         const error = new CustomError('Coupon is not available for this subchannel', 422, true, 'UNPROCESSABLE_ENTITY');

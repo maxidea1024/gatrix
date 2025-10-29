@@ -3,6 +3,7 @@ import { ulid } from 'ulid';
 import database from '../../config/database';
 import logger from '../../config/logger';
 import { RowDataPacket } from 'mysql2/promise';
+import { generateCouponCode, CodePattern } from '../../utils/couponCodeGenerator';
 
 export interface CouponGenerationJobData {
   type: string;
@@ -66,13 +67,19 @@ export class CouponGenerationJob {
         ['IN_PROGRESS', jobIdForDb, settingId]
       );
 
+      // Get codePattern from settings
+      const [settings] = await pool.execute<RowDataPacket[]>(
+        'SELECT codePattern FROM g_coupon_settings WHERE id = ?',
+        [settingId]
+      );
+      const codePattern = (settings[0]?.codePattern || 'ALPHANUMERIC_8') as CodePattern;
+
       // Generate and insert codes in streaming batches
       const localSet = new Set<string>();
-      const genCode = () => ulid().substring(0, 16).toUpperCase();
       let totalGenerated = 0;
       let lastProgressUpdate = 0;
 
-      logger.info('Starting streaming batch generation', { settingId, quantity });
+      logger.info('Starting streaming batch generation', { settingId, quantity, codePattern });
 
       for (let i = 0; i < quantity; i += this.BATCH_SIZE) {
         const batchCodes: Array<[string, string, string]> = [];
@@ -85,7 +92,7 @@ export class CouponGenerationJob {
 
           // Try to find a unique code
           for (let attempt = 0; attempt < 10; attempt++) {
-            code = genCode();
+            code = generateCouponCode(codePattern);
             if (localSet.has(code)) continue;
 
             // Check database for duplicates less frequently

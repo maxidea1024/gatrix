@@ -5,6 +5,7 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 import { convertToMySQLDateTime } from '../utils/dateUtils';
 import { queueService } from './QueueService';
 import logger from '../config/logger';
+import { generateCouponCode, CodePattern } from '../utils/couponCodeGenerator';
 
 export type CouponType = 'SPECIAL' | 'NORMAL';
 export type CouponStatus = 'ACTIVE' | 'DISABLED' | 'DELETED';
@@ -25,6 +26,7 @@ export interface CouponSetting {
   startsAt: string; // MySQL DATETIME
   expiresAt: string; // MySQL DATETIME
   status: CouponStatus;
+  codePattern?: CodePattern;
   createdBy?: number | null;
   updatedBy?: number | null;
 }
@@ -44,6 +46,7 @@ export interface CreateCouponSettingInput {
   startsAt: string | Date;
   expiresAt: string | Date;
   status?: CouponStatus;
+  codePattern?: CodePattern; // NORMAL only
   quantity?: number; // NORMAL only
   targetWorlds?: string[] | null;
   targetPlatforms?: string[] | null;
@@ -193,12 +196,18 @@ export class CouponSettingsService {
     const settingCode = isNormal ? null : (input.code ?? null);
     const maxTotalUses = isNormal ? null : (input.maxTotalUses ?? null);
 
+    // Validate codePattern for NORMAL type
+    const codePattern = isNormal ? (input.codePattern ?? 'ALPHANUMERIC_8') : 'ALPHANUMERIC_8';
+    if (isNormal && !['ALPHANUMERIC_8', 'ALPHANUMERIC_16', 'ALPHANUMERIC_16_HYPHEN'].includes(codePattern)) {
+      throw new CustomError('Invalid code pattern', 400);
+    }
+
     // Insert main row
     await pool.execute(
       `INSERT INTO g_coupon_settings
        (id, code, type, name, description, tags, maxTotalUses, perUserLimit, rewardTemplateId, rewardData,
-        rewardEmailTitle, rewardEmailBody, startsAt, expiresAt, status, createdBy)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        rewardEmailTitle, rewardEmailBody, startsAt, expiresAt, status, codePattern, createdBy)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         settingCode,
@@ -215,6 +224,7 @@ export class CouponSettingsService {
         startsAt,
         expiresAt,
         input.status ?? 'ACTIVE',
+        codePattern,
         input.createdBy ?? null,
       ]
     );
@@ -384,19 +394,27 @@ export class CouponSettingsService {
     return (res as ResultSetHeader).affectedRows || 0;
   }
 
-  // Usage listing by setting
-  static async getUsageBySetting(id: string, query: CouponUsageQuery) {
+  // Usage listing by setting (or all settings if id is not provided)
+  static async getUsageBySetting(id: string | undefined, query: CouponUsageQuery) {
     const pool = database.getPool();
 
-    // Ensure setting exists
-    const setting = await this.getSettingById(id);
+    // If id is provided, ensure setting exists
+    if (id) {
+      await this.getSettingById(id);
+    }
 
     const page = query.page || 1;
     const limit = query.limit || 20;
     const offset = (page - 1) * limit;
 
-    const where: string[] = ['settingId = ?'];
-    const args: any[] = [id];
+    const where: string[] = [];
+    const args: any[] = [];
+
+    // Add settingId filter if provided
+    if (id) {
+      where.push('settingId = ?');
+      args.push(id);
+    }
 
     // Track if any filters are applied
     const hasFilters = query.search || query.platform || query.gameWorldId || query.from || query.to;
@@ -423,19 +441,14 @@ export class CouponSettingsService {
       args.push(convertToMySQLDateTime(query.to));
     }
 
-    const whereSql = `WHERE ${where.join(' AND ')}`;
+    const whereSql = where.length > 0 ? `WHERE ${where.join(' AND ')}` : '';
 
-    // Use cached count if no filters applied
-    let total: number;
-    if (!hasFilters) {
-      total = Number(setting.usedCount || 0);
-    } else {
-      const [countRows] = await pool.execute<RowDataPacket[]>(
-        `SELECT COUNT(*) as total FROM g_coupon_uses ${whereSql}`,
-        args
-      );
-      total = Number(countRows[0].total || 0);
-    }
+    // Get total count
+    const [countRows] = await pool.execute<RowDataPacket[]>(
+      `SELECT COUNT(*) as total FROM g_coupon_uses ${whereSql}`,
+      args
+    );
+    const total = Number(countRows[0].total || 0);
 
     const [rows] = await pool.execute<RowDataPacket[]>(
       `SELECT * FROM g_coupon_uses ${whereSql} ORDER BY usedAt DESC LIMIT ${limit} OFFSET ${offset}`,
@@ -696,7 +709,14 @@ export class CouponSettingsService {
     const BATCH_SIZE = 1000;
     const DUPLICATE_CHECK_BATCH = 100;
     const localSet = new Set<string>();
-    const genCode = () => ulid().substring(0, 16).toUpperCase();
+
+    // Get codePattern from settings
+    const [settings] = await pool.execute<RowDataPacket[]>(
+      'SELECT codePattern FROM g_coupon_settings WHERE id = ?',
+      [settingId]
+    );
+    const codePattern = (settings[0]?.codePattern || 'ALPHANUMERIC_8') as CodePattern;
+
     const codes: Array<[string, string, string]> = [];
 
     // Generate all codes
@@ -706,7 +726,7 @@ export class CouponSettingsService {
 
       // Try to find a unique code
       for (let attempt = 0; attempt < 10; attempt++) {
-        code = genCode();
+        code = generateCouponCode(codePattern);
         if (localSet.has(code)) continue;
 
         // Check database for duplicates in batches

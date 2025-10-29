@@ -9,6 +9,9 @@ router.get('/', CouponSettingsController.list);
 // Create coupon setting
 router.post('/', CouponSettingsController.create);
 
+// Usage records for all settings (no settingId)
+router.get('/usage', CouponSettingsController.usage);
+
 // Get single
 router.get('/:id', CouponSettingsController.getById);
 
@@ -18,7 +21,7 @@ router.patch('/:id', CouponSettingsController.update);
 // Delete (soft)
 router.delete('/:id', CouponSettingsController.remove);
 
-// Usage records for a setting
+// Usage records for a specific setting
 router.get('/:id/usage', CouponSettingsController.usage);
 
 // Issued codes statistics for a setting

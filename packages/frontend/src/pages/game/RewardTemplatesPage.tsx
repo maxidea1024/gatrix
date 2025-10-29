@@ -51,6 +51,7 @@ const RewardTemplatesPage: React.FC = () => {
   // State
   const [templates, setTemplates] = useState<RewardTemplate[]>([]);
   const [allTemplates, setAllTemplates] = useState<RewardTemplate[]>([]); // All templates for tag extraction
+  const [allRegistryTags, setAllRegistryTags] = useState<any[]>([]); // All registry tags for filter options
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -293,8 +294,6 @@ const RewardTemplatesPage: React.FC = () => {
   }, [activeFilters]);
 
   // Load all registry tags on mount (for filter options)
-  const [allRegistryTags, setAllRegistryTags] = useState<any[]>([]);
-
   useEffect(() => {
     const loadTags = async () => {
       try {

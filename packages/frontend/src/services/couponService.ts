@@ -2,6 +2,7 @@ import { api } from './api';
 
 export type CouponType = 'SPECIAL' | 'NORMAL';
 export type CouponStatus = 'ACTIVE' | 'DISABLED' | 'DELETED';
+export type CodePattern = 'ALPHANUMERIC_8' | 'ALPHANUMERIC_16' | 'ALPHANUMERIC_16_HYPHEN';
 
 export interface CouponSetting {
   id: string;
@@ -19,6 +20,7 @@ export interface CouponSetting {
   startsAt: string; // ISO from server wrapper
   expiresAt: string;
   status: CouponStatus;
+  codePattern?: CodePattern;
   createdAt?: string;
   generationStatus?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
   generatedCount?: number;
@@ -126,8 +128,9 @@ export const couponService = {
   async deleteSetting(id: string): Promise<void> {
     await api.delete(`/admin/coupon-settings/${id}`);
   },
-  async getUsage(settingId: string, params?: { page?: number; limit?: number; search?: string; platform?: string; gameWorldId?: string; from?: string; to?: string; }): Promise<UsageListResponse> {
-    const res = await api.get(`/admin/coupon-settings/${settingId}/usage`, { params });
+  async getUsage(settingId?: string, params?: { page?: number; limit?: number; search?: string; platform?: string; gameWorldId?: string; from?: string; to?: string; }): Promise<UsageListResponse> {
+    const url = settingId ? `/admin/coupon-settings/${settingId}/usage` : '/admin/coupon-settings/usage';
+    const res = await api.get(url, { params });
     return res.data;
   },
   async getIssuedCodesStats(settingId: string): Promise<IssuedCodesStats> {

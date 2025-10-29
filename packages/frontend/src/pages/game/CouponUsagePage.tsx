@@ -14,9 +14,8 @@ import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSe
 const CouponUsagePage: React.FC = () => {
   const { t } = useTranslation();
 
-  // settings selector
+  // settings list
   const [settings, setSettings] = useState<CouponSetting[]>([]);
-  const [settingId, setSettingId] = useState('');
 
   // list state
   const [records, setRecords] = useState<UsageRecord[]>([]);
@@ -31,6 +30,7 @@ const CouponUsagePage: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
   // derive individual filter values (stable for deps)
+  const settingIdFilter = useMemo(() => activeFilters.find(f => f.key === 'settingId')?.value as string || '', [activeFilters]);
   const platformFilter = useMemo(() => activeFilters.find(f => f.key === 'platform')?.value as string || '', [activeFilters]);
   const worldFilter = useMemo(() => activeFilters.find(f => f.key === 'gameWorldId')?.value as string || '', [activeFilters]);
   const fromFilter = useMemo(() => activeFilters.find(f => f.key === 'from')?.value as string || '', [activeFilters]);
@@ -38,6 +38,7 @@ const CouponUsagePage: React.FC = () => {
 
   // filter definitions
   const availableFilterDefinitions: FilterDefinition[] = [
+    { key: 'settingId', label: t('coupons.couponUsage.filters.coupon'), type: 'select', options: settings.map(s => ({ value: s.id, label: `${s.name} (${s.type})` })) },
     { key: 'platform', label: t('coupons.couponUsage.filters.platform'), type: 'text', placeholder: t('coupons.couponUsage.filters.platform') as string },
     { key: 'gameWorldId', label: t('coupons.couponUsage.filters.gameWorldId'), type: 'text', placeholder: t('coupons.couponUsage.filters.gameWorldId') as string },
     { key: 'from', label: t('coupons.couponUsage.filters.from'), type: 'text', placeholder: 'YYYY-MM-DD HH:mm:ss' },
@@ -135,17 +136,15 @@ const CouponUsagePage: React.FC = () => {
     (async () => {
       const res = await couponService.listSettings({ page: 1, limit: 100 });
       setSettings(res.settings || []);
-      if (!settingId && res.settings && res.settings.length > 0) setSettingId(res.settings[0].id);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // loader
   const load = useMemo(() => async () => {
-    if (!settingId) return;
     setLoading(true);
     try {
-      const res = await couponService.getUsage(settingId, {
+      const res = await couponService.getUsage(settingIdFilter || undefined, {
         page: page + 1,
         limit: rowsPerPage,
         search: debouncedSearchTerm || undefined,
@@ -159,7 +158,7 @@ const CouponUsagePage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [settingId, page, rowsPerPage, debouncedSearchTerm, platformFilter, worldFilter, fromFilter, toFilter]);
+  }, [settingIdFilter, page, rowsPerPage, debouncedSearchTerm, platformFilter, worldFilter, fromFilter, toFilter]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -200,13 +199,6 @@ const CouponUsagePage: React.FC = () => {
                 onRefresh={load}
                 refreshDisabled={loading}
                 noWrap
-                leftActions={(
-                  <TextField select size="small" value={settingId} onChange={(e) => { setSettingId(e.target.value); setPage(0); }} sx={{ minWidth: 240 }} label={t('common.select')}>
-                    {settings.map(s => (
-                      <MenuItem key={s.id} value={s.id}>{s.name} ({s.type})</MenuItem>
-                    ))}
-                  </TextField>
-                )}
                 afterFilterAddActions={(
                   <Tooltip title={t('common.columnSettings')}>
                     <IconButton

@@ -6,6 +6,7 @@ import ServerUserController from '../../controllers/ServerUserController';
 import ServerNotificationController from '../../controllers/ServerNotificationController';
 import ServerFileController from '../../controllers/ServerFileController';
 import ServerChatController from '../../controllers/ServerChatController';
+import { CouponRedeemController } from '../../controllers/CouponRedeemController';
 import serviceDiscoveryRoutes from './serviceDiscovery';
 
 const router = express.Router();
@@ -60,6 +61,9 @@ router.get('/chat/servers', serverSDKAuth, ServerChatController.getRegisteredSer
 
 // Notification routes (bulk)
 router.post('/notifications/bulk', serverSDKAuth, ServerNotificationController.sendBulkNotification);
+
+// Coupon routes
+router.post('/coupons/:code/redeem', serverSDKAuth, CouponRedeemController.redeem);
 
 // Service discovery routes
 router.use('/services', serviceDiscoveryRoutes);

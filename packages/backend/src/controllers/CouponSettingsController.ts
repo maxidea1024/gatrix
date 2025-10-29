@@ -118,9 +118,11 @@ export class CouponSettingsController {
 
   static usage = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    if (!id) throw new CustomError('id is required', 400);
     const { page, limit, search, platform, gameWorldId, from, to } = req.query;
-    const data = await CouponSettingsService.getUsageBySetting(id, {
+
+    // If id is provided, get usage for specific coupon setting
+    // If id is not provided, get usage for all coupon settings
+    const data = await CouponSettingsService.getUsageBySetting(id || undefined, {
       page: page ? parseInt(page as string) : undefined,
       limit: limit ? parseInt(limit as string) : undefined,
       search: search as string,

@@ -1,10 +1,8 @@
 import express from 'express';
-import { CouponRedeemController } from '../controllers/CouponRedeemController';
 
 const router = express.Router();
 
-// Redeem coupon
-router.post('/:code/redeem', CouponRedeemController.redeem);
+// Note: Coupon redeem endpoint has been moved to /api/v1/server/coupons/:code/redeem
+// This file is kept for potential future client-side coupon endpoints
 
 export default router;
-
