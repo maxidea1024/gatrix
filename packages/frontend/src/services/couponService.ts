@@ -3,6 +3,7 @@ import { api } from './api';
 export type CouponType = 'SPECIAL' | 'NORMAL';
 export type CouponStatus = 'ACTIVE' | 'DISABLED' | 'DELETED';
 export type CodePattern = 'ALPHANUMERIC_8' | 'ALPHANUMERIC_16' | 'ALPHANUMERIC_16_HYPHEN';
+export type UsageLimitType = 'USER' | 'CHARACTER';
 
 export interface CouponSetting {
   id: string;
@@ -13,6 +14,7 @@ export interface CouponSetting {
   tags?: any | null;
   maxTotalUses?: number | null;
   perUserLimit?: number;
+  usageLimitType?: UsageLimitType;
   rewardTemplateId?: string | null;
   rewardData?: any | null;
   rewardEmailTitle?: string | null;
@@ -61,6 +63,7 @@ export interface UsageRecord {
   id: string;
   userId: string;
   userName: string;
+  characterId?: string | null;
   sequence: number;
   usedAt: string;
   userIp?: string | null;
@@ -68,6 +71,10 @@ export interface UsageRecord {
   platform?: string | null;
   channel?: string | null;
   subchannel?: string | null;
+  couponName?: string | null;
+  couponCode?: string | null;
+  couponStartsAt?: string | null;
+  couponExpiresAt?: string | null;
 }
 
 export interface UsageListResponse {
@@ -128,9 +135,13 @@ export const couponService = {
   async deleteSetting(id: string): Promise<void> {
     await api.delete(`/admin/coupon-settings/${id}`);
   },
-  async getUsage(settingId?: string, params?: { page?: number; limit?: number; search?: string; platform?: string; gameWorldId?: string; from?: string; to?: string; }): Promise<UsageListResponse> {
+  async getUsage(settingId?: string, params?: { page?: number; limit?: number; search?: string; platform?: string; channel?: string; subChannel?: string; gameWorldId?: string; characterId?: string; from?: string; to?: string; }): Promise<UsageListResponse> {
     const url = settingId ? `/admin/coupon-settings/${settingId}/usage` : '/admin/coupon-settings/usage';
     const res = await api.get(url, { params });
+    return res.data;
+  },
+  async exportUsage(params?: { settingId?: string; couponCode?: string; platform?: string; channel?: string; subChannel?: string; gameWorldId?: string; characterId?: string; }): Promise<string> {
+    const res = await api.get('/admin/coupon-settings/usage/export', { params, responseType: 'text' });
     return res.data;
   },
   async getIssuedCodesStats(settingId: string): Promise<IssuedCodesStats> {

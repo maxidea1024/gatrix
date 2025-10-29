@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import VarsModel from '../models/Vars';
+import { pubSubService } from '../services/PubSubService';
 
 export class VarsController {
   static async getVar(req: Request, res: Response, next: NextFunction) {
@@ -118,6 +119,12 @@ export class VarsController {
         { varValue, valueType, description },
         userId
       );
+
+      // Invalidate related caches when specific KV items are updated
+      if (fullKey === 'kv:clientVersionPassiveData') {
+        // Invalidate all client version caches since meta field includes clientVersionPassiveData
+        await pubSubService.invalidateByPattern('client_version:*');
+      }
 
       res.json({
         success: true,

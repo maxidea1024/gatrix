@@ -184,13 +184,13 @@ export class PubSubService extends EventEmitter {
 
       switch (data.type) {
         case 'clear':
-          cacheService.clear();
+          await cacheService.clear();
           break;
         case 'invalidate':
           if (data.pattern) {
-            cacheService.deleteByPattern(data.pattern);
+            await cacheService.deleteByPattern(data.pattern);
           } else if (data.key) {
-            cacheService.delete(data.key);
+            await cacheService.delete(data.key);
           }
           break;
       }
@@ -280,7 +280,7 @@ export class PubSubService extends EventEmitter {
    */
   async invalidateByPattern(pattern: string): Promise<void> {
     // Invalidate local cache immediately
-    cacheService.deleteByPattern(pattern);
+    await cacheService.deleteByPattern(pattern);
 
     // Broadcast to other instances via queue
     await this.addCacheInvalidationJob({
@@ -296,7 +296,7 @@ export class PubSubService extends EventEmitter {
     logger.debug(`Cache invalidation requested for key: ${key}`);
 
     // Invalidate local cache immediately
-    cacheService.delete(key);
+    await cacheService.delete(key);
     logger.debug(`Local cache deleted for key: ${key}`);
 
     // Broadcast to other instances via queue
@@ -312,7 +312,7 @@ export class PubSubService extends EventEmitter {
    */
   async clearAll(): Promise<void> {
     // Clear local cache immediately
-    cacheService.clear();
+    await cacheService.clear();
 
     // Broadcast to other instances via queue
     await this.addCacheInvalidationJob({

@@ -118,7 +118,7 @@ export class CouponSettingsController {
 
   static usage = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    const { page, limit, search, platform, gameWorldId, from, to } = req.query;
+    const { page, limit, search, platform, gameWorldId, characterId, from, to } = req.query;
 
     // If id is provided, get usage for specific coupon setting
     // If id is not provided, get usage for all coupon settings
@@ -128,6 +128,7 @@ export class CouponSettingsController {
       search: search as string,
       platform: platform as string,
       gameWorldId: gameWorldId as string,
+      characterId: characterId as string,
       from: from as string,
       to: to as string,
     });
@@ -188,6 +189,68 @@ export class CouponSettingsController {
     if (!id) throw new CustomError('id is required', 400);
     const result = await CouponSettingsService.recalculateCacheForSetting(id);
     res.json({ success: true, data: result });
+  });
+
+  // Export coupon usage records to CSV
+  static exportUsage = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { settingId, couponCode, platform, gameWorldId, characterId } = req.query;
+
+    // Get all usage records with filters
+    const records = await CouponSettingsService.getUsageForExport({
+      settingId: settingId as string,
+      couponCode: couponCode as string,
+      platform: platform as string,
+      gameWorldId: gameWorldId as string,
+      characterId: characterId as string,
+    } as any);
+
+    // Build CSV content
+    const headers = [
+      'Coupon Name',
+      'Coupon Code',
+      'User ID',
+      'User Name',
+      'Character ID',
+      'Sequence',
+      'Used At',
+      'Coupon Start Date',
+      'Coupon Expiry Date',
+      'Game World',
+      'Platform'
+    ];
+
+    const rows = records.map((r: any) => [
+      r.couponName || '-',
+      r.couponCode || '-',
+      r.userId || '-',
+      r.userName || '-',
+      r.characterId || '-',
+      r.sequence || '-',
+      r.usedAt || '-',
+      r.couponStartsAt || '-',
+      r.couponExpiresAt || '-',
+      r.gameWorldId || '-',
+      r.platform || '-'
+    ]);
+
+    // Create CSV string
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(r => r.map((cell: any) => {
+        // Escape quotes and wrap in quotes if contains comma
+        const str = String(cell);
+        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+          return `"${str.replace(/"/g, '""')}"`;
+        }
+        return str;
+      }).join(','))
+    ].join('\n');
+
+    // Set response headers for CSV download
+    const timestamp = new Date().toISOString().slice(0, 10);
+    res.setHeader('Content-Type', 'text/csv;charset=utf-8;');
+    res.setHeader('Content-Disposition', `attachment; filename="coupon-usage-${timestamp}.csv"`);
+    res.send(csvContent);
   });
 }
 

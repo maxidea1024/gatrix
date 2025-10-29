@@ -123,7 +123,7 @@ const createValidationSchema = (t: any) => yup.object({
   maintenanceMessage: yup
     .string()
     .when('clientStatus', {
-      is: 'MAINTENANCE',
+      is: ClientStatus.MAINTENANCE,
       then: (schema) => schema.required(t('clientVersions.maintenance.messageRequired')),
       otherwise: (schema) => schema.optional(),
     }),
@@ -606,16 +606,19 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                 renderInput={(params) => (
                   <TextField {...params} label={t('common.tags')} helperText={t('clientVersions.form.bulkTagsHelp')} />
                 )}
-                renderOption={(props, option) => (
-                  <Box component="li" {...props}>
-                    <Chip
-                      label={option.name}
-                      size="small"
-                      sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
-                    />
-                    {option.description || t('common.noDescription')}
-                  </Box>
-                )}
+                renderOption={(props, option) => {
+                  const { key, ...restProps } = props;
+                  return (
+                    <Box key={option.id} component="li" {...restProps}>
+                      <Chip
+                        label={option.name}
+                        size="small"
+                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
+                      />
+                      {option.description || t('common.noDescription')}
+                    </Box>
+                  );
+                }}
               />
             </Paper>
 

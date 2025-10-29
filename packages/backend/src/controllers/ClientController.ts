@@ -57,7 +57,7 @@ export class ClientController {
     const cacheKey = `client_version:${platform}:${version}`;
 
     // Try to get from cache first
-    const cachedData = cacheService.get(cacheKey);
+    const cachedData = await cacheService.get(cacheKey);
     if (cachedData) {
       logger.debug(`Cache hit for client version: ${cacheKey}`);
       return res.json({
@@ -67,10 +67,10 @@ export class ClientController {
       });
     }
 
-    // If not in cache, fetch from database (exact match and ONLINE only)
+    // If not in cache, fetch from database (exact match, any status)
     logger.debug(`Cache miss for client version: ${cacheKey}`);
 
-    const record = await ClientVersionService.findOnlineByExact(platform, version);
+    const record = await ClientVersionService.findByExact(platform, version);
 
     if (!record) {
       return res.status(404).json({
@@ -152,7 +152,7 @@ export class ClientController {
       status: record.clientStatus,
       gameServerAddress,
       patchAddress,
-      guestModeAllowed: record.clientStatus === ClientStatus.MAINTENANCE ? false : record.guestModeAllowed,
+      guestModeAllowed: record.clientStatus === ClientStatus.MAINTENANCE ? false : Boolean(record.guestModeAllowed),
       externalClickLink: record.externalClickLink,
       meta,
     };
@@ -163,7 +163,7 @@ export class ClientController {
     }
 
     // Cache the result for 5 minutes
-    cacheService.set(cacheKey, clientData, 5 * 60 * 1000);
+    await cacheService.set(cacheKey, clientData, 5 * 60 * 1000);
 
     return res.json({
       success: true,
@@ -180,7 +180,7 @@ export class ClientController {
     const cacheKey = GAME_WORLDS.PUBLIC;
 
     // Try to get from cache first
-    const cachedData = cacheService.get(cacheKey);
+    const cachedData = await cacheService.get(cacheKey);
     if (cachedData) {
       logger.debug(`Cache hit for game worlds: ${cacheKey}`);
       return res.json({
@@ -217,7 +217,7 @@ export class ClientController {
     };
 
     // Cache the result for 10 minutes (game worlds change less frequently)
-    cacheService.set(cacheKey, clientData, DEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL);
+    await cacheService.set(cacheKey, clientData, DEFAULT_CONFIG.GAME_WORLDS_PUBLIC_TTL);
 
     res.json({
       success: true,

@@ -177,6 +177,8 @@ export default class VarsModel {
 
   /**
    * Programmatically define a system KV item
+   * If the item already exists, only update description and isSystemDefined flag
+   * Do NOT overwrite existing values
    */
   static async defineSystemKV(
     key: string,
@@ -186,21 +188,27 @@ export default class VarsModel {
   ): Promise<void> {
     const fullKey = key.startsWith('kv:') ? key : `kv:${key}`;
 
-    await db('g_vars')
-      .insert({
+    // Check if item already exists
+    const existing = await this.getKV(fullKey);
+
+    if (existing) {
+      // Item exists: only update description and ensure isSystemDefined is true
+      await db('g_vars')
+        .where('varKey', fullKey)
+        .update({
+          description: description || existing.description || null,
+          isSystemDefined: true,
+        });
+    } else {
+      // Item doesn't exist: create it with initial value
+      await db('g_vars').insert({
         varKey: fullKey,
         varValue: value,
         valueType,
         description: description || null,
         isSystemDefined: true,
         createdBy: 1, // System user
-      })
-      .onConflict('varKey')
-      .merge({
-        varValue: value,
-        valueType,
-        description: description || null,
-        isSystemDefined: true,
       });
+    }
   }
 }

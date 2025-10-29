@@ -6,6 +6,36 @@ import { ClientVersionModel } from '../models/ClientVersion';
 import { CustomError } from '../middleware/errorHandler';
 import logger from '../config/logger';
 
+/**
+ * Convert ISO 8601 datetime string to MySQL DATETIME format
+ * MySQL DATETIME format: YYYY-MM-DD HH:MM:SS
+ * ISO 8601 format: YYYY-MM-DDTHH:MM:SS.sssZ
+ *
+ * @param isoDateString - ISO 8601 datetime string
+ * @returns MySQL DATETIME format string or null if invalid
+ */
+function convertISOToMySQLDateTime(isoDateString: string | null | undefined): string | null {
+  if (!isoDateString) return null;
+
+  try {
+    const date = new Date(isoDateString);
+    if (isNaN(date.getTime())) return null;
+
+    // Convert to MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  } catch (error) {
+    logger.warn(`Failed to convert ISO date to MySQL format: ${isoDateString}`, error);
+    return null;
+  }
+}
+
 // Validation schemas
 const createClientVersionSchema = Joi.object({
   platform: Joi.string().min(1).max(50).required(),
@@ -313,6 +343,9 @@ export class ClientVersionController {
 
     const clientVersionData = {
       ...value,
+      // Convert ISO 8601 datetime to MySQL DATETIME format
+      maintenanceStartDate: convertISOToMySQLDateTime(value.maintenanceStartDate),
+      maintenanceEndDate: convertISOToMySQLDateTime(value.maintenanceEndDate),
       createdBy: userId,
       updatedBy: userId,
     };
@@ -345,6 +378,9 @@ export class ClientVersionController {
 
     const bulkCreateData = {
       ...value,
+      // Convert ISO 8601 datetime to MySQL DATETIME format
+      maintenanceStartDate: convertISOToMySQLDateTime(value.maintenanceStartDate),
+      maintenanceEndDate: convertISOToMySQLDateTime(value.maintenanceEndDate),
       createdBy: userId,
       updatedBy: userId,
     };
@@ -394,6 +430,9 @@ export class ClientVersionController {
 
     const updateData = {
       ...value,
+      // Convert ISO 8601 datetime to MySQL DATETIME format
+      maintenanceStartDate: convertISOToMySQLDateTime(value.maintenanceStartDate),
+      maintenanceEndDate: convertISOToMySQLDateTime(value.maintenanceEndDate),
       createdBy: userId, // maintenanceLocales 새로 생성 시 필요
       updatedBy: userId,
     };
@@ -456,6 +495,9 @@ export class ClientVersionController {
 
     const bulkUpdateData: BulkStatusUpdateRequest = {
       ...value,
+      // Convert ISO 8601 datetime to MySQL DATETIME format
+      maintenanceStartDate: convertISOToMySQLDateTime(value.maintenanceStartDate),
+      maintenanceEndDate: convertISOToMySQLDateTime(value.maintenanceEndDate),
       updatedBy: userId,
     };
 
@@ -554,6 +596,38 @@ export class ClientVersionController {
       res.status(500).json({
         success: false,
         message: error.message || 'Failed to export client versions',
+      });
+    }
+  }
+
+  /**
+   * Reset all client versions and clear cache (for testing)
+   * DELETE /api/v1/admin/client-versions/reset/all
+   */
+  static async resetAllClientVersions(req: Request, res: Response) {
+    try {
+      // Delete all client versions
+      const deletedCount = await ClientVersionModel.deleteAll();
+
+      // Clear all client version related cache
+      const { pubSubService } = require('../services/PubSubService');
+      await pubSubService.invalidateByPattern('client_version:.*');
+
+      logger.info(`Reset all client versions: ${deletedCount} records deleted, cache cleared`);
+
+      res.json({
+        success: true,
+        message: `All client versions have been reset. ${deletedCount} records deleted and cache cleared.`,
+        data: {
+          deletedCount,
+          cacheCleared: true,
+        }
+      });
+    } catch (error: any) {
+      logger.error('Error resetting client versions:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to reset client versions',
       });
     }
   }

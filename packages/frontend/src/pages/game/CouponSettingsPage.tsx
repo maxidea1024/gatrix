@@ -282,6 +282,7 @@ const CouponSettingsPage: React.FC = () => {
     description: '',
     quantity: 1,
     perUserLimit: 1,
+    usageLimitType: 'USER' as any,
     maxTotalUses: null as any,
     startsAt: null as Dayjs | null,
     expiresAt: null as Dayjs | null,
@@ -297,7 +298,7 @@ const CouponSettingsPage: React.FC = () => {
 
   const resetForm = () => {
     setEditing(null);
-    setForm({ code: '', type: 'NORMAL', name: '', description: '', quantity: 1, perUserLimit: 1, maxTotalUses: null, startsAt: null, expiresAt: null, status: 'ACTIVE', rewardData: [], rewardTemplateId: null, rewardEmailTitle: '', rewardEmailBody: '' });
+    setForm({ code: '', type: 'NORMAL', name: '', description: '', quantity: 1, perUserLimit: 1, usageLimitType: 'USER', maxTotalUses: null, startsAt: null, expiresAt: null, status: 'ACTIVE', rewardData: [], rewardTemplateId: null, rewardEmailTitle: '', rewardEmailBody: '' });
     setRewardMode('direct');
     setIsDescriptionManuallyEdited(false);
   };
@@ -701,6 +702,7 @@ const CouponSettingsPage: React.FC = () => {
       description: (it as any).description || '',
       quantity: 1,
       perUserLimit: it.perUserLimit || 1,
+      usageLimitType: it.usageLimitType || 'USER',
       maxTotalUses: it.maxTotalUses ?? null,
       startsAt: parseUTCForPicker(it.startsAt),
       expiresAt: parseUTCForPicker(it.expiresAt),
@@ -1265,21 +1267,32 @@ const CouponSettingsPage: React.FC = () => {
                 }}
               />
             )}
-            {/* 6. PerUserLimit (NORMAL only) */}
+            {/* 6 & 7. Usage Limit Type + PerUserLimit (NORMAL only) */}
             {form.type === 'NORMAL' && (
-              <TextField
-                type="number"
-                fullWidth
-                label={t('coupons.couponSettings.form.perUserLimit')}
-                value={form.perUserLimit}
-                onChange={(e) => setForm((s: any) => ({ ...s, perUserLimit: Number(e.target.value) }))}
-                error={perUserLimitError}
-                helperText={perUserLimitError ? t('coupons.couponSettings.form.perUserLimitMinError') : t('coupons.couponSettings.form.perUserLimitHelp')}
-                sx={{
-                  '& input[type=number]': { MozAppearance: 'textfield' },
-                  '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
-                }}
-              />
+              <Box sx={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 2 }}>
+                <TextField
+                  select
+                  label={t('coupons.couponSettings.form.usageLimitType')}
+                  value={form.usageLimitType}
+                  onChange={(e) => setForm((s: any) => ({ ...s, usageLimitType: e.target.value }))}
+                  helperText={t('coupons.couponSettings.form.usageLimitTypeHelp')}
+                >
+                  <MenuItem value="USER">{t('coupons.couponSettings.form.usageLimitTypeUser')}</MenuItem>
+                  <MenuItem value="CHARACTER">{t('coupons.couponSettings.form.usageLimitTypeCharacter')}</MenuItem>
+                </TextField>
+                <TextField
+                  type="number"
+                  label={form.usageLimitType === 'CHARACTER' ? t('coupons.couponSettings.form.perCharacterLimit') : t('coupons.couponSettings.form.perUserLimit')}
+                  value={form.perUserLimit}
+                  onChange={(e) => setForm((s: any) => ({ ...s, perUserLimit: Number(e.target.value) }))}
+                  error={perUserLimitError}
+                  helperText={perUserLimitError ? t('coupons.couponSettings.form.perUserLimitMinError') : (form.usageLimitType === 'CHARACTER' ? t('coupons.couponSettings.form.perCharacterLimitHelp') : t('coupons.couponSettings.form.perUserLimitHelp'))}
+                  sx={{
+                    '& input[type=number]': { MozAppearance: 'textfield' },
+                    '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': { WebkitAppearance: 'none', margin: 0 },
+                  }}
+                />
+              </Box>
             )}
             {/* 7. MaxTotalUses + Unlimited (SPECIAL only) */}
             {form.type === 'SPECIAL' && (

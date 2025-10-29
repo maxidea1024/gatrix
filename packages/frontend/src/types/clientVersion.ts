@@ -1,12 +1,12 @@
 // 클라이언트 상태 enum
 export enum ClientStatus {
-  ONLINE = 'online',
-  OFFLINE = 'offline',
-  RECOMMENDED_UPDATE = 'recommended_update',
-  FORCED_UPDATE = 'forced_update',
-  UNDER_REVIEW = 'under_review',
-  BLOCKED_PATCH_ALLOWED = 'blocked_patch_allowed',
-  MAINTENANCE = 'maintenance'
+  ONLINE = 'ONLINE',
+  OFFLINE = 'OFFLINE',
+  RECOMMENDED_UPDATE = 'RECOMMENDED_UPDATE',
+  FORCED_UPDATE = 'FORCED_UPDATE',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  BLOCKED_PATCH_ALLOWED = 'BLOCKED_PATCH_ALLOWED',
+  MAINTENANCE = 'MAINTENANCE'
 }
 
 // 클라이언트 상태 라벨 매핑

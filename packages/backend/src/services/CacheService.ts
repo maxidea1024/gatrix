@@ -8,6 +8,7 @@ export class CacheService extends EventEmitter {
   private l1Cache!: Keyv; // Memory cache
   private l2Cache?: Keyv; // Redis cache
   private defaultTTL = 5 * 60 * 1000; // 5 minutes
+  private keyRegistry: Set<string> = new Set(); // Track all cache keys
 
   constructor() {
     super();
@@ -64,6 +65,9 @@ export class CacheService extends EventEmitter {
       set: async (key: string, value: any, ttl?: number) => {
         const cacheTTL = ttl || this.defaultTTL;
 
+        // Track key in registry
+        this.keyRegistry.add(key);
+
         // Set in L1 (memory) always
         await this.l1Cache.set(key, value, cacheTTL);
 
@@ -76,6 +80,9 @@ export class CacheService extends EventEmitter {
       },
 
       delete: async (key: string) => {
+        // Remove from registry
+        this.keyRegistry.delete(key);
+
         // Delete from L1 (memory)
         await this.l1Cache.delete(key);
 
@@ -88,6 +95,9 @@ export class CacheService extends EventEmitter {
       },
 
       clear: async () => {
+        // Clear registry
+        this.keyRegistry.clear();
+
         // Clear L1 (memory)
         await this.l1Cache.clear();
 
@@ -198,13 +208,33 @@ export class CacheService extends EventEmitter {
   }
 
   /**
-   * Delete cache by pattern (limited support in cache-manager)
+   * Delete cache by pattern
+   * Supports wildcard patterns like 'client_version:*'
    */
   async deleteByPattern(pattern: string): Promise<number> {
     try {
-      // cache-manager doesn't support pattern deletion directly
-      logger.warn(`Pattern deletion not fully supported: ${pattern}`);
-      return 0;
+      let deletedCount = 0;
+
+      // Convert wildcard pattern to regex
+      // e.g., 'client_version:*' -> /^client_version:.*/
+      const regexPattern = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+
+      // Get all keys from registry that match the pattern
+      const keysToDelete: string[] = [];
+      for (const key of this.keyRegistry) {
+        if (regexPattern.test(key)) {
+          keysToDelete.push(key);
+        }
+      }
+
+      // Delete matching keys
+      for (const key of keysToDelete) {
+        await this.cache.delete(key);
+        deletedCount++;
+      }
+
+      logger.info(`Cache pattern deletion: ${pattern} - ${deletedCount} keys deleted`);
+      return deletedCount;
     } catch (error) {
       logger.error(`Cache pattern delete error for ${pattern}:`, error);
       return 0;

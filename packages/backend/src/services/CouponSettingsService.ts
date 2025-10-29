@@ -9,6 +9,7 @@ import { generateCouponCode, CodePattern } from '../utils/couponCodeGenerator';
 
 export type CouponType = 'SPECIAL' | 'NORMAL';
 export type CouponStatus = 'ACTIVE' | 'DISABLED' | 'DELETED';
+export type UsageLimitType = 'USER' | 'CHARACTER';
 
 export interface CouponSetting {
   id: string;
@@ -19,6 +20,7 @@ export interface CouponSetting {
   tags?: any | null;
   maxTotalUses?: number | null;
   perUserLimit: number;
+  usageLimitType?: UsageLimitType;
   rewardTemplateId?: string | null;
   rewardData?: any | null;
   rewardEmailTitle?: string | null;
@@ -39,6 +41,7 @@ export interface CreateCouponSettingInput {
   tags?: any | null;
   maxTotalUses?: number | null;
   perUserLimit?: number;
+  usageLimitType?: UsageLimitType;
   rewardTemplateId?: string | null;
   rewardData?: any | null;
   rewardEmailTitle?: string | null;
@@ -64,7 +67,10 @@ export interface CouponUsageQuery {
   limit?: number;
   search?: string; // userId or userName
   platform?: string;
+  channel?: string;
+  subChannel?: string;
   gameWorldId?: string;
+  characterId?: string;
   from?: string | Date;
   to?: string | Date;
 }
@@ -205,9 +211,9 @@ export class CouponSettingsService {
     // Insert main row
     await pool.execute(
       `INSERT INTO g_coupon_settings
-       (id, code, type, name, description, tags, maxTotalUses, perUserLimit, rewardTemplateId, rewardData,
+       (id, code, type, name, description, tags, maxTotalUses, perUserLimit, usageLimitType, rewardTemplateId, rewardData,
         rewardEmailTitle, rewardEmailBody, startsAt, expiresAt, status, codePattern, createdBy)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         settingCode,
@@ -217,6 +223,7 @@ export class CouponSettingsService {
         input.tags ? JSON.stringify(input.tags) : null,
         maxTotalUses,
         perUserLimit,
+        input.usageLimitType ?? 'USER',
         input.rewardTemplateId ?? null,
         input.rewardData ? JSON.stringify(input.rewardData) : null,
         input.rewardEmailTitle ?? null,
@@ -291,6 +298,7 @@ export class CouponSettingsService {
     if (input.tags !== undefined) add('tags = ?', input.tags ? JSON.stringify(input.tags) : null);
     if (input.maxTotalUses !== undefined) add('maxTotalUses = ?', input.maxTotalUses);
     if (input.perUserLimit !== undefined) add('perUserLimit = ?', input.perUserLimit);
+    if (input.usageLimitType !== undefined) add('usageLimitType = ?', input.usageLimitType);
     if (input.rewardTemplateId !== undefined) add('rewardTemplateId = ?', input.rewardTemplateId);
     if (input.rewardData !== undefined) add('rewardData = ?', input.rewardData ? JSON.stringify(input.rewardData) : null);
     if (input.rewardEmailTitle !== undefined) add('rewardEmailTitle = ?', input.rewardEmailTitle);
@@ -417,7 +425,7 @@ export class CouponSettingsService {
     }
 
     // Track if any filters are applied
-    const hasFilters = query.search || query.platform || query.gameWorldId || query.from || query.to;
+    const hasFilters = query.search || query.platform || query.channel || query.subChannel || query.gameWorldId || query.from || query.to || (query as any).characterId;
 
     if (query.search) {
       where.push('(userId LIKE ? OR userName LIKE ?)');
@@ -428,9 +436,21 @@ export class CouponSettingsService {
       where.push('platform = ?');
       args.push(query.platform);
     }
+    if (query.channel) {
+      where.push('channel = ?');
+      args.push(query.channel);
+    }
+    if (query.subChannel) {
+      where.push('subchannel = ?');
+      args.push(query.subChannel);
+    }
     if (query.gameWorldId) {
       where.push('gameWorldId = ?');
       args.push(query.gameWorldId);
+    }
+    if ((query as any).characterId) {
+      where.push('characterId = ?');
+      args.push((query as any).characterId);
     }
     if (query.from) {
       where.push('usedAt >= ?');
@@ -451,11 +471,98 @@ export class CouponSettingsService {
     const total = Number(countRows[0].total || 0);
 
     const [rows] = await pool.execute<RowDataPacket[]>(
-      `SELECT * FROM g_coupon_uses ${whereSql} ORDER BY usedAt DESC LIMIT ${limit} OFFSET ${offset}`,
+      `SELECT
+        cu.*,
+        cs.name as couponName,
+        COALESCE(c.code, cs.code) as couponCode,
+        cs.startsAt as couponStartsAt,
+        cs.expiresAt as couponExpiresAt
+      FROM g_coupon_uses cu
+      LEFT JOIN g_coupon_settings cs ON cu.settingId = cs.id
+      LEFT JOIN g_coupons c ON cu.issuedCouponId = c.id
+      ${whereSql}
+      ORDER BY cu.usedAt DESC
+      LIMIT ${limit} OFFSET ${offset}`,
       args
     );
 
     return { records: rows, total, page, limit };
+  }
+
+  /**
+   * Get coupon usage records for export (all records without pagination)
+   */
+  static async getUsageForExport(query: CouponUsageQuery = {}): Promise<any[]> {
+    const pool = database.getPool();
+
+    const where: string[] = [];
+    const args: any[] = [];
+
+    // Optional: filter by specific setting
+    if ((query as any).settingId) {
+      where.push('settingId = ?');
+      args.push((query as any).settingId);
+    }
+
+    // Optional: filter by coupon code
+    if ((query as any).couponCode) {
+      where.push('COALESCE(c.code, cs.code) = ?');
+      args.push((query as any).couponCode);
+    }
+
+    // Optional: filter by platform
+    if (query.platform) {
+      where.push('cu.platform = ?');
+      args.push(query.platform);
+    }
+
+    // Optional: filter by game world
+    if (query.gameWorldId) {
+      where.push('cu.gameWorldId = ?');
+      args.push(query.gameWorldId);
+    }
+
+    // Optional: filter by character ID
+    if ((query as any).characterId) {
+      where.push('cu.characterId = ?');
+      args.push((query as any).characterId);
+    }
+
+    // Optional: filter by date range
+    if (query.from) {
+      where.push('cu.usedAt >= ?');
+      args.push(convertToMySQLDateTime(query.from));
+    }
+    if (query.to) {
+      where.push('cu.usedAt <= ?');
+      args.push(convertToMySQLDateTime(query.to));
+    }
+
+    const whereSql = where.length > 0 ? `WHERE ${where.join(' AND ')}` : '';
+
+    const [rows] = await pool.execute<RowDataPacket[]>(
+      `SELECT
+        cu.id,
+        cu.userId,
+        cu.userName,
+        cu.characterId,
+        cu.sequence,
+        cu.usedAt,
+        cu.gameWorldId,
+        cu.platform,
+        cs.name as couponName,
+        COALESCE(c.code, cs.code) as couponCode,
+        cs.startsAt as couponStartsAt,
+        cs.expiresAt as couponExpiresAt
+      FROM g_coupon_uses cu
+      LEFT JOIN g_coupon_settings cs ON cu.settingId = cs.id
+      LEFT JOIN g_coupons c ON cu.issuedCouponId = c.id
+      ${whereSql}
+      ORDER BY cu.usedAt DESC`,
+      args
+    );
+
+    return rows;
   }
 
   /**

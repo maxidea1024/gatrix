@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Typography, TextField, MenuItem, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, InputAdornment, IconButton, Tooltip, TableSortLabel } from '@mui/material';
-import { History as HistoryIcon, Search as SearchIcon, ViewColumn as ViewColumnIcon } from '@mui/icons-material';
+import { Box, Typography, TextField, MenuItem, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, InputAdornment, IconButton, Tooltip, TableSortLabel, Button } from '@mui/material';
+import { History as HistoryIcon, Search as SearchIcon, ViewColumn as ViewColumnIcon, Download as DownloadIcon } from '@mui/icons-material';
+import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import SimplePagination from '@/components/common/SimplePagination';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -13,6 +14,7 @@ import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSe
 // Coupon Usage page (admin view of redemption records)
 const CouponUsagePage: React.FC = () => {
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
 
   // settings list
   const [settings, setSettings] = useState<CouponSetting[]>([]);
@@ -24,6 +26,9 @@ const CouponUsagePage: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
 
+  // export state
+  const [exporting, setExporting] = useState(false);
+
   // search & dynamic filters
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -32,28 +37,39 @@ const CouponUsagePage: React.FC = () => {
   // derive individual filter values (stable for deps)
   const settingIdFilter = useMemo(() => activeFilters.find(f => f.key === 'settingId')?.value as string || '', [activeFilters]);
   const platformFilter = useMemo(() => activeFilters.find(f => f.key === 'platform')?.value as string || '', [activeFilters]);
+  const channelFilter = useMemo(() => activeFilters.find(f => f.key === 'channel')?.value as string || '', [activeFilters]);
+  const subChannelFilter = useMemo(() => activeFilters.find(f => f.key === 'subChannel')?.value as string || '', [activeFilters]);
   const worldFilter = useMemo(() => activeFilters.find(f => f.key === 'gameWorldId')?.value as string || '', [activeFilters]);
-  const fromFilter = useMemo(() => activeFilters.find(f => f.key === 'from')?.value as string || '', [activeFilters]);
-  const toFilter = useMemo(() => activeFilters.find(f => f.key === 'to')?.value as string || '', [activeFilters]);
+  const couponCodeFilter = useMemo(() => activeFilters.find(f => f.key === 'couponCode')?.value as string || '', [activeFilters]);
+  const characterIdFilter = useMemo(() => activeFilters.find(f => f.key === 'characterId')?.value as string || '', [activeFilters]);
 
   // filter definitions
   const availableFilterDefinitions: FilterDefinition[] = [
     { key: 'settingId', label: t('coupons.couponUsage.filters.coupon'), type: 'select', options: settings.map(s => ({ value: s.id, label: `${s.name} (${s.type})` })) },
+    { key: 'couponCode', label: t('coupons.couponUsage.filters.couponCode'), type: 'text', placeholder: t('coupons.couponUsage.filters.couponCode') as string },
     { key: 'platform', label: t('coupons.couponUsage.filters.platform'), type: 'text', placeholder: t('coupons.couponUsage.filters.platform') as string },
+    { key: 'channel', label: t('coupons.couponUsage.filters.channel'), type: 'text', placeholder: t('coupons.couponUsage.filters.channel') as string },
+    { key: 'subChannel', label: t('coupons.couponUsage.filters.subChannel'), type: 'text', placeholder: t('coupons.couponUsage.filters.subChannel') as string },
     { key: 'gameWorldId', label: t('coupons.couponUsage.filters.gameWorldId'), type: 'text', placeholder: t('coupons.couponUsage.filters.gameWorldId') as string },
-    { key: 'from', label: t('coupons.couponUsage.filters.from'), type: 'text', placeholder: 'YYYY-MM-DD HH:mm:ss' },
-    { key: 'to', label: t('coupons.couponUsage.filters.to'), type: 'text', placeholder: 'YYYY-MM-DD HH:mm:ss' },
+    { key: 'characterId', label: t('coupons.couponUsage.filters.characterId'), type: 'text', placeholder: t('coupons.couponUsage.filters.characterId') as string },
   ];
 
 
   // Column settings
   const defaultColumns: ColumnConfig[] = [
+    { id: 'couponName', labelKey: 'coupons.couponUsage.columns.couponName', visible: true },
+    { id: 'couponCode', labelKey: 'coupons.couponUsage.columns.couponCode', visible: true },
     { id: 'userId', labelKey: 'coupons.couponUsage.columns.userId', visible: true },
     { id: 'userName', labelKey: 'coupons.couponUsage.columns.userName', visible: true },
+    { id: 'characterId', labelKey: 'coupons.couponUsage.columns.characterId', visible: true },
     { id: 'sequence', labelKey: 'coupons.couponUsage.columns.sequence', visible: true },
     { id: 'usedAt', labelKey: 'coupons.couponUsage.columns.usedAt', visible: true },
+    { id: 'couponStartsAt', labelKey: 'coupons.couponUsage.columns.couponStartsAt', visible: true },
+    { id: 'couponExpiresAt', labelKey: 'coupons.couponUsage.columns.couponExpiresAt', visible: true },
     { id: 'gameWorldId', labelKey: 'coupons.couponUsage.columns.gameWorldId', visible: true },
     { id: 'platform', labelKey: 'coupons.couponUsage.columns.platform', visible: true },
+    { id: 'channel', labelKey: 'coupons.couponUsage.columns.channel', visible: true },
+    { id: 'subChannel', labelKey: 'coupons.couponUsage.columns.subChannel', visible: true },
   ];
 
   const [columnSettingsAnchor, setColumnSettingsAnchor] = useState<HTMLElement | null>(null);
@@ -106,10 +122,14 @@ const CouponUsagePage: React.FC = () => {
   const sortedRecords = useMemo(() => {
     const getVal = (r: UsageRecord) => {
       switch (orderBy) {
+        case 'couponName': return r.couponName || '';
+        case 'couponCode': return r.couponCode || '';
         case 'userId': return r.userId || '';
         case 'userName': return r.userName || '';
         case 'sequence': return String(r.sequence ?? '');
         case 'usedAt': return r.usedAt || '';
+        case 'couponStartsAt': return r.couponStartsAt || '';
+        case 'couponExpiresAt': return r.couponExpiresAt || '';
         case 'gameWorldId': return r.gameWorldId || '';
         case 'platform': return r.platform || '';
         default: return '';
@@ -149,18 +169,57 @@ const CouponUsagePage: React.FC = () => {
         limit: rowsPerPage,
         search: debouncedSearchTerm || undefined,
         platform: platformFilter || undefined,
+        channel: channelFilter || undefined,
+        subChannel: subChannelFilter || undefined,
         gameWorldId: worldFilter || undefined,
-        from: fromFilter || undefined,
-        to: toFilter || undefined,
-      });
+        characterId: characterIdFilter || undefined,
+      } as any);
       setRecords(res.records || []);
       setTotal(res.total || 0);
     } finally {
       setLoading(false);
     }
-  }, [settingIdFilter, page, rowsPerPage, debouncedSearchTerm, platformFilter, worldFilter, fromFilter, toFilter]);
+  }, [settingIdFilter, page, rowsPerPage, debouncedSearchTerm, platformFilter, channelFilter, subChannelFilter, worldFilter, characterIdFilter]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Export usage records to CSV
+  const handleExport = async () => {
+    try {
+      setExporting(true);
+      const now = new Date();
+      const dateStr = now.toISOString().slice(0, 10);
+
+      // Call backend export API with current filters using axios
+      const response = await couponService.exportUsage({
+        ...(settingIdFilter && { settingId: settingIdFilter }),
+        ...(couponCodeFilter && { couponCode: couponCodeFilter }),
+        ...(platformFilter && { platform: platformFilter }),
+        ...(channelFilter && { channel: channelFilter }),
+        ...(subChannelFilter && { subChannel: subChannelFilter }),
+        ...(worldFilter && { gameWorldId: worldFilter }),
+        ...(characterIdFilter && { characterId: characterIdFilter }),
+      });
+
+      // Download CSV file
+      const blob = new Blob([response], { type: 'text/csv;charset=utf-8;' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `coupon-usage-${dateStr}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      enqueueSnackbar(t('coupons.couponSettings.exportSuccess'), { variant: 'success' });
+    } catch (error) {
+      console.error('Export error:', error);
+      enqueueSnackbar(t('coupons.couponSettings.exportError'), { variant: 'error' });
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <Box sx={{ p: 3 }}>
@@ -173,7 +232,14 @@ const CouponUsagePage: React.FC = () => {
           </Typography>
           <Typography variant="body2" color="text.secondary">{t('coupons.couponUsage.subtitle')}</Typography>
         </Box>
-        <Box />
+        <Button
+          variant="outlined"
+          startIcon={<DownloadIcon />}
+          onClick={handleExport}
+          disabled={exporting || records.length === 0}
+        >
+          {exporting ? t('common.exporting') : t('common.export')}
+        </Button>
       </Box>
 
       {/* Search & Filters */}
@@ -245,6 +311,14 @@ const CouponUsagePage: React.FC = () => {
                     <TableRow key={r.id} hover>
                       {visibleColumns.map((col) => {
                         switch (col.id) {
+                          case 'couponName':
+                            return (
+                              <TableCell key="couponName"><Typography variant="body2">{r.couponName || '-'}</Typography></TableCell>
+                            );
+                          case 'couponCode':
+                            return (
+                              <TableCell key="couponCode"><Typography variant="body2">{r.couponCode || '-'}</Typography></TableCell>
+                            );
                           case 'userId':
                             return (
                               <TableCell key="userId"><Typography variant="body2">{r.userId}</Typography></TableCell>
@@ -252,6 +326,10 @@ const CouponUsagePage: React.FC = () => {
                           case 'userName':
                             return (
                               <TableCell key="userName"><Typography variant="body2">{r.userName}</Typography></TableCell>
+                            );
+                          case 'characterId':
+                            return (
+                              <TableCell key="characterId"><Typography variant="body2">{r.characterId || '-'}</Typography></TableCell>
                             );
                           case 'sequence':
                             return (
@@ -261,15 +339,29 @@ const CouponUsagePage: React.FC = () => {
                             return (
                               <TableCell key="usedAt"><Typography variant="caption">{formatDateTime(r.usedAt)}</Typography></TableCell>
                             );
+                          case 'couponStartsAt':
+                            return (
+                              <TableCell key="couponStartsAt"><Typography variant="caption">{r.couponStartsAt ? formatDateTime(r.couponStartsAt) : '-'}</Typography></TableCell>
+                            );
+                          case 'couponExpiresAt':
+                            return (
+                              <TableCell key="couponExpiresAt"><Typography variant="caption">{r.couponExpiresAt ? formatDateTime(r.couponExpiresAt) : '-'}</Typography></TableCell>
+                            );
                           case 'gameWorldId':
                             return (
                               <TableCell key="gameWorldId"><Typography variant="body2">{r.gameWorldId || '-'}</Typography></TableCell>
                             );
                           case 'platform':
-
-
                             return (
                               <TableCell key="platform"><Typography variant="body2">{r.platform || '-'}</Typography></TableCell>
+                            );
+                          case 'channel':
+                            return (
+                              <TableCell key="channel"><Typography variant="body2">{r.channel || '-'}</Typography></TableCell>
+                            );
+                          case 'subChannel':
+                            return (
+                              <TableCell key="subChannel"><Typography variant="body2">{r.subChannel || '-'}</Typography></TableCell>
                             );
                           default:
                             return null;

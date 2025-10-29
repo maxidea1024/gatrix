@@ -7,6 +7,7 @@ import logger from '../config/logger';
 export interface RedeemRequest {
   userId: string;
   userName: string;
+  characterId?: string;
   worldId?: string;
   platform?: string;
   channel?: string;
@@ -101,12 +102,20 @@ export class CouponRedeemService {
       // 6. Check targeting conditions
       await this.validateTargeting(connection, setting.id, request);
 
-      // 7. Check per-user limit
-      const [usageRows] = await connection.execute<RowDataPacket[]>(
-        'SELECT COUNT(*) as count FROM g_coupon_uses WHERE settingId = ? AND userId = ?',
-        [setting.id, request.userId]
-      );
+      // 7. Check per-user/character limit based on usageLimitType
+      const usageLimitType = setting.usageLimitType || 'USER';
+      let usageQuery = 'SELECT COUNT(*) as count FROM g_coupon_uses WHERE settingId = ? AND ';
+      let usageParams: any[] = [setting.id];
 
+      if (usageLimitType === 'CHARACTER' && request.characterId) {
+        usageQuery += 'characterId = ?';
+        usageParams.push(request.characterId);
+      } else {
+        usageQuery += 'userId = ?';
+        usageParams.push(request.userId);
+      }
+
+      const [usageRows] = await connection.execute<RowDataPacket[]>(usageQuery, usageParams);
       const userUsedCount = (usageRows[0] as any).count || 0;
 
       if (userUsedCount >= setting.perUserLimit) {
@@ -128,13 +137,14 @@ export class CouponRedeemService {
 
       await connection.execute(
         `INSERT INTO g_coupon_uses
-         (id, settingId, issuedCouponId, userId, userName, sequence, usedAt, gameWorldId, platform, channel, subchannel)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         (id, settingId, issuedCouponId, userId, characterId, userName, sequence, usedAt, gameWorldId, platform, channel, subchannel)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           useId,
           setting.id,
           coupon.id,
           request.userId,
+          request.characterId || null,
           sanitizedUserName,
           sequence,
           usedAtMySQL,
@@ -163,7 +173,18 @@ export class CouponRedeemService {
       });
 
       // 11. Build response
-      const reward = setting.rewardData ? (typeof setting.rewardData === 'string' ? JSON.parse(setting.rewardData) : setting.rewardData) : {};
+      let reward: any[] = [];
+      if (setting.rewardData) {
+        const rewardData = typeof setting.rewardData === 'string' ? JSON.parse(setting.rewardData) : setting.rewardData;
+        // Ensure reward is always an array and transform to API format
+        if (Array.isArray(rewardData)) {
+          reward = rewardData.map((item: any) => ({
+            type: parseInt(item.rewardType || item.type || 0),
+            id: parseInt(item.itemId || item.id || 0),
+            quantity: parseInt(item.quantity || 0),
+          }));
+        }
+      }
 
       return {
         reward,

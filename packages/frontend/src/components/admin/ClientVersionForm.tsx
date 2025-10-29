@@ -123,7 +123,7 @@ const createValidationSchema = (t: any) => yup.object({
   maintenanceMessage: yup
     .string()
     .when('clientStatus', {
-      is: 'MAINTENANCE',
+      is: ClientStatus.MAINTENANCE,
       then: (schema) => schema.required(t('clientVersions.maintenance.messageRequired')),
       otherwise: (schema) => schema.notRequired(),
     }),

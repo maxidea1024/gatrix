@@ -18,7 +18,6 @@ import {
 } from '@mui/material';
 import {
   Add as AddIcon,
-  Close as CloseIcon,
   FilterList as FilterListIcon,
   Tune as TuneIcon,
   Refresh as RefreshIcon,
@@ -996,7 +995,7 @@ const DynamicFilterBar: React.FC<DynamicFilterBarProps> = ({
             }
           }}
         >
-          <CloseIcon sx={{ fontSize: 16 }} />
+          ✕
         </IconButton>
       </Box>
     );

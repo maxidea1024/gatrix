@@ -12,6 +12,9 @@ router.post('/', CouponSettingsController.create);
 // Usage records for all settings (no settingId)
 router.get('/usage', CouponSettingsController.usage);
 
+// Export usage records to CSV
+router.get('/usage/export', CouponSettingsController.exportUsage);
+
 // Get single
 router.get('/:id', CouponSettingsController.getById);
 

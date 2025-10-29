@@ -8,6 +8,7 @@ import { CouponRedeemService } from '../services/CouponRedeemService';
 const redeemSchema = Joi.object({
   userId: Joi.string().max(64).required(),
   userName: Joi.string().max(128).required(),
+  characterId: Joi.string().max(64).required(),
   worldId: Joi.string().max(64).optional().allow(null, ''),
   platform: Joi.string().max(32).optional().allow(null, ''),
   channel: Joi.string().max(64).optional().allow(null, ''),

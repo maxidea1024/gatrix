@@ -366,16 +366,17 @@ export class ClientVersionService {
   }
 
   /**
-   * Find exactly matching ONLINE client version by channel, subChannel and clientVersion
+   * Find exactly matching client version by platform and clientVersion
+   * Returns any status version (ONLINE, OFFLINE, MAINTENANCE, etc.)
+   * Only returns null if the version doesn't exist
    */
-  static async findOnlineByExact(
+  static async findByExact(
     platform: string,
     clientVersion: string
   ): Promise<ClientVersionAttributes | null> {
     const result = await ClientVersionModel.findAll({
       platform,
       clientVersion,
-      clientStatus: ClientStatus.ONLINE,
       limit: 1,
       offset: 0,
       sortBy: 'id',
@@ -384,6 +385,17 @@ export class ClientVersionService {
     const { clientVersions: rows } = result;
 
     return rows[0] || null;
+  }
+
+  /**
+   * @deprecated Use findByExact instead
+   * Find exactly matching ONLINE or MAINTENANCE client version by platform and clientVersion
+   */
+  static async findOnlineByExact(
+    platform: string,
+    clientVersion: string
+  ): Promise<ClientVersionAttributes | null> {
+    return this.findByExact(platform, clientVersion);
   }
 }
 

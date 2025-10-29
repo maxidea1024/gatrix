@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -13,6 +13,7 @@ import {
   TextField,
   Button,
   CircularProgress,
+  Collapse,
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -47,6 +48,7 @@ const SDKGuideDrawer: React.FC<SDKGuideDrawerProps> = ({ open, onClose }) => {
   const [couponCode, setCouponCode] = useState('');
   const [userId, setUserId] = useState('user123');
   const [userName, setUserName] = useState('John Doe');
+  const [characterId, setCharacterId] = useState('');
   const [worldId, setWorldId] = useState('world01');
   const [platform, setPlatform] = useState('ios');
   const [channel, setChannel] = useState('app_store');
@@ -54,6 +56,52 @@ const SDKGuideDrawer: React.FC<SDKGuideDrawerProps> = ({ open, onClose }) => {
   const [testResponse, setTestResponse] = useState<any>(null);
   const [testLoading, setTestLoading] = useState(false);
   const [testError, setTestError] = useState<string | null>(null);
+  const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>({});
+  const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
+  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(false);
+  const [expandedResponseHeaders, setExpandedResponseHeaders] = useState(false);
+  const [testDuration, setTestDuration] = useState<number | null>(null);
+  const [testStatus, setTestStatus] = useState<number | null>(null);
+
+  // Load saved values from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('sdkGuideDrawer_testInputs');
+      if (saved) {
+        const { apiToken: savedToken, couponCode: savedCode, userId: savedUserId, userName: savedUserName, characterId: savedCharacterId, worldId: savedWorldId, platform: savedPlatform, channel: savedChannel, subChannel: savedSubChannel } = JSON.parse(saved);
+        if (savedToken) setApiToken(savedToken);
+        if (savedCode) setCouponCode(savedCode);
+        if (savedUserId) setUserId(savedUserId);
+        if (savedUserName) setUserName(savedUserName);
+        if (savedCharacterId) setCharacterId(savedCharacterId);
+        if (savedWorldId) setWorldId(savedWorldId);
+        if (savedPlatform) setPlatform(savedPlatform);
+        if (savedChannel) setChannel(savedChannel);
+        if (savedSubChannel) setSubChannel(savedSubChannel);
+      }
+    } catch (error) {
+      // Silently ignore localStorage errors
+    }
+  }, []);
+
+  // Save values to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('sdkGuideDrawer_testInputs', JSON.stringify({
+        apiToken,
+        couponCode,
+        userId,
+        userName,
+        characterId,
+        worldId,
+        platform,
+        channel,
+        subChannel,
+      }));
+    } catch (error) {
+      // Silently ignore localStorage errors
+    }
+  }, [apiToken, couponCode, userId, userName, characterId, worldId, platform, channel, subChannel]);
 
   // curl example code
   const curlExample = `# Coupon Redeem API Example
@@ -64,6 +112,7 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
   -d '{
     "userId": "user123",
     "userName": "John Doe",
+    "characterId": "char456",
     "worldId": "world01",
     "platform": "ios",
     "channel": "app_store",
@@ -74,6 +123,7 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
   const jsonRequest = `{
   "userId": "user123",
   "userName": "John Doe",
+  "characterId": "char456",
   "worldId": "world01",
   "platform": "ios",
   "channel": "app_store",
@@ -84,12 +134,103 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
   const jsonResponse = `{
   "success": true,
   "data": {
-    "reward": {},
+    "reward": [
+      {
+        "type": 1,
+        "id": 1001,
+        "quantity": 100
+      },
+      {
+        "type": 2,
+        "id": 2001,
+        "quantity": 50
+      }
+    ],
     "userUsedCount": 1,
     "sequence": 1,
     "usedAt": "2025-10-28T04:17:05.123Z",
     "rewardEmailTitle": "Congratulations! You received a coupon reward.",
     "rewardEmailBody": "Congratulations! You received a reward by using the coupon. Please check it in the game."
+  }
+}`;
+
+  // Error response examples
+  const errorMissingParams = `{
+  "success": false,
+  "error": {
+    "code": "INVALID_PARAMETERS",
+    "message": "Missing required parameters",
+    "details": {
+      "missing": ["userId", "userName"]
+    }
+  }
+}`;
+
+  const errorMissingHeaders = `{
+  "success": false,
+  "error": {
+    "code": "INVALID_PARAMETERS",
+    "message": "Missing required headers",
+    "details": {
+      "missing": ["X-API-Token", "X-Application-Name"]
+    }
+  }
+}`;
+
+  const errorNotFound = `{
+  "success": false,
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Coupon code not found",
+    "details": {
+      "code": "INVALID_CODE"
+    }
+  }
+}`;
+
+  const errorConflict = `{
+  "success": false,
+  "error": {
+    "code": "CONFLICT",
+    "message": "Coupon already used by this user",
+    "details": {
+      "reason": "ALREADY_USED"
+    }
+  }
+}`;
+
+  const errorLimitReached = `{
+  "success": false,
+  "error": {
+    "code": "LIMIT_REACHED",
+    "message": "User has reached the usage limit for this coupon",
+    "details": {
+      "reason": "USER_LIMIT_EXCEEDED",
+      "limit": 1,
+      "used": 1
+    }
+  }
+}`;
+
+  const errorUnprocessable = `{
+  "success": false,
+  "error": {
+    "code": "UNPROCESSABLE_ENTITY",
+    "message": "Coupon is expired or targeting conditions not met",
+    "details": {
+      "reason": "EXPIRED_OR_INVALID_TARGET"
+    }
+  }
+}`;
+
+  const errorTooManyRequests = `{
+  "success": false,
+  "error": {
+    "code": "TOO_MANY_REQUESTS",
+    "message": "Too many requests for this coupon code",
+    "details": {
+      "retryAfter": 60
+    }
   }
 }`;
 
@@ -114,6 +255,10 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
     setTestLoading(true);
     setTestError(null);
     setTestResponse(null);
+    setTestStatus(null);
+    setTestDuration(null);
+
+    const startTime = performance.now();
 
     try {
       const response = await fetch(
@@ -128,6 +273,7 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
           body: JSON.stringify({
             userId,
             userName,
+            ...(characterId && { characterId }),
             worldId,
             platform,
             channel,
@@ -136,11 +282,33 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
         }
       );
 
+      const endTime = performance.now();
+      const duration = Math.round(endTime - startTime);
+
       const data = await response.json();
       setTestResponse(data);
+      setTestStatus(response.status);
+      setTestDuration(duration);
 
+      // Set request headers
+      setRequestHeaders({
+        'Content-Type': 'application/json',
+        'X-Application-Name': 'AdminTestClient',
+        'X-API-Token': apiToken,
+      });
+
+      // Set response headers (basic info)
+      setResponseHeaders({
+        'Content-Type': response.headers.get('Content-Type') || 'application/json',
+        'Status': `${response.status} ${response.statusText}`,
+      });
+
+      // Only set error if response is not ok
       if (!response.ok) {
-        setTestError(`HTTP ${response.status}`);
+        setTestError(`HTTP ${response.status}: ${data.error?.message || 'Request failed'}`);
+      } else {
+        // Clear error on success
+        setTestError(null);
       }
     } catch (error) {
       setTestError(error instanceof Error ? error.message : 'Unknown error occurred');
@@ -273,6 +441,9 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
             • <strong>userName</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramUserName')}
           </Typography>
           <Typography variant="body2">
+            • <strong>characterId</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramCharacterId')}
+          </Typography>
+          <Typography variant="body2">
             • <strong>worldId</strong>: {t('coupons.couponSettings.sdkGuideDrawer.paramWorldId')}
           </Typography>
           <Typography variant="body2">
@@ -328,55 +499,33 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
 
         <Divider sx={{ my: 3 }} />
 
-        {/* Error Codes */}
+        {/* Error Codes - Tabbed */}
         <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
           {t('coupons.couponSettings.sdkGuideDrawer.errorCodes')}
         </Typography>
-        <Stack spacing={2}>
-          <Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-              400 Bad Request
-            </Typography>
-            <Typography variant="body2" sx={{ ml: 2 }}>
-              • <strong>INVALID_PARAMETERS</strong>: {t('coupons.couponSettings.sdkGuideDrawer.error400')}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-              404 Not Found
-            </Typography>
-            <Typography variant="body2" sx={{ ml: 2 }}>
-              • <strong>NOT_FOUND</strong>: {t('coupons.couponSettings.sdkGuideDrawer.error404')}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-              409 Conflict
-            </Typography>
-            <Typography variant="body2" sx={{ ml: 2 }}>
-              • <strong>CONFLICT</strong>: {t('coupons.couponSettings.sdkGuideDrawer.error409Conflict')}
-            </Typography>
-            <Typography variant="body2" sx={{ ml: 2 }}>
-              • <strong>LIMIT_REACHED</strong>: {t('coupons.couponSettings.sdkGuideDrawer.error409LimitReached')}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-              422 Unprocessable Entity
-            </Typography>
-            <Typography variant="body2" sx={{ ml: 2 }}>
-              • <strong>UNPROCESSABLE_ENTITY</strong>: {t('coupons.couponSettings.sdkGuideDrawer.error422')}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-              429 Too Many Requests
-            </Typography>
-            <Typography variant="body2" sx={{ ml: 2 }}>
-              • <strong>TOO_MANY_REQUESTS</strong>: {t('coupons.couponSettings.sdkGuideDrawer.error429')}
-            </Typography>
-          </Box>
-        </Stack>
+        <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+          {t('coupons.couponSettings.sdkGuideDrawer.errorCodesDesc') || 'Error response examples for different scenarios'}
+        </Typography>
+
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+          <Tabs value={errorTabValue} onChange={(e, newValue) => setErrorTabValue(newValue)} variant="scrollable" scrollButtons="auto">
+            <Tab label="400 - Missing Params" />
+            <Tab label="400 - Missing Headers" />
+            <Tab label="404 - Not Found" />
+            <Tab label="409 - Conflict" />
+            <Tab label="409 - Limit Reached" />
+            <Tab label="422 - Unprocessable" />
+            <Tab label="429 - Too Many Requests" />
+          </Tabs>
+        </Box>
+
+        {errorTabValue === 0 && <CodeBlock code={errorMissingParams} language="json" />}
+        {errorTabValue === 1 && <CodeBlock code={errorMissingHeaders} language="json" />}
+        {errorTabValue === 2 && <CodeBlock code={errorNotFound} language="json" />}
+        {errorTabValue === 3 && <CodeBlock code={errorConflict} language="json" />}
+        {errorTabValue === 4 && <CodeBlock code={errorLimitReached} language="json" />}
+        {errorTabValue === 5 && <CodeBlock code={errorUnprocessable} language="json" />}
+        {errorTabValue === 6 && <CodeBlock code={errorTooManyRequests} language="json" />}
           </>
         )}
 
@@ -390,7 +539,7 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
             <Box sx={{ mb: 3 }}>
               <Stack spacing={2} sx={{ mb: 2 }}>
                 <TextField
-                  label="X-API-Token"
+                  label="API Token"
                   type="password"
                   value={apiToken}
                   onChange={(e) => setApiToken(e.target.value)}
@@ -421,6 +570,15 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
                   size="small"
                   fullWidth
                   placeholder="e.g., John Doe"
+                />
+                <TextField
+                  label="Character ID"
+                  value={characterId}
+                  onChange={(e) => setCharacterId(e.target.value)}
+                  size="small"
+                  fullWidth
+                  placeholder="e.g., char456"
+                  required
                 />
                 <TextField
                   label="World ID"
@@ -475,8 +633,127 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
 
             {testResponse && (
               <Box sx={{ mb: 3 }}>
+                {/* Status and Duration */}
+                <Box sx={{ mb: 2, p: 1.5, backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5', borderRadius: 1 }}>
+                  <Stack direction="row" spacing={3}>
+                    <Box>
+                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>Status</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {testStatus} {testStatus === 200 ? 'OK' : testStatus === 404 ? 'Not Found' : testStatus === 400 ? 'Bad Request' : 'Error'}
+                      </Typography>
+                    </Box>
+                    {testDuration !== null && (
+                      <Box>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>Time</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{testDuration}ms</Typography>
+                      </Box>
+                    )}
+                    {Object.keys(requestHeaders).length > 0 && (
+                      <Box>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>Request Size</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {new Blob([JSON.stringify(requestHeaders)]).size} bytes
+                        </Typography>
+                      </Box>
+                    )}
+                    {Object.keys(responseHeaders).length > 0 && (
+                      <Box>
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>Response Size</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {new Blob([JSON.stringify(testResponse)]).size} bytes
+                        </Typography>
+                      </Box>
+                    )}
+                  </Stack>
+                </Box>
+
+                {/* Request Headers */}
+                {Object.keys(requestHeaders).length > 0 && (
+                  <Box sx={{ mb: 2 }}>
+                    <Box
+                      onClick={() => setExpandedRequestHeaders(!expandedRequestHeaders)}
+                      sx={{
+                        p: 1,
+                        backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                        borderRadius: 1,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#3d3d3d' : '#eeeeee' },
+                      }}
+                    >
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        Request Headers ({Object.keys(requestHeaders).length})
+                      </Typography>
+                      <Box sx={{ transform: expandedRequestHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
+                        ▼
+                      </Box>
+                    </Box>
+                    <Collapse in={expandedRequestHeaders}>
+                      <Box sx={{ p: 1.5, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
+                        <Stack spacing={0.5}>
+                          {Object.entries(requestHeaders).map(([key, value]) => (
+                            <Box key={key} sx={{ display: 'flex', gap: 1 }}>
+                              <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 150, color: 'primary.main' }}>
+                                {key}:
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', wordBreak: 'break-all' }}>
+                                {String(value)}
+                              </Typography>
+                            </Box>
+                          ))}
+                        </Stack>
+                      </Box>
+                    </Collapse>
+                  </Box>
+                )}
+
+                {/* Response Headers */}
+                {Object.keys(responseHeaders).length > 0 && (
+                  <Box sx={{ mb: 2 }}>
+                    <Box
+                      onClick={() => setExpandedResponseHeaders(!expandedResponseHeaders)}
+                      sx={{
+                        p: 1,
+                        backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                        borderRadius: 1,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#3d3d3d' : '#eeeeee' },
+                      }}
+                    >
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        Response Headers ({Object.keys(responseHeaders).length})
+                      </Typography>
+                      <Box sx={{ transform: expandedResponseHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
+                        ▼
+                      </Box>
+                    </Box>
+                    <Collapse in={expandedResponseHeaders}>
+                      <Box sx={{ p: 1.5, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
+                        <Stack spacing={0.5}>
+                          {Object.entries(responseHeaders).map(([key, value]) => (
+                            <Box key={key} sx={{ display: 'flex', gap: 1 }}>
+                              <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 150, color: 'primary.main' }}>
+                                {key}:
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', wordBreak: 'break-all' }}>
+                                {String(value)}
+                              </Typography>
+                            </Box>
+                          ))}
+                        </Stack>
+                      </Box>
+                    </Collapse>
+                  </Box>
+                )}
+
+                {/* Response Body */}
                 <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                  Response:
+                  Response Body:
                 </Typography>
                 <Box
                   sx={{

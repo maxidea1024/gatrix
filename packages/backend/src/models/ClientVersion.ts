@@ -20,13 +20,13 @@ export interface ClientVersionListResult {
 }
 
 export enum ClientStatus {
-  ONLINE = 'online',
-  OFFLINE = 'offline',
-  RECOMMENDED_UPDATE = 'recommended_update',
-  FORCED_UPDATE = 'forced_update',
-  UNDER_REVIEW = 'under_review',
-  BLOCKED_PATCH_ALLOWED = 'blocked_patch_allowed',
-  MAINTENANCE = 'maintenance'
+  ONLINE = 'ONLINE',
+  OFFLINE = 'OFFLINE',
+  RECOMMENDED_UPDATE = 'RECOMMENDED_UPDATE',
+  FORCED_UPDATE = 'FORCED_UPDATE',
+  UNDER_REVIEW = 'UNDER_REVIEW',
+  BLOCKED_PATCH_ALLOWED = 'BLOCKED_PATCH_ALLOWED',
+  MAINTENANCE = 'MAINTENANCE'
 }
 
 export interface ClientVersionAttributes {
@@ -545,6 +545,30 @@ export class ClientVersionModel {
       return locales;
     } catch (error) {
       logger.error('Error getting maintenance locales:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete all client versions (for testing/reset)
+   */
+  static async deleteAll(): Promise<number> {
+    try {
+      // First delete all maintenance locales
+      await db('g_client_version_maintenance_locales').del();
+
+      // Then delete all tag assignments
+      await db('g_tag_assignments')
+        .where('entityType', 'client_version')
+        .del();
+
+      // Finally delete all client versions
+      const deletedCount = await db('g_client_versions').del();
+
+      logger.info(`Deleted all client versions: ${deletedCount} records`);
+      return deletedCount;
+    } catch (error) {
+      logger.error('Error deleting all client versions:', error);
       throw error;
     }
   }
