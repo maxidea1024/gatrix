@@ -293,13 +293,18 @@ const CouponSettingsPage: React.FC = () => {
     status: 'ACTIVE' as CouponStatus,
     rewardData: [],
     rewardTemplateId: null as string | null,
+    rewardEmailTitle: '',
+    rewardEmailBody: '',
   });
   const [rewardMode, setRewardMode] = useState<'direct' | 'template'>('direct');
+  // Track if description was manually edited by user
+  const [isDescriptionManuallyEdited, setIsDescriptionManuallyEdited] = useState(false);
 
   const resetForm = () => {
     setEditing(null);
-    setForm({ code: '', type: 'NORMAL', name: '', description: '', quantity: 1, perUserLimit: 1, maxTotalUses: null, startsAt: null, expiresAt: null, status: 'ACTIVE', rewardData: [], rewardTemplateId: null });
+    setForm({ code: '', type: 'NORMAL', name: '', description: '', quantity: 1, perUserLimit: 1, maxTotalUses: null, startsAt: null, expiresAt: null, status: 'ACTIVE', rewardData: [], rewardTemplateId: null, rewardEmailTitle: '', rewardEmailBody: '' });
     setRewardMode('direct');
+    setIsDescriptionManuallyEdited(false);
   };
 
   const availableFilterDefinitions: FilterDefinition[] = [
@@ -603,6 +608,16 @@ const CouponSettingsPage: React.FC = () => {
     if (!form.name || !form.startsAt || !form.expiresAt) return;
     if (codeError || quantityError || maxTotalUsesError || perUserLimitError) return;
 
+    // Validate reward email fields
+    if (!form.rewardEmailTitle || form.rewardEmailTitle.trim() === '') {
+      enqueueSnackbar(t('coupons.couponSettings.form.rewardEmailTitleRequired'), { variant: 'error' });
+      return;
+    }
+    if (!form.rewardEmailBody || form.rewardEmailBody.trim() === '') {
+      enqueueSnackbar(t('coupons.couponSettings.form.rewardEmailBodyRequired'), { variant: 'error' });
+      return;
+    }
+
     // Validate that either rewardData or rewardTemplateId is provided
     if (rewardMode === 'direct' && (!form.rewardData || form.rewardData.length === 0)) {
       enqueueSnackbar(t('surveys.atLeastOneReward'), { variant: 'error' });
@@ -651,7 +666,7 @@ const CouponSettingsPage: React.FC = () => {
         await load();
       } else {
         // For create: close form immediately and load in background
-        const result = await couponService.createSetting(payload);
+        await couponService.createSetting(payload);
         setOpenForm(false);
         resetForm();
 
@@ -697,7 +712,11 @@ const CouponSettingsPage: React.FC = () => {
       status: it.status,
       rewardData: it.rewardData || [],
       rewardTemplateId: it.rewardTemplateId || null,
+      rewardEmailTitle: it.rewardEmailTitle || '',
+      rewardEmailBody: it.rewardEmailBody || '',
     });
+    // When editing, mark description as manually edited (since it already has a value)
+    setIsDescriptionManuallyEdited(true);
     setOpenForm(true);
   };
 
@@ -1156,7 +1175,15 @@ const CouponSettingsPage: React.FC = () => {
               autoFocus
               label={t('coupons.couponSettings.form.name')}
               value={form.name}
-              onChange={(e) => setForm((s: any) => ({ ...s, name: e.target.value }))}
+              onChange={(e) => {
+                const newName = e.target.value;
+                setForm((s: any) => ({
+                  ...s,
+                  name: newName,
+                  // Auto-fill description if it hasn't been manually edited
+                  description: !isDescriptionManuallyEdited ? newName : s.description,
+                }));
+              }}
               helperText={t('coupons.couponSettings.form.nameHelp')}
               fullWidth
             />
@@ -1164,7 +1191,11 @@ const CouponSettingsPage: React.FC = () => {
             <TextField
               label={t('coupons.couponSettings.form.description')}
               value={form.description}
-              onChange={(e) => setForm((s: any) => ({ ...s, description: e.target.value }))}
+              onChange={(e) => {
+                setForm((s: any) => ({ ...s, description: e.target.value }));
+                // Mark description as manually edited when user types
+                setIsDescriptionManuallyEdited(true);
+              }}
               helperText={t('coupons.couponSettings.form.descriptionHelp')}
               fullWidth
             />
@@ -1318,6 +1349,7 @@ const CouponSettingsPage: React.FC = () => {
             <Box sx={{ pt: 1 }}>
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
                 {t('surveys.participationRewards')}
+                <span style={{ color: '#d32f2f', marginLeft: '4px' }}>*</span>
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
                 {t('surveys.participationRewardsHelp')}
@@ -1336,6 +1368,35 @@ const CouponSettingsPage: React.FC = () => {
                 minQuantity={1}
                 initialMode={rewardMode}
                 initialTemplateId={form.rewardTemplateId || ''}
+              />
+            </Box>
+
+            {/* 13. Reward Email */}
+            <Box sx={{ pt: 2, borderTop: 1, borderColor: 'divider' }}>
+              <Typography variant="subtitle2" sx={{ mb: 2 }}>
+                {t('coupons.couponSettings.form.rewardEmail')}
+                <span style={{ color: '#d32f2f', marginLeft: '4px' }}>*</span>
+              </Typography>
+              <TextField
+                required
+                fullWidth
+                label={t('coupons.couponSettings.form.rewardEmailTitle')}
+                value={form.rewardEmailTitle || ''}
+                onChange={(e) => setForm((s: any) => ({ ...s, rewardEmailTitle: e.target.value }))}
+                placeholder={t('coupons.couponSettings.form.rewardEmailTitlePlaceholder')}
+                helperText={t('coupons.couponSettings.form.rewardEmailTitleHelp')}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                required
+                fullWidth
+                multiline
+                rows={4}
+                label={t('coupons.couponSettings.form.rewardEmailBody')}
+                value={form.rewardEmailBody || ''}
+                onChange={(e) => setForm((s: any) => ({ ...s, rewardEmailBody: e.target.value }))}
+                placeholder={t('coupons.couponSettings.form.rewardEmailBodyPlaceholder')}
+                helperText={t('coupons.couponSettings.form.rewardEmailBodyHelp')}
               />
             </Box>
           </Stack>

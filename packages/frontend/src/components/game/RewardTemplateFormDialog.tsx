@@ -55,6 +55,8 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
   const [saving, setSaving] = useState(false);
   const [loadingTags, setLoadingTags] = useState(false);
   const [isCopy, setIsCopy] = useState(false);
+  // Track if description was manually edited by user
+  const [isDescriptionManuallyEdited, setIsDescriptionManuallyEdited] = useState(false);
   const nameInputRef = React.useRef<HTMLInputElement>(null);
 
   // Load available tags
@@ -137,6 +139,15 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
       setRewardItems([]);
       setSelectedTags([]);
       setIsCopy(false);
+      setIsDescriptionManuallyEdited(false);
+    }
+
+    // When editing or copying, mark description as manually edited (since it already has a value)
+    if (template && template.id) {
+      setIsDescriptionManuallyEdited(true);
+    } else if (template && !template.id) {
+      // Copy operation - mark as manually edited since it has a value
+      setIsDescriptionManuallyEdited(true);
     }
 
     // Focus on name input when drawer opens
@@ -269,11 +280,21 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
           <Stack spacing={2}>
             {/* Name */}
             <Box>
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('rewardTemplates.name')}</Typography>
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                {t('rewardTemplates.name')}
+                <span style={{ color: '#d32f2f', marginLeft: '4px' }}>*</span>
+              </Typography>
               <TextField
                 inputRef={nameInputRef}
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => {
+                  const newName = e.target.value;
+                  setName(newName);
+                  // Auto-fill description if it hasn't been manually edited
+                  if (!isDescriptionManuallyEdited) {
+                    setDescription(newName);
+                  }
+                }}
                 fullWidth
                 size="small"
                 placeholder={t('rewardTemplates.nameHelp')}
@@ -285,12 +306,49 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
               <Typography variant="subtitle2" sx={{ mb: 1 }}>{t('rewardTemplates.description')}</Typography>
               <TextField
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  // Mark description as manually edited when user types
+                  setIsDescriptionManuallyEdited(true);
+                }}
                 fullWidth
                 multiline
                 rows={3}
                 size="small"
                 placeholder={t('rewardTemplates.descriptionHelp')}
+              />
+            </Box>
+
+            {/* Tags */}
+            <Box>
+              <Autocomplete
+                multiple
+                options={availableTags.filter(tag => typeof tag !== 'string')}
+                getOptionLabel={(option) => option.name}
+                filterSelectedOptions
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                value={selectedTags}
+                onChange={(_, value) => setSelectedTags(value)}
+                loading={loadingTags}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => {
+                    const { key, ...chipProps } = getTagProps({ index });
+                    return (
+                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
+                        <Chip
+                          variant="outlined"
+                          label={option.name}
+                          size="small"
+                          sx={{ bgcolor: option.color, color: '#fff' }}
+                          {...chipProps}
+                        />
+                      </Tooltip>
+                    );
+                  })
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label={t('rewardTemplates.tags')} />
+                )}
               />
             </Box>
 
@@ -311,6 +369,7 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
               >
                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
                   {t('rewardTemplates.rewardItems')}
+                  <span style={{ color: '#d32f2f', marginLeft: '4px' }}>*</span>
                 </Typography>
                 <IconButton size="small" sx={{ pointerEvents: 'none' }}>
                   {rewardsExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
@@ -353,39 +412,6 @@ const RewardTemplateFormDialog: React.FC<RewardTemplateFormDialogProps> = ({
                   </Button>
                 </Stack>
               </Collapse>
-            </Box>
-
-            {/* Tags */}
-            <Box>
-              <Autocomplete
-                multiple
-                options={availableTags.filter(tag => typeof tag !== 'string')}
-                getOptionLabel={(option) => option.name}
-                filterSelectedOptions
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                value={selectedTags}
-                onChange={(_, value) => setSelectedTags(value)}
-                loading={loadingTags}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...chipProps } = getTagProps({ index });
-                    return (
-                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
-                        <Chip
-                          variant="outlined"
-                          label={option.name}
-                          size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
-                          {...chipProps}
-                        />
-                      </Tooltip>
-                    );
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label={t('rewardTemplates.tags')} />
-                )}
-              />
             </Box>
           </Stack>
         </Box>

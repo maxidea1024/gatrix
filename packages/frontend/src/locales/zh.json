@@ -2934,7 +2934,16 @@
         "codeFormatError": "优惠券代码只能包含大写字母(A-Z)和数字(0-9)。",
         "quantityMinError": "最少需要 1 个。",
         "maxTotalUsesMinError": "必须大于等于 1。",
-        "perUserLimitMinError": "必须大于等于 1。"
+        "perUserLimitMinError": "必须大于等于 1。",
+        "rewardEmail": "奖励邮件",
+        "rewardEmailTitle": "邮件主题",
+        "rewardEmailTitlePlaceholder": "例如：恭喜！您已获得优惠券奖励。",
+        "rewardEmailTitleHelp": "输入奖励邮件的主题行。",
+        "rewardEmailTitleRequired": "邮件主题为必填项。",
+        "rewardEmailBody": "邮件正文",
+        "rewardEmailBodyPlaceholder": "例如：恭喜！您已通过使用优惠券获得奖励。请在游戏中查看。",
+        "rewardEmailBodyHelp": "输入奖励邮件的正文内容。",
+        "rewardEmailBodyRequired": "邮件正文为必填项。"
       },
       "deleteConfirmTitle": "确认删除",
       "deleteConfirmMessage": "确定要删除'{{name}}'吗？此操作无法撤销。",

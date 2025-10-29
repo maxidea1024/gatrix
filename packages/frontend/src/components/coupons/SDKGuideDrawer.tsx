@@ -60,7 +60,9 @@ curl -X POST http://localhost:5000/api/v1/coupons/{COUPON_CODE}/redeem \\
     "reward": {},
     "userUsedCount": 1,
     "sequence": 1,
-    "usedAt": "2025-10-28T04:17:05.123Z"
+    "usedAt": "2025-10-28T04:17:05.123Z",
+    "rewardEmailTitle": "Congratulations! You received a coupon reward.",
+    "rewardEmailBody": "Congratulations! You received a reward by using the coupon. Please check it in the game."
   }
 }`;
 
@@ -238,19 +240,50 @@ curl -X POST http://localhost:5000/api/v1/coupons/{COUPON_CODE}/redeem \\
         <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
           {t('coupons.couponSettings.sdkGuideDrawer.errorCodes')}
         </Typography>
-        <Stack spacing={1}>
-          <Typography variant="body2">
-            {t('coupons.couponSettings.sdkGuideDrawer.error400')}
-          </Typography>
-          <Typography variant="body2">
-            {t('coupons.couponSettings.sdkGuideDrawer.error404')}
-          </Typography>
-          <Typography variant="body2">
-            {t('coupons.couponSettings.sdkGuideDrawer.error409')}
-          </Typography>
-          <Typography variant="body2">
-            {t('coupons.couponSettings.sdkGuideDrawer.error422')}
-          </Typography>
+        <Stack spacing={2}>
+          <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+              400 Bad Request
+            </Typography>
+            <Typography variant="body2" sx={{ ml: 2 }}>
+              • <strong>INVALID_PARAMETERS</strong>: {t('coupons.couponSettings.sdkGuideDrawer.error400')}
+            </Typography>
+          </Box>
+          <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+              404 Not Found
+            </Typography>
+            <Typography variant="body2" sx={{ ml: 2 }}>
+              • <strong>NOT_FOUND</strong>: {t('coupons.couponSettings.sdkGuideDrawer.error404')}
+            </Typography>
+          </Box>
+          <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+              409 Conflict
+            </Typography>
+            <Typography variant="body2" sx={{ ml: 2 }}>
+              • <strong>CONFLICT</strong>: {t('coupons.couponSettings.sdkGuideDrawer.error409Conflict')}
+            </Typography>
+            <Typography variant="body2" sx={{ ml: 2 }}>
+              • <strong>LIMIT_REACHED</strong>: {t('coupons.couponSettings.sdkGuideDrawer.error409LimitReached')}
+            </Typography>
+          </Box>
+          <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+              422 Unprocessable Entity
+            </Typography>
+            <Typography variant="body2" sx={{ ml: 2 }}>
+              • <strong>UNPROCESSABLE_ENTITY</strong>: {t('coupons.couponSettings.sdkGuideDrawer.error422')}
+            </Typography>
+          </Box>
+          <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+              429 Too Many Requests
+            </Typography>
+            <Typography variant="body2" sx={{ ml: 2 }}>
+              • <strong>TOO_MANY_REQUESTS</strong>: {t('coupons.couponSettings.sdkGuideDrawer.error429')}
+            </Typography>
+          </Box>
         </Stack>
       </Box>
     </ResizableDrawer>

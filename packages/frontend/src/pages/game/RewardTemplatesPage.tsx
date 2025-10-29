@@ -34,6 +34,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import rewardTemplateService, { RewardTemplate } from '../../services/rewardTemplateService';
+import { tagService } from '../../services/tagService';
 import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import ColumnSettingsDialog, { ColumnConfig } from '../../components/common/ColumnSettingsDialog';
@@ -49,6 +50,7 @@ const RewardTemplatesPage: React.FC = () => {
 
   // State
   const [templates, setTemplates] = useState<RewardTemplate[]>([]);
+  const [allTemplates, setAllTemplates] = useState<RewardTemplate[]>([]); // All templates for tag extraction
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -79,16 +81,19 @@ const RewardTemplatesPage: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(() => {
     try {
       const saved = localStorage.getItem('rewardTemplatesActiveFilters');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
+      const filters = saved ? JSON.parse(saved) : [];
+      console.log('[RewardTemplatesPage] Restored filters from localStorage:', filters);
+      return filters;
+    } catch (e) {
+      console.error('[RewardTemplatesPage] Failed to restore filters:', e);
       return [];
     }
   });
 
-  // Get all unique tags from templates for filter options
+  // Get all unique tags from all templates for filter options (not just displayed ones)
   const allTags = useMemo(() => {
     const tagMap = new Map<number, any>();
-    templates.forEach((template, idx) => {
+    allTemplates.forEach((template) => {
       if (template.tags && Array.isArray(template.tags)) {
         template.tags.forEach(tag => {
           if (tag && typeof tag === 'object' && 'id' in tag) {
@@ -98,18 +103,14 @@ const RewardTemplatesPage: React.FC = () => {
       }
     });
     const result = Array.from(tagMap.values());
-    console.log('[RewardTemplatesPage] allTags computed:', {
-      templateCount: templates.length,
+    console.log('[RewardTemplatesPage] allTags computed from allTemplates:', {
+      allTemplateCount: allTemplates.length,
+      displayedTemplateCount: templates.length,
       uniqueTagCount: result.length,
       tags: result.map(t => ({ id: t.id, name: t.name })),
-      templateTags: templates.map((t, idx) => ({
-        templateId: t.id,
-        templateName: t.name,
-        tagIds: t.tags?.map((tag: any) => tag.id) || [],
-      })),
     });
     return result;
-  }, [templates]);
+  }, [allTemplates]);
 
   // Filter definitions
   const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [
@@ -119,13 +120,14 @@ const RewardTemplatesPage: React.FC = () => {
       type: 'tags',
       operator: 'include_all',
       allowOperatorToggle: true,
-      options: allTags.map(tag => ({
+      options: allRegistryTags.map(tag => ({
         value: tag.id,
         label: tag.name,
         color: tag.color,
+        description: tag.description,
       })),
     },
-  ], [t, allTags]);
+  ], [t, allRegistryTags]);
 
   // Default columns for reset
   const defaultColumns: ColumnConfig[] = [
@@ -165,7 +167,12 @@ const RewardTemplatesPage: React.FC = () => {
       return templatesToFilter;
     }
 
-    return templatesToFilter.filter(template => {
+    console.log('[RewardTemplatesPage] Applying filters:', {
+      activeFilters,
+      templateCount: templatesToFilter.length,
+    });
+
+    const filtered = templatesToFilter.filter(template => {
       return activeFilters.every(filter => {
         // Handle tags filter
         if (filter.key === 'tags') {
@@ -182,15 +189,31 @@ const RewardTemplatesPage: React.FC = () => {
 
           // include_all: all selected tags must be present
           // any_of: at least one selected tag must be present
-          if (filter.operator === 'include_all') {
-            return selectedTagIds.every(tagId => templateTagIds.includes(tagId));
-          } else {
-            return selectedTagIds.some(tagId => templateTagIds.includes(tagId));
-          }
+          const matches = filter.operator === 'include_all'
+            ? selectedTagIds.every(tagId => templateTagIds.includes(tagId))
+            : selectedTagIds.some(tagId => templateTagIds.includes(tagId));
+
+          console.log('[RewardTemplatesPage] Tag filter check:', {
+            templateId: template.id,
+            templateName: template.name,
+            templateTagIds,
+            selectedTagIds,
+            operator: filter.operator,
+            matches,
+          });
+
+          return matches;
         }
         return true;
       });
     });
+
+    console.log('[RewardTemplatesPage] Filter result:', {
+      beforeCount: templatesToFilter.length,
+      afterCount: filtered.length,
+    });
+
+    return filtered;
   };
 
   // Load templates
@@ -235,6 +258,9 @@ const RewardTemplatesPage: React.FC = () => {
           };
         });
 
+        // Store all templates for tag extraction (for filter options)
+        setAllTemplates(templatesCopy);
+
         // Apply dynamic filters
         const filteredTemplates = applyFilters(templatesCopy);
         setTemplates(filteredTemplates);
@@ -245,12 +271,14 @@ const RewardTemplatesPage: React.FC = () => {
       } else {
         console.error('Invalid response:', result);
         setTemplates([]);
+        setAllTemplates([]);
         setTotal(0);
       }
     } catch (error: any) {
       console.error('Failed to load templates:', error);
       enqueueSnackbar(error.message || t('rewardTemplates.loadFailed'), { variant: 'error' });
       setTemplates([]);
+      setAllTemplates([]);
       setTotal(0);
     } finally {
       setLoading(false);
@@ -260,8 +288,25 @@ const RewardTemplatesPage: React.FC = () => {
 
   // Save active filters to localStorage
   useEffect(() => {
+    console.log('[RewardTemplatesPage] Saving filters to localStorage:', activeFilters);
     localStorage.setItem('rewardTemplatesActiveFilters', JSON.stringify(activeFilters));
   }, [activeFilters]);
+
+  // Load all registry tags on mount (for filter options)
+  const [allRegistryTags, setAllRegistryTags] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadTags = async () => {
+      try {
+        const tags = await tagService.list();
+        setAllRegistryTags(tags);
+        console.log('[RewardTemplatesPage] Registry tags loaded:', tags.length);
+      } catch (error) {
+        console.error('[RewardTemplatesPage] Failed to load registry tags:', error);
+      }
+    };
+    loadTags();
+  }, []);
 
   useEffect(() => {
     loadTemplates();
@@ -303,23 +348,31 @@ const RewardTemplatesPage: React.FC = () => {
 
   // Filter handlers
   const handleFilterAdd = (filter: ActiveFilter) => {
+    console.log('[RewardTemplatesPage] Adding filter:', filter);
     setActiveFilters(prev => [...prev, filter]);
+    setPage(0); // Reset to first page when adding filter
   };
 
   const handleFilterRemove = (key: string) => {
+    console.log('[RewardTemplatesPage] Removing filter:', key);
     setActiveFilters(prev => prev.filter(f => f.key !== key));
+    setPage(0); // Reset to first page when removing filter
   };
 
   const handleDynamicFilterChange = (key: string, value: any) => {
+    console.log('[RewardTemplatesPage] Changing filter value:', { key, value });
     setActiveFilters(prev =>
       prev.map(f => (f.key === key ? { ...f, value } : f))
     );
+    setPage(0); // Reset to first page when changing filter value
   };
 
   const handleOperatorChange = (key: string, operator: 'any_of' | 'include_all') => {
+    console.log('[RewardTemplatesPage] Changing operator:', { key, operator });
     setActiveFilters(prev =>
       prev.map(f => (f.key === key ? { ...f, operator } : f))
     );
+    setPage(0); // Reset to first page when changing operator
   };
 
   // CRUD handlers
@@ -674,7 +727,17 @@ const RewardTemplatesPage: React.FC = () => {
                         if (column.id === 'description') {
                           return (
                             <TableCell key={column.id}>
-                              {template.description || '-'}
+                              <Typography
+                                sx={{
+                                  cursor: 'pointer',
+                                  '&:hover': {
+                                    textDecoration: 'underline'
+                                  }
+                                }}
+                                onClick={() => handleEdit(template)}
+                              >
+                                {template.description || '-'}
+                              </Typography>
                             </TableCell>
                           );
                         }

@@ -14,6 +14,8 @@ export interface CouponSetting {
   perUserLimit?: number;
   rewardTemplateId?: string | null;
   rewardData?: any | null;
+  rewardEmailTitle?: string | null;
+  rewardEmailBody?: string | null;
   startsAt: string; // ISO from server wrapper
   expiresAt: string;
   status: CouponStatus;

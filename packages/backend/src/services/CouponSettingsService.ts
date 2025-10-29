@@ -20,6 +20,8 @@ export interface CouponSetting {
   perUserLimit: number;
   rewardTemplateId?: string | null;
   rewardData?: any | null;
+  rewardEmailTitle?: string | null;
+  rewardEmailBody?: string | null;
   startsAt: string; // MySQL DATETIME
   expiresAt: string; // MySQL DATETIME
   status: CouponStatus;
@@ -37,6 +39,8 @@ export interface CreateCouponSettingInput {
   perUserLimit?: number;
   rewardTemplateId?: string | null;
   rewardData?: any | null;
+  rewardEmailTitle?: string | null;
+  rewardEmailBody?: string | null;
   startsAt: string | Date;
   expiresAt: string | Date;
   status?: CouponStatus;
@@ -193,8 +197,8 @@ export class CouponSettingsService {
     await pool.execute(
       `INSERT INTO g_coupon_settings
        (id, code, type, name, description, tags, maxTotalUses, perUserLimit, rewardTemplateId, rewardData,
-        startsAt, expiresAt, status, createdBy)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        rewardEmailTitle, rewardEmailBody, startsAt, expiresAt, status, createdBy)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         settingCode,
@@ -206,6 +210,8 @@ export class CouponSettingsService {
         perUserLimit,
         input.rewardTemplateId ?? null,
         input.rewardData ? JSON.stringify(input.rewardData) : null,
+        input.rewardEmailTitle ?? null,
+        input.rewardEmailBody ?? null,
         startsAt,
         expiresAt,
         input.status ?? 'ACTIVE',
@@ -277,6 +283,8 @@ export class CouponSettingsService {
     if (input.perUserLimit !== undefined) add('perUserLimit = ?', input.perUserLimit);
     if (input.rewardTemplateId !== undefined) add('rewardTemplateId = ?', input.rewardTemplateId);
     if (input.rewardData !== undefined) add('rewardData = ?', input.rewardData ? JSON.stringify(input.rewardData) : null);
+    if (input.rewardEmailTitle !== undefined) add('rewardEmailTitle = ?', input.rewardEmailTitle);
+    if (input.rewardEmailBody !== undefined) add('rewardEmailBody = ?', input.rewardEmailBody);
 
     if (input.startsAt !== undefined) {
       const v = convertToMySQLDateTime(input.startsAt);

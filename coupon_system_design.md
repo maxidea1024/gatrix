@@ -322,27 +322,36 @@ Response 예시
   "data": {
     "reward": { /* rewardData에서 계산된 실제 보상 */ },
     "userUsedCount": 2,
-    "globalUsed": 35001,
-
-
     "sequence": 2,
-    "usedAt": "2025-10-27 12:34:56"
+    "usedAt": "2025-10-27T12:34:56.000Z",
+    "rewardEmailTitle": "축하합니다! 쿠폰 보상을 받으셨습니다.",
+    "rewardEmailBody": "축하합니다! 쿠폰을 사용하여 보상을 받으셨습니다. 게임에서 확인해주세요."
   }
 }
 ```
 
 오류 형식 및 코드
 - 공통 오류 포맷: `{ "success": false, "error": { "code": "...", "message": "...", "details": {...} } }`
-- 404 NOT_FOUND: 코드가 없거나 삭제/비활성화된 쿠폰
-- 409 CONFLICT: perUserLimit 초과, 재시도 불가 상태
-- 409 LIMIT_REACHED: 스페셜 선착순 한도 소진(추가 사용 불가)
-- 422 INVALID_TEMPLATE: rewardTemplateId가 존재하지 않거나 비활성 상태
-- 400 INVALID_PARAMETERS: rewardTemplateId와 rewardData를 동시에 지정함(서로 배타적)
 
+**HTTP 상태 코드별 에러 코드:**
+- 400 Bad Request
+  - `INVALID_PARAMETERS`: 필수 파라미터 누락 또는 유효하지 않은 입력값
 
-- 422 UNPROCESSABLE_ENTITY: 기간 외 사용(startsAt/expiresAt 불만족), 타겟팅 미충족, 입력값 유효성 실패(userName 길이 초과 등)
-- 429 TOO_MANY_REQUESTS: 동일 유저/코드에 대한 과도한 요청(스팸) 제한
-- 500 INTERNAL_ERROR: 서버 내부 오류
+- 404 Not Found
+  - `NOT_FOUND`: 코드가 없거나 삭제/비활성화된 쿠폰
+
+- 409 Conflict
+  - `CONFLICT`: 쿠폰이 이미 사용됨
+  - `LIMIT_REACHED`: 사용자별 한도 초과 (perUserLimit 초과)
+
+- 422 Unprocessable Entity
+  - `UNPROCESSABLE_ENTITY`: 기간 외 사용(startsAt/expiresAt 불만족), 타겟팅 미충족, 쿠폰 비활성 상태
+
+- 429 Too Many Requests
+  - `TOO_MANY_REQUESTS`: 동일 유저/코드에 대한 과도한 요청(스팸) 제한
+
+- 500 Internal Server Error
+  - `INTERNAL_ERROR`: 서버 내부 오류
 
 
 처리 알고리즘(원자성/동시성)

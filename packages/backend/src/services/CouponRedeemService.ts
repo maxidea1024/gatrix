@@ -19,6 +19,8 @@ export interface RedeemResponse {
   userUsedCount: number;
   sequence: number;
   usedAt: string;
+  rewardEmailTitle?: string | null;
+  rewardEmailBody?: string | null;
 }
 
 /**
@@ -55,14 +57,16 @@ export class CouponRedeemService {
       );
 
       if (couponRows.length === 0) {
-        throw new CustomError('Coupon code not found', 404);
+        const error = new CustomError('Coupon code not found', 404, true, 'NOT_FOUND');
+        throw error;
       }
 
       const coupon = couponRows[0] as any;
 
       // 2. Check if coupon is already used
       if (coupon.status === 'USED') {
-        throw new CustomError('Coupon has already been used', 409);
+        const error = new CustomError('Coupon has already been used', 409, true, 'CONFLICT');
+        throw error;
       }
 
       // 3. Get coupon setting
@@ -72,14 +76,16 @@ export class CouponRedeemService {
       );
 
       if (settingRows.length === 0) {
-        throw new CustomError('Coupon setting not found', 404);
+        const error = new CustomError('Coupon setting not found', 404, true, 'NOT_FOUND');
+        throw error;
       }
 
       const setting = settingRows[0] as any;
 
       // 4. Check if setting is active
       if (setting.status !== 'ACTIVE') {
-        throw new CustomError('Coupon is not active', 422);
+        const error = new CustomError('Coupon is not active', 422, true, 'UNPROCESSABLE_ENTITY');
+        throw error;
       }
 
       // 5. Check date range
@@ -88,7 +94,8 @@ export class CouponRedeemService {
       const expiresAt = new Date(setting.expiresAt);
 
       if (now < startsAt || now > expiresAt) {
-        throw new CustomError('Coupon is not available in this period', 422);
+        const error = new CustomError('Coupon is not available in this period', 422, true, 'UNPROCESSABLE_ENTITY');
+        throw error;
       }
 
       // 6. Check targeting conditions
@@ -103,7 +110,8 @@ export class CouponRedeemService {
       const userUsedCount = (usageRows[0] as any).count || 0;
 
       if (userUsedCount >= setting.perUserLimit) {
-        throw new CustomError('User has reached the usage limit for this coupon', 409);
+        const error = new CustomError('User has reached the usage limit for this coupon', 409, true, 'LIMIT_REACHED');
+        throw error;
       }
 
       // 8. Update coupon status to USED
@@ -162,6 +170,8 @@ export class CouponRedeemService {
         userUsedCount: sequence,
         sequence,
         usedAt: usedAtISO, // Return ISO 8601 format for API response
+        rewardEmailTitle: setting.rewardEmailTitle || null,
+        rewardEmailBody: setting.rewardEmailBody || null,
       };
     } catch (error) {
       await connection.rollback();
@@ -212,7 +222,8 @@ export class CouponRedeemService {
         [settingId, request.gameWorldId]
       );
       if ((worldMatch[0] as any).count === 0) {
-        throw new CustomError('Coupon is not available for this game world', 422);
+        const error = new CustomError('Coupon is not available for this game world', 422, true, 'UNPROCESSABLE_ENTITY');
+        throw error;
       }
     }
 
@@ -223,7 +234,8 @@ export class CouponRedeemService {
         [settingId, request.platform]
       );
       if ((platformMatch[0] as any).count === 0) {
-        throw new CustomError('Coupon is not available for this platform', 422);
+        const error = new CustomError('Coupon is not available for this platform', 422, true, 'UNPROCESSABLE_ENTITY');
+        throw error;
       }
     }
 
@@ -234,7 +246,8 @@ export class CouponRedeemService {
         [settingId, request.channel]
       );
       if ((channelMatch[0] as any).count === 0) {
-        throw new CustomError('Coupon is not available for this channel', 422);
+        const error = new CustomError('Coupon is not available for this channel', 422, true, 'UNPROCESSABLE_ENTITY');
+        throw error;
       }
     }
 
@@ -245,7 +258,8 @@ export class CouponRedeemService {
         [settingId, request.subchannel]
       );
       if ((subchannelMatch[0] as any).count === 0) {
-        throw new CustomError('Coupon is not available for this subchannel', 422);
+        const error = new CustomError('Coupon is not available for this subchannel', 422, true, 'UNPROCESSABLE_ENTITY');
+        throw error;
       }
     }
   }

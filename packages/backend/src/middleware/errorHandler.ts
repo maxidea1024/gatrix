@@ -9,11 +9,13 @@ export interface AppError extends Error {
 export class GatrixError extends Error implements AppError {
   public statusCode: number;
   public isOperational: boolean;
+  public code?: string;
 
-  constructor(message: string, statusCode: number = 500, isOperational: boolean = true) {
+  constructor(message: string, statusCode: number = 500, isOperational: boolean = true, code?: string) {
     super(message);
     this.statusCode = statusCode;
     this.isOperational = isOperational;
+    this.code = code;
 
     //TODO 개발 환경에서만 callstack을 추적하는게?
     Error.captureStackTrace(this, this.constructor);
@@ -97,6 +99,7 @@ export const errorHandler = (
   res.status(statusCode).json({
     success: false,
     error: {
+      code: (error as any).code || `ERROR_${statusCode}`,
       message,
       ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
       ...((error as any).validationErrors && { validationErrors: (error as any).validationErrors }),
