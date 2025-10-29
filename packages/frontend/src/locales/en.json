@@ -1496,6 +1496,8 @@
     "sdkGuideDrawer": {
       "title": "Client Version Query API",
       "subtitle": "Learn how to query your client version information from your client application.",
+      "tabGuide": "SDK Integration Guide",
+      "tabTest": "API Test",
       "description": "Your client application can query detailed version information based on platform, client version, and environment. The response includes game server address, patch server address, guest mode availability, and additional metadata from key-value settings.",
       "endpoint": "Endpoint",
       "method": "Method",
@@ -1519,6 +1521,7 @@
       "errorMissingParams": "Missing required parameters",
       "errorMissingHeaders": "Missing required headers",
       "errorNotFound": "Client version not found",
+      "apiTest": "API Test",
       "whitelistNote": "If the request is from a whitelisted IP address, the whitelist server addresses (gameServerAddressForWhiteList, patchAddressForWhiteList) will be returned if configured."
     }
   },
@@ -2894,6 +2897,8 @@
       "sdkGuideDrawer": {
         "title": "Coupon Redeem API Integration Guide",
         "subtitle": "Learn how to call the Coupon Redeem API from your client.",
+        "tabGuide": "SDK Integration Guide",
+        "tabTest": "API Test",
         "description": "Call the following API to redeem a coupon code and receive rewards.",
         "endpoint": "API Endpoint",
         "method": "Method",
@@ -2917,6 +2922,7 @@
         "error409LimitReached": "User usage limit exceeded",
         "error422": "Coupon period expired, targeting conditions not met, or input validation failed",
         "error429": "Too many requests for the same user/code (spam limit)",
+        "apiTest": "API Test",
         "copiedToClipboard": "Code copied to clipboard."
       },
       "columns": {

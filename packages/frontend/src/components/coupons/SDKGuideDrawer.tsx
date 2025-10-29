@@ -36,6 +36,22 @@ const SDKGuideDrawer: React.FC<SDKGuideDrawerProps> = ({ open, onClose }) => {
   const isDark = theme.palette.mode === 'dark';
   const { enqueueSnackbar } = useSnackbar();
 
+  // State for error response tabs
+  const [errorTabValue, setErrorTabValue] = useState(0);
+
+  // State for API test
+  const [apiToken, setApiToken] = useState('');
+  const [couponCode, setCouponCode] = useState('');
+  const [userId, setUserId] = useState('user123');
+  const [userName, setUserName] = useState('John Doe');
+  const [worldId, setWorldId] = useState('world01');
+  const [platform, setPlatform] = useState('ios');
+  const [channel, setChannel] = useState('app_store');
+  const [subChannel, setSubChannel] = useState('web');
+  const [testResponse, setTestResponse] = useState<any>(null);
+  const [testLoading, setTestLoading] = useState(false);
+  const [testError, setTestError] = useState<string | null>(null);
+
   // curl example code
   const curlExample = `# Coupon Redeem API Example
 curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
@@ -79,6 +95,55 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
     enqueueSnackbar(t('coupons.couponSettings.sdkGuideDrawer.copiedToClipboard'), {
       variant: 'success',
     });
+  };
+
+  const handleTestAPI = async () => {
+    if (!apiToken.trim()) {
+      setTestError('API Token is required');
+      return;
+    }
+
+    if (!couponCode.trim()) {
+      setTestError('Coupon Code is required');
+      return;
+    }
+
+    setTestLoading(true);
+    setTestError(null);
+    setTestResponse(null);
+
+    try {
+      const response = await fetch(
+        `/api/v1/server/coupons/${couponCode}/redeem`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Application-Name': 'AdminTestClient',
+            'X-API-Token': apiToken,
+          },
+          body: JSON.stringify({
+            userId,
+            userName,
+            worldId,
+            platform,
+            channel,
+            subChannel,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      setTestResponse(data);
+
+      if (!response.ok) {
+        setTestError(`HTTP ${response.status}`);
+      }
+    } catch (error) {
+      setTestError(error instanceof Error ? error.message : 'Unknown error occurred');
+    } finally {
+      setTestLoading(false);
+    }
   };
 
   const CodeBlock: React.FC<{ code: string; language: string; title?: string }> = ({
@@ -236,6 +301,153 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
           curl {t('common.example') || 'Example'}
         </Typography>
         <CodeBlock code={curlExample} language="bash" />
+
+        <Divider sx={{ my: 3 }} />
+
+        {/* API Test Section */}
+        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+          {t('coupons.couponSettings.sdkGuideDrawer.apiTest') || 'API Test'}
+        </Typography>
+
+        <Box sx={{ mb: 3 }}>
+          <Stack spacing={2} sx={{ mb: 2 }}>
+            <TextField
+              label="X-API-Token"
+              type="password"
+              value={apiToken}
+              onChange={(e) => setApiToken(e.target.value)}
+              size="small"
+              fullWidth
+              placeholder="Enter your API token"
+            />
+            <TextField
+              label="Coupon Code"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value)}
+              size="small"
+              fullWidth
+              placeholder="e.g., ABC123XYZ"
+            />
+            <TextField
+              label="User ID"
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+              size="small"
+              fullWidth
+            />
+            <TextField
+              label="User Name"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              size="small"
+              fullWidth
+            />
+            <TextField
+              label="World ID"
+              value={worldId}
+              onChange={(e) => setWorldId(e.target.value)}
+              size="small"
+              fullWidth
+            />
+            <TextField
+              label="Platform"
+              value={platform}
+              onChange={(e) => setPlatform(e.target.value)}
+              size="small"
+              fullWidth
+              placeholder="e.g., ios, android"
+            />
+            <TextField
+              label="Channel"
+              value={channel}
+              onChange={(e) => setChannel(e.target.value)}
+              size="small"
+              fullWidth
+              placeholder="e.g., app_store"
+            />
+            <TextField
+              label="Sub Channel"
+              value={subChannel}
+              onChange={(e) => setSubChannel(e.target.value)}
+              size="small"
+              fullWidth
+              placeholder="e.g., web"
+            />
+          </Stack>
+
+          <Button
+            variant="contained"
+            startIcon={testLoading ? <CircularProgress size={20} /> : <PlayArrowIcon />}
+            onClick={handleTestAPI}
+            disabled={testLoading}
+            fullWidth
+          >
+            {testLoading ? 'Testing...' : 'Test API'}
+          </Button>
+        </Box>
+
+        {testError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {testError}
+          </Alert>
+        )}
+
+        {testResponse && (
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+              Response:
+            </Typography>
+            <Box
+              sx={{
+                position: 'relative',
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: 1,
+                overflow: 'hidden',
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  p: 0.5,
+                  backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
+                  borderBottom: `1px solid ${theme.palette.divider}`,
+                }}
+              >
+                <Tooltip title={t('common.copy') || 'Copy'}>
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      handleCopyCode(JSON.stringify(testResponse, null, 2));
+                    }}
+                    sx={{ color: 'primary.main' }}
+                  >
+                    <ContentCopyIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+              <Box sx={{ height: 300, overflow: 'hidden' }}>
+                <Editor
+                  height="100%"
+                  language="json"
+                  value={JSON.stringify(testResponse, null, 2)}
+                  theme={isDark ? 'vs-dark' : 'light'}
+                  options={{
+                    readOnly: true,
+                    minimap: { enabled: false },
+                    scrollBeyondLastLine: false,
+                    wordWrap: 'on',
+                    automaticLayout: true,
+                    fontSize: 12,
+                    lineNumbers: 'on',
+                    folding: true,
+                    padding: { top: 8, bottom: 8 },
+                  }}
+                />
+              </Box>
+            </Box>
+          </Box>
+        )}
 
         <Divider sx={{ my: 3 }} />
 

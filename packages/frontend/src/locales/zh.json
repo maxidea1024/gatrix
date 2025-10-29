@@ -1574,6 +1574,7 @@
       "errorMissingParams": "缺少必需参数",
       "errorMissingHeaders": "缺少必需标头",
       "errorNotFound": "找不到客户端版本",
+      "apiTest": "API 测试",
       "whitelistNote": "如果请求来自白名单 IP 地址，如果配置了白名单服务器地址（gameServerAddressForWhiteList、patchAddressForWhiteList），将返回这些地址。"
     }
   },
@@ -3030,6 +3031,7 @@
         "error409LimitReached": "超过用户使用限制",
         "error422": "优惠券已过期、不符合目标条件或输入验证失败",
         "error429": "同一用户/代码的请求过多（垃圾邮件限制）",
+        "apiTest": "API 测试",
         "copiedToClipboard": "代码已复制到剪贴板。"
       }
     },

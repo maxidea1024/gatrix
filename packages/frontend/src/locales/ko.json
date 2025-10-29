@@ -1496,6 +1496,8 @@
     "sdkGuideDrawer": {
       "title": "클라이언트 버전 조회 API",
       "subtitle": "클라이언트 애플리케이션에서 자신의 버전 정보를 조회하는 방법을 안내합니다.",
+      "tabGuide": "SDK 연동 가이드",
+      "tabTest": "API 테스트",
       "description": "클라이언트 애플리케이션에서 플랫폼, 클라이언트 버전, 환경 정보를 기반으로 해당 버전의 상세 정보를 조회할 수 있습니다. 응답에는 게임 서버 주소, 패치 서버 주소, 게스트 모드 허용 여부 등의 정보가 포함됩니다.",
       "endpoint": "엔드포인트",
       "method": "메서드",
@@ -1519,6 +1521,7 @@
       "errorMissingParams": "필수 파라미터 누락",
       "errorMissingHeaders": "필수 헤더 누락",
       "errorNotFound": "클라이언트 버전을 찾을 수 없음",
+      "apiTest": "API 테스트",
       "whitelistNote": "화이트리스트 IP 주소에서 요청하는 경우, 화이트리스트 서버 주소(gameServerAddressForWhiteList, patchAddressForWhiteList)가 설정되어 있으면 해당 주소로 응답됩니다."
     }
   },
@@ -2894,6 +2897,8 @@
       "sdkGuideDrawer": {
         "title": "쿠폰 사용 API 연동 가이드",
         "subtitle": "클라이언트에서 쿠폰 Redeem API를 호출하는 방법을 안내합니다.",
+        "tabGuide": "SDK 연동 가이드",
+        "tabTest": "API 테스트",
         "description": "쿠폰 코드를 사용하여 보상을 받기 위해 다음 API를 호출합니다.",
         "endpoint": "API 엔드포인트",
         "method": "메서드",
@@ -2917,6 +2922,7 @@
         "error409LimitReached": "사용자별 사용 한도 초과",
         "error422": "쿠폰 기간 만료, 타겟팅 조건 불일치, 또는 입력값 유효성 실패",
         "error429": "동일 사용자/코드에 대한 과도한 요청 (스팸 제한)",
+        "apiTest": "API 테스트",
         "copiedToClipboard": "코드가 클립보드에 복사되었습니다."
       },
       "columns": {
