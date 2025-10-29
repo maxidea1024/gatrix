@@ -118,7 +118,7 @@ export class CouponSettingsController {
 
   static usage = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
     const { id } = req.params;
-    const { page, limit, search, platform, gameWorldId, characterId, from, to } = req.query;
+    const { page, limit, search, platform, channel, subChannel, gameWorldId, characterId, from, to } = req.query;
 
     // If id is provided, get usage for specific coupon setting
     // If id is not provided, get usage for all coupon settings
@@ -127,6 +127,8 @@ export class CouponSettingsController {
       limit: limit ? parseInt(limit as string) : undefined,
       search: search as string,
       platform: platform as string,
+      channel: channel as string,
+      subChannel: subChannel as string,
       gameWorldId: gameWorldId as string,
       characterId: characterId as string,
       from: from as string,

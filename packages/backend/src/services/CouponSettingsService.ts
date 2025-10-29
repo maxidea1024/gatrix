@@ -516,6 +516,18 @@ export class CouponSettingsService {
       args.push(query.platform);
     }
 
+    // Optional: filter by channel
+    if (query.channel) {
+      where.push('cu.channel = ?');
+      args.push(query.channel);
+    }
+
+    // Optional: filter by subchannel
+    if (query.subChannel) {
+      where.push('cu.subchannel = ?');
+      args.push(query.subChannel);
+    }
+
     // Optional: filter by game world
     if (query.gameWorldId) {
       where.push('cu.gameWorldId = ?');

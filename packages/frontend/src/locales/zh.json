@@ -1435,6 +1435,7 @@
     "addBulk": "快速添加",
     "bulkAdd": "批量添加客户端版本",
     "bulkCreate": "批量创建",
+    "bulkCreateSuccess": "已成功创建 {{count}} 个客户端版本。",
     "bulkCreateFailed": "客户端版本创建失败",
     "creating": "正在创建客户端版本...",
     "bulkDeleteError": "批量删除错误",
@@ -3084,6 +3085,8 @@
         "coupon": "优惠券",
         "couponCode": "优惠券代码",
         "platform": "平台",
+        "channel": "频道",
+        "subChannel": "子频道",
         "gameWorldId": "游戏世界",
         "characterId": "角色ID"
       },
@@ -3099,7 +3102,9 @@
         "couponStartsAt": "优惠券开始日期",
         "couponExpiresAt": "优惠券过期日期",
         "gameWorldId": "游戏世界",
-        "platform": "平台"
+        "platform": "平台",
+        "channel": "频道",
+        "subChannel": "子频道"
       }
     },
     "subtitle": "创建和管理游戏优惠券"

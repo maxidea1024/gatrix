@@ -1380,6 +1380,7 @@
     "addBulk": "간편 추가",
     "bulkAdd": "간편 버전 추가",
     "bulkCreate": "간편 생성",
+    "bulkCreateSuccess": "{{count}}개의 클라이언트 버전이 생성되었습니다.",
     "bulkCreateFailed": "클라이언트 버전 생성에 실패했습니다",
     "creating": "클라이언트 버전 생성 중...",
     "bulkDeleteError": "일괄 삭제 오류",
@@ -3040,6 +3041,8 @@
         "coupon": "쿠폰",
         "couponCode": "쿠폰 코드",
         "platform": "플랫폼",
+        "channel": "채널",
+        "subChannel": "서브채널",
         "gameWorldId": "게임 월드",
         "characterId": "캐릭터 ID"
       },
@@ -3055,7 +3058,9 @@
         "couponStartsAt": "쿠폰 시작일",
         "couponExpiresAt": "쿠폰 종료일",
         "gameWorldId": "게임 월드",
-        "platform": "플랫폼"
+        "platform": "플랫폼",
+        "channel": "채널",
+        "subChannel": "서브채널"
       }
     },
     "subtitle": "게임 쿠폰을 생성하고 관리합니다"

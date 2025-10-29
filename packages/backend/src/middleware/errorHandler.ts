@@ -101,7 +101,6 @@ export const errorHandler = (
     error: {
       code: (error as any).code || `ERROR_${statusCode}`,
       message,
-      ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
       ...((error as any).validationErrors && { validationErrors: (error as any).validationErrors }),
     },
   });
