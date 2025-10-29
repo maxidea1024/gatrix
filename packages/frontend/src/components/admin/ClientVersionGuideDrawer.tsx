@@ -67,7 +67,7 @@ const ClientVersionGuideDrawer: React.FC<ClientVersionGuideDrawerProps> = ({ ope
   const [testStatus, setTestStatus] = useState<number | null>(null);
   const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>({});
   const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
-  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(false);
+  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(true);
   const [expandedResponseHeaders, setExpandedResponseHeaders] = useState(false);
 
   // Load saved values from localStorage on mount
@@ -184,6 +184,7 @@ curl -X GET "http://localhost:5000/api/v1/client/client-version?platform=ios&ver
     setTestDuration(null);
     setRequestHeaders({});
     setResponseHeaders({});
+    // Collapse Request and prepare to expand Response
     setExpandedRequestHeaders(false);
     setExpandedResponseHeaders(false);
 
@@ -228,6 +229,9 @@ curl -X GET "http://localhost:5000/api/v1/client/client-version?platform=ios&ver
 
       const data = await response.json();
       setTestResponse(data);
+
+      // Expand Response section when response is received
+      setExpandedResponseHeaders(true);
 
       if (!response.ok) {
         setTestError(`HTTP ${response.status}: ${data.message || 'Request failed'}`);
@@ -607,168 +611,172 @@ curl -X GET "http://localhost:5000/api/v1/client/client-version?platform=ios&ver
         {/* Tab 2: API Test */}
         {mainTabValue === 1 && (
           <>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-              {t('clientVersions.sdkGuideDrawer.apiTest') || 'API Test'}
-            </Typography>
-
+            {/* REQUEST SECTION */}
             <Box sx={{ mb: 3 }}>
-              <Stack spacing={2} sx={{ mb: 2 }}>
-                <TextField
-                  label="API Token"
-                  type="password"
-                  value={apiToken}
-                  onChange={(e) => setApiToken(e.target.value)}
-                  size="small"
-                  fullWidth
-                  placeholder="Enter your API token"
-                />
-                <TextField
-                  label="Platform"
-                  value={platform}
-                  onChange={(e) => setPlatform(e.target.value)}
-                  size="small"
-                  fullWidth
-                  placeholder="e.g., ios, android, pc"
-                />
-                <TextField
-                  label="Version"
-                  value={version}
-                  onChange={(e) => setVersion(e.target.value)}
-                  size="small"
-                  fullWidth
-                  placeholder="e.g., 1.0.0"
-                />
-                <TextField
-                  label="Language (optional)"
-                  value={lang}
-                  onChange={(e) => setLang(e.target.value)}
-                  size="small"
-                  fullWidth
-                  placeholder="e.g., ko, en, zh"
-                />
-              </Stack>
-
-              <Button
-                variant="contained"
-                startIcon={testLoading ? <CircularProgress size={16} sx={{ color: 'inherit' }} /> : <PlayArrowIcon />}
-                onClick={handleTestAPI}
-                disabled={testLoading}
-                fullWidth
+              <Box
+                onClick={() => setExpandedRequestHeaders(!expandedRequestHeaders)}
+                sx={{
+                  p: 1.5,
+                  backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                  borderRadius: 1,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#3d3d3d' : '#eeeeee' },
+                }}
               >
-                Test API
-              </Button>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  Request
+                </Typography>
+                <Box sx={{ transform: expandedRequestHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
+                  ▼
+                </Box>
+              </Box>
+              <Collapse in={expandedRequestHeaders}>
+                <Box sx={{ p: 2, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
+                  {/* Parameters */}
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+                      Parameters
+                    </Typography>
+                    <Stack spacing={2} sx={{ pl: 1 }}>
+                      <TextField
+                        label="API Token"
+                        type="password"
+                        value={apiToken}
+                        onChange={(e) => setApiToken(e.target.value)}
+                        size="small"
+                        fullWidth
+                        placeholder="Enter your API token"
+                      />
+                      <TextField
+                        label="Platform"
+                        value={platform}
+                        onChange={(e) => setPlatform(e.target.value)}
+                        size="small"
+                        fullWidth
+                        placeholder="e.g., ios, android, pc"
+                      />
+                      <TextField
+                        label="Version"
+                        value={version}
+                        onChange={(e) => setVersion(e.target.value)}
+                        size="small"
+                        fullWidth
+                        placeholder="e.g., 1.0.0"
+                      />
+                      <TextField
+                        label="Language (optional)"
+                        value={lang}
+                        onChange={(e) => setLang(e.target.value)}
+                        size="small"
+                        fullWidth
+                        placeholder="e.g., ko, en, zh"
+                      />
+                    </Stack>
+                  </Box>
+
+                  {/* Request Headers */}
+                  {Object.keys(requestHeaders).length > 0 && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                        Headers ({Object.keys(requestHeaders).length})
+                      </Typography>
+                      <Stack spacing={0.5} sx={{ pl: 1 }}>
+                        {Object.entries(requestHeaders).map(([key, value]) => (
+                          <Box key={key} sx={{ display: 'flex', gap: 1 }}>
+                            <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 150, color: 'primary.main' }}>
+                              {key}:
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', wordBreak: 'break-all' }}>
+                              {String(value)}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </Stack>
+                    </Box>
+                  )}
+
+                  {/* Test Button */}
+                  <Button
+                    variant="contained"
+                    startIcon={testLoading ? <CircularProgress size={16} sx={{ color: 'inherit' }} /> : <PlayArrowIcon />}
+                    onClick={handleTestAPI}
+                    disabled={testLoading}
+                    fullWidth
+                  >
+                    Test API
+                  </Button>
+                </Box>
+              </Collapse>
             </Box>
 
-            {testError && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {testError}
-              </Alert>
-            )}
-
+            {/* RESPONSE SECTION */}
             {testResponse && (
               <Box sx={{ mb: 3 }}>
-                {/* Status and Duration */}
-                <Box sx={{ mb: 2, p: 1.5, backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5', borderRadius: 1 }}>
-                  <Stack direction="row" spacing={3}>
-                    <Box>
-                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>Status</Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        {testStatus} {testStatus === 200 ? 'OK' : testStatus === 404 ? 'Not Found' : testStatus === 400 ? 'Bad Request' : 'Error'}
-                      </Typography>
-                    </Box>
-                    {testDuration !== null && (
-                      <Box>
-                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>Time</Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{testDuration}ms</Typography>
+                <Box
+                  onClick={() => setExpandedResponseHeaders(!expandedResponseHeaders)}
+                  sx={{
+                    p: 1.5,
+                    backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                    borderRadius: 1,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#3d3d3d' : '#eeeeee' },
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      Response
+                    </Typography>
+                    {testStatus && (
+                      <Box sx={{ display: 'flex', gap: 2 }}>
+                        <Box>
+                          <Typography variant="caption" sx={{ color: 'text.secondary' }}>Status</Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {testStatus} {testStatus === 200 ? 'OK' : testStatus === 404 ? 'Not Found' : testStatus === 400 ? 'Bad Request' : 'Error'}
+                          </Typography>
+                        </Box>
+                        {testDuration !== null && (
+                          <Box>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>Time</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>{testDuration}ms</Typography>
+                          </Box>
+                        )}
+                        {Object.keys(responseHeaders).length > 0 && (
+                          <Box>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>Size</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              {new Blob([JSON.stringify(testResponse)]).size} bytes
+                            </Typography>
+                          </Box>
+                        )}
                       </Box>
                     )}
-                    {Object.keys(requestHeaders).length > 0 && (
-                      <Box>
-                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>Request Size</Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {new Blob([JSON.stringify(requestHeaders)]).size} bytes
-                        </Typography>
-                      </Box>
-                    )}
-                    {Object.keys(responseHeaders).length > 0 && (
-                      <Box>
-                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>Response Size</Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {new Blob([JSON.stringify(testResponse)]).size} bytes
-                        </Typography>
-                      </Box>
-                    )}
-                  </Stack>
-                </Box>
-
-                {/* Request Headers */}
-                {Object.keys(requestHeaders).length > 0 && (
-                  <Box sx={{ mb: 2 }}>
-                    <Box
-                      onClick={() => setExpandedRequestHeaders(!expandedRequestHeaders)}
-                      sx={{
-                        p: 1,
-                        backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
-                        borderRadius: 1,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#3d3d3d' : '#eeeeee' },
-                      }}
-                    >
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        Request Headers ({Object.keys(requestHeaders).length})
-                      </Typography>
-                      <Box sx={{ transform: expandedRequestHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
-                        ▼
-                      </Box>
-                    </Box>
-                    <Collapse in={expandedRequestHeaders}>
-                      <Box sx={{ p: 1.5, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
-                        <Stack spacing={0.5}>
-                          {Object.entries(requestHeaders).map(([key, value]) => (
-                            <Box key={key} sx={{ display: 'flex', gap: 1 }}>
-                              <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 150, color: 'primary.main' }}>
-                                {key}:
-                              </Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary', wordBreak: 'break-all' }}>
-                                {String(value)}
-                              </Typography>
-                            </Box>
-                          ))}
-                        </Stack>
-                      </Box>
-                    </Collapse>
                   </Box>
-                )}
+                  <Box sx={{ transform: expandedResponseHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
+                    ▼
+                  </Box>
+                </Box>
+                <Collapse in={expandedResponseHeaders}>
+                  <Box sx={{ p: 2, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
+                    {/* Error Message */}
+                    {testError && (
+                      <Alert severity="error" sx={{ mb: 2 }}>
+                        {testError}
+                      </Alert>
+                    )}
 
-                {/* Response Headers */}
-                {Object.keys(responseHeaders).length > 0 && (
-                  <Box sx={{ mb: 2 }}>
-                    <Box
-                      onClick={() => setExpandedResponseHeaders(!expandedResponseHeaders)}
-                      sx={{
-                        p: 1,
-                        backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
-                        borderRadius: 1,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#3d3d3d' : '#eeeeee' },
-                      }}
-                    >
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        Response Headers ({Object.keys(responseHeaders).length})
-                      </Typography>
-                      <Box sx={{ transform: expandedResponseHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
-                        ▼
-                      </Box>
-                    </Box>
-                    <Collapse in={expandedResponseHeaders}>
-                      <Box sx={{ p: 1.5, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
-                        <Stack spacing={0.5}>
+                    {/* Response Headers */}
+                    {Object.keys(responseHeaders).length > 0 && (
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                          Headers ({Object.keys(responseHeaders).length})
+                        </Typography>
+                        <Stack spacing={0.5} sx={{ pl: 1 }}>
                           {Object.entries(responseHeaders).map(([key, value]) => (
                             <Box key={key} sx={{ display: 'flex', gap: 1 }}>
                               <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 150, color: 'primary.main' }}>
@@ -781,63 +789,65 @@ curl -X GET "http://localhost:5000/api/v1/client/client-version?platform=ios&ver
                           ))}
                         </Stack>
                       </Box>
-                    </Collapse>
-                  </Box>
-                )}
+                    )}
 
-                {/* Response Body */}
-                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                  Response Body:
-                </Typography>
-                <Box
-                  sx={{
-                    position: 'relative',
-                    border: `1px solid ${theme.palette.divider}`,
-                    borderRadius: 1,
-                    overflow: 'hidden',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'flex-end',
-                      p: 0.5,
-                      backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
-                      borderBottom: `1px solid ${theme.palette.divider}`,
-                    }}
-                  >
-                    <Tooltip title={t('common.copy') || 'Copy'}>
-                      <IconButton
-                        size="small"
-                        onClick={() => {
-                          handleCopyCode(JSON.stringify(testResponse, null, 2));
+                    {/* Response Body */}
+                    <Box>
+                      <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                        Body
+                      </Typography>
+                      <Box
+                        sx={{
+                          position: 'relative',
+                          border: `1px solid ${theme.palette.divider}`,
+                          borderRadius: 1,
+                          overflow: 'hidden',
                         }}
-                        sx={{ color: 'primary.main' }}
                       >
-                        <ContentCopyIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            p: 0.5,
+                            backgroundColor: theme.palette.mode === 'dark' ? '#0e0e0e' : '#f0f0f0',
+                            borderBottom: `1px solid ${theme.palette.divider}`,
+                          }}
+                        >
+                          <Tooltip title={t('common.copy') || 'Copy'}>
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                handleCopyCode(JSON.stringify(testResponse, null, 2));
+                              }}
+                              sx={{ color: 'primary.main' }}
+                            >
+                              <ContentCopyIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                        <Box sx={{ height: 300, overflow: 'hidden' }}>
+                          <Editor
+                            height="100%"
+                            language="json"
+                            value={JSON.stringify(testResponse, null, 2)}
+                            theme={isDark ? 'vs-dark' : 'light'}
+                            options={{
+                              readOnly: true,
+                              minimap: { enabled: false },
+                              scrollBeyondLastLine: false,
+                              wordWrap: 'on',
+                              automaticLayout: true,
+                              fontSize: 12,
+                              lineNumbers: 'on',
+                              folding: true,
+                              padding: { top: 8, bottom: 8 },
+                            }}
+                          />
+                        </Box>
+                      </Box>
+                    </Box>
                   </Box>
-                  <Box sx={{ height: 300, overflow: 'hidden' }}>
-                    <Editor
-                      height="100%"
-                      language="json"
-                      value={JSON.stringify(testResponse, null, 2)}
-                      theme={isDark ? 'vs-dark' : 'light'}
-                      options={{
-                        readOnly: true,
-                        minimap: { enabled: false },
-                        scrollBeyondLastLine: false,
-                        wordWrap: 'on',
-                        automaticLayout: true,
-                        fontSize: 12,
-                        lineNumbers: 'on',
-                        folding: true,
-                        padding: { top: 8, bottom: 8 },
-                      }}
-                    />
-                  </Box>
-                </Box>
+                </Collapse>
               </Box>
             )}
           </>
