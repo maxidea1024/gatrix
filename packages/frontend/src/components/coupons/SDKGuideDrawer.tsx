@@ -8,10 +8,16 @@ import {
   Divider,
   Alert,
   Paper,
+  Tabs,
+  Tab,
+  TextField,
+  Button,
+  CircularProgress,
 } from '@mui/material';
 import {
   Close as CloseIcon,
   ContentCopy as ContentCopyIcon,
+  PlayArrow as PlayArrowIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@mui/material/styles';
@@ -34,14 +40,15 @@ const SDKGuideDrawer: React.FC<SDKGuideDrawerProps> = ({ open, onClose }) => {
   const curlExample = `# Coupon Redeem API Example
 curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
   -H "Content-Type: application/json" \\
+  -H "X-Application-Name: MyGameApp" \\
   -H "X-API-Token: your-api-token-here" \\
   -d '{
     "userId": "user123",
     "userName": "John Doe",
     "worldId": "world01",
     "platform": "ios",
-    "channel": "kakao",
-    "subChannel": "google"
+    "channel": "app_store",
+    "subChannel": "web"
   }'`;
 
   // JSON request example
@@ -50,8 +57,8 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
   "userName": "John Doe",
   "worldId": "world01",
   "platform": "ios",
-  "channel": "kakao",
-  "subChannel": "google"
+  "channel": "app_store",
+  "subChannel": "web"
 }`;
 
   // JSON response example

@@ -1557,12 +1557,24 @@
       "parameters": "参数",
       "paramPlatform": "客户端运行的平台（必需，例如：ios、android、pc）",
       "paramClientVersion": "客户端的当前版本（必需，例如：1.0.0）",
-      "paramEnvironment": "环境信息（必需，例如：production、staging）",
+      "paramLang": "维护消息的语言（可选，例如：ko、en、zh）",
       "requiredHeaders": "必需的标头",
+      "headerAppName": "应用程序名称",
+      "headerApiToken": "API 身份验证令牌",
       "headerContentType": "请求正文的内容类型 (application/json)",
       "requestBody": "请求正文",
       "responseExample": "响应示例",
-      "responseDescription": "响应包括游戏服务器地址、补丁服务器地址、访客模式可用性以及键值设置中管理的其他元数据。"
+      "responseDescription": "响应包括游戏服务器地址、补丁服务器地址、访客模式可用性、状态以及键值设置中管理的其他元数据。",
+      "responseStatus": "状态字段",
+      "responseStatusDesc": "客户端版本的状态（ONLINE、MAINTENANCE、OFFLINE 等）",
+      "maintenanceResponse": "维护状态响应示例",
+      "maintenanceResponseDesc": "当状态为 MAINTENANCE 时，maintenanceMessage 字段包含维护消息，guestModeAllowed 设置为 false。",
+      "errorResponses": "错误响应示例",
+      "errorResponsesDesc": "各种错误情况的响应示例。",
+      "errorMissingParams": "缺少必需参数",
+      "errorMissingHeaders": "缺少必需标头",
+      "errorNotFound": "找不到客户端版本",
+      "whitelistNote": "如果请求来自白名单 IP 地址，如果配置了白名单服务器地址（gameServerAddressForWhiteList、patchAddressForWhiteList），将返回这些地址。"
     }
   },
   "common": {
@@ -1798,7 +1810,8 @@
       "bannerActive": "服务当前处于维护中"
     },
     "connectionLostRefresh": "连接已断开。请刷新页面。",
-    "comingSoon": "即将推出"
+    "comingSoon": "即将推出",
+    "note": "注意"
   },
   "createdAt": "createdAt",
   "dashboard": {

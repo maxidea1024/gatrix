@@ -1502,12 +1502,24 @@
       "parameters": "파라미터",
       "paramPlatform": "클라이언트가 실행 중인 플랫폼 (필수, 예: ios, android, pc)",
       "paramClientVersion": "클라이언트의 현재 버전 (필수, 예: 1.0.0)",
-      "paramEnvironment": "환경 정보 (필수, 예: production, staging)",
+      "paramLang": "점검 메시지 언어 (선택, 예: ko, en, zh)",
       "requiredHeaders": "필수 헤더",
+      "headerAppName": "애플리케이션 이름",
+      "headerApiToken": "API 인증 토큰",
       "headerContentType": "요청 본문의 콘텐츠 타입 (application/json)",
       "requestBody": "요청 본문",
       "responseExample": "응답 예시",
-      "responseDescription": "응답에는 게임 서버 주소, 패치 서버 주소, 게스트 모드 허용 여부, 그리고 키-값 설정에서 관리하는 추가 메타데이터가 포함됩니다."
+      "responseDescription": "응답에는 게임 서버 주소, 패치 서버 주소, 게스트 모드 허용 여부, 상태, 그리고 키-값 설정에서 관리하는 추가 메타데이터가 포함됩니다.",
+      "responseStatus": "상태 필드",
+      "responseStatusDesc": "클라이언트 버전의 상태 (ONLINE, MAINTENANCE, OFFLINE 등)",
+      "maintenanceResponse": "점검 상태 응답 예시",
+      "maintenanceResponseDesc": "상태가 MAINTENANCE일 경우, maintenanceMessage 필드에 점검 메시지가 포함되며, guestModeAllowed는 false로 설정됩니다.",
+      "errorResponses": "오류 응답 예시",
+      "errorResponsesDesc": "다양한 오류 상황에 대한 응답 예시입니다.",
+      "errorMissingParams": "필수 파라미터 누락",
+      "errorMissingHeaders": "필수 헤더 누락",
+      "errorNotFound": "클라이언트 버전을 찾을 수 없음",
+      "whitelistNote": "화이트리스트 IP 주소에서 요청하는 경우, 화이트리스트 서버 주소(gameServerAddressForWhiteList, patchAddressForWhiteList)가 설정되어 있으면 해당 주소로 응답됩니다."
     }
   },
   "common": {
@@ -1743,7 +1755,8 @@
       "bannerActive": "현재 서비스 점검이 진행 중입니다"
     },
     "connectionLostRefresh": "연결이 끊어졌습니다. 페이지를 새로고침해주세요.",
-    "comingSoon": "준비 중입니다"
+    "comingSoon": "준비 중입니다",
+    "note": "참고"
   },
   "createdAt": "생성일",
   "dashboard": {

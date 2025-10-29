@@ -42,6 +42,7 @@ import {
   ListItemText,
   ClickAwayListener,
   Checkbox,
+  Divider,
 } from '@mui/material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import {

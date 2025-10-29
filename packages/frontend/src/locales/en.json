@@ -1502,12 +1502,24 @@
       "parameters": "Parameters",
       "paramPlatform": "Platform where the client is running (required, e.g., ios, android, pc)",
       "paramClientVersion": "Current version of the client (required, e.g., 1.0.0)",
-      "paramEnvironment": "Environment information (required, e.g., production, staging)",
+      "paramLang": "Language for maintenance message (optional, e.g., ko, en, zh)",
       "requiredHeaders": "Required Headers",
+      "headerAppName": "Application name",
+      "headerApiToken": "API authentication token",
       "headerContentType": "Content type of request body (application/json)",
       "requestBody": "Request Body",
       "responseExample": "Response Example",
-      "responseDescription": "The response includes game server address, patch server address, guest mode availability, and additional metadata managed in key-value settings."
+      "responseDescription": "The response includes game server address, patch server address, guest mode availability, status, and additional metadata managed in key-value settings.",
+      "responseStatus": "Status Field",
+      "responseStatusDesc": "Status of the client version (ONLINE, MAINTENANCE, OFFLINE, etc.)",
+      "maintenanceResponse": "Maintenance Status Response Example",
+      "maintenanceResponseDesc": "When status is MAINTENANCE, the maintenanceMessage field contains the maintenance message, and guestModeAllowed is set to false.",
+      "errorResponses": "Error Response Examples",
+      "errorResponsesDesc": "Response examples for various error scenarios.",
+      "errorMissingParams": "Missing required parameters",
+      "errorMissingHeaders": "Missing required headers",
+      "errorNotFound": "Client version not found",
+      "whitelistNote": "If the request is from a whitelisted IP address, the whitelist server addresses (gameServerAddressForWhiteList, patchAddressForWhiteList) will be returned if configured."
     }
   },
   "common": {
@@ -1743,7 +1755,8 @@
       "bannerActive": "The service is currently under maintenance"
     },
     "connectionLostRefresh": "Connection lost. Please refresh the page.",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "note": "Note"
   },
   "createdAt": "createdAt",
   "dashboard": {

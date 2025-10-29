@@ -534,4 +534,18 @@ export class ClientVersionModel {
       throw error;
     }
   }
+
+  static async getMaintenanceLocales(clientVersionId: number): Promise<ClientVersionMaintenanceLocale[]> {
+    try {
+      const locales = await db('g_client_version_maintenance_locales')
+        .select(['lang', 'message'])
+        .where('clientVersionId', clientVersionId)
+        .orderBy('lang');
+
+      return locales;
+    } catch (error) {
+      logger.error('Error getting maintenance locales:', error);
+      throw error;
+    }
+  }
 }

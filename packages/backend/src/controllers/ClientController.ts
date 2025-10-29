@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { ClientVersionService } from '../services/ClientVersionService';
+import { ClientVersionModel, ClientStatus } from '../models/ClientVersion';
 import { GameWorldService } from '../services/GameWorldService';
 import { cacheService } from '../services/CacheService';
 import { pubSubService } from '../services/PubSubService';
@@ -7,25 +8,53 @@ import { GAME_WORLDS, DEFAULT_CONFIG } from '../constants/cacheKeys';
 import logger from '../config/logger';
 import { asyncHandler } from '../utils/asyncHandler';
 import VarsModel from '../models/Vars';
+import { IpWhitelistService } from '../services/IpWhitelistService';
 
 export class ClientController {
+  /**
+   * Extract client IP address from request
+   */
+  private static getClientIp(req: Request): string {
+    let clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0] ||
+                   req.socket.remoteAddress ||
+                   '';
+
+    // Remove "::ffff:" prefix from IPv4-mapped IPv6 addresses
+    if (clientIp.startsWith('::ffff:')) {
+      clientIp = clientIp.substring(7);
+    }
+
+    return clientIp.trim();
+  }
+
   /**
    * Get client version information
    * GET /api/v1/client/client-version
    */
   static getClientVersion = asyncHandler(async (req: Request, res: Response) => {
-    const { platform, version, environment } = req.query as { platform?: string; version?: string, environment?: string };
+    const { platform, version, lang } = req.query as { platform?: string; version?: string; lang?: string };
 
     // Validate required query params
-    if (!platform || !version || !environment) {
+    if (!platform || !version) {
       return res.status(400).json({
         success: false,
         message: 'platform and version are required query parameters',
       });
     }
 
-    // Create cache key for exact match
-    const cacheKey = `client_version:${platform}:${version}:${environment}`;
+    // Validate required headers
+    const appName = req.headers['x-application-name'];
+    const apiToken = req.headers['x-api-token'];
+
+    if (!appName || !apiToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'X-Application-Name and X-API-Token headers are required',
+      });
+    }
+
+    // Create cache key for exact match (without environment)
+    const cacheKey = `client_version:${platform}:${version}`;
 
     // Try to get from cache first
     const cachedData = cacheService.get(cacheKey);
@@ -51,36 +80,87 @@ export class ClientController {
     }
 
     // Get clientVersionPassiveData from KV settings
-    let meta = {};
+    let passiveData = {};
     try {
       const passiveDataStr = await VarsModel.get('kv:clientVersionPassiveData');
       if (passiveDataStr) {
-        meta = JSON.parse(passiveDataStr);
+        passiveData = JSON.parse(passiveDataStr);
       }
     } catch (error) {
       logger.warn('Failed to parse clientVersionPassiveData:', error);
     }
 
+    // Parse customPayload
+    let customPayload = {};
+    try {
+      if (record.customPayload) {
+        customPayload = JSON.parse(record.customPayload);
+      }
+    } catch (error) {
+      logger.warn('Failed to parse customPayload:', error);
+    }
+
+    // Merge meta: passiveData first, then customPayload (customPayload overwrites)
+    const meta = { ...passiveData, ...customPayload };
+
+    // Get client IP and check whitelist
+    const clientIp = this.getClientIp(req);
+    let gameServerAddress = record.gameServerAddress;
+    let patchAddress = record.patchAddress;
+
+    if (clientIp) {
+      const isWhitelisted = await IpWhitelistService.isIpWhitelisted(clientIp);
+      if (isWhitelisted) {
+        // Use whitelist addresses if available
+        if (record.gameServerAddressForWhiteList) {
+          gameServerAddress = record.gameServerAddressForWhiteList;
+        }
+        if (record.patchAddressForWhiteList) {
+          patchAddress = record.patchAddressForWhiteList;
+        }
+      }
+    }
+
+    // Get maintenance message if status is MAINTENANCE
+    let maintenanceMessage: string | undefined;
+    if (record.clientStatus === ClientStatus.MAINTENANCE && record.id) {
+      // Try to get localized maintenance message from database
+      try {
+        const maintenanceLocales = await ClientVersionModel.getMaintenanceLocales(record.id);
+        if (maintenanceLocales && maintenanceLocales.length > 0) {
+          // Try to find message for requested language
+          if (lang) {
+            const localeMessage = maintenanceLocales.find((m: any) => m.lang === lang);
+            if (localeMessage) {
+              maintenanceMessage = localeMessage.message;
+            }
+          }
+          // If no localized message found, use first available message
+          if (!maintenanceMessage) {
+            maintenanceMessage = maintenanceLocales[0].message;
+          }
+        }
+      } catch (error) {
+        logger.warn('Failed to get maintenance locales:', error);
+      }
+    }
+
     // Transform data for client consumption (remove sensitive fields)
-    const clientData = {
-      id: record.id,
+    const clientData: any = {
       platform: record.platform,
       clientVersion: record.clientVersion,
-      environment,
-      gameServerAddress: record.gameServerAddress,
-      gameServerAddressForWhiteList: record.gameServerAddressForWhiteList,
-      patchAddress: record.patchAddress,
-      patchAddressForWhiteList: record.patchAddressForWhiteList,
-      guestModeAllowed: record.guestModeAllowed,
+      status: record.clientStatus,
+      gameServerAddress,
+      patchAddress,
+      guestModeAllowed: record.clientStatus === ClientStatus.MAINTENANCE ? false : record.guestModeAllowed,
       externalClickLink: record.externalClickLink,
-      customPayload: record.customPayload ? JSON.parse(record.customPayload) : null,
-      createdAt: record.createdAt,
-      updatedAt: record.updatedAt,
-      timestamp: new Date().toISOString(),
       meta,
-      // areaId: '...',
-      // groupId: '...'
     };
+
+    // Add maintenance message if applicable
+    if (maintenanceMessage) {
+      clientData.maintenanceMessage = maintenanceMessage;
+    }
 
     // Cache the result for 5 minutes
     cacheService.set(cacheKey, clientData, 5 * 60 * 1000);
