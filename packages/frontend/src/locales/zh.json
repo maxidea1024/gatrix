@@ -1551,6 +1551,8 @@
     "sdkGuideDrawer": {
       "title": "客户端版本查询 API",
       "subtitle": "了解如何从客户端应用程序查询您的客户端版本信息。",
+      "tabGuide": "SDK 集成指南",
+      "tabTest": "API 测试",
       "description": "您的客户端应用程序可以根据平台、客户端版本和环境信息查询详细的版本信息。响应包括游戏服务器地址、补丁服务器地址、访客模式可用性以及键值设置中管理的其他元数据。",
       "endpoint": "端点",
       "method": "方法",
@@ -3008,6 +3010,8 @@
       "sdkGuideDrawer": {
         "title": "优惠券兑换 API 集成指南",
         "subtitle": "了解如何从客户端调用优惠券兑换 API。",
+        "tabGuide": "SDK 集成指南",
+        "tabTest": "API 测试",
         "description": "调用以下 API 来兑换优惠券代码并获得奖励。",
         "endpoint": "API 端点",
         "method": "方法",

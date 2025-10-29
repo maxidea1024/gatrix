@@ -36,6 +36,9 @@ const SDKGuideDrawer: React.FC<SDKGuideDrawerProps> = ({ open, onClose }) => {
   const isDark = theme.palette.mode === 'dark';
   const { enqueueSnackbar } = useSnackbar();
 
+  // State for main tabs (Guide vs Test)
+  const [mainTabValue, setMainTabValue] = useState(0);
+
   // State for error response tabs
   const [errorTabValue, setErrorTabValue] = useState(0);
 
@@ -215,7 +218,20 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
       subtitle={t('coupons.couponSettings.sdkGuideDrawer.subtitle')}
       defaultWidth={600}
     >
-      <Box sx={{ p: 3, overflow: 'auto', height: '100%' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        {/* Main Tabs */}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 3, pt: 2 }}>
+          <Tabs value={mainTabValue} onChange={(e, newValue) => setMainTabValue(newValue)}>
+            <Tab label={t('coupons.couponSettings.sdkGuideDrawer.tabGuide')} />
+            <Tab label={t('coupons.couponSettings.sdkGuideDrawer.tabTest')} />
+          </Tabs>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ p: 3, overflow: 'auto', flex: 1 }}>
+        {/* Tab 1: SDK Guide */}
+        {mainTabValue === 0 && (
+          <>
         {/* Description */}
         <Alert severity="info" sx={{ mb: 3 }}>
           {t('coupons.couponSettings.sdkGuideDrawer.description')}
@@ -304,153 +320,6 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
 
         <Divider sx={{ my: 3 }} />
 
-        {/* API Test Section */}
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-          {t('coupons.couponSettings.sdkGuideDrawer.apiTest') || 'API Test'}
-        </Typography>
-
-        <Box sx={{ mb: 3 }}>
-          <Stack spacing={2} sx={{ mb: 2 }}>
-            <TextField
-              label="X-API-Token"
-              type="password"
-              value={apiToken}
-              onChange={(e) => setApiToken(e.target.value)}
-              size="small"
-              fullWidth
-              placeholder="Enter your API token"
-            />
-            <TextField
-              label="Coupon Code"
-              value={couponCode}
-              onChange={(e) => setCouponCode(e.target.value)}
-              size="small"
-              fullWidth
-              placeholder="e.g., ABC123XYZ"
-            />
-            <TextField
-              label="User ID"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              size="small"
-              fullWidth
-            />
-            <TextField
-              label="User Name"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              size="small"
-              fullWidth
-            />
-            <TextField
-              label="World ID"
-              value={worldId}
-              onChange={(e) => setWorldId(e.target.value)}
-              size="small"
-              fullWidth
-            />
-            <TextField
-              label="Platform"
-              value={platform}
-              onChange={(e) => setPlatform(e.target.value)}
-              size="small"
-              fullWidth
-              placeholder="e.g., ios, android"
-            />
-            <TextField
-              label="Channel"
-              value={channel}
-              onChange={(e) => setChannel(e.target.value)}
-              size="small"
-              fullWidth
-              placeholder="e.g., app_store"
-            />
-            <TextField
-              label="Sub Channel"
-              value={subChannel}
-              onChange={(e) => setSubChannel(e.target.value)}
-              size="small"
-              fullWidth
-              placeholder="e.g., web"
-            />
-          </Stack>
-
-          <Button
-            variant="contained"
-            startIcon={testLoading ? <CircularProgress size={20} /> : <PlayArrowIcon />}
-            onClick={handleTestAPI}
-            disabled={testLoading}
-            fullWidth
-          >
-            {testLoading ? 'Testing...' : 'Test API'}
-          </Button>
-        </Box>
-
-        {testError && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {testError}
-          </Alert>
-        )}
-
-        {testResponse && (
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-              Response:
-            </Typography>
-            <Box
-              sx={{
-                position: 'relative',
-                border: `1px solid ${theme.palette.divider}`,
-                borderRadius: 1,
-                overflow: 'hidden',
-              }}
-            >
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  p: 0.5,
-                  backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
-                  borderBottom: `1px solid ${theme.palette.divider}`,
-                }}
-              >
-                <Tooltip title={t('common.copy') || 'Copy'}>
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      handleCopyCode(JSON.stringify(testResponse, null, 2));
-                    }}
-                    sx={{ color: 'primary.main' }}
-                  >
-                    <ContentCopyIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-              <Box sx={{ height: 300, overflow: 'hidden' }}>
-                <Editor
-                  height="100%"
-                  language="json"
-                  value={JSON.stringify(testResponse, null, 2)}
-                  theme={isDark ? 'vs-dark' : 'light'}
-                  options={{
-                    readOnly: true,
-                    minimap: { enabled: false },
-                    scrollBeyondLastLine: false,
-                    wordWrap: 'on',
-                    automaticLayout: true,
-                    fontSize: 12,
-                    lineNumbers: 'on',
-                    folding: true,
-                    padding: { top: 8, bottom: 8 },
-                  }}
-                />
-              </Box>
-            </Box>
-          </Box>
-        )}
-
-        <Divider sx={{ my: 3 }} />
-
         {/* Response Example */}
         <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
           {t('coupons.couponSettings.sdkGuideDrawer.responseExample')}
@@ -508,6 +377,161 @@ curl -X POST http://localhost:5000/api/v1/server/coupons/{COUPON_CODE}/redeem \\
             </Typography>
           </Box>
         </Stack>
+          </>
+        )}
+
+        {/* Tab 2: API Test */}
+        {mainTabValue === 1 && (
+          <>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+              {t('coupons.couponSettings.sdkGuideDrawer.apiTest') || 'API Test'}
+            </Typography>
+
+            <Box sx={{ mb: 3 }}>
+              <Stack spacing={2} sx={{ mb: 2 }}>
+                <TextField
+                  label="X-API-Token"
+                  type="password"
+                  value={apiToken}
+                  onChange={(e) => setApiToken(e.target.value)}
+                  size="small"
+                  fullWidth
+                  placeholder="Enter your API token"
+                />
+                <TextField
+                  label="Coupon Code"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                  size="small"
+                  fullWidth
+                  placeholder="e.g., ABC12345"
+                />
+                <TextField
+                  label="User ID"
+                  value={userId}
+                  onChange={(e) => setUserId(e.target.value)}
+                  size="small"
+                  fullWidth
+                  placeholder="e.g., user123"
+                />
+                <TextField
+                  label="User Name"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  size="small"
+                  fullWidth
+                  placeholder="e.g., John Doe"
+                />
+                <TextField
+                  label="World ID"
+                  value={worldId}
+                  onChange={(e) => setWorldId(e.target.value)}
+                  size="small"
+                  fullWidth
+                  placeholder="e.g., world01"
+                />
+                <TextField
+                  label="Platform"
+                  value={platform}
+                  onChange={(e) => setPlatform(e.target.value)}
+                  size="small"
+                  fullWidth
+                  placeholder="e.g., ios, android, pc"
+                />
+                <TextField
+                  label="Channel"
+                  value={channel}
+                  onChange={(e) => setChannel(e.target.value)}
+                  size="small"
+                  fullWidth
+                  placeholder="e.g., app_store"
+                />
+                <TextField
+                  label="Sub Channel"
+                  value={subChannel}
+                  onChange={(e) => setSubChannel(e.target.value)}
+                  size="small"
+                  fullWidth
+                  placeholder="e.g., web"
+                />
+              </Stack>
+
+              <Button
+                variant="contained"
+                startIcon={testLoading ? <CircularProgress size={16} sx={{ color: 'inherit' }} /> : <PlayArrowIcon />}
+                onClick={handleTestAPI}
+                disabled={testLoading}
+                fullWidth
+              >
+                Test API
+              </Button>
+            </Box>
+
+            {testError && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {testError}
+              </Alert>
+            )}
+
+            {testResponse && (
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                  Response:
+                </Typography>
+                <Box
+                  sx={{
+                    position: 'relative',
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: 1,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'flex-end',
+                      p: 0.5,
+                      backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
+                      borderBottom: `1px solid ${theme.palette.divider}`,
+                    }}
+                  >
+                    <Tooltip title={t('common.copy') || 'Copy'}>
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          handleCopyCode(JSON.stringify(testResponse, null, 2));
+                        }}
+                        sx={{ color: 'primary.main' }}
+                      >
+                        <ContentCopyIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                  <Box sx={{ height: 300, overflow: 'hidden' }}>
+                    <Editor
+                      height="100%"
+                      language="json"
+                      value={JSON.stringify(testResponse, null, 2)}
+                      theme={isDark ? 'vs-dark' : 'light'}
+                      options={{
+                        readOnly: true,
+                        minimap: { enabled: false },
+                        scrollBeyondLastLine: false,
+                        wordWrap: 'on',
+                        automaticLayout: true,
+                        fontSize: 12,
+                        lineNumbers: 'on',
+                        folding: true,
+                        padding: { top: 8, bottom: 8 },
+                      }}
+                    />
+                  </Box>
+                </Box>
+              </Box>
+            )}
+          </>
+        )}
+        </Box>
       </Box>
     </ResizableDrawer>
   );
