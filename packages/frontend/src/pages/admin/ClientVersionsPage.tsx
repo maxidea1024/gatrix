@@ -1132,7 +1132,7 @@ const ClientVersionsPage: React.FC = () => {
                 }}
                 sx={{ p: 0.5 }}
               >
-                <CopyIcon sx={{ fontSize: '0.875rem' }} />
+                <CopyIcon sx={{ fontSize: '1.25rem' }} />
               </IconButton>
             </Tooltip>
           </Box>
@@ -1152,7 +1152,7 @@ const ClientVersionsPage: React.FC = () => {
                 }}
                 sx={{ p: 0.5 }}
               >
-                <CopyIcon sx={{ fontSize: '0.875rem' }} />
+                <CopyIcon sx={{ fontSize: '1.25rem' }} />
               </IconButton>
             </Tooltip>
           </Box>
