@@ -64,15 +64,25 @@ class ServiceDiscoveryService {
   }
 
   /**
+   * Delete a service instance
+   */
+  async deleteService(type: string, instanceId: string): Promise<void> {
+    await api.delete(`/admin/services/${type}/${instanceId}`);
+  }
+
+  /**
    * Create SSE connection for real-time updates
+   * Safari compatibility: Add timestamp to prevent caching
    */
   createSSEConnection(
     onMessage: (event: { type: string; data: any }) => void,
     onError?: (error: Event) => void
   ): EventSource {
     const token = localStorage.getItem('accessToken');
+    // Add timestamp to prevent Safari caching
+    const timestamp = Date.now();
     // Use relative URL - Vite proxy will handle it
-    const url = `/api/v1/admin/services/sse?token=${token}`;
+    const url = `/api/v1/admin/services/sse?token=${token}&t=${timestamp}`;
 
     const eventSource = new EventSource(url);
 

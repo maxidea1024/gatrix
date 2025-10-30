@@ -2135,7 +2135,8 @@
     "gameWorlds": "游戏世界",
     "maintenance": "服务维护",
     "maintenanceTemplates": "消息模板",
-    "scheduler": "计划管理",
+    "scheduleManagement": "计划管理",
+    "scheduler": "计划",
     "whitelist": "账户白名单",
     "auditLogs": "审计日志",
     "apiTokens": "API令牌",
@@ -2158,6 +2159,7 @@
     "hotTimeButtonEvent": "热时按钮活动",
     "liveEvent": "直播活动",
     "planningData": "策划数据",
+    "serverManagement": "服务器管理",
     "serverList": "服务器列表"
   },
   "signUpPrompt": {

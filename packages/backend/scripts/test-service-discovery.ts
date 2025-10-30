@@ -44,7 +44,7 @@ const SERVER_TYPES = ['world', 'auth', 'channel', 'chat', 'lobby', 'match'];
 const STATUSES = ['initializing', 'ready', 'shutting_down', 'error', 'terminated'] as const;
 const DEFAULT_TTL = 30; // seconds
 const HEARTBEAT_INTERVAL = 15; // seconds
-const TERMINATED_TTL = 3600; // 1 hour for terminated servers
+const TERMINATED_TTL = 300; // 5 minutes for terminated/error servers (auto-cleanup)
 
 // Custom state templates
 const CUSTOM_STATES = {
@@ -209,11 +209,19 @@ async function registerToStorage(server: ActiveServer) {
     updatedAt: new Date().toISOString(),
   });
 
-  if (MODE === 'etcd') {
-    const lease = etcdClient.lease(DEFAULT_TTL);
-    await lease.put(key).value(value);
-  } else if (redisClient) {
-    await redisClient.setex(key, DEFAULT_TTL, value);
+  try {
+    if (MODE === 'etcd') {
+      if (!etcdClient) {
+        console.error('❌ etcd client not initialized');
+        return;
+      }
+      const lease = etcdClient.lease(DEFAULT_TTL);
+      await lease.put(key).value(value);
+    } else if (redisClient) {
+      await redisClient.setex(key, DEFAULT_TTL, value);
+    }
+  } catch (error) {
+    console.error(`❌ Failed to register ${server.type}:${server.instanceId}:`, error);
   }
 }
 
@@ -243,11 +251,19 @@ async function updateStatusInStorage(server: ActiveServer) {
     updatedAt: new Date().toISOString(),
   });
 
-  if (MODE === 'etcd') {
-    const lease = etcdClient.lease(DEFAULT_TTL);
-    await lease.put(key).value(value);
-  } else if (redisClient) {
-    await redisClient.setex(key, DEFAULT_TTL, value);
+  try {
+    if (MODE === 'etcd') {
+      if (!etcdClient) {
+        console.error('❌ etcd client not initialized');
+        return;
+      }
+      const lease = etcdClient.lease(DEFAULT_TTL);
+      await lease.put(key).value(value);
+    } else if (redisClient) {
+      await redisClient.setex(key, DEFAULT_TTL, value);
+    }
+  } catch (error) {
+    console.error(`❌ Failed to update ${server.type}:${server.instanceId}:`, error);
   }
 }
 
@@ -267,10 +283,18 @@ async function unregisterFromStorage(server: ActiveServer) {
     ? `/services/${server.type}/${server.instanceId}`
     : `services:${server.type}:${server.instanceId}`;
 
-  if (MODE === 'etcd') {
-    await etcdClient.delete().key(key);
-  } else if (redisClient) {
-    await redisClient.del(key);
+  try {
+    if (MODE === 'etcd') {
+      if (!etcdClient) {
+        console.error('❌ etcd client not initialized');
+        return;
+      }
+      await etcdClient.delete().key(key);
+    } else if (redisClient) {
+      await redisClient.del(key);
+    }
+  } catch (error) {
+    console.error(`❌ Failed to unregister ${server.type}:${server.instanceId}:`, error);
   }
 }
 
@@ -414,12 +438,42 @@ async function unregisterServer(instanceId: string, type: string) {
  * List all active servers
  */
 async function listServers() {
-  console.log(`\n📋 Active Servers (${activeServers.length}):\n`);
-  activeServers.forEach(server => {
-    const tcpPorts = server.ports.tcp?.join(',') || '';
-    console.log(`  ${server.type}:${server.instanceId} - ${server.status} - ${server.hostname} (${server.internalAddress}:${tcpPorts})`);
-  });
-  console.log('');
+  try {
+    if (MODE === 'etcd') {
+      if (!etcdClient) {
+        console.error('❌ etcd client not initialized');
+        return;
+      }
+      // Get all services from etcd
+      const keys = await etcdClient.getAll().prefix('/services/').keys();
+      console.log(`\n📋 Active Servers (${keys.length}):\n`);
+
+      for (const key of keys) {
+        const value = await etcdClient.get(key).string();
+        if (value) {
+          const server = JSON.parse(value);
+          const tcpPorts = server.ports?.tcp?.join(',') || '';
+          console.log(`  ${server.type}:${server.instanceId} - ${server.status} - ${server.hostname} (${server.internalAddress}:${tcpPorts})`);
+        }
+      }
+    } else if (redisClient) {
+      // Get all services from Redis
+      const keys = await redisClient.keys('service:instance:*');
+      console.log(`\n📋 Active Servers (${keys.length}):\n`);
+
+      for (const key of keys) {
+        const value = await redisClient.get(key);
+        if (value) {
+          const server = JSON.parse(value);
+          const tcpPorts = server.ports?.tcp?.join(',') || '';
+          console.log(`  ${server.type}:${server.instanceId} - ${server.status} - ${server.hostname} (${server.internalAddress}:${tcpPorts})`);
+        }
+      }
+    }
+    console.log('');
+  } catch (error) {
+    console.error('❌ Failed to list servers:', error);
+  }
 }
 
 /**

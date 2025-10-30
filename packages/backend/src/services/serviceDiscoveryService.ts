@@ -44,6 +44,13 @@ class ServiceDiscoveryService {
   }
 
   /**
+   * Unregister a service instance (Admin cleanup)
+   */
+  async unregister(instanceId: string, type: string): Promise<void> {
+    await this.provider.unregister(instanceId, type);
+  }
+
+  /**
    * Get service types (unique types from all registered services)
    */
   async getServiceTypes(): Promise<string[]> {

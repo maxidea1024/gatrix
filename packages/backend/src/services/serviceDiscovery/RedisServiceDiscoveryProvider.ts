@@ -171,8 +171,15 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         instance.meta = meta;
       }
 
-      const ttl = await this.client.ttl(key);
-      await this.client.set(key, JSON.stringify(instance), 'EX', Math.max(ttl, 30));
+      // Use short TTL (5 minutes) for terminated/error servers, otherwise keep existing TTL
+      let ttl = await this.client.ttl(key);
+      if (status === 'terminated' || status === 'error') {
+        ttl = 300; // 5 minutes for auto-cleanup
+      } else {
+        ttl = Math.max(ttl, 30);
+      }
+
+      await this.client.set(key, JSON.stringify(instance), 'EX', ttl);
 
       // Publish update event
       await this.publishEvent({
@@ -180,7 +187,7 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
         instance,
       });
 
-      logger.debug(`Service status updated: ${type}:${instanceId} -> ${status}`);
+      logger.debug(`Service status updated: ${type}:${instanceId} -> ${status} (TTL: ${ttl}s)`);
     } catch (error) {
       logger.error(`Failed to update status for ${type}:${instanceId}:`, error);
       throw error;

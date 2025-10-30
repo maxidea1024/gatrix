@@ -2080,6 +2080,7 @@
     "gameWorlds": "게임 월드",
     "maintenance": "서비스 점검",
     "maintenanceTemplates": "메시지 템플릿",
+    "scheduleManagement": "스케줄 관리",
     "scheduler": "스케줄",
     "whitelist": "화이트리스트",
     "auditLogs": "감사 로그",
@@ -2103,6 +2104,7 @@
     "hotTimeButtonEvent": "핫타임버튼 이벤트",
     "liveEvent": "라이브이벤트",
     "planningData": "기획데이터",
+    "serverManagement": "서버관리",
     "serverList": "서버목록"
   },
   "signUpPrompt": {

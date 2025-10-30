@@ -2080,7 +2080,8 @@
     "gameWorlds": "Game Worlds",
     "maintenance": "Service Maintenance",
     "maintenanceTemplates": "Message Templates",
-    "scheduler": "Schedule Management",
+    "scheduleManagement": "Schedule Management",
+    "scheduler": "Schedule",
     "whitelist": "Account Whitelist",
     "auditLogs": "Audit Logs",
     "apiTokens": "API Tokens",
@@ -2103,6 +2104,7 @@
     "hotTimeButtonEvent": "Hot Time Button Event",
     "liveEvent": "Live Event",
     "planningData": "Planning Data",
+    "serverManagement": "Server Management",
     "serverList": "Server List"
   },
   "signUpPrompt": {

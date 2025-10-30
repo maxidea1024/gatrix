@@ -115,7 +115,8 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
     meta?: Record<string, any>
   ): Promise<void> {
     const key = this.getInstanceKey(type, instanceId);
-    const lease = this.leases.get(`${type}:${instanceId}`);
+    const leaseKey = `${type}:${instanceId}`;
+    let lease = this.leases.get(leaseKey);
 
     try {
       const value = await this.client.get(key).string();
@@ -133,13 +134,37 @@ export class EtcdServiceDiscoveryProvider implements IServiceDiscoveryProvider {
         instance.meta = meta;
       }
 
-      if (lease) {
-        await lease.put(key).value(JSON.stringify(instance));
-      } else {
-        await this.client.put(key).value(JSON.stringify(instance));
-      }
+      // For terminated/error servers, create a new lease with short TTL (5 minutes)
+      if (status === 'terminated' || status === 'error') {
+        // Revoke old lease if exists
+        if (lease) {
+          try {
+            if ((lease as any)._heartbeatInterval) {
+              clearInterval((lease as any)._heartbeatInterval);
+            }
+            await lease.revoke();
+          } catch (error) {
+            logger.warn(`Failed to revoke old lease for ${leaseKey}:`, error);
+          }
+        }
 
-      logger.debug(`Service status updated: ${type}:${instanceId} -> ${status}`);
+        // Create new lease with 5 minutes TTL
+        const newLease = this.client.lease(300); // 5 minutes
+        await newLease.put(key).value(JSON.stringify(instance));
+        this.leases.set(leaseKey, newLease);
+        lease = newLease;
+
+        logger.debug(`Service status updated: ${type}:${instanceId} -> ${status} (TTL: 300s)`);
+      } else {
+        // For other statuses, use existing lease
+        if (lease) {
+          await lease.put(key).value(JSON.stringify(instance));
+        } else {
+          await this.client.put(key).value(JSON.stringify(instance));
+        }
+
+        logger.debug(`Service status updated: ${type}:${instanceId} -> ${status}`);
+      }
     } catch (error) {
       logger.error(`Failed to update status for ${type}:${instanceId}:`, error);
       throw error;

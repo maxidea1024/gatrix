@@ -125,13 +125,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
   };
 
   const isItemActive = (item: NavItem): boolean => {
+    // If item has a path, check if it matches current location
     if (item.path) {
       return location.pathname === item.path;
     }
+    // If item has children but no path (parent menu), don't mark as active
+    // Only child items should be marked as active
     if (item.children) {
-      return item.children.some(child => child.path === location.pathname);
+      return false;
     }
     return false;
+  };
+
+  const hasActiveChild = (item: NavItem): boolean => {
+    if (!item.children) {
+      return false;
+    }
+    return item.children.some(child => {
+      if (child.path === location.pathname) {
+        return true;
+      }
+      return hasActiveChild(child);
+    });
   };
 
   const isItemExpanded = (item: NavItem): boolean => {
@@ -155,17 +170,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
     const isActive = isItemActive(item);
     const isExpanded = isItemExpanded(item);
     const hasChildren = item.children && item.children.length > 0;
+    const childActive = hasActiveChild(item);
 
     return (
       <React.Fragment key={item.id}>
+        {/* Divider before this item if specified */}
+        {(item as any).divider && <Divider sx={{ my: 1 }} />}
+
         <ListItem disablePadding sx={{ pl: level * 2 }}>
           <ListItemButton
-            selected={isActive}
+            selected={isActive && !hasChildren}
             onClick={() => handleItemClick(item)}
             sx={{
               minHeight: 48,
               borderRadius: 1,
               mx: 1,
+              backgroundColor: childActive && hasChildren ? 'rgba(25, 118, 210, 0.08)' : 'transparent',
               '&.Mui-selected': {
                 backgroundColor: 'primary.main',
                 color: 'primary.contrastText',
@@ -185,7 +205,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {
               primary={t(item.label)}
               primaryTypographyProps={{
                 fontSize: '0.875rem',
-                fontWeight: isActive ? 600 : 400,
+                fontWeight: isActive || childActive ? 600 : 400,
               }}
             />
             {hasChildren && (

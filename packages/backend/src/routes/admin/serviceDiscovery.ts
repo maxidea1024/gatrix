@@ -76,11 +76,15 @@ router.get('/sse', authenticateSSE, async (req, res) => {
       return res.status(403).json({ error: 'Admin access required' });
     }
 
-    // Set SSE headers
+    // Set SSE headers (Safari compatibility)
     res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     res.setHeader('Connection', 'keep-alive');
     res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
 
     const clientId = `service-discovery-${Date.now()}-${userId}`;
 
@@ -88,12 +92,17 @@ router.get('/sse', authenticateSSE, async (req, res) => {
     const services = await serviceDiscoveryService.getServices();
     res.write(`data: ${JSON.stringify({ type: 'init', data: services })}\n\n`);
 
-    // Watch for changes
-    await serviceDiscoveryService.watchServices((event) => {
+    // Watch for changes (don't await - watcher runs in background)
+    serviceDiscoveryService.watchServices((event) => {
       try {
         res.write(`data: ${JSON.stringify({ type: event.type, data: event.instance })}\n\n`);
       } catch (error) {
         logger.error('Failed to send SSE event:', error);
+      }
+    }).catch((error) => {
+      logger.error('Failed to start watching services:', error);
+      if (!res.headersSent) {
+        res.write(`data: ${JSON.stringify({ type: 'error', data: { message: 'Failed to watch services' } })}\n\n`);
       }
     });
 
@@ -143,6 +152,39 @@ router.get('/config', ServiceDiscoveryConfigController.getConfig);
  * PUT /api/v1/admin/services/config
  */
 router.put('/config', ServiceDiscoveryConfigController.updateConfig);
+
+/**
+ * Delete a service instance
+ * DELETE /api/v1/admin/services/:type/:instanceId
+ */
+router.delete('/:type/:instanceId', async (req: Request, res: Response) => {
+  try {
+    const { type, instanceId } = req.params;
+
+    if (!type || !instanceId) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'type and instanceId are required' },
+      });
+    }
+
+    // Unregister the service from storage
+    await serviceDiscoveryService.unregister(instanceId, type);
+
+    logger.info(`Service deleted: ${type}:${instanceId}`);
+
+    res.json({
+      success: true,
+      message: `Service ${type}:${instanceId} deleted successfully`,
+    });
+  } catch (error) {
+    logger.error('Error deleting service:', error);
+    res.status(500).json({
+      success: false,
+      error: { message: 'Failed to delete service' },
+    });
+  }
+});
 
 export default router;
 

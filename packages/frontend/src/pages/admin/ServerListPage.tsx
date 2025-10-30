@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -154,6 +154,12 @@ const ServerListPage: React.FC = () => {
   const [pendingUpdates, setPendingUpdates] = useState<ServiceInstance[]>([]);
   const [isPaused, setIsPaused] = useState(false);
 
+  // Track isPaused state in ref for use in SSE event handler
+  const isPausedRef = useRef(false);
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
+
   // Sort state (persisted in localStorage)
   const [sortBy, setSortBy] = useState<string>(() => {
     return localStorage.getItem('serverListSortBy') || 'updatedAt';
@@ -250,7 +256,7 @@ const ServerListPage: React.FC = () => {
     }
   }, [data]);
 
-  // Setup SSE connection for real-time updates
+  // Setup SSE connection for real-time updates (only once on mount)
   useEffect(() => {
     let eventSource: EventSource | null = null;
 
@@ -258,10 +264,18 @@ const ServerListPage: React.FC = () => {
       eventSource = serviceDiscoveryService.createSSEConnection(
         (event) => {
           if (event.type === 'init') {
-            // Initial data - always apply
-            setServices(event.data);
+            // Initial data - only apply if services is empty (first connection)
+            // This prevents overwriting user's filtered/deleted servers on reconnection
+            setServices((prev) => {
+              if (prev.length === 0) {
+                // First connection - apply initial data
+                return event.data;
+              }
+              // Reconnection - ignore init event to preserve current state
+              return prev;
+            });
             setPendingUpdates([]);
-          } else if (isPaused) {
+          } else if (isPausedRef.current) {
             // If paused, store updates in pending queue
             setPendingUpdates((prev) => {
               if (event.type === 'put') {
@@ -322,7 +336,7 @@ const ServerListPage: React.FC = () => {
         eventSource.close();
       }
     };
-  }, [isPaused]);
+  }, []); // Empty dependency array - only setup once on mount
 
   // Apply pending updates when unpausing
   const handleTogglePause = () => {
@@ -356,9 +370,26 @@ const ServerListPage: React.FC = () => {
     setCleanupDialogOpen(true);
   };
 
-  const handleCleanupConfirm = () => {
-    setServices((prev) => prev.filter((s) => s.status !== 'terminated' && s.status !== 'error'));
-    setCleanupDialogOpen(false);
+  const handleCleanupConfirm = async () => {
+    try {
+      // Get servers to delete
+      const serversToDelete = services.filter((s) => s.status === 'terminated' || s.status === 'error');
+
+      // Delete each server from backend
+      for (const server of serversToDelete) {
+        try {
+          await serviceDiscoveryService.deleteService(server.type, server.instanceId);
+        } catch (error) {
+          console.error(`Failed to delete ${server.type}:${server.instanceId}:`, error);
+        }
+      }
+
+      // Remove from frontend state
+      setServices((prev) => prev.filter((s) => s.status !== 'terminated' && s.status !== 'error'));
+      setCleanupDialogOpen(false);
+    } catch (error) {
+      console.error('Cleanup failed:', error);
+    }
   };
 
   const handleCleanupCancel = () => {

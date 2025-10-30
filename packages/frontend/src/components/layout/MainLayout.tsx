@@ -300,7 +300,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     if (item.children) {
       const submenuKey = `submenu-${index}`;
       const isExpanded = expandedSubmenus[submenuKey];
-      const hasActiveChild = item.children.some((child: any) => isActivePath(child.path));
+      // For settings menu, use exact path matching only
+      const isSettingsMenu = item.text === 'sidebar.settings';
+      const hasActiveChild = item.children.some((child: any) =>
+        isSettingsMenu ? isActiveSettingsPath(child.path) : isActivePath(child.path)
+      );
 
       const toggleSubmenu = () => {
         setExpandedSubmenus(prev => {
@@ -322,9 +326,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           {/* Parent menu item - only show when sidebar is expanded */}
           {!sidebarCollapsed && (
             <>
-              {/* Divider before parent menu item */}
-              <Divider sx={{ my: 1 }} />
-
               {/* Parent menu item */}
               <ListItemButton
                 onClick={toggleSubmenu}
@@ -364,79 +365,91 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               {/* Divider before first child item when sidebar is collapsed */}
               <Divider sx={{ my: 0.5 }} />
 
-              {item.children.map((child: any, childIndex: number) => (
-                <Tooltip
-                  key={childIndex}
-                  title={t(child.text)}
-                  placement="right"
-                  arrow
-                >
-                  <ListItemButton
-                    onClick={() => navigate(child.path)}
-                    sx={{
-                      pl: 0,
-                      pr: 0,
-                      borderRadius: 1,
-                      py: 0.75,
-                      my: 0.5,
-                      justifyContent: 'center',
-                      color: isActivePath(child.path) ? theme.palette.text.primary : theme.palette.text.secondary,
-                      backgroundColor: isActivePath(child.path) ? `${theme.palette.primary.main}20` : 'transparent',
-                      '&:hover': {
-                        backgroundColor: theme.palette.mode === 'dark'
-                          ? 'rgba(255,255,255,0.1)'
-                          : 'rgba(0,0,0,0.08)',
-                      },
-                    }}
+              {item.children.map((child: any, childIndex: number) => {
+                // For settings menu, use exact path matching only
+                const isSettingsMenu = item.text === 'sidebar.settings';
+                const isChildActive = isSettingsMenu ? isActiveSettingsPath(child.path) : isActivePath(child.path);
+
+                return (
+                  <Tooltip
+                    key={childIndex}
+                    title={t(child.text)}
+                    placement="right"
+                    arrow
                   >
-                    <ListItemIcon sx={{
-                      color: 'inherit',
-                      minWidth: 0,
-                      justifyContent: 'center'
-                    }}>
-                      {child.icon}
-                    </ListItemIcon>
-                  </ListItemButton>
-                </Tooltip>
-              ))}
+                    <ListItemButton
+                      onClick={() => navigate(child.path)}
+                      sx={{
+                        pl: 0,
+                        pr: 0,
+                        borderRadius: 1,
+                        py: 0.75,
+                        my: 0.5,
+                        justifyContent: 'center',
+                        color: isChildActive ? theme.palette.text.primary : theme.palette.text.secondary,
+                        backgroundColor: isChildActive ? `${theme.palette.primary.main}20` : 'transparent',
+                        '&:hover': {
+                          backgroundColor: theme.palette.mode === 'dark'
+                            ? 'rgba(255,255,255,0.1)'
+                            : 'rgba(0,0,0,0.08)',
+                        },
+                      }}
+                    >
+                      <ListItemIcon sx={{
+                        color: 'inherit',
+                        minWidth: 0,
+                        justifyContent: 'center'
+                      }}>
+                        {child.icon}
+                      </ListItemIcon>
+                    </ListItemButton>
+                  </Tooltip>
+                );
+              })}
             </List>
           ) : (
             // When sidebar is expanded, show child items with text
             <Collapse in={isExpanded} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                {item.children.map((child: any, childIndex: number) => (
-                  <ListItemButton
-                    key={childIndex}
-                    onClick={() => navigate(child.path)}
-                    sx={{
-                      pl: 2,
-                      pr: 2,
-                      borderRadius: 1,
-                      py: 0.75,
-                      my: 0.5,
-                      ml: 2,
-                      color: isActivePath(child.path) ? theme.palette.text.primary : theme.palette.text.secondary,
-                      backgroundColor: isActivePath(child.path) ? `${theme.palette.primary.main}20` : 'transparent',
-                      '&:hover': {
-                        backgroundColor: theme.palette.mode === 'dark'
-                          ? 'rgba(255,255,255,0.1)'
-                          : 'rgba(0,0,0,0.08)',
-                      },
-                    }}
-                  >
-                    <ListItemIcon sx={{
-                      color: 'inherit',
-                      minWidth: 40,
-                      justifyContent: 'center'
-                    }}>
-                      {child.icon}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={t(child.text)}
-                      primaryTypographyProps={{ fontSize: '0.875rem' }}
-                    />
-                  </ListItemButton>
-                ))}
+                {item.children.map((child: any, childIndex: number) => {
+                  // For settings menu, use exact path matching only
+                  const isSettingsMenu = item.text === 'sidebar.settings';
+                  const isChildActive = isSettingsMenu ? isActiveSettingsPath(child.path) : isActivePath(child.path);
+
+                  return (
+                    <ListItemButton
+                      key={childIndex}
+                      onClick={() => navigate(child.path)}
+                      sx={{
+                        pl: 2,
+                        pr: 2,
+                        borderRadius: 1,
+                        py: 0.75,
+                        my: 0.5,
+                        ml: 2,
+                        color: isChildActive ? theme.palette.text.primary : theme.palette.text.secondary,
+                        backgroundColor: isChildActive ? `${theme.palette.primary.main}20` : 'transparent',
+                        '&:hover': {
+                          backgroundColor: theme.palette.mode === 'dark'
+                            ? 'rgba(255,255,255,0.1)'
+                            : 'rgba(0,0,0,0.08)',
+                        },
+                      }}
+                    >
+                      <ListItemIcon sx={{
+                        color: 'inherit',
+                        minWidth: 40,
+                        justifyContent: 'center'
+                      }}>
+                        {child.icon}
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={t(child.text)}
+                        primaryTypographyProps={{ fontSize: '0.875rem' }}
+                      />
+                    </ListItemButton>
+                  );
+                })}
               </List>
             </Collapse>
           )}

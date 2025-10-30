@@ -33,6 +33,7 @@ import {
   Dns as DnsIcon,
   Notifications as NotificationsIcon,
   AdminPanelSettings,
+  Storage as ServerIcon,
 } from '@mui/icons-material';
 
 export interface MenuItem {
@@ -41,6 +42,7 @@ export interface MenuItem {
   path?: string;
   adminOnly?: boolean;
   children?: MenuItem[];
+  divider?: boolean; // Show divider before this item
 }
 
 export interface MenuCategory {
@@ -63,9 +65,11 @@ export const adminPanelMenuItems: MenuItem[] = [
   { text: 'sidebar.gameWorlds', icon: <LanguageIcon />, path: '/admin/game-worlds', adminOnly: true },
   { text: 'sidebar.maintenance', icon: <BuildIcon />, path: '/admin/maintenance', adminOnly: true },
   { text: 'sidebar.maintenanceTemplates', icon: <TextIcon />, path: '/admin/maintenance-templates', adminOnly: true },
-  { text: 'sidebar.scheduler', icon: <ScheduleIcon />, path: '/admin/scheduler', adminOnly: true },
-  { text: 'sidebar.jobs', icon: <JobIcon />, path: '/admin/jobs', adminOnly: true },
-  { text: 'sidebar.queueMonitor', icon: <MonitorIcon />, path: '/admin/queue-monitor', adminOnly: true },
+  { text: 'sidebar.scheduleManagement', icon: <ScheduleIcon />, adminOnly: true, children: [
+    { text: 'sidebar.scheduler', icon: <ScheduleIcon />, path: '/admin/scheduler', adminOnly: true },
+    { text: 'sidebar.jobs', icon: <JobIcon />, path: '/admin/jobs', adminOnly: true },
+    { text: 'sidebar.queueMonitor', icon: <MonitorIcon />, path: '/admin/queue-monitor', adminOnly: true },
+  ] },
   { text: 'sidebar.whitelist', icon: <SecurityIcon />, path: '/admin/whitelist', adminOnly: true },
   { text: 'sidebar.auditLogs', icon: <HistoryIcon />, path: '/admin/audit-logs', adminOnly: true },
   { text: 'sidebar.realtimeEvents', icon: <TimelineIcon />, path: '/admin/realtime-events', adminOnly: true },
@@ -73,7 +77,9 @@ export const adminPanelMenuItems: MenuItem[] = [
   { text: 'sidebar.remoteConfig', icon: <CloudSyncIcon />, path: '/admin/remote-config', adminOnly: true },
   { text: 'sidebar.apiTokens', icon: <VpnKeyIcon />, path: '/admin/api-tokens', adminOnly: true },
   { text: 'sidebar.console', icon: <TerminalIcon />, path: '/admin/console', adminOnly: true },
-  { text: 'sidebar.serverList', icon: <DnsIcon />, path: '/admin/server-list', adminOnly: true },
+  { text: 'sidebar.serverManagement', icon: <DnsIcon />, adminOnly: true, children: [
+    { text: 'sidebar.serverList', icon: <ServerIcon />, path: '/admin/server-list', adminOnly: true },
+  ] },
 ];
 
 // 게임관리 메뉴
@@ -159,20 +165,34 @@ export interface NavItem {
   path?: string;
   children?: NavItem[];
   roles?: string[];
+  divider?: boolean;
 }
 
-// MenuItem을 NavItem으로 변환
-export const menuItemToNavItem = (item: MenuItem): NavItem => {
+// MenuItem을 NavItem으로 변환 (재귀적)
+export const menuItemToNavItem = (item: MenuItem, parentPath?: string): NavItem => {
   // 아이콘 이름 추출 (예: <DashboardIcon /> -> 'Dashboard')
   const iconName = item.icon.type.name?.replace('Icon', '') || 'Dashboard';
-  
-  return {
-    id: item.path.replace(/\//g, '-').replace(/^-/, ''),
+
+  // id 생성: path가 있으면 path 기반, 없으면 text 기반
+  const id = item.path
+    ? item.path.replace(/\//g, '-').replace(/^-/, '')
+    : item.text.replace(/\./g, '-').toLowerCase();
+
+  const navItem: NavItem = {
+    id,
     label: item.text,
     icon: iconName,
     path: item.path,
     roles: item.adminOnly ? ['admin'] : undefined,
+    divider: item.divider,
   };
+
+  // 자식 메뉴가 있으면 재귀적으로 변환
+  if (item.children && item.children.length > 0) {
+    navItem.children = item.children.map(child => menuItemToNavItem(child, item.path));
+  }
+
+  return navItem;
 };
 
 // Sidebar.tsx용 네비게이션 아이템 생성
