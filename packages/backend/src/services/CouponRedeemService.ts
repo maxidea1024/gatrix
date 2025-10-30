@@ -91,11 +91,19 @@ export class CouponRedeemService {
 
       // 5. Check date range
       const now = new Date();
-      const startsAt = new Date(setting.startsAt);
+      // startsAt is optional - if null, coupon is immediately available
+      const startsAt = setting.startsAt ? new Date(setting.startsAt) : null;
       const expiresAt = new Date(setting.expiresAt);
 
-      if (now < startsAt || now > expiresAt) {
-        const error = new CustomError('Coupon is not available in this period', 422, true, 'UNPROCESSABLE_ENTITY');
+      // Check if coupon has started (if startsAt is set)
+      if (startsAt && now < startsAt) {
+        const error = new CustomError('Coupon is not available yet', 422, true, 'UNPROCESSABLE_ENTITY');
+        throw error;
+      }
+
+      // Check if coupon has expired
+      if (now > expiresAt) {
+        const error = new CustomError('Coupon has expired', 422, true, 'UNPROCESSABLE_ENTITY');
         throw error;
       }
 

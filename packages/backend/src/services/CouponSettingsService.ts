@@ -181,9 +181,10 @@ export class CouponSettingsService {
     }
 
     // Convert dates to MySQL DATETIME
-    const startsAt = convertToMySQLDateTime(input.startsAt);
+    // startsAt is optional - if not provided, coupon is immediately available
+    const startsAt = input.startsAt ? convertToMySQLDateTime(input.startsAt) : null;
     const expiresAt = convertToMySQLDateTime(input.expiresAt);
-    if (!startsAt || !expiresAt) throw new CustomError('Invalid date range', 400);
+    if (!expiresAt) throw new CustomError('Invalid expiration date', 400);
 
     const id = ulid();
 

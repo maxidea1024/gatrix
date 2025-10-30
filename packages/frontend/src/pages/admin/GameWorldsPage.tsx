@@ -89,9 +89,6 @@ import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 import 'dayjs/locale/en';
@@ -99,16 +96,14 @@ import 'dayjs/locale/zh-cn';
 import { gameWorldService } from '../../services/gameWorldService';
 import { tagService, Tag } from '@/services/tagService';
 import { GameWorld, CreateGameWorldData, GameWorldMaintenanceLocale } from '../../types/gameWorld';
-import { formatDateTimeDetailed, parseUTCForPicker } from '../../utils/dateFormat';
+import { formatDateTimeDetailed } from '../../utils/dateFormat';
 import FormDialogHeader from '../../components/common/FormDialogHeader';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import translationService from '../../services/translationService';
-import MultiLanguageMessageInput, { MessageLocale } from '@/components/common/MultiLanguageMessageInput';
-import JsonEditor from '@/components/common/JsonEditor';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
-import MaintenanceSettingsInput from '../../components/common/MaintenanceSettingsInput';
 import { messageTemplateService, MessageTemplate } from '@/services/messageTemplateService';
 import GameWorldSDKGuideDrawer from '../../components/gameWorlds/GameWorldSDKGuideDrawer';
+import GameWorldForm from '../../components/admin/GameWorldForm';
 
 // Column definition interface
 interface ColumnConfig {
@@ -389,6 +384,10 @@ const GameWorldsPage: React.FC = () => {
   const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>([]);
   const [toggleInputMode, setToggleInputMode] = useState<'direct' | 'template'>('direct');
   const [toggleSelectedTemplateId, setToggleSelectedTemplateId] = useState<number | ''>('');
+
+  // 게임월드 편집 폼용 state
+  const [inputMode, setInputMode] = useState<'direct' | 'template'>('direct');
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | ''>('');
 
   const worldIdRef = useRef<HTMLInputElement>(null);
 
@@ -713,6 +712,8 @@ const GameWorldsPage: React.FC = () => {
     setFormTags([]);
     setMaintenanceLocales([]);
     setSupportsMultiLanguage(false);
+    setInputMode('direct');
+    setSelectedTemplateId('');
     setFormErrors({});
     setDialogOpen(true);
     setTimeout(() => {
@@ -747,6 +748,8 @@ const GameWorldsPage: React.FC = () => {
     setFormTags((world.tags || []));
     setMaintenanceLocales(world.maintenanceLocales || []);
     setSupportsMultiLanguage(shouldEnableMultiLanguage);
+    setInputMode('direct');
+    setSelectedTemplateId('');
     setFormErrors({});
     setDialogOpen(true);
   };
@@ -779,6 +782,8 @@ const GameWorldsPage: React.FC = () => {
     setFormTags(world.tags || []);
     setMaintenanceLocales(world.maintenanceLocales || []);
     setSupportsMultiLanguage(shouldEnableMultiLanguage);
+    setInputMode('direct');
+    setSelectedTemplateId('');
     setFormErrors({});
     setDialogOpen(true);
 
@@ -1434,234 +1439,29 @@ const GameWorldsPage: React.FC = () => {
       >
         {/* Content */}
         <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
-            <Box>
-              <TextField
-                fullWidth
-                label={t('gameWorlds.worldId')}
-                value={formData.worldId}
-                onChange={(e) => {
-                  const newWorldId = e.target.value;
-                  const newFormData = { ...formData, worldId: newWorldId };
-
-                  // 새 게임월드 추가 시에만 자동 복사 (편집 시에는 하지 않음)
-                  // 이름이 비어있거나 이전 worldId와 동일한 경우에만 자동 복사
-                  if (!editingWorld && (formData.name === '' || formData.name === formData.worldId)) {
-                    newFormData.name = newWorldId;
-                  }
-
-                  setFormData(newFormData);
-                }}
-                error={!!formErrors.worldId}
-                helperText={formErrors.worldId}
-                required
-                inputRef={worldIdRef}
-                autoFocus
-              />
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                {t('gameWorlds.form.worldIdHelp')}
-              </Typography>
-            </Box>
-
-            <Box>
-              <TextField
-                fullWidth
-                label={t('gameWorlds.name')}
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                error={!!formErrors.name}
-                helperText={formErrors.name}
-                required
-              />
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                {t('gameWorlds.form.nameHelp')}
-              </Typography>
-            </Box>
-
-            <Box>
-              <TextField
-                fullWidth
-                label={t('gameWorlds.description')}
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                multiline
-                rows={3}
-                placeholder={t('gameWorlds.description')}
-              />
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                {t('gameWorlds.form.descriptionHelp')}
-              </Typography>
-            </Box>
-
-            <Box>
-              <Autocomplete
-                multiple
-                options={allRegistryTags.filter(tag => typeof tag !== 'string')} // Tag 객체만 사용
-                getOptionLabel={(option) => option.name}
-                filterSelectedOptions
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                value={formTags}
-                onChange={(_, value) => setFormTags(value)}
-                slotProps={{
-                  popper: {}
-                }}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => {
-                    const { key, ...chipProps } = getTagProps({ index });
-                    return (
-                      <Tooltip key={option.id} title={option.description || t('tags.noDescription')} arrow>
-                        <Chip
-                          variant="outlined"
-                          label={option.name}
-                          size="small"
-                          sx={{ bgcolor: option.color, color: '#fff' }}
-                          {...chipProps}
-                        />
-                      </Tooltip>
-                    );
-                  })
-                }
-                renderInput={(params) => (
-                  <TextField {...params} label={t('gameWorlds.tags')} />
-                )}
-                renderOption={(props, option) => {
-                  const { key, ...otherProps } = props;
-                  return (
-                    <Box component="li" key={key} {...otherProps}>
-                      <Chip
-                        label={option.name}
-                        size="small"
-                        sx={{ bgcolor: option.color, color: '#fff', mr: 1 }}
-                      />
-                      {option.description || t('common.noDescription')}
-                    </Box>
-                  );
-                }}
-              />
-            </Box>
-
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              {/* 표시 여부 */}
-              <FormControl variant="standard">
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.isVisible}
-                      onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
-                    />
-                  }
-                  label={t('gameWorlds.visibleToUsers')}
-                />
-                <FormHelperText sx={{ ml: 6, mt: -0.5, mb: 1 }}>
-                  {t('gameWorlds.form.visibleHelp')}
-                </FormHelperText>
-              </FormControl>
-
-              {/* 점검 중 */}
-              <FormControl variant="standard">
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.isMaintenance}
-                      onChange={(e) => setFormData({ ...formData, isMaintenance: e.target.checked })}
-                    />
-                  }
-                  label={t('gameWorlds.underMaintenance')}
-                />
-                <FormHelperText sx={{ ml: 6, mt: -0.5 }}>
-                  {t('gameWorlds.form.maintenanceHelp')}
-                </FormHelperText>
-              </FormControl>
-            </Box>
-
-            {/* 점검 설정 섹션 */}
-            {!!formData.isMaintenance && (
-              <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="h6" gutterBottom sx={{ color: 'warning.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  🔧 {t('maintenance.title')}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  {t('maintenance.description')}
-                </Typography>
-
-                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
-                  <Stack spacing={2}>
-                    {/* 점검 시작일과 종료일 */}
-                    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-                      <DateTimePicker
-                        label={t('maintenance.startDate')}
-                        value={parseUTCForPicker(formData.maintenanceStartDate)}
-                        onChange={(date) => setFormData({ ...formData, maintenanceStartDate: date ? date.toISOString() : '' })}
-                        slotProps={{
-                          textField: {
-                            fullWidth: true,
-                            helperText: t('maintenance.startDateHelp'),
-                          },
-                          popper: {}
-                        }}
-                      />
-
-                      <DateTimePicker
-                        label={t('maintenance.endDate')}
-                        value={parseUTCForPicker(formData.maintenanceEndDate)}
-                        onChange={(date) => setFormData({ ...formData, maintenanceEndDate: date ? date.toISOString() : '' })}
-                        slotProps={{
-                          textField: {
-                            fullWidth: true,
-                            helperText: t('maintenance.endDateHelp'),
-                          },
-                          popper: {}
-                        }}
-                      />
-                    </Box>
-
-                    {/* 점검 메시지 입력 컴포넌트 */}
-                    <MultiLanguageMessageInput
-                      defaultMessage={formData.maintenanceMessage || ''}
-                      onDefaultMessageChange={(message) => setFormData({ ...formData, maintenanceMessage: message })}
-                      defaultMessageLabel={t('maintenance.defaultMessage')}
-                      defaultMessageHelperText={t('maintenance.defaultMessageHelp')}
-                      defaultMessageRequired={formData.isMaintenance}
-                      defaultMessageError={!!formErrors.maintenanceMessage}
-                      supportsMultiLanguage={supportsMultiLanguage}
-                      onSupportsMultiLanguageChange={handleSupportsMultiLanguageChange}
-                      supportsMultiLanguageLabel={t('maintenance.supportsMultiLanguage')}
-                      supportsMultiLanguageHelperText={t('maintenance.supportsMultiLanguageHelp')}
-
-                      locales={maintenanceLocales.map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
-                      onLocalesChange={(locales) => {
-                        const newLocales = locales.map(l => ({ lang: l.lang, message: l.message }));
-                        setMaintenanceLocales(newLocales);
-                        setFormData(prev => ({ ...prev, maintenanceLocales: newLocales }));
-                        // 번역 결과가 있으면 자동으로 언어별 메시지 사용 활성화
-                        const hasNonEmptyLocales = locales.some(l => l.message && l.message.trim() !== '');
-                        if (hasNonEmptyLocales && !supportsMultiLanguage) {
-                          setSupportsMultiLanguage(true);
-                          setFormData(prev => ({ ...prev, supportsMultiLanguage: true }));
-                        }
-                      }}
-                      languageSpecificMessagesLabel={t('maintenance.languageSpecificMessages')}
-
-                      enableTranslation={true}
-                      translateButtonLabel={t('common.autoTranslate')}
-                      translateTooltip={t('maintenance.translateTooltip')}
-                    />
-                  </Stack>
-                </LocalizationProvider>
-              </Paper>
-            )}
-
-            {/* Custom Payload */}
-            <JsonEditor
-              value={customPayloadText}
-              onChange={(val) => setCustomPayloadText(val)}
-              height="200px"
-              label={t('gameWorlds.customPayload') || 'Custom Payload'}
-              placeholder='{\n  "key": "value"\n}'
-              error={customPayloadError}
-              helperText={t('gameWorlds.form.customPayloadHelp') || '게임월드 관련 추가 데이터(JSON). 비워두면 {}로 저장됩니다.'}
-            />
-          </Box>
+          <GameWorldForm
+            editingWorld={editingWorld}
+            formData={formData}
+            onFormDataChange={setFormData}
+            formErrors={formErrors}
+            allRegistryTags={allRegistryTags}
+            formTags={formTags}
+            onFormTagsChange={setFormTags}
+            maintenanceLocales={maintenanceLocales}
+            onMaintenanceLocalesChange={setMaintenanceLocales}
+            supportsMultiLanguage={supportsMultiLanguage}
+            onSupportsMultiLanguageChange={setSupportsMultiLanguage}
+            customPayloadText={customPayloadText}
+            onCustomPayloadTextChange={setCustomPayloadText}
+            customPayloadError={customPayloadError}
+            onCustomPayloadErrorChange={setCustomPayloadError}
+            messageTemplates={messageTemplates}
+            inputMode={inputMode}
+            onInputModeChange={setInputMode}
+            selectedTemplateId={selectedTemplateId}
+            onSelectedTemplateIdChange={setSelectedTemplateId}
+            worldIdRef={worldIdRef}
+          />
         </Box>
 
         {/* Actions */}

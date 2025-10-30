@@ -1,6 +1,7 @@
 import { ClientVersionModel, ClientVersionAttributes, ClientVersionCreationAttributes, ClientStatus } from '../models/ClientVersion';
 import { pubSubService } from './PubSubService';
 import logger from '../config/logger';
+import { applyMaintenanceStatusCalculationToArray, applyMaintenanceStatusCalculation } from '../utils/maintenanceUtils';
 
 export interface ClientVersionFilters {
   version?: string | string[];
@@ -98,7 +99,9 @@ export class ClientVersionService {
     });
     const { clientVersions: data, total } = result;
 
-    return { data, total };
+    // Apply maintenance status calculation based on time constraints
+    const processedData = applyMaintenanceStatusCalculationToArray(data);
+    return { data: processedData, total };
   }
 
   static async getAllClientVersions(
@@ -176,8 +179,11 @@ export class ClientVersionService {
 
       const totalPages = Math.ceil(total / limit);
 
+      // Apply maintenance status calculation based on time constraints
+      const processedVersions = applyMaintenanceStatusCalculationToArray(clientVersions);
+
       return {
-        clientVersions,
+        clientVersions: processedVersions,
         total,
         page,
         limit,
@@ -202,8 +208,11 @@ export class ClientVersionService {
 
       const totalPages = Math.ceil(total / limit);
 
+      // Apply maintenance status calculation based on time constraints
+      const processedVersions = applyMaintenanceStatusCalculationToArray(clientVersions);
+
       return {
-        clientVersions,
+        clientVersions: processedVersions,
         total,
         page,
         limit,
@@ -227,8 +236,11 @@ export class ClientVersionService {
 
     const totalPages = Math.ceil(result.total / limit);
 
+    // Apply maintenance status calculation based on time constraints
+    const processedVersions = applyMaintenanceStatusCalculationToArray(result.clientVersions);
+
     return {
-      clientVersions: result.clientVersions,
+      clientVersions: processedVersions,
       total: result.total,
       page,
       limit,
@@ -237,7 +249,10 @@ export class ClientVersionService {
   }
 
   static async getClientVersionById(id: number): Promise<ClientVersionAttributes | null> {
-    return await ClientVersionModel.findById(id);
+    const version = await ClientVersionModel.findById(id);
+    if (!version) return null;
+    // Apply maintenance status calculation based on time constraints
+    return applyMaintenanceStatusCalculation(version);
   }
 
   static async createClientVersion(
@@ -384,7 +399,9 @@ export class ClientVersionService {
     });
     const { clientVersions: rows } = result;
 
-    return rows[0] || null;
+    if (!rows[0]) return null;
+    // Apply maintenance status calculation based on time constraints
+    return applyMaintenanceStatusCalculation(rows[0]);
   }
 
   /**

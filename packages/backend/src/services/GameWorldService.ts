@@ -9,6 +9,7 @@ import { GatrixError } from '../middleware/errorHandler';
 import { GAME_WORLDS } from '../constants/cacheKeys';
 import { createLogger } from '../config/logger';
 import { pubSubService } from './PubSubService';
+import { applyMaintenanceStatusCalculationToArray, applyMaintenanceStatusCalculation } from '../utils/maintenanceUtils';
 
 const logger = createLogger('GameWorldService');
 
@@ -24,7 +25,9 @@ export class GameWorldService {
       } as any;
 
       const data = await GameWorldModel.list(params);
-      return { data, total: data.length };
+      // Apply maintenance status calculation based on time constraints
+      const processedData = applyMaintenanceStatusCalculationToArray(data);
+      return { data: processedData, total: processedData.length };
     } catch (error) {
       logger.error('Error in getGameWorlds service:', error);
       throw new GatrixError('Failed to fetch game worlds', 500);
@@ -33,7 +36,9 @@ export class GameWorldService {
 
   static async getAllGameWorlds(params: GameWorldListParams): Promise<GameWorld[]> {
     try {
-      return await GameWorldModel.list(params);
+      const worlds = await GameWorldModel.list(params);
+      // Apply maintenance status calculation based on time constraints
+      return applyMaintenanceStatusCalculationToArray(worlds);
     } catch (error) {
       logger.error('Error in getAllGameWorlds service:', error);
       throw new GatrixError('Failed to fetch game worlds', 500);
@@ -46,7 +51,8 @@ export class GameWorldService {
       if (!world) {
         throw new GatrixError('Game world not found', 404);
       }
-      return world;
+      // Apply maintenance status calculation based on time constraints
+      return applyMaintenanceStatusCalculation(world);
     } catch (error) {
       if (error instanceof GatrixError) {
         throw error;

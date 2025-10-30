@@ -389,9 +389,9 @@ curl -X GET "http://localhost:5000/api/v1/server/ingame-popup-notices" \\
 
               <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
                 <Tabs value={errorTabValue} onChange={(e, newValue) => setErrorTabValue(newValue)} variant="scrollable" scrollButtons="auto">
-                  <Tab label={t('ingamePopupNotices.sdkGuideDrawer.errorMissingHeaders')} />
-                  <Tab label={t('ingamePopupNotices.sdkGuideDrawer.errorInvalidToken')} />
-                  <Tab label={t('ingamePopupNotices.sdkGuideDrawer.errorServerError')} />
+                  <Tab label="401 - Missing Headers" />
+                  <Tab label="401 - Invalid Token" />
+                  <Tab label="500 - Server Error" />
                 </Tabs>
               </Box>
 

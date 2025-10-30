@@ -97,6 +97,9 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
                   fullWidth: true,
                   helperText: t('maintenance.startDateHelp'),
                 },
+                actionBar: {
+                  actions: ['clear', 'cancel', 'accept'],
+                },
               }}
             />
 
@@ -108,6 +111,9 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
                 textField: {
                   fullWidth: true,
                   helperText: t('maintenance.endDateHelp'),
+                },
+                actionBar: {
+                  actions: ['clear', 'cancel', 'accept'],
                 },
               }}
             />

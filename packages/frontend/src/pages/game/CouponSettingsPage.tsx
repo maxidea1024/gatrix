@@ -601,7 +601,7 @@ const CouponSettingsPage: React.FC = () => {
 
   const handleSave = async () => {
     // Basic validation
-    if (!form.name || !form.startsAt || !form.expiresAt) return;
+    if (!form.name || !form.expiresAt) return;
     if (codeError || quantityError || maxTotalUsesError || perUserLimitError) return;
 
     // Validate reward email fields
@@ -626,7 +626,7 @@ const CouponSettingsPage: React.FC = () => {
 
     const payload: any = {
       ...form,
-      startsAt: (form.startsAt as Dayjs).toDate().toISOString(),
+      startsAt: form.startsAt ? (form.startsAt as Dayjs).toDate().toISOString() : null,
       expiresAt: (form.expiresAt as Dayjs).toDate().toISOString(),
       rewardData: rewardMode === 'direct' ? form.rewardData : null,
       rewardTemplateId: rewardMode === 'template' ? form.rewardTemplateId : null,
@@ -1329,28 +1329,42 @@ const CouponSettingsPage: React.FC = () => {
                   label={t('coupons.couponSettings.form.startsAt')}
                   value={form.startsAt}
                   onChange={(date) => setForm((s: any) => ({ ...s, startsAt: date }))}
-                  slotProps={{ textField: { fullWidth: true, required: true } }}
+                  slotProps={{
+                    textField: { fullWidth: true },
+                    actionBar: {
+                      actions: ['clear', 'cancel', 'accept'],
+                    },
+                  }}
                 />
                 <DateTimePicker
                   label={t('coupons.couponSettings.form.expiresAt')}
                   value={form.expiresAt}
                   onChange={(date) => setForm((s: any) => ({ ...s, expiresAt: date }))}
                   minDateTime={form.startsAt || undefined}
-                  slotProps={{ textField: { fullWidth: true, required: true } }}
+                  slotProps={{
+                    textField: { fullWidth: true, required: true },
+                    actionBar: {
+                      actions: ['clear', 'cancel', 'accept'],
+                    },
+                  }}
                 />
               </Box>
               <Typography variant="caption" color="text.secondary" sx={{ ml: 1.75 }}>
                 {t('coupons.couponSettings.form.startsAtHelp')} / {t('coupons.couponSettings.form.expiresAtHelp')}
               </Typography>
-              {form.startsAt && form.expiresAt && (
+              {form.expiresAt && (
                 <Typography variant="body2" color="text.secondary" sx={{ ml: 1.75 }}>
                   {(() => {
-                    const s = form.startsAt as Dayjs;
                     const e = form.expiresAt as Dayjs;
-                    const startStr = s.format('YYYY-MM-DD HH:mm');
                     const endStr = e.format('YYYY-MM-DD HH:mm');
-                    const days = Math.max(0, Math.ceil(e.diff(s, 'hour') / 24));
-                    return `${t('coupons.couponSettings.form.applicablePeriod')}: ${startStr} ~ ${endStr} (${days}${t('common.day')})`;
+                    if (form.startsAt) {
+                      const s = form.startsAt as Dayjs;
+                      const startStr = s.format('YYYY-MM-DD HH:mm');
+                      const days = Math.max(0, Math.ceil(e.diff(s, 'hour') / 24));
+                      return `${t('coupons.couponSettings.form.applicablePeriod')}: ${startStr} ~ ${endStr} (${days}${t('common.day')})`;
+                    } else {
+                      return `${t('coupons.couponSettings.form.applicablePeriod')}: ${t('coupons.couponSettings.form.immediatelyAvailable')} ~ ${endStr}`;
+                    }
                   })()}
                 </Typography>
               )}
