@@ -2808,6 +2808,10 @@
     "noNoticesFound": "No notices found",
     "unread": "Unread",
     "noticeList": "Notice List",
+    "copyUrl": "Copy Notice URL",
+    "copyUrlTooltip": "Copy the notice page URL to clipboard",
+    "copyUrlSuccess": "Notice URL copied to clipboard",
+    "copyUrlFailed": "Failed to copy URL",
     "previewPage": {
       "title": "Service Notices",
       "subtitle": "This preview shows how notices will appear in the in-game webview. Actual display may vary slightly.",

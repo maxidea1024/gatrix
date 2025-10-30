@@ -281,7 +281,7 @@ const AppContent: React.FC = () => {
               }}
               style={{ zIndex: 9999 }}
             >
-              <Router>
+              <Router basename={import.meta.env.VITE_ROUTER_BASENAME || '/'}>
                 <Routes>
                 {/* Public Routes */}
                 <Route path="/login" element={<LoginPage />} />

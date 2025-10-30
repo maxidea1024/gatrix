@@ -23,6 +23,7 @@ import {
   DialogActions,
   DialogContentText,
   Skeleton,
+  Divider,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -34,6 +35,7 @@ import {
   ViewColumn as ViewColumnIcon,
   Close as CloseIcon,
   Refresh as RefreshIcon,
+  ContentCopy as ContentCopyIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -353,6 +355,18 @@ const ServiceNoticesPage: React.FC = () => {
     }
   };
 
+  // Copy notice URL to clipboard
+  const handleCopyNoticeUrl = async () => {
+    try {
+      const noticeUrl = `${window.location.origin}/service-notices-preview`;
+      await navigator.clipboard.writeText(noticeUrl);
+      enqueueSnackbar(t('serviceNotices.copyUrlSuccess'), { variant: 'success' });
+    } catch (error) {
+      console.error('Failed to copy notice URL:', error);
+      enqueueSnackbar(t('serviceNotices.copyUrlFailed'), { variant: 'error' });
+    }
+  };
+
   const handleToggleActive = async (notice: ServiceNotice) => {
     try {
       await serviceNoticeService.toggleActive(notice.id);
@@ -376,7 +390,7 @@ const ServiceNoticesPage: React.FC = () => {
             {t('serviceNotices.subtitle')}
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           <Button
             variant="outlined"
             startIcon={<VisibilityIcon />}
@@ -391,6 +405,16 @@ const ServiceNoticesPage: React.FC = () => {
           >
             {t('serviceNotices.createNotice')}
           </Button>
+          <Divider orientation="vertical" sx={{ height: 32, mx: 0.5 }} />
+          <Tooltip title={t('serviceNotices.copyUrlTooltip')}>
+            <IconButton
+              size="small"
+              onClick={handleCopyNoticeUrl}
+              sx={{ p: 1 }}
+            >
+              <ContentCopyIcon />
+            </IconButton>
+          </Tooltip>
         </Box>
       </Box>
 

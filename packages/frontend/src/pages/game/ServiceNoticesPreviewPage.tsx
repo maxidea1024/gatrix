@@ -296,6 +296,9 @@ const ServiceNoticesPreviewPage: React.FC = () => {
         left: 0,
         margin: 0,
         padding: 0,
+        WebkitFontSmoothing: 'antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+        textRendering: 'optimizeLegibility',
       }}
     >
       {/* Left Sidebar - Notice List */}
@@ -325,23 +328,27 @@ const ServiceNoticesPreviewPage: React.FC = () => {
             overflowY: 'auto',
             overflowX: 'hidden',
             p: 0,
+            m: 0,
+            WebkitFontSmoothing: 'antialiased',
+            MozOsxFontSmoothing: 'grayscale',
             // Custom scrollbar for game UI
             '&::-webkit-scrollbar': {
-              width: '6px',
+              width: '8px',
             },
             '&::-webkit-scrollbar-track': {
-              background: 'transparent',
+              background: 'rgba(0, 0, 0, 0.1)',
+              borderRadius: '4px',
             },
             '&::-webkit-scrollbar-thumb': {
-              background: 'rgba(255, 255, 255, 0.3)',
-              borderRadius: '3px',
+              background: 'rgba(255, 255, 255, 0.4)',
+              borderRadius: '4px',
               '&:hover': {
-                background: 'rgba(255, 255, 255, 0.4)',
+                background: 'rgba(255, 255, 255, 0.6)',
               },
             },
             // Firefox scrollbar
             scrollbarWidth: 'thin',
-            scrollbarColor: 'rgba(255, 255, 255, 0.3) transparent',
+            scrollbarColor: 'rgba(255, 255, 255, 0.4) rgba(0, 0, 0, 0.1)',
           }}
         >
           {notices.map((notice, index) => (
@@ -499,32 +506,38 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                 overflowX: 'hidden',
                 p: 3,
                 minHeight: 0,
+                WebkitFontSmoothing: 'antialiased',
+                MozOsxFontSmoothing: 'grayscale',
                 // Custom scrollbar
                 '&::-webkit-scrollbar': {
-                  width: '6px',
+                  width: '8px',
                 },
                 '&::-webkit-scrollbar-track': {
-                  background: 'transparent',
+                  background: 'rgba(0, 0, 0, 0.05)',
+                  borderRadius: '4px',
                 },
                 '&::-webkit-scrollbar-thumb': {
-                  background: 'rgba(107, 93, 82, 0.3)',
-                  borderRadius: '3px',
+                  background: 'rgba(107, 93, 82, 0.4)',
+                  borderRadius: '4px',
                   '&:hover': {
-                    background: 'rgba(107, 93, 82, 0.5)',
+                    background: 'rgba(107, 93, 82, 0.6)',
                   },
                 },
                 // Firefox scrollbar
                 scrollbarWidth: 'thin',
-                scrollbarColor: 'rgba(107, 93, 82, 0.3) transparent',
+                scrollbarColor: 'rgba(107, 93, 82, 0.4) rgba(0, 0, 0, 0.05)',
               }}
             >
               <Box
                 sx={{
                   color: GAME_COLORS.textPrimary,
-                  lineHeight: 1.5,
+                  lineHeight: 1.6,
                   fontSize: '0.95rem',
                   width: '100%',
                   maxWidth: '100%',
+                  fontFamily: '"Noto Sans KR", "Roboto", sans-serif',
+                  WebkitFontSmoothing: 'antialiased',
+                  MozOsxFontSmoothing: 'grayscale',
                   '& img': {
                     maxWidth: '100%',
                     height: 'auto',
@@ -543,8 +556,9 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                     },
                   },
                   '& p': {
-                    margin: '0 0 0.5em 0',
+                    margin: '0 0 0.75em 0',
                     wordWrap: 'break-word',
+                    wordBreak: 'break-word',
                   },
                   '& p:last-child': {
                     marginBottom: 0,
@@ -552,15 +566,29 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                   '& h1, & h2, & h3, & h4, & h5, & h6': {
                     color: GAME_COLORS.textPrimary,
                     fontWeight: 700,
-                    marginTop: '1em',
-                    marginBottom: '0.3em',
+                    marginTop: '1.2em',
+                    marginBottom: '0.5em',
                   },
                   '& ul, & ol': {
-                    paddingLeft: '2em',
-                    margin: '0.5em 0',
+                    paddingLeft: '2.5em',
+                    margin: '0.75em 0',
+                    listStylePosition: 'outside',
                   },
                   '& li': {
-                    marginBottom: '0.2em',
+                    marginBottom: '0.4em',
+                    lineHeight: 1.6,
+                    display: 'list-item',
+                  },
+                  '& ul li': {
+                    listStyleType: 'disc',
+                  },
+                  '& ol li': {
+                    listStyleType: 'decimal',
+                  },
+                  '& ul ul, & ol ol, & ul ol, & ol ul': {
+                    marginTop: '0.4em',
+                    marginBottom: '0.4em',
+                    paddingLeft: '2.5em',
                   },
                   '& br': {
                     lineHeight: 1.2,
@@ -600,6 +628,49 @@ const ServiceNoticesPreviewPage: React.FC = () => {
                   '& .emoji': {
                     display: 'inline-block',
                     verticalAlign: 'middle',
+                  },
+                  // Code block styling
+                  '& code': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                    padding: '0.2em 0.4em',
+                    borderRadius: '3px',
+                    fontFamily: 'Monaco, Courier New, monospace',
+                    fontSize: '0.9em',
+                  },
+                  '& pre': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                    padding: '1em',
+                    borderRadius: '4px',
+                    overflow: 'auto',
+                    margin: '0.75em 0',
+                  },
+                  '& pre code': {
+                    backgroundColor: 'transparent',
+                    padding: 0,
+                  },
+                  // Table styling
+                  '& table': {
+                    borderCollapse: 'collapse',
+                    width: '100%',
+                    margin: '0.75em 0',
+                  },
+                  '& th, & td': {
+                    border: `1px solid ${GAME_COLORS.border}`,
+                    padding: '0.5em',
+                    textAlign: 'left',
+                  },
+                  '& th': {
+                    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                    fontWeight: 700,
+                  },
+                  // Blockquote styling
+                  '& blockquote': {
+                    borderLeft: `4px solid ${GAME_COLORS.border}`,
+                    paddingLeft: '1em',
+                    marginLeft: 0,
+                    marginRight: 0,
+                    color: GAME_COLORS.textSecondary,
+                    fontStyle: 'italic',
                   },
                 }}
                 dangerouslySetInnerHTML={{ __html: selectedNotice.content }}

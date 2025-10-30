@@ -2852,6 +2852,10 @@
     "noTitle": "(无标题)",
     "noContent": "(无内容)",
     "noNoticesFound": "未找到公告",
+    "copyUrl": "复制公告URL",
+    "copyUrlTooltip": "将公告页面URL复制到剪贴板",
+    "copyUrlSuccess": "公告URL已复制到剪贴板",
+    "copyUrlFailed": "复制URL失败",
     "previewPage": {
       "title": "服务公告",
       "subtitle": "此预览显示游戏内网页视图中的公告内容。实际显示可能略有不同。",
