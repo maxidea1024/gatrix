@@ -21,7 +21,6 @@ import {
   Add as AddIcon,
   Delete as DeleteIcon,
   DragIndicator as DragIcon,
-  ContentCopy as CopyIcon,
   AddCircleOutline as InsertIcon,
   Straighten as ResizeIcon,
   Edit as EditIcon,
@@ -260,14 +259,6 @@ const SortableItem: React.FC<SortableItemProps> = ({
         {renderInput()}
       </Box>
       <Box sx={{ display: 'flex', gap: 0.5, alignSelf: 'center' }}>
-        <Tooltip title={t('settings.kv.duplicateElement')}>
-          <IconButton
-            size="small"
-            onClick={() => onDuplicate(item.id)}
-          >
-            <CopyIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
         <Tooltip title={t('settings.kv.insertBefore')}>
           <IconButton
             size="small"

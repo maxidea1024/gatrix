@@ -284,9 +284,20 @@ const KeyValuePage: React.FC = () => {
                       </TableCell>
                       <TableCell>{renderValueDisplay(item)}</TableCell>
                       <TableCell>
-                        <Typography variant="body2" color="text.secondary">
-                          {item.description?.replace(/\[elementType:\w+\]\s*/, '') || '-'}
-                        </Typography>
+                        <Tooltip title={item.description?.replace(/\[elementType:\w+\]\s*/, '') || '-'}>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{
+                              maxWidth: '300px',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {item.description?.replace(/\[elementType:\w+\]\s*/, '') || '-'}
+                          </Typography>
+                        </Tooltip>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" color="text.secondary">

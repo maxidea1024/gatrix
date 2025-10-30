@@ -83,7 +83,7 @@ export class ClientController {
     // Get clientVersionPassiveData from KV settings
     let passiveData = {};
     try {
-      const passiveDataStr = await VarsModel.get('kv:clientVersionPassiveData');
+      const passiveDataStr = await VarsModel.get('$clientVersionPassiveData');
       if (passiveDataStr) {
         passiveData = JSON.parse(passiveDataStr);
       }
