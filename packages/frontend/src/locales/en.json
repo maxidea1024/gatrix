@@ -1701,6 +1701,7 @@
     "expand": "Expand",
     "example": "Example",
     "export": "Export",
+    "exporting": "Exporting...",
     "filter": {
       "addFilter": "Add filter",
       "removeFilter": "Remove filter",
@@ -3183,6 +3184,14 @@
         "platform": "Platform",
         "channel": "Channel",
         "subChannel": "Sub Channel"
+      },
+      "exportDialog": {
+        "title": "Export Coupon Usage Records",
+        "processing": "Processing coupon usage records...",
+        "completed": "Export completed.",
+        "failed": "Export failed.",
+        "progress": "Processing {{processed}} / {{total}} records",
+        "successMessage": "Coupon usage records have been exported."
       }
     },
     "subtitle": "Create and manage game coupons"

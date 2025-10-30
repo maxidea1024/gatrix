@@ -17,6 +17,8 @@ const createSchema = Joi.object({
   tags: Joi.alternatives(Joi.object(), Joi.array(), Joi.string()).optional().allow(null),
   maxTotalUses: Joi.number().integer().min(1).allow(null),
   perUserLimit: Joi.number().integer().min(1).default(1),
+  usageLimitType: Joi.string().valid('USER', 'CHARACTER').optional().default('USER'),
+  codePattern: Joi.string().valid('ALPHANUMERIC_8', 'ALPHANUMERIC_16', 'ALPHANUMERIC_16_HYPHEN').optional(),
   rewardTemplateId: Joi.string().length(26).allow(null),
   rewardData: Joi.alternatives(Joi.object(), Joi.array(), Joi.string()).allow(null),
   rewardEmailTitle: Joi.string().max(255).required(),
@@ -194,9 +196,24 @@ export class CouponSettingsController {
     res.json({ success: true, data: result });
   });
 
-  // Export coupon usage records to CSV
+  // Get coupon usage records for export (chunked)
+  static getUsageForExport = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { offset, limit, settingId, couponCode, platform, gameWorldId, characterId } = req.query;
+    const data = await CouponSettingsService.getUsageForExportChunked({
+      offset: offset ? parseInt(offset as string) : undefined,
+      limit: limit ? parseInt(limit as string) : undefined,
+      settingId: settingId as string,
+      couponCode: couponCode as string,
+      platform: platform as string,
+      gameWorldId: gameWorldId as string,
+      characterId: characterId as string,
+    } as any);
+    res.json({ success: true, data });
+  });
+
+  // Export coupon usage records (returns JSON data for frontend to format as CSV/XLSX)
   static exportUsage = asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-    const { settingId, couponCode, platform, gameWorldId, characterId } = req.query;
+    const { settingId, couponCode, platform, gameWorldId, characterId, timezone } = req.query;
 
     // Get all usage records with filters
     const records = await CouponSettingsService.getUsageForExport({
@@ -207,53 +224,38 @@ export class CouponSettingsController {
       characterId: characterId as string,
     } as any);
 
-    // Build CSV content
-    const headers = [
-      'Coupon Name',
-      'Coupon Code',
-      'User ID',
-      'User Name',
-      'Character ID',
-      'Sequence',
-      'Used At',
-      'Coupon Start Date',
-      'Coupon Expiry Date',
-      'Game World',
-      'Platform'
-    ];
+    // Use provided timezone or default to Asia/Seoul
+    const tz = (timezone as string) || 'Asia/Seoul';
 
-    const rows = records.map((r: any) => [
-      r.couponName || '-',
-      r.couponCode || '-',
-      r.userId || '-',
-      r.userName || '-',
-      r.characterId || '-',
-      r.sequence || '-',
-      r.usedAt || '-',
-      r.couponStartsAt || '-',
-      r.couponExpiresAt || '-',
-      r.gameWorldId || '-',
-      r.platform || '-'
-    ]);
+    // Import timezone conversion function
+    const { convertMySQLDateTimeToTimezone } = require('../utils/dateUtils');
 
-    // Create CSV string
-    const csvContent = [
-      headers.join(','),
-      ...rows.map(r => r.map((cell: any) => {
-        // Escape quotes and wrap in quotes if contains comma
-        const str = String(cell);
-        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-          return `"${str.replace(/"/g, '""')}"`;
-        }
-        return str;
-      }).join(','))
-    ].join('\n');
+    // Transform records with timezone conversion
+    const transformedRecords = records.map((r: any) => ({
+      'Coupon Name': r.couponName || '-',
+      'Coupon Code': r.couponCode || '-',
+      'User ID': r.userId || '-',
+      'User Name': r.userName || '-',
+      'Character ID': r.characterId || '-',
+      'Sequence': r.sequence || '-',
+      'Used At': convertMySQLDateTimeToTimezone(r.usedAt, tz) || '-',
+      'Coupon Start Date': convertMySQLDateTimeToTimezone(r.couponStartsAt, tz) || '-',
+      'Coupon Expiry Date': convertMySQLDateTimeToTimezone(r.couponExpiresAt, tz) || '-',
+      'Game World': r.gameWorldId || '-',
+      'Platform': r.platform || '-',
+      'Channel': r.channel || '-',
+      'Sub Channel': r.subchannel || '-'
+    }));
 
-    // Set response headers for CSV download
+    // Return JSON data (frontend will format as CSV or XLSX)
     const timestamp = new Date().toISOString().slice(0, 10);
-    res.setHeader('Content-Type', 'text/csv;charset=utf-8;');
-    res.setHeader('Content-Disposition', `attachment; filename="coupon-usage-${timestamp}.csv"`);
-    res.send(csvContent);
+    res.json({
+      success: true,
+      data: {
+        records: transformedRecords,
+        filename: `coupon-usage-${timestamp}`
+      }
+    });
   });
 }
 

@@ -895,7 +895,16 @@ const CouponSettingsPage: React.FC = () => {
                             return (
                               <TableCell key="name" sx={{ py: 1, px: 2 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                  <Typography variant="body2">{it.name}</Typography>
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      cursor: 'pointer',
+                                      '&:hover': { color: 'primary.main', textDecoration: 'underline' }
+                                    }}
+                                    onClick={() => handleEditClick(it)}
+                                  >
+                                    {it.name}
+                                  </Typography>
                                   <Tooltip title={t('coupons.couponSettings.copyName')}>
                                     <IconButton size="small" onClick={() => handleCopyName(it.name)}>
                                       <ContentCopyIcon fontSize="inherit" />

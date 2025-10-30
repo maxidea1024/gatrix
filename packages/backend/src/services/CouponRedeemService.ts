@@ -182,7 +182,28 @@ export class CouponRedeemService {
 
       // 11. Build response
       let reward: any[] = [];
-      if (setting.rewardData) {
+
+      // Get reward from template or direct data
+      if (setting.rewardTemplateId) {
+        // Get reward items from template
+        const [templateRows] = await connection.execute<RowDataPacket[]>(
+          'SELECT rewardItems FROM g_reward_templates WHERE id = ?',
+          [setting.rewardTemplateId]
+        );
+
+        if (templateRows.length > 0) {
+          const template = templateRows[0] as any;
+          const rewardItems = typeof template.rewardItems === 'string' ? JSON.parse(template.rewardItems) : template.rewardItems;
+          if (Array.isArray(rewardItems)) {
+            reward = rewardItems.map((item: any) => ({
+              type: parseInt(item.rewardType || item.type || 0),
+              id: parseInt(item.itemId || item.id || 0),
+              quantity: parseInt(item.quantity || 0),
+            }));
+          }
+        }
+      } else if (setting.rewardData) {
+        // Get reward from direct data
         const rewardData = typeof setting.rewardData === 'string' ? JSON.parse(setting.rewardData) : setting.rewardData;
         // Ensure reward is always an array and transform to API format
         if (Array.isArray(rewardData)) {

@@ -1701,6 +1701,7 @@
     "expand": "펼치기",
     "example": "예시",
     "export": "내보내기",
+    "exporting": "내보내는 중",
     "filter": {
       "addFilter": "필터 추가",
       "removeFilter": "필터 제거",
@@ -3183,6 +3184,14 @@
         "platform": "플랫폼",
         "channel": "채널",
         "subChannel": "서브채널"
+      },
+      "exportDialog": {
+        "title": "쿠폰 사용 기록 내보내기",
+        "processing": "쿠폰 사용 기록을 처리 중입니다...",
+        "completed": "내보내기가 완료되었습니다.",
+        "failed": "내보내기에 실패했습니다.",
+        "progress": "{{processed}} / {{total}} 건 처리 중",
+        "successMessage": "쿠폰 사용 기록을 내보냈습니다."
       }
     },
     "subtitle": "게임 쿠폰을 생성하고 관리합니다"

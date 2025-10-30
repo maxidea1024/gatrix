@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Typography, TextField, MenuItem, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, InputAdornment, IconButton, Tooltip, TableSortLabel, Button } from '@mui/material';
-import { History as HistoryIcon, Search as SearchIcon, ViewColumn as ViewColumnIcon, Download as DownloadIcon } from '@mui/icons-material';
+import { Box, Typography, TextField, MenuItem, Card, CardContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, InputAdornment, IconButton, Tooltip, TableSortLabel, Button, Dialog, DialogTitle, DialogContent, DialogActions, LinearProgress, Menu } from '@mui/material';
+import { History as HistoryIcon, Search as SearchIcon, ViewColumn as ViewColumnIcon, Download as DownloadIcon, ContentCopy as ContentCopyIcon } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import SimplePagination from '@/components/common/SimplePagination';
@@ -8,7 +8,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 import DynamicFilterBar, { ActiveFilter, FilterDefinition } from '@/components/common/DynamicFilterBar';
 import EmptyTableRow from '@/components/common/EmptyTableRow';
 import { couponService, CouponSetting, UsageRecord } from '@/services/couponService';
-import { formatDateTime } from '@/utils/dateFormat';
+import { formatDateTime, getStoredTimezone } from '@/utils/dateFormat';
 import ColumnSettingsDialog, { ColumnConfig } from '@/components/common/ColumnSettingsDialog';
 
 // Coupon Usage page (admin view of redemption records)
@@ -28,6 +28,13 @@ const CouponUsagePage: React.FC = () => {
 
   // export state
   const [exporting, setExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
+  const [exportProcessedCount, setExportProcessedCount] = useState(0);
+  const [exportError, setExportError] = useState<string | null>(null);
+  const [exportSuccess, setExportSuccess] = useState(false);
+  const [exportFormat, setExportFormat] = useState<'csv' | 'xlsx'>('csv');
+  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
+  const exportAbortControllerRef = React.useRef<AbortController | null>(null);
 
   // search & dynamic filters
   const [searchTerm, setSearchTerm] = useState('');
@@ -119,6 +126,16 @@ const CouponUsagePage: React.FC = () => {
     }
   };
 
+  // Copy to clipboard handler
+  const handleCopy = (text: string | undefined) => {
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+    }).catch(() => {
+      enqueueSnackbar(t('common.copyFailed'), { variant: 'error' });
+    });
+  };
+
   const sortedRecords = useMemo(() => {
     const getVal = (r: UsageRecord) => {
       switch (orderBy) {
@@ -183,15 +200,17 @@ const CouponUsagePage: React.FC = () => {
 
   useEffect(() => { load(); }, [load]);
 
-  // Export usage records to CSV
-  const handleExport = async () => {
+  // Export usage records to CSV or XLSX
+  const handleExport = async (format: 'csv' | 'xlsx') => {
     try {
-      setExporting(true);
-      const now = new Date();
-      const dateStr = now.toISOString().slice(0, 10);
+      // Get user's timezone setting
+      const userTimezone = getStoredTimezone();
 
-      // Call backend export API with current filters using axios
-      const response = await couponService.exportUsage({
+      // Close menu
+      setExportMenuAnchor(null);
+
+      // Call backend API to get data with timezone conversion
+      const exportResult = await couponService.exportUsage({
         ...(settingIdFilter && { settingId: settingIdFilter }),
         ...(couponCodeFilter && { couponCode: couponCodeFilter }),
         ...(platformFilter && { platform: platformFilter }),
@@ -199,25 +218,58 @@ const CouponUsagePage: React.FC = () => {
         ...(subChannelFilter && { subChannel: subChannelFilter }),
         ...(worldFilter && { gameWorldId: worldFilter }),
         ...(characterIdFilter && { characterId: characterIdFilter }),
+        timezone: userTimezone,
       });
 
-      // Download CSV file
-      const blob = new Blob([response], { type: 'text/csv;charset=utf-8;' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `coupon-usage-${dateStr}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      const records = exportResult.records || [];
+      const filename = exportResult.filename;
+
+      if (format === 'csv') {
+        // CSV export
+        const headers = Object.keys(records[0] || {});
+        const csvContent = [
+          headers.join(','),
+          ...records.map((r: any) => headers.map(h => {
+            const cell = r[h] || '-';
+            const str = String(cell);
+            if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+              return `"${str.replace(/"/g, '""')}"`;
+            }
+            return str;
+          }).join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${filename}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else if (format === 'xlsx') {
+        // XLSX export using xlsx library
+        const XLSX = await import('xlsx');
+        const ws = XLSX.utils.json_to_sheet(records);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Coupon Usage');
+        const xlsxBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([xlsxBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${filename}.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }
 
       enqueueSnackbar(t('coupons.couponSettings.exportSuccess'), { variant: 'success' });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Export error:', error);
-      enqueueSnackbar(t('coupons.couponSettings.exportError'), { variant: 'error' });
-    } finally {
-      setExporting(false);
+      enqueueSnackbar(error.message || t('coupons.couponSettings.exportError'), { variant: 'error' });
     }
   };
 
@@ -232,14 +284,24 @@ const CouponUsagePage: React.FC = () => {
           </Typography>
           <Typography variant="body2" color="text.secondary">{t('coupons.couponUsage.subtitle')}</Typography>
         </Box>
-        <Button
-          variant="outlined"
-          startIcon={<DownloadIcon />}
-          onClick={handleExport}
-          disabled={exporting || records.length === 0}
-        >
-          {exporting ? t('common.exporting') : t('common.export')}
-        </Button>
+        <Box>
+          <Button
+            variant="outlined"
+            startIcon={<DownloadIcon />}
+            onClick={(e) => setExportMenuAnchor(e.currentTarget)}
+            disabled={exporting || records.length === 0}
+          >
+            {exporting ? t('common.exporting') : t('common.export')}
+          </Button>
+          <Menu
+            anchorEl={exportMenuAnchor}
+            open={Boolean(exportMenuAnchor)}
+            onClose={() => setExportMenuAnchor(null)}
+          >
+            <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
+            <MenuItem onClick={() => handleExport('xlsx')}>Excel (XLSX)</MenuItem>
+          </Menu>
+        </Box>
       </Box>
 
       {/* Search & Filters */}
@@ -313,23 +375,74 @@ const CouponUsagePage: React.FC = () => {
                         switch (col.id) {
                           case 'couponName':
                             return (
-                              <TableCell key="couponName"><Typography variant="body2">{r.couponName || '-'}</Typography></TableCell>
+                              <TableCell key="couponName">
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Typography variant="body2">{r.couponName || '-'}</Typography>
+                                  {r.couponName && (
+                                    <Tooltip title={t('common.copy')}>
+                                      <IconButton size="small" onClick={() => handleCopy(r.couponName)}>
+                                        <ContentCopyIcon fontSize="inherit" />
+                                      </IconButton>
+                                    </Tooltip>
+                                  )}
+                                </Box>
+                              </TableCell>
                             );
                           case 'couponCode':
                             return (
-                              <TableCell key="couponCode"><Typography variant="body2">{r.couponCode || '-'}</Typography></TableCell>
+                              <TableCell key="couponCode">
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Typography variant="body2">{r.couponCode || '-'}</Typography>
+                                  {r.couponCode && (
+                                    <Tooltip title={t('common.copy')}>
+                                      <IconButton size="small" onClick={() => handleCopy(r.couponCode)}>
+                                        <ContentCopyIcon fontSize="inherit" />
+                                      </IconButton>
+                                    </Tooltip>
+                                  )}
+                                </Box>
+                              </TableCell>
                             );
                           case 'userId':
                             return (
-                              <TableCell key="userId"><Typography variant="body2">{r.userId}</Typography></TableCell>
+                              <TableCell key="userId">
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Typography variant="body2">{r.userId}</Typography>
+                                  <Tooltip title={t('common.copy')}>
+                                    <IconButton size="small" onClick={() => handleCopy(r.userId)}>
+                                      <ContentCopyIcon fontSize="inherit" />
+                                    </IconButton>
+                                  </Tooltip>
+                                </Box>
+                              </TableCell>
                             );
                           case 'userName':
                             return (
-                              <TableCell key="userName"><Typography variant="body2">{r.userName}</Typography></TableCell>
+                              <TableCell key="userName">
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Typography variant="body2">{r.userName}</Typography>
+                                  <Tooltip title={t('common.copy')}>
+                                    <IconButton size="small" onClick={() => handleCopy(r.userName)}>
+                                      <ContentCopyIcon fontSize="inherit" />
+                                    </IconButton>
+                                  </Tooltip>
+                                </Box>
+                              </TableCell>
                             );
                           case 'characterId':
                             return (
-                              <TableCell key="characterId"><Typography variant="body2">{r.characterId || '-'}</Typography></TableCell>
+                              <TableCell key="characterId">
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Typography variant="body2">{r.characterId || '-'}</Typography>
+                                  {r.characterId && (
+                                    <Tooltip title={t('common.copy')}>
+                                      <IconButton size="small" onClick={() => handleCopy(r.characterId)}>
+                                        <ContentCopyIcon fontSize="inherit" />
+                                      </IconButton>
+                                    </Tooltip>
+                                  )}
+                                </Box>
+                              </TableCell>
                             );
                           case 'sequence':
                             return (
@@ -394,6 +507,92 @@ const CouponUsagePage: React.FC = () => {
         onColumnsChange={handleColumnsChange}
         onReset={handleResetColumns}
       />
+
+      {/* Export Progress Dialog - Only show for large datasets (>1000 records) */}
+      <Dialog
+        open={(exporting || exportSuccess || exportError !== null) && total > 1000}
+        onClose={() => {
+          if (!exporting) {
+            setExportSuccess(false);
+            setExportError(null);
+            setExportProgress(0);
+            setExportProcessedCount(0);
+          }
+        }}
+        maxWidth="sm"
+        fullWidth
+        disableEscapeKeyDown={exporting}
+      >
+        <DialogTitle>
+          {exportSuccess
+            ? t('coupons.couponUsage.exportDialog.completed')
+            : exportError
+            ? t('coupons.couponUsage.exportDialog.failed')
+            : t('coupons.couponUsage.exportDialog.title')}
+        </DialogTitle>
+        <DialogContent sx={{ py: 3 }}>
+          {exporting ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                {t('coupons.couponUsage.exportDialog.processing')}
+              </Typography>
+              <Box>
+                <LinearProgress
+                  variant="determinate"
+                  value={exportProgress}
+                  sx={{ height: 8, borderRadius: 1 }}
+                />
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                  {t('coupons.couponUsage.exportDialog.progress', {
+                    processed: exportProcessedCount,
+                    total: total
+                  })}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {exportProgress}%
+                </Typography>
+              </Box>
+            </Box>
+          ) : exportSuccess ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}>
+              <Typography variant="body2" color="text.secondary">
+                {t('coupons.couponUsage.exportDialog.successMessage')}
+              </Typography>
+            </Box>
+          ) : (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Typography variant="body2" color="error">
+                {exportError}
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          {exporting ? (
+            <Button
+              onClick={() => {
+                exportAbortControllerRef.current?.abort();
+              }}
+              color="error"
+            >
+              {t('common.cancel')}
+            </Button>
+          ) : (
+            <Button
+              onClick={() => {
+                setExportSuccess(false);
+                setExportError(null);
+                setExportProgress(0);
+                setExportProcessedCount(0);
+              }}
+            >
+              {t('common.close')}
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
 
     </Box>
   );

@@ -140,8 +140,12 @@ export const couponService = {
     const res = await api.get(url, { params });
     return res.data;
   },
-  async exportUsage(params?: { settingId?: string; couponCode?: string; platform?: string; channel?: string; subChannel?: string; gameWorldId?: string; characterId?: string; }): Promise<string> {
-    const res = await api.get('/admin/coupon-settings/usage/export', { params, responseType: 'text' });
+  async getUsageForExport(params?: { offset?: number; limit?: number; settingId?: string; couponCode?: string; platform?: string; channel?: string; subChannel?: string; gameWorldId?: string; characterId?: string; }): Promise<{ records: any[]; total: number; offset: number; limit: number; hasMore: boolean }> {
+    const res = await api.get('/admin/coupon-settings/usage/export-chunked', { params });
+    return res.data;
+  },
+  async exportUsage(params?: { settingId?: string; couponCode?: string; platform?: string; channel?: string; subChannel?: string; gameWorldId?: string; characterId?: string; timezone?: string; }): Promise<{ records: any[]; filename: string }> {
+    const res = await api.get('/admin/coupon-settings/usage/export', { params });
     return res.data;
   },
   async getIssuedCodesStats(settingId: string): Promise<IssuedCodesStats> {

@@ -563,6 +563,8 @@ export class CouponSettingsService {
         cu.usedAt,
         cu.gameWorldId,
         cu.platform,
+        cu.channel,
+        cu.subchannel,
         cs.name as couponName,
         COALESCE(c.code, cs.code) as couponCode,
         cs.startsAt as couponStartsAt,
@@ -576,6 +578,101 @@ export class CouponSettingsService {
     );
 
     return rows;
+  }
+
+  /**
+   * Get coupon usage records for export with pagination (chunked)
+   * Returns records in chunks for streaming/pagination
+   */
+  static async getUsageForExportChunked(query: CouponUsageQuery & { offset?: number; limit?: number } = {}) {
+    const pool = database.getPool();
+
+    const offset = query.offset || 0;
+    const limit = Math.min(query.limit || 1000, 10000); // Max 10000 per request
+
+    const where: string[] = [];
+    const args: any[] = [];
+
+    // Build WHERE clause with same filters as getUsageForExport
+    if ((query as any).settingId) {
+      where.push('cu.settingId = ?');
+      args.push((query as any).settingId);
+    }
+    if ((query as any).couponCode) {
+      where.push('COALESCE(c.code, cs.code) = ?');
+      args.push((query as any).couponCode);
+    }
+    if (query.platform) {
+      where.push('cu.platform = ?');
+      args.push(query.platform);
+    }
+    if (query.channel) {
+      where.push('cu.channel = ?');
+      args.push(query.channel);
+    }
+    if (query.subChannel) {
+      where.push('cu.subchannel = ?');
+      args.push(query.subChannel);
+    }
+    if (query.gameWorldId) {
+      where.push('cu.gameWorldId = ?');
+      args.push(query.gameWorldId);
+    }
+    if ((query as any).characterId) {
+      where.push('cu.characterId = ?');
+      args.push((query as any).characterId);
+    }
+    if (query.from) {
+      where.push('cu.usedAt >= ?');
+      args.push(convertToMySQLDateTime(query.from));
+    }
+    if (query.to) {
+      where.push('cu.usedAt <= ?');
+      args.push(convertToMySQLDateTime(query.to));
+    }
+
+    const whereSql = where.length > 0 ? `WHERE ${where.join(' AND ')}` : '';
+
+    // Get total count
+    const countQuery = `SELECT COUNT(*) as total FROM g_coupon_uses cu
+       LEFT JOIN g_coupon_settings cs ON cu.settingId = cs.id
+       LEFT JOIN g_coupons c ON cu.issuedCouponId = c.id
+       ${whereSql}`;
+    const [countRows] = await pool.execute<RowDataPacket[]>(countQuery, args);
+    const total = Number(countRows[0]?.total || 0);
+
+    // Get records for this chunk
+    // Note: LIMIT and OFFSET must be in the query string, not as parameters
+    const recordsQuery = `SELECT
+        cu.id,
+        cu.userId,
+        cu.userName,
+        cu.characterId,
+        cu.sequence,
+        cu.usedAt,
+        cu.gameWorldId,
+        cu.platform,
+        cu.channel,
+        cu.subchannel,
+        cs.name as couponName,
+        COALESCE(c.code, cs.code) as couponCode,
+        cs.startsAt as couponStartsAt,
+        cs.expiresAt as couponExpiresAt
+      FROM g_coupon_uses cu
+      LEFT JOIN g_coupon_settings cs ON cu.settingId = cs.id
+      LEFT JOIN g_coupons c ON cu.issuedCouponId = c.id
+      ${whereSql}
+      ORDER BY cu.usedAt DESC
+      LIMIT ${limit} OFFSET ${offset}`;
+    const [rows] = await pool.execute<RowDataPacket[]>(recordsQuery, args);
+
+    return {
+      records: rows,
+      total,
+      offset,
+      limit,
+      hasMore: offset + limit < total
+    };
   }
 
   /**

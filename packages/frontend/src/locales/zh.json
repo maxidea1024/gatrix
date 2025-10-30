@@ -1756,6 +1756,7 @@
     "expand": "展开",
     "example": "示例",
     "export": "导出",
+    "exporting": "导出中...",
     "filter": {
       "addFilter": "添加筛选",
       "removeFilter": "删除筛选",
@@ -3227,6 +3228,14 @@
         "platform": "平台",
         "channel": "频道",
         "subChannel": "子频道"
+      },
+      "exportDialog": {
+        "title": "导出优惠券使用记录",
+        "processing": "正在处理优惠券使用记录...",
+        "completed": "导出完成。",
+        "failed": "导出失败。",
+        "progress": "已处理 {{processed}} / {{total}} 条记录",
+        "successMessage": "优惠券使用记录已导出。"
       }
     },
     "subtitle": "创建和管理游戏优惠券"

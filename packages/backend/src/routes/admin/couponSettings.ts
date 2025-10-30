@@ -12,6 +12,9 @@ router.post('/', CouponSettingsController.create);
 // Usage records for all settings (no settingId)
 router.get('/usage', CouponSettingsController.usage);
 
+// Get usage records for export (chunked)
+router.get('/usage/export-chunked', CouponSettingsController.getUsageForExport);
+
 // Export usage records to CSV
 router.get('/usage/export', CouponSettingsController.exportUsage);
 

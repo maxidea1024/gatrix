@@ -173,8 +173,61 @@ export const TIMEZONE = {
 } as const;
 
 /**
+ * MySQL DATETIME 문자열을 지정된 타임존으로 변환
+ *
+ * @param mysqlDateTimeStr - MySQL DATETIME 형식 문자열 (YYYY-MM-DD HH:MM:SS)
+ * @param timezone - 변환할 타임존 (기본값: Asia/Seoul)
+ * @returns 타임존이 적용된 포맷된 날짜 문자열 (YYYY-MM-DD HH:MM:SS)
+ *
+ * @example
+ * convertMySQLDateTimeToTimezone("2025-10-30 08:30:00", "Asia/Seoul") // "2025-10-30 17:30:00"
+ * convertMySQLDateTimeToTimezone("2025-10-30 08:30:00", "UTC") // "2025-10-30 08:30:00"
+ */
+export function convertMySQLDateTimeToTimezone(
+  mysqlDateTimeStr: string | null | undefined,
+  timezone: string = 'Asia/Seoul'
+): string | null {
+  if (!mysqlDateTimeStr) return null;
+
+  try {
+    // MySQL DATETIME은 UTC로 저장되므로 'Z'를 붙여서 UTC로 파싱
+    const date = new Date(mysqlDateTimeStr + 'Z');
+
+    if (isNaN(date.getTime())) {
+      console.warn(`Invalid MySQL datetime: ${mysqlDateTimeStr}`);
+      return null;
+    }
+
+    // 지정된 타임존으로 포맷
+    const formatter = new Intl.DateTimeFormat('sv-SE', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+
+    const parts = formatter.formatToParts(date);
+    const year = parts.find(p => p.type === 'year')?.value;
+    const month = parts.find(p => p.type === 'month')?.value;
+    const day = parts.find(p => p.type === 'day')?.value;
+    const hour = parts.find(p => p.type === 'hour')?.value;
+    const minute = parts.find(p => p.type === 'minute')?.value;
+    const second = parts.find(p => p.type === 'second')?.value;
+
+    return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+  } catch (error) {
+    console.error(`Error converting MySQL datetime to timezone: ${mysqlDateTimeStr}`, error);
+    return null;
+  }
+}
+
+/**
  * 데이터베이스 설정 확인용 함수
- * 
+ *
  * @returns 현재 시간 정보 객체
  */
 export function getTimeInfo() {
