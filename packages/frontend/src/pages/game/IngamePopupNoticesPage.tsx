@@ -38,6 +38,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import ingamePopupNoticeService, { IngamePopupNotice, IngamePopupNoticeFilters } from '../../services/ingamePopupNoticeService';
 import IngamePopupNoticeFormDialog from '../../components/game/IngamePopupNoticeFormDialog';
 import IngamePopupNoticeGuideDrawer from '../../components/game/IngamePopupNoticeGuideDrawer';
@@ -53,6 +54,7 @@ import dayjs from 'dayjs';
 const IngamePopupNoticesPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { platforms } = usePlatformConfig();
 
   // State
   const [notices, setNotices] = useState<IngamePopupNotice[]>([]);
@@ -165,13 +167,10 @@ const IngamePopupNoticesPage: React.FC = () => {
       type: 'multiselect',
       operator: 'any_of',
       allowOperatorToggle: true,
-      options: [
-        { value: 'pc', label: 'PC' },
-        { value: 'pc-wegame', label: 'PC-WeGame' },
-        { value: 'ios', label: 'iOS' },
-        { value: 'android', label: 'Android' },
-        { value: 'harmonyos', label: 'HarmonyOS' },
-      ],
+      options: platforms.map(platform => ({
+        value: platform.value,
+        label: platform.label,
+      })),
     },
   ];
 

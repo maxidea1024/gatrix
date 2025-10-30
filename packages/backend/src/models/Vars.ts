@@ -9,6 +9,7 @@ export interface VarItem {
   valueType: VarValueType;
   description: string | null;
   isSystemDefined: boolean;
+  isCopyable: boolean;
   createdBy: number;
   updatedBy: number | null;
   createdAt: Date;
@@ -48,7 +49,7 @@ export default class VarsModel {
   }
 
   /**
-   * Get all KV items (keys starting with 'kv:')
+   * Get all KV items (keys starting with 'kv:' or '$')
    */
   static async getAllKV(): Promise<VarItem[]> {
     const results = await db('g_vars as v')
@@ -59,13 +60,16 @@ export default class VarsModel {
         'creator.name as createdByName',
         'updater.name as updatedByName'
       )
-      .where('v.varKey', 'like', 'kv:%')
+      .where((builder) => {
+        builder.where('v.varKey', 'like', 'kv:%').orWhere('v.varKey', 'like', '$%');
+      })
       .orderBy('v.varKey', 'asc');
 
     // Convert MySQL boolean (0/1) to JavaScript boolean
     return results.map(item => ({
       ...item,
       isSystemDefined: Boolean(item.isSystemDefined),
+      isCopyable: Boolean(item.isCopyable),
     }));
   }
 
@@ -92,6 +96,7 @@ export default class VarsModel {
     return {
       ...result,
       isSystemDefined: Boolean(result.isSystemDefined),
+      isCopyable: Boolean(result.isCopyable),
     };
   }
 
@@ -184,9 +189,10 @@ export default class VarsModel {
     key: string,
     value: string | null,
     valueType: VarValueType,
-    description?: string
+    description?: string,
+    isCopyable: boolean = true
   ): Promise<void> {
-    const fullKey = key.startsWith('kv:') ? key : `kv:${key}`;
+    const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
 
     // Check if item already exists
     const existing = await this.getKV(fullKey);
@@ -198,6 +204,7 @@ export default class VarsModel {
         .update({
           description: description || existing.description || null,
           isSystemDefined: true,
+          isCopyable,
         });
     } else {
       // Item doesn't exist: create it with initial value
@@ -207,6 +214,7 @@ export default class VarsModel {
         valueType,
         description: description || null,
         isSystemDefined: true,
+        isCopyable,
         createdBy: 1, // System user
       });
     }

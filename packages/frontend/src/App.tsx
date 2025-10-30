@@ -25,6 +25,7 @@ import './styles/scrollbar.css'; // Must be last to override all other scrollbar
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { I18nProvider, useI18n } from './contexts/I18nContext';
+import { PlatformConfigProvider } from './contexts/PlatformConfigContext';
 
 // Components
 import { LoadingIndicator } from './components/LoadingIndicator';
@@ -240,9 +241,10 @@ const AppContent: React.FC = () => {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <AuthInitializer>
-          <LocalizedDatePickers>
-            <CssBaseline />
+        <PlatformConfigProvider>
+          <AuthInitializer>
+            <LocalizedDatePickers>
+              <CssBaseline />
             {/* Global scrollbar styles */}
             <GlobalStyles
               styles={(theme) => ({
@@ -411,9 +413,10 @@ const AppContent: React.FC = () => {
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Router>
-          </SnackbarProvider>
-        </LocalizedDatePickers>
-        </AuthInitializer>
+            </SnackbarProvider>
+          </LocalizedDatePickers>
+          </AuthInitializer>
+        </PlatformConfigProvider>
       </AuthProvider>
     </ThemeProvider>
   );

@@ -122,6 +122,7 @@ import SimplePagination from '../../components/common/SimplePagination';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import ClientVersionGuideDrawer from '../../components/admin/ClientVersionGuideDrawer';
+import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 
 // HSV를 RGB로 변환하는 함수
 const hsvToRgb = (h: number, s: number, v: number): [number, number, number] => {
@@ -294,6 +295,7 @@ const ClientVersionsPage: React.FC = () => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
+  const { platforms } = usePlatformConfig();
 
   // 페이지 상태 관리 (localStorage 연동)
   const {
@@ -371,9 +373,6 @@ const ClientVersionsPage: React.FC = () => {
   const [editingClientVersion, setEditingClientVersion] = useState<ClientVersion | null>(null);
   const [isCopyMode, setIsCopyMode] = useState(false);
 
-
-  // 메타데이터
-  const [platforms] = useState<string[]>(['pc', 'pc-wegame', 'ios', 'android', 'harmonyos']);
 
   // 태그 관련 상태
   const [tagDialogOpen, setTagDialogOpen] = useState(false);
@@ -476,8 +475,8 @@ const ClientVersionsPage: React.FC = () => {
       operator: 'any_of',
       allowOperatorToggle: false,
       options: platforms.map(platform => ({
-        value: platform,
-        label: platform,
+        value: platform.value,
+        label: platform.label,
       })),
     },
     {
@@ -515,7 +514,7 @@ const ClientVersionsPage: React.FC = () => {
         description: tag.description || '',
       })),
     },
-  ], [t, versions, allTags]);
+  ], [t, versions, allTags, platforms]);
 
   // 동적 필터 추가 핸들러
   const handleFilterAdd = useCallback((filter: ActiveFilter) => {
@@ -1120,15 +1119,43 @@ const ClientVersionsPage: React.FC = () => {
         );
       case 'gameServerAddress':
         return (
-          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
-            {clientVersion.gameServerAddress}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+              {clientVersion.gameServerAddress}
+            </Typography>
+            <Tooltip title={t('common.copy')}>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  navigator.clipboard.writeText(clientVersion.gameServerAddress);
+                  enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                }}
+                sx={{ p: 0.5 }}
+              >
+                <CopyIcon sx={{ fontSize: '0.875rem' }} />
+              </IconButton>
+            </Tooltip>
+          </Box>
         );
       case 'patchAddress':
         return (
-          <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
-            {clientVersion.patchAddress}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" sx={{ fontFamily: 'monospace', fontSize: '0.75rem' }}>
+              {clientVersion.patchAddress}
+            </Typography>
+            <Tooltip title={t('common.copy')}>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  navigator.clipboard.writeText(clientVersion.patchAddress);
+                  enqueueSnackbar(t('common.copiedToClipboard'), { variant: 'success' });
+                }}
+                sx={{ p: 0.5 }}
+              >
+                <CopyIcon sx={{ fontSize: '0.875rem' }} />
+              </IconButton>
+            </Tooltip>
+          </Box>
         );
       case 'guestModeAllowed':
         return (

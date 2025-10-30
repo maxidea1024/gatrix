@@ -79,8 +79,14 @@ const KeyValuePage: React.FC = () => {
 
   // Handle duplicate
   const handleDuplicate = (item: VarItem) => {
+    // Check if item is copyable
+    if (!item.isCopyable) {
+      enqueueSnackbar(t('common.cannotCopySystemItem'), { variant: 'warning' });
+      return;
+    }
+
     // Create a copy with _copy suffix
-    const baseKey = item.varKey.replace('kv:', '');
+    const baseKey = item.varKey.replace(/^(kv:|$)/, '');
     const newKey = `${baseKey}_copy`;
 
     // Create a new item with copied data (without id to trigger create mode)
@@ -88,6 +94,7 @@ const KeyValuePage: React.FC = () => {
       ...item,
       varKey: `kv:${newKey}`,
       isSystemDefined: false, // Duplicated items are never system-defined
+      isCopyable: true, // Duplicated items are always copyable
     };
 
     // Remove id to ensure it's treated as a new item
@@ -292,10 +299,16 @@ const KeyValuePage: React.FC = () => {
                             <EditIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title={t('common.duplicate')}>
-                          <IconButton size="small" onClick={() => handleDuplicate(item)}>
-                            <DuplicateIcon fontSize="small" />
-                          </IconButton>
+                        <Tooltip title={!item.isCopyable ? t('settings.kv.cannotCopy') : t('common.duplicate')}>
+                          <span>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleDuplicate(item)}
+                              disabled={!item.isCopyable}
+                            >
+                              <DuplicateIcon fontSize="small" />
+                            </IconButton>
+                          </span>
                         </Tooltip>
                         <Tooltip title={item.isSystemDefined ? t('settings.kv.systemDefined') : t('common.delete')}>
                           <span>

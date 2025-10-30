@@ -24,6 +24,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
+import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import {
   IngamePopupNotice,
   CreateIngamePopupNoticeData,
@@ -49,6 +50,7 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { platforms } = usePlatformConfig();
   const [submitting, setSubmitting] = useState(false);
 
   // Form state
@@ -275,9 +277,9 @@ const IngamePopupNoticeFormDialog: React.FC<IngamePopupNoticeFormDialogProps> = 
                 </Box>
               )}
             >
-              {['pc', 'pc-wegame', 'ios', 'android', 'harmonyos'].map((platform) => (
-                <MenuItem key={platform} value={platform}>
-                  {platform}
+              {platforms.map((platform) => (
+                <MenuItem key={platform.value} value={platform.value}>
+                  {platform.label}
                 </MenuItem>
               ))}
             </Select>

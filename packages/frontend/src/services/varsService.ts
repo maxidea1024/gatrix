@@ -1,4 +1,5 @@
 import { apiService } from './api';
+import { PlatformOption, ChannelOption, PlatformConfig } from '../types/platformConfig';
 
 export type VarValueType = 'string' | 'number' | 'boolean' | 'color' | 'object' | 'array';
 
@@ -62,6 +63,50 @@ export const varsService = {
 
   async deleteKV(key: string): Promise<void> {
     await apiService.delete(`/admin/vars/kv/${encodeURIComponent(key)}`);
+  },
+
+  // Platform and Channel Configuration
+  async getPlatforms(): Promise<PlatformOption[]> {
+    try {
+      const res = await apiService.get<VarItem>(`/admin/vars/kv/${encodeURIComponent('$platforms')}`);
+      const item = (res as any)?.data;
+      if (!item || !item.varValue) {
+        return [];
+      }
+      const parsed = typeof item.varValue === 'string' ? JSON.parse(item.varValue) : item.varValue;
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      console.error('Failed to load platforms:', error);
+      return [];
+    }
+  },
+
+  async getChannels(): Promise<ChannelOption[]> {
+    try {
+      const res = await apiService.get<VarItem>(`/admin/vars/kv/${encodeURIComponent('$channels')}`);
+      const item = (res as any)?.data;
+      if (!item || !item.varValue) {
+        return [];
+      }
+      const parsed = typeof item.varValue === 'string' ? JSON.parse(item.varValue) : item.varValue;
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      console.error('Failed to load channels:', error);
+      return [];
+    }
+  },
+
+  async getPlatformConfig(): Promise<PlatformConfig> {
+    try {
+      const [platforms, channels] = await Promise.all([
+        this.getPlatforms(),
+        this.getChannels(),
+      ]);
+      return { platforms, channels };
+    } catch (error) {
+      console.error('Failed to load platform config:', error);
+      return { platforms: [], channels: [] };
+    }
   },
 };
 

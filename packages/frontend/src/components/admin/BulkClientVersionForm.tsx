@@ -41,7 +41,7 @@ import { ClientVersionService } from '../../services/clientVersionService';
 import FormDialogHeader from '../common/FormDialogHeader';
 import { tagService } from '../../services/tagService';
 import { PlatformDefaultsService } from '../../services/platformDefaultsService';
-import { AVAILABLE_PLATFORMS } from '../../constants/platforms';
+import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import MaintenanceSettingsInput from '../common/MaintenanceSettingsInput';
 import { MessageTemplate, messageTemplateService } from '../../services/messageTemplateService';
 import ResizableDrawer from '../common/ResizableDrawer';
@@ -138,6 +138,7 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { platforms } = usePlatformConfig();
   const [loading, setLoading] = useState(false);
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
 
@@ -475,9 +476,9 @@ const BulkClientVersionForm: React.FC<BulkClientVersionFormProps> = ({
                       </Box>
                     )}
                   >
-                    {AVAILABLE_PLATFORMS.map((platform) => (
-                      <MenuItem key={platform} value={platform}>
-                        {platform.toUpperCase()}
+                    {platforms.map((platform) => (
+                      <MenuItem key={platform.value} value={platform.value}>
+                        {platform.label}
                       </MenuItem>
                     ))}
                   </Select>

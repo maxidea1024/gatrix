@@ -21,7 +21,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { PlatformDefaultsService, PlatformDefaults, PlatformDefaultsMap } from '@/services/platformDefaultsService';
-import { AVAILABLE_PLATFORMS } from '@/constants/platforms';
+import { usePlatformConfig } from '@/contexts/PlatformConfigContext';
 
 interface PlatformDefaultsDialogProps {
   open: boolean;
@@ -34,6 +34,7 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { platforms, isLoading: platformsLoading } = usePlatformConfig();
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -45,10 +46,10 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
       setLoading(true);
       const data = await PlatformDefaultsService.getAllDefaults();
       // Ensure all known platforms are present, even if not stored yet
-      const merged: PlatformDefaultsMap = AVAILABLE_PLATFORMS.reduce((acc, p) => {
-        acc[p] = {
-          gameServerAddress: data?.[p]?.gameServerAddress || '',
-          patchAddress: data?.[p]?.patchAddress || '',
+      const merged: PlatformDefaultsMap = platforms.reduce((acc, p) => {
+        acc[p.value] = {
+          gameServerAddress: data?.[p.value]?.gameServerAddress || '',
+          patchAddress: data?.[p.value]?.patchAddress || '',
         };
         return acc;
       }, {} as PlatformDefaultsMap);
@@ -62,10 +63,10 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
   };
 
   useEffect(() => {
-    if (open) {
+    if (open && !platformsLoading && platforms.length > 0) {
       loadDefaults();
     }
-  }, [open]);
+  }, [open, platforms, platformsLoading]);
 
   // 플랫폼 삭제/추가 기능은 사용하지 않음 (고정된 플랫폼 목록 사용)
 
@@ -95,7 +96,7 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
     }
   };
 
-  const platformList = AVAILABLE_PLATFORMS;
+  const platformList = platforms;
 
   return (
     <Drawer
@@ -160,11 +161,11 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
               </Alert>
             ) : (
               platformList.map((platform) => (
-                <Accordion key={platform} defaultExpanded>
+                <Accordion key={platform.value} defaultExpanded>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', mr: 2 }}>
                       <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                        {platform}
+                        {platform.label}
                       </Typography>
                     </Box>
                   </AccordionSummary>
@@ -173,16 +174,16 @@ const PlatformDefaultsDialog: React.FC<PlatformDefaultsDialogProps> = ({
                       <TextField
                         fullWidth
                         label={t('clientVersions.form.gameServerAddress')}
-                        value={defaults[platform]?.gameServerAddress || ''}
-                        onChange={(e) => handlePlatformDefaultChange(platform, 'gameServerAddress', e.target.value)}
+                        value={defaults[platform.value]?.gameServerAddress || ''}
+                        onChange={(e) => handlePlatformDefaultChange(platform.value, 'gameServerAddress', e.target.value)}
                         placeholder="https://game.example.com"
                         helperText={t('platformDefaults.gameServerAddressHelp')}
                       />
                       <TextField
                         fullWidth
                         label={t('clientVersions.form.patchAddress')}
-                        value={defaults[platform]?.patchAddress || ''}
-                        onChange={(e) => handlePlatformDefaultChange(platform, 'patchAddress', e.target.value)}
+                        value={defaults[platform.value]?.patchAddress || ''}
+                        onChange={(e) => handlePlatformDefaultChange(platform.value, 'patchAddress', e.target.value)}
                         placeholder="https://patch.example.com"
                         helperText={t('platformDefaults.patchAddressHelp')}
                       />

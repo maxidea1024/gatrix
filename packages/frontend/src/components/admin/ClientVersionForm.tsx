@@ -53,7 +53,7 @@ import {
 import { ClientVersionService } from '../../services/clientVersionService';
 import { tagService } from '../../services/tagService';
 import { PlatformDefaultsService } from '../../services/platformDefaultsService';
-import { AVAILABLE_PLATFORMS } from '../../constants/platforms';
+import { usePlatformConfig } from '../../contexts/PlatformConfigContext';
 import JsonEditor from '../common/JsonEditor';
 import MaintenanceSettingsInput from '../common/MaintenanceSettingsInput';
 import { MessageTemplate, messageTemplateService } from '../../services/messageTemplateService';
@@ -141,6 +141,7 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
 }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
+  const { platforms } = usePlatformConfig();
   const [loading, setLoading] = useState(false);
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
   const versionFieldRef = useRef<HTMLInputElement>(null);
@@ -695,9 +696,9 @@ const ClientVersionForm: React.FC<ClientVersionFormProps> = ({
                           }
                         }}
                       >
-                        {AVAILABLE_PLATFORMS.map((p) => (
-                          <MenuItem key={p} value={p}>
-                            {p}
+                        {platforms.map((p) => (
+                          <MenuItem key={p.value} value={p.value}>
+                            {p.label}
                           </MenuItem>
                         ))}
                       </Select>

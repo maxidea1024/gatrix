@@ -16,6 +16,7 @@ interface SystemKVDefinition {
   value: string | null;
   valueType: VarValueType;
   description: string;
+  isCopyable?: boolean;
 }
 
 /**
@@ -24,25 +25,47 @@ interface SystemKVDefinition {
  */
 const SYSTEM_KV_DEFINITIONS: SystemKVDefinition[] = [
   {
-    key: 'kv:marketTypes',
-    value: JSON.stringify(['PC', 'A1']),
-    valueType: 'array',
-    description: '[elementType:string] Market types for the system',
-  },
-  {
-    key: 'kv:clientVersionPassiveData',
+    key: '$clientVersionPassiveData',
     value: JSON.stringify({}),
     valueType: 'object',
     description: 'Passive data sent with client version info queries from client SDK',
+    isCopyable: false,
   },
-  // Add more system KV definitions here as needed
-  // Example:
-  // {
-  //   key: 'kv:defaultTheme',
-  //   value: 'light',
-  //   valueType: 'string',
-  //   description: 'Default theme for the application',
-  // },
+  {
+    key: '$platforms',
+    value: JSON.stringify([
+      { label: 'PC', value: 'pc' },
+      { label: 'PC-WeGame', value: 'pc-wegame' },
+      { label: 'iOS', value: 'ios' },
+      { label: 'Android', value: 'android' },
+      { label: 'HarmonyOS', value: 'harmonyos' },
+    ]),
+    valueType: 'array',
+    description: '[elementType:object] Platform definitions with label and value. Used for platform selection in UI.',
+    isCopyable: false,
+  },
+  {
+    key: '$channels',
+    value: JSON.stringify([
+      {
+        label: 'PC',
+        value: 'pc',
+        subChannels: [
+          { label: 'PC', value: 'pc' },
+        ],
+      },
+      {
+        label: 'iOS',
+        value: 'ios',
+        subChannels: [
+          { label: 'iOS', value: 'ios' },
+        ],
+      },
+    ]),
+    valueType: 'array',
+    description: '[elementType:object] Channel definitions with label, value, and subChannels. Used for channel selection in UI.',
+    isCopyable: false,
+  },
 ];
 
 /**
@@ -58,7 +81,8 @@ export async function initializeSystemKV(): Promise<void> {
         def.key,
         def.value,
         def.valueType,
-        def.description
+        def.description,
+        def.isCopyable
       );
       logger.info(`System KV initialized: ${def.key}`);
     }

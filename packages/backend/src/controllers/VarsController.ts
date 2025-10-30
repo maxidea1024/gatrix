@@ -51,12 +51,18 @@ export class VarsController {
   static async getKV(req: Request, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
-      const fullKey = key.startsWith('kv:') ? key : `kv:${key}`;
+      const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
       const item = await VarsModel.getKV(fullKey);
 
       if (!item) {
         return res.status(404).json({ success: false, message: 'KV item not found' });
       }
+
+      // Set cache control headers to prevent browser caching
+      // This ensures that platform/channel updates are immediately reflected
+      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
 
       res.json({ success: true, data: item });
     } catch (e) {
@@ -110,7 +116,7 @@ export class VarsController {
   static async updateKV(req: Request, res: Response, next: NextFunction) {
     try {
       const key = req.params.key;
-      const fullKey = key.startsWith('kv:') ? key : `kv:${key}`;
+      const fullKey = key.startsWith('kv:') || key.startsWith('$') ? key : `kv:${key}`;
       const { varValue, valueType, description } = req.body;
 
       const userId = (req as any).user?.userId || (req as any).user?.id;
@@ -121,9 +127,20 @@ export class VarsController {
       );
 
       // Invalidate related caches when specific KV items are updated
-      if (fullKey === 'kv:clientVersionPassiveData') {
+      if (fullKey === '$clientVersionPassiveData' || fullKey === 'kv:clientVersionPassiveData') {
         // Invalidate all client version caches since meta field includes clientVersionPassiveData
         await pubSubService.invalidateByPattern('client_version:*');
+      }
+
+      // Invalidate platform/channel caches when they are updated
+      if (fullKey === '$platforms' || fullKey === 'kv:platforms' || fullKey === '$channels' || fullKey === 'kv:channels') {
+        // Broadcast to all frontend instances to refresh platform/channel data
+        await pubSubService.publishNotification({
+          type: 'system:config:updated',
+          data: {
+            configType: (fullKey === '$platforms' || fullKey === 'kv:platforms') ? 'platforms' : 'channels',
+          },
+        });
       }
 
       res.json({
