@@ -319,41 +319,89 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
       return (
         <React.Fragment key={index}>
-          {/* Parent menu item */}
-          <ListItemButton
-            onClick={toggleSubmenu}
-            sx={{
-              pl: 2,
-              borderRadius: 1,
-              color: theme.palette.text.secondary,
-              backgroundColor: 'transparent',
-              '&:hover': {
-                backgroundColor: theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.1)'
-                  : 'rgba(0,0,0,0.08)',
-              },
-            }}
-          >
-            <ListItemIcon sx={{
-              color: 'inherit',
-              minWidth: 40,
-              justifyContent: 'center'
-            }}>
-              {item.icon}
-            </ListItemIcon>
-            {!sidebarCollapsed && (
-              <>
+          {/* Parent menu item - only show when sidebar is expanded */}
+          {!sidebarCollapsed && (
+            <>
+              {/* Divider before parent menu item */}
+              <Divider sx={{ my: 1 }} />
+
+              {/* Parent menu item */}
+              <ListItemButton
+                onClick={toggleSubmenu}
+                sx={{
+                  pl: 2,
+                  borderRadius: 1,
+                  py: 0.75,
+                  color: theme.palette.text.secondary,
+                  backgroundColor: 'transparent',
+                  '&:hover': {
+                    backgroundColor: theme.palette.mode === 'dark'
+                      ? 'rgba(255,255,255,0.1)'
+                      : 'rgba(0,0,0,0.08)',
+                  },
+                }}
+              >
+                <ListItemIcon sx={{
+                  color: 'inherit',
+                  minWidth: 40,
+                  justifyContent: 'center'
+                }}>
+                  {item.icon}
+                </ListItemIcon>
                 <ListItemText
                   primary={t(item.text)}
                   primaryTypographyProps={{ fontSize: '0.875rem' }}
                 />
                 {isExpanded ? <ExpandLess /> : <ExpandMore />}
-              </>
-            )}
-          </ListItemButton>
+              </ListItemButton>
+            </>
+          )}
 
           {/* Child menu items */}
-          {!sidebarCollapsed && (
+          {sidebarCollapsed ? (
+            // When sidebar is collapsed, show child items as icons
+            <List component="div" disablePadding>
+              {/* Divider before first child item when sidebar is collapsed */}
+              <Divider sx={{ my: 0.5 }} />
+
+              {item.children.map((child: any, childIndex: number) => (
+                <Tooltip
+                  key={childIndex}
+                  title={t(child.text)}
+                  placement="right"
+                  arrow
+                >
+                  <ListItemButton
+                    onClick={() => navigate(child.path)}
+                    sx={{
+                      pl: 0,
+                      pr: 0,
+                      borderRadius: 1,
+                      py: 0.75,
+                      my: 0.5,
+                      justifyContent: 'center',
+                      color: isActivePath(child.path) ? theme.palette.text.primary : theme.palette.text.secondary,
+                      backgroundColor: isActivePath(child.path) ? `${theme.palette.primary.main}20` : 'transparent',
+                      '&:hover': {
+                        backgroundColor: theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.1)'
+                          : 'rgba(0,0,0,0.08)',
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{
+                      color: 'inherit',
+                      minWidth: 0,
+                      justifyContent: 'center'
+                    }}>
+                      {child.icon}
+                    </ListItemIcon>
+                  </ListItemButton>
+                </Tooltip>
+              ))}
+            </List>
+          ) : (
+            // When sidebar is expanded, show child items with text
             <Collapse in={isExpanded} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {item.children.map((child: any, childIndex: number) => (
@@ -361,8 +409,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                     key={childIndex}
                     onClick={() => navigate(child.path)}
                     sx={{
-                      pl: 4,
+                      pl: 2,
+                      pr: 2,
                       borderRadius: 1,
+                      py: 0.75,
+                      my: 0.5,
+                      ml: 2,
                       color: isActivePath(child.path) ? theme.palette.text.primary : theme.palette.text.secondary,
                       backgroundColor: isActivePath(child.path) ? `${theme.palette.primary.main}20` : 'transparent',
                       '&:hover': {
@@ -402,6 +454,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           color: isActive ? theme.palette.text.primary : theme.palette.text.secondary,
           backgroundColor: isActive ? `${theme.palette.primary.main}20` : 'transparent',
           borderRadius: 1,
+          py: 0.75,
+          my: 0.5,
           '&:hover': {
             backgroundColor: theme.palette.mode === 'dark'
               ? 'rgba(255,255,255,0.1)'
@@ -497,7 +551,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 opacity: 0.8,
               },
             }}
-            onClick={() => navigate('/dashboard')}
+            onClick={() => {
+              setSelectedCategory(null);
+              try {
+                localStorage.removeItem('sidebarSelectedCategory');
+              } catch (error) {
+                console.warn('Failed to clear selected category:', error);
+              }
+              navigate('/dashboard');
+            }}
           >
             <Box
               sx={{
@@ -531,7 +593,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 opacity: 0.8,
               },
             }}
-            onClick={() => navigate('/dashboard')}
+            onClick={() => {
+              setSelectedCategory(null);
+              try {
+                localStorage.removeItem('sidebarSelectedCategory');
+              } catch (error) {
+                console.warn('Failed to clear selected category:', error);
+              }
+              navigate('/dashboard');
+            }}
           >
             <Box
               sx={{
@@ -601,7 +671,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           sx={{
             opacity: selectedCategory ? 0 : 1,
             visibility: selectedCategory ? 'hidden' : 'visible',
-            transition: 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out',
+            transform: selectedCategory ? 'scale(0.92)' : 'scale(1)',
+            transition: 'opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.35s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
             position: selectedCategory ? 'absolute' : 'relative',
           }}
         >
@@ -624,6 +695,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   px: sidebarCollapsed ? 0 : 2,
                   pl: sidebarCollapsed ? 0 : 2,
                   borderRadius: 1,
+                  py: 0.75,
+                  my: 0.5,
                   '&:hover': {
                     backgroundColor: theme.palette.mode === 'dark'
                       ? 'rgba(255,255,255,0.1)'
@@ -672,7 +745,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           sx={{
             opacity: selectedCategory ? 1 : 0,
             visibility: selectedCategory ? 'visible' : 'hidden',
-            transition: 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out',
+            transform: selectedCategory ? 'scale(1)' : 'scale(0.92)',
+            transition: 'opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.35s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)',
             position: selectedCategory ? 'relative' : 'absolute',
           }}
         >
@@ -680,43 +754,86 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           {selectedCategory && (
             <>
               {/* Back to main button */}
-              <ListItemButton
-                onClick={() => {
-                  setSelectedCategory(null);
-                  try {
-                    localStorage.removeItem('sidebarSelectedCategory');
-                  } catch (error) {
-                    console.warn('Failed to clear selected category:', error);
-                  }
-                }}
-                sx={{
-                  color: theme.palette.text.secondary,
-                  mb: 2,
-                  borderRadius: 1,
-                  justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
-                  px: sidebarCollapsed ? 0 : 2,
-                  pl: sidebarCollapsed ? 0 : 2,
-                  '&:hover': {
-                    backgroundColor: theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.1)'
-                      : 'rgba(0,0,0,0.08)'
-                  }
-                }}
-              >
-                <ListItemIcon sx={{
-                  color: 'inherit',
-                  minWidth: sidebarCollapsed ? 0 : 40,
-                  justifyContent: 'center'
-                }}>
-                  <ArrowBackIcon />
-                </ListItemIcon>
-                {!sidebarCollapsed && (
+              {sidebarCollapsed ? (
+                <Tooltip
+                  title={t('sidebar.backToMain')}
+                  placement="right"
+                  arrow
+                >
+                  <ListItemButton
+                    onClick={() => {
+                      setSelectedCategory(null);
+                      try {
+                        localStorage.removeItem('sidebarSelectedCategory');
+                      } catch (error) {
+                        console.warn('Failed to clear selected category:', error);
+                      }
+                    }}
+                    sx={{
+                      color: theme.palette.text.secondary,
+                      mb: 2,
+                      borderRadius: 1,
+                      py: 0.75,
+                      justifyContent: 'center',
+                      px: 0,
+                      pl: 0,
+                      '&:hover': {
+                        backgroundColor: theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.1)'
+                          : 'rgba(0,0,0,0.08)'
+                      }
+                    }}
+                  >
+                    <ListItemIcon sx={{
+                      color: 'inherit',
+                      minWidth: 0,
+                      justifyContent: 'center'
+                    }}>
+                      <ArrowBackIcon />
+                    </ListItemIcon>
+                  </ListItemButton>
+                </Tooltip>
+              ) : (
+                <ListItemButton
+                  onClick={() => {
+                    setSelectedCategory(null);
+                    try {
+                      localStorage.removeItem('sidebarSelectedCategory');
+                    } catch (error) {
+                      console.warn('Failed to clear selected category:', error);
+                    }
+                  }}
+                  sx={{
+                    color: theme.palette.text.secondary,
+                    mb: 2,
+                    borderRadius: 1,
+                    py: 0.75,
+                    justifyContent: 'flex-start',
+                    px: 2,
+                    pl: 2,
+                    '&:hover': {
+                      backgroundColor: theme.palette.mode === 'dark'
+                        ? 'rgba(255,255,255,0.1)'
+                        : 'rgba(0,0,0,0.08)'
+                    }
+                  }}
+                >
+                  <ListItemIcon sx={{
+                    color: 'inherit',
+                    minWidth: 40,
+                    justifyContent: 'center'
+                  }}>
+                    <ArrowBackIcon />
+                  </ListItemIcon>
                   <ListItemText
                     primary={t('sidebar.backToMain')}
                     primaryTypographyProps={{ fontSize: '0.875rem' }}
                   />
-                )}
-              </ListItemButton>
+                </ListItemButton>
+              )}
+
+              {/* Divider after back to main button */}
+              <Divider sx={{ my: 1 }} />
 
               {/* Category title */}
               {!sidebarCollapsed && (
@@ -740,7 +857,22 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               {/* Submenu items */}
               {getMenuCategories(isAdmin())
                 .find(c => c.id === selectedCategory)
-                ?.children.map((item, index) => renderMenuItem(item, index))}
+                ?.children.map((item, index, items) => {
+                  // Check if previous item has children (is a submenu group)
+                  const prevItem = index > 0 ? items[index - 1] : null;
+                  const prevHasChildren = prevItem?.children && prevItem.children.length > 0;
+                  const currentHasChildren = item.children && item.children.length > 0;
+
+                  // Add divider if current item is regular (no children) and previous item is a submenu group
+                  const showDivider = !currentHasChildren && prevHasChildren && sidebarCollapsed;
+
+                  return (
+                    <React.Fragment key={index}>
+                      {showDivider && <Divider sx={{ my: 0.5 }} />}
+                      {renderMenuItem(item, index)}
+                    </React.Fragment>
+                  );
+                })}
             </>
           )}
         </Box>
