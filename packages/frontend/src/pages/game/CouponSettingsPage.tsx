@@ -901,7 +901,7 @@ const CouponSettingsPage: React.FC = () => {
                                       cursor: 'pointer',
                                       '&:hover': { color: 'primary.main', textDecoration: 'underline' }
                                     }}
-                                    onClick={() => handleEditClick(it)}
+                                    onClick={() => handleEdit(it)}
                                   >
                                     {it.name}
                                   </Typography>
