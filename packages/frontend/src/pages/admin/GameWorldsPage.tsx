@@ -1578,54 +1578,55 @@ const GameWorldsPage: React.FC = () => {
             {!!formData.isMaintenance && (
               <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}>
                 <Typography variant="h6" gutterBottom sx={{ color: 'warning.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  🔧 {t('gameWorlds.maintenance.title')}
+                  🔧 {t('maintenance.title')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  {t('gameWorlds.maintenance.description')}
+                  {t('maintenance.description')}
                 </Typography>
 
                 <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
                   <Stack spacing={2}>
-                    {/* 점검 시작일 */}
-                    <DateTimePicker
-                      label={t('gameWorlds.maintenance.startDate')}
-                      value={parseUTCForPicker(formData.maintenanceStartDate)}
-                      onChange={(date) => setFormData({ ...formData, maintenanceStartDate: date ? date.toISOString() : '' })}
-                      slotProps={{
-                        textField: {
-                          fullWidth: true,
-                          helperText: t('gameWorlds.maintenance.startDateHelp'),
-                        },
-                        popper: {}
-                      }}
-                    />
+                    {/* 점검 시작일과 종료일 */}
+                    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+                      <DateTimePicker
+                        label={t('maintenance.startDate')}
+                        value={parseUTCForPicker(formData.maintenanceStartDate)}
+                        onChange={(date) => setFormData({ ...formData, maintenanceStartDate: date ? date.toISOString() : '' })}
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            helperText: t('maintenance.startDateHelp'),
+                          },
+                          popper: {}
+                        }}
+                      />
 
-                    {/* 점검 종료일 */}
-                    <DateTimePicker
-                      label={t('gameWorlds.maintenance.endDate')}
-                      value={parseUTCForPicker(formData.maintenanceEndDate)}
-                      onChange={(date) => setFormData({ ...formData, maintenanceEndDate: date ? date.toISOString() : '' })}
-                      slotProps={{
-                        textField: {
-                          fullWidth: true,
-                          helperText: t('gameWorlds.maintenance.endDateHelp'),
-                        },
-                        popper: {}
-                      }}
-                    />
+                      <DateTimePicker
+                        label={t('maintenance.endDate')}
+                        value={parseUTCForPicker(formData.maintenanceEndDate)}
+                        onChange={(date) => setFormData({ ...formData, maintenanceEndDate: date ? date.toISOString() : '' })}
+                        slotProps={{
+                          textField: {
+                            fullWidth: true,
+                            helperText: t('maintenance.endDateHelp'),
+                          },
+                          popper: {}
+                        }}
+                      />
+                    </Box>
 
                     {/* 점검 메시지 입력 컴포넌트 */}
                     <MultiLanguageMessageInput
                       defaultMessage={formData.maintenanceMessage || ''}
                       onDefaultMessageChange={(message) => setFormData({ ...formData, maintenanceMessage: message })}
-                      defaultMessageLabel={t('gameWorlds.maintenance.defaultMessage')}
-                      defaultMessageHelperText={t('gameWorlds.maintenance.defaultMessageHelp')}
+                      defaultMessageLabel={t('maintenance.defaultMessage')}
+                      defaultMessageHelperText={t('maintenance.defaultMessageHelp')}
                       defaultMessageRequired={formData.isMaintenance}
                       defaultMessageError={!!formErrors.maintenanceMessage}
                       supportsMultiLanguage={supportsMultiLanguage}
                       onSupportsMultiLanguageChange={handleSupportsMultiLanguageChange}
-                      supportsMultiLanguageLabel={t('gameWorlds.maintenance.supportsMultiLanguage')}
-                      supportsMultiLanguageHelperText={t('gameWorlds.maintenance.supportsMultiLanguageHelp')}
+                      supportsMultiLanguageLabel={t('maintenance.supportsMultiLanguage')}
+                      supportsMultiLanguageHelperText={t('maintenance.supportsMultiLanguageHelp')}
 
                       locales={maintenanceLocales.map(l => ({ lang: l.lang as 'ko' | 'en' | 'zh', message: l.message }))}
                       onLocalesChange={(locales) => {
@@ -1639,7 +1640,7 @@ const GameWorldsPage: React.FC = () => {
                           setFormData(prev => ({ ...prev, supportsMultiLanguage: true }));
                         }
                       }}
-                      languageSpecificMessagesLabel={t('gameWorlds.maintenance.languageSpecificMessages')}
+                      languageSpecificMessagesLabel={t('maintenance.languageSpecificMessages')}
 
                       enableTranslation={true}
                       translateButtonLabel={t('common.autoTranslate')}

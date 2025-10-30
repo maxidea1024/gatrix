@@ -44,12 +44,12 @@ export class ServerGameWorldController {
         return null;
       };
 
-      // Fetch visible game worlds sorted by displayOrder
+      // Fetch visible game worlds sorted by displayOrder ASC
       const allWorlds = await GameWorldService.getAllGameWorlds({
-        isVisible: true,
-        sortBy: 'displayOrder',
-        sortOrder: 'ASC'
+        isVisible: true
       });
+
+      logger.debug(`Game worlds fetched. First world displayOrder: ${allWorlds[0]?.displayOrder}, Last world displayOrder: ${allWorlds[allWorlds.length - 1]?.displayOrder}`);
 
       // Fetch tags for each world
       const { TagService } = await import('../services/TagService');

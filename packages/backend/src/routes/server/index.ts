@@ -8,6 +8,7 @@ import ServerFileController from '../../controllers/ServerFileController';
 import ServerChatController from '../../controllers/ServerChatController';
 import { CouponRedeemController } from '../../controllers/CouponRedeemController';
 import ServerGameWorldController from '../../controllers/ServerGameWorldController';
+import IngamePopupNoticeController from '../../controllers/IngamePopupNoticeController';
 import serviceDiscoveryRoutes from './serviceDiscovery';
 
 const router = express.Router();
@@ -70,6 +71,9 @@ router.post('/coupons/:code/redeem', serverSDKAuth, CouponRedeemController.redee
 router.get('/game-worlds', serverSDKAuth, ServerGameWorldController.getGameWorlds);
 router.get('/game-worlds/world/:worldId', serverSDKAuth, ServerGameWorldController.getGameWorldByWorldId);
 router.get('/game-worlds/:id', serverSDKAuth, ServerGameWorldController.getGameWorldById);
+
+// Ingame popup notice routes
+router.get('/ingame-popup-notices', serverSDKAuth, IngamePopupNoticeController.getServerIngamePopupNotices);
 
 // Service discovery routes
 router.use('/services', serviceDiscoveryRoutes);

@@ -262,6 +262,29 @@ class IngamePopupNoticeController {
       next(error);
     }
   }
+
+  /**
+   * Get active ingame popup notices for Server SDK
+   * GET /api/v1/server/ingame-popup-notices
+   * Returns only active notices that are currently visible
+   */
+  async getServerIngamePopupNotices(req: Request, res: Response, next: NextFunction) {
+    try {
+      const filters: IngamePopupNoticeFilters = {
+        isActive: true,
+        currentlyVisible: true
+      };
+
+      const result = await IngamePopupNoticeService.getIngamePopupNotices(1, 1000, filters);
+
+      res.json({
+        success: true,
+        data: result.notices
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new IngamePopupNoticeController();

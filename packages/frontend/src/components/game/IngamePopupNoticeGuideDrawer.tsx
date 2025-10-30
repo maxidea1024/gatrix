@@ -7,18 +7,24 @@ import {
   Stack,
   Divider,
   Alert,
-  Paper,
   Tabs,
   Tab,
   TextField,
   Button,
   CircularProgress,
   Collapse,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from '@mui/material';
 import {
-  Close as CloseIcon,
   ContentCopy as ContentCopyIcon,
   PlayArrow as PlayArrowIcon,
+  CheckCircle as CheckCircleIcon,
+  Error as ErrorIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@mui/material/styles';
@@ -26,12 +32,12 @@ import Editor from '@monaco-editor/react';
 import { useSnackbar } from 'notistack';
 import ResizableDrawer from '../common/ResizableDrawer';
 
-interface GameWorldSDKGuideDrawerProps {
+interface IngamePopupNoticeGuideDrawerProps {
   open: boolean;
   onClose: () => void;
 }
 
-const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open, onClose }) => {
+const IngamePopupNoticeGuideDrawer: React.FC<IngamePopupNoticeGuideDrawerProps> = ({ open, onClose }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -39,130 +45,54 @@ const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open,
 
   const [mainTabValue, setMainTabValue] = useState(0);
   const [errorTabValue, setErrorTabValue] = useState(0);
-
-  // API test state
   const [apiToken, setApiToken] = useState('');
-  const [appName, setAppName] = useState('MyGameApp');
-  const [page, setPage] = useState('1');
-  const [limit, setLimit] = useState('10');
-  const [lang, setLang] = useState('');
+  const [applicationName, setApplicationName] = useState('');
   const [testResponse, setTestResponse] = useState<any>(null);
   const [testLoading, setTestLoading] = useState(false);
   const [testError, setTestError] = useState<string | null>(null);
+  const [testDuration, setTestDuration] = useState<number | null>(null);
+  const [testStatus, setTestStatus] = useState<number | null>(null);
   const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>({});
   const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
   const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(true);
   const [expandedResponseHeaders, setExpandedResponseHeaders] = useState(false);
-  const [testDuration, setTestDuration] = useState<number | null>(null);
-  const [testStatus, setTestStatus] = useState<number | null>(null);
 
-  // Load saved values from localStorage on mount
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('gameWorldSDKGuide_testInputs');
+      const saved = localStorage.getItem('ingamePopupNoticeGuideDrawer_testInputs');
       if (saved) {
-        const { apiToken: savedToken, appName: savedAppName, lang: savedLang } = JSON.parse(saved);
+        const { apiToken: savedToken, applicationName: savedAppName } = JSON.parse(saved);
         if (savedToken) setApiToken(savedToken);
-        if (savedAppName) setAppName(savedAppName);
-        if (savedLang) setLang(savedLang);
+        if (savedAppName) setApplicationName(savedAppName);
       }
     } catch (error) {
       // Silently ignore localStorage errors
     }
   }, []);
 
-  // Save values to localStorage whenever they change
   useEffect(() => {
     try {
-      localStorage.setItem('gameWorldSDKGuide_testInputs', JSON.stringify({
-        apiToken,
-        appName,
-        lang,
-      }));
+      localStorage.setItem('ingamePopupNoticeGuideDrawer_testInputs', JSON.stringify({ apiToken, applicationName }));
     } catch (error) {
       // Silently ignore localStorage errors
     }
-  }, [apiToken, appName, lang]);
-
-  // curl example code
-  const curlExample = `# Get Game Worlds List API Example
-# Optional: Add ?lang=ko for Korean maintenance messages (ko, en, zh supported)
-curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
-  -H "Content-Type: application/json" \\
-  -H "X-Application-Name: MyGameApp" \\
-  -H "X-API-Token: your-api-token-here"`;
-
-  // JSON response example
-  const jsonResponse = `{
-  "success": true,
-  "data": {
-    "worlds": [
-      {
-        "worldId": "world_001",
-        "name": "Main World",
-        "isMaintenance": false,
-        "customPayload": {
-          "region": "asia",
-          "maxPlayers": 1000
-        },
-        "tags": ["adventure", "pve"]
-      },
-      {
-        "worldId": "world_002",
-        "name": "PvP Arena",
-        "isMaintenance": true,
-        "maintenanceMessage": "Server maintenance in progress. Expected completion: 2025-10-30 14:00 UTC",
-        "customPayload": null,
-        "tags": ["pvp"]
-      }
-    ]
-  }
-}`;
-
-  // Error response examples
-  const errorMissingHeaders = `{
-  "success": false,
-  "error": {
-    "code": "INVALID_PARAMETERS",
-    "message": "Missing required headers",
-    "details": {
-      "missing": ["X-API-Token", "X-Application-Name"]
-    }
-  }
-}`;
-
-  const errorUnauthorized = `{
-  "success": false,
-  "error": {
-    "code": "UNAUTHORIZED",
-    "message": "Invalid API token",
-    "details": {
-      "reason": "INVALID_TOKEN"
-    }
-  }
-}`;
-
-  const errorInvalidParams = `{
-  "success": false,
-  "error": {
-    "code": "INVALID_PARAMETERS",
-    "message": "Invalid query parameters",
-    "details": {
-      "reason": "INVALID_PAGE_OR_LIMIT"
-    }
-  }
-}`;
+  }, [apiToken, applicationName]);
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
-    enqueueSnackbar(t('gameWorlds.sdkGuide.copiedToClipboard'), {
-      variant: 'success',
-    });
+    enqueueSnackbar(t('common.copied') || 'Copied to clipboard', { variant: 'success' });
   };
 
   const handleTestAPI = async () => {
     if (!apiToken.trim()) {
-      setTestError('API Token is required');
+      setTestError(t('ingamePopupNotices.sdkGuideDrawer.headerApiToken') + ' ' + (t('common.isRequired') || 'is required'));
+      setExpandedResponseHeaders(true);
+      return;
+    }
+
+    if (!applicationName.trim()) {
+      setTestError(t('ingamePopupNotices.sdkGuideDrawer.headerAppName') + ' ' + (t('common.isRequired') || 'is required'));
+      setExpandedResponseHeaders(true);
       return;
     }
 
@@ -171,57 +101,50 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
     setTestResponse(null);
     setTestStatus(null);
     setTestDuration(null);
+    setRequestHeaders({});
+    setResponseHeaders({});
     setExpandedRequestHeaders(false);
     setExpandedResponseHeaders(false);
 
-    const startTime = performance.now();
-
     try {
-      let url = `/api/v1/server/game-worlds`;
-      if (lang.trim()) {
-        url += `?lang=${encodeURIComponent(lang)}`;
-      }
+      const startTime = performance.now();
 
-      const response = await fetch(
-        url,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Application-Name': appName,
-            'X-API-Token': apiToken,
-          },
-        }
-      );
+      const headers = {
+        'Content-Type': 'application/json',
+        'X-Application-Name': applicationName,
+        'X-API-Token': apiToken,
+      };
+
+      setRequestHeaders(headers);
+
+      const response = await fetch('/api/v1/server/ingame-popup-notices', {
+        method: 'GET',
+        headers,
+      });
 
       const endTime = performance.now();
       const duration = Math.round(endTime - startTime);
+      setTestDuration(duration);
+      setTestStatus(response.status);
+
+      const resHeaders: Record<string, string> = {};
+      response.headers.forEach((value, key) => {
+        resHeaders[key] = value;
+      });
+      setResponseHeaders(resHeaders);
 
       const data = await response.json();
       setTestResponse(data);
-      setTestStatus(response.status);
-      setTestDuration(duration);
-
-      setRequestHeaders({
-        'Content-Type': 'application/json',
-        'X-Application-Name': appName,
-        'X-API-Token': apiToken,
-      });
-
-      setResponseHeaders({
-        'Content-Type': response.headers.get('Content-Type') || 'application/json',
-        'Status': `${response.status} ${response.statusText}`,
-      });
-
       setExpandedResponseHeaders(true);
 
       if (!response.ok) {
-        setTestError(`HTTP ${response.status}: ${data.error?.message || 'Request failed'}`);
+        setTestError(`HTTP ${response.status}: ${data.message || 'Request failed'}`);
       } else {
         setTestError(null);
       }
     } catch (error) {
       setTestError(error instanceof Error ? error.message : 'Unknown error occurred');
+      setExpandedResponseHeaders(true);
     } finally {
       setTestLoading(false);
     }
@@ -288,88 +211,112 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
     </Box>
   );
 
+  const curlExample = `# Ingame Popup Notice Server SDK API Example
+curl -X GET "http://localhost:5000/api/v1/server/ingame-popup-notices" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Application-Name: MyGameServer" \\
+  -H "X-API-Token: your-server-api-token-here"`;
+
+  const jsonResponse = `{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "content": "Game update notice",
+      "displayPriority": 100,
+      "startDate": "2025-01-01T00:00:00Z",
+      "endDate": "2025-12-31T23:59:59Z",
+      "showOnce": false
+    },
+    {
+      "id": 2,
+      "content": "New event started",
+      "displayPriority": 90,
+      "startDate": "2025-01-15T00:00:00Z",
+      "endDate": "2025-01-31T23:59:59Z",
+      "showOnce": true
+    }
+  ]
+}`;
+
+  const errorUnauthorized = `{
+  "success": false,
+  "message": "X-API-Token header is required"
+}`;
+
+  const errorInvalidToken = `{
+  "success": false,
+  "message": "Invalid or expired API token"
+}`;
+
+  const errorServerError = `{
+  "success": false,
+  "message": "Internal server error"
+}`;
+
   return (
     <ResizableDrawer
       open={open}
       onClose={onClose}
-      title={t('gameWorlds.sdkGuide.title')}
-      subtitle={t('gameWorlds.sdkGuide.subtitle')}
+      title={t('ingamePopupNotices.sdkGuideDrawer.title')}
+      subtitle={t('ingamePopupNotices.sdkGuideDrawer.subtitle')}
       defaultWidth={600}
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        {/* Main Tabs */}
         <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 3, pt: 2 }}>
           <Tabs value={mainTabValue} onChange={(e, newValue) => setMainTabValue(newValue)}>
-            <Tab label={t('gameWorlds.sdkGuide.tabGuide')} />
-            <Tab label={t('gameWorlds.sdkGuide.tabApiTest')} />
+            <Tab label={t('ingamePopupNotices.sdkGuideDrawer.tabGuide')} />
+            <Tab label={t('ingamePopupNotices.sdkGuideDrawer.tabTest')} />
           </Tabs>
         </Box>
 
-        {/* Content */}
         <Box sx={{ p: 3, overflow: 'auto', flex: 1 }}>
-          {/* Tab 1: SDK Guide */}
           {mainTabValue === 0 && (
             <>
-              {/* Description */}
               <Alert severity="info" sx={{ mb: 3 }}>
-                {t('gameWorlds.sdkGuide.description')}
+                {t('ingamePopupNotices.sdkGuideDrawer.description')}
               </Alert>
 
-              {/* Endpoint */}
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                {t('gameWorlds.sdkGuide.endpoint')}
+                {t('ingamePopupNotices.sdkGuideDrawer.endpoint')}
               </Typography>
-              <Paper
+              <Box
                 sx={{
                   p: 2,
                   mb: 3,
                   backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
                   fontFamily: 'monospace',
                   fontSize: '0.9rem',
+                  borderRadius: 1,
                 }}
               >
                 <Typography component="div" sx={{ mb: 1 }}>
-                  <strong>{t('gameWorlds.sdkGuide.method')}:</strong> GET
+                  <strong>{t('ingamePopupNotices.sdkGuideDrawer.method')}:</strong> GET
                 </Typography>
                 <Typography component="div" sx={{ wordBreak: 'break-all' }}>
-                  /api/v1/server/game-worlds
+                  /api/v1/server/ingame-popup-notices
                 </Typography>
-              </Paper>
+              </Box>
 
               <Divider sx={{ my: 3 }} />
 
-              {/* Parameters */}
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                {t('gameWorlds.sdkGuide.parameters')}
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
-                {t('gameWorlds.sdkGuide.noParameters')}
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 3, color: 'text.secondary' }}>
-                {t('gameWorlds.sdkGuide.optionalParameters')}
-              </Typography>
-
-              <Divider sx={{ my: 3 }} />
-
-              {/* Required Headers */}
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                {t('gameWorlds.sdkGuide.requiredHeaders')}
+                {t('ingamePopupNotices.sdkGuideDrawer.requiredHeaders')}
               </Typography>
               <Stack spacing={1} sx={{ mb: 3 }}>
                 <Typography variant="body2">
-                  • <strong>X-API-Token</strong>: {t('gameWorlds.sdkGuide.headerApiToken')}
+                  • <strong>X-API-Token</strong>: {t('ingamePopupNotices.sdkGuideDrawer.headerApiToken')}
                 </Typography>
                 <Typography variant="body2">
-                  • <strong>X-Application-Name</strong>: {t('gameWorlds.sdkGuide.headerAppName')}
+                  • <strong>X-Application-Name</strong>: {t('ingamePopupNotices.sdkGuideDrawer.headerAppName')}
                 </Typography>
                 <Typography variant="body2">
-                  • <strong>Content-Type</strong>: {t('gameWorlds.sdkGuide.headerContentType')}
+                  • <strong>Content-Type</strong>: {t('ingamePopupNotices.sdkGuideDrawer.headerContentType')}
                 </Typography>
               </Stack>
 
               <Divider sx={{ my: 3 }} />
 
-              {/* curl Example */}
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
                 curl {t('common.example') || 'Example'}
               </Typography>
@@ -377,131 +324,85 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
 
               <Divider sx={{ my: 3 }} />
 
-              {/* Response Example */}
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                {t('gameWorlds.sdkGuide.responseExample')}
+                {t('ingamePopupNotices.sdkGuideDrawer.responseExample')}
               </Typography>
               <CodeBlock code={jsonResponse} language="json" />
 
               <Divider sx={{ my: 3 }} />
 
-              {/* Response Fields Description */}
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                {t('gameWorlds.sdkGuide.responseFields')}
+                {t('ingamePopupNotices.sdkGuideDrawer.responseFields')}
               </Typography>
-              <Box sx={{ overflowX: 'auto', mb: 3 }}>
-                <table style={{
-                  width: '100%',
-                  borderCollapse: 'collapse',
-                  fontSize: '0.875rem',
-                }}>
-                  <thead>
-                    <tr style={{
-                      backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
-                      borderBottom: `2px solid ${theme.palette.divider}`,
-                    }}>
-                      <th style={{
-                        padding: '12px',
-                        textAlign: 'left',
-                        fontWeight: 600,
-                        borderRight: `1px solid ${theme.palette.divider}`,
-                      }}>
-                        {t('common.fieldName')}
-                      </th>
-                      <th style={{
-                        padding: '12px',
-                        textAlign: 'left',
-                        fontWeight: 600,
-                        borderRight: `1px solid ${theme.palette.divider}`,
-                      }}>
-                        Type
-                      </th>
-                      <th style={{
-                        padding: '12px',
-                        textAlign: 'left',
-                        fontWeight: 600,
-                      }}>
-                        {t('common.description')}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      { field: 'worldId', type: 'string', desc: 'fieldWorldIdDesc' },
-                      { field: 'name', type: 'string', desc: 'fieldNameDesc' },
-                      { field: 'isMaintenance', type: 'boolean', desc: 'fieldIsMaintenanceDesc' },
-                      { field: 'maintenanceMessage', type: 'string', desc: 'fieldMaintenanceMessageDesc' },
-                      { field: 'customPayload', type: 'object', desc: 'fieldCustomPayloadDesc' },
-                      { field: 'tags', type: 'array', desc: 'fieldTagsDesc' },
-                    ].map((row, idx) => (
-                      <tr key={idx} style={{
-                        borderBottom: `1px solid ${theme.palette.divider}`,
-                      }}>
-                        <td style={{
-                          padding: '12px',
-                          borderRight: `1px solid ${theme.palette.divider}`,
-                          fontFamily: 'monospace',
-                          fontWeight: 500,
-                        }}>
-                          {row.field}
-                        </td>
-                        <td style={{
-                          padding: '12px',
-                          borderRight: `1px solid ${theme.palette.divider}`,
-                          fontFamily: 'monospace',
-                          color: theme.palette.mode === 'dark' ? '#64b5f6' : '#1976d2',
-                        }}>
-                          {row.type}
-                        </td>
-                        <td style={{
-                          padding: '12px',
-                          color: theme.palette.mode === 'dark' ? '#b0bec5' : '#666',
-                        }}>
-                          {t(`gameWorlds.sdkGuide.${row.desc}`)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </Box>
-
-              <Alert severity="info" sx={{ mb: 3 }}>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>{t('gameWorlds.sdkGuide.maintenanceMessageNote')}</strong>
-                </Typography>
-                <Typography variant="body2">
-                  {t('gameWorlds.sdkGuide.langParameter')}
-                </Typography>
-              </Alert>
+              <TableContainer sx={{ mb: 3, border: `1px solid ${theme.palette.divider}`, borderRadius: 1 }}>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow sx={{ backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5' }}>
+                      <TableCell sx={{ fontWeight: 600, width: '20%' }}>{t('common.fieldName') || 'Field'}</TableCell>
+                      <TableCell sx={{ fontWeight: 600, width: '30%' }}>{t('common.type') || 'Type'}</TableCell>
+                      <TableCell sx={{ fontWeight: 600, width: '50%' }}>{t('common.description') || 'Description'}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell><Typography variant="body2" sx={{ fontWeight: 600 }}>id</Typography></TableCell>
+                      <TableCell><Typography variant="body2">number</Typography></TableCell>
+                      <TableCell><Typography variant="body2">{t('ingamePopupNotices.sdkGuideDrawer.fieldId')}</Typography></TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell><Typography variant="body2" sx={{ fontWeight: 600 }}>content</Typography></TableCell>
+                      <TableCell><Typography variant="body2">string</Typography></TableCell>
+                      <TableCell><Typography variant="body2">{t('ingamePopupNotices.sdkGuideDrawer.fieldContent')}</Typography></TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell><Typography variant="body2" sx={{ fontWeight: 600 }}>displayPriority</Typography></TableCell>
+                      <TableCell><Typography variant="body2">number</Typography></TableCell>
+                      <TableCell><Typography variant="body2">{t('ingamePopupNotices.sdkGuideDrawer.fieldDisplayPriority')}</Typography></TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell><Typography variant="body2" sx={{ fontWeight: 600 }}>startDate</Typography></TableCell>
+                      <TableCell><Typography variant="body2">string</Typography></TableCell>
+                      <TableCell><Typography variant="body2">{t('ingamePopupNotices.sdkGuideDrawer.fieldStartDate')}</Typography></TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell><Typography variant="body2" sx={{ fontWeight: 600 }}>endDate</Typography></TableCell>
+                      <TableCell><Typography variant="body2">string</Typography></TableCell>
+                      <TableCell><Typography variant="body2">{t('ingamePopupNotices.sdkGuideDrawer.fieldEndDate')}</Typography></TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell><Typography variant="body2" sx={{ fontWeight: 600 }}>showOnce</Typography></TableCell>
+                      <TableCell><Typography variant="body2">boolean</Typography></TableCell>
+                      <TableCell><Typography variant="body2">{t('ingamePopupNotices.sdkGuideDrawer.fieldShowOnce')}</Typography></TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
 
               <Divider sx={{ my: 3 }} />
 
-              {/* Error Codes - Tabbed */}
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                {t('gameWorlds.sdkGuide.errorCodes')}
+                {t('clientVersions.sdkGuideDrawer.errorResponses')}
               </Typography>
               <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
-                {t('gameWorlds.sdkGuide.errorCodesDesc')}
+                {t('ingamePopupNotices.sdkGuideDrawer.errorResponsesDesc')}
               </Typography>
 
               <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
                 <Tabs value={errorTabValue} onChange={(e, newValue) => setErrorTabValue(newValue)} variant="scrollable" scrollButtons="auto">
-                  <Tab label={`400 - ${t('gameWorlds.sdkGuide.missingHeaders')}`} />
-                  <Tab label={`401 - ${t('gameWorlds.sdkGuide.unauthorized')}`} />
-                  <Tab label={`400 - ${t('gameWorlds.sdkGuide.invalidParams')}`} />
+                  <Tab label={t('ingamePopupNotices.sdkGuideDrawer.errorMissingHeaders')} />
+                  <Tab label={t('ingamePopupNotices.sdkGuideDrawer.errorInvalidToken')} />
+                  <Tab label={t('ingamePopupNotices.sdkGuideDrawer.errorServerError')} />
                 </Tabs>
               </Box>
 
-              {errorTabValue === 0 && <CodeBlock code={errorMissingHeaders} language="json" />}
-              {errorTabValue === 1 && <CodeBlock code={errorUnauthorized} language="json" />}
-              {errorTabValue === 2 && <CodeBlock code={errorInvalidParams} language="json" />}
+              {errorTabValue === 0 && <CodeBlock code={errorUnauthorized} language="json" />}
+              {errorTabValue === 1 && <CodeBlock code={errorInvalidToken} language="json" />}
+              {errorTabValue === 2 && <CodeBlock code={errorServerError} language="json" />}
             </>
           )}
 
-          {/* Tab 2: API Test */}
           {mainTabValue === 1 && (
             <>
-              {/* REQUEST SECTION */}
               <Box sx={{ mb: 3 }}>
                 <Box
                   onClick={() => setExpandedRequestHeaders(!expandedRequestHeaders)}
@@ -517,7 +418,7 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
                   }}
                 >
                   <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    {t('gameWorlds.sdkGuide.requestBody')}
+                    {t('ingamePopupNotices.sdkGuideDrawer.request')}
                   </Typography>
                   <Box sx={{ transform: expandedRequestHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
                     ▼
@@ -525,46 +426,35 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
                 </Box>
                 <Collapse in={expandedRequestHeaders}>
                   <Box sx={{ p: 2, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
-                    {/* API Token and App Name */}
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
-                        {t('gameWorlds.sdkGuide.authentication')}
+                        {t('ingamePopupNotices.sdkGuideDrawer.parameters')}
                       </Typography>
                       <Stack spacing={2} sx={{ pl: 1 }}>
                         <TextField
-                          label={t('gameWorlds.sdkGuide.testApiToken')}
+                          label="X-Application-Name"
+                          value={applicationName}
+                          onChange={(e) => setApplicationName(e.target.value)}
+                          size="small"
+                          fullWidth
+                          placeholder={t('ingamePopupNotices.sdkGuideDrawer.headerAppName')}
+                        />
+                        <TextField
+                          label="X-API-Token"
                           type="password"
                           value={apiToken}
                           onChange={(e) => setApiToken(e.target.value)}
                           size="small"
                           fullWidth
-                          placeholder="Enter your API token"
-                        />
-                        <TextField
-                          label={t('gameWorlds.sdkGuide.testAppName')}
-                          value={appName}
-                          onChange={(e) => setAppName(e.target.value)}
-                          size="small"
-                          fullWidth
-                          placeholder="e.g., MyGameApp"
-                        />
-                        <TextField
-                          label={t('gameWorlds.sdkGuide.testLang')}
-                          value={lang}
-                          onChange={(e) => setLang(e.target.value)}
-                          size="small"
-                          fullWidth
-                          placeholder="e.g., ko, en, zh (optional)"
-                          helperText={t('gameWorlds.sdkGuide.testLangHelp')}
+                          placeholder={t('ingamePopupNotices.sdkGuideDrawer.headerApiToken')}
                         />
                       </Stack>
                     </Box>
 
-                    {/* Request Headers */}
                     {Object.keys(requestHeaders).length > 0 && (
                       <Box sx={{ mb: 2 }}>
                         <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                          {t('gameWorlds.sdkGuide.requestHeaders')} ({Object.keys(requestHeaders).length})
+                          {t('ingamePopupNotices.sdkGuideDrawer.headers')} ({Object.keys(requestHeaders).length})
                         </Typography>
                         <Stack spacing={0.5} sx={{ pl: 1 }}>
                           {Object.entries(requestHeaders).map(([key, value]) => (
@@ -581,7 +471,6 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
                       </Box>
                     )}
 
-                    {/* Test Button */}
                     <Button
                       variant="contained"
                       startIcon={testLoading ? <CircularProgress size={16} sx={{ color: 'inherit' }} /> : <PlayArrowIcon />}
@@ -589,13 +478,12 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
                       disabled={testLoading}
                       fullWidth
                     >
-                      {testLoading ? t('gameWorlds.sdkGuide.testLoading') : t('gameWorlds.sdkGuide.testButton')}
+                      {t('ingamePopupNotices.sdkGuideDrawer.apiTest')}
                     </Button>
                   </Box>
                 </Collapse>
               </Box>
 
-              {/* RESPONSE SECTION */}
               {testResponse && (
                 <Box sx={{ mb: 3 }}>
                   <Box
@@ -613,28 +501,21 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        {t('gameWorlds.sdkGuide.responseBody')}
+                        {t('ingamePopupNotices.sdkGuideDrawer.response')}
                       </Typography>
                       {testStatus && (
                         <Box sx={{ display: 'flex', gap: 2 }}>
                           <Box>
-                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('gameWorlds.sdkGuide.testStatus')}</Typography>
-                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                              {testStatus} {testStatus === 200 ? 'OK' : testStatus === 401 ? 'Unauthorized' : testStatus === 400 ? 'Bad Request' : 'Error'}
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('ingamePopupNotices.sdkGuideDrawer.status')}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              {testStatus === 200 ? <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} /> : <ErrorIcon sx={{ fontSize: 16, color: 'error.main' }} />}
+                              {testStatus} {testStatus === 200 ? 'OK' : 'Error'}
                             </Typography>
                           </Box>
                           {testDuration !== null && (
                             <Box>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('gameWorlds.sdkGuide.testDuration')}</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('ingamePopupNotices.sdkGuideDrawer.time')}</Typography>
                               <Typography variant="body2" sx={{ fontWeight: 600 }}>{testDuration}ms</Typography>
-                            </Box>
-                          )}
-                          {Object.keys(responseHeaders).length > 0 && (
-                            <Box>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Size</Typography>
-                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                {new Blob([JSON.stringify(testResponse)]).size} bytes
-                              </Typography>
                             </Box>
                           )}
                         </Box>
@@ -646,18 +527,16 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
                   </Box>
                   <Collapse in={expandedResponseHeaders}>
                     <Box sx={{ p: 2, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
-                      {/* Error Message */}
                       {testError && (
                         <Alert severity="error" sx={{ mb: 2 }}>
                           {testError}
                         </Alert>
                       )}
 
-                      {/* Response Headers */}
                       {Object.keys(responseHeaders).length > 0 && (
                         <Box sx={{ mb: 2 }}>
                           <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                            {t('gameWorlds.sdkGuide.responseHeaders')} ({Object.keys(responseHeaders).length})
+                            {t('ingamePopupNotices.sdkGuideDrawer.headers')} ({Object.keys(responseHeaders).length})
                           </Typography>
                           <Stack spacing={0.5} sx={{ pl: 1 }}>
                             {Object.entries(responseHeaders).map(([key, value]) => (
@@ -674,10 +553,9 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
                         </Box>
                       )}
 
-                      {/* Response Body */}
                       <Box>
                         <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                          {t('gameWorlds.sdkGuide.responseBody')}
+                          {t('ingamePopupNotices.sdkGuideDrawer.body')}
                         </Typography>
                         <Box
                           sx={{
@@ -741,5 +619,5 @@ curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
   );
 };
 
-export default GameWorldSDKGuideDrawer;
+export default IngamePopupNoticeGuideDrawer;
 

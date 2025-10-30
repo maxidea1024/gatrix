@@ -58,7 +58,7 @@ const SDKGuideDrawer: React.FC<SDKGuideDrawerProps> = ({ open, onClose }) => {
   const [testError, setTestError] = useState<string | null>(null);
   const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>({});
   const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
-  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(false);
+  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(true);
   const [expandedResponseHeaders, setExpandedResponseHeaders] = useState(false);
   const [testDuration, setTestDuration] = useState<number | null>(null);
   const [testStatus, setTestStatus] = useState<number | null>(null);

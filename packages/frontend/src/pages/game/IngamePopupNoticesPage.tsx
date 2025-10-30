@@ -23,6 +23,7 @@ import {
   DialogActions,
   DialogContentText,
   Skeleton,
+  Divider,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -33,11 +34,14 @@ import {
   ViewColumn as ViewColumnIcon,
   Close as CloseIcon,
   Refresh as RefreshIcon,
+  Code as CodeIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import ingamePopupNoticeService, { IngamePopupNotice, IngamePopupNoticeFilters } from '../../services/ingamePopupNoticeService';
 import IngamePopupNoticeFormDialog from '../../components/game/IngamePopupNoticeFormDialog';
+import IngamePopupNoticeGuideDrawer from '../../components/game/IngamePopupNoticeGuideDrawer';
+
 import SimplePagination from '../../components/common/SimplePagination';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import EmptyTableRow from '../../components/common/EmptyTableRow';
@@ -96,6 +100,7 @@ const IngamePopupNoticesPage: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingNotice, setDeletingNotice] = useState<IngamePopupNotice | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+  const [guideDrawerOpen, setGuideDrawerOpen] = useState(false);
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
@@ -352,13 +357,21 @@ const IngamePopupNoticesPage: React.FC = () => {
             {t('ingamePopupNotices.subtitle')}
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={handleCreate}
           >
             {t('ingamePopupNotices.createNotice')}
+          </Button>
+          <Divider orientation="vertical" flexItem sx={{ my: 1 }} />
+          <Button
+            variant="outlined"
+            startIcon={<CodeIcon />}
+            onClick={() => setGuideDrawerOpen(true)}
+          >
+            {t('ingamePopupNotices.sdkGuide')}
           </Button>
         </Box>
       </Box>
@@ -734,6 +747,12 @@ const IngamePopupNoticesPage: React.FC = () => {
         columns={columns}
         onColumnsChange={handleColumnsChange}
         onReset={handleResetColumns}
+      />
+
+      {/* SDK Guide Drawer */}
+      <IngamePopupNoticeGuideDrawer
+        open={guideDrawerOpen}
+        onClose={() => setGuideDrawerOpen(false)}
       />
     </Box>
   );

@@ -78,39 +78,40 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
   return (
     <Box sx={{ mt: 2, p: 2, border: '1px solid', borderColor: 'warning.light', borderRadius: 1, bgcolor: 'background.default', ...sx }}>
       <Typography variant="subtitle1" gutterBottom sx={{ color: 'warning.main', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <BuildIcon fontSize="small" sx={{ mr: 0.5 }} /> {t('clientVersions.maintenance.title')}
+        <BuildIcon fontSize="small" sx={{ mr: 0.5 }} /> {t('maintenance.title')}
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        {t('clientVersions.maintenance.description')}
+        {t('maintenance.description')}
       </Typography>
 
       <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={getDateLocale()}>
         <Stack spacing={2}>
-          {/* 점검 시작일 */}
-          <DateTimePicker
-            label={t('clientVersions.maintenance.startDate')}
-            value={parseUTCForPicker(startDate)}
-            onChange={(date) => onStartDateChange(date ? date.toISOString() : '')}
-            slotProps={{
-              textField: {
-                fullWidth: true,
-                helperText: t('clientVersions.maintenance.startDateHelp'),
-              },
-            }}
-          />
+          {/* 점검 시작일과 종료일 */}
+          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+            <DateTimePicker
+              label={t('maintenance.startDate')}
+              value={parseUTCForPicker(startDate)}
+              onChange={(date) => onStartDateChange(date ? date.toISOString() : '')}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  helperText: t('maintenance.startDateHelp'),
+                },
+              }}
+            />
 
-          {/* 점검 종료일 */}
-          <DateTimePicker
-            label={t('clientVersions.maintenance.endDate')}
-            value={parseUTCForPicker(endDate)}
-            onChange={(date) => onEndDateChange(date ? date.toISOString() : '')}
-            slotProps={{
-              textField: {
-                fullWidth: true,
-                helperText: t('clientVersions.maintenance.endDateHelp'),
-              },
-            }}
-          />
+            <DateTimePicker
+              label={t('maintenance.endDate')}
+              value={parseUTCForPicker(endDate)}
+              onChange={(date) => onEndDateChange(date ? date.toISOString() : '')}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  helperText: t('maintenance.endDateHelp'),
+                },
+              }}
+            />
+          </Box>
 
           {/* 구분선 */}
           <Box sx={{ width: '100%', my: 2 }}>
@@ -141,17 +142,17 @@ const MaintenanceSettingsInput: React.FC<MaintenanceSettingsInputProps> = ({
             <MultiLanguageMessageInput
               defaultMessage={maintenanceMessage}
               onDefaultMessageChange={onMaintenanceMessageChange}
-              defaultMessageLabel={t('clientVersions.maintenance.defaultMessage')}
-              defaultMessageHelperText={t('clientVersions.maintenance.defaultMessageHelp')}
+              defaultMessageLabel={t('maintenance.defaultMessage')}
+              defaultMessageHelperText={t('maintenance.defaultMessageHelp')}
               defaultMessageRequired={messageRequired}
               defaultMessageError={messageError}
               supportsMultiLanguage={supportsMultiLanguage}
               onSupportsMultiLanguageChange={onSupportsMultiLanguageChange}
-              supportsMultiLanguageLabel={t('clientVersions.maintenance.supportsMultiLanguage')}
-              supportsMultiLanguageHelperText={t('clientVersions.maintenance.supportsMultiLanguageHelp')}
+              supportsMultiLanguageLabel={t('maintenance.supportsMultiLanguage')}
+              supportsMultiLanguageHelperText={t('maintenance.supportsMultiLanguageHelp')}
               locales={maintenanceLocales}
               onLocalesChange={onMaintenanceLocalesChange}
-              languageSpecificMessagesLabel={t('clientVersions.maintenance.languageSpecificMessages')}
+              languageSpecificMessagesLabel={t('maintenance.languageSpecificMessages')}
               enableTranslation={true}
               translateButtonLabel={t('common.autoTranslate')}
               translateTooltip={t('maintenance.translateTooltip')}

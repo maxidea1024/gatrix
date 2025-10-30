@@ -77,8 +77,6 @@ export interface UpdateGameWorldData {
 
 export interface GameWorldListParams {
   search?: string;
-  sortBy?: 'name' | 'worldId' | 'displayOrder' | 'createdAt' | 'updatedAt';
-  sortOrder?: 'ASC' | 'DESC';
   isVisible?: boolean;
   isMaintenance?: boolean;
   tags?: string; // comma-separated; filtering uses LIKE per tag
@@ -139,8 +137,6 @@ export class GameWorldModel {
     try {
       const {
         search = '',
-        sortBy = 'displayOrder',
-        sortOrder = 'ASC',
         isVisible,
         isMaintenance,
         tags,
@@ -189,7 +185,7 @@ export class GameWorldModel {
         LEFT JOIN g_users c ON gw.createdBy = c.id
         LEFT JOIN g_users u ON gw.updatedBy = u.id
         ${whereClause}
-        ORDER BY gw.${sortBy} ${sortOrder}
+        ORDER BY gw.displayOrder ASC
       `;
 
       // Convert raw SQL to knex query builder
@@ -240,7 +236,7 @@ export class GameWorldModel {
         }
       }
 
-      const worlds = await query.orderBy(`gw.${sortBy}`, sortOrder);
+      const worlds = await query.orderBy('gw.displayOrder', 'ASC');
 
       // 각 게임월드에 대해 maintenanceLocales 추가
       const worldsWithLocales = await Promise.all(

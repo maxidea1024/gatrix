@@ -195,10 +195,8 @@ export class ClientController {
     // If not in cache, fetch from database
     logger.debug(`Cache miss for game worlds: ${cacheKey}`);
 
-    // No pagination: fetch all visible, non-maintenance worlds ordered by displayOrder
+    // No pagination: fetch all visible, non-maintenance worlds ordered by displayOrder ASC
     const worlds = await GameWorldService.getAllGameWorlds({
-      sortBy: 'displayOrder',
-      sortOrder: 'ASC',
       isVisible: true,
       isMaintenance: false,
     });

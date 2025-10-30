@@ -161,7 +161,6 @@ const SwaggerUIWrapper: React.FC<{ spec: any }> = ({ spec }) => {
   >
     <SwaggerUI
       spec={updatedSpec}
-      url={apiBaseUrl}
       persistAuthorization={true}
       tryItOutEnabled={true}
       requestInterceptor={(request) => {
