@@ -72,6 +72,7 @@ import {
   Whatshot as WhatshotIcon,
   Celebration as CelebrationIcon,
   Dns as DnsIcon,
+  ArrowBack as ArrowBackIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -83,7 +84,7 @@ import { maintenanceService, MaintenanceDetail } from '@/services/maintenanceSer
 import { useSSENotifications } from '@/hooks/useSSENotifications';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import moment from 'moment';
-import { baseMenuItems, adminMenuItems as configAdminMenuItems, gameMenuItems as configGameMenuItems, settingsMenuItems as configSettingsMenuItems } from '@/config/navigation';
+import { getMenuCategories } from '@/config/navigation';
 import mailService from '@/services/mailService';
 
 // Sidebar width is now dynamic
@@ -92,28 +93,30 @@ interface MainLayoutProps {
   children: React.ReactNode;
 }
 
-// 중앙 설정에서 메뉴 가져오기
-const menuItems = baseMenuItems;
-const adminMenuItems = configAdminMenuItems;
-const gameMenuItems = configGameMenuItems;
-const settingsMenuItems = configSettingsMenuItems.map(item => ({
-  ...item,
-  requireAdmin: item.path !== '/settings', // settings 페이지는 모든 사용자 접근 가능
-}));
-
 export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
-  // Load expanded sections from localStorage
-  const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>(() => {
+
+  // Load selected category from localStorage
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(() => {
     try {
-      const stored = localStorage.getItem('sidebarExpandedSections');
-      return stored ? JSON.parse(stored) : { admin: true, game: true, settings: true };
+      const stored = localStorage.getItem('sidebarSelectedCategory');
+      return stored ? stored : null;
     } catch {
-      return { admin: true, game: true, settings: true };
+      return null;
+    }
+  });
+
+  // Expanded submenu items state
+  const [expandedSubmenus, setExpandedSubmenus] = useState<{ [key: string]: boolean }>(() => {
+    try {
+      const stored = localStorage.getItem('sidebarExpandedSubmenus');
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
     }
   });
 
@@ -127,7 +130,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     }
   });
 
-  const sidebarWidth = 280; // Fixed width
+  const sidebarWidth = 240; // Fixed width
   const [avatarImageError, setAvatarImageError] = useState(false);
 
   const location = useLocation();
@@ -260,20 +263,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     handleUserMenuClose();
   };
 
-  const toggleSection = (section: string) => {
-    setExpandedSections(prev => {
-      const newSections = {
-        ...prev,
-        [section]: !prev[section]
-      };
-      try {
-        localStorage.setItem('sidebarExpandedSections', JSON.stringify(newSections));
-      } catch (error) {
-        console.warn('Failed to save expanded sections:', error);
-      }
-      return newSections;
-    });
-  };
+
 
   const isActivePath = (path: string) => {
     // 정확한 경로 매칭을 위해 수정
@@ -292,129 +282,139 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     return location.pathname === path;
   };
 
-  const renderMenuItem = (item: any, index: number) => {
-    const isAdminItem = typeof index === 'string' && index.startsWith('admin-');
-    const isGameItem = typeof index === 'string' && index.startsWith('game-');
-    const isSettingsItemByIndex = typeof index === 'string' && index.startsWith('settings-');
-    // 설정 메뉴 항목인지 확인
-    const isSettingsItem = settingsMenuItems.some(settingsItem => settingsItem.path === item.path);
+  // Check if any child item is active
+  const hasActiveChild = (children: any[]) => {
+    return children?.some(child => {
+      if (child.path) {
+        return isActivePath(child.path);
+      }
+      if (child.children) {
+        return hasActiveChild(child.children);
+      }
+      return false;
+    });
+  };
 
+  const renderMenuItem = (item: any, index: any) => {
     // 서브메뉴가 있는 경우
     if (item.children) {
-      const isExpanded = expandedSections[`menu-${index}`];
+      const submenuKey = `submenu-${index}`;
+      const isExpanded = expandedSubmenus[submenuKey];
       const hasActiveChild = item.children.some((child: any) => isActivePath(child.path));
 
-      const menuButton = (
-        <ListItemButton
-          key={index}
-          onClick={() => toggleSection(`menu-${index}`)}
-          sx={{
-            color: theme.palette.text.secondary,
-            backgroundColor: 'transparent',
-            '&:hover': {
-              backgroundColor: theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.1)'
-                : 'rgba(0,0,0,0.08)',
-            },
-            justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
-            px: sidebarCollapsed ? 1 : 2,
-            pl: (isAdminItem || isGameItem || isSettingsItemByIndex) ? 2 : (sidebarCollapsed ? 1 : 2),
-          }}
-        >
-          <ListItemIcon sx={{
-            color: 'inherit',
-            minWidth: sidebarCollapsed ? 'auto' : 40,
-            justifyContent: 'center'
-          }}>
-            {item.icon}
-          </ListItemIcon>
-          {!sidebarCollapsed && (
-            <>
-              <ListItemText
-                primary={t(item.text)}
-                primaryTypographyProps={{ fontSize: '0.875rem' }}
-              />
-              {isExpanded ? <ExpandLess /> : <ExpandMore />}
-            </>
-          )}
-        </ListItemButton>
-      );
-
-      if (sidebarCollapsed) {
-        return (
-          <Tooltip
-            key={index}
-            title={t(item.text)}
-            placement="right"
-            arrow
-          >
-            <Box sx={{ px: 1, py: 0.5 }}>
-              {item.children.map((child: any, childIndex: number) => renderMenuItem(child, `${index}-${childIndex}`))}
-            </Box>
-          </Tooltip>
-        );
-      }
+      const toggleSubmenu = () => {
+        setExpandedSubmenus(prev => {
+          const newState = {
+            ...prev,
+            [submenuKey]: !prev[submenuKey]
+          };
+          try {
+            localStorage.setItem('sidebarExpandedSubmenus', JSON.stringify(newState));
+          } catch (error) {
+            console.warn('Failed to save expanded submenus:', error);
+          }
+          return newState;
+        });
+      };
 
       return (
         <React.Fragment key={index}>
-          {menuButton}
-          <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              {item.children.map((child: any, childIndex: number) => (
-                <ListItemButton
-                  key={childIndex}
-                  onClick={() => navigate(child.path)}
-                  sx={{
-                    pl: 4,
-                    color: isActivePath(child.path) ? theme.palette.text.primary : theme.palette.text.secondary,
-                    backgroundColor: isActivePath(child.path) ? `${theme.palette.primary.main}20` : 'transparent',
-                    '&:hover': {
-                      backgroundColor: theme.palette.mode === 'dark'
-                        ? 'rgba(255,255,255,0.1)'
-                        : 'rgba(0,0,0,0.08)',
-                    },
-                  }}
-                >
-                  <ListItemIcon sx={{
-                    color: 'inherit',
-                    minWidth: 40,
-                    justifyContent: 'center'
-                  }}>
-                    {child.icon}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={t(child.text)}
-                    primaryTypographyProps={{ fontSize: '0.875rem' }}
-                  />
-                </ListItemButton>
-              ))}
-            </List>
-          </Collapse>
+          {/* Parent menu item */}
+          <ListItemButton
+            onClick={toggleSubmenu}
+            sx={{
+              pl: 2,
+              borderRadius: 1,
+              color: theme.palette.text.secondary,
+              backgroundColor: 'transparent',
+              '&:hover': {
+                backgroundColor: theme.palette.mode === 'dark'
+                  ? 'rgba(255,255,255,0.1)'
+                  : 'rgba(0,0,0,0.08)',
+              },
+            }}
+          >
+            <ListItemIcon sx={{
+              color: 'inherit',
+              minWidth: 40,
+              justifyContent: 'center'
+            }}>
+              {item.icon}
+            </ListItemIcon>
+            {!sidebarCollapsed && (
+              <>
+                <ListItemText
+                  primary={t(item.text)}
+                  primaryTypographyProps={{ fontSize: '0.875rem' }}
+                />
+                {isExpanded ? <ExpandLess /> : <ExpandMore />}
+              </>
+            )}
+          </ListItemButton>
+
+          {/* Child menu items */}
+          {!sidebarCollapsed && (
+            <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {item.children.map((child: any, childIndex: number) => (
+                  <ListItemButton
+                    key={childIndex}
+                    onClick={() => navigate(child.path)}
+                    sx={{
+                      pl: 4,
+                      borderRadius: 1,
+                      color: isActivePath(child.path) ? theme.palette.text.primary : theme.palette.text.secondary,
+                      backgroundColor: isActivePath(child.path) ? `${theme.palette.primary.main}20` : 'transparent',
+                      '&:hover': {
+                        backgroundColor: theme.palette.mode === 'dark'
+                          ? 'rgba(255,255,255,0.1)'
+                          : 'rgba(0,0,0,0.08)',
+                      },
+                    }}
+                  >
+                    <ListItemIcon sx={{
+                      color: 'inherit',
+                      minWidth: 40,
+                      justifyContent: 'center'
+                    }}>
+                      {child.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={t(child.text)}
+                      primaryTypographyProps={{ fontSize: '0.875rem' }}
+                    />
+                  </ListItemButton>
+                ))}
+              </List>
+            </Collapse>
+          )}
         </React.Fragment>
       );
     }
 
     // 일반 메뉴 아이템
+    const isActive = isActivePath(item.path);
     const menuButton = (
       <ListItemButton
         key={index}
         onClick={() => navigate(item.path)}
         sx={{
-          color: (isSettingsItem ? isActiveSettingsPath(item.path) : isActivePath(item.path)) ? theme.palette.text.primary : theme.palette.text.secondary,
-          backgroundColor: (isSettingsItem ? isActiveSettingsPath(item.path) : isActivePath(item.path)) ? `${theme.palette.primary.main}20` : 'transparent',
+          color: isActive ? theme.palette.text.primary : theme.palette.text.secondary,
+          backgroundColor: isActive ? `${theme.palette.primary.main}20` : 'transparent',
+          borderRadius: 1,
           '&:hover': {
             backgroundColor: theme.palette.mode === 'dark'
               ? 'rgba(255,255,255,0.1)'
               : 'rgba(0,0,0,0.08)',
           },
           justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
-          px: sidebarCollapsed ? 1 : 2,
-          pl: (isAdminItem || isGameItem || isSettingsItemByIndex) ? 2 : (sidebarCollapsed ? 1 : 2),
+          px: sidebarCollapsed ? 0 : 2,
+          pl: sidebarCollapsed ? 0 : 2,
         }}
       >
         <ListItemIcon sx={{
           color: 'inherit',
-          minWidth: sidebarCollapsed ? 'auto' : 40,
+          minWidth: sidebarCollapsed ? 0 : 40,
           justifyContent: 'center'
         }}>
           {item.icon}
@@ -597,38 +597,33 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             }
           }}
         >
-        {/* 기본 메뉴 */}
-        {!sidebarCollapsed && (
-          <Typography
-            variant="overline"
-            sx={{
-              px: 2,
-              py: 1,
-              color: '#94a3b8',
-              fontSize: '0.75rem',
-              fontWeight: 600,
-              letterSpacing: '0.05em'
-            }}
-          >
-            {t('sidebar.navigation')}
-          </Typography>
-        )}
-        {menuItems.map((item, index) => renderMenuItem(item, index))}
-
-        {/* 관리자 메뉴 */}
-        {isAdmin() && (
-          <>
-            <Divider sx={{
-              my: 2,
-              borderColor: theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.1)'
-                : 'rgba(0,0,0,0.12)'
-            }} />
-            {!sidebarCollapsed && (
+        <Box
+          sx={{
+            opacity: selectedCategory ? 0 : 1,
+            visibility: selectedCategory ? 'hidden' : 'visible',
+            transition: 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out',
+            position: selectedCategory ? 'absolute' : 'relative',
+          }}
+        >
+          {/* Show main categories */}
+          {getMenuCategories(isAdmin()).map((category) => {
+            const categoryButton = (
               <ListItemButton
-                onClick={() => toggleSection('admin')}
+                key={category.id}
+                onClick={() => {
+                  setSelectedCategory(category.id);
+                  try {
+                    localStorage.setItem('sidebarSelectedCategory', category.id);
+                  } catch (error) {
+                    console.warn('Failed to save selected category:', error);
+                  }
+                }}
                 sx={{
                   color: theme.palette.text.secondary,
+                  justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+                  px: sidebarCollapsed ? 0 : 2,
+                  pl: sidebarCollapsed ? 0 : 2,
+                  borderRadius: 1,
                   '&:hover': {
                     backgroundColor: theme.palette.mode === 'dark'
                       ? 'rgba(255,255,255,0.1)'
@@ -636,43 +631,71 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   }
                 }}
               >
-                <ListItemText
-                  primary={t('sidebar.adminPanel')}
-                  primaryTypographyProps={{
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}
-                />
-                {expandedSections.admin ? <ExpandLess /> : <ExpandMore />}
+                <ListItemIcon sx={{
+                  color: 'inherit',
+                  minWidth: sidebarCollapsed ? 0 : 40,
+                  justifyContent: 'center'
+                }}>
+                  {category.icon}
+                </ListItemIcon>
+                {!sidebarCollapsed && (
+                  <ListItemText
+                    primary={t(category.text)}
+                    primaryTypographyProps={{
+                      fontSize: '0.875rem',
+                      fontWeight: 500
+                    }}
+                  />
+                )}
               </ListItemButton>
-            )}
-            {sidebarCollapsed && (
-              <Box sx={{ px: 1, py: 0.5 }}>
-                {adminMenuItems.map((item, index) => renderMenuItem(item, index))}
-              </Box>
-            )}
-            {!sidebarCollapsed && (
-              <Collapse in={expandedSections.admin} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                  {adminMenuItems.map((item, index) => renderMenuItem(item, `admin-${index}`))}
-                </List>
-              </Collapse>
-            )}
+            );
 
-            {/* Game Management Panel */}
-            <Divider sx={{
-              my: 2,
-              borderColor: theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.1)'
-                : 'rgba(0,0,0,0.12)'
-            }} />
-            {!sidebarCollapsed && (
+            // Show tooltip when sidebar is collapsed
+            if (sidebarCollapsed) {
+              return (
+                <Tooltip
+                  key={category.id}
+                  title={t(category.text)}
+                  placement="right"
+                  arrow
+                >
+                  {categoryButton}
+                </Tooltip>
+              );
+            }
+
+            return categoryButton;
+          })}
+        </Box>
+
+        <Box
+          sx={{
+            opacity: selectedCategory ? 1 : 0,
+            visibility: selectedCategory ? 'visible' : 'hidden',
+            transition: 'opacity 0.3s ease-in-out, visibility 0.3s ease-in-out',
+            position: selectedCategory ? 'relative' : 'absolute',
+          }}
+        >
+          {/* Show selected category's submenu */}
+          {selectedCategory && (
+            <>
+              {/* Back to main button */}
               <ListItemButton
-                onClick={() => toggleSection('game')}
+                onClick={() => {
+                  setSelectedCategory(null);
+                  try {
+                    localStorage.removeItem('sidebarSelectedCategory');
+                  } catch (error) {
+                    console.warn('Failed to clear selected category:', error);
+                  }
+                }}
                 sx={{
                   color: theme.palette.text.secondary,
+                  mb: 2,
+                  borderRadius: 1,
+                  justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+                  px: sidebarCollapsed ? 0 : 2,
+                  pl: sidebarCollapsed ? 0 : 2,
                   '&:hover': {
                     backgroundColor: theme.palette.mode === 'dark'
                       ? 'rgba(255,255,255,0.1)'
@@ -680,80 +703,47 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   }
                 }}
               >
-                <ListItemText
-                  primary={t('sidebar.gamePanel')}
-                  primaryTypographyProps={{
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
-                  }}
-                />
-                {expandedSections.game ? <ExpandLess /> : <ExpandMore />}
+                <ListItemIcon sx={{
+                  color: 'inherit',
+                  minWidth: sidebarCollapsed ? 0 : 40,
+                  justifyContent: 'center'
+                }}>
+                  <ArrowBackIcon />
+                </ListItemIcon>
+                {!sidebarCollapsed && (
+                  <ListItemText
+                    primary={t('sidebar.backToMain')}
+                    primaryTypographyProps={{ fontSize: '0.875rem' }}
+                  />
+                )}
               </ListItemButton>
-            )}
-            {sidebarCollapsed && (
-              <Box sx={{ px: 1, py: 0.5 }}>
-                {gameMenuItems.map((item, index) => renderMenuItem(item, index))}
-              </Box>
-            )}
-            {!sidebarCollapsed && (
-              <Collapse in={expandedSections.game} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                  {gameMenuItems.map((item, index) => renderMenuItem(item, `game-${index}`))}
-                </List>
-              </Collapse>
-            )}
 
-            {/* Settings Panel */}
-            <Divider sx={{
-              my: 2,
-              borderColor: theme.palette.mode === 'dark'
-                ? 'rgba(255,255,255,0.1)'
-                : 'rgba(0,0,0,0.12)'
-            }} />
-            {!sidebarCollapsed && (
-              <ListItemButton
-                onClick={() => toggleSection('settings')}
-                sx={{
-                  color: theme.palette.text.secondary,
-                  '&:hover': {
-                    backgroundColor: theme.palette.mode === 'dark'
-                      ? 'rgba(255,255,255,0.1)'
-                      : 'rgba(0,0,0,0.08)'
-                  }
-                }}
-              >
-                <ListItemText
-                  primary={t('sidebar.settingsPanel')}
-                  primaryTypographyProps={{
-                    fontSize: '0.75rem',
+              {/* Category title */}
+              {!sidebarCollapsed && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    px: 2,
+                    py: 1,
+                    display: 'block',
+                    color: theme.palette.text.secondary,
                     fontWeight: 600,
                     textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
+                    letterSpacing: '0.05em',
+                    fontSize: '0.7rem'
                   }}
-                />
-                {expandedSections.settings ? <ExpandLess /> : <ExpandMore />}
-              </ListItemButton>
-            )}
-            {sidebarCollapsed && (
-              <Box sx={{ px: 1, py: 0.5 }}>
-                {settingsMenuItems
-                  .filter(item => !item.requireAdmin || user?.role === 'admin')
-                  .map((item, index) => renderMenuItem(item, index))}
-              </Box>
-            )}
-            {!sidebarCollapsed && (
-              <Collapse in={expandedSections.settings} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                  {settingsMenuItems
-                    .filter(item => !item.requireAdmin || user?.role === 'admin')
-                    .map((item, index) => renderMenuItem(item, `settings-${index}`))}
-                </List>
-              </Collapse>
-            )}
-          </>
-        )}
+                >
+                  {t(getMenuCategories(isAdmin()).find(c => c.id === selectedCategory)?.text || '')}
+                </Typography>
+              )}
+
+              {/* Submenu items */}
+              {getMenuCategories(isAdmin())
+                .find(c => c.id === selectedCategory)
+                ?.children.map((item, index) => renderMenuItem(item, index))}
+            </>
+          )}
+        </Box>
         </List>
       </Box>
     </Box>

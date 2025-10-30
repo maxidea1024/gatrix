@@ -2119,6 +2119,8 @@
   "sidebar": {
     "adminPanel": "管理员面板",
     "gamePanel": "游戏管理",
+    "gameManagement": "游戏管理",
+    "backToMain": "返回主菜单",
     "chat": "聊天",
     "dashboard": "仪表板",
     "logout": "退出登录",

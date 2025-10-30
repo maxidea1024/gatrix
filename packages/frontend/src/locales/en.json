@@ -2064,6 +2064,8 @@
   "sidebar": {
     "adminPanel": "ADMIN PANEL",
     "gamePanel": "GAME MANAGEMENT",
+    "gameManagement": "GAME MANAGEMENT",
+    "backToMain": "Back to Main",
     "chat": "Chat",
     "dashboard": "Dashboard",
     "logout": "Logout",

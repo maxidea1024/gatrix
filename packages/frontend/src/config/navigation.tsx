@@ -32,6 +32,7 @@ import {
   Celebration as CelebrationIcon,
   Dns as DnsIcon,
   Notifications as NotificationsIcon,
+  AdminPanelSettings,
 } from '@mui/icons-material';
 
 export interface MenuItem {
@@ -42,13 +43,21 @@ export interface MenuItem {
   children?: MenuItem[];
 }
 
+export interface MenuCategory {
+  id: string;
+  text: string;
+  icon: React.ReactElement;
+  adminOnly?: boolean;
+  children: MenuItem[];
+}
+
 // 기본 메뉴 (모든 사용자)
 export const baseMenuItems: MenuItem[] = [
   { text: 'sidebar.dashboard', icon: <DashboardIcon />, path: '/dashboard' },
 ];
 
-// 관리자 메뉴
-export const adminMenuItems: MenuItem[] = [
+// 관리자 메뉴 - 관리자패널 카테고리
+export const adminPanelMenuItems: MenuItem[] = [
   { text: 'sidebar.userManagement', icon: <PeopleIcon />, path: '/admin/users', adminOnly: true },
   { text: 'sidebar.clientVersions', icon: <WidgetsIcon />, path: '/admin/client-versions', adminOnly: true },
   { text: 'sidebar.gameWorlds', icon: <LanguageIcon />, path: '/admin/game-worlds', adminOnly: true },
@@ -95,10 +104,49 @@ export const settingsMenuItems: MenuItem[] = [
   { text: 'tags.title', icon: <LabelIcon />, path: '/settings/tags' },
 ];
 
-// 모든 메뉴를 가져오는 함수
+// 메뉴 카테고리 구성
+export const getMenuCategories = (isAdmin: boolean): MenuCategory[] => {
+  const categories: MenuCategory[] = [
+    {
+      id: 'navigation',
+      text: 'sidebar.navigation',
+      icon: <DashboardIcon />,
+      children: baseMenuItems,
+    },
+  ];
+
+  if (isAdmin) {
+    categories.push(
+      {
+        id: 'admin-panel',
+        text: 'sidebar.adminPanel',
+        icon: <AdminPanelSettings />,
+        adminOnly: true,
+        children: adminPanelMenuItems,
+      },
+      {
+        id: 'game-management',
+        text: 'sidebar.gameManagement',
+        icon: <SportsEsportsIcon />,
+        adminOnly: true,
+        children: gameMenuItems,
+      },
+      {
+        id: 'settings',
+        text: 'sidebar.settings',
+        icon: <SettingsIcon />,
+        children: settingsMenuItems,
+      }
+    );
+  }
+
+  return categories;
+};
+
+// 기존 호환성을 위한 함수
 export const getAllMenuItems = (isAdmin: boolean): MenuItem[] => {
   if (isAdmin) {
-    return [...baseMenuItems, ...adminMenuItems];
+    return [...baseMenuItems, ...adminPanelMenuItems];
   }
   return baseMenuItems;
 };

@@ -2064,6 +2064,8 @@
   "sidebar": {
     "adminPanel": "관리자 패널",
     "gamePanel": "게임 관리",
+    "gameManagement": "게임 관리",
+    "backToMain": "메인으로",
     "chat": "채팅",
     "dashboard": "대시보드",
     "logout": "로그아웃",
