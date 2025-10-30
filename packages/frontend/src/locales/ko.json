@@ -691,7 +691,7 @@
       "endpoint": "API 엔드포인트",
       "method": "메서드",
       "parameters": "요청 파라미터",
-      "noParameters": "이 API는 필수 파라미터가 없습니다. 모든 활성 게임월드를 displayOrder 내림차순(높을수록 앞쪽)으로 조회합니다.",
+      "noParameters": "이 API는 필수 파라미터가 없습니다. 모든 활성 게임월드를 displayOrder 오름차순(낮을수록 앞쪽)으로 조회합니다.",
       "optionalParameters": "선택사항 파라미터: lang (점검 메시지의 언어 지정, 기본값: 언어에 상관없는 기본 메시지)",
       "requiredHeaders": "필수 헤더",
       "requestBody": "요청 본문",

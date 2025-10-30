@@ -16,12 +16,10 @@ export class GameWorldService {
   // Deprecated: kept for backward compatibility if referenced elsewhere
   static async getGameWorlds(
     filters: any = {},
-    pagination: { page?: number; limit?: number; sortBy?: string; sortOrder?: 'ASC' | 'DESC' } = {}
+    pagination: { page?: number; limit?: number } = {}
   ): Promise<{ data: GameWorld[], total: number }> {
     try {
       const params: GameWorldListParams = {
-        sortBy: (pagination.sortBy as any) || 'displayOrder',
-        sortOrder: (pagination.sortOrder as any) || 'DESC',
         ...filters
       } as any;
 

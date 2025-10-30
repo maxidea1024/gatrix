@@ -746,7 +746,7 @@
       "endpoint": "API 端点",
       "method": "方法",
       "parameters": "请求参数",
-      "noParameters": "此 API 没有必需参数。它按 displayOrder 降序（数值越大越靠前）检索所有活跃游戏世界。",
+      "noParameters": "此 API 没有必需参数。它按 displayOrder 升序（数值越小越靠前）检索所有活跃游戏世界。",
       "optionalParameters": "可选参数：lang（指定维护消息的语言，默认值：与语言无关的默认消息）",
       "requiredHeaders": "必需的标头",
       "requestBody": "请求正文",

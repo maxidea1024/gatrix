@@ -1034,8 +1034,8 @@ const GameWorldsPage: React.FC = () => {
       // Update display orders
       const orderUpdates = newWorlds.map((world, index) => ({
         id: world.id,
-        // Server lists by displayOrder DESC; assign larger numbers to rows nearer the top
-        displayOrder: (newWorlds.length - index) * 10
+        // Server lists by displayOrder ASC; assign lower numbers to rows nearer the top
+        displayOrder: index * 10
       }));
 
       console.log('Order updates to send:', orderUpdates);

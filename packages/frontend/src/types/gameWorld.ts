@@ -63,8 +63,6 @@ export interface UpdateGameWorldData {
 
 export interface GameWorldListParams {
   search?: string;
-  sortBy?: 'name' | 'worldId' | 'displayOrder' | 'createdAt' | 'updatedAt';
-  sortOrder?: 'ASC' | 'DESC';
   isVisible?: boolean;
   isMaintenance?: boolean;
   // Prefer tagIds for server-side filtering; keep tags for backward compatibility
