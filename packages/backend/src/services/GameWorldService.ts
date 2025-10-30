@@ -271,4 +271,37 @@ export class GameWorldService {
       throw new GatrixError('Failed to invalidate cache', 500);
     }
   }
+
+  /**
+   * Get maintenance message for a game world in specified language
+   * @param worldId - Game world ID
+   * @param lang - Language code (ko, en, zh)
+   * @returns Maintenance message or null if not found
+   */
+  static async getMaintenanceMessage(worldId: number, lang: string = 'en'): Promise<string | null> {
+    try {
+      const world = await GameWorldModel.findById(worldId);
+      if (!world) {
+        return null;
+      }
+
+      // If world has multi-language support, try to get localized message
+      if (world.supportsMultiLanguage && world.maintenanceLocales && Array.isArray(world.maintenanceLocales)) {
+        const locale = world.maintenanceLocales.find((l: any) => l.lang === lang);
+        if (locale) {
+          return locale.message;
+        }
+        // Fallback to first available locale if requested language not found
+        if (world.maintenanceLocales.length > 0) {
+          return world.maintenanceLocales[0].message;
+        }
+      }
+
+      // Return default maintenance message if available
+      return world.maintenanceMessage || null;
+    } catch (error) {
+      logger.error(`Error in getMaintenanceMessage service for world ${worldId}:`, error);
+      return null;
+    }
+  }
 }

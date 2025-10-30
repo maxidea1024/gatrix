@@ -78,6 +78,7 @@ import MailboxPage from './pages/mailbox/MailboxPage';
 import SystemConsolePage from './pages/admin/SystemConsolePage';
 import RealtimeEventsPage from './pages/admin/RealtimeEventsPage';
 import ServerListPage from './pages/admin/ServerListPage';
+import OpenApiPage from './pages/admin/OpenApiPage';
 // import AdvancedSettingsPage from './pages/admin/AdvancedSettingsPage'];
 
 // Pages - Game
@@ -380,6 +381,7 @@ const AppContent: React.FC = () => {
                         <Route path="api-tokens" element={<ApiTokensPage />} />
                         <Route path="console" element={<SystemConsolePage />} />
                         <Route path="server-list" element={<ServerListPage />} />
+                        <Route path="open-api" element={<OpenApiPage />} />
                       </Routes>
                     </MainLayout>
                   </ProtectedRoute>

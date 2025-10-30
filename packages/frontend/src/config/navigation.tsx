@@ -34,6 +34,7 @@ import {
   Notifications as NotificationsIcon,
   AdminPanelSettings,
   Storage as ServerIcon,
+  Api as ApiIcon,
 } from '@mui/icons-material';
 
 export interface MenuItem {
@@ -80,6 +81,7 @@ export const adminPanelMenuItems: MenuItem[] = [
   { text: 'sidebar.serverManagement', icon: <DnsIcon />, adminOnly: true, children: [
     { text: 'sidebar.serverList', icon: <ServerIcon />, path: '/admin/server-list', adminOnly: true },
   ] },
+  { text: 'sidebar.openApi', icon: <ApiIcon />, path: '/admin/open-api', adminOnly: true },
 ];
 
 // 게임관리 메뉴

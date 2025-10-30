@@ -53,8 +53,9 @@ export class ClientController {
       });
     }
 
-    // Create cache key for exact match (without environment)
-    const cacheKey = `client_version:${platform}:${version}`;
+    // Create cache key for exact match (with language)
+    // Cache separately for each language to ensure correct maintenance messages
+    const cacheKey = `client_version:${platform}:${version}${lang ? `:${lang}` : ''}`;
 
     // Try to get from cache first
     const cachedData = await cacheService.get(cacheKey);
@@ -122,7 +123,7 @@ export class ClientController {
     }
 
     // Get maintenance message if status is MAINTENANCE
-    let maintenanceMessage: string | undefined;
+    let maintenanceMessage: string | undefined = record.maintenanceMessage;
     if (record.clientStatus === ClientStatus.MAINTENANCE && record.id) {
       // Try to get localized maintenance message from database
       try {
@@ -157,9 +158,10 @@ export class ClientController {
       meta,
     };
 
-    // Add maintenance message if applicable
-    if (maintenanceMessage) {
-      clientData.maintenanceMessage = maintenanceMessage;
+    // Add maintenance message if status is MAINTENANCE
+    // Always include maintenanceMessage field when status is MAINTENANCE
+    if (record.clientStatus === ClientStatus.MAINTENANCE) {
+      clientData.maintenanceMessage = maintenanceMessage || '';
     }
 
     // Cache the result for 5 minutes

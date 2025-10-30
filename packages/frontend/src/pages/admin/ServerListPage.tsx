@@ -250,11 +250,15 @@ const ServerListPage: React.FC = () => {
   );
 
   // Initialize services from SWR data (only on initial load)
+  // Use a ref to track if we've already initialized to prevent re-initialization on data changes
+  const initializedRef = useRef(false);
+
   useEffect(() => {
-    if (data && services.length === 0) {
+    if (data && !initializedRef.current) {
       setServices(data);
+      initializedRef.current = true;
     }
-  }, [data]);
+  }, []);
 
   // Setup SSE connection for real-time updates (only once on mount)
   useEffect(() => {
@@ -372,23 +376,18 @@ const ServerListPage: React.FC = () => {
 
   const handleCleanupConfirm = async () => {
     try {
-      // Get servers to delete
-      const serversToDelete = services.filter((s) => s.status === 'terminated' || s.status === 'error');
+      console.log('🗑️ Starting cleanup...');
 
-      // Delete each server from backend
-      for (const server of serversToDelete) {
-        try {
-          await serviceDiscoveryService.deleteService(server.type, server.instanceId);
-        } catch (error) {
-          console.error(`Failed to delete ${server.type}:${server.instanceId}:`, error);
-        }
-      }
+      // Call backend cleanup endpoint (handles all terminated/error servers)
+      const result = await serviceDiscoveryService.cleanupServices();
 
-      // Remove from frontend state
+      console.log(`✅ Cleanup complete: ${result.deletedCount}/${result.totalCount} servers deleted`);
+
+      // Remove from frontend state (will be updated by SSE delete events)
       setServices((prev) => prev.filter((s) => s.status !== 'terminated' && s.status !== 'error'));
       setCleanupDialogOpen(false);
     } catch (error) {
-      console.error('Cleanup failed:', error);
+      console.error('❌ Cleanup failed:', error);
     }
   };
 

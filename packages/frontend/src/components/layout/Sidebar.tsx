@@ -48,6 +48,7 @@ import {
   Whatshot,
   Celebration,
   Dns,
+  Api,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -97,6 +98,7 @@ const iconMap: Record<string, React.ReactElement> = {
   Whatshot: <Whatshot />,
   Celebration: <Celebration />,
   Dns: <Dns />,
+  Api: <Api />,
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ open, onClose, width }) => {

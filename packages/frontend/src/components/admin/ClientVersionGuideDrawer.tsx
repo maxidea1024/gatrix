@@ -67,7 +67,7 @@ const ClientVersionGuideDrawer: React.FC<ClientVersionGuideDrawerProps> = ({ ope
   const [testStatus, setTestStatus] = useState<number | null>(null);
   const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>({});
   const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
-  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(true);
+  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(false);
   const [expandedResponseHeaders, setExpandedResponseHeaders] = useState(false);
 
   // Load saved values from localStorage on mount

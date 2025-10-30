@@ -73,6 +73,7 @@ import {
   Celebration as CelebrationIcon,
   Dns as DnsIcon,
   ArrowBack as ArrowBackIcon,
+  Api as ApiIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -1248,6 +1249,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 mx: 1
               }}
             />
+
+            <Tooltip title="Open API">
+              <IconButton
+                onClick={() => navigate('/admin/open-api')}
+                color="inherit"
+              >
+                <ApiIcon />
+              </IconButton>
+            </Tooltip>
 
             <IconButton onClick={toggleTheme} color="inherit">
               {isDark ? <LightModeIcon /> : <DarkModeIcon />}

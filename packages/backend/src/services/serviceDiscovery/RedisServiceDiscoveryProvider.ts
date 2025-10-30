@@ -20,6 +20,8 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
   private heartbeatIntervals: Map<string, ReturnType<typeof setInterval>> = new Map();
   private watchCallbacks: Set<WatchCallback> = new Set();
   private isWatching = false;
+  private ttlCheckInterval: ReturnType<typeof setInterval> | null = null;
+  private trackedServices: Map<string, ServiceInstance> = new Map();
 
   constructor(host: string, port: number, password?: string, db?: number) {
     this.client = new Redis({
@@ -239,23 +241,69 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
 
   async watch(callback: WatchCallback): Promise<void> {
     this.watchCallbacks.add(callback);
-    
+
     if (!this.isWatching) {
       await this.subscriber.subscribe('service:events');
-      
+
       this.subscriber.on('message', (channel, message) => {
         if (channel === 'service:events') {
           try {
             const event: WatchEvent = JSON.parse(message);
+
+            // Track services for TTL expiration detection
+            if (event.type === 'put') {
+              this.trackedServices.set(
+                `${event.instance.type}:${event.instance.instanceId}`,
+                event.instance
+              );
+            } else if (event.type === 'delete') {
+              this.trackedServices.delete(
+                `${event.instance.type}:${event.instance.instanceId}`
+              );
+            }
+
             this.watchCallbacks.forEach(cb => cb(event));
           } catch (error) {
             logger.error('Failed to parse watch event:', error);
           }
         }
       });
-      
+
+      // Start TTL expiration check (every 10 seconds)
+      this.ttlCheckInterval = setInterval(async () => {
+        await this.checkExpiredServices();
+      }, 10000);
+
       this.isWatching = true;
-      logger.info('Started watching service changes');
+      logger.info('Started watching service changes with TTL expiration detection');
+    }
+  }
+
+  /**
+   * Check for expired services and emit delete events
+   */
+  private async checkExpiredServices(): Promise<void> {
+    try {
+      for (const [key, instance] of this.trackedServices.entries()) {
+        const redisKey = this.getInstanceKey(instance.type, instance.instanceId);
+        const exists = await this.client.exists(redisKey);
+
+        if (!exists) {
+          // Service has expired, emit delete event
+          this.trackedServices.delete(key);
+          await this.publishEvent({
+            type: 'delete',
+            instance: {
+              ...instance,
+              status: 'terminated',
+              updatedAt: new Date().toISOString(),
+            },
+          });
+          logger.info(`Service expired (TTL): ${instance.type}:${instance.instanceId}`);
+        }
+      }
+    } catch (error) {
+      logger.error('Error checking expired services:', error);
     }
   }
 
@@ -263,11 +311,20 @@ export class RedisServiceDiscoveryProvider implements IServiceDiscoveryProvider 
     // Clear all heartbeat intervals
     this.heartbeatIntervals.forEach(interval => clearInterval(interval));
     this.heartbeatIntervals.clear();
-    
+
+    // Clear TTL check interval
+    if (this.ttlCheckInterval) {
+      clearInterval(this.ttlCheckInterval);
+      this.ttlCheckInterval = null;
+    }
+
+    // Clear tracked services
+    this.trackedServices.clear();
+
     // Close connections
     await this.client.quit();
     await this.subscriber.quit();
-    
+
     logger.info('RedisServiceDiscoveryProvider closed');
   }
 

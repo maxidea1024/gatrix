@@ -120,14 +120,58 @@ router.get('/sse', authenticateSSE, async (req, res) => {
   }
 });
 
-// All other admin routes require authentication and admin role
+// All other routes (non-SSE) require authentication and admin role
 router.use(authenticate as any, requireAdmin as any);
 
 /**
- * Get all services or services of a specific type
- * GET /api/v1/admin/services?type=chat
+ * Clean up all terminated and error services
+ * POST /api/v1/admin/services/cleanup
  */
-router.get('/', ServiceDiscoveryController.getServices);
+router.post('/cleanup', async (req: Request, res: Response) => {
+  try {
+    const services = await serviceDiscoveryService.getServices();
+
+    // Filter terminated and error services
+    const toDelete = services.filter((s) => s.status === 'terminated' || s.status === 'error');
+
+    if (toDelete.length === 0) {
+      return res.json({
+        success: true,
+        data: {
+          deletedCount: 0,
+          totalCount: 0,
+        },
+        message: 'No services to clean up',
+      });
+    }
+
+    // Delete all terminated/error services
+    const results = await Promise.allSettled(
+      toDelete.map((service) =>
+        serviceDiscoveryService.unregister(service.instanceId, service.type)
+      )
+    );
+
+    const successCount = results.filter((r) => r.status === 'fulfilled').length;
+
+    logger.info(`Cleanup completed: ${successCount}/${toDelete.length} services deleted`);
+
+    res.json({
+      success: true,
+      data: {
+        deletedCount: successCount,
+        totalCount: toDelete.length,
+      },
+      message: `Cleanup completed: ${successCount}/${toDelete.length} services deleted`,
+    });
+  } catch (error) {
+    logger.error('Error during cleanup:', error);
+    res.status(500).json({
+      success: false,
+      error: { message: 'Failed to cleanup services' },
+    });
+  }
+});
 
 /**
  * Get service statistics
@@ -185,6 +229,13 @@ router.delete('/:type/:instanceId', async (req: Request, res: Response) => {
     });
   }
 });
+
+/**
+ * Get all services or services of a specific type
+ * GET /api/v1/admin/services?type=chat
+ * NOTE: This must be last to avoid matching dynamic routes
+ */
+router.get('/', ServiceDiscoveryController.getServices);
 
 export default router;
 

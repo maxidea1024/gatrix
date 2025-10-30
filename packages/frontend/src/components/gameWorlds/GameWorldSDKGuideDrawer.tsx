@@ -1,0 +1,703 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Typography,
+  IconButton,
+  Tooltip,
+  Stack,
+  Divider,
+  Alert,
+  Paper,
+  Tabs,
+  Tab,
+  TextField,
+  Button,
+  CircularProgress,
+  Collapse,
+} from '@mui/material';
+import {
+  Close as CloseIcon,
+  ContentCopy as ContentCopyIcon,
+  PlayArrow as PlayArrowIcon,
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '@mui/material/styles';
+import Editor from '@monaco-editor/react';
+import { useSnackbar } from 'notistack';
+import ResizableDrawer from '../common/ResizableDrawer';
+
+interface GameWorldSDKGuideDrawerProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+const GameWorldSDKGuideDrawer: React.FC<GameWorldSDKGuideDrawerProps> = ({ open, onClose }) => {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  const { enqueueSnackbar } = useSnackbar();
+
+  const [mainTabValue, setMainTabValue] = useState(0);
+  const [errorTabValue, setErrorTabValue] = useState(0);
+
+  // API test state
+  const [apiToken, setApiToken] = useState('');
+  const [appName, setAppName] = useState('MyGameApp');
+  const [page, setPage] = useState('1');
+  const [limit, setLimit] = useState('10');
+  const [testResponse, setTestResponse] = useState<any>(null);
+  const [testLoading, setTestLoading] = useState(false);
+  const [testError, setTestError] = useState<string | null>(null);
+  const [requestHeaders, setRequestHeaders] = useState<Record<string, string>>({});
+  const [responseHeaders, setResponseHeaders] = useState<Record<string, string>>({});
+  const [expandedRequestHeaders, setExpandedRequestHeaders] = useState(false);
+  const [expandedResponseHeaders, setExpandedResponseHeaders] = useState(false);
+  const [testDuration, setTestDuration] = useState<number | null>(null);
+  const [testStatus, setTestStatus] = useState<number | null>(null);
+
+  // Load saved values from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('gameWorldSDKGuide_testInputs');
+      if (saved) {
+        const { apiToken: savedToken, appName: savedAppName } = JSON.parse(saved);
+        if (savedToken) setApiToken(savedToken);
+        if (savedAppName) setAppName(savedAppName);
+      }
+    } catch (error) {
+      // Silently ignore localStorage errors
+    }
+  }, []);
+
+  // Save values to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('gameWorldSDKGuide_testInputs', JSON.stringify({
+        apiToken,
+        appName,
+      }));
+    } catch (error) {
+      // Silently ignore localStorage errors
+    }
+  }, [apiToken, appName]);
+
+  // curl example code
+  const curlExample = `# Get Game Worlds List API Example
+# Optional: Add ?lang=ko for Korean maintenance messages (ko, en, zh supported)
+curl -X GET "http://localhost:5000/api/v1/server/game-worlds?lang=ko" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Application-Name: MyGameApp" \\
+  -H "X-API-Token: your-api-token-here"`;
+
+  // JSON response example
+  const jsonResponse = `{
+  "success": true,
+  "data": {
+    "worlds": [
+      {
+        "worldId": "world_001",
+        "name": "Main World",
+        "isMaintenance": false,
+        "customPayload": {
+          "region": "asia",
+          "maxPlayers": 1000
+        },
+        "tags": ["adventure", "pve"]
+      },
+      {
+        "worldId": "world_002",
+        "name": "PvP Arena",
+        "isMaintenance": true,
+        "maintenanceMessage": "Server maintenance in progress. Expected completion: 2025-10-30 14:00 UTC",
+        "customPayload": null,
+        "tags": ["pvp"]
+      }
+    ]
+  }
+}`;
+
+  // Error response examples
+  const errorMissingHeaders = `{
+  "success": false,
+  "error": {
+    "code": "INVALID_PARAMETERS",
+    "message": "Missing required headers",
+    "details": {
+      "missing": ["X-API-Token", "X-Application-Name"]
+    }
+  }
+}`;
+
+  const errorUnauthorized = `{
+  "success": false,
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Invalid API token",
+    "details": {
+      "reason": "INVALID_TOKEN"
+    }
+  }
+}`;
+
+  const errorInvalidParams = `{
+  "success": false,
+  "error": {
+    "code": "INVALID_PARAMETERS",
+    "message": "Invalid query parameters",
+    "details": {
+      "reason": "INVALID_PAGE_OR_LIMIT"
+    }
+  }
+}`;
+
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    enqueueSnackbar(t('gameWorlds.sdkGuide.copiedToClipboard'), {
+      variant: 'success',
+    });
+  };
+
+  const handleTestAPI = async () => {
+    if (!apiToken.trim()) {
+      setTestError('API Token is required');
+      return;
+    }
+
+    setTestLoading(true);
+    setTestError(null);
+    setTestResponse(null);
+    setTestStatus(null);
+    setTestDuration(null);
+    setExpandedRequestHeaders(false);
+    setExpandedResponseHeaders(false);
+
+    const startTime = performance.now();
+
+    try {
+      const response = await fetch(
+        `/api/v1/server/game-worlds`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Application-Name': appName,
+            'X-API-Token': apiToken,
+          },
+        }
+      );
+
+      const endTime = performance.now();
+      const duration = Math.round(endTime - startTime);
+
+      const data = await response.json();
+      setTestResponse(data);
+      setTestStatus(response.status);
+      setTestDuration(duration);
+
+      setRequestHeaders({
+        'Content-Type': 'application/json',
+        'X-Application-Name': appName,
+        'X-API-Token': apiToken,
+      });
+
+      setResponseHeaders({
+        'Content-Type': response.headers.get('Content-Type') || 'application/json',
+        'Status': `${response.status} ${response.statusText}`,
+      });
+
+      setExpandedResponseHeaders(true);
+
+      if (!response.ok) {
+        setTestError(`HTTP ${response.status}: ${data.error?.message || 'Request failed'}`);
+      } else {
+        setTestError(null);
+      }
+    } catch (error) {
+      setTestError(error instanceof Error ? error.message : 'Unknown error occurred');
+    } finally {
+      setTestLoading(false);
+    }
+  };
+
+  const CodeBlock: React.FC<{ code: string; language: string; title?: string }> = ({
+    code,
+    language,
+    title,
+  }) => (
+    <Box sx={{ mb: 2 }}>
+      {title && (
+        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+          {title}
+        </Typography>
+      )}
+      <Box
+        sx={{
+          position: 'relative',
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: 1,
+          overflow: 'hidden',
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            p: 0.5,
+            backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
+            borderBottom: `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Tooltip title={t('common.copy') || 'Copy'}>
+            <IconButton
+              size="small"
+              onClick={() => handleCopyCode(code)}
+              sx={{ color: 'primary.main' }}
+            >
+              <ContentCopyIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
+        <Box sx={{ height: 200, overflow: 'hidden' }}>
+          <Editor
+            height="100%"
+            language={language}
+            value={code}
+            theme={isDark ? 'vs-dark' : 'light'}
+            options={{
+              readOnly: true,
+              minimap: { enabled: false },
+              scrollBeyondLastLine: false,
+              wordWrap: 'on',
+              automaticLayout: true,
+              fontSize: 12,
+              lineNumbers: 'on',
+              folding: true,
+              padding: { top: 8, bottom: 8 },
+            }}
+          />
+        </Box>
+      </Box>
+    </Box>
+  );
+
+  return (
+    <ResizableDrawer
+      open={open}
+      onClose={onClose}
+      title={t('gameWorlds.sdkGuide.title')}
+      subtitle={t('gameWorlds.sdkGuide.subtitle')}
+      defaultWidth={600}
+    >
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        {/* Main Tabs */}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 3, pt: 2 }}>
+          <Tabs value={mainTabValue} onChange={(e, newValue) => setMainTabValue(newValue)}>
+            <Tab label={t('gameWorlds.sdkGuide.tabGuide')} />
+            <Tab label={t('gameWorlds.sdkGuide.tabApiTest')} />
+          </Tabs>
+        </Box>
+
+        {/* Content */}
+        <Box sx={{ p: 3, overflow: 'auto', flex: 1 }}>
+          {/* Tab 1: SDK Guide */}
+          {mainTabValue === 0 && (
+            <>
+              {/* Description */}
+              <Alert severity="info" sx={{ mb: 3 }}>
+                {t('gameWorlds.sdkGuide.description')}
+              </Alert>
+
+              {/* Endpoint */}
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                {t('gameWorlds.sdkGuide.endpoint')}
+              </Typography>
+              <Paper
+                sx={{
+                  p: 2,
+                  mb: 3,
+                  backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                  fontFamily: 'monospace',
+                  fontSize: '0.9rem',
+                }}
+              >
+                <Typography component="div" sx={{ mb: 1 }}>
+                  <strong>{t('gameWorlds.sdkGuide.method')}:</strong> GET
+                </Typography>
+                <Typography component="div" sx={{ wordBreak: 'break-all' }}>
+                  /api/v1/server/game-worlds
+                </Typography>
+              </Paper>
+
+              <Divider sx={{ my: 3 }} />
+
+              {/* Parameters */}
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                {t('gameWorlds.sdkGuide.parameters')}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+                {t('gameWorlds.sdkGuide.noParameters')}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 3, color: 'text.secondary' }}>
+                {t('gameWorlds.sdkGuide.optionalParameters')}
+              </Typography>
+
+              <Divider sx={{ my: 3 }} />
+
+              {/* Required Headers */}
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                {t('gameWorlds.sdkGuide.requiredHeaders')}
+              </Typography>
+              <Stack spacing={1} sx={{ mb: 3 }}>
+                <Typography variant="body2">
+                  • <strong>X-API-Token</strong>: {t('gameWorlds.sdkGuide.headerApiToken')}
+                </Typography>
+                <Typography variant="body2">
+                  • <strong>X-Application-Name</strong>: {t('gameWorlds.sdkGuide.headerAppName')}
+                </Typography>
+                <Typography variant="body2">
+                  • <strong>Content-Type</strong>: {t('gameWorlds.sdkGuide.headerContentType')}
+                </Typography>
+              </Stack>
+
+              <Divider sx={{ my: 3 }} />
+
+              {/* curl Example */}
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                curl {t('common.example') || 'Example'}
+              </Typography>
+              <CodeBlock code={curlExample} language="bash" />
+
+              <Divider sx={{ my: 3 }} />
+
+              {/* Response Example */}
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                {t('gameWorlds.sdkGuide.responseExample')}
+              </Typography>
+              <CodeBlock code={jsonResponse} language="json" />
+
+              <Divider sx={{ my: 3 }} />
+
+              {/* Response Fields Description */}
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                {t('gameWorlds.sdkGuide.responseFields')}
+              </Typography>
+              <Stack spacing={2} sx={{ mb: 3 }}>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                    • {t('gameWorlds.sdkGuide.fieldWorldId')}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', pl: 2 }}>
+                    {t('gameWorlds.sdkGuide.fieldWorldId')}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                    • {t('gameWorlds.sdkGuide.fieldName')}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', pl: 2 }}>
+                    {t('gameWorlds.sdkGuide.fieldName')}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                    • {t('gameWorlds.sdkGuide.fieldIsMaintenance')}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', pl: 2 }}>
+                    {t('gameWorlds.sdkGuide.fieldIsMaintenance')}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                    • {t('gameWorlds.sdkGuide.fieldMaintenanceMessage')}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', pl: 2 }}>
+                    {t('gameWorlds.sdkGuide.fieldMaintenanceMessage')}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                    • {t('gameWorlds.sdkGuide.fieldCustomPayload')}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', pl: 2 }}>
+                    {t('gameWorlds.sdkGuide.fieldCustomPayload')}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                    • {t('gameWorlds.sdkGuide.fieldTags')}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', pl: 2 }}>
+                    {t('gameWorlds.sdkGuide.fieldTags')}
+                  </Typography>
+                </Box>
+              </Stack>
+
+              <Alert severity="info" sx={{ mb: 3 }}>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  <strong>{t('gameWorlds.sdkGuide.maintenanceMessageNote')}</strong>
+                </Typography>
+                <Typography variant="body2">
+                  {t('gameWorlds.sdkGuide.langParameter')}
+                </Typography>
+              </Alert>
+
+              <Divider sx={{ my: 3 }} />
+
+              {/* Error Codes - Tabbed */}
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                {t('gameWorlds.sdkGuide.errorCodes')}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+                {t('gameWorlds.sdkGuide.errorCodesDesc')}
+              </Typography>
+
+              <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+                <Tabs value={errorTabValue} onChange={(e, newValue) => setErrorTabValue(newValue)} variant="scrollable" scrollButtons="auto">
+                  <Tab label={`400 - ${t('gameWorlds.sdkGuide.missingHeaders')}`} />
+                  <Tab label={`401 - ${t('gameWorlds.sdkGuide.unauthorized')}`} />
+                  <Tab label={`400 - ${t('gameWorlds.sdkGuide.invalidParams')}`} />
+                </Tabs>
+              </Box>
+
+              {errorTabValue === 0 && <CodeBlock code={errorMissingHeaders} language="json" />}
+              {errorTabValue === 1 && <CodeBlock code={errorUnauthorized} language="json" />}
+              {errorTabValue === 2 && <CodeBlock code={errorInvalidParams} language="json" />}
+            </>
+          )}
+
+          {/* Tab 2: API Test */}
+          {mainTabValue === 1 && (
+            <>
+              {/* REQUEST SECTION */}
+              <Box sx={{ mb: 3 }}>
+                <Box
+                  onClick={() => setExpandedRequestHeaders(!expandedRequestHeaders)}
+                  sx={{
+                    p: 1.5,
+                    backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                    borderRadius: 1,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#3d3d3d' : '#eeeeee' },
+                  }}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    {t('gameWorlds.sdkGuide.requestBody')}
+                  </Typography>
+                  <Box sx={{ transform: expandedRequestHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
+                    ▼
+                  </Box>
+                </Box>
+                <Collapse in={expandedRequestHeaders}>
+                  <Box sx={{ p: 2, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
+                    {/* API Token and App Name */}
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+                        {t('gameWorlds.sdkGuide.authentication')}
+                      </Typography>
+                      <Stack spacing={2} sx={{ pl: 1 }}>
+                        <TextField
+                          label={t('gameWorlds.sdkGuide.testApiToken')}
+                          type="password"
+                          value={apiToken}
+                          onChange={(e) => setApiToken(e.target.value)}
+                          size="small"
+                          fullWidth
+                          placeholder="Enter your API token"
+                        />
+                        <TextField
+                          label={t('gameWorlds.sdkGuide.testAppName')}
+                          value={appName}
+                          onChange={(e) => setAppName(e.target.value)}
+                          size="small"
+                          fullWidth
+                          placeholder="e.g., MyGameApp"
+                        />
+                      </Stack>
+                    </Box>
+
+                    {/* Request Headers */}
+                    {Object.keys(requestHeaders).length > 0 && (
+                      <Box sx={{ mb: 2 }}>
+                        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                          {t('gameWorlds.sdkGuide.requestHeaders')} ({Object.keys(requestHeaders).length})
+                        </Typography>
+                        <Stack spacing={0.5} sx={{ pl: 1 }}>
+                          {Object.entries(requestHeaders).map(([key, value]) => (
+                            <Box key={key} sx={{ display: 'flex', gap: 1 }}>
+                              <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 150, color: 'primary.main' }}>
+                                {key}:
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', wordBreak: 'break-all' }}>
+                                {String(value)}
+                              </Typography>
+                            </Box>
+                          ))}
+                        </Stack>
+                      </Box>
+                    )}
+
+                    {/* Test Button */}
+                    <Button
+                      variant="contained"
+                      startIcon={testLoading ? <CircularProgress size={16} sx={{ color: 'inherit' }} /> : <PlayArrowIcon />}
+                      onClick={handleTestAPI}
+                      disabled={testLoading}
+                      fullWidth
+                    >
+                      {testLoading ? t('gameWorlds.sdkGuide.testLoading') : t('gameWorlds.sdkGuide.testButton')}
+                    </Button>
+                  </Box>
+                </Collapse>
+              </Box>
+
+              {/* RESPONSE SECTION */}
+              {testResponse && (
+                <Box sx={{ mb: 3 }}>
+                  <Box
+                    onClick={() => setExpandedResponseHeaders(!expandedResponseHeaders)}
+                    sx={{
+                      p: 1.5,
+                      backgroundColor: theme.palette.mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
+                      borderRadius: 1,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      '&:hover': { backgroundColor: theme.palette.mode === 'dark' ? '#3d3d3d' : '#eeeeee' },
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        {t('gameWorlds.sdkGuide.responseBody')}
+                      </Typography>
+                      {testStatus && (
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                          <Box>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('gameWorlds.sdkGuide.testStatus')}</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              {testStatus} {testStatus === 200 ? 'OK' : testStatus === 401 ? 'Unauthorized' : testStatus === 400 ? 'Bad Request' : 'Error'}
+                            </Typography>
+                          </Box>
+                          {testDuration !== null && (
+                            <Box>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>{t('gameWorlds.sdkGuide.testDuration')}</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>{testDuration}ms</Typography>
+                            </Box>
+                          )}
+                          {Object.keys(responseHeaders).length > 0 && (
+                            <Box>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Size</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                {new Blob([JSON.stringify(testResponse)]).size} bytes
+                              </Typography>
+                            </Box>
+                          )}
+                        </Box>
+                      )}
+                    </Box>
+                    <Box sx={{ transform: expandedResponseHeaders ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}>
+                      ▼
+                    </Box>
+                  </Box>
+                  <Collapse in={expandedResponseHeaders}>
+                    <Box sx={{ p: 2, backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa', borderRadius: 1, mt: 0.5 }}>
+                      {/* Error Message */}
+                      {testError && (
+                        <Alert severity="error" sx={{ mb: 2 }}>
+                          {testError}
+                        </Alert>
+                      )}
+
+                      {/* Response Headers */}
+                      {Object.keys(responseHeaders).length > 0 && (
+                        <Box sx={{ mb: 2 }}>
+                          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                            {t('gameWorlds.sdkGuide.responseHeaders')} ({Object.keys(responseHeaders).length})
+                          </Typography>
+                          <Stack spacing={0.5} sx={{ pl: 1 }}>
+                            {Object.entries(responseHeaders).map(([key, value]) => (
+                              <Box key={key} sx={{ display: 'flex', gap: 1 }}>
+                                <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 150, color: 'primary.main' }}>
+                                  {key}:
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: 'text.secondary', wordBreak: 'break-all' }}>
+                                  {String(value)}
+                                </Typography>
+                              </Box>
+                            ))}
+                          </Stack>
+                        </Box>
+                      )}
+
+                      {/* Response Body */}
+                      <Box>
+                        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                          {t('gameWorlds.sdkGuide.responseBody')}
+                        </Typography>
+                        <Box
+                          sx={{
+                            position: 'relative',
+                            border: `1px solid ${theme.palette.divider}`,
+                            borderRadius: 1,
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'flex-end',
+                              p: 0.5,
+                              backgroundColor: theme.palette.mode === 'dark' ? '#0e0e0e' : '#f0f0f0',
+                              borderBottom: `1px solid ${theme.palette.divider}`,
+                            }}
+                          >
+                            <Tooltip title={t('common.copy') || 'Copy'}>
+                              <IconButton
+                                size="small"
+                                onClick={() => {
+                                  handleCopyCode(JSON.stringify(testResponse, null, 2));
+                                }}
+                                sx={{ color: 'primary.main' }}
+                              >
+                                <ContentCopyIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                          <Box sx={{ height: 300, overflow: 'hidden' }}>
+                            <Editor
+                              height="100%"
+                              language="json"
+                              value={JSON.stringify(testResponse, null, 2)}
+                              theme={isDark ? 'vs-dark' : 'light'}
+                              options={{
+                                readOnly: true,
+                                minimap: { enabled: false },
+                                scrollBeyondLastLine: false,
+                                wordWrap: 'on',
+                                automaticLayout: true,
+                                fontSize: 12,
+                                lineNumbers: 'on',
+                                folding: true,
+                                padding: { top: 8, bottom: 8 },
+                              }}
+                            />
+                          </Box>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Collapse>
+                </Box>
+              )}
+            </>
+          )}
+        </Box>
+      </Box>
+    </ResizableDrawer>
+  );
+};
+
+export default GameWorldSDKGuideDrawer;
+

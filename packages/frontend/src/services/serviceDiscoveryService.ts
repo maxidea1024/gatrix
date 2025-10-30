@@ -71,6 +71,14 @@ class ServiceDiscoveryService {
   }
 
   /**
+   * Clean up all terminated and error services
+   */
+  async cleanupServices(): Promise<{ deletedCount: number; totalCount: number }> {
+    const response = await api.post('/admin/services/cleanup');
+    return response.data;
+  }
+
+  /**
    * Create SSE connection for real-time updates
    * Safari compatibility: Add timestamp to prevent caching
    */

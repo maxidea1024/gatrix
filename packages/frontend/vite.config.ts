@@ -98,13 +98,6 @@ export default defineConfig({
           });
         },
       },
-      '/admin/queues': {
-        target: backendUrl,
-        changeOrigin: true,
-        secure: false,
-        agent: httpAgent,
-      },
-
     },
   },
   build: {

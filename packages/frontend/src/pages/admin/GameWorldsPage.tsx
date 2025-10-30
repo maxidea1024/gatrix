@@ -108,7 +108,7 @@ import JsonEditor from '@/components/common/JsonEditor';
 import DynamicFilterBar, { FilterDefinition, ActiveFilter } from '../../components/common/DynamicFilterBar';
 import MaintenanceSettingsInput from '../../components/common/MaintenanceSettingsInput';
 import { messageTemplateService, MessageTemplate } from '@/services/messageTemplateService';
-import SDKGuideDrawer from '../../components/coupons/SDKGuideDrawer';
+import GameWorldSDKGuideDrawer from '../../components/gameWorlds/GameWorldSDKGuideDrawer';
 
 // Column definition interface
 interface ColumnConfig {
@@ -2154,7 +2154,7 @@ const GameWorldsPage: React.FC = () => {
       </Popover>
 
       {/* SDK Guide Drawer */}
-      <SDKGuideDrawer open={openSDKGuide} onClose={() => setOpenSDKGuide(false)} />
+      <GameWorldSDKGuideDrawer open={openSDKGuide} onClose={() => setOpenSDKGuide(false)} />
     </Box>
   );
 };
