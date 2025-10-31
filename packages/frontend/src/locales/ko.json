@@ -3146,6 +3146,7 @@
         "targetChannelsHelp": "쿠폰이 적용될 채널을 선택합니다 (복수 선택 가능, 미선택 시 전체)",
         "targetChannelsTableHeader": "채널",
         "targetChannelsTableSubheader": "서브채널",
+        "targetChannelsAll": "전체",
         "targetChannelsNone": "선택 안함 (전체 적용)",
         "targetSubchannels": "대상 서브채널",
         "targetSubchannelsHelp": "쿠폰이 적용될 서브채널을 선택합니다 (복수 선택 가능, 미선택 시 전체)",

@@ -3157,6 +3157,7 @@
         "targetChannelsHelp": "选择优惠券适用的渠道（可多选，未选择时为全部）",
         "targetChannelsTableHeader": "渠道",
         "targetChannelsTableSubheader": "子渠道",
+        "targetChannelsAll": "全部",
         "targetChannelsNone": "未选择（应用于全部）",
         "targetSubchannels": "目标子渠道",
         "targetSubchannelsHelp": "选择优惠券适用的子渠道（可多选，未选择时为全部）",

@@ -3146,6 +3146,7 @@
         "targetChannelsHelp": "Select channels where the coupon applies (multiple selection available, all if not selected)",
         "targetChannelsTableHeader": "Channel",
         "targetChannelsTableSubheader": "Subchannel",
+        "targetChannelsAll": "All",
         "targetChannelsNone": "Not Selected (Apply to All)",
         "targetSubchannels": "Target Subchannels",
         "targetSubchannelsHelp": "Select subchannels where the coupon applies (multiple selection available, all if not selected)",
